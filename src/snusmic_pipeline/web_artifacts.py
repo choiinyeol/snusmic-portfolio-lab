@@ -29,6 +29,40 @@ REQUIRED_ARTIFACTS = [
 ]
 
 
+def _enrich_holdings_with_native(
+    holdings: pd.DataFrame, prices: pd.DataFrame, close_column: str = "last_close_krw"
+) -> pd.DataFrame:
+    """Attach (currency, last_close_native) for every row.
+
+    The simulator stores positions in KRW only, so the static dashboard could
+    not show users the native quote of a foreign holding without re-fetching
+    prices in the browser. Look up the latest warehouse row per symbol — the
+    daily-prices CSV already keeps native open/high/low/close alongside
+    source_currency and krw_per_unit — and copy those two fields onto each
+    holdings row.
+    """
+
+    if holdings.empty:
+        return holdings
+    if prices.empty or "symbol" not in prices.columns:
+        out = holdings.copy()
+        out["currency"] = "KRW"
+        out["last_close_native"] = pd.to_numeric(out.get(close_column), errors="coerce")
+        return out
+
+    work = prices.dropna(subset=["symbol", "date"]).copy()
+    work = work.sort_values("date")
+    latest_by_symbol = work.groupby("symbol", as_index=False).tail(1)
+    latest_by_symbol = latest_by_symbol[["symbol", "source_currency", "close"]]
+    sym_to_currency = dict(zip(latest_by_symbol["symbol"], latest_by_symbol["source_currency"], strict=True))
+    sym_to_native_close = dict(zip(latest_by_symbol["symbol"], latest_by_symbol["close"], strict=True))
+    out = holdings.copy()
+    out["currency"] = out["symbol"].map(sym_to_currency).fillna("KRW")
+    out["last_close_native"] = out["symbol"].map(sym_to_native_close)
+    out["last_close_native"] = pd.to_numeric(out["last_close_native"], errors="coerce")
+    return out
+
+
 @dataclass(frozen=True)
 class ExportInputs:
     warehouse: Path = Path("data/warehouse")
@@ -77,8 +111,14 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     _write_json(out / "return-windows.json", return_windows)
     _write_json(out / "target-hit-distribution.json", target_distribution)
     _write_json(out / "insights.json", insights)
-    _write_json(out / "current-holdings.json", _records(current_holdings))
-    _write_json(out / "monthly-holdings.json", _records(monthly_holdings))
+    _write_json(
+        out / "current-holdings.json",
+        _records(_enrich_holdings_with_native(current_holdings, prices)),
+    )
+    _write_json(
+        out / "monthly-holdings.json",
+        _records(_enrich_holdings_with_native(monthly_holdings, prices, close_column="month_close_krw")),
+    )
     _write_json(out / "missing-symbols.json", [{"symbol": symbol} for symbol in missing_symbols])
     _write_json(out / "data-quality.json", data_quality)
     _write_download_csvs(out, report_rows, data_quality)
