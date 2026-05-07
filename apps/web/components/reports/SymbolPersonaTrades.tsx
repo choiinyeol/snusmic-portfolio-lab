@@ -26,7 +26,7 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
 
   if (!personas.length) {
     return (
-      <section id="persona-trades" className="panel anchor-section">
+      <section id="persona-trades" className="panel anchor-section trade-ledger">
         <h2>페르소나별 매매 내역</h2>
         <p className="muted">{symbol}에 연결된 전략 매매 내역이 없습니다.</p>
       </section>
@@ -34,32 +34,36 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
   }
 
   return (
-    <section id="persona-trades" className="panel anchor-section">
-      <div className="section-headline">
+    <section id="persona-trades" className="panel anchor-section trade-ledger">
+      <div className="section-headline trade-ledger__header">
         <div>
           <h2>페르소나별 매매 내역</h2>
           <p className="muted">전략을 바꾸면 {symbol}을 언제 샀고, 언제 팔았는지 포지션과 체결 원장 단위로 확인합니다.</p>
         </div>
         <Link className="mini-link secondary" href={`/portfolio?strategy=${persona}`}>포트폴리오 원장</Link>
       </div>
-      <div className="strategy-tabs compact" role="group" aria-label="페르소나 선택">
+      <div className="strategy-tabs compact trade-ledger__tabs" role="group" aria-label="페르소나 선택">
         {personas.map((item) => (
           <button key={item} type="button" aria-pressed={persona === item} className={persona === item ? 'active' : ''} onClick={() => setPersona(item)}>
             {personaLabels[item] ?? item}
           </button>
         ))}
       </div>
-      <div className="grid cards compact-stat-row">
+      <div className="trade-summary-grid">
         <div className="param"><dt>포지션</dt><dd>{selectedEpisodes.length.toLocaleString('ko-KR')}개</dd></div>
         <div className="param"><dt>체결</dt><dd>{selectedTrades.length.toLocaleString('ko-KR')}건</dd></div>
         <div className="param"><dt>실현손익</dt><dd className={realizedPnl >= 0 ? 'good' : 'bad'}>{formatKrw(realizedPnl)}</dd></div>
         <div className="param"><dt>미실현손익</dt><dd className={unrealizedPnl >= 0 ? 'good' : 'bad'}>{formatKrw(unrealizedPnl)}</dd></div>
       </div>
 
-      <h3>포지션 생애주기</h3>
-      <div className="table-wrap inset compact-table">
+      <div className="ledger-table-card">
+        <div className="ledger-table-card__head">
+          <h3>포지션 생애주기</h3>
+          <span>{selectedEpisodes.length.toLocaleString('ko-KR')}개 포지션</span>
+        </div>
+      <div className="table-wrap inset compact-table ledger-table-wrap">
         <table>
-          <thead><tr><th>매수 시작</th><th>매도/상태</th><th>보유일</th><th>매수/매도 횟수</th><th>평균 진입</th><th>평균 청산/최근</th><th>종목 수익률</th><th>손익</th><th>매도 기준</th></tr></thead>
+          <thead><tr><th>매수 시작</th><th>매도/상태</th><th className="num">보유일</th><th className="num">매수/매도</th><th className="num">평균 진입</th><th className="num">평균 청산/최근</th><th className="num">종목 수익률</th><th className="num">손익</th><th>매도 기준</th></tr></thead>
           <tbody>{selectedEpisodes.map((episode) => {
             const exitOrLast = episode.avgExitPriceKrw ?? episode.lastCloseKrw;
             const stockReturn = episode.avgEntryPriceKrw && exitOrLast ? exitOrLast / episode.avgEntryPriceKrw - 1 : null;
@@ -68,36 +72,42 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
               <tr key={`${episode.persona}-${episode.symbol}-${episode.openDate}-${episode.closeDate ?? 'open'}`}>
                 <td>{episode.openDate}</td>
                 <td>{episode.closeDate ?? <span className="pill good">보유중</span>}<div className="muted">{episode.status}</div></td>
-                <td>{formatDays(episode.holdingDays)}</td>
-                <td>{episode.buyFills ?? 0} / {episode.sellFills ?? 0}</td>
-                <td>{formatAssetPrice(episode.avgEntryPriceNative, episode.avgEntryPriceKrw, episode.currency)}</td>
-                <td>{formatAssetPrice(episode.avgExitPriceNative ?? episode.lastCloseNative, exitOrLast, episode.currency)}</td>
-                <td className={(stockReturn ?? 0) >= 0 ? 'good' : 'bad'}>{formatPercent(stockReturn)}</td>
-                <td className={(pnl ?? 0) >= 0 ? 'good' : 'bad'}>{formatKrw(pnl)}</td>
+                <td className="num">{formatDays(episode.holdingDays)}</td>
+                <td className="num">{episode.buyFills ?? 0} / {episode.sellFills ?? 0}</td>
+                <td className="num">{formatAssetPrice(episode.avgEntryPriceNative, episode.avgEntryPriceKrw, episode.currency)}</td>
+                <td className="num">{formatAssetPrice(episode.avgExitPriceNative ?? episode.lastCloseNative, exitOrLast, episode.currency)}</td>
+                <td className={`num ${(stockReturn ?? 0) >= 0 ? 'good' : 'bad'}`}>{formatPercent(stockReturn)}</td>
+                <td className={`num ${(pnl ?? 0) >= 0 ? 'good' : 'bad'}`}>{formatKrw(pnl)}</td>
                 <td>{humanReason(episode.exitReasons)}</td>
               </tr>
             );
           })}</tbody>
         </table>
       </div>
+      </div>
 
-      <h3>체결 원장</h3>
-      <div className="table-wrap inset compact-table">
+      <div className="ledger-table-card">
+        <div className="ledger-table-card__head">
+          <h3>체결 원장</h3>
+          <span>{selectedTrades.length.toLocaleString('ko-KR')}건 체결</span>
+        </div>
+      <div className="table-wrap inset compact-table ledger-table-wrap">
         <table>
-          <thead><tr><th>일자</th><th>구분</th><th>수량</th><th>체결가</th><th>체결금액</th><th>현금잔고</th><th>사유</th><th>리포트</th></tr></thead>
+          <thead><tr><th>일자</th><th>구분</th><th className="num">수량</th><th className="num">체결가</th><th className="num">체결금액</th><th className="num">현금잔고</th><th>사유</th><th>리포트</th></tr></thead>
           <tbody>{selectedTrades.map((trade) => (
             <tr key={`${trade.persona}-${trade.date}-${trade.side}-${trade.qty}-${trade.fillPriceKrw}-${trade.cashAfterKrw}`}>
               <td>{trade.date}</td>
               <td><span className={`pill ${trade.side === 'buy' ? 'good' : 'warn'}`}>{trade.side === 'buy' ? '매수' : '매도'}</span></td>
-              <td>{trade.qty?.toLocaleString('ko-KR') ?? '—'}</td>
-              <td>{formatAssetPrice(trade.fillPriceNative, trade.fillPriceKrw, trade.currency)}</td>
-              <td>{formatAssetPrice(trade.grossNative, trade.grossKrw, trade.currency)}</td>
-              <td>{formatKrw(trade.cashAfterKrw)}</td>
+              <td className="num">{trade.qty?.toLocaleString('ko-KR') ?? '—'}</td>
+              <td className="num">{formatAssetPrice(trade.fillPriceNative, trade.fillPriceKrw, trade.currency)}</td>
+              <td className="num">{formatAssetPrice(trade.grossNative, trade.grossKrw, trade.currency)}</td>
+              <td className="num">{formatKrw(trade.cashAfterKrw)}</td>
               <td>{humanReason(trade.reason)}</td>
               <td>{trade.reportId ?? '—'}</td>
             </tr>
           ))}</tbody>
         </table>
+      </div>
       </div>
     </section>
   );
@@ -117,7 +127,7 @@ function formatAssetPrice(native: number | null, krw: number | null, currency: s
   return (
     <>
       {primary}
-      {secondary ? <div className="muted" style={{ fontSize: '.74rem' }}>{secondary}</div> : null}
+      {secondary ? <div className="native-price-secondary">{secondary}</div> : null}
     </>
   );
 }

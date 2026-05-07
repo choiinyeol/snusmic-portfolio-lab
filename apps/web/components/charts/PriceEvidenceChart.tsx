@@ -115,7 +115,7 @@ export function PriceEvidenceChart({
     };
     const chart: IChartApi = createChart(container, {
       autoSize: true,
-      height: 420,
+      height: 560,
       layout: {
         background: { type: ColorType.Solid, color: '#ffffff' },
         textColor: '#4e5968',
@@ -165,8 +165,8 @@ export function PriceEvidenceChart({
     }, 1);
     volumeSeries.priceScale().applyOptions({ scaleMargins: { top: 0.18, bottom: 0.06 }, ticksVisible: false });
     volumeSeries.setData(volumeData);
-    chart.panes()[0]?.setHeight(340);
-    chart.panes()[1]?.setHeight(90);
+    chart.panes()[0]?.setHeight(450);
+    chart.panes()[1]?.setHeight(110);
 
     if (isFinitePrice(targetPrice)) {
       candleSeries.createPriceLine({

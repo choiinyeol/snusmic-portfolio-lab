@@ -53,7 +53,7 @@ export default async function ReportDetailPage({ params }: { params: ReportParam
         <div className="page-header__eyebrow">리포트 분석 · Report dossier</div>
         <h1 className="page-header__title">{report.company}</h1>
         <p className="page-header__lede">
-          {report.title || `${report.company} 리포트`}. 발간일 종가 {formatAssetPrice(report.entryPriceNative, report)} 대비
+          {report.title || `${report.company} 리포트`}. 발간일 종가 {formatAssetPrice(reportEntryPrice(report), report)} 대비
           목표가 {formatAssetPrice(report.targetPriceNative, report)} ({formatPercent(report.targetUpsideAtPub)} 업사이드)으로
           제시되었으며, 원화 환산은 성과·합산 검증에만 사용합니다.
         </p>
@@ -74,68 +74,77 @@ export default async function ReportDetailPage({ params }: { params: ReportParam
       <Section
         eyebrow="Price evidence"
         title="가격 경로와 추출 목표가"
-        caption="발간 1년 전부터의 가격 흐름과 함께, 발간 시점·목표 도달·관측 고점·관측 저점을 마커로 표시합니다."
+        caption="차트는 자산의 표시 통화 그대로 보여주고, 목표가·관측 고저점·현재가를 한 화면에서 검증합니다."
       >
-        <div className="panel" style={{ padding: 0, overflow: 'hidden' }}>
-          <PriceEvidenceChart
-            priceSeries={prices}
-            targetPrice={report.targetPriceNative}
-            currency={report.currency}
-            publicationDate={report.publicationDate}
-            targetHitDate={report.targetHitDate}
-            evidenceMarkers={pathEvidence.markers}
-          />
-        </div>
-      </Section>
-
-      <Section
-        eyebrow="Headline metrics"
-        title="핵심 사후 지표"
-        caption="발간일 종가, 추출 목표가, 현재 수익률, 목표 도달 상태를 한 줄에서 검증합니다."
-      >
-        <div className="grid bento-metrics">
-          <KpiTile
-            label="발간일 진입 종가"
-            value={<span className="display-num">{formatAssetPrice(report.entryPriceNative, report)}</span>}
-            caption={`${report.publicationDate} 기준`}
-          />
-          <KpiTile
-            label="추출 목표가"
-            value={<span className="display-num">{formatAssetPrice(report.targetPriceNative, report)}</span>}
-            delta={`${formatPercent(report.targetUpsideAtPub)} 업사이드`}
-            tone="accent"
-          />
-          <KpiTile
-            label="현재 수익률"
-            value={<span className="display-num">{formatPercent(report.currentReturn)}</span>}
-            delta={`최근 종가 ${formatAssetPrice(report.lastCloseNative, report)}`}
-            tone={(report.currentReturn ?? 0) >= 0 ? 'good' : 'bad'}
-          />
-          <KpiTile
-            label="목표 상태"
-            value={status.label}
-            delta={status.detail}
-            tone={status.tone}
-          />
+        <div className="report-evidence-grid">
+          <div className="panel report-chart-panel">
+            <PriceEvidenceChart
+              priceSeries={prices}
+              targetPrice={report.targetPriceNative}
+              currency={report.currency}
+              publicationDate={report.publicationDate}
+              targetHitDate={report.targetHitDate}
+              evidenceMarkers={pathEvidence.markers}
+            />
+          </div>
+          <aside className="report-side-rail" aria-label="리포트 핵심 가격 지표">
+            <KpiTile
+              label="발간일 진입 종가"
+              value={<span className="display-num">{formatAssetPrice(reportEntryPrice(report), report)}</span>}
+              caption={`${report.publicationDate} 기준`}
+            />
+            <KpiTile
+              label="추출 목표가"
+              value={<span className="display-num">{formatAssetPrice(report.targetPriceNative, report)}</span>}
+              delta={`${formatPercent(report.targetUpsideAtPub)} 업사이드`}
+              tone="accent"
+            />
+            <KpiTile
+              label="현재 수익률"
+              value={<span className="display-num">{formatPercent(report.currentReturn)}</span>}
+              delta={`최근 종가 ${formatAssetPrice(report.lastCloseNative, report)}`}
+              tone={(report.currentReturn ?? 0) >= 0 ? 'good' : 'bad'}
+            />
+            <KpiTile
+              label="목표 상태"
+              value={status.label}
+              delta={status.detail}
+              tone={status.tone}
+            />
+            <article className="dossier-card report-rail-card">
+              <span className="dossier-card__label">Path range</span>
+              <dl className="definition-list">
+                <dt>관측 고점</dt>
+                <dd>{pathEvidence.peak ? `${formatAssetPrice(pathEvidence.peak.value, report)} (${pathEvidence.peak.time})` : '—'}</dd>
+                <dt>관측 저점</dt>
+                <dd>{pathEvidence.trough ? `${formatAssetPrice(pathEvidence.trough.value, report)} (${pathEvidence.trough.time})` : '—'}</dd>
+                <dt>최근 종가</dt>
+                <dd>{formatAssetPrice(report.lastCloseNative, report)}</dd>
+                <dt>최근 종가일</dt>
+                <dd>{report.lastCloseDate ?? '—'}</dd>
+              </dl>
+            </article>
+          </aside>
         </div>
       </Section>
 
       <Section
         eyebrow="Path observations"
-        title="시점별 매수 시나리오와 경로 통계"
-        caption="발간 이후 구간의 분위 시점에서 매수했을 때의 사후 수익률과, 관측 구간의 고점·저점·중앙 통계를 동시에 검토합니다."
+        title="가격대별 매수 시나리오와 경로 통계"
+        caption="발간 이후 시간 경과가 아니라, 관측 저점~고점 사이의 가격 수준에서 매수했을 경우를 비교합니다."
       >
-        <div className="grid two-col">
-          <article className="panel">
-            <h3 style={{ marginBottom: '.45rem' }}>시점별 매수 사후 수익률</h3>
-            <p className="muted" style={{ marginBottom: '.75rem', fontSize: '.85rem' }}>
-              발간 이후 분위 시점·고점·저점·현재가에 매수했을 경우의 사후 결과입니다.
+        <div className="path-observation-grid">
+          <article className="panel path-scenario-panel">
+            <h3>가격대별 매수 사후 수익률</h3>
+            <p className="muted path-scenario-note">
+              가격 기준 25%/75%는 발간 후 저점~고점 가격 범위를 4분위로 나눈 뒤, 해당 가격 수준에 가장 가까운 관측 종가를 사용합니다.
             </p>
             <div className="table-wrap">
               <table>
                 <thead>
                   <tr>
-                    <th>시점</th>
+                    <th>가격 시나리오</th>
+                    <th>기준 가격</th>
                     <th>일자</th>
                     <th className="num">매수가</th>
                     <th className="num">현재까지</th>
@@ -146,6 +155,7 @@ export default async function ReportDetailPage({ params }: { params: ReportParam
                   {scenarioRows.map((row) => (
                     <tr key={row.label}>
                       <td>{row.label}</td>
+                      <td>{row.basis}</td>
                       <td>{row.point?.time ?? '—'}</td>
                       <td className="num">{formatAssetPrice(row.point?.value, report)}</td>
                       <td className={`num ${(row.currentReturn ?? 0) >= 0 ? 'good' : 'bad'}`}>{formatPercent(row.currentReturn)}</td>
@@ -157,7 +167,7 @@ export default async function ReportDetailPage({ params }: { params: ReportParam
             </div>
           </article>
 
-          <article className="dossier-card">
+          <article className="dossier-card path-stat-card">
             <span className="dossier-card__label">경로 통계</span>
             <dl className="definition-list">
               <dt>관측 고점</dt>
@@ -254,7 +264,7 @@ function buildPathEvidence(prices: PricePoint[], report: ReportRow): PathEvidenc
   const peak = observed.reduce<PricePoint | null>((best, point) => (!best || point.value > best.value ? point : best), null);
   const trough = observed.reduce<PricePoint | null>((best, point) => (!best || point.value < best.value ? point : best), null);
   const markers: PathEvidence['markers'] = [
-    { time: report.publicationDate, kind: 'publication', label: '발간', value: report.entryPriceNative },
+    { time: report.publicationDate, kind: 'publication', label: '발간', value: reportEntryPrice(report) },
   ];
   if (report.targetHitDate) markers.push({ time: report.targetHitDate, kind: 'target-hit', label: '목표 도달', value: report.targetPriceNative });
   if (peak) markers.push({ time: peak.time, kind: 'peak', label: '관측 고점', value: peak.value });
@@ -262,29 +272,51 @@ function buildPathEvidence(prices: PricePoint[], report: ReportRow): PathEvidenc
   return { peak, trough, markers };
 }
 
-type ScenarioRow = { label: string; point: PricePoint | null; currentReturn: number | null; targetReturn: number | null };
+type ScenarioRow = {
+  label: string;
+  basis: string;
+  point: PricePoint | null;
+  currentReturn: number | null;
+  targetReturn: number | null;
+};
 
 function buildScenarioRows(prices: PricePoint[], report: ReportRow): ScenarioRow[] {
   const postPublication = prices.filter((point) => point.time >= report.publicationDate);
   if (!postPublication.length) {
-    return ['발간 후 저점', '25% 경과', '75% 경과', '발간 후 고점', '현재가'].map((label) => ({ label, point: null, currentReturn: null, targetReturn: null }));
+    return ['발간 후 저점', '25% 가격 수준', '75% 가격 수준', '발간 후 고점', '현재가'].map((label) => ({
+      label,
+      basis: '—',
+      point: null,
+      currentReturn: null,
+      targetReturn: null,
+    }));
   }
   const low = postPublication.reduce((best, point) => point.value < best.value ? point : best, postPublication[0]);
   const high = postPublication.reduce((best, point) => point.value > best.value ? point : best, postPublication[0]);
-  const q25 = postPublication[Math.floor((postPublication.length - 1) * 0.25)] ?? null;
-  const q75 = postPublication[Math.floor((postPublication.length - 1) * 0.75)] ?? null;
+  const priceRange = Math.max(0, high.value - low.value);
+  const price25 = low.value + priceRange * 0.25;
+  const price75 = low.value + priceRange * 0.75;
+  const q25 = nearestPricePoint(postPublication, price25);
+  const q75 = nearestPricePoint(postPublication, price75);
   const current = postPublication.at(-1) ?? null;
   return [
-    { label: '발간 후 저점', point: low },
-    { label: '25% 경과', point: q25 },
-    { label: '75% 경과', point: q75 },
-    { label: '발간 후 고점', point: high },
-    { label: '현재가', point: current },
+    { label: '발간 후 저점', basis: formatAssetPrice(low.value, report), point: low },
+    { label: '25% 가격 수준', basis: formatAssetPrice(price25, report), point: q25 },
+    { label: '75% 가격 수준', basis: formatAssetPrice(price75, report), point: q75 },
+    { label: '발간 후 고점', basis: formatAssetPrice(high.value, report), point: high },
+    { label: '현재가', basis: current ? formatAssetPrice(current.value, report) : '—', point: current },
   ].map((row) => ({
     ...row,
     currentReturn: row.point && current ? current.value / row.point.value - 1 : null,
     targetReturn: row.point && report.targetPriceNative ? report.targetPriceNative / row.point.value - 1 : null,
   }));
+}
+
+function nearestPricePoint(points: PricePoint[], value: number): PricePoint | null {
+  return points.reduce<PricePoint | null>((best, point) => {
+    if (!best) return point;
+    return Math.abs(point.value - value) < Math.abs(best.value - value) ? point : best;
+  }, null);
 }
 
 function oneYearBefore(date: string): string {
@@ -309,7 +341,7 @@ function buildKoreanInvestmentMemo(report: ReportRow) {
     : '관측 저점 기준 하방 훼손은 제한적이지만, 목표가 미도달 상태에서는 시간 비용을 함께 점검할 필요가 있습니다.';
 
   return {
-    summary: `${report.company} 리포트는 발간일 종가 ${formatAssetPrice(report.entryPriceNative, report)} 대비 목표가 ${formatAssetPrice(report.targetPriceNative, report)}를 제시했습니다. ${targetSentence}`,
+    summary: `${report.company} 리포트는 발간일 종가 ${formatAssetPrice(reportEntryPrice(report), report)} 대비 목표가 ${formatAssetPrice(report.targetPriceNative, report)}를 제시했습니다. ${targetSentence}`,
     bullets: [
       { label: '상승 여력', text: `발간 시점 목표 업사이드 ${formatPercent(report.targetUpsideAtPub)}, 관측 최고 수익률 ${formatPercent(report.peakReturn)}.` },
       { label: '리스크', text: `${riskTone} 관측 최저 수익률 ${formatPercent(report.troughReturn)}.` },
@@ -320,6 +352,17 @@ function buildKoreanInvestmentMemo(report: ReportRow) {
 
 function formatAssetPrice(value: number | null | undefined, report: ReportRow): string {
   return formatNative(value, report.currency);
+}
+
+function reportEntryPrice(report: ReportRow): number | null {
+  if (report.entryPriceNative !== null && report.entryPriceNative !== undefined && Number.isFinite(report.entryPriceNative)) {
+    return report.entryPriceNative;
+  }
+  if (report.targetPriceNative && report.targetUpsideAtPub !== null && report.targetUpsideAtPub !== undefined) {
+    const divisor = 1 + report.targetUpsideAtPub;
+    return divisor > 0 ? report.targetPriceNative / divisor : null;
+  }
+  return null;
 }
 
 function targetStatus(report: ReportRow): { label: string; detail: string; tone: 'good' | 'warn' | 'bad' | 'accent' } {
