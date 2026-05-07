@@ -5,6 +5,7 @@ import {
   ColorType,
   CrosshairMode,
   HistogramSeries,
+  LineSeries,
   LineStyle,
   createChart,
   createSeriesMarkers,
@@ -54,6 +55,7 @@ type TooltipState = OhlcState & {
 
 type CandlePoint = { time: Time; open: number; high: number; low: number; close: number };
 type VolumePoint = { time: Time; value: number; color: string };
+type LinePoint = { time: Time; value: number };
 
 type Props = {
   priceSeries: PricePoint[];
@@ -76,6 +78,11 @@ export function PriceEvidenceChart({
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
   const candleData = useMemo(() => priceSeries.map(toCandlePoint), [priceSeries]);
   const volumeData = useMemo(() => priceSeries.map(toVolumePoint), [priceSeries]);
+  const movingAverageData = useMemo(() => ({
+    ma20: toMovingAverageData(priceSeries, 20),
+    ma60: toMovingAverageData(priceSeries, 60),
+    ma200: toMovingAverageData(priceSeries, 200),
+  }), [priceSeries]);
   const priceByTime = useMemo(() => new Map(priceSeries.map((point) => [point.time, point])), [priceSeries]);
   const lastBar = useMemo(() => activeBarFromPoint(priceSeries.at(-1)), [priceSeries]);
   const [hoverBar, setHoverBar] = useState<OhlcState | null>(null);
@@ -156,6 +163,37 @@ export function PriceEvidenceChart({
 
     candleSeries.setData(candleData);
 
+    const ma20Series = chart.addSeries(LineSeries, {
+      color: '#1b64da',
+      lineWidth: 2,
+      title: 'MA20',
+      priceFormat: priceFormatForCurrency(currency),
+      priceLineVisible: false,
+      lastValueVisible: false,
+    });
+    ma20Series.setData(movingAverageData.ma20);
+
+    const ma60Series = chart.addSeries(LineSeries, {
+      color: '#7d6bff',
+      lineWidth: 2,
+      title: 'MA60',
+      priceFormat: priceFormatForCurrency(currency),
+      priceLineVisible: false,
+      lastValueVisible: false,
+    });
+    ma60Series.setData(movingAverageData.ma60);
+
+    const ma200Series = chart.addSeries(LineSeries, {
+      color: '#f29423',
+      lineWidth: 2,
+      lineStyle: LineStyle.Dotted,
+      title: 'MA200',
+      priceFormat: priceFormatForCurrency(currency),
+      priceLineVisible: false,
+      lastValueVisible: false,
+    });
+    ma200Series.setData(movingAverageData.ma200);
+
     const volumeSeries = chart.addSeries(HistogramSeries, {
       color: 'rgba(49, 130, 246, 0.28)',
       priceFormat: { type: 'volume' },
@@ -214,7 +252,7 @@ export function PriceEvidenceChart({
       chart.unsubscribeCrosshairMove(handleCrosshairMove);
       chart.remove();
     };
-  }, [candleData, chartMarkers, currency, priceByTime, priceSeries.length, targetPrice, volumeData]);
+  }, [candleData, chartMarkers, currency, movingAverageData, priceByTime, priceSeries.length, targetPrice, volumeData]);
 
   if (priceSeries.length === 0) {
     return <div className="panel chart-box">이 리포트 종목의 가격 경로를 찾을 수 없습니다.</div>;
@@ -262,6 +300,20 @@ function toVolumePoint(point: PricePoint): VolumePoint {
   };
 }
 
+function toMovingAverageData(points: PricePoint[], window: number): LinePoint[] {
+  const output: LinePoint[] = [];
+  const closes: number[] = [];
+  for (const point of points) {
+    const close = point.close ?? point.value;
+    closes.push(close);
+    if (closes.length < window) continue;
+    const slice = closes.slice(-window);
+    const average = slice.reduce((sum, value) => sum + value, 0) / window;
+    output.push({ time: point.time as Time, value: average });
+  }
+  return output;
+}
+
 function OhlcLegend({ bar, currency, targetPrice }: { bar: OhlcState; currency: string; targetPrice: number | null }) {
   const change = bar.close - bar.open;
   const changePct = bar.open !== 0 ? change / bar.open : null;
@@ -272,6 +324,7 @@ function OhlcLegend({ bar, currency, targetPrice }: { bar: OhlcState; currency: 
       <div className="chart-legend-main">
         <span className="legend-symbol">{currency.toUpperCase()} OHLC</span>
         <span>{bar.time}</span>
+        <span className="legend-ma">MA20·60·200</span>
       </div>
       <div className="chart-legend-values">
         <span>O {formatChartPrice(bar.open, currency)}</span>
