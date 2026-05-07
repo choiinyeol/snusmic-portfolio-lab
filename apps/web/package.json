@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "check:report-ui": "node scripts/check-report-ui.mjs"
   },
   "dependencies": {
     "@tanstack/react-table": "^8.21.3",

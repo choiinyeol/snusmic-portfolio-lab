@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from snusmic_pipeline.web_artifacts import ExportInputs, check_web_artifacts, export_web_artifacts
 
 
@@ -188,3 +190,61 @@ def test_reports_artifact_marks_target_below_entry_as_non_actionable(tmp_path: P
     assert rznomics["target_hit_date"] is None
     assert rznomics["days_to_target"] is None
     assert "target_below_entry_price" in rznomics["caveat_flags"]
+
+
+def test_reports_artifact_infers_native_entry_for_foreign_report_display_ssot(tmp_path: Path) -> None:
+    out = tmp_path / "web"
+    export_web_artifacts(
+        ExportInputs(
+            warehouse=Path("data/warehouse"),
+            sim=Path("data/sim"),
+            out=out,
+            extraction_quality=Path("data/extraction_quality.json"),
+        )
+    )
+
+    reports = json.loads((out / "reports.json").read_text(encoding="utf-8"))
+    sxt = next(row for row in reports if row["symbol"] == "SXT")
+    assert sxt["currency"] == "USD"
+    assert sxt["display_currency"] == "USD"
+    assert sxt["target_direction"] == "upside"
+    assert sxt["target_price_native"] == 238.0
+    assert sxt["entry_price_native"] == pytest.approx(238.0 / (1.0 + 1.49))
+    assert sxt["entry_price_krw"] > 100_000
+    assert "entry_price_native_inferred" in sxt["caveat_flags"]
+
+
+def test_reports_artifact_populates_native_entry_for_krw_rows(tmp_path: Path) -> None:
+    out = tmp_path / "web"
+    export_web_artifacts(
+        ExportInputs(
+            warehouse=Path("data/warehouse"),
+            sim=Path("data/sim"),
+            out=out,
+            extraction_quality=Path("data/extraction_quality.json"),
+        )
+    )
+
+    reports = json.loads((out / "reports.json").read_text(encoding="utf-8"))
+    krw_rows = [row for row in reports if row["currency"] == "KRW" and row["entry_price_krw"] is not None]
+    assert krw_rows
+    assert all(row["entry_price_native"] == row["entry_price_krw"] for row in krw_rows)
+
+
+def test_reports_download_csv_carries_display_price_ssot_fields(tmp_path: Path) -> None:
+    out = tmp_path / "web"
+    export_web_artifacts(
+        ExportInputs(
+            warehouse=Path("data/warehouse"),
+            sim=Path("data/sim"),
+            out=out,
+            extraction_quality=Path("data/extraction_quality.json"),
+        )
+    )
+
+    header = (out / "table-download-reports.csv").read_text(encoding="utf-8").splitlines()[0].split(",")
+    assert "currency" in header
+    assert "display_currency" in header
+    assert "entry_price_native" in header
+    assert "target_price_native" in header
+    assert "target_direction" in header

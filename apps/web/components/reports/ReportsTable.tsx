@@ -29,8 +29,13 @@ const csvHeaders: Array<[string, (report: ReportRow) => string | number | boolea
   ['거래소', (report) => report.exchange],
   ['시장구분', (report) => marketLabel(marketRegionForSymbol(report.symbol, report.exchange))],
   ['게시일', (report) => report.publicationDate],
+  ['통화', (report) => report.currency],
+  ['표시통화', (report) => report.displayCurrency],
   ['진입가(KRW)', (report) => report.entryPriceKrw],
+  ['진입가(표시통화)', (report) => report.entryPriceNative],
   ['목표가(KRW)', (report) => report.targetPriceKrw],
+  ['목표가(표시통화)', (report) => report.targetPriceNative],
+  ['목표 방향', (report) => report.targetDirection],
   ['제시 상승여력', (report) => report.targetUpsideAtPub],
   ['현재 수익률', (report) => report.currentReturn],
   ['최고 수익률', (report) => report.peakReturn],
@@ -110,7 +115,7 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         accessorKey: 'targetHit',
         header: '목표 달성',
         cell: ({ row }) => {
-          if (isBearishReport(row.original)) {
+          if (row.original.targetDirection === 'downside') {
             return row.original.targetHit ? (
               <span className="pill good">매도 적중 · {formatDays(row.original.daysToTarget)}</span>
             ) : (
@@ -283,10 +288,6 @@ function escapeCsv(value: string | number | boolean | null): string {
   const text = String(value);
   if (!/[",\n\r]/.test(text)) return text;
   return `"${text.replaceAll('"', '""')}"`;
-}
-
-function isBearishReport(report: ReportRow): boolean {
-  return (report.targetUpsideAtPub ?? 0) < 0 && report.caveatFlags.some((flag) => /non_buy_rating:.*(sell|reduce|underperform|매도)/i.test(flag));
 }
 
 function marketLabel(region: 'domestic' | 'overseas'): string {
