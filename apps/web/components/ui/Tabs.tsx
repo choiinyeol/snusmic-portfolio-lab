@@ -17,7 +17,6 @@ export function Tabs({ tabs, defaultTabId }: { tabs: Tab[]; defaultTabId?: strin
             role="tab"
             type="button"
             aria-selected={tab.id === active}
-            aria-pressed={tab.id === active}
             className={tab.id === active ? 'tabs__pill tabs__pill--active' : 'tabs__pill'}
             onClick={() => setActive(tab.id)}
           >

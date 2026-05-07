@@ -20,7 +20,7 @@ export default function ReportsPage() {
           <span className="hero-summary__eyebrow">Research archive</span>
           <h1 className="display-1">SMIC가 그동안 추천한 종목, 정말 맞았을까.</h1>
           <p className="hero-summary__sub">
-            모든 추출 리포트를 정렬·필터·CSV 다운로드로 검토합니다. 위쪽은 "한눈에 답"이 나오는 카드,
+            모든 추출 리포트를 정렬·필터·CSV 다운로드로 검토합니다. 위쪽은 한눈에 답이 나오는 카드,
             아래는 행 단위로 깊이 들여다보는 표입니다.
           </p>
           <div className="hero-summary__signals">
