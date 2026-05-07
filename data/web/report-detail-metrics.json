@@ -14,7 +14,7 @@
       {
         "date": "2021-07-19",
         "label": "발간 후 저점",
-        "price_krw": 115711513.3594,
+        "price_krw": 85887.1875,
         "type": "trough"
       },
       {
@@ -26,13 +26,13 @@
       {
         "date": "2026-03-19",
         "label": "발간 후 고점",
-        "price_krw": 631010432.8771,
+        "price_krw": 365924.0521,
         "type": "peak"
       },
       {
         "date": "2026-05-07",
         "label": "최근 종가",
-        "price_krw": 607246113.8153,
+        "price_krw": 355738.7896,
         "type": "latest"
       }
     ],
@@ -41,13 +41,13 @@
       "peak": {
         "date": "2026-03-19",
         "label": "발간 후 고점",
-        "price_krw": 631010432.8771,
+        "price_krw": 365924.0521,
         "type": "peak"
       },
       "trough": {
         "date": "2021-07-19",
         "label": "발간 후 저점",
-        "price_krw": 115711513.3594,
+        "price_krw": 85887.1875,
         "type": "trough"
       }
     },
@@ -60,15 +60,15 @@
       "date_60d": "2021-02-03",
       "date_90d": "2021-03-05",
       "entry_price_krw": 105191.12,
-      "price_180d_krw": 127907462.953,
-      "price_30d_krw": 141381440.6735,
-      "price_60d_krw": 140675238.5343,
-      "price_90d_krw": 125728915.0789,
+      "price_180d_krw": 94386.2013,
+      "price_30d_krw": 106715.8633,
+      "price_60d_krw": 104951.7585,
+      "price_90d_krw": 92633.6788,
       "report_id": "02f44f98e36b5ee9",
-      "return_180d": 1214.953048,
-      "return_30d": 1343.043496,
-      "return_60d": 1336.329981,
-      "return_90d": 1194.24267,
+      "return_180d": -0.102717,
+      "return_30d": 0.014495,
+      "return_60d": -0.002275,
+      "return_90d": -0.119377,
       "symbol": "GTT.PA"
     },
     "symbol": "GTT.PA",
@@ -248,19 +248,19 @@
       {
         "date": "2021-07-26",
         "label": "발간 후 고점",
-        "price_krw": 635374538.0945,
+        "price_krw": 551962.0377,
         "type": "peak"
       },
       {
         "date": "2022-12-28",
         "label": "발간 후 저점",
-        "price_krw": 62805421.9154,
+        "price_krw": 49364.4642,
         "type": "trough"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 278043975.839,
+        "price_krw": 188637.4007,
         "type": "latest"
       }
     ],
@@ -269,13 +269,13 @@
       "peak": {
         "date": "2021-07-26",
         "label": "발간 후 고점",
-        "price_krw": 635374538.0945,
+        "price_krw": 551962.0377,
         "type": "peak"
       },
       "trough": {
         "date": "2022-12-28",
         "label": "발간 후 저점",
-        "price_krw": 62805421.9154,
+        "price_krw": 49364.4642,
         "type": "trough"
       }
     },
@@ -288,15 +288,15 @@
       "date_60d": "2021-02-03",
       "date_90d": "2021-03-05",
       "entry_price_krw": 325112.35,
-      "price_180d_krw": 398867712.8153,
-      "price_30d_krw": 374053572.4131,
-      "price_60d_krw": 527140877.7637,
-      "price_90d_krw": 454115836.3538,
+      "price_180d_krw": 359379.132,
+      "price_30d_krw": 344835.6542,
+      "price_60d_krw": 473362.2046,
+      "price_90d_krw": 400684.5601,
       "report_id": "044fd5b652cd7b71",
-      "return_180d": 1225.861154,
-      "return_30d": 1149.536337,
-      "return_60d": 1620.411422,
-      "return_90d": 1395.796635,
+      "return_180d": 0.1054,
+      "return_30d": 0.060666,
+      "return_60d": 0.455996,
+      "return_90d": 0.23245,
       "symbol": "ROKU"
     },
     "symbol": "ROKU",
@@ -846,10 +846,10 @@
         "type": "publication"
       },
       {
-        "date": "2021-07-16",
-        "label": "발간 후 저점",
-        "price_krw": 22539808.479,
-        "type": "trough"
+        "date": "2022-05-23",
+        "label": "발간 후 고점",
+        "price_krw": 42779.8527,
+        "type": "peak"
       },
       {
         "date": "2022-05-23",
@@ -858,30 +858,30 @@
         "type": "target_hit"
       },
       {
-        "date": "2026-05-06",
-        "label": "발간 후 고점",
-        "price_krw": 58441808.4687,
-        "type": "peak"
+        "date": "2025-04-08",
+        "label": "발간 후 저점",
+        "price_krw": 18609.5662,
+        "type": "trough"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 58441808.4687,
+        "price_krw": 39649.5224,
         "type": "latest"
       }
     ],
     "peak_return": 0.93,
     "price_extremes": {
       "peak": {
-        "date": "2026-05-06",
+        "date": "2022-05-23",
         "label": "발간 후 고점",
-        "price_krw": 58441808.4687,
+        "price_krw": 42779.8527,
         "type": "peak"
       },
       "trough": {
-        "date": "2021-07-16",
+        "date": "2025-04-08",
         "label": "발간 후 저점",
-        "price_krw": 22539808.479,
+        "price_krw": 18609.5662,
         "type": "trough"
       }
     },
@@ -894,15 +894,15 @@
       "date_60d": "2021-07-30",
       "date_90d": "2021-08-30",
       "entry_price_krw": 22128.53,
-      "price_180d_krw": 31153440.4545,
-      "price_30d_krw": 29331314.6211,
-      "price_60d_krw": 24823457.6199,
-      "price_90d_krw": 32193166.1911,
+      "price_180d_krw": 26078.3359,
+      "price_30d_krw": 25945.2056,
+      "price_60d_krw": 21734.5443,
+      "price_90d_krw": 27720.947,
       "report_id": "1488bad8a01bf103",
-      "return_180d": 1406.840487,
-      "return_30d": 1324.497655,
-      "return_60d": 1120.785208,
-      "return_90d": 1453.826244,
+      "return_180d": 0.178494,
+      "return_30d": 0.172478,
+      "return_60d": -0.017804,
+      "return_90d": 0.252724,
       "symbol": "SBLK"
     },
     "symbol": "SBLK",
@@ -1308,36 +1308,36 @@
         "type": "target_hit"
       },
       {
-        "date": "2025-04-10",
+        "date": "2025-04-09",
         "label": "발간 후 저점",
-        "price_krw": 207049647.7882,
+        "price_krw": 129886.4956,
         "type": "trough"
       },
       {
-        "date": "2026-05-06",
+        "date": "2026-05-07",
         "label": "발간 후 고점",
-        "price_krw": 760870810.5079,
+        "price_krw": 441600.9208,
         "type": "peak"
       },
       {
         "date": "2026-05-07",
         "label": "최근 종가",
-        "price_krw": 753812771.8694,
+        "price_krw": 441600.9208,
         "type": "latest"
       }
     ],
     "peak_return": 1.62,
     "price_extremes": {
       "peak": {
-        "date": "2026-05-06",
+        "date": "2026-05-07",
         "label": "발간 후 고점",
-        "price_krw": 760870810.5079,
+        "price_krw": 441600.9208,
         "type": "peak"
       },
       "trough": {
-        "date": "2025-04-10",
+        "date": "2025-04-09",
         "label": "발간 후 저점",
-        "price_krw": 207049647.7882,
+        "price_krw": 129886.4956,
         "type": "trough"
       }
     },
@@ -1350,15 +1350,15 @@
       "date_60d": "2024-01-22",
       "date_90d": "2024-02-20",
       "entry_price_krw": 168689.67,
-      "price_180d_krw": 289046207.9715,
-      "price_30d_krw": 281590206.6862,
-      "price_60d_krw": 296567032.8376,
-      "price_90d_krw": 316190357.8079,
+      "price_180d_krw": 200551.1857,
+      "price_30d_krw": 196985.1044,
+      "price_60d_krw": 208226.0774,
+      "price_90d_krw": 220091.7124,
       "report_id": "17625b05df5d5a99",
-      "return_180d": 1712.479005,
-      "return_30d": 1668.279492,
-      "return_60d": 1757.062796,
-      "return_90d": 1873.390754,
+      "return_180d": 0.188877,
+      "return_30d": 0.167737,
+      "return_60d": 0.234374,
+      "return_90d": 0.304714,
       "symbol": "BESI.AS"
     },
     "symbol": "BESI.AS",
@@ -1460,7 +1460,7 @@
       {
         "date": "2025-04-21",
         "label": "발간 후 저점",
-        "price_krw": 7220167.4301,
+        "price_krw": 5105.3701,
         "type": "trough"
       },
       {
@@ -1472,13 +1472,13 @@
       {
         "date": "2026-02-03",
         "label": "발간 후 고점",
-        "price_krw": 68001191.8067,
+        "price_krw": 46815.3648,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 29459886.9367,
+        "price_krw": 19986.8977,
         "type": "latest"
       }
     ],
@@ -1487,13 +1487,13 @@
       "peak": {
         "date": "2026-02-03",
         "label": "발간 후 고점",
-        "price_krw": 68001191.8067,
+        "price_krw": 46815.3648,
         "type": "peak"
       },
       "trough": {
         "date": "2025-04-21",
         "label": "발간 후 저점",
-        "price_krw": 7220167.4301,
+        "price_krw": 5105.3701,
         "type": "trough"
       }
     },
@@ -1506,15 +1506,15 @@
       "date_60d": "2024-07-23",
       "date_90d": "2024-08-22",
       "entry_price_krw": 31797.16,
-      "price_180d_krw": 42463980.1807,
-      "price_30d_krw": 35892413.244,
-      "price_60d_krw": 31054106.7899,
-      "price_90d_krw": 31624381.984,
+      "price_180d_krw": 30502.2261,
+      "price_30d_krw": 25851.8232,
+      "price_60d_krw": 22387.7928,
+      "price_90d_krw": 23712.4763,
       "report_id": "1986a142e4bb3a97",
-      "return_180d": 1334.464557,
-      "return_30d": 1127.793051,
-      "return_60d": 975.63146,
-      "return_90d": 993.566244,
+      "return_180d": -0.040725,
+      "return_30d": -0.186977,
+      "return_60d": -0.295918,
+      "return_90d": -0.254258,
       "symbol": "FLNC"
     },
     "symbol": "FLNC",
@@ -1582,7 +1582,7 @@
       {
         "date": "2023-12-11",
         "label": "발간 후 저점",
-        "price_krw": 727840175.1013,
+        "price_krw": 486362.0636,
         "type": "trough"
       },
       {
@@ -1592,30 +1592,30 @@
         "type": "target_hit"
       },
       {
-        "date": "2026-01-21",
+        "date": "2025-10-24",
         "label": "발간 후 고점",
-        "price_krw": 1952440236.1361,
+        "price_krw": 1059271.3088,
         "type": "peak"
       },
       {
         "date": "2026-05-07",
         "label": "최근 종가",
-        "price_krw": 1710336752.3725,
+        "price_krw": 916485.8916,
         "type": "latest"
       }
     ],
     "peak_return": 1.05,
     "price_extremes": {
       "peak": {
-        "date": "2026-01-21",
+        "date": "2025-10-24",
         "label": "발간 후 고점",
-        "price_krw": 1952440236.1361,
+        "price_krw": 1059271.3088,
         "type": "peak"
       },
       "trough": {
         "date": "2023-12-11",
         "label": "발간 후 저점",
-        "price_krw": 727840175.1013,
+        "price_krw": 486362.0636,
         "type": "trough"
       }
     },
@@ -1628,15 +1628,15 @@
       "date_60d": "2024-01-22",
       "date_90d": "2024-02-20",
       "entry_price_krw": 516433.73,
-      "price_180d_krw": 1134075468.3797,
-      "price_30d_krw": 806008620.8041,
-      "price_60d_krw": 879988995.0838,
-      "price_90d_krw": 1036193432.0904,
+      "price_180d_krw": 758869.8894,
+      "price_30d_krw": 533858.2707,
+      "price_60d_krw": 572841.9423,
+      "price_90d_krw": 686106.8893,
       "report_id": "2123a3988d72c5e2",
-      "return_180d": 2194.974822,
-      "return_30d": 1559.720329,
-      "return_60d": 1702.972734,
-      "return_90d": 2005.440269,
+      "return_180d": 0.469443,
+      "return_30d": 0.03374,
+      "return_60d": 0.109226,
+      "return_90d": 0.328548,
       "symbol": "LONN.SW"
     },
     "symbol": "LONN.SW",
@@ -1660,19 +1660,19 @@
       {
         "date": "2021-12-03",
         "label": "발간 후 고점",
-        "price_krw": 82629.2526,
+        "price_krw": 7935.995,
         "type": "peak"
       },
       {
-        "date": "2024-05-30",
+        "date": "2024-04-17",
         "label": "발간 후 저점",
-        "price_krw": 26855.5143,
+        "price_krw": 3053.8736,
         "type": "trough"
       },
       {
         "date": "2026-05-07",
         "label": "최근 종가",
-        "price_krw": 37646.2417,
+        "price_krw": 4068.5443,
         "type": "latest"
       }
     ],
@@ -1681,13 +1681,13 @@
       "peak": {
         "date": "2021-12-03",
         "label": "발간 후 고점",
-        "price_krw": 82629.2526,
+        "price_krw": 7935.995,
         "type": "peak"
       },
       "trough": {
-        "date": "2024-05-30",
+        "date": "2024-04-17",
         "label": "발간 후 저점",
-        "price_krw": 26855.5143,
+        "price_krw": 3053.8736,
         "type": "trough"
       }
     },
@@ -1700,15 +1700,15 @@
       "date_60d": "2022-01-31",
       "date_90d": "2022-02-28",
       "entry_price_krw": 7868.34,
-      "price_180d_krw": 40830.7573,
-      "price_30d_krw": 70765.6008,
-      "price_60d_krw": 63356.7248,
-      "price_90d_krw": 59701.868,
+      "price_180d_krw": 4152.4485,
+      "price_30d_krw": 6872.3332,
+      "price_60d_krw": 6046.7482,
+      "price_90d_krw": 5769.7279,
       "report_id": "235ca36dccfc1783",
-      "return_180d": 4.189247,
-      "return_30d": 7.993714,
-      "return_60d": 7.052108,
-      "return_90d": 6.587607,
+      "return_180d": -0.472259,
+      "return_30d": -0.126584,
+      "return_60d": -0.231509,
+      "return_90d": -0.266716,
       "symbol": "4689.T"
     },
     "symbol": "4689.T",
@@ -1732,19 +1732,19 @@
       {
         "date": "2026-04-24",
         "label": "발간 후 고점",
-        "price_krw": 444621127.1686,
+        "price_krw": 300429.8401,
         "type": "peak"
       },
       {
         "date": "2026-04-28",
         "label": "발간 후 저점",
-        "price_krw": 389402952.7396,
+        "price_krw": 264455.6157,
         "type": "trough"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 440029875.9379,
+        "price_krw": 298535.8406,
         "type": "latest"
       }
     ],
@@ -1753,13 +1753,13 @@
       "peak": {
         "date": "2026-04-24",
         "label": "발간 후 고점",
-        "price_krw": 444621127.1686,
+        "price_krw": 300429.8401,
         "type": "peak"
       },
       "trough": {
         "date": "2026-04-28",
         "label": "발간 후 저점",
-        "price_krw": 389402952.7396,
+        "price_krw": 264455.6157,
         "type": "trough"
       }
     },
@@ -2260,19 +2260,19 @@
       {
         "date": "2025-12-19",
         "label": "발간 후 고점",
-        "price_krw": 99558.9515,
+        "price_krw": 10507.658,
         "type": "peak"
       },
       {
         "date": "2026-05-07",
         "label": "발간 후 저점",
-        "price_krw": 72432.8397,
+        "price_krw": 7828.0382,
         "type": "trough"
       },
       {
         "date": "2026-05-07",
         "label": "최근 종가",
-        "price_krw": 72432.8397,
+        "price_krw": 7828.0382,
         "type": "latest"
       }
     ],
@@ -2281,13 +2281,13 @@
       "peak": {
         "date": "2025-12-19",
         "label": "발간 후 고점",
-        "price_krw": 99558.9515,
+        "price_krw": 10507.658,
         "type": "peak"
       },
       "trough": {
         "date": "2026-05-07",
         "label": "발간 후 저점",
-        "price_krw": 72432.8397,
+        "price_krw": 7828.0382,
         "type": "trough"
       }
     },
@@ -2301,14 +2301,14 @@
       "date_90d": "2026-03-02",
       "entry_price_krw": 10198.64,
       "price_180d_krw": null,
-      "price_30d_krw": 87128.6531,
-      "price_60d_krw": 86056.3406,
-      "price_90d_krw": 74817.7423,
+      "price_30d_krw": 9496.218,
+      "price_60d_krw": 9225.493,
+      "price_90d_krw": 8150.9604,
       "report_id": "25e4f4697656dffa",
       "return_180d": null,
-      "return_30d": 7.543164,
-      "return_60d": 7.438021,
-      "return_90d": 6.336051,
+      "return_30d": -0.068874,
+      "return_60d": -0.095419,
+      "return_90d": -0.20078,
       "symbol": "2124.T"
     },
     "symbol": "2124.T",
@@ -2552,9 +2552,9 @@
         "type": "publication"
       },
       {
-        "date": "2023-12-18",
+        "date": "2023-12-22",
         "label": "발간 후 저점",
-        "price_krw": 944646805.7132,
+        "price_krw": 736778.4635,
         "type": "trough"
       },
       {
@@ -2566,13 +2566,13 @@
       {
         "date": "2025-11-25",
         "label": "발간 후 고점",
-        "price_krw": 2414354653.6218,
+        "price_krw": 1637006.0057,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 2144423314.2609,
+        "price_krw": 1454872.1615,
         "type": "latest"
       }
     ],
@@ -2581,13 +2581,13 @@
       "peak": {
         "date": "2025-11-25",
         "label": "발간 후 고점",
-        "price_krw": 2414354653.6218,
+        "price_krw": 1637006.0057,
         "type": "peak"
       },
       "trough": {
-        "date": "2023-12-18",
+        "date": "2023-12-22",
         "label": "발간 후 저점",
-        "price_krw": 944646805.7132,
+        "price_krw": 736778.4635,
         "type": "trough"
       }
     },
@@ -2600,15 +2600,15 @@
       "date_60d": "2024-01-22",
       "date_90d": "2024-02-20",
       "entry_price_krw": 770754.62,
-      "price_180d_krw": 1434523014.5605,
-      "price_30d_krw": 951704080.3597,
-      "price_60d_krw": 1121356907.587,
-      "price_90d_krw": 1343408872.9256,
+      "price_180d_krw": 1059947.9818,
+      "price_30d_krw": 736778.4635,
+      "price_60d_krw": 841095.5067,
+      "price_90d_krw": 1007551.6428,
       "report_id": "2706f0a40fb7c071",
-      "return_180d": 1860.192885,
-      "return_30d": 1233.769219,
-      "return_60d": 1453.88185,
-      "return_90d": 1741.978684,
+      "return_180d": 0.375208,
+      "return_30d": -0.044082,
+      "return_60d": 0.091262,
+      "return_90d": 0.307228,
       "symbol": "LLY"
     },
     "symbol": "LLY",
@@ -2632,19 +2632,19 @@
       {
         "date": "2022-07-11",
         "label": "발간 후 고점",
-        "price_krw": 3040128.5669,
+        "price_krw": 14072.4544,
         "type": "peak"
       },
       {
         "date": "2023-10-20",
         "label": "발간 후 저점",
-        "price_krw": 1476660.5297,
+        "price_krw": 6835.3155,
         "type": "trough"
       },
       {
         "date": "2026-05-07",
         "label": "최근 종가",
-        "price_krw": 2005066.6323,
+        "price_krw": 9400.1748,
         "type": "latest"
       }
     ],
@@ -2653,13 +2653,13 @@
       "peak": {
         "date": "2022-07-11",
         "label": "발간 후 고점",
-        "price_krw": 3040128.5669,
+        "price_krw": 14072.4544,
         "type": "peak"
       },
       "trough": {
         "date": "2023-10-20",
         "label": "발간 후 저점",
-        "price_krw": 1476660.5297,
+        "price_krw": 6835.3155,
         "type": "trough"
       }
     },
@@ -2672,15 +2672,15 @@
       "date_60d": "2022-02-07",
       "date_90d": "2022-02-28",
       "entry_price_krw": 11320.18,
-      "price_180d_krw": 2293864.3706,
-      "price_30d_krw": 2433409.6271,
-      "price_60d_krw": 2577622.0592,
-      "price_90d_krw": 2663962.9382,
+      "price_180d_krw": 10618.0713,
+      "price_30d_krw": 11264.0124,
+      "price_60d_krw": 11931.5575,
+      "price_90d_krw": 12331.2209,
       "report_id": "27fa19d322870ea6",
-      "return_180d": 201.634973,
-      "return_30d": 213.962097,
-      "return_60d": 226.701508,
-      "return_90d": 234.328673,
+      "return_180d": -0.062023,
+      "return_30d": -0.004962,
+      "return_60d": 0.054008,
+      "return_90d": 0.089313,
       "symbol": "002714.SZ"
     },
     "symbol": "002714.SZ",
@@ -2774,9 +2774,9 @@
         "type": "publication"
       },
       {
-        "date": "2023-10-24",
+        "date": "2023-10-27",
         "label": "발간 후 저점",
-        "price_krw": 45355190.7877,
+        "price_krw": 33988.057,
         "type": "trough"
       },
       {
@@ -2788,13 +2788,13 @@
       {
         "date": "2025-12-24",
         "label": "발간 후 고점",
-        "price_krw": 122988661.8109,
+        "price_krw": 83175.19,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 116449103.6865,
+        "price_krw": 79004.2517,
         "type": "latest"
       }
     ],
@@ -2803,13 +2803,13 @@
       "peak": {
         "date": "2025-12-24",
         "label": "발간 후 고점",
-        "price_krw": 122988661.8109,
+        "price_krw": 83175.19,
         "type": "peak"
       },
       "trough": {
-        "date": "2023-10-24",
+        "date": "2023-10-27",
         "label": "발간 후 저점",
-        "price_krw": 45355190.7877,
+        "price_krw": 33988.057,
         "type": "trough"
       }
     },
@@ -2822,15 +2822,15 @@
       "date_60d": "2023-07-24",
       "date_90d": "2023-08-23",
       "entry_price_krw": 37142.71,
-      "price_180d_krw": 49215741.9437,
-      "price_30d_krw": 48033926.7732,
-      "price_60d_krw": 53967056.4414,
-      "price_90d_krw": 51061183.3768,
+      "price_180d_krw": 38206.5295,
+      "price_30d_krw": 36732.4517,
+      "price_60d_krw": 41976.4753,
+      "price_90d_krw": 38114.1799,
       "report_id": "2937539ac8e17f5c",
-      "return_180d": 1324.044455,
-      "return_30d": 1292.226229,
-      "return_60d": 1451.964968,
-      "return_90d": 1373.729614,
+      "return_180d": 0.028641,
+      "return_30d": -0.011045,
+      "return_60d": 0.13014,
+      "return_90d": 0.026155,
       "symbol": "BAC"
     },
     "symbol": "BAC",
@@ -3010,7 +3010,7 @@
       {
         "date": "2024-08-05",
         "label": "발간 후 저점",
-        "price_krw": 19376899.5996,
+        "price_krw": 14277.4295,
         "type": "trough"
       },
       {
@@ -3022,13 +3022,13 @@
       {
         "date": "2025-10-14",
         "label": "발간 후 고점",
-        "price_krw": 200622090.3602,
+        "price_krw": 140681.8024,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 157836339.5774,
+        "price_krw": 107083.1934,
         "type": "latest"
       }
     ],
@@ -3037,13 +3037,13 @@
       "peak": {
         "date": "2025-10-14",
         "label": "발간 후 고점",
-        "price_krw": 200622090.3602,
+        "price_krw": 140681.8024,
         "type": "peak"
       },
       "trough": {
         "date": "2024-08-05",
         "label": "발간 후 저점",
-        "price_krw": 19376899.5996,
+        "price_krw": 14277.4295,
         "type": "trough"
       }
     },
@@ -3056,15 +3056,15 @@
       "date_60d": "2023-01-24",
       "date_90d": "2023-02-23",
       "entry_price_krw": 43846.2,
-      "price_180d_krw": 38671902.6144,
-      "price_30d_krw": 39852194.9066,
-      "price_60d_krw": 45515218.5079,
-      "price_90d_krw": 53602814.8154,
+      "price_180d_krw": 29300.4482,
+      "price_30d_krw": 31253.4367,
+      "price_60d_krw": 37025.9155,
+      "price_90d_krw": 41143.3699,
       "report_id": "2dcae6668e7aa836",
-      "return_180d": 880.989833,
-      "return_30d": 907.908752,
-      "return_60d": 1037.065294,
-      "return_90d": 1221.519051,
+      "return_180d": -0.331745,
+      "return_30d": -0.287203,
+      "return_60d": -0.15555,
+      "return_90d": -0.061643,
       "symbol": "MP"
     },
     "symbol": "MP",
@@ -3086,36 +3086,36 @@
         "type": "publication"
       },
       {
-        "date": "2021-09-14",
+        "date": "2021-06-23",
         "label": "발간 후 고점",
-        "price_krw": 260689.3802,
+        "price_krw": 24766.6451,
         "type": "peak"
       },
       {
-        "date": "2023-11-17",
+        "date": "2023-10-11",
         "label": "발간 후 저점",
-        "price_krw": 60277.7206,
+        "price_krw": 6887.5756,
         "type": "trough"
       },
       {
         "date": "2026-05-07",
         "label": "최근 종가",
-        "price_krw": 106294.7641,
+        "price_krw": 11487.5998,
         "type": "latest"
       }
     ],
     "peak_return": 0.11,
     "price_extremes": {
       "peak": {
-        "date": "2021-09-14",
+        "date": "2021-06-23",
         "label": "발간 후 고점",
-        "price_krw": 260689.3802,
+        "price_krw": 24766.6451,
         "type": "peak"
       },
       "trough": {
-        "date": "2023-11-17",
+        "date": "2023-10-11",
         "label": "발간 후 저점",
-        "price_krw": 60277.7206,
+        "price_krw": 6887.5756,
         "type": "trough"
       }
     },
@@ -3128,15 +3128,15 @@
       "date_60d": "2021-07-30",
       "date_90d": "2021-08-30",
       "entry_price_krw": 22251.23,
-      "price_180d_krw": 232082.3532,
-      "price_30d_krw": 249495.7048,
-      "price_60d_krw": 214021.2171,
-      "price_90d_krw": 222254.7789,
+      "price_180d_krw": 22113.2883,
+      "price_30d_krw": 24393.5905,
+      "price_60d_krw": 20502.1382,
+      "price_90d_krw": 21025.336,
       "report_id": "32a42b5c3654e918",
-      "return_180d": 9.430091,
-      "return_30d": 10.21267,
-      "return_60d": 8.618399,
-      "return_90d": 8.988427,
+      "return_180d": -0.006199,
+      "return_30d": 0.096281,
+      "return_60d": -0.078607,
+      "return_90d": -0.055093,
       "symbol": "4751.T"
     },
     "symbol": "4751.T",
@@ -3388,19 +3388,19 @@
       {
         "date": "2025-02-12",
         "label": "발간 후 고점",
-        "price_krw": 305803.4112,
+        "price_krw": 32197.4155,
         "type": "peak"
       },
       {
         "date": "2026-04-27",
         "label": "발간 후 저점",
-        "price_krw": 115277.0757,
+        "price_krw": 12474.937,
         "type": "trough"
       },
       {
         "date": "2026-05-07",
         "label": "최근 종가",
-        "price_krw": 121149.4895,
+        "price_krw": 13092.9954,
         "type": "latest"
       }
     ],
@@ -3409,13 +3409,13 @@
       "peak": {
         "date": "2025-02-12",
         "label": "발간 후 고점",
-        "price_krw": 305803.4112,
+        "price_krw": 32197.4155,
         "type": "peak"
       },
       "trough": {
         "date": "2026-04-27",
         "label": "발간 후 저점",
-        "price_krw": 115277.0757,
+        "price_krw": 12474.937,
         "type": "trough"
       }
     },
@@ -3428,15 +3428,15 @@
       "date_60d": "2025-01-20",
       "date_90d": "2025-02-19",
       "entry_price_krw": 24344.55,
-      "price_180d_krw": 184823.9352,
-      "price_30d_krw": 217304.0537,
-      "price_60d_krw": 237610.1098,
-      "price_90d_krw": 229081.9559,
+      "price_180d_krw": 19298.1924,
+      "price_30d_krw": 23539.867,
+      "price_60d_krw": 25487.7626,
+      "price_90d_krw": 24178.8575,
       "report_id": "3871aacd23309b30",
-      "return_180d": 6.592005,
-      "return_30d": 7.926189,
-      "return_60d": 8.7603,
-      "return_90d": 8.409989,
+      "return_180d": -0.207289,
+      "return_30d": -0.033054,
+      "return_60d": 0.04696,
+      "return_90d": -0.006806,
       "symbol": "5253.T"
     },
     "symbol": "5253.T",
@@ -3532,19 +3532,19 @@
       {
         "date": "2026-03-20",
         "label": "발간 후 저점",
-        "price_krw": 184139932.3146,
+        "price_krw": 123597.1222,
         "type": "trough"
       },
       {
         "date": "2026-04-28",
         "label": "발간 후 고점",
-        "price_krw": 272495331.6034,
+        "price_krw": 185060.0264,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 258795110.9303,
+        "price_krw": 175578.1146,
         "type": "latest"
       }
     ],
@@ -3553,13 +3553,13 @@
       "peak": {
         "date": "2026-04-28",
         "label": "발간 후 고점",
-        "price_krw": 272495331.6034,
+        "price_krw": 185060.0264,
         "type": "peak"
       },
       "trough": {
         "date": "2026-03-20",
         "label": "발간 후 저점",
-        "price_krw": 184139932.3146,
+        "price_krw": 123597.1222,
         "type": "trough"
       }
     },
@@ -3573,14 +3573,14 @@
       "date_90d": "2026-03-02",
       "entry_price_krw": 140186.55,
       "price_180d_krw": null,
-      "price_30d_krw": 194249629.468,
-      "price_60d_krw": 192948883.3909,
-      "price_90d_krw": 208128412.494,
+      "price_30d_krw": 135091.6433,
+      "price_60d_krw": 135046.3913,
+      "price_90d_krw": 144684.3326,
       "report_id": "3b0f47d453265251",
       "return_180d": null,
-      "return_30d": 1384.650973,
-      "return_60d": 1375.372294,
-      "return_90d": 1483.653217,
+      "return_30d": -0.036344,
+      "return_60d": -0.036667,
+      "return_90d": 0.032084,
       "symbol": "SXT"
     },
     "symbol": "SXT",
@@ -3804,19 +3804,19 @@
       {
         "date": "2025-01-08",
         "label": "발간 후 고점",
-        "price_krw": 30565355.4544,
+        "price_krw": 21052.2601,
         "type": "peak"
       },
       {
         "date": "2025-08-08",
         "label": "발간 후 저점",
-        "price_krw": 4718628.9498,
+        "price_krw": 3407.0262,
         "type": "trough"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 9515804.1417,
+        "price_krw": 6455.9448,
         "type": "latest"
       }
     ],
@@ -3825,13 +3825,13 @@
       "peak": {
         "date": "2025-01-08",
         "label": "발간 후 고점",
-        "price_krw": 30565355.4544,
+        "price_krw": 21052.2601,
         "type": "peak"
       },
       "trough": {
         "date": "2025-08-08",
         "label": "발간 후 저점",
-        "price_krw": 4718628.9498,
+        "price_krw": 3407.0262,
         "type": "trough"
       }
     },
@@ -3844,15 +3844,15 @@
       "date_60d": "2025-01-21",
       "date_90d": "2025-02-19",
       "entry_price_krw": 14437.41,
-      "price_180d_krw": 7943653.2803,
-      "price_30d_krw": 25739425.1168,
-      "price_60d_krw": 27469750.2214,
-      "price_90d_krw": 27778957.5477,
+      "price_180d_krw": 5720.826,
+      "price_30d_krw": 17807.5745,
+      "price_60d_krw": 19135.6152,
+      "price_90d_krw": 19289.8717,
       "report_id": "3d77b9f898008ae2",
-      "return_180d": 549.213181,
-      "return_30d": 1781.828438,
-      "return_60d": 1901.678543,
-      "return_90d": 1923.095634,
+      "return_180d": -0.60375,
+      "return_30d": 0.233433,
+      "return_60d": 0.325419,
+      "return_90d": 0.336103,
       "symbol": "FNKO"
     },
     "symbol": "FNKO",
@@ -3954,7 +3954,7 @@
       {
         "date": "2021-02-12",
         "label": "발간 후 고점",
-        "price_krw": 144195162.2125,
+        "price_krw": 130822.491,
         "type": "peak"
       },
       {
@@ -3966,13 +3966,13 @@
       {
         "date": "2024-03-26",
         "label": "발간 후 저점",
-        "price_krw": 27365287.9443,
+        "price_krw": 20435.1242,
         "type": "trough"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 53423200.7264,
+        "price_krw": 36244.6757,
         "type": "latest"
       }
     ],
@@ -3981,13 +3981,13 @@
       "peak": {
         "date": "2021-02-12",
         "label": "발간 후 고점",
-        "price_krw": 144195162.2125,
+        "price_krw": 130822.491,
         "type": "peak"
       },
       "trough": {
         "date": "2024-03-26",
         "label": "발간 후 저점",
-        "price_krw": 27365287.9443,
+        "price_krw": 20435.1242,
         "type": "trough"
       }
     },
@@ -4000,15 +4000,15 @@
       "date_60d": "2021-02-03",
       "date_90d": "2021-03-05",
       "entry_price_krw": 81045.07,
-      "price_180d_krw": 92547656.8808,
-      "price_30d_krw": 104603220.4993,
-      "price_60d_krw": 128613590.7222,
-      "price_90d_krw": 106445040.7205,
+      "price_180d_krw": 83385.2817,
+      "price_30d_krw": 96432.4969,
+      "price_60d_krw": 115492.4906,
+      "price_90d_krw": 93920.7156,
       "report_id": "427716b6d195f77b",
-      "return_180d": 1140.928274,
-      "return_30d": 1289.679624,
-      "return_60d": 1585.939103,
-      "return_90d": 1312.4055,
+      "return_180d": 0.028875,
+      "return_30d": 0.189863,
+      "return_60d": 0.42504,
+      "return_90d": 0.15887,
       "symbol": "CHWY"
     },
     "symbol": "CHWY",
@@ -4036,36 +4036,36 @@
         "type": "target_hit"
       },
       {
-        "date": "2025-05-14",
+        "date": "2025-06-02",
         "label": "발간 후 고점",
-        "price_krw": 48321850.3649,
+        "price_krw": 34176.6118,
         "type": "peak"
       },
       {
         "date": "2026-02-12",
         "label": "발간 후 저점",
-        "price_krw": 20543993.9762,
+        "price_krw": 14225.2715,
         "type": "trough"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 29307806.4701,
+        "price_krw": 19883.7195,
         "type": "latest"
       }
     ],
     "peak_return": 0.64,
     "price_extremes": {
       "peak": {
-        "date": "2025-05-14",
+        "date": "2025-06-02",
         "label": "발간 후 고점",
-        "price_krw": 48321850.3649,
+        "price_krw": 34176.6118,
         "type": "peak"
       },
       "trough": {
         "date": "2026-02-12",
         "label": "발간 후 저점",
-        "price_krw": 20543993.9762,
+        "price_krw": 14225.2715,
         "type": "trough"
       }
     },
@@ -4078,15 +4078,15 @@
       "date_60d": "2025-01-21",
       "date_90d": "2025-02-19",
       "entry_price_krw": 20866.47,
-      "price_180d_krw": 46871410.7685,
-      "price_30d_krw": 37021315.4784,
-      "price_60d_krw": 35568484.4578,
-      "price_90d_krw": 37515590.0786,
+      "price_180d_krw": 33755.6509,
+      "price_30d_krw": 25612.8422,
+      "price_60d_krw": 24777.2486,
+      "price_90d_krw": 26051.0466,
       "report_id": "42bfead83e507f2d",
-      "return_180d": 2245.254914,
-      "return_30d": 1773.20117,
-      "return_60d": 1703.576024,
-      "return_90d": 1796.888674,
+      "return_180d": 0.617698,
+      "return_30d": 0.227464,
+      "return_60d": 0.187419,
+      "return_90d": 0.248464,
       "symbol": "GRND"
     },
     "symbol": "GRND",
@@ -4494,19 +4494,19 @@
       {
         "date": "2025-04-04",
         "label": "발간 후 저점",
-        "price_krw": 38743340.5806,
+        "price_krw": 26707.0196,
         "type": "trough"
       },
       {
         "date": "2026-04-27",
         "label": "발간 후 고점",
-        "price_krw": 116564475.3697,
+        "price_krw": 79043.3786,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 106629148.9713,
+        "price_krw": 72341.9576,
         "type": "latest"
       }
     ],
@@ -4515,13 +4515,13 @@
       "peak": {
         "date": "2026-04-27",
         "label": "발간 후 고점",
-        "price_krw": 116564475.3697,
+        "price_krw": 79043.3786,
         "type": "peak"
       },
       "trough": {
         "date": "2025-04-04",
         "label": "발간 후 저점",
-        "price_krw": 38743340.5806,
+        "price_krw": 26707.0196,
         "type": "trough"
       }
     },
@@ -4534,15 +4534,15 @@
       "date_60d": "2023-01-24",
       "date_90d": "2023-02-23",
       "entry_price_krw": 48037.09,
-      "price_180d_krw": 69661684.5636,
-      "price_30d_krw": 61233522.6473,
-      "price_60d_krw": 60943851.0829,
-      "price_90d_krw": 64567800.1767,
+      "price_180d_krw": 52780.4024,
+      "price_30d_krw": 48021.3958,
+      "price_60d_krw": 49576.8658,
+      "price_90d_krw": 49559.6527,
       "report_id": "4be410cfa6fd46e4",
-      "return_180d": 1449.164541,
-      "return_30d": 1273.713407,
-      "return_60d": 1267.683242,
-      "return_90d": 1343.123888,
+      "return_180d": 0.098743,
+      "return_30d": -0.000327,
+      "return_60d": 0.032054,
+      "return_90d": 0.031696,
       "symbol": "NE"
     },
     "symbol": "NE",
@@ -4786,36 +4786,36 @@
         "type": "publication"
       },
       {
-        "date": "2026-01-29",
+        "date": "2026-01-08",
         "label": "발간 후 저점",
-        "price_krw": 70211473.3667,
+        "price_krw": 48966.3018,
         "type": "trough"
       },
       {
-        "date": "2026-04-02",
+        "date": "2026-02-27",
         "label": "발간 후 고점",
-        "price_krw": 91753879.12,
+        "price_krw": 61346.2659,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 77538590.8389,
+        "price_krw": 52605.629,
         "type": "latest"
       }
     ],
     "peak_return": 0.14,
     "price_extremes": {
       "peak": {
-        "date": "2026-04-02",
+        "date": "2026-02-27",
         "label": "발간 후 고점",
-        "price_krw": 91753879.12,
+        "price_krw": 61346.2659,
         "type": "peak"
       },
       "trough": {
-        "date": "2026-01-29",
+        "date": "2026-01-08",
         "label": "발간 후 저점",
-        "price_krw": 70211473.3667,
+        "price_krw": 48966.3018,
         "type": "trough"
       }
     },
@@ -4829,14 +4829,14 @@
       "date_90d": "2026-03-02",
       "entry_price_krw": 53993.44,
       "price_180d_krw": null,
-      "price_30d_krw": 76417949.553,
-      "price_60d_krw": 71263708.5163,
-      "price_90d_krw": 86951241.0922,
+      "price_30d_krw": 53145.1535,
+      "price_60d_krw": 49878.0117,
+      "price_90d_krw": 60445.7707,
       "report_id": "554d2e862320e96a",
       "return_180d": null,
-      "return_30d": 1414.319149,
-      "return_60d": 1318.858644,
-      "return_90d": 1609.403803,
+      "return_30d": -0.015711,
+      "return_60d": -0.076221,
+      "return_90d": 0.119502,
       "symbol": "IMAX"
     },
     "symbol": "IMAX",
@@ -5088,19 +5088,19 @@
       {
         "date": "2021-02-10",
         "label": "발간 후 고점",
-        "price_krw": 192663470.9839,
+        "price_krw": 173570.6946,
         "type": "peak"
       },
       {
         "date": "2024-02-02",
         "label": "발간 후 저점",
-        "price_krw": 15789004.535,
+        "price_krw": 11880.812,
         "type": "trough"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 48600123.5327,
+        "price_krw": 32972.4856,
         "type": "latest"
       }
     ],
@@ -5109,13 +5109,13 @@
       "peak": {
         "date": "2021-02-10",
         "label": "발간 후 고점",
-        "price_krw": 192663470.9839,
+        "price_krw": 173570.6946,
         "type": "peak"
       },
       "trough": {
         "date": "2024-02-02",
         "label": "발간 후 저점",
-        "price_krw": 15789004.535,
+        "price_krw": 11880.812,
         "type": "trough"
       }
     },
@@ -5128,15 +5128,15 @@
       "date_60d": "2021-02-03",
       "date_90d": "2021-03-05",
       "entry_price_krw": 78628.24,
-      "price_180d_krw": 129638168.0886,
-      "price_30d_krw": 111474788.7126,
-      "price_60d_krw": 167652799.1246,
-      "price_90d_krw": 152647856.0415,
+      "price_180d_krw": 116803.7693,
+      "price_30d_krw": 102767.316,
+      "price_60d_krw": 150548.9366,
+      "price_90d_krw": 134687.3069,
       "report_id": "5d0752b834ca2cb9",
-      "return_180d": 1647.748186,
-      "return_30d": 1416.744931,
-      "return_60d": 2131.221186,
-      "return_90d": 1940.387166,
+      "return_180d": 0.485519,
+      "return_30d": 0.307003,
+      "return_60d": 0.914693,
+      "return_90d": 0.712964,
       "symbol": "BILI"
     },
     "symbol": "BILI",
@@ -5376,7 +5376,7 @@
       {
         "date": "2023-11-29",
         "label": "발간 후 저점",
-        "price_krw": 70105554.4612,
+        "price_krw": 54449.6461,
         "type": "trough"
       },
       {
@@ -5388,13 +5388,13 @@
       {
         "date": "2026-05-06",
         "label": "발간 후 고점",
-        "price_krw": 779774534.4896,
+        "price_krw": 529033.729,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 779774534.4896,
+        "price_krw": 529033.729,
         "type": "latest"
       }
     ],
@@ -5403,13 +5403,13 @@
       "peak": {
         "date": "2026-05-06",
         "label": "발간 후 고점",
-        "price_krw": 779774534.4896,
+        "price_krw": 529033.729,
         "type": "peak"
       },
       "trough": {
         "date": "2023-11-29",
         "label": "발간 후 저점",
-        "price_krw": 70105554.4612,
+        "price_krw": 54449.6461,
         "type": "trough"
       }
     },
@@ -5422,15 +5422,15 @@
       "date_60d": "2024-01-22",
       "date_90d": "2024-02-20",
       "entry_price_krw": 56366.67,
-      "price_180d_krw": 181920920.7344,
-      "price_30d_krw": 81390141.2822,
-      "price_60d_krw": 95004639.713,
-      "price_90d_krw": 110258875.5192,
+      "price_180d_krw": 134418.6958,
+      "price_30d_krw": 63009.6103,
+      "price_60d_krw": 71260.0734,
+      "price_90d_krw": 82693.7453,
       "report_id": "616b5a7fe9444744",
-      "return_180d": 3226.455529,
-      "return_30d": 1442.940919,
-      "return_60d": 1684.475472,
-      "return_90d": 1955.100574,
+      "return_180d": 1.384719,
+      "return_30d": 0.117852,
+      "return_60d": 0.264224,
+      "return_90d": 0.467068,
       "symbol": "VRT"
     },
     "symbol": "VRT",
@@ -5610,7 +5610,7 @@
       {
         "date": "2022-07-06",
         "label": "발간 후 저점",
-        "price_krw": 50161794.4493,
+        "price_krw": 38330.6536,
         "type": "trough"
       },
       {
@@ -5622,13 +5622,13 @@
       {
         "date": "2026-05-05",
         "label": "발간 후 고점",
-        "price_krw": 188721056.9185,
+        "price_krw": 127855.4593,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 179366380.4058,
+        "price_krw": 121690.1308,
         "type": "latest"
       }
     ],
@@ -5637,13 +5637,13 @@
       "peak": {
         "date": "2026-05-05",
         "label": "발간 후 고점",
-        "price_krw": 188721056.9185,
+        "price_krw": 127855.4593,
         "type": "peak"
       },
       "trough": {
         "date": "2022-07-06",
         "label": "발간 후 저점",
-        "price_krw": 50161794.4493,
+        "price_krw": 38330.6536,
         "type": "trough"
       }
     },
@@ -5656,15 +5656,15 @@
       "date_60d": "2022-07-25",
       "date_90d": "2022-08-23",
       "entry_price_krw": 39847.28,
-      "price_180d_krw": 95172518.6226,
-      "price_30d_krw": 58828604.9652,
-      "price_60d_krw": 69052756.0194,
-      "price_90d_krw": 72689932.3009,
+      "price_180d_krw": 71075.7164,
+      "price_30d_krw": 45259.3858,
+      "price_60d_krw": 52739.4058,
+      "price_90d_krw": 54110.5386,
       "report_id": "6405448206fb6311",
-      "return_180d": 2387.431999,
-      "return_30d": 1475.351835,
-      "return_60d": 1731.935247,
-      "return_90d": 1823.213153,
+      "return_180d": 0.783703,
+      "return_30d": 0.135821,
+      "return_60d": 0.323538,
+      "return_90d": 0.357948,
       "symbol": "STNG"
     },
     "symbol": "STNG",
@@ -5688,19 +5688,19 @@
       {
         "date": "2021-07-19",
         "label": "발간 후 저점",
-        "price_krw": 86364313.1394,
+        "price_krw": 75658.6186,
         "type": "trough"
       },
       {
         "date": "2024-11-25",
         "label": "발간 후 고점",
-        "price_krw": 195880928.9658,
+        "price_krw": 139565.0388,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 136284560.2407,
+        "price_krw": 92461.5077,
         "type": "latest"
       }
     ],
@@ -5709,13 +5709,13 @@
       "peak": {
         "date": "2024-11-25",
         "label": "발간 후 고점",
-        "price_krw": 195880928.9658,
+        "price_krw": 139565.0388,
         "type": "peak"
       },
       "trough": {
         "date": "2021-07-19",
         "label": "발간 후 저점",
-        "price_krw": 86364313.1394,
+        "price_krw": 75658.6186,
         "type": "trough"
       }
     },
@@ -5728,15 +5728,15 @@
       "date_60d": "2021-07-30",
       "date_90d": "2021-08-30",
       "entry_price_krw": 85503.13,
-      "price_180d_krw": 119276436.9824,
-      "price_30d_krw": 91610830.9847,
-      "price_60d_krw": 93489075.0378,
-      "price_90d_krw": 106168663.2912,
+      "price_180d_krw": 99845.5048,
+      "price_30d_krw": 81034.9578,
+      "price_60d_krw": 81855.738,
+      "price_90d_krw": 91419.8956,
       "report_id": "65b98e5336bd59f3",
-      "return_180d": 1393.994978,
-      "return_30d": 1070.432484,
-      "return_60d": 1092.399447,
-      "return_90d": 1240.693296,
+      "return_180d": 0.167741,
+      "return_30d": -0.052257,
+      "return_60d": -0.042658,
+      "return_90d": 0.069199,
       "symbol": "WFG"
     },
     "symbol": "WFG",
@@ -6070,36 +6070,36 @@
         "type": "publication"
       },
       {
-        "date": "2025-12-22",
+        "date": "2026-02-24",
         "label": "발간 후 고점",
-        "price_krw": 166385472.1181,
+        "price_krw": 114900.0675,
         "type": "peak"
       },
       {
         "date": "2026-03-30",
         "label": "발간 후 저점",
-        "price_krw": 124206966.6457,
+        "price_krw": 82418.9228,
         "type": "trough"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 161942472.808,
+        "price_krw": 109868.9768,
         "type": "latest"
       }
     ],
     "peak_return": 0.16,
     "price_extremes": {
       "peak": {
-        "date": "2025-12-22",
+        "date": "2026-02-24",
         "label": "발간 후 고점",
-        "price_krw": 166385472.1181,
+        "price_krw": 114900.0675,
         "type": "peak"
       },
       "trough": {
         "date": "2026-03-30",
         "label": "발간 후 저점",
-        "price_krw": 124206966.6457,
+        "price_krw": 82418.9228,
         "type": "trough"
       }
     },
@@ -6113,14 +6113,14 @@
       "date_90d": "2026-03-02",
       "entry_price_krw": 99354.38,
       "price_180d_krw": null,
-      "price_30d_krw": 150685608.536,
-      "price_60d_krw": 139118357.6441,
-      "price_90d_krw": 157472376.0675,
+      "price_30d_krw": 104794.8793,
+      "price_60d_krw": 97369.9968,
+      "price_90d_krw": 109469.8478,
       "report_id": "69575019ea6dce78",
       "return_180d": null,
-      "return_30d": 1515.647867,
-      "return_60d": 1399.223701,
-      "return_90d": 1583.956557,
+      "return_30d": 0.054759,
+      "return_60d": -0.019973,
+      "return_90d": 0.101812,
       "symbol": "ESTA"
     },
     "symbol": "ESTA",
@@ -6338,7 +6338,7 @@
       {
         "date": "2024-05-29",
         "label": "발간 후 저점",
-        "price_krw": 38887985.8297,
+        "price_krw": 28536.1953,
         "type": "trough"
       },
       {
@@ -6348,30 +6348,30 @@
         "type": "target_hit"
       },
       {
-        "date": "2025-12-24",
+        "date": "2025-11-03",
         "label": "발간 후 고점",
-        "price_krw": 424545924.2423,
+        "price_krw": 295681.0793,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 290666515.7447,
+        "price_krw": 197201.0933,
         "type": "latest"
       }
     ],
     "peak_return": 9.29,
     "price_extremes": {
       "peak": {
-        "date": "2025-12-24",
+        "date": "2025-11-03",
         "label": "발간 후 고점",
-        "price_krw": 424545924.2423,
+        "price_krw": 295681.0793,
         "type": "peak"
       },
       "trough": {
         "date": "2024-05-29",
         "label": "발간 후 저점",
-        "price_krw": 38887985.8297,
+        "price_krw": 28536.1953,
         "type": "trough"
       }
     },
@@ -6384,15 +6384,15 @@
       "date_60d": "2024-07-23",
       "date_90d": "2024-08-22",
       "entry_price_krw": 28733.7,
-      "price_180d_krw": 120395363.8447,
-      "price_30d_krw": 46571463.9857,
-      "price_60d_krw": 55431774.0933,
-      "price_90d_krw": 56774478.9853,
+      "price_180d_krw": 86480.9798,
+      "price_30d_krw": 33543.5025,
+      "price_60d_krw": 39962.3496,
+      "price_90d_krw": 42570.4284,
       "report_id": "6c514ea82bbdec4a",
-      "return_180d": 4189.0404,
-      "return_30d": 1619.795929,
-      "return_60d": 1928.155455,
-      "return_90d": 1974.884727,
+      "return_180d": 2.00974,
+      "return_30d": 0.167392,
+      "return_60d": 0.390783,
+      "return_90d": 0.481551,
       "symbol": "PLTR"
     },
     "symbol": "PLTR",
@@ -8366,7 +8366,7 @@
       {
         "date": "2025-04-07",
         "label": "발간 후 저점",
-        "price_krw": 506346.6115,
+        "price_krw": 50487.1156,
         "type": "trough"
       },
       {
@@ -8378,13 +8378,13 @@
       {
         "date": "2026-04-27",
         "label": "발간 후 고점",
-        "price_krw": 2689798.4332,
+        "price_krw": 291081.8624,
         "type": "peak"
       },
       {
         "date": "2026-05-07",
         "label": "최근 종가",
-        "price_krw": 2544139.2801,
+        "price_krw": 274952.9027,
         "type": "latest"
       }
     ],
@@ -8393,13 +8393,13 @@
       "peak": {
         "date": "2026-04-27",
         "label": "발간 후 고점",
-        "price_krw": 2689798.4332,
+        "price_krw": 291081.8624,
         "type": "peak"
       },
       "trough": {
         "date": "2025-04-07",
         "label": "발간 후 저점",
-        "price_krw": 506346.6115,
+        "price_krw": 50487.1156,
         "type": "trough"
       }
     },
@@ -8412,15 +8412,15 @@
       "date_60d": "2025-02-03",
       "date_90d": "2025-03-05",
       "entry_price_krw": 85358.24,
-      "price_180d_krw": 678979.5682,
-      "price_30d_krw": 807458.8203,
-      "price_60d_krw": 729231.2963,
-      "price_90d_krw": 729249.5376,
+      "price_180d_krw": 70291.7799,
+      "price_30d_krw": 86665.9215,
+      "price_60d_krw": 77798.5846,
+      "price_90d_krw": 75192.2314,
       "report_id": "918efca8ecaf4fcc",
-      "return_180d": 6.95447,
-      "return_30d": 8.459647,
-      "return_60d": 7.543186,
-      "return_90d": 7.543399,
+      "return_180d": -0.176509,
+      "return_30d": 0.01532,
+      "return_60d": -0.088564,
+      "return_90d": -0.119098,
       "symbol": "6857.T"
     },
     "symbol": "6857.T",
@@ -8444,19 +8444,19 @@
       {
         "date": "2025-10-08",
         "label": "발간 후 고점",
-        "price_krw": 206604089.7265,
+        "price_krw": 146054.347,
         "type": "peak"
       },
       {
         "date": "2026-04-10",
         "label": "발간 후 저점",
-        "price_krw": 93203587.6997,
+        "price_krw": 63262.6424,
         "type": "trough"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 116231851.2049,
+        "price_krw": 78856.8579,
         "type": "latest"
       }
     ],
@@ -8465,13 +8465,13 @@
       "peak": {
         "date": "2025-10-08",
         "label": "발간 후 고점",
-        "price_krw": 206604089.7265,
+        "price_krw": 146054.347,
         "type": "peak"
       },
       "trough": {
         "date": "2026-04-10",
         "label": "발간 후 저점",
-        "price_krw": 93203587.6997,
+        "price_krw": 63262.6424,
         "type": "trough"
       }
     },
@@ -8484,15 +8484,15 @@
       "date_60d": "2025-07-24",
       "date_90d": "2025-08-25",
       "entry_price_krw": 90116.75,
-      "price_180d_krw": 152562026.3752,
-      "price_30d_krw": 126651231.7207,
-      "price_60d_krw": 119529329.6659,
-      "price_90d_krw": 145150008.6775,
+      "price_180d_krw": 103554.7438,
+      "price_30d_krw": 92993.2575,
+      "price_60d_krw": 87011.4232,
+      "price_90d_krw": 104961.3542,
       "report_id": "91d1a46a03353151",
-      "return_180d": 1691.93751,
-      "return_30d": 1404.412775,
-      "return_60d": 1325.383049,
-      "return_90d": 1609.688453,
+      "return_180d": 0.149118,
+      "return_30d": 0.03192,
+      "return_60d": -0.034459,
+      "return_90d": 0.164726,
       "symbol": "TEM"
     },
     "symbol": "TEM",
@@ -8750,19 +8750,19 @@
       {
         "date": "2024-09-06",
         "label": "발간 후 저점",
-        "price_krw": 62811004.7158,
+        "price_krw": 47127.4566,
         "type": "trough"
       },
       {
         "date": "2025-10-15",
         "label": "발간 후 고점",
-        "price_krw": 890865841.4051,
+        "price_krw": 623231.5034,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 502556124.7108,
+        "price_krw": 340956.429,
         "type": "latest"
       }
     ],
@@ -8771,13 +8771,13 @@
       "peak": {
         "date": "2025-10-15",
         "label": "발간 후 고점",
-        "price_krw": 890865841.4051,
+        "price_krw": 623231.5034,
         "type": "peak"
       },
       "trough": {
         "date": "2024-09-06",
         "label": "발간 후 저점",
-        "price_krw": 62811004.7158,
+        "price_krw": 47127.4566,
         "type": "trough"
       }
     },
@@ -8790,15 +8790,15 @@
       "date_60d": "2024-07-23",
       "date_90d": "2024-08-22",
       "entry_price_krw": 65604.73,
-      "price_180d_krw": 145629551.2131,
-      "price_30d_krw": 84430053.8049,
-      "price_60d_krw": 83849943.1192,
-      "price_90d_krw": 66752698.0552,
+      "price_180d_krw": 104606.9041,
+      "price_30d_krw": 60811.4816,
+      "price_60d_krw": 60449.8195,
+      "price_90d_krw": 50052.2595,
       "report_id": "978bb1d9f47f5b6d",
-      "return_180d": 2218.802615,
-      "return_30d": 1285.950709,
-      "return_60d": 1277.108196,
-      "return_90d": 1016.498251,
+      "return_180d": 0.594502,
+      "return_30d": -0.073063,
+      "return_60d": -0.078575,
+      "return_90d": -0.237063,
       "symbol": "LEU"
     },
     "symbol": "LEU",
@@ -9094,7 +9094,7 @@
       {
         "date": "2023-01-19",
         "label": "발간 후 저점",
-        "price_krw": 42718001.704,
+        "price_krw": 34509.0005,
         "type": "trough"
       },
       {
@@ -9106,13 +9106,13 @@
       {
         "date": "2026-04-22",
         "label": "발간 후 고점",
-        "price_krw": 392357055.8335,
+        "price_krw": 264071.2363,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 319496369.2416,
+        "price_krw": 216760.5483,
         "type": "latest"
       }
     ],
@@ -9121,13 +9121,13 @@
       "peak": {
         "date": "2026-04-22",
         "label": "발간 후 고점",
-        "price_krw": 392357055.8335,
+        "price_krw": 264071.2363,
         "type": "peak"
       },
       "trough": {
         "date": "2023-01-19",
         "label": "발간 후 저점",
-        "price_krw": 42718001.704,
+        "price_krw": 34509.0005,
         "type": "trough"
       }
     },
@@ -9140,15 +9140,15 @@
       "date_60d": "2023-01-24",
       "date_90d": "2023-02-23",
       "entry_price_krw": 44729.19,
-      "price_180d_krw": 61500517.4181,
-      "price_30d_krw": 48315298.5178,
-      "price_60d_krw": 46002555.1999,
-      "price_90d_krw": 58066885.6932,
+      "price_180d_krw": 46596.9504,
+      "price_30d_krw": 37890.4883,
+      "price_60d_krw": 37422.3563,
+      "price_90d_krw": 44569.8116,
       "report_id": "9ad4504d75edadfa",
-      "return_180d": 1373.95263,
-      "return_30d": 1079.173786,
-      "return_60d": 1027.468327,
-      "return_90d": 1297.187731,
+      "return_180d": 0.041757,
+      "return_30d": -0.152891,
+      "return_60d": -0.163357,
+      "return_90d": -0.003563,
       "symbol": "ANET"
     },
     "symbol": "ANET",
@@ -9700,19 +9700,19 @@
       {
         "date": "2023-05-31",
         "label": "발간 후 저점",
-        "price_krw": 43128101.0996,
+        "price_krw": 32678.0017,
         "type": "trough"
       },
       {
         "date": "2026-04-30",
         "label": "발간 후 고점",
-        "price_krw": 141365927.299,
+        "price_krw": 95043.5846,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 135632794.5083,
+        "price_krw": 92019.3208,
         "type": "latest"
       }
     ],
@@ -9721,13 +9721,13 @@
       "peak": {
         "date": "2026-04-30",
         "label": "발간 후 고점",
-        "price_krw": 141365927.299,
+        "price_krw": 95043.5846,
         "type": "peak"
       },
       "trough": {
         "date": "2023-05-31",
         "label": "발간 후 저점",
-        "price_krw": 43128101.0996,
+        "price_krw": 32678.0017,
         "type": "trough"
       }
     },
@@ -9740,15 +9740,15 @@
       "date_60d": "2023-01-24",
       "date_90d": "2023-02-23",
       "entry_price_krw": 44584.22,
-      "price_180d_krw": 45918528.8957,
-      "price_30d_krw": 57932832.8775,
-      "price_60d_krw": 52511746.3174,
-      "price_90d_krw": 57829255.504,
+      "price_180d_krw": 34790.9823,
+      "price_30d_krw": 45432.8834,
+      "price_60d_krw": 42717.481,
+      "price_90d_krw": 44387.4162,
       "report_id": "9f7576102ac7fc38",
-      "return_180d": 1028.927829,
-      "return_30d": 1298.402185,
-      "return_60d": 1176.810138,
-      "return_90d": 1296.079,
+      "return_180d": -0.219657,
+      "return_30d": 0.019035,
+      "return_60d": -0.04187,
+      "return_90d": -0.004414,
       "symbol": "TS"
     },
     "symbol": "TS",
@@ -9772,19 +9772,19 @@
       {
         "date": "2025-12-22",
         "label": "발간 후 고점",
-        "price_krw": 41786404.1243,
+        "price_krw": 28354.3719,
         "type": "peak"
       },
       {
         "date": "2026-04-10",
         "label": "발간 후 저점",
-        "price_krw": 23941210.5337,
+        "price_krw": 16250.2783,
         "type": "trough"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 28612588.5839,
+        "price_krw": 19412.0528,
         "type": "latest"
       }
     ],
@@ -9793,13 +9793,13 @@
       "peak": {
         "date": "2025-12-22",
         "label": "발간 후 고점",
-        "price_krw": 41786404.1243,
+        "price_krw": 28354.3719,
         "type": "peak"
       },
       "trough": {
         "date": "2026-04-10",
         "label": "발간 후 저점",
-        "price_krw": 23941210.5337,
+        "price_krw": 16250.2783,
         "type": "trough"
       }
     },
@@ -9812,15 +9812,15 @@
       "date_60d": "2025-07-24",
       "date_90d": "2025-08-25",
       "entry_price_krw": 23476.6,
-      "price_180d_krw": 36637456.8735,
-      "price_30d_krw": 30160355.7936,
-      "price_60d_krw": 27514013.4703,
-      "price_90d_krw": 30273051.1212,
+      "price_180d_krw": 24868.4588,
+      "price_30d_krw": 22145.1438,
+      "price_60d_krw": 20028.8371,
+      "price_90d_krw": 21891.1488,
       "report_id": "a3c8fafb9892885e",
-      "return_180d": 1559.594672,
-      "return_30d": 1283.698627,
-      "return_60d": 1170.976073,
-      "return_90d": 1288.498953,
+      "return_180d": 0.059287,
+      "return_30d": -0.056714,
+      "return_60d": -0.14686,
+      "return_90d": -0.067533,
       "symbol": "CLBT"
     },
     "symbol": "CLBT",
@@ -9844,7 +9844,7 @@
       {
         "date": "2025-11-20",
         "label": "발간 후 저점",
-        "price_krw": 167728384.4068,
+        "price_krw": 114402.1225,
         "type": "trough"
       },
       {
@@ -9856,13 +9856,13 @@
       {
         "date": "2026-05-06",
         "label": "발간 후 고점",
-        "price_krw": 394471365.88,
+        "price_krw": 267626.9209,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 394471365.88,
+        "price_krw": 267626.9209,
         "type": "latest"
       }
     ],
@@ -9871,13 +9871,13 @@
       "peak": {
         "date": "2026-05-06",
         "label": "발간 후 고점",
-        "price_krw": 394471365.88,
+        "price_krw": 267626.9209,
         "type": "peak"
       },
       "trough": {
         "date": "2025-11-20",
         "label": "발간 후 저점",
-        "price_krw": 167728384.4068,
+        "price_krw": 114402.1225,
         "type": "trough"
       }
     },
@@ -9890,15 +9890,15 @@
       "date_60d": "2025-12-22",
       "date_90d": "2026-01-21",
       "entry_price_krw": 122785.53,
-      "price_180d_krw": 357161040.7403,
-      "price_30d_krw": 177939501.7267,
-      "price_60d_krw": 191991592.1151,
-      "price_90d_krw": 204232131.0468,
+      "price_180d_krw": 243089.0641,
+      "price_30d_krw": 121234.4941,
+      "price_60d_krw": 130276.8477,
+      "price_90d_krw": 138201.9834,
       "report_id": "a45f9d90222e517c",
-      "return_180d": 2907.820288,
-      "return_30d": 1448.189507,
-      "return_60d": 1562.633696,
-      "return_90d": 1662.324099,
+      "return_180d": 0.979786,
+      "return_30d": -0.012632,
+      "return_60d": 0.061011,
+      "return_90d": 0.125556,
       "symbol": "GLW"
     },
     "symbol": "GLW",
@@ -10372,19 +10372,19 @@
       {
         "date": "2021-11-30",
         "label": "발간 후 고점",
-        "price_krw": 22458929.9299,
+        "price_krw": 18861.3216,
         "type": "peak"
       },
       {
         "date": "2025-06-25",
         "label": "발간 후 저점",
-        "price_krw": 938352.8728,
+        "price_krw": 693.1354,
         "type": "trough"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 11862166.5797,
+        "price_krw": 8047.8214,
         "type": "latest"
       }
     ],
@@ -10393,13 +10393,13 @@
       "peak": {
         "date": "2021-11-30",
         "label": "발간 후 고점",
-        "price_krw": 22458929.9299,
+        "price_krw": 18861.3216,
         "type": "peak"
       },
       "trough": {
         "date": "2025-06-25",
         "label": "발간 후 저점",
-        "price_krw": 938352.8728,
+        "price_krw": 693.1354,
         "type": "trough"
       }
     },
@@ -10412,15 +10412,15 @@
       "date_60d": "2022-01-31",
       "date_90d": "2022-02-28",
       "entry_price_krw": 18861.32,
-      "price_180d_krw": 11048281.4388,
-      "price_30d_krw": 20623821.0317,
-      "price_60d_krw": 14483534.5081,
-      "price_90d_krw": 11975751.9612,
+      "price_180d_krw": 8937.5094,
+      "price_30d_krw": 17423.6234,
+      "price_60d_krw": 11992.5603,
+      "price_90d_krw": 9999.8767,
       "report_id": "ab2a3cd1f6220db2",
-      "return_180d": 584.763957,
-      "return_30d": 1092.445264,
-      "return_60d": 766.896123,
-      "return_90d": 633.937107,
+      "return_180d": -0.526146,
+      "return_30d": -0.076225,
+      "return_60d": -0.364172,
+      "return_90d": -0.469821,
       "symbol": "OPEN"
     },
     "symbol": "OPEN",
@@ -10600,19 +10600,19 @@
       {
         "date": "2021-10-19",
         "label": "발간 후 고점",
-        "price_krw": 515928176.5441,
+        "price_krw": 435132.7113,
         "type": "peak"
       },
       {
         "date": "2023-12-20",
         "label": "발간 후 저점",
-        "price_krw": 59131597.4458,
+        "price_krw": 45564.3547,
         "type": "trough"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 195573660.8464,
+        "price_krw": 132685.8707,
         "type": "latest"
       }
     ],
@@ -10621,13 +10621,13 @@
       "peak": {
         "date": "2021-10-19",
         "label": "발간 후 고점",
-        "price_krw": 515928176.5441,
+        "price_krw": 435132.7113,
         "type": "peak"
       },
       "trough": {
         "date": "2023-12-20",
         "label": "발간 후 저점",
-        "price_krw": 59131597.4458,
+        "price_krw": 45564.3547,
         "type": "trough"
       }
     },
@@ -10640,15 +10640,15 @@
       "date_60d": "2021-02-03",
       "date_90d": "2021-03-05",
       "entry_price_krw": 215206.21,
-      "price_180d_krw": 307465680.3781,
-      "price_30d_krw": 230691865.0586,
-      "price_60d_krw": 302020569.834,
-      "price_90d_krw": 295122615.671,
+      "price_180d_krw": 277026.056,
+      "price_30d_krw": 212672.1573,
+      "price_60d_krw": 271208.5684,
+      "price_90d_krw": 260398.4842,
       "report_id": "aca3b0e80e5d334c",
-      "return_180d": 1427.70264,
-      "return_30d": 1070.957287,
-      "return_60d": 1402.400812,
-      "return_90d": 1370.348046,
+      "return_180d": 0.287259,
+      "return_30d": -0.011775,
+      "return_60d": 0.260226,
+      "return_90d": 0.209995,
       "symbol": "SE"
     },
     "symbol": "SE",
@@ -10748,36 +10748,36 @@
         "type": "publication"
       },
       {
-        "date": "2022-06-07",
+        "date": "2022-06-06",
         "label": "발간 후 고점",
-        "price_krw": 142106922.7348,
+        "price_krw": 113298.0187,
         "type": "peak"
       },
       {
-        "date": "2024-08-05",
+        "date": "2024-08-12",
         "label": "발간 후 저점",
-        "price_krw": 10112088.3781,
+        "price_krw": 7446.5663,
         "type": "trough"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 20530672.3685,
+        "price_krw": 13928.9213,
         "type": "latest"
       }
     ],
     "peak_return": 0.06,
     "price_extremes": {
       "peak": {
-        "date": "2022-06-07",
+        "date": "2022-06-06",
         "label": "발간 후 고점",
-        "price_krw": 142106922.7348,
+        "price_krw": 113298.0187,
         "type": "peak"
       },
       "trough": {
-        "date": "2024-08-05",
+        "date": "2024-08-12",
         "label": "발간 후 저점",
-        "price_krw": 10112088.3781,
+        "price_krw": 7446.5663,
         "type": "trough"
       }
     },
@@ -10790,15 +10790,15 @@
       "date_60d": "2022-07-25",
       "date_90d": "2022-08-23",
       "entry_price_krw": 107184.15,
-      "price_180d_krw": 99332281.3684,
-      "price_30d_krw": 130429872.5902,
-      "price_60d_krw": 126345284.5613,
-      "price_90d_krw": 118382810.1424,
+      "price_180d_krw": 74182.2657,
+      "price_30d_krw": 100345.3326,
+      "price_60d_krw": 96496.876,
+      "price_90d_krw": 88124.413,
       "report_id": "ae2cc012ee18fbdb",
-      "return_180d": 925.744126,
-      "return_30d": 1215.876493,
-      "return_60d": 1177.768359,
-      "return_90d": 1103.480561,
+      "return_180d": -0.307899,
+      "return_30d": -0.063804,
+      "return_60d": -0.099709,
+      "return_90d": -0.177822,
       "symbol": "EAF"
     },
     "symbol": "EAF",
@@ -10822,19 +10822,19 @@
       {
         "date": "2025-09-29",
         "label": "발간 후 고점",
-        "price_krw": 149072922.6543,
+        "price_krw": 105822.2961,
         "type": "peak"
       },
       {
         "date": "2026-04-10",
         "label": "발간 후 저점",
-        "price_krw": 45690160.9855,
+        "price_krw": 31012.5435,
         "type": "trough"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 55813015.3183,
+        "price_krw": 37866.0322,
         "type": "latest"
       }
     ],
@@ -10843,13 +10843,13 @@
       "peak": {
         "date": "2025-09-29",
         "label": "발간 후 고점",
-        "price_krw": 149072922.6543,
+        "price_krw": 105822.2961,
         "type": "peak"
       },
       "trough": {
         "date": "2026-04-10",
         "label": "발간 후 저점",
-        "price_krw": 45690160.9855,
+        "price_krw": 31012.5435,
         "type": "trough"
       }
     },
@@ -10862,15 +10862,15 @@
       "date_60d": "2025-07-24",
       "date_90d": "2025-08-25",
       "entry_price_krw": 71278.01,
-      "price_180d_krw": 109434869.687,
-      "price_30d_krw": 108770185.7583,
-      "price_60d_krw": 114453015.6167,
-      "price_90d_krw": 126982353.1477,
+      "price_180d_krw": 74281.2623,
+      "price_30d_krw": 79864.1573,
+      "price_60d_krw": 83316.1183,
+      "price_90d_krw": 91823.8991,
       "report_id": "afafe74c5dc92db9",
-      "return_180d": 1534.324425,
-      "return_30d": 1524.999193,
-      "return_60d": 1604.726866,
-      "return_90d": 1780.508114,
+      "return_180d": 0.042134,
+      "return_30d": 0.12046,
+      "return_60d": 0.16889,
+      "return_90d": 0.28825,
       "symbol": "DOCS"
     },
     "symbol": "DOCS",
@@ -11056,19 +11056,19 @@
       {
         "date": "2025-10-06",
         "label": "발간 후 고점",
-        "price_krw": 219230070.865,
+        "price_krw": 155917.999,
         "type": "peak"
       },
       {
         "date": "2026-04-10",
         "label": "발간 후 저점",
-        "price_krw": 82698105.792,
+        "price_krw": 56131.9669,
         "type": "trough"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 94245566.905,
+        "price_krw": 63940.3847,
         "type": "latest"
       }
     ],
@@ -11077,13 +11077,13 @@
       "peak": {
         "date": "2025-10-06",
         "label": "발간 후 고점",
-        "price_krw": 219230070.865,
+        "price_krw": 155917.999,
         "type": "peak"
       },
       "trough": {
         "date": "2026-04-10",
         "label": "발간 후 저점",
-        "price_krw": 82698105.792,
+        "price_krw": 56131.9669,
         "type": "trough"
       }
     },
@@ -11096,15 +11096,15 @@
       "date_60d": "2025-07-24",
       "date_90d": "2025-08-25",
       "entry_price_krw": 85711.47,
-      "price_180d_krw": 157380462.5735,
-      "price_30d_krw": 115503403.606,
-      "price_60d_krw": 142174601.162,
-      "price_90d_krw": 171368802.4334,
+      "price_180d_krw": 106825.3606,
+      "price_30d_krw": 84808.0008,
+      "price_60d_krw": 103496.0576,
+      "price_90d_krw": 123920.7751,
       "report_id": "b28f6fdfc2ee056e",
-      "return_180d": 1835.165715,
-      "return_30d": 1346.583977,
-      "return_60d": 1657.75817,
-      "return_90d": 1998.368374,
+      "return_180d": 0.246337,
+      "return_30d": -0.010541,
+      "return_60d": 0.207494,
+      "return_90d": 0.44579,
       "symbol": "LIF"
     },
     "symbol": "LIF",
@@ -11134,19 +11134,19 @@
       {
         "date": "2025-08-18",
         "label": "발간 후 고점",
-        "price_krw": 146202.8464,
+        "price_krw": 15512.8942,
         "type": "peak"
       },
       {
         "date": "2026-03-30",
         "label": "발간 후 저점",
-        "price_krw": 70951.2109,
+        "price_krw": 7544.3397,
         "type": "trough"
       },
       {
         "date": "2026-05-07",
         "label": "최근 종가",
-        "price_krw": 73152.0331,
+        "price_krw": 7905.7636,
         "type": "latest"
       }
     ],
@@ -11155,13 +11155,13 @@
       "peak": {
         "date": "2025-08-18",
         "label": "발간 후 고점",
-        "price_krw": 146202.8464,
+        "price_krw": 15512.8942,
         "type": "peak"
       },
       "trough": {
         "date": "2026-03-30",
         "label": "발간 후 저점",
-        "price_krw": 70951.2109,
+        "price_krw": 7544.3397,
         "type": "trough"
       }
     },
@@ -11174,15 +11174,15 @@
       "date_60d": "2025-01-20",
       "date_90d": "2025-02-19",
       "entry_price_krw": 9062.83,
-      "price_180d_krw": 92182.6575,
-      "price_30d_krw": 114276.3671,
-      "price_60d_krw": 106290.1113,
-      "price_90d_krw": 110681.0547,
+      "price_180d_krw": 9625.153,
+      "price_30d_krw": 12379.2006,
+      "price_60d_krw": 11401.4388,
+      "price_90d_krw": 11682.0264,
       "report_id": "b3f38ee317977754",
-      "return_180d": 9.171509,
-      "return_30d": 11.609347,
-      "return_60d": 10.728137,
-      "return_90d": 11.212637,
+      "return_180d": 0.062047,
+      "return_30d": 0.365931,
+      "return_60d": 0.258044,
+      "return_90d": 0.289004,
       "symbol": "4680.T"
     },
     "symbol": "4680.T",
@@ -11284,7 +11284,7 @@
       {
         "date": "2025-12-16",
         "label": "발간 후 저점",
-        "price_krw": 680828219.2922,
+        "price_krw": 463943.7869,
         "type": "trough"
       },
       {
@@ -11296,13 +11296,13 @@
       {
         "date": "2026-05-05",
         "label": "발간 후 고점",
-        "price_krw": 2166871484.1446,
+        "price_krw": 1468020.333,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 2051503100.2056,
+        "price_krw": 1391830.9551,
         "type": "latest"
       }
     ],
@@ -11311,13 +11311,13 @@
       "peak": {
         "date": "2026-05-05",
         "label": "발간 후 고점",
-        "price_krw": 2166871484.1446,
+        "price_krw": 1468020.333,
         "type": "peak"
       },
       "trough": {
         "date": "2025-12-16",
         "label": "발간 후 저점",
-        "price_krw": 680828219.2922,
+        "price_krw": 463943.7869,
         "type": "trough"
       }
     },
@@ -11331,14 +11331,14 @@
       "date_90d": "2026-03-16",
       "entry_price_krw": 492968.26,
       "price_180d_krw": null,
-      "price_30d_krw": 719535299.4845,
-      "price_60d_krw": 1168356761.2165,
-      "price_90d_krw": 1409172384.1384,
+      "price_30d_krw": 488479.5722,
+      "price_60d_krw": 810852.0657,
+      "price_90d_krw": 938353.5103,
       "report_id": "b724efa4bec6fd8e",
       "return_180d": null,
-      "return_30d": 1458.597621,
-      "return_60d": 2369.044597,
-      "return_90d": 2857.545871,
+      "return_30d": -0.009105,
+      "return_60d": 0.644836,
+      "return_90d": 0.903477,
       "symbol": "LITE"
     },
     "symbol": "LITE",
@@ -11440,19 +11440,19 @@
       {
         "date": "2025-12-17",
         "label": "발간 후 저점",
-        "price_krw": 139816507.1663,
+        "price_krw": 95000.8209,
         "type": "trough"
       },
       {
         "date": "2026-05-06",
         "label": "발간 후 고점",
-        "price_krw": 299769538.9282,
+        "price_krw": 203376.9891,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 299769538.9282,
+        "price_krw": 203376.9891,
         "type": "latest"
       }
     ],
@@ -11461,13 +11461,13 @@
       "peak": {
         "date": "2026-05-06",
         "label": "발간 후 고점",
-        "price_krw": 299769538.9282,
+        "price_krw": 203376.9891,
         "type": "peak"
       },
       "trough": {
         "date": "2025-12-17",
         "label": "발간 후 저점",
-        "price_krw": 139816507.1663,
+        "price_krw": 95000.8209,
         "type": "trough"
       }
     },
@@ -11480,15 +11480,15 @@
       "date_60d": "2025-12-22",
       "date_90d": "2026-01-21",
       "entry_price_krw": 176425.53,
-      "price_180d_krw": 248598776.1758,
-      "price_30d_krw": 158551420.0666,
-      "price_60d_krw": 184238086.3071,
-      "price_90d_krw": 205389576.9642,
+      "price_180d_krw": 169199.9881,
+      "price_30d_krw": 108024.9243,
+      "price_60d_krw": 125015.6678,
+      "price_90d_krw": 138985.2163,
       "report_id": "b8e4eb25010494a7",
-      "return_180d": 1408.08618,
-      "return_30d": 897.687509,
-      "return_60d": 1043.282459,
-      "return_90d": 1163.171517,
+      "return_180d": -0.040955,
+      "return_30d": -0.387702,
+      "return_60d": -0.291397,
+      "return_90d": -0.212216,
       "symbol": "CRWV"
     },
     "symbol": "CRWV",
@@ -11700,19 +11700,19 @@
       {
         "date": "2025-06-09",
         "label": "발간 후 저점",
-        "price_krw": 122203.0676,
+        "price_krw": 13009.6598,
         "type": "trough"
       },
       {
         "date": "2026-03-02",
         "label": "발간 후 고점",
-        "price_krw": 284357.9731,
+        "price_krw": 30979.1569,
         "type": "peak"
       },
       {
         "date": "2026-05-07",
         "label": "최근 종가",
-        "price_krw": 216613.5749,
+        "price_krw": 23410.0907,
         "type": "latest"
       }
     ],
@@ -11721,13 +11721,13 @@
       "peak": {
         "date": "2026-03-02",
         "label": "발간 후 고점",
-        "price_krw": 284357.9731,
+        "price_krw": 30979.1569,
         "type": "peak"
       },
       "trough": {
         "date": "2025-06-09",
         "label": "발간 후 저점",
-        "price_krw": 122203.0676,
+        "price_krw": 13009.6598,
         "type": "trough"
       }
     },
@@ -11740,15 +11740,15 @@
       "date_60d": "2024-07-23",
       "date_90d": "2024-08-22",
       "entry_price_krw": 20169.71,
-      "price_180d_krw": 161834.1155,
-      "price_30d_krw": 209588.145,
-      "price_60d_krw": 195517.1762,
-      "price_90d_krw": 204537.9667,
+      "price_180d_krw": 17986.2836,
+      "price_30d_krw": 24133.9067,
+      "price_60d_krw": 22117.5038,
+      "price_90d_krw": 22257.3798,
       "report_id": "bafddc2de3fbd482",
-      "return_180d": 7.023621,
-      "return_30d": 9.391232,
-      "return_60d": 8.693604,
-      "return_90d": 9.140848,
+      "return_180d": -0.108253,
+      "return_30d": 0.196542,
+      "return_60d": 0.09657,
+      "return_90d": 0.103505,
       "symbol": "5726.T"
     },
     "symbol": "5726.T",
@@ -11850,19 +11850,19 @@
       {
         "date": "2025-08-22",
         "label": "발간 후 고점",
-        "price_krw": 61960261.91,
+        "price_krw": 44269.6627,
         "type": "peak"
       },
       {
         "date": "2026-04-28",
         "label": "발간 후 저점",
-        "price_krw": 25822878.3413,
+        "price_krw": 17537.1171,
         "type": "trough"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 29025373.6858,
+        "price_krw": 19692.1046,
         "type": "latest"
       }
     ],
@@ -11871,13 +11871,13 @@
       "peak": {
         "date": "2025-08-22",
         "label": "발간 후 고점",
-        "price_krw": 61960261.91,
+        "price_krw": 44269.6627,
         "type": "peak"
       },
       "trough": {
         "date": "2026-04-28",
         "label": "발간 후 저점",
-        "price_krw": 25822878.3413,
+        "price_krw": 17537.1171,
         "type": "trough"
       }
     },
@@ -11890,15 +11890,15 @@
       "date_60d": "2025-07-24",
       "date_90d": "2025-08-25",
       "entry_price_krw": 32601.82,
-      "price_180d_krw": 46990578.6002,
-      "price_30d_krw": 50026123.2222,
-      "price_60d_krw": 53122048.8853,
-      "price_90d_krw": 60297493.8243,
+      "price_180d_krw": 31895.8619,
+      "price_30d_krw": 36731.5193,
+      "price_60d_krw": 38670.2167,
+      "price_90d_krw": 43602.5231,
       "report_id": "bb8b54c6c0db0df2",
-      "return_180d": 1440.348324,
-      "return_30d": 1533.457991,
-      "return_60d": 1628.419734,
-      "return_90d": 1848.51312,
+      "return_180d": -0.021654,
+      "return_30d": 0.126671,
+      "return_60d": 0.186137,
+      "return_90d": 0.337426,
       "symbol": "SRAD"
     },
     "symbol": "SRAD",
@@ -12366,19 +12366,19 @@
       {
         "date": "2022-07-27",
         "label": "발간 후 고점",
-        "price_krw": 475574.2879,
+        "price_krw": 2201.3863,
         "type": "peak"
       },
       {
         "date": "2024-02-05",
         "label": "발간 후 저점",
-        "price_krw": 193216.6408,
+        "price_krw": 894.3807,
         "type": "trough"
       },
       {
         "date": "2026-05-07",
         "label": "최근 종가",
-        "price_krw": 415390.4858,
+        "price_krw": 1947.4381,
         "type": "latest"
       }
     ],
@@ -12387,13 +12387,13 @@
       "peak": {
         "date": "2022-07-27",
         "label": "발간 후 고점",
-        "price_krw": 475574.2879,
+        "price_krw": 2201.3863,
         "type": "peak"
       },
       "trough": {
         "date": "2024-02-05",
         "label": "발간 후 저점",
-        "price_krw": 193216.6408,
+        "price_krw": 894.3807,
         "type": "trough"
       }
     },
@@ -12406,15 +12406,15 @@
       "date_60d": "2022-07-25",
       "date_90d": "2022-08-23",
       "entry_price_krw": 1587.85,
-      "price_180d_krw": 380832.8043,
-      "price_30d_krw": 439171.1639,
-      "price_60d_krw": 455039.2049,
-      "price_90d_krw": 427503.492,
+      "price_180d_krw": 1762.8374,
+      "price_30d_krw": 2032.8799,
+      "price_60d_krw": 2106.3315,
+      "price_90d_krw": 1978.8714,
       "report_id": "c631200d3a42357e",
-      "return_180d": 238.841801,
-      "return_30d": 275.582274,
-      "return_60d": 285.575687,
-      "return_90d": 268.23418,
+      "return_180d": 0.110204,
+      "return_30d": 0.280272,
+      "return_60d": 0.326531,
+      "return_90d": 0.246258,
       "symbol": "002340.SZ"
     },
     "symbol": "002340.SZ",
@@ -12654,19 +12654,19 @@
       {
         "date": "2021-06-30",
         "label": "발간 후 고점",
-        "price_krw": 2050821.7537,
+        "price_krw": 14082.4166,
         "type": "peak"
       },
       {
         "date": "2024-12-06",
         "label": "발간 후 저점",
-        "price_krw": 199077.1555,
+        "price_krw": 1096.5519,
         "type": "trough"
       },
       {
         "date": "2026-05-07",
         "label": "최근 종가",
-        "price_krw": 379089.6183,
+        "price_krw": 2052.2392,
         "type": "latest"
       }
     ],
@@ -12675,13 +12675,13 @@
       "peak": {
         "date": "2021-06-30",
         "label": "발간 후 고점",
-        "price_krw": 2050821.7537,
+        "price_krw": 14082.4166,
         "type": "peak"
       },
       "trough": {
         "date": "2024-12-06",
         "label": "발간 후 저점",
-        "price_krw": 199077.1555,
+        "price_krw": 1096.5519,
         "type": "trough"
       }
     },
@@ -12694,15 +12694,15 @@
       "date_60d": "2021-07-30",
       "date_90d": "2021-08-30",
       "entry_price_krw": 13061.06,
-      "price_180d_krw": 698208.8928,
-      "price_30d_krw": 2050821.7537,
-      "price_60d_krw": 1566544.5218,
-      "price_90d_krw": 1249719.1884,
+      "price_180d_krw": 4561.4279,
+      "price_30d_krw": 14082.4166,
+      "price_60d_krw": 10657.1327,
+      "price_90d_krw": 8380.5859,
       "report_id": "c899a139ba93106b",
-      "return_180d": 52.457292,
-      "return_30d": 156.018018,
-      "return_60d": 118.940075,
-      "return_90d": 94.68283,
+      "return_180d": -0.650761,
+      "return_30d": 0.078199,
+      "return_60d": -0.184053,
+      "return_90d": -0.358353,
       "symbol": "1833.HK"
     },
     "symbol": "1833.HK",
@@ -12874,9 +12874,9 @@
         "type": "publication"
       },
       {
-        "date": "2022-12-28",
+        "date": "2022-11-02",
         "label": "발간 후 저점",
-        "price_krw": 118261960.3617,
+        "price_krw": 85732.6312,
         "type": "trough"
       },
       {
@@ -12888,13 +12888,13 @@
       {
         "date": "2026-05-06",
         "label": "발간 후 고점",
-        "price_krw": 911388066.9245,
+        "price_krw": 618326.2036,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 911388066.9245,
+        "price_krw": 618326.2036,
         "type": "latest"
       }
     ],
@@ -12903,13 +12903,13 @@
       "peak": {
         "date": "2026-05-06",
         "label": "발간 후 고점",
-        "price_krw": 911388066.9245,
+        "price_krw": 618326.2036,
         "type": "peak"
       },
       "trough": {
-        "date": "2022-12-28",
+        "date": "2022-11-02",
         "label": "발간 후 저점",
-        "price_krw": 118261960.3617,
+        "price_krw": 85732.6312,
         "type": "trough"
       }
     },
@@ -12922,15 +12922,15 @@
       "date_60d": "2022-07-25",
       "date_90d": "2022-08-23",
       "entry_price_krw": 114006.11,
-      "price_180d_krw": 143314603.9965,
-      "price_30d_krw": 145162368.6156,
-      "price_60d_krw": 147945710.9187,
-      "price_90d_krw": 155251116.5996,
+      "price_180d_krw": 107028.6707,
+      "price_30d_krw": 111679.6779,
+      "price_60d_krw": 112994.3154,
+      "price_90d_krw": 115569.2579,
       "report_id": "ce21d8373593ec16",
-      "return_180d": 1256.078274,
-      "return_30d": 1272.285867,
-      "return_60d": 1296.699842,
-      "return_90d": 1360.778913,
+      "return_180d": -0.061202,
+      "return_30d": -0.020406,
+      "return_60d": -0.008875,
+      "return_90d": 0.013711,
       "symbol": "TSM"
     },
     "symbol": "TSM",
@@ -12954,19 +12954,19 @@
       {
         "date": "2022-04-04",
         "label": "발간 후 고점",
-        "price_krw": 55005277.0426,
+        "price_krw": 45131.423,
         "type": "peak"
       },
       {
         "date": "2025-04-10",
         "label": "발간 후 저점",
-        "price_krw": 959096.0897,
+        "price_krw": 664.217,
         "type": "trough"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 2520167.1686,
+        "price_krw": 1709.7935,
         "type": "latest"
       }
     ],
@@ -12975,13 +12975,13 @@
       "peak": {
         "date": "2022-04-04",
         "label": "발간 후 고점",
-        "price_krw": 55005277.0426,
+        "price_krw": 45131.423,
         "type": "peak"
       },
       "trough": {
         "date": "2025-04-10",
         "label": "발간 후 저점",
-        "price_krw": 959096.0897,
+        "price_krw": 664.217,
         "type": "trough"
       }
     },
@@ -12994,15 +12994,15 @@
       "date_60d": "2022-01-31",
       "date_90d": "2022-02-28",
       "entry_price_krw": 33162.11,
-      "price_180d_krw": 29737143.308,
-      "price_30d_krw": 42760802.7113,
-      "price_60d_krw": 38608170.8663,
-      "price_90d_krw": 44848114.0359,
+      "price_180d_krw": 24055.8679,
+      "price_30d_krw": 36125.6103,
+      "price_60d_krw": 31968.0818,
+      "price_90d_krw": 37448.6388,
       "report_id": "cefde513c9366947",
-      "return_180d": 895.720483,
-      "return_30d": 1288.447587,
-      "return_60d": 1163.225403,
-      "return_90d": 1351.390244,
+      "return_180d": -0.274598,
+      "return_30d": 0.089364,
+      "return_60d": -0.036006,
+      "return_90d": 0.12926,
       "symbol": "CHGG"
     },
     "symbol": "CHGG",
@@ -13098,19 +13098,19 @@
       {
         "date": "2026-03-04",
         "label": "발간 후 고점",
-        "price_krw": 231189074.8402,
+        "price_krw": 155885.483,
         "type": "peak"
       },
       {
         "date": "2026-04-29",
         "label": "발간 후 저점",
-        "price_krw": 181379019.8356,
+        "price_krw": 123220.2807,
         "type": "trough"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 187361394.3853,
+        "price_krw": 127114.3039,
         "type": "latest"
       }
     ],
@@ -13119,13 +13119,13 @@
       "peak": {
         "date": "2026-03-04",
         "label": "발간 후 고점",
-        "price_krw": 231189074.8402,
+        "price_krw": 155885.483,
         "type": "peak"
       },
       "trough": {
         "date": "2026-04-29",
         "label": "발간 후 저점",
-        "price_krw": 181379019.8356,
+        "price_krw": 123220.2807,
         "type": "trough"
       }
     },
@@ -13139,14 +13139,14 @@
       "date_90d": "2026-03-02",
       "entry_price_krw": 135291.38,
       "price_180d_krw": null,
-      "price_30d_krw": 201134692.191,
-      "price_60d_krw": 199807837.9929,
-      "price_90d_krw": 214667336.1945,
+      "price_30d_krw": 139879.8864,
+      "price_60d_krw": 139847.0258,
+      "price_90d_krw": 149229.9869,
       "report_id": "cfa62286ec8e7734",
       "return_180d": null,
-      "return_30d": 1485.677807,
-      "return_60d": 1475.870426,
-      "return_90d": 1585.703722,
+      "return_30d": 0.033916,
+      "return_60d": 0.033673,
+      "return_90d": 0.103027,
       "symbol": "IRMD"
     },
     "symbol": "IRMD",
@@ -13168,21 +13168,21 @@
         "type": "publication"
       },
       {
-        "date": "2026-04-20",
+        "date": "2026-04-17",
         "label": "발간 후 저점",
-        "price_krw": 112785759.7362,
+        "price_krw": 76615.3753,
         "type": "trough"
       },
       {
         "date": "2026-05-05",
         "label": "발간 후 고점",
-        "price_krw": 124383339.0284,
+        "price_krw": 84267.6975,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 118752018.1145,
+        "price_krw": 80566.6512,
         "type": "latest"
       }
     ],
@@ -13191,13 +13191,13 @@
       "peak": {
         "date": "2026-05-05",
         "label": "발간 후 고점",
-        "price_krw": 124383339.0284,
+        "price_krw": 84267.6975,
         "type": "peak"
       },
       "trough": {
-        "date": "2026-04-20",
+        "date": "2026-04-17",
         "label": "발간 후 저점",
-        "price_krw": 112785759.7362,
+        "price_krw": 76615.3753,
         "type": "trough"
       }
     },
@@ -13392,34 +13392,34 @@
       {
         "date": "2025-04-08",
         "label": "발간 후 저점",
-        "price_krw": 26836550.673,
+        "price_krw": 18256.7785,
         "type": "trough"
       },
       {
-        "date": "2026-04-21",
+        "date": "2025-10-09",
         "label": "발간 후 고점",
-        "price_krw": 50427816.7639,
+        "price_krw": 34908.6426,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 50034011.459,
+        "price_krw": 33945.2989,
         "type": "latest"
       }
     ],
     "peak_return": 0.56,
     "price_extremes": {
       "peak": {
-        "date": "2026-04-21",
+        "date": "2025-10-09",
         "label": "발간 후 고점",
-        "price_krw": 50427816.7639,
+        "price_krw": 34908.6426,
         "type": "peak"
       },
       "trough": {
         "date": "2025-04-08",
         "label": "발간 후 저점",
-        "price_krw": 26836550.673,
+        "price_krw": 18256.7785,
         "type": "trough"
       }
     },
@@ -13432,15 +13432,15 @@
       "date_60d": "2025-01-21",
       "date_90d": "2025-02-19",
       "entry_price_krw": 22319.99,
-      "price_180d_krw": 34396791.1819,
-      "price_30d_krw": 36185620.634,
-      "price_60d_krw": 36145494.883,
-      "price_90d_krw": 37785186.2745,
+      "price_180d_krw": 24771.7331,
+      "price_30d_krw": 25034.6747,
+      "price_60d_krw": 25179.198,
+      "price_90d_krw": 26238.2558,
       "report_id": "d06874cf9f0f98b8",
-      "return_180d": 1540.075564,
-      "return_30d": 1620.220289,
-      "return_60d": 1618.422539,
-      "return_90d": 1691.885448,
+      "return_180d": 0.109845,
+      "return_30d": 0.121626,
+      "return_60d": 0.128101,
+      "return_90d": 0.17555,
       "symbol": "LEVI"
     },
     "symbol": "LEVI",
@@ -14002,9 +14002,9 @@
         "type": "publication"
       },
       {
-        "date": "2023-11-07",
+        "date": "2023-11-09",
         "label": "발간 후 저점",
-        "price_krw": 46218117.653,
+        "price_krw": 35410.8079,
         "type": "trough"
       },
       {
@@ -14016,13 +14016,13 @@
       {
         "date": "2026-05-06",
         "label": "발간 후 고점",
-        "price_krw": 394471365.88,
+        "price_krw": 267626.9209,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 394471365.88,
+        "price_krw": 267626.9209,
         "type": "latest"
       }
     ],
@@ -14031,13 +14031,13 @@
       "peak": {
         "date": "2026-05-06",
         "label": "발간 후 고점",
-        "price_krw": 394471365.88,
+        "price_krw": 267626.9209,
         "type": "peak"
       },
       "trough": {
-        "date": "2023-11-07",
+        "date": "2023-11-09",
         "label": "발간 후 저점",
-        "price_krw": 46218117.653,
+        "price_krw": 35410.8079,
         "type": "trough"
       }
     },
@@ -14050,15 +14050,15 @@
       "date_60d": "2021-07-30",
       "date_90d": "2021-08-30",
       "entry_price_krw": 47732.98,
-      "price_180d_krw": 54885996.1312,
-      "price_30d_krw": 52272364.8313,
-      "price_60d_krw": 54603778.9609,
-      "price_90d_krw": 54028413.7613,
+      "price_180d_krw": 45944.6989,
+      "price_30d_krw": 46237.8611,
+      "price_60d_krw": 47809.1437,
+      "price_90d_krw": 46522.8796,
       "report_id": "d524f1b9b99a53af",
-      "return_180d": 1148.854799,
-      "return_30d": 1094.099548,
-      "return_60d": 1142.942385,
-      "return_90d": 1130.888555,
+      "return_180d": -0.037464,
+      "return_30d": -0.031323,
+      "return_60d": 0.001596,
+      "return_90d": -0.025351,
       "symbol": "GLW"
     },
     "symbol": "GLW",
@@ -14682,19 +14682,19 @@
       {
         "date": "2026-02-09",
         "label": "발간 후 저점",
-        "price_krw": 31843960.6839,
+        "price_krw": 21775.1369,
         "type": "trough"
       },
       {
         "date": "2026-05-06",
         "label": "발간 후 고점",
-        "price_krw": 93593801.1726,
+        "price_krw": 63498.1978,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 93593801.1726,
+        "price_krw": 63498.1978,
         "type": "latest"
       }
     ],
@@ -14703,13 +14703,13 @@
       "peak": {
         "date": "2026-05-06",
         "label": "발간 후 고점",
-        "price_krw": 93593801.1726,
+        "price_krw": 63498.1978,
         "type": "peak"
       },
       "trough": {
         "date": "2026-02-09",
         "label": "발간 후 저점",
-        "price_krw": 31843960.6839,
+        "price_krw": 21775.1369,
         "type": "trough"
       }
     },
@@ -14722,15 +14722,15 @@
       "date_60d": "2025-09-29",
       "date_90d": "2025-09-29",
       "entry_price_krw": 31132.49,
-      "price_180d_krw": 43856649.7214,
-      "price_30d_krw": 43856649.7214,
-      "price_60d_krw": 43856649.7214,
-      "price_90d_krw": 43856649.7214,
+      "price_180d_krw": 31132.4907,
+      "price_30d_krw": 31132.4907,
+      "price_60d_krw": 31132.4907,
+      "price_90d_krw": 31132.4907,
       "report_id": "e48aad623ee4de4e",
-      "return_180d": 1407.709991,
-      "return_30d": 1407.709991,
-      "return_60d": 1407.709991,
-      "return_90d": 1407.709991,
+      "return_180d": 0.0,
+      "return_30d": 0.0,
+      "return_60d": 0.0,
+      "return_90d": 0.0,
       "symbol": "WOLF"
     },
     "symbol": "WOLF",
@@ -14832,19 +14832,19 @@
       {
         "date": "2021-11-30",
         "label": "발간 후 고점",
-        "price_krw": 107757491.0501,
+        "price_krw": 90496.2393,
         "type": "peak"
       },
       {
         "date": "2025-06-13",
         "label": "발간 후 저점",
-        "price_krw": 24341026.2525,
+        "price_krw": 18033.1945,
         "type": "trough"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 29525063.0955,
+        "price_krw": 20031.1161,
         "type": "latest"
       }
     ],
@@ -14853,13 +14853,13 @@
       "peak": {
         "date": "2021-11-30",
         "label": "발간 후 고점",
-        "price_krw": 107757491.0501,
+        "price_krw": 90496.2393,
         "type": "peak"
       },
       "trough": {
         "date": "2025-06-13",
         "label": "발간 후 저점",
-        "price_krw": 24341026.2525,
+        "price_krw": 18033.1945,
         "type": "trough"
       }
     },
@@ -14872,15 +14872,15 @@
       "date_60d": "2022-01-31",
       "date_90d": "2022-02-28",
       "entry_price_krw": 90496.24,
-      "price_180d_krw": 40968799.266,
-      "price_30d_krw": 98341441.7328,
-      "price_60d_krw": 70346509.6907,
-      "price_90d_krw": 61226923.5233,
+      "price_180d_krw": 33141.7182,
+      "price_30d_krw": 83081.8033,
+      "price_60d_krw": 58247.8509,
+      "price_90d_krw": 51125.114,
       "report_id": "e4f61fb5a56f7d82",
-      "return_180d": 451.712723,
-      "return_30d": 1085.690914,
-      "return_60d": 776.341796,
-      "return_90d": 675.568701,
+      "return_180d": -0.633778,
+      "return_30d": -0.081931,
+      "return_60d": -0.356351,
+      "return_90d": -0.435058,
       "symbol": "INMD"
     },
     "symbol": "INMD",
@@ -15054,7 +15054,7 @@
       {
         "date": "2024-05-29",
         "label": "발간 후 저점",
-        "price_krw": 739874542.6009,
+        "price_krw": 542923.5796,
         "type": "trough"
       },
       {
@@ -15064,30 +15064,30 @@
         "type": "target_hit"
       },
       {
-        "date": "2025-12-24",
+        "date": "2025-02-19",
         "label": "발간 후 고점",
-        "price_krw": 1261918385.1883,
+        "price_krw": 876259.8235,
         "type": "peak"
       },
       {
         "date": "2026-05-06",
         "label": "최근 종가",
-        "price_krw": 981409634.0515,
+        "price_krw": 665831.9493,
         "type": "latest"
       }
     ],
     "peak_return": 0.58,
     "price_extremes": {
       "peak": {
-        "date": "2025-12-24",
+        "date": "2025-02-19",
         "label": "발간 후 고점",
-        "price_krw": 1261918385.1883,
+        "price_krw": 876259.8235,
         "type": "peak"
       },
       "trough": {
         "date": "2024-05-29",
         "label": "발간 후 저점",
-        "price_krw": 739874542.6009,
+        "price_krw": 542923.5796,
         "type": "trough"
       }
     },
@@ -15100,15 +15100,15 @@
       "date_60d": "2024-07-23",
       "date_90d": "2024-08-22",
       "entry_price_krw": 553680.96,
-      "price_180d_krw": 1050106536.41,
-      "price_30d_krw": 827029032.8054,
-      "price_60d_krw": 875556523.8162,
-      "price_90d_krw": 872302858.5965,
+      "price_180d_krw": 754300.1599,
+      "price_30d_krw": 595674.8637,
+      "price_60d_krw": 631213.7115,
+      "price_90d_krw": 654066.8808,
       "report_id": "edabc743b3fa8967",
-      "return_180d": 1895.591381,
-      "return_30d": 1492.692383,
-      "return_60d": 1580.337606,
-      "return_90d": 1574.46118,
+      "return_180d": 0.362337,
+      "return_30d": 0.075845,
+      "return_60d": 0.140031,
+      "return_90d": 0.181306,
       "symbol": "ISRG"
     },
     "symbol": "ISRG",
@@ -15654,34 +15654,34 @@
       {
         "date": "2024-02-02",
         "label": "발간 후 저점",
-        "price_krw": 1663406.9207,
+        "price_krw": 9788.3725,
         "type": "trough"
       },
       {
-        "date": "2025-03-20",
+        "date": "2025-05-21",
         "label": "발간 후 고점",
-        "price_krw": 4968654.4065,
+        "price_krw": 27432.4397,
         "type": "peak"
       },
       {
         "date": "2026-05-07",
         "label": "최근 종가",
-        "price_krw": 3436032.8162,
+        "price_krw": 18601.3036,
         "type": "latest"
       }
     ],
     "peak_return": 1.06,
     "price_extremes": {
       "peak": {
-        "date": "2025-03-20",
+        "date": "2025-05-21",
         "label": "발간 후 고점",
-        "price_krw": 4968654.4065,
+        "price_krw": 27432.4397,
         "type": "peak"
       },
       "trough": {
         "date": "2024-02-02",
         "label": "발간 후 저점",
-        "price_krw": 1663406.9207,
+        "price_krw": 9788.3725,
         "type": "trough"
       }
     },
@@ -15694,15 +15694,15 @@
       "date_60d": "2024-01-22",
       "date_90d": "2024-02-20",
       "entry_price_krw": 13291.41,
-      "price_180d_krw": 2276376.0699,
-      "price_30d_krw": 1850822.2872,
-      "price_60d_krw": 1854003.7682,
-      "price_90d_krw": 1765192.8638,
+      "price_180d_krw": 13124.2441,
+      "price_30d_krw": 11179.9909,
+      "price_60d_krw": 10861.6958,
+      "price_90d_krw": 10354.0353,
       "report_id": "f6ba22fa65ef060a",
-      "return_180d": 170.266711,
-      "return_30d": 138.249507,
-      "return_60d": 138.48887,
-      "return_90d": 131.807043,
+      "return_180d": -0.012577,
+      "return_30d": -0.158856,
+      "return_60d": -0.182803,
+      "return_90d": -0.220998,
       "symbol": "1211.HK"
     },
     "symbol": "1211.HK",

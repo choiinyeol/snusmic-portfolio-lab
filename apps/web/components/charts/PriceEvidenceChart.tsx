@@ -15,7 +15,7 @@ import {
   type Time,
 } from 'lightweight-charts';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { formatKrw, formatPercent } from '@/lib/format';
+import { formatNative, formatPercent } from '@/lib/format';
 
 type PricePoint = {
   time: string;
@@ -53,6 +53,7 @@ type VolumePoint = { time: Time; value: number; color: string };
 type Props = {
   priceSeries: PricePoint[];
   targetPrice: number | null;
+  currency?: string;
   publicationDate: string;
   targetHitDate: string | null;
   evidenceMarkers?: EvidenceMarker[];
@@ -61,6 +62,7 @@ type Props = {
 export function PriceEvidenceChart({
   priceSeries,
   targetPrice,
+  currency = 'KRW',
   publicationDate,
   targetHitDate,
   evidenceMarkers = [],
@@ -102,6 +104,7 @@ export function PriceEvidenceChart({
       priceLineVisible: false,
       lastValueVisible: true,
       title: 'OHLC',
+      priceFormat: priceFormatForCurrency(currency),
     });
 
     candleSeries.setData(candleData);
@@ -164,7 +167,7 @@ export function PriceEvidenceChart({
       chart.unsubscribeCrosshairMove(handleCrosshairMove);
       chart.remove();
     };
-  }, [candleData, chartMarkers, priceByTime, priceSeries.length, targetPrice, volumeData]);
+  }, [candleData, chartMarkers, currency, priceByTime, priceSeries.length, targetPrice, volumeData]);
 
   if (priceSeries.length === 0) {
     return <div className="panel chart-box">이 리포트 종목의 가격 경로를 찾을 수 없습니다.</div>;
@@ -175,10 +178,10 @@ export function PriceEvidenceChart({
       {tooltip ? (
         <div className="chart-tooltip" style={{ left: tooltip.x, top: tooltip.y }}>
           <div className="tooltip-date">{tooltip.time}</div>
-          <div>시가 {formatKrw(tooltip.open)} · 고가 {formatKrw(tooltip.high)}</div>
-          <div>저가 {formatKrw(tooltip.low)} · 종가 {formatKrw(tooltip.close)}</div>
+          <div>시가 {formatNative(tooltip.open, currency)} · 고가 {formatNative(tooltip.high, currency)}</div>
+          <div>저가 {formatNative(tooltip.low, currency)} · 종가 {formatNative(tooltip.close, currency)}</div>
           <div>거래량 {formatVolume(tooltip.volume)}</div>
-          <div>목표가 {formatKrw(tooltip.targetPrice)}</div>
+          <div>목표가 {formatNative(tooltip.targetPrice, currency)}</div>
           <div className={tooltip.targetGapPct !== null && tooltip.targetGapPct <= 0 ? 'good' : 'warn'}>
             목표까지 {formatPercent(tooltip.targetGapPct)}
           </div>
@@ -209,6 +212,12 @@ function toVolumePoint(point: PricePoint): VolumePoint {
     value: Math.max(0, point.volume ?? 0),
     color: close >= open ? 'rgba(22, 163, 104, 0.32)' : 'rgba(239, 68, 82, 0.30)',
   };
+}
+
+function priceFormatForCurrency(currency: string) {
+  const code = currency.toUpperCase();
+  const precision = code === 'KRW' || code === 'JPY' ? 0 : 2;
+  return { type: 'price' as const, precision, minMove: precision === 0 ? 1 : 0.01 };
 }
 
 function buildMarkers(publicationDate: string, targetHitDate: string | null, evidenceMarkers: EvidenceMarker[]): SeriesMarker<Time>[] {

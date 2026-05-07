@@ -18,13 +18,17 @@ export type ReportRow = {
   markdownFilename: string;
   pdfFilename: string;
   pdfUrl: string;
+  currency: string;
   entryPriceKrw: number | null;
+  entryPriceNative: number | null;
   targetPriceKrw: number | null;
+  targetPriceNative: number | null;
   targetUpsideAtPub: number | null;
   targetHit: boolean;
   targetHitDate: string | null;
   daysToTarget: number | null;
   lastCloseKrw: number | null;
+  lastCloseNative: number | null;
   lastCloseDate: string | null;
   currentReturn: number | null;
   peakReturn: number | null;
@@ -72,7 +76,10 @@ export type TradeRow = {
   symbol: string;
   side: 'buy' | 'sell' | string;
   qty: number | null;
+  currency: string;
   fillPriceKrw: number | null;
+  fillPriceNative: number | null;
+  grossNative: number | null;
   grossKrw: number | null;
   cashAfterKrw: number | null;
   reason: string;
@@ -90,11 +97,15 @@ export type PositionEpisodeRow = {
   sellFills: number | null;
   totalQtyBought: number | null;
   totalQtySold: number | null;
+  currency: string;
   avgEntryPriceKrw: number | null;
+  avgEntryPriceNative: number | null;
   avgExitPriceKrw: number | null;
+  avgExitPriceNative: number | null;
   realizedPnlKrw: number | null;
   unrealizedPnlKrw: number | null;
   lastCloseKrw: number | null;
+  lastCloseNative: number | null;
   status: string;
   exitReasons: string;
 };
@@ -106,6 +117,8 @@ export type PricePoint = {
   high?: number;
   low?: number;
   close?: number;
+  closeKrw?: number | null;
+  currency?: string;
   volume?: number | null;
 };
 
@@ -115,8 +128,10 @@ export type ReportTargetDigest = {
   company: string;
   exchange: string;
   marketRegion: 'domestic' | 'overseas';
+  currency: string;
   publicationDate: string;
   targetPriceKrw: number | null;
+  targetPriceNative: number | null;
   targetUpsideAtPub: number | null;
 };
 export type EquityPoint = {
@@ -326,10 +341,10 @@ function strOrNull(value: unknown): string | null {
   return String(value);
 }
 
-function scaledPrice(value: unknown, scale: number): number | undefined {
+function positivePrice(value: unknown): number | undefined {
   const parsed = num(value);
   if (parsed === null || parsed <= 0) return undefined;
-  return parsed * scale;
+  return parsed;
 }
 
 let reportCache: ReportRow[] | undefined;
@@ -356,13 +371,17 @@ function fromRawReport(row: RawReport): ReportRow {
     markdownFilename: String(row.markdown_filename ?? row.markdownFilename ?? ''),
     pdfFilename: String(row.pdf_filename ?? row.pdfFilename ?? ''),
     pdfUrl: String(row.pdf_url ?? row.pdfUrl ?? ''),
+    currency: String(row.currency ?? row.price_currency ?? 'KRW') || 'KRW',
     entryPriceKrw: num(row.entry_price_krw ?? row.publication_price_krw ?? row.entryPriceKrw),
+    entryPriceNative: num(row.entry_price_native ?? row.entry_price ?? row.report_current_price ?? row.entryPriceNative),
     targetPriceKrw: num(row.target_price_krw ?? row.targetPriceKrw),
+    targetPriceNative: num(row.target_price_native ?? row.target_price ?? row.targetPriceNative),
     targetUpsideAtPub: num(row.target_upside_at_pub ?? row.targetUpsideAtPub),
     targetHit: bool(row.target_hit ?? row.targetHit),
     targetHitDate: strOrNull(row.target_hit_date ?? row.targetHitDate),
     daysToTarget: num(row.days_to_target ?? row.daysToTarget),
     lastCloseKrw: num(row.last_close_krw ?? row.lastCloseKrw),
+    lastCloseNative: num(row.last_close_native ?? row.lastCloseNative),
     lastCloseDate: strOrNull(row.last_close_date ?? row.lastCloseDate),
     currentReturn: num(row.current_return ?? row.currentReturn),
     peakReturn: num(row.peak_return ?? row.peakReturn),
@@ -370,18 +389,22 @@ function fromRawReport(row: RawReport): ReportRow {
     targetGapPct: num(row.target_gap_pct ?? row.targetGapPct),
     caveatFlags: Array.isArray(row.caveat_flags) ? row.caveat_flags : [],
   };
-  return withOhlcTargetTouch(report);
+  const enriched = withLatestNativeClose(report);
+  const hasTargetHitField = row.target_hit !== undefined || row.targetHit !== undefined;
+  return hasTargetHitField ? enriched : withOhlcTargetTouch(enriched);
 }
 
 function withOhlcTargetTouch(report: ReportRow): ReportRow {
-  if (!report.symbol || !report.publicationDate || !report.targetPriceKrw || !report.entryPriceKrw || report.entryPriceKrw <= 0) return report;
-  const direction = report.targetPriceKrw > report.entryPriceKrw ? 'upside' : report.targetPriceKrw < report.entryPriceKrw ? 'downside' : null;
+  const targetPrice = report.targetPriceNative ?? report.targetPriceKrw;
+  const entryPrice = report.entryPriceNative ?? report.entryPriceKrw;
+  if (!report.symbol || !report.publicationDate || !targetPrice || !entryPrice || entryPrice <= 0) return report;
+  const direction = targetPrice > entryPrice ? 'upside' : targetPrice < entryPrice ? 'downside' : null;
   if (!direction) return report;
   const prices = getPriceSeries(report.symbol, report.publicationDate);
   const hit = prices.find((point) => {
     const high = point.high ?? point.close ?? point.value;
     const low = point.low ?? point.close ?? point.value;
-    return direction === 'upside' ? high >= report.targetPriceKrw! : low <= report.targetPriceKrw!;
+    return direction === 'upside' ? high >= targetPrice : low <= targetPrice;
   });
   if (!hit) return { ...report, targetHit: false, targetHitDate: null, daysToTarget: null };
   return {
@@ -389,6 +412,18 @@ function withOhlcTargetTouch(report: ReportRow): ReportRow {
     targetHit: true,
     targetHitDate: hit.time,
     daysToTarget: diffDays(report.publicationDate, hit.time),
+  };
+}
+
+function withLatestNativeClose(report: ReportRow): ReportRow {
+  if (report.lastCloseNative !== null) return report;
+  const prices = getPriceSeries(report.symbol, undefined, report.lastCloseDate);
+  const latest = prices.at(-1);
+  if (!latest) return report;
+  return {
+    ...report,
+    currency: latest.currency ?? report.currency,
+    lastCloseNative: latest.close ?? latest.value,
   };
 }
 
@@ -426,8 +461,10 @@ export function getReportTargetDigests(): ReportTargetDigest[] {
     company: report.company,
     exchange: report.exchange,
     marketRegion: marketRegionForSymbol(report.symbol, report.exchange),
+    currency: report.currency,
     publicationDate: report.publicationDate,
     targetPriceKrw: report.targetPriceKrw,
+    targetPriceNative: report.targetPriceNative,
     targetUpsideAtPub: report.targetUpsideAtPub,
   }));
 }
@@ -452,26 +489,50 @@ export function marketRegionForSymbol(symbol: string, exchange?: string): 'domes
 }
 
 export function getPriceSeries(symbol: string, startDate?: string, endDate?: string | null): PricePoint[] {
-  const artifact = readJson<{ prices: Array<Record<string, unknown>> }>(`data/web/prices/${symbol}.json`, { prices: [] });
+  const artifact = readJson<{ currency?: string; prices: Array<Record<string, unknown>> }>(`data/web/prices/${symbol}.json`, { prices: [] });
   const stop = endDate ?? '9999-99-99';
   return artifact.prices
     .filter((point) => (!startDate || String(point.date) >= startDate) && String(point.date) <= stop)
     .map((point) => {
       const close = num(point.close);
-      const closeKrw = num(point.close_krw ?? point.close);
-      const scale = close && closeKrw ? closeKrw / close : 1;
-      const value = closeKrw ?? (close ? close * scale : 0);
+      const closeKrw = num(point.close_krw);
+      const currency = String(point.currency ?? point.source_currency ?? artifact.currency ?? 'KRW') || 'KRW';
+      const value = close ?? closeKrw ?? 0;
       return {
         time: String(point.date),
         value,
-        open: scaledPrice(point.open, scale),
-        high: scaledPrice(point.high, scale),
-        low: scaledPrice(point.low, scale),
+        open: positivePrice(point.open),
+        high: positivePrice(point.high),
+        low: positivePrice(point.low),
         close: value,
+        closeKrw,
+        currency,
         volume: num(point.volume),
       };
     })
     .filter((point) => point.value > 0);
+}
+
+const nativePricePointCache = new Map<string, PricePoint | undefined>();
+
+function nativePricePointAtOrBefore(symbol: string, date: string | null | undefined): PricePoint | undefined {
+  const key = `${symbol}|${date ?? ''}`;
+  if (nativePricePointCache.has(key)) return nativePricePointCache.get(key);
+  const series = getPriceSeries(symbol, undefined, date);
+  const point = series.at(-1);
+  nativePricePointCache.set(key, point);
+  return point;
+}
+
+function nativeFromKrwAtSymbolDate(symbol: string, date: string | null | undefined, krw: number | null): number | null {
+  if (krw === null) return null;
+  const point = nativePricePointAtOrBefore(symbol, date);
+  if (!point?.closeKrw || point.closeKrw <= 0) return krw;
+  return krw * point.value / point.closeKrw;
+}
+
+function currencyForPricePoint(symbol: string, date: string | null | undefined): string {
+  return nativePricePointAtOrBefore(symbol, date)?.currency ?? 'KRW';
 }
 
 export function getMarkdownSnippet(report: ReportRow): string {
@@ -679,43 +740,66 @@ function applyCostBasisTrade(state: Map<string, { qty: number; cost: number }>, 
 let tradesCache: TradeRow[] | undefined;
 export function getTrades(): TradeRow[] {
   if (tradesCache) return tradesCache;
-  tradesCache = parseCsv(readText('data/sim/trades.csv')).map((row) => ({
-    persona: String(row.persona ?? ''),
-    date: String(row.date ?? ''),
-    symbol: String(row.symbol ?? ''),
-    side: String(row.side ?? ''),
-    qty: num(row.qty),
-    fillPriceKrw: num(row.fill_price_krw),
-    grossKrw: num(row.gross_krw),
-    cashAfterKrw: num(row.cash_after_krw),
-    reason: String(row.reason ?? ''),
-    reportId: strOrNull(row.report_id),
-  })).sort((a, b) => b.date.localeCompare(a.date));
+  tradesCache = parseCsv(readText('data/sim/trades.csv')).map((row) => {
+    const symbol = String(row.symbol ?? '');
+    const date = String(row.date ?? '');
+    const fillPriceKrw = num(row.fill_price_krw);
+    const qty = num(row.qty);
+    const fillPriceNative = nativeFromKrwAtSymbolDate(symbol, date, fillPriceKrw);
+    return {
+      persona: String(row.persona ?? ''),
+      date,
+      symbol,
+      side: String(row.side ?? ''),
+      qty,
+      currency: currencyForPricePoint(symbol, date),
+      fillPriceKrw,
+      fillPriceNative,
+      grossNative: fillPriceNative !== null && qty !== null ? fillPriceNative * qty : null,
+      grossKrw: num(row.gross_krw),
+      cashAfterKrw: num(row.cash_after_krw),
+      reason: String(row.reason ?? ''),
+      reportId: strOrNull(row.report_id),
+    };
+  }).sort((a, b) => b.date.localeCompare(a.date));
   return tradesCache;
 }
 
 let positionEpisodesCache: PositionEpisodeRow[] | undefined;
 export function getPositionEpisodes(): PositionEpisodeRow[] {
   if (positionEpisodesCache) return positionEpisodesCache;
-  positionEpisodesCache = parseCsv(readText('data/sim/position_episodes.csv')).map((row) => ({
-    persona: String(row.persona ?? ''),
-    symbol: String(row.symbol ?? ''),
-    company: String(row.company ?? row.symbol ?? ''),
-    openDate: String(row.open_date ?? ''),
-    closeDate: strOrNull(row.close_date),
-    holdingDays: num(row.holding_days),
-    buyFills: num(row.buy_fills),
-    sellFills: num(row.sell_fills),
-    totalQtyBought: num(row.total_qty_bought),
-    totalQtySold: num(row.total_qty_sold),
-    avgEntryPriceKrw: num(row.avg_entry_price_krw),
-    avgExitPriceKrw: num(row.avg_exit_price_krw),
-    realizedPnlKrw: num(row.realized_pnl_krw),
-    unrealizedPnlKrw: num(row.unrealized_pnl_krw),
-    lastCloseKrw: num(row.last_close_krw),
-    status: String(row.status ?? ''),
-    exitReasons: String(row.exit_reasons ?? ''),
-  })).sort((a, b) => b.openDate.localeCompare(a.openDate));
+  positionEpisodesCache = parseCsv(readText('data/sim/position_episodes.csv')).map((row) => {
+    const symbol = String(row.symbol ?? '');
+    const openDate = String(row.open_date ?? '');
+    const closeDate = strOrNull(row.close_date);
+    const lastCloseDate = closeDate ?? getPriceSeries(symbol).at(-1)?.time ?? openDate;
+    const avgEntryPriceKrw = num(row.avg_entry_price_krw);
+    const avgExitPriceKrw = num(row.avg_exit_price_krw);
+    const lastCloseKrw = num(row.last_close_krw);
+    return {
+      persona: String(row.persona ?? ''),
+      symbol,
+      company: String(row.company ?? row.symbol ?? ''),
+      openDate,
+      closeDate,
+      holdingDays: num(row.holding_days),
+      buyFills: num(row.buy_fills),
+      sellFills: num(row.sell_fills),
+      totalQtyBought: num(row.total_qty_bought),
+      totalQtySold: num(row.total_qty_sold),
+      currency: currencyForPricePoint(symbol, lastCloseDate),
+      avgEntryPriceKrw,
+      avgEntryPriceNative: nativeFromKrwAtSymbolDate(symbol, openDate, avgEntryPriceKrw),
+      avgExitPriceKrw,
+      avgExitPriceNative: nativeFromKrwAtSymbolDate(symbol, closeDate, avgExitPriceKrw),
+      realizedPnlKrw: num(row.realized_pnl_krw),
+      unrealizedPnlKrw: num(row.unrealized_pnl_krw),
+      lastCloseKrw,
+      lastCloseNative: nativeFromKrwAtSymbolDate(symbol, lastCloseDate, lastCloseKrw),
+      status: String(row.status ?? ''),
+      exitReasons: String(row.exit_reasons ?? ''),
+    };
+  }).sort((a, b) => b.openDate.localeCompare(a.openDate));
   return positionEpisodesCache;
 }
 

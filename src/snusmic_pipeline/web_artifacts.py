@@ -366,6 +366,74 @@ def _number(value: Any) -> float | None:
     return parsed
 
 
+def _round_number(value: Any, digits: int = 4) -> float | None:
+    parsed = _number(value)
+    return round(parsed, digits) if parsed is not None else None
+
+
+def _price_frame_with_native(prices: pd.DataFrame) -> pd.DataFrame:
+    """Return prices with explicit native and KRW OHLC columns.
+
+    Warehouse prices are simulation-ready: cross-market OHLC values are often
+    KRW-normalized while source_currency and krw_per_unit preserve the market
+    quote. Web artifacts should expose native prices as the asset-price SSOT
+    and keep KRW only as a valuation/aggregation companion.
+    """
+
+    if prices.empty:
+        return prices.copy()
+    out = prices.copy()
+    source_currency = out.get("source_currency", "KRW")
+    display_currency = out.get("display_currency", source_currency)
+    out["_source_currency_norm"] = (
+        pd.Series(source_currency, index=out.index).astype(str).map(normalize_currency)
+    )
+    out["_display_currency_norm"] = (
+        pd.Series(display_currency, index=out.index).astype(str).map(normalize_currency)
+    )
+    out["_krw_per_unit_num"] = pd.to_numeric(out.get("krw_per_unit", 1.0), errors="coerce")
+    for column in ("open", "high", "low", "close"):
+        values = pd.to_numeric(out.get(column), errors="coerce")
+        out[f"{column}_native"] = _native_from_display_prices(
+            values,
+            out["_source_currency_norm"],
+            out["_display_currency_norm"],
+            out["_krw_per_unit_num"],
+        )
+        out[f"{column}_krw"] = _krw_from_display_prices(
+            values,
+            out["_display_currency_norm"],
+            out["_krw_per_unit_num"],
+        )
+    out["currency"] = out["_source_currency_norm"].replace("", "KRW")
+    return out
+
+
+def _native_from_display_prices(
+    values: pd.Series,
+    source_currency: pd.Series,
+    display_currency: pd.Series,
+    krw_per_unit: pd.Series,
+) -> pd.Series:
+    native = pd.to_numeric(values, errors="coerce").copy()
+    is_foreign_source = source_currency.ne("KRW")
+    is_krw_display = display_currency.eq("KRW")
+    can_convert = is_foreign_source & is_krw_display & krw_per_unit.gt(0)
+    native.loc[can_convert] = native.loc[can_convert] / krw_per_unit.loc[can_convert]
+    return native
+
+
+def _krw_from_display_prices(
+    values: pd.Series,
+    display_currency: pd.Series,
+    krw_per_unit: pd.Series,
+) -> pd.Series:
+    krw = pd.to_numeric(values, errors="coerce").copy()
+    needs_conversion = display_currency.ne("KRW") & krw_per_unit.gt(0)
+    krw.loc[needs_conversion] = krw.loc[needs_conversion] * krw_per_unit.loc[needs_conversion]
+    return krw
+
+
 def _bool(value: Any) -> bool | None:
     if isinstance(value, bool):
         return value
@@ -403,8 +471,22 @@ def _build_report_rows(
         target_price_krw = (
             perf_target_price_krw if perf_target_price_krw is not None else raw_target_price_krw
         )
-        raw_target_price = _number(row.get("target_price"))
-        target_price = target_price_krw if target_price_krw is not None else raw_target_price
+        price_currency = normalize_currency(
+            row.get("price_currency") or row.get("target_currency") or currency_for_symbol(symbol) or "KRW"
+        )
+        target_currency = normalize_currency(row.get("target_currency") or price_currency)
+        raw_target_price = _number(row.get("target_price_local")) or _number(row.get("target_price"))
+        entry_price_native = _number(row.get("report_current_price"))
+        entry_price_krw = _number(perf.get("entry_price_krw")) or _number(row.get("report_current_price_krw"))
+        if price_currency == "KRW":
+            target_price_native = target_price_krw
+        elif raw_target_price is not None and target_currency == price_currency:
+            target_price_native = raw_target_price
+        elif entry_price_native is not None and entry_price_krw and target_price_krw:
+            target_price_native = entry_price_native * target_price_krw / entry_price_krw
+        else:
+            target_price_native = raw_target_price
+        target_price = target_price_native if target_price_native is not None else target_price_krw
         if (
             raw_target_price_krw is not None
             and target_price_krw is not None
@@ -428,8 +510,13 @@ def _build_report_rows(
                 "markdown_filename": row.get("markdown_filename"),
                 "target_price": target_price,
                 "target_price_krw": target_price_krw,
+                "target_price_native": target_price_native,
+                "currency": price_currency,
+                "price_currency": price_currency,
+                "target_currency": target_currency,
                 "publication_price_krw": _number(row.get("report_current_price_krw")),
-                "entry_price_krw": _number(perf.get("entry_price_krw")),
+                "entry_price_krw": entry_price_krw,
+                "entry_price_native": entry_price_native,
                 "target_upside_at_pub": target_upside_at_pub,
                 "target_hit": _bool(perf.get("target_hit")),
                 "target_hit_date": perf.get("target_hit_date") or None,
@@ -559,11 +646,8 @@ def _build_return_windows(
 ) -> list[dict[str, Any]]:
     if prices.empty:
         return []
-    priced = prices.copy()
+    priced = _price_frame_with_native(prices)
     priced["date"] = pd.to_datetime(priced["date"], errors="coerce")
-    priced["close_krw"] = priced.apply(
-        lambda row: (_number(row.get("close")) or 0) * (_number(row.get("krw_per_unit")) or 1.0), axis=1
-    )
     by_symbol = {
         str(symbol): group.sort_values("date") for symbol, group in priced.groupby("symbol", sort=True)
     }
@@ -616,11 +700,8 @@ def _build_detail_metrics(
             str(row["report_id"]): _detail_without_prices(row, windows_by_id.get(str(row["report_id"]), {}))
             for row in report_rows
         }
-    priced = prices.copy()
+    priced = _price_frame_with_native(prices)
     priced["date"] = pd.to_datetime(priced["date"], errors="coerce")
-    priced["close_krw"] = priced.apply(
-        lambda row: (_number(row.get("close")) or 0) * (_number(row.get("krw_per_unit")) or 1.0), axis=1
-    )
     by_symbol = {
         str(symbol): group.sort_values("date") for symbol, group in priced.groupby("symbol", sort=True)
     }
@@ -982,24 +1063,26 @@ def _csv_cell(value: Any) -> Any:
 def _write_price_artifacts(prices: pd.DataFrame, symbols: set[str], prices_out: Path) -> None:
     if prices.empty:
         return
-    filtered = prices[prices["symbol"].astype(str).isin(symbols)].copy()
+    filtered = _price_frame_with_native(prices)
+    filtered = filtered[filtered["symbol"].astype(str).isin(symbols)].copy()
     filtered.sort_values(["symbol", "date"], inplace=True)
     for symbol, group in filtered.groupby("symbol", sort=True):
         rows = []
         for row in group.to_dict(orient="records"):
-            krw_per_unit = _number(row.get("krw_per_unit")) or 1.0
-            close = _number(row.get("close"))
             rows.append(
                 {
                     "date": row.get("date"),
-                    "open": _number(row.get("open")),
-                    "high": _number(row.get("high")),
-                    "low": _number(row.get("low")),
-                    "close": close,
-                    "close_krw": round(close * krw_per_unit, 4) if close is not None else None,
+                    "open": _number(row.get("open_native")),
+                    "high": _number(row.get("high_native")),
+                    "low": _number(row.get("low_native")),
+                    "close": _number(row.get("close_native")),
+                    "close_krw": _round_number(row.get("close_krw")),
                     "volume": _number(row.get("volume")),
-                    "source_currency": row.get("source_currency"),
-                    "display_currency": row.get("display_currency"),
+                    "currency": row.get("currency"),
+                    "source_currency": row.get("currency"),
+                    "display_currency": row.get("currency"),
+                    "krw_per_unit": _number(row.get("krw_per_unit")),
                 }
             )
-        _write_json(prices_out / f"{symbol}.json", {"symbol": symbol, "prices": rows})
+        currency = str(group.iloc[-1].get("currency") or "KRW")
+        _write_json(prices_out / f"{symbol}.json", {"symbol": symbol, "currency": currency, "prices": rows})
