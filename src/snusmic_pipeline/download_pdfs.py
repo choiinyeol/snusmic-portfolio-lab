@@ -71,6 +71,13 @@ def download_pdf(
             meta=meta, path=None, sha256=None, status="missing_pdf_url", note="No PDF URL in post content"
         )
 
+    # Skip the network round-trip when a local copy already exists and the
+    # caller did not force a re-download. SMIC PDFs are immutable once
+    # published, so this keeps origin bandwidth proportional to the number of
+    # *new* reports rather than the size of the entire archive.
+    if target.exists() and not force:
+        return DownloadedPdf(meta=meta, path=target, sha256=sha256_file(target), status="reused", note="")
+
     client = session or requests.Session()
     try:
         response = client.get(
