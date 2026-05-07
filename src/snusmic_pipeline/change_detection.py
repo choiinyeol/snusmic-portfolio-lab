@@ -82,9 +82,7 @@ def fetch_page_one_post_urls(session: requests.Session | None = None) -> list[st
 
     status_code = getattr(response, "status_code", 0)
     if status_code != 200:
-        raise SnusmicSiteUnavailable(
-            f"REST API responded with HTTP {status_code}."
-        )
+        raise SnusmicSiteUnavailable(f"REST API responded with HTTP {status_code}.")
 
     try:
         payload = response.json()
@@ -94,9 +92,7 @@ def fetch_page_one_post_urls(session: requests.Session | None = None) -> list[st
         ) from exc
 
     if not isinstance(payload, list):
-        raise SnusmicSiteUnavailable(
-            "REST API returned an unexpected payload (not a JSON list)."
-        )
+        raise SnusmicSiteUnavailable("REST API returned an unexpected payload (not a JSON list).")
     if not payload:
         raise SnusmicSiteUnavailable(
             "REST API returned zero posts on page one; treating as outage rather "
@@ -112,9 +108,7 @@ def fetch_page_one_post_urls(session: requests.Session | None = None) -> list[st
             urls.append(link)
 
     if not urls:
-        raise SnusmicSiteUnavailable(
-            "REST API returned posts but none were valid snusmic.com links."
-        )
+        raise SnusmicSiteUnavailable("REST API returned posts but none were valid snusmic.com links.")
     return urls
 
 

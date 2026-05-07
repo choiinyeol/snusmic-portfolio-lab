@@ -97,7 +97,9 @@ def _enrich_holdings_with_native(
     return out
 
 
-def _attach_monthly_native_close(holdings: pd.DataFrame, prices: pd.DataFrame, fx_rates: pd.DataFrame) -> pd.DataFrame:
+def _attach_monthly_native_close(
+    holdings: pd.DataFrame, prices: pd.DataFrame, fx_rates: pd.DataFrame
+) -> pd.DataFrame:
     """Attach native month-end closes using the nearest known price at/before each month."""
 
     out = holdings.copy()
@@ -253,7 +255,9 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     )
     _write_json(
         out / "monthly-holdings.json",
-        _records(_enrich_holdings_with_native(monthly_holdings, prices, fx_rates, close_column="month_close_krw")),
+        _records(
+            _enrich_holdings_with_native(monthly_holdings, prices, fx_rates, close_column="month_close_krw")
+        ),
     )
     _write_json(out / "missing-symbols.json", [{"symbol": symbol} for symbol in missing_symbols])
     _write_json(out / "data-quality.json", data_quality)
