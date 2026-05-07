@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useDeferredValue, useMemo, useState } from 'react';
 import type { PositionEpisodeRow, ReportTargetDigest, TradeRow } from '@/lib/artifacts';
-import { formatDays, formatKrw, formatPercent } from '@/lib/format';
+import { formatDays, formatKrw, formatNativeWithKrw, formatPercent } from '@/lib/format';
 import { PaginationControls, SortHeader, defaultPersonaFor, pageRows, sortRows, useUrlBackedStrategy, type SortState } from './TableControls';
 
 type Props = {
@@ -51,7 +51,7 @@ export function TradesTable({ trades, episodes, personaLabels, capitalByPersona 
     strategy: (row) => personaLabels[row.persona] ?? row.persona,
     market: (row) => marketLabel(targetsBySymbol[row.symbol]?.marketRegion),
     symbol: (row) => row.company || row.symbol,
-    target: (row) => targetsBySymbol[row.symbol]?.targetPriceKrw,
+    target: (row) => targetsBySymbol[row.symbol]?.targetPriceNative ?? targetsBySymbol[row.symbol]?.targetPriceKrw,
     openDate: (row) => row.openDate,
     closeDate: (row) => row.closeDate ?? '9999-99-99',
     holdingDays: (row) => row.holdingDays,
@@ -67,7 +67,7 @@ export function TradesTable({ trades, episodes, personaLabels, capitalByPersona 
     market: (row) => marketLabel((row.reportId ? targetsByReportId[row.reportId]?.marketRegion : undefined) ?? targetsBySymbol[row.symbol]?.marketRegion),
     side: (row) => row.side,
     symbol: (row) => row.symbol,
-    target: (row) => (row.reportId ? targetsByReportId[row.reportId]?.targetPriceKrw : undefined) ?? targetsBySymbol[row.symbol]?.targetPriceKrw,
+    target: (row) => (row.reportId ? targetsByReportId[row.reportId]?.targetPriceNative : undefined) ?? targetsBySymbol[row.symbol]?.targetPriceNative ?? targetsBySymbol[row.symbol]?.targetPriceKrw,
     qty: (row) => row.qty,
     price: (row) => row.fillPriceKrw,
     gross: (row) => row.grossKrw,
@@ -150,12 +150,15 @@ export function TradesTable({ trades, episodes, personaLabels, capitalByPersona 
                     <td>{personaLabels[episode.persona] ?? episode.persona}</td>
                     <td><span className="pill">{marketLabel(target?.marketRegion)}</span></td>
                     <td><strong><Link href={`/reports/${episode.symbol}`}>{episode.company || episode.symbol}</Link></strong><div className="muted">{episode.symbol}</div></td>
-                    <td>{formatKrw(target?.targetPriceKrw)}<div className="muted">{target?.publicationDate ?? '—'}</div></td>
+                    <td>{formatTarget(target)}<div className="muted">{target?.publicationDate ?? '—'}</div></td>
                     <td>{episode.openDate}<div className="muted">{episode.buyFills ?? 0}회 매수</div></td>
                     <td>{episode.closeDate ?? <span className="pill good">보유중</span>}<div className="muted">{episode.status}</div></td>
                     <td>{formatDays(episode.holdingDays)}</td>
-                    <td>{formatKrw(episode.avgEntryPriceKrw)}</td>
-                    <td>{formatKrw(episode.avgExitPriceKrw ?? episode.lastCloseKrw)}<div className="muted">손익 {formatKrw(pnl)}</div></td>
+                    <td>{formatAssetPrice(episode.avgEntryPriceNative, episode.avgEntryPriceKrw, episode.currency)}</td>
+                    <td>
+                      {formatAssetPrice(episode.avgExitPriceNative ?? episode.lastCloseNative, episode.avgExitPriceKrw ?? episode.lastCloseKrw, episode.currency)}
+                      <div className="muted">손익 {formatKrw(pnl)}</div>
+                    </td>
                     <td className={(stockReturn ?? 0) >= 0 ? 'good' : 'bad'}>{formatPercent(stockReturn)}</td>
                     <td className={(contribution ?? 0) >= 0 ? 'good' : 'bad'}>{formatPercent(contribution)}</td>
                     <td>{humanReason(episode.exitReasons)}</td>
@@ -197,10 +200,10 @@ export function TradesTable({ trades, episodes, personaLabels, capitalByPersona 
                   <td><span className="pill">{marketLabel(target?.marketRegion)}</span></td>
                   <td><span className={`pill ${trade.side === 'buy' ? 'good' : 'warn'}`}>{trade.side === 'buy' ? '매수' : '매도'}</span></td>
                   <td><Link href={`/reports/${trade.symbol}`}>{trade.symbol}</Link></td>
-                  <td>{formatKrw(target?.targetPriceKrw)}<div className="muted">{target?.publicationDate ?? '—'}</div></td>
+                  <td>{formatTarget(target)}<div className="muted">{target?.publicationDate ?? '—'}</div></td>
                   <td>{trade.qty?.toLocaleString('ko-KR') ?? '—'}</td>
-                  <td>{formatKrw(trade.fillPriceKrw)}</td>
-                  <td>{formatKrw(trade.grossKrw)}</td>
+                  <td>{formatAssetPrice(trade.fillPriceNative, trade.fillPriceKrw, trade.currency)}</td>
+                  <td>{formatAssetPrice(trade.grossNative, trade.grossKrw, trade.currency)}</td>
                   <td>{formatKrw(trade.cashAfterKrw)}</td>
                   <td>{humanReason(trade.reason)}</td>
                   <td>{trade.reportId && reportSymbolsById[trade.reportId] ? <Link href={`/reports/${reportSymbolsById[trade.reportId]}`}>리포트</Link> : '—'}</td>
@@ -224,9 +227,30 @@ function humanReason(reason: string): string {
   return reason.replace(/[()']/g, '') || '—';
 }
 
+function formatTarget(target: ReportTargetDigest | undefined) {
+  if (!target) return '—';
+  const { primary, secondary } = formatNativeWithKrw(target.targetPriceNative, target.targetPriceKrw, target.currency);
+  return (
+    <>
+      {primary}
+      {secondary ? <div className="muted" style={{ fontSize: '.74rem' }}>{secondary}</div> : null}
+    </>
+  );
+}
+
+function formatAssetPrice(native: number | null, krw: number | null, currency: string) {
+  const { primary, secondary } = formatNativeWithKrw(native, krw, currency);
+  return (
+    <>
+      {primary}
+      {secondary ? <div className="muted" style={{ fontSize: '.74rem' }}>{secondary}</div> : null}
+    </>
+  );
+}
+
 function downloadTrades(rows: TradeRow[]) {
-  const headers = ['date', 'persona', 'side', 'symbol', 'qty', 'fill_price_krw', 'gross_krw', 'cash_after_krw', 'reason', 'report_id'];
-  const csv = [headers.join(','), ...rows.map((row) => [row.date, row.persona, row.side, row.symbol, row.qty ?? '', row.fillPriceKrw ?? '', row.grossKrw ?? '', row.cashAfterKrw ?? '', row.reason, row.reportId ?? ''].map(csvEscape).join(','))].join('\n');
+  const headers = ['date', 'persona', 'side', 'symbol', 'currency', 'qty', 'fill_price_native', 'fill_price_krw', 'gross_native', 'gross_krw', 'cash_after_krw', 'reason', 'report_id'];
+  const csv = [headers.join(','), ...rows.map((row) => [row.date, row.persona, row.side, row.symbol, row.currency, row.qty ?? '', row.fillPriceNative ?? '', row.fillPriceKrw ?? '', row.grossNative ?? '', row.grossKrw ?? '', row.cashAfterKrw ?? '', row.reason, row.reportId ?? ''].map(csvEscape).join(','))].join('\n');
   const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');

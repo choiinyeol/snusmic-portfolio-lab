@@ -114,6 +114,35 @@ def test_holdings_artifact_exposes_native_currency_for_foreign_positions(tmp_pat
     assert qqq["last_close_krw"] > 1_000_000
 
 
+def test_price_artifacts_keep_asset_prices_native_and_krw_for_valuation_only(tmp_path: Path) -> None:
+    out = tmp_path / "web"
+    export_web_artifacts(
+        ExportInputs(
+            warehouse=Path("data/warehouse"),
+            sim=Path("data/sim"),
+            out=out,
+            extraction_quality=Path("data/extraction_quality.json"),
+        )
+    )
+
+    camt_prices = json.loads((out / "prices" / "CAMT.json").read_text(encoding="utf-8"))
+    latest = camt_prices["prices"][-1]
+    assert camt_prices["currency"] == "USD"
+    assert latest["currency"] == "USD"
+    assert 100 < latest["close"] < 1_000
+    assert latest["close_krw"] > 100_000
+    assert latest["close_krw"] / latest["close"] > 1_000
+
+    reports = json.loads((out / "reports.json").read_text(encoding="utf-8"))
+    camt = next(row for row in reports if row["symbol"] == "CAMT")
+    assert camt["currency"] == "USD"
+    assert camt["entry_price_native"] == 176.51
+    assert 100 < camt["target_price_native"] < 1_000
+    assert camt["target_price_krw"] > 100_000
+    assert camt["target_hit"] is False
+    assert camt["target_hit_date"] is None
+
+
 def test_reports_artifact_uses_adjusted_target_price_when_price_scale_changed(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(

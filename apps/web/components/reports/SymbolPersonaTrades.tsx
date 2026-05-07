@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import type { PositionEpisodeRow, TradeRow } from '@/lib/artifacts';
-import { formatDays, formatKrw, formatPercent } from '@/lib/format';
+import { formatDays, formatKrw, formatNativeWithKrw, formatPercent } from '@/lib/format';
 import { DEFAULT_PERSONA } from '@/components/trading/TableControls';
 
 type Props = {
@@ -40,7 +40,7 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
           <h2>페르소나별 매매 내역</h2>
           <p className="muted">전략을 바꾸면 {symbol}을 언제 샀고, 언제 팔았는지 포지션과 체결 원장 단위로 확인합니다.</p>
         </div>
-        <Link className="mini-link secondary" href={`/trades?strategy=${persona}&q=${symbol}`}>원장 전문</Link>
+        <Link className="mini-link secondary" href={`/portfolio?strategy=${persona}`}>포트폴리오 원장</Link>
       </div>
       <div className="strategy-tabs compact" role="group" aria-label="페르소나 선택">
         {personas.map((item) => (
@@ -70,8 +70,8 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
                 <td>{episode.closeDate ?? <span className="pill good">보유중</span>}<div className="muted">{episode.status}</div></td>
                 <td>{formatDays(episode.holdingDays)}</td>
                 <td>{episode.buyFills ?? 0} / {episode.sellFills ?? 0}</td>
-                <td>{formatKrw(episode.avgEntryPriceKrw)}</td>
-                <td>{formatKrw(exitOrLast)}</td>
+                <td>{formatAssetPrice(episode.avgEntryPriceNative, episode.avgEntryPriceKrw, episode.currency)}</td>
+                <td>{formatAssetPrice(episode.avgExitPriceNative ?? episode.lastCloseNative, exitOrLast, episode.currency)}</td>
                 <td className={(stockReturn ?? 0) >= 0 ? 'good' : 'bad'}>{formatPercent(stockReturn)}</td>
                 <td className={(pnl ?? 0) >= 0 ? 'good' : 'bad'}>{formatKrw(pnl)}</td>
                 <td>{humanReason(episode.exitReasons)}</td>
@@ -90,8 +90,8 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
               <td>{trade.date}</td>
               <td><span className={`pill ${trade.side === 'buy' ? 'good' : 'warn'}`}>{trade.side === 'buy' ? '매수' : '매도'}</span></td>
               <td>{trade.qty?.toLocaleString('ko-KR') ?? '—'}</td>
-              <td>{formatKrw(trade.fillPriceKrw)}</td>
-              <td>{formatKrw(trade.grossKrw)}</td>
+              <td>{formatAssetPrice(trade.fillPriceNative, trade.fillPriceKrw, trade.currency)}</td>
+              <td>{formatAssetPrice(trade.grossNative, trade.grossKrw, trade.currency)}</td>
               <td>{formatKrw(trade.cashAfterKrw)}</td>
               <td>{humanReason(trade.reason)}</td>
               <td>{trade.reportId ?? '—'}</td>
@@ -110,4 +110,14 @@ function humanReason(reason: string): string {
   if (reason.includes('rebalance_sell')) return '리밸런싱 매도';
   if (reason.includes('time')) return '시간 손절';
   return reason.replace(/[()']/g, '') || '—';
+}
+
+function formatAssetPrice(native: number | null, krw: number | null, currency: string) {
+  const { primary, secondary } = formatNativeWithKrw(native, krw, currency);
+  return (
+    <>
+      {primary}
+      {secondary ? <div className="muted" style={{ fontSize: '.74rem' }}>{secondary}</div> : null}
+    </>
+  );
 }

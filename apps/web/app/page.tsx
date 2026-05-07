@@ -45,11 +45,11 @@ export default function DashboardPage() {
     <>
       <section className="v2-hero" aria-labelledby="dashboard-title">
         <div className="v2-hero__main">
-          <div className="v2-hero__eyebrow">SNUSMIC Portfolio v2</div>
-          <h1 id="dashboard-title">오늘은 이 4가지만 보면 됩니다.</h1>
+          <div className="v2-hero__eyebrow">SNUSMIC Portfolio Intelligence</div>
+          <h1 id="dashboard-title">포트폴리오의 현재 판단을 먼저 보여줍니다.</h1>
           <p>
-            SMIC 리포트 기반 포트폴리오를 투자 앱처럼 요약했습니다. 현재 계좌 상태,
-            추세 추종 신호, 리스크, 최근 리포트만 먼저 보여주고 상세 원장은 뒤로 숨겼습니다.
+            SMIC 리포트 기반 보유자산을 계좌 가치, 추세, 리스크, 리서치 근거 순서로 정리했습니다.
+            가격은 해당 시장 통화로 보고, 원화는 포트폴리오 합산 가치에서만 보조로 확인합니다.
           </p>
           <div className="v2-hero__actions" aria-label="주요 페이지 이동">
             <Link className="button-link" href="/portfolio">보유 종목 보기</Link>
@@ -84,7 +84,7 @@ export default function DashboardPage() {
       </section>
 
       <section className="decision-grid" aria-label="오늘의 투자 판단 요약">
-        <KpiTile label="추세 추종 모드" value={trend.mode} delta={trend.caption} tone={trend.tone} emphasis />
+          <KpiTile label="시장 대응 상태" value={trend.mode} delta={trend.caption} tone={trend.tone} emphasis />
         <KpiTile label="90일 계좌 모멘텀" value={<span>{formatPercent(trend.return90d)}</span>} delta={`120일 ${formatPercent(trend.return120d)}`} tone={(trend.return90d ?? 0) >= 0 ? 'good' : 'bad'} />
         <KpiTile label="상승 포지션 비율" value={<span>{formatPercent(trend.positiveBreadth)}</span>} delta={`${trend.positiveCount}/${holdings.length} 종목 플러스`} tone={(trend.positiveBreadth ?? 0) >= 0.5 ? 'good' : 'warn'} />
         <KpiTile label="고점 대비 낙폭" value={<span>{formatPercent(trend.currentDrawdown)}</span>} delta="최근 계좌 수익률 기준" tone={(trend.currentDrawdown ?? 0) > -0.1 ? 'good' : 'bad'} />

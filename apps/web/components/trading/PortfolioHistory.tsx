@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import type { MonthlyHoldingRow, ReportTargetDigest } from '@/lib/artifacts';
-import { formatKrw, formatPercent } from '@/lib/format';
+import { formatKrw, formatNativeWithKrw, formatPercent } from '@/lib/format';
 import { PaginationControls, SortHeader, defaultPersonaFor, pageRows, sortRows, useUrlBackedStrategy, type SortState } from './TableControls';
 
 type Props = {
@@ -31,7 +31,7 @@ export function PortfolioHistory({ monthly, personaLabels, targetsBySymbol }: Pr
     strategy: (row) => personaLabels[row.persona] ?? row.persona,
     market: (row) => marketLabel(targetsBySymbol[row.symbol]?.marketRegion),
     symbol: (row) => row.company || row.symbol,
-    target: (row) => targetsBySymbol[row.symbol]?.targetPriceKrw,
+    target: (row) => targetsBySymbol[row.symbol]?.targetPriceNative ?? targetsBySymbol[row.symbol]?.targetPriceKrw,
     qty: (row) => row.qty,
     monthClose: (row) => row.monthCloseKrw,
     avgCost: (row) => row.avgCostKrw,
@@ -126,11 +126,11 @@ export function PortfolioHistory({ monthly, personaLabels, targetsBySymbol }: Pr
                   <td>{personaLabels[row.persona] ?? row.persona}</td>
                   <td><span className="pill">{marketLabel(target?.marketRegion)}</span></td>
                   <td>{row.company || row.symbol}<div className="muted"><a href={`/reports/${row.symbol}`}>{row.symbol}</a></div></td>
-                  <td>{formatKrw(target?.targetPriceKrw)}<div className="muted">{target?.publicationDate ?? '—'}</div></td>
+                  <td>{formatTarget(target)}<div className="muted">{target?.publicationDate ?? '—'}</div></td>
                   <td>{row.qty?.toLocaleString('ko-KR') ?? '—'}</td>
-                  <td>{formatKrw(row.monthCloseKrw)}</td>
-                  <td>{formatKrw(row.avgCostKrw)}</td>
-                  <td>{formatKrw(row.marketValueKrw)}</td>
+                  <td>{formatMonthlyPrice(row.monthCloseNative, row.monthCloseKrw, row.currency)}</td>
+                  <td>{formatMonthlyPrice(nativeFromKrw(row.avgCostKrw, row.monthCloseNative, row.monthCloseKrw), row.avgCostKrw, row.currency)}</td>
+                  <td>{formatMonthlyPrice(row.monthCloseNative !== null && row.qty !== null ? row.monthCloseNative * row.qty : null, row.marketValueKrw, row.currency)}</td>
                   <td className={(row.unrealizedPnlKrw ?? 0) >= 0 ? 'good' : 'bad'}>{formatKrw(row.unrealizedPnlKrw)}</td>
                   <td className={(row.unrealizedReturn ?? 0) >= 0 ? 'good' : 'bad'}>{formatPercent(row.unrealizedReturn)}</td>
                   <td className={(gap ?? 0) >= 0 ? 'good' : 'bad'}>{formatPercent(gap)}</td>
@@ -188,6 +188,36 @@ function csvEscape(value: unknown): string {
 
 function marketLabel(region: 'domestic' | 'overseas' | undefined): string {
   return region === 'domestic' ? '국내' : '해외';
+}
+
+function formatTarget(target: ReportTargetDigest | undefined) {
+  if (!target) return '—';
+  const { primary, secondary } = formatNativeWithKrw(target.targetPriceNative, target.targetPriceKrw, target.currency);
+  return (
+    <>
+      {primary}
+      {secondary ? <div className="muted" style={{ fontSize: '.74rem' }}>{secondary}</div> : null}
+    </>
+  );
+}
+
+function formatMonthlyPrice(native: number | null, krw: number | null, currency: string) {
+  const { primary, secondary } = formatNativeWithKrw(native, krw, currency);
+  return (
+    <>
+      {primary}
+      {secondary ? <div className="muted" style={{ fontSize: '.74rem' }}>{secondary}</div> : null}
+    </>
+  );
+}
+
+function nativeFromKrw(
+  krw: number | null,
+  nativeReference: number | null,
+  krwReference: number | null,
+): number | null {
+  if (krw === null || nativeReference === null || krwReference === null || krwReference <= 0) return krw;
+  return krw * nativeReference / krwReference;
 }
 
 function targetGap(row: MonthlyHoldingRow, target: ReportTargetDigest | undefined): number | null {

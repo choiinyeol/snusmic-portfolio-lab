@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import type { HoldingRow, ReportTargetDigest } from '@/lib/artifacts';
 import { formatDays, formatKrw, formatNativeWithKrw, formatPercent } from '@/lib/format';
 import { PaginationControls, SortHeader, defaultPersonaFor, pageRows, sortRows, useUrlBackedStrategy, type SortState } from './TableControls';
@@ -26,7 +26,7 @@ export function PortfolioTables({ holdings, personaLabels, capitalByPersona = {}
     strategy: (row) => personaLabels[row.persona] ?? row.persona,
     market: (row) => marketLabel(targetsBySymbol[row.symbol]?.marketRegion),
     symbol: (row) => row.company || row.symbol,
-    target: (row) => targetsBySymbol[row.symbol]?.targetPriceKrw,
+    target: (row) => targetsBySymbol[row.symbol]?.targetPriceNative ?? targetsBySymbol[row.symbol]?.targetPriceKrw,
     qty: (row) => row.qty,
     avgCost: (row) => row.avgCostKrw,
     lastClose: (row) => row.lastCloseKrw,
@@ -85,9 +85,9 @@ export function PortfolioTables({ holdings, personaLabels, capitalByPersona = {}
                     <td>{personaLabels[row.persona] ?? row.persona}</td>
                     <td><span className="pill">{marketLabel(target?.marketRegion)}</span></td>
                     <td><strong><Link href={`/reports/${row.symbol}`}>{row.company || row.symbol}</Link></strong><div className="muted">{row.symbol}</div></td>
-                    <td>{formatKrw(target?.targetPriceKrw)}<div className="muted">{target?.publicationDate ?? '—'}</div></td>
+                    <td>{formatTarget(target)}<div className="muted">{target?.publicationDate ?? '—'}</div></td>
                     <td>{row.qty?.toLocaleString('ko-KR') ?? '—'}</td>
-                    <td>{formatKrw(row.avgCostKrw)}</td>
+                    <td>{formatHoldingPrice(nativeFromKrw(row.avgCostKrw, row.lastCloseNative, row.lastCloseKrw), row.avgCostKrw, row.currency)}</td>
                     <td>{(() => {
                       const { primary, secondary } = formatNativeWithKrw(row.lastCloseNative, row.lastCloseKrw, row.currency);
                       return (
@@ -151,4 +151,38 @@ function capitalContribution(pnl: number | null, capital: number | undefined): n
 
 function marketLabel(region: 'domestic' | 'overseas' | undefined): string {
   return region === 'domestic' ? '국내' : '해외';
+}
+
+function formatTarget(target: ReportTargetDigest | undefined): ReactNode {
+  if (!target) return '—';
+  const { primary, secondary } = formatNativeWithKrw(target.targetPriceNative, target.targetPriceKrw, target.currency);
+  return (
+    <>
+      {primary}
+      {secondary ? <div className="muted" style={{ fontSize: '.74rem' }}>{secondary}</div> : null}
+    </>
+  );
+}
+
+function formatHoldingPrice(
+  native: number | null,
+  krw: number | null,
+  currency: string,
+): ReactNode {
+  const { primary, secondary } = formatNativeWithKrw(native, krw, currency);
+  return (
+    <>
+      {primary}
+      {secondary ? <div className="muted" style={{ fontSize: '.74rem' }}>{secondary}</div> : null}
+    </>
+  );
+}
+
+function nativeFromKrw(
+  krw: number | null,
+  nativeReference: number | null,
+  krwReference: number | null,
+): number | null {
+  if (krw === null || nativeReference === null || krwReference === null || krwReference <= 0) return krw;
+  return krw * nativeReference / krwReference;
 }
