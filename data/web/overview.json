@@ -19,20 +19,20 @@
     },
     {
       "cagr": 0.92,
-      "final_cash_krw": 6011981.07,
-      "final_equity_krw": 3292120556.66,
-      "final_holdings_value_krw": 3286108575.59,
+      "final_cash_krw": 6000049.66,
+      "final_equity_krw": 3292207100.53,
+      "final_holdings_value_krw": 3286207050.87,
       "initial_capital_krw": 10000000.0,
       "label": "Weak Prophet (6M look-ahead)",
       "max_drawdown": 0.22,
       "money_weighted_return": 1.52,
-      "net_profit_krw": 3190120556.66,
+      "net_profit_krw": 3190207100.53,
       "open_positions": 12,
       "persona": "weak_oracle",
-      "realized_pnl_krw": 1926808539.31,
-      "time_weighted_return": 133.54,
+      "realized_pnl_krw": 1926798500.02,
+      "time_weighted_return": 133.55,
       "total_contributed_krw": 102000000.0,
-      "trade_count": 1152
+      "trade_count": 1151
     },
     {
       "cagr": 0.07,

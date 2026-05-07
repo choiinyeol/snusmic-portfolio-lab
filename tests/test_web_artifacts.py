@@ -92,6 +92,28 @@ def test_extended_web_artifacts_support_insights_and_downloads(tmp_path: Path) -
     assert (out / "data-quality-download.csv").read_text(encoding="utf-8").startswith("section,metric,value")
 
 
+def test_holdings_artifact_exposes_native_currency_for_foreign_positions(tmp_path: Path) -> None:
+    out = tmp_path / "web"
+    export_web_artifacts(
+        ExportInputs(
+            warehouse=Path("data/warehouse"),
+            sim=Path("data/sim"),
+            out=out,
+            extraction_quality=Path("data/extraction_quality.json"),
+        )
+    )
+
+    holdings = json.loads((out / "current-holdings.json").read_text(encoding="utf-8"))
+    camt = next(row for row in holdings if row["symbol"] == "CAMT")
+    assert camt["currency"] == "USD"
+    assert camt["last_close_native"] < 1_000
+    assert camt["last_close_krw"] > 100_000
+    qqq = next(row for row in holdings if row["symbol"] == "QQQ")
+    assert qqq["currency"] == "USD"
+    assert qqq["last_close_native"] < 1_000
+    assert qqq["last_close_krw"] > 1_000_000
+
+
 def test_reports_artifact_uses_adjusted_target_price_when_price_scale_changed(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(

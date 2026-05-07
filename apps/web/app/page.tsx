@@ -10,11 +10,12 @@ import {
   getPersonaLabel,
   getReportRows,
   getSummaryRows,
+  type EquityPoint,
   type HoldingRow,
   type ReportRow,
   type SummaryRow,
 } from '@/lib/artifacts';
-import { formatKrw, formatPercent } from '@/lib/format';
+import { formatDateKo, formatKrw, formatNativeWithKrw, formatPercent } from '@/lib/format';
 
 const PERSONA_PRIMARY = 'smic_follower_v2';
 
@@ -35,143 +36,140 @@ export default function DashboardPage() {
   const newestReports = [...reports]
     .filter((report) => report.publicationDate)
     .sort((a, b) => b.publicationDate.localeCompare(a.publicationDate))
-    .slice(0, 6);
+    .slice(0, 5);
   const verdict = strategyVerdict(personas);
+  const trend = trendSnapshot(equity, holdings, persona);
+  const overseasCount = holdings.filter((row) => row.currency && row.currency !== 'KRW').length;
 
   return (
     <>
-      <section className="hero-summary">
-        <div className="hero-summary__lede">
-          <span className="hero-summary__eyebrow">Quant Terminal</span>
-          <h1 className="display-1">SMIC 리서치 기반 매매 시스템의 정량적 검증</h1>
-          <p className="hero-summary__sub">
-            SMIC follower 시리즈와 단순 4자산 all-weather 기준선의 누적 손익,
-            보유 구성, 리스크 지표를 동일 데이터로 비교합니다. 모든 수치는
-            커밋된 정적 아티팩트에서 직접 산출되며, 실시간 거래나 외부
-            호출은 수반되지 않습니다.
+      <section className="v2-hero" aria-labelledby="dashboard-title">
+        <div className="v2-hero__main">
+          <div className="v2-hero__eyebrow">SNUSMIC Portfolio v2</div>
+          <h1 id="dashboard-title">오늘은 이 4가지만 보면 됩니다.</h1>
+          <p>
+            SMIC 리포트 기반 포트폴리오를 투자 앱처럼 요약했습니다. 현재 계좌 상태,
+            추세 추종 신호, 리스크, 최근 리포트만 먼저 보여주고 상세 원장은 뒤로 숨겼습니다.
           </p>
-          <div className="hero-summary__signals">
-            <span>스냅샷 기준일 {lastUpdated ?? '—'}</span>
-            <span>보유 종목 {holdings.length}</span>
-            <span>리포트 {reports.length}건</span>
-            <span>전략 {personas.length}개</span>
+          <div className="v2-hero__actions" aria-label="주요 페이지 이동">
+            <Link className="button-link" href="/portfolio">보유 종목 보기</Link>
+            <Link className="button-link secondary" href="/strategies">전략 검증</Link>
+            <Link className="button-link ghost" href="/reports">리포트 탐색</Link>
           </div>
-          <div className="action-row" style={{ marginTop: '.6rem' }}>
-            <Link className="button-link" href="/portfolio">포트폴리오 분석</Link>
-            <Link className="button-link secondary" href="/reports">리포트 아카이브</Link>
-          </div>
+          <dl className="v2-snapshot-meta" aria-label="데이터 스냅샷">
+            <div><dt>기준일</dt><dd>{formatDateKo(lastUpdated)}</dd></div>
+            <div><dt>보유</dt><dd>{holdings.length}종목</dd></div>
+            <div><dt>외화</dt><dd>{overseasCount}종목</dd></div>
+            <div><dt>전략</dt><dd>{getPersonaLabel(PERSONA_PRIMARY)}</dd></div>
+          </dl>
         </div>
-        <div className="hero-summary__kpis">
-          <KpiTile
-            label="현재 평가액"
-            value={<span className="display-num">{formatKrw(portfolio.marketValue)}</span>}
-            caption={`상위 5종목 집중도 ${formatPercent(portfolio.top5Weight)}`}
-            tone="accent"
-            emphasis
-          >
-            <Sparkline values={equitySpark} height={36} tone="accent" />
-          </KpiTile>
-          <KpiTile
-            label="미실현 손익"
-            value={<span className="display-num">{formatKrw(portfolio.unrealizedPnl)}</span>}
-            delta={formatPercent(portfolio.unrealizedReturn)}
-            tone={portfolio.unrealizedPnl >= 0 ? 'good' : 'bad'}
-          />
-          <KpiTile
-            label="전략 누적 수익률 (MWR)"
-            value={<span className="display-num">{formatPercent(persona?.moneyWeightedReturn ?? persona?.irr)}</span>}
-            delta={`MDD ${formatPercent(persona?.maxDrawdown)}`}
-            tone={(persona?.moneyWeightedReturn ?? 0) >= 0 ? 'good' : 'bad'}
-          />
-          <KpiTile
-            label="리포트 목표 적중"
-            value={<span className="display-num">{formatPercent(overview.target_stats?.target_hit_rate)}</span>}
-            delta={`${overview.target_stats?.target_hit_count ?? 0}건 도달`}
-            tone="good"
-          />
+
+        <div className="account-card" aria-label="현재 계좌 핵심 지표">
+          <div className="account-card__topline">
+            <span>평가금액</span>
+            <span className={`signal-dot signal-dot--${trend.tone}`} />
+          </div>
+          <div className="account-card__value">{formatKrw(portfolio.marketValue)}</div>
+          <div className={`account-card__pnl ${portfolio.unrealizedPnl >= 0 ? 'good' : 'bad'}`}>
+            {formatKrw(portfolio.unrealizedPnl)} · {formatPercent(portfolio.unrealizedReturn)}
+          </div>
+          <Sparkline values={equitySpark} height={54} tone={trend.tone === 'bad' ? 'bad' : trend.tone === 'good' ? 'good' : 'accent'} />
+          <div className="account-card__grid">
+            <div><span>MWR</span><strong>{formatPercent(persona?.moneyWeightedReturn ?? persona?.irr)}</strong></div>
+            <div><span>MDD</span><strong>{formatPercent(persona?.maxDrawdown)}</strong></div>
+            <div><span>집중도</span><strong>{formatPercent(portfolio.top5Weight)}</strong></div>
+            <div><span>목표 적중</span><strong>{formatPercent(overview.target_stats?.target_hit_rate)}</strong></div>
+          </div>
         </div>
       </section>
 
+      <section className="decision-grid" aria-label="오늘의 투자 판단 요약">
+        <KpiTile label="추세 추종 모드" value={trend.mode} delta={trend.caption} tone={trend.tone} emphasis />
+        <KpiTile label="90일 계좌 모멘텀" value={<span>{formatPercent(trend.return90d)}</span>} delta={`120일 ${formatPercent(trend.return120d)}`} tone={(trend.return90d ?? 0) >= 0 ? 'good' : 'bad'} />
+        <KpiTile label="상승 포지션 비율" value={<span>{formatPercent(trend.positiveBreadth)}</span>} delta={`${trend.positiveCount}/${holdings.length} 종목 플러스`} tone={(trend.positiveBreadth ?? 0) >= 0.5 ? 'good' : 'warn'} />
+        <KpiTile label="고점 대비 낙폭" value={<span>{formatPercent(trend.currentDrawdown)}</span>} delta="최근 계좌 수익률 기준" tone={(trend.currentDrawdown ?? 0) > -0.1 ? 'good' : 'bad'} />
+      </section>
+
       <Section
-        eyebrow="Open positions"
-        title="현재 보유 상위 종목"
-        caption="평가금 기준 상위 6종목. 각 카드는 해당 종목의 리포트 근거 페이지로 연결됩니다."
-        actions={<Link className="terminal-link" href="/portfolio">전체 보유 보기</Link>}
+        eyebrow="Positions"
+        title="외화는 외화로, 원화는 보조로"
+        caption="해외 자산은 USD·JPY 등 현지 통화를 우선 표시하고 원화 환산액은 작게 붙였습니다. 투자자가 실제 시장 가격을 바로 인지할 수 있게 했습니다."
+        actions={<Link className="terminal-link" href="/portfolio">전체 원장</Link>}
       >
-        <div className="holdings-strip">
-          {holdings.slice(0, 6).map((row) => (
-            <Link
-              key={row.symbol}
-              href={`/reports/${row.symbol}`}
-              className="holdings-strip__cell"
-              title={`${row.company || row.symbol}`}
-            >
-              <span className="name">{row.company || row.symbol}</span>
-              <span className="symbol">{row.symbol}</span>
-              <span className="value">{formatKrw(row.marketValueKrw)}</span>
-              <span className={`ret ${(row.unrealizedReturn ?? 0) >= 0 ? 'good' : 'bad'}`}>
-                {formatPercent(row.unrealizedReturn)} · 비중 {formatPercent(weight(row, portfolio.marketValue))}
-              </span>
-            </Link>
-          ))}
+        <div className="asset-list">
+          {holdings.slice(0, 6).map((row, index) => {
+            const display = holdingValueDisplay(row);
+            const target = targets[row.symbol];
+            return (
+              <Link key={row.symbol} href={`/reports/${row.symbol}`} className="asset-row">
+                <div className="asset-row__rank">{String(index + 1).padStart(2, '0')}</div>
+                <div className="asset-row__name">
+                  <strong>{row.company || row.symbol}</strong>
+                  <span>{row.symbol} · {row.currency || 'KRW'}</span>
+                </div>
+                <div className="asset-row__price">
+                  <strong>{display.primary}</strong>
+                  {display.secondary ? <span>{display.secondary}</span> : null}
+                </div>
+                <div className="asset-row__signal">
+                  <span className={(row.unrealizedReturn ?? 0) >= 0 ? 'good' : 'bad'}>{formatPercent(row.unrealizedReturn)}</span>
+                  <small>목표까지 {formatPercent(targetGap(row.lastCloseKrw, target?.targetPriceKrw))}</small>
+                </div>
+              </Link>
+            );
+          })}
           {!holdings.length ? <p className="muted">현재 보유 포지션이 없습니다.</p> : null}
         </div>
       </Section>
 
-      <Section
-        eyebrow="Latest research"
-        title="최근 발간 리포트"
-        caption="발간일 기준 최신 6건과 발간 이후 가격 경로의 사후 평가를 함께 보여줍니다."
-        actions={<Link className="terminal-link" href="/reports">전체 아카이브</Link>}
-      >
-        <div className="reports-strip">
-          {newestReports.map((report) => (
-            <Link key={report.symbol + report.publicationDate} href={`/reports/${report.symbol}`} className="report-card">
-              <span className="report-card__date">{report.publicationDate || '—'}</span>
-              <strong className="report-card__title">{report.company || report.symbol}</strong>
-              <span className="report-card__symbol">{report.symbol}</span>
-              <div className="report-card__line">
-                <span className="muted" style={{ fontSize: '.78rem' }}>현재 수익률</span>
-                <span className={`report-card__metric ${(report.currentReturn ?? 0) >= 0 ? 'good' : 'bad'}`}>
-                  {formatPercent(report.currentReturn)}
-                </span>
-              </div>
-              <div className="report-card__line">
-                <span className="muted" style={{ fontSize: '.78rem' }}>목표가까지</span>
-                <span className="report-card__metric">{formatPercent(targetGap(report.lastCloseKrw, targets[report.symbol]?.targetPriceKrw))}</span>
-              </div>
-              {targetUpsidePill(report)}
-            </Link>
-          ))}
-        </div>
-      </Section>
+      <div className="v2-two-column">
+        <Section
+          eyebrow="Research"
+          title="최근 리포트 — 행동 신호만"
+          caption="최신 발간 순으로 현재 수익률, 목표까지 남은 거리, 실행 상태만 압축했습니다."
+          actions={<Link className="terminal-link" href="/reports">전체 리포트</Link>}
+        >
+          <div className="brief-feed">
+            {newestReports.map((report) => (
+              <Link key={report.symbol + report.publicationDate} href={`/reports/${report.symbol}`} className="brief-item">
+                <div>
+                  <span className="brief-item__date">{formatDateKo(report.publicationDate)}</span>
+                  <strong>{report.company || report.symbol}</strong>
+                  <small>{report.symbol}</small>
+                </div>
+                <div className="brief-item__metrics">
+                  <span className={(report.currentReturn ?? 0) >= 0 ? 'good' : 'bad'}>{formatPercent(report.currentReturn)}</span>
+                  {targetUpsidePill(report)}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </Section>
 
-      <Section
-        eyebrow="Strategy validation"
-        title="기준선 대비 SMIC follower의 위치"
-        caption="단순 4자산 all-weather와 v1을 기준선으로 두고, v2가 손절 규칙을 통해 만든 손익·낙폭의 차이를 비교합니다."
-        actions={<Link className="terminal-link" href="/strategies">전략 리더보드</Link>}
-      >
-        <article className="verdict-card">
-          <div className="verdict-card__head">
+        <Section
+          eyebrow="Validation"
+          title="전략 평결"
+          caption="추세 추종 모델은 수익률만 보지 않고 기준선 대비 우위와 낙폭을 같이 봐야 합니다."
+          actions={<Link className="terminal-link" href="/strategies">리더보드</Link>}
+        >
+          <article className="verdict-card verdict-card--compact">
             <span className={`verdict-pill ${verdict.tone}`}>{verdict.headline}</span>
             <h3 className="verdict-card__title">{verdict.summary}</h3>
-          </div>
-          <p className="verdict-card__detail">{verdict.detail}</p>
-          <div className="verdict-card__rows">
-            {personas
-              .filter((row) => ['smic_follower_v2', 'smic_follower', 'all_weather'].includes(row.persona))
-              .map((row) => (
-                <div className="verdict-card__row" key={row.persona}>
-                  <strong>{row.label || row.persona}</strong>
-                  <span>누적 손익 <b>{formatKrw(row.netProfitKrw)}</b></span>
-                  <span>MWR <b>{formatPercent(row.moneyWeightedReturn ?? row.irr)}</b></span>
-                  <span>MDD <b>{formatPercent(row.maxDrawdown)}</b></span>
-                </div>
-              ))}
-          </div>
-        </article>
-      </Section>
+            <p className="verdict-card__detail">{verdict.detail}</p>
+            <div className="mini-scoreboard">
+              {personas
+                .filter((row) => ['smic_follower_v2', 'all_weather'].includes(row.persona))
+                .map((row) => (
+                  <div key={row.persona}>
+                    <span>{row.label || row.persona}</span>
+                    <strong>{formatPercent(row.moneyWeightedReturn ?? row.irr)}</strong>
+                    <small>MDD {formatPercent(row.maxDrawdown)}</small>
+                  </div>
+                ))}
+            </div>
+          </article>
+        </Section>
+      </div>
     </>
   );
 }
@@ -189,9 +187,9 @@ function summarizeHoldings(rows: HoldingRow[]) {
   };
 }
 
-function weight(row: HoldingRow, total: number): number | null {
-  if (!total) return null;
-  return (row.marketValueKrw ?? 0) / total;
+function holdingValueDisplay(row: HoldingRow): { primary: string; secondary: string | null } {
+  const nativeMarketValue = row.lastCloseNative !== null && row.qty !== null ? row.lastCloseNative * row.qty : null;
+  return formatNativeWithKrw(nativeMarketValue, row.marketValueKrw, row.currency);
 }
 
 function targetGap(current: number | null | undefined, target: number | null | undefined): number | null {
@@ -200,12 +198,12 @@ function targetGap(current: number | null | undefined, target: number | null | u
 }
 
 function targetUpsidePill(report: ReportRow) {
-  if ((report.targetUpsideAtPub ?? 0) <= 0) return <span className="report-card__pill skip">목표가 비실행</span>;
-  if (report.targetHit) return <span className="report-card__pill hit">목표 도달</span>;
-  return <span className="report-card__pill open">진행 중</span>;
+  if ((report.targetUpsideAtPub ?? 0) <= 0) return <span className="report-card__pill skip">보류</span>;
+  if (report.targetHit) return <span className="report-card__pill hit">도달</span>;
+  return <span className="report-card__pill open">진행</span>;
 }
 
-function sparkPoints(equity: ReturnType<typeof getEquityDaily>, persona: string): number[] {
+function sparkPoints(equity: EquityPoint[], persona: string): number[] {
   const series = equity
     .filter((point) => point.persona === persona && point.cumulativeReturn !== null)
     .sort((a, b) => a.date.localeCompare(b.date))
@@ -213,8 +211,40 @@ function sparkPoints(equity: ReturnType<typeof getEquityDaily>, persona: string)
   return series.slice(-90);
 }
 
-function equityLatestDate(equity: ReturnType<typeof getEquityDaily>): string | null {
+function equityLatestDate(equity: EquityPoint[]): string | null {
   return equity.reduce<string | null>((latest, point) => (point.date > (latest ?? '') ? point.date : latest), null);
+}
+
+function trendSnapshot(equity: EquityPoint[], holdings: HoldingRow[], persona: SummaryRow | undefined) {
+  const series = equity
+    .filter((point) => point.persona === PERSONA_PRIMARY && point.cumulativeReturn !== null)
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .map((point) => point.cumulativeReturn ?? 0);
+  const last = series.at(-1) ?? null;
+  const return90d = windowReturn(series, 90);
+  const return120d = windowReturn(series, 120);
+  const peak = series.reduce<number | null>((max, value) => (max === null || value > max ? value : max), null);
+  const currentDrawdown = last !== null && peak !== null ? (1 + last) / Math.max(0.0001, 1 + peak) - 1 : null;
+  const positiveCount = holdings.filter((row) => (row.unrealizedReturn ?? 0) > 0).length;
+  const positiveBreadth = holdings.length ? positiveCount / holdings.length : null;
+  const score = [
+    (return90d ?? 0) > 0,
+    (return120d ?? 0) > 0,
+    (positiveBreadth ?? 0) >= 0.5,
+    (currentDrawdown ?? -1) > -0.1,
+    (persona?.moneyWeightedReturn ?? persona?.irr ?? 0) > 0,
+  ].filter(Boolean).length;
+  if (score >= 4) return { mode: 'Risk-on', tone: 'good' as const, caption: '추세 유지 · 보유 우선', return90d, return120d, currentDrawdown, positiveBreadth, positiveCount };
+  if (score >= 2) return { mode: 'Neutral', tone: 'warn' as const, caption: '선별 보유 · 신규 진입 보수적', return90d, return120d, currentDrawdown, positiveBreadth, positiveCount };
+  return { mode: 'Defense', tone: 'bad' as const, caption: '현금/손절 규칙 우선 점검', return90d, return120d, currentDrawdown, positiveBreadth, positiveCount };
+}
+
+function windowReturn(series: number[], days: number): number | null {
+  if (series.length < 2) return null;
+  const last = series.at(-1);
+  const past = series.at(Math.max(0, series.length - 1 - days));
+  if (last === undefined || past === undefined) return null;
+  return (1 + last) / Math.max(0.0001, 1 + past) - 1;
 }
 
 function strategyVerdict(personas: SummaryRow[]) {
@@ -230,22 +260,22 @@ function strategyVerdict(personas: SummaryRow[]) {
     return {
       tone: 'good' as const,
       headline: '검증 신호',
-      summary: 'v2의 MWR이 기준선과 v1을 모두 상회합니다.',
-      detail: `v2 MWR ${formatPercent(v2Return)}는 all-weather ${formatPercent(awReturn)}와 v1 ${formatPercent(v1Return)}를 동시에 상회합니다. 다만 표본이 한정적이며 거래 비용과 최대 낙폭을 함께 검토할 필요가 있습니다.`,
+      summary: 'v2가 기준선과 v1을 모두 상회합니다.',
+      detail: `v2 MWR ${formatPercent(v2Return)}는 all-weather ${formatPercent(awReturn)}와 v1 ${formatPercent(v1Return)}를 동시에 상회합니다.`,
     };
   }
   if (beatsAw) {
     return {
       tone: 'warn' as const,
       headline: '부분 신호',
-      summary: '기준선은 상회하지만 v1 대비 개선 폭은 제한적입니다.',
-      detail: `v2의 MWR이 all-weather ${formatPercent(awReturn)}는 상회하나 v1 ${formatPercent(v1Return)} 대비 개선 폭은 좁습니다. 손절 규칙의 기여가 수익률보다 위험 통제 측면에 있는지 점검이 필요합니다.`,
+      summary: 'v2는 기준선보다 낫지만 v1 대비 추가 검증이 필요합니다.',
+      detail: `v2 MWR ${formatPercent(v2Return)}가 all-weather ${formatPercent(awReturn)}를 상회하지만 v1 대비 우위는 아직 충분하지 않습니다.`,
     };
   }
   return {
     tone: 'bad' as const,
     headline: '재검토 필요',
     summary: '기준선 대비 통계적 우위가 확보되지 않았습니다.',
-    detail: `v2 MWR ${formatPercent(v2Return)}가 all-weather ${formatPercent(awReturn)}를 안정적으로 상회한다고 보기 어렵습니다. 리포트 선택 기준과 청산 규칙의 재검토가 권장됩니다.`,
+    detail: `v2 MWR ${formatPercent(v2Return)}가 all-weather ${formatPercent(awReturn)}를 안정적으로 상회한다고 보기 어렵습니다. 리포트 선택 기준과 청산 규칙을 다시 점검해야 합니다.`,
   };
 }

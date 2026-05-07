@@ -3,9 +3,9 @@ import Link from 'next/link';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'SNUSMIC Ledger — quant terminal',
+  title: 'SNUSMIC Portfolio v2 — quant dashboard',
   description:
-    'SMIC 리포트와 시뮬레이션 결과를 한 화면에서 검증합니다. 보유 포지션, 매매 원장, 리포트 성과, 전략 백테스트를 한곳에 모은 한국어 정적 대시보드.',
+    'SMIC 리포트 기반 포트폴리오를 계좌 현황, 외화 표시, 추세 추종 신호, 리포트 성과 중심으로 요약하는 한국어 정적 대시보드.',
 };
 
 const NAV = [
@@ -34,7 +34,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <Link className="brand" href="/" aria-label="SNUSMIC Ledger 홈">
               <span className="brand__mark" aria-hidden="true" />
               <span className="brand__name">
-                SNUSMIC<span className="brand__dot">·</span>Ledger
+                <span>SNUSMIC Ledger</span>
                 <span className="brand-kicker">snusmic quant terminal</span>
               </span>
             </Link>
