@@ -559,6 +559,44 @@ select:focus-visible {
 
 /* ─────────────────────  Charts  ───────────────────── */
 .chart-shell { position: relative; width: 100%; }
+.chart-legend {
+  position: absolute;
+  top: .65rem;
+  left: .75rem;
+  z-index: 2;
+  max-width: min(760px, calc(100% - 6rem));
+  padding: .62rem .75rem;
+  border: 1px solid rgba(229, 232, 239, .88);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .86);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, .07);
+  backdrop-filter: blur(12px);
+  pointer-events: none;
+}
+.chart-legend-main,
+.chart-legend-values {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  flex-wrap: wrap;
+}
+.chart-legend-main {
+  margin-bottom: .26rem;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: .72rem;
+}
+.legend-symbol {
+  color: var(--ink);
+  font-weight: 800;
+  letter-spacing: .01em;
+}
+.chart-legend-values {
+  color: var(--ink-2);
+  font-family: var(--mono);
+  font-size: .76rem;
+  font-weight: 650;
+}
 .chart-box {
   height: 430px;
   min-height: 430px;
@@ -592,6 +630,16 @@ select:focus-visible {
   pointer-events: none;
 }
 .tooltip-date { color: var(--accent); font-family: var(--mono); font-weight: 700; }
+
+@media (max-width: 720px) {
+  .chart-legend {
+    top: .5rem;
+    left: .5rem;
+    right: .5rem;
+    max-width: none;
+  }
+  .chart-legend-values { gap: .42rem; font-size: .7rem; }
+}
 
 /* ─────────────────────  Markdown / code  ───────────────────── */
 .markdown-snippet {
