@@ -97,7 +97,17 @@ export function PortfolioTables({ holdings, personaLabels, capitalByPersona = {}
                         </>
                       );
                     })()}</td>
-                    <td>{formatKrw(row.marketValueKrw)}<div className="muted">손익 {formatKrw(row.unrealizedPnlKrw)}</div></td>
+                    <td>{(() => {
+                      const nativeValue = row.lastCloseNative !== null && row.qty !== null ? row.lastCloseNative * row.qty : null;
+                      const { primary, secondary } = formatNativeWithKrw(nativeValue, row.marketValueKrw, row.currency);
+                      return (
+                        <>
+                          {primary}
+                          <div className="muted">{secondary ?? `손익 ${formatKrw(row.unrealizedPnlKrw)}`}</div>
+                          {secondary ? <div className="muted">손익 {formatKrw(row.unrealizedPnlKrw)}</div> : null}
+                        </>
+                      );
+                    })()}</td>
                     <td className={(row.unrealizedReturn ?? 0) >= 0 ? 'good' : 'bad'}>{formatPercent(row.unrealizedReturn)}</td>
                     <td className={(contribution ?? 0) >= 0 ? 'good' : 'bad'}>{formatPercent(contribution)}</td>
                     <td>{row.firstBuyDate}<div className="muted">{formatDays(row.holdingDays)}</div></td>

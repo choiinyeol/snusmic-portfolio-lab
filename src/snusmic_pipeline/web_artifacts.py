@@ -10,6 +10,8 @@ from typing import Any
 
 import pandas as pd
 
+from .currency import currency_for_symbol, normalize_currency
+
 REQUIRED_ARTIFACTS = [
     "overview.json",
     "personas.json",
@@ -30,37 +32,170 @@ REQUIRED_ARTIFACTS = [
 
 
 def _enrich_holdings_with_native(
-    holdings: pd.DataFrame, prices: pd.DataFrame, close_column: str = "last_close_krw"
+    holdings: pd.DataFrame,
+    prices: pd.DataFrame,
+    fx_rates: pd.DataFrame | None = None,
+    close_column: str = "last_close_krw",
 ) -> pd.DataFrame:
     """Attach (currency, last_close_native) for every row.
 
     The simulator stores positions in KRW only, so the static dashboard could
     not show users the native quote of a foreign holding without re-fetching
-    prices in the browser. Look up the latest warehouse row per symbol — the
-    daily-prices CSV already keeps native open/high/low/close alongside
-    source_currency and krw_per_unit — and copy those two fields onto each
-    holdings row.
+    prices in the browser. The warehouse OHLC columns are KRW-normalized for
+    cross-market simulation, while source_currency + krw_per_unit preserve the
+    market currency. Convert KRW close back to the native quote for display.
     """
 
     if holdings.empty:
         return holdings
+    fx_rates = fx_rates if fx_rates is not None else pd.DataFrame()
     if prices.empty or "symbol" not in prices.columns:
         out = holdings.copy()
-        out["currency"] = "KRW"
-        out["last_close_native"] = pd.to_numeric(out.get(close_column), errors="coerce")
+        out["currency"] = out["symbol"].map(currency_for_symbol).fillna("KRW")
+        out["last_close_native"] = _fallback_native_from_krw(
+            _holding_close_krw(out, close_column),
+            out["currency"],
+            fx_rates,
+            pd.to_datetime(out.get("month_end"), errors="coerce") if "month_end" in out.columns else None,
+        )
         return out
 
     work = prices.dropna(subset=["symbol", "date"]).copy()
-    work = work.sort_values("date")
-    latest_by_symbol = work.groupby("symbol", as_index=False).tail(1)
-    latest_by_symbol = latest_by_symbol[["symbol", "source_currency", "close"]]
-    sym_to_currency = dict(zip(latest_by_symbol["symbol"], latest_by_symbol["source_currency"], strict=True))
-    sym_to_native_close = dict(zip(latest_by_symbol["symbol"], latest_by_symbol["close"], strict=True))
+    work["date"] = pd.to_datetime(work["date"], errors="coerce")
+    work["close"] = pd.to_numeric(work.get("close"), errors="coerce")
+    work["krw_per_unit"] = pd.to_numeric(work.get("krw_per_unit"), errors="coerce")
+    work = work.dropna(subset=["date"]).sort_values(["symbol", "date"])
     out = holdings.copy()
-    out["currency"] = out["symbol"].map(sym_to_currency).fillna("KRW")
-    out["last_close_native"] = out["symbol"].map(sym_to_native_close)
+    if "month_end" in out.columns:
+        out = _attach_monthly_native_close(out, work, fx_rates)
+    else:
+        latest_by_symbol = work.groupby("symbol", as_index=False).tail(1)
+        latest_by_symbol = latest_by_symbol[["symbol", "source_currency", "close", "krw_per_unit"]]
+        latest_by_symbol["last_close_native"] = _native_close(
+            latest_by_symbol["close"],
+            latest_by_symbol["krw_per_unit"],
+            latest_by_symbol["source_currency"],
+        )
+        sym_to_currency = dict(
+            zip(latest_by_symbol["symbol"], latest_by_symbol["source_currency"], strict=True)
+        )
+        sym_to_native_close = dict(
+            zip(latest_by_symbol["symbol"], latest_by_symbol["last_close_native"], strict=True)
+        )
+        out["currency"] = (
+            out["symbol"].map(sym_to_currency).fillna(out["symbol"].map(currency_for_symbol)).fillna("KRW")
+        )
+        out["last_close_native"] = out["symbol"].map(sym_to_native_close)
+        missing_native = out["last_close_native"].isna()
+        out.loc[missing_native, "last_close_native"] = _fallback_native_from_krw(
+            pd.to_numeric(out.loc[missing_native, close_column], errors="coerce"),
+            out.loc[missing_native, "currency"],
+            fx_rates,
+        )
+    out["currency"] = out["currency"].fillna("KRW")
     out["last_close_native"] = pd.to_numeric(out["last_close_native"], errors="coerce")
     return out
+
+
+def _attach_monthly_native_close(holdings: pd.DataFrame, prices: pd.DataFrame, fx_rates: pd.DataFrame) -> pd.DataFrame:
+    """Attach native month-end closes using the nearest known price at/before each month."""
+
+    out = holdings.copy()
+    out["_row_order"] = range(len(out))
+    out["month_end_dt"] = pd.to_datetime(out["month_end"], errors="coerce")
+    chunks: list[pd.DataFrame] = []
+    price_columns = ["date", "source_currency", "close", "krw_per_unit"]
+    for symbol, group in out.groupby("symbol", sort=False):
+        price_group = prices[prices["symbol"] == symbol][price_columns].sort_values("date")
+        if price_group.empty:
+            missing = group.copy()
+            missing["currency"] = missing["symbol"].map(currency_for_symbol).fillna("KRW")
+            missing["last_close_native"] = _fallback_native_from_krw(
+                _holding_close_krw(missing, "month_close_krw"),
+                missing["currency"],
+                fx_rates,
+                missing["month_end_dt"],
+            )
+            chunks.append(missing)
+            continue
+        merged = pd.merge_asof(
+            group.sort_values("month_end_dt"),
+            price_group,
+            left_on="month_end_dt",
+            right_on="date",
+            direction="backward",
+        )
+        merged["currency"] = merged["source_currency"].fillna("KRW")
+        merged["last_close_native"] = _native_close(
+            merged["close"],
+            merged["krw_per_unit"],
+            merged["currency"],
+        )
+        chunks.append(merged)
+    enriched = pd.concat(chunks, ignore_index=True).sort_values("_row_order")
+    return enriched.drop(
+        columns=["_row_order", "month_end_dt", "date", "source_currency", "close", "krw_per_unit"],
+        errors="ignore",
+    )
+
+
+def _holding_close_krw(holdings: pd.DataFrame, close_column: str) -> pd.Series:
+    if close_column in holdings.columns:
+        return pd.to_numeric(holdings[close_column], errors="coerce")
+    qty = pd.to_numeric(holdings.get("qty"), errors="coerce")
+    market_value = pd.to_numeric(holdings.get("market_value_krw"), errors="coerce")
+    return market_value / qty.where(qty.ne(0))
+
+
+def _native_close(close_krw: pd.Series, krw_per_unit: pd.Series, currency: pd.Series) -> pd.Series:
+    native = pd.to_numeric(close_krw, errors="coerce").copy()
+    rate = pd.to_numeric(krw_per_unit, errors="coerce")
+    is_foreign = currency.fillna("KRW").astype(str).str.upper().ne("KRW")
+    can_convert = is_foreign & rate.notna() & rate.gt(0)
+    native.loc[can_convert] = native.loc[can_convert] / rate.loc[can_convert]
+    return native
+
+
+def _fallback_native_from_krw(
+    close_krw: pd.Series,
+    currency: pd.Series,
+    fx_rates: pd.DataFrame,
+    dates: pd.Series | None = None,
+) -> pd.Series:
+    """Convert KRW-only benchmark holdings back to their inferred native currency."""
+
+    native = pd.to_numeric(close_krw, errors="coerce").copy()
+    normalized = currency.fillna("KRW").astype(str).map(normalize_currency)
+    if fx_rates.empty:
+        return native.where(normalized.eq("KRW"), pd.NA)
+
+    rates = fx_rates.copy()
+    rates["date"] = pd.to_datetime(rates["date"], errors="coerce")
+    rates["currency"] = rates["currency"].astype(str).map(normalize_currency)
+    rates["krw_per_unit"] = pd.to_numeric(rates["krw_per_unit"], errors="coerce")
+    rates = rates.dropna(subset=["date", "krw_per_unit"]).sort_values(["currency", "date"])
+    for code in sorted(set(normalized) - {"", "KRW"}):
+        mask = normalized.eq(code)
+        currency_rates = rates[rates["currency"].eq(code)][["date", "krw_per_unit"]]
+        if currency_rates.empty:
+            native.loc[mask] = pd.NA
+            continue
+        if dates is None:
+            rate = currency_rates.iloc[-1]["krw_per_unit"]
+            native.loc[mask] = native.loc[mask] / rate
+            continue
+        lookups = pd.DataFrame(
+            {"_order": range(mask.sum()), "date": dates.loc[mask], "value": native.loc[mask]}
+        )
+        merged = pd.merge_asof(
+            lookups.sort_values("date"),
+            currency_rates.sort_values("date"),
+            on="date",
+            direction="backward",
+        ).sort_values("_order")
+        converted = merged["value"] / merged["krw_per_unit"]
+        native.loc[mask] = converted.to_numpy()
+    return native
 
 
 @dataclass(frozen=True)
@@ -76,6 +211,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
 
     reports = _read_csv(inputs.warehouse / "reports.csv")
     prices = _read_csv(inputs.warehouse / "daily_prices.csv")
+    fx_rates = _read_optional_csv(inputs.warehouse / "fx_rates.csv")
     summary = _read_csv(inputs.sim / "summary.csv")
     current_holdings = _read_csv(inputs.sim / "current_holdings.csv")
     monthly_holdings = _read_optional_csv(inputs.sim / "monthly_holdings.csv")
@@ -113,11 +249,11 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     _write_json(out / "insights.json", insights)
     _write_json(
         out / "current-holdings.json",
-        _records(_enrich_holdings_with_native(current_holdings, prices)),
+        _records(_enrich_holdings_with_native(current_holdings, prices, fx_rates)),
     )
     _write_json(
         out / "monthly-holdings.json",
-        _records(_enrich_holdings_with_native(monthly_holdings, prices, close_column="month_close_krw")),
+        _records(_enrich_holdings_with_native(monthly_holdings, prices, fx_rates, close_column="month_close_krw")),
     )
     _write_json(out / "missing-symbols.json", [{"symbol": symbol} for symbol in missing_symbols])
     _write_json(out / "data-quality.json", data_quality)

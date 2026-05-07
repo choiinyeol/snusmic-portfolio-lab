@@ -85,6 +85,8 @@ export function useUrlBackedStrategy(persona: string, setPersona: (value: string
   useEffect(() => {
     if (!persona || !validPersonas.includes(persona)) return;
     const url = new URL(window.location.href);
+    const requested = url.searchParams.get('strategy');
+    if (requested && validPersonas.includes(requested) && requested !== persona) return;
     url.searchParams.set('strategy', persona);
     const nextUrl = `${url.pathname}${url.search}${url.hash}`;
     const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
