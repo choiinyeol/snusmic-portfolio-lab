@@ -598,15 +598,15 @@ select:focus-visible {
   font-weight: 650;
 }
 .chart-box {
-  height: 430px;
-  min-height: 430px;
-  max-height: 430px;
+  height: 560px;
+  min-height: 560px;
+  max-height: 560px;
   overflow: hidden;
   border-radius: var(--radius);
   background: var(--surface-muted);
 }
 .chart-box-fixed > div,
-.chart-box-fixed canvas { max-height: 430px !important; }
+.chart-box-fixed canvas { max-height: 560px !important; }
 .chart-box-return {
   height: 360px;
   min-height: 360px;
@@ -683,6 +683,78 @@ select:focus-visible {
 .compact-stat-row {
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   margin: .8rem 0 1rem;
+}
+
+.trade-ledger {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+}
+.trade-ledger:hover,
+.report-chart-panel:hover,
+.path-scenario-panel:hover {
+  transform: none;
+}
+.trade-ledger__header {
+  margin: 0;
+  padding-bottom: var(--space-4);
+}
+.trade-ledger__header h2 {
+  margin: 0;
+  font-size: 1.18rem;
+  letter-spacing: -.02em;
+}
+.trade-ledger__tabs {
+  width: 100%;
+  justify-content: flex-start;
+  border-radius: var(--radius);
+}
+.trade-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+.trade-summary-grid .param {
+  display: grid;
+  align-content: space-between;
+  min-height: 94px;
+}
+.trade-summary-grid .param dd {
+  font-family: var(--display);
+  font-size: clamp(1.25rem, 1.5vw, 1.55rem);
+  letter-spacing: -.035em;
+}
+.ledger-table-card {
+  display: grid;
+  gap: .7rem;
+}
+.ledger-table-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.ledger-table-card__head h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  letter-spacing: -.02em;
+}
+.ledger-table-card__head span {
+  color: var(--faint);
+  font-family: var(--mono);
+  font-size: .75rem;
+}
+.ledger-table-wrap {
+  box-shadow: none;
+}
+.ledger-table-wrap th,
+.ledger-table-wrap td {
+  padding: .82rem 1rem;
+}
+.native-price-secondary {
+  margin-top: .18rem;
+  color: var(--faint);
+  font-size: .74rem;
 }
 
 /* ─────────────────────  Bars & lists  ───────────────────── */
@@ -1016,9 +1088,12 @@ select:focus-visible {
   .bento-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .bento-metrics > :first-child { grid-column: span 2; }
   .two-col,
+  .report-evidence-grid,
+  .path-observation-grid,
   .detail-grid,
   .dashboard-hero-grid,
   .dashboard-stats-grid { grid-template-columns: 1fr; }
+  .trade-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .table-toolbar { grid-template-columns: 1fr 1fr; }
   .strategy-score-row { grid-template-columns: 1fr 1fr; }
 }
@@ -1028,6 +1103,8 @@ select:focus-visible {
   .topbar { align-items: flex-start; flex-direction: column; }
   main { width: min(100% - 1rem, 1380px); padding-top: 1rem; }
   .terminal-frame { min-height: 0; padding: 1.25rem; }
+  .trade-summary-grid { grid-template-columns: 1fr; }
+  .trade-ledger { padding: var(--space-4); }
   .table-toolbar { grid-template-columns: 1fr; }
   th, td { padding: .8rem; }
   .stack-row { grid-template-columns: 1fr; gap: .35rem; }
@@ -1142,6 +1219,62 @@ select:focus-visible {
 }
 .definition-list dt { color: var(--muted); font-family: var(--mono); font-size: .76rem; letter-spacing: .04em; text-transform: uppercase; }
 .definition-list dd { margin: 0; color: var(--ink); font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* Report detail: chart-first composition. The old page stacked every block
+   vertically, which made the chart feel small and left side tables visually
+   disconnected. This grid gives the chart the primary column and keeps only
+   glanceable facts in the right rail. */
+.report-evidence-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.72fr) minmax(300px, .58fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+.report-chart-panel {
+  padding: 0;
+  overflow: hidden;
+  min-width: 0;
+}
+.report-side-rail {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  min-width: 0;
+}
+.report-side-rail .kpi-tile {
+  min-height: 118px;
+}
+.report-side-rail .display-num {
+  font-size: clamp(1.7rem, 2.7vw, 2.3rem);
+}
+.report-rail-card {
+  align-content: start;
+  min-height: 0;
+}
+.path-observation-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(300px, .65fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+.path-scenario-panel {
+  display: grid;
+  gap: .75rem;
+}
+.path-scenario-panel h3 {
+  margin: 0;
+  font-size: 1.08rem;
+  letter-spacing: -.02em;
+}
+.path-scenario-note {
+  margin: 0;
+  max-width: 76ch;
+  font-size: .88rem;
+  line-height: 1.65;
+}
+.path-stat-card {
+  align-content: start;
+}
 
 /* Numeric-friendly table tweaks — right-align numbers, give the sort
    header room to breathe, and stripe long lists for legibility. */
