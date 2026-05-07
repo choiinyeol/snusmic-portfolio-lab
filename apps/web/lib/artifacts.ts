@@ -41,6 +41,8 @@ export type HoldingRow = {
   qty: number | null;
   avgCostKrw: number | null;
   lastCloseKrw: number | null;
+  lastCloseNative: number | null;
+  currency: string;
   marketValueKrw: number | null;
   unrealizedPnlKrw: number | null;
   unrealizedReturn: number | null;
@@ -56,6 +58,8 @@ export type MonthlyHoldingRow = {
   qty: number | null;
   avgCostKrw: number | null;
   monthCloseKrw: number | null;
+  monthCloseNative: number | null;
+  currency: string;
   marketValueKrw: number | null;
   unrealizedPnlKrw: number | null;
   unrealizedReturn: number | null;
@@ -573,6 +577,8 @@ export function getCurrentHoldings(): HoldingRow[] {
     qty: num(row.qty),
     avgCostKrw: num(row.avg_cost_krw ?? row.avgCostKrw),
     lastCloseKrw: num(row.last_close_krw ?? row.lastCloseKrw),
+    lastCloseNative: num(row.last_close_native ?? row.lastCloseNative),
+    currency: String(row.currency ?? 'KRW') || 'KRW',
     marketValueKrw: num(row.market_value_krw ?? row.marketValueKrw),
     unrealizedPnlKrw: num(row.unrealized_pnl_krw ?? row.unrealizedPnlKrw),
     unrealizedReturn: num(row.unrealized_return ?? row.unrealizedReturn),
@@ -612,6 +618,8 @@ function enrichMonthlyHolding(row: RawReport, costBySnapshot: Map<string, number
     qty,
     avgCostKrw,
     monthCloseKrw,
+    monthCloseNative: num(row.last_close_native ?? row.lastCloseNative ?? row.month_close_native ?? row.monthCloseNative),
+    currency: String(row.currency ?? 'KRW') || 'KRW',
     marketValueKrw,
     unrealizedPnlKrw,
     unrealizedReturn,

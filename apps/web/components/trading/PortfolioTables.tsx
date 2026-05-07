@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import type { HoldingRow, ReportTargetDigest } from '@/lib/artifacts';
-import { formatDays, formatKrw, formatPercent } from '@/lib/format';
+import { formatDays, formatKrw, formatNativeWithKrw, formatPercent } from '@/lib/format';
 import { PaginationControls, SortHeader, defaultPersonaFor, pageRows, sortRows, useUrlBackedStrategy, type SortState } from './TableControls';
 
 type Props = {
@@ -88,7 +88,15 @@ export function PortfolioTables({ holdings, personaLabels, capitalByPersona = {}
                     <td>{formatKrw(target?.targetPriceKrw)}<div className="muted">{target?.publicationDate ?? '—'}</div></td>
                     <td>{row.qty?.toLocaleString('ko-KR') ?? '—'}</td>
                     <td>{formatKrw(row.avgCostKrw)}</td>
-                    <td>{formatKrw(row.lastCloseKrw)}</td>
+                    <td>{(() => {
+                      const { primary, secondary } = formatNativeWithKrw(row.lastCloseNative, row.lastCloseKrw, row.currency);
+                      return (
+                        <>
+                          {primary}
+                          {secondary ? <div className="muted" style={{ fontSize: '.74rem' }}>{secondary}</div> : null}
+                        </>
+                      );
+                    })()}</td>
                     <td>{formatKrw(row.marketValueKrw)}<div className="muted">손익 {formatKrw(row.unrealizedPnlKrw)}</div></td>
                     <td className={(row.unrealizedReturn ?? 0) >= 0 ? 'good' : 'bad'}>{formatPercent(row.unrealizedReturn)}</td>
                     <td className={(contribution ?? 0) >= 0 ? 'good' : 'bad'}>{formatPercent(contribution)}</td>
@@ -105,10 +113,10 @@ export function PortfolioTables({ holdings, personaLabels, capitalByPersona = {}
 }
 
 function downloadHoldings(rows: HoldingRow[], targetsBySymbol: Record<string, ReportTargetDigest>) {
-  const headers = ['persona', 'market_region', 'symbol', 'company', 'target_price_krw', 'target_publication_date', 'qty', 'avg_cost_krw', 'last_close_krw', 'market_value_krw', 'unrealized_pnl_krw', 'unrealized_return', 'first_buy_date'];
+  const headers = ['persona', 'market_region', 'symbol', 'company', 'currency', 'target_price_krw', 'target_publication_date', 'qty', 'avg_cost_krw', 'last_close_native', 'last_close_krw', 'market_value_krw', 'unrealized_pnl_krw', 'unrealized_return', 'first_buy_date'];
   const csv = [headers.join(','), ...rows.map((row) => {
     const target = targetsBySymbol[row.symbol];
-    return [row.persona, target?.marketRegion ?? '', row.symbol, row.company, target?.targetPriceKrw ?? '', target?.publicationDate ?? '', row.qty ?? '', row.avgCostKrw ?? '', row.lastCloseKrw ?? '', row.marketValueKrw ?? '', row.unrealizedPnlKrw ?? '', row.unrealizedReturn ?? '', row.firstBuyDate ?? ''].map(csvEscape).join(',');
+    return [row.persona, target?.marketRegion ?? '', row.symbol, row.company, row.currency, target?.targetPriceKrw ?? '', target?.publicationDate ?? '', row.qty ?? '', row.avgCostKrw ?? '', row.lastCloseNative ?? '', row.lastCloseKrw ?? '', row.marketValueKrw ?? '', row.unrealizedPnlKrw ?? '', row.unrealizedReturn ?? '', row.firstBuyDate ?? ''].map(csvEscape).join(',');
   })].join('\n');
   const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
