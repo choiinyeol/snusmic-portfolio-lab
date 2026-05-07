@@ -12402,11 +12402,77 @@
       "close_krw": 26245670.4035,
       "date": "2026-04-28",
       "display_currency": "KRW",
-      "high": 19068.338392790873,
+      "high": 19068.33839279088,
       "low": 17587.91752012726,
       "open": 18788.717163193505,
       "source_currency": "USD",
       "volume": 3487574.0
+    },
+    {
+      "close": 17413.641472168732,
+      "close_krw": 25632705.9406,
+      "date": "2026-04-29",
+      "display_currency": "KRW",
+      "high": 18399.874877929688,
+      "low": 16685.006595458603,
+      "open": 18370.434404301457,
+      "source_currency": "USD",
+      "volume": 4835700.0
+    },
+    {
+      "close": 18116.28891338501,
+      "close_krw": 26945805.8924,
+      "date": "2026-04-30",
+      "display_currency": "KRW",
+      "high": 18443.51149315643,
+      "low": 17089.99591566925,
+      "open": 17182.213884493103,
+      "source_currency": "USD",
+      "volume": 4925800.0
+    },
+    {
+      "close": 17968.181400523754,
+      "close_krw": 26485279.2417,
+      "date": "2026-05-01",
+      "display_currency": "KRW",
+      "high": 18285.09377753944,
+      "low": 17319.617614746094,
+      "open": 17820.781242982484,
+      "source_currency": "USD",
+      "volume": 4914100.0
+    },
+    {
+      "close": 18146.4305468956,
+      "close_krw": 26706645.8744,
+      "date": "2026-05-04",
+      "display_currency": "KRW",
+      "high": 18389.2659375309,
+      "low": 17498.869973051827,
+      "open": 17660.759765625,
+      "source_currency": "USD",
+      "volume": 4963100.0
+    },
+    {
+      "close": 18731.074500253657,
+      "close_krw": 27648003.4307,
+      "date": "2026-05-05",
+      "display_currency": "KRW",
+      "high": 18908.20174486353,
+      "low": 18088.993517309194,
+      "open": 18199.6969894371,
+      "source_currency": "USD",
+      "volume": 4309200.0
+    },
+    {
+      "close": 19986.897688810717,
+      "close_krw": 29459886.9367,
+      "date": "2026-05-06",
+      "display_currency": "KRW",
+      "high": 20119.55290452577,
+      "low": 18218.144611143507,
+      "open": 18645.59294358827,
+      "source_currency": "USD",
+      "volume": 10681600.0
     }
   ],
   "symbol": "FLNC"

@@ -14592,10 +14592,76 @@
       "date": "2026-04-28",
       "display_currency": "KRW",
       "high": 19922.51831042138,
-      "low": 19245.182067727674,
+      "low": 19245.18206772768,
       "open": 19775.27215590514,
       "source_currency": "USD",
       "volume": 440858.0
+    },
+    {
+      "close": 19562.74691406288,
+      "close_krw": 28796167.639,
+      "date": "2026-04-29",
+      "display_currency": "KRW",
+      "high": 19827.705561520765,
+      "low": 19444.987827148056,
+      "open": 19680.506000977708,
+      "source_currency": "USD",
+      "volume": 867700.0
+    },
+    {
+      "close": 19886.27049506607,
+      "close_krw": 29578441.1061,
+      "date": "2026-04-30",
+      "display_currency": "KRW",
+      "high": 20094.504206401063,
+      "low": 19440.056209906004,
+      "open": 19663.16406172409,
+      "source_currency": "USD",
+      "volume": 733100.0
+    },
+    {
+      "close": 20311.857540967176,
+      "close_krw": 29939881.3323,
+      "date": "2026-05-01",
+      "display_currency": "KRW",
+      "high": 20326.59797843895,
+      "low": 19722.25409935112,
+      "open": 19913.87556930771,
+      "source_currency": "USD",
+      "volume": 1043300.0
+    },
+    {
+      "close": 20089.113671978004,
+      "close_krw": 29565750.8721,
+      "date": "2026-05-04",
+      "display_currency": "KRW",
+      "high": 20589.502089905556,
+      "low": 19809.48559325142,
+      "open": 20368.743154255677,
+      "source_currency": "USD",
+      "volume": 967900.0
+    },
+    {
+      "close": 20354.730117033003,
+      "close_krw": 30044600.3831,
+      "date": "2026-05-05",
+      "display_currency": "KRW",
+      "high": 20635.179006935097,
+      "low": 20060.995628031906,
+      "open": 20177.60428009415,
+      "source_currency": "USD",
+      "volume": 1063500.0
+    },
+    {
+      "close": 19883.719535684213,
+      "close_krw": 29307806.4701,
+      "date": "2026-05-06",
+      "display_currency": "KRW",
+      "high": 20275.792581667192,
+      "low": 19485.75107718352,
+      "open": 20237.46958894655,
+      "source_currency": "USD",
+      "volume": 1925400.0
     }
   ],
   "symbol": "GRND"

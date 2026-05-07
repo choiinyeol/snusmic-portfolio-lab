@@ -15099,9 +15099,75 @@
       "display_currency": "KRW",
       "high": 19053.76080302545,
       "low": 18420.599670517724,
-      "open": 18818.165832394036,
+      "open": 18818.16583239404,
       "source_currency": "USD",
       "volume": 640206.0
+    },
+    {
+      "close": 18708.992832030868,
+      "close_krw": 27539450.1761,
+      "date": "2026-04-29",
+      "display_currency": "KRW",
+      "high": 18760.512257081224,
+      "low": 18296.836027828977,
+      "open": 18635.39305175934,
+      "source_currency": "USD",
+      "volume": 831000.0
+    },
+    {
+      "close": 19335.94006347656,
+      "close_krw": 28759890.626,
+      "date": "2026-04-30",
+      "display_currency": "KRW",
+      "high": 19398.409751334228,
+      "low": 18562.501780068967,
+      "open": 18859.978915826418,
+      "source_currency": "USD",
+      "volume": 1099200.0
+    },
+    {
+      "close": 19678.03419266129,
+      "close_krw": 29005619.3725,
+      "date": "2026-05-01",
+      "display_currency": "KRW",
+      "high": 19972.83591346932,
+      "low": 19132.649252009574,
+      "open": 19604.33341102791,
+      "source_currency": "USD",
+      "volume": 3650800.0
+    },
+    {
+      "close": 20074.39743887214,
+      "close_krw": 29544092.5506,
+      "date": "2026-05-04",
+      "display_currency": "KRW",
+      "high": 20611.578544890974,
+      "low": 19691.747307098005,
+      "open": 19691.747307098005,
+      "source_currency": "USD",
+      "volume": 3421800.0
+    },
+    {
+      "close": 20059.520388801586,
+      "close_krw": 29608856.0494,
+      "date": "2026-05-05",
+      "display_currency": "KRW",
+      "high": 20310.449009716045,
+      "low": 19808.59176788712,
+      "open": 20177.60428009415,
+      "source_currency": "USD",
+      "volume": 1491200.0
+    },
+    {
+      "close": 19412.052798001096,
+      "close_krw": 28612588.5839,
+      "date": "2026-05-06",
+      "display_currency": "KRW",
+      "high": 20097.444404745474,
+      "low": 19264.65623963624,
+      "open": 19898.45947265625,
+      "source_currency": "USD",
+      "volume": 1413700.0
     }
   ],
   "symbol": "CLBT"

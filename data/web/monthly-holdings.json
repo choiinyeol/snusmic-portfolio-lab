@@ -2269,26 +2269,26 @@
   },
   {
     "company": "",
-    "market_value_krw": 55135675.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 59443475.0,
+    "month_end": "2026-04-30",
     "persona": "all_weather",
     "qty": 595,
     "symbol": "069500.KS",
-    "weight_in_portfolio": 0.27
+    "weight_in_portfolio": 0.28
   },
   {
     "company": "",
-    "market_value_krw": 52450068.83,
-    "month_end": "2026-04-28",
+    "market_value_krw": 55618254.16,
+    "month_end": "2026-04-30",
     "persona": "all_weather",
     "qty": 56,
     "symbol": "QQQ",
-    "weight_in_portfolio": 0.25
+    "weight_in_portfolio": 0.26
   },
   {
     "company": "",
-    "market_value_krw": 50396787.59,
-    "month_end": "2026-04-28",
+    "market_value_krw": 52377103.24,
+    "month_end": "2026-04-30",
     "persona": "all_weather",
     "qty": 49,
     "symbol": "SPY",
@@ -2296,10 +2296,46 @@
   },
   {
     "company": "",
-    "market_value_krw": 47894334.76,
-    "month_end": "2026-04-28",
+    "market_value_krw": 46630612.96,
+    "month_end": "2026-04-30",
     "persona": "all_weather",
     "qty": 74,
+    "symbol": "GLD",
+    "weight_in_portfolio": 0.22
+  },
+  {
+    "company": "",
+    "market_value_krw": 59775540.0,
+    "month_end": "2026-05-07",
+    "persona": "all_weather",
+    "qty": 517,
+    "symbol": "069500.KS",
+    "weight_in_portfolio": 0.27
+  },
+  {
+    "company": "",
+    "market_value_krw": 56404543.29,
+    "month_end": "2026-05-07",
+    "persona": "all_weather",
+    "qty": 55,
+    "symbol": "QQQ",
+    "weight_in_portfolio": 0.26
+  },
+  {
+    "company": "",
+    "market_value_krw": 54081803.17,
+    "month_end": "2026-05-07",
+    "persona": "all_weather",
+    "qty": 50,
+    "symbol": "SPY",
+    "weight_in_portfolio": 0.25
+  },
+  {
+    "company": "",
+    "market_value_krw": 49546986.23,
+    "month_end": "2026-05-07",
+    "persona": "all_weather",
+    "qty": 78,
     "symbol": "GLD",
     "weight_in_portfolio": 0.23
   },
@@ -6229,8 +6265,8 @@
   },
   {
     "company": "비에이치",
-    "market_value_krw": 3021765300.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 2924289000.0,
+    "month_end": "2026-04-30",
     "persona": "oracle",
     "qty": 84762,
     "symbol": "090460.KS",
@@ -6238,8 +6274,8 @@
   },
   {
     "company": "DL이앤씨",
-    "market_value_krw": 2562135300.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 2539053000.0,
+    "month_end": "2026-04-30",
     "persona": "oracle",
     "qty": 25647,
     "symbol": "375500.KS",
@@ -6247,21 +6283,21 @@
   },
   {
     "company": "효성티앤씨",
-    "market_value_krw": 2409737000.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 2414398000.0,
+    "month_end": "2026-04-30",
     "persona": "oracle",
     "qty": 4661,
     "symbol": "298020.KQ",
-    "weight_in_portfolio": 0.23
+    "weight_in_portfolio": 0.24
   },
   {
     "company": "동진쎄미켐",
-    "market_value_krw": 2344691200.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 2182722400.0,
+    "month_end": "2026-04-30",
     "persona": "oracle",
     "qty": 38564,
     "symbol": "005290.KS",
-    "weight_in_portfolio": 0.23
+    "weight_in_portfolio": 0.22
   },
   {
     "company": "SEA ltd.",
@@ -35011,278 +35047,269 @@
   },
   {
     "company": "아스플로",
-    "market_value_krw": 2498400.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 2541600.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 240,
     "symbol": "159010.KQ",
     "weight_in_portfolio": 0.02
   },
   {
-    "company": "레이",
-    "market_value_krw": 2239050.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 253,
-    "symbol": "228670.KQ",
-    "weight_in_portfolio": 0.02
-  },
-  {
     "company": "Wolfspeed",
-    "market_value_krw": 2061089.9,
-    "month_end": "2026-04-28",
+    "market_value_krw": 2415728.29,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 55,
     "symbol": "WOLF",
     "weight_in_portfolio": 0.02
   },
   {
+    "company": "레이",
+    "market_value_krw": 2228930.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 253,
+    "symbol": "228670.KQ",
+    "weight_in_portfolio": 0.02
+  },
+  {
     "company": "Chegg",
-    "market_value_krw": 1926049.52,
-    "month_end": "2026-04-28",
+    "market_value_krw": 2000615.41,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 1234,
     "symbol": "CHGG",
-    "weight_in_portfolio": 0.01
+    "weight_in_portfolio": 0.02
   },
   {
     "company": "Coreweave",
-    "market_value_krw": 1881286.55,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1991899.28,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 12,
     "symbol": "CRWV",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "Sensient Technologies Corp",
-    "market_value_krw": 1850600.26,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 10,
-    "symbol": "SXT",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "예스티",
-    "market_value_krw": 1846000.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 65,
-    "symbol": "122640.KQ",
-    "weight_in_portfolio": 0.01
+    "weight_in_portfolio": 0.02
   },
   {
     "company": "Funko Inc.",
-    "market_value_krw": 1801125.31,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1823498.08,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 278,
     "symbol": "FNKO",
     "weight_in_portfolio": 0.01
   },
   {
+    "company": "예스티",
+    "market_value_krw": 1768000.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 65,
+    "symbol": "122640.KQ",
+    "weight_in_portfolio": 0.01
+  },
+  {
     "company": "아이씨에이치",
-    "market_value_krw": 1775752.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1747328.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 1496,
     "symbol": "368600.KQ",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "GrafTech International Ltd.",
-    "market_value_krw": 1759012.66,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 132,
-    "symbol": "EAF",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "한국카본",
-    "market_value_krw": 1657600.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 32,
-    "symbol": "017960.KS",
-    "weight_in_portfolio": 0.01
-  },
-  {
     "company": "KG스틸",
-    "market_value_krw": 1642120.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1715320.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 244,
     "symbol": "016380.KS",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "현대제철",
-    "market_value_krw": 1631700.0,
-    "month_end": "2026-04-28",
+    "company": "Sensient Technologies Corp",
+    "market_value_krw": 1690258.63,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
-    "qty": 37,
-    "symbol": "004020.KS",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "이랜텍",
-    "market_value_krw": 1601470.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 127,
-    "symbol": "054210.KQ",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "Opendoor",
-    "market_value_krw": 1583530.98,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 195,
-    "symbol": "OPEN",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "두산",
-    "market_value_krw": 1583000.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 1,
-    "symbol": "000150.KS",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "원티드랩",
-    "market_value_krw": 1575840.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 392,
-    "symbol": "376980.KQ",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "파이오링크",
-    "market_value_krw": 1570520.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 142,
-    "symbol": "170790.KQ",
+    "qty": 10,
+    "symbol": "SXT",
     "weight_in_portfolio": 0.01
   },
   {
     "company": "마이크로컨텍솔",
-    "market_value_krw": 1563750.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1683000.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 45,
     "symbol": "098120.KQ",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "효성티앤씨",
-    "market_value_krw": 1551000.0,
-    "month_end": "2026-04-28",
+    "company": "GrafTech International Ltd.",
+    "market_value_krw": 1668840.37,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
-    "qty": 3,
-    "symbol": "298020.KQ",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "벽산",
-    "market_value_krw": 1547875.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 725,
-    "symbol": "007210.KS",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "Levi Strauss & Co",
-    "market_value_krw": 1544679.88,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 47,
-    "symbol": "LEVI",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "에스트래픽",
-    "market_value_krw": 1538460.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 396,
-    "symbol": "234300.KQ",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "국도화학",
-    "market_value_krw": 1537350.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 37,
-    "symbol": "007690.KS",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "솔루엠",
-    "market_value_krw": 1531200.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 80,
-    "symbol": "248070.KS",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "메쎄이상",
-    "market_value_krw": 1520970.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 419,
-    "symbol": "408920.KQ",
+    "qty": 132,
+    "symbol": "EAF",
     "weight_in_portfolio": 0.01
   },
   {
     "company": "Establishment Labs Holdings",
-    "market_value_krw": 1514288.15,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1633262.17,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 16,
     "symbol": "ESTA",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "폰드그룹",
-    "market_value_krw": 1507880.0,
-    "month_end": "2026-04-28",
+    "company": "이랜텍",
+    "market_value_krw": 1619250.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
-    "qty": 253,
-    "symbol": "472850.KQ",
+    "qty": 127,
+    "symbol": "054210.KQ",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "파이오링크",
+    "market_value_krw": 1615960.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 142,
+    "symbol": "170790.KQ",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "두산",
+    "market_value_krw": 1596000.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 1,
+    "symbol": "000150.KS",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "벽산",
+    "market_value_krw": 1595000.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 725,
+    "symbol": "007210.KS",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "한국카본",
+    "market_value_krw": 1585600.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 32,
+    "symbol": "017960.KS",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "현대제철",
+    "market_value_krw": 1574350.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 37,
+    "symbol": "004020.KS",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "원티드랩",
+    "market_value_krw": 1568000.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 392,
+    "symbol": "376980.KQ",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "Tempus AI Inc",
+    "market_value_krw": 1567877.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 19,
+    "symbol": "TEM",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "Opendoor",
+    "market_value_krw": 1560410.4,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 195,
+    "symbol": "OPEN",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "Levi Strauss & Co",
+    "market_value_krw": 1557524.89,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 47,
+    "symbol": "LEVI",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "효성티앤씨",
+    "market_value_krw": 1554000.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 3,
+    "symbol": "298020.KQ",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "솔루엠",
+    "market_value_krw": 1552000.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 80,
+    "symbol": "248070.KS",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "국도화학",
+    "market_value_krw": 1546600.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 37,
+    "symbol": "007690.KS",
     "weight_in_portfolio": 0.01
   },
   {
     "company": "케이씨씨글라스",
-    "market_value_krw": 1505400.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1523600.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 52,
     "symbol": "344820.KQ",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "인터로조",
-    "market_value_krw": 1493850.0,
-    "month_end": "2026-04-28",
+    "company": "에스트래픽",
+    "market_value_krw": 1522620.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
-    "qty": 69,
-    "symbol": "119610.KQ",
+    "qty": 396,
+    "symbol": "234300.KQ",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "메쎄이상",
+    "market_value_krw": 1518875.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 419,
+    "symbol": "408920.KQ",
     "weight_in_portfolio": 0.01
   },
   {
     "company": "GEM Co., Ltd.",
-    "market_value_krw": 1492978.86,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1512867.23,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 776,
     "symbol": "002340.SZ",
@@ -35290,8 +35317,8 @@
   },
   {
     "company": "DL",
-    "market_value_krw": 1478400.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1501500.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 21,
     "symbol": "000210.KS",
@@ -35299,242 +35326,161 @@
   },
   {
     "company": "인선이엔티",
-    "market_value_krw": 1473150.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1494080.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 322,
     "symbol": "060150.KQ",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "한화비전",
-    "market_value_krw": 1470500.0,
-    "month_end": "2026-04-28",
+    "company": "인터로조",
+    "market_value_krw": 1483500.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
-    "qty": 17,
-    "symbol": "489790.KS",
+    "qty": 69,
+    "symbol": "119610.KQ",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "HDC현대산업개발",
-    "market_value_krw": 1469400.0,
-    "month_end": "2026-04-28",
+    "company": "폰드그룹",
+    "market_value_krw": 1480050.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
-    "qty": 62,
-    "symbol": "294870.KS",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "세경하이테크",
-    "market_value_krw": 1459120.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 299,
-    "symbol": "148150.KQ",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "브이티",
-    "market_value_krw": 1455200.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 85,
-    "symbol": "018290.KS",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "씨에스윈드",
-    "market_value_krw": 1454000.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 20,
-    "symbol": "112610.KS",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "롯데렌탈",
-    "market_value_krw": 1451250.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 43,
-    "symbol": "089860.KQ",
+    "qty": 253,
+    "symbol": "472850.KQ",
     "weight_in_portfolio": 0.01
   },
   {
     "company": "대림제지",
-    "market_value_krw": 1438360.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1466080.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 154,
     "symbol": "017650.KS",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "키이스트",
-    "market_value_krw": 1436400.0,
-    "month_end": "2026-04-28",
+    "company": "한화비전",
+    "market_value_krw": 1465400.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
-    "qty": 513,
-    "symbol": "054780.KQ",
+    "qty": 17,
+    "symbol": "489790.KS",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "Tempus AI Inc",
-    "market_value_krw": 1432986.68,
-    "month_end": "2026-04-28",
+    "company": "지투지바이오",
+    "market_value_krw": 1455200.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
-    "qty": 19,
-    "symbol": "TEM",
+    "qty": 17,
+    "symbol": "456160.KQ",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "쿠콘",
-    "market_value_krw": 1431150.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 47,
-    "symbol": "294570.KQ",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "화승인더",
-    "market_value_krw": 1425960.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 408,
-    "symbol": "006060.KS",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "율촌화학",
-    "market_value_krw": 1420400.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 53,
-    "symbol": "008730.KS",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "에이디테크놀로지",
-    "market_value_krw": 1420000.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 25,
-    "symbol": "200710.KQ",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "Doximity",
-    "market_value_krw": 1416133.26,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 39,
-    "symbol": "DOCS",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "동아쏘시오홀딩스",
-    "market_value_krw": 1411200.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 14,
-    "symbol": "000640.KS",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "한양디지텍",
-    "market_value_krw": 1406100.0,
-    "month_end": "2026-04-28",
+    "company": "롯데렌탈",
+    "market_value_krw": 1446950.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 43,
-    "symbol": "078350.KS",
+    "symbol": "089860.KQ",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "애니플러스",
-    "market_value_krw": 1399740.0,
-    "month_end": "2026-04-28",
+    "company": "브이티",
+    "market_value_krw": 1441600.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
-    "qty": 492,
-    "symbol": "310200.KQ",
+    "qty": 85,
+    "symbol": "018290.KS",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "세경하이테크",
+    "market_value_krw": 1432210.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 299,
+    "symbol": "148150.KQ",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "씨에스윈드",
+    "market_value_krw": 1432000.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 20,
+    "symbol": "112610.KS",
     "weight_in_portfolio": 0.01
   },
   {
     "company": "노바텍",
-    "market_value_krw": 1390800.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1427400.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 61,
     "symbol": "285490.KQ",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "티와이홀딩스",
-    "market_value_krw": 1389530.0,
-    "month_end": "2026-04-28",
+    "company": "화승인더",
+    "market_value_krw": 1423920.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
-    "qty": 491,
-    "symbol": "363280.KS",
+    "qty": 408,
+    "symbol": "006060.KS",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "LG유플러스",
-    "market_value_krw": 1383480.0,
-    "month_end": "2026-04-28",
+    "company": "HDC현대산업개발",
+    "market_value_krw": 1422900.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
-    "qty": 84,
-    "symbol": "032640.KS",
+    "qty": 62,
+    "symbol": "294870.KS",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "크래프톤",
-    "market_value_krw": 1380000.0,
-    "month_end": "2026-04-28",
+    "company": "Doximity",
+    "market_value_krw": 1417711.16,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
-    "qty": 5,
-    "symbol": "259960.KQ",
+    "qty": 39,
+    "symbol": "DOCS",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "쿠쿠홈시스",
-    "market_value_krw": 1374800.0,
-    "month_end": "2026-04-28",
+    "company": "키이스트",
+    "market_value_krw": 1410750.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
-    "qty": 56,
-    "symbol": "284740.KS",
+    "qty": 513,
+    "symbol": "054780.KQ",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "쿠콘",
+    "market_value_krw": 1402950.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 47,
+    "symbol": "294570.KQ",
     "weight_in_portfolio": 0.01
   },
   {
     "company": "나스미디어",
-    "market_value_krw": 1371950.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1401850.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 115,
     "symbol": "089600.KQ",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "Z-holdings",
-    "market_value_krw": 1371920.81,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 357,
-    "symbol": "4689.T",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "국순당",
-    "market_value_krw": 1371720.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 322,
-    "symbol": "043650.KQ",
-    "weight_in_portfolio": 0.01
-  },
-  {
     "company": "Muyuan foods co ltd",
-    "market_value_krw": 1371341.72,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1401579.53,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 147,
     "symbol": "002714.SZ",
@@ -35542,107 +35488,179 @@
   },
   {
     "company": "Inmode",
-    "market_value_krw": 1361961.06,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1398955.29,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 65,
     "symbol": "INMD",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "에스티팜",
-    "market_value_krw": 1349600.0,
-    "month_end": "2026-04-28",
+    "company": "애니플러스",
+    "market_value_krw": 1397280.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
-    "qty": 8,
-    "symbol": "237690.KQ",
+    "qty": 492,
+    "symbol": "310200.KQ",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "롯데웰푸드",
-    "market_value_krw": 1343100.0,
-    "month_end": "2026-04-28",
+    "company": "티와이홀딩스",
+    "market_value_krw": 1394440.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
-    "qty": 11,
-    "symbol": "280360.KQ",
+    "qty": 491,
+    "symbol": "363280.KS",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "지투지바이오",
-    "market_value_krw": 1343000.0,
-    "month_end": "2026-04-28",
+    "company": "국순당",
+    "market_value_krw": 1378160.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
-    "qty": 17,
-    "symbol": "456160.KQ",
+    "qty": 322,
+    "symbol": "043650.KQ",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "골프존",
-    "market_value_krw": 1339000.0,
-    "month_end": "2026-04-28",
+    "company": "동아쏘시오홀딩스",
+    "market_value_krw": 1370600.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
-    "qty": 26,
-    "symbol": "215000.KQ",
+    "qty": 14,
+    "symbol": "000640.KS",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "아난티",
-    "market_value_krw": 1337050.0,
-    "month_end": "2026-04-28",
+    "company": "Z-holdings",
+    "market_value_krw": 1366662.56,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
-    "qty": 187,
-    "symbol": "025980.KS",
+    "qty": 357,
+    "symbol": "4689.T",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "인바디",
-    "market_value_krw": 1336500.0,
-    "month_end": "2026-04-28",
+    "company": "쿠쿠홈시스",
+    "market_value_krw": 1366400.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
-    "qty": 45,
-    "symbol": "041830.KQ",
+    "qty": 56,
+    "symbol": "284740.KS",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "율촌화학",
+    "market_value_krw": 1364750.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 53,
+    "symbol": "008730.KS",
     "weight_in_portfolio": 0.01
   },
   {
     "company": "현대그린푸드",
-    "market_value_krw": 1334140.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1356280.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 82,
     "symbol": "453340.KQ",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "JYP Ent.",
-    "market_value_krw": 1333500.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 21,
-    "symbol": "035900.KQ",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "West Fraser Timber. Co. Ltd",
-    "market_value_krw": 1326537.94,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 14,
-    "symbol": "WFG",
-    "weight_in_portfolio": 0.01
-  },
-  {
     "company": "큐브엔터",
-    "market_value_krw": 1326080.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1338880.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 128,
     "symbol": "182360.KQ",
     "weight_in_portfolio": 0.01
   },
   {
+    "company": "골프존",
+    "market_value_krw": 1333800.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 26,
+    "symbol": "215000.KQ",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "롯데웰푸드",
+    "market_value_krw": 1332100.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 11,
+    "symbol": "280360.KQ",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "한양디지텍",
+    "market_value_krw": 1330850.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 43,
+    "symbol": "078350.KS",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "LG유플러스",
+    "market_value_krw": 1330560.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 84,
+    "symbol": "032640.KS",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "인바디",
+    "market_value_krw": 1327500.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 45,
+    "symbol": "041830.KQ",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "크래프톤",
+    "market_value_krw": 1325000.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 5,
+    "symbol": "259960.KQ",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "JYP Ent.",
+    "market_value_krw": 1320900.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 21,
+    "symbol": "035900.KQ",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "아난티",
+    "market_value_krw": 1320220.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 187,
+    "symbol": "025980.KS",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "West Fraser Timber. Co. Ltd",
+    "market_value_krw": 1318324.42,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 14,
+    "symbol": "WFG",
+    "weight_in_portfolio": 0.01
+  },
+  {
     "company": "JAC recruitment Co. Ltd",
-    "market_value_krw": 1318470.9,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1312595.39,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 164,
     "symbol": "2124.T",
@@ -35650,143 +35668,152 @@
   },
   {
     "company": "고려신용정보",
-    "market_value_krw": 1318200.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1307800.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 130,
     "symbol": "049720.KQ",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "카카오게임즈",
-    "market_value_krw": 1315030.0,
-    "month_end": "2026-04-28",
+    "company": "에이디테크놀로지",
+    "market_value_krw": 1307500.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
-    "qty": 107,
-    "symbol": "293490.KQ",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "바이넥스",
-    "market_value_krw": 1307410.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 113,
-    "symbol": "053030.KQ",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "S-OIL",
-    "market_value_krw": 1305700.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 11,
-    "symbol": "010950.KS",
+    "qty": 25,
+    "symbol": "200710.KQ",
     "weight_in_portfolio": 0.01
   },
   {
     "company": "BYD",
-    "market_value_krw": 1303217.62,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1303387.39,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 67,
     "symbol": "1211.HK",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "파마리서치",
-    "market_value_krw": 1300000.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 4,
-    "symbol": "214450.KQ",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "SK디앤디",
-    "market_value_krw": 1297850.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 101,
-    "symbol": "210980.KS",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "Cover Corp",
-    "market_value_krw": 1292501.52,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 102,
-    "symbol": "5253.T",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "OSAKA Titanium Technologies Co.,Ltd.",
-    "market_value_krw": 1291451.69,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 54,
-    "symbol": "5726.T",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "코오롱티슈진",
-    "market_value_krw": 1280400.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 12,
-    "symbol": "950160.KQ",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "아프리카TV",
-    "market_value_krw": 1262100.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 21,
-    "symbol": "067160.KQ",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "Iradimed Corporation",
-    "market_value_krw": 1255133.37,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower",
-    "qty": 10,
-    "symbol": "IRMD",
-    "weight_in_portfolio": 0.01
-  },
-  {
     "company": "IMAX Corp",
-    "market_value_krw": 1252225.22,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1300654.33,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 23,
     "symbol": "IMAX",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "Cyber Agent",
-    "market_value_krw": 1214888.07,
-    "month_end": "2026-04-28",
+    "company": "Cover Corp",
+    "market_value_krw": 1299373.61,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
-    "qty": 104,
-    "symbol": "4751.T",
+    "qty": 102,
+    "symbol": "5253.T",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "SK디앤디",
+    "market_value_krw": 1294820.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 101,
+    "symbol": "210980.KS",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "카카오게임즈",
+    "market_value_krw": 1286140.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 107,
+    "symbol": "293490.KQ",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "OSAKA Titanium Technologies Co.,Ltd.",
+    "market_value_krw": 1261992.39,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 54,
+    "symbol": "5726.T",
     "weight_in_portfolio": 0.01
   },
   {
     "company": "Cellebrite DI",
-    "market_value_krw": 1204517.25,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1256836.1,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 65,
     "symbol": "CLBT",
     "weight_in_portfolio": 0.01
   },
   {
+    "company": "파마리서치",
+    "market_value_krw": 1254000.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 4,
+    "symbol": "214450.KQ",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "바이넥스",
+    "market_value_krw": 1245260.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 113,
+    "symbol": "053030.KQ",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "Iradimed Corporation",
+    "market_value_krw": 1241069.91,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 10,
+    "symbol": "IRMD",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "아프리카TV",
+    "market_value_krw": 1226400.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 21,
+    "symbol": "067160.KQ",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "코오롱티슈진",
+    "market_value_krw": 1224000.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 12,
+    "symbol": "950160.KQ",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "에스티팜",
+    "market_value_krw": 1220000.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 8,
+    "symbol": "237690.KQ",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "Cyber Agent",
+    "market_value_krw": 1205595.58,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower",
+    "qty": 104,
+    "symbol": "4751.T",
+    "weight_in_portfolio": 0.01
+  },
+  {
     "company": "Ping An Healthcare & Technology",
-    "market_value_krw": 1144925.4,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1164982.55,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 571,
     "symbol": "1833.HK",
@@ -35794,8 +35821,8 @@
   },
   {
     "company": "데브시스터즈",
-    "market_value_krw": 1144150.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1109850.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 49,
     "symbol": "194480.KQ",
@@ -35803,8 +35830,8 @@
   },
   {
     "company": "진시스템",
-    "market_value_krw": 1050500.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1052410.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 191,
     "symbol": "363250.KQ",
@@ -35812,8 +35839,8 @@
   },
   {
     "company": "하이브",
-    "market_value_krw": 994000.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1052000.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 4,
     "symbol": "352820.KS",
@@ -35821,12 +35848,228 @@
   },
   {
     "company": "Sportradar",
-    "market_value_krw": 947004.32,
-    "month_end": "2026-04-28",
+    "market_value_krw": 1048156.7,
+    "month_end": "2026-04-30",
     "persona": "smic_follower",
     "qty": 54,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "Wolfspeed",
+    "market_value_krw": 6857805.36,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 108,
+    "symbol": "WOLF",
+    "weight_in_portfolio": 0.05
+  },
+  {
+    "company": "Coreweave",
+    "market_value_krw": 6711440.64,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 33,
+    "symbol": "CRWV",
+    "weight_in_portfolio": 0.05
+  },
+  {
+    "company": "GrafTech International Ltd.",
+    "market_value_krw": 6518735.19,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 468,
+    "symbol": "EAF",
+    "weight_in_portfolio": 0.05
+  },
+  {
+    "company": "Camtek",
+    "market_value_krw": 6269252.65,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 21,
+    "symbol": "CAMT",
+    "weight_in_portfolio": 0.04
+  },
+  {
+    "company": "Establishment Labs Holdings",
+    "market_value_krw": 6262531.68,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 57,
+    "symbol": "ESTA",
+    "weight_in_portfolio": 0.04
+  },
+  {
+    "company": "Sensient Technologies Corp",
+    "market_value_krw": 6145234.01,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 35,
+    "symbol": "SXT",
+    "weight_in_portfolio": 0.04
+  },
+  {
+    "company": "Chegg",
+    "market_value_krw": 6112511.78,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 3575,
+    "symbol": "CHGG",
+    "weight_in_portfolio": 0.04
+  },
+  {
+    "company": "Z-holdings",
+    "market_value_krw": 6090610.86,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 1497,
+    "symbol": "4689.T",
+    "weight_in_portfolio": 0.04
+  },
+  {
+    "company": "Levi Strauss & Co",
+    "market_value_krw": 6076208.51,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 179,
+    "symbol": "LEVI",
+    "weight_in_portfolio": 0.04
+  },
+  {
+    "company": "Doximity",
+    "market_value_krw": 6058565.15,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 160,
+    "symbol": "DOCS",
+    "weight_in_portfolio": 0.04
+  },
+  {
+    "company": "Sportradar",
+    "market_value_krw": 5927323.48,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 301,
+    "symbol": "SRAD",
+    "weight_in_portfolio": 0.04
+  },
+  {
+    "company": "West Fraser Timber. Co. Ltd",
+    "market_value_krw": 5917536.49,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 64,
+    "symbol": "WFG",
+    "weight_in_portfolio": 0.04
+  },
+  {
+    "company": "Opendoor",
+    "market_value_krw": 5915148.76,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 735,
+    "symbol": "OPEN",
+    "weight_in_portfolio": 0.04
+  },
+  {
+    "company": "Funko Inc.",
+    "market_value_krw": 5816806.26,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 901,
+    "symbol": "FNKO",
+    "weight_in_portfolio": 0.04
+  },
+  {
+    "company": "Cellebrite DI",
+    "market_value_krw": 5804203.79,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 299,
+    "symbol": "CLBT",
+    "weight_in_portfolio": 0.04
+  },
+  {
+    "company": "Cyber Agent",
+    "market_value_krw": 5801237.91,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 505,
+    "symbol": "4751.T",
+    "weight_in_portfolio": 0.04
+  },
+  {
+    "company": "JAC recruitment Co. Ltd",
+    "market_value_krw": 5777092.21,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 738,
+    "symbol": "2124.T",
+    "weight_in_portfolio": 0.04
+  },
+  {
+    "company": "OSAKA Titanium Technologies Co.,Ltd.",
+    "market_value_krw": 5758882.3,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 246,
+    "symbol": "5726.T",
+    "weight_in_portfolio": 0.04
+  },
+  {
+    "company": "Cover Corp",
+    "market_value_krw": 5734731.97,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 438,
+    "symbol": "5253.T",
+    "weight_in_portfolio": 0.04
+  },
+  {
+    "company": "IMAX Corp",
+    "market_value_krw": 5734013.56,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 109,
+    "symbol": "IMAX",
+    "weight_in_portfolio": 0.04
+  },
+  {
+    "company": "Golar LNG",
+    "market_value_krw": 5720232.24,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 71,
+    "symbol": "GLNG",
+    "weight_in_portfolio": 0.04
+  },
+  {
+    "company": "Iradimed Corporation",
+    "market_value_krw": 5720143.67,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 45,
+    "symbol": "IRMD",
+    "weight_in_portfolio": 0.04
+  },
+  {
+    "company": "Tempus AI Inc",
+    "market_value_krw": 5677693.77,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 72,
+    "symbol": "TEM",
+    "weight_in_portfolio": 0.04
+  },
+  {
+    "company": "Inmode",
+    "market_value_krw": 5548619.16,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower",
+    "qty": 277,
+    "symbol": "INMD",
+    "weight_in_portfolio": 0.04
   },
   {
     "company": "SEA ltd.",
@@ -47313,117 +47556,117 @@
     "weight_in_portfolio": 0.24
   },
   {
-    "company": "예스티",
-    "market_value_krw": 13177600.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower_v2",
-    "qty": 464,
-    "symbol": "122640.KQ",
-    "weight_in_portfolio": 0.08
-  },
-  {
-    "company": "Sensient Technologies Corp",
-    "market_value_krw": 12769141.82,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower_v2",
-    "qty": 69,
-    "symbol": "SXT",
-    "weight_in_portfolio": 0.08
-  },
-  {
     "company": "두산",
-    "market_value_krw": 12664000.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 12768000.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower_v2",
     "qty": 8,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.08
   },
   {
+    "company": "예스티",
+    "market_value_krw": 12620800.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower_v2",
+    "qty": 464,
+    "symbol": "122640.KQ",
+    "weight_in_portfolio": 0.08
+  },
+  {
+    "company": "KG스틸",
+    "market_value_krw": 12211110.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower_v2",
+    "qty": 1737,
+    "symbol": "016380.KS",
+    "weight_in_portfolio": 0.08
+  },
+  {
+    "company": "Sensient Technologies Corp",
+    "market_value_krw": 11662784.54,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower_v2",
+    "qty": 69,
+    "symbol": "SXT",
+    "weight_in_portfolio": 0.07
+  },
+  {
     "company": "한국카본",
-    "market_value_krw": 11914000.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 11396500.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower_v2",
     "qty": 230,
     "symbol": "017960.KS",
     "weight_in_portfolio": 0.07
   },
   {
-    "company": "KG스틸",
-    "market_value_krw": 11690010.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower_v2",
-    "qty": 1737,
-    "symbol": "016380.KS",
-    "weight_in_portfolio": 0.07
-  },
-  {
     "company": "에스트래픽",
-    "market_value_krw": 10928505.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 10815985.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower_v2",
     "qty": 2813,
     "symbol": "234300.KQ",
     "weight_in_portfolio": 0.07
   },
   {
-    "company": "HDC현대산업개발",
-    "market_value_krw": 10475400.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower_v2",
-    "qty": 442,
-    "symbol": "294870.KS",
-    "weight_in_portfolio": 0.06
-  },
-  {
-    "company": "S-OIL",
-    "market_value_krw": 9852100.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower_v2",
-    "qty": 83,
-    "symbol": "010950.KS",
-    "weight_in_portfolio": 0.06
-  },
-  {
     "company": "지투지바이오",
-    "market_value_krw": 9796000.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 10614400.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower_v2",
     "qty": 124,
     "symbol": "456160.KQ",
-    "weight_in_portfolio": 0.06
+    "weight_in_portfolio": 0.07
+  },
+  {
+    "company": "HDC현대산업개발",
+    "market_value_krw": 10143900.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower_v2",
+    "qty": 442,
+    "symbol": "294870.KS",
+    "weight_in_portfolio": 0.07
   },
   {
     "company": "JYP Ent.",
-    "market_value_krw": 9525000.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 9435000.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower_v2",
     "qty": 150,
     "symbol": "035900.KQ",
     "weight_in_portfolio": 0.06
   },
   {
-    "company": "고려신용정보",
-    "market_value_krw": 9359220.0,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower_v2",
-    "qty": 923,
-    "symbol": "049720.KQ",
-    "weight_in_portfolio": 0.06
-  },
-  {
     "company": "JAC recruitment Co. Ltd",
-    "market_value_krw": 9333809.21,
-    "month_end": "2026-04-28",
+    "market_value_krw": 9292214.91,
+    "month_end": "2026-04-30",
     "persona": "smic_follower_v2",
     "qty": 1161,
     "symbol": "2124.T",
     "weight_in_portfolio": 0.06
   },
   {
+    "company": "고려신용정보",
+    "market_value_krw": 9285380.0,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower_v2",
+    "qty": 923,
+    "symbol": "049720.KQ",
+    "weight_in_portfolio": 0.06
+  },
+  {
+    "company": "IMAX Corp",
+    "market_value_krw": 9274230.91,
+    "month_end": "2026-04-30",
+    "persona": "smic_follower_v2",
+    "qty": 164,
+    "symbol": "IMAX",
+    "weight_in_portfolio": 0.06
+  },
+  {
     "company": "아프리카TV",
-    "market_value_krw": 9315500.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 9052000.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower_v2",
     "qty": 155,
     "symbol": "067160.KQ",
@@ -47431,30 +47674,75 @@
   },
   {
     "company": "코오롱티슈진",
-    "market_value_krw": 9282900.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 8874000.0,
+    "month_end": "2026-04-30",
     "persona": "smic_follower_v2",
     "qty": 87,
     "symbol": "950160.KQ",
     "weight_in_portfolio": 0.06
   },
   {
-    "company": "IMAX Corp",
-    "market_value_krw": 8928910.29,
-    "month_end": "2026-04-28",
-    "persona": "smic_follower_v2",
-    "qty": 164,
-    "symbol": "IMAX",
-    "weight_in_portfolio": 0.05
-  },
-  {
     "company": "Iradimed Corporation",
-    "market_value_krw": 8283880.25,
-    "month_end": "2026-04-28",
+    "market_value_krw": 8191061.42,
+    "month_end": "2026-04-30",
     "persona": "smic_follower_v2",
     "qty": 66,
     "symbol": "IRMD",
     "weight_in_portfolio": 0.05
+  },
+  {
+    "company": "Camtek",
+    "market_value_krw": 30152119.9,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower_v2",
+    "qty": 101,
+    "symbol": "CAMT",
+    "weight_in_portfolio": 0.18
+  },
+  {
+    "company": "Sensient Technologies Corp",
+    "market_value_krw": 29497123.25,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower_v2",
+    "qty": 168,
+    "symbol": "SXT",
+    "weight_in_portfolio": 0.17
+  },
+  {
+    "company": "Iradimed Corporation",
+    "market_value_krw": 27710918.25,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower_v2",
+    "qty": 218,
+    "symbol": "IRMD",
+    "weight_in_portfolio": 0.16
+  },
+  {
+    "company": "Golar LNG",
+    "market_value_krw": 27473228.07,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower_v2",
+    "qty": 341,
+    "symbol": "GLNG",
+    "weight_in_portfolio": 0.16
+  },
+  {
+    "company": "JAC recruitment Co. Ltd",
+    "market_value_krw": 27468586.11,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower_v2",
+    "qty": 3509,
+    "symbol": "2124.T",
+    "weight_in_portfolio": 0.16
+  },
+  {
+    "company": "IMAX Corp",
+    "market_value_krw": 27407532.7,
+    "month_end": "2026-05-07",
+    "persona": "smic_follower_v2",
+    "qty": 521,
+    "symbol": "IMAX",
+    "weight_in_portfolio": 0.16
   },
   {
     "company": "Roku",
@@ -51175,10 +51463,10 @@
   },
   {
     "company": "이지바이오",
-    "market_value_krw": 7848920.0,
+    "market_value_krw": 7852090.0,
     "month_end": "2023-11-30",
     "persona": "weak_oracle",
-    "qty": 2476,
+    "qty": 2477,
     "symbol": "353810.KQ",
     "weight_in_portfolio": 0.03
   },
@@ -51805,10 +52093,10 @@
   },
   {
     "company": "국순당",
-    "market_value_krw": 3263040.0,
+    "market_value_krw": 3269220.0,
     "month_end": "2024-01-31",
     "persona": "weak_oracle",
-    "qty": 528,
+    "qty": 529,
     "symbol": "043650.KQ",
     "weight_in_portfolio": 0.01
   },
@@ -52561,10 +52849,10 @@
   },
   {
     "company": "LG유플러스",
-    "market_value_krw": 98435680.0,
+    "market_value_krw": 98425860.0,
     "month_end": "2024-06-30",
     "persona": "weak_oracle",
-    "qty": 10024,
+    "qty": 10023,
     "symbol": "032640.KS",
     "weight_in_portfolio": 0.2
   },
@@ -53146,10 +53434,10 @@
   },
   {
     "company": "Z-holdings",
-    "market_value_krw": 202726770.57,
+    "market_value_krw": 202730542.59,
     "month_end": "2024-10-31",
     "persona": "weak_oracle",
-    "qty": 53745,
+    "qty": 53746,
     "symbol": "4689.T",
     "weight_in_portfolio": 0.33
   },
@@ -53533,10 +53821,10 @@
   },
   {
     "company": "현대그린푸드",
-    "market_value_krw": 33890680.0,
+    "market_value_krw": 33876240.0,
     "month_end": "2024-12-31",
     "persona": "weak_oracle",
-    "qty": 2347,
+    "qty": 2346,
     "symbol": "453340.KQ",
     "weight_in_portfolio": 0.05
   },
@@ -53695,10 +53983,10 @@
   },
   {
     "company": "LG유플러스",
-    "market_value_krw": 94496480.0,
+    "market_value_krw": 94506520.0,
     "month_end": "2025-01-31",
     "persona": "weak_oracle",
-    "qty": 9412,
+    "qty": 9413,
     "symbol": "032640.KS",
     "weight_in_portfolio": 0.12
   },
@@ -53776,10 +54064,10 @@
   },
   {
     "company": "쿠쿠홈시스",
-    "market_value_krw": 14076990.0,
+    "market_value_krw": 14057680.0,
     "month_end": "2025-01-31",
     "persona": "weak_oracle",
-    "qty": 729,
+    "qty": 728,
     "symbol": "284740.KS",
     "weight_in_portfolio": 0.02
   },
@@ -53925,6 +54213,15 @@
     "persona": "weak_oracle",
     "qty": 10,
     "symbol": "MP",
+    "weight_in_portfolio": 0.0
+  },
+  {
+    "company": "애니플러스",
+    "market_value_krw": 10720.0,
+    "month_end": "2025-01-31",
+    "persona": "weak_oracle",
+    "qty": 4,
+    "symbol": "310200.KQ",
     "weight_in_portfolio": 0.0
   },
   {
@@ -54235,10 +54532,10 @@
   },
   {
     "company": "GEM Co., Ltd.",
-    "market_value_krw": 36992529.45,
+    "market_value_krw": 36993937.99,
     "month_end": "2025-03-31",
     "persona": "weak_oracle",
-    "qty": 26263,
+    "qty": 26264,
     "symbol": "002340.SZ",
     "weight_in_portfolio": 0.04
   },
@@ -54388,10 +54685,10 @@
   },
   {
     "company": "GEM Co., Ltd.",
-    "market_value_krw": 205920119.22,
+    "market_value_krw": 205918797.1,
     "month_end": "2025-04-30",
     "persona": "weak_oracle",
-    "qty": 155749,
+    "qty": 155748,
     "symbol": "002340.SZ",
     "weight_in_portfolio": 0.22
   },
@@ -54667,10 +54964,10 @@
   },
   {
     "company": "GEM Co., Ltd.",
-    "market_value_krw": 203901296.41,
+    "market_value_krw": 203899987.25,
     "month_end": "2025-05-31",
     "persona": "weak_oracle",
-    "qty": 155749,
+    "qty": 155748,
     "symbol": "002340.SZ",
     "weight_in_portfolio": 0.2
   },
@@ -54766,10 +55063,10 @@
   },
   {
     "company": "Chegg",
-    "market_value_krw": 28509900.19,
+    "market_value_krw": 28512695.82,
     "month_end": "2025-05-31",
     "persona": "weak_oracle",
-    "qty": 20396,
+    "qty": 20398,
     "symbol": "CHGG",
     "weight_in_portfolio": 0.03
   },
@@ -54946,10 +55243,10 @@
   },
   {
     "company": "GEM Co., Ltd.",
-    "market_value_krw": 213658948.02,
+    "market_value_krw": 213657576.2,
     "month_end": "2025-06-30",
     "persona": "weak_oracle",
-    "qty": 155749,
+    "qty": 155748,
     "symbol": "002340.SZ",
     "weight_in_portfolio": 0.18
   },
@@ -55018,10 +55315,10 @@
   },
   {
     "company": "코세스",
-    "market_value_krw": 48964120.0,
+    "market_value_krw": 48956880.0,
     "month_end": "2025-06-30",
     "persona": "weak_oracle",
-    "qty": 6763,
+    "qty": 6762,
     "symbol": "089890.KQ",
     "weight_in_portfolio": 0.04
   },
@@ -55054,10 +55351,10 @@
   },
   {
     "company": "Fluence Energy Inc.",
-    "market_value_krw": 38456141.7,
+    "market_value_krw": 38465291.39,
     "month_end": "2025-06-30",
     "persona": "weak_oracle",
-    "qty": 4203,
+    "qty": 4204,
     "symbol": "FLNC",
     "weight_in_portfolio": 0.03
   },
@@ -55180,10 +55477,10 @@
   },
   {
     "company": "공구우먼",
-    "market_value_krw": 8726100.0,
+    "market_value_krw": 8730450.0,
     "month_end": "2025-06-30",
     "persona": "weak_oracle",
-    "qty": 2006,
+    "qty": 2007,
     "symbol": "366030.KQ",
     "weight_in_portfolio": 0.01
   },
@@ -55216,10 +55513,10 @@
   },
   {
     "company": "Opendoor",
-    "market_value_krw": 4840444.32,
+    "market_value_krw": 4839717.53,
     "month_end": "2025-06-30",
     "persona": "weak_oracle",
-    "qty": 6660,
+    "qty": 6659,
     "symbol": "OPEN",
     "weight_in_portfolio": 0.0
   },
@@ -55239,6 +55536,15 @@
     "persona": "weak_oracle",
     "qty": 167,
     "symbol": "5726.T",
+    "weight_in_portfolio": 0.0
+  },
+  {
+    "company": "Chegg",
+    "market_value_krw": 1649.94,
+    "month_end": "2025-06-30",
+    "persona": "weak_oracle",
+    "qty": 1,
+    "symbol": "CHGG",
     "weight_in_portfolio": 0.0
   },
   {
@@ -55648,10 +55954,10 @@
   },
   {
     "company": "공구우먼",
-    "market_value_krw": 39813960.0,
+    "market_value_krw": 39818220.0,
     "month_end": "2025-08-31",
     "persona": "weak_oracle",
-    "qty": 9346,
+    "qty": 9347,
     "symbol": "366030.KQ",
     "weight_in_portfolio": 0.03
   },
@@ -55746,21 +56052,21 @@
     "weight_in_portfolio": 0.01
   },
   {
+    "company": "티엘비",
+    "market_value_krw": 9577000.0,
+    "month_end": "2025-08-31",
+    "persona": "weak_oracle",
+    "qty": 314,
+    "symbol": "356860.KQ",
+    "weight_in_portfolio": 0.01
+  },
+  {
     "company": "노바텍",
     "market_value_krw": 9567600.0,
     "month_end": "2025-08-31",
     "persona": "weak_oracle",
     "qty": 469,
     "symbol": "285490.KQ",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "티엘비",
-    "market_value_krw": 9546500.0,
-    "month_end": "2025-08-31",
-    "persona": "weak_oracle",
-    "qty": 313,
-    "symbol": "356860.KQ",
     "weight_in_portfolio": 0.01
   },
   {
@@ -56061,12 +56367,12 @@
     "weight_in_portfolio": 0.0
   },
   {
-    "company": "이지바이오",
-    "market_value_krw": 12700.0,
+    "company": "HDC현대산업개발",
+    "market_value_krw": 20350.0,
     "month_end": "2025-09-30",
     "persona": "weak_oracle",
-    "qty": 2,
-    "symbol": "353810.KQ",
+    "qty": 1,
+    "symbol": "294870.KS",
     "weight_in_portfolio": 0.0
   },
   {
@@ -56269,1235 +56575,1136 @@
   },
   {
     "company": "Tenaris S.A.",
-    "market_value_krw": 243691559.64,
+    "market_value_krw": 212657033.95,
     "month_end": "2025-11-30",
     "persona": "weak_oracle",
-    "qty": 4146,
+    "qty": 3618,
     "symbol": "TS",
-    "weight_in_portfolio": 0.13
-  },
-  {
-    "company": "Noble Corporation PLC",
-    "market_value_krw": 206646587.14,
-    "month_end": "2025-11-30",
-    "persona": "weak_oracle",
-    "qty": 4618,
-    "symbol": "NE",
     "weight_in_portfolio": 0.11
   },
   {
-    "company": "Scorpio Tankers Inc.",
-    "market_value_krw": 166056054.96,
+    "company": "Noble Corporation PLC",
+    "market_value_krw": 187941893.89,
     "month_end": "2025-11-30",
     "persona": "weak_oracle",
-    "qty": 1982,
+    "qty": 4200,
+    "symbol": "NE",
+    "weight_in_portfolio": 0.1
+  },
+  {
+    "company": "Scorpio Tankers Inc.",
+    "market_value_krw": 173009966.45,
+    "month_end": "2025-11-30",
+    "persona": "weak_oracle",
+    "qty": 2065,
     "symbol": "STNG",
     "weight_in_portfolio": 0.09
   },
   {
-    "company": "BE Semiconductor Industries N.V.",
-    "market_value_krw": 149216317.84,
+    "company": "Eli Lilly & Co.",
+    "market_value_krw": 165027643.35,
     "month_end": "2025-11-30",
     "persona": "weak_oracle",
-    "qty": 678,
+    "qty": 105,
+    "symbol": "LLY",
+    "weight_in_portfolio": 0.09
+  },
+  {
+    "company": "BE Semiconductor Industries N.V.",
+    "market_value_krw": 164181966.24,
+    "month_end": "2025-11-30",
+    "persona": "weak_oracle",
+    "qty": 746,
     "symbol": "BESI.AS",
-    "weight_in_portfolio": 0.08
+    "weight_in_portfolio": 0.09
   },
   {
     "company": "에이피알",
-    "market_value_krw": 143080000.0,
+    "market_value_krw": 130560500.0,
     "month_end": "2025-11-30",
     "persona": "weak_oracle",
-    "qty": 560,
+    "qty": 511,
     "symbol": "278470.KS",
-    "weight_in_portfolio": 0.08
-  },
-  {
-    "company": "LX인터내셔널",
-    "market_value_krw": 139103950.0,
-    "month_end": "2025-11-30",
-    "persona": "weak_oracle",
-    "qty": 4409,
-    "symbol": "001120.KS",
-    "weight_in_portfolio": 0.08
-  },
-  {
-    "company": "Eli Lilly & Co.",
-    "market_value_krw": 121020271.79,
-    "month_end": "2025-11-30",
-    "persona": "weak_oracle",
-    "qty": 77,
-    "symbol": "LLY",
     "weight_in_portfolio": 0.07
   },
   {
-    "company": "삼성엔지니어링",
-    "market_value_krw": 111295800.0,
+    "company": "LX인터내셔널",
+    "market_value_krw": 127966800.0,
     "month_end": "2025-11-30",
     "persona": "weak_oracle",
-    "qty": 4356,
-    "symbol": "028050.KS",
-    "weight_in_portfolio": 0.06
+    "qty": 4056,
+    "symbol": "001120.KS",
+    "weight_in_portfolio": 0.07
   },
   {
     "company": "오리온",
-    "market_value_krw": 85138500.0,
+    "market_value_krw": 104339500.0,
     "month_end": "2025-11-30",
     "persona": "weak_oracle",
-    "qty": 807,
+    "qty": 989,
     "symbol": "271560.KS",
+    "weight_in_portfolio": 0.06
+  },
+  {
+    "company": "삼성엔지니어링",
+    "market_value_krw": 92542100.0,
+    "month_end": "2025-11-30",
+    "persona": "weak_oracle",
+    "qty": 3622,
+    "symbol": "028050.KS",
     "weight_in_portfolio": 0.05
   },
   {
     "company": "영원무역홀딩스",
-    "market_value_krw": 83779500.0,
+    "market_value_krw": 85106700.0,
     "month_end": "2025-11-30",
     "persona": "weak_oracle",
-    "qty": 505,
+    "qty": 513,
     "symbol": "009970.KS",
     "weight_in_portfolio": 0.05
   },
   {
     "company": "Gaztransport&technigaz",
-    "market_value_krw": 74147497.16,
+    "market_value_krw": 78234367.09,
     "month_end": "2025-11-30",
     "persona": "weak_oracle",
-    "qty": 254,
+    "qty": 268,
     "symbol": "GTT.PA",
     "weight_in_portfolio": 0.04
   },
   {
     "company": "폰드그룹",
-    "market_value_krw": 63233826.84,
+    "market_value_krw": 55503598.23,
     "month_end": "2025-11-30",
     "persona": "weak_oracle",
-    "qty": 13628,
+    "qty": 11962,
     "symbol": "472850.KQ",
     "weight_in_portfolio": 0.03
   },
   {
     "company": "펄어비스",
-    "market_value_krw": 42801600.0,
+    "market_value_krw": 38355150.0,
     "month_end": "2025-11-30",
     "persona": "weak_oracle",
-    "qty": 1184,
+    "qty": 1061,
     "symbol": "263750.KQ",
     "weight_in_portfolio": 0.02
   },
   {
-    "company": "이지바이오",
-    "market_value_krw": 39498000.0,
-    "month_end": "2025-11-30",
-    "persona": "weak_oracle",
-    "qty": 5800,
-    "symbol": "353810.KQ",
-    "weight_in_portfolio": 0.02
-  },
-  {
     "company": "주성엔지니어링",
-    "market_value_krw": 37989150.0,
+    "market_value_krw": 38207950.0,
     "month_end": "2025-11-30",
     "persona": "weak_oracle",
-    "qty": 1389,
+    "qty": 1397,
     "symbol": "036930.KQ",
     "weight_in_portfolio": 0.02
   },
   {
-    "company": "Funko Inc.",
-    "market_value_krw": 37221275.07,
+    "company": "이지바이오",
+    "market_value_krw": 33334950.0,
     "month_end": "2025-11-30",
     "persona": "weak_oracle",
-    "qty": 8060,
-    "symbol": "FNKO",
+    "qty": 4895,
+    "symbol": "353810.KQ",
     "weight_in_portfolio": 0.02
   },
   {
-    "company": "Inmode",
-    "market_value_krw": 26885010.9,
+    "company": "레이",
+    "market_value_krw": 28541700.0,
     "month_end": "2025-11-30",
     "persona": "weak_oracle",
-    "qty": 1291,
-    "symbol": "INMD",
-    "weight_in_portfolio": 0.01
+    "qty": 6138,
+    "symbol": "228670.KQ",
+    "weight_in_portfolio": 0.02
   },
   {
-    "company": "레이",
-    "market_value_krw": 26100450.0,
+    "company": "Funko Inc.",
+    "market_value_krw": 22485159.84,
     "month_end": "2025-11-30",
     "persona": "weak_oracle",
-    "qty": 5613,
-    "symbol": "228670.KQ",
+    "qty": 4869,
+    "symbol": "FNKO",
     "weight_in_portfolio": 0.01
   },
   {
     "company": "현대에너지솔루션",
-    "market_value_krw": 16241000.0,
+    "market_value_krw": 21364000.0,
     "month_end": "2025-11-30",
     "persona": "weak_oracle",
-    "qty": 298,
+    "qty": 392,
     "symbol": "322000.KS",
     "weight_in_portfolio": 0.01
   },
   {
     "company": "두산테스나",
-    "market_value_krw": 15232000.0,
+    "market_value_krw": 21011200.0,
     "month_end": "2025-11-30",
     "persona": "weak_oracle",
-    "qty": 340,
+    "qty": 469,
     "symbol": "131970.KQ",
     "weight_in_portfolio": 0.01
   },
   {
-    "company": "DL이앤씨",
-    "market_value_krw": 13725250.0,
+    "company": "Roku",
+    "market_value_krw": 20934438.64,
     "month_end": "2025-11-30",
     "persona": "weak_oracle",
-    "qty": 341,
+    "qty": 148,
+    "symbol": "ROKU",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "Inmode",
+    "market_value_krw": 15347988.41,
+    "month_end": "2025-11-30",
+    "persona": "weak_oracle",
+    "qty": 737,
+    "symbol": "INMD",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "DL이앤씨",
+    "market_value_krw": 9338000.0,
+    "month_end": "2025-11-30",
+    "persona": "weak_oracle",
+    "qty": 232,
     "symbol": "375500.KS",
     "weight_in_portfolio": 0.01
   },
   {
     "company": "Chegg",
-    "market_value_krw": 4418528.49,
+    "market_value_krw": 8139618.41,
     "month_end": "2025-11-30",
     "persona": "weak_oracle",
-    "qty": 3117,
+    "qty": 5742,
     "symbol": "CHGG",
     "weight_in_portfolio": 0.0
   },
   {
-    "company": "효성티앤씨",
-    "market_value_krw": 3322500.0,
+    "company": "DL",
+    "market_value_krw": 6929550.0,
     "month_end": "2025-11-30",
     "persona": "weak_oracle",
-    "qty": 15,
+    "qty": 177,
+    "symbol": "000210.KS",
+    "weight_in_portfolio": 0.0
+  },
+  {
+    "company": "효성티앤씨",
+    "market_value_krw": 4873000.0,
+    "month_end": "2025-11-30",
+    "persona": "weak_oracle",
+    "qty": 22,
     "symbol": "298020.KQ",
     "weight_in_portfolio": 0.0
   },
   {
-    "company": "Tenaris S.A.",
-    "market_value_krw": 221482293.5,
-    "month_end": "2025-12-31",
+    "company": "아이스크림미디어",
+    "market_value_krw": 3945260.0,
+    "month_end": "2025-11-30",
     "persona": "weak_oracle",
-    "qty": 4006,
-    "symbol": "TS",
-    "weight_in_portfolio": 0.12
+    "qty": 227,
+    "symbol": "461300.KQ",
+    "weight_in_portfolio": 0.0
+  },
+  {
+    "company": "Cellebrite DI",
+    "market_value_krw": 887011.39,
+    "month_end": "2025-11-30",
+    "persona": "weak_oracle",
+    "qty": 36,
+    "symbol": "CLBT",
+    "weight_in_portfolio": 0.0
   },
   {
     "company": "BE Semiconductor Industries N.V.",
-    "market_value_krw": 202182658.02,
+    "market_value_krw": 222287972.61,
     "month_end": "2025-12-31",
     "persona": "weak_oracle",
-    "qty": 895,
+    "qty": 984,
     "symbol": "BESI.AS",
-    "weight_in_portfolio": 0.11
+    "weight_in_portfolio": 0.12
+  },
+  {
+    "company": "Tenaris S.A.",
+    "market_value_krw": 191129378.09,
+    "month_end": "2025-12-31",
+    "persona": "weak_oracle",
+    "qty": 3457,
+    "symbol": "TS",
+    "weight_in_portfolio": 0.1
   },
   {
     "company": "Scorpio Tankers Inc.",
-    "market_value_krw": 166789028.79,
+    "market_value_krw": 164304003.82,
     "month_end": "2025-12-31",
     "persona": "weak_oracle",
-    "qty": 2282,
+    "qty": 2248,
     "symbol": "STNG",
     "weight_in_portfolio": 0.09
   },
   {
     "company": "Gaztransport&technigaz",
-    "market_value_krw": 152878597.13,
+    "market_value_krw": 139389309.14,
     "month_end": "2025-12-31",
     "persona": "weak_oracle",
-    "qty": 578,
+    "qty": 527,
     "symbol": "GTT.PA",
     "weight_in_portfolio": 0.08
+  },
+  {
+    "company": "LX인터내셔널",
+    "market_value_krw": 121322500.0,
+    "month_end": "2025-12-31",
+    "persona": "weak_oracle",
+    "qty": 3733,
+    "symbol": "001120.KS",
+    "weight_in_portfolio": 0.07
+  },
+  {
+    "company": "삼성엔지니어링",
+    "market_value_krw": 105579500.0,
+    "month_end": "2025-12-31",
+    "persona": "weak_oracle",
+    "qty": 4390,
+    "symbol": "028050.KS",
+    "weight_in_portfolio": 0.06
   },
   {
     "company": "폰드그룹",
-    "market_value_krw": 134123916.64,
+    "market_value_krw": 97120318.17,
     "month_end": "2025-12-31",
     "persona": "weak_oracle",
-    "qty": 23734,
+    "qty": 17186,
     "symbol": "472850.KQ",
-    "weight_in_portfolio": 0.07
-  },
-  {
-    "company": "LX인터내셔널",
-    "market_value_krw": 112970000.0,
-    "month_end": "2025-12-31",
-    "persona": "weak_oracle",
-    "qty": 3476,
-    "symbol": "001120.KS",
-    "weight_in_portfolio": 0.06
-  },
-  {
-    "company": "에이피알",
-    "market_value_krw": 102795000.0,
-    "month_end": "2025-12-31",
-    "persona": "weak_oracle",
-    "qty": 445,
-    "symbol": "278470.KS",
-    "weight_in_portfolio": 0.06
-  },
-  {
-    "company": "Noble Corporation PLC",
-    "market_value_krw": 96400018.63,
-    "month_end": "2025-12-31",
-    "persona": "weak_oracle",
-    "qty": 2374,
-    "symbol": "NE",
     "weight_in_portfolio": 0.05
-  },
-  {
-    "company": "삼성엔지니어링",
-    "market_value_krw": 75276500.0,
-    "month_end": "2025-12-31",
-    "persona": "weak_oracle",
-    "qty": 3130,
-    "symbol": "028050.KS",
-    "weight_in_portfolio": 0.04
-  },
-  {
-    "company": "오리온",
-    "market_value_krw": 63314300.0,
-    "month_end": "2025-12-31",
-    "persona": "weak_oracle",
-    "qty": 599,
-    "symbol": "271560.KS",
-    "weight_in_portfolio": 0.03
-  },
-  {
-    "company": "Funko Inc.",
-    "market_value_krw": 61834734.52,
-    "month_end": "2025-12-31",
-    "persona": "weak_oracle",
-    "qty": 12648,
-    "symbol": "FNKO",
-    "weight_in_portfolio": 0.03
-  },
-  {
-    "company": "IMAX Corp",
-    "market_value_krw": 52932572.93,
-    "month_end": "2025-12-31",
-    "persona": "weak_oracle",
-    "qty": 996,
-    "symbol": "IMAX",
-    "weight_in_portfolio": 0.03
-  },
-  {
-    "company": "Inmode",
-    "market_value_krw": 48688279.43,
-    "month_end": "2025-12-31",
-    "persona": "weak_oracle",
-    "qty": 2305,
-    "symbol": "INMD",
-    "weight_in_portfolio": 0.03
-  },
-  {
-    "company": "두산테스나",
-    "market_value_krw": 46496800.0,
-    "month_end": "2025-12-31",
-    "persona": "weak_oracle",
-    "qty": 874,
-    "symbol": "131970.KQ",
-    "weight_in_portfolio": 0.03
-  },
-  {
-    "company": "한국카본",
-    "market_value_krw": 46237650.0,
-    "month_end": "2025-12-31",
-    "persona": "weak_oracle",
-    "qty": 1549,
-    "symbol": "017960.KS",
-    "weight_in_portfolio": 0.03
-  },
-  {
-    "company": "Sensient Technologies Corp",
-    "market_value_krw": 42959142.58,
-    "month_end": "2025-12-31",
-    "persona": "weak_oracle",
-    "qty": 318,
-    "symbol": "SXT",
-    "weight_in_portfolio": 0.02
-  },
-  {
-    "company": "펄어비스",
-    "market_value_krw": 39569200.0,
-    "month_end": "2025-12-31",
-    "persona": "weak_oracle",
-    "qty": 1058,
-    "symbol": "263750.KQ",
-    "weight_in_portfolio": 0.02
-  },
-  {
-    "company": "레이",
-    "market_value_krw": 37661510.0,
-    "month_end": "2025-12-31",
-    "persona": "weak_oracle",
-    "qty": 5563,
-    "symbol": "228670.KQ",
-    "weight_in_portfolio": 0.02
-  },
-  {
-    "company": "현대에너지솔루션",
-    "market_value_krw": 36102000.0,
-    "month_end": "2025-12-31",
-    "persona": "weak_oracle",
-    "qty": 660,
-    "symbol": "322000.KS",
-    "weight_in_portfolio": 0.02
-  },
-  {
-    "company": "주성엔지니어링",
-    "market_value_krw": 34098700.0,
-    "month_end": "2025-12-31",
-    "persona": "weak_oracle",
-    "qty": 1231,
-    "symbol": "036930.KQ",
-    "weight_in_portfolio": 0.02
-  },
-  {
-    "company": "DL",
-    "market_value_krw": 27409200.0,
-    "month_end": "2025-12-31",
-    "persona": "weak_oracle",
-    "qty": 728,
-    "symbol": "000210.KS",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "코오롱티슈진",
-    "market_value_krw": 16238400.0,
-    "month_end": "2025-12-31",
-    "persona": "weak_oracle",
-    "qty": 204,
-    "symbol": "950160.KQ",
-    "weight_in_portfolio": 0.01
   },
   {
     "company": "Roku",
-    "market_value_krw": 5303961.12,
+    "market_value_krw": 97031288.77,
     "month_end": "2025-12-31",
     "persona": "weak_oracle",
-    "qty": 34,
+    "qty": 622,
     "symbol": "ROKU",
-    "weight_in_portfolio": 0.0
-  },
-  {
-    "company": "Grindr Inc.",
-    "market_value_krw": 3173496.19,
-    "month_end": "2025-12-31",
-    "persona": "weak_oracle",
-    "qty": 163,
-    "symbol": "GRND",
-    "weight_in_portfolio": 0.0
-  },
-  {
-    "company": "현대차",
-    "market_value_krw": 889500.0,
-    "month_end": "2025-12-31",
-    "persona": "weak_oracle",
-    "qty": 3,
-    "symbol": "005380.KS",
-    "weight_in_portfolio": 0.0
-  },
-  {
-    "company": "DL이앤씨",
-    "market_value_krw": 411500.0,
-    "month_end": "2025-12-31",
-    "persona": "weak_oracle",
-    "qty": 10,
-    "symbol": "375500.KS",
-    "weight_in_portfolio": 0.0
-  },
-  {
-    "company": "Scorpio Tankers Inc.",
-    "market_value_krw": 280964822.52,
-    "month_end": "2026-01-31",
-    "persona": "weak_oracle",
-    "qty": 3091,
-    "symbol": "STNG",
-    "weight_in_portfolio": 0.13
-  },
-  {
-    "company": "Tenaris S.A.",
-    "market_value_krw": 270708726.02,
-    "month_end": "2026-01-31",
-    "persona": "weak_oracle",
-    "qty": 4277,
-    "symbol": "TS",
-    "weight_in_portfolio": 0.12
-  },
-  {
-    "company": "Gaztransport&technigaz",
-    "market_value_krw": 227767937.2,
-    "month_end": "2026-01-31",
-    "persona": "weak_oracle",
-    "qty": 734,
-    "symbol": "GTT.PA",
-    "weight_in_portfolio": 0.1
-  },
-  {
-    "company": "Noble Corporation PLC",
-    "market_value_krw": 226522206.03,
-    "month_end": "2026-01-31",
-    "persona": "weak_oracle",
-    "qty": 4451,
-    "symbol": "NE",
-    "weight_in_portfolio": 0.1
-  },
-  {
-    "company": "이지바이오",
-    "market_value_krw": 221454600.0,
-    "month_end": "2026-01-31",
-    "persona": "weak_oracle",
-    "qty": 31412,
-    "symbol": "353810.KQ",
-    "weight_in_portfolio": 0.1
-  },
-  {
-    "company": "에이피알",
-    "market_value_krw": 218430000.0,
-    "month_end": "2026-01-31",
-    "persona": "weak_oracle",
-    "qty": 809,
-    "symbol": "278470.KS",
-    "weight_in_portfolio": 0.1
-  },
-  {
-    "company": "BE Semiconductor Industries N.V.",
-    "market_value_krw": 214590424.82,
-    "month_end": "2026-01-31",
-    "persona": "weak_oracle",
-    "qty": 763,
-    "symbol": "BESI.AS",
-    "weight_in_portfolio": 0.1
-  },
-  {
-    "company": "삼성엔지니어링",
-    "market_value_krw": 125787200.0,
-    "month_end": "2026-01-31",
-    "persona": "weak_oracle",
-    "qty": 4084,
-    "symbol": "028050.KS",
-    "weight_in_portfolio": 0.06
-  },
-  {
-    "company": "LX인터내셔널",
-    "market_value_krw": 69270750.0,
-    "month_end": "2026-01-31",
-    "persona": "weak_oracle",
-    "qty": 1811,
-    "symbol": "001120.KS",
-    "weight_in_portfolio": 0.03
-  },
-  {
-    "company": "주성엔지니어링",
-    "market_value_krw": 66035950.0,
-    "month_end": "2026-01-31",
-    "persona": "weak_oracle",
-    "qty": 1597,
-    "symbol": "036930.KQ",
-    "weight_in_portfolio": 0.03
-  },
-  {
-    "company": "펄어비스",
-    "market_value_krw": 53539200.0,
-    "month_end": "2026-01-31",
-    "persona": "weak_oracle",
-    "qty": 936,
-    "symbol": "263750.KQ",
-    "weight_in_portfolio": 0.02
-  },
-  {
-    "company": "세아제강지주",
-    "market_value_krw": 37400000.0,
-    "month_end": "2026-01-31",
-    "persona": "weak_oracle",
-    "qty": 275,
-    "symbol": "003030.KS",
-    "weight_in_portfolio": 0.02
-  },
-  {
-    "company": "코오롱티슈진",
-    "market_value_krw": 37065000.0,
-    "month_end": "2026-01-31",
-    "persona": "weak_oracle",
-    "qty": 353,
-    "symbol": "950160.KQ",
-    "weight_in_portfolio": 0.02
-  },
-  {
-    "company": "현대에너지솔루션",
-    "market_value_krw": 33984000.0,
-    "month_end": "2026-01-31",
-    "persona": "weak_oracle",
-    "qty": 640,
-    "symbol": "322000.KS",
-    "weight_in_portfolio": 0.02
-  },
-  {
-    "company": "오리온",
-    "market_value_krw": 31725000.0,
-    "month_end": "2026-01-31",
-    "persona": "weak_oracle",
-    "qty": 270,
-    "symbol": "271560.KS",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "DL",
-    "market_value_krw": 30502500.0,
-    "month_end": "2026-01-31",
-    "persona": "weak_oracle",
-    "qty": 735,
-    "symbol": "000210.KS",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "Funko Inc.",
-    "market_value_krw": 24821475.82,
-    "month_end": "2026-01-31",
-    "persona": "weak_oracle",
-    "qty": 4279,
-    "symbol": "FNKO",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "Sensient Technologies Corp",
-    "market_value_krw": 16475659.74,
-    "month_end": "2026-01-31",
-    "persona": "weak_oracle",
-    "qty": 122,
-    "symbol": "SXT",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "Coreweave",
-    "market_value_krw": 4660115.21,
-    "month_end": "2026-01-31",
-    "persona": "weak_oracle",
-    "qty": 35,
-    "symbol": "CRWV",
-    "weight_in_portfolio": 0.0
-  },
-  {
-    "company": "Inmode",
-    "market_value_krw": 3456656.25,
-    "month_end": "2026-01-31",
-    "persona": "weak_oracle",
-    "qty": 154,
-    "symbol": "INMD",
-    "weight_in_portfolio": 0.0
-  },
-  {
-    "company": "두산테스나",
-    "market_value_krw": 2169600.0,
-    "month_end": "2026-01-31",
-    "persona": "weak_oracle",
-    "qty": 32,
-    "symbol": "131970.KQ",
-    "weight_in_portfolio": 0.0
-  },
-  {
-    "company": "IMAX Corp",
-    "market_value_krw": 1446462.34,
-    "month_end": "2026-01-31",
-    "persona": "weak_oracle",
-    "qty": 29,
-    "symbol": "IMAX",
-    "weight_in_portfolio": 0.0
-  },
-  {
-    "company": "Scorpio Tankers Inc.",
-    "market_value_krw": 350110967.55,
-    "month_end": "2026-02-28",
-    "persona": "weak_oracle",
-    "qty": 3091,
-    "symbol": "STNG",
-    "weight_in_portfolio": 0.14
-  },
-  {
-    "company": "Tenaris S.A.",
-    "market_value_krw": 333256172.47,
-    "month_end": "2026-02-28",
-    "persona": "weak_oracle",
-    "qty": 4277,
-    "symbol": "TS",
-    "weight_in_portfolio": 0.13
-  },
-  {
-    "company": "Noble Corporation PLC",
-    "market_value_krw": 289627885.7,
-    "month_end": "2026-02-28",
-    "persona": "weak_oracle",
-    "qty": 4451,
-    "symbol": "NE",
-    "weight_in_portfolio": 0.11
-  },
-  {
-    "company": "에이피알",
-    "market_value_krw": 252812500.0,
-    "month_end": "2026-02-28",
-    "persona": "weak_oracle",
-    "qty": 809,
-    "symbol": "278470.KS",
-    "weight_in_portfolio": 0.1
-  },
-  {
-    "company": "BE Semiconductor Industries N.V.",
-    "market_value_krw": 244159140.16,
-    "month_end": "2026-02-28",
-    "persona": "weak_oracle",
-    "qty": 763,
-    "symbol": "BESI.AS",
-    "weight_in_portfolio": 0.09
-  },
-  {
-    "company": "Gaztransport&technigaz",
-    "market_value_krw": 238847579.63,
-    "month_end": "2026-02-28",
-    "persona": "weak_oracle",
-    "qty": 734,
-    "symbol": "GTT.PA",
-    "weight_in_portfolio": 0.09
-  },
-  {
-    "company": "이지바이오",
-    "market_value_krw": 230249960.0,
-    "month_end": "2026-02-28",
-    "persona": "weak_oracle",
-    "qty": 31412,
-    "symbol": "353810.KQ",
-    "weight_in_portfolio": 0.09
-  },
-  {
-    "company": "삼성엔지니어링",
-    "market_value_krw": 148657600.0,
-    "month_end": "2026-02-28",
-    "persona": "weak_oracle",
-    "qty": 4084,
-    "symbol": "028050.KS",
-    "weight_in_portfolio": 0.06
-  },
-  {
-    "company": "주성엔지니어링",
-    "market_value_krw": 89591700.0,
-    "month_end": "2026-02-28",
-    "persona": "weak_oracle",
-    "qty": 1597,
-    "symbol": "036930.KQ",
-    "weight_in_portfolio": 0.03
-  },
-  {
-    "company": "LX인터내셔널",
-    "market_value_krw": 77148600.0,
-    "month_end": "2026-02-28",
-    "persona": "weak_oracle",
-    "qty": 1811,
-    "symbol": "001120.KS",
-    "weight_in_portfolio": 0.03
-  },
-  {
-    "company": "현대에너지솔루션",
-    "market_value_krw": 66560000.0,
-    "month_end": "2026-02-28",
-    "persona": "weak_oracle",
-    "qty": 640,
-    "symbol": "322000.KS",
-    "weight_in_portfolio": 0.03
-  },
-  {
-    "company": "펄어비스",
-    "market_value_krw": 50169600.0,
-    "month_end": "2026-02-28",
-    "persona": "weak_oracle",
-    "qty": 936,
-    "symbol": "263750.KQ",
-    "weight_in_portfolio": 0.02
-  },
-  {
-    "company": "세아제강지주",
-    "market_value_krw": 39050000.0,
-    "month_end": "2026-02-28",
-    "persona": "weak_oracle",
-    "qty": 275,
-    "symbol": "003030.KS",
-    "weight_in_portfolio": 0.02
-  },
-  {
-    "company": "DL",
-    "market_value_krw": 37999500.0,
-    "month_end": "2026-02-28",
-    "persona": "weak_oracle",
-    "qty": 735,
-    "symbol": "000210.KS",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "코오롱티슈진",
-    "market_value_krw": 37771000.0,
-    "month_end": "2026-02-28",
-    "persona": "weak_oracle",
-    "qty": 353,
-    "symbol": "950160.KQ",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "오리온",
-    "market_value_krw": 36018000.0,
-    "month_end": "2026-02-28",
-    "persona": "weak_oracle",
-    "qty": 270,
-    "symbol": "271560.KS",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "Funko Inc.",
-    "market_value_krw": 30644485.25,
-    "month_end": "2026-02-28",
-    "persona": "weak_oracle",
-    "qty": 4279,
-    "symbol": "FNKO",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "Sensient Technologies Corp",
-    "market_value_krw": 17741659.97,
-    "month_end": "2026-02-28",
-    "persona": "weak_oracle",
-    "qty": 122,
-    "symbol": "SXT",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "Coreweave",
-    "market_value_krw": 3988438.0,
-    "month_end": "2026-02-28",
-    "persona": "weak_oracle",
-    "qty": 35,
-    "symbol": "CRWV",
-    "weight_in_portfolio": 0.0
-  },
-  {
-    "company": "Inmode",
-    "market_value_krw": 3032937.49,
-    "month_end": "2026-02-28",
-    "persona": "weak_oracle",
-    "qty": 154,
-    "symbol": "INMD",
-    "weight_in_portfolio": 0.0
-  },
-  {
-    "company": "두산테스나",
-    "market_value_krw": 2176000.0,
-    "month_end": "2026-02-28",
-    "persona": "weak_oracle",
-    "qty": 32,
-    "symbol": "131970.KQ",
-    "weight_in_portfolio": 0.0
-  },
-  {
-    "company": "IMAX Corp",
-    "market_value_krw": 1779041.71,
-    "month_end": "2026-02-28",
-    "persona": "weak_oracle",
-    "qty": 29,
-    "symbol": "IMAX",
-    "weight_in_portfolio": 0.0
-  },
-  {
-    "company": "Tenaris S.A.",
-    "market_value_krw": 377267515.62,
-    "month_end": "2026-03-31",
-    "persona": "weak_oracle",
-    "qty": 4277,
-    "symbol": "TS",
-    "weight_in_portfolio": 0.14
-  },
-  {
-    "company": "Scorpio Tankers Inc.",
-    "market_value_krw": 349883493.88,
-    "month_end": "2026-03-31",
-    "persona": "weak_oracle",
-    "qty": 3091,
-    "symbol": "STNG",
-    "weight_in_portfolio": 0.13
-  },
-  {
-    "company": "Noble Corporation PLC",
-    "market_value_krw": 331138816.5,
-    "month_end": "2026-03-31",
-    "persona": "weak_oracle",
-    "qty": 4451,
-    "symbol": "NE",
-    "weight_in_portfolio": 0.12
-  },
-  {
-    "company": "에이피알",
-    "market_value_krw": 272633000.0,
-    "month_end": "2026-03-31",
-    "persona": "weak_oracle",
-    "qty": 809,
-    "symbol": "278470.KS",
-    "weight_in_portfolio": 0.1
-  },
-  {
-    "company": "Gaztransport&technigaz",
-    "market_value_krw": 258961093.06,
-    "month_end": "2026-03-31",
-    "persona": "weak_oracle",
-    "qty": 734,
-    "symbol": "GTT.PA",
-    "weight_in_portfolio": 0.09
-  },
-  {
-    "company": "BE Semiconductor Industries N.V.",
-    "market_value_krw": 237066940.99,
-    "month_end": "2026-03-31",
-    "persona": "weak_oracle",
-    "qty": 763,
-    "symbol": "BESI.AS",
-    "weight_in_portfolio": 0.09
-  },
-  {
-    "company": "이지바이오",
-    "market_value_krw": 217685160.0,
-    "month_end": "2026-03-31",
-    "persona": "weak_oracle",
-    "qty": 31412,
-    "symbol": "353810.KQ",
-    "weight_in_portfolio": 0.08
-  },
-  {
-    "company": "삼성엔지니어링",
-    "market_value_krw": 145798800.0,
-    "month_end": "2026-03-31",
-    "persona": "weak_oracle",
-    "qty": 4084,
-    "symbol": "028050.KS",
     "weight_in_portfolio": 0.05
   },
   {
-    "company": "주성엔지니어링",
-    "market_value_krw": 96937900.0,
-    "month_end": "2026-03-31",
+    "company": "오리온",
+    "market_value_krw": 91113400.0,
+    "month_end": "2025-12-31",
     "persona": "weak_oracle",
-    "qty": 1597,
-    "symbol": "036930.KQ",
-    "weight_in_portfolio": 0.04
+    "qty": 862,
+    "symbol": "271560.KS",
+    "weight_in_portfolio": 0.05
+  },
+  {
+    "company": "에이피알",
+    "market_value_krw": 87318000.0,
+    "month_end": "2025-12-31",
+    "persona": "weak_oracle",
+    "qty": 378,
+    "symbol": "278470.KS",
+    "weight_in_portfolio": 0.05
+  },
+  {
+    "company": "Noble Corporation PLC",
+    "market_value_krw": 82715601.5,
+    "month_end": "2025-12-31",
+    "persona": "weak_oracle",
+    "qty": 2037,
+    "symbol": "NE",
+    "weight_in_portfolio": 0.05
   },
   {
     "company": "현대에너지솔루션",
-    "market_value_krw": 89024000.0,
-    "month_end": "2026-03-31",
+    "market_value_krw": 53715400.0,
+    "month_end": "2025-12-31",
     "persona": "weak_oracle",
-    "qty": 640,
+    "qty": 982,
     "symbol": "322000.KS",
     "weight_in_portfolio": 0.03
   },
   {
-    "company": "LX인터내셔널",
-    "market_value_krw": 81947750.0,
-    "month_end": "2026-03-31",
+    "company": "코오롱티슈진",
+    "market_value_krw": 50227600.0,
+    "month_end": "2025-12-31",
     "persona": "weak_oracle",
-    "qty": 1811,
-    "symbol": "001120.KS",
+    "qty": 631,
+    "symbol": "950160.KQ",
     "weight_in_portfolio": 0.03
   },
   {
-    "company": "펄어비스",
-    "market_value_krw": 64584000.0,
-    "month_end": "2026-03-31",
-    "persona": "weak_oracle",
-    "qty": 936,
-    "symbol": "263750.KQ",
-    "weight_in_portfolio": 0.02
-  },
-  {
-    "company": "세아제강지주",
-    "market_value_krw": 52415000.0,
-    "month_end": "2026-03-31",
-    "persona": "weak_oracle",
-    "qty": 275,
-    "symbol": "003030.KS",
-    "weight_in_portfolio": 0.02
-  },
-  {
-    "company": "DL",
-    "market_value_krw": 44394000.0,
-    "month_end": "2026-03-31",
-    "persona": "weak_oracle",
-    "qty": 735,
-    "symbol": "000210.KS",
-    "weight_in_portfolio": 0.02
-  },
-  {
-    "company": "코오롱티슈진",
-    "market_value_krw": 37665100.0,
-    "month_end": "2026-03-31",
-    "persona": "weak_oracle",
-    "qty": 353,
-    "symbol": "950160.KQ",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "오리온",
-    "market_value_krw": 34560000.0,
-    "month_end": "2026-03-31",
-    "persona": "weak_oracle",
-    "qty": 270,
-    "symbol": "271560.KS",
-    "weight_in_portfolio": 0.01
-  },
-  {
     "company": "Funko Inc.",
-    "market_value_krw": 20435689.54,
-    "month_end": "2026-03-31",
+    "market_value_krw": 46742717.96,
+    "month_end": "2025-12-31",
     "persona": "weak_oracle",
-    "qty": 4279,
+    "qty": 9561,
     "symbol": "FNKO",
-    "weight_in_portfolio": 0.01
+    "weight_in_portfolio": 0.03
+  },
+  {
+    "company": "두산테스나",
+    "market_value_krw": 41762000.0,
+    "month_end": "2025-12-31",
+    "persona": "weak_oracle",
+    "qty": 785,
+    "symbol": "131970.KQ",
+    "weight_in_portfolio": 0.02
   },
   {
     "company": "Sensient Technologies Corp",
-    "market_value_krw": 15988622.32,
-    "month_end": "2026-03-31",
+    "market_value_krw": 40392401.35,
+    "month_end": "2025-12-31",
     "persona": "weak_oracle",
-    "qty": 122,
+    "qty": 299,
     "symbol": "SXT",
+    "weight_in_portfolio": 0.02
+  },
+  {
+    "company": "주성엔지니어링",
+    "market_value_krw": 35954600.0,
+    "month_end": "2025-12-31",
+    "persona": "weak_oracle",
+    "qty": 1298,
+    "symbol": "036930.KQ",
+    "weight_in_portfolio": 0.02
+  },
+  {
+    "company": "Eli Lilly & Co.",
+    "market_value_krw": 29360571.42,
+    "month_end": "2025-12-31",
+    "persona": "weak_oracle",
+    "qty": 19,
+    "symbol": "LLY",
+    "weight_in_portfolio": 0.02
+  },
+  {
+    "company": "펄어비스",
+    "market_value_krw": 26628800.0,
+    "month_end": "2025-12-31",
+    "persona": "weak_oracle",
+    "qty": 712,
+    "symbol": "263750.KQ",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "레이",
+    "market_value_krw": 25841090.0,
+    "month_end": "2025-12-31",
+    "persona": "weak_oracle",
+    "qty": 3817,
+    "symbol": "228670.KQ",
     "weight_in_portfolio": 0.01
   },
   {
     "company": "Coreweave",
-    "market_value_krw": 4110910.77,
-    "month_end": "2026-03-31",
+    "market_value_krw": 23785778.58,
+    "month_end": "2025-12-31",
     "persona": "weak_oracle",
-    "qty": 35,
+    "qty": 231,
     "symbol": "CRWV",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "한국카본",
+    "market_value_krw": 15880200.0,
+    "month_end": "2025-12-31",
+    "persona": "weak_oracle",
+    "qty": 532,
+    "symbol": "017960.KS",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "DL",
+    "market_value_krw": 14419950.0,
+    "month_end": "2025-12-31",
+    "persona": "weak_oracle",
+    "qty": 383,
+    "symbol": "000210.KS",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "영원무역홀딩스",
+    "market_value_krw": 12639000.0,
+    "month_end": "2025-12-31",
+    "persona": "weak_oracle",
+    "qty": 66,
+    "symbol": "009970.KS",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "효성티앤씨",
+    "market_value_krw": 4895000.0,
+    "month_end": "2025-12-31",
+    "persona": "weak_oracle",
+    "qty": 22,
+    "symbol": "298020.KQ",
     "weight_in_portfolio": 0.0
   },
   {
-    "company": "두산테스나",
-    "market_value_krw": 3241600.0,
-    "month_end": "2026-03-31",
+    "company": "Corning",
+    "market_value_krw": 2769874.78,
+    "month_end": "2025-12-31",
     "persona": "weak_oracle",
-    "qty": 32,
-    "symbol": "131970.KQ",
-    "weight_in_portfolio": 0.0
-  },
-  {
-    "company": "Inmode",
-    "market_value_krw": 3194061.48,
-    "month_end": "2026-03-31",
-    "persona": "weak_oracle",
-    "qty": 154,
-    "symbol": "INMD",
+    "qty": 22,
+    "symbol": "GLW",
     "weight_in_portfolio": 0.0
   },
   {
     "company": "IMAX Corp",
-    "market_value_krw": 1671214.87,
-    "month_end": "2026-03-31",
+    "market_value_krw": 2391531.91,
+    "month_end": "2025-12-31",
     "persona": "weak_oracle",
-    "qty": 29,
+    "qty": 45,
     "symbol": "IMAX",
     "weight_in_portfolio": 0.0
   },
   {
-    "company": "Tenaris S.A.",
-    "market_value_krw": 397955070.7,
-    "month_end": "2026-04-28",
+    "company": "아이스크림미디어",
+    "market_value_krw": 417600.0,
+    "month_end": "2025-12-31",
     "persona": "weak_oracle",
-    "qty": 4277,
-    "symbol": "TS",
-    "weight_in_portfolio": 0.12
-  },
-  {
-    "company": "에이피알",
-    "market_value_krw": 371331000.0,
-    "month_end": "2026-04-28",
-    "persona": "weak_oracle",
-    "qty": 809,
-    "symbol": "278470.KS",
-    "weight_in_portfolio": 0.11
+    "qty": 24,
+    "symbol": "461300.KQ",
+    "weight_in_portfolio": 0.0
   },
   {
     "company": "Scorpio Tankers Inc.",
-    "market_value_krw": 368390705.87,
-    "month_end": "2026-04-28",
+    "market_value_krw": 266966575.14,
+    "month_end": "2026-01-31",
     "persona": "weak_oracle",
-    "qty": 3091,
+    "qty": 2937,
     "symbol": "STNG",
-    "weight_in_portfolio": 0.11
-  },
-  {
-    "company": "Noble Corporation PLC",
-    "market_value_krw": 339167628.7,
-    "month_end": "2026-04-28",
-    "persona": "weak_oracle",
-    "qty": 4451,
-    "symbol": "NE",
-    "weight_in_portfolio": 0.1
+    "weight_in_portfolio": 0.12
   },
   {
     "company": "BE Semiconductor Industries N.V.",
-    "market_value_krw": 305097125.32,
-    "month_end": "2026-04-28",
+    "market_value_krw": 228652706.92,
+    "month_end": "2026-01-31",
     "persona": "weak_oracle",
-    "qty": 763,
+    "qty": 813,
     "symbol": "BESI.AS",
-    "weight_in_portfolio": 0.09
+    "weight_in_portfolio": 0.1
   },
   {
     "company": "Gaztransport&technigaz",
-    "market_value_krw": 259202304.96,
-    "month_end": "2026-04-28",
+    "market_value_krw": 217527689.34,
+    "month_end": "2026-01-31",
     "persona": "weak_oracle",
-    "qty": 734,
+    "qty": 701,
     "symbol": "GTT.PA",
+    "weight_in_portfolio": 0.1
+  },
+  {
+    "company": "Tenaris S.A.",
+    "market_value_krw": 215073240.83,
+    "month_end": "2026-01-31",
+    "persona": "weak_oracle",
+    "qty": 3398,
+    "symbol": "TS",
+    "weight_in_portfolio": 0.1
+  },
+  {
+    "company": "Noble Corporation PLC",
+    "market_value_krw": 203773289.81,
+    "month_end": "2026-01-31",
+    "persona": "weak_oracle",
+    "qty": 4004,
+    "symbol": "NE",
+    "weight_in_portfolio": 0.09
+  },
+  {
+    "company": "에이피알",
+    "market_value_krw": 184140000.0,
+    "month_end": "2026-01-31",
+    "persona": "weak_oracle",
+    "qty": 682,
+    "symbol": "278470.KS",
     "weight_in_portfolio": 0.08
   },
   {
     "company": "이지바이오",
-    "market_value_krw": 248468920.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 162996000.0,
+    "month_end": "2026-01-31",
     "persona": "weak_oracle",
-    "qty": 31412,
+    "qty": 23120,
     "symbol": "353810.KQ",
-    "weight_in_portfolio": 0.08
-  },
-  {
-    "company": "삼성엔지니어링",
-    "market_value_krw": 229929200.0,
-    "month_end": "2026-04-28",
-    "persona": "weak_oracle",
-    "qty": 4084,
-    "symbol": "028050.KS",
     "weight_in_portfolio": 0.07
   },
   {
-    "company": "주성엔지니어링",
-    "market_value_krw": 208408500.0,
-    "month_end": "2026-04-28",
+    "company": "삼성엔지니어링",
+    "market_value_krw": 129729600.0,
+    "month_end": "2026-01-31",
     "persona": "weak_oracle",
-    "qty": 1597,
-    "symbol": "036930.KQ",
+    "qty": 4212,
+    "symbol": "028050.KS",
     "weight_in_portfolio": 0.06
   },
   {
-    "company": "현대에너지솔루션",
-    "market_value_krw": 126400000.0,
-    "month_end": "2026-04-28",
+    "company": "코오롱티슈진",
+    "market_value_krw": 81480000.0,
+    "month_end": "2026-01-31",
     "persona": "weak_oracle",
-    "qty": 640,
-    "symbol": "322000.KS",
+    "qty": 776,
+    "symbol": "950160.KQ",
     "weight_in_portfolio": 0.04
   },
   {
-    "company": "LX인터내셔널",
-    "market_value_krw": 100872700.0,
-    "month_end": "2026-04-28",
+    "company": "주성엔지니어링",
+    "market_value_krw": 61818250.0,
+    "month_end": "2026-01-31",
     "persona": "weak_oracle",
-    "qty": 1811,
-    "symbol": "001120.KS",
+    "qty": 1495,
+    "symbol": "036930.KQ",
     "weight_in_portfolio": 0.03
   },
   {
-    "company": "세아제강지주",
-    "market_value_krw": 68750000.0,
-    "month_end": "2026-04-28",
+    "company": "오리온",
+    "market_value_krw": 61335000.0,
+    "month_end": "2026-01-31",
     "persona": "weak_oracle",
-    "qty": 275,
-    "symbol": "003030.KS",
+    "qty": 522,
+    "symbol": "271560.KS",
+    "weight_in_portfolio": 0.03
+  },
+  {
+    "company": "Coreweave",
+    "market_value_krw": 54456774.86,
+    "month_end": "2026-01-31",
+    "persona": "weak_oracle",
+    "qty": 409,
+    "symbol": "CRWV",
     "weight_in_portfolio": 0.02
   },
   {
-    "company": "펄어비스",
-    "market_value_krw": 56721600.0,
-    "month_end": "2026-04-28",
+    "company": "LX인터내셔널",
+    "market_value_krw": 53397000.0,
+    "month_end": "2026-01-31",
     "persona": "weak_oracle",
-    "qty": 936,
-    "symbol": "263750.KQ",
+    "qty": 1396,
+    "symbol": "001120.KS",
+    "weight_in_portfolio": 0.02
+  },
+  {
+    "company": "현대에너지솔루션",
+    "market_value_krw": 51029100.0,
+    "month_end": "2026-01-31",
+    "persona": "weak_oracle",
+    "qty": 961,
+    "symbol": "322000.KS",
     "weight_in_portfolio": 0.02
   },
   {
     "company": "DL",
-    "market_value_krw": 51744000.0,
-    "month_end": "2026-04-28",
+    "market_value_krw": 41583000.0,
+    "month_end": "2026-01-31",
     "persona": "weak_oracle",
-    "qty": 735,
+    "qty": 1002,
     "symbol": "000210.KS",
     "weight_in_portfolio": 0.02
   },
   {
-    "company": "오리온",
-    "market_value_krw": 38124000.0,
-    "month_end": "2026-04-28",
+    "company": "펄어비스",
+    "market_value_krw": 40154400.0,
+    "month_end": "2026-01-31",
     "persona": "weak_oracle",
-    "qty": 270,
-    "symbol": "271560.KS",
-    "weight_in_portfolio": 0.01
-  },
-  {
-    "company": "코오롱티슈진",
-    "market_value_krw": 37665100.0,
-    "month_end": "2026-04-28",
-    "persona": "weak_oracle",
-    "qty": 353,
-    "symbol": "950160.KQ",
-    "weight_in_portfolio": 0.01
+    "qty": 702,
+    "symbol": "263750.KQ",
+    "weight_in_portfolio": 0.02
   },
   {
     "company": "Funko Inc.",
-    "market_value_krw": 27723076.22,
-    "month_end": "2026-04-28",
+    "market_value_krw": 34775589.52,
+    "month_end": "2026-01-31",
     "persona": "weak_oracle",
-    "qty": 4279,
+    "qty": 5995,
     "symbol": "FNKO",
+    "weight_in_portfolio": 0.02
+  },
+  {
+    "company": "세아제강지주",
+    "market_value_krw": 33320000.0,
+    "month_end": "2026-01-31",
+    "persona": "weak_oracle",
+    "qty": 245,
+    "symbol": "003030.KS",
+    "weight_in_portfolio": 0.02
+  },
+  {
+    "company": "Eli Lilly & Co.",
+    "market_value_krw": 26673092.62,
+    "month_end": "2026-01-31",
+    "persona": "weak_oracle",
+    "qty": 18,
+    "symbol": "LLY",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "아이스크림미디어",
+    "market_value_krw": 17806230.0,
+    "month_end": "2026-01-31",
+    "persona": "weak_oracle",
+    "qty": 1053,
+    "symbol": "461300.KQ",
     "weight_in_portfolio": 0.01
   },
   {
     "company": "Sensient Technologies Corp",
-    "market_value_krw": 22577323.22,
-    "month_end": "2026-04-28",
+    "market_value_krw": 16070520.57,
+    "month_end": "2026-01-31",
     "persona": "weak_oracle",
-    "qty": 122,
+    "qty": 119,
     "symbol": "SXT",
     "weight_in_portfolio": 0.01
   },
   {
+    "company": "Vertiv Holdings Co.",
+    "market_value_krw": 4256104.45,
+    "month_end": "2026-01-31",
+    "persona": "weak_oracle",
+    "qty": 16,
+    "symbol": "VRT",
+    "weight_in_portfolio": 0.0
+  },
+  {
+    "company": "Wolfspeed",
+    "market_value_krw": 3691772.95,
+    "month_end": "2026-01-31",
+    "persona": "weak_oracle",
+    "qty": 165,
+    "symbol": "WOLF",
+    "weight_in_portfolio": 0.0
+  },
+  {
+    "company": "Tenaris S.A.",
+    "market_value_krw": 969536252.98,
+    "month_end": "2026-02-28",
+    "persona": "weak_oracle",
+    "qty": 12443,
+    "symbol": "TS",
+    "weight_in_portfolio": 0.37
+  },
+  {
+    "company": "BE Semiconductor Industries N.V.",
+    "market_value_krw": 400318590.23,
+    "month_end": "2026-02-28",
+    "persona": "weak_oracle",
+    "qty": 1251,
+    "symbol": "BESI.AS",
+    "weight_in_portfolio": 0.15
+  },
+  {
+    "company": "Noble Corporation PLC",
+    "market_value_krw": 282860574.96,
+    "month_end": "2026-02-28",
+    "persona": "weak_oracle",
+    "qty": 4347,
+    "symbol": "NE",
+    "weight_in_portfolio": 0.11
+  },
+  {
+    "company": "Lumentum Holdings Inc",
+    "market_value_krw": 192754048.34,
+    "month_end": "2026-02-28",
+    "persona": "weak_oracle",
+    "qty": 192,
+    "symbol": "LITE",
+    "weight_in_portfolio": 0.07
+  },
+  {
+    "company": "Gaztransport&technigaz",
+    "market_value_krw": 183854063.34,
+    "month_end": "2026-02-28",
+    "persona": "weak_oracle",
+    "qty": 565,
+    "symbol": "GTT.PA",
+    "weight_in_portfolio": 0.07
+  },
+  {
+    "company": "Vertiv Holdings Co.",
+    "market_value_krw": 139462099.55,
+    "month_end": "2026-02-28",
+    "persona": "weak_oracle",
+    "qty": 382,
+    "symbol": "VRT",
+    "weight_in_portfolio": 0.05
+  },
+  {
+    "company": "Sensient Technologies Corp",
+    "market_value_krw": 132626179.47,
+    "month_end": "2026-02-28",
+    "persona": "weak_oracle",
+    "qty": 912,
+    "symbol": "SXT",
+    "weight_in_portfolio": 0.05
+  },
+  {
+    "company": "Grindr Inc.",
+    "market_value_krw": 122541905.07,
+    "month_end": "2026-02-28",
+    "persona": "weak_oracle",
+    "qty": 7518,
+    "symbol": "GRND",
+    "weight_in_portfolio": 0.05
+  },
+  {
+    "company": "Scorpio Tankers Inc.",
+    "market_value_krw": 65242289.65,
+    "month_end": "2026-02-28",
+    "persona": "weak_oracle",
+    "qty": 576,
+    "symbol": "STNG",
+    "weight_in_portfolio": 0.03
+  },
+  {
+    "company": "Wolfspeed",
+    "market_value_krw": 52197403.76,
+    "month_end": "2026-02-28",
+    "persona": "weak_oracle",
+    "qty": 1848,
+    "symbol": "WOLF",
+    "weight_in_portfolio": 0.02
+  },
+  {
     "company": "Coreweave",
-    "market_value_krw": 5487085.79,
-    "month_end": "2026-04-28",
+    "market_value_krw": 41821621.31,
+    "month_end": "2026-02-28",
     "persona": "weak_oracle",
-    "qty": 35,
+    "qty": 367,
     "symbol": "CRWV",
-    "weight_in_portfolio": 0.0
+    "weight_in_portfolio": 0.02
   },
   {
-    "company": "두산테스나",
-    "market_value_krw": 4153600.0,
-    "month_end": "2026-04-28",
+    "company": "Roku",
+    "market_value_krw": 24103238.51,
+    "month_end": "2026-02-28",
     "persona": "weak_oracle",
-    "qty": 32,
-    "symbol": "131970.KQ",
-    "weight_in_portfolio": 0.0
+    "qty": 171,
+    "symbol": "ROKU",
+    "weight_in_portfolio": 0.01
   },
   {
-    "company": "Inmode",
-    "market_value_krw": 3226800.04,
-    "month_end": "2026-04-28",
+    "company": "Tenaris S.A.",
+    "market_value_krw": 1097577670.52,
+    "month_end": "2026-03-31",
     "persona": "weak_oracle",
-    "qty": 154,
-    "symbol": "INMD",
-    "weight_in_portfolio": 0.0
+    "qty": 12443,
+    "symbol": "TS",
+    "weight_in_portfolio": 0.39
   },
   {
-    "company": "IMAX Corp",
-    "market_value_krw": 1578892.67,
-    "month_end": "2026-04-28",
+    "company": "BE Semiconductor Industries N.V.",
+    "market_value_krw": 388690358.03,
+    "month_end": "2026-03-31",
     "persona": "weak_oracle",
-    "qty": 29,
-    "symbol": "IMAX",
-    "weight_in_portfolio": 0.0
+    "qty": 1251,
+    "symbol": "BESI.AS",
+    "weight_in_portfolio": 0.14
+  },
+  {
+    "company": "Noble Corporation PLC",
+    "market_value_krw": 323401580.62,
+    "month_end": "2026-03-31",
+    "persona": "weak_oracle",
+    "qty": 4347,
+    "symbol": "NE",
+    "weight_in_portfolio": 0.12
+  },
+  {
+    "company": "Lumentum Holdings Inc",
+    "market_value_krw": 204571303.11,
+    "month_end": "2026-03-31",
+    "persona": "weak_oracle",
+    "qty": 192,
+    "symbol": "LITE",
+    "weight_in_portfolio": 0.07
+  },
+  {
+    "company": "Gaztransport&technigaz",
+    "market_value_krw": 199336536.21,
+    "month_end": "2026-03-31",
+    "persona": "weak_oracle",
+    "qty": 565,
+    "symbol": "GTT.PA",
+    "weight_in_portfolio": 0.07
+  },
+  {
+    "company": "Vertiv Holdings Co.",
+    "market_value_krw": 145126330.29,
+    "month_end": "2026-03-31",
+    "persona": "weak_oracle",
+    "qty": 382,
+    "symbol": "VRT",
+    "weight_in_portfolio": 0.05
+  },
+  {
+    "company": "Grindr Inc.",
+    "market_value_krw": 137805030.14,
+    "month_end": "2026-03-31",
+    "persona": "weak_oracle",
+    "qty": 7518,
+    "symbol": "GRND",
+    "weight_in_portfolio": 0.05
+  },
+  {
+    "company": "Sensient Technologies Corp",
+    "market_value_krw": 119521504.57,
+    "month_end": "2026-03-31",
+    "persona": "weak_oracle",
+    "qty": 912,
+    "symbol": "SXT",
+    "weight_in_portfolio": 0.04
+  },
+  {
+    "company": "Scorpio Tankers Inc.",
+    "market_value_krw": 65199900.51,
+    "month_end": "2026-03-31",
+    "persona": "weak_oracle",
+    "qty": 576,
+    "symbol": "STNG",
+    "weight_in_portfolio": 0.02
+  },
+  {
+    "company": "Wolfspeed",
+    "market_value_krw": 45725509.77,
+    "month_end": "2026-03-31",
+    "persona": "weak_oracle",
+    "qty": 1848,
+    "symbol": "WOLF",
+    "weight_in_portfolio": 0.02
+  },
+  {
+    "company": "Coreweave",
+    "market_value_krw": 43105835.75,
+    "month_end": "2026-03-31",
+    "persona": "weak_oracle",
+    "qty": 367,
+    "symbol": "CRWV",
+    "weight_in_portfolio": 0.02
+  },
+  {
+    "company": "Roku",
+    "market_value_krw": 24531014.51,
+    "month_end": "2026-03-31",
+    "persona": "weak_oracle",
+    "qty": 171,
+    "symbol": "ROKU",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "Tenaris S.A.",
+    "market_value_krw": 1182627322.95,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 12443,
+    "symbol": "TS",
+    "weight_in_portfolio": 0.36
+  },
+  {
+    "company": "BE Semiconductor Industries N.V.",
+    "market_value_krw": 537038673.34,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 1251,
+    "symbol": "BESI.AS",
+    "weight_in_portfolio": 0.17
+  },
+  {
+    "company": "Noble Corporation PLC",
+    "market_value_krw": 329941646.28,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 4347,
+    "symbol": "NE",
+    "weight_in_portfolio": 0.1
+  },
+  {
+    "company": "Lumentum Holdings Inc",
+    "market_value_krw": 257681805.48,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 192,
+    "symbol": "LITE",
+    "weight_in_portfolio": 0.08
+  },
+  {
+    "company": "Gaztransport&technigaz",
+    "market_value_krw": 203104050.14,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 565,
+    "symbol": "GTT.PA",
+    "weight_in_portfolio": 0.06
+  },
+  {
+    "company": "Vertiv Holdings Co.",
+    "market_value_krw": 186641167.33,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 382,
+    "symbol": "VRT",
+    "weight_in_portfolio": 0.06
+  },
+  {
+    "company": "Sensient Technologies Corp",
+    "market_value_krw": 154151586.92,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 912,
+    "symbol": "SXT",
+    "weight_in_portfolio": 0.05
+  },
+  {
+    "company": "Grindr Inc.",
+    "market_value_krw": 149504981.58,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 7518,
+    "symbol": "GRND",
+    "weight_in_portfolio": 0.05
+  },
+  {
+    "company": "Wolfspeed",
+    "market_value_krw": 81168470.58,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 1848,
+    "symbol": "WOLF",
+    "weight_in_portfolio": 0.03
+  },
+  {
+    "company": "Scorpio Tankers Inc.",
+    "market_value_krw": 69677924.27,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 576,
+    "symbol": "STNG",
+    "weight_in_portfolio": 0.02
+  },
+  {
+    "company": "Coreweave",
+    "market_value_krw": 60918919.5,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 367,
+    "symbol": "CRWV",
+    "weight_in_portfolio": 0.02
+  },
+  {
+    "company": "Roku",
+    "market_value_krw": 29646100.67,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 171,
+    "symbol": "ROKU",
+    "weight_in_portfolio": 0.01
+  },
+  {
+    "company": "Tenaris S.A.",
+    "market_value_krw": 1144996408.85,
+    "month_end": "2026-05-07",
+    "persona": "weak_oracle",
+    "qty": 12443,
+    "symbol": "TS",
+    "weight_in_portfolio": 0.35
+  },
+  {
+    "company": "BE Semiconductor Industries N.V.",
+    "market_value_krw": 552442751.97,
+    "month_end": "2026-05-07",
+    "persona": "weak_oracle",
+    "qty": 1251,
+    "symbol": "BESI.AS",
+    "weight_in_portfolio": 0.17
+  },
+  {
+    "company": "Noble Corporation PLC",
+    "market_value_krw": 314470489.61,
+    "month_end": "2026-05-07",
+    "persona": "weak_oracle",
+    "qty": 4347,
+    "symbol": "NE",
+    "weight_in_portfolio": 0.1
+  },
+  {
+    "company": "Lumentum Holdings Inc",
+    "market_value_krw": 267231543.38,
+    "month_end": "2026-05-07",
+    "persona": "weak_oracle",
+    "qty": 192,
+    "symbol": "LITE",
+    "weight_in_portfolio": 0.08
+  },
+  {
+    "company": "Vertiv Holdings Co.",
+    "market_value_krw": 202090884.47,
+    "month_end": "2026-05-07",
+    "persona": "weak_oracle",
+    "qty": 382,
+    "symbol": "VRT",
+    "weight_in_portfolio": 0.06
+  },
+  {
+    "company": "Gaztransport&technigaz",
+    "market_value_krw": 200992416.11,
+    "month_end": "2026-05-07",
+    "persona": "weak_oracle",
+    "qty": 565,
+    "symbol": "GTT.PA",
+    "weight_in_portfolio": 0.06
+  },
+  {
+    "company": "Sensient Technologies Corp",
+    "market_value_krw": 160127240.51,
+    "month_end": "2026-05-07",
+    "persona": "weak_oracle",
+    "qty": 912,
+    "symbol": "SXT",
+    "weight_in_portfolio": 0.05
+  },
+  {
+    "company": "Grindr Inc.",
+    "market_value_krw": 149485803.47,
+    "month_end": "2026-05-07",
+    "persona": "weak_oracle",
+    "qty": 7518,
+    "symbol": "GRND",
+    "weight_in_portfolio": 0.05
+  },
+  {
+    "company": "Wolfspeed",
+    "market_value_krw": 117344669.56,
+    "month_end": "2026-05-07",
+    "persona": "weak_oracle",
+    "qty": 1848,
+    "symbol": "WOLF",
+    "weight_in_portfolio": 0.04
+  },
+  {
+    "company": "Coreweave",
+    "market_value_krw": 74639355.0,
+    "month_end": "2026-05-07",
+    "persona": "weak_oracle",
+    "qty": 367,
+    "symbol": "CRWV",
+    "weight_in_portfolio": 0.02
+  },
+  {
+    "company": "Scorpio Tankers Inc.",
+    "market_value_krw": 70093515.33,
+    "month_end": "2026-05-07",
+    "persona": "weak_oracle",
+    "qty": 576,
+    "symbol": "STNG",
+    "weight_in_portfolio": 0.02
+  },
+  {
+    "company": "Roku",
+    "market_value_krw": 32256995.53,
+    "month_end": "2026-05-07",
+    "persona": "weak_oracle",
+    "qty": 171,
+    "symbol": "ROKU",
+    "weight_in_portfolio": 0.01
   }
 ]

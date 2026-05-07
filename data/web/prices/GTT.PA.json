@@ -21764,7 +21764,7 @@
       "date": "2026-04-27",
       "display_currency": "KRW",
       "high": 348368.84648449713,
-      "low": 341629.55258782953,
+      "low": 341629.5525878296,
       "open": 342147.9638671875,
       "source_currency": "EUR",
       "volume": 59394.0
@@ -21774,11 +21774,77 @@
       "close_krw": 608913551.9115,
       "date": "2026-04-28",
       "display_currency": "KRW",
-      "high": 357274.96485504135,
+      "high": 357274.9648550413,
       "low": 346239.45506683365,
       "open": 346584.3098144531,
       "source_currency": "EUR",
       "volume": 21963.0
+    },
+    {
+      "close": 351424.5702769775,
+      "close_krw": 605982466.855,
+      "date": "2026-04-29",
+      "display_currency": "KRW",
+      "high": 354873.2902476806,
+      "low": 350045.0770263672,
+      "open": 353148.93026232906,
+      "source_currency": "EUR",
+      "volume": 65077.0
+    },
+    {
+      "close": 359476.19494628906,
+      "close_krw": 624266351.3675,
+      "date": "2026-04-30",
+      "display_currency": "KRW",
+      "high": 360518.1655310057,
+      "low": 352529.7950439453,
+      "open": 354961.02441040054,
+      "source_currency": "EUR",
+      "volume": 69772.0
+    },
+    {
+      "close": 364483.51721191406,
+      "close_krw": 629612484.925,
+      "date": "2026-05-04",
+      "display_currency": "KRW",
+      "high": 364828.9939471129,
+      "low": 353773.58027163707,
+      "open": 359301.287109375,
+      "source_currency": "EUR",
+      "volume": 98142.0
+    },
+    {
+      "close": 365731.8051757813,
+      "close_krw": 630942232.628,
+      "date": "2026-05-05",
+      "display_currency": "KRW",
+      "high": 367111.93046005256,
+      "low": 362281.5051269531,
+      "open": 364006.6551513672,
+      "source_currency": "EUR",
+      "volume": 84420.0
+    },
+    {
+      "close": 363784.13151470944,
+      "close_krw": 628389793.4783,
+      "date": "2026-05-06",
+      "display_currency": "KRW",
+      "high": 365166.0064247437,
+      "low": 354110.84899902344,
+      "open": 363784.13151470944,
+      "source_currency": "EUR",
+      "volume": 94703.0
+    },
+    {
+      "close": 355738.7895812988,
+      "close_krw": 607246113.8153,
+      "date": "2026-05-07",
+      "display_currency": "KRW",
+      "high": 357104.3947906494,
+      "low": 352324.7895812988,
+      "open": 356080.2104187012,
+      "source_currency": "EUR",
+      "volume": 7888.0
     }
   ],
   "symbol": "GTT.PA"

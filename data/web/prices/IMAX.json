@@ -21356,7 +21356,7 @@
       "close_krw": 80725248.5895,
       "date": "2026-04-27",
       "display_currency": "KRW",
-      "high": 56097.206721212715,
+      "high": 56097.20672121272,
       "low": 54268.58871865086,
       "open": 54268.58871865086,
       "source_currency": "USD",
@@ -21372,6 +21372,72 @@
       "open": 55158.72375445254,
       "source_currency": "USD",
       "volume": 260282.0
+    },
+    {
+      "close": 54816.90970701445,
+      "close_krw": 80689942.3843,
+      "date": "2026-04-29",
+      "display_currency": "KRW",
+      "high": 55317.386528301984,
+      "low": 53182.9999194229,
+      "open": 54448.912209455855,
+      "source_currency": "USD",
+      "volume": 1095300.0
+    },
+    {
+      "close": 56550.18846651306,
+      "close_krw": 84111619.5974,
+      "date": "2026-04-30",
+      "display_currency": "KRW",
+      "high": 56862.53690580139,
+      "low": 54259.62189725647,
+      "open": 55657.75705924072,
+      "source_currency": "USD",
+      "volume": 1164300.0
+    },
+    {
+      "close": 53816.10298246611,
+      "close_krw": 79325474.4827,
+      "date": "2026-05-01",
+      "display_currency": "KRW",
+      "high": 55113.233365472406,
+      "low": 50322.700833734125,
+      "open": 52356.836221623234,
+      "source_currency": "USD",
+      "volume": 3739400.0
+    },
+    {
+      "close": 51863.766981968656,
+      "close_krw": 76329460.7674,
+      "date": "2026-05-04",
+      "display_currency": "KRW",
+      "high": 55204.589097132906,
+      "low": 51319.2228469681,
+      "open": 53718.144287109375,
+      "source_currency": "USD",
+      "volume": 2251200.0
+    },
+    {
+      "close": 52754.031222618185,
+      "close_krw": 77867590.362,
+      "date": "2026-05-05",
+      "display_currency": "KRW",
+      "high": 53787.26175225061,
+      "low": 52340.73338008113,
+      "open": 52680.22421562951,
+      "source_currency": "USD",
+      "volume": 1301600.0
+    },
+    {
+      "close": 52605.6289816834,
+      "close_krw": 77538590.8389,
+      "date": "2026-05-06",
+      "display_currency": "KRW",
+      "high": 53711.09895238653,
+      "low": 52472.97236029059,
+      "open": 53401.5687100403,
+      "source_currency": "USD",
+      "volume": 809400.0
     }
   ],
   "symbol": "IMAX"

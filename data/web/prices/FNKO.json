@@ -21372,6 +21372,72 @@
       "open": 6375.794860803988,
       "source_currency": "USD",
       "volume": 135250.0
+    },
+    {
+      "close": 6285.3972302248,
+      "close_krw": 9252041.8075,
+      "date": "2026-04-29",
+      "display_currency": "KRW",
+      "high": 6609.234719240572,
+      "low": 6219.15756836033,
+      "open": 6403.1563171396265,
+      "source_currency": "USD",
+      "volume": 456700.0
+    },
+    {
+      "close": 6559.345594577026,
+      "close_krw": 9756239.4825,
+      "date": "2026-04-30",
+      "display_currency": "KRW",
+      "high": 6670.899520486069,
+      "low": 6291.617449023819,
+      "open": 6365.986732963182,
+      "source_currency": "USD",
+      "volume": 400200.0
+    },
+    {
+      "close": 6544.604527702904,
+      "close_krw": 9646812.5838,
+      "date": "2026-05-01",
+      "display_currency": "KRW",
+      "high": 6647.785481417086,
+      "low": 6441.423573988723,
+      "open": 6441.423573988723,
+      "source_currency": "USD",
+      "volume": 438700.0
+    },
+    {
+      "close": 6299.004625187488,
+      "close_krw": 9270433.954,
+      "date": "2026-05-04",
+      "display_currency": "KRW",
+      "high": 6578.632703914074,
+      "low": 6225.417845453834,
+      "open": 6460.894417760661,
+      "source_currency": "USD",
+      "volume": 374100.0
+    },
+    {
+      "close": 6376.536464318284,
+      "close_krw": 9412086.9595,
+      "date": "2026-05-05",
+      "display_currency": "KRW",
+      "high": 6531.521747598657,
+      "low": 6317.494518672,
+      "open": 6317.494518672,
+      "source_currency": "USD",
+      "volume": 228100.0
+    },
+    {
+      "close": 6455.944797587581,
+      "close_krw": 9515804.1417,
+      "date": "2026-05-06",
+      "display_currency": "KRW",
+      "high": 6522.273108283989,
+      "low": 6382.246518405154,
+      "open": 6382.246518405154,
+      "source_currency": "USD",
+      "volume": 482300.0
     }
   ],
   "symbol": "FNKO"

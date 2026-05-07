@@ -21361,6 +21361,72 @@
       "open": 902045.622174926,
       "source_currency": "CHF",
       "volume": 47693.0
+    },
+    {
+      "close": 884323.0297851562,
+      "close_krw": 1649846457.8236,
+      "date": "2026-04-29",
+      "display_currency": "KRW",
+      "high": 902793.056361936,
+      "low": 879099.2034382373,
+      "open": 899434.8904154077,
+      "source_currency": "CHF",
+      "volume": 169697.0
+    },
+    {
+      "close": 901527.9562660976,
+      "close_krw": 1696061425.7626,
+      "date": "2026-04-30",
+      "display_currency": "KRW",
+      "high": 903973.647644043,
+      "low": 884407.9443806075,
+      "open": 886665.4924033359,
+      "source_currency": "CHF",
+      "volume": 151208.0
+    },
+    {
+      "close": 902781.644579284,
+      "close_krw": 1700781880.275,
+      "date": "2026-05-04",
+      "display_currency": "KRW",
+      "high": 912201.3192619012,
+      "low": 888463.7275630794,
+      "open": 911824.5092773438,
+      "source_currency": "CHF",
+      "volume": 213020.0
+    },
+    {
+      "close": 922884.2801351176,
+      "close_krw": 1737485461.6707,
+      "date": "2026-05-05",
+      "display_currency": "KRW",
+      "high": 930791.4547200388,
+      "low": 901798.3663330078,
+      "open": 901798.3663330078,
+      "source_currency": "CHF",
+      "volume": 217626.0
+    },
+    {
+      "close": 930961.8473514728,
+      "close_krw": 1755854843.0048,
+      "date": "2026-05-06",
+      "display_currency": "KRW",
+      "high": 946804.784423828,
+      "low": 927944.1313476562,
+      "open": 937563.075928133,
+      "source_currency": "CHF",
+      "volume": 173738.0
+    },
+    {
+      "close": 916485.8916149288,
+      "close_krw": 1710336752.3725,
+      "date": "2026-05-07",
+      "display_currency": "KRW",
+      "high": 925630.2109375,
+      "low": 915179.5358753056,
+      "open": 923204.1867943108,
+      "source_currency": "CHF",
+      "volume": 14259.0
     }
   ],
   "symbol": "LONN.SW"
