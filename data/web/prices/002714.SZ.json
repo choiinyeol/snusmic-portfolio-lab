@@ -20591,6 +20591,50 @@
       "open": 9367.635732064664,
       "source_currency": "CNY",
       "volume": 45467974.0
+    },
+    {
+      "close": 9517.49016340531,
+      "close_krw": 2030090.1205,
+      "date": "2026-04-29",
+      "display_currency": "KRW",
+      "high": 9681.732027099002,
+      "low": 9255.130037352908,
+      "open": 9265.794924360816,
+      "source_currency": "CNY",
+      "volume": 69496713.0
+    },
+    {
+      "close": 9534.55463356094,
+      "close_krw": 2033729.989,
+      "date": "2026-04-30",
+      "display_currency": "KRW",
+      "high": 9679.59937516891,
+      "low": 9344.716878312523,
+      "open": 9385.243774414062,
+      "source_currency": "CNY",
+      "volume": 43324850.0
+    },
+    {
+      "close": 9521.756280944215,
+      "close_krw": 2031000.0877,
+      "date": "2026-05-06",
+      "display_currency": "KRW",
+      "high": 9545.219520568848,
+      "low": 9385.243774414062,
+      "open": 9468.431032225955,
+      "source_currency": "CNY",
+      "volume": 48114282.0
+    },
+    {
+      "close": 9400.174778960878,
+      "close_krw": 2005066.6323,
+      "date": "2026-05-07",
+      "display_currency": "KRW",
+      "high": 9515.357511475217,
+      "low": 9323.386290617986,
+      "open": 9487.628154311678,
+      "source_currency": "CNY",
+      "volume": 40919800.0
     }
   ],
   "symbol": "002714.SZ"

@@ -20800,6 +20800,39 @@
       "open": 8163.778175354004,
       "source_currency": "JPY",
       "volume": 1190500.0
+    },
+    {
+      "close": 7938.635730743408,
+      "close_krw": 73709.8681,
+      "date": "2026-04-30",
+      "display_currency": "KRW",
+      "high": 8087.194995880127,
+      "low": 7907.9954956506845,
+      "open": 8077.910041809082,
+      "source_currency": "JPY",
+      "volume": 1269500.0
+    },
+    {
+      "close": 8002.516826931678,
+      "close_krw": 75138.1867,
+      "date": "2026-05-01",
+      "display_currency": "KRW",
+      "high": 8071.99801987008,
+      "low": 7891.722972393036,
+      "open": 7990.310826301575,
+      "source_currency": "JPY",
+      "volume": 1344300.0
+    },
+    {
+      "close": 7905.763647534186,
+      "close_krw": 73152.0331,
+      "date": "2026-05-07",
+      "display_currency": "KRW",
+      "high": 8031.604225158691,
+      "low": 7756.7900045028655,
+      "open": 8004.770298503106,
+      "source_currency": "JPY",
+      "volume": 2445000.0
     }
   ],
   "symbol": "4680.T"

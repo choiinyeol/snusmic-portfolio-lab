@@ -19641,10 +19641,76 @@
       "date": "2026-04-28",
       "display_currency": "KRW",
       "high": 33881.53436290054,
-      "low": 32482.686767327137,
+      "low": 32482.686767327134,
       "open": 33631.21435554046,
       "source_currency": "USD",
       "volume": 1038020.0
+    },
+    {
+      "close": 32221.85998779908,
+      "close_krw": 47430255.3688,
+      "date": "2026-04-29",
+      "display_currency": "KRW",
+      "high": 32729.69833129272,
+      "low": 32074.66323485412,
+      "open": 32604.577722171787,
+      "source_currency": "USD",
+      "volume": 3504400.0
+    },
+    {
+      "close": 33138.82753009186,
+      "close_krw": 49290029.4535,
+      "date": "2026-04-30",
+      "display_currency": "KRW",
+      "high": 33466.05010986328,
+      "low": 32291.018544268794,
+      "open": 32707.48596693878,
+      "source_currency": "USD",
+      "volume": 4417200.0
+    },
+    {
+      "close": 32840.94402970048,
+      "close_krw": 48407880.2299,
+      "date": "2026-05-01",
+      "display_currency": "KRW",
+      "high": 32973.60515549546,
+      "low": 32280.818651576992,
+      "open": 32619.84027907485,
+      "source_currency": "USD",
+      "volume": 2815000.0
+    },
+    {
+      "close": 32510.51549312286,
+      "close_krw": 47846700.3317,
+      "date": "2026-05-04",
+      "display_currency": "KRW",
+      "high": 33334.683496196754,
+      "low": 32127.86536134873,
+      "open": 32863.7303515831,
+      "source_currency": "USD",
+      "volume": 2727400.0
+    },
+    {
+      "close": 32915.91496273037,
+      "close_krw": 48585537.888,
+      "date": "2026-05-05",
+      "display_currency": "KRW",
+      "high": 33063.52053068159,
+      "low": 32502.622750877403,
+      "open": 32812.59190976713,
+      "source_currency": "USD",
+      "volume": 1864400.0
+    },
+    {
+      "close": 33945.29891247861,
+      "close_krw": 50034011.459,
+      "date": "2026-05-06",
+      "display_currency": "KRW",
+      "high": 33996.88728620298,
+      "low": 33237.79599459842,
+      "open": 33237.79599459842,
+      "source_currency": "USD",
+      "volume": 2276500.0
     }
   ],
   "symbol": "LEVI"

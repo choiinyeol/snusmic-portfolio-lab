@@ -21759,15 +21759,81 @@
       "volume": 460565.0
     },
     {
-      "close": 399865.1707989499,
+      "close": 399865.17079895,
       "close_krw": 689487533.5333,
       "date": "2026-04-28",
       "display_currency": "KRW",
       "high": 424867.52150695777,
       "low": 397968.4565316774,
-      "open": 424177.8120117187,
+      "open": 424177.8120117188,
       "source_currency": "EUR",
       "volume": 201769.0
+    },
+    {
+      "close": 412811.769968506,
+      "close_krw": 711836097.6158,
+      "date": "2026-04-29",
+      "display_currency": "KRW",
+      "high": 416950.24972033687,
+      "low": 407466.2698009033,
+      "open": 409707.94304418936,
+      "source_currency": "EUR",
+      "volume": 362514.0
+    },
+    {
+      "close": 429287.5086651612,
+      "close_krw": 745500677.0673,
+      "date": "2026-04-30",
+      "display_currency": "KRW",
+      "high": 429287.5086651612,
+      "low": 411921.5089093018,
+      "open": 412268.8236047365,
+      "source_currency": "EUR",
+      "volume": 494581.0
+    },
+    {
+      "close": 422006.2766217347,
+      "close_krw": 728977876.7232,
+      "date": "2026-05-04",
+      "display_currency": "KRW",
+      "high": 440144.08198062144,
+      "low": 421142.5716046449,
+      "open": 434616.3751428835,
+      "source_currency": "EUR",
+      "volume": 429884.0
+    },
+    {
+      "close": 438188.1062011719,
+      "close_krw": 755940222.1109,
+      "date": "2026-05-05",
+      "display_currency": "KRW",
+      "high": 438533.1309413146,
+      "low": 419038.93040069565,
+      "open": 423696.8565255739,
+      "source_currency": "EUR",
+      "volume": 471006.0
+    },
+    {
+      "close": 440479.3487548828,
+      "close_krw": 760870810.5079,
+      "date": "2026-05-06",
+      "display_currency": "KRW",
+      "high": 455680.18362585455,
+      "low": 430287.8763267212,
+      "open": 446870.6388228759,
+      "source_currency": "EUR",
+      "volume": 558976.0
+    },
+    {
+      "close": 441600.9208374024,
+      "close_krw": 753812771.8694,
+      "date": "2026-05-07",
+      "display_currency": "KRW",
+      "high": 446551.2104187012,
+      "low": 438016.2104187012,
+      "open": 440918.07916259766,
+      "source_currency": "EUR",
+      "volume": 144318.0
     }
   ],
   "symbol": "BESI.AS"

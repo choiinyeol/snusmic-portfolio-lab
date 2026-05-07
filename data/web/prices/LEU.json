@@ -21363,7 +21363,7 @@
       "volume": 1035200.0
     },
     {
-      "close": 303328.81396484375,
+      "close": 303328.8139648437,
       "close_krw": 446642569.8122,
       "date": "2026-04-28",
       "display_currency": "KRW",
@@ -21372,6 +21372,72 @@
       "open": 307746.2238769531,
       "source_currency": "USD",
       "volume": 564260.0
+    },
+    {
+      "close": 282592.6320361756,
+      "close_krw": 415973525.6712,
+      "date": "2026-04-29",
+      "display_currency": "KRW",
+      "high": 305688.1585766785,
+      "low": 278942.10314941406,
+      "open": 304878.5595898926,
+      "source_currency": "USD",
+      "volume": 1109900.0
+    },
+    {
+      "close": 313777.69581614994,
+      "close_krw": 466706670.7351,
+      "date": "2026-04-30",
+      "display_currency": "KRW",
+      "high": 314075.16727800295,
+      "low": 289265.6569948364,
+      "open": 290485.31949273683,
+      "source_currency": "USD",
+      "volume": 782900.0
+    },
+    {
+      "close": 304589.42751830444,
+      "close_krw": 448967865.0308,
+      "date": "2026-05-01",
+      "display_currency": "KRW",
+      "high": 310736.04656003416,
+      "low": 297750.02197265625,
+      "open": 306712.0055310242,
+      "source_currency": "USD",
+      "volume": 484200.0
+    },
+    {
+      "close": 304530.36486377567,
+      "close_krw": 448186467.9331,
+      "date": "2026-05-04",
+      "display_currency": "KRW",
+      "high": 310108.23406556994,
+      "low": 297289.4560546875,
+      "open": 304883.5881435424,
+      "source_currency": "USD",
+      "volume": 678500.0
+    },
+    {
+      "close": 304125.3421505429,
+      "close_krw": 448904226.1312,
+      "date": "2026-05-05",
+      "display_currency": "KRW",
+      "high": 309970.51025390625,
+      "low": 294235.8113279417,
+      "open": 309114.3985228576,
+      "source_currency": "USD",
+      "volume": 920900.0
+    },
+    {
+      "close": 340956.4289596677,
+      "close_krw": 502556124.7108,
+      "date": "2026-05-06",
+      "display_currency": "KRW",
+      "high": 341030.10896503925,
+      "low": 292286.2647520751,
+      "open": 303635.751953125,
+      "source_currency": "USD",
+      "volume": 1342200.0
     }
   ],
   "symbol": "LEU"

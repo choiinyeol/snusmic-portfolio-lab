@@ -16884,6 +16884,61 @@
       "open": 29100.0,
       "source_currency": "KRW",
       "volume": 20228.0
+    },
+    {
+      "close": 28950.0,
+      "close_krw": 28950.0,
+      "date": "2026-04-28",
+      "display_currency": "KRW",
+      "high": 29400.0,
+      "low": 28800.0,
+      "open": 28950.0,
+      "source_currency": "KRW",
+      "volume": 20488.0
+    },
+    {
+      "close": 29300.0,
+      "close_krw": 29300.0,
+      "date": "2026-04-29",
+      "display_currency": "KRW",
+      "high": 29300.0,
+      "low": 28850.0,
+      "open": 29200.0,
+      "source_currency": "KRW",
+      "volume": 18552.0
+    },
+    {
+      "close": 29300.0,
+      "close_krw": 29300.0,
+      "date": "2026-04-30",
+      "display_currency": "KRW",
+      "high": 29450.0,
+      "low": 29000.0,
+      "open": 29300.0,
+      "source_currency": "KRW",
+      "volume": 17957.0
+    },
+    {
+      "close": 28950.0,
+      "close_krw": 28950.0,
+      "date": "2026-05-04",
+      "display_currency": "KRW",
+      "high": 29500.0,
+      "low": 28850.0,
+      "open": 29500.0,
+      "source_currency": "KRW",
+      "volume": 32284.0
+    },
+    {
+      "close": 28350.0,
+      "close_krw": 28350.0,
+      "date": "2026-05-06",
+      "display_currency": "KRW",
+      "high": 29000.0,
+      "low": 28200.0,
+      "open": 28950.0,
+      "source_currency": "KRW",
+      "volume": 37420.0
     }
   ],
   "symbol": "344820.KQ"

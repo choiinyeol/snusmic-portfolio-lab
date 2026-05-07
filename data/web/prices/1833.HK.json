@@ -20910,6 +20910,72 @@
       "open": 2070.772873704147,
       "source_currency": "HKD",
       "volume": 10635425.0
+    },
+    {
+      "close": 2038.372466227884,
+      "close_krw": 382945.8217,
+      "date": "2026-04-29",
+      "display_currency": "KRW",
+      "high": 2051.523198537325,
+      "low": 1998.92009013427,
+      "open": 2027.100281987441,
+      "source_currency": "HKD",
+      "volume": 9618900.0
+    },
+    {
+      "close": 2040.2496452331543,
+      "close_krw": 387220.3363,
+      "date": "2026-04-30",
+      "display_currency": "KRW",
+      "high": 2068.718172534689,
+      "low": 2015.5768371058657,
+      "open": 2026.964356625569,
+      "source_currency": "HKD",
+      "volume": 5498342.0
+    },
+    {
+      "close": 2054.9968578236585,
+      "close_krw": 386015.7448,
+      "date": "2026-05-04",
+      "display_currency": "KRW",
+      "high": 2086.9300969473843,
+      "low": 2009.9147011103632,
+      "open": 2019.3068618774412,
+      "source_currency": "HKD",
+      "volume": 1452082.0
+    },
+    {
+      "close": 2059.5565553074703,
+      "close_krw": 388085.3693,
+      "date": "2026-05-05",
+      "display_currency": "KRW",
+      "high": 2061.4407339192694,
+      "low": 2006.795600726502,
+      "open": 2061.4407339192694,
+      "source_currency": "HKD",
+      "volume": 1357276.0
+    },
+    {
+      "close": 2023.997319054528,
+      "close_krw": 380721.6599,
+      "date": "2026-05-06",
+      "display_currency": "KRW",
+      "high": 2069.142196655273,
+      "low": 2008.949026520946,
+      "open": 2069.142196655273,
+      "source_currency": "HKD",
+      "volume": 5650701.0
+    },
+    {
+      "close": 2052.239150143432,
+      "close_krw": 379089.6183,
+      "date": "2026-05-07",
+      "display_currency": "KRW",
+      "high": 2068.863978439331,
+      "low": 2009.7536344207765,
+      "open": 2017.142427423096,
+      "source_currency": "HKD",
+      "volume": 10373729.0
     }
   ],
   "symbol": "1833.HK"

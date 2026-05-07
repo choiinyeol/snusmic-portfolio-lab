@@ -21363,7 +21363,7 @@
       "volume": 1077600.0
     },
     {
-      "close": 185060.02636733092,
+      "close": 185060.02636733087,
       "close_krw": 272495331.6034,
       "date": "2026-04-28",
       "display_currency": "KRW",
@@ -21372,6 +21372,72 @@
       "open": 187268.7313233856,
       "source_currency": "USD",
       "volume": 210868.0
+    },
+    {
+      "close": 177433.67477049865,
+      "close_krw": 261180593.1927,
+      "date": "2026-04-29",
+      "display_currency": "KRW",
+      "high": 181069.49184324036,
+      "low": 175034.33512935787,
+      "open": 179803.57955320738,
+      "source_currency": "USD",
+      "volume": 426300.0
+    },
+    {
+      "close": 169025.8628470581,
+      "close_krw": 251405688.7068,
+      "date": "2026-04-30",
+      "display_currency": "KRW",
+      "high": 172312.97129611205,
+      "low": 162139.29750966188,
+      "open": 166586.560546875,
+      "source_currency": "USD",
+      "volume": 1227700.0
+    },
+    {
+      "close": 166459.9508526642,
+      "close_krw": 245363633.7819,
+      "date": "2026-05-01",
+      "display_currency": "KRW",
+      "high": 170469.2598785553,
+      "low": 165634.5088458527,
+      "open": 170012.3091283813,
+      "source_currency": "USD",
+      "volume": 405700.0
+    },
+    {
+      "close": 168468.9326608032,
+      "close_krw": 247940778.9745,
+      "date": "2026-05-04",
+      "display_currency": "KRW",
+      "high": 169984.81274414062,
+      "low": 163862.41063575447,
+      "open": 164657.14617261663,
+      "source_currency": "USD",
+      "volume": 420200.0
+    },
+    {
+      "close": 170823.2771058809,
+      "close_krw": 252143706.5131,
+      "date": "2026-05-05",
+      "display_currency": "KRW",
+      "high": 173686.8065428771,
+      "low": 166203.23324577324,
+      "open": 170262.37088005058,
+      "source_currency": "USD",
+      "volume": 415600.0
+    },
+    {
+      "close": 175578.11459522694,
+      "close_krw": 258795110.9303,
+      "date": "2026-05-06",
+      "display_currency": "KRW",
+      "high": 176698.31606883556,
+      "low": 171112.00646743178,
+      "open": 172807.06267159432,
+      "source_currency": "USD",
+      "volume": 485100.0
     }
   ],
   "symbol": "SXT"
