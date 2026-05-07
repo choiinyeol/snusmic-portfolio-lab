@@ -49,11 +49,12 @@ export default function PortfolioPage() {
     <>
       <section className="hero-summary">
         <div className="hero-summary__lede">
-          <span className="hero-summary__eyebrow">Portfolio</span>
-          <h1 className="display-1">현재 보유, 월말 스냅샷, 체결 원장 — 한 화면.</h1>
+          <span className="hero-summary__eyebrow">Portfolio ledger</span>
+          <h1 className="display-1">현재 보유 · 월말 스냅샷 · 체결 원장</h1>
           <p className="hero-summary__sub">
-            과거 별도 페이지로 흩어졌던 보유·월말·매매를 하나의 페이지 세 탭으로 모았습니다. 같은
-            데이터를 다른 각도로 봅니다.
+            동일 시뮬레이션 결과를 세 가지 시계열적 시점에서 제공합니다. 현재
+            포지션은 가장 최근 종가 기준, 월말 스냅샷은 매월 말일 기준
+            잔고, 체결 원장은 매수·매도 단위 기록입니다.
           </p>
           <div className="hero-summary__signals">
             <span>현재 보유 {holdings.length}종목</span>
@@ -90,7 +91,7 @@ export default function PortfolioPage() {
         </div>
       </section>
 
-      <Section eyebrow="One book" title="세 가지 시점에서 같은 자산을 본다" caption="현재 / 월말 / 체결을 탭으로 전환합니다.">
+      <Section eyebrow="View" title="시점별 잔고와 체결" caption="현재 / 월말 / 체결 탭에서 동일 데이터를 시점에 따라 전환합니다.">
         <Tabs
           tabs={[
             {

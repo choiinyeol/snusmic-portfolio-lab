@@ -989,18 +989,120 @@ select:focus-visible {
    Section primitive — every page is a stack of `Section` blocks. Generous
    negative space, single-axis hierarchy: eyebrow → h2 → caption → body.
    ─────────────────────────────────────────────────────────────────── */
-.layout-section { margin-top: var(--space-7); }
-.layout-section:first-of-type { margin-top: var(--space-5); }
+.layout-section { margin-top: var(--space-8); }
+.layout-section:first-of-type { margin-top: var(--space-6); }
 .layout-section__head {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: var(--space-4);
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--line);
 }
-.layout-section__title { display: grid; gap: .35rem; max-width: 760px; }
-.layout-section__caption { margin: 0; color: var(--muted); font-size: .95rem; line-height: 1.55; }
+.layout-section__title { display: grid; gap: .55rem; max-width: 720px; }
+.layout-section__title h2 {
+  font-size: clamp(1.2rem, 1.7vw, 1.5rem);
+  font-weight: 700;
+  letter-spacing: -.025em;
+  line-height: 1.2;
+}
+.layout-section__caption {
+  margin: 0;
+  color: var(--muted);
+  font-size: .96rem;
+  line-height: 1.65;
+  max-width: 60ch;
+}
 .layout-section__actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+.layout-section__body { display: grid; gap: var(--space-5); }
+
+/* Editorial page header — used by detail pages where the entity itself
+   (a company / a strategy run) is the page subject. */
+.page-header {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-6) 0 var(--space-5);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: var(--space-6);
+}
+.page-header__eyebrow {
+  font-family: var(--mono);
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.page-header__title {
+  margin: 0;
+  font-size: clamp(2rem, 3.4vw, 2.85rem);
+  font-weight: 800;
+  letter-spacing: -.04em;
+  line-height: 1.05;
+  color: var(--ink);
+}
+.page-header__lede {
+  margin: .25rem 0 0;
+  color: var(--muted);
+  font-size: clamp(.98rem, 1.1vw, 1.05rem);
+  line-height: 1.7;
+  max-width: 64ch;
+}
+.page-header__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  margin-top: var(--space-3);
+  font-family: var(--mono);
+  font-size: .82rem;
+  color: var(--muted);
+}
+.page-header__meta dt { color: var(--faint); font-weight: 600; }
+.page-header__meta dd { margin: 0 0 0 .35rem; color: var(--ink); font-weight: 600; }
+.page-header__meta-item { display: inline-flex; gap: .35rem; align-items: baseline; }
+
+/* Tighter detail-page primitives — used inside aside columns to host
+   compact metadata blocks. */
+.dossier-card {
+  display: grid;
+  gap: .65rem;
+  padding: var(--space-4) var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.dossier-card__label {
+  font-family: var(--mono);
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.dossier-card h3 { margin: 0; font-size: 1.02rem; font-weight: 700; letter-spacing: -.02em; }
+.dossier-card p { margin: 0; color: var(--ink-2); font-size: .9rem; line-height: 1.65; }
+.dossier-card ul { margin: 0; padding-left: 1.1rem; color: var(--ink-2); font-size: .9rem; line-height: 1.7; }
+.dossier-card a { color: var(--accent-strong); font-weight: 600; }
+
+.definition-list {
+  display: grid;
+  gap: var(--space-2) var(--space-3);
+  grid-template-columns: max-content 1fr;
+  align-items: baseline;
+  font-size: .88rem;
+}
+.definition-list dt { color: var(--muted); font-family: var(--mono); font-size: .76rem; letter-spacing: .04em; text-transform: uppercase; }
+.definition-list dd { margin: 0; color: var(--ink); font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* Numeric-friendly table tweaks — right-align numbers, give the sort
+   header room to breathe, and stripe long lists for legibility. */
+table th .sort-button { font-weight: 700; letter-spacing: .04em; }
+table td.num,
+table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+table tbody tr + tr td { border-top: 1px solid var(--line-divider); }
+table tbody tr td:first-child { padding-left: 1rem; }
+table tbody tr td:last-child { padding-right: 1rem; }
 
 /* ───────────────────────────────────────────────────────────────────────
    Hero summary — single, opinionated answer band that opens the dashboard.

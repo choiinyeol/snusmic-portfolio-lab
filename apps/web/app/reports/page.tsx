@@ -18,10 +18,11 @@ export default function ReportsPage() {
       <section className="hero-summary">
         <div className="hero-summary__lede">
           <span className="hero-summary__eyebrow">Research archive</span>
-          <h1 className="display-1">SMIC가 그동안 추천한 종목, 정말 맞았을까.</h1>
+          <h1 className="display-1">SMIC 리포트의 사후 적중률과 가격 경로</h1>
           <p className="hero-summary__sub">
-            모든 추출 리포트를 정렬·필터·CSV 다운로드로 검토합니다. 위쪽은 한눈에 답이 나오는 카드,
-            아래는 행 단위로 깊이 들여다보는 표입니다.
+            SMIC가 발행한 모든 리포트의 발간 시점 목표가, 발간 이후 실제
+            가격 경로, 도달 여부를 정량 지표로 제공합니다. 상단의 핵심
+            지표 이후 표 단위로 행마다 깊이 검토할 수 있습니다.
           </p>
           <div className="hero-summary__signals">
             <span>리포트 {reports.length}건</span>
@@ -58,8 +59,8 @@ export default function ReportsPage() {
 
       <Section
         eyebrow="Highlights"
-        title="가장 눈에 띄는 5가지"
-        caption="Top 수익률·하위 수익률·가장 공격적인 목표가. 평균만 보면 보이지 않는 꼬리를 먼저 봅니다."
+        title="분포의 양 끝 — 최고 수익, 최저 수익, 최대 업사이드"
+        caption="평균 지표만으로는 가려지는 꼬리 사례를 먼저 보여줍니다. 사후 검증의 강한 신호와 약한 신호가 모두 여기에 노출됩니다."
       >
         <div className="grid two-col">
           <RankingPanel title="가장 수익이 큰 리포트" rows={rankings.top_winners ?? []} metric="current" tone="good" />
@@ -72,8 +73,8 @@ export default function ReportsPage() {
 
       <Section
         eyebrow="Archive"
-        title="리포트 전체 보기"
-        caption="기업/심볼 검색, 거래소·목표달성·수익률 필터, 열 정렬을 지원합니다. CSV로도 내려받을 수 있습니다."
+        title="리포트 전체 표"
+        caption="기업/심볼 검색, 거래소 및 목표 달성 여부 필터, 열 단위 정렬, CSV 내려받기를 지원합니다."
       >
         <ReportsTable reports={reports} />
       </Section>
