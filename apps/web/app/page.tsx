@@ -42,25 +42,23 @@ export default function DashboardPage() {
     <>
       <section className="hero-summary">
         <div className="hero-summary__lede">
-          <span className="hero-summary__eyebrow">{getPersonaLabel(PERSONA_PRIMARY)} · 정적 스냅샷</span>
-          <h1 className="display-1">
-            오늘 SMIC 전략은
-            <br />
-            얼마를 들고 있고, 얼마를 벌었나.
-          </h1>
+          <span className="hero-summary__eyebrow">Quant Terminal</span>
+          <h1 className="display-1">SMIC 리서치 기반 매매 시스템의 정량적 검증</h1>
           <p className="hero-summary__sub">
-            수치 한 화면으로 답합니다. 평가액·미실현 손익·전략 누적 수익률·리포트 적중률을
-            먼저 보고, 필요한 만큼만 더 깊이 들어가세요.
+            SMIC follower 시리즈와 단순 4자산 all-weather 기준선의 누적 손익,
+            보유 구성, 리스크 지표를 동일 데이터로 비교합니다. 모든 수치는
+            커밋된 정적 아티팩트에서 직접 산출되며, 실시간 거래나 외부
+            호출은 수반되지 않습니다.
           </p>
           <div className="hero-summary__signals">
-            <span>업데이트 {lastUpdated ?? '—'}</span>
-            <span>보유 {holdings.length}종목</span>
+            <span>스냅샷 기준일 {lastUpdated ?? '—'}</span>
+            <span>보유 종목 {holdings.length}</span>
             <span>리포트 {reports.length}건</span>
             <span>전략 {personas.length}개</span>
           </div>
           <div className="action-row" style={{ marginTop: '.6rem' }}>
-            <Link className="button-link" href="/portfolio">포트폴리오 자세히 보기</Link>
-            <Link className="button-link secondary" href="/reports">리포트 살펴보기</Link>
+            <Link className="button-link" href="/portfolio">포트폴리오 분석</Link>
+            <Link className="button-link secondary" href="/reports">리포트 아카이브</Link>
           </div>
         </div>
         <div className="hero-summary__kpis">
@@ -96,9 +94,9 @@ export default function DashboardPage() {
 
       <Section
         eyebrow="Open positions"
-        title="지금 가장 큰 베팅"
-        caption="평가금이 큰 순서로 6종목. 카드를 누르면 SMIC가 어떤 근거로 들고 있는지 곧장 확인할 수 있습니다."
-        actions={<Link className="terminal-link" href="/portfolio">전체 보기 →</Link>}
+        title="현재 보유 상위 종목"
+        caption="평가금 기준 상위 6종목. 각 카드는 해당 종목의 리포트 근거 페이지로 연결됩니다."
+        actions={<Link className="terminal-link" href="/portfolio">전체 보유 보기</Link>}
       >
         <div className="holdings-strip">
           {holdings.slice(0, 6).map((row) => (
@@ -121,10 +119,10 @@ export default function DashboardPage() {
       </Section>
 
       <Section
-        eyebrow="What's new"
-        title="가장 최근 리포트"
-        caption="발간일 기준 최신 6건. 발간 후 가격 흐름과 목표 도달 여부까지 한 카드에서 봅니다."
-        actions={<Link className="terminal-link" href="/reports">전체 아카이브 →</Link>}
+        eyebrow="Latest research"
+        title="최근 발간 리포트"
+        caption="발간일 기준 최신 6건과 발간 이후 가격 경로의 사후 평가를 함께 보여줍니다."
+        actions={<Link className="terminal-link" href="/reports">전체 아카이브</Link>}
       >
         <div className="reports-strip">
           {newestReports.map((report) => (
@@ -149,10 +147,10 @@ export default function DashboardPage() {
       </Section>
 
       <Section
-        eyebrow="Strategy"
-        title="검증해 보면 — SMIC follower는 견디는가?"
-        caption="단순 4자산 all-weather와 v1을 기준선으로 두고 v2의 손절 규칙이 만든 차이를 봅니다."
-        actions={<Link className="terminal-link" href="/strategies">전략 리더보드 →</Link>}
+        eyebrow="Strategy validation"
+        title="기준선 대비 SMIC follower의 위치"
+        caption="단순 4자산 all-weather와 v1을 기준선으로 두고, v2가 손절 규칙을 통해 만든 손익·낙폭의 차이를 비교합니다."
+        actions={<Link className="terminal-link" href="/strategies">전략 리더보드</Link>}
       >
         <article className="verdict-card">
           <div className="verdict-card__head">
@@ -232,22 +230,22 @@ function strategyVerdict(personas: SummaryRow[]) {
     return {
       tone: 'good' as const,
       headline: '검증 신호',
-      summary: 'v2는 기준선과 v1을 모두 이깁니다.',
-      detail: `v2 MWR ${formatPercent(v2Return)}가 all-weather ${formatPercent(awReturn)}, v1 ${formatPercent(v1Return)}를 모두 상회합니다. 다만 거래 비용과 낙폭을 함께 검토해야 합니다.`,
+      summary: 'v2의 MWR이 기준선과 v1을 모두 상회합니다.',
+      detail: `v2 MWR ${formatPercent(v2Return)}는 all-weather ${formatPercent(awReturn)}와 v1 ${formatPercent(v1Return)}를 동시에 상회합니다. 다만 표본이 한정적이며 거래 비용과 최대 낙폭을 함께 검토할 필요가 있습니다.`,
     };
   }
   if (beatsAw) {
     return {
       tone: 'warn' as const,
       headline: '부분 신호',
-      summary: '기준선은 이기지만 개선 폭은 제한적.',
-      detail: `v2가 all-weather ${formatPercent(awReturn)}는 넘지만 v1 대비 개선이 뚜렷하지 않습니다. 손절 규칙이 수익보다 위험 통제에 기여했는지 확인이 필요합니다.`,
+      summary: '기준선은 상회하지만 v1 대비 개선 폭은 제한적입니다.',
+      detail: `v2의 MWR이 all-weather ${formatPercent(awReturn)}는 상회하나 v1 ${formatPercent(v1Return)} 대비 개선 폭은 좁습니다. 손절 규칙의 기여가 수익률보다 위험 통제 측면에 있는지 점검이 필요합니다.`,
     };
   }
   return {
     tone: 'bad' as const,
     headline: '재검토 필요',
-    summary: '기준선 대비 우위 부족.',
-    detail: `v2 MWR ${formatPercent(v2Return)}가 all-weather ${formatPercent(awReturn)}를 확실히 넘지 못합니다. 리포트 선택 기준과 청산 규칙을 다시 보아야 합니다.`,
+    summary: '기준선 대비 통계적 우위가 확보되지 않았습니다.',
+    detail: `v2 MWR ${formatPercent(v2Return)}가 all-weather ${formatPercent(awReturn)}를 안정적으로 상회한다고 보기 어렵습니다. 리포트 선택 기준과 청산 규칙의 재검토가 권장됩니다.`,
   };
 }
