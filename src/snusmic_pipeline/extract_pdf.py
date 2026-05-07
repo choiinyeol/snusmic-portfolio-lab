@@ -5,6 +5,7 @@ from pathlib import Path
 
 from pypdf import PdfReader
 
+from .currency import EXCHANGE_CURRENCIES, infer_exchange_from_text
 from .models import DownloadedPdf, ExtractedReport
 
 _TICKER_RE = re.compile(r"\(([A-Z0-9]{1,10})\)")
@@ -351,28 +352,50 @@ def ticker_from_text(text: str, fallback_company: str = "") -> str:
     return ""
 
 
-def infer_exchange(ticker: str) -> tuple[str, str]:
+def infer_exchange(ticker: str, text: str = "") -> tuple[str, str]:
     if not ticker:
         return "", "Ticker not found"
     exchange = KNOWN_EXCHANGES.get(ticker.upper(), "")
     if exchange:
         return exchange, ""
+    text_exchange = infer_exchange_from_text(text)
+    if text_exchange:
+        return text_exchange, ""
     if ticker.isdigit() and len(ticker) == 6:
         return "KRX", "Korean numeric ticker; exchange prefix inferred as KRX"
+    if ticker.isdigit() and len(ticker) == 4:
+        return "TYO", "4-digit numeric ticker; exchange inferred as TYO"
     return "", "Exchange not mapped; verify ticker/exchange"
 
 
-def infer_currency(text: str, ticker: str) -> str:
-    if ticker.isdigit() and len(ticker) == 6:
+def infer_currency(text: str, ticker: str, exchange: str = "") -> str:
+    """Resolve a SMIC report's quoted currency.
+
+    Order of evidence:
+
+    1. The report's exchange (resolved upstream via ``infer_exchange``) — the
+       single source of truth, mapped through ``EXCHANGE_CURRENCIES``.
+    2. The PDF cover page's exchange keywords — covers reports where the
+       ticker mapping has not been hard-coded yet.
+    3. KRX-style 6-digit numeric tickers default to KRW.
+    4. Tokyo-style 4-digit numeric tickers default to JPY.
+    5. Final fallback: USD when the cover page mentions ``USD`` / ``$``,
+       otherwise USD as a last resort.
+    """
+
+    code = (exchange or "").strip().upper()
+    if code in EXCHANGE_CURRENCIES:
+        return EXCHANGE_CURRENCIES[code]
+    text_exchange = infer_exchange_from_text(text)
+    if text_exchange in EXCHANGE_CURRENCIES:
+        return EXCHANGE_CURRENCIES[text_exchange]
+    digits = (ticker or "").strip()
+    if digits.isdigit() and len(digits) == 6:
         return "KRW"
-    if ticker in {"6857", "4680", "5253", "2124", "5726", "4751", "4689"}:
+    if digits.isdigit() and len(digits) == 4:
         return "JPY"
-    if ticker in {"1211", "1833"}:
-        return "HKD"
-    if ticker in {"002340", "002714"}:
-        return "CNY"
-    first_page = text[:3000]
-    if "$" in first_page or "USD" in first_page.upper():
+    first_page = text[:3000].upper() if text else ""
+    if "USD" in first_page or "$" in (text[:3000] if text else ""):
         return "USD"
     return "USD"
 
@@ -435,7 +458,7 @@ def parse_report_text(text: str, fallback_company: str = "") -> dict[str, object
         base_target = median_price(case_prices)
     if single_target is not None and ("base" in target_raw.lower() or base_target is None):
         base_target = single_target
-    exchange, exchange_note = infer_exchange(ticker)
+    exchange, exchange_note = infer_exchange(ticker, text)
     if exchange_note:
         notes.append(exchange_note)
     if base_target is None:
@@ -457,7 +480,7 @@ def parse_report_text(text: str, fallback_company: str = "") -> dict[str, object
         "bear_target": scenario_values.get("bear"),
         "base_target": base_target,
         "bull_target": scenario_values.get("bull"),
-        "target_currency": infer_currency(text, ticker),
+        "target_currency": infer_currency(text, ticker, exchange),
         "target_price_detail": target_detail_text(scenario_values, case_values, rating, base_target),
         "investment_points": extract_investment_points(text),
         "status": "ok" if ticker and base_target is not None else "needs_review",

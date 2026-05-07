@@ -21,14 +21,74 @@ EXCHANGE_CURRENCIES = {
     "NASDAQ": "USD",
     "NYSE": "USD",
     "AMEX": "USD",
+    "NYSEAMERICAN": "USD",
     "TYO": "JPY",
+    "TSE": "JPY",
     "HKG": "HKD",
     "HKEX": "HKD",
     "SZSE": "CNY",
     "SSE": "CNY",
+    "SHE": "CNY",
+    "SHA": "CNY",
     "EPA": "EUR",
     "AMS": "EUR",
+    "FRA": "EUR",
+    "ETR": "EUR",
+    "BIT": "EUR",
+    "MIL": "EUR",
     "SIX": "CHF",
+    "SWX": "CHF",
+    "LSE": "GBP",
+    "LON": "GBP",
+    "TSX": "CAD",
+    "ASX": "AUD",
+}
+
+# Exchange identifiers that may appear inside a SMIC PDF report. The match is
+# case-insensitive and looks at the first ~3,000 characters of the document
+# (where the cover-page meta lives). This lets the pipeline auto-classify
+# Japan/HK/China/EU listings without maintaining a per-ticker hard-coded list.
+EXCHANGE_KEYWORDS = {
+    "TYO": ["TYO", "TSE", "TOKYO", "JAPAN EXCHANGE", "JPX", "NIKKEI"],
+    "HKG": ["HKEX", "HKG", "HKSE", "HONG KONG"],
+    "SZSE": ["SZSE", "SHENZHEN"],
+    "SSE": ["SSE", "SHANGHAI STOCK", "SHANGHAI EXCHANGE"],
+    "NASDAQ": ["NASDAQ"],
+    "NYSE": ["NYSE", "NEW YORK STOCK EXCHANGE"],
+    "EPA": ["EURONEXT PARIS", "PARIS BOURSE", " PARIS "],
+    "AMS": ["EURONEXT AMSTERDAM", "AMSTERDAM"],
+    "FRA": ["FRANKFURT", "DEUTSCHE BORSE", "XETRA"],
+    "SIX": ["SWISS EXCHANGE", "SIX SWISS", "SIX EXCHANGE"],
+    "LSE": ["LONDON STOCK EXCHANGE", "LSE LISTING"],
+    "ASX": ["AUSTRALIAN SECURITIES EXCHANGE", "ASX:"],
+    "TSX": ["TORONTO STOCK EXCHANGE", "TSX:"],
+    "KRX": ["KOSPI", "KOSDAQ", "KRX:", "KOREA EXCHANGE"],
+}
+
+# yfinance ticker suffix per exchange. Used to lift a raw market identifier
+# (e.g. KRX "100090") to a yfinance symbol ("100090.KS") so callers can fetch
+# prices and FX consistently. KRX is a special case — the suffix depends on
+# which segment (KOSPI vs KOSDAQ) the listing belongs to, so the canonical
+# resolver lives below.
+EXCHANGE_TO_YFINANCE_SUFFIX = {
+    "TYO": ".T",
+    "TSE": ".T",
+    "HKG": ".HK",
+    "HKEX": ".HK",
+    "SZSE": ".SZ",
+    "SHE": ".SZ",
+    "SSE": ".SS",
+    "SHA": ".SS",
+    "EPA": ".PA",
+    "AMS": ".AS",
+    "FRA": ".F",
+    "ETR": ".DE",
+    "SIX": ".SW",
+    "SWX": ".SW",
+    "LSE": ".L",
+    "LON": ".L",
+    "TSX": ".TO",
+    "ASX": ".AX",
 }
 
 Downloader = Callable[[str, datetime, datetime], pd.DataFrame]
@@ -59,12 +119,54 @@ def currency_for_symbol(symbol: str, exchange: str = "") -> str:
         ".SS": "CNY",
         ".PA": "EUR",
         ".AS": "EUR",
+        ".F": "EUR",
+        ".DE": "EUR",
         ".SW": "CHF",
+        ".L": "GBP",
+        ".TO": "CAD",
+        ".AX": "AUD",
     }
     for suffix, currency in suffix_map.items():
         if symbol.endswith(suffix):
             return currency
     return "USD" if symbol else ""
+
+
+def infer_exchange_from_text(text: str | None) -> str:
+    """Scan the cover-page text of a SMIC report for a known exchange marker."""
+
+    if not text:
+        return ""
+    upper = text[:3000].upper()
+    for exchange_code, keywords in EXCHANGE_KEYWORDS.items():
+        for keyword in keywords:
+            if keyword.upper() in upper:
+                return exchange_code
+    return ""
+
+
+def yfinance_symbol(ticker: str, exchange: str = "") -> str:
+    """Build a yfinance-shaped ticker (e.g. ``100090.KS``) from a raw symbol.
+
+    KRX numeric listings are looked up against the KOSPI/KOSDAQ segment so the
+    correct ``.KS`` / ``.KQ`` suffix is used. For every other supported venue
+    the suffix comes from ``EXCHANGE_TO_YFINANCE_SUFFIX``. If the ticker
+    already carries a suffix or the exchange is not mapped, the input is
+    returned unchanged.
+    """
+
+    raw = str(ticker or "").strip()
+    if not raw:
+        return ""
+    if "." in raw:
+        return raw  # already in yfinance shape
+    code = str(exchange or "").strip().upper()
+    if code in {"KRX", "KOSPI", "KOSDAQ"} and raw.isdigit() and len(raw) == 6:
+        return f"{raw}.{'KS' if code == 'KOSPI' else 'KQ' if code == 'KOSDAQ' else 'KS'}"
+    suffix = EXCHANGE_TO_YFINANCE_SUFFIX.get(code, "")
+    if suffix:
+        return f"{raw}{suffix}"
+    return raw
 
 
 def yfinance_fx_symbol(currency: str) -> str:
