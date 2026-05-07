@@ -213,7 +213,7 @@ export function PriceEvidenceChart({
         lineWidth: 2,
         lineStyle: LineStyle.Dashed,
         axisLabelVisible: true,
-        title: `목표가 ${formatChartPrice(targetPrice, currency)}`,
+        title: '',
       });
     }
 
