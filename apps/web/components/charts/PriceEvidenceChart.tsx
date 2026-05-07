@@ -82,23 +82,23 @@ export function PriceEvidenceChart({
       autoSize: true,
       height: 420,
       layout: {
-        background: { type: ColorType.Solid, color: '#0f172a' },
-        textColor: '#cbd5e1',
+        background: { type: ColorType.Solid, color: '#ffffff' },
+        textColor: '#4e5968',
         attributionLogo: true,
       },
-      grid: { vertLines: { color: '#1f2937' }, horzLines: { color: '#1f2937' } },
+      grid: { vertLines: { color: '#f1f3f6' }, horzLines: { color: '#f1f3f6' } },
       crosshair: { mode: CrosshairMode.Normal },
-      rightPriceScale: { borderColor: '#334155', autoScale: true, scaleMargins: { top: 0.10, bottom: 0.22 } },
-      timeScale: { borderColor: '#334155', timeVisible: true, secondsVisible: false },
+      rightPriceScale: { borderColor: '#eaedf2', autoScale: true, scaleMargins: { top: 0.10, bottom: 0.22 } },
+      timeScale: { borderColor: '#eaedf2', timeVisible: true, secondsVisible: false },
     });
 
     const candleSeries: ISeriesApi<'Candlestick'> = chart.addSeries(CandlestickSeries, {
-      upColor: '#35f2c2',
-      downColor: '#ff6f91',
-      borderUpColor: '#35f2c2',
-      borderDownColor: '#ff6f91',
-      wickUpColor: '#35f2c2',
-      wickDownColor: '#ff6f91',
+      upColor: '#16a368',
+      downColor: '#ef4452',
+      borderUpColor: '#16a368',
+      borderDownColor: '#ef4452',
+      wickUpColor: '#16a368',
+      wickDownColor: '#ef4452',
       priceLineVisible: false,
       lastValueVisible: true,
       title: 'OHLC',
@@ -107,7 +107,7 @@ export function PriceEvidenceChart({
     candleSeries.setData(candleData);
 
     const volumeSeries = chart.addSeries(HistogramSeries, {
-      color: 'rgba(138, 180, 255, 0.36)',
+      color: 'rgba(49, 130, 246, 0.28)',
       priceFormat: { type: 'volume' },
       priceScaleId: 'volume',
       lastValueVisible: false,
@@ -120,7 +120,7 @@ export function PriceEvidenceChart({
     if (targetPrice && Number.isFinite(targetPrice)) {
       candleSeries.createPriceLine({
         price: targetPrice,
-        color: '#f87171',
+        color: '#ef4452',
         lineWidth: 2,
         lineStyle: LineStyle.Dashed,
         axisLabelVisible: true,
@@ -207,16 +207,16 @@ function toVolumePoint(point: PricePoint): VolumePoint {
   return {
     time: point.time as Time,
     value: Math.max(0, point.volume ?? 0),
-    color: close >= open ? 'rgba(53, 242, 194, 0.34)' : 'rgba(255, 111, 145, 0.32)',
+    color: close >= open ? 'rgba(22, 163, 104, 0.32)' : 'rgba(239, 68, 82, 0.30)',
   };
 }
 
 function buildMarkers(publicationDate: string, targetHitDate: string | null, evidenceMarkers: EvidenceMarker[]): SeriesMarker<Time>[] {
   const markerByKey = new Map<string, SeriesMarker<Time>>();
   const addMarker = (marker: SeriesMarker<Time>) => markerByKey.set(`${String(marker.time)}-${marker.text}`, marker);
-  addMarker({ time: publicationDate as Time, position: 'belowBar', color: '#fbbf24', shape: 'arrowUp', text: '발간' });
+  addMarker({ time: publicationDate as Time, position: 'belowBar', color: '#f29423', shape: 'arrowUp', text: '발간' });
   if (targetHitDate) {
-    addMarker({ time: targetHitDate as Time, position: 'aboveBar', color: '#34d399', shape: 'circle', text: '목표 도달' });
+    addMarker({ time: targetHitDate as Time, position: 'aboveBar', color: '#16a368', shape: 'circle', text: '목표 도달' });
   }
   for (const marker of evidenceMarkers) {
     const markerConfig = markerStyle(marker);
@@ -248,14 +248,14 @@ function isObjectWithNumber(value: unknown, key: 'open' | 'high' | 'low' | 'clos
 function markerStyle(marker: EvidenceMarker): MarkerStyle {
   switch (marker.kind) {
     case 'target-hit':
-      return { color: '#34d399', position: 'aboveBar', shape: 'circle' };
+      return { color: '#16a368', position: 'aboveBar', shape: 'circle' };
     case 'peak':
-      return { color: '#22d3ee', position: 'aboveBar', shape: 'arrowDown' };
+      return { color: '#3182f6', position: 'aboveBar', shape: 'arrowDown' };
     case 'trough':
-      return { color: '#fb7185', position: 'belowBar', shape: 'arrowUp' };
+      return { color: '#ef4452', position: 'belowBar', shape: 'arrowUp' };
     case 'publication':
     default:
-      return { color: '#fbbf24', position: 'belowBar', shape: 'arrowUp' };
+      return { color: '#f29423', position: 'belowBar', shape: 'arrowUp' };
   }
 }
 

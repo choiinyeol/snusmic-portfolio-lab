@@ -20,14 +20,14 @@ export function CumulativeReturnChart({ series }: { series: ReturnSeries[] }) {
       autoSize: true,
       height: 360,
       layout: {
-        background: { type: ColorType.Solid, color: '#080b0a' },
-        textColor: '#cbd5e1',
+        background: { type: ColorType.Solid, color: '#ffffff' },
+        textColor: '#4e5968',
         attributionLogo: true,
       },
-      grid: { vertLines: { color: '#18201d' }, horzLines: { color: '#18201d' } },
+      grid: { vertLines: { color: '#f1f3f6' }, horzLines: { color: '#f1f3f6' } },
       crosshair: { mode: CrosshairMode.Normal },
-      rightPriceScale: { borderColor: '#334155', scaleMargins: { top: 0.12, bottom: 0.12 } },
-      timeScale: { borderColor: '#334155', timeVisible: true, secondsVisible: false },
+      rightPriceScale: { borderColor: '#eaedf2', scaleMargins: { top: 0.12, bottom: 0.12 } },
+      timeScale: { borderColor: '#eaedf2', timeVisible: true, secondsVisible: false },
     });
     const apiByLabel = new Map<ISeriesApi<'Line'>, ReturnSeries>();
     for (const item of series) {
