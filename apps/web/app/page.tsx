@@ -1,316 +1,182 @@
 import Link from 'next/link';
-import { CumulativeReturnChart, type ReturnSeries } from '@/components/charts/CumulativeReturnChart';
-import { MetricCard, Panel, TerminalHero } from '@/components/ui/Terminal';
+import { KpiTile } from '@/components/ui/KpiTile';
+import { Section } from '@/components/ui/Section';
+import { Sparkline } from '@/components/ui/Sparkline';
 import {
   getCurrentHoldings,
   getEquityDaily,
   getLatestReportTargetsBySymbol,
-  getPositionEpisodes,
+  getOverview,
+  getPersonaLabel,
   getReportRows,
   getSummaryRows,
   type HoldingRow,
   type ReportRow,
   type SummaryRow,
 } from '@/lib/artifacts';
-import { formatDays, formatKrw, formatPercent } from '@/lib/format';
+import { formatKrw, formatPercent } from '@/lib/format';
 
-const DEFAULT_PERSONA = 'smic_follower_v2';
-const STRATEGY_COLORS: Record<string, string> = {
-  smic_follower_v2: '#35f2c2',
-  smic_follower: '#d7ff4f',
-  all_weather: '#8ab4ff',
-};
+const PERSONA_PRIMARY = 'smic_follower_v2';
 
-export default function Home() {
+export default function DashboardPage() {
   const personas = getSummaryRows();
   const reports = getReportRows();
-  const allHoldings = getCurrentHoldings();
-  const targetsBySymbol = getLatestReportTargetsBySymbol();
-  const episodes = getPositionEpisodes();
-  const equity = getEquityDaily();
-  const defaultLabel = getPersonaLabel(personas, DEFAULT_PERSONA);
-  const holdings = allHoldings
-    .filter((row) => row.persona === DEFAULT_PERSONA)
+  const holdings = getCurrentHoldings()
+    .filter((row) => row.persona === PERSONA_PRIMARY)
     .sort((a, b) => (b.marketValueKrw ?? 0) - (a.marketValueKrw ?? 0));
+  const targets = getLatestReportTargetsBySymbol();
+  const equity = getEquityDaily();
+  const overview = getOverview();
+
+  const persona = personas.find((row) => row.persona === PERSONA_PRIMARY);
   const portfolio = summarizeHoldings(holdings);
-  const v2 = personas.find((row) => row.persona === DEFAULT_PERSONA);
-  const v1 = personas.find((row) => row.persona === 'smic_follower');
-  const allWeather = personas.find((row) => row.persona === 'all_weather');
-  const reportStats = buildReportStats(reports);
-  const latestReportCloseDate = latestCloseDate(reports);
-  const realizedPnl = episodes
-    .filter((row) => row.persona === DEFAULT_PERSONA && row.status === 'closed')
-    .reduce((sum, row) => sum + (row.realizedPnlKrw ?? 0), 0);
-  const totalCapital = v2?.totalContributedKrw ?? v2?.cumulativeDepositsKrw ?? null;
-  const realizedContribution = totalCapital && totalCapital > 0 ? realizedPnl / totalCapital : null;
-  const recentWinningEpisodes = episodes
-    .filter((row) => row.persona === DEFAULT_PERSONA && row.status === 'closed' && (row.realizedPnlKrw ?? 0) > 0)
-    .sort((a, b) => (b.closeDate ?? '').localeCompare(a.closeDate ?? ''))
+  const equitySpark = sparkPoints(equity, PERSONA_PRIMARY);
+  const lastUpdated = equityLatestDate(equity) ?? overview.simulation_window?.report_end ?? null;
+  const newestReports = [...reports]
+    .filter((report) => report.publicationDate)
+    .sort((a, b) => b.publicationDate.localeCompare(a.publicationDate))
     .slice(0, 6);
-  const openPositions = episodes
-    .filter((row) => row.persona === DEFAULT_PERSONA && row.status !== 'closed')
-    .sort((a, b) => (b.unrealizedPnlKrw ?? 0) - (a.unrealizedPnlKrw ?? 0))
-    .slice(0, 6);
-  const returnSeries = buildReturnSeries(equity, personas);
-  const conclusion = buildStrategyConclusion(v2, allWeather, v1);
+  const verdict = strategyVerdict(personas);
 
   return (
     <>
-      <TerminalHero eyebrow="Portfolio evidence" title="지금 무엇을 들고 있고, 이 전략은 돈이 됐는가.">
-        <p>
-          메인 화면은 방법론 설명 대신 {defaultLabel}의 현재 보유, 최근 실현 이익, 리포트 성과 분포,
-          전략별 손익/낙폭을 한 번에 검증하도록 재구성했습니다. 면적은 돈이 많이 들어간 종목,
-          색상은 손익률입니다.
-        </p>
-        <div className="action-row">
-          <Link className="button-link" href="/portfolio">현재 포트폴리오 보기</Link>
-          <Link className="button-link secondary" href="/trades">체결 원장 보기</Link>
-          <Link className="button-link secondary" href="/reports">리포트 근거 보기</Link>
+      <section className="hero-summary">
+        <div className="hero-summary__lede">
+          <span className="hero-summary__eyebrow">{getPersonaLabel(PERSONA_PRIMARY)} · 정적 스냅샷</span>
+          <h1 className="display-1">
+            오늘 SMIC 전략은
+            <br />
+            얼마를 들고 있고, 얼마를 벌었나.
+          </h1>
+          <p className="hero-summary__sub">
+            수치 한 화면으로 답합니다. 평가액·미실현 손익·전략 누적 수익률·리포트 적중률을
+            먼저 보고, 필요한 만큼만 더 깊이 들어가세요.
+          </p>
+          <div className="hero-summary__signals">
+            <span>업데이트 {lastUpdated ?? '—'}</span>
+            <span>보유 {holdings.length}종목</span>
+            <span>리포트 {reports.length}건</span>
+            <span>전략 {personas.length}개</span>
+          </div>
+          <div className="action-row" style={{ marginTop: '.6rem' }}>
+            <Link className="button-link" href="/portfolio">포트폴리오 자세히 보기</Link>
+            <Link className="button-link secondary" href="/reports">리포트 살펴보기</Link>
+          </div>
         </div>
-      </TerminalHero>
-
-      <section className="grid cards bento-metrics" style={{ marginBottom: '1rem' }}>
-        <MetricCard label={`${defaultLabel} 평가액`} value={formatKrw(portfolio.marketValue)} detail={`${holdings.length.toLocaleString('ko-KR')}개 보유 · 집중도 ${formatPercent(portfolio.top5Weight)}`} tone="accent" />
-        <MetricCard label="현재 미실현 손익" value={formatKrw(portfolio.unrealizedPnl)} detail={formatPercent(portfolio.unrealizedReturn)} tone={portfolio.unrealizedPnl >= 0 ? 'good' : 'bad'} />
-        <MetricCard label="실현손익/투입금" value={formatKrw(realizedPnl)} detail={`투입금 대비 ${formatPercent(realizedContribution)}`} tone={realizedPnl >= 0 ? 'good' : 'bad'} />
-        <MetricCard label="전략 누적 손익" value={formatKrw(v2?.netProfitKrw)} detail={`MWR ${formatPercent(v2?.moneyWeightedReturn ?? v2?.irr)} · MDD ${formatPercent(v2?.maxDrawdown)}`} tone={(v2?.netProfitKrw ?? 0) >= 0 ? 'good' : 'bad'} />
-        <MetricCard label="리포트 목표 터치율" value={formatPercent(reportStats.hitRate)} detail={`${reportStats.hitCount.toLocaleString('ko-KR')}건 / ${reportStats.count.toLocaleString('ko-KR')}건`} tone="good" />
+        <div className="hero-summary__kpis">
+          <KpiTile
+            label="현재 평가액"
+            value={<span className="display-num">{formatKrw(portfolio.marketValue)}</span>}
+            caption={`상위 5종목 집중도 ${formatPercent(portfolio.top5Weight)}`}
+            tone="accent"
+            emphasis
+          >
+            <Sparkline values={equitySpark} height={36} tone="accent" />
+          </KpiTile>
+          <KpiTile
+            label="미실현 손익"
+            value={<span className="display-num">{formatKrw(portfolio.unrealizedPnl)}</span>}
+            delta={formatPercent(portfolio.unrealizedReturn)}
+            tone={portfolio.unrealizedPnl >= 0 ? 'good' : 'bad'}
+          />
+          <KpiTile
+            label="전략 누적 수익률 (MWR)"
+            value={<span className="display-num">{formatPercent(persona?.moneyWeightedReturn ?? persona?.irr)}</span>}
+            delta={`MDD ${formatPercent(persona?.maxDrawdown)}`}
+            tone={(persona?.moneyWeightedReturn ?? 0) >= 0 ? 'good' : 'bad'}
+          />
+          <KpiTile
+            label="리포트 목표 적중"
+            value={<span className="display-num">{formatPercent(overview.target_stats?.target_hit_rate)}</span>}
+            delta={`${overview.target_stats?.target_hit_count ?? 0}건 도달`}
+            tone="good"
+          />
+        </div>
       </section>
 
-      <section className="grid dashboard-hero-grid" style={{ marginBottom: '1rem' }}>
-        <Panel title="현재 포트폴리오 히트맵" className="dashboard-main-panel">
-          <div className="panel-caption">면적 = 평가금 · 색상 = 현재 평가손익률 · 기준 전략 = {defaultLabel}</div>
-          <PortfolioHeatmap holdings={holdings} />
-          <div className="heatmap-legend" aria-label="히트맵 색상 범례">
-            <span className="legend-bad">손실</span><span className="legend-neutral">중립</span><span className="legend-good">수익</span>
-          </div>
-        </Panel>
+      <Section
+        eyebrow="Open positions"
+        title="지금 가장 큰 베팅"
+        caption="평가금이 큰 순서로 6종목. 카드를 누르면 SMIC가 어떤 근거로 들고 있는지 곧장 확인할 수 있습니다."
+        actions={<Link className="terminal-link" href="/portfolio">전체 보기 →</Link>}
+      >
+        <div className="holdings-strip">
+          {holdings.slice(0, 6).map((row) => (
+            <Link
+              key={row.symbol}
+              href={`/reports/${row.symbol}`}
+              className="holdings-strip__cell"
+              title={`${row.company || row.symbol}`}
+            >
+              <span className="name">{row.company || row.symbol}</span>
+              <span className="symbol">{row.symbol}</span>
+              <span className="value">{formatKrw(row.marketValueKrw)}</span>
+              <span className={`ret ${(row.unrealizedReturn ?? 0) >= 0 ? 'good' : 'bad'}`}>
+                {formatPercent(row.unrealizedReturn)} · 비중 {formatPercent(weight(row, portfolio.marketValue))}
+              </span>
+            </Link>
+          ))}
+          {!holdings.length ? <p className="muted">현재 보유 포지션이 없습니다.</p> : null}
+        </div>
+      </Section>
 
-        <Panel title="전략 유의성 요약">
-          <p className={`strategy-verdict ${conclusion.tone}`}>{conclusion.label}</p>
-          <p>{conclusion.detail}</p>
-          <div className="strategy-score-list">
-            {personas.filter((row) => ['smic_follower_v2', 'smic_follower', 'all_weather'].includes(row.persona)).map((row) => (
-              <div className="strategy-score-row" key={row.persona}>
-                <strong>{row.label ?? row.persona}</strong>
-                <span>{formatKrw(row.netProfitKrw)}</span>
-                <span>MWR {formatPercent(row.moneyWeightedReturn ?? row.irr)}</span>
-                <span>MDD {formatPercent(row.maxDrawdown)}</span>
+      <Section
+        eyebrow="What's new"
+        title="가장 최근 리포트"
+        caption="발간일 기준 최신 6건. 발간 후 가격 흐름과 목표 도달 여부까지 한 카드에서 봅니다."
+        actions={<Link className="terminal-link" href="/reports">전체 아카이브 →</Link>}
+      >
+        <div className="reports-strip">
+          {newestReports.map((report) => (
+            <Link key={report.symbol + report.publicationDate} href={`/reports/${report.symbol}`} className="report-card">
+              <span className="report-card__date">{report.publicationDate || '—'}</span>
+              <strong className="report-card__title">{report.company || report.symbol}</strong>
+              <span className="report-card__symbol">{report.symbol}</span>
+              <div className="report-card__line">
+                <span className="muted" style={{ fontSize: '.78rem' }}>현재 수익률</span>
+                <span className={`report-card__metric ${(report.currentReturn ?? 0) >= 0 ? 'good' : 'bad'}`}>
+                  {formatPercent(report.currentReturn)}
+                </span>
               </div>
-            ))}
-          </div>
-          <p><Link href="/strategies">전략별 실험/파라미터 보기 →</Link></p>
-        </Panel>
-      </section>
-
-      <section className="panel" style={{ marginBottom: '1rem' }}>
-        <h2>누적 수익률 경로</h2>
-        <p className="muted">SMIC Follower v2가 단순 all-weather 대비 어떤 경로와 낙폭으로 움직였는지 비교합니다.</p>
-        <div className="data-freshness-row">
-          <span>시뮬레이션 최신일 {latestEquityDate(equity) ?? '—'}</span>
-          <span>{defaultLabel} {formatPercent(latestReturn(returnSeries, DEFAULT_PERSONA))}</span>
-          <span>All-Weather {formatPercent(latestReturn(returnSeries, 'all_weather'))}</span>
+              <div className="report-card__line">
+                <span className="muted" style={{ fontSize: '.78rem' }}>목표가까지</span>
+                <span className="report-card__metric">{formatPercent(targetGap(report.lastCloseKrw, targets[report.symbol]?.targetPriceKrw))}</span>
+              </div>
+              {targetUpsidePill(report)}
+            </Link>
+          ))}
         </div>
-        <CumulativeReturnChart series={returnSeries} />
-      </section>
+      </Section>
 
-      <section className="grid two-col feature-grid" style={{ marginBottom: '1rem' }}>
-        <Panel title="최근 이익 실현 포지션">
-          <div className="table-wrap inset compact-table">
-            <table>
-              <thead><tr><th>청산일</th><th>종목</th><th>보유</th><th>평균 진입/청산</th><th>실현손익</th><th>사유</th><th>전문</th></tr></thead>
-              <tbody>{recentWinningEpisodes.map((episode) => (
-                <tr key={`${episode.persona}-${episode.symbol}-${episode.openDate}-${episode.closeDate}`}>
-                  <td>{episode.closeDate ?? '—'}</td>
-                  <td><Link href={`/reports/${episode.symbol}`}>{episode.company || episode.symbol}</Link><div className="muted">{episode.symbol}</div></td>
-                  <td>{formatDays(episode.holdingDays)}<div className="muted">매수 {episode.buyFills ?? 0}회 · 매도 {episode.sellFills ?? 0}회</div></td>
-                  <td>{formatKrw(episode.avgEntryPriceKrw)}<div className="muted">→ {formatKrw(episode.avgExitPriceKrw)}</div></td>
-                  <td className="good">{formatKrw(episode.realizedPnlKrw)}<div>{formatPercent(positionReturn(episode.avgEntryPriceKrw, episode.avgExitPriceKrw))}</div></td>
-                  <td>{humanReason(episode.exitReasons)}</td>
-                  <td><Link className="mini-link" href={`/reports/${episode.symbol}#persona-trades`}>매매</Link><Link className="mini-link secondary" href={`/trades?strategy=${DEFAULT_PERSONA}&q=${episode.symbol}`}>원장</Link></td>
-                </tr>
-              ))}</tbody>
-            </table>
+      <Section
+        eyebrow="Strategy"
+        title="검증해 보면 — SMIC follower는 견디는가?"
+        caption="단순 4자산 all-weather와 v1을 기준선으로 두고 v2의 손절 규칙이 만든 차이를 봅니다."
+        actions={<Link className="terminal-link" href="/strategies">전략 리더보드 →</Link>}
+      >
+        <article className="verdict-card">
+          <div className="verdict-card__head">
+            <span className={`verdict-pill ${verdict.tone}`}>{verdict.headline}</span>
+            <h3 className="verdict-card__title">{verdict.summary}</h3>
           </div>
-        </Panel>
-
-        <Panel title="현재 열려 있는 큰 포지션">
-          <div className="table-wrap inset compact-table">
-            <table>
-              <thead><tr><th>종목</th><th>목표가</th><th>평균 진입</th><th>최근가</th><th>미실현 손익</th><th>전문</th></tr></thead>
-              <tbody>{openPositions.map((episode) => {
-                const target = targetsBySymbol[episode.symbol];
-                return (
-                  <tr key={`${episode.persona}-${episode.symbol}-${episode.openDate}`}>
-                    <td><Link href={`/reports/${episode.symbol}`}>{episode.company || episode.symbol}</Link><div className="muted">{episode.symbol}</div></td>
-                    <td>{formatKrw(target?.targetPriceKrw)}<div className="muted">목표까지 {formatPercent(targetGap(episode.lastCloseKrw, target?.targetPriceKrw))}</div></td>
-                    <td>{formatKrw(episode.avgEntryPriceKrw)}</td>
-                    <td>{formatKrw(episode.lastCloseKrw)}</td>
-                    <td className={(episode.unrealizedPnlKrw ?? 0) >= 0 ? 'good' : 'bad'}>{formatKrw(episode.unrealizedPnlKrw)}</td>
-                    <td><Link className="mini-link" href={`/reports/${episode.symbol}#persona-trades`}>매매</Link><Link className="mini-link secondary" href={`/trades?strategy=${DEFAULT_PERSONA}&q=${episode.symbol}`}>원장</Link></td>
-                  </tr>
-                );
-              })}</tbody>
-            </table>
+          <p className="verdict-card__detail">{verdict.detail}</p>
+          <div className="verdict-card__rows">
+            {personas
+              .filter((row) => ['smic_follower_v2', 'smic_follower', 'all_weather'].includes(row.persona))
+              .map((row) => (
+                <div className="verdict-card__row" key={row.persona}>
+                  <strong>{row.label || row.persona}</strong>
+                  <span>누적 손익 <b>{formatKrw(row.netProfitKrw)}</b></span>
+                  <span>MWR <b>{formatPercent(row.moneyWeightedReturn ?? row.irr)}</b></span>
+                  <span>MDD <b>{formatPercent(row.maxDrawdown)}</b></span>
+                </div>
+              ))}
           </div>
-        </Panel>
-      </section>
-
-      <section className="grid dashboard-stats-grid">
-        <Panel title="SMIC 리포트 성과 분포">
-          <p className="muted">최신 가격 기준일 {latestReportCloseDate ?? '—'} · 검증 가능 리포트 {reportStats.count.toLocaleString('ko-KR')}건. 평균만 보면 왜곡되므로 중앙값, 왜도, 꼬리를 함께 봅니다.</p>
-          <DistributionGrid stats={reportStats.distributions} />
-        </Panel>
-        <Panel title="현재 수익률 히스토그램">
-          <Histogram bins={reportStats.currentReturnHistogram} />
-          <p className="muted">최신 가격 기준일 {latestReportCloseDate ?? '—'} 기준입니다. 오른쪽 꼬리가 길수록 소수의 큰 승자가 평균을 끌어올립니다. 중앙값이 낮으면 재현 가능한 매매 방식인지 더 보수적으로 봐야 합니다.</p>
-        </Panel>
-      </section>
+        </article>
+      </Section>
     </>
   );
 }
-
-
-function latestEquityDate(equity: ReturnType<typeof getEquityDaily>): string | null {
-  return equity.reduce<string | null>((latest, point) => point.date > (latest ?? '') ? point.date : latest, null);
-}
-
-function latestReturn(series: ReturnSeries[], id: string): number | null {
-  const points = series.find((item) => item.id === id)?.points ?? [];
-  return points.at(-1)?.value ?? null;
-}
-
-function latestCloseDate(reports: ReportRow[]): string | null {
-  return reports.reduce<string | null>((latest, report) => report.lastCloseDate && report.lastCloseDate > (latest ?? '') ? report.lastCloseDate : latest, null);
-}
-
-function PortfolioHeatmap({ holdings }: { holdings: HoldingRow[] }) {
-  const total = holdings.reduce((sum, row) => sum + Math.max(0, row.marketValueKrw ?? 0), 0);
-  if (!holdings.length || total <= 0) return <div className="empty-chart">현재 보유 포지션이 없습니다.</div>;
-  const rects = buildTreemap(holdings.slice(0, 32));
-  return (
-    <div className="portfolio-heatmap">
-      {rects.map((rect) => {
-        const { row } = rect;
-        const value = Math.max(0, row.marketValueKrw ?? 0);
-        const weight = value / total;
-        const returnPct = row.unrealizedReturn ?? 0;
-        const area = rect.w * rect.h;
-        const minSide = Math.min(rect.w, rect.h);
-        const maxSide = Math.max(rect.w, rect.h);
-        const aspect = maxSide / Math.max(1, minSide);
-        const sizeClass = minSide < 7 || area < 130
-          ? 'tiny'
-          : minSide < 13 || area < 260 || aspect > 4.2
-            ? 'small'
-            : minSide < 20 || area < 560 || aspect > 2.9
-              ? 'medium'
-              : 'large';
-        return (
-          <Link
-            href={`/reports/${row.symbol}`}
-            className={`heatmap-cell ${sizeClass}`}
-            key={`${row.persona}-${row.symbol}`}
-            style={{
-              left: `${rect.x}%`,
-              top: `${rect.y}%`,
-              width: `${rect.w}%`,
-              height: `${rect.h}%`,
-              background: returnColor(returnPct),
-            }}
-            title={`${row.company || row.symbol} · 비중 ${formatPercent(weight)} · 평가금 ${formatKrw(value)}`}
-          >
-            <strong>{row.company || row.symbol}</strong>
-            <span>{row.symbol}</span>
-            <em>{formatKrw(value)}</em>
-            <b className={returnPct >= 0 ? 'good' : 'bad'}>{formatPercent(returnPct)}</b>
-          </Link>
-        );
-      })}
-    </div>
-  );
-}
-
-function DistributionGrid({ stats }: { stats: DistributionStat[] }) {
-  return (
-    <div className="distribution-grid">
-      {stats.map((stat) => (
-        <article className="distribution-card" key={stat.label}>
-          <div className="distribution-card-head">
-            <div>
-              <div className="muted">{stat.label}</div>
-              <div className="distribution-main">평균 {formatStat(stat.mean, stat.kind)}</div>
-            </div>
-            <span className={stat.skewness !== null && Math.abs(stat.skewness) > 1 ? 'pill warn' : 'pill'}>{skewLabel(stat.skewness)}</span>
-          </div>
-          <DistributionCurve stat={stat} />
-          <div>중앙값 {formatStat(stat.median, stat.kind)} · P25/P75 {formatStat(stat.p25, stat.kind)} / {formatStat(stat.p75, stat.kind)}</div>
-          <div className={stat.skewness !== null && Math.abs(stat.skewness) > 1 ? 'warn' : ''}>왜도 {formatNumber(stat.skewness, 2)} · 첨도 {formatNumber(stat.kurtosis, 2)} · 표준편차 {formatStat(stat.stdDev, stat.kind)}</div>
-        </article>
-      ))}
-    </div>
-  );
-}
-
-function DistributionCurve({ stat }: { stat: DistributionStat }) {
-  if (!stat.histogram.length || stat.min === null || stat.max === null || stat.max <= stat.min) {
-    return <div className="empty-chart small">표본 부족</div>;
-  }
-  const range = stat.max - stat.min;
-  const maxCount = Math.max(1, ...stat.histogram.map((bin) => bin.count));
-  const sd = stat.stdDev !== null && stat.stdDev > 0 ? stat.stdDev : range / 6;
-  const mu = stat.mean ?? (stat.min + stat.max) / 2;
-  const curvePoints = Array.from({ length: 58 }, (_, index) => {
-    const x = stat.min! + (range * index) / 57;
-    const density = Math.exp(-0.5 * ((x - mu) / sd) ** 2);
-    return { x: ((x - stat.min!) / range) * 100, y: 84 - density * 70 };
-  });
-  const path = curvePoints.map((point, index) => `${index === 0 ? 'M' : 'L'}${point.x.toFixed(2)},${point.y.toFixed(2)}`).join(' ');
-  const meanX = Math.max(0, Math.min(100, ((mu - stat.min) / range) * 100));
-  return (
-    <svg className="distribution-curve" viewBox="0 0 100 92" role="img" aria-label={`${stat.label} 평균·왜도·첨도 분포 곡선`}>
-      {stat.histogram.map((bin) => {
-        const x = ((bin.start - stat.min!) / range) * 100;
-        const w = Math.max(1.2, ((bin.end - bin.start) / range) * 100 - 0.45);
-        const h = (bin.count / maxCount) * 58;
-        return <rect key={`${bin.start}-${bin.end}`} x={x} y={84 - h} width={w} height={h} rx="1.4" />;
-      })}
-      <path d={path} />
-      <line x1={meanX} x2={meanX} y1="12" y2="86" />
-    </svg>
-  );
-}
-
-function Histogram({ bins }: { bins: HistogramBin[] }) {
-  const max = Math.max(1, ...bins.map((bin) => bin.count));
-  return (
-    <div className="histogram histogram-vertical" aria-label="현재 수익률 분포 히스토그램">
-      {bins.map((bin) => (
-        <div className="histogram-column" key={bin.label}>
-          <div className="histogram-track"><div style={{ height: `${(bin.count / max) * 100}%` }} /></div>
-          <strong>{bin.count}</strong>
-          <span>{bin.label}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-type DistributionStat = {
-  label: string;
-  kind: 'percent' | 'days';
-  mean: number | null;
-  median: number | null;
-  p25: number | null;
-  p75: number | null;
-  stdDev: number | null;
-  skewness: number | null;
-  kurtosis: number | null;
-  min: number | null;
-  max: number | null;
-  histogram: HistogramBin[];
-};
-type HistogramBin = { label: string; count: number; start: number; end: number };
 
 function summarizeHoldings(rows: HoldingRow[]) {
   const marketValue = rows.reduce((sum, row) => sum + (row.marketValueKrw ?? 0), 0);
@@ -325,156 +191,9 @@ function summarizeHoldings(rows: HoldingRow[]) {
   };
 }
 
-function buildReportStats(reports: ReportRow[]) {
-  const actionable = reports.filter((row) => (row.targetUpsideAtPub ?? 0) > 0 && row.entryPriceKrw !== null);
-  const currentReturns = actionable.map((row) => row.currentReturn).filter(isNumber);
-  const targetUpsides = actionable.map((row) => row.targetUpsideAtPub).filter(isNumber);
-  const daysToTarget = actionable.filter((row) => row.targetHit).map((row) => row.daysToTarget).filter(isNumber);
-  const peakReturns = actionable.map((row) => row.peakReturn).filter(isNumber);
-  const troughReturns = actionable.map((row) => row.troughReturn).filter(isNumber);
-  return {
-    count: actionable.length,
-    hitCount: actionable.filter((row) => row.targetHit).length,
-    hitRate: actionable.filter((row) => row.targetHit).length / Math.max(1, actionable.length),
-    distributions: [
-      distribution('현재 수익률', currentReturns, 'percent'),
-      distribution('제시 업사이드', targetUpsides, 'percent'),
-      distribution('목표 도달 소요', daysToTarget, 'days'),
-      distribution('발간 후 고점 수익률', peakReturns, 'percent'),
-      distribution('발간 후 저점 수익률', troughReturns, 'percent'),
-    ],
-    currentReturnHistogram: histogram(currentReturns, [-1, -0.75, -0.5, -0.25, -0.1, 0, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 3, 5, Number.POSITIVE_INFINITY]),
-  };
-}
-
-function buildReturnSeries(equity: ReturnType<typeof getEquityDaily>, personas: SummaryRow[]): ReturnSeries[] {
-  const labels = new Map(personas.map((row) => [row.persona, row.label ?? row.persona]));
-  return ['smic_follower_v2', 'smic_follower', 'all_weather'].map((persona) => ({
-    id: persona,
-    label: labels.get(persona) ?? persona,
-    color: STRATEGY_COLORS[persona] ?? '#cbd5e1',
-    points: equity.filter((point) => point.persona === persona && point.cumulativeReturn !== null).map((point) => ({ time: point.date, value: point.cumulativeReturn ?? 0 })),
-  }));
-}
-
-function distribution(label: string, values: number[], kind: 'percent' | 'days'): DistributionStat {
-  const sorted = [...values].sort((a, b) => a - b);
-  const min = sorted[0] ?? null;
-  const max = sorted.at(-1) ?? null;
-  return {
-    label,
-    kind,
-    mean: mean(sorted),
-    median: percentile(sorted, 0.5),
-    p25: percentile(sorted, 0.25),
-    p75: percentile(sorted, 0.75),
-    stdDev: stdDev(sorted),
-    skewness: skewness(sorted),
-    kurtosis: kurtosis(sorted),
-    min,
-    max,
-    histogram: autoHistogram(sorted, 16),
-  };
-}
-
-function histogram(values: number[], edges: number[]): HistogramBin[] {
-  return edges.slice(0, -1).map((start, index) => {
-    const end = edges[index + 1];
-    const count = values.filter((value) => value >= start && value < end).length;
-    return { label: formatHistogramLabel(start, end), count, start, end };
-  });
-}
-
-function autoHistogram(values: number[], targetBins: number): HistogramBin[] {
-  if (!values.length) return [];
-  const min = values[0];
-  const max = values.at(-1) ?? min;
-  if (min === max) return [{ label: formatHistogramEdge(min), count: values.length, start: min - 0.5, end: min + 0.5 }];
-  const step = (max - min) / targetBins;
-  return Array.from({ length: targetBins }, (_, index) => {
-    const start = min + step * index;
-    const end = index === targetBins - 1 ? max + Number.EPSILON : start + step;
-    const count = values.filter((value) => value >= start && value < end).length;
-    return { label: formatHistogramLabel(start, end), count, start, end };
-  });
-}
-
-function buildStrategyConclusion(v2: SummaryRow | undefined, benchmark: SummaryRow | undefined, v1: SummaryRow | undefined) {
-  const v2Return = v2?.moneyWeightedReturn ?? v2?.irr ?? null;
-  const benchmarkReturn = benchmark?.moneyWeightedReturn ?? benchmark?.irr ?? null;
-  const v1Return = v1?.moneyWeightedReturn ?? v1?.irr ?? null;
-  const beatsBenchmark = v2Return !== null && benchmarkReturn !== null && v2Return > benchmarkReturn;
-  const improvesV1 = v2Return !== null && v1Return !== null && v2Return > v1Return;
-  if (beatsBenchmark && improvesV1) {
-    return { tone: 'good', label: '검증 신호: 기준선과 v1을 모두 상회', detail: `v2 MWR ${formatPercent(v2Return)}가 all-weather ${formatPercent(benchmarkReturn)}와 v1 ${formatPercent(v1Return)}를 상회합니다. 다만 drawdown과 거래 비용을 함께 봐야 합니다.` };
-  }
-  if (beatsBenchmark) {
-    return { tone: 'warn', label: '부분 신호: 기준선은 상회하지만 개선 폭 제한', detail: `v2가 all-weather보다 높지만 v1 대비 개선은 뚜렷하지 않습니다. 손절 규칙이 수익보다 리스크 제어에 기여했는지 확인해야 합니다.` };
-  }
-  return { tone: 'bad', label: '주의: 기준선 대비 우위 부족', detail: `v2 MWR ${formatPercent(v2Return)}가 all-weather ${formatPercent(benchmarkReturn)}를 확실히 넘지 못합니다. 리포트 선택/청산 규칙의 재검토가 필요합니다.` };
-}
-
-function returnColor(value: number): string {
-  const capped = Math.max(-0.6, Math.min(0.8, value));
-  if (capped >= 0) {
-    const alpha = 0.18 + Math.min(capped / 0.8, 1) * 0.62;
-    return `linear-gradient(135deg, rgba(103, 232, 165, ${alpha}), rgba(53, 242, 194, ${Math.max(0.12, alpha - 0.14)}))`;
-  }
-  const alpha = 0.20 + Math.min(Math.abs(capped) / 0.6, 1) * 0.58;
-  return `linear-gradient(135deg, rgba(255, 111, 145, ${alpha}), rgba(138, 180, 255, ${Math.max(0.12, alpha - 0.2)}))`;
-}
-
-type TreemapRect = { row: HoldingRow; x: number; y: number; w: number; h: number; value: number };
-
-function buildTreemap(rows: HoldingRow[]): TreemapRect[] {
-  const items = rows
-    .map((row) => ({ row, value: Math.max(0, row.marketValueKrw ?? 0) }))
-    .filter((item) => item.value > 0)
-    .sort((a, b) => b.value - a.value);
-  const rects: TreemapRect[] = [];
-  layoutTreemap(items, 0, 0, 100, 100, rects);
-  return rects;
-}
-
-function layoutTreemap(
-  items: Array<{ row: HoldingRow; value: number }>,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  rects: TreemapRect[],
-) {
-  if (!items.length || w <= 0 || h <= 0) return;
-  if (items.length === 1) {
-    rects.push({ ...items[0], x, y, w, h });
-    return;
-  }
-  const total = items.reduce((sum, item) => sum + item.value, 0);
-  let running = 0;
-  let splitIndex = 0;
-  for (; splitIndex < items.length - 1; splitIndex += 1) {
-    if (running + items[splitIndex].value > total / 2 && splitIndex > 0) break;
-    running += items[splitIndex].value;
-  }
-  splitIndex = Math.min(splitIndex, items.length - 2);
-  const first = items.slice(0, splitIndex + 1);
-  const second = items.slice(splitIndex + 1);
-  const firstValue = first.reduce((sum, item) => sum + item.value, 0);
-  const ratio = firstValue / total;
-  if (w >= h) {
-    const firstW = w * ratio;
-    layoutTreemap(first, x, y, firstW, h, rects);
-    layoutTreemap(second, x + firstW, y, w - firstW, h, rects);
-  } else {
-    const firstH = h * ratio;
-    layoutTreemap(first, x, y, w, firstH, rects);
-    layoutTreemap(second, x, y + firstH, w, h - firstH, rects);
-  }
-}
-
-function positionReturn(entry: number | null, exit: number | null): number | null {
-  if (!entry || !exit || entry <= 0) return null;
-  return exit / entry - 1;
+function weight(row: HoldingRow, total: number): number | null {
+  if (!total) return null;
+  return (row.marketValueKrw ?? 0) / total;
 }
 
 function targetGap(current: number | null | undefined, target: number | null | undefined): number | null {
@@ -482,87 +201,53 @@ function targetGap(current: number | null | undefined, target: number | null | u
   return target / current - 1;
 }
 
-function getPersonaLabel(personas: SummaryRow[], persona: string) {
-  return personas.find((row) => row.persona === persona)?.label ?? persona;
+function targetUpsidePill(report: ReportRow) {
+  if ((report.targetUpsideAtPub ?? 0) <= 0) return <span className="report-card__pill skip">목표가 비실행</span>;
+  if (report.targetHit) return <span className="report-card__pill hit">목표 도달</span>;
+  return <span className="report-card__pill open">진행 중</span>;
 }
 
-function humanReason(reason: string): string {
-  if (reason.includes('target_hit')) return '목표가 도달';
-  if (reason.includes('stop')) return '손절/리스크 제한';
-  if (reason.includes('rebalance_buy')) return '리밸런싱 매수';
-  if (reason.includes('rebalance_sell')) return '리밸런싱 매도';
-  if (reason.includes('time')) return '시간 손절';
-  return reason.replace(/[()']/g, '') || '—';
+function sparkPoints(equity: ReturnType<typeof getEquityDaily>, persona: string): number[] {
+  const series = equity
+    .filter((point) => point.persona === persona && point.cumulativeReturn !== null)
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .map((point) => point.cumulativeReturn ?? 0);
+  return series.slice(-90);
 }
 
-function mean(values: number[]): number | null {
-  if (!values.length) return null;
-  return values.reduce((sum, value) => sum + value, 0) / values.length;
+function equityLatestDate(equity: ReturnType<typeof getEquityDaily>): string | null {
+  return equity.reduce<string | null>((latest, point) => (point.date > (latest ?? '') ? point.date : latest), null);
 }
 
-function percentile(values: number[], p: number): number | null {
-  if (!values.length) return null;
-  const index = (values.length - 1) * p;
-  const lower = Math.floor(index);
-  const upper = Math.ceil(index);
-  if (lower === upper) return values[lower];
-  return values[lower] + (values[upper] - values[lower]) * (index - lower);
-}
-
-function skewness(values: number[]): number | null {
-  if (values.length < 3) return null;
-  const avg = mean(values);
-  if (avg === null) return null;
-  const sd = stdDev(values);
-  if (!sd) return 0;
-  return values.reduce((sum, value) => sum + ((value - avg) / sd) ** 3, 0) / values.length;
-}
-
-function stdDev(values: number[]): number | null {
-  if (!values.length) return null;
-  const avg = mean(values);
-  if (avg === null) return null;
-  const variance = values.reduce((sum, value) => sum + (value - avg) ** 2, 0) / values.length;
-  return Math.sqrt(variance);
-}
-
-function kurtosis(values: number[]): number | null {
-  if (values.length < 4) return null;
-  const avg = mean(values);
-  const sd = stdDev(values);
-  if (avg === null || !sd) return 0;
-  return values.reduce((sum, value) => sum + ((value - avg) / sd) ** 4, 0) / values.length - 3;
-}
-
-function isNumber(value: number | null | undefined): value is number {
-  return value !== null && value !== undefined && Number.isFinite(value);
-}
-
-function skewLabel(value: number | null): string {
-  if (value === null) return '표본 부족';
-  if (value > 1) return '오른쪽 꼬리 큼';
-  if (value < -1) return '왼쪽 꼬리 큼';
-  if (value > 0.3) return '약한 오른쪽 왜도';
-  if (value < -0.3) return '약한 왼쪽 왜도';
-  return '대체로 대칭';
-}
-
-function formatStat(value: number | null, kind: 'percent' | 'days') {
-  return kind === 'percent' ? formatPercent(value) : formatDays(value);
-}
-
-function formatNumber(value: number | null, digits: number) {
-  if (value === null || !Number.isFinite(value)) return '—';
-  return value.toLocaleString('ko-KR', { maximumFractionDigits: digits, minimumFractionDigits: digits });
-}
-
-function formatHistogramEdge(value: number) {
-  if (value === Number.POSITIVE_INFINITY) return '∞';
-  return `${Math.round(value * 100)}%`;
-}
-
-function formatHistogramLabel(start: number, end: number) {
-  if (start <= -1) return `≤${formatHistogramEdge(end)}`;
-  if (end === Number.POSITIVE_INFINITY) return `≥${formatHistogramEdge(start)}`;
-  return `${formatHistogramEdge(start)}~${formatHistogramEdge(end)}`;
+function strategyVerdict(personas: SummaryRow[]) {
+  const v2 = personas.find((row) => row.persona === 'smic_follower_v2');
+  const v1 = personas.find((row) => row.persona === 'smic_follower');
+  const aw = personas.find((row) => row.persona === 'all_weather');
+  const v2Return = v2?.moneyWeightedReturn ?? v2?.irr ?? null;
+  const awReturn = aw?.moneyWeightedReturn ?? aw?.irr ?? null;
+  const v1Return = v1?.moneyWeightedReturn ?? v1?.irr ?? null;
+  const beatsAw = v2Return !== null && awReturn !== null && v2Return > awReturn;
+  const beatsV1 = v2Return !== null && v1Return !== null && v2Return > v1Return;
+  if (beatsAw && beatsV1) {
+    return {
+      tone: 'good' as const,
+      headline: '검증 신호',
+      summary: 'v2는 기준선과 v1을 모두 이깁니다.',
+      detail: `v2 MWR ${formatPercent(v2Return)}가 all-weather ${formatPercent(awReturn)}, v1 ${formatPercent(v1Return)}를 모두 상회합니다. 다만 거래 비용과 낙폭을 함께 검토해야 합니다.`,
+    };
+  }
+  if (beatsAw) {
+    return {
+      tone: 'warn' as const,
+      headline: '부분 신호',
+      summary: '기준선은 이기지만 개선 폭은 제한적.',
+      detail: `v2가 all-weather ${formatPercent(awReturn)}는 넘지만 v1 대비 개선이 뚜렷하지 않습니다. 손절 규칙이 수익보다 위험 통제에 기여했는지 확인이 필요합니다.`,
+    };
+  }
+  return {
+    tone: 'bad' as const,
+    headline: '재검토 필요',
+    summary: '기준선 대비 우위 부족.',
+    detail: `v2 MWR ${formatPercent(v2Return)}가 all-weather ${formatPercent(awReturn)}를 확실히 넘지 못합니다. 리포트 선택 기준과 청산 규칙을 다시 보아야 합니다.`,
+  };
 }
