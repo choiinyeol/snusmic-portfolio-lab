@@ -19,6 +19,8 @@ export type ReportRow = {
   pdfFilename: string;
   pdfUrl: string;
   currency: string;
+  displayCurrency: string;
+  targetDirection: 'upside' | 'downside' | null;
   entryPriceKrw: number | null;
   entryPriceNative: number | null;
   targetPriceKrw: number | null;
@@ -341,6 +343,10 @@ function strOrNull(value: unknown): string | null {
   return String(value);
 }
 
+function targetDirection(value: unknown): 'upside' | 'downside' | null {
+  return value === 'upside' || value === 'downside' ? value : null;
+}
+
 function positivePrice(value: unknown): number | undefined {
   const parsed = num(value);
   if (parsed === null || parsed <= 0) return undefined;
@@ -372,6 +378,8 @@ function fromRawReport(row: RawReport): ReportRow {
     pdfFilename: String(row.pdf_filename ?? row.pdfFilename ?? ''),
     pdfUrl: String(row.pdf_url ?? row.pdfUrl ?? ''),
     currency: String(row.currency ?? row.price_currency ?? 'KRW') || 'KRW',
+    displayCurrency: String(row.display_currency ?? row.displayCurrency ?? row.currency ?? row.price_currency ?? 'KRW') || 'KRW',
+    targetDirection: targetDirection(row.target_direction ?? row.targetDirection),
     entryPriceKrw: num(row.entry_price_krw ?? row.publication_price_krw ?? row.entryPriceKrw),
     entryPriceNative: num(row.entry_price_native ?? row.entry_price ?? row.report_current_price ?? row.entryPriceNative),
     targetPriceKrw: num(row.target_price_krw ?? row.targetPriceKrw),

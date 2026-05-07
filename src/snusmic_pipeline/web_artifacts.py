@@ -444,6 +444,37 @@ def _bool(value: Any) -> bool | None:
     return None
 
 
+def _target_direction(target: float | None, entry: float | None) -> str | None:
+    if target is None or entry is None or entry <= 0:
+        return None
+    if target > entry:
+        return "upside"
+    if target < entry:
+        return "downside"
+    return None
+
+
+def _infer_native_entry_from_target(
+    target_price_native: float | None,
+    target_upside_at_pub: float | None,
+) -> float | None:
+    """Infer native entry from target/upside when extraction missed it.
+
+    ``report_performance.csv`` is KRW-oriented, while the web report artifact is
+    the display SSOT. For overseas reports, the frontend should not have to
+    guess a native entry price from the target. When the extracted target is
+    native and the realised upside is available, target / (1 + upside) is the
+    same deterministic relationship used by the simulation for KRW values.
+    """
+
+    if target_price_native is None or target_upside_at_pub is None:
+        return None
+    divisor = 1.0 + target_upside_at_pub
+    if divisor <= 0:
+        return None
+    return target_price_native / divisor
+
+
 def _build_report_rows(
     reports: pd.DataFrame,
     report_performance: pd.DataFrame,
@@ -494,8 +525,15 @@ def _build_report_rows(
         ):
             caveats.append("price_scale_adjusted_target")
         target_upside_at_pub = _number(perf.get("target_upside_at_pub"))
+        if price_currency == "KRW":
+            entry_price_native = entry_price_krw or _number(row.get("report_current_price_krw"))
+        elif entry_price_native is None:
+            entry_price_native = _infer_native_entry_from_target(target_price_native, target_upside_at_pub)
+            if entry_price_native is not None:
+                caveats.append("entry_price_native_inferred")
         if target_upside_at_pub is not None and target_upside_at_pub <= 0:
             caveats.append("target_below_entry_price")
+        target_direction = _target_direction(target_price_native, entry_price_native)
         rows.append(
             {
                 "report_id": report_id,
@@ -512,8 +550,10 @@ def _build_report_rows(
                 "target_price_krw": target_price_krw,
                 "target_price_native": target_price_native,
                 "currency": price_currency,
+                "display_currency": price_currency,
                 "price_currency": price_currency,
                 "target_currency": target_currency,
+                "target_direction": target_direction,
                 "publication_price_krw": _number(row.get("report_current_price_krw")),
                 "entry_price_krw": entry_price_krw,
                 "entry_price_native": entry_price_native,
@@ -954,8 +994,13 @@ def _write_download_csvs(out: Path, report_rows: list[dict[str, Any]], data_qual
         "title",
         "rating",
         "target_price_krw",
+        "target_price_native",
+        "currency",
+        "display_currency",
+        "target_direction",
         "publication_price_krw",
         "entry_price_krw",
+        "entry_price_native",
         "target_upside_at_pub",
         "target_hit",
         "target_hit_date",
