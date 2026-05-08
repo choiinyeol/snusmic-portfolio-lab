@@ -103,10 +103,19 @@ export function ReportsTable({ reports }: ReportsTableProps) {
       },
       {
         accessorKey: 'currentReturn',
-        header: '현재 수익률',
-        cell: ({ getValue }) => {
-          const value = getValue<number | null>();
-          return <span className={(value ?? 0) >= 0 ? 'good' : 'bad'}>{formatPercent(value)}</span>;
+        header: () => <span title="만료 행은 만료일 종가 기준 최종 수익률입니다.">현재 수익률</span>,
+        cell: ({ row }) => {
+          const value = row.original.currentReturn;
+          const className = (value ?? 0) >= 0 ? 'good' : 'bad';
+          if (row.original.expired) {
+            return (
+              <span className={className} title={`만료(${row.original.expiryDate ?? ''}) 종가 기준 최종 수익률`}>
+                {formatPercent(value)}
+                <span className="ml-1 text-xs text-base-content/55">(최종)</span>
+              </span>
+            );
+          }
+          return <span className={className}>{formatPercent(value)}</span>;
         },
       },
       {
@@ -160,7 +169,7 @@ export function ReportsTable({ reports }: ReportsTableProps) {
       },
       {
         accessorKey: 'lastCloseDate',
-        header: '최근 가격일',
+        header: () => <span title="만료 행은 만료일 = 최근 가격일">최근 가격일</span>,
       },
     ],
     [],

@@ -185,11 +185,25 @@ def _dispatch(
         )
     if isinstance(persona, SmicFollowerConfig):
         return simulate_smic_follower(
-            persona, config.savings_plan, config.fees, board, reports, cashflows, trading_dates
+            persona,
+            config.savings_plan,
+            config.fees,
+            board,
+            reports,
+            cashflows,
+            trading_dates,
+            expiry_days=config.report_expiry_days,
         )
     if isinstance(persona, SmicFollowerV2Config):
         return simulate_smic_follower_v2(
-            persona, config.savings_plan, config.fees, board, reports, cashflows, trading_dates
+            persona,
+            config.savings_plan,
+            config.fees,
+            board,
+            reports,
+            cashflows,
+            trading_dates,
+            expiry_days=config.report_expiry_days,
         )
     if isinstance(persona, AllWeatherConfig):
         if benchmark_board is None or benchmark_board.is_empty:

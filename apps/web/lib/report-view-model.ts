@@ -173,13 +173,6 @@ export function buildTrendSnapshot(prices: PricePoint[], report: ReportRow): Tre
   };
 }
 
-export function oneYearBefore(date: string): string {
-  const [year, month, day] = date.split('-').map(Number);
-  if (!year || !month || !day) return date;
-  const value = new Date(Date.UTC(year - 1, month - 1, day));
-  return value.toISOString().slice(0, 10);
-}
-
 export function buildKoreanInvestmentMemo(report: ReportRow): KoreanInvestmentMemo {
   const targetSentence =
     report.targetDirection === 'downside'
