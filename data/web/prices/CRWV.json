@@ -3608,9 +3608,9 @@
       "currency": "USD",
       "date": "2026-05-06",
       "display_currency": "USD",
-      "high": 138.24999999999997,
+      "high": 138.24999999999994,
       "krw_per_unit": 1473.9599609375,
-      "low": 130.41000366210938,
+      "low": 130.4100036621094,
       "open": 131.0749969482422,
       "source_currency": "USD",
       "volume": 31649536.0
@@ -3621,12 +3621,12 @@
       "currency": "USD",
       "date": "2026-05-07",
       "display_currency": "USD",
-      "high": 133.58900451660156,
+      "high": 133.58889770507812,
       "krw_per_unit": 1444.449951171875,
       "low": 125.4300003051758,
-      "open": 132.05499267578128,
+      "open": 132.05499267578122,
       "source_currency": "USD",
-      "volume": 39914600.0
+      "volume": 37359032.0
     }
   ],
   "symbol": "CRWV"

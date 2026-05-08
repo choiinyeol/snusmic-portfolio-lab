@@ -25346,10 +25346,10 @@
       "display_currency": "USD",
       "high": 54.0,
       "krw_per_unit": 1444.449951171875,
-      "low": 52.5,
+      "low": 52.500099182128906,
       "open": 53.54999923706055,
       "source_currency": "USD",
-      "volume": 28677700.0
+      "volume": 21204905.0
     }
   ],
   "symbol": "BAC"

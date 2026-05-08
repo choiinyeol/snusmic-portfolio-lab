@@ -25344,12 +25344,12 @@
       "currency": "USD",
       "date": "2026-05-07",
       "display_currency": "USD",
-      "high": 55.220001220703125,
+      "high": 55.21500015258789,
       "krw_per_unit": 1444.449951171875,
-      "low": 53.25,
+      "low": 53.250701904296875,
       "open": 54.349998474121094,
       "source_currency": "USD",
-      "volume": 1834600.0
+      "volume": 1834296.0
     }
   ],
   "symbol": "GLNG"

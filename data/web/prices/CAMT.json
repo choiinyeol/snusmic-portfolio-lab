@@ -25333,7 +25333,7 @@
       "display_currency": "USD",
       "high": 205.22000122070312,
       "krw_per_unit": 1473.9599609375,
-      "low": 198.30499267578125,
+      "low": 198.30499267578122,
       "open": 203.75,
       "source_currency": "USD",
       "volume": 258302.0
@@ -25346,10 +25346,10 @@
       "display_currency": "USD",
       "high": 201.2100067138672,
       "krw_per_unit": 1444.449951171875,
-      "low": 188.94000244140625,
-      "open": 199.89999389648438,
+      "low": 188.93499755859375,
+      "open": 200.16000366210938,
       "source_currency": "USD",
-      "volume": 227800.0
+      "volume": 224901.0
     }
   ],
   "symbol": "CAMT"

@@ -25344,12 +25344,12 @@
       "currency": "USD",
       "date": "2026-05-07",
       "display_currency": "USD",
-      "high": 918.02001953125,
+      "high": 916.02001953125,
       "krw_per_unit": 1444.449951171875,
       "low": 854.6199951171875,
-      "open": 915.9749755859375,
+      "open": 914.6599731445314,
       "source_currency": "USD",
-      "volume": 7250500.0
+      "volume": 7204581.0
     }
   ],
   "symbol": "LITE"

@@ -15165,12 +15165,12 @@
       "currency": "USD",
       "date": "2026-05-07",
       "display_currency": "USD",
-      "high": 14.439999580383299,
+      "high": 14.439900398254395,
       "krw_per_unit": 1444.449951171875,
       "low": 13.420000076293945,
       "open": 14.050000190734863,
       "source_currency": "USD",
-      "volume": 2772800.0
+      "volume": 2736795.0
     }
   ],
   "symbol": "SRAD"

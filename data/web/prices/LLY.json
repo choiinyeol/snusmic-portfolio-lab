@@ -25344,12 +25344,12 @@
       "currency": "USD",
       "date": "2026-05-07",
       "display_currency": "USD",
-      "high": 989.0,
+      "high": 988.760009765625,
       "krw_per_unit": 1444.449951171875,
       "low": 967.0999755859375,
       "open": 985.3699951171875,
       "source_currency": "USD",
-      "volume": 3492600.0
+      "volume": 1904196.0
     }
   ],
   "symbol": "LLY"
