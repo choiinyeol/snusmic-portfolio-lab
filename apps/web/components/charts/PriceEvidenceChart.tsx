@@ -119,6 +119,8 @@ export function PriceEvidenceChart({
   const measureModeRef = useRef(false);
   const dragStartRef = useRef<{ time: string; x: number; price: number } | null>(null);
   const chartApiRef = useRef<IChartApi | null>(null);
+  const timeScaleRef = useRef<ITimeScaleApi<Time> | null>(null);
+  const overlayRef = useRef<HTMLDivElement | null>(null);
   measureModeRef.current = measureMode;
   const chartMarkers = useMemo(
     () => buildMarkers(publicationDate, targetHitDate, evidenceMarkers),
@@ -353,58 +355,13 @@ export function PriceEvidenceChart({
     // scroll/scale handlers wholesale so the drag can't race with internal
     // panning logic — releasing the toggle restores normal pan/zoom.
     chartApiRef.current = chart;
-    const chartEl = chart.chartElement();
-    const xFromEvent = (event: PointerEvent): number => {
-      const rect = container.getBoundingClientRect();
-      return event.clientX - rect.left;
-    };
-    const handlePointerDown = (event: PointerEvent) => {
-      if (!measureModeRef.current) return;
-      const x = xFromEvent(event);
-      const time = timeScale.coordinateToTime(x);
-      if (time === null) return;
-      const timeStr = String(time);
-      const point = priceByTime.get(timeStr);
-      if (!point) return;
-      event.preventDefault();
-      dragStartRef.current = { time: timeStr, x, price: point.close ?? point.value };
-      setDrag(null);
-      chartEl.setPointerCapture?.(event.pointerId);
-    };
-    const handlePointerMove = (event: PointerEvent) => {
-      if (!dragStartRef.current) return;
-      const x = xFromEvent(event);
-      const time = timeScale.coordinateToTime(x);
-      if (time === null) return;
-      const timeStr = String(time);
-      const point = priceByTime.get(timeStr);
-      if (!point) return;
-      const start = dragStartRef.current;
-      if (Math.abs(x - start.x) < 2) return;
-      const fromX = Math.min(start.x, x);
-      const toX = Math.max(start.x, x);
-      const fromTime = start.x <= x ? start.time : timeStr;
-      const toTime = start.x <= x ? timeStr : start.time;
-      const fromPrice = priceByTime.get(fromTime)?.close ?? priceByTime.get(fromTime)?.value ?? start.price;
-      const toPrice = priceByTime.get(toTime)?.close ?? priceByTime.get(toTime)?.value ?? point.close ?? point.value;
-      setDrag({ fromTime, toTime, fromPrice, toPrice, fromX, toX });
-    };
-    const finishDrag = () => {
-      dragStartRef.current = null;
-    };
-    chartEl.addEventListener('pointerdown', handlePointerDown);
-    chartEl.addEventListener('pointermove', handlePointerMove);
-    chartEl.addEventListener('pointerup', finishDrag);
-    chartEl.addEventListener('pointercancel', finishDrag);
+    timeScaleRef.current = timeScale;
 
     return () => {
       chart.unsubscribeCrosshairMove(handleCrosshairMove);
       timeScale.unsubscribeVisibleTimeRangeChange(updateVerticalLines);
-      chartEl.removeEventListener('pointerdown', handlePointerDown);
-      chartEl.removeEventListener('pointermove', handlePointerMove);
-      chartEl.removeEventListener('pointerup', finishDrag);
-      chartEl.removeEventListener('pointercancel', finishDrag);
       chartApiRef.current = null;
+      timeScaleRef.current = null;
       chart.remove();
     };
   }, [
@@ -431,14 +388,65 @@ export function PriceEvidenceChart({
   }
   // Measurement mode wholesale flips off the chart's pan/zoom handlers so
   // the drag-to-measure overlay can't fight the library for the gesture.
-  // Effect runs when the toggle changes; cleanup leaves the chart in
-  // pan-enabled state.
   useEffect(() => {
     const chart = chartApiRef.current;
     if (!chart) return;
     chart.applyOptions({ handleScroll: !measureMode, handleScale: !measureMode });
-    if (!measureMode) dragStartRef.current = null;
+    if (!measureMode) {
+      dragStartRef.current = null;
+      setDrag(null);
+    }
   }, [measureMode]);
+
+  // Drag-to-measure handlers attached to a transparent overlay div that
+  // covers the chart canvas only while measureMode is on. Pointer events go
+  // straight to the overlay and never reach lightweight-charts' canvas, so
+  // there's no race with the library's internal handlers.
+  const handleOverlayPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    const timeScale = timeScaleRef.current;
+    if (!timeScale) return;
+    const overlay = overlayRef.current;
+    if (!overlay) return;
+    const rect = overlay.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const time = timeScale.coordinateToTime(x);
+    if (time === null) return;
+    const timeStr = String(time);
+    const point = priceByTime.get(timeStr);
+    if (!point) return;
+    event.preventDefault();
+    dragStartRef.current = { time: timeStr, x, price: point.close ?? point.value };
+    setDrag(null);
+    overlay.setPointerCapture(event.pointerId);
+  };
+
+  const handleOverlayPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragStartRef.current) return;
+    const timeScale = timeScaleRef.current;
+    if (!timeScale) return;
+    const overlay = overlayRef.current;
+    if (!overlay) return;
+    const rect = overlay.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const time = timeScale.coordinateToTime(x);
+    if (time === null) return;
+    const timeStr = String(time);
+    const point = priceByTime.get(timeStr);
+    if (!point) return;
+    const start = dragStartRef.current;
+    if (Math.abs(x - start.x) < 2) return;
+    const fromX = Math.min(start.x, x);
+    const toX = Math.max(start.x, x);
+    const fromTime = start.x <= x ? start.time : timeStr;
+    const toTime = start.x <= x ? timeStr : start.time;
+    const fromPrice = priceByTime.get(fromTime)?.close ?? priceByTime.get(fromTime)?.value ?? start.price;
+    const toPrice = priceByTime.get(toTime)?.close ?? priceByTime.get(toTime)?.value ?? point.close ?? point.value;
+    setDrag({ fromTime, toTime, fromPrice, toPrice, fromX, toX });
+  };
+
+  const handleOverlayPointerUp = () => {
+    dragStartRef.current = null;
+  };
 
   const dragReturnPct = drag && drag.fromPrice ? drag.toPrice / drag.fromPrice - 1 : null;
   return (
@@ -449,6 +457,17 @@ export function PriceEvidenceChart({
         className="chart-box chart-box-fixed relative"
         aria-label="목표가 기준선, OHLC 캔들, 거래량, 발간·만료·목표도달·고점·저점 마커가 포함된 가격 경로"
       />
+      {measureMode ? (
+        <div
+          ref={overlayRef}
+          className="absolute inset-0 z-10 cursor-crosshair touch-none select-none"
+          onPointerDown={handleOverlayPointerDown}
+          onPointerMove={handleOverlayPointerMove}
+          onPointerUp={handleOverlayPointerUp}
+          onPointerCancel={handleOverlayPointerUp}
+          role="presentation"
+        />
+      ) : null}
       {verticalLines.pub !== null ? (
         <VerticalLine x={verticalLines.pub} color="#f29423" label="발간" position="top" />
       ) : null}
