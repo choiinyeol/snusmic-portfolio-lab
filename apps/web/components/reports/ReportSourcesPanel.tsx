@@ -2,7 +2,6 @@ import type { ReportRow } from '@/lib/artifacts';
 import type { KoreanInvestmentMemo } from '@/lib/report-view-model';
 
 type Props = {
-  report: ReportRow;
   siblingReports: ReportRow[];
   memo: KoreanInvestmentMemo;
   snippet: string;
@@ -10,7 +9,7 @@ type Props = {
   pdfHref: string | null;
 };
 
-export function ReportSourcesPanel({ report, siblingReports, memo, snippet, markdownHref, pdfHref }: Props) {
+export function ReportSourcesPanel({ siblingReports, memo, snippet, markdownHref, pdfHref }: Props) {
   return (
     <>
       <div className="grid two-col">
@@ -51,7 +50,6 @@ export function ReportSourcesPanel({ report, siblingReports, memo, snippet, mark
           <ul>
             <li><a href={markdownHref}>GitHub Markdown</a></li>
             {pdfHref ? <li><a href={pdfHref}>GitHub PDF</a></li> : null}
-            {report.pdfUrl ? <li><a href={report.pdfUrl}>SMIC 원본 PDF</a></li> : null}
           </ul>
         </article>
       </div>

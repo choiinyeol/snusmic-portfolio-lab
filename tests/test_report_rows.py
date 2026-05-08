@@ -52,3 +52,7 @@ def test_report_rows_are_local_archive_rows_without_sheet_formulas():
         "비고",
     ]
     assert all(not str(cell).startswith("=") for row in rows for cell in row)
+    assert rows[1][8] == (
+        "https://raw.githubusercontent.com/ChoiInYeol/snusmic-quant-terminal/main/data/pdfs/sample.pdf"
+    )
+    assert "snusmic.com" not in ",".join(str(cell) for cell in rows[1])

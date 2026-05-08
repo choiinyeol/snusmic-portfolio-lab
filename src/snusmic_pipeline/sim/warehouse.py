@@ -31,6 +31,7 @@ from ..currency import (
     download_fx_rates,
     normalize_currency,
 )
+from ..github_urls import github_pdf_url
 from .schemas import TABLE_DTYPES, TABLE_MODELS
 
 WAREHOUSE_TABLES = ["reports", "fx_rates", "daily_prices"]
@@ -354,7 +355,7 @@ def read_reports(data_dir: Path) -> pd.DataFrame:
                     "exchange": exchange,
                     "symbol": symbol,
                     "pdf_filename": row.get("PDF 파일명", ""),
-                    "pdf_url": row.get("PDF URL", ""),
+                    "pdf_url": github_pdf_url(row.get("PDF 파일명", "")),
                     "report_current_price": _float_or_none(row.get("리포트 현재주가")),
                     "bear_target": _float_or_none(row.get("Bear 목표가")),
                     "base_target": _float_or_none(row.get("Base 목표가")),

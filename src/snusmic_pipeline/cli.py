@@ -15,6 +15,7 @@ from .download_pdfs import download_all
 from .extract_pdf import extract_report, extract_text_from_pdf, parse_report_text
 from .extraction_quality import analyze_extraction_quality
 from .fetch_index import fetch_reports, parse_pages
+from .github_urls import github_pdf_url
 from .markdown_export import export_markdown
 from .models import DownloadedPdf, ExtractedReport, ReportMeta
 from .opendataloader_fallback import OpenDataLoaderUnavailable, convert_pdfs_to_markdown
@@ -122,7 +123,7 @@ def build_report_rows(reports: list[ExtractedReport]) -> list[list[Any]]:
                 report.ticker,
                 report.exchange,
                 report.rating,
-                report.meta.pdf_url,
+                github_pdf_url(report.pdf_filename),
                 report.pdf_filename,
                 _number_or_blank(report.report_current_price),
                 _number_or_blank(report.bear_target),
