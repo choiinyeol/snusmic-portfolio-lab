@@ -256,3 +256,39 @@ def test_reports_download_csv_carries_display_price_ssot_fields(tmp_path: Path) 
     assert "entry_price_native" in header
     assert "target_price_native" in header
     assert "target_direction" in header
+
+
+def test_reports_artifact_freezes_expired_report_at_pub_plus_730d(tmp_path: Path) -> None:
+    """A report past its 730-day window must be flagged expired and have its
+    current_return frozen at the close on (or just before) expiry — not today.
+    Fixture: 노바텍 (285490.KQ), pub 2021-01-16 → expiry 2023-01-16."""
+    out = tmp_path / "web"
+    export_web_artifacts(
+        ExportInputs(
+            warehouse=Path("data/warehouse"),
+            sim=Path("data/sim"),
+            out=out,
+            extraction_quality=Path("data/extraction_quality.json"),
+        )
+    )
+
+    reports = json.loads((out / "reports.json").read_text(encoding="utf-8"))
+    novatek = next(row for row in reports if row["symbol"] == "285490.KQ")
+    assert novatek["expired"] is True
+    assert novatek["expiry_date"] == "2023-01-16"
+    assert novatek["target_hit"] is False
+    # last_close_date is capped at expiry_date (or the prior trading day if
+    # the expiry itself was a holiday). In either case, it must not extend
+    # past expiry — that would mean the freeze contract is broken.
+    assert novatek["last_close_date"] is not None
+    assert novatek["last_close_date"] <= "2023-01-16"
+    # Frozen current_return should be deterministic (driven by sim CSV) and
+    # bounded — sanity-check it lives in the negative half-plane (the report
+    # underperformed) and is the same value re-exposed via current_return.
+    assert novatek["current_return"] is not None
+    assert novatek["current_return"] < 0
+    expected = (
+        novatek["last_close_krw"] / novatek["entry_price_krw"] - 1 if novatek["entry_price_krw"] else None
+    )
+    assert expected is not None
+    assert novatek["current_return"] == pytest.approx(expected, abs=0.01)
