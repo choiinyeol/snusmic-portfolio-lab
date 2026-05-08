@@ -18,7 +18,7 @@ const NAV = [
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ko" data-scroll-behavior="smooth">
+    <html lang="ko" data-theme="corporate" data-scroll-behavior="smooth">
       <head>
         <link
           rel="stylesheet"
