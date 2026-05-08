@@ -1,6 +1,41 @@
 @import "tailwindcss";
 @plugin "daisyui" {
-  themes: corporate --default, business --prefersdark;
+  themes: snusmic --default, business --prefersdark;
+  logs: false;
+}
+@plugin "daisyui/theme" {
+  name: "snusmic";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+  --color-base-100: #ffffff;
+  --color-base-200: #f4f6f9;
+  --color-base-300: #e5e7eb;
+  --color-base-content: #191f28;
+  --color-primary: #1b64da;
+  --color-primary-content: #ffffff;
+  --color-secondary: #00a99a;
+  --color-secondary-content: #ffffff;
+  --color-accent: #7d6bff;
+  --color-accent-content: #ffffff;
+  --color-neutral: #333d4b;
+  --color-neutral-content: #ffffff;
+  --color-info: #3182f6;
+  --color-info-content: #ffffff;
+  --color-success: #16a368;
+  --color-success-content: #ffffff;
+  --color-warning: #f29423;
+  --color-warning-content: #1f2937;
+  --color-error: #ef4452;
+  --color-error-content: #ffffff;
+  --radius-selector: 999rem;
+  --radius-field: 999rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
 }
 
 /* ───────────────────────────────────────────────────────────────────────
@@ -145,26 +180,45 @@ code, pre { font-family: var(--mono); }
   letter-spacing: .14em;
   text-transform: uppercase;
 }
-.nav { display: flex; flex-wrap: wrap; gap: .15rem; color: var(--muted); font-size: .9rem; }
+.nav {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: 100%;
+  gap: .35rem;
+  color: var(--muted);
+  font-size: .82rem;
+}
 .nav__item {
   display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
   flex-direction: column;
   text-decoration: none;
-  padding: .5rem .9rem .55rem;
+  padding: .45rem .5rem;
   border-radius: 14px;
   border: 1px solid transparent;
   line-height: 1.15;
+  text-align: center;
   transition: background-color .18s ease, color .18s ease, border-color .18s ease;
 }
-.nav__label { color: var(--ink); font-weight: 700; font-size: .92rem; letter-spacing: -.015em; }
-.nav__kicker {
-  margin-top: .1rem;
-  color: var(--faint);
-  font-family: var(--mono);
-  font-size: .62rem;
-  font-weight: 600;
-  letter-spacing: .1em;
-  text-transform: uppercase;
+.nav__label { color: var(--ink); font-weight: 700; font-size: .82rem; letter-spacing: -.015em; }
+.nav__kicker { display: none; }
+@media (min-width: 1024px) {
+  .topbar { flex-wrap: nowrap; }
+  .nav { display: flex; flex-wrap: wrap; width: auto; gap: .15rem; font-size: .9rem; }
+  .nav__item { align-items: flex-start; justify-content: center; padding: .5rem .9rem .55rem; text-align: left; }
+  .nav__label { font-size: .92rem; }
+  .nav__kicker {
+    display: block;
+    margin-top: .1rem;
+    color: var(--faint);
+    font-family: var(--mono);
+    font-size: .62rem;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
 }
 .nav__item:hover {
   background: var(--accent-soft);
@@ -216,7 +270,6 @@ ul, ol { color: var(--muted); line-height: 1.7; }
 /* ─────────────────────  Hero / terminal-frame  ─────────────────────
    The "terminal-frame" naming is preserved so existing pages keep
    working, but it's now a soft, breathable hero card. */
-.hero { display: grid; gap: .75rem; margin-bottom: 1rem; }
 .terminal-frame {
   position: relative;
   overflow: hidden;
@@ -237,20 +290,21 @@ ul, ol { color: var(--muted); line-height: 1.7; }
 .hero-copy p { margin: 0; color: var(--muted); font-size: clamp(.95rem, 1.1vw, 1.05rem); }
 .action-row { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; margin-top: .35rem; }
 
-/* ─────────────────────  Grids  ───────────────────── */
-.grid { display: grid; gap: 1rem; }
-.cards { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+/* ─────────────────────  Grids  ─────────────────────
+   Do not redefine Tailwind's .grid utility. Legacy layout helper classes
+   only add templates/gaps so Tailwind gap-* classes keep working. */
+.cards { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; }
 .bento-metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .bento-metrics > :first-child { grid-column: span 2; }
 .feature-grid > .panel:first-child { min-height: 240px; }
 .feature-grid > .panel:last-child { border-color: var(--accent-2-soft); }
-.two-col { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.dashboard-hero-grid { grid-template-columns: minmax(0, 1.45fr) minmax(320px, .75fr); }
-.dashboard-stats-grid { grid-template-columns: minmax(0, 1.25fr) minmax(360px, .75fr); }
+.two-col { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.dashboard-hero-grid { grid-template-columns: minmax(0, 1.45fr) minmax(320px, .75fr); gap: 1rem; }
+.dashboard-stats-grid { grid-template-columns: minmax(0, 1.25fr) minmax(360px, .75fr); gap: 1rem; }
 .dashboard-main-panel { min-height: 520px; }
 
 /* ─────────────────────  Card & panel  ───────────────────── */
-.card,
+.legacy-card,
 .panel {
   position: relative;
   overflow: hidden;
@@ -382,6 +436,8 @@ ul, ol { color: var(--muted); line-height: 1.7; }
 /* ─────────────────────  Tables  ───────────────────── */
 .dense-panel { margin-top: 1rem; }
 .table-wrap {
+  max-width: 100%;
+  min-width: 0;
   overflow-x: auto;
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -1127,20 +1183,12 @@ table tbody tr td:last-child { padding-right: 1rem; }
    ─────────────────────────────────────────────────────────────────── */
 .kpi-tile {
   position: relative;
-  padding: var(--space-4);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  display: grid;
-  gap: .35rem;
-  align-content: space-between;
-  min-height: 122px;
+  min-width: 0;
+  overflow: hidden;
   transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 .kpi-tile:hover { transform: translateY(-1px); box-shadow: var(--shadow); border-color: var(--line-strong); }
 .kpi-tile--emphasis {
-  min-height: 168px;
-  padding: var(--space-5);
   background:
     radial-gradient(420px 180px at 100% 0%, rgba(49, 130, 246, .10), transparent 60%),
     var(--surface);

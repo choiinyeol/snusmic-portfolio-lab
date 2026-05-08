@@ -13,7 +13,7 @@ import {
 } from '@tanstack/react-table';
 import { useMemo, useState } from 'react';
 import type { ReportRow } from '@/lib/artifacts';
-import { formatDays, formatKrw, formatPercent } from '@/lib/format';
+import { formatDays, formatNative, formatPercent } from '@/lib/format';
 
 type HitFilter = 'all' | 'hit' | 'open';
 type ReturnFilter = 'all' | 'positive' | 'negative';
@@ -31,10 +31,10 @@ const csvHeaders: Array<[string, (report: ReportRow) => string | number | boolea
   ['게시일', (report) => report.publicationDate],
   ['통화', (report) => report.currency],
   ['표시통화', (report) => report.displayCurrency],
-  ['진입가(KRW)', (report) => report.entryPriceKrw],
   ['진입가(표시통화)', (report) => report.entryPriceNative],
-  ['목표가(KRW)', (report) => report.targetPriceKrw],
   ['목표가(표시통화)', (report) => report.targetPriceNative],
+  ['진입가(KRW 환산)', (report) => report.entryPriceKrw],
+  ['목표가(KRW 환산)', (report) => report.targetPriceKrw],
   ['목표 방향', (report) => report.targetDirection],
   ['제시 상승여력', (report) => report.targetUpsideAtPub],
   ['현재 수익률', (report) => report.currentReturn],
@@ -75,18 +75,18 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         id: 'marketRegion',
         header: '시장',
         accessorFn: (report) => marketLabel(marketRegionForSymbol(report.symbol, report.exchange)),
-        cell: ({ row }) => <span className="pill">{marketLabel(marketRegionForSymbol(row.original.symbol, row.original.exchange))}</span>,
+        cell: ({ row }) => <span className="badge badge-ghost badge-sm">{marketLabel(marketRegionForSymbol(row.original.symbol, row.original.exchange))}</span>,
       },
       { accessorKey: 'publicationDate', header: '게시일' },
       {
-        accessorKey: 'entryPriceKrw',
+        accessorKey: 'entryPriceNative',
         header: '진입가',
-        cell: ({ getValue }) => formatKrw(getValue<number | null>()),
+        cell: ({ row }) => formatNative(row.original.entryPriceNative, row.original.currency),
       },
       {
-        accessorKey: 'targetPriceKrw',
+        accessorKey: 'targetPriceNative',
         header: '목표가',
-        cell: ({ getValue }) => formatKrw(getValue<number | null>()),
+        cell: ({ row }) => formatNative(row.original.targetPriceNative, row.original.currency),
       },
       {
         accessorKey: 'targetUpsideAtPub',
@@ -117,18 +117,18 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         cell: ({ row }) => {
           if (row.original.targetDirection === 'downside') {
             return row.original.targetHit ? (
-              <span className="pill good">매도 적중 · {formatDays(row.original.daysToTarget)}</span>
+              <span className="badge badge-success badge-soft badge-sm">매도 적중 · {formatDays(row.original.daysToTarget)}</span>
             ) : (
-              <span className="pill warn">매도 의견 · 미달성</span>
+              <span className="badge badge-warning badge-soft badge-sm">매도 의견 · 미달성</span>
             );
           }
           if ((row.original.targetUpsideAtPub ?? 0) <= 0) {
-            return <span className="pill warn">이미 초과/비실행</span>;
+            return <span className="badge badge-warning badge-soft badge-sm">이미 초과/비실행</span>;
           }
           return row.original.targetHit ? (
-            <span className="pill good">달성 · {formatDays(row.original.daysToTarget)}</span>
+            <span className="badge badge-success badge-soft badge-sm">달성 · {formatDays(row.original.daysToTarget)}</span>
           ) : (
-            <span className="pill">미달성</span>
+            <span className="badge badge-ghost badge-sm">미달성</span>
           );
         },
       },
@@ -165,11 +165,12 @@ export function ReportsTable({ reports }: ReportsTableProps) {
   });
 
   return (
-    <section className="panel report-table-panel">
-      <div className="table-toolbar" aria-label="리포트 표 필터">
+    <section className="report-table-panel card w-full min-w-0 overflow-hidden bg-base-100 border border-base-300 shadow-sm">
+      <div className="table-toolbar card-body grid gap-3 p-4 md:grid-cols-[minmax(220px,1.3fr)_repeat(3,minmax(140px,.7fr))_auto]" aria-label="리포트 표 필터">
         <label>
           <span>검색</span>
           <input
+            className="input input-sm input-bordered"
             value={globalFilter ?? ''}
             onChange={(event) => setGlobalFilter(event.target.value)}
             placeholder="기업명, 심볼, 리포트 제목 검색"
@@ -177,7 +178,7 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         </label>
         <label>
           <span>거래소</span>
-          <select value={exchangeFilter} onChange={(event) => setExchangeFilter(event.target.value)}>
+          <select className="select select-sm select-bordered" value={exchangeFilter} onChange={(event) => setExchangeFilter(event.target.value)}>
             {exchanges.map((exchange) => (
               <option key={exchange} value={exchange}>{exchange === 'all' ? '전체' : exchange}</option>
             ))}
@@ -185,7 +186,7 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         </label>
         <label>
           <span>목표 달성</span>
-          <select value={hitFilter} onChange={(event) => setHitFilter(event.target.value as HitFilter)}>
+          <select className="select select-sm select-bordered" value={hitFilter} onChange={(event) => setHitFilter(event.target.value as HitFilter)}>
             <option value="all">전체</option>
             <option value="hit">달성</option>
             <option value="open">미달성/진행</option>
@@ -193,29 +194,29 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         </label>
         <label>
           <span>현재 수익률</span>
-          <select value={returnFilter} onChange={(event) => setReturnFilter(event.target.value as ReturnFilter)}>
+          <select className="select select-sm select-bordered" value={returnFilter} onChange={(event) => setReturnFilter(event.target.value as ReturnFilter)}>
             <option value="all">전체</option>
             <option value="positive">0% 이상</option>
             <option value="negative">0% 미만</option>
           </select>
         </label>
         <div className="download-actions">
-          <button type="button" onClick={() => downloadCsv('snusmic-reports-all.csv', reports)}>
+          <button className="btn btn-sm btn-outline" type="button" onClick={() => downloadCsv('snusmic-reports-all.csv', reports)}>
             전체 CSV
           </button>
-          <button type="button" onClick={() => downloadCsv('snusmic-reports-current.csv', filteredRows.map((row) => row.original))}>
+          <button className="btn btn-sm btn-primary" type="button" onClick={() => downloadCsv('snusmic-reports-current.csv', filteredRows.map((row) => row.original))}>
             현재 보기 CSV
           </button>
         </div>
       </div>
 
-      <div className="table-meta">
+      <div className="table-meta flex flex-wrap justify-between gap-2 border-y border-base-300 bg-base-200/40 px-4 py-3 text-sm text-base-content/60">
         <span>현재 {filteredRows.length.toLocaleString('ko-KR')}개 / 전체 {reports.length.toLocaleString('ko-KR')}개</span>
         <span className="muted">열 제목을 클릭해 정렬합니다.</span>
       </div>
 
-      <div className="table-wrap">
-        <table>
+      <div className="table-wrap w-full min-w-0 overflow-x-auto rounded-none border-0 shadow-none">
+        <table className="table table-sm table-zebra">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>

@@ -20,7 +20,7 @@ type Props = {
 export function PriceEvidencePanel({ report, prices, pathEvidence, status }: Props) {
   return (
     <div className="report-evidence-grid">
-      <div className="panel report-chart-panel">
+      <div className="panel report-chart-panel card border border-base-300 bg-base-100 shadow-sm">
         <PriceEvidenceChart
           priceSeries={prices}
           targetPrice={report.targetPriceNative}
@@ -49,7 +49,7 @@ export function PriceEvidencePanel({ report, prices, pathEvidence, status }: Pro
           tone={(report.currentReturn ?? 0) >= 0 ? 'good' : 'bad'}
         />
         <KpiTile label="목표 상태" value={status.label} delta={status.detail} tone={status.tone} />
-        <article className="dossier-card report-rail-card">
+        <article className="dossier-card report-rail-card card border border-base-300 bg-base-100 shadow-sm">
           <span className="dossier-card__label">Path range</span>
           <dl className="definition-list">
             <dt>관측 고점</dt>
