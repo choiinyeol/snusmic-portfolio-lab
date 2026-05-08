@@ -1,6 +1,13 @@
 import 'server-only';
 import fs from 'node:fs';
 import path from 'node:path';
+import {
+  parseRows,
+  RawEquityPointSchema,
+  RawHoldingRowSchema,
+  RawReportRowSchema,
+  RawTradeRowSchema,
+} from '@/lib/schemas';
 
 const repoRoot = path.resolve(/* turbopackIgnore: true */ process.cwd(), '../..');
 
@@ -337,9 +344,9 @@ function positivePrice(value: unknown): number | undefined {
 let reportCache: ReportRow[] | undefined;
 export function getReportRows(): ReportRow[] {
   if (reportCache) return reportCache;
-  const raw = JSON.parse(readText('data/web/reports.json')) as RawReport[];
+  const raw = parseRows('reports.json', RawReportRowSchema, JSON.parse(readText('data/web/reports.json')));
   reportCache = raw
-    .map(fromRawReport)
+    .map((row) => fromRawReport(row as RawReport))
     .sort((a, b) => b.publicationDate.localeCompare(a.publicationDate) || a.company.localeCompare(b.company, 'ko-KR'));
   return reportCache;
 }
@@ -660,22 +667,26 @@ export function readDownloadCsv(fileName: string): string {
 let holdingsCache: HoldingRow[] | undefined;
 export function getCurrentHoldings(): HoldingRow[] {
   if (holdingsCache) return holdingsCache;
-  const raw = readJson<RawReport[]>('data/web/current-holdings.json', []);
+  const raw = parseRows(
+    'current-holdings.json',
+    RawHoldingRowSchema,
+    JSON.parse(readText('data/web/current-holdings.json')),
+  );
   holdingsCache = raw
     .map((row) => ({
-      persona: String(row.persona ?? ''),
-      symbol: String(row.symbol ?? ''),
-      company: String(row.company ?? row.symbol ?? ''),
-      qty: num(row.qty),
-      avgCostKrw: num(row.avg_cost_krw ?? row.avgCostKrw),
-      lastCloseKrw: num(row.last_close_krw ?? row.lastCloseKrw),
-      lastCloseNative: num(row.last_close_native ?? row.lastCloseNative),
-      currency: String(row.currency ?? 'KRW') || 'KRW',
-      marketValueKrw: num(row.market_value_krw ?? row.marketValueKrw),
-      unrealizedPnlKrw: num(row.unrealized_pnl_krw ?? row.unrealizedPnlKrw),
-      unrealizedReturn: num(row.unrealized_return ?? row.unrealizedReturn),
-      holdingDays: num(row.holding_days ?? row.holdingDays),
-      firstBuyDate: strOrNull(row.first_buy_date ?? row.firstBuyDate),
+      persona: row.persona,
+      symbol: row.symbol,
+      company: row.company || row.symbol,
+      qty: row.qty,
+      avgCostKrw: row.avg_cost_krw,
+      lastCloseKrw: row.last_close_krw,
+      lastCloseNative: row.last_close_native,
+      currency: row.currency || 'KRW',
+      marketValueKrw: row.market_value_krw,
+      unrealizedPnlKrw: row.unrealized_pnl_krw,
+      unrealizedReturn: row.unrealized_return,
+      holdingDays: row.holding_days,
+      firstBuyDate: row.first_buy_date,
     }))
     .sort((a, b) => (b.marketValueKrw ?? 0) - (a.marketValueKrw ?? 0));
   return holdingsCache;
@@ -783,27 +794,24 @@ function applyCostBasisTrade(
 let tradesCache: TradeRow[] | undefined;
 export function getTrades(): TradeRow[] {
   if (tradesCache) return tradesCache;
-  tradesCache = (JSON.parse(readText('data/web/trades.json')) as RawReport[])
+  const raw = parseRows('trades.json', RawTradeRowSchema, JSON.parse(readText('data/web/trades.json')));
+  tradesCache = raw
     .map((row) => {
-      const symbol = String(row.symbol ?? '');
-      const date = String(row.date ?? '');
-      const fillPriceKrw = num(row.fill_price_krw);
-      const qty = num(row.qty);
-      const fillPriceNative = nativeFromKrwAtSymbolDate(symbol, date, fillPriceKrw);
+      const fillPriceNative = nativeFromKrwAtSymbolDate(row.symbol, row.date, row.fill_price_krw);
       return {
-        persona: String(row.persona ?? ''),
-        date,
-        symbol,
-        side: String(row.side ?? ''),
-        qty,
-        currency: currencyForPricePoint(symbol, date),
-        fillPriceKrw,
+        persona: row.persona,
+        date: row.date,
+        symbol: row.symbol,
+        side: row.side,
+        qty: row.qty,
+        currency: currencyForPricePoint(row.symbol, row.date),
+        fillPriceKrw: row.fill_price_krw,
         fillPriceNative,
-        grossNative: fillPriceNative !== null && qty !== null ? fillPriceNative * qty : null,
-        grossKrw: num(row.gross_krw),
-        cashAfterKrw: num(row.cash_after_krw),
-        reason: String(row.reason ?? ''),
-        reportId: strOrNull(row.report_id),
+        grossNative: fillPriceNative !== null && row.qty !== null ? fillPriceNative * row.qty : null,
+        grossKrw: row.gross_krw,
+        cashAfterKrw: row.cash_after_krw,
+        reason: row.reason,
+        reportId: row.report_id,
       };
     })
     .sort((a, b) => b.date.localeCompare(a.date));
@@ -857,17 +865,17 @@ export function getPersonaLabel(persona: string): string {
 let equityDailyCache: EquityPoint[] | undefined;
 export function getEquityDaily(): EquityPoint[] {
   if (equityDailyCache) return equityDailyCache;
-  equityDailyCache = (JSON.parse(readText('data/web/equity-daily.json')) as RawReport[]).map((row) => {
-    const equity = num(row.equity_krw);
-    const contributed = num(row.contributed_capital_krw);
-    return {
-      persona: String(row.persona ?? ''),
-      date: String(row.date ?? ''),
-      equityKrw: equity,
-      contributedCapitalKrw: contributed,
-      cumulativeReturn: equity !== null && contributed !== null && contributed > 0 ? equity / contributed - 1 : null,
-    };
-  });
+  const raw = parseRows('equity-daily.json', RawEquityPointSchema, JSON.parse(readText('data/web/equity-daily.json')));
+  equityDailyCache = raw.map((row) => ({
+    persona: row.persona,
+    date: row.date,
+    equityKrw: row.equity_krw,
+    contributedCapitalKrw: row.contributed_capital_krw,
+    cumulativeReturn:
+      row.equity_krw !== null && row.contributed_capital_krw !== null && row.contributed_capital_krw > 0
+        ? row.equity_krw / row.contributed_capital_krw - 1
+        : null,
+  }));
   return equityDailyCache;
 }
 
