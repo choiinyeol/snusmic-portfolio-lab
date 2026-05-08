@@ -452,46 +452,51 @@ export function PriceEvidenceChart({
   return (
     <div className={`chart-shell relative ${measureMode ? 'cursor-crosshair' : ''}`}>
       {activeBar ? <OhlcLegend bar={activeBar} ma={activeMa} currency={currency} targetPrice={targetPrice} /> : null}
-      <div
-        ref={ref}
-        className="chart-box chart-box-fixed relative"
-        aria-label="목표가 기준선, OHLC 캔들, 거래량, 발간·만료·목표도달·고점·저점 마커가 포함된 가격 경로"
-      />
-      {measureMode ? (
+      {/* Wrapper sized exactly to the chart canvas — every overlay (drag
+          rect, vertical lines, measure overlay) lives here, so they can
+          never drift below the canvas regardless of chart-shell siblings. */}
+      <div className="relative" style={{ height: 560 }}>
         <div
-          ref={overlayRef}
-          className="absolute inset-0 z-10 cursor-crosshair touch-none select-none"
-          onPointerDown={handleOverlayPointerDown}
-          onPointerMove={handleOverlayPointerMove}
-          onPointerUp={handleOverlayPointerUp}
-          onPointerCancel={handleOverlayPointerUp}
-          role="presentation"
+          ref={ref}
+          className="chart-box chart-box-fixed absolute inset-0"
+          aria-label="목표가 기준선, OHLC 캔들, 거래량, 발간·만료·목표도달·고점·저점 마커가 포함된 가격 경로"
         />
-      ) : null}
-      {verticalLines.pub !== null ? (
-        <VerticalLine x={verticalLines.pub} color="#f29423" label="발간" position="top" />
-      ) : null}
-      {verticalLines.expiry !== null ? (
-        <VerticalLine x={verticalLines.expiry} color="#ef4452" label="만료" position="top" dashed />
-      ) : null}
-      {drag ? (
-        <div
-          className="pointer-events-none absolute top-0 bottom-0 bg-primary/10 ring-1 ring-primary/30"
-          style={{ left: drag.fromX, width: Math.max(1, drag.toX - drag.fromX) }}
-        >
-          {dragReturnPct !== null ? (
-            <div className="absolute left-1/2 top-2 -translate-x-1/2 rounded-md bg-base-100/95 px-2 py-1 text-xs font-semibold shadow-md">
-              <span className={dragReturnPct >= 0 ? 'text-success' : 'text-error'}>
-                {dragReturnPct >= 0 ? '+' : ''}
-                {formatPercent(dragReturnPct)}
-              </span>
-              <span className="ml-2 text-base-content/55">
-                {drag.fromTime} → {drag.toTime}
-              </span>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
+        {measureMode ? (
+          <div
+            ref={overlayRef}
+            className="absolute inset-0 z-10 cursor-crosshair touch-none select-none"
+            onPointerDown={handleOverlayPointerDown}
+            onPointerMove={handleOverlayPointerMove}
+            onPointerUp={handleOverlayPointerUp}
+            onPointerCancel={handleOverlayPointerUp}
+            role="presentation"
+          />
+        ) : null}
+        {verticalLines.pub !== null ? (
+          <VerticalLine x={verticalLines.pub} color="#f29423" label="발간" position="top" />
+        ) : null}
+        {verticalLines.expiry !== null ? (
+          <VerticalLine x={verticalLines.expiry} color="#ef4452" label="만료" position="top" dashed />
+        ) : null}
+        {drag ? (
+          <div
+            className="pointer-events-none absolute top-0 bottom-0 z-20 bg-primary/15 ring-2 ring-primary/50"
+            style={{ left: drag.fromX, width: Math.max(1, drag.toX - drag.fromX) }}
+          >
+            {dragReturnPct !== null ? (
+              <div className="absolute left-1/2 top-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-base-100 px-2 py-1 text-xs font-semibold shadow-md ring-1 ring-base-300">
+                <span className={dragReturnPct >= 0 ? 'text-success' : 'text-error'}>
+                  {dragReturnPct >= 0 ? '+' : ''}
+                  {formatPercent(dragReturnPct)}
+                </span>
+                <span className="ml-2 text-base-content/55">
+                  {drag.fromTime} → {drag.toTime}
+                </span>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
       <button
         type="button"
         className={`absolute right-3 top-3 z-20 rounded-md px-2 py-1 text-[11px] font-semibold shadow-sm ${
