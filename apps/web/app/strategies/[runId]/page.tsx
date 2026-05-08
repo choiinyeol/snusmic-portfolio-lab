@@ -1,12 +1,13 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { CumulativeReturnChart } from '@/components/charts/CumulativeReturnChart';
+import { StrategyExperimentTables } from '@/components/strategies/StrategyExperimentTables';
 import { StrategySummary } from '@/components/strategies/StrategySummary';
 import { KpiTile } from '@/components/ui/KpiTile';
 import { PageHero } from '@/components/ui/PageHero';
 import { Section } from '@/components/ui/Section';
 import { getStrategyExperiment, getStrategyRuns } from '@/lib/artifacts';
-import { formatKrw, formatPercent } from '@/lib/format';
+import { formatPercent } from '@/lib/format';
 
 type StrategyParams = Promise<{ runId: string }>;
 
@@ -64,91 +65,9 @@ export default async function StrategyDetailPage({ params }: { params: StrategyP
         </article>
       </Section>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Section eyebrow="Positions" title="실험 포트폴리오">
-          <article className="card border border-base-300 bg-base-100 shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="table table-sm table-zebra">
-                <thead>
-                  <tr>
-                    <th>종목</th>
-                    <th>발간일</th>
-                    <th>비중</th>
-                    <th>진입가</th>
-                    <th>목표가</th>
-                    <th>실험 수익률</th>
-                    <th>상태</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {experiment.positions.map((position) => (
-                    <tr key={`${position.symbol}-${position.publicationDate}`}>
-                      <td>
-                        <Link className="link link-hover" href={`/reports/${position.symbol}`}>
-                          {position.company || position.symbol}
-                        </Link>
-                        <div className="text-xs text-base-content/55">{position.symbol}</div>
-                      </td>
-                      <td className="font-mono text-xs">{position.publicationDate}</td>
-                      <td className="tabular-nums">{formatPercent(position.weight)}</td>
-                      <td className="tabular-nums">{formatKrw(position.entryPriceKrw)}</td>
-                      <td className="tabular-nums">{formatKrw(position.targetPriceKrw)}</td>
-                      <td
-                        className={`tabular-nums ${(position.realizedReturn ?? 0) >= 0 ? 'text-success' : 'text-error'}`}
-                      >
-                        {formatPercent(position.realizedReturn)}
-                      </td>
-                      <td>{position.status === 'closed' ? `청산 · ${position.exitDate}` : '보유/오픈'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </article>
-        </Section>
-
-        <Section eyebrow="Trades" title="실험 매매내역">
-          <article className="card border border-base-300 bg-base-100 shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="table table-sm table-zebra">
-                <thead>
-                  <tr>
-                    <th>일자</th>
-                    <th>구분</th>
-                    <th>종목</th>
-                    <th>비중</th>
-                    <th>참조가격</th>
-                    <th>기준</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {experiment.trades.map((trade) => (
-                    <tr key={`${trade.date}-${trade.side}-${trade.symbol}`}>
-                      <td className="font-mono text-xs">{trade.date}</td>
-                      <td>
-                        <span
-                          className={`badge badge-soft badge-sm ${trade.side === 'buy' ? 'badge-success' : 'badge-warning'}`}
-                        >
-                          {trade.side === 'buy' ? '매수' : '매도'}
-                        </span>
-                      </td>
-                      <td>
-                        <Link className="link link-hover" href={`/reports/${trade.symbol}`}>
-                          {trade.company || trade.symbol}
-                        </Link>
-                        <div className="text-xs text-base-content/55">{trade.symbol}</div>
-                      </td>
-                      <td className="tabular-nums">{formatPercent(trade.weight)}</td>
-                      <td className="tabular-nums">{formatKrw(trade.referencePriceKrw)}</td>
-                      <td className="text-sm">{trade.reason}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </article>
-        </Section>
-      </div>
+      <Section eyebrow="Ledger" title="실험 포트폴리오 · 매매내역">
+        <StrategyExperimentTables runLabel={run.run_id} experiment={experiment} />
+      </Section>
 
       <Section eyebrow="Params" title="파라미터">
         <article className="card border border-base-300 bg-base-100 shadow-sm">

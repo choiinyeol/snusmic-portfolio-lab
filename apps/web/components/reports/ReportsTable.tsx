@@ -48,7 +48,7 @@ const csvHeaders: Array<[string, (report: ReportRow) => string | number | boolea
 ];
 
 export function ReportsTable({ reports }: ReportsTableProps) {
-  const [sorting, setSorting] = useState<SortingState>([{ id: 'currentReturn', desc: true }]);
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'publicationDate', desc: true }]);
   const [globalFilter, setGlobalFilter] = useState('');
   const [exchangeFilter, setExchangeFilter] = useState('all');
   const [hitFilter, setHitFilter] = useState<HitFilter>('all');
@@ -102,6 +102,14 @@ export function ReportsTable({ reports }: ReportsTableProps) {
       {
         accessorKey: 'currentReturn',
         header: '현재 수익률',
+        cell: ({ getValue }) => {
+          const value = getValue<number | null>();
+          return <span className={(value ?? 0) >= 0 ? 'good' : 'bad'}>{formatPercent(value)}</span>;
+        },
+      },
+      {
+        accessorKey: 'targetGapPct',
+        header: '목표가 괴리',
         cell: ({ getValue }) => {
           const value = getValue<number | null>();
           return <span className={(value ?? 0) >= 0 ? 'good' : 'bad'}>{formatPercent(value)}</span>;
