@@ -50,32 +50,58 @@ export function PathScenarioPanel({ report, scenarioRows, trend }: Props) {
 }
 
 function PriceScenarioBand({ rows, report }: { rows: ScenarioRow[]; report: ReportRow }) {
-  const bandRows = rows.filter((row) => row.bandPosition !== null);
   const maxAbsReturn = Math.max(0.01, ...rows.flatMap((row) => [Math.abs(row.currentReturn ?? 0), Math.abs(row.targetReturn ?? 0)]));
+  const low = rows.find((row) => row.label === '발간 후 저점') ?? rows[0];
+  const high = rows.find((row) => row.label === '발간 후 고점') ?? rows[3];
+  const current = rows.find((row) => row.label === '현재가') ?? rows.at(-1);
+  const currentPosition = Math.max(0, Math.min(1, current?.bandPosition ?? 0));
+  const levelRows = rows.filter((row) => row.label !== '현재가');
+
   return (
     <div className="price-band-card">
+      <div className="price-band-card__header">
+        <div>
+          <span className="badge badge-primary badge-soft badge-sm">관측 가격 레인지</span>
+          <strong>{low?.basis ?? '—'} → {high?.basis ?? '—'}</strong>
+        </div>
+        <span className="badge badge-outline">{report.currency ?? '표시통화'}</span>
+      </div>
+
       <div className="price-band">
         <div className="price-band__track" aria-label="발간 이후 관측 가격 레인지">
-          {bandRows.map((row) => (
-            <span
-              key={row.label}
-              className={`price-band__marker ${row.label === '현재가' ? 'current' : ''}`}
-              style={{ left: `${Math.round((row.bandPosition ?? 0) * 100)}%` }}
-              title={`${row.label} ${row.basis}`}
-            >
-              <span>{priceBandLabel(row.label)}</span>
-            </span>
-          ))}
+          <span className="price-band__fill" style={{ width: `${Math.round(currentPosition * 100)}%` }} />
+          <span
+            className="price-band__current-marker"
+            style={{ left: `${Math.round(currentPosition * 100)}%` }}
+            title={`현재가 ${current?.basis ?? '—'}`}
+          />
         </div>
         <div className="price-band__axis">
-          <span>{rows[0]?.basis ?? '—'}</span>
-          <span>{rows[3]?.basis ?? '—'}</span>
+          <span>저점 {low?.basis ?? '—'}</span>
+          <span>고점 {high?.basis ?? '—'}</span>
         </div>
       </div>
+
+      <div className="price-band__levels" aria-label="가격 분위 기준">
+        {levelRows.map((row) => (
+          <div key={`${row.label}-level`} className="price-band__level">
+            <span>{priceBandLabel(row.label)}</span>
+            <strong>{row.basis}</strong>
+            <small>{row.point?.time ?? '—'}</small>
+          </div>
+        ))}
+      </div>
+
+      <div className="price-band__current-callout">
+        <span>현재가 위치</span>
+        <strong>{current?.basis ?? '—'}</strong>
+        <small>{Math.round(currentPosition * 100)}% 지점 · {current?.point?.time ?? '—'}</small>
+      </div>
+
       <div className="scenario-return-bars">
         {rows.map((row) => (
           <div className="scenario-return-bars__row" key={`${row.label}-bar`}>
-            <span>{row.label}</span>
+            <span className="scenario-return-bars__label">{row.label}</span>
             <div className="return-bar">
               <i className={(row.currentReturn ?? 0) >= 0 ? 'good-bg' : 'bad-bg'} style={{ width: `${Math.max(3, Math.abs(row.currentReturn ?? 0) / maxAbsReturn * 100)}%` }} />
             </div>
