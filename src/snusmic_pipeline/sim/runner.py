@@ -127,7 +127,9 @@ def run_simulation(
     )
 
     # Persona-agnostic SMIC report statistics.
-    report_perf = tuple(compute_report_performance(reports, board, last_day))
+    report_perf = tuple(
+        compute_report_performance(reports, board, last_day, expiry_days=config.report_expiry_days)
+    )
     report_stats_obj = aggregate_report_stats(report_perf) if report_perf else None
 
     return SimulationResult(

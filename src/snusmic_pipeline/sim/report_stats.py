@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import statistics
 from collections.abc import Iterable
-from datetime import date
+from datetime import date, timedelta
 
 import pandas as pd
 
@@ -30,12 +30,19 @@ def compute_report_performance(
     reports: pd.DataFrame,
     board: PriceBoard,
     end_date: date,
+    *,
+    expiry_days: int | None = 730,
 ) -> list[ReportPerformance]:
     """One :class:`ReportPerformance` row per (report_id) in ``reports``.
 
     Reports without a tradable price after publication, or without a
     valid target_price, still produce a row — but with ``None`` for the
     fields that require either.
+
+    ``expiry_days`` defines the report's validity window: prices, target
+    hits, peaks/troughs and current returns are evaluated within
+    ``[publication_date, min(end_date, publication_date + expiry_days)]``.
+    Pass ``None`` (or ``0``) to disable the cap and use the full window.
     """
     if reports.empty:
         return []
@@ -47,11 +54,15 @@ def compute_report_performance(
         if not symbol:
             continue
         pub_day: date = record["_pub"]
-        target = adjusted_target_price_krw(record, board, pub_day, end_date)
-        entry_price = _first_close_on_or_after(board, pub_day, end_date, symbol)
-        last_close, last_close_date = _last_close_in_window(board, pub_day, end_date, symbol)
-        peak_close = _max_close_after(board, pub_day, end_date, symbol)
-        trough_close = _min_close_after(board, pub_day, end_date, symbol)
+        expiry_day: date | None = (
+            pub_day + timedelta(days=expiry_days) if expiry_days and expiry_days > 0 else None
+        )
+        window_end = min(end_date, expiry_day) if expiry_day is not None else end_date
+        target = adjusted_target_price_krw(record, board, pub_day, window_end)
+        entry_price = _first_close_on_or_after(board, pub_day, window_end, symbol)
+        last_close, last_close_date = _last_close_in_window(board, pub_day, window_end, symbol)
+        peak_close = _max_close_after(board, pub_day, window_end, symbol)
+        trough_close = _min_close_after(board, pub_day, window_end, symbol)
 
         target_upside_at_pub = (
             (target / entry_price - 1.0) if (target is not None and entry_price and entry_price > 0) else None
@@ -60,9 +71,9 @@ def compute_report_performance(
         target_hit_date: date | None = None
         days_to_target: int | None = None
         if target_direction == "upside" and target is not None:
-            target_hit_date = _first_ohlc_touch_at_or_above(board, pub_day, end_date, symbol, target)
+            target_hit_date = _first_ohlc_touch_at_or_above(board, pub_day, window_end, symbol, target)
         elif target_direction == "downside" and target is not None:
-            target_hit_date = _first_ohlc_touch_at_or_below(board, pub_day, end_date, symbol, target)
+            target_hit_date = _first_ohlc_touch_at_or_below(board, pub_day, window_end, symbol, target)
         if target_hit_date is not None:
             days_to_target = (target_hit_date - pub_day).days
 
@@ -82,6 +93,11 @@ def compute_report_performance(
         else:
             target_gap_pct = None
 
+        # Expired = window already capped by expiry_day AND target wasn't hit
+        # within the validity window. A target-hit report is "resolved" not
+        # "expired", even if today is past pub+expiry_days.
+        expired = bool(expiry_day is not None and end_date >= expiry_day and target_hit_date is None)
+
         out.append(
             ReportPerformance(
                 report_id=str(record.get("report_id") or ""),
@@ -100,6 +116,8 @@ def compute_report_performance(
                 peak_return=peak_return,
                 trough_return=trough_return,
                 target_gap_pct=target_gap_pct,
+                expiry_date=expiry_day,
+                expired=expired,
             )
         )
     return out

@@ -153,17 +153,18 @@ export default function DashboardPage() {
 
 function statusBadge(report: ReportRow) {
   if (report.targetDirection === 'downside') {
-    return report.targetHit ? (
-      <span className="badge badge-success badge-soft badge-sm">매도 적중</span>
-    ) : (
-      <span className="badge badge-warning badge-soft badge-sm">매도 의견</span>
-    );
+    if (report.targetHit) return <span className="badge badge-success badge-soft badge-sm">매도 적중</span>;
+    if (report.expired) return <span className="badge badge-error badge-soft badge-sm">매도 만료</span>;
+    return <span className="badge badge-warning badge-soft badge-sm">매도 의견</span>;
   }
   if ((report.targetUpsideAtPub ?? 0) <= 0) {
     return <span className="badge badge-warning badge-soft badge-sm">비실행</span>;
   }
   if (report.targetHit) {
     return <span className="badge badge-success badge-soft badge-sm">도달</span>;
+  }
+  if (report.expired) {
+    return <span className="badge badge-error badge-soft badge-sm">만료</span>;
   }
   return <span className="badge badge-primary badge-soft badge-sm">진행</span>;
 }

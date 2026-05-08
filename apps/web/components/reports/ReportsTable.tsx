@@ -15,7 +15,7 @@ import { useMemo, useState } from 'react';
 import type { ReportRow } from '@/lib/artifacts';
 import { formatDays, formatNative, formatPercent } from '@/lib/format';
 
-type HitFilter = 'all' | 'hit' | 'open';
+type HitFilter = 'all' | 'hit' | 'open' | 'expired';
 type ReturnFilter = 'all' | 'positive' | 'negative';
 
 type ReportsTableProps = {
@@ -43,6 +43,8 @@ const csvHeaders: Array<[string, (report: ReportRow) => string | number | boolea
   ['목표 달성', (report) => report.targetHit],
   ['목표 달성일', (report) => report.targetHitDate],
   ['달성 소요일', (report) => report.daysToTarget],
+  ['만료', (report) => report.expired],
+  ['만료 예정일', (report) => report.expiryDate],
   ['최근 종가일', (report) => report.lastCloseDate],
   ['PDF URL', (report) => report.pdfUrl],
 ];
@@ -134,6 +136,8 @@ export function ReportsTable({ reports }: ReportsTableProps) {
               <span className="badge badge-success badge-soft badge-sm">
                 매도 적중 · {formatDays(row.original.daysToTarget)}
               </span>
+            ) : row.original.expired ? (
+              <span className="badge badge-error badge-soft badge-sm">매도 의견 · 만료</span>
             ) : (
               <span className="badge badge-warning badge-soft badge-sm">매도 의견 · 미달성</span>
             );
@@ -141,13 +145,17 @@ export function ReportsTable({ reports }: ReportsTableProps) {
           if ((row.original.targetUpsideAtPub ?? 0) <= 0) {
             return <span className="badge badge-warning badge-soft badge-sm">이미 초과/비실행</span>;
           }
-          return row.original.targetHit ? (
-            <span className="badge badge-success badge-soft badge-sm">
-              달성 · {formatDays(row.original.daysToTarget)}
-            </span>
-          ) : (
-            <span className="badge badge-ghost badge-sm">미달성</span>
-          );
+          if (row.original.targetHit) {
+            return (
+              <span className="badge badge-success badge-soft badge-sm">
+                달성 · {formatDays(row.original.daysToTarget)}
+              </span>
+            );
+          }
+          if (row.original.expired) {
+            return <span className="badge badge-error badge-soft badge-sm">만료</span>;
+          }
+          return <span className="badge badge-ghost badge-sm">미달성</span>;
         },
       },
       {
@@ -176,7 +184,8 @@ export function ReportsTable({ reports }: ReportsTableProps) {
     const report = row.original;
     if (exchangeFilter !== 'all' && report.exchange !== exchangeFilter) return false;
     if (hitFilter === 'hit' && !report.targetHit) return false;
-    if (hitFilter === 'open' && report.targetHit) return false;
+    if (hitFilter === 'open' && (report.targetHit || report.expired)) return false;
+    if (hitFilter === 'expired' && !report.expired) return false;
     if (returnFilter === 'positive' && (report.currentReturn ?? -Infinity) < 0) return false;
     if (returnFilter === 'negative' && (report.currentReturn ?? Infinity) >= 0) return false;
     return true;
@@ -220,7 +229,8 @@ export function ReportsTable({ reports }: ReportsTableProps) {
           >
             <option value="all">전체</option>
             <option value="hit">달성</option>
-            <option value="open">미달성/진행</option>
+            <option value="open">진행 중</option>
+            <option value="expired">만료</option>
           </select>
         </label>
         <label>

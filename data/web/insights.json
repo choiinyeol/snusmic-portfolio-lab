@@ -1,18 +1,18 @@
 [
   {
     "id": "target-hit-rate",
-    "metric": 0.520362,
+    "metric": 0.41629,
     "related_report_ids": [],
-    "sentence": "가격 매칭 리포트 기준 목표가 도달률은 0.520362입니다.",
+    "sentence": "가격 매칭 리포트 기준 목표가 도달률은 0.41629입니다.",
     "title": "목표가 도달률"
   },
   {
     "id": "average-days-to-target",
-    "metric": 364.69,
+    "metric": 202.3587,
     "related_report_ids": [
       "bb032f63980dd892"
     ],
-    "sentence": "목표가에 도달한 리포트의 평균 소요 기간은 364.69일입니다.",
+    "sentence": "목표가에 도달한 리포트의 평균 소요 기간은 202.3587일입니다.",
     "title": "목표가 도달 속도"
   },
   {
@@ -24,20 +24,20 @@
   },
   {
     "id": "best-current-return",
-    "metric": 23.62,
+    "metric": 8.3944,
     "related_report_ids": [
-      "fea27bf20d0f8d88"
+      "98f5913a5681e6f8"
     ],
-    "sentence": "현재 수익률 최상위 리포트는 이수페타시스 (007660.KS)입니다.",
+    "sentence": "현재 수익률 최상위 리포트는 HD현대일렉트릭 (267260.KS)입니다.",
     "title": "현재 수익률 상위 리포트"
   },
   {
     "id": "worst-current-return",
-    "metric": -0.94,
+    "metric": -0.8594,
     "related_report_ids": [
-      "cefde513c9366947"
+      "c82e104c235c6247"
     ],
-    "sentence": "현재 수익률 최하위 리포트는 Chegg (CHGG)입니다.",
+    "sentence": "현재 수익률 최하위 리포트는 티와이홀딩스 (363280.KS)입니다.",
     "title": "하방 리스크 리포트"
   },
   {
