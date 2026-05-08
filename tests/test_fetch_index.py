@@ -1,4 +1,6 @@
-from snusmic_pipeline.cli import build_parser
+import json
+
+from snusmic_pipeline.cli import build_parser, resolve_sync_pages
 from snusmic_pipeline.fetch_index import clean_html_text, fetch_reports, parse_pages
 
 
@@ -27,11 +29,18 @@ def test_parse_pages_range_and_list():
     assert parse_pages("1-3,5") == [1, 2, 3, 5]
 
 
-def test_sync_default_pages_is_one_to_seven():
+def test_sync_default_pages_is_auto():
     parser = build_parser()
     args = parser.parse_args(["sync"])
 
-    assert args.pages == "1-7"
+    assert args.pages == "auto"
+
+
+def test_resolve_sync_pages_auto_keeps_existing_archive_plus_one_window(tmp_path):
+    manifest = tmp_path / "manifest.json"
+    manifest.write_text(json.dumps([{"post_url": f"http://example.com/{idx}"} for idx in range(216)]))
+
+    assert resolve_sync_pages("auto", manifest) == list(range(1, 20))
 
 
 def test_clean_html_text_unescapes_entities():

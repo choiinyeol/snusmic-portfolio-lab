@@ -3,13 +3,14 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
 import os
 import subprocess
 import sys
 from pathlib import Path
 from typing import Any
 
-from .change_detection import new_report_urls
+from .change_detection import PAGE_ONE_POST_LIMIT, new_report_urls
 from .download_pdfs import download_all
 from .extract_pdf import extract_report, extract_text_from_pdf, parse_report_text
 from .extraction_quality import analyze_extraction_quality
@@ -76,6 +77,32 @@ def write_json(path: Path, data: Any) -> None:
     path.write_text(
         json.dumps(data, ensure_ascii=False, indent=2, default=_json_default) + "\n", encoding="utf-8"
     )
+
+
+def resolve_sync_pages(value: str, manifest_path: Path) -> list[int]:
+    """Resolve an explicit page range or the safe default archive window.
+
+    ``sync`` rewrites the manifest/CSV from the fetched page window. A fixed
+    low default can therefore drop older committed reports as soon as new
+    reports arrive. ``auto`` keeps at least the current manifest size plus one
+    page-one window so scheduled syncs can add new reports without shrinking
+    the local archive.
+    """
+    if value.strip().lower() != "auto":
+        return parse_pages(value)
+
+    current_count = 0
+    if manifest_path.exists():
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            if isinstance(manifest, list):
+                current_count = len(manifest)
+        except json.JSONDecodeError:
+            current_count = 0
+
+    minimum_rows = max(PAGE_ONE_POST_LIMIT, current_count + PAGE_ONE_POST_LIMIT)
+    page_count = max(1, math.ceil(minimum_rows / PAGE_ONE_POST_LIMIT))
+    return list(range(1, page_count + 1))
 
 
 def _number_or_blank(value: float | None) -> float | str:
@@ -219,7 +246,7 @@ def apply_parsed_report(report: ExtractedReport, parsed: dict[str, object], sour
 def run_sync(args: argparse.Namespace) -> int:
     data_dir = Path(args.data_dir)
     pdf_dir = data_dir / "pdfs"
-    pages = parse_pages(args.pages)
+    pages = resolve_sync_pages(args.pages, data_dir / "manifest.json")
     logs: list[str] = []
 
     metas = fetch_reports(pages)
@@ -463,7 +490,14 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command")
 
     sync = subparsers.add_parser("sync", help="Fetch reports, download PDFs, and extract local archive rows.")
-    sync.add_argument("--pages", default="1-7", help="Page range/list, for example 1-7 or 1,3,5.")
+    sync.add_argument(
+        "--pages",
+        default="auto",
+        help=(
+            "Page range/list, for example 1-7 or 1,3,5. Use 'auto' to keep "
+            "the current archive size plus one page-one window."
+        ),
+    )
     sync.add_argument("--data-dir", default="data", help="Output data directory.")
     sync.add_argument("--force", action="store_true", help="Re-download PDFs even when a local copy exists.")
     sync.add_argument(
