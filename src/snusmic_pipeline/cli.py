@@ -12,13 +12,12 @@ from typing import Any
 
 from .change_detection import PAGE_ONE_POST_LIMIT, new_report_urls
 from .download_pdfs import download_all
-from .extract_pdf import extract_report, extract_text_from_pdf, parse_report_text
+from .extract_pdf import extract_report, parse_report_text
 from .extraction_quality import analyze_extraction_quality
 from .fetch_index import fetch_reports, parse_pages
 from .github_urls import github_pdf_url
 from .markdown_export import export_markdown
 from .models import DownloadedPdf, ExtractedReport, ReportMeta
-from .opendataloader_fallback import OpenDataLoaderUnavailable, convert_pdfs_to_markdown
 from .sim.warehouse import build_warehouse, refresh_price_history
 from .web_artifacts import ExportInputs, check_web_artifacts, export_web_artifacts
 
@@ -193,40 +192,6 @@ def _float_or_none(value: str | None) -> float | None:
         return None
 
 
-def apply_opendataloader_fallback(
-    reports: list[ExtractedReport],
-    output_dir: Path,
-    hybrid: str = "",
-    force_all: bool = False,
-) -> list[str]:
-    candidates = [
-        report for report in reports if report.pdf_path and (force_all or report.extraction_status != "ok")
-    ]
-    if not candidates:
-        return []
-    try:
-        markdown_by_path = convert_pdfs_to_markdown(
-            [report.pdf_path for report in candidates if report.pdf_path],
-            output_dir=output_dir,
-            hybrid=hybrid,
-        )
-    except OpenDataLoaderUnavailable as exc:
-        return [f"OpenDataLoader fallback unavailable: {exc}"]
-
-    logs: list[str] = []
-    for report in candidates:
-        if not report.pdf_path:
-            continue
-        markdown = markdown_by_path.get(report.pdf_path)
-        if not markdown:
-            logs.append(f"OpenDataLoader produced no markdown for {report.pdf_filename}")
-            continue
-        parsed = parse_report_text(markdown, fallback_company=report.meta.company)
-        if parsed["status"] == "ok" or (not report.ticker and parsed["ticker"]):
-            apply_parsed_report(report, parsed, source="OpenDataLoader fallback")
-    return logs
-
-
 def apply_parsed_report(report: ExtractedReport, parsed: dict[str, object], source: str = "") -> None:
     report.ticker = str(parsed["ticker"])
     report.exchange = str(parsed["exchange"])
@@ -253,15 +218,6 @@ def run_sync(args: argparse.Namespace) -> int:
     metas = fetch_reports(pages)
     downloads = download_all(metas, pdf_dir=pdf_dir, force=args.force)
     extracted = [extract_report(download, max_pages=args.max_pages) for download in downloads]
-    if args.opendataloader_fallback:
-        logs.extend(
-            apply_opendataloader_fallback(
-                extracted,
-                output_dir=Path(args.opendataloader_output_dir),
-                hybrid=args.opendataloader_hybrid,
-                force_all=args.opendataloader_force_all,
-            )
-        )
 
     write_manifest(downloads, data_dir / "manifest.json")
     write_csv(extracted, data_dir / "extracted_reports.csv")
@@ -270,7 +226,6 @@ def run_sync(args: argparse.Namespace) -> int:
             export_markdown(
                 extracted,
                 data_dir / "markdown",
-                use_opendataloader=args.markdown_opendataloader,
                 hybrid=args.opendataloader_hybrid,
                 force=args.force_markdown,
             )
@@ -295,7 +250,6 @@ def run_ocr_reextract(args: argparse.Namespace) -> int:
             export_markdown(
                 reports,
                 markdown_dir,
-                use_opendataloader=True,
                 hybrid=args.opendataloader_hybrid,
                 force=True,
             )
@@ -317,16 +271,11 @@ def run_ocr_reextract(args: argparse.Namespace) -> int:
             "note": report.note,
         }
         markdown_path = markdown_dir / f"{report.pdf_path.stem}.md" if report.pdf_path else None
-        text = ""
         source = "markdown reextract"
-        if markdown_path and markdown_path.exists():
-            text = markdown_path.read_text(encoding="utf-8", errors="replace")
-        elif args.allow_pypdf_fallback and report.pdf_path and report.pdf_path.exists():
-            text = extract_text_from_pdf(report.pdf_path, max_pages=args.max_pages)
-            source = "pypdf reextract"
-        else:
+        if not (markdown_path and markdown_path.exists()):
             missing_markdown += 1
             continue
+        text = markdown_path.read_text(encoding="utf-8", errors="replace")
         parsed = parse_report_text(text, fallback_company=report.meta.company)
         apply_parsed_report(report, parsed, source=source)
         if (
@@ -421,7 +370,6 @@ def run_export_markdown(args: argparse.Namespace) -> int:
     logs = export_markdown(
         reports,
         data_dir / "markdown",
-        use_opendataloader=args.markdown_opendataloader,
         hybrid=args.opendataloader_hybrid,
         force=args.force,
     )
@@ -505,22 +453,6 @@ def build_parser() -> argparse.ArgumentParser:
         "--max-pages", type=int, default=4, help="Maximum PDF pages to parse for target-price extraction."
     )
     sync.add_argument(
-        "--opendataloader-fallback",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-        help="Use opendataloader-pdf for reports that pypdf cannot parse cleanly.",
-    )
-    sync.add_argument(
-        "--opendataloader-force-all",
-        action="store_true",
-        help="Run OpenDataLoader fallback over every report, not only needs-review rows.",
-    )
-    sync.add_argument(
-        "--opendataloader-output-dir",
-        default="data/opendataloader",
-        help="OpenDataLoader markdown output directory.",
-    )
-    sync.add_argument(
         "--opendataloader-hybrid",
         default=os.environ.get("OPENDATALOADER_HYBRID", ""),
         help="Optional OpenDataLoader hybrid mode, for example docling-fast.",
@@ -530,12 +462,6 @@ def build_parser() -> argparse.ArgumentParser:
         action=argparse.BooleanOptionalAction,
         default=True,
         help="Export one markdown file per PDF.",
-    )
-    sync.add_argument(
-        "--markdown-opendataloader",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-        help="Try opendataloader-pdf before falling back to pypdf text.",
     )
     sync.add_argument(
         "--force-markdown", action="store_true", help="Overwrite existing markdown during markdown export."
@@ -561,7 +487,6 @@ def build_parser() -> argparse.ArgumentParser:
         "export-markdown", help="Export one markdown file per committed PDF/report row."
     )
     export_md.add_argument("--data-dir", default="data")
-    export_md.add_argument("--markdown-opendataloader", action=argparse.BooleanOptionalAction, default=True)
     export_md.add_argument("--opendataloader-hybrid", default=os.environ.get("OPENDATALOADER_HYBRID", ""))
     export_md.add_argument("--force", action="store_true", help="Overwrite existing markdown files.")
     export_md.set_defaults(func=run_export_markdown)
@@ -576,7 +501,6 @@ def build_parser() -> argparse.ArgumentParser:
         help="Regenerate markdown for every PDF with OpenDataLoader before parsing.",
     )
     ocr.add_argument("--opendataloader-hybrid", default=os.environ.get("OPENDATALOADER_HYBRID", ""))
-    ocr.add_argument("--allow-pypdf-fallback", action=argparse.BooleanOptionalAction, default=True)
     ocr.add_argument("--preserve-existing-targets", action=argparse.BooleanOptionalAction, default=True)
     ocr.add_argument("--max-pages", type=int, default=4)
     ocr.add_argument("--audit", action=argparse.BooleanOptionalAction, default=True)

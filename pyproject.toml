@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
   "requests",
-  "pypdf",
+  "opendataloader-pdf[hybrid]>=2.4.3",
   "yfinance",
   "pandas",
   "numpy",
@@ -19,9 +19,6 @@ dependencies = [
   "pydantic>=2.6",
   "matplotlib>=3.7",
 ]
-
-[project.optional-dependencies]
-ocr = ["opendataloader-pdf[hybrid]"]
 
 [project.scripts]
 snusmic-sync = "snusmic_pipeline.cli:main"

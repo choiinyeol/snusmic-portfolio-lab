@@ -21,11 +21,11 @@ def test_export_web_artifacts_matches_baseline_counts(tmp_path: Path) -> None:
 
     overview = json.loads((out / "overview.json").read_text(encoding="utf-8"))
     assert overview["report_counts"] == {
-        "extracted_reports": 216,
+        "extracted_reports": 221,
         "missing_price_symbols": 5,
-        "price_matched_reports": 211,
-        "report_stat_rows": 216,
-        "web_report_rows": 216,
+        "price_matched_reports": 216,
+        "report_stat_rows": 221,
+        "web_report_rows": 221,
     }
     assert result["missing_symbols"] == ["003410.KS", "010620.KS", "287410.KQ", "NETI", "VTNR"]
 
@@ -84,9 +84,9 @@ def test_extended_web_artifacts_support_insights_and_downloads(tmp_path: Path) -
     assert len(insights) >= 6
     assert "6615fd1894ed9c54" in detail_metrics
     assert detail_metrics["6615fd1894ed9c54"]["markers"]
-    assert len(return_windows) == 216
+    assert len(return_windows) == 221
     assert {"return_30d", "return_60d", "return_90d", "return_180d"} <= set(return_windows[0])
-    assert target_distribution["summary"]["total_reports"] == 216
+    assert target_distribution["summary"]["total_reports"] == 221
     assert rankings["fastest_hits"]
     assert rankings["best_current_returns"]
     assert (out / "table-download-reports.csv").read_text(encoding="utf-8").startswith("report_id,date")
