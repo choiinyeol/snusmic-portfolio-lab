@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useMemo, useState, type ReactNode } from 'react';
+import { BlockPagination } from '@/components/trading/TableControls';
 import { Tabs, type Tab } from '@/components/ui/Tabs';
 import type { ReportRow } from '@/lib/artifacts';
 import { formatDays, formatPercent } from '@/lib/format';
@@ -99,7 +100,7 @@ export function RankingTabs({ reports }: Props) {
 }
 
 function RankingTable({ ranking }: { ranking: Ranking }) {
-  const [sortBy, setSortBy] = useState<SortColumn>('metric');
+  const [sortBy, setSortBy] = useState<SortColumn>(ranking.id === 'recent' ? 'publicationDate' : 'metric');
   const [sortDir, setSortDir] = useState<SortDir>(ranking.id === 'target-gaps' ? 'asc' : 'desc');
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState<PageSize>(10);
@@ -109,14 +110,20 @@ function RankingTable({ ranking }: { ranking: Ranking }) {
     rows.sort((a, b) => {
       const aValue = sortValueFor(a, sortBy, ranking.metric);
       const bValue = sortValueFor(b, sortBy, ranking.metric);
-      if (aValue === null && bValue === null) return 0;
-      if (aValue === null) return 1;
-      if (bValue === null) return -1;
-      const comparison =
-        typeof aValue === 'string' && typeof bValue === 'string'
-          ? aValue.localeCompare(bValue)
-          : Number(aValue) - Number(bValue);
-      return sortDir === 'asc' ? comparison : -comparison;
+      let primary = 0;
+      if (aValue === null && bValue === null) primary = 0;
+      else if (aValue === null) primary = 1;
+      else if (bValue === null) primary = -1;
+      else {
+        primary =
+          typeof aValue === 'string' && typeof bValue === 'string'
+            ? aValue.localeCompare(bValue)
+            : Number(aValue) - Number(bValue);
+        primary = sortDir === 'asc' ? primary : -primary;
+      }
+      if (primary !== 0 || sortBy === 'publicationDate') return primary;
+      // Tie-break: latest publication first.
+      return b.publicationDate.localeCompare(a.publicationDate);
     });
     return rows;
   }, [ranking, sortBy, sortDir]);
@@ -225,25 +232,10 @@ function RankingTable({ ranking }: { ranking: Ranking }) {
         </table>
       </div>
       <div className="flex items-center justify-between gap-2 border-t border-base-300 px-4 py-2">
-        <button
-          type="button"
-          className="btn btn-xs btn-ghost"
-          disabled={safePage === 0}
-          onClick={() => setPage((p) => Math.max(0, p - 1))}
-        >
-          ← 이전
-        </button>
         <span className="text-xs text-base-content/55">
           {safePage * pageSize + 1}–{Math.min(sorted.length, (safePage + 1) * pageSize)} / {sorted.length}
         </span>
-        <button
-          type="button"
-          className="btn btn-xs btn-ghost"
-          disabled={safePage >= totalPages - 1}
-          onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-        >
-          다음 →
-        </button>
+        <BlockPagination page={safePage} pageCount={totalPages} onPageChange={setPage} />
       </div>
     </article>
   );

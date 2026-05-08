@@ -64,7 +64,11 @@ export function PathScenarioPanel({ report, scenarioRows, trend }: Props) {
 }
 
 function PriceScenarioCards({ rows, report }: { rows: ScenarioRow[]; report: ReportRow }) {
-  const ordered = ['발간 후 저점', '25% 가격 수준', '75% 가격 수준', '발간 후 고점', '현재가']
+  // Order: 발간 후 고점 → 75% → 25% → 발간 후 저점 → 현재가. Climbing down the
+  // price ladder from peak to trough makes "여기서 매수했다면 → 현재까지" read
+  // as a positive level-up sequence (peak entry = worst PnL, trough = best),
+  // and "현재가" sits at the right anchored to the live closing price.
+  const ordered = ['발간 후 고점', '75% 가격 수준', '25% 가격 수준', '발간 후 저점', '현재가']
     .map((label) => rows.find((row) => row.label === label))
     .filter((row): row is ScenarioRow => Boolean(row));
   if (ordered.length === 0) return null;
@@ -108,13 +112,18 @@ function PriceScenarioCards({ rows, report }: { rows: ScenarioRow[]; report: Rep
 }
 
 function ScenarioReturnBars({ rows }: { rows: ScenarioRow[] }) {
+  // Match card order so the bar list reads "level up" — highest entry first
+  // (worst current PnL), trough at the bottom (best current PnL), 현재가 last.
+  const ordered = ['발간 후 고점', '75% 가격 수준', '25% 가격 수준', '발간 후 저점', '현재가']
+    .map((label) => rows.find((row) => row.label === label))
+    .filter((row): row is ScenarioRow => Boolean(row));
   const maxAbs = Math.max(
     0.01,
-    ...rows.flatMap((row) => [Math.abs(row.currentReturn ?? 0), Math.abs(row.targetReturn ?? 0)]),
+    ...ordered.flatMap((row) => [Math.abs(row.currentReturn ?? 0), Math.abs(row.targetReturn ?? 0)]),
   );
   return (
     <div className="grid gap-3">
-      {rows.map((row) => (
+      {ordered.map((row) => (
         <div key={`${row.label}-bar`} className="grid gap-1">
           <span className="text-sm font-semibold text-base-content/70">{row.label}</span>
           <ScenarioBar label="현재까지" value={row.currentReturn} maxAbs={maxAbs} positiveTone="success" />
