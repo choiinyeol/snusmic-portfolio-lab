@@ -88,7 +88,10 @@ export class DragSelectionPrimitive implements IPanePrimitive<Time> {
               const boxH = 13 + 11 + padY * 2 + 2;
               const cx = left + width / 2;
               const boxLeft = Math.max(2, Math.min(mediaSize.width - boxW - 2, cx - boxW / 2));
-              const boxTop = 8;
+              // Position the badge near the bottom of the candle pane so it
+              // doesn't slip under the top-left OHLC/MA legend overlay (which
+              // is a DOM element layered over the canvas top-left corner).
+              const boxTop = Math.max(8, mediaSize.height - boxH - 12);
               ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
               ctx.fillRect(boxLeft, boxTop, boxW, boxH);
               ctx.strokeStyle = 'rgba(15, 23, 42, 0.12)';
