@@ -163,7 +163,7 @@ function drawHeatmap(
   height: number,
 ): void {
   ctx.clearRect(0, 0, width, height);
-  const leaves = root.leaves() as LeafNode[];
+  const leaves = root.leaves() as unknown as LeafNode[];
   for (const leaf of leaves) {
     const x = leaf.x0;
     const y = leaf.y0;
@@ -213,7 +213,7 @@ function findLeafAt(
   x: number,
   y: number,
 ): LeafNode | null {
-  for (const leaf of root.leaves() as LeafNode[]) {
+  for (const leaf of root.leaves() as unknown as LeafNode[]) {
     if (x >= leaf.x0 && x <= leaf.x1 && y >= leaf.y0 && y <= leaf.y1) return leaf;
   }
   return null;
