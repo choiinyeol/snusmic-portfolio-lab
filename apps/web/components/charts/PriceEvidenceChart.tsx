@@ -19,6 +19,7 @@ import {
   type Time,
 } from 'lightweight-charts';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { DragSelectionPrimitive } from '@/components/charts/dragSelectionPrimitive';
 import { formatPercent } from '@/lib/format';
 
 type PricePoint = {
@@ -121,6 +122,7 @@ export function PriceEvidenceChart({
   const chartApiRef = useRef<IChartApi | null>(null);
   const timeScaleRef = useRef<ITimeScaleApi<Time> | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
+  const dragPrimitiveRef = useRef<DragSelectionPrimitive | null>(null);
   measureModeRef.current = measureMode;
   const chartMarkers = useMemo(
     () => buildMarkers(publicationDate, targetHitDate, evidenceMarkers),
@@ -356,10 +358,17 @@ export function PriceEvidenceChart({
     // panning logic — releasing the toggle restores normal pan/zoom.
     chartApiRef.current = chart;
     timeScaleRef.current = timeScale;
+    // Attach the drag-selection primitive to the candle pane so the
+    // measurement band is drawn inside lightweight-charts' own canvas.
+    const dragPrimitive = new DragSelectionPrimitive();
+    dragPrimitiveRef.current = dragPrimitive;
+    chart.panes()[0]?.attachPrimitive(dragPrimitive);
 
     return () => {
       chart.unsubscribeCrosshairMove(handleCrosshairMove);
       timeScale.unsubscribeVisibleTimeRangeChange(updateVerticalLines);
+      chart.panes()[0]?.detachPrimitive(dragPrimitive);
+      dragPrimitiveRef.current = null;
       chartApiRef.current = null;
       timeScaleRef.current = null;
       chart.remove();
@@ -397,6 +406,12 @@ export function PriceEvidenceChart({
       setDrag(null);
     }
   }, [measureMode]);
+
+  // Push drag state into the canvas-native primitive so the band redraws
+  // inside the chart's own coordinate system instead of as a DOM overlay.
+  useEffect(() => {
+    dragPrimitiveRef.current?.setState(drag);
+  }, [drag]);
 
   // Drag-to-measure handlers attached to a transparent overlay div that
   // covers the chart canvas only while measureMode is on. Pointer events go
@@ -448,7 +463,6 @@ export function PriceEvidenceChart({
     dragStartRef.current = null;
   };
 
-  const dragReturnPct = drag && drag.fromPrice ? drag.toPrice / drag.fromPrice - 1 : null;
   return (
     <div className={`chart-shell relative ${measureMode ? 'cursor-crosshair' : ''}`}>
       {activeBar ? <OhlcLegend bar={activeBar} ma={activeMa} currency={currency} targetPrice={targetPrice} /> : null}
@@ -478,24 +492,8 @@ export function PriceEvidenceChart({
         {verticalLines.expiry !== null ? (
           <VerticalLine x={verticalLines.expiry} color="#ef4452" label="만료" position="top" dashed />
         ) : null}
-        {drag ? (
-          <div
-            className="pointer-events-none absolute top-0 bottom-0 z-20 bg-primary/15 ring-2 ring-primary/50"
-            style={{ left: drag.fromX, width: Math.max(1, drag.toX - drag.fromX) }}
-          >
-            {dragReturnPct !== null ? (
-              <div className="absolute left-1/2 top-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-base-100 px-2 py-1 text-xs font-semibold shadow-md ring-1 ring-base-300">
-                <span className={dragReturnPct >= 0 ? 'text-success' : 'text-error'}>
-                  {dragReturnPct >= 0 ? '+' : ''}
-                  {formatPercent(dragReturnPct)}
-                </span>
-                <span className="ml-2 text-base-content/55">
-                  {drag.fromTime} → {drag.toTime}
-                </span>
-              </div>
-            ) : null}
-          </div>
-        ) : null}
+        {/* Drag selection band is rendered by DragSelectionPrimitive inside
+            the chart's own canvas — no DOM overlay needed here. */}
       </div>
       <button
         type="button"
