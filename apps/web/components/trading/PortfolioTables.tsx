@@ -6,18 +6,13 @@ import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
 import type { HoldingRow, ReportTargetDigest } from '@/lib/artifacts';
 import { Money } from '@/components/ui/Money';
 import { formatDays, formatKrw, formatPercent } from '@/lib/format';
-import {
-  PaginationControls,
-  SortHeader,
-  defaultPersonaFor,
-  pageRows,
-  sortRows,
-  useUrlBackedStrategy,
-  type SortState,
-} from './TableControls';
+import { PaginationControls, SortHeader, pageRows, sortRows, type SortState } from './TableControls';
 
 type Props = {
   holdings: HoldingRow[];
+  /** Strategy/persona controlled by the parent — single source of truth so
+   * URL state and inner state cannot drift apart. */
+  persona: string;
   personaLabels: Record<string, string>;
   capitalByPersona: Record<string, number>;
   targetsBySymbol: Record<string, ReportTargetDigest>;
@@ -36,13 +31,10 @@ type HoldingSortKey =
   | 'contribution'
   | 'firstBuy';
 
-export function PortfolioTables({ holdings, personaLabels, capitalByPersona = {}, targetsBySymbol }: Props) {
-  const personas = useMemo(() => Array.from(new Set(holdings.map((row) => row.persona))).sort(), [holdings]);
-  const [persona, setPersona] = useState(() => defaultPersonaFor(personas));
+export function PortfolioTables({ holdings, persona, personaLabels, capitalByPersona = {}, targetsBySymbol }: Props) {
   const [sort, setSort] = useState<SortState<HoldingSortKey>>({ key: 'marketValue', direction: 'desc' });
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(25);
-  useUrlBackedStrategy(persona, setPersona, personas);
   const currentRows = useMemo(
     () =>
       sortRows(
@@ -73,40 +65,15 @@ export function PortfolioTables({ holdings, personaLabels, capitalByPersona = {}
 
   return (
     <div className="grid gap-4">
-      <section className="card border border-base-300 bg-base-100 shadow-sm">
-        <div className="card-body gap-3 p-5">
-          <h2 className="card-title">전략 선택</h2>
-          <div
-            className="tabs tabs-box w-fit max-w-full overflow-x-auto bg-base-200"
-            role="group"
-            aria-label="전략 선택"
-          >
-            {personas.map((item) => (
-              <button
-                type="button"
-                key={item}
-                aria-pressed={persona === item}
-                className={persona === item ? 'tab tab-active font-bold' : 'tab'}
-                onClick={() => {
-                  setPersona(item);
-                  setPage(0);
-                }}
-              >
-                {personaLabels[item] ?? item}
-              </button>
-            ))}
-          </div>
-          <div className="flex flex-wrap gap-2" aria-label="포트폴리오 필터">
-            <button
-              className="btn btn-sm btn-outline"
-              type="button"
-              onClick={() => downloadHoldings(currentRows, targetsBySymbol)}
-            >
-              현재 포트폴리오 CSV
-            </button>
-          </div>
-        </div>
-      </section>
+      <div className="flex justify-end" aria-label="포트폴리오 필터">
+        <button
+          className="btn btn-sm btn-outline"
+          type="button"
+          onClick={() => downloadHoldings(currentRows, targetsBySymbol)}
+        >
+          현재 포트폴리오 CSV
+        </button>
+      </div>
 
       <section className="card border border-base-300 bg-base-100 shadow-sm">
         <div className="card-body gap-2 p-5">

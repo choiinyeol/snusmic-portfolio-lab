@@ -5,19 +5,13 @@ import { useDeferredValue, useMemo, useState } from 'react';
 import type { PositionEpisodeRow, ReportTargetDigest, TradeRow } from '@/lib/artifacts';
 import { Money } from '@/components/ui/Money';
 import { formatDays, formatKrw, formatPercent } from '@/lib/format';
-import {
-  PaginationControls,
-  SortHeader,
-  defaultPersonaFor,
-  pageRows,
-  sortRows,
-  useUrlBackedStrategy,
-  type SortState,
-} from './TableControls';
+import { PaginationControls, SortHeader, pageRows, sortRows, type SortState } from './TableControls';
 
 type Props = {
   trades: TradeRow[];
   episodes: PositionEpisodeRow[];
+  /** Strategy controlled by the parent — single source of truth. */
+  persona: string;
   personaLabels: Record<string, string>;
   capitalByPersona: Record<string, number>;
   reportSymbolsById: Record<string, string>;
@@ -54,14 +48,13 @@ type TradeSortKey =
 export function TradesTable({
   trades,
   episodes,
+  persona,
   personaLabels,
   capitalByPersona = {},
   reportSymbolsById,
   targetsBySymbol,
   targetsByReportId,
 }: Props) {
-  const personas = useMemo(() => Array.from(new Set(trades.map((trade) => trade.persona))).sort(), [trades]);
-  const [persona, setPersona] = useState(() => defaultPersonaFor(personas));
   const [query, setQuery] = useState(() => initialUrlQuery());
   const [side, setSide] = useState('all');
   const [episodeSort, setEpisodeSort] = useState<SortState<EpisodeSortKey>>({ key: 'openDate', direction: 'desc' });
@@ -70,7 +63,6 @@ export function TradesTable({
   const [tradePage, setTradePage] = useState(0);
   const [episodePageSize, setEpisodePageSize] = useState(25);
   const [tradePageSize, setTradePageSize] = useState(50);
-  useUrlBackedStrategy(persona, setPersona, personas);
 
   const deferredQuery = useDeferredValue(query);
   const normalizedQuery = deferredQuery.trim().toLowerCase();
@@ -167,28 +159,6 @@ export function TradesTable({
     <div className="grid gap-4">
       <section className="card border border-base-300 bg-base-100 shadow-sm">
         <div className="card-body gap-3 p-5">
-          <h2 className="card-title">전략 선택</h2>
-          <div
-            className="tabs tabs-box w-fit max-w-full overflow-x-auto bg-base-200"
-            role="group"
-            aria-label="전략 선택"
-          >
-            {personas.map((item) => (
-              <button
-                type="button"
-                key={item}
-                aria-pressed={persona === item}
-                className={persona === item ? 'tab tab-active font-bold' : 'tab'}
-                onClick={() => {
-                  setPersona(item);
-                  setEpisodePage(0);
-                  setTradePage(0);
-                }}
-              >
-                {personaLabels[item] ?? item}
-              </button>
-            ))}
-          </div>
           <div className="flex flex-wrap items-end gap-3" aria-label="매매 필터">
             <label className="form-control">
               <span className="label-text">매수/매도</span>

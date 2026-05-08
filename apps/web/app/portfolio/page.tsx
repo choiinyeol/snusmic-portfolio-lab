@@ -2,8 +2,8 @@ import { PortfolioStrategyView } from '@/components/trading/PortfolioStrategyVie
 import { PageHero } from '@/components/ui/PageHero';
 import {
   getCurrentHoldings,
+  getEquityDaily,
   getLatestReportTargetsBySymbol,
-  getMonthlyHoldings,
   getPersonaLabel,
   getPositionEpisodes,
   getReportSymbolById,
@@ -14,7 +14,7 @@ import {
 
 export default function PortfolioPage() {
   const holdings = getCurrentHoldings();
-  const monthly = getMonthlyHoldings();
+  const equity = getEquityDaily();
   const summaries = getSummaryRows();
   const trades = getTrades();
   const episodes = getPositionEpisodes();
@@ -31,7 +31,7 @@ export default function PortfolioPage() {
       .map((reportId) => [reportId, getReportSymbolById(reportId)])
       .filter((entry): entry is [string, string] => Boolean(entry[1])),
   );
-  const latestMonth = monthly.reduce((latest, row) => (row.monthEnd > latest ? row.monthEnd : latest), '');
+  const latestEquity = equity.reduce((latest, row) => (row.date > latest ? row.date : latest), '');
 
   return (
     <>
@@ -41,13 +41,13 @@ export default function PortfolioPage() {
         badges={[
           { label: '전략', value: `${personas.length}개` },
           { label: '체결', value: trades.length.toLocaleString('ko-KR') },
-          { label: '월말 스냅샷', value: latestMonth || '—' },
+          { label: '최근 평가', value: latestEquity || '—' },
         ]}
       />
 
       <PortfolioStrategyView
         holdings={holdings}
-        monthly={monthly}
+        equity={equity}
         trades={trades}
         episodes={episodes}
         personas={personas}

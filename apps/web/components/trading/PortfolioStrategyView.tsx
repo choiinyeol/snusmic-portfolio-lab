@@ -1,17 +1,17 @@
 'use client';
 
 import { useMemo, useState, useEffect } from 'react';
-import { PortfolioHistory } from '@/components/trading/PortfolioHistory';
+import { DailyEquityHistory } from '@/components/trading/DailyEquityHistory';
 import { PortfolioTables } from '@/components/trading/PortfolioTables';
 import { TradesTable } from '@/components/trading/TradesTable';
 import { KpiTile } from '@/components/ui/KpiTile';
 import { Tabs } from '@/components/ui/Tabs';
-import type { HoldingRow, MonthlyHoldingRow, PositionEpisodeRow, ReportTargetDigest, TradeRow } from '@/lib/artifacts';
+import type { EquityPoint, HoldingRow, PositionEpisodeRow, ReportTargetDigest, TradeRow } from '@/lib/artifacts';
 import { formatKrw, formatPercent } from '@/lib/format';
 
 type Props = {
   holdings: HoldingRow[];
-  monthly: MonthlyHoldingRow[];
+  equity: EquityPoint[];
   trades: TradeRow[];
   episodes: PositionEpisodeRow[];
   personas: string[];
@@ -26,7 +26,7 @@ const URL_STRATEGY_PARAM = 'strategy';
 
 export function PortfolioStrategyView({
   holdings,
-  monthly,
+  equity,
   trades,
   episodes,
   personas,
@@ -121,6 +121,7 @@ export function PortfolioStrategyView({
             content: (
               <PortfolioTables
                 holdings={holdings}
+                persona={persona}
                 personaLabels={personaLabels}
                 capitalByPersona={capitalByPersona}
                 targetsBySymbol={targetsBySymbol}
@@ -129,10 +130,10 @@ export function PortfolioStrategyView({
           },
           {
             id: 'history',
-            label: '월말 히스토리',
-            meta: monthly.filter((row) => row.persona === persona).length.toString(),
+            label: '일별 평가액',
+            meta: equity.filter((row) => row.persona === persona).length.toString(),
             content: (
-              <PortfolioHistory monthly={monthly} personaLabels={personaLabels} targetsBySymbol={targetsBySymbol} />
+              <DailyEquityHistory equity={equity} trades={trades} persona={persona} personaLabels={personaLabels} />
             ),
           },
           {
@@ -143,6 +144,7 @@ export function PortfolioStrategyView({
               <TradesTable
                 trades={trades}
                 episodes={episodes}
+                persona={persona}
                 personaLabels={personaLabels}
                 capitalByPersona={capitalByPersona}
                 reportSymbolsById={reportSymbolsById}
