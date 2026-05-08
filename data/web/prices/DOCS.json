@@ -15880,7 +15880,7 @@
       "currency": "USD",
       "date": "2026-05-06",
       "display_currency": "USD",
-      "high": 25.860000610351562,
+      "high": 25.860000610351566,
       "krw_per_unit": 1473.9599609375,
       "low": 24.799999237060547,
       "open": 25.700000762939453,
@@ -15893,12 +15893,12 @@
       "currency": "USD",
       "date": "2026-05-07",
       "display_currency": "USD",
-      "high": 26.450000762939453,
+      "high": 26.424999237060547,
       "krw_per_unit": 1444.449951171875,
       "low": 25.75,
       "open": 26.059999465942383,
       "source_currency": "USD",
-      "volume": 2171000.0
+      "volume": 1809495.0
     }
   ],
   "symbol": "DOCS"

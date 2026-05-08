@@ -13650,13 +13650,13 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 22867615.4172,
-    "commission_krw": 1168.637,
+    "cash_after_krw": 22864468.3727,
+    "commission_krw": 1169.109,
     "date": "2023-11-01",
     "fill_price_krw": 3146.5725,
-    "gross_krw": 7790913.51,
+    "gross_krw": 7794060.0825,
     "persona": "weak_oracle",
-    "qty": 2476,
+    "qty": 2477,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
@@ -13664,7 +13664,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 10037835.5163,
+    "cash_after_krw": 10034688.4718,
     "commission_krw": 1924.1784,
     "date": "2023-11-01",
     "fill_price_krw": 3536.7675,
@@ -13678,7 +13678,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 6183838.262,
+    "cash_after_krw": 6180691.2175,
     "commission_krw": 578.0129,
     "date": "2023-11-01",
     "fill_price_krw": 36013.2639,
@@ -13692,7 +13692,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 9974.2929,
+    "cash_after_krw": 6827.2484,
     "commission_krw": 925.9407,
     "date": "2023-11-01",
     "fill_price_krw": 54627.7702,
@@ -13706,7 +13706,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 15405659.8644,
+    "cash_after_krw": 15402512.82,
     "commission_krw": 2088.4253,
     "date": "2023-12-01",
     "fill_price_krw": 48175.9,
@@ -13720,7 +13720,7 @@
     "tax_krw": 25061.1032
   },
   {
-    "cash_after_krw": 19285756.192,
+    "cash_after_krw": 19282609.1475,
     "commission_krw": 583.1516,
     "date": "2023-12-01",
     "fill_price_krw": 86392.8289,
@@ -13734,7 +13734,7 @@
     "tax_krw": 6997.8191
   },
   {
-    "cash_after_krw": 19646664.2878,
+    "cash_after_krw": 19643517.2433,
     "commission_krw": 54.242,
     "date": "2023-12-01",
     "fill_price_krw": 27816.4032,
@@ -13748,7 +13748,7 @@
     "tax_krw": 650.9038
   },
   {
-    "cash_after_krw": 20525704.5504,
+    "cash_after_krw": 20522557.5059,
     "commission_krw": 132.1137,
     "date": "2023-12-01",
     "fill_price_krw": 1204.8669,
@@ -13762,7 +13762,7 @@
     "tax_krw": 1585.3639
   },
   {
-    "cash_after_krw": 20908265.3493,
+    "cash_after_krw": 20905118.3048,
     "commission_krw": 57.4962,
     "date": "2023-12-01",
     "fill_price_krw": 76661.65,
@@ -13776,7 +13776,7 @@
     "tax_krw": 689.9549
   },
   {
-    "cash_after_krw": 22843713.751,
+    "cash_after_krw": 22840566.7065,
     "commission_krw": 290.8845,
     "date": "2023-12-01",
     "fill_price_krw": 17791.1,
@@ -13790,7 +13790,7 @@
     "tax_krw": 3490.6138
   },
   {
-    "cash_after_krw": 33868048.5961,
+    "cash_after_krw": 33864901.5516,
     "commission_krw": 1656.8811,
     "date": "2023-12-01",
     "fill_price_krw": 24437.775,
@@ -13804,7 +13804,7 @@
     "tax_krw": 19882.5737
   },
   {
-    "cash_after_krw": 34057184.261,
+    "cash_after_krw": 34054037.2165,
     "commission_krw": 28.4258,
     "date": "2023-12-01",
     "fill_price_krw": 15792.1,
@@ -13818,7 +13818,7 @@
     "tax_krw": 341.1094
   },
   {
-    "cash_after_krw": 35745778.6984,
+    "cash_after_krw": 35742631.6539,
     "commission_krw": 253.784,
     "date": "2023-12-01",
     "fill_price_krw": 7906.045,
@@ -13832,7 +13832,7 @@
     "tax_krw": 3045.4085
   },
   {
-    "cash_after_krw": 36987230.8868,
+    "cash_after_krw": 36984083.8423,
     "commission_krw": 186.5817,
     "date": "2023-12-01",
     "fill_price_krw": 65467.25,
@@ -13846,7 +13846,7 @@
     "tax_krw": 2238.98
   },
   {
-    "cash_after_krw": 40243267.1957,
+    "cash_after_krw": 40240120.1512,
     "commission_krw": 489.3597,
     "date": "2023-12-01",
     "fill_price_krw": 4707.645,
@@ -13860,7 +13860,7 @@
     "tax_krw": 5872.3164
   },
   {
-    "cash_after_krw": 43961638.455,
+    "cash_after_krw": 43958491.4105,
     "commission_krw": 558.8454,
     "date": "2023-12-01",
     "fill_price_krw": 7096.45,
@@ -13874,7 +13874,7 @@
     "tax_krw": 6706.1453
   },
   {
-    "cash_after_krw": 48096886.2668,
+    "cash_after_krw": 48093739.2223,
     "commission_krw": 621.4991,
     "date": "2023-12-01",
     "fill_price_krw": 17631.18,
@@ -13888,7 +13888,7 @@
     "tax_krw": 7457.9891
   },
   {
-    "cash_after_krw": 66544197.4271,
+    "cash_after_krw": 66541050.3826,
     "commission_krw": 2772.5031,
     "date": "2023-12-01",
     "fill_price_krw": 5947.025,
@@ -13902,7 +13902,7 @@
     "tax_krw": 33270.0367
   },
   {
-    "cash_after_krw": 68610325.0065,
+    "cash_after_krw": 68607177.962,
     "commission_krw": 310.5247,
     "date": "2023-12-01",
     "fill_price_krw": 86256.85,
@@ -13916,7 +13916,7 @@
     "tax_krw": 3726.2959
   },
   {
-    "cash_after_krw": 70083907.3067,
+    "cash_after_krw": 70080760.2623,
     "commission_krw": 221.4692,
     "date": "2023-12-01",
     "fill_price_krw": 123038.45,
@@ -13930,7 +13930,7 @@
     "tax_krw": 2657.6305
   },
   {
-    "cash_after_krw": 82357006.3889,
+    "cash_after_krw": 82353859.3444,
     "commission_krw": 1844.5618,
     "date": "2023-12-01",
     "fill_price_krw": 12903.545,
@@ -13944,7 +13944,7 @@
     "tax_krw": 22134.7411
   },
   {
-    "cash_after_krw": 86933770.2622,
+    "cash_after_krw": 86930623.2177,
     "commission_krw": 687.8559,
     "date": "2023-12-01",
     "fill_price_krw": 61969.0,
@@ -13958,7 +13958,7 @@
     "tax_krw": 8254.2708
   },
   {
-    "cash_after_krw": 104514708.4007,
+    "cash_after_krw": 104511561.3562,
     "commission_krw": 2642.2932,
     "date": "2023-12-01",
     "fill_price_krw": 3898.05,
@@ -13972,7 +13972,7 @@
     "tax_krw": 31707.5183
   },
   {
-    "cash_after_krw": 115647573.7842,
+    "cash_after_krw": 115644426.7397,
     "commission_krw": 1673.1925,
     "date": "2023-12-01",
     "fill_price_krw": 40124.5212,
@@ -13986,7 +13986,7 @@
     "tax_krw": 20078.3104
   },
   {
-    "cash_after_krw": 122913529.0605,
+    "cash_after_krw": 122910382.016,
     "commission_krw": 1092.0227,
     "date": "2023-12-01",
     "fill_price_krw": 127721.9574,
@@ -14000,7 +14000,7 @@
     "tax_krw": 13104.2728
   },
   {
-    "cash_after_krw": 119596374.0619,
+    "cash_after_krw": 119593227.0174,
     "commission_krw": 497.4986,
     "date": "2023-12-01",
     "fill_price_krw": 132666.3,
@@ -14014,7 +14014,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 109721802.1111,
+    "cash_after_krw": 109718655.0666,
     "commission_krw": 1480.9636,
     "date": "2023-12-01",
     "fill_price_krw": 8338.7593,
@@ -14028,7 +14028,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 99984676.3612,
+    "cash_after_krw": 99981529.3168,
     "commission_krw": 1460.3498,
     "date": "2023-12-01",
     "fill_price_krw": 30615.3,
@@ -14042,7 +14042,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 96341209.3732,
+    "cash_after_krw": 96338062.3287,
     "commission_krw": 546.4381,
     "date": "2023-12-01",
     "fill_price_krw": 68734.35,
@@ -14056,7 +14056,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 95972569.8855,
+    "cash_after_krw": 95969422.841,
     "commission_krw": 55.2876,
     "date": "2023-12-01",
     "fill_price_krw": 30715.35,
@@ -14070,7 +14070,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 83952861.2496,
+    "cash_after_krw": 83949714.2052,
     "commission_krw": 1802.6859,
     "date": "2023-12-01",
     "fill_price_krw": 106353.15,
@@ -14084,7 +14084,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 77843292.1517,
+    "cash_after_krw": 77840145.1072,
     "commission_krw": 916.2979,
     "date": "2023-12-01",
     "fill_price_krw": 63631.8,
@@ -14098,7 +14098,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 71142939.2495,
+    "cash_after_krw": 71139792.205,
     "commission_krw": 1004.9022,
     "date": "2023-12-01",
     "fill_price_krw": 24012.0,
@@ -14112,13 +14112,13 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 63418040.7485,
-    "commission_krw": 1158.561,
+    "cash_after_krw": 63418055.7583,
+    "commission_krw": 1158.0868,
     "date": "2023-12-01",
     "fill_price_krw": 3161.58,
-    "gross_krw": 7723739.94,
+    "gross_krw": 7720578.36,
     "persona": "weak_oracle",
-    "qty": 2443,
+    "qty": 2442,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
@@ -14126,7 +14126,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 59210705.8189,
+    "cash_after_krw": 59210720.8287,
     "commission_krw": 631.0056,
     "date": "2023-12-01",
     "fill_price_krw": 23766.6888,
@@ -14140,7 +14140,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 50641529.1217,
+    "cash_after_krw": 50641544.1315,
     "commission_krw": 1285.1837,
     "date": "2023-12-01",
     "fill_price_krw": 37414.3734,
@@ -14154,7 +14154,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 30181101.9079,
+    "cash_after_krw": 30181116.9176,
     "commission_krw": 3068.6038,
     "date": "2023-12-01",
     "fill_price_krw": 757679.9485,
@@ -14168,7 +14168,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 23518735.688,
+    "cash_after_krw": 23518750.6978,
     "commission_krw": 999.2051,
     "date": "2023-12-01",
     "fill_price_krw": 48623.1169,
@@ -14182,7 +14182,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 4869492.3934,
+    "cash_after_krw": 4869507.4032,
     "commission_krw": 2796.9669,
     "date": "2023-12-01",
     "fill_price_krw": 72273.0478,
@@ -14196,7 +14196,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 242519.0488,
+    "cash_after_krw": 242534.0586,
     "commission_krw": 693.9419,
     "date": "2023-12-01",
     "fill_price_krw": 58560.4988,
@@ -14210,7 +14210,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 5195254.5788,
+    "cash_after_krw": 5195269.5886,
     "commission_krw": 518.9222,
     "date": "2024-01-02",
     "fill_price_krw": 96096.7089,
@@ -14224,7 +14224,7 @@
     "tax_krw": 6227.0667
   },
   {
-    "cash_after_krw": 8746536.0498,
+    "cash_after_krw": 8746551.0596,
     "commission_krw": 533.733,
     "date": "2024-01-02",
     "fill_price_krw": 142328.8,
@@ -14238,7 +14238,7 @@
     "tax_krw": 6404.796
   },
   {
-    "cash_after_krw": 12502786.8738,
+    "cash_after_krw": 12502801.8835,
     "commission_krw": 564.5385,
     "date": "2024-01-02",
     "fill_price_krw": 8960.9282,
@@ -14252,7 +14252,7 @@
     "tax_krw": 6774.4617
   },
   {
-    "cash_after_krw": 23811723.0121,
+    "cash_after_krw": 23811738.0218,
     "commission_krw": 1699.6547,
     "date": "2024-01-02",
     "fill_price_krw": 35632.175,
@@ -14266,7 +14266,7 @@
     "tax_krw": 20395.857
   },
   {
-    "cash_after_krw": 25847924.0622,
+    "cash_after_krw": 25847939.072,
     "commission_krw": 306.0269,
     "date": "2024-01-02",
     "fill_price_krw": 75562.2,
@@ -14280,7 +14280,7 @@
     "tax_krw": 3672.3229
   },
   {
-    "cash_after_krw": 32495204.7393,
+    "cash_after_krw": 32495219.749,
     "commission_krw": 999.0402,
     "date": "2024-01-02",
     "fill_price_krw": 6166.915,
@@ -14294,7 +14294,7 @@
     "tax_krw": 11988.4828
   },
   {
-    "cash_after_krw": 32839958.3562,
+    "cash_after_krw": 32839973.366,
     "commission_krw": 51.8141,
     "date": "2024-01-02",
     "fill_price_krw": 28785.6,
@@ -14308,7 +14308,7 @@
     "tax_krw": 621.769
   },
   {
-    "cash_after_krw": 37032465.5939,
+    "cash_after_krw": 37032480.6037,
     "commission_krw": 630.1048,
     "date": "2024-01-02",
     "fill_price_krw": 110544.7,
@@ -14322,7 +14322,7 @@
     "tax_krw": 7561.2575
   },
   {
-    "cash_after_krw": 40148216.3093,
+    "cash_after_krw": 40148231.319,
     "commission_krw": 468.2757,
     "date": "2024-01-02",
     "fill_price_krw": 67866.05,
@@ -14336,7 +14336,7 @@
     "tax_krw": 5619.3089
   },
   {
-    "cash_after_krw": 47486201.2814,
+    "cash_after_krw": 47486216.2911,
     "commission_krw": 1102.8483,
     "date": "2024-01-02",
     "fill_price_krw": 122538.7,
@@ -14350,7 +14350,7 @@
     "tax_krw": 13234.1796
   },
   {
-    "cash_after_krw": 55320817.0064,
+    "cash_after_krw": 55320832.0161,
     "commission_krw": 1177.4885,
     "date": "2024-01-02",
     "fill_price_krw": 28135.925,
@@ -14364,7 +14364,7 @@
     "tax_krw": 14129.8615
   },
   {
-    "cash_after_krw": 56895850.2408,
+    "cash_after_krw": 56895865.2505,
     "commission_krw": 236.7166,
     "date": "2024-01-02",
     "fill_price_krw": 83058.45,
@@ -14378,7 +14378,7 @@
     "tax_krw": 2840.599
   },
   {
-    "cash_after_krw": 74536347.1603,
+    "cash_after_krw": 74536362.17,
     "commission_krw": 2651.2445,
     "date": "2024-01-02",
     "fill_price_krw": 3593.2025,
@@ -14392,7 +14392,7 @@
     "tax_krw": 31814.9336
   },
   {
-    "cash_after_krw": 76007177.8545,
+    "cash_after_krw": 76007192.8643,
     "commission_krw": 221.0557,
     "date": "2024-01-02",
     "fill_price_krw": 28896.1651,
@@ -14406,7 +14406,7 @@
     "tax_krw": 2652.668
   },
   {
-    "cash_after_krw": 77502228.7973,
+    "cash_after_krw": 77502243.807,
     "commission_krw": 224.6958,
     "date": "2024-01-02",
     "fill_price_krw": 39420.3155,
@@ -14420,7 +14420,7 @@
     "tax_krw": 2696.3496
   },
   {
-    "cash_after_krw": 95895915.841,
+    "cash_after_krw": 95895930.8507,
     "commission_krw": 2764.4437,
     "date": "2024-01-02",
     "fill_price_krw": 80831.6878,
@@ -14434,7 +14434,7 @@
     "tax_krw": 33173.3247
   },
   {
-    "cash_after_krw": 96602626.8381,
+    "cash_after_krw": 96602641.8479,
     "commission_krw": 106.2138,
     "date": "2024-01-02",
     "fill_price_krw": 59007.648,
@@ -14448,7 +14448,7 @@
     "tax_krw": 1274.5652
   },
   {
-    "cash_after_krw": 93795202.9877,
+    "cash_after_krw": 93795217.9975,
     "commission_krw": 421.0504,
     "date": "2024-01-02",
     "fill_price_krw": 50125.05,
@@ -14462,7 +14462,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 89164984.1216,
+    "cash_after_krw": 89164999.1314,
     "commission_krw": 694.4287,
     "date": "2024-01-02",
     "fill_price_krw": 25863.265,
@@ -14476,7 +14476,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 87972695.6852,
+    "cash_after_krw": 87972710.6949,
     "commission_krw": 178.8164,
     "date": "2024-01-02",
     "fill_price_krw": 1177.9739,
@@ -14490,7 +14490,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 87492183.5192,
+    "cash_after_krw": 87492198.5289,
     "commission_krw": 72.066,
     "date": "2024-01-02",
     "fill_price_krw": 68634.3,
@@ -14504,13 +14504,13 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 84332690.9464,
-    "commission_krw": 473.8528,
+    "cash_after_krw": 84326722.0687,
+    "commission_krw": 474.7503,
     "date": "2024-01-02",
     "fill_price_krw": 5982.99,
-    "gross_krw": 3159018.72,
+    "gross_krw": 3165001.71,
     "persona": "weak_oracle",
-    "qty": 528,
+    "qty": 529,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
@@ -14518,7 +14518,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 79775910.6218,
+    "cash_after_krw": 79769941.7441,
     "commission_krw": 683.4145,
     "date": "2024-01-02",
     "fill_price_krw": 9374.685,
@@ -14532,7 +14532,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 75604220.4722,
+    "cash_after_krw": 75598251.5945,
     "commission_krw": 625.6597,
     "date": "2024-01-02",
     "fill_price_krw": 10075.035,
@@ -14546,7 +14546,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 69247590.8707,
+    "cash_after_krw": 69241621.993,
     "commission_krw": 953.3514,
     "date": "2024-01-02",
     "fill_price_krw": 84742.35,
@@ -14560,7 +14560,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 60994133.9904,
+    "cash_after_krw": 60988165.1127,
     "commission_krw": 1237.8329,
     "date": "2024-01-02",
     "fill_price_krw": 4817.4075,
@@ -14574,7 +14574,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 57934096.0285,
+    "cash_after_krw": 57928127.1508,
     "commission_krw": 458.9369,
     "date": "2024-01-02",
     "fill_price_krw": 27563.775,
@@ -14588,7 +14588,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 55148286.2197,
+    "cash_after_krw": 55142317.342,
     "commission_krw": 417.8088,
     "date": "2024-01-02",
     "fill_price_krw": 7253.625,
@@ -14602,7 +14602,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 52490119.3345,
+    "cash_after_krw": 52484150.4568,
     "commission_krw": 398.6652,
     "date": "2024-01-02",
     "fill_price_krw": 16928.46,
@@ -14616,7 +14616,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 43512587.0566,
+    "cash_after_krw": 43506618.1789,
     "commission_krw": 1346.4279,
     "date": "2024-01-02",
     "fill_price_krw": 122961.45,
@@ -14630,7 +14630,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 41990097.9675,
+    "cash_after_krw": 41984129.0898,
     "commission_krw": 228.3391,
     "date": "2024-01-02",
     "fill_price_krw": 44772.375,
@@ -14644,7 +14644,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 40787816.9024,
+    "cash_after_krw": 40781848.0247,
     "commission_krw": 180.3151,
     "date": "2024-01-02",
     "fill_price_krw": 80140.05,
@@ -14658,7 +14658,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 36894767.7726,
+    "cash_after_krw": 36888798.8949,
     "commission_krw": 583.8698,
     "date": "2024-01-02",
     "fill_price_krw": 12846.42,
@@ -14672,7 +14672,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 33533674.2292,
+    "cash_after_krw": 33527705.3515,
     "commission_krw": 504.0884,
     "date": "2024-01-02",
     "fill_price_krw": 3831.915,
@@ -14686,7 +14686,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 26249674.6158,
+    "cash_after_krw": 26243705.7382,
     "commission_krw": 1092.4361,
     "date": "2024-01-02",
     "fill_price_krw": 43872.9348,
@@ -14700,7 +14700,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 19792437.6284,
+    "cash_after_krw": 19786468.7507,
     "commission_krw": 968.4403,
     "date": "2024-01-02",
     "fill_price_krw": 189890.2514,
@@ -14714,7 +14714,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 11360581.1541,
+    "cash_after_krw": 11354612.2764,
     "commission_krw": 1264.5888,
     "date": "2024-01-02",
     "fill_price_krw": 766417.4441,
@@ -14728,7 +14728,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 4990155.8076,
+    "cash_after_krw": 4984186.9299,
     "commission_krw": 955.4205,
     "date": "2024-01-02",
     "fill_price_krw": 49761.4838,
@@ -14742,7 +14742,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 127671.494,
+    "cash_after_krw": 121702.6163,
     "commission_krw": 729.2633,
     "date": "2024-01-02",
     "fill_price_krw": 131398.7851,
@@ -14756,7 +14756,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 4867717.0608,
+    "cash_after_krw": 4861748.1831,
     "commission_krw": 486.9564,
     "date": "2024-02-01",
     "fill_price_krw": 57971.0,
@@ -14770,7 +14770,7 @@
     "tax_krw": 5843.4768
   },
   {
-    "cash_after_krw": 8737217.2928,
+    "cash_after_krw": 8731248.4151,
     "commission_krw": 581.5591,
     "date": "2024-02-01",
     "fill_price_krw": 86156.9,
@@ -14784,21 +14784,21 @@
     "tax_krw": 6978.7089
   },
   {
-    "cash_after_krw": 12044936.7177,
-    "commission_krw": 497.1273,
+    "cash_after_krw": 12045232.4602,
+    "commission_krw": 498.0688,
     "date": "2024-02-01",
     "fill_price_krw": 6276.86,
-    "gross_krw": 3314182.08,
+    "gross_krw": 3320458.94,
     "persona": "weak_oracle",
-    "qty": 528,
+    "qty": 529,
     "reason": "rebalance_sell",
     "report_id": "",
     "side": "sell",
     "symbol": "043650.KQ",
-    "tax_krw": 5965.5277
+    "tax_krw": 5976.8261
   },
   {
-    "cash_after_krw": 16750085.4015,
+    "cash_after_krw": 16750381.1439,
     "commission_krw": 707.1512,
     "date": "2024-02-01",
     "fill_price_krw": 10094.95,
@@ -14812,7 +14812,7 @@
     "tax_krw": 8485.815
   },
   {
-    "cash_after_krw": 20586726.3044,
+    "cash_after_krw": 20587022.0468,
     "commission_krw": 576.6205,
     "date": "2024-02-01",
     "fill_price_krw": 9285.355,
@@ -14826,7 +14826,7 @@
     "tax_krw": 6919.4465
   },
   {
-    "cash_after_krw": 34664165.6636,
+    "cash_after_krw": 34664461.406,
     "commission_krw": 2115.7416,
     "date": "2024-02-01",
     "fill_price_krw": 100749.6,
@@ -14840,7 +14840,7 @@
     "tax_krw": 25388.8992
   },
   {
-    "cash_after_krw": 54723120.1791,
+    "cash_after_krw": 54723415.9215,
     "commission_krw": 3014.7219,
     "date": "2024-02-01",
     "fill_price_krw": 5297.35,
@@ -14854,7 +14854,7 @@
     "tax_krw": 36176.6626
   },
   {
-    "cash_after_krw": 57701707.6354,
+    "cash_after_krw": 57702003.3778,
     "commission_krw": 447.6611,
     "date": "2024-02-01",
     "fill_price_krw": 26886.55,
@@ -14868,7 +14868,7 @@
     "tax_krw": 5371.9327
   },
   {
-    "cash_after_krw": 63459638.245,
+    "cash_after_krw": 63459933.9874,
     "commission_krw": 865.3771,
     "date": "2024-02-01",
     "fill_price_krw": 7712.8082,
@@ -14882,7 +14882,7 @@
     "tax_krw": 10384.5249
   },
   {
-    "cash_after_krw": 71739411.0926,
+    "cash_after_krw": 71739706.835,
     "commission_krw": 1244.3925,
     "date": "2024-02-01",
     "fill_price_krw": 113643.15,
@@ -14896,7 +14896,7 @@
     "tax_krw": 14932.7099
   },
   {
-    "cash_after_krw": 75344360.8061,
+    "cash_after_krw": 75344656.5485,
     "commission_krw": 541.799,
     "date": "2024-02-01",
     "fill_price_krw": 63368.3,
@@ -14910,7 +14910,7 @@
     "tax_krw": 6501.5876
   },
   {
-    "cash_after_krw": 79698471.3017,
+    "cash_after_krw": 79698767.0442,
     "commission_krw": 654.3926,
     "date": "2024-02-01",
     "fill_price_krw": 99150.4,
@@ -14924,7 +14924,7 @@
     "tax_krw": 7852.7117
   },
   {
-    "cash_after_krw": 89817229.3718,
+    "cash_after_krw": 89817525.1142,
     "commission_krw": 1520.7792,
     "date": "2024-02-01",
     "fill_price_krw": 128335.8,
@@ -14938,7 +14938,7 @@
     "tax_krw": 18249.3508
   },
   {
-    "cash_after_krw": 101518242.9453,
+    "cash_after_krw": 101518538.6877,
     "commission_krw": 1758.5813,
     "date": "2024-02-01",
     "fill_price_krw": 14402.795,
@@ -14952,7 +14952,7 @@
     "tax_krw": 21102.9752
   },
   {
-    "cash_after_krw": 109453960.4616,
+    "cash_after_krw": 109454256.204,
     "commission_krw": 1192.6834,
     "date": "2024-02-01",
     "fill_price_krw": 180709.6,
@@ -14966,7 +14966,7 @@
     "tax_krw": 14312.2003
   },
   {
-    "cash_after_krw": 126150472.4546,
+    "cash_after_krw": 126150768.1971,
     "commission_krw": 2509.3701,
     "date": "2024-02-01",
     "fill_price_krw": 44730.3043,
@@ -14980,7 +14980,7 @@
     "tax_krw": 30112.4408
   },
   {
-    "cash_after_krw": 133020728.0654,
+    "cash_after_krw": 133021023.8078,
     "commission_krw": 1032.5518,
     "date": "2024-02-01",
     "fill_price_krw": 202461.1407,
@@ -14994,7 +14994,7 @@
     "tax_krw": 12390.6218
   },
   {
-    "cash_after_krw": 145745430.0592,
+    "cash_after_krw": 145745725.8016,
     "commission_krw": 1912.4345,
     "date": "2024-02-01",
     "fill_price_krw": 42783.7706,
@@ -15008,7 +15008,7 @@
     "tax_krw": 22949.2146
   },
   {
-    "cash_after_krw": 168594144.6559,
+    "cash_after_krw": 168594440.3983,
     "commission_krw": 3434.0035,
     "date": "2024-02-01",
     "fill_price_krw": 880513.717,
@@ -15022,7 +15022,7 @@
     "tax_krw": 41208.042
   },
   {
-    "cash_after_krw": 189236573.4281,
+    "cash_after_krw": 189236869.1705,
     "commission_krw": 3102.414,
     "date": "2024-02-01",
     "fill_price_krw": 90713.8603,
@@ -15036,7 +15036,7 @@
     "tax_krw": 37228.9683
   },
   {
-    "cash_after_krw": 194819194.0301,
+    "cash_after_krw": 194819489.7725,
     "commission_krw": 839.0292,
     "date": "2024-02-01",
     "fill_price_krw": 151176.4319,
@@ -15050,7 +15050,7 @@
     "tax_krw": 10068.3504
   },
   {
-    "cash_after_krw": 200120237.1612,
+    "cash_after_krw": 200120532.9036,
     "commission_krw": 796.7101,
     "date": "2024-02-01",
     "fill_price_krw": 79274.6323,
@@ -15064,7 +15064,7 @@
     "tax_krw": 9560.5207
   },
   {
-    "cash_after_krw": 187217751.179,
+    "cash_after_krw": 187218046.9214,
     "commission_krw": 1935.0826,
     "date": "2024-02-01",
     "fill_price_krw": 25545.6453,
@@ -15078,7 +15078,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 180484496.9083,
+    "cash_after_krw": 180484792.6507,
     "commission_krw": 1009.8367,
     "date": "2024-02-01",
     "fill_price_krw": 976.9619,
@@ -15092,7 +15092,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 143916069.3866,
+    "cash_after_krw": 143916365.129,
     "commission_krw": 5484.4415,
     "date": "2024-02-01",
     "fill_price_krw": 7612.522,
@@ -15106,7 +15106,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 135910468.5266,
+    "cash_after_krw": 135910764.269,
     "commission_krw": 1200.66,
     "date": "2024-02-01",
     "fill_price_krw": 67833.9,
@@ -15120,7 +15120,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 125977505.5506,
+    "cash_after_krw": 125977801.293,
     "commission_krw": 1489.721,
     "date": "2024-02-01",
     "fill_price_krw": 12716.355,
@@ -15134,7 +15134,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 118346548.0786,
+    "cash_after_krw": 118346843.8211,
     "commission_krw": 1144.4719,
     "date": "2024-02-01",
     "fill_price_krw": 23261.625,
@@ -15148,7 +15148,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 105102273.9005,
+    "cash_after_krw": 105102569.6429,
     "commission_krw": 1986.3432,
     "date": "2024-02-01",
     "fill_price_krw": 10435.215,
@@ -15162,7 +15162,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 102512791.6364,
+    "cash_after_krw": 102513087.3788,
     "commission_krw": 388.3641,
     "date": "2024-02-01",
     "fill_price_krw": 9084.54,
@@ -15176,7 +15176,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 100816684.6403,
+    "cash_after_krw": 100816980.3828,
     "commission_krw": 254.3779,
     "date": "2024-02-01",
     "fill_price_krw": 9975.6036,
@@ -15190,7 +15190,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 98359168.1081,
+    "cash_after_krw": 98359463.8506,
     "commission_krw": 368.5722,
     "date": "2024-02-01",
     "fill_price_krw": 15167.58,
@@ -15204,7 +15204,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 97842082.1819,
+    "cash_after_krw": 97842377.9243,
     "commission_krw": 77.5513,
     "date": "2024-02-01",
     "fill_price_krw": 39769.875,
@@ -15218,7 +15218,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 89740418.9147,
+    "cash_after_krw": 89740714.6571,
     "commission_krw": 1215.0672,
     "date": "2024-02-01",
     "fill_price_krw": 103851.9,
@@ -15232,7 +15232,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 87887365.0733,
+    "cash_after_krw": 87887660.8157,
     "commission_krw": 277.9164,
     "date": "2024-02-01",
     "fill_price_krw": 24062.025,
@@ -15246,7 +15246,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 80586321.931,
+    "cash_after_krw": 80586617.6735,
     "commission_krw": 1094.9922,
     "date": "2024-02-01",
     "fill_price_krw": 7373.685,
@@ -15260,7 +15260,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 52590194.1717,
+    "cash_after_krw": 52590489.9141,
     "commission_krw": 4198.7893,
     "date": "2024-02-01",
     "fill_price_krw": 3941.97,
@@ -15274,7 +15274,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 46025626.2758,
+    "cash_after_krw": 46025922.0183,
     "commission_krw": 984.5375,
     "date": "2024-02-01",
     "fill_price_krw": 12478.2954,
@@ -15288,7 +15288,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 39001228.0605,
+    "cash_after_krw": 39001523.8029,
     "commission_krw": 1053.5017,
     "date": "2024-02-01",
     "fill_price_krw": 23888.9276,
@@ -15302,7 +15302,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 602430.096,
+    "cash_after_krw": 602725.8384,
     "commission_krw": 5758.9559,
     "date": "2024-02-01",
     "fill_price_krw": 661948.9484,
@@ -15316,7 +15316,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 116264.1906,
+    "cash_after_krw": 116559.933,
     "commission_krw": 72.9139,
     "date": "2024-02-01",
     "fill_price_krw": 54010.3324,
@@ -15330,7 +15330,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 10779132.9116,
+    "cash_after_krw": 10779428.654,
     "commission_krw": 1377.1157,
     "date": "2024-03-01",
     "fill_price_krw": 1161.6818,
@@ -15344,7 +15344,7 @@
     "tax_krw": 16525.3882
   },
   {
-    "cash_after_krw": 13549680.4689,
+    "cash_after_krw": 13549976.2113,
     "commission_krw": 416.3941,
     "date": "2024-03-01",
     "fill_price_krw": 89547.1187,
@@ -15358,7 +15358,7 @@
     "tax_krw": 4996.7292
   },
   {
-    "cash_after_krw": 132940.1927,
+    "cash_after_krw": 133235.9351,
     "commission_krw": 2012.2092,
     "date": "2024-03-01",
     "fill_price_krw": 8250.1403,
@@ -15372,7 +15372,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 23.4844,
+    "cash_after_krw": 319.2268,
     "commission_krw": 19.9345,
     "date": "2024-03-01",
     "fill_price_krw": 11074.7311,
@@ -15386,7 +15386,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 6318398.2369,
+    "cash_after_krw": 6318693.9794,
     "commission_krw": 724.1683,
     "date": "2024-04-01",
     "fill_price_krw": 24885.51,
@@ -15400,7 +15400,7 @@
     "tax_krw": 8690.0201
   },
   {
-    "cash_after_krw": 36390954.8529,
+    "cash_after_krw": 36391250.5953,
     "commission_krw": 4519.6969,
     "date": "2024-04-01",
     "fill_price_krw": 9638.9356,
@@ -15414,7 +15414,7 @@
     "tax_krw": 54236.3628
   },
   {
-    "cash_after_krw": 50240952.5898,
+    "cash_after_krw": 50241248.3322,
     "commission_krw": 2081.5587,
     "date": "2024-04-01",
     "fill_price_krw": 77961.0,
@@ -15428,7 +15428,7 @@
     "tax_krw": 24978.7044
   },
   {
-    "cash_after_krw": 59901635.2521,
+    "cash_after_krw": 59901930.9945,
     "commission_krw": 1451.9337,
     "date": "2024-04-01",
     "fill_price_krw": 12393.8,
@@ -15442,7 +15442,7 @@
     "tax_krw": 17423.204
   },
   {
-    "cash_after_krw": 68146992.591,
+    "cash_after_krw": 68147288.3335,
     "commission_krw": 1239.2201,
     "date": "2024-04-01",
     "fill_price_krw": 25187.4,
@@ -15456,7 +15456,7 @@
     "tax_krw": 14870.641
   },
   {
-    "cash_after_krw": 80780596.62,
+    "cash_after_krw": 80780892.3625,
     "commission_krw": 1898.7432,
     "date": "2024-04-01",
     "fill_price_krw": 9975.01,
@@ -15470,7 +15470,7 @@
     "tax_krw": 22784.9178
   },
   {
-    "cash_after_krw": 81068120.7376,
+    "cash_after_krw": 81068416.48,
     "commission_krw": 43.2129,
     "date": "2024-04-01",
     "fill_price_krw": 15162.415,
@@ -15484,7 +15484,7 @@
     "tax_krw": 518.5546
   },
   {
-    "cash_after_krw": 88175471.6866,
+    "cash_after_krw": 88175767.429,
     "commission_krw": 1068.1856,
     "date": "2024-04-01",
     "fill_price_krw": 9728.4663,
@@ -15498,7 +15498,7 @@
     "tax_krw": 12818.2273
   },
   {
-    "cash_after_krw": 99538774.353,
+    "cash_after_krw": 99539070.0954,
     "commission_krw": 1707.8257,
     "date": "2024-04-01",
     "fill_price_krw": 24537.725,
@@ -15512,7 +15512,7 @@
     "tax_krw": 20493.9079
   },
   {
-    "cash_after_krw": 101873642.1651,
+    "cash_after_krw": 101873937.9075,
     "commission_krw": 350.9145,
     "date": "2024-04-01",
     "fill_price_krw": 49775.1,
@@ -15526,7 +15526,7 @@
     "tax_krw": 4210.9735
   },
   {
-    "cash_after_krw": 103042073.6221,
+    "cash_after_krw": 103042369.3645,
     "commission_krw": 175.6072,
     "date": "2024-04-01",
     "fill_price_krw": 90054.95,
@@ -15540,7 +15540,7 @@
     "tax_krw": 2107.2858
   },
   {
-    "cash_after_krw": 104270058.8723,
+    "cash_after_krw": 104270354.6147,
     "commission_krw": 184.5577,
     "date": "2024-04-01",
     "fill_price_krw": 123038.45,
@@ -15554,7 +15554,7 @@
     "tax_krw": 2214.6921
   },
   {
-    "cash_after_krw": 106178822.7854,
+    "cash_after_krw": 106179118.5278,
     "commission_krw": 286.874,
     "date": "2024-04-01",
     "fill_price_krw": 24837.575,
@@ -15568,7 +15568,7 @@
     "tax_krw": 3442.4879
   },
   {
-    "cash_after_krw": 114385574.9016,
+    "cash_after_krw": 114385870.6441,
     "commission_krw": 1233.418,
     "date": "2024-04-01",
     "fill_price_krw": 8305.845,
@@ -15582,7 +15582,7 @@
     "tax_krw": 14801.0158
   },
   {
-    "cash_after_krw": 146296322.8205,
+    "cash_after_krw": 146296618.5629,
     "commission_krw": 4795.9643,
     "date": "2024-04-01",
     "fill_price_krw": 4827.585,
@@ -15596,7 +15596,7 @@
     "tax_krw": 57551.5718
   },
   {
-    "cash_after_krw": 158544360.0142,
+    "cash_after_krw": 158544655.7567,
     "commission_krw": 1840.7951,
     "date": "2024-04-01",
     "fill_price_krw": 1022663.9609,
@@ -15610,7 +15610,7 @@
     "tax_krw": 22089.5416
   },
   {
-    "cash_after_krw": 146316416.0977,
+    "cash_after_krw": 146316711.8402,
     "commission_krw": 1833.9165,
     "date": "2024-04-01",
     "fill_price_krw": 130065.0,
@@ -15624,7 +15624,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 109680615.5518,
+    "cash_after_krw": 109680911.2943,
     "commission_krw": 5494.5459,
     "date": "2024-04-01",
     "fill_price_krw": 108054.0,
@@ -15638,7 +15638,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 107864435.6657,
+    "cash_after_krw": 107864731.4081,
     "commission_krw": 272.3861,
     "date": "2024-04-01",
     "fill_price_krw": 181590.75,
@@ -15652,7 +15652,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 92195008.5497,
+    "cash_after_krw": 92195304.2921,
     "commission_krw": 2350.0616,
     "date": "2024-04-01",
     "fill_price_krw": 15021.1669,
@@ -15666,7 +15666,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 75083521.1782,
+    "cash_after_krw": 75083816.9206,
     "commission_krw": 2566.3382,
     "date": "2024-04-01",
     "fill_price_krw": 21656.8621,
@@ -15680,7 +15680,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 49487249.1897,
+    "cash_after_krw": 49487544.9321,
     "commission_krw": 3838.865,
     "date": "2024-04-01",
     "fill_price_krw": 43973.2528,
@@ -15694,7 +15694,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 24576.0654,
+    "cash_after_krw": 24871.8079,
     "commission_krw": 7418.2882,
     "date": "2024-04-01",
     "fill_price_krw": 71364.0041,
@@ -15708,7 +15708,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 11253898.4962,
+    "cash_after_krw": 11254194.2386,
     "commission_krw": 1462.2498,
     "date": "2024-05-01",
     "fill_price_krw": 17628.0862,
@@ -15722,7 +15722,7 @@
     "tax_krw": 17546.997
   },
   {
-    "cash_after_krw": 19142073.3218,
+    "cash_after_krw": 19142369.0642,
     "commission_krw": 1185.538,
     "date": "2024-05-01",
     "fill_price_krw": 86852.6024,
@@ -15736,7 +15736,7 @@
     "tax_krw": 14226.4563
   },
   {
-    "cash_after_krw": 36165.8375,
+    "cash_after_krw": 36461.5799,
     "commission_krw": 2865.4563,
     "date": "2024-05-01",
     "fill_price_krw": 88440.0094,
@@ -15750,7 +15750,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 15301.11,
+    "cash_after_krw": 15596.8524,
     "commission_krw": 3.1292,
     "date": "2024-05-01",
     "fill_price_krw": 20861.5983,
@@ -15764,7 +15764,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 51550521.6012,
+    "cash_after_krw": 51550817.3436,
     "commission_krw": 7519.947,
     "date": "2024-06-03",
     "fill_price_krw": 10440.0208,
@@ -15778,7 +15778,7 @@
     "tax_krw": 90239.3636
   },
   {
-    "cash_after_krw": 55351639.7139,
+    "cash_after_krw": 55351935.4563,
     "commission_krw": 571.2817,
     "date": "2024-06-03",
     "fill_price_krw": 13363.315,
@@ -15792,7 +15792,7 @@
     "tax_krw": 6855.3806
   },
   {
-    "cash_after_krw": 56097037.3232,
+    "cash_after_krw": 56097333.0656,
     "commission_krw": 112.0281,
     "date": "2024-06-03",
     "fill_price_krw": 13579.1632,
@@ -15806,7 +15806,7 @@
     "tax_krw": 1344.3372
   },
   {
-    "cash_after_krw": 71916001.1746,
+    "cash_after_krw": 71916296.917,
     "commission_krw": 2377.4807,
     "date": "2024-06-03",
     "fill_price_krw": 168615.65,
@@ -15820,7 +15820,7 @@
     "tax_krw": 28529.768
   },
   {
-    "cash_after_krw": 127848983.6081,
+    "cash_after_krw": 127849279.3505,
     "commission_krw": 8406.3397,
     "date": "2024-06-03",
     "fill_price_krw": 130634.65,
@@ -15834,7 +15834,7 @@
     "tax_krw": 100876.0767
   },
   {
-    "cash_after_krw": 162102888.9877,
+    "cash_after_krw": 162103184.7301,
     "commission_krw": 5148.1246,
     "date": "2024-06-03",
     "fill_price_krw": 290854.5,
@@ -15848,7 +15848,7 @@
     "tax_krw": 61777.4958
   },
   {
-    "cash_after_krw": 173194937.593,
+    "cash_after_krw": 173195233.3354,
     "commission_krw": 1667.0581,
     "date": "2024-06-03",
     "fill_price_krw": 5237.38,
@@ -15862,7 +15862,7 @@
     "tax_krw": 20004.6966
   },
   {
-    "cash_after_krw": 195261357.8334,
+    "cash_after_krw": 195261653.5759,
     "commission_krw": 3316.4301,
     "date": "2024-06-03",
     "fill_price_krw": 102358.9529,
@@ -15876,7 +15876,7 @@
     "tax_krw": 39797.1609
   },
   {
-    "cash_after_krw": 212387068.1972,
+    "cash_after_krw": 212387363.9396,
     "commission_krw": 2573.8756,
     "date": "2024-06-03",
     "fill_price_krw": 20306.7109,
@@ -15890,7 +15890,7 @@
     "tax_krw": 30886.5073
   },
   {
-    "cash_after_krw": 247680798.4066,
+    "cash_after_krw": 247681094.149,
     "commission_krw": 5304.4031,
     "date": "2024-06-03",
     "fill_price_krw": 30750.163,
@@ -15904,7 +15904,7 @@
     "tax_krw": 63652.8374
   },
   {
-    "cash_after_krw": 277658919.9477,
+    "cash_after_krw": 277659215.6901,
     "commission_krw": 4505.504,
     "date": "2024-06-03",
     "fill_price_krw": 51609.4383,
@@ -15918,7 +15918,7 @@
     "tax_krw": 54066.0476
   },
   {
-    "cash_after_krw": 306247474.7034,
+    "cash_after_krw": 306247770.4458,
     "commission_krw": 4296.6617,
     "date": "2024-06-03",
     "fill_price_krw": 95800.7069,
@@ -15932,7 +15932,7 @@
     "tax_krw": 51559.9404
   },
   {
-    "cash_after_krw": 266394146.5715,
+    "cash_after_krw": 266394442.314,
     "commission_krw": 5977.1027,
     "date": "2024-06-03",
     "fill_price_krw": 22913.9454,
@@ -15946,13 +15946,13 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 168596612.1415,
-    "commission_krw": 14667.43,
+    "cash_after_krw": 168606664.2222,
+    "commission_krw": 14665.9668,
     "date": "2024-06-03",
     "fill_price_krw": 9754.875,
-    "gross_krw": 97782867.0,
+    "gross_krw": 97773112.125,
     "persona": "weak_oracle",
-    "qty": 10024,
+    "qty": 10023,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
@@ -15960,7 +15960,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 156806457.6361,
+    "cash_after_krw": 156816509.7167,
     "commission_krw": 1768.2579,
     "date": "2024-06-03",
     "fill_price_krw": 4387.1925,
@@ -15974,7 +15974,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 130729866.9091,
+    "cash_after_krw": 130739918.9897,
     "commission_krw": 3910.902,
     "date": "2024-06-03",
     "fill_price_krw": 10055.025,
@@ -15988,7 +15988,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 118312093.5652,
+    "cash_after_krw": 118322145.6459,
     "commission_krw": 1862.3866,
     "date": "2024-06-03",
     "fill_price_krw": 2030.0705,
@@ -16002,7 +16002,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 113333859.4421,
+    "cash_after_krw": 113343911.5227,
     "commission_krw": 746.6231,
     "date": "2024-06-03",
     "fill_price_krw": 199099.5,
@@ -16016,7 +16016,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 108252158.1012,
+    "cash_after_krw": 108262210.1818,
     "commission_krw": 762.1409,
     "date": "2024-06-03",
     "fill_price_krw": 55227.6,
@@ -16030,7 +16030,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 96855213.635,
+    "cash_after_krw": 96865265.7156,
     "commission_krw": 1709.2853,
     "date": "2024-06-03",
     "fill_price_krw": 65115.6296,
@@ -16044,7 +16044,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 96111420.2559,
+    "cash_after_krw": 96121472.3366,
     "commission_krw": 111.5523,
     "date": "2024-06-03",
     "fill_price_krw": 743681.8268,
@@ -16058,7 +16058,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 18089.6894,
+    "cash_after_krw": 28141.7701,
     "commission_krw": 14411.8378,
     "date": "2024-06-03",
     "fill_price_krw": 29481.1042,
@@ -16072,21 +16072,21 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 99312720.2093,
-    "commission_krw": 14697.8554,
+    "cash_after_krw": 99313016.2414,
+    "commission_krw": 14696.3891,
     "date": "2024-07-01",
     "fill_price_krw": 9775.11,
-    "gross_krw": 97985702.64,
+    "gross_krw": 97975927.53,
     "persona": "weak_oracle",
-    "qty": 10024,
+    "qty": 10023,
     "reason": "rebalance_sell",
     "report_id": "",
     "side": "sell",
     "symbol": "032640.KS",
-    "tax_krw": 176374.2648
+    "tax_krw": 176356.6696
   },
   {
-    "cash_after_krw": 109793140.3852,
+    "cash_after_krw": 109793436.4174,
     "commission_krw": 1575.1345,
     "date": "2024-07-01",
     "fill_price_krw": 5547.225,
@@ -16100,7 +16100,7 @@
     "tax_krw": 18901.6145
   },
   {
-    "cash_after_krw": 117267051.6532,
+    "cash_after_krw": 117267347.6853,
     "commission_krw": 1123.2771,
     "date": "2024-07-01",
     "fill_price_krw": 11574.21,
@@ -16114,7 +16114,7 @@
     "tax_krw": 13479.325
   },
   {
-    "cash_after_krw": 124187561.5423,
+    "cash_after_krw": 124187857.5744,
     "commission_krw": 1040.1047,
     "date": "2024-07-01",
     "fill_price_krw": 277361.25,
@@ -16128,7 +16128,7 @@
     "tax_krw": 12481.2562
   },
   {
-    "cash_after_krw": 126324305.096,
+    "cash_after_krw": 126324601.1281,
     "commission_krw": 321.1378,
     "date": "2024-07-01",
     "fill_price_krw": 35097.022,
@@ -16142,7 +16142,7 @@
     "tax_krw": 3853.653
   },
   {
-    "cash_after_krw": 145424354.8667,
+    "cash_after_krw": 145424650.8988,
     "commission_krw": 2870.6051,
     "date": "2024-07-01",
     "fill_price_krw": 35704.0441,
@@ -16156,7 +16156,7 @@
     "tax_krw": 34447.2617
   },
   {
-    "cash_after_krw": 146379792.4813,
+    "cash_after_krw": 146380088.5134,
     "commission_krw": 143.5957,
     "date": "2024-07-01",
     "fill_price_krw": 95730.4358,
@@ -16170,7 +16170,7 @@
     "tax_krw": 1723.1478
   },
   {
-    "cash_after_krw": 145725172.1859,
+    "cash_after_krw": 145725468.218,
     "commission_krw": 98.1783,
     "date": "2024-07-01",
     "fill_price_krw": 26180.8847,
@@ -16184,7 +16184,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 125597095.9273,
+    "cash_after_krw": 125597391.9594,
     "commission_krw": 3018.7586,
     "date": "2024-07-01",
     "fill_price_krw": 149074.5,
@@ -16198,7 +16198,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 115699415.873,
+    "cash_after_krw": 115699711.9051,
     "commission_krw": 1484.4293,
     "date": "2024-07-01",
     "fill_price_krw": 48274.125,
@@ -16212,7 +16212,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 72532172.1575,
+    "cash_after_krw": 72532468.1896,
     "commission_krw": 6474.1154,
     "date": "2024-07-01",
     "fill_price_krw": 12206.1,
@@ -16226,7 +16226,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 65753180.4465,
+    "cash_after_krw": 65753476.4786,
     "commission_krw": 1016.6963,
     "date": "2024-07-01",
     "fill_price_krw": 21115.187,
@@ -16240,7 +16240,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 59128246.6403,
+    "cash_after_krw": 59128542.6725,
     "commission_krw": 993.591,
     "date": "2024-07-01",
     "fill_price_krw": 13381.6974,
@@ -16254,7 +16254,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 58260170.3711,
+    "cash_after_krw": 58260466.4032,
     "commission_krw": 130.1919,
     "date": "2024-07-01",
     "fill_price_krw": 57863.0718,
@@ -16268,7 +16268,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 13308690.8618,
+    "cash_after_krw": 13308986.894,
     "commission_krw": 6741.7107,
     "date": "2024-07-01",
     "fill_price_krw": 749078.9633,
@@ -16282,7 +16282,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 19431.312,
+    "cash_after_krw": 19727.3442,
     "commission_krw": 1993.09,
     "date": "2024-07-01",
     "fill_price_krw": 42451.3305,
@@ -16296,7 +16296,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 24917770.1819,
+    "cash_after_krw": 24918066.214,
     "commission_krw": 3516.6082,
     "date": "2024-08-01",
     "fill_price_krw": 27197.2793,
@@ -16310,7 +16310,7 @@
     "tax_krw": 42199.2986
   },
   {
-    "cash_after_krw": 29733467.4647,
+    "cash_after_krw": 29733763.4968,
     "commission_krw": 723.7659,
     "date": "2024-08-01",
     "fill_price_krw": 6076.96,
@@ -16324,7 +16324,7 @@
     "tax_krw": 8685.1912
   },
   {
-    "cash_after_krw": 36488932.5449,
+    "cash_after_krw": 36489228.5771,
     "commission_krw": 1015.2996,
     "date": "2024-08-01",
     "fill_price_krw": 13403.295,
@@ -16338,7 +16338,7 @@
     "tax_krw": 12183.5952
   },
   {
-    "cash_after_krw": 48580958.8133,
+    "cash_after_krw": 48581254.8454,
     "commission_krw": 1817.3478,
     "date": "2024-08-01",
     "fill_price_krw": 1980.9764,
@@ -16352,7 +16352,7 @@
     "tax_krw": 21808.1732
   },
   {
-    "cash_after_krw": 79437205.572,
+    "cash_after_krw": 79437501.6041,
     "commission_krw": 4637.4801,
     "date": "2024-08-01",
     "fill_price_krw": 147926.0,
@@ -16366,7 +16366,7 @@
     "tax_krw": 55649.7612
   },
   {
-    "cash_after_krw": 124199153.314,
+    "cash_after_krw": 124199449.3461,
     "commission_krw": 6727.4106,
     "date": "2024-08-01",
     "fill_price_krw": 12683.655,
@@ -16380,7 +16380,7 @@
     "tax_krw": 80728.9273
   },
   {
-    "cash_after_krw": 134424094.1498,
+    "cash_after_krw": 134424390.1819,
     "commission_krw": 1536.7378,
     "date": "2024-08-01",
     "fill_price_krw": 20823.0049,
@@ -16394,7 +16394,7 @@
     "tax_krw": 18440.8532
   },
   {
-    "cash_after_krw": 137314198.7385,
+    "cash_after_krw": 137314494.7706,
     "commission_krw": 434.3627,
     "date": "2024-08-01",
     "fill_price_krw": 55687.5251,
@@ -16408,7 +16408,7 @@
     "tax_krw": 5212.3523
   },
   {
-    "cash_after_krw": 157528174.1085,
+    "cash_after_krw": 157528470.1406,
     "commission_krw": 3038.0204,
     "date": "2024-08-01",
     "fill_price_krw": 35657.517,
@@ -16422,7 +16422,7 @@
     "tax_krw": 36456.2453
   },
   {
-    "cash_after_krw": 142226733.4866,
+    "cash_after_krw": 142227029.5187,
     "commission_krw": 2294.8719,
     "date": "2024-08-01",
     "fill_price_krw": 179989.95,
@@ -16436,7 +16436,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 130736969.1304,
+    "cash_after_krw": 130737265.1626,
     "commission_krw": 1723.2062,
     "date": "2024-08-01",
     "fill_price_krw": 57728.85,
@@ -16450,7 +16450,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 119384794.1596,
+    "cash_after_krw": 119385090.1917,
     "commission_krw": 1702.5709,
     "date": "2024-08-01",
     "fill_price_krw": 32616.3,
@@ -16464,7 +16464,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 97676131.7401,
+    "cash_after_krw": 97676427.7722,
     "commission_krw": 3255.811,
     "date": "2024-08-01",
     "fill_price_krw": 13243.0791,
@@ -16478,7 +16478,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 77489017.1271,
+    "cash_after_krw": 77489313.1592,
     "commission_krw": 3027.613,
     "date": "2024-08-01",
     "fill_price_krw": 154077.0,
@@ -16492,7 +16492,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 69850154.5195,
+    "cash_after_krw": 69850450.5517,
     "commission_krw": 1145.6575,
     "date": "2024-08-01",
     "fill_price_krw": 39369.675,
@@ -16506,7 +16506,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 48160112.5085,
+    "cash_after_krw": 48160408.5406,
     "commission_krw": 3253.0183,
     "date": "2024-08-01",
     "fill_price_krw": 3355.0107,
@@ -16520,7 +16520,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 16303471.5937,
+    "cash_after_krw": 16303767.6258,
     "commission_krw": 4777.7795,
     "date": "2024-08-01",
     "fill_price_krw": 31820.0431,
@@ -16534,7 +16534,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 10008317.648,
+    "cash_after_krw": 10008613.6801,
     "commission_krw": 944.1315,
     "date": "2024-08-01",
     "fill_price_krw": 9580.228,
@@ -16548,7 +16548,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 13682.3456,
+    "cash_after_krw": 13978.3778,
     "commission_krw": 1498.9704,
     "date": "2024-08-01",
     "fill_price_krw": 87659.0906,
@@ -16562,7 +16562,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 16454003.2982,
+    "cash_after_krw": 16454299.3303,
     "commission_krw": 2245.4267,
     "date": "2024-09-02",
     "fill_price_krw": 176111.9,
@@ -16576,7 +16576,7 @@
     "tax_krw": 26945.1207
   },
   {
-    "cash_after_krw": 37049989.3811,
+    "cash_after_krw": 37050285.4132,
     "commission_krw": 3095.434,
     "date": "2024-09-02",
     "fill_price_krw": 42028.975,
@@ -16590,7 +16590,7 @@
     "tax_krw": 37145.2081
   },
   {
-    "cash_after_krw": 128223454.4696,
+    "cash_after_krw": 128223750.5018,
     "commission_krw": 13702.7401,
     "date": "2024-09-02",
     "fill_price_krw": 861807.5539,
@@ -16604,7 +16604,7 @@
     "tax_krw": 164432.8813
   },
   {
-    "cash_after_krw": 118797829.8765,
+    "cash_after_krw": 118798125.9086,
     "commission_krw": 1413.6316,
     "date": "2024-09-02",
     "fill_price_krw": 28131.973,
@@ -16618,7 +16618,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 107920603.4572,
+    "cash_after_krw": 107920899.4893,
     "commission_krw": 1631.3393,
     "date": "2024-09-02",
     "fill_price_krw": 3921.96,
@@ -16632,7 +16632,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 71317824.3638,
+    "cash_after_krw": 71318120.3959,
     "commission_krw": 5489.5934,
     "date": "2024-09-02",
     "fill_price_krw": 82241.1,
@@ -16646,7 +16646,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 37529673.8013,
+    "cash_after_krw": 37529969.8334,
     "commission_krw": 5067.4625,
     "date": "2024-09-02",
     "fill_price_krw": 50725.35,
@@ -16660,7 +16660,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 14348614.1639,
+    "cash_after_krw": 14348910.196,
     "commission_krw": 3476.6374,
     "date": "2024-09-02",
     "fill_price_krw": 26013.0,
@@ -16674,7 +16674,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 7572411.986,
+    "cash_after_krw": 7572708.0181,
     "commission_krw": 1016.2779,
     "date": "2024-09-02",
     "fill_price_krw": 34567.275,
@@ -16688,7 +16688,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 3226788.8403,
+    "cash_after_krw": 3227084.8724,
     "commission_krw": 651.7457,
     "date": "2024-09-02",
     "fill_price_krw": 13166.58,
@@ -16702,7 +16702,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 378567.9913,
+    "cash_after_krw": 378864.0235,
     "commission_krw": 427.1691,
     "date": "2024-09-02",
     "fill_price_krw": 13432.9891,
@@ -16716,7 +16716,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 17133.1842,
+    "cash_after_krw": 17429.2164,
     "commission_krw": 54.2071,
     "date": "2024-09-02",
     "fill_price_krw": 120460.2,
@@ -16730,7 +16730,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 1913.2966,
+    "cash_after_krw": 2209.3287,
     "commission_krw": 2.2826,
     "date": "2024-09-02",
     "fill_price_krw": 15217.605,
@@ -16744,7 +16744,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 40063948.4571,
+    "cash_after_krw": 40064244.4892,
     "commission_krw": 5795.6067,
     "date": "2024-10-01",
     "fill_price_krw": 38598.7793,
@@ -16758,7 +16758,7 @@
     "tax_krw": 69547.2805
   },
   {
-    "cash_after_krw": 60621018.1467,
+    "cash_after_krw": 60621314.1788,
     "commission_krw": 3089.5851,
     "date": "2024-10-01",
     "fill_price_krw": 17879.5437,
@@ -16772,7 +16772,7 @@
     "tax_krw": 37075.0217
   },
   {
-    "cash_after_krw": 71447253.2742,
+    "cash_after_krw": 71447549.3064,
     "commission_krw": 1627.1081,
     "date": "2024-10-01",
     "fill_price_krw": 78604.2575,
@@ -16786,7 +16786,7 @@
     "tax_krw": 19525.2976
   },
   {
-    "cash_after_krw": 82248889.9349,
+    "cash_after_krw": 82249185.9671,
     "commission_krw": 1623.4112,
     "date": "2024-10-01",
     "fill_price_krw": 832518.5389,
@@ -16800,7 +16800,7 @@
     "tax_krw": 19480.9338
   },
   {
-    "cash_after_krw": 137934046.1396,
+    "cash_after_krw": 137934342.1718,
     "commission_krw": 8369.0932,
     "date": "2024-10-01",
     "fill_price_krw": 47932.9505,
@@ -16814,7 +16814,7 @@
     "tax_krw": 100429.1179
   },
   {
-    "cash_after_krw": 182065574.1248,
+    "cash_after_krw": 182065870.157,
     "commission_krw": 6632.6629,
     "date": "2024-10-01",
     "fill_price_krw": 128167.3988,
@@ -16828,13 +16828,13 @@
     "tax_krw": 79591.9547
   },
   {
-    "cash_after_krw": 3674.2352,
-    "commission_krw": 27305.1892,
+    "cash_after_krw": 119.6318,
+    "commission_krw": 27305.7667,
     "date": "2024-10-01",
     "fill_price_krw": 3850.0581,
-    "gross_krw": 182034594.7004,
+    "gross_krw": 182038444.7585,
     "persona": "weak_oracle",
-    "qty": 47281,
+    "qty": 47282,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
@@ -16842,7 +16842,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 30226128.9863,
+    "cash_after_krw": 30222574.3829,
     "commission_krw": 4316.7859,
     "date": "2024-11-01",
     "fill_price_krw": 35311.1325,
@@ -16856,7 +16856,7 @@
     "tax_krw": 51801.4313
   },
   {
-    "cash_after_krw": 41982516.6144,
+    "cash_after_krw": 41978962.011,
     "commission_krw": 1766.9036,
     "date": "2024-11-01",
     "fill_price_krw": 4247.875,
@@ -16870,7 +16870,7 @@
     "tax_krw": 21202.8433
   },
   {
-    "cash_after_krw": 76870864.4141,
+    "cash_after_krw": 76867309.8106,
     "commission_krw": 5243.4769,
     "date": "2024-11-01",
     "fill_price_krw": 86956.5,
@@ -16884,7 +16884,7 @@
     "tax_krw": 62921.7234
   },
   {
-    "cash_after_krw": 118936342.0911,
+    "cash_after_krw": 118932787.4877,
     "commission_krw": 6322.1498,
     "date": "2024-11-01",
     "fill_price_krw": 48725.625,
@@ -16898,7 +16898,7 @@
     "tax_krw": 75865.7981
   },
   {
-    "cash_after_krw": 148000688.0334,
+    "cash_after_krw": 147997133.43,
     "commission_krw": 4368.1698,
     "date": "2024-11-01",
     "fill_price_krw": 32683.65,
@@ -16912,7 +16912,7 @@
     "tax_krw": 52418.0379
   },
   {
-    "cash_after_krw": 168479212.489,
+    "cash_after_krw": 168475657.8856,
     "commission_krw": 3077.7803,
     "date": "2024-11-01",
     "fill_price_krw": 153123.4,
@@ -16926,7 +16926,7 @@
     "tax_krw": 36933.3641
   },
   {
-    "cash_after_krw": 169754082.6351,
+    "cash_after_krw": 169750528.0316,
     "commission_krw": 191.6041,
     "date": "2024-11-01",
     "fill_price_krw": 212893.5,
@@ -16940,21 +16940,21 @@
     "tax_krw": 2299.2498
   },
   {
-    "cash_after_krw": 260277703.9091,
-    "commission_krw": 13605.0731,
+    "cash_after_krw": 260277882.3924,
+    "commission_krw": 13605.6341,
     "date": "2024-11-01",
     "fill_price_krw": 3740.3805,
-    "gross_krw": 90700487.2241,
+    "gross_krw": 90704227.6046,
     "persona": "weak_oracle",
-    "qty": 24249,
+    "qty": 24250,
     "reason": "rebalance_sell",
     "report_id": "",
     "side": "sell",
     "symbol": "4689.T",
-    "tax_krw": 163260.877
+    "tax_krw": 163267.6097
   },
   {
-    "cash_after_krw": 277271737.6199,
+    "cash_after_krw": 277271916.1032,
     "commission_krw": 2554.0855,
     "date": "2024-11-01",
     "fill_price_krw": 57524.4487,
@@ -16968,7 +16968,7 @@
     "tax_krw": 30649.0263
   },
   {
-    "cash_after_krw": 293992296.3104,
+    "cash_after_krw": 293992474.7937,
     "commission_krw": 2512.9841,
     "date": "2024-11-01",
     "fill_price_krw": 130884.5897,
@@ -16982,7 +16982,7 @@
     "tax_krw": 30155.8095
   },
   {
-    "cash_after_krw": 308232870.1811,
+    "cash_after_krw": 308233048.6644,
     "commission_krw": 2140.2596,
     "date": "2024-11-01",
     "fill_price_krw": 45585.9337,
@@ -16996,7 +16996,7 @@
     "tax_krw": 25683.115
   },
   {
-    "cash_after_krw": 275541472.1268,
+    "cash_after_krw": 275541650.6102,
     "commission_krw": 4902.9743,
     "date": "2024-11-01",
     "fill_price_krw": 10045.02,
@@ -17010,7 +17010,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 262454570.186,
+    "cash_after_krw": 262454748.6693,
     "commission_krw": 1962.7409,
     "date": "2024-11-01",
     "fill_price_krw": 26813.4,
@@ -17024,7 +17024,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 251090787.6742,
+    "cash_after_krw": 251090966.1576,
     "commission_krw": 1704.3117,
     "date": "2024-11-01",
     "fill_price_krw": 12766.38,
@@ -17038,7 +17038,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 240543353.7493,
+    "cash_after_krw": 240543532.2327,
     "commission_krw": 1581.8778,
     "date": "2024-11-01",
     "fill_price_krw": 16350.1582,
@@ -17052,7 +17052,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 236746186.9097,
+    "cash_after_krw": 236746365.3931,
     "commission_krw": 569.4896,
     "date": "2024-11-01",
     "fill_price_krw": 13906.95,
@@ -17066,7 +17066,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 194807041.0313,
+    "cash_after_krw": 194807219.5147,
     "commission_krw": 6289.9284,
     "date": "2024-11-01",
     "fill_price_krw": 5352.675,
@@ -17080,7 +17080,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 144584013.5071,
+    "cash_after_krw": 144584191.9904,
     "commission_krw": 7532.3243,
     "date": "2024-11-01",
     "fill_price_krw": 98849.4,
@@ -17094,7 +17094,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 123930716.0371,
+    "cash_after_krw": 123930894.5204,
     "commission_krw": 3097.53,
     "date": "2024-11-01",
     "fill_price_krw": 13186.59,
@@ -17108,7 +17108,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 110212003.6388,
+    "cash_after_krw": 110212182.1222,
     "commission_krw": 2057.4982,
     "date": "2024-11-01",
     "fill_price_krw": 2601.3,
@@ -17122,7 +17122,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 107783325.8418,
+    "cash_after_krw": 107783504.3251,
     "commission_krw": 364.247,
     "date": "2024-11-01",
     "fill_price_krw": 186793.35,
@@ -17136,13 +17136,13 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 73131153.9656,
-    "commission_krw": 5197.0462,
+    "cash_after_krw": 73134844.7307,
+    "commission_krw": 5196.5195,
     "date": "2024-11-01",
     "fill_price_krw": 3511.755,
-    "gross_krw": 34646974.83,
+    "gross_krw": 34643463.075,
     "persona": "weak_oracle",
-    "qty": 9866,
+    "qty": 9865,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
@@ -17150,7 +17150,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 67730045.1207,
+    "cash_after_krw": 67733735.8859,
     "commission_krw": 810.0448,
     "date": "2024-11-01",
     "fill_price_krw": 31215.6,
@@ -17164,7 +17164,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 39238545.5418,
+    "cash_after_krw": 39242236.3069,
     "commission_krw": 4273.084,
     "date": "2024-11-01",
     "fill_price_krw": 4692.345,
@@ -17178,7 +17178,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 858371.7591,
+    "cash_after_krw": 862062.5242,
     "commission_krw": 5756.1626,
     "date": "2024-11-01",
     "fill_price_krw": 11865.93,
@@ -17192,7 +17192,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 6849.0806,
+    "cash_after_krw": 10539.8457,
     "commission_krw": 127.7092,
     "date": "2024-11-01",
     "fill_price_krw": 25041.0285,
@@ -17206,7 +17206,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 36577213.5849,
+    "cash_after_krw": 36580904.35,
     "commission_krw": 5270.8328,
     "date": "2024-12-02",
     "fill_price_krw": 38529.4795,
@@ -17220,7 +17220,7 @@
     "tax_krw": 63249.9936
   },
   {
-    "cash_after_krw": 73971489.2379,
+    "cash_after_krw": 73975180.003,
     "commission_krw": 5620.1005,
     "date": "2024-12-02",
     "fill_price_krw": 11514.24,
@@ -17234,7 +17234,7 @@
     "tax_krw": 67441.2065
   },
   {
-    "cash_after_krw": 79701023.0179,
+    "cash_after_krw": 79704713.783,
     "commission_krw": 861.1092,
     "date": "2024-12-02",
     "fill_price_krw": 33183.4,
@@ -17248,7 +17248,7 @@
     "tax_krw": 10333.3108
   },
   {
-    "cash_after_krw": 107514749.2783,
+    "cash_after_krw": 107518440.0434,
     "commission_krw": 4180.2103,
     "date": "2024-12-02",
     "fill_price_krw": 18060.965,
@@ -17262,7 +17262,7 @@
     "tax_krw": 50162.5242
   },
   {
-    "cash_after_krw": 159963984.4419,
+    "cash_after_krw": 159967675.207,
     "commission_krw": 7882.7566,
     "date": "2024-12-02",
     "fill_price_krw": 103448.25,
@@ -17276,7 +17276,7 @@
     "tax_krw": 94593.0798
   },
   {
-    "cash_after_krw": 181615828.3543,
+    "cash_after_krw": 181619519.1194,
     "commission_krw": 3254.1221,
     "date": "2024-12-02",
     "fill_price_krw": 14992.5,
@@ -17290,7 +17290,7 @@
     "tax_krw": 39049.4655
   },
   {
-    "cash_after_krw": 195029048.3968,
+    "cash_after_krw": 195032739.1619,
     "commission_krw": 2015.914,
     "date": "2024-12-02",
     "fill_price_krw": 2548.725,
@@ -17304,7 +17304,7 @@
     "tax_krw": 24190.9685
   },
   {
-    "cash_after_krw": 197490405.6725,
+    "cash_after_krw": 197494096.4376,
     "commission_krw": 369.9249,
     "date": "2024-12-02",
     "fill_price_krw": 189705.1,
@@ -17318,21 +17318,21 @@
     "tax_krw": 4439.0993
   },
   {
-    "cash_after_krw": 235381481.662,
-    "commission_krw": 5694.7662,
+    "cash_after_krw": 235381331.8558,
+    "commission_krw": 5694.189,
     "date": "2024-12-02",
     "fill_price_krw": 3848.075,
-    "gross_krw": 37965107.95,
+    "gross_krw": 37961259.875,
     "persona": "weak_oracle",
-    "qty": 9866,
+    "qty": 9865,
     "reason": "rebalance_sell",
     "report_id": "",
     "side": "sell",
     "symbol": "353810.KQ",
-    "tax_krw": 68337.1943
+    "tax_krw": 68330.2678
   },
   {
-    "cash_after_krw": 241154159.5217,
+    "cash_after_krw": 241154009.7155,
     "commission_krw": 867.5935,
     "date": "2024-12-02",
     "fill_price_krw": 33433.275,
@@ -17346,7 +17346,7 @@
     "tax_krw": 10411.1218
   },
   {
-    "cash_after_krw": 241365291.1855,
+    "cash_after_krw": 241365141.3794,
     "commission_krw": 31.7316,
     "date": "2024-12-02",
     "fill_price_krw": 4147.925,
@@ -17360,35 +17360,35 @@
     "tax_krw": 380.7795
   },
   {
-    "cash_after_krw": 253487430.8786,
-    "commission_krw": 1821.8736,
+    "cash_after_krw": 253500947.5208,
+    "commission_krw": 1823.9276,
     "date": "2024-12-02",
     "fill_price_krw": 13693.15,
-    "gross_krw": 12145824.05,
+    "gross_krw": 12159517.2,
     "persona": "weak_oracle",
-    "qty": 887,
+    "qty": 888,
     "reason": "rebalance_sell",
     "report_id": "",
     "side": "sell",
     "symbol": "453340.KQ",
-    "tax_krw": 21862.4833
+    "tax_krw": 21887.131
   },
   {
-    "cash_after_krw": 270764779.4771,
-    "commission_krw": 2596.6658,
+    "cash_after_krw": 270774413.569,
+    "commission_krw": 2596.0823,
     "date": "2024-12-02",
     "fill_price_krw": 3890.136,
-    "gross_krw": 17311105.2537,
+    "gross_krw": 17307215.1177,
     "persona": "weak_oracle",
-    "qty": 4450,
+    "qty": 4449,
     "reason": "rebalance_sell",
     "report_id": "",
     "side": "sell",
     "symbol": "4689.T",
-    "tax_krw": 31159.9895
+    "tax_krw": 31152.9872
   },
   {
-    "cash_after_krw": 271462213.304,
+    "cash_after_krw": 271471847.396,
     "commission_krw": 104.8195,
     "date": "2024-12-02",
     "fill_price_krw": 29116.52,
@@ -17402,7 +17402,7 @@
     "tax_krw": 1257.8337
   },
   {
-    "cash_after_krw": 319578235.8213,
+    "cash_after_krw": 319587869.9133,
     "commission_krw": 7231.5048,
     "date": "2024-12-02",
     "fill_price_krw": 92890.2352,
@@ -17416,7 +17416,7 @@
     "tax_krw": 86778.0577
   },
   {
-    "cash_after_krw": 366859680.4876,
+    "cash_after_krw": 366869314.5795,
     "commission_krw": 7106.0735,
     "date": "2024-12-02",
     "fill_price_krw": 158440.8817,
@@ -17430,7 +17430,7 @@
     "tax_krw": 85272.8825
   },
   {
-    "cash_after_krw": 310760082.593,
+    "cash_after_krw": 310769716.6849,
     "commission_krw": 8413.6776,
     "date": "2024-12-02",
     "fill_price_krw": 97890.3739,
@@ -17444,7 +17444,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 308792004.0255,
+    "cash_after_krw": 308801638.1174,
     "commission_krw": 295.1675,
     "date": "2024-12-02",
     "fill_price_krw": 22361.175,
@@ -17458,7 +17458,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 251929463.1236,
+    "cash_after_krw": 251939097.2155,
     "commission_krw": 8528.1019,
     "date": "2024-12-02",
     "fill_price_krw": 83241.6,
@@ -17472,7 +17472,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 226077468.3059,
+    "cash_after_krw": 226087102.3979,
     "commission_krw": 3877.2176,
     "date": "2024-12-02",
     "fill_price_krw": 24112.05,
@@ -17486,7 +17486,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 189944674.5397,
+    "cash_after_krw": 189954308.6317,
     "commission_krw": 5419.1062,
     "date": "2024-12-02",
     "fill_price_krw": 8794.395,
@@ -17500,7 +17500,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 185337081.2044,
+    "cash_after_krw": 185346715.2963,
     "commission_krw": 691.0353,
     "date": "2024-12-02",
     "fill_price_krw": 10125.06,
@@ -17514,7 +17514,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 177386204.3375,
+    "cash_after_krw": 177395838.4295,
     "commission_krw": 1192.4527,
     "date": "2024-12-02",
     "fill_price_krw": 15526.7274,
@@ -17528,7 +17528,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 156420223.7321,
+    "cash_after_krw": 156429857.824,
     "commission_krw": 3144.4254,
     "date": "2024-12-02",
     "fill_price_krw": 8144.07,
@@ -17542,7 +17542,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 132567447.7123,
+    "cash_after_krw": 132577081.8042,
     "commission_krw": 3577.3798,
     "date": "2024-12-02",
     "fill_price_krw": 6363.18,
@@ -17556,7 +17556,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 97006645.5419,
+    "cash_after_krw": 97016279.6339,
     "commission_krw": 5333.3203,
     "date": "2024-12-02",
     "fill_price_krw": 48974.475,
@@ -17570,7 +17570,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 81386417.8192,
+    "cash_after_krw": 81396051.9111,
     "commission_krw": 2342.6828,
     "date": "2024-12-02",
     "fill_price_krw": 19139.565,
@@ -17584,7 +17584,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 61056136.5407,
+    "cash_after_krw": 61065770.6327,
     "commission_krw": 3049.0848,
     "date": "2024-12-02",
     "fill_price_krw": 9583.7964,
@@ -17598,7 +17598,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 58126285.9989,
+    "cash_after_krw": 58135920.0909,
     "commission_krw": 439.4117,
     "date": "2024-12-02",
     "fill_price_krw": 27899.1536,
@@ -17612,7 +17612,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 10770735.2622,
+    "cash_after_krw": 10780369.3541,
     "commission_krw": 7102.2673,
     "date": "2024-12-02",
     "fill_price_krw": 21232.4881,
@@ -17626,7 +17626,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 5761.2081,
+    "cash_after_krw": 15395.3001,
     "commission_krw": 1614.5039,
     "date": "2024-12-02",
     "fill_price_krw": 23865.5422,
@@ -17640,7 +17640,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 56279763.0137,
+    "cash_after_krw": 56289397.1057,
     "commission_krw": 8232.153,
     "date": "2025-01-02",
     "fill_price_krw": 100147.8463,
@@ -17654,7 +17654,7 @@
     "tax_krw": 98785.8356
   },
   {
-    "cash_after_krw": 58088123.4212,
+    "cash_after_krw": 58097757.5132,
     "commission_krw": 271.784,
     "date": "2025-01-02",
     "fill_price_krw": 20589.7,
@@ -17668,7 +17668,7 @@
     "tax_krw": 3261.4085
   },
   {
-    "cash_after_krw": 116822528.2579,
+    "cash_after_krw": 116832162.3498,
     "commission_krw": 8827.3741,
     "date": "2025-01-02",
     "fill_price_krw": 81059.45,
@@ -17682,7 +17682,7 @@
     "tax_krw": 105928.4893
   },
   {
-    "cash_after_krw": 118255410.4783,
+    "cash_after_krw": 118265044.5703,
     "commission_krw": 215.3523,
     "date": "2025-01-02",
     "fill_price_krw": 37781.1,
@@ -17696,7 +17696,7 @@
     "tax_krw": 2584.2272
   },
   {
-    "cash_after_krw": 123561334.2368,
+    "cash_after_krw": 123570968.3288,
     "commission_krw": 797.4436,
     "date": "2025-01-02",
     "fill_price_krw": 11684.155,
@@ -17710,7 +17710,7 @@
     "tax_krw": 9569.3229
   },
   {
-    "cash_after_krw": 147781622.5221,
+    "cash_after_krw": 147791256.614,
     "commission_krw": 3640.1415,
     "date": "2025-01-02",
     "fill_price_krw": 24737.625,
@@ -17724,7 +17724,7 @@
     "tax_krw": 43681.6982
   },
   {
-    "cash_after_krw": 167191233.7534,
+    "cash_after_krw": 167200867.8454,
     "commission_krw": 2917.1301,
     "date": "2025-01-02",
     "fill_price_krw": 16287.7169,
@@ -17738,7 +17738,7 @@
     "tax_krw": 35005.5611
   },
   {
-    "cash_after_krw": 196159515.5369,
+    "cash_after_krw": 196169149.6288,
     "commission_krw": 4353.732,
     "date": "2025-01-02",
     "fill_price_krw": 10194.9,
@@ -17752,7 +17752,7 @@
     "tax_krw": 52244.7845
   },
   {
-    "cash_after_krw": 226999302.7045,
+    "cash_after_krw": 227008936.7964,
     "commission_krw": 4635.0063,
     "date": "2025-01-02",
     "fill_price_krw": 51074.45,
@@ -17766,7 +17766,7 @@
     "tax_krw": 55620.076
   },
   {
-    "cash_after_krw": 240755929.6701,
+    "cash_after_krw": 240765563.7621,
     "commission_krw": 2067.5257,
     "date": "2025-01-02",
     "fill_price_krw": 20389.8,
@@ -17780,7 +17780,7 @@
     "tax_krw": 24810.3086
   },
   {
-    "cash_after_krw": 275081419.3076,
+    "cash_after_krw": 275091053.3996,
     "commission_krw": 5158.8833,
     "date": "2025-01-02",
     "fill_price_krw": 6266.865,
@@ -17794,21 +17794,21 @@
     "tax_krw": 61906.5992
   },
   {
-    "cash_after_krw": 307929186.8083,
-    "commission_krw": 4936.7919,
+    "cash_after_krw": 307924825.2601,
+    "commission_krw": 4934.6884,
     "date": "2025-01-02",
     "fill_price_krw": 14022.985,
-    "gross_krw": 32911945.795,
+    "gross_krw": 32897922.81,
     "persona": "weak_oracle",
-    "qty": 2347,
+    "qty": 2346,
     "reason": "rebalance_sell",
     "report_id": "",
     "side": "sell",
     "symbol": "453340.KQ",
-    "tax_krw": 59241.5024
+    "tax_krw": 59216.2611
   },
   {
-    "cash_after_krw": 310573042.6964,
+    "cash_after_krw": 310568681.1482,
     "commission_krw": 397.3532,
     "date": "2025-01-02",
     "fill_price_krw": 25228.776,
@@ -17822,7 +17822,7 @@
     "tax_krw": 4768.2387
   },
   {
-    "cash_after_krw": 367643602.0181,
+    "cash_after_krw": 367639240.4698,
     "commission_krw": 8577.3097,
     "date": "2025-01-02",
     "fill_price_krw": 26436.4606,
@@ -17836,7 +17836,7 @@
     "tax_krw": 102927.7158
   },
   {
-    "cash_after_krw": 387095586.0692,
+    "cash_after_krw": 387091224.521,
     "commission_krw": 2923.4984,
     "date": "2025-01-02",
     "fill_price_krw": 110738.5769,
@@ -17850,7 +17850,7 @@
     "tax_krw": 35081.9812
   },
   {
-    "cash_after_krw": 390486877.3889,
+    "cash_after_krw": 390482515.8407,
     "commission_krw": 509.6876,
     "date": "2025-01-02",
     "fill_price_krw": 154450.7845,
@@ -17864,7 +17864,7 @@
     "tax_krw": 6116.2511
   },
   {
-    "cash_after_krw": 308032385.4219,
+    "cash_after_krw": 308028023.8736,
     "commission_krw": 12366.3188,
     "date": "2025-01-02",
     "fill_price_krw": 8124.7783,
@@ -17878,7 +17878,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 296620021.349,
+    "cash_after_krw": 296615659.8008,
     "commission_krw": 1711.5979,
     "date": "2025-01-02",
     "fill_price_krw": 20860.425,
@@ -17892,7 +17892,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 292450612.6815,
+    "cash_after_krw": 292446251.1333,
     "commission_krw": 625.3175,
     "date": "2025-01-02",
     "fill_price_krw": 16158.075,
@@ -17906,7 +17906,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 263058718.1585,
+    "cash_after_krw": 263054356.6103,
     "commission_krw": 4408.123,
     "date": "2025-01-02",
     "fill_price_krw": 54827.4,
@@ -17920,7 +17920,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 260905719.4572,
+    "cash_after_krw": 260901357.9089,
     "commission_krw": 322.9014,
     "date": "2025-01-02",
     "fill_price_krw": 19569.78,
@@ -17934,7 +17934,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 239503615.523,
+    "cash_after_krw": 239499253.9748,
     "commission_krw": 3209.8341,
     "date": "2025-01-02",
     "fill_price_krw": 16588.29,
@@ -17948,7 +17948,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 152393624.284,
+    "cash_after_krw": 152389262.7358,
     "commission_krw": 13064.539,
     "date": "2025-01-02",
     "fill_price_krw": 7563.78,
@@ -17962,7 +17962,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 54633554.1928,
+    "cash_after_krw": 54629192.6446,
     "commission_krw": 14661.8112,
     "date": "2025-01-02",
     "fill_price_krw": 10385.19,
@@ -17976,7 +17976,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 47486000.7656,
+    "cash_after_krw": 47481639.2174,
     "commission_krw": 1071.9722,
     "date": "2025-01-02",
     "fill_price_krw": 15637.815,
@@ -17990,7 +17990,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 43820019.1508,
+    "cash_after_krw": 43815657.6026,
     "commission_krw": 549.8148,
     "date": "2025-01-02",
     "fill_price_krw": 8604.3,
@@ -18004,7 +18004,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 36995685.7043,
+    "cash_after_krw": 36991324.1561,
     "commission_krw": 1023.4965,
     "date": "2025-01-02",
     "fill_price_krw": 53726.85,
@@ -18018,7 +18018,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 34899412.8282,
+    "cash_after_krw": 34895051.28,
     "commission_krw": 314.3938,
     "date": "2025-01-02",
     "fill_price_krw": 1163.129,
@@ -18032,7 +18032,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 23117958.9752,
+    "cash_after_krw": 23113597.427,
     "commission_krw": 1766.953,
     "date": "2025-01-02",
     "fill_price_krw": 5582.79,
@@ -18046,7 +18046,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 14882168.5719,
+    "cash_after_krw": 14877807.0237,
     "commission_krw": 1235.1833,
     "date": "2025-01-02",
     "fill_price_krw": 12826.41,
@@ -18060,13 +18060,13 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 900.9166,
-    "commission_krw": 2231.8554,
+    "cash_after_krw": 16952.6299,
+    "commission_krw": 2228.7938,
     "date": "2025-01-02",
     "fill_price_krw": 20410.2,
-    "gross_krw": 14879035.8,
+    "gross_krw": 14858625.6,
     "persona": "weak_oracle",
-    "qty": 729,
+    "qty": 728,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
@@ -18074,7 +18074,21 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 3174379.7243,
+    "cash_after_krw": 491.9361,
+    "commission_krw": 2.4687,
+    "date": "2025-01-02",
+    "fill_price_krw": 16458.225,
+    "gross_krw": 16458.225,
+    "persona": "weak_oracle",
+    "qty": 1,
+    "reason": "rebalance_buy",
+    "report_id": "",
+    "side": "buy",
+    "symbol": "294570.KQ",
+    "tax_krw": 0.0
+  },
+  {
+    "cash_after_krw": 3173970.7439,
     "commission_krw": 176.3657,
     "date": "2025-02-03",
     "fill_price_krw": 90443.9663,
@@ -18088,7 +18102,7 @@
     "tax_krw": 2116.3888
   },
   {
-    "cash_after_krw": 8205927.0871,
+    "cash_after_krw": 8205518.1067,
     "commission_krw": 756.2067,
     "date": "2025-02-03",
     "fill_price_krw": 19540.225,
@@ -18102,7 +18116,7 @@
     "tax_krw": 9074.4805
   },
   {
-    "cash_after_krw": 40447572.6399,
+    "cash_after_krw": 40447163.6595,
     "commission_krw": 4845.6959,
     "date": "2025-02-03",
     "fill_price_krw": 60269.85,
@@ -18116,7 +18130,7 @@
     "tax_krw": 58148.3513
   },
   {
-    "cash_after_krw": 41807134.8637,
+    "cash_after_krw": 41806725.8833,
     "commission_krw": 204.3328,
     "date": "2025-02-03",
     "fill_price_krw": 20639.675,
@@ -18130,7 +18144,7 @@
     "tax_krw": 2451.9934
   },
   {
-    "cash_after_krw": 62023403.168,
+    "cash_after_krw": 62022994.1876,
     "commission_krw": 3038.3651,
     "date": "2025-02-03",
     "fill_price_krw": 15702.145,
@@ -18144,7 +18158,7 @@
     "tax_krw": 36460.3807
   },
   {
-    "cash_after_krw": 71642487.9546,
+    "cash_after_krw": 71642078.9742,
     "commission_krw": 1445.6818,
     "date": "2025-02-03",
     "fill_price_krw": 21089.45,
@@ -18158,7 +18172,7 @@
     "tax_krw": 17348.1816
   },
   {
-    "cash_after_krw": 73920894.3815,
+    "cash_after_krw": 73920485.4011,
     "commission_krw": 342.4287,
     "date": "2025-02-03",
     "fill_price_krw": 57071.45,
@@ -18172,7 +18186,7 @@
     "tax_krw": 4109.1444
   },
   {
-    "cash_after_krw": 82345711.1409,
+    "cash_after_krw": 82345302.1605,
     "commission_krw": 1266.1916,
     "date": "2025-02-03",
     "fill_price_krw": 66466.75,
@@ -18186,7 +18200,7 @@
     "tax_krw": 15194.299
   },
   {
-    "cash_after_krw": 90466733.7272,
+    "cash_after_krw": 90466324.7468,
     "commission_krw": 1220.5334,
     "date": "2025-02-03",
     "fill_price_krw": 17094.3057,
@@ -18200,7 +18214,7 @@
     "tax_krw": 14646.4011
   },
   {
-    "cash_after_krw": 93758053.4141,
+    "cash_after_krw": 93757644.4337,
     "commission_krw": 494.6625,
     "date": "2025-02-03",
     "fill_price_krw": 5637.18,
@@ -18214,7 +18228,7 @@
     "tax_krw": 5935.9505
   },
   {
-    "cash_after_krw": 104280280.9515,
+    "cash_after_krw": 104279871.9711,
     "commission_krw": 1581.4179,
     "date": "2025-02-03",
     "fill_price_krw": 16421.785,
@@ -18228,7 +18242,7 @@
     "tax_krw": 18977.0147
   },
   {
-    "cash_after_krw": 107915556.2146,
+    "cash_after_krw": 107915147.2342,
     "commission_krw": 546.3567,
     "date": "2025-02-03",
     "fill_price_krw": 6846.575,
@@ -18242,21 +18256,21 @@
     "tax_krw": 6556.2802
   },
   {
-    "cash_after_krw": 216298368.5012,
-    "commission_krw": 16289.1858,
+    "cash_after_krw": 216302286.8709,
+    "commission_krw": 16289.8361,
     "date": "2025-02-03",
     "fill_price_krw": 4335.805,
-    "gross_krw": 108594571.7014,
+    "gross_krw": 108598907.5064,
     "persona": "weak_oracle",
-    "qty": 25046,
+    "qty": 25047,
     "reason": "rebalance_sell",
     "report_id": "",
     "side": "sell",
     "symbol": "4689.T",
-    "tax_krw": 195470.2291
+    "tax_krw": 195478.0335
   },
   {
-    "cash_after_krw": 238758256.1731,
+    "cash_after_krw": 238762174.5428,
     "commission_krw": 3375.5655,
     "date": "2025-02-03",
     "fill_price_krw": 10609.9812,
@@ -18270,7 +18284,7 @@
     "tax_krw": 40506.786
   },
   {
-    "cash_after_krw": 240517645.7896,
+    "cash_after_krw": 240521564.1593,
     "commission_krw": 264.4241,
     "date": "2025-02-03",
     "fill_price_krw": 26310.8527,
@@ -18284,7 +18298,7 @@
     "tax_krw": 3173.0888
   },
   {
-    "cash_after_krw": 250460045.1001,
+    "cash_after_krw": 250463963.4698,
     "commission_krw": 1494.2737,
     "date": "2025-02-03",
     "fill_price_krw": 22088.3035,
@@ -18298,7 +18312,7 @@
     "tax_krw": 17931.2848
   },
   {
-    "cash_after_krw": 243921797.51,
+    "cash_after_krw": 243925715.8798,
     "commission_krw": 980.59,
     "date": "2025-02-03",
     "fill_price_krw": 22011.0,
@@ -18312,7 +18326,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 243397456.8707,
+    "cash_after_krw": 243401375.2405,
     "commission_krw": 78.6393,
     "date": "2025-02-03",
     "fill_price_krw": 26213.1,
@@ -18326,7 +18340,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 217388620.1603,
+    "cash_after_krw": 217392538.5301,
     "commission_krw": 3900.7404,
     "date": "2025-02-03",
     "fill_price_krw": 18339.165,
@@ -18340,7 +18354,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 203831212.5542,
+    "cash_after_krw": 203835130.9239,
     "commission_krw": 2033.3061,
     "date": "2025-02-03",
     "fill_price_krw": 7723.86,
@@ -18354,7 +18368,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 175004985.5186,
+    "cash_after_krw": 175008903.8884,
     "commission_krw": 4323.2856,
     "date": "2025-02-03",
     "fill_price_krw": 10025.01,
@@ -18368,7 +18382,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 163965313.5662,
+    "cash_after_krw": 163969231.9359,
     "commission_krw": 1655.7024,
     "date": "2025-02-03",
     "fill_price_krw": 7503.75,
@@ -18382,7 +18396,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 153044218.6476,
+    "cash_after_krw": 153048137.0174,
     "commission_krw": 1637.9185,
     "date": "2025-02-03",
     "fill_price_krw": 51025.5,
@@ -18396,13 +18410,13 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 150818902.9654,
-    "commission_krw": 333.7473,
+    "cash_after_krw": 150814025.6209,
+    "commission_krw": 335.0664,
     "date": "2025-02-03",
     "fill_price_krw": 8794.395,
-    "gross_krw": 2224981.935,
+    "gross_krw": 2233776.33,
     "persona": "weak_oracle",
-    "qty": 253,
+    "qty": 254,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
@@ -18410,7 +18424,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 144217434.3036,
+    "cash_after_krw": 144212556.9592,
     "commission_krw": 990.0718,
     "date": "2025-02-03",
     "fill_price_krw": 6433.215,
@@ -18424,7 +18438,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 139121623.7966,
+    "cash_after_krw": 139116746.4522,
     "commission_krw": 764.2569,
     "date": "2025-02-03",
     "fill_price_krw": 29114.55,
@@ -18438,7 +18452,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 92232318.6651,
+    "cash_after_krw": 92227441.3207,
     "commission_krw": 7032.3409,
     "date": "2025-02-03",
     "fill_price_krw": 1144.084,
@@ -18452,7 +18466,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 52096244.1568,
+    "cash_after_krw": 52091366.8124,
     "commission_krw": 6019.5082,
     "date": "2025-02-03",
     "fill_price_krw": 42021.0,
@@ -18466,7 +18480,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 46280866.181,
+    "cash_after_krw": 46275988.8366,
     "commission_krw": 872.1759,
     "date": "2025-02-03",
     "fill_price_krw": 100250.1,
@@ -18480,13 +18494,13 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 46031234.0068,
-    "commission_krw": 37.4392,
+    "cash_after_krw": 46007154.1874,
+    "commission_krw": 40.3191,
     "date": "2025-02-03",
     "fill_price_krw": 19199.595,
-    "gross_krw": 249594.735,
+    "gross_krw": 268794.33,
     "persona": "weak_oracle",
-    "qty": 13,
+    "qty": 14,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
@@ -18494,13 +18508,13 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 39683109.931,
-    "commission_krw": 952.0758,
+    "cash_after_krw": 39674290.0252,
+    "commission_krw": 949.7872,
     "date": "2025-02-03",
     "fill_price_krw": 15257.625,
-    "gross_krw": 6347172.0,
+    "gross_krw": 6331914.375,
     "persona": "weak_oracle",
-    "qty": 416,
+    "qty": 415,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
@@ -18508,13 +18522,13 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 4785178.3963,
-    "commission_krw": 5233.9046,
+    "cash_after_krw": 4779020.2198,
+    "commission_krw": 5233.5054,
     "date": "2025-02-03",
     "fill_price_krw": 2661.33,
-    "gross_krw": 34892697.63,
+    "gross_krw": 34890036.3,
     "persona": "weak_oracle",
-    "qty": 13111,
+    "qty": 13110,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
@@ -18522,7 +18536,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 4142160.6581,
+    "cash_after_krw": 4136002.4816,
     "commission_krw": 96.4382,
     "date": "2025-02-03",
     "fill_price_krw": 23811.9,
@@ -18536,7 +18550,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 84460.6725,
+    "cash_after_krw": 78302.496,
     "commission_krw": 608.5637,
     "date": "2025-02-03",
     "fill_price_krw": 119326.2183,
@@ -18550,7 +18564,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 19650.1294,
+    "cash_after_krw": 13491.9528,
     "commission_krw": 9.7201,
     "date": "2025-02-03",
     "fill_price_krw": 32400.4115,
@@ -18564,13 +18578,13 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 408.1316,
-    "commission_krw": 2.8859,
+    "cash_after_krw": 22.5544,
+    "commission_krw": 2.0201,
     "date": "2025-02-03",
     "fill_price_krw": 1923.9112,
-    "gross_krw": 19239.1119,
+    "gross_krw": 13467.3783,
     "persona": "weak_oracle",
-    "qty": 10,
+    "qty": 7,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
@@ -18578,7 +18592,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 35243236.6733,
+    "cash_after_krw": 35242851.0961,
     "commission_krw": 4996.1668,
     "date": "2025-03-03",
     "fill_price_krw": 22735.6851,
@@ -18592,7 +18606,7 @@
     "tax_krw": 59954.0017
   },
   {
-    "cash_after_krw": 39402215.1648,
+    "cash_after_krw": 39401829.5877,
     "commission_krw": 625.0657,
     "date": "2025-03-03",
     "fill_price_krw": 122561.8925,
@@ -18606,7 +18620,7 @@
     "tax_krw": 7500.7878
   },
   {
-    "cash_after_krw": 1133.9078,
+    "cash_after_krw": 748.3306,
     "commission_krw": 5909.2758,
     "date": "2025-03-03",
     "fill_price_krw": 1500.0256,
@@ -18620,7 +18634,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 3151707.3007,
+    "cash_after_krw": 3151321.7236,
     "commission_krw": 172.9232,
     "date": "2025-04-01",
     "fill_price_krw": 96068.4496,
@@ -18634,7 +18648,7 @@
     "tax_krw": 2075.0785
   },
   {
-    "cash_after_krw": 52526521.5977,
+    "cash_after_krw": 52526136.0205,
     "commission_krw": 7420.6925,
     "date": "2025-04-01",
     "fill_price_krw": 8373.6092,
@@ -18648,7 +18662,7 @@
     "tax_krw": 89048.3099
   },
   {
-    "cash_after_krw": 53025297.0852,
+    "cash_after_krw": 53024911.508,
     "commission_krw": 74.9625,
     "date": "2025-04-01",
     "fill_price_krw": 24987.5,
@@ -18662,7 +18676,7 @@
     "tax_krw": 899.55
   },
   {
-    "cash_after_krw": 90457699.1364,
+    "cash_after_krw": 90457313.5592,
     "commission_krw": 5625.8307,
     "date": "2025-04-01",
     "fill_price_krw": 8215.89,
@@ -18676,7 +18690,7 @@
     "tax_krw": 67509.9681
   },
   {
-    "cash_after_krw": 187533773.7379,
+    "cash_after_krw": 187533388.1608,
     "commission_krw": 14589.8614,
     "date": "2025-04-01",
     "fill_price_krw": 10294.85,
@@ -18690,7 +18704,7 @@
     "tax_krw": 175078.337
   },
   {
-    "cash_after_krw": 202805072.1285,
+    "cash_after_krw": 202804686.5513,
     "commission_krw": 2295.1703,
     "date": "2025-04-01",
     "fill_price_krw": 8065.965,
@@ -18704,7 +18718,7 @@
     "tax_krw": 27542.0441
   },
   {
-    "cash_after_krw": 232669354.1977,
+    "cash_after_krw": 232668968.6205,
     "commission_krw": 4488.3947,
     "date": "2025-04-01",
     "fill_price_krw": 69265.35,
@@ -18718,7 +18732,7 @@
     "tax_krw": 53860.7362
   },
   {
-    "cash_after_krw": 249683384.1171,
+    "cash_after_krw": 249682998.5399,
     "commission_krw": 2557.0908,
     "date": "2025-04-01",
     "fill_price_krw": 79660.15,
@@ -18732,7 +18746,7 @@
     "tax_krw": 30685.0898
   },
   {
-    "cash_after_krw": 259331697.1473,
+    "cash_after_krw": 259331311.5701,
     "commission_krw": 1450.0746,
     "date": "2025-04-01",
     "fill_price_krw": 30984.5,
@@ -18746,7 +18760,7 @@
     "tax_krw": 17400.8952
   },
   {
-    "cash_after_krw": 262823006.5696,
+    "cash_after_krw": 262822620.9924,
     "commission_krw": 524.7196,
     "date": "2025-04-01",
     "fill_price_krw": 1341.8223,
@@ -18760,7 +18774,7 @@
     "tax_krw": 6296.6354
   },
   {
-    "cash_after_krw": 354216561.9686,
+    "cash_after_krw": 354216176.3914,
     "commission_krw": 13735.8182,
     "date": "2025-04-01",
     "fill_price_krw": 6986.505,
@@ -18774,7 +18788,7 @@
     "tax_krw": 164829.8179
   },
   {
-    "cash_after_krw": 408028551.5191,
+    "cash_after_krw": 408028165.9419,
     "commission_krw": 8087.5692,
     "date": "2025-04-01",
     "fill_price_krw": 70664.65,
@@ -18788,7 +18802,7 @@
     "tax_krw": 97050.8303
   },
   {
-    "cash_after_krw": 414693788.1136,
+    "cash_after_krw": 414693402.5364,
     "commission_krw": 1001.7389,
     "date": "2025-04-01",
     "fill_price_krw": 115142.4,
@@ -18802,7 +18816,7 @@
     "tax_krw": 12020.8666
   },
   {
-    "cash_after_krw": 430237627.4061,
+    "cash_after_krw": 430237241.8289,
     "commission_krw": 2336.1313,
     "date": "2025-04-01",
     "fill_price_krw": 20989.5,
@@ -18816,21 +18830,21 @@
     "tax_krw": 28033.5762
   },
   {
-    "cash_after_krw": 464565501.1904,
-    "commission_krw": 5159.2416,
+    "cash_after_krw": 464562013.2297,
+    "commission_krw": 5158.7753,
     "date": "2025-04-01",
     "fill_price_krw": 3108.445,
-    "gross_krw": 34394943.925,
+    "gross_krw": 34391835.48,
     "persona": "weak_oracle",
-    "qty": 11065,
+    "qty": 11064,
     "reason": "rebalance_sell",
     "report_id": "",
     "side": "sell",
     "symbol": "310200.KQ",
-    "tax_krw": 61910.8991
+    "tax_krw": 61905.3039
   },
   {
-    "cash_after_krw": 466346129.6808,
+    "cash_after_krw": 466342641.7201,
     "commission_krw": 267.6161,
     "date": "2025-04-01",
     "fill_price_krw": 23788.1,
@@ -18844,13 +18858,13 @@
     "tax_krw": 3211.3935
   },
   {
-    "cash_after_krw": 283281309.5449,
-    "commission_krw": 27455.6047,
+    "cash_after_krw": 283280649.1458,
+    "commission_krw": 27455.1806,
     "date": "2025-04-01",
     "fill_price_krw": 1413.5688,
-    "gross_krw": 183037364.5312,
+    "gross_krw": 183034537.3937,
     "persona": "weak_oracle",
-    "qty": 129486,
+    "qty": 129484,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
@@ -18858,7 +18872,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 279318134.8579,
+    "cash_after_krw": 279317474.4588,
     "commission_krw": 594.387,
     "date": "2025-04-01",
     "fill_price_krw": 24612.3,
@@ -18872,13 +18886,13 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 261803556.4651,
-    "commission_krw": 2626.7927,
+    "cash_after_krw": 261824360.0101,
+    "commission_krw": 2623.5736,
     "date": "2025-04-01",
     "fill_price_krw": 21460.725,
-    "gross_krw": 17511951.6,
+    "gross_krw": 17490490.875,
     "persona": "weak_oracle",
-    "qty": 816,
+    "qty": 815,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
@@ -18886,7 +18900,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 251534455.116,
+    "cash_after_krw": 251555258.6609,
     "commission_krw": 1540.1342,
     "date": "2025-04-01",
     "fill_price_krw": 5732.865,
@@ -18900,7 +18914,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 244610957.247,
+    "cash_after_krw": 244631760.792,
     "commission_krw": 1038.3689,
     "date": "2025-04-01",
     "fill_price_krw": 20360.175,
@@ -18914,7 +18928,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 238558125.0084,
+    "cash_after_krw": 238578928.5534,
     "commission_krw": 907.7887,
     "date": "2025-04-01",
     "fill_price_krw": 61130.55,
@@ -18928,13 +18942,13 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 189511861.9723,
-    "commission_krw": 7355.8361,
+    "cash_after_krw": 189539469.9378,
+    "commission_krw": 7354.8156,
     "date": "2025-04-01",
     "fill_price_krw": 6803.4,
-    "gross_krw": 49038907.2,
+    "gross_krw": 49032103.8,
     "persona": "weak_oracle",
-    "qty": 7208,
+    "qty": 7207,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
@@ -18942,7 +18956,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 186710041.7623,
+    "cash_after_krw": 186737649.7278,
     "commission_krw": 420.21,
     "date": "2025-04-01",
     "fill_price_krw": 22411.2,
@@ -18956,7 +18970,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 182793257.2127,
+    "cash_after_krw": 182820865.1782,
     "commission_krw": 587.4296,
     "date": "2025-04-01",
     "fill_price_krw": 7043.52,
@@ -18970,7 +18984,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 176555644.9312,
+    "cash_after_krw": 176583252.8967,
     "commission_krw": 935.5015,
     "date": "2025-04-01",
     "fill_price_krw": 17518.755,
@@ -18984,7 +18998,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 165174651.2382,
+    "cash_after_krw": 165202259.2037,
     "commission_krw": 1706.893,
     "date": "2025-04-01",
     "fill_price_krw": 16808.4,
@@ -18998,7 +19012,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 155516376.7143,
+    "cash_after_krw": 155543984.6798,
     "commission_krw": 1448.5239,
     "date": "2025-04-01",
     "fill_price_krw": 19009.5,
@@ -19012,7 +19026,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 153129586.1294,
+    "cash_after_krw": 153157194.0949,
     "commission_krw": 357.9649,
     "date": "2025-04-01",
     "fill_price_krw": 2086.0425,
@@ -19026,7 +19040,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 142249467.8314,
+    "cash_after_krw": 142277075.7969,
     "commission_krw": 1631.773,
     "date": "2025-04-01",
     "fill_price_krw": 25962.975,
@@ -19040,7 +19054,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 131621817.7123,
+    "cash_after_krw": 131649425.6778,
     "commission_krw": 1593.9084,
     "date": "2025-04-01",
     "fill_price_krw": 9513.0315,
@@ -19054,7 +19068,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 112997844.5603,
+    "cash_after_krw": 113025452.5258,
     "commission_krw": 2793.177,
     "date": "2025-04-01",
     "fill_price_krw": 913.0715,
@@ -19068,7 +19082,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 81733240.6959,
+    "cash_after_krw": 81760848.6614,
     "commission_krw": 4688.9872,
     "date": "2025-04-01",
     "fill_price_krw": 49305.8594,
@@ -19082,7 +19096,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 77887160.0766,
+    "cash_after_krw": 77914768.0421,
     "commission_krw": 576.8256,
     "date": "2025-04-01",
     "fill_price_krw": 7068.9408,
@@ -19096,7 +19110,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 75874861.042,
+    "cash_after_krw": 75902469.0075,
     "commission_krw": 301.7996,
     "date": "2025-04-01",
     "fill_price_krw": 67066.5745,
@@ -19110,7 +19124,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 53120386.0402,
+    "cash_after_krw": 53147994.0057,
     "commission_krw": 3412.6594,
     "date": "2025-04-01",
     "fill_price_krw": 95592.6989,
@@ -19124,7 +19138,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 33100794.8014,
+    "cash_after_krw": 33128402.7669,
     "commission_krw": 3002.4883,
     "date": "2025-04-01",
     "fill_price_krw": 37067.7569,
@@ -19138,13 +19152,13 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 23258403.6231,
-    "commission_krw": 1476.1373,
+    "cash_after_krw": 23281570.7444,
+    "commission_krw": 1476.8033,
     "date": "2025-04-01",
     "fill_price_krw": 1480.0594,
-    "gross_krw": 9840915.041,
+    "gross_krw": 9845355.2193,
     "persona": "weak_oracle",
-    "qty": 6649,
+    "qty": 6652,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
@@ -19152,7 +19166,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 25497.9858,
+    "cash_after_krw": 48665.107,
     "commission_krw": 3484.4132,
     "date": "2025-04-01",
     "fill_price_krw": 56109.7131,
@@ -19166,13 +19180,13 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 2206.0655,
-    "commission_krw": 303.4483,
+    "cash_after_krw": 7702.5149,
+    "commission_krw": 306.0985,
     "date": "2025-05-01",
     "fill_price_krw": 8834.0108,
-    "gross_krw": 2022988.472,
+    "gross_krw": 2040656.4936,
     "persona": "weak_oracle",
-    "qty": 229,
+    "qty": 231,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
@@ -19180,13 +19194,13 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 126.0392,
-    "commission_krw": 0.312,
+    "cash_after_krw": 422.4227,
+    "commission_krw": 1.0919,
     "date": "2025-05-01",
     "fill_price_krw": 1039.8572,
-    "gross_krw": 2079.7144,
+    "gross_krw": 7279.0004,
     "persona": "weak_oracle",
-    "qty": 2,
+    "qty": 7,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
@@ -19194,7 +19208,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 29519814.1742,
+    "cash_after_krw": 29520110.5578,
     "commission_krw": 4136.0185,
     "date": "2025-06-02",
     "fill_price_krw": 27436.275,
@@ -19208,21 +19222,21 @@
     "tax_krw": 49632.2215
   },
   {
-    "cash_after_krw": 54201419.9079,
-    "commission_krw": 3709.4743,
+    "cash_after_krw": 54171690.0071,
+    "commission_krw": 3704.9616,
     "date": "2025-06-02",
     "fill_price_krw": 30084.95,
-    "gross_krw": 24729828.9,
+    "gross_krw": 24699743.95,
     "persona": "weak_oracle",
-    "qty": 822,
+    "qty": 821,
     "reason": "rebalance_sell",
     "report_id": "",
     "side": "sell",
     "symbol": "015760.KS",
-    "tax_krw": 44513.692
+    "tax_krw": 44459.5391
   },
   {
-    "cash_after_krw": 67529558.8277,
+    "cash_after_krw": 67499828.9269,
     "commission_krw": 2003.1269,
     "date": "2025-06-02",
     "fill_price_krw": 7456.27,
@@ -19236,7 +19250,7 @@
     "tax_krw": 24037.5232
   },
   {
-    "cash_after_krw": 105146308.2991,
+    "cash_after_krw": 105116578.3983,
     "commission_krw": 5653.5368,
     "date": "2025-06-02",
     "fill_price_krw": 21439.275,
@@ -19250,7 +19264,7 @@
     "tax_krw": 67842.4418
   },
   {
-    "cash_after_krw": 267600706.6675,
+    "cash_after_krw": 267570976.7667,
     "commission_krw": 24415.7705,
     "date": "2025-06-02",
     "fill_price_krw": 12703.645,
@@ -19264,7 +19278,7 @@
     "tax_krw": 292989.2461
   },
   {
-    "cash_after_krw": 304077474.8356,
+    "cash_after_krw": 304047744.9349,
     "commission_krw": 5482.2055,
     "date": "2025-06-02",
     "fill_price_krw": 12873.56,
@@ -19278,7 +19292,7 @@
     "tax_krw": 65786.4663
   },
   {
-    "cash_after_krw": 311681805.9181,
+    "cash_after_krw": 311652076.0173,
     "commission_krw": 1142.8783,
     "date": "2025-06-02",
     "fill_price_krw": 76961.5,
@@ -19292,7 +19306,7 @@
     "tax_krw": 13714.5393
   },
   {
-    "cash_after_krw": 379273086.7924,
+    "cash_after_krw": 379243356.8916,
     "commission_krw": 10158.5012,
     "date": "2025-06-02",
     "fill_price_krw": 11164.415,
@@ -19306,7 +19320,7 @@
     "tax_krw": 121902.0145
   },
   {
-    "cash_after_krw": 382808158.06,
+    "cash_after_krw": 382778428.1592,
     "commission_krw": 531.2967,
     "date": "2025-06-02",
     "fill_price_krw": 28335.825,
@@ -19320,7 +19334,7 @@
     "tax_krw": 6375.5606
   },
   {
-    "cash_after_krw": 391868624.808,
+    "cash_after_krw": 391838894.9072,
     "commission_krw": 1361.7254,
     "date": "2025-06-02",
     "fill_price_krw": 1229.4379,
@@ -19334,7 +19348,7 @@
     "tax_krw": 16340.7045
   },
   {
-    "cash_after_krw": 411533546.6884,
+    "cash_after_krw": 411503816.7876,
     "commission_krw": 2955.5015,
     "date": "2025-06-02",
     "fill_price_krw": 22088.95,
@@ -19348,7 +19362,7 @@
     "tax_krw": 35466.0181
   },
   {
-    "cash_after_krw": 418932132.8822,
+    "cash_after_krw": 418902402.9814,
     "commission_krw": 1111.9562,
     "date": "2025-06-02",
     "fill_price_krw": 3623.1875,
@@ -19362,7 +19376,7 @@
     "tax_krw": 13343.4749
   },
   {
-    "cash_after_krw": 421457193.7632,
+    "cash_after_krw": 421427463.8624,
     "commission_krw": 379.4992,
     "date": "2025-06-02",
     "fill_price_krw": 18880.555,
@@ -19376,7 +19390,7 @@
     "tax_krw": 4553.9899
   },
   {
-    "cash_after_krw": 426247832.5655,
+    "cash_after_krw": 426218102.6647,
     "commission_krw": 719.9998,
     "date": "2025-06-02",
     "fill_price_krw": 52173.9,
@@ -19390,7 +19404,7 @@
     "tax_krw": 8639.9978
   },
   {
-    "cash_after_krw": 428866882.6993,
+    "cash_after_krw": 428837152.7986,
     "commission_krw": 393.6251,
     "date": "2025-06-02",
     "fill_price_krw": 2293.8525,
@@ -19404,7 +19418,7 @@
     "tax_krw": 4723.5011
   },
   {
-    "cash_after_krw": 439713304.3281,
+    "cash_after_krw": 439683574.4273,
     "commission_krw": 1630.142,
     "date": "2025-06-02",
     "fill_price_krw": 25937.025,
@@ -19418,35 +19432,35 @@
     "tax_krw": 19561.7043
   },
   {
-    "cash_after_krw": 454962397.7637,
-    "commission_krw": 2291.8331,
+    "cash_after_krw": 454955326.2485,
+    "commission_krw": 2295.2385,
     "date": "2025-06-02",
     "fill_price_krw": 11351.3278,
-    "gross_krw": 15278887.2658,
+    "gross_krw": 15301589.9215,
     "persona": "weak_oracle",
-    "qty": 1346,
+    "qty": 1348,
     "reason": "rebalance_sell",
     "report_id": "",
     "side": "sell",
     "symbol": "4680.T",
-    "tax_krw": 27501.9971
+    "tax_krw": 27542.8619
   },
   {
-    "cash_after_krw": 488704043.5129,
-    "commission_krw": 5071.1356,
+    "cash_after_krw": 488703589.3041,
+    "commission_krw": 5072.1301,
     "date": "2025-06-02",
     "fill_price_krw": 1657.5589,
-    "gross_krw": 33807570.5117,
+    "gross_krw": 33814200.7471,
     "persona": "weak_oracle",
-    "qty": 20396,
+    "qty": 20400,
     "reason": "rebalance_sell",
     "report_id": "",
     "side": "sell",
     "symbol": "CHGG",
-    "tax_krw": 60853.6269
+    "tax_krw": 60865.5613
   },
   {
-    "cash_after_krw": 530185784.7723,
+    "cash_after_krw": 530185330.5635,
     "commission_krw": 6234.4183,
     "date": "2025-06-02",
     "fill_price_krw": 65556.449,
@@ -19460,7 +19474,7 @@
     "tax_krw": 74813.0197
   },
   {
-    "cash_after_krw": 571061492.4715,
+    "cash_after_krw": 571061038.2627,
     "commission_krw": 6143.3357,
     "date": "2025-06-02",
     "fill_price_krw": 172082.2314,
@@ -19474,7 +19488,7 @@
     "tax_krw": 73720.0279
   },
   {
-    "cash_after_krw": 559280939.2035,
+    "cash_after_krw": 559280484.9947,
     "commission_krw": 1766.818,
     "date": "2025-06-02",
     "fill_price_krw": 38119.05,
@@ -19488,7 +19502,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 493991523.76,
+    "cash_after_krw": 493991069.5512,
     "commission_krw": 9791.9435,
     "date": "2025-06-02",
     "fill_price_krw": 119559.75,
@@ -19502,7 +19516,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 431856157.3529,
+    "cash_after_krw": 431855703.1441,
     "commission_krw": 9318.9071,
     "date": "2025-06-02",
     "fill_price_krw": 55027.5,
@@ -19516,7 +19530,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 420178570.9776,
+    "cash_after_krw": 420178116.7688,
     "commission_krw": 1751.3752,
     "date": "2025-06-02",
     "fill_price_krw": 77838.9,
@@ -19530,7 +19544,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 406081913.4838,
+    "cash_after_krw": 406081459.275,
     "commission_krw": 2114.1815,
     "date": "2025-06-02",
     "fill_price_krw": 154885.0913,
@@ -19544,7 +19558,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 399441899.7812,
+    "cash_after_krw": 399441445.5724,
     "commission_krw": 995.8527,
     "date": "2025-06-02",
     "fill_price_krw": 9094.545,
@@ -19558,7 +19572,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 362684730.3877,
+    "cash_after_krw": 362684276.1789,
     "commission_krw": 5512.7485,
     "date": "2025-06-02",
     "fill_price_krw": 7093.545,
@@ -19572,7 +19586,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 351298133.0542,
+    "cash_after_krw": 351297678.8454,
     "commission_krw": 1707.7334,
     "date": "2025-06-02",
     "fill_price_krw": 25412.7,
@@ -19586,7 +19600,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 348108330.7907,
+    "cash_after_krw": 348107876.5818,
     "commission_krw": 478.3986,
     "date": "2025-06-02",
     "fill_price_krw": 14697.345,
@@ -19600,7 +19614,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 320634482.3315,
+    "cash_after_krw": 320634028.1226,
     "commission_krw": 4120.4592,
     "date": "2025-06-02",
     "fill_price_krw": 38419.2,
@@ -19614,7 +19628,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 283280615.2917,
+    "cash_after_krw": 283280161.0829,
     "commission_krw": 5602.2397,
     "date": "2025-06-02",
     "fill_price_krw": 123261.6,
@@ -19628,7 +19642,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 276139075.7715,
+    "cash_after_krw": 276138621.5627,
     "commission_krw": 1071.0703,
     "date": "2025-06-02",
     "fill_price_krw": 66733.35,
@@ -19642,7 +19656,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 235415359.5002,
+    "cash_after_krw": 235414905.2914,
     "commission_krw": 6107.6413,
     "date": "2025-06-02",
     "fill_price_krw": 17238.615,
@@ -19656,7 +19670,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 227095084.2111,
+    "cash_after_krw": 227094630.0022,
     "commission_krw": 1247.8541,
     "date": "2025-06-02",
     "fill_price_krw": 4147.0725,
@@ -19670,7 +19684,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 203051564.274,
+    "cash_after_krw": 203051110.0652,
     "commission_krw": 3605.9871,
     "date": "2025-06-02",
     "fill_price_krw": 10105.05,
@@ -19684,7 +19698,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 182720406.0826,
+    "cash_after_krw": 182719951.8738,
     "commission_krw": 3049.2163,
     "date": "2025-06-02",
     "fill_price_krw": 24462.225,
@@ -19698,7 +19712,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 180451652.8725,
+    "cash_after_krw": 180451198.6637,
     "commission_krw": 340.2619,
     "date": "2025-06-02",
     "fill_price_krw": 13583.3111,
@@ -19712,7 +19726,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 167227234.235,
+    "cash_after_krw": 167226780.0262,
     "commission_krw": 1983.3653,
     "date": "2025-06-02",
     "fill_price_krw": 68156.8828,
@@ -19726,7 +19740,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 142112652.5041,
+    "cash_after_krw": 142112198.2953,
     "commission_krw": 3766.6223,
     "date": "2025-06-02",
     "fill_price_krw": 60948.5804,
@@ -19740,7 +19754,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 132768613.6066,
+    "cash_after_krw": 132768159.3977,
     "commission_krw": 1401.3956,
     "date": "2025-06-02",
     "fill_price_krw": 13965.0785,
@@ -19754,7 +19768,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 110302263.8912,
+    "cash_after_krw": 110301809.6824,
     "commission_krw": 3369.447,
     "date": "2025-06-02",
     "fill_price_krw": 6139.1037,
@@ -19768,7 +19782,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 60132455.1677,
+    "cash_after_krw": 60132000.9589,
     "commission_krw": 7524.3427,
     "date": "2025-06-02",
     "fill_price_krw": 69189.3578,
@@ -19782,7 +19796,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 7658971.0497,
+    "cash_after_krw": 7658516.8409,
     "commission_krw": 7869.8421,
     "date": "2025-06-02",
     "fill_price_krw": 259730.7637,
@@ -19796,7 +19810,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 426686.0931,
+    "cash_after_krw": 426231.8843,
     "commission_krw": 1084.68,
     "date": "2025-06-02",
     "fill_price_krw": 1033028.6109,
@@ -19810,7 +19824,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 1447.914,
+    "cash_after_krw": 993.7052,
     "commission_krw": 63.7762,
     "date": "2025-06-02",
     "fill_price_krw": 28344.9602,
@@ -19824,7 +19838,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 622.3296,
+    "cash_after_krw": 168.1208,
     "commission_krw": 0.1238,
     "date": "2025-06-02",
     "fill_price_krw": 825.4606,
@@ -19838,21 +19852,21 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 205230059.4769,
-    "commission_krw": 30543.9763,
+    "cash_after_krw": 205226868.3556,
+    "commission_krw": 30543.565,
     "date": "2025-07-01",
     "fill_price_krw": 1371.1299,
-    "gross_krw": 203626508.8395,
+    "gross_krw": 203623766.5796,
     "persona": "weak_oracle",
-    "qty": 148510,
+    "qty": 148508,
     "reason": "rebalance_sell",
     "report_id": "",
     "side": "sell",
     "symbol": "002340.SZ",
-    "tax_krw": 366527.7159
+    "tax_krw": 366522.7798
   },
   {
-    "cash_after_krw": 243588991.402,
+    "cash_after_krw": 243585800.2807,
     "commission_krw": 5765.0817,
     "date": "2025-07-01",
     "fill_price_krw": 9066.7322,
@@ -19866,7 +19880,7 @@
     "tax_krw": 69180.9804
   },
   {
-    "cash_after_krw": 259216924.2417,
+    "cash_after_krw": 259213733.1204,
     "commission_krw": 2348.77,
     "date": "2025-07-01",
     "fill_price_krw": 50674.65,
@@ -19880,7 +19894,7 @@
     "tax_krw": 28185.2403
   },
   {
-    "cash_after_krw": 307598346.0394,
+    "cash_after_krw": 307595154.9181,
     "commission_krw": 7271.3925,
     "date": "2025-07-01",
     "fill_price_krw": 141329.3,
@@ -19894,7 +19908,7 @@
     "tax_krw": 87256.7098
   },
   {
-    "cash_after_krw": 377199672.1773,
+    "cash_after_krw": 377196481.056,
     "commission_krw": 10460.5971,
     "date": "2025-07-01",
     "fill_price_krw": 61769.1,
@@ -19908,7 +19922,7 @@
     "tax_krw": 125527.165
   },
   {
-    "cash_after_krw": 402374616.7456,
+    "cash_after_krw": 402371425.6243,
     "commission_krw": 3783.6197,
     "date": "2025-07-01",
     "fill_price_krw": 37931.025,
@@ -19922,7 +19936,7 @@
     "tax_krw": 45403.4369
   },
   {
-    "cash_after_krw": 416935269.7971,
+    "cash_after_krw": 416932078.6758,
     "commission_krw": 2188.3653,
     "date": "2025-07-01",
     "fill_price_krw": 160319.8,
@@ -19936,7 +19950,7 @@
     "tax_krw": 26260.3832
   },
   {
-    "cash_after_krw": 433763555.7249,
+    "cash_after_krw": 433760364.6036,
     "commission_krw": 2529.1748,
     "date": "2025-07-01",
     "fill_price_krw": 7196.4,
@@ -19950,7 +19964,7 @@
     "tax_krw": 30350.0974
   },
   {
-    "cash_after_krw": 445248958.6307,
+    "cash_after_krw": 445245767.5094,
     "commission_krw": 1726.1765,
     "date": "2025-07-01",
     "fill_price_krw": 25687.15,
@@ -19964,7 +19978,7 @@
     "tax_krw": 20714.1178
   },
   {
-    "cash_after_krw": 449379178.7855,
+    "cash_after_krw": 449375987.6642,
     "commission_krw": 620.7435,
     "date": "2025-07-01",
     "fill_price_krw": 19070.46,
@@ -19978,7 +19992,7 @@
     "tax_krw": 7448.9217
   },
   {
-    "cash_after_krw": 479763583.9331,
+    "cash_after_krw": 479760392.8118,
     "commission_krw": 4566.5656,
     "date": "2025-07-01",
     "fill_price_krw": 42578.7,
@@ -19992,7 +20006,7 @@
     "tax_krw": 54798.7869
   },
   {
-    "cash_after_krw": 496068754.1296,
+    "cash_after_krw": 496065563.0083,
     "commission_krw": 2450.5541,
     "date": "2025-07-01",
     "fill_price_krw": 154122.9,
@@ -20006,7 +20020,7 @@
     "tax_krw": 29406.6493
   },
   {
-    "cash_after_krw": 508229249.6577,
+    "cash_after_krw": 508226058.5364,
     "commission_krw": 1827.6382,
     "date": "2025-07-01",
     "fill_price_krw": 22438.775,
@@ -20020,7 +20034,7 @@
     "tax_krw": 21931.6587
   },
   {
-    "cash_after_krw": 535048956.2736,
+    "cash_after_krw": 535045765.1523,
     "commission_krw": 4030.8161,
     "date": "2025-07-01",
     "fill_price_krw": 22638.675,
@@ -20034,7 +20048,7 @@
     "tax_krw": 48369.793
   },
   {
-    "cash_after_krw": 567490241.7031,
+    "cash_after_krw": 567487050.5818,
     "commission_krw": 4875.7004,
     "date": "2025-07-01",
     "fill_price_krw": 13663.165,
@@ -20048,7 +20062,7 @@
     "tax_krw": 58508.4052
   },
   {
-    "cash_after_krw": 569781946.4569,
+    "cash_after_krw": 569778755.3356,
     "commission_krw": 344.4273,
     "date": "2025-07-01",
     "fill_price_krw": 13749.5947,
@@ -20062,7 +20076,7 @@
     "tax_krw": 4133.1282
   },
   {
-    "cash_after_krw": 589317595.5064,
+    "cash_after_krw": 589314404.3851,
     "commission_krw": 2936.0727,
     "date": "2025-07-01",
     "fill_price_krw": 100895.969,
@@ -20076,7 +20090,7 @@
     "tax_krw": 35232.8724
   },
   {
-    "cash_after_krw": 591455047.1256,
+    "cash_after_krw": 591451856.0043,
     "commission_krw": 321.2442,
     "date": "2025-07-01",
     "fill_price_krw": 64897.8119,
@@ -20090,7 +20104,21 @@
     "tax_krw": 3854.93
   },
   {
-    "cash_after_krw": 619328642.7553,
+    "cash_after_krw": 591453712.3768,
+    "commission_krw": 0.279,
+    "date": "2025-07-01",
+    "fill_price_krw": 1859.9995,
+    "gross_krw": 1859.9995,
+    "persona": "weak_oracle",
+    "qty": 1,
+    "reason": "rebalance_sell",
+    "report_id": "",
+    "side": "sell",
+    "symbol": "CHGG",
+    "tax_krw": 3.348
+  },
+  {
+    "cash_after_krw": 619327308.0066,
     "commission_krw": 4189.2083,
     "date": "2025-07-01",
     "fill_price_krw": 9893.0412,
@@ -20104,7 +20132,7 @@
     "tax_krw": 50270.4996
   },
   {
-    "cash_after_krw": 671644625.336,
+    "cash_after_krw": 671643290.5872,
     "commission_krw": 7862.7297,
     "date": "2025-07-01",
     "fill_price_krw": 259496.03,
@@ -20118,7 +20146,7 @@
     "tax_krw": 94352.7565
   },
   {
-    "cash_after_krw": 673889719.5742,
+    "cash_after_krw": 673888384.8254,
     "commission_krw": 337.4221,
     "date": "2025-07-01",
     "fill_price_krw": 42443.0326,
@@ -20132,7 +20160,7 @@
     "tax_krw": 4049.0653
   },
   {
-    "cash_after_krw": 653606042.2289,
+    "cash_after_krw": 653604707.4801,
     "commission_krw": 3042.0953,
     "date": "2025-07-01",
     "fill_price_krw": 285642.75,
@@ -20146,7 +20174,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 614296504.6826,
+    "cash_after_krw": 614295169.9338,
     "commission_krw": 5895.5463,
     "date": "2025-07-01",
     "fill_price_krw": 85442.7,
@@ -20160,7 +20188,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 511125479.3498,
+    "cash_after_krw": 511124144.601,
     "commission_krw": 15473.3328,
     "date": "2025-07-01",
     "fill_price_krw": 288144.0,
@@ -20174,7 +20202,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 491333181.2303,
+    "cash_after_krw": 491331846.4816,
     "commission_krw": 2968.3995,
     "date": "2025-07-01",
     "fill_price_krw": 17328.66,
@@ -20188,7 +20216,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 453492247.7666,
+    "cash_after_krw": 453490913.0178,
     "commission_krw": 5675.2887,
     "date": "2025-07-01",
     "fill_price_krw": 23661.825,
@@ -20202,7 +20230,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 431808160.6414,
+    "cash_after_krw": 431806825.8926,
     "commission_krw": 3252.1252,
     "date": "2025-07-01",
     "fill_price_krw": 78839.4,
@@ -20216,7 +20244,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 427205170.2964,
+    "cash_after_krw": 427203835.5476,
     "commission_krw": 690.345,
     "date": "2025-07-01",
     "fill_price_krw": 11505.75,
@@ -20230,7 +20258,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 378817765.2892,
+    "cash_after_krw": 378816430.5404,
     "commission_krw": 7257.0222,
     "date": "2025-07-01",
     "fill_price_krw": 9234.615,
@@ -20244,7 +20272,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 375692935.235,
+    "cash_after_krw": 375691600.4862,
     "commission_krw": 468.6542,
     "date": "2025-07-01",
     "fill_price_krw": 84442.2,
@@ -20258,7 +20286,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 365288776.1452,
+    "cash_after_krw": 365287441.3964,
     "commission_krw": 1560.3898,
     "date": "2025-07-01",
     "fill_price_krw": 55927.95,
@@ -20272,7 +20300,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 333696191.9383,
+    "cash_after_krw": 333694857.1895,
     "commission_krw": 4738.1769,
     "date": "2025-07-01",
     "fill_price_krw": 4422.21,
@@ -20286,7 +20314,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 319928647.8164,
+    "cash_after_krw": 319927313.0676,
     "commission_krw": 2064.8219,
     "date": "2025-07-01",
     "fill_price_krw": 2301.15,
@@ -20300,7 +20328,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 316174408.865,
+    "cash_after_krw": 316173074.1162,
     "commission_krw": 563.0514,
     "date": "2025-07-01",
     "fill_price_krw": 25362.675,
@@ -20314,7 +20342,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 314140952.2348,
+    "cash_after_krw": 314139617.486,
     "commission_krw": 304.9727,
     "date": "2025-07-01",
     "fill_price_krw": 56476.4349,
@@ -20328,7 +20356,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 290183268.8712,
+    "cash_after_krw": 290181934.1224,
     "commission_krw": 3593.1135,
     "date": "2025-07-01",
     "fill_price_krw": 21330.4455,
@@ -20342,7 +20370,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 283113210.3629,
+    "cash_after_krw": 283111875.6141,
     "commission_krw": 1060.3497,
     "date": "2025-07-01",
     "fill_price_krw": 13464.7584,
@@ -20356,7 +20384,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 187170265.0134,
+    "cash_after_krw": 187168930.2646,
     "commission_krw": 14389.2834,
     "date": "2025-07-01",
     "fill_price_krw": 70953.074,
@@ -20370,7 +20398,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 23841173.2958,
+    "cash_after_krw": 23839838.547,
     "commission_krw": 24495.6894,
     "date": "2025-07-01",
     "fill_price_krw": 1046824.3335,
@@ -20384,7 +20412,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 3665840.5645,
+    "cash_after_krw": 3664505.8157,
     "commission_krw": 3025.846,
     "date": "2025-07-01",
     "fill_price_krw": 762.2834,
@@ -20398,7 +20426,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 4711.7624,
+    "cash_after_krw": 3377.0137,
     "commission_krw": 549.087,
     "date": "2025-07-01",
     "fill_price_krw": 53832.0546,
@@ -20412,7 +20440,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 12049982.5292,
+    "cash_after_krw": 12048647.7804,
     "commission_krw": 1509.7346,
     "date": "2025-08-01",
     "fill_price_krw": 1390.5633,
@@ -20426,7 +20454,7 @@
     "tax_krw": 18116.8152
   },
   {
-    "cash_after_krw": 57616115.9652,
+    "cash_after_krw": 57614781.2164,
     "commission_krw": 6848.2742,
     "date": "2025-08-01",
     "fill_price_krw": 99250.35,
@@ -20440,7 +20468,7 @@
     "tax_krw": 82179.2898
   },
   {
-    "cash_after_krw": 76880042.3046,
+    "cash_after_krw": 76878707.5559,
     "commission_krw": 2895.2347,
     "date": "2025-08-01",
     "fill_price_krw": 16901.545,
@@ -20454,7 +20482,7 @@
     "tax_krw": 34742.8159
   },
   {
-    "cash_after_krw": 114843041.7194,
+    "cash_after_krw": 114841706.9707,
     "commission_krw": 5705.5758,
     "date": "2025-08-01",
     "fill_price_krw": 23788.1,
@@ -20468,7 +20496,7 @@
     "tax_krw": 68466.9094
   },
   {
-    "cash_after_krw": 205488104.6953,
+    "cash_after_krw": 205486769.9466,
     "commission_krw": 13623.3249,
     "date": "2025-08-01",
     "fill_price_krw": 117341.3,
@@ -20482,7 +20510,7 @@
     "tax_krw": 163479.8992
   },
   {
-    "cash_after_krw": 222750026.032,
+    "cash_after_krw": 222748691.2833,
     "commission_krw": 2594.3472,
     "date": "2025-08-01",
     "fill_price_krw": 13253.37,
@@ -20496,7 +20524,7 @@
     "tax_krw": 31132.1661
   },
   {
-    "cash_after_krw": 275744023.783,
+    "cash_after_krw": 275742689.0343,
     "commission_krw": 7964.6307,
     "date": "2025-08-01",
     "fill_price_krw": 8895.55,
@@ -20510,7 +20538,7 @@
     "tax_krw": 95575.5683
   },
   {
-    "cash_after_krw": 321599447.0018,
+    "cash_after_krw": 321598112.2531,
     "commission_krw": 6891.7524,
     "date": "2025-08-01",
     "fill_price_krw": 10394.8,
@@ -20524,7 +20552,7 @@
     "tax_krw": 82701.0288
   },
   {
-    "cash_after_krw": 391126164.6173,
+    "cash_after_krw": 391124829.8685,
     "commission_krw": 10449.3839,
     "date": "2025-08-01",
     "fill_price_krw": 2124.571,
@@ -20538,7 +20566,7 @@
     "tax_krw": 125392.6073
   },
   {
-    "cash_after_krw": 397817736.5576,
+    "cash_after_krw": 397816401.8088,
     "commission_krw": 1005.6969,
     "date": "2025-08-01",
     "fill_price_krw": 171914.0,
@@ -20552,7 +20580,7 @@
     "tax_krw": 12068.3628
   },
   {
-    "cash_after_krw": 416611497.1715,
+    "cash_after_krw": 416610162.4227,
     "commission_krw": 2824.572,
     "date": "2025-08-01",
     "fill_price_krw": 64267.85,
@@ -20566,7 +20594,7 @@
     "tax_krw": 33894.8641
   },
   {
-    "cash_after_krw": 451802601.6921,
+    "cash_after_krw": 451801266.9433,
     "commission_krw": 5288.9792,
     "date": "2025-08-01",
     "fill_price_krw": 25737.125,
@@ -20580,7 +20608,7 @@
     "tax_krw": 63467.7502
   },
   {
-    "cash_after_krw": 467228201.2674,
+    "cash_after_krw": 467226866.5187,
     "commission_krw": 2318.3607,
     "date": "2025-08-01",
     "fill_price_krw": 2583.7075,
@@ -20594,7 +20622,7 @@
     "tax_krw": 27820.3289
   },
   {
-    "cash_after_krw": 480311980.1005,
+    "cash_after_krw": 480310645.3517,
     "commission_krw": 1966.4013,
     "date": "2025-08-01",
     "fill_price_krw": 22838.575,
@@ -20608,7 +20636,7 @@
     "tax_krw": 23596.8157
   },
   {
-    "cash_after_krw": 639483432.6656,
+    "cash_after_krw": 639482097.9169,
     "commission_krw": 23922.3665,
     "date": "2025-08-01",
     "fill_price_krw": 86300.0234,
@@ -20622,7 +20650,7 @@
     "tax_krw": 287068.398
   },
   {
-    "cash_after_krw": 694509413.9962,
+    "cash_after_krw": 694508079.2474,
     "commission_krw": 8270.0237,
     "date": "2025-08-01",
     "fill_price_krw": 1060259.4546,
@@ -20636,7 +20664,7 @@
     "tax_krw": 99240.285
   },
   {
-    "cash_after_krw": 739951241.7015,
+    "cash_after_krw": 739949906.9527,
     "commission_krw": 6829.5919,
     "date": "2025-08-01",
     "fill_price_krw": 88580.958,
@@ -20650,7 +20678,7 @@
     "tax_krw": 81955.1023
   },
   {
-    "cash_after_krw": 833313323.489,
+    "cash_after_krw": 833311988.7403,
     "commission_krw": 14031.674,
     "date": "2025-08-01",
     "fill_price_krw": 2920.7098,
@@ -20664,7 +20692,7 @@
     "tax_krw": 168380.0884
   },
   {
-    "cash_after_krw": 747859808.3842,
+    "cash_after_krw": 747858473.6354,
     "commission_krw": 12816.1048,
     "date": "2025-08-01",
     "fill_price_krw": 258129.0,
@@ -20678,7 +20706,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 701408681.2851,
+    "cash_after_krw": 701407346.5364,
     "commission_krw": 6966.6241,
     "date": "2025-08-01",
     "fill_price_krw": 22361.175,
@@ -20692,7 +20720,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 681025439.2574,
+    "cash_after_krw": 681024104.5086,
     "commission_krw": 3057.0277,
     "date": "2025-08-01",
     "fill_price_krw": 210105.0,
@@ -20706,7 +20734,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 648532330.022,
+    "cash_after_krw": 648530995.2732,
     "commission_krw": 4873.2354,
     "date": "2025-08-01",
     "fill_price_krw": 132066.0,
@@ -20720,7 +20748,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 578961232.9725,
+    "cash_after_krw": 578959898.2238,
     "commission_krw": 10434.0994,
     "date": "2025-08-01",
     "fill_price_krw": 60330.15,
@@ -20734,7 +20762,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 573571231.3435,
+    "cash_after_krw": 573569896.5948,
     "commission_krw": 808.379,
     "date": "2025-08-01",
     "fill_price_krw": 283641.75,
@@ -20748,7 +20776,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 565468367.2962,
+    "cash_after_krw": 565467032.5475,
     "commission_krw": 1215.2473,
     "date": "2025-08-01",
     "fill_price_krw": 36168.075,
@@ -20762,7 +20790,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 454769891.7352,
+    "cash_after_krw": 454768556.9865,
     "commission_krw": 16602.281,
     "date": "2025-08-01",
     "fill_price_krw": 7043.52,
@@ -20776,7 +20804,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 421024068.6709,
+    "cash_after_krw": 421022733.9222,
     "commission_krw": 5061.1143,
     "date": "2025-08-01",
     "fill_price_krw": 90945.45,
@@ -20790,7 +20818,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 380005420.7965,
+    "cash_after_krw": 380004086.0478,
     "commission_krw": 6151.8744,
     "date": "2025-08-01",
     "fill_price_krw": 24412.2,
@@ -20804,7 +20832,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 309581970.0132,
+    "cash_after_krw": 309580635.2644,
     "commission_krw": 10561.9333,
     "date": "2025-08-01",
     "fill_price_krw": 82741.35,
@@ -20818,7 +20846,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 260933965.707,
+    "cash_after_krw": 260932630.9582,
     "commission_krw": 7296.1062,
     "date": "2025-08-01",
     "fill_price_krw": 38819.4,
@@ -20832,7 +20860,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 252416082.0411,
+    "cash_after_krw": 252414747.2923,
     "commission_krw": 1277.4909,
     "date": "2025-08-01",
     "fill_price_krw": 18159.075,
@@ -20846,7 +20874,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 249257029.7543,
+    "cash_after_krw": 249255695.0055,
     "commission_krw": 473.7868,
     "date": "2025-08-01",
     "fill_price_krw": 225612.75,
@@ -20860,7 +20888,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 195508111.6257,
+    "cash_after_krw": 195506776.877,
     "commission_krw": 8061.1286,
     "date": "2025-08-01",
     "fill_price_krw": 251125.5,
@@ -20874,7 +20902,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 194707771.6827,
+    "cash_after_krw": 194706436.934,
     "commission_krw": 120.033,
     "date": "2025-08-01",
     "fill_price_krw": 4062.03,
@@ -20888,7 +20916,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 132783140.3643,
+    "cash_after_krw": 132781805.6156,
     "commission_krw": 9287.3016,
     "date": "2025-08-01",
     "fill_price_krw": 63568.115,
@@ -20902,7 +20930,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 88526246.2146,
+    "cash_after_krw": 88524911.4658,
     "commission_krw": 6637.5385,
     "date": "2025-08-01",
     "fill_price_krw": 30475.3833,
@@ -20916,7 +20944,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 52375083.6907,
+    "cash_after_krw": 52373748.942,
     "commission_krw": 5421.8611,
     "date": "2025-08-01",
     "fill_price_krw": 49994.1088,
@@ -20930,7 +20958,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 44553891.0159,
+    "cash_after_krw": 44552556.2672,
     "commission_krw": 1173.003,
     "date": "2025-08-01",
     "fill_price_krw": 19073.2187,
@@ -20944,7 +20972,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 43413224.9622,
+    "cash_after_krw": 43411890.2134,
     "commission_krw": 171.0742,
     "date": "2025-08-01",
     "fill_price_krw": 17820.2341,
@@ -20958,7 +20986,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 31681101.2908,
+    "cash_after_krw": 31679766.542,
     "commission_krw": 1759.5546,
     "date": "2025-08-01",
     "fill_price_krw": 10831.3611,
@@ -20972,7 +21000,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 2185582.7893,
+    "cash_after_krw": 2184248.0405,
     "commission_krw": 4423.6642,
     "date": "2025-08-01",
     "fill_price_krw": 25644.4303,
@@ -20986,7 +21014,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 23650.3024,
+    "cash_after_krw": 22315.5536,
     "commission_krw": 324.2412,
     "date": "2025-08-01",
     "fill_price_krw": 65503.2802,
@@ -21000,7 +21028,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 10706333.9888,
+    "cash_after_krw": 10704999.24,
     "commission_krw": 1304.9472,
     "date": "2025-09-01",
     "fill_price_krw": 255872.0,
@@ -21014,7 +21042,7 @@
     "tax_krw": 15659.3664
   },
   {
-    "cash_after_krw": 10707920.1051,
+    "cash_after_krw": 10706585.3563,
     "commission_krw": 0.2384,
     "date": "2025-09-01",
     "fill_price_krw": 1589.2152,
@@ -21028,7 +21056,7 @@
     "tax_krw": 2.8606
   },
   {
-    "cash_after_krw": 116863803.4362,
+    "cash_after_krw": 116862468.6874,
     "commission_krw": 15954.4938,
     "date": "2025-09-01",
     "fill_price_krw": 321339.25,
@@ -21042,7 +21070,7 @@
     "tax_krw": 191453.9252
   },
   {
-    "cash_after_krw": 133698822.8331,
+    "cash_after_krw": 133697488.0843,
     "commission_krw": 2530.1868,
     "date": "2025-09-01",
     "fill_price_krw": 36431.775,
@@ -21056,7 +21084,7 @@
     "tax_krw": 30362.2413
   },
   {
-    "cash_after_krw": 153855058.5197,
+    "cash_after_krw": 153853723.7709,
     "commission_krw": 3029.3426,
     "date": "2025-09-01",
     "fill_price_krw": 7056.47,
@@ -21070,7 +21098,7 @@
     "tax_krw": 36352.1109
   },
   {
-    "cash_after_krw": 161607426.1668,
+    "cash_after_krw": 161606091.418,
     "commission_krw": 1165.1271,
     "date": "2025-09-01",
     "fill_price_krw": 15852.07,
@@ -21084,7 +21112,7 @@
     "tax_krw": 13981.5257
   },
   {
-    "cash_after_krw": 179006710.2728,
+    "cash_after_krw": 179005375.524,
     "commission_krw": 2614.9918,
     "date": "2025-09-01",
     "fill_price_krw": 26986.5,
@@ -21098,7 +21126,7 @@
     "tax_krw": 31379.9022
   },
   {
-    "cash_after_krw": 201316738.3184,
+    "cash_after_krw": 201315403.5697,
     "commission_krw": 3353.0426,
     "date": "2025-09-01",
     "fill_price_krw": 92753.6,
@@ -21112,7 +21140,7 @@
     "tax_krw": 40236.5117
   },
   {
-    "cash_after_krw": 210626981.3232,
+    "cash_after_krw": 210625646.5744,
     "commission_krw": 1399.265,
     "date": "2025-09-01",
     "fill_price_krw": 19890.05,
@@ -21126,7 +21154,7 @@
     "tax_krw": 16791.1802
   },
   {
-    "cash_after_krw": 211913822.081,
+    "cash_after_krw": 211912487.3322,
     "commission_krw": 193.4032,
     "date": "2025-09-01",
     "fill_price_krw": 214892.5,
@@ -21140,7 +21168,7 @@
     "tax_krw": 2320.839
   },
   {
-    "cash_after_krw": 272754456.0462,
+    "cash_after_krw": 272753121.2974,
     "commission_krw": 9143.9257,
     "date": "2025-09-01",
     "fill_price_krw": 284857.5,
@@ -21154,7 +21182,7 @@
     "tax_krw": 109727.109
   },
   {
-    "cash_after_krw": 281980954.6466,
+    "cash_after_krw": 281979619.8979,
     "commission_krw": 1386.6788,
     "date": "2025-09-01",
     "fill_price_krw": 29535.225,
@@ -21168,7 +21196,7 @@
     "tax_krw": 16640.1458
   },
   {
-    "cash_after_krw": 318323851.474,
+    "cash_after_krw": 318322516.7252,
     "commission_krw": 5462.0856,
     "date": "2025-09-01",
     "fill_price_krw": 4202.8975,
@@ -21182,7 +21210,7 @@
     "tax_krw": 65545.0271
   },
   {
-    "cash_after_krw": 331805752.9011,
+    "cash_after_krw": 331804418.1523,
     "commission_krw": 2026.2364,
     "date": "2025-09-01",
     "fill_price_krw": 42478.75,
@@ -21196,7 +21224,7 @@
     "tax_krw": 24314.8365
   },
   {
-    "cash_after_krw": 323197360.4359,
+    "cash_after_krw": 323196025.6871,
     "commission_krw": 1291.0652,
     "date": "2025-09-01",
     "fill_price_krw": 21410.7,
@@ -21210,7 +21238,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 251708917.7777,
+    "cash_after_krw": 251707583.0289,
     "commission_krw": 10721.6582,
     "date": "2025-09-01",
     "fill_price_krw": 220610.25,
@@ -21224,7 +21252,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 191599067.2524,
+    "cash_after_krw": 191597732.5036,
     "commission_krw": 9015.1253,
     "date": "2025-09-01",
     "fill_price_krw": 132966.45,
@@ -21238,7 +21266,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 186895511.5749,
+    "cash_after_krw": 186894176.8261,
     "commission_krw": 705.4275,
     "date": "2025-09-01",
     "fill_price_krw": 59529.75,
@@ -21252,7 +21280,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 178255118.3203,
+    "cash_after_krw": 178253783.5715,
     "commission_krw": 1295.8646,
     "date": "2025-09-01",
     "fill_price_krw": 16028.01,
@@ -21266,7 +21294,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 173101069.979,
+    "cash_after_krw": 173099735.2302,
     "commission_krw": 772.9913,
     "date": "2025-09-01",
     "fill_price_krw": 26563.275,
@@ -21280,7 +21308,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 91796750.4101,
+    "cash_after_krw": 91795415.6613,
     "commission_krw": 12193.8189,
     "date": "2025-09-01",
     "fill_price_krw": 93546.75,
@@ -21294,7 +21322,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 11221.6957,
+    "cash_after_krw": 9886.9469,
     "commission_krw": 13765.7644,
     "date": "2025-09-01",
     "fill_price_krw": 32566.275,
@@ -21308,13 +21336,13 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 394.6618,
-    "commission_krw": 1.6238,
+    "cash_after_krw": 4473.43,
+    "commission_krw": 0.8119,
     "date": "2025-09-01",
     "fill_price_krw": 5412.705,
-    "gross_krw": 10825.41,
+    "gross_krw": 5412.705,
     "persona": "weak_oracle",
-    "qty": 2,
+    "qty": 1,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
@@ -21322,7 +21350,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 118713858.7368,
+    "cash_after_krw": 118717937.505,
     "commission_krw": 17541.225,
     "date": "2025-10-01",
     "fill_price_krw": 359820.0,
@@ -21336,7 +21364,7 @@
     "tax_krw": 210494.7
   },
   {
-    "cash_after_krw": 171016304.2744,
+    "cash_after_krw": 171020383.0426,
     "commission_krw": 7860.6952,
     "date": "2025-10-01",
     "fill_price_krw": 21139.425,
@@ -21350,7 +21378,7 @@
     "tax_krw": 94328.3422
   },
   {
-    "cash_after_krw": 230563613.4006,
+    "cash_after_krw": 230567692.1687,
     "commission_krw": 8949.548,
     "date": "2025-10-01",
     "fill_price_krw": 215392.25,
@@ -21364,7 +21392,7 @@
     "tax_krw": 107394.5758
   },
   {
-    "cash_after_krw": 307252140.1955,
+    "cash_after_krw": 307256218.9636,
     "commission_krw": 11525.7542,
     "date": "2025-10-01",
     "fill_price_krw": 62368.8,
@@ -21378,7 +21406,7 @@
     "tax_krw": 138309.0509
   },
   {
-    "cash_after_krw": 320811850.5986,
+    "cash_after_krw": 320815929.3668,
     "commission_krw": 2037.9305,
     "date": "2025-10-01",
     "fill_price_krw": 295352.25,
@@ -21392,7 +21420,7 @@
     "tax_krw": 24455.1663
   },
   {
-    "cash_after_krw": 328117215.6539,
+    "cash_after_krw": 328121294.422,
     "commission_krw": 1097.9458,
     "date": "2025-10-01",
     "fill_price_krw": 35532.225,
@@ -21406,7 +21434,7 @@
     "tax_krw": 13175.349
   },
   {
-    "cash_after_krw": 421578843.8567,
+    "cash_after_krw": 421582922.6248,
     "commission_krw": 14046.6352,
     "date": "2025-10-01",
     "fill_price_krw": 7286.355,
@@ -21420,7 +21448,7 @@
     "tax_krw": 168559.622
   },
   {
-    "cash_after_krw": 431144170.6212,
+    "cash_after_krw": 431148249.3894,
     "commission_krw": 1437.6023,
     "date": "2025-10-01",
     "fill_price_krw": 17781.105,
@@ -21434,7 +21462,7 @@
     "tax_krw": 17251.2281
   },
   {
-    "cash_after_krw": 436833802.3623,
+    "cash_after_krw": 436837881.1304,
     "commission_krw": 855.1122,
     "date": "2025-10-01",
     "fill_price_krw": 29385.3,
@@ -21448,7 +21476,7 @@
     "tax_krw": 10261.3468
   },
   {
-    "cash_after_krw": 568817776.7626,
+    "cash_after_krw": 568821855.5307,
     "commission_krw": 19836.2769,
     "date": "2025-10-01",
     "fill_price_krw": 106646.65,
@@ -21462,7 +21490,7 @@
     "tax_krw": 238035.3228
   },
   {
-    "cash_after_krw": 611984700.3486,
+    "cash_after_krw": 611988779.1168,
     "commission_krw": 6487.6895,
     "date": "2025-10-01",
     "fill_price_krw": 41829.075,
@@ -21476,7 +21504,7 @@
     "tax_krw": 77852.2744
   },
   {
-    "cash_after_krw": 657980279.4794,
+    "cash_after_krw": 657984358.2476,
     "commission_krw": 6912.8169,
     "date": "2025-10-01",
     "fill_price_krw": 88455.75,
@@ -21490,7 +21518,7 @@
     "tax_krw": 82953.8024
   },
   {
-    "cash_after_krw": 725311578.6186,
+    "cash_after_krw": 725315657.3867,
     "commission_krw": 10119.4278,
     "date": "2025-10-01",
     "fill_price_krw": 34882.55,
@@ -21504,7 +21532,7 @@
     "tax_krw": 121433.1331
   },
   {
-    "cash_after_krw": 757596318.3735,
+    "cash_after_krw": 757600397.1416,
     "commission_krw": 4852.1727,
     "date": "2025-10-01",
     "fill_price_krw": 260869.5,
@@ -21518,7 +21546,7 @@
     "tax_krw": 58226.0724
   },
   {
-    "cash_after_krw": 759292155.031,
+    "cash_after_krw": 759296233.7991,
     "commission_krw": 254.8725,
     "date": "2025-10-01",
     "fill_price_krw": 212393.75,
@@ -21532,21 +21560,21 @@
     "tax_krw": 3058.47
   },
   {
-    "cash_after_krw": 759304764.0753,
-    "commission_krw": 1.8951,
+    "cash_after_krw": 759302538.3213,
+    "commission_krw": 0.9475,
     "date": "2025-10-01",
     "fill_price_krw": 6316.84,
-    "gross_krw": 12633.68,
+    "gross_krw": 6316.84,
     "persona": "weak_oracle",
-    "qty": 2,
+    "qty": 1,
     "reason": "rebalance_sell",
     "report_id": "",
     "side": "sell",
     "symbol": "353810.KQ",
-    "tax_krw": 22.7406
+    "tax_krw": 11.3703
   },
   {
-    "cash_after_krw": 762430879.3453,
+    "cash_after_krw": 762428653.5912,
     "commission_krw": 469.8335,
     "date": "2025-10-01",
     "fill_price_krw": 4592.7025,
@@ -21560,7 +21588,7 @@
     "tax_krw": 5638.0016
   },
   {
-    "cash_after_krw": 766987193.4236,
+    "cash_after_krw": 766984967.6696,
     "commission_krw": 684.7824,
     "date": "2025-10-01",
     "fill_price_krw": 52473.75,
@@ -21574,7 +21602,7 @@
     "tax_krw": 8217.3892
   },
   {
-    "cash_after_krw": 862965616.6797,
+    "cash_after_krw": 862963390.9257,
     "commission_krw": 14424.892,
     "date": "2025-10-01",
     "fill_price_krw": 71076.0878,
@@ -21588,7 +21616,7 @@
     "tax_krw": 173098.7043
   },
   {
-    "cash_after_krw": 920847919.36,
+    "cash_after_krw": 920845693.606,
     "commission_krw": 8699.3091,
     "date": "2025-10-01",
     "fill_price_krw": 39941.7312,
@@ -21602,7 +21630,7 @@
     "tax_krw": 104391.7087
   },
   {
-    "cash_after_krw": 962854531.4709,
+    "cash_after_krw": 962852305.7169,
     "commission_krw": 6313.3028,
     "date": "2025-10-01",
     "fill_price_krw": 55452.813,
@@ -21616,7 +21644,7 @@
     "tax_krw": 75759.6331
   },
   {
-    "cash_after_krw": 1002551111.1487,
+    "cash_after_krw": 1002548885.3946,
     "commission_krw": 5966.1209,
     "date": "2025-10-01",
     "fill_price_krw": 25945.2963,
@@ -21630,7 +21658,7 @@
     "tax_krw": 71593.4506
   },
   {
-    "cash_after_krw": 1025301161.5385,
+    "cash_after_krw": 1025298935.7845,
     "commission_krw": 3419.1749,
     "date": "2025-10-01",
     "fill_price_krw": 18119.6341,
@@ -21644,7 +21672,7 @@
     "tax_krw": 41030.0994
   },
   {
-    "cash_after_krw": 1070389787.581,
+    "cash_after_krw": 1070387561.827,
     "commission_krw": 6776.5081,
     "date": "2025-10-01",
     "fill_price_krw": 18862.9314,
@@ -21658,7 +21686,7 @@
     "tax_krw": 81318.0972
   },
   {
-    "cash_after_krw": 1080511733.3729,
+    "cash_after_krw": 1080509507.6189,
     "commission_krw": 1521.2583,
     "date": "2025-10-01",
     "fill_price_krw": 116571.519,
@@ -21672,7 +21700,7 @@
     "tax_krw": 18255.0999
   },
   {
-    "cash_after_krw": 1112861579.2267,
+    "cash_after_krw": 1112859353.4727,
     "commission_krw": 4861.9577,
     "date": "2025-10-01",
     "fill_price_krw": 1157608.9751,
@@ -21686,7 +21714,7 @@
     "tax_krw": 58343.4923
   },
   {
-    "cash_after_krw": 1125215032.8507,
+    "cash_after_krw": 1125212807.0966,
     "commission_krw": 1856.6385,
     "date": "2025-10-01",
     "fill_price_krw": 11303.7351,
@@ -21700,7 +21728,7 @@
     "tax_krw": 22279.6619
   },
   {
-    "cash_after_krw": 1155348067.7392,
+    "cash_after_krw": 1155345841.9852,
     "commission_krw": 4528.7864,
     "date": "2025-10-01",
     "fill_price_krw": 26253.834,
@@ -21714,7 +21742,7 @@
     "tax_krw": 54345.4364
   },
   {
-    "cash_after_krw": 1127434733.767,
+    "cash_after_krw": 1127432508.013,
     "commission_krw": 4186.3721,
     "date": "2025-10-01",
     "fill_price_krw": 35417.7,
@@ -21728,7 +21756,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 975148300.478,
+    "cash_after_krw": 975146074.724,
     "commission_krw": 22839.5391,
     "date": "2025-10-01",
     "fill_price_krw": 31265.625,
@@ -21742,7 +21770,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 973381752.8356,
+    "cash_after_krw": 973379527.0815,
     "commission_krw": 264.9424,
     "date": "2025-10-01",
     "fill_price_krw": 135867.9,
@@ -21756,7 +21784,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 938259535.5931,
+    "cash_after_krw": 938257309.8391,
     "commission_krw": 5267.5425,
     "date": "2025-10-01",
     "fill_price_krw": 42721.35,
@@ -21770,7 +21798,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 921670758.6498,
+    "cash_after_krw": 921668532.8957,
     "commission_krw": 2487.9433,
     "date": "2025-10-01",
     "fill_price_krw": 46073.025,
@@ -21784,7 +21812,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 880925888.6359,
+    "cash_after_krw": 880923662.8819,
     "commission_krw": 6110.8139,
     "date": "2025-10-01",
     "fill_price_krw": 40820.4,
@@ -21798,7 +21826,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 860946709.1084,
+    "cash_after_krw": 860944483.3544,
     "commission_krw": 2996.4275,
     "date": "2025-10-01",
     "fill_price_krw": 21410.7,
@@ -21812,7 +21840,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 858735264.9134,
+    "cash_after_krw": 858733039.1593,
     "commission_krw": 331.6669,
     "date": "2025-10-01",
     "fill_price_krw": 5327.982,
@@ -21826,7 +21854,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 720130734.5981,
+    "cash_after_krw": 720128508.8441,
     "commission_krw": 20787.5614,
     "date": "2025-10-01",
     "fill_price_krw": 210613.5908,
@@ -21840,7 +21868,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 470172051.0959,
+    "cash_after_krw": 470169825.3419,
     "commission_krw": 37488.1793,
     "date": "2025-10-01",
     "fill_price_krw": 256592.603,
@@ -21854,7 +21882,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 454360401.7328,
+    "cash_after_krw": 454358175.9788,
     "commission_krw": 2371.3917,
     "date": "2025-10-01",
     "fill_price_krw": 21450.8521,
@@ -21868,7 +21896,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 332431289.0213,
+    "cash_after_krw": 332429063.2673,
     "commission_krw": 18286.6239,
     "date": "2025-10-01",
     "fill_price_krw": 40978.4289,
@@ -21882,7 +21910,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 179640895.1859,
+    "cash_after_krw": 179638669.4319,
     "commission_krw": 22915.1218,
     "date": "2025-10-01",
     "fill_price_krw": 79359.7292,
@@ -21896,7 +21924,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 35287.7813,
+    "cash_after_krw": 33062.0273,
     "commission_krw": 26936.8006,
     "date": "2025-10-01",
     "fill_price_krw": 51886.3538,
@@ -21910,7 +21938,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 25623078.8709,
+    "cash_after_krw": 25620853.1168,
     "commission_krw": 3545.0816,
     "date": "2025-11-03",
     "fill_price_krw": 38680.65,
@@ -21924,7 +21952,7 @@
     "tax_krw": 42540.9789
   },
   {
-    "cash_after_krw": 52217787.8644,
+    "cash_after_krw": 52215562.1103,
     "commission_krw": 3997.0005,
     "date": "2025-11-03",
     "fill_price_krw": 619690.0,
@@ -21938,7 +21966,7 @@
     "tax_krw": 47964.006
   },
   {
-    "cash_after_krw": 76537382.3492,
+    "cash_after_krw": 76535156.5951,
     "commission_krw": 3655.0666,
     "date": "2025-11-03",
     "fill_price_krw": 29935.025,
@@ -21952,7 +21980,7 @@
     "tax_krw": 43860.7986
   },
   {
-    "cash_after_krw": 118410582.0758,
+    "cash_after_krw": 118408356.3217,
     "commission_krw": 6293.2518,
     "date": "2025-11-03",
     "fill_price_krw": 291354.25,
@@ -21966,7 +21994,7 @@
     "tax_krw": 75519.0216
   },
   {
-    "cash_after_krw": 174533099.1946,
+    "cash_after_krw": 174530873.4405,
     "commission_krw": 8434.8255,
     "date": "2025-11-03",
     "fill_price_krw": 140229.85,
@@ -21980,7 +22008,7 @@
     "tax_krw": 101217.9057
   },
   {
-    "cash_after_krw": 192984999.0893,
+    "cash_after_krw": 192982773.3353,
     "commission_krw": 2773.1927,
     "date": "2025-11-03",
     "fill_price_krw": 52373.8,
@@ -21994,7 +22022,7 @@
     "tax_krw": 33278.3125
   },
   {
-    "cash_after_krw": 205642125.3703,
+    "cash_after_krw": 205639899.6163,
     "commission_krw": 1902.2784,
     "date": "2025-11-03",
     "fill_price_krw": 100649.65,
@@ -22008,7 +22036,7 @@
     "tax_krw": 22827.3406
   },
   {
-    "cash_after_krw": 243102558.6039,
+    "cash_after_krw": 243100332.8499,
     "commission_krw": 5630.0436,
     "date": "2025-11-03",
     "fill_price_krw": 34882.55,
@@ -22022,7 +22050,7 @@
     "tax_krw": 67560.5228
   },
   {
-    "cash_after_krw": 275233974.774,
+    "cash_after_krw": 275231749.0199,
     "commission_krw": 4829.1292,
     "date": "2025-11-03",
     "fill_price_krw": 42028.975,
@@ -22036,7 +22064,7 @@
     "tax_krw": 57949.5507
   },
   {
-    "cash_after_krw": 299339494.8196,
+    "cash_after_krw": 299337269.0655,
     "commission_krw": 3622.8926,
     "date": "2025-11-03",
     "fill_price_krw": 25887.05,
@@ -22050,7 +22078,7 @@
     "tax_krw": 43474.7118
   },
   {
-    "cash_after_krw": 301354108.6012,
+    "cash_after_krw": 301351882.8472,
     "commission_krw": 302.7825,
     "date": "2025-11-03",
     "fill_price_krw": 29684.5581,
@@ -22064,7 +22092,7 @@
     "tax_krw": 3633.3899
   },
   {
-    "cash_after_krw": 322780415.3771,
+    "cash_after_krw": 322778189.6231,
     "commission_krw": 3220.2255,
     "date": "2025-11-03",
     "fill_price_krw": 124814.9402,
@@ -22078,7 +22106,7 @@
     "tax_krw": 38642.7055
   },
   {
-    "cash_after_krw": 539153195.8629,
+    "cash_after_krw": 539150970.1089,
     "commission_krw": 32519.3298,
     "date": "2025-11-03",
     "fill_price_krw": 307075.824,
@@ -22092,7 +22120,7 @@
     "tax_krw": 390231.9572
   },
   {
-    "cash_after_krw": 572050762.3241,
+    "cash_after_krw": 572048536.5701,
     "commission_krw": 4944.2763,
     "date": "2025-11-03",
     "fill_price_krw": 87898.2455,
@@ -22106,7 +22134,7 @@
     "tax_krw": 59331.3157
   },
   {
-    "cash_after_krw": 476005366.1754,
+    "cash_after_krw": 476003140.4214,
     "commission_krw": 14404.6487,
     "date": "2025-11-03",
     "fill_price_krw": 26513.25,
@@ -22120,7 +22148,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 432320736.3387,
+    "cash_after_krw": 432318510.5846,
     "commission_krw": 6551.7117,
     "date": "2025-11-03",
     "fill_price_krw": 31265.625,
@@ -22134,7 +22162,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 400873746.7177,
+    "cash_after_krw": 400871520.9637,
     "commission_krw": 4716.341,
     "date": "2025-11-03",
     "fill_price_krw": 5122.56,
@@ -22148,7 +22176,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 302107382.885,
+    "cash_after_krw": 302105157.131,
     "commission_krw": 14812.7327,
     "date": "2025-11-03",
     "fill_price_krw": 99849.9,
@@ -22162,7 +22190,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 257388331.0333,
+    "cash_after_krw": 257386105.2792,
     "commission_krw": 6706.8518,
     "date": "2025-11-03",
     "fill_price_krw": 272636.25,
@@ -22176,7 +22204,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 252864392.0442,
+    "cash_after_krw": 252862166.2902,
     "commission_krw": 678.4891,
     "date": "2025-11-03",
     "fill_price_krw": 205602.75,
@@ -22190,7 +22218,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 250530075.5492,
+    "cash_after_krw": 250527849.7952,
     "commission_krw": 350.095,
     "date": "2025-11-03",
     "fill_price_krw": 72936.45,
@@ -22204,7 +22232,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 222365528.3758,
+    "cash_after_krw": 222363302.6217,
     "commission_krw": 4224.0485,
     "date": "2025-11-03",
     "fill_price_krw": 5752.875,
@@ -22218,7 +22246,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 218385903.0015,
+    "cash_after_krw": 218383677.2475,
     "commission_krw": 596.8543,
     "date": "2025-11-03",
     "fill_price_krw": 17528.76,
@@ -22232,7 +22260,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 164124005.7177,
+    "cash_after_krw": 164121779.9637,
     "commission_krw": 8138.0639,
     "date": "2025-11-03",
     "fill_price_krw": 4698.5156,
@@ -22246,7 +22274,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 142985532.7271,
+    "cash_after_krw": 142983306.9731,
     "commission_krw": 3170.2954,
     "date": "2025-11-03",
     "fill_price_krw": 240173.8943,
@@ -22260,7 +22288,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 135277403.371,
+    "cash_after_krw": 135275177.617,
     "commission_krw": 1156.046,
     "date": "2025-11-03",
     "fill_price_krw": 1342.2106,
@@ -22274,7 +22302,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 134422943.8453,
+    "cash_after_krw": 134420718.0913,
     "commission_krw": 128.1497,
     "date": "2025-11-03",
     "fill_price_krw": 23731.4271,
@@ -22288,7 +22316,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 112867378.9512,
+    "cash_after_krw": 112865153.1972,
     "commission_krw": 3232.8498,
     "date": "2025-11-03",
     "fill_price_krw": 4426.4391,
@@ -22302,7 +22330,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 84700062.3498,
+    "cash_after_krw": 84697836.5958,
     "commission_krw": 4224.4638,
     "date": "2025-11-03",
     "fill_price_krw": 1280140.5517,
@@ -22316,7 +22344,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 32514869.2795,
+    "cash_after_krw": 32512643.5254,
     "commission_krw": 7826.605,
     "date": "2025-11-03",
     "fill_price_krw": 42593.7685,
@@ -22330,7 +22358,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 9554998.6008,
+    "cash_after_krw": 9552772.8468,
     "commission_krw": 3443.4641,
     "date": "2025-11-03",
     "fill_price_krw": 155110.9947,
@@ -22344,7 +22372,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 422870.157,
+    "cash_after_krw": 420644.403,
     "commission_krw": 1369.6138,
     "date": "2025-11-03",
     "fill_price_krw": 58157.6996,
@@ -22358,7 +22386,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 9308964.5374,
+    "cash_after_krw": 9306738.7834,
     "commission_krw": 1034.9323,
     "date": "2025-12-01",
     "fill_price_krw": 38980.5,
@@ -22372,7 +22400,7 @@
     "tax_krw": 12419.1873
   },
   {
-    "cash_after_krw": 20268358.8141,
+    "cash_after_krw": 20266133.06,
     "commission_krw": 1647.121,
     "date": "2025-12-01",
     "fill_price_krw": 31284.35,
@@ -22386,7 +22414,7 @@
     "tax_krw": 19765.4523
   },
   {
-    "cash_after_krw": 104910858.3081,
+    "cash_after_krw": 104908632.5541,
     "commission_krw": 12721.1812,
     "date": "2025-12-01",
     "fill_price_krw": 166616.65,
@@ -22400,7 +22428,7 @@
     "tax_krw": 152654.1747
   },
   {
-    "cash_after_krw": 111410601.1959,
+    "cash_after_krw": 111408375.4419,
     "commission_krw": 976.8663,
     "date": "2025-12-01",
     "fill_price_krw": 29335.325,
@@ -22414,7 +22442,7 @@
     "tax_krw": 11722.3959
   },
   {
-    "cash_after_krw": 130407163.923,
+    "cash_after_krw": 130404938.169,
     "commission_krw": 2855.0518,
     "date": "2025-12-01",
     "fill_price_krw": 5407.295,
@@ -22428,21 +22456,21 @@
     "tax_krw": 34260.6211
   },
   {
-    "cash_after_krw": 153105339.0531,
-    "commission_krw": 3411.3785,
+    "cash_after_krw": 153141070.1136,
+    "commission_krw": 3417.0831,
     "date": "2025-12-01",
     "fill_price_krw": 38030.975,
-    "gross_krw": 22742523.05,
+    "gross_krw": 22780554.025,
     "persona": "weak_oracle",
-    "qty": 598,
+    "qty": 599,
     "reason": "rebalance_sell",
     "report_id": "",
     "side": "sell",
     "symbol": "263750.KQ",
-    "tax_krw": 40936.5415
+    "tax_krw": 41004.9972
   },
   {
-    "cash_after_krw": 164842523.8249,
+    "cash_after_krw": 164878254.8855,
     "commission_krw": 1764.0175,
     "date": "2025-12-01",
     "fill_price_krw": 105947.0,
@@ -22456,7 +22484,7 @@
     "tax_krw": 21168.2106
   },
   {
-    "cash_after_krw": 195823963.231,
+    "cash_after_krw": 195859694.2916,
     "commission_krw": 4656.2957,
     "date": "2025-12-01",
     "fill_price_krw": 252373.75,
@@ -22470,7 +22498,7 @@
     "tax_krw": 55875.5482
   },
   {
-    "cash_after_krw": 197140730.518,
+    "cash_after_krw": 197176461.5786,
     "commission_krw": 197.901,
     "date": "2025-12-01",
     "fill_price_krw": 219890.0,
@@ -22484,7 +22512,7 @@
     "tax_krw": 2374.812
   },
   {
-    "cash_after_krw": 229075629.146,
+    "cash_after_krw": 229111360.2065,
     "commission_krw": 4799.594,
     "date": "2025-12-01",
     "fill_price_krw": 6536.73,
@@ -22498,7 +22526,7 @@
     "tax_krw": 57595.128
   },
   {
-    "cash_after_krw": 238240329.4635,
+    "cash_after_krw": 238276060.524,
     "commission_krw": 1377.391,
     "date": "2025-12-01",
     "fill_price_krw": 39580.2,
@@ -22512,7 +22540,7 @@
     "tax_krw": 16528.6915
   },
   {
-    "cash_after_krw": 242153283.016,
+    "cash_after_krw": 242189014.0765,
     "commission_krw": 588.0898,
     "date": "2025-12-01",
     "fill_price_krw": 17271.36,
@@ -22526,7 +22554,7 @@
     "tax_krw": 7057.0777
   },
   {
-    "cash_after_krw": 249456915.6748,
+    "cash_after_krw": 249492646.7354,
     "commission_krw": 1097.6854,
     "date": "2025-12-01",
     "fill_price_krw": 1274.4519,
@@ -22540,7 +22568,7 @@
     "tax_krw": 13172.2246
   },
   {
-    "cash_after_krw": 250359047.0381,
+    "cash_after_krw": 250394778.0987,
     "commission_krw": 135.5841,
     "date": "2025-12-01",
     "fill_price_krw": 25108.1655,
@@ -22554,7 +22582,7 @@
     "tax_krw": 1627.0091
   },
   {
-    "cash_after_krw": 265767534.5209,
+    "cash_after_krw": 265803265.5815,
     "commission_krw": 2315.7889,
     "date": "2025-12-01",
     "fill_price_krw": 20947.887,
@@ -22568,7 +22596,7 @@
     "tax_krw": 27789.4669
   },
   {
-    "cash_after_krw": 414247627.1112,
+    "cash_after_krw": 414283358.1718,
     "commission_krw": 22315.5292,
     "date": "2025-12-01",
     "fill_price_krw": 1549689.5257,
@@ -22582,7 +22610,7 @@
     "tax_krw": 267786.35
   },
   {
-    "cash_after_krw": 504587745.1157,
+    "cash_after_krw": 504623476.1763,
     "commission_krw": 13577.4938,
     "date": "2025-12-01",
     "fill_price_krw": 45924.2138,
@@ -22596,7 +22624,7 @@
     "tax_krw": 162929.9258
   },
   {
-    "cash_after_krw": 587331588.7238,
+    "cash_after_krw": 587367319.7843,
     "commission_krw": 12435.8264,
     "date": "2025-12-01",
     "fill_price_krw": 59430.4727,
@@ -22610,7 +22638,7 @@
     "tax_krw": 149229.9168
   },
   {
-    "cash_after_krw": 583256941.6184,
+    "cash_after_krw": 583292672.6789,
     "commission_krw": 611.1054,
     "date": "2025-12-01",
     "fill_price_krw": 254627.25,
@@ -22624,7 +22652,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 577689324.6011,
+    "cash_after_krw": 577725055.6616,
     "commission_krw": 835.0173,
     "date": "2025-12-01",
     "fill_price_krw": 26763.375,
@@ -22638,7 +22666,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 570792694.1867,
+    "cash_after_krw": 570828425.2472,
     "commission_krw": 1034.3394,
     "date": "2025-12-01",
     "fill_price_krw": 22461.225,
@@ -22652,13 +22680,13 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 539866602.9687,
-    "commission_krw": 4638.2179,
+    "cash_after_krw": 539927850.6062,
+    "commission_krw": 4634.391,
     "date": "2025-12-01",
     "fill_price_krw": 25512.75,
-    "gross_krw": 30921453.0,
+    "gross_krw": 30895940.25,
     "persona": "weak_oracle",
-    "qty": 1212,
+    "qty": 1211,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
@@ -22666,7 +22694,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 517566365.5598,
+    "cash_after_krw": 517627613.1973,
     "commission_krw": 3344.5339,
     "date": "2025-12-01",
     "fill_price_krw": 45972.975,
@@ -22680,7 +22708,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 486907748.1069,
+    "cash_after_krw": 486968995.7444,
     "commission_krw": 4598.1029,
     "date": "2025-12-01",
     "fill_price_krw": 53126.55,
@@ -22694,7 +22722,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 408199655.1836,
+    "cash_after_krw": 408260902.8211,
     "commission_krw": 11804.4433,
     "date": "2025-12-01",
     "fill_price_krw": 15227.61,
@@ -22708,7 +22736,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 400141037.5397,
+    "cash_after_krw": 400202285.1772,
     "commission_krw": 1208.6114,
     "date": "2025-12-01",
     "fill_price_krw": 3894.3495,
@@ -22722,7 +22750,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 392429313.4422,
+    "cash_after_krw": 392490561.0797,
     "commission_krw": 1156.5851,
     "date": "2025-12-01",
     "fill_price_krw": 4687.2751,
@@ -22736,7 +22764,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 322107128.4465,
+    "cash_after_krw": 322168376.084,
     "commission_krw": 10546.7457,
     "date": "2025-12-01",
     "fill_price_krw": 87343.65,
@@ -22750,7 +22778,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 268678896.179,
+    "cash_after_krw": 268740143.8165,
     "commission_krw": 8013.0329,
     "date": "2025-12-01",
     "fill_price_krw": 219836.2931,
@@ -22764,7 +22792,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 247658274.8524,
+    "cash_after_krw": 247719522.4899,
     "commission_krw": 3152.6203,
     "date": "2025-12-01",
     "fill_price_krw": 112997.1436,
@@ -22778,7 +22806,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 223492586.9986,
+    "cash_after_krw": 223553834.6361,
     "commission_krw": 3624.3095,
     "date": "2025-12-01",
     "fill_price_krw": 4648.3385,
@@ -22792,7 +22820,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 212064171.914,
+    "cash_after_krw": 212125419.5515,
     "commission_krw": 1714.0052,
     "date": "2025-12-01",
     "fill_price_krw": 121560.6498,
@@ -22806,7 +22834,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 132601472.3136,
+    "cash_after_krw": 132662719.9511,
     "commission_krw": 11917.6173,
     "date": "2025-12-01",
     "fill_price_krw": 292098.4632,
@@ -22820,7 +22848,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 67203710.1844,
+    "cash_after_krw": 67264957.8218,
     "commission_krw": 9808.1931,
     "date": "2025-12-01",
     "fill_price_krw": 141532.3678,
@@ -22834,7 +22862,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 34936527.542,
+    "cash_after_krw": 34997775.1794,
     "commission_krw": 4839.3515,
     "date": "2025-12-01",
     "fill_price_krw": 81470.5639,
@@ -22848,7 +22876,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 7383.5925,
+    "cash_after_krw": 68631.23,
     "commission_krw": 5238.5858,
     "date": "2025-12-01",
     "fill_price_krw": 140256.648,
@@ -22862,7 +22890,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 70351595.9917,
+    "cash_after_krw": 70412843.6292,
     "commission_krw": 10271.6616,
     "date": "2026-01-02",
     "fill_price_krw": 31984.0,
@@ -22876,7 +22904,7 @@
     "tax_krw": 123259.9392
   },
   {
-    "cash_after_krw": 75115899.4483,
+    "cash_after_krw": 75177147.0858,
     "commission_krw": 716.0418,
     "date": "2026-01-02",
     "fill_price_krw": 298350.75,
@@ -22890,7 +22918,7 @@
     "tax_krw": 8592.5016
   },
   {
-    "cash_after_krw": 75848500.8844,
+    "cash_after_krw": 75909748.5218,
     "commission_krw": 110.1049,
     "date": "2026-01-02",
     "fill_price_krw": 183508.2,
@@ -22904,7 +22932,7 @@
     "tax_krw": 1321.259
   },
   {
-    "cash_after_krw": 81606365.1121,
+    "cash_after_krw": 81667612.7495,
     "commission_krw": 865.3671,
     "date": "2026-01-02",
     "fill_price_krw": 27736.125,
@@ -22918,7 +22946,7 @@
     "tax_krw": 10384.4052
   },
   {
-    "cash_after_krw": 88022263.8404,
+    "cash_after_krw": 88083511.4779,
     "commission_krw": 964.2651,
     "date": "2026-01-02",
     "fill_price_krw": 20939.525,
@@ -22932,7 +22960,7 @@
     "tax_krw": 11571.1815
   },
   {
-    "cash_after_krw": 136970793.3674,
+    "cash_after_krw": 137032041.0049,
     "commission_krw": 7356.6248,
     "date": "2026-01-02",
     "fill_price_krw": 54072.95,
@@ -22946,7 +22974,7 @@
     "tax_krw": 88279.4982
   },
   {
-    "cash_after_krw": 154729594.8447,
+    "cash_after_krw": 154790842.4822,
     "commission_krw": 2669.0248,
     "date": "2026-01-02",
     "fill_price_krw": 6796.6,
@@ -22960,7 +22988,7 @@
     "tax_krw": 32028.2978
   },
   {
-    "cash_after_krw": 186303779.0402,
+    "cash_after_krw": 186365026.6776,
     "commission_krw": 4745.3811,
     "date": "2026-01-02",
     "fill_price_krw": 103048.45,
@@ -22974,7 +23002,7 @@
     "tax_krw": 56944.5735
   },
   {
-    "cash_after_krw": 189719393.5786,
+    "cash_after_krw": 189780641.216,
     "commission_krw": 513.3432,
     "date": "2026-01-02",
     "fill_price_krw": 213893.0,
@@ -22988,7 +23016,7 @@
     "tax_krw": 6160.1184
   },
   {
-    "cash_after_krw": 190877849.5258,
+    "cash_after_krw": 190939097.1633,
     "commission_krw": 174.1079,
     "date": "2026-01-02",
     "fill_price_krw": 55272.35,
@@ -23002,7 +23030,7 @@
     "tax_krw": 2089.2948
   },
   {
-    "cash_after_krw": 222155461.8164,
+    "cash_after_krw": 222216709.4538,
     "commission_krw": 4700.8084,
     "date": "2026-01-02",
     "fill_price_krw": 15392.3,
@@ -23016,7 +23044,7 @@
     "tax_krw": 56409.701
   },
   {
-    "cash_after_krw": 294095945.2355,
+    "cash_after_krw": 294157192.873,
     "commission_krw": 10812.1562,
     "date": "2026-01-02",
     "fill_price_krw": 5297.35,
@@ -23030,7 +23058,7 @@
     "tax_krw": 129745.8746
   },
   {
-    "cash_after_krw": 336361976.7472,
+    "cash_after_krw": 336423224.3847,
     "commission_krw": 6352.2917,
     "date": "2026-01-02",
     "fill_price_krw": 252075.0673,
@@ -23044,7 +23072,7 @@
     "tax_krw": 76227.5003
   },
   {
-    "cash_after_krw": 352625018.8008,
+    "cash_after_krw": 352686266.4383,
     "commission_krw": 2444.2225,
     "date": "2026-01-02",
     "fill_price_krw": 4848.205,
@@ -23058,7 +23086,7 @@
     "tax_krw": 29330.6705
   },
   {
-    "cash_after_krw": 364899000.4398,
+    "cash_after_krw": 364960248.0773,
     "commission_krw": 1844.6944,
     "date": "2026-01-02",
     "fill_price_krw": 130829.3901,
@@ -23072,7 +23100,7 @@
     "tax_krw": 22136.3328
   },
   {
-    "cash_after_krw": 366454831.7208,
+    "cash_after_krw": 366516079.3583,
     "commission_krw": 233.8307,
     "date": "2026-01-02",
     "fill_price_krw": 1558871.0796,
@@ -23086,7 +23114,7 @@
     "tax_krw": 2805.9679
   },
   {
-    "cash_after_krw": 461961411.4255,
+    "cash_after_krw": 462022659.063,
     "commission_krw": 14353.9772,
     "date": "2026-01-02",
     "fill_price_krw": 156874.0679,
@@ -23100,7 +23128,7 @@
     "tax_krw": 172247.7265
   },
   {
-    "cash_after_krw": 484298930.5774,
+    "cash_after_krw": 484360178.2149,
     "commission_krw": 3357.1744,
     "date": "2026-01-02",
     "fill_price_krw": 134826.2796,
@@ -23114,7 +23142,7 @@
     "tax_krw": 40286.0924
   },
   {
-    "cash_after_krw": 484861579.4028,
+    "cash_after_krw": 484922827.0403,
     "commission_krw": 84.5622,
     "date": "2026-01-02",
     "fill_price_krw": 56374.8134,
@@ -23128,7 +23156,7 @@
     "tax_krw": 1014.7466
   },
   {
-    "cash_after_krw": 461705536.0172,
+    "cash_after_krw": 461766783.6547,
     "commission_krw": 3472.8856,
     "date": "2026-01-02",
     "fill_price_krw": 36518.25,
@@ -23142,7 +23170,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 437851639.2693,
+    "cash_after_krw": 437912886.9068,
     "commission_krw": 3577.5479,
     "date": "2026-01-02",
     "fill_price_krw": 126863.4,
@@ -23156,13 +23184,13 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 434175751.2188,
-    "commission_krw": 551.3005,
+    "cash_after_krw": 434213733.7421,
+    "commission_krw": 554.7898,
     "date": "2026-01-02",
     "fill_price_krw": 23261.625,
-    "gross_krw": 3675336.75,
+    "gross_krw": 3698598.375,
     "persona": "weak_oracle",
-    "qty": 158,
+    "qty": 159,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
@@ -23170,7 +23198,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 426070785.8063,
+    "cash_after_krw": 426108768.3296,
     "commission_krw": 1215.5625,
     "date": "2026-01-02",
     "fill_price_krw": 30465.225,
@@ -23184,13 +23212,13 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 423561755.8083,
-    "commission_krw": 376.2981,
+    "cash_after_krw": 423559912.4585,
+    "commission_krw": 382.271,
     "date": "2026-01-02",
     "fill_price_krw": 39819.9,
-    "gross_krw": 2508653.7,
+    "gross_krw": 2548473.6,
     "persona": "weak_oracle",
-    "qty": 63,
+    "qty": 64,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
@@ -23198,7 +23226,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 357346739.0454,
+    "cash_after_krw": 357344895.6956,
     "commission_krw": 9930.7629,
     "date": "2026-01-02",
     "fill_price_krw": 233116.5,
@@ -23212,7 +23240,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 239782022.8128,
+    "cash_after_krw": 239780179.463,
     "commission_krw": 17632.0626,
     "date": "2026-01-02",
     "fill_price_krw": 5822.91,
@@ -23226,7 +23254,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 229048489.7443,
+    "cash_after_krw": 229046646.3945,
     "commission_krw": 1609.7885,
     "date": "2026-01-02",
     "fill_price_krw": 17198.595,
@@ -23240,7 +23268,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 218316517.6899,
+    "cash_after_krw": 218314674.3401,
     "commission_krw": 1609.5544,
     "date": "2026-01-02",
     "fill_price_krw": 71535.75,
@@ -23254,7 +23282,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 200441419.1029,
+    "cash_after_krw": 200439575.7532,
     "commission_krw": 2680.8627,
     "date": "2026-01-02",
     "fill_price_krw": 114566.7803,
@@ -23268,7 +23296,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 140772388.0106,
+    "cash_after_krw": 140770544.6609,
     "commission_krw": 8949.0123,
     "date": "2026-01-02",
     "fill_price_krw": 262819.7448,
@@ -23282,7 +23310,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 56861157.3241,
+    "cash_after_krw": 56859313.9743,
     "commission_krw": 12584.7969,
     "date": "2026-01-02",
     "fill_price_krw": 41886.4932,
@@ -23296,7 +23324,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 4030265.4196,
+    "cash_after_krw": 4028422.0698,
     "commission_krw": 7923.4453,
     "date": "2026-01-02",
     "fill_price_krw": 71770.3376,
@@ -23310,7 +23338,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 10422.3478,
+    "cash_after_krw": 8578.9981,
     "commission_krw": 602.886,
     "date": "2026-01-02",
     "fill_price_krw": 27341.77,
@@ -23324,7 +23352,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 27466426.9034,
+    "cash_after_krw": 27464583.5536,
     "commission_krw": 3825.8611,
     "date": "2026-02-02",
     "fill_price_krw": 40229.875,
@@ -23338,7 +23366,7 @@
     "tax_krw": 45910.3334
   },
   {
-    "cash_after_krw": 86440842.5046,
+    "cash_after_krw": 86438999.1548,
     "commission_krw": 8863.4461,
     "date": "2026-02-02",
     "fill_price_krw": 37781.1,
@@ -23352,7 +23380,7 @@
     "tax_krw": 106361.3527
   },
   {
-    "cash_after_krw": 110914758.1252,
+    "cash_after_krw": 110912914.7755,
     "commission_krw": 3678.26,
     "date": "2026-02-02",
     "fill_price_krw": 130434.75,
@@ -23366,7 +23394,7 @@
     "tax_krw": 44139.1194
   },
   {
-    "cash_after_krw": 264291811.715,
+    "cash_after_krw": 264289968.3652,
     "commission_krw": 23051.5085,
     "date": "2026-02-02",
     "fill_price_krw": 30784.6,
@@ -23380,7 +23408,7 @@
     "tax_krw": 276618.1018
   },
   {
-    "cash_after_krw": 323012500.2257,
+    "cash_after_krw": 323010656.876,
     "commission_krw": 8825.3126,
     "date": "2026-02-02",
     "fill_price_krw": 40829.575,
@@ -23394,7 +23422,7 @@
     "tax_krw": 105903.7516
   },
   {
-    "cash_after_krw": 325942806.2148,
+    "cash_after_krw": 325940962.865,
     "commission_krw": 440.4047,
     "date": "2026-02-02",
     "fill_price_krw": 62468.75,
@@ -23408,7 +23436,7 @@
     "tax_krw": 5284.8562
   },
   {
-    "cash_after_krw": 354959369.4654,
+    "cash_after_krw": 354957526.1156,
     "commission_krw": 4360.9884,
     "date": "2026-02-02",
     "fill_price_krw": 55272.35,
@@ -23422,7 +23450,7 @@
     "tax_krw": 52331.861
   },
   {
-    "cash_after_krw": 422058438.7376,
+    "cash_after_krw": 422056595.3878,
     "commission_krw": 10084.5252,
     "date": "2026-02-02",
     "fill_price_krw": 117741.1,
@@ -23436,7 +23464,7 @@
     "tax_krw": 121014.3026
   },
   {
-    "cash_after_krw": 605735504.6624,
+    "cash_after_krw": 605733661.3126,
     "commission_krw": 27605.3904,
     "date": "2026-02-02",
     "fill_price_krw": 273863.0,
@@ -23450,7 +23478,7 @@
     "tax_krw": 331264.6848
   },
   {
-    "cash_after_krw": 653586827.872,
+    "cash_after_krw": 653584984.5222,
     "commission_krw": 7191.7223,
     "date": "2026-02-02",
     "fill_price_krw": 50574.7,
@@ -23464,7 +23492,7 @@
     "tax_krw": 86300.6681
   },
   {
-    "cash_after_krw": 795758012.2902,
+    "cash_after_krw": 795756168.9404,
     "commission_krw": 21367.344,
     "date": "2026-02-02",
     "fill_price_krw": 7056.47,
@@ -23478,7 +23506,7 @@
     "tax_krw": 256408.1278
   },
   {
-    "cash_after_krw": 842466740.613,
+    "cash_after_krw": 842464897.2632,
     "commission_krw": 7019.9982,
     "date": "2026-02-02",
     "fill_price_krw": 14942.525,
@@ -23492,7 +23520,7 @@
     "tax_krw": 84239.9789
   },
   {
-    "cash_after_krw": 852980289.4569,
+    "cash_after_krw": 852978446.1071,
     "commission_krw": 1580.1135,
     "date": "2026-02-02",
     "fill_price_krw": 16881.555,
@@ -23506,7 +23534,7 @@
     "tax_krw": 18961.3626
   },
   {
-    "cash_after_krw": 860587325.6594,
+    "cash_after_krw": 860585482.3096,
     "commission_krw": 1143.2848,
     "date": "2026-02-02",
     "fill_price_krw": 3683.8564,
@@ -23520,7 +23548,7 @@
     "tax_krw": 13719.418
   },
   {
-    "cash_after_krw": 958616161.1972,
+    "cash_after_krw": 958614317.8474,
     "commission_krw": 14733.0548,
     "date": "2026-02-02",
     "fill_price_krw": 102848.55,
@@ -23534,7 +23562,7 @@
     "tax_krw": 176796.6574
   },
   {
-    "cash_after_krw": 1002577083.2063,
+    "cash_after_krw": 1002575239.8565,
     "commission_krw": 6607.022,
     "date": "2026-02-02",
     "fill_price_krw": 128791.8517,
@@ -23548,7 +23576,7 @@
     "tax_krw": 79284.2639
   },
   {
-    "cash_after_krw": 1042798300.0183,
+    "cash_after_krw": 1042796456.6685,
     "commission_krw": 6044.9702,
     "date": "2026-02-02",
     "fill_price_krw": 6009.5141,
@@ -23562,7 +23590,7 @@
     "tax_krw": 72539.6426
   },
   {
-    "cash_after_krw": 1054870547.0162,
+    "cash_after_krw": 1054868703.6665,
     "commission_krw": 1814.3751,
     "date": "2026-02-02",
     "fill_price_krw": 1511979.2343,
@@ -23576,7 +23604,7 @@
     "tax_krw": 21772.501
   },
   {
-    "cash_after_krw": 1086365823.9129,
+    "cash_after_krw": 1086363980.5632,
     "commission_krw": 4733.5219,
     "date": "2026-02-02",
     "fill_price_krw": 92271.3821,
@@ -23590,7 +23618,7 @@
     "tax_krw": 56802.2628
   },
   {
-    "cash_after_krw": 928514904.9308,
+    "cash_after_krw": 928513061.5811,
     "commission_krw": 23674.0867,
     "date": "2026-02-02",
     "fill_price_krw": 284373.4142,
@@ -23604,7 +23632,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 880636888.2264,
+    "cash_after_krw": 880635044.8766,
     "commission_krw": 7180.6254,
     "date": "2026-02-02",
     "fill_price_krw": 1058.1529,
@@ -23618,7 +23646,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 635943655.1711,
+    "cash_after_krw": 635941811.8213,
     "commission_krw": 36698.4802,
     "date": "2026-02-02",
     "fill_price_krw": 15944.7689,
@@ -23632,7 +23660,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 570390072.106,
+    "cash_after_krw": 570388228.7562,
     "commission_krw": 9831.5627,
     "date": "2026-02-02",
     "fill_price_krw": 310633.8934,
@@ -23646,7 +23674,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 463580219.9131,
+    "cash_after_krw": 463578376.5634,
     "commission_krw": 16019.075,
     "date": "2026-02-02",
     "fill_price_krw": 613757.6616,
@@ -23660,7 +23688,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 351109245.0552,
+    "cash_after_krw": 351107401.7054,
     "commission_krw": 16868.116,
     "date": "2026-02-02",
     "fill_price_krw": 52182.8802,
@@ -23674,7 +23702,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 290935879.6272,
+    "cash_after_krw": 290934036.2774,
     "commission_krw": 9024.6511,
     "date": "2026-02-02",
     "fill_price_krw": 137675.837,
@@ -23688,7 +23716,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 224880713.2726,
+    "cash_after_krw": 224878869.9229,
     "commission_krw": 9906.7889,
     "date": "2026-02-02",
     "fill_price_krw": 64750.2545,
@@ -23702,7 +23730,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 126264083.5388,
+    "cash_after_krw": 126262240.1891,
     "commission_krw": 14790.2759,
     "date": "2026-02-02",
     "fill_price_krw": 275424.1326,
@@ -23716,7 +23744,7 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 7796.7405,
+    "cash_after_krw": 5953.3908,
     "commission_krw": 18935.6027,
     "date": "2026-02-02",
     "fill_price_krw": 24091.0976,

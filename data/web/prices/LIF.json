@@ -6247,12 +6247,12 @@
       "currency": "USD",
       "date": "2026-05-07",
       "display_currency": "USD",
-      "high": 44.720001220703125,
+      "high": 44.709999084472656,
       "krw_per_unit": 1444.449951171875,
       "low": 42.849998474121094,
-      "open": 42.849998474121094,
+      "open": 43.20000076293945,
       "source_currency": "USD",
-      "volume": 797400.0
+      "volume": 748157.0
     }
   ],
   "symbol": "LIF"

@@ -25344,12 +25344,12 @@
       "currency": "USD",
       "date": "2026-05-07",
       "display_currency": "USD",
-      "high": 235.0,
+      "high": 234.9600067138672,
       "krw_per_unit": 1444.449951171875,
-      "low": 204.22000122070312,
+      "low": 204.4199981689453,
       "open": 232.0,
       "source_currency": "USD",
-      "volume": 1281100.0
+      "volume": 1278375.0
     }
   ],
   "symbol": "LEU"

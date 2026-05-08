@@ -19,20 +19,20 @@
     },
     {
       "cagr": 0.9136,
-      "final_cash_krw": 6007796.7405,
-      "final_equity_krw": 3260584265.711,
+      "final_cash_krw": 6005953.3908,
+      "final_equity_krw": 3260582422.3612,
       "final_holdings_value_krw": 3254576468.9705,
       "initial_capital_krw": 10000000.0,
       "label": "Weak Prophet (6M look-ahead)",
       "max_drawdown": 0.2209,
       "money_weighted_return": 1.5173,
-      "net_profit_krw": 3158584265.711,
+      "net_profit_krw": 3158582422.3612,
       "open_positions": 11,
       "persona": "weak_oracle",
-      "realized_pnl_krw": 1896087955.9014,
-      "time_weighted_return": 132.2495,
+      "realized_pnl_krw": 1896086112.5516,
+      "time_weighted_return": 132.2494,
       "total_contributed_krw": 102000000.0,
-      "trade_count": 1159
+      "trade_count": 1161
     },
     {
       "cagr": 0.0588,
@@ -69,19 +69,19 @@
       "trade_count": 1788
     },
     {
-      "cagr": 0.1628,
+      "cagr": 0.1597,
       "final_cash_krw": 8377731.5547,
-      "final_equity_krw": 228186604.2447,
-      "final_holdings_value_krw": 219808872.6901,
+      "final_equity_krw": 224933501.7042,
+      "final_holdings_value_krw": 216555770.1496,
       "initial_capital_krw": 10000000.0,
       "label": "All-Weather (25/25/25/25)",
       "max_drawdown": 0.0946,
-      "money_weighted_return": 0.3135,
-      "net_profit_krw": 126186604.2447,
+      "money_weighted_return": 0.3078,
+      "net_profit_krw": 122933501.7042,
       "open_positions": 4,
       "persona": "all_weather",
       "realized_pnl_krw": 17624429.114,
-      "time_weighted_return": 2.0444,
+      "time_weighted_return": 2.001,
       "total_contributed_krw": 102000000.0,
       "trade_count": 186
     }

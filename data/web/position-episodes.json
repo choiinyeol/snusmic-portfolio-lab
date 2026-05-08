@@ -26714,7 +26714,7 @@
     "unrealized_pnl_krw": ""
   },
   {
-    "avg_entry_price_krw": 3154.499,
+    "avg_entry_price_krw": 3154.496,
     "avg_exit_price_krw": "3586.1958",
     "buy_fills": 2,
     "close_date": "2024-01-02",
@@ -26724,7 +26724,7 @@
     "last_close_krw": "",
     "open_date": "2023-11-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 2123516.2714,
+    "realized_pnl_krw": 2123531.2812,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "353810.KQ",
@@ -26990,12 +26990,12 @@
     "last_close_krw": "",
     "open_date": "2024-01-02",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 148226.8521,
+    "realized_pnl_krw": 148507.5848,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "043650.KQ",
-    "total_qty_bought": 528,
-    "total_qty_sold": 528,
+    "total_qty_bought": 529,
+    "total_qty_sold": 529,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27370,12 +27370,12 @@
     "last_close_krw": "",
     "open_date": "2024-06-03",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -2903.9102,
+    "realized_pnl_krw": -2903.6205,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "032640.KS",
-    "total_qty_bought": 10024,
-    "total_qty_sold": 10024,
+    "total_qty_bought": 10023,
+    "total_qty_sold": 10023,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27645,8 +27645,8 @@
     "unrealized_pnl_krw": ""
   },
   {
-    "avg_entry_price_krw": 3791.0865,
-    "avg_exit_price_krw": "4022.398",
+    "avg_entry_price_krw": 3791.0876,
+    "avg_exit_price_krw": "4022.4009",
     "buy_fills": 2,
     "close_date": "2025-02-03",
     "company": "Z-holdings",
@@ -27655,12 +27655,12 @@
     "last_close_krw": "",
     "open_date": "2024-08-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 12431840.2584,
+    "realized_pnl_krw": 12432167.5095,
     "sell_fills": 3,
     "status": "closed",
     "symbol": "4689.T",
-    "total_qty_bought": 53745,
-    "total_qty_sold": 53745,
+    "total_qty_bought": 53746,
+    "total_qty_sold": 53746,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27740,9 +27740,9 @@
     "unrealized_pnl_krw": ""
   },
   {
-    "avg_entry_price_krw": 14217.2953,
+    "avg_entry_price_krw": 14217.8087,
     "avg_exit_price_krw": "17664.2864",
-    "buy_fills": 4,
+    "buy_fills": 5,
     "close_date": "2025-06-02",
     "company": "쿠콘",
     "exit_reasons": "('rebalance_sell',)",
@@ -27750,7 +27750,7 @@
     "last_close_krw": "",
     "open_date": "2024-09-02",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 8062512.0778,
+    "realized_pnl_krw": 8061311.2977,
     "sell_fills": 2,
     "status": "closed",
     "symbol": "294570.KQ",
@@ -27883,12 +27883,12 @@
     "last_close_krw": "",
     "open_date": "2024-11-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 3238904.1133,
+    "realized_pnl_krw": 3238575.8238,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "353810.KQ",
-    "total_qty_bought": 9866,
-    "total_qty_sold": 9866,
+    "total_qty_bought": 9865,
+    "total_qty_sold": 9865,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27931,7 +27931,7 @@
   },
   {
     "avg_entry_price_krw": 11867.7099,
-    "avg_exit_price_krw": "13905.3516",
+    "avg_exit_price_krw": "13905.2498",
     "buy_fills": 1,
     "close_date": "2025-01-02",
     "company": "현대그린푸드",
@@ -27940,7 +27940,7 @@
     "last_close_krw": "",
     "open_date": "2024-11-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 6589733.4112,
+    "realized_pnl_krw": 6589404.2193,
     "sell_fills": 2,
     "status": "closed",
     "symbol": "453340.KQ",
@@ -28006,8 +28006,8 @@
     "unrealized_pnl_krw": ""
   },
   {
-    "avg_entry_price_krw": 24132.5094,
-    "avg_exit_price_krw": "33913.815",
+    "avg_entry_price_krw": 24133.7109,
+    "avg_exit_price_krw": "33915.5654",
     "buy_fills": 4,
     "close_date": "2025-10-01",
     "company": "한국전력",
@@ -28016,12 +28016,12 @@
     "last_close_krw": "",
     "open_date": "2024-12-02",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 21734061.0189,
+    "realized_pnl_krw": 21725498.6787,
     "sell_fills": 5,
     "status": "closed",
     "symbol": "015760.KS",
-    "total_qty_bought": 2222,
-    "total_qty_sold": 2222,
+    "total_qty_bought": 2221,
+    "total_qty_sold": 2221,
     "unrealized_pnl_krw": ""
   },
   {
@@ -28386,7 +28386,7 @@
     "unrealized_pnl_krw": ""
   },
   {
-    "avg_entry_price_krw": 20392.0483,
+    "avg_entry_price_krw": 20390.4165,
     "avg_exit_price_krw": "20948.5705",
     "buy_fills": 2,
     "close_date": "2025-04-01",
@@ -28396,7 +28396,7 @@
     "last_close_krw": "",
     "open_date": "2025-01-02",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 412939.4629,
+    "realized_pnl_krw": 414150.2495,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "284740.KS",
@@ -28462,7 +28462,7 @@
     "unrealized_pnl_krw": ""
   },
   {
-    "avg_entry_price_krw": 7107.8195,
+    "avg_entry_price_krw": 7108.0728,
     "avg_exit_price_krw": "11780.3803",
     "buy_fills": 3,
     "close_date": "2025-09-01",
@@ -28472,7 +28472,7 @@
     "last_close_krw": "",
     "open_date": "2025-02-03",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 36731000.7947,
+    "realized_pnl_krw": 36729009.5011,
     "sell_fills": 3,
     "status": "closed",
     "symbol": "075580.KS",
@@ -28520,7 +28520,7 @@
   },
   {
     "avg_entry_price_krw": 2661.7292,
-    "avg_exit_price_krw": "3182.5536",
+    "avg_exit_price_krw": "3182.5597",
     "buy_fills": 1,
     "close_date": "2025-06-02",
     "company": "애니플러스",
@@ -28529,12 +28529,12 @@
     "last_close_krw": "",
     "open_date": "2025-02-03",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 6828528.4435,
+    "realized_pnl_krw": 6828087.7892,
     "sell_fills": 2,
     "status": "closed",
     "symbol": "310200.KQ",
-    "total_qty_bought": 13111,
-    "total_qty_sold": 13111,
+    "total_qty_bought": 13110,
+    "total_qty_sold": 13110,
     "unrealized_pnl_krw": ""
   },
   {
@@ -28557,7 +28557,7 @@
     "unrealized_pnl_krw": ""
   },
   {
-    "avg_entry_price_krw": 906.856,
+    "avg_entry_price_krw": 906.8158,
     "avg_exit_price_krw": "3191.6051",
     "buy_fills": 4,
     "close_date": "2025-10-01",
@@ -28567,7 +28567,7 @@
     "last_close_krw": "",
     "open_date": "2025-02-03",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 75677743.9197,
+    "realized_pnl_krw": 75679075.6748,
     "sell_fills": 2,
     "status": "closed",
     "symbol": "OPEN",
@@ -28576,7 +28576,7 @@
     "unrealized_pnl_krw": ""
   },
   {
-    "avg_entry_price_krw": 1428.3617,
+    "avg_entry_price_krw": 1428.3619,
     "avg_exit_price_krw": "1369.359",
     "buy_fills": 2,
     "close_date": "2025-09-01",
@@ -28586,12 +28586,12 @@
     "last_close_krw": "",
     "open_date": "2025-03-03",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -9189607.3627,
+    "realized_pnl_krw": -9189516.7136,
     "sell_fills": 3,
     "status": "closed",
     "symbol": "002340.SZ",
-    "total_qty_bought": 155749,
-    "total_qty_sold": 155749,
+    "total_qty_bought": 155747,
+    "total_qty_sold": 155747,
     "unrealized_pnl_krw": ""
   },
   {
@@ -28728,7 +28728,7 @@
     "unrealized_pnl_krw": ""
   },
   {
-    "avg_entry_price_krw": 9398.9168,
+    "avg_entry_price_krw": 9398.0806,
     "avg_exit_price_krw": "11329.1927",
     "buy_fills": 2,
     "close_date": "2025-06-02",
@@ -28738,31 +28738,31 @@
     "last_close_krw": "",
     "open_date": "2025-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 2598151.3963,
+    "realized_pnl_krw": 2603139.11,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "4680.T",
-    "total_qty_bought": 1346,
-    "total_qty_sold": 1346,
+    "total_qty_bought": 1348,
+    "total_qty_sold": 1348,
     "unrealized_pnl_krw": ""
   },
   {
-    "avg_entry_price_krw": 913.2209,
-    "avg_exit_price_krw": "1654.3266",
+    "avg_entry_price_krw": 913.252,
+    "avg_exit_price_krw": "1654.3365",
     "buy_fills": 2,
-    "close_date": "2025-06-02",
+    "close_date": "2025-07-01",
     "company": "Chegg",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 62,
+    "holding_days": 91,
     "last_close_krw": "",
     "open_date": "2025-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 15115592.5708,
-    "sell_fills": 1,
+    "realized_pnl_krw": 15118866.1839,
+    "sell_fills": 2,
     "status": "closed",
     "symbol": "CHGG",
-    "total_qty_bought": 20396,
-    "total_qty_sold": 20396,
+    "total_qty_bought": 20401,
+    "total_qty_sold": 20401,
     "unrealized_pnl_krw": ""
   },
   {
@@ -29488,8 +29488,8 @@
     "unrealized_pnl_krw": ""
   },
   {
-    "avg_entry_price_krw": 34577.3012,
-    "avg_exit_price_krw": "37858.3625",
+    "avg_entry_price_krw": 34578.5705,
+    "avg_exit_price_krw": "37858.3864",
     "buy_fills": 3,
     "close_date": "2026-02-02",
     "company": "펄어비스",
@@ -29498,12 +29498,12 @@
     "last_close_krw": "",
     "open_date": "2025-08-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 13563907.7347,
+    "realized_pnl_krw": 13562038.6763,
     "sell_fills": 4,
     "status": "closed",
     "symbol": "263750.KQ",
-    "total_qty_bought": 4134,
-    "total_qty_sold": 4134,
+    "total_qty_bought": 4135,
+    "total_qty_sold": 4135,
     "unrealized_pnl_krw": ""
   },
   {
@@ -29650,12 +29650,12 @@
     "last_close_krw": "",
     "open_date": "2025-09-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 1782.0105,
+    "realized_pnl_krw": 891.0053,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "353810.KQ",
-    "total_qty_bought": 2,
-    "total_qty_sold": 2,
+    "total_qty_bought": 1,
+    "total_qty_sold": 1,
     "unrealized_pnl_krw": ""
   },
   {
@@ -29887,7 +29887,7 @@
     "unrealized_pnl_krw": "93838467.8411"
   },
   {
-    "avg_entry_price_krw": 26171.3492,
+    "avg_entry_price_krw": 26170.8982,
     "avg_exit_price_krw": "30724.57",
     "buy_fills": 3,
     "close_date": "2026-02-02",
@@ -29897,7 +29897,7 @@
     "last_close_krw": "",
     "open_date": "2025-11-03",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 22729678.1726,
+    "realized_pnl_krw": 22731929.6352,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "028050.KS",
@@ -30445,7 +30445,7 @@
     "company": "KOSPI 200 (069500.KS)",
     "exit_reasons": "('rebalance_sell',)",
     "holding_days": 1950,
-    "last_close_krw": "115620.0",
+    "last_close_krw": "115810.0",
     "open_date": "2021-01-04",
     "persona": "all_weather",
     "realized_pnl_krw": 13966769.8192,
@@ -30454,7 +30454,7 @@
     "symbol": "069500.KS",
     "total_qty_bought": 977,
     "total_qty_sold": 460,
-    "unrealized_pnl_krw": "39613951.0343"
+    "unrealized_pnl_krw": "39712181.0343"
   },
   {
     "avg_entry_price_krw": 295179.0443,
@@ -30464,7 +30464,7 @@
     "company": "Gold (GLD)",
     "exit_reasons": "('rebalance_sell',)",
     "holding_days": 1950,
-    "last_close_krw": "635217.7722",
+    "last_close_krw": "623540.1443",
     "open_date": "2021-01-04",
     "persona": "all_weather",
     "realized_pnl_krw": 2977955.8274,
@@ -30473,7 +30473,7 @@
     "symbol": "GLD",
     "total_qty_bought": 97,
     "total_qty_sold": 19,
-    "unrealized_pnl_krw": "26523020.7728"
+    "unrealized_pnl_krw": "25612165.8022"
   },
   {
     "avg_entry_price_krw": 593913.1421,
@@ -30483,7 +30483,7 @@
     "company": "NASDAQ-100 (QQQ)",
     "exit_reasons": "('rebalance_sell',)",
     "holding_days": 1950,
-    "last_close_krw": "1025537.1508",
+    "last_close_krw": "1003806.0526",
     "open_date": "2021-01-04",
     "persona": "all_weather",
     "realized_pnl_krw": 679703.4674,
@@ -30492,7 +30492,7 @@
     "symbol": "QQQ",
     "total_qty_bought": 57,
     "total_qty_sold": 2,
-    "unrealized_pnl_krw": "23739320.4809"
+    "unrealized_pnl_krw": "22544110.079"
   },
   {
     "avg_entry_price_krw": 707918.4065,
@@ -30502,7 +30502,7 @@
     "company": "S&P 500 (SPY)",
     "exit_reasons": "()",
     "holding_days": 1950,
-    "last_close_krw": "1081636.0633",
+    "last_close_krw": "1056730.72",
     "open_date": "2021-01-04",
     "persona": "all_weather",
     "realized_pnl_krw": 0.0,
@@ -30511,6 +30511,6 @@
     "symbol": "SPY",
     "total_qty_bought": 50,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "18685882.8428"
+    "unrealized_pnl_krw": "17440615.6747"
   }
 ]

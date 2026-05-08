@@ -25346,10 +25346,10 @@
       "display_currency": "USD",
       "high": 462.3999938964844,
       "krw_per_unit": 1444.449951171875,
-      "low": 452.0,
-      "open": 453.0400085449219,
+      "low": 452.05999755859375,
+      "open": 453.0350036621094,
       "source_currency": "USD",
-      "volume": 1563000.0
+      "volume": 1527098.0
     }
   ],
   "symbol": "ISRG"

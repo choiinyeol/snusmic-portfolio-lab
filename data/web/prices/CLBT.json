@@ -17929,7 +17929,7 @@
       "volume": 1415131.0
     },
     {
-      "close": 13.810000419616697,
+      "close": 13.8100004196167,
       "close_krw": 19947.8544,
       "currency": "USD",
       "date": "2026-05-07",
@@ -17939,7 +17939,7 @@
       "low": 13.5,
       "open": 13.5,
       "source_currency": "USD",
-      "volume": 1807900.0
+      "volume": 1718688.0
     }
   ],
   "symbol": "CLBT"
