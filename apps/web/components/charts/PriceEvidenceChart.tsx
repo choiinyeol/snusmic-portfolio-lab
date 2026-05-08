@@ -11,6 +11,7 @@ import {
   createSeriesMarkers,
   type IChartApi,
   type ISeriesApi,
+  type ITimeScaleApi,
   type AutoscaleInfoProvider,
   type MouseEventParams,
   type PriceFormatCustom,
@@ -64,8 +65,20 @@ type Props = {
   currency?: string;
   publicationDate: string;
   targetHitDate: string | null;
+  expiryDate?: string | null;
   evidenceMarkers?: EvidenceMarker[];
 };
+
+type DragSelection = {
+  fromTime: string;
+  toTime: string;
+  fromPrice: number;
+  toPrice: number;
+  fromX: number;
+  toX: number;
+};
+
+const DEFAULT_VISIBLE_BARS_AROUND_PUB = { before: 22, after: 130 } as const; // ≈ 1mo before, 6mo after
 
 export function PriceEvidenceChart({
   priceSeries,
@@ -74,6 +87,7 @@ export function PriceEvidenceChart({
   currency = 'KRW',
   publicationDate,
   targetHitDate,
+  expiryDate = null,
   evidenceMarkers = [],
 }: Props) {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -89,9 +103,19 @@ export function PriceEvidenceChart({
     [priceSeries],
   );
   const priceByTime = useMemo(() => new Map(priceSeries.map((point) => [point.time, point])), [priceSeries]);
+  const maByTime = useMemo(() => buildMaByTime(movingAverageData), [movingAverageData]);
   const lastBar = useMemo(() => activeBarFromPoint(priceSeries.at(-1)), [priceSeries]);
   const [hoverBar, setHoverBar] = useState<OhlcState | null>(null);
+  const lastMa = useMemo<MaValues>(
+    () => maByTime.get(priceSeries.at(-1)?.time ?? '') ?? EMPTY_MA,
+    [maByTime, priceSeries],
+  );
+  const [hoverMa, setHoverMa] = useState<MaValues>(EMPTY_MA);
   const activeBar = isCurrentHoverBar(hoverBar, priceByTime) ? hoverBar : lastBar;
+  const activeMa = hoverBar ? hoverMa : lastMa;
+  const [verticalLines, setVerticalLines] = useState<VerticalLineState>({ pub: null, expiry: null });
+  const [drag, setDrag] = useState<DragSelection | null>(null);
+  const dragStartRef = useRef<{ time: string; x: number; price: number } | null>(null);
   const chartMarkers = useMemo(
     () => buildMarkers(publicationDate, targetHitDate, evidenceMarkers),
     [evidenceMarkers, publicationDate, targetHitDate],
@@ -168,10 +192,11 @@ export function PriceEvidenceChart({
 
     candleSeries.setData(candleData);
 
+    // MA series: no right-axis title, no last-value label — legend is rendered
+    // as a top-left HTML overlay (TradingView style).
     const ma20Series = chart.addSeries(LineSeries, {
-      color: '#1b64da',
+      color: MA_COLORS.ma20,
       lineWidth: 2,
-      title: 'MA20',
       priceFormat: priceFormatForCurrency(currency),
       priceLineVisible: false,
       lastValueVisible: false,
@@ -179,9 +204,8 @@ export function PriceEvidenceChart({
     ma20Series.setData(movingAverageData.ma20);
 
     const ma60Series = chart.addSeries(LineSeries, {
-      color: '#7d6bff',
+      color: MA_COLORS.ma60,
       lineWidth: 2,
-      title: 'MA60',
       priceFormat: priceFormatForCurrency(currency),
       priceLineVisible: false,
       lastValueVisible: false,
@@ -189,10 +213,9 @@ export function PriceEvidenceChart({
     ma60Series.setData(movingAverageData.ma60);
 
     const ma200Series = chart.addSeries(LineSeries, {
-      color: '#f29423',
+      color: MA_COLORS.ma200,
       lineWidth: 2,
       lineStyle: LineStyle.Dotted,
-      title: 'MA200',
       priceFormat: priceFormatForCurrency(currency),
       priceLineVisible: false,
       lastValueVisible: false,
@@ -242,6 +265,7 @@ export function PriceEvidenceChart({
       if (!params.point || !params.time || params.point.x < 0 || params.point.y < 0) {
         setTooltip(null);
         setHoverBar(null);
+        setHoverMa(EMPTY_MA);
         return;
       }
       const time = String(params.time);
@@ -251,12 +275,14 @@ export function PriceEvidenceChart({
       if (!hoveredCandle) {
         setTooltip(null);
         setHoverBar(null);
+        setHoverMa(EMPTY_MA);
         return;
       }
       const { open, high, low, close } = hoveredCandle;
       const targetGapPct = isFinitePrice(targetPrice) ? (targetPrice - close) / close : null;
       const nextBar = { time, open, high, low, close, volume: fallback?.volume ?? null };
       setHoverBar(nextBar);
+      setHoverMa(maByTime.get(time) ?? EMPTY_MA);
       setTooltip({
         ...nextBar,
         x: Math.min(params.point.x + 16, Math.max(16, container.clientWidth - 240)),
@@ -266,9 +292,82 @@ export function PriceEvidenceChart({
       });
     };
     chart.subscribeCrosshairMove(handleCrosshairMove);
-    chart.timeScale().fitContent();
+
+    // Default zoom: pub - ~1mo to pub + ~6mo (B-3). Falls back to fitContent
+    // when the publication date sits outside the available price series.
+    const timeScale = chart.timeScale();
+    const pubIndex = priceSeries.findIndex((point) => point.time >= publicationDate);
+    if (pubIndex >= 0) {
+      const fromIdx = Math.max(0, pubIndex - DEFAULT_VISIBLE_BARS_AROUND_PUB.before);
+      const toIdx = Math.min(priceSeries.length - 1, pubIndex + DEFAULT_VISIBLE_BARS_AROUND_PUB.after);
+      timeScale.setVisibleRange({
+        from: priceSeries[fromIdx].time as Time,
+        to: priceSeries[toIdx].time as Time,
+      });
+    } else {
+      timeScale.fitContent();
+    }
+
+    // Vertical lines (B-1): pub date and expiry date overlays. We compute the
+    // x-coordinate via timeToCoordinate and re-position on every visible-range
+    // change so pan/zoom stays in sync.
+    const updateVerticalLines = () => {
+      const pubX = timeToCoordinateX(timeScale, publicationDate);
+      const expiryX = expiryDate ? timeToCoordinateX(timeScale, expiryDate) : null;
+      setVerticalLines({ pub: pubX, expiry: expiryX });
+    };
+    updateVerticalLines();
+    timeScale.subscribeVisibleTimeRangeChange(updateVerticalLines);
+
+    // Drag-to-measure (B-2): mousedown on the candle pane starts a selection,
+    // mouseup ends it. We translate pixel x → time → price via the chart
+    // primitives so the result matches what's actually plotted.
+    const handleMouseDown = (event: MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const time = timeScale.coordinateToTime(x);
+      if (time === null) return;
+      const timeStr = String(time);
+      const point = priceByTime.get(timeStr);
+      if (!point) return;
+      dragStartRef.current = { time: timeStr, x, price: point.close ?? point.value };
+      setDrag(null);
+    };
+    const handleMouseMove = (event: MouseEvent) => {
+      if (!dragStartRef.current) return;
+      const rect = container.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const time = timeScale.coordinateToTime(x);
+      if (time === null) return;
+      const timeStr = String(time);
+      const point = priceByTime.get(timeStr);
+      if (!point) return;
+      const start = dragStartRef.current;
+      // Tiny mousedown movements should not register as a selection.
+      if (Math.abs(x - start.x) < 4) return;
+      const fromX = Math.min(start.x, x);
+      const toX = Math.max(start.x, x);
+      const fromTime = start.x <= x ? start.time : timeStr;
+      const toTime = start.x <= x ? timeStr : start.time;
+      const fromPrice = priceByTime.get(fromTime)?.close ?? priceByTime.get(fromTime)?.value ?? start.price;
+      const toPrice = priceByTime.get(toTime)?.close ?? priceByTime.get(toTime)?.value ?? point.close ?? point.value;
+      setDrag({ fromTime, toTime, fromPrice, toPrice, fromX, toX });
+    };
+    const handleMouseUp = () => {
+      dragStartRef.current = null;
+    };
+    container.addEventListener('mousedown', handleMouseDown);
+    container.addEventListener('mousemove', handleMouseMove);
+    container.addEventListener('mouseup', handleMouseUp);
+    container.addEventListener('mouseleave', handleMouseUp);
+
     return () => {
       chart.unsubscribeCrosshairMove(handleCrosshairMove);
+      timeScale.unsubscribeVisibleTimeRangeChange(updateVerticalLines);
+      container.removeEventListener('mousedown', handleMouseDown);
+      container.removeEventListener('mousemove', handleMouseMove);
+      container.removeEventListener('mouseup', handleMouseUp);
+      container.removeEventListener('mouseleave', handleMouseUp);
       chart.remove();
     };
   }, [
@@ -276,9 +375,12 @@ export function PriceEvidenceChart({
     chartMarkers,
     currency,
     entryPrice,
+    expiryDate,
+    maByTime,
     movingAverageData,
     priceByTime,
-    priceSeries.length,
+    priceSeries,
+    publicationDate,
     targetPrice,
     volumeData,
   ]);
@@ -290,14 +392,40 @@ export function PriceEvidenceChart({
       </div>
     );
   }
+  const dragReturnPct = drag && drag.fromPrice ? drag.toPrice / drag.fromPrice - 1 : null;
   return (
-    <div className="chart-shell">
+    <div className="chart-shell relative">
       {activeBar ? <OhlcLegend bar={activeBar} currency={currency} targetPrice={targetPrice} /> : null}
+      <MaLegend ma={activeMa} currency={currency} />
       <div
         ref={ref}
-        className="chart-box chart-box-fixed"
-        aria-label="목표가 기준선, OHLC 캔들, 거래량, 발간·목표도달·고점·저점 마커가 포함된 가격 경로"
+        className="chart-box chart-box-fixed relative"
+        aria-label="목표가 기준선, OHLC 캔들, 거래량, 발간·만료·목표도달·고점·저점 마커가 포함된 가격 경로"
       />
+      {verticalLines.pub !== null ? (
+        <VerticalLine x={verticalLines.pub} color="#f29423" label="발간" position="top" />
+      ) : null}
+      {verticalLines.expiry !== null ? (
+        <VerticalLine x={verticalLines.expiry} color="#ef4452" label="만료" position="top" dashed />
+      ) : null}
+      {drag ? (
+        <div
+          className="pointer-events-none absolute top-0 bottom-0 bg-primary/10 ring-1 ring-primary/30"
+          style={{ left: drag.fromX, width: Math.max(1, drag.toX - drag.fromX) }}
+        >
+          {dragReturnPct !== null ? (
+            <div className="absolute left-1/2 top-2 -translate-x-1/2 rounded-md bg-base-100/95 px-2 py-1 text-xs font-semibold shadow-md">
+              <span className={dragReturnPct >= 0 ? 'text-success' : 'text-error'}>
+                {dragReturnPct >= 0 ? '+' : ''}
+                {formatPercent(dragReturnPct)}
+              </span>
+              <span className="ml-2 text-base-content/55">
+                {drag.fromTime} → {drag.toTime}
+              </span>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
       {tooltip ? (
         <div className="chart-tooltip" style={{ left: tooltip.x, top: tooltip.y }}>
           <div className="tooltip-date">{tooltip.time}</div>
@@ -531,4 +659,85 @@ function formatVolume(value: number | null): string {
     return `${(value / 1_000_000).toLocaleString('ko-KR', { maximumFractionDigits: 1 })}M`;
   if (Math.abs(value) >= 1_000) return `${(value / 1_000).toLocaleString('ko-KR', { maximumFractionDigits: 1 })}K`;
   return value.toLocaleString('ko-KR', { maximumFractionDigits: 0 });
+}
+
+const MA_COLORS = { ma20: '#1b64da', ma60: '#7d6bff', ma200: '#f29423' } as const;
+
+type MaValues = { ma20: number | null; ma60: number | null; ma200: number | null };
+const EMPTY_MA: MaValues = { ma20: null, ma60: null, ma200: null };
+
+type VerticalLineState = { pub: number | null; expiry: number | null };
+
+function buildMaByTime(data: { ma20: LinePoint[]; ma60: LinePoint[]; ma200: LinePoint[] }): Map<string, MaValues> {
+  const result = new Map<string, MaValues>();
+  const insert = (key: keyof MaValues, points: LinePoint[]) => {
+    for (const point of points) {
+      const time = String(point.time);
+      const existing = result.get(time) ?? { ...EMPTY_MA };
+      existing[key] = point.value;
+      result.set(time, existing);
+    }
+  };
+  insert('ma20', data.ma20);
+  insert('ma60', data.ma60);
+  insert('ma200', data.ma200);
+  return result;
+}
+
+function timeToCoordinateX(timeScale: ITimeScaleApi<Time>, time: string): number | null {
+  const coord = timeScale.timeToCoordinate(time as Time);
+  return coord !== null && Number.isFinite(coord) ? Number(coord) : null;
+}
+
+function VerticalLine({
+  x,
+  color,
+  label,
+  position,
+  dashed = false,
+}: {
+  x: number;
+  color: string;
+  label: string;
+  position: 'top' | 'bottom';
+  dashed?: boolean;
+}) {
+  return (
+    <div className="pointer-events-none absolute top-0 bottom-0" style={{ left: x - 0.5, width: 1 }} aria-hidden="true">
+      <div
+        className="h-full w-px"
+        style={{
+          backgroundColor: color,
+          backgroundImage: dashed ? `linear-gradient(to bottom, ${color} 50%, transparent 50%)` : undefined,
+          backgroundSize: dashed ? '1px 6px' : undefined,
+          backgroundRepeat: dashed ? 'repeat-y' : undefined,
+        }}
+      />
+      <span
+        className={`absolute ${position === 'top' ? 'top-1' : 'bottom-1'} -translate-x-1/2 rounded-sm px-1 py-0.5 text-[10px] font-bold text-white shadow-sm`}
+        style={{ left: 0, backgroundColor: color }}
+      >
+        {label}
+      </span>
+    </div>
+  );
+}
+
+function MaLegend({ ma, currency }: { ma: MaValues; currency: string }) {
+  return (
+    <div className="pointer-events-none absolute left-3 top-3 z-10 flex gap-3 rounded-md bg-base-100/90 px-2 py-1 text-xs font-semibold shadow-sm">
+      <span className="flex items-center gap-1" style={{ color: MA_COLORS.ma20 }}>
+        <span className="inline-block h-2 w-2 rounded-full" style={{ background: MA_COLORS.ma20 }} />
+        MA20 {ma.ma20 !== null ? formatChartPrice(ma.ma20, currency) : '—'}
+      </span>
+      <span className="flex items-center gap-1" style={{ color: MA_COLORS.ma60 }}>
+        <span className="inline-block h-2 w-2 rounded-full" style={{ background: MA_COLORS.ma60 }} />
+        MA60 {ma.ma60 !== null ? formatChartPrice(ma.ma60, currency) : '—'}
+      </span>
+      <span className="flex items-center gap-1" style={{ color: MA_COLORS.ma200 }}>
+        <span className="inline-block h-2 w-2 rounded-full" style={{ background: MA_COLORS.ma200 }} />
+        MA200 {ma.ma200 !== null ? formatChartPrice(ma.ma200, currency) : '—'}
+      </span>
+    </div>
+  );
 }

@@ -63,33 +63,34 @@ export default function DashboardPage() {
           </Link>
         }
       >
-        <div className="grid gap-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {newestReports.map((report) => (
             <Link
               key={`${report.symbol}-${report.publicationDate}`}
               href={`/reports/${report.symbol}`}
               className="card border border-base-300 bg-base-100 shadow-sm transition hover:border-primary/40"
             >
-              <div className="card-body grid gap-3 p-4 md:grid-cols-[minmax(0,1fr)_auto_auto] md:items-center">
-                <div className="min-w-0">
-                  <div className="text-xs font-semibold uppercase tracking-[0.16em] text-base-content/55">
-                    {formatDateKo(report.publicationDate)}
+              <div className="card-body grid gap-3 p-4">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="text-xs font-semibold uppercase tracking-[0.16em] text-base-content/55">
+                      {formatDateKo(report.publicationDate)}
+                    </div>
+                    <h3 className="mt-1 truncate text-base font-bold">{report.company || report.symbol}</h3>
                   </div>
-                  <h3 className="mt-1 truncate text-base font-bold">{report.company || report.symbol}</h3>
-                  <div className="mt-1 flex flex-wrap gap-1.5">
+                  {statusBadge(report)}
+                </div>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex flex-wrap gap-1.5">
                     <span className="badge badge-ghost badge-sm">{report.symbol}</span>
                     {report.exchange ? <span className="badge badge-outline badge-sm">{report.exchange}</span> : null}
                   </div>
-                </div>
-                <div className="text-left md:text-right">
-                  <div className="text-xs text-base-content/55">현재 수익률</div>
                   <strong
-                    className={`tabular-nums ${(report.currentReturn ?? 0) >= 0 ? 'text-success' : 'text-error'}`}
+                    className={`tabular-nums text-sm ${(report.currentReturn ?? 0) >= 0 ? 'text-success' : 'text-error'}`}
                   >
                     {formatPercent(report.currentReturn)}
                   </strong>
                 </div>
-                <div>{statusBadge(report)}</div>
               </div>
             </Link>
           ))}
