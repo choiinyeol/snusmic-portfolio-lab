@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
         exclude: "^(apps/|site/|data/)"
@@ -10,16 +10,21 @@ repos:
         args: [--allow-multiple-documents]
       - id: check-added-large-files
         args: [--maxkb=512]
+      - id: check-merge-conflict
+      - id: check-json
+        exclude: "^(apps/web/tsconfig.json|apps/web/biome.json)$"
+      - id: mixed-line-ending
+        args: [--fix=lf]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.9
+    rev: v0.14.4
     hooks:
-      - id: ruff
+      - id: ruff-check
         args: [--fix]
       - id: ruff-format
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.2
+    rev: v1.18.1
     hooks:
       - id: mypy
         files: ^src/snusmic_pipeline/sim/
@@ -27,3 +32,11 @@ repos:
           - pydantic>=2.6
           - pandas-stubs
           - types-requests
+
+  - repo: https://github.com/biomejs/pre-commit
+    rev: v2.4.14
+    hooks:
+      - id: biome-check
+        files: ^apps/web/.*\.(ts|tsx|js|jsx|mjs|cjs|json)$
+        exclude: ^apps/web/(\.next|out|public|node_modules)/
+        additional_dependencies: ["@biomejs/biome@2.4.14"]
