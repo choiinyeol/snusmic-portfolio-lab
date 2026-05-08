@@ -88,7 +88,11 @@ jobs:
         working-directory: apps/web
         run: pnpm install --frozen-lockfile
 
-      - name: Lint web app
+      - name: Format check (Biome)
+        working-directory: apps/web
+        run: pnpm format:check
+
+      - name: Lint web app (Biome)
         working-directory: apps/web
         run: pnpm lint
 

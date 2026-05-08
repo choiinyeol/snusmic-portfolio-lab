@@ -29,7 +29,9 @@ export function KpiTile({
 }) {
   const toneClass = toneClasses[tone];
   return (
-    <article className={`kpi-tile card bg-base-100 text-base-content border ${toneClass.border} shadow-sm ${emphasis ? 'kpi-tile--emphasis ring-1 ring-primary/10' : ''}`}>
+    <article
+      className={`kpi-tile card bg-base-100 text-base-content border ${toneClass.border} shadow-sm ${emphasis ? 'kpi-tile--emphasis ring-1 ring-primary/10' : ''}`}
+    >
       <div className="card-body gap-2 p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="kpi-tile__label stat-title text-base-content/60">{label}</div>
@@ -37,7 +39,9 @@ export function KpiTile({
         </div>
         <div className={`kpi-tile__value stat-value leading-none ${toneClass.value}`}>{value}</div>
         {delta ? <div className="kpi-tile__delta stat-desc font-semibold text-base-content/70">{delta}</div> : null}
-        {caption ? <div className="kpi-tile__caption text-sm leading-relaxed text-base-content/55">{caption}</div> : null}
+        {caption ? (
+          <div className="kpi-tile__caption text-sm leading-relaxed text-base-content/55">{caption}</div>
+        ) : null}
         {children ? <div className="kpi-tile__extra pt-1">{children}</div> : null}
       </div>
     </article>

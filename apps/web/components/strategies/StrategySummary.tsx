@@ -43,20 +43,35 @@ export function StrategySummary({ run, href }: { run: StrategyRun; href?: string
         <header className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
             <span className="text-xs font-mono uppercase tracking-[0.16em] text-base-content/55">
-              {run.scope ?? 'local'} · {run.sampler ?? 'artifact'}{run.trial_number !== undefined ? ` · trial ${run.trial_number}` : ''}
+              {run.scope ?? 'local'} · {run.sampler ?? 'artifact'}
+              {run.trial_number !== undefined ? ` · trial ${run.trial_number}` : ''}
             </span>
             <h3 className="mt-1 text-xl font-black tracking-[-0.03em] md:text-2xl">
-              {href ? <Link className="link link-hover" href={href}>{run.label}</Link> : run.label}
+              {href ? (
+                <Link className="link link-hover" href={href}>
+                  {run.label}
+                </Link>
+              ) : (
+                run.label
+              )}
             </h3>
           </div>
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className={`badge badge-soft ${verdict.tone === 'good' ? 'badge-success' : verdict.tone === 'warn' ? 'badge-warning' : 'badge-ghost'}`}>{verdict.label}</span>
+            <span
+              className={`badge badge-soft ${verdict.tone === 'good' ? 'badge-success' : verdict.tone === 'warn' ? 'badge-warning' : 'badge-ghost'}`}
+            >
+              {verdict.label}
+            </span>
             <span className="badge badge-primary badge-soft">score {formatPercent(run.metrics.score)}</span>
           </div>
         </header>
 
         <dl className="grid grid-cols-2 gap-2 md:grid-cols-5">
-          <Stat label="최종 자산" value={finalEquity !== null ? formatKrw(finalEquity) : '—'} tone={(finalEquity ?? 0) > 0 ? 'good' : 'neutral'} />
+          <Stat
+            label="최종 자산"
+            value={finalEquity !== null ? formatKrw(finalEquity) : '—'}
+            tone={(finalEquity ?? 0) > 0 ? 'good' : 'neutral'}
+          />
           <Stat label="MWR" value={formatPercent(mwr)} tone={(mwr ?? 0) >= 0 ? 'good' : 'bad'} />
           <Stat label="MDD" value={formatPercent(mdd)} tone={(mdd ?? 0) < -0.25 ? 'bad' : 'warn'} />
           <Stat label="거래" value={tradeCount !== null ? Number(tradeCount).toLocaleString('ko-KR') : '—'} />
@@ -64,7 +79,9 @@ export function StrategySummary({ run, href }: { run: StrategyRun; href?: string
         </dl>
 
         {hitRate !== null ? (
-          <div className="text-sm text-base-content/65">목표 도달률 <strong className="text-base-content tabular-nums">{formatPercent(hitRate)}</strong></div>
+          <div className="text-sm text-base-content/65">
+            목표 도달률 <strong className="text-base-content tabular-nums">{formatPercent(hitRate)}</strong>
+          </div>
         ) : null}
 
         {topParams.length ? (
@@ -79,13 +96,17 @@ export function StrategySummary({ run, href }: { run: StrategyRun; href?: string
 
         {run.warnings?.length ? (
           <ul className="grid gap-1 text-xs text-warning">
-            {run.warnings.map((warning) => <li key={warning}>주의: {warning}</li>)}
+            {run.warnings.map((warning) => (
+              <li key={warning}>주의: {warning}</li>
+            ))}
           </ul>
         ) : null}
 
         {href ? (
           <div className="card-actions">
-            <Link className="btn btn-sm btn-primary" href={href}>매매·포트폴리오</Link>
+            <Link className="btn btn-sm btn-primary" href={href}>
+              매매·포트폴리오
+            </Link>
           </div>
         ) : null}
       </div>
@@ -93,8 +114,23 @@ export function StrategySummary({ run, href }: { run: StrategyRun; href?: string
   );
 }
 
-function Stat({ label, value, tone = 'neutral' }: { label: string; value: string; tone?: 'good' | 'bad' | 'warn' | 'neutral' }) {
-  const toneClass = tone === 'good' ? 'text-success' : tone === 'bad' ? 'text-error' : tone === 'warn' ? 'text-warning' : 'text-base-content';
+function Stat({
+  label,
+  value,
+  tone = 'neutral',
+}: {
+  label: string;
+  value: string;
+  tone?: 'good' | 'bad' | 'warn' | 'neutral';
+}) {
+  const toneClass =
+    tone === 'good'
+      ? 'text-success'
+      : tone === 'bad'
+        ? 'text-error'
+        : tone === 'warn'
+          ? 'text-warning'
+          : 'text-base-content';
   return (
     <div className="rounded-md border border-base-200 bg-base-100 px-3 py-2.5">
       <dt className="text-xs uppercase tracking-[0.14em] text-base-content/55">{label}</dt>
@@ -116,7 +152,10 @@ function strategyVerdict(run: StrategyRun): { label: string; tone: 'good' | 'war
 function formatParam(value: unknown): string {
   if (typeof value === 'number') {
     if (Math.abs(value) < 1) return formatPercent(roundTwo(value));
-    return roundTwo(value).toLocaleString('ko-KR', { maximumFractionDigits: 2, minimumFractionDigits: Number.isInteger(roundTwo(value)) ? 0 : 2 });
+    return roundTwo(value).toLocaleString('ko-KR', {
+      maximumFractionDigits: 2,
+      minimumFractionDigits: Number.isInteger(roundTwo(value)) ? 0 : 2,
+    });
   }
   if (typeof value === 'boolean') return value ? '예' : '아니오';
   return String(value ?? '—');

@@ -11,7 +11,10 @@ export default function ReportsPage() {
   const overview = getOverview();
   const targetHitCount = reports.filter((report) => report.targetHit).length;
   const positiveReturnCount = reports.filter((report) => (report.currentReturn ?? -Infinity) >= 0).length;
-  const latestDate = reports.reduce((latest, report) => (report.publicationDate > latest ? report.publicationDate : latest), '');
+  const latestDate = reports.reduce(
+    (latest, report) => (report.publicationDate > latest ? report.publicationDate : latest),
+    '',
+  );
 
   return (
     <>

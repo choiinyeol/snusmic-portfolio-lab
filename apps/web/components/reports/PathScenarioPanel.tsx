@@ -18,8 +18,8 @@ export function PathScenarioPanel({ report, scenarioRows, trend }: Props) {
           <header className="flex flex-col gap-1">
             <h3 className="text-lg font-bold tracking-tight">가격 레인지와 사후 수익률</h3>
             <p className="text-sm text-base-content/65">
-              발간 후 저점~고점 가격 범위를 4분위로 나눠, 25%/75% 가격 수준에 가장 가까운 관측 종가를 사용합니다.
-              모든 가격은 {report.currency} 기준입니다.
+              발간 후 저점~고점 가격 범위를 4분위로 나눠, 25%/75% 가격 수준에 가장 가까운 관측 종가를 사용합니다. 모든
+              가격은 {report.currency} 기준입니다.
             </p>
           </header>
           <PriceScenarioCards rows={scenarioRows} report={report} />
@@ -42,8 +42,12 @@ export function PathScenarioPanel({ report, scenarioRows, trend }: Props) {
                   <td>{row.basis}</td>
                   <td>{row.point?.time ?? '—'}</td>
                   <td className="num">{formatAssetPrice(row.point?.value, report)}</td>
-                  <td className={`num ${(row.currentReturn ?? 0) >= 0 ? 'good' : 'bad'}`}>{formatPercent(row.currentReturn)}</td>
-                  <td className={`num ${(row.targetReturn ?? 0) >= 0 ? 'good' : 'bad'}`}>{formatPercent(row.targetReturn)}</td>
+                  <td className={`num ${(row.currentReturn ?? 0) >= 0 ? 'good' : 'bad'}`}>
+                    {formatPercent(row.currentReturn)}
+                  </td>
+                  <td className={`num ${(row.targetReturn ?? 0) >= 0 ? 'good' : 'bad'}`}>
+                    {formatPercent(row.targetReturn)}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -86,7 +90,10 @@ function PriceScenarioCards({ rows, report }: { rows: ScenarioRow[]; report: Rep
 }
 
 function ScenarioReturnBars({ rows }: { rows: ScenarioRow[] }) {
-  const maxAbsReturn = Math.max(0.01, ...rows.flatMap((row) => [Math.abs(row.currentReturn ?? 0), Math.abs(row.targetReturn ?? 0)]));
+  const maxAbsReturn = Math.max(
+    0.01,
+    ...rows.flatMap((row) => [Math.abs(row.currentReturn ?? 0), Math.abs(row.targetReturn ?? 0)]),
+  );
   return (
     <div className="grid gap-1.5">
       {rows.map((row) => {

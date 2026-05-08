@@ -21,7 +21,19 @@ export function DataTable({
   compact?: boolean;
   className?: string;
 }) {
-  const classes = ['table-wrap', 'overflow-x-auto', 'rounded-box', 'border', 'border-base-300', 'bg-base-100', 'shadow-sm', compact ? 'compact-table' : '', className].filter(Boolean).join(' ');
+  const classes = [
+    'table-wrap',
+    'overflow-x-auto',
+    'rounded-box',
+    'border',
+    'border-base-300',
+    'bg-base-100',
+    'shadow-sm',
+    compact ? 'compact-table' : '',
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
   return (
     <div className={classes}>
       <table className={`table ${compact ? 'table-sm' : ''}`}>{children}</table>

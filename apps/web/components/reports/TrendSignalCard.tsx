@@ -34,7 +34,11 @@ export function TrendSignalCard({ report, trend }: Props) {
             <div key={ma.label} className="grid gap-0.5 rounded-md border border-base-200 bg-base-100 px-3 py-2.5">
               <span className="text-xs uppercase tracking-[0.14em] text-base-content/55">{ma.label}</span>
               <strong className="tabular-nums text-base-content">{formatAssetPrice(ma.value, report)}</strong>
-              <em className={`not-italic text-xs tabular-nums ${(ma.distance ?? 0) >= 0 ? 'text-success' : 'text-error'}`}>{formatPercent(ma.distance)}</em>
+              <em
+                className={`not-italic text-xs tabular-nums ${(ma.distance ?? 0) >= 0 ? 'text-success' : 'text-error'}`}
+              >
+                {formatPercent(ma.distance)}
+              </em>
             </div>
           ))}
         </div>
@@ -42,7 +46,11 @@ export function TrendSignalCard({ report, trend }: Props) {
           {trend.metrics.map((metric) => (
             <div key={metric.label} className="contents">
               <dt className="text-base-content/60">{metric.label}</dt>
-              <dd className={`text-right tabular-nums font-semibold ${metric.tone ? metricTone[metric.tone] ?? '' : 'text-base-content'}`}>{metric.value}</dd>
+              <dd
+                className={`text-right tabular-nums font-semibold ${metric.tone ? (metricTone[metric.tone] ?? '') : 'text-base-content'}`}
+              >
+                {metric.value}
+              </dd>
             </div>
           ))}
         </dl>

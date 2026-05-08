@@ -18,7 +18,9 @@ export function ReportSourcesPanel({ siblingReports, memo, snippet, markdownHref
           <p className="text-sm leading-relaxed text-base-content/75">{memo.summary}</p>
           <ul className="grid gap-1.5 text-sm leading-relaxed text-base-content/75 marker:text-base-content/40 ml-4 list-disc">
             {memo.bullets.map((item) => (
-              <li key={item.label}><strong className="text-base-content">{item.label}.</strong> {item.text}</li>
+              <li key={item.label}>
+                <strong className="text-base-content">{item.label}.</strong> {item.text}
+              </li>
             ))}
           </ul>
         </SourcesCard>
@@ -45,8 +47,18 @@ export function ReportSourcesPanel({ siblingReports, memo, snippet, markdownHref
 
         <SourcesCard label="원본 자료">
           <ul className="grid gap-1.5 text-sm">
-            <li><a className="link link-primary" href={markdownHref}>GitHub Markdown</a></li>
-            {pdfHref ? <li><a className="link link-primary" href={pdfHref}>GitHub PDF</a></li> : null}
+            <li>
+              <a className="link link-primary" href={markdownHref}>
+                GitHub Markdown
+              </a>
+            </li>
+            {pdfHref ? (
+              <li>
+                <a className="link link-primary" href={pdfHref}>
+                  GitHub PDF
+                </a>
+              </li>
+            ) : null}
           </ul>
         </SourcesCard>
       </div>

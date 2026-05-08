@@ -37,7 +37,6 @@ export type ReportRow = {
   caveatFlags: string[];
 };
 
-
 export type HoldingRow = {
   persona: string;
   symbol: string;
@@ -280,7 +279,13 @@ export type WebDataQuality = {
   missing_symbols?: { symbol: string; company?: string; reason?: string }[];
 };
 
-export type Insight = { id: string; title: string; sentence: string; metric?: number | string | null; related_report_ids?: string[] };
+export type Insight = {
+  id: string;
+  title: string;
+  sentence: string;
+  metric?: number | string | null;
+  related_report_ids?: string[];
+};
 
 function fullPath(relativePath: string): string {
   return path.join(repoRoot, relativePath);
@@ -325,7 +330,9 @@ let reportCache: ReportRow[] | undefined;
 export function getReportRows(): ReportRow[] {
   if (reportCache) return reportCache;
   const raw = JSON.parse(readText('data/web/reports.json')) as RawReport[];
-  reportCache = raw.map(fromRawReport).sort((a, b) => b.publicationDate.localeCompare(a.publicationDate) || a.company.localeCompare(b.company, 'ko-KR'));
+  reportCache = raw
+    .map(fromRawReport)
+    .sort((a, b) => b.publicationDate.localeCompare(a.publicationDate) || a.company.localeCompare(b.company, 'ko-KR'));
   return reportCache;
 }
 
@@ -341,10 +348,13 @@ function fromRawReport(row: RawReport): ReportRow {
     pdfFilename: String(row.pdf_filename ?? row.pdfFilename ?? ''),
     pdfUrl: String(row.pdf_url ?? row.pdfUrl ?? ''),
     currency: String(row.currency ?? row.price_currency ?? 'KRW') || 'KRW',
-    displayCurrency: String(row.display_currency ?? row.displayCurrency ?? row.currency ?? row.price_currency ?? 'KRW') || 'KRW',
+    displayCurrency:
+      String(row.display_currency ?? row.displayCurrency ?? row.currency ?? row.price_currency ?? 'KRW') || 'KRW',
     targetDirection: targetDirection(row.target_direction ?? row.targetDirection),
     entryPriceKrw: num(row.entry_price_krw ?? row.publication_price_krw ?? row.entryPriceKrw),
-    entryPriceNative: num(row.entry_price_native ?? row.entry_price ?? row.report_current_price ?? row.entryPriceNative),
+    entryPriceNative: num(
+      row.entry_price_native ?? row.entry_price ?? row.report_current_price ?? row.entryPriceNative,
+    ),
     targetPriceKrw: num(row.target_price_krw ?? row.targetPriceKrw),
     targetPriceNative: num(row.target_price_native ?? row.target_price ?? row.targetPriceNative),
     targetUpsideAtPub: num(row.target_upside_at_pub ?? row.targetUpsideAtPub),
@@ -455,12 +465,22 @@ export function getReportTargetsById(): Record<string, ReportTargetDigest> {
 
 export function marketRegionForSymbol(symbol: string, exchange?: string): 'domestic' | 'overseas' {
   const upperExchange = (exchange ?? '').toUpperCase();
-  if (symbol.endsWith('.KS') || symbol.endsWith('.KQ') || upperExchange === 'KRX' || upperExchange === 'KOSPI' || upperExchange === 'KOSDAQ') return 'domestic';
+  if (
+    symbol.endsWith('.KS') ||
+    symbol.endsWith('.KQ') ||
+    upperExchange === 'KRX' ||
+    upperExchange === 'KOSPI' ||
+    upperExchange === 'KOSDAQ'
+  )
+    return 'domestic';
   return 'overseas';
 }
 
 export function getPriceSeries(symbol: string, startDate?: string, endDate?: string | null): PricePoint[] {
-  const artifact = readJson<{ currency?: string; prices: Array<Record<string, unknown>> }>(`data/web/prices/${symbol}.json`, { prices: [] });
+  const artifact = readJson<{ currency?: string; prices: Array<Record<string, unknown>> }>(
+    `data/web/prices/${symbol}.json`,
+    { prices: [] },
+  );
   const stop = endDate ?? '9999-99-99';
   return artifact.prices
     .filter((point) => (!startDate || String(point.date) >= startDate) && String(point.date) <= stop)
@@ -499,7 +519,7 @@ function nativeFromKrwAtSymbolDate(symbol: string, date: string | null | undefin
   if (krw === null) return null;
   const point = nativePricePointAtOrBefore(symbol, date);
   if (!point?.closeKrw || point.closeKrw <= 0) return krw;
-  return krw * point.value / point.closeKrw;
+  return (krw * point.value) / point.closeKrw;
 }
 
 function currencyForPricePoint(symbol: string, date: string | null | undefined): string {
@@ -514,16 +534,18 @@ export function getMarkdownSnippet(report: ReportRow): string {
 }
 
 export function getSummaryRows(): SummaryRow[] {
-  return getOverview().baseline_personas?.map((row) => ({
-    persona: row.persona,
-    label: row.label,
-    finalEquityKrw: num(row.final_equity_krw),
-    totalContributedKrw: num(row.total_contributed_krw),
-    netProfitKrw: num(row.net_profit_krw),
-    moneyWeightedReturn: num(row.money_weighted_return),
-    maxDrawdown: num(row.max_drawdown),
-    tradeCount: num(row.trade_count),
-  })) ?? [];
+  return (
+    getOverview().baseline_personas?.map((row) => ({
+      persona: row.persona,
+      label: row.label,
+      finalEquityKrw: num(row.final_equity_krw),
+      totalContributedKrw: num(row.total_contributed_krw),
+      netProfitKrw: num(row.net_profit_krw),
+      moneyWeightedReturn: num(row.money_weighted_return),
+      maxDrawdown: num(row.max_drawdown),
+      tradeCount: num(row.trade_count),
+    })) ?? []
+  );
 }
 
 export function getDataQuality(): DataQuality {
@@ -548,7 +570,10 @@ export function getOverview(): WebOverview {
   return readJson<WebOverview>('data/web/overview.json', {
     baseline_personas: [],
     report_counts: { price_matched_reports: getReportRows().length },
-    target_stats: { target_hit_rate: getDataQuality().targetHitRate, target_hit_count: getReportRows().filter((report) => report.targetHit).length },
+    target_stats: {
+      target_hit_rate: getDataQuality().targetHitRate,
+      target_hit_count: getReportRows().filter((report) => report.targetHit).length,
+    },
   });
 }
 
@@ -568,11 +593,20 @@ export function getInsights(): Insight[] {
 }
 
 export function getStrategyRuns(): StrategyRunsArtifact {
-  return readJson<StrategyRunsArtifact>('data/web/strategy-runs.json', readJson<StrategyRunsArtifact>('apps/web/public/artifacts/strategy-runs.json', { runs: [], study_name: 'No local export yet' }));
+  return readJson<StrategyRunsArtifact>(
+    'data/web/strategy-runs.json',
+    readJson<StrategyRunsArtifact>('apps/web/public/artifacts/strategy-runs.json', {
+      runs: [],
+      study_name: 'No local export yet',
+    }),
+  );
 }
 
 export function getParameterImportance(): ParameterImportanceArtifact {
-  return readJson<ParameterImportanceArtifact>('data/web/parameter-importance.json', readJson<ParameterImportanceArtifact>('apps/web/public/artifacts/parameter-importance.json', { parameters: [] }));
+  return readJson<ParameterImportanceArtifact>(
+    'data/web/parameter-importance.json',
+    readJson<ParameterImportanceArtifact>('apps/web/public/artifacts/parameter-importance.json', { parameters: [] }),
+  );
 }
 
 export function getDownloadHref(fileName: string): string {
@@ -587,21 +621,23 @@ let holdingsCache: HoldingRow[] | undefined;
 export function getCurrentHoldings(): HoldingRow[] {
   if (holdingsCache) return holdingsCache;
   const raw = readJson<RawReport[]>('data/web/current-holdings.json', []);
-  holdingsCache = raw.map((row) => ({
-    persona: String(row.persona ?? ''),
-    symbol: String(row.symbol ?? ''),
-    company: String(row.company ?? row.symbol ?? ''),
-    qty: num(row.qty),
-    avgCostKrw: num(row.avg_cost_krw ?? row.avgCostKrw),
-    lastCloseKrw: num(row.last_close_krw ?? row.lastCloseKrw),
-    lastCloseNative: num(row.last_close_native ?? row.lastCloseNative),
-    currency: String(row.currency ?? 'KRW') || 'KRW',
-    marketValueKrw: num(row.market_value_krw ?? row.marketValueKrw),
-    unrealizedPnlKrw: num(row.unrealized_pnl_krw ?? row.unrealizedPnlKrw),
-    unrealizedReturn: num(row.unrealized_return ?? row.unrealizedReturn),
-    holdingDays: num(row.holding_days ?? row.holdingDays),
-    firstBuyDate: strOrNull(row.first_buy_date ?? row.firstBuyDate),
-  })).sort((a, b) => (b.marketValueKrw ?? 0) - (a.marketValueKrw ?? 0));
+  holdingsCache = raw
+    .map((row) => ({
+      persona: String(row.persona ?? ''),
+      symbol: String(row.symbol ?? ''),
+      company: String(row.company ?? row.symbol ?? ''),
+      qty: num(row.qty),
+      avgCostKrw: num(row.avg_cost_krw ?? row.avgCostKrw),
+      lastCloseKrw: num(row.last_close_krw ?? row.lastCloseKrw),
+      lastCloseNative: num(row.last_close_native ?? row.lastCloseNative),
+      currency: String(row.currency ?? 'KRW') || 'KRW',
+      marketValueKrw: num(row.market_value_krw ?? row.marketValueKrw),
+      unrealizedPnlKrw: num(row.unrealized_pnl_krw ?? row.unrealizedPnlKrw),
+      unrealizedReturn: num(row.unrealized_return ?? row.unrealizedReturn),
+      holdingDays: num(row.holding_days ?? row.holdingDays),
+      firstBuyDate: strOrNull(row.first_buy_date ?? row.firstBuyDate),
+    }))
+    .sort((a, b) => (b.marketValueKrw ?? 0) - (a.marketValueKrw ?? 0));
   return holdingsCache;
 }
 
@@ -610,9 +646,11 @@ export function getMonthlyHoldings(): MonthlyHoldingRow[] {
   if (monthlyHoldingsCache) return monthlyHoldingsCache;
   const raw = readJson<RawReport[]>('data/web/monthly-holdings.json', []);
   const costBySnapshot = buildMonthlyCostBasis(raw);
-  monthlyHoldingsCache = raw.map((row) => ({
-    ...enrichMonthlyHolding(row, costBySnapshot),
-  })).sort((a, b) => b.monthEnd.localeCompare(a.monthEnd) || (b.marketValueKrw ?? 0) - (a.marketValueKrw ?? 0));
+  monthlyHoldingsCache = raw
+    .map((row) => ({
+      ...enrichMonthlyHolding(row, costBySnapshot),
+    }))
+    .sort((a, b) => b.monthEnd.localeCompare(a.monthEnd) || (b.marketValueKrw ?? 0) - (a.marketValueKrw ?? 0));
   return monthlyHoldingsCache;
 }
 
@@ -626,7 +664,8 @@ function enrichMonthlyHolding(row: RawReport, costBySnapshot: Map<string, number
   const avgCostKrw = costBySnapshot.get(`${persona}|${monthEnd}|${symbol}`) ?? null;
   const costValueKrw = avgCostKrw !== null && qty !== null ? avgCostKrw * qty : null;
   const unrealizedPnlKrw = marketValueKrw !== null && costValueKrw !== null ? marketValueKrw - costValueKrw : null;
-  const unrealizedReturn = avgCostKrw !== null && avgCostKrw > 0 && monthCloseKrw !== null ? monthCloseKrw / avgCostKrw - 1 : null;
+  const unrealizedReturn =
+    avgCostKrw !== null && avgCostKrw > 0 && monthCloseKrw !== null ? monthCloseKrw / avgCostKrw - 1 : null;
   return {
     persona,
     monthEnd,
@@ -635,7 +674,9 @@ function enrichMonthlyHolding(row: RawReport, costBySnapshot: Map<string, number
     qty,
     avgCostKrw,
     monthCloseKrw,
-    monthCloseNative: num(row.last_close_native ?? row.lastCloseNative ?? row.month_close_native ?? row.monthCloseNative),
+    monthCloseNative: num(
+      row.last_close_native ?? row.lastCloseNative ?? row.month_close_native ?? row.monthCloseNative,
+    ),
     currency: String(row.currency ?? 'KRW') || 'KRW',
     marketValueKrw,
     unrealizedPnlKrw,
@@ -654,14 +695,16 @@ function buildMonthlyCostBasis(rows: RawReport[]): Map<string, number | null> {
     }))
     .filter((row) => row.persona && row.monthEnd && row.symbol)
     .sort((a, b) => a.monthEnd.localeCompare(b.monthEnd));
-  const trades = (JSON.parse(readText('data/web/trades.json')) as RawReport[]).map((row) => ({
-    persona: String(row.persona ?? ''),
-    date: String(row.date ?? ''),
-    symbol: String(row.symbol ?? ''),
-    side: String(row.side ?? ''),
-    qty: num(row.qty),
-    price: num(row.fill_price_krw),
-  })).sort((a, b) => a.date.localeCompare(b.date));
+  const trades = (JSON.parse(readText('data/web/trades.json')) as RawReport[])
+    .map((row) => ({
+      persona: String(row.persona ?? ''),
+      date: String(row.date ?? ''),
+      symbol: String(row.symbol ?? ''),
+      side: String(row.side ?? ''),
+      qty: num(row.qty),
+      price: num(row.fill_price_krw),
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date));
   const out = new Map<string, number | null>();
   const state = new Map<string, { qty: number; cost: number }>();
   let tradeIndex = 0;
@@ -678,8 +721,12 @@ function buildMonthlyCostBasis(rows: RawReport[]): Map<string, number | null> {
   return out;
 }
 
-function applyCostBasisTrade(state: Map<string, { qty: number; cost: number }>, trade: { persona: string; symbol: string; side: string; qty: number | null; price: number | null }) {
-  if (!trade.persona || !trade.symbol || !trade.qty || trade.qty <= 0 || trade.price === null || trade.price <= 0) return;
+function applyCostBasisTrade(
+  state: Map<string, { qty: number; cost: number }>,
+  trade: { persona: string; symbol: string; side: string; qty: number | null; price: number | null },
+) {
+  if (!trade.persona || !trade.symbol || !trade.qty || trade.qty <= 0 || trade.price === null || trade.price <= 0)
+    return;
   const key = `${trade.persona}|${trade.symbol}`;
   const lot = state.get(key) ?? { qty: 0, cost: 0 };
   if (trade.side === 'buy') {
@@ -696,66 +743,70 @@ function applyCostBasisTrade(state: Map<string, { qty: number; cost: number }>, 
 let tradesCache: TradeRow[] | undefined;
 export function getTrades(): TradeRow[] {
   if (tradesCache) return tradesCache;
-  tradesCache = (JSON.parse(readText('data/web/trades.json')) as RawReport[]).map((row) => {
-    const symbol = String(row.symbol ?? '');
-    const date = String(row.date ?? '');
-    const fillPriceKrw = num(row.fill_price_krw);
-    const qty = num(row.qty);
-    const fillPriceNative = nativeFromKrwAtSymbolDate(symbol, date, fillPriceKrw);
-    return {
-      persona: String(row.persona ?? ''),
-      date,
-      symbol,
-      side: String(row.side ?? ''),
-      qty,
-      currency: currencyForPricePoint(symbol, date),
-      fillPriceKrw,
-      fillPriceNative,
-      grossNative: fillPriceNative !== null && qty !== null ? fillPriceNative * qty : null,
-      grossKrw: num(row.gross_krw),
-      cashAfterKrw: num(row.cash_after_krw),
-      reason: String(row.reason ?? ''),
-      reportId: strOrNull(row.report_id),
-    };
-  }).sort((a, b) => b.date.localeCompare(a.date));
+  tradesCache = (JSON.parse(readText('data/web/trades.json')) as RawReport[])
+    .map((row) => {
+      const symbol = String(row.symbol ?? '');
+      const date = String(row.date ?? '');
+      const fillPriceKrw = num(row.fill_price_krw);
+      const qty = num(row.qty);
+      const fillPriceNative = nativeFromKrwAtSymbolDate(symbol, date, fillPriceKrw);
+      return {
+        persona: String(row.persona ?? ''),
+        date,
+        symbol,
+        side: String(row.side ?? ''),
+        qty,
+        currency: currencyForPricePoint(symbol, date),
+        fillPriceKrw,
+        fillPriceNative,
+        grossNative: fillPriceNative !== null && qty !== null ? fillPriceNative * qty : null,
+        grossKrw: num(row.gross_krw),
+        cashAfterKrw: num(row.cash_after_krw),
+        reason: String(row.reason ?? ''),
+        reportId: strOrNull(row.report_id),
+      };
+    })
+    .sort((a, b) => b.date.localeCompare(a.date));
   return tradesCache;
 }
 
 let positionEpisodesCache: PositionEpisodeRow[] | undefined;
 export function getPositionEpisodes(): PositionEpisodeRow[] {
   if (positionEpisodesCache) return positionEpisodesCache;
-  positionEpisodesCache = (JSON.parse(readText('data/web/position-episodes.json')) as RawReport[]).map((row) => {
-    const symbol = String(row.symbol ?? '');
-    const openDate = String(row.open_date ?? '');
-    const closeDate = strOrNull(row.close_date);
-    const lastCloseDate = closeDate ?? getPriceSeries(symbol).at(-1)?.time ?? openDate;
-    const avgEntryPriceKrw = num(row.avg_entry_price_krw);
-    const avgExitPriceKrw = num(row.avg_exit_price_krw);
-    const lastCloseKrw = num(row.last_close_krw);
-    return {
-      persona: String(row.persona ?? ''),
-      symbol,
-      company: String(row.company ?? row.symbol ?? ''),
-      openDate,
-      closeDate,
-      holdingDays: num(row.holding_days),
-      buyFills: num(row.buy_fills),
-      sellFills: num(row.sell_fills),
-      totalQtyBought: num(row.total_qty_bought),
-      totalQtySold: num(row.total_qty_sold),
-      currency: currencyForPricePoint(symbol, lastCloseDate),
-      avgEntryPriceKrw,
-      avgEntryPriceNative: nativeFromKrwAtSymbolDate(symbol, openDate, avgEntryPriceKrw),
-      avgExitPriceKrw,
-      avgExitPriceNative: nativeFromKrwAtSymbolDate(symbol, closeDate, avgExitPriceKrw),
-      realizedPnlKrw: num(row.realized_pnl_krw),
-      unrealizedPnlKrw: num(row.unrealized_pnl_krw),
-      lastCloseKrw,
-      lastCloseNative: nativeFromKrwAtSymbolDate(symbol, lastCloseDate, lastCloseKrw),
-      status: String(row.status ?? ''),
-      exitReasons: String(row.exit_reasons ?? ''),
-    };
-  }).sort((a, b) => b.openDate.localeCompare(a.openDate));
+  positionEpisodesCache = (JSON.parse(readText('data/web/position-episodes.json')) as RawReport[])
+    .map((row) => {
+      const symbol = String(row.symbol ?? '');
+      const openDate = String(row.open_date ?? '');
+      const closeDate = strOrNull(row.close_date);
+      const lastCloseDate = closeDate ?? getPriceSeries(symbol).at(-1)?.time ?? openDate;
+      const avgEntryPriceKrw = num(row.avg_entry_price_krw);
+      const avgExitPriceKrw = num(row.avg_exit_price_krw);
+      const lastCloseKrw = num(row.last_close_krw);
+      return {
+        persona: String(row.persona ?? ''),
+        symbol,
+        company: String(row.company ?? row.symbol ?? ''),
+        openDate,
+        closeDate,
+        holdingDays: num(row.holding_days),
+        buyFills: num(row.buy_fills),
+        sellFills: num(row.sell_fills),
+        totalQtyBought: num(row.total_qty_bought),
+        totalQtySold: num(row.total_qty_sold),
+        currency: currencyForPricePoint(symbol, lastCloseDate),
+        avgEntryPriceKrw,
+        avgEntryPriceNative: nativeFromKrwAtSymbolDate(symbol, openDate, avgEntryPriceKrw),
+        avgExitPriceKrw,
+        avgExitPriceNative: nativeFromKrwAtSymbolDate(symbol, closeDate, avgExitPriceKrw),
+        realizedPnlKrw: num(row.realized_pnl_krw),
+        unrealizedPnlKrw: num(row.unrealized_pnl_krw),
+        lastCloseKrw,
+        lastCloseNative: nativeFromKrwAtSymbolDate(symbol, lastCloseDate, lastCloseKrw),
+        status: String(row.status ?? ''),
+        exitReasons: String(row.exit_reasons ?? ''),
+      };
+    })
+    .sort((a, b) => b.openDate.localeCompare(a.openDate));
   return positionEpisodesCache;
 }
 
@@ -796,7 +847,7 @@ export function getStrategyExperiment(run: StrategyRunArtifact): StrategyExperim
       company: report.company,
       publicationDate: report.publicationDate,
       exitDate: report.targetHitDate ?? report.lastCloseDate,
-      status: report.targetHit ? 'closed' as const : 'open' as const,
+      status: report.targetHit ? ('closed' as const) : ('open' as const),
       weight: weights[index] ?? 0,
       entryPriceKrw: report.entryPriceKrw,
       targetPriceKrw: report.targetPriceKrw,
@@ -805,31 +856,35 @@ export function getStrategyExperiment(run: StrategyRunArtifact): StrategyExperim
       targetHit: report.targetHit,
     };
   });
-  const trades = positions.flatMap((position) => {
-    const out: StrategyExperimentTrade[] = [{
-      runId: run.run_id,
-      date: position.publicationDate,
-      side: 'buy',
-      symbol: position.symbol,
-      company: position.company,
-      weight: position.weight,
-      referencePriceKrw: position.entryPriceKrw,
-      reason: '조건 충족 리포트 발간 후 매수',
-    }];
-    if (position.status === 'closed' && position.exitDate) {
-      out.push({
-        runId: run.run_id,
-        date: position.exitDate,
-        side: 'sell',
-        symbol: position.symbol,
-        company: position.company,
-        weight: position.weight,
-        referencePriceKrw: position.targetPriceKrw,
-        reason: '목표가 도달 청산',
-      });
-    }
-    return out;
-  }).sort((a, b) => b.date.localeCompare(a.date));
+  const trades = positions
+    .flatMap((position) => {
+      const out: StrategyExperimentTrade[] = [
+        {
+          runId: run.run_id,
+          date: position.publicationDate,
+          side: 'buy',
+          symbol: position.symbol,
+          company: position.company,
+          weight: position.weight,
+          referencePriceKrw: position.entryPriceKrw,
+          reason: '조건 충족 리포트 발간 후 매수',
+        },
+      ];
+      if (position.status === 'closed' && position.exitDate) {
+        out.push({
+          runId: run.run_id,
+          date: position.exitDate,
+          side: 'sell',
+          symbol: position.symbol,
+          company: position.company,
+          weight: position.weight,
+          referencePriceKrw: position.targetPriceKrw,
+          reason: '목표가 도달 청산',
+        });
+      }
+      return out;
+    })
+    .sort((a, b) => b.date.localeCompare(a.date));
   return {
     runId: run.run_id,
     positions,
@@ -848,7 +903,8 @@ function selectReportsForRun(reports: ReportRow[], params: Record<string, unknow
   return reports
     .filter((report) => {
       if (requirePublicationPrice && !report.entryPriceKrw) return false;
-      if ((report.targetUpsideAtPub ?? Number.NaN) < minUpside || (report.targetUpsideAtPub ?? Number.NaN) > maxUpside) return false;
+      if ((report.targetUpsideAtPub ?? Number.NaN) < minUpside || (report.targetUpsideAtPub ?? Number.NaN) > maxUpside)
+        return false;
       if (report.daysToTarget !== null && report.daysToTarget > maxReportAgeDays) return false;
       if (universe !== 'all') {
         const domestic = report.symbol.endsWith('.KS') || report.symbol.endsWith('.KQ');
@@ -880,10 +936,15 @@ function weightsForRun(reports: ReportRow[], params: Record<string, unknown>): n
 
 function experimentCumulativeSeries(positions: StrategyExperimentPosition[]): PricePoint[] {
   if (!positions.length) return [];
-  const start = positions.reduce((min, position) => position.publicationDate < min ? position.publicationDate : min, positions[0].publicationDate);
+  const start = positions.reduce(
+    (min, position) => (position.publicationDate < min ? position.publicationDate : min),
+    positions[0].publicationDate,
+  );
   let cumulative = 0;
   const points: PricePoint[] = [{ time: start, value: 0 }];
-  for (const position of [...positions].sort((a, b) => (a.exitDate ?? a.publicationDate).localeCompare(b.exitDate ?? b.publicationDate))) {
+  for (const position of [...positions].sort((a, b) =>
+    (a.exitDate ?? a.publicationDate).localeCompare(b.exitDate ?? b.publicationDate),
+  )) {
     cumulative += position.weight * (position.realizedReturn ?? 0);
     points.push({ time: position.exitDate ?? position.publicationDate, value: cumulative });
   }

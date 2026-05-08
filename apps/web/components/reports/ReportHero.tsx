@@ -18,18 +18,34 @@ export function ReportHero({ report, status, markdownHref, pdfHref }: Props) {
           <div className="grid gap-2">
             <div className="flex flex-wrap items-center gap-2">
               <span className="badge badge-primary badge-soft tracking-[0.16em]">REPORT</span>
-              <span className={`badge badge-soft ${status.tone === 'good' ? 'badge-success' : status.tone === 'bad' ? 'badge-error' : status.tone === 'warn' ? 'badge-warning' : 'badge-primary'}`}>{status.label}</span>
+              <span
+                className={`badge badge-soft ${status.tone === 'good' ? 'badge-success' : status.tone === 'bad' ? 'badge-error' : status.tone === 'warn' ? 'badge-warning' : 'badge-primary'}`}
+              >
+                {status.label}
+              </span>
             </div>
             <h1 className="text-3xl font-black tracking-[-0.04em] text-base-content md:text-4xl">{report.company}</h1>
             <p className="max-w-4xl text-sm leading-relaxed text-base-content/70 md:text-base">
-              {report.title || `${report.company} 리포트`} · 발간가 {formatAssetPrice(reportEntryPrice(report), report)} → 목표가 {formatAssetPrice(report.targetPriceNative, report)}
-              <strong className="text-primary"> {formatPercent(report.targetUpsideAtPub)} {targetMoveLabel(report)}</strong>
+              {report.title || `${report.company} 리포트`} · 발간가 {formatAssetPrice(reportEntryPrice(report), report)}{' '}
+              → 목표가 {formatAssetPrice(report.targetPriceNative, report)}
+              <strong className="text-primary">
+                {' '}
+                {formatPercent(report.targetUpsideAtPub)} {targetMoveLabel(report)}
+              </strong>
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Link className="btn btn-sm btn-outline" href="/reports">아카이브</Link>
-            {pdfHref ? <a className="btn btn-sm btn-outline" href={pdfHref}>GitHub PDF</a> : null}
-            <a className="btn btn-sm btn-ghost" href={markdownHref}>Markdown</a>
+            <Link className="btn btn-sm btn-outline" href="/reports">
+              아카이브
+            </Link>
+            {pdfHref ? (
+              <a className="btn btn-sm btn-outline" href={pdfHref}>
+                GitHub PDF
+              </a>
+            ) : null}
+            <a className="btn btn-sm btn-ghost" href={markdownHref}>
+              Markdown
+            </a>
           </div>
         </div>
         <dl className="flex flex-wrap gap-2">

@@ -1,6 +1,14 @@
 'use client';
 
-import { ColorType, CrosshairMode, LineSeries, createChart, type ISeriesApi, type MouseEventParams, type Time } from 'lightweight-charts';
+import {
+  ColorType,
+  CrosshairMode,
+  LineSeries,
+  createChart,
+  type ISeriesApi,
+  type MouseEventParams,
+  type Time,
+} from 'lightweight-charts';
 import { useEffect, useRef, useState } from 'react';
 import { formatPercent } from '@/lib/format';
 
@@ -70,7 +78,8 @@ export function CumulativeReturnChart({ series }: { series: ReturnSeries[] }) {
     };
   }, [series]);
 
-  if (!series.some((item) => item.points.length)) return <div className="chart-box empty-chart">수익률 경로 데이터가 없습니다.</div>;
+  if (!series.some((item) => item.points.length))
+    return <div className="chart-box empty-chart">수익률 경로 데이터가 없습니다.</div>;
   return (
     <div className="chart-shell">
       <div ref={ref} className="chart-box chart-box-fixed chart-box-return" aria-label="전략 누적 수익률 비교 차트" />
@@ -78,7 +87,9 @@ export function CumulativeReturnChart({ series }: { series: ReturnSeries[] }) {
         <div className="chart-tooltip" style={{ left: tooltip.x, top: tooltip.y }}>
           <div className="tooltip-date">{tooltip.time}</div>
           {tooltip.rows.map((row) => (
-            <div key={row.label} style={{ color: row.color }}>{row.label}: {formatPercent(row.value)}</div>
+            <div key={row.label} style={{ color: row.color }}>
+              {row.label}: {formatPercent(row.value)}
+            </div>
           ))}
         </div>
       ) : null}

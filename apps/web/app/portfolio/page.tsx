@@ -87,11 +87,18 @@ export default function PortfolioPage() {
         }
       />
 
-
       <Section eyebrow="Contribution" title="기여 상위 / 점검 상위">
         <div className="grid gap-4 lg:grid-cols-2">
-          <ContributionCard title="수익 기여 상위" rows={[...holdings].sort((a, b) => (b.unrealizedPnlKrw ?? 0) - (a.unrealizedPnlKrw ?? 0)).slice(0, 5)} tone="good" />
-          <ContributionCard title="손실 기여 상위" rows={[...holdings].sort((a, b) => (a.unrealizedPnlKrw ?? 0) - (b.unrealizedPnlKrw ?? 0)).slice(0, 5)} tone="bad" />
+          <ContributionCard
+            title="수익 기여 상위"
+            rows={[...holdings].sort((a, b) => (b.unrealizedPnlKrw ?? 0) - (a.unrealizedPnlKrw ?? 0)).slice(0, 5)}
+            tone="good"
+          />
+          <ContributionCard
+            title="손실 기여 상위"
+            rows={[...holdings].sort((a, b) => (a.unrealizedPnlKrw ?? 0) - (b.unrealizedPnlKrw ?? 0)).slice(0, 5)}
+            tone="bad"
+          />
         </div>
       </Section>
 
@@ -116,11 +123,7 @@ export default function PortfolioPage() {
               label: '월말 히스토리',
               meta: monthly.length.toString(),
               content: (
-                <PortfolioHistory
-                  monthly={monthly}
-                  personaLabels={personaLabels}
-                  targetsBySymbol={targetsBySymbol}
-                />
+                <PortfolioHistory monthly={monthly} personaLabels={personaLabels} targetsBySymbol={targetsBySymbol} />
               ),
             },
             {
@@ -146,23 +149,41 @@ export default function PortfolioPage() {
   );
 }
 
-function ContributionCard({ title, rows, tone }: { title: string; rows: ReturnType<typeof getCurrentHoldings>; tone: 'good' | 'bad' }) {
+function ContributionCard({
+  title,
+  rows,
+  tone,
+}: {
+  title: string;
+  rows: ReturnType<typeof getCurrentHoldings>;
+  tone: 'good' | 'bad';
+}) {
   return (
     <article className="card border border-base-300 bg-base-100 shadow-sm">
       <div className="card-body gap-3 p-5">
         <div className="flex items-center justify-between">
           <h3 className="card-title">{title}</h3>
-          <span className={`badge badge-soft ${tone === 'good' ? 'badge-success' : 'badge-error'}`}>{tone === 'good' ? '기여' : '점검'}</span>
+          <span className={`badge badge-soft ${tone === 'good' ? 'badge-success' : 'badge-error'}`}>
+            {tone === 'good' ? '기여' : '점검'}
+          </span>
         </div>
         <div className="grid gap-2">
           {rows.map((row) => (
-            <Link key={`${title}-${row.persona}-${row.symbol}`} href={`/reports/${row.symbol}`} className="flex items-center justify-between gap-3 rounded-box border border-base-300 bg-base-200/40 p-3 transition hover:border-primary/40">
+            <Link
+              key={`${title}-${row.persona}-${row.symbol}`}
+              href={`/reports/${row.symbol}`}
+              className="flex items-center justify-between gap-3 rounded-box border border-base-300 bg-base-200/40 p-3 transition hover:border-primary/40"
+            >
               <div className="min-w-0">
                 <strong className="block truncate">{row.company || row.symbol}</strong>
-                <span className="text-xs text-base-content/50">{row.symbol} · {row.currency}</span>
+                <span className="text-xs text-base-content/50">
+                  {row.symbol} · {row.currency}
+                </span>
               </div>
               <div className="text-right">
-                <strong className={tone === 'good' ? 'text-success' : 'text-error'}>{formatKrw(row.unrealizedPnlKrw)}</strong>
+                <strong className={tone === 'good' ? 'text-success' : 'text-error'}>
+                  {formatKrw(row.unrealizedPnlKrw)}
+                </strong>
                 <span className="block text-xs text-base-content/50">{formatPercent(row.unrealizedReturn)}</span>
               </div>
             </Link>

@@ -3,7 +3,7 @@
   max-height: 360px;
   overflow: auto;
   white-space: pre-wrap;
-  font-size: .85rem;
+  font-size: 0.85rem;
   color: var(--ink-2);
 }
 
@@ -13,5 +13,5 @@
 }
 .ledger-table-wrap th,
 .ledger-table-wrap td {
-  padding: .82rem 1rem;
+  padding: 0.82rem 1rem;
 }
