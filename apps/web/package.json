@@ -10,18 +10,23 @@
     "check:report-ui": "node scripts/check-report-ui.mjs"
   },
   "dependencies": {
+    "@tailwindcss/postcss": "^4.2.4",
     "@tanstack/react-table": "^8.21.3",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "daisyui": "^5.5.19",
     "lightweight-charts": "^5.0.9",
     "next": "latest",
+    "postcss": "^8.5.14",
     "react": "latest",
     "react-dom": "latest",
+    "tailwindcss": "^4.2.4",
     "typescript": "latest"
   },
   "devDependencies": {
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.4"
-  }
+  },
+  "browserslist": "> 1%"
 }
