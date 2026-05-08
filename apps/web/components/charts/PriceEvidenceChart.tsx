@@ -115,7 +115,11 @@ export function PriceEvidenceChart({
   const activeMa = hoverBar ? hoverMa : lastMa;
   const [verticalLines, setVerticalLines] = useState<VerticalLineState>({ pub: null, expiry: null });
   const [drag, setDrag] = useState<DragSelection | null>(null);
+  const [measureMode, setMeasureMode] = useState(false);
+  const measureModeRef = useRef(false);
   const dragStartRef = useRef<{ time: string; x: number; price: number } | null>(null);
+  const chartApiRef = useRef<IChartApi | null>(null);
+  measureModeRef.current = measureMode;
   const chartMarkers = useMemo(
     () => buildMarkers(publicationDate, targetHitDate, evidenceMarkers),
     [evidenceMarkers, publicationDate, targetHitDate],
@@ -344,40 +348,63 @@ export function PriceEvidenceChart({
     updateVerticalLines();
     timeScale.subscribeVisibleTimeRangeChange(updateVerticalLines);
 
-    // Drag-to-measure (B-2). lightweight-charts owns mouse drag for panning
-    // — we only intercept it when the user holds Shift to opt into a
-    // measurement selection. Without Shift the chart pans as normal.
+    // Drag-to-measure (B-2). Active only when the user has flipped the
+    // "측정 모드" toggle. Doing so disables lightweight-charts' built-in
+    // scroll/scale handlers wholesale so the drag can't race with internal
+    // panning logic — releasing the toggle restores normal pan/zoom.
+    chartApiRef.current = chart;
     const chartEl = chart.chartElement();
+    const xFromEvent = (event: PointerEvent): number => {
+      const rect = container.getBoundingClientRect();
+      return event.clientX - rect.left;
+    };
     const handlePointerDown = (event: PointerEvent) => {
-      if (!event.shiftKey) return;
-      const params = latestParams;
-      if (!params?.time || !params.point) return;
-      const time = String(params.time);
-      const point = priceByTime.get(time);
+      if (!measureModeRef.current) return;
+      const x = xFromEvent(event);
+      const time = timeScale.coordinateToTime(x);
+      if (time === null) return;
+      const timeStr = String(time);
+      const point = priceByTime.get(timeStr);
       if (!point) return;
       event.preventDefault();
-      dragStartRef.current = { time, x: params.point.x, price: point.close ?? point.value };
+      dragStartRef.current = { time: timeStr, x, price: point.close ?? point.value };
       setDrag(null);
-      chart.applyOptions({ handleScroll: false, handleScale: false });
       chartEl.setPointerCapture?.(event.pointerId);
     };
-    const finishDrag = () => {
+    const handlePointerMove = (event: PointerEvent) => {
       if (!dragStartRef.current) return;
+      const x = xFromEvent(event);
+      const time = timeScale.coordinateToTime(x);
+      if (time === null) return;
+      const timeStr = String(time);
+      const point = priceByTime.get(timeStr);
+      if (!point) return;
+      const start = dragStartRef.current;
+      if (Math.abs(x - start.x) < 2) return;
+      const fromX = Math.min(start.x, x);
+      const toX = Math.max(start.x, x);
+      const fromTime = start.x <= x ? start.time : timeStr;
+      const toTime = start.x <= x ? timeStr : start.time;
+      const fromPrice = priceByTime.get(fromTime)?.close ?? priceByTime.get(fromTime)?.value ?? start.price;
+      const toPrice = priceByTime.get(toTime)?.close ?? priceByTime.get(toTime)?.value ?? point.close ?? point.value;
+      setDrag({ fromTime, toTime, fromPrice, toPrice, fromX, toX });
+    };
+    const finishDrag = () => {
       dragStartRef.current = null;
-      chart.applyOptions({ handleScroll: true, handleScale: true });
     };
     chartEl.addEventListener('pointerdown', handlePointerDown);
+    chartEl.addEventListener('pointermove', handlePointerMove);
     chartEl.addEventListener('pointerup', finishDrag);
     chartEl.addEventListener('pointercancel', finishDrag);
-    chartEl.addEventListener('pointerleave', finishDrag);
 
     return () => {
       chart.unsubscribeCrosshairMove(handleCrosshairMove);
       timeScale.unsubscribeVisibleTimeRangeChange(updateVerticalLines);
       chartEl.removeEventListener('pointerdown', handlePointerDown);
+      chartEl.removeEventListener('pointermove', handlePointerMove);
       chartEl.removeEventListener('pointerup', finishDrag);
       chartEl.removeEventListener('pointercancel', finishDrag);
-      chartEl.removeEventListener('pointerleave', finishDrag);
+      chartApiRef.current = null;
       chart.remove();
     };
   }, [
@@ -402,9 +429,20 @@ export function PriceEvidenceChart({
       </div>
     );
   }
+  // Measurement mode wholesale flips off the chart's pan/zoom handlers so
+  // the drag-to-measure overlay can't fight the library for the gesture.
+  // Effect runs when the toggle changes; cleanup leaves the chart in
+  // pan-enabled state.
+  useEffect(() => {
+    const chart = chartApiRef.current;
+    if (!chart) return;
+    chart.applyOptions({ handleScroll: !measureMode, handleScale: !measureMode });
+    if (!measureMode) dragStartRef.current = null;
+  }, [measureMode]);
+
   const dragReturnPct = drag && drag.fromPrice ? drag.toPrice / drag.fromPrice - 1 : null;
   return (
-    <div className="chart-shell relative">
+    <div className={`chart-shell relative ${measureMode ? 'cursor-crosshair' : ''}`}>
       {activeBar ? <OhlcLegend bar={activeBar} ma={activeMa} currency={currency} targetPrice={targetPrice} /> : null}
       <div
         ref={ref}
@@ -435,9 +473,24 @@ export function PriceEvidenceChart({
           ) : null}
         </div>
       ) : null}
-      <div className="pointer-events-none absolute right-3 bottom-3 z-10 rounded-md bg-base-100/85 px-2 py-1 text-[10px] text-base-content/55 shadow-sm">
-        Shift+드래그 → 구간 수익률
-      </div>
+      <button
+        type="button"
+        className={`absolute right-3 top-3 z-20 rounded-md px-2 py-1 text-[11px] font-semibold shadow-sm ${
+          measureMode ? 'bg-primary text-primary-content' : 'bg-base-100/85 text-base-content/65'
+        }`}
+        aria-pressed={measureMode}
+        onClick={() => {
+          setMeasureMode((m) => !m);
+          if (measureMode) setDrag(null);
+        }}
+      >
+        {measureMode ? '측정 모드 ●' : '측정 모드'}
+      </button>
+      {measureMode ? (
+        <div className="pointer-events-none absolute left-1/2 bottom-3 z-10 -translate-x-1/2 rounded-md bg-base-100/95 px-3 py-1 text-[11px] font-semibold text-base-content/70 shadow">
+          드래그하여 두 시점의 수익률 측정
+        </div>
+      ) : null}
       {tooltip ? (
         <div className="chart-tooltip" style={{ left: tooltip.x, top: tooltip.y }}>
           <div className="tooltip-date">{tooltip.time}</div>
