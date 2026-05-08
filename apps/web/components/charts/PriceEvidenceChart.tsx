@@ -340,13 +340,12 @@ export function PriceEvidenceChart({
     updateVerticalLines();
     timeScale.subscribeVisibleTimeRangeChange(updateVerticalLines);
 
-    // Drag-to-measure (B-2). lightweight-charts has no native range selector
-    // so we capture pointerdown/up on `chart.chartElement()` (the canvas
-    // surface, which lets the library translate coords for us via
-    // crosshairMove) and disable handleScroll/handleScale while the drag is
-    // active so the chart doesn't pan under the selection.
+    // Drag-to-measure (B-2). lightweight-charts owns mouse drag for panning
+    // — we only intercept it when the user holds Shift to opt into a
+    // measurement selection. Without Shift the chart pans as normal.
     const chartEl = chart.chartElement();
     const handlePointerDown = (event: PointerEvent) => {
+      if (!event.shiftKey) return;
       const params = latestParams;
       if (!params?.time || !params.point) return;
       const time = String(params.time);
@@ -358,21 +357,23 @@ export function PriceEvidenceChart({
       chart.applyOptions({ handleScroll: false, handleScale: false });
       chartEl.setPointerCapture?.(event.pointerId);
     };
-    const handlePointerUp = () => {
+    const finishDrag = () => {
       if (!dragStartRef.current) return;
       dragStartRef.current = null;
       chart.applyOptions({ handleScroll: true, handleScale: true });
     };
     chartEl.addEventListener('pointerdown', handlePointerDown);
-    chartEl.addEventListener('pointerup', handlePointerUp);
-    chartEl.addEventListener('pointerleave', handlePointerUp);
+    chartEl.addEventListener('pointerup', finishDrag);
+    chartEl.addEventListener('pointercancel', finishDrag);
+    chartEl.addEventListener('pointerleave', finishDrag);
 
     return () => {
       chart.unsubscribeCrosshairMove(handleCrosshairMove);
       timeScale.unsubscribeVisibleTimeRangeChange(updateVerticalLines);
       chartEl.removeEventListener('pointerdown', handlePointerDown);
-      chartEl.removeEventListener('pointerup', handlePointerUp);
-      chartEl.removeEventListener('pointerleave', handlePointerUp);
+      chartEl.removeEventListener('pointerup', finishDrag);
+      chartEl.removeEventListener('pointercancel', finishDrag);
+      chartEl.removeEventListener('pointerleave', finishDrag);
       chart.remove();
     };
   }, [
@@ -430,6 +431,9 @@ export function PriceEvidenceChart({
           ) : null}
         </div>
       ) : null}
+      <div className="pointer-events-none absolute right-3 bottom-3 z-10 rounded-md bg-base-100/85 px-2 py-1 text-[10px] text-base-content/55 shadow-sm">
+        Shift+드래그 → 구간 수익률
+      </div>
       {tooltip ? (
         <div className="chart-tooltip" style={{ left: tooltip.x, top: tooltip.y }}>
           <div className="tooltip-date">{tooltip.time}</div>
