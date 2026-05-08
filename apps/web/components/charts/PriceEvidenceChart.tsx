@@ -136,7 +136,9 @@ export function PriceEvidenceChart({
       const minValue = Math.min(...anchors);
       const maxValue = Math.max(...anchors);
       const span = Math.max(maxValue - minValue, Math.abs(maxValue) * 0.02, Math.abs(minValue) * 0.02, 1);
-      const paddedMin = minValue >= 0 ? Math.max(0, minValue - span * 0.04) : minValue - span * 0.04;
+      // Asset prices cannot go below 0 — clamp the lower padding so the y-axis
+      // doesn't render a negative tick band.
+      const paddedMin = Math.max(0, minValue - span * 0.04);
       return {
         ...info,
         priceRange: {
@@ -261,11 +263,17 @@ export function PriceEvidenceChart({
 
     createSeriesMarkers(candleSeries, chartMarkers);
 
+    let latestParams: MouseEventParams<Time> | null = null;
     const handleCrosshairMove = (params: MouseEventParams<Time>) => {
+      latestParams = params;
       if (!params.point || !params.time || params.point.x < 0 || params.point.y < 0) {
         setTooltip(null);
         setHoverBar(null);
         setHoverMa(EMPTY_MA);
+        if (dragStartRef.current) {
+          // Mouse left the plot area mid-drag — keep the start point alive
+          // (pointerup fires globally) but stop extending the selection.
+        }
         return;
       }
       const time = String(params.time);
@@ -290,6 +298,19 @@ export function PriceEvidenceChart({
         targetPrice,
         targetGapPct,
       });
+      // Extend the active drag selection while the pointer is still down.
+      if (dragStartRef.current) {
+        const start = dragStartRef.current;
+        const x = params.point.x;
+        if (Math.abs(x - start.x) < 2) return;
+        const fromX = Math.min(start.x, x);
+        const toX = Math.max(start.x, x);
+        const fromTime = start.x <= x ? start.time : time;
+        const toTime = start.x <= x ? time : start.time;
+        const fromPrice = priceByTime.get(fromTime)?.close ?? priceByTime.get(fromTime)?.value ?? start.price;
+        const toPrice = priceByTime.get(toTime)?.close ?? priceByTime.get(toTime)?.value ?? close;
+        setDrag({ fromTime, toTime, fromPrice, toPrice, fromX, toX });
+      }
     };
     chart.subscribeCrosshairMove(handleCrosshairMove);
 
@@ -319,55 +340,39 @@ export function PriceEvidenceChart({
     updateVerticalLines();
     timeScale.subscribeVisibleTimeRangeChange(updateVerticalLines);
 
-    // Drag-to-measure (B-2): mousedown on the candle pane starts a selection,
-    // mouseup ends it. We translate pixel x → time → price via the chart
-    // primitives so the result matches what's actually plotted.
-    const handleMouseDown = (event: MouseEvent) => {
-      const rect = container.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const time = timeScale.coordinateToTime(x);
-      if (time === null) return;
-      const timeStr = String(time);
-      const point = priceByTime.get(timeStr);
+    // Drag-to-measure (B-2). lightweight-charts has no native range selector
+    // so we capture pointerdown/up on `chart.chartElement()` (the canvas
+    // surface, which lets the library translate coords for us via
+    // crosshairMove) and disable handleScroll/handleScale while the drag is
+    // active so the chart doesn't pan under the selection.
+    const chartEl = chart.chartElement();
+    const handlePointerDown = (event: PointerEvent) => {
+      const params = latestParams;
+      if (!params?.time || !params.point) return;
+      const time = String(params.time);
+      const point = priceByTime.get(time);
       if (!point) return;
-      dragStartRef.current = { time: timeStr, x, price: point.close ?? point.value };
+      event.preventDefault();
+      dragStartRef.current = { time, x: params.point.x, price: point.close ?? point.value };
       setDrag(null);
+      chart.applyOptions({ handleScroll: false, handleScale: false });
+      chartEl.setPointerCapture?.(event.pointerId);
     };
-    const handleMouseMove = (event: MouseEvent) => {
+    const handlePointerUp = () => {
       if (!dragStartRef.current) return;
-      const rect = container.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const time = timeScale.coordinateToTime(x);
-      if (time === null) return;
-      const timeStr = String(time);
-      const point = priceByTime.get(timeStr);
-      if (!point) return;
-      const start = dragStartRef.current;
-      // Tiny mousedown movements should not register as a selection.
-      if (Math.abs(x - start.x) < 4) return;
-      const fromX = Math.min(start.x, x);
-      const toX = Math.max(start.x, x);
-      const fromTime = start.x <= x ? start.time : timeStr;
-      const toTime = start.x <= x ? timeStr : start.time;
-      const fromPrice = priceByTime.get(fromTime)?.close ?? priceByTime.get(fromTime)?.value ?? start.price;
-      const toPrice = priceByTime.get(toTime)?.close ?? priceByTime.get(toTime)?.value ?? point.close ?? point.value;
-      setDrag({ fromTime, toTime, fromPrice, toPrice, fromX, toX });
-    };
-    const handleMouseUp = () => {
       dragStartRef.current = null;
+      chart.applyOptions({ handleScroll: true, handleScale: true });
     };
-    container.addEventListener('mousedown', handleMouseDown);
-    container.addEventListener('mousemove', handleMouseMove);
-    container.addEventListener('mouseup', handleMouseUp);
-    container.addEventListener('mouseleave', handleMouseUp);
+    chartEl.addEventListener('pointerdown', handlePointerDown);
+    chartEl.addEventListener('pointerup', handlePointerUp);
+    chartEl.addEventListener('pointerleave', handlePointerUp);
 
     return () => {
       chart.unsubscribeCrosshairMove(handleCrosshairMove);
       timeScale.unsubscribeVisibleTimeRangeChange(updateVerticalLines);
-      container.removeEventListener('mousedown', handleMouseDown);
-      container.removeEventListener('mousemove', handleMouseMove);
-      container.removeEventListener('mouseup', handleMouseUp);
-      container.removeEventListener('mouseleave', handleMouseUp);
+      chartEl.removeEventListener('pointerdown', handlePointerDown);
+      chartEl.removeEventListener('pointerup', handlePointerUp);
+      chartEl.removeEventListener('pointerleave', handlePointerUp);
       chart.remove();
     };
   }, [
@@ -395,8 +400,7 @@ export function PriceEvidenceChart({
   const dragReturnPct = drag && drag.fromPrice ? drag.toPrice / drag.fromPrice - 1 : null;
   return (
     <div className="chart-shell relative">
-      {activeBar ? <OhlcLegend bar={activeBar} currency={currency} targetPrice={targetPrice} /> : null}
-      <MaLegend ma={activeMa} currency={currency} />
+      {activeBar ? <OhlcLegend bar={activeBar} ma={activeMa} currency={currency} targetPrice={targetPrice} /> : null}
       <div
         ref={ref}
         className="chart-box chart-box-fixed relative"
@@ -483,7 +487,17 @@ function toMovingAverageData(points: PricePoint[], window: number): LinePoint[] 
   return output;
 }
 
-function OhlcLegend({ bar, currency, targetPrice }: { bar: OhlcState; currency: string; targetPrice: number | null }) {
+function OhlcLegend({
+  bar,
+  ma,
+  currency,
+  targetPrice,
+}: {
+  bar: OhlcState;
+  ma: MaValues;
+  currency: string;
+  targetPrice: number | null;
+}) {
   const change = bar.close - bar.open;
   const changePct = bar.open !== 0 ? change / bar.open : null;
   const gapPct = isFinitePrice(targetPrice) && bar.close !== 0 ? (targetPrice - bar.close) / bar.close : null;
@@ -493,7 +507,6 @@ function OhlcLegend({ bar, currency, targetPrice }: { bar: OhlcState; currency: 
       <div className="chart-legend-main">
         <span className="legend-symbol">{currency.toUpperCase()} OHLC</span>
         <span>{bar.time}</span>
-        <span className="legend-ma">MA20·60·200</span>
       </div>
       <div className="chart-legend-values">
         <span>O {formatChartPrice(bar.open, currency)}</span>
@@ -506,6 +519,17 @@ function OhlcLegend({ bar, currency, targetPrice }: { bar: OhlcState; currency: 
         <span>Vol {formatVolume(bar.volume)}</span>
         <span>
           목표 {formatChartPrice(targetPrice, currency)} · Gap {formatPercent(gapPct)}
+        </span>
+      </div>
+      <div className="chart-legend-values">
+        <span style={{ color: MA_COLORS.ma20 }}>
+          MA20 {ma.ma20 !== null ? formatChartPrice(ma.ma20, currency) : '—'}
+        </span>
+        <span style={{ color: MA_COLORS.ma60 }}>
+          MA60 {ma.ma60 !== null ? formatChartPrice(ma.ma60, currency) : '—'}
+        </span>
+        <span style={{ color: MA_COLORS.ma200 }}>
+          MA200 {ma.ma200 !== null ? formatChartPrice(ma.ma200, currency) : '—'}
         </span>
       </div>
     </div>
@@ -718,25 +742,6 @@ function VerticalLine({
         style={{ left: 0, backgroundColor: color }}
       >
         {label}
-      </span>
-    </div>
-  );
-}
-
-function MaLegend({ ma, currency }: { ma: MaValues; currency: string }) {
-  return (
-    <div className="pointer-events-none absolute left-3 top-3 z-10 flex gap-3 rounded-md bg-base-100/90 px-2 py-1 text-xs font-semibold shadow-sm">
-      <span className="flex items-center gap-1" style={{ color: MA_COLORS.ma20 }}>
-        <span className="inline-block h-2 w-2 rounded-full" style={{ background: MA_COLORS.ma20 }} />
-        MA20 {ma.ma20 !== null ? formatChartPrice(ma.ma20, currency) : '—'}
-      </span>
-      <span className="flex items-center gap-1" style={{ color: MA_COLORS.ma60 }}>
-        <span className="inline-block h-2 w-2 rounded-full" style={{ background: MA_COLORS.ma60 }} />
-        MA60 {ma.ma60 !== null ? formatChartPrice(ma.ma60, currency) : '—'}
-      </span>
-      <span className="flex items-center gap-1" style={{ color: MA_COLORS.ma200 }}>
-        <span className="inline-block h-2 w-2 rounded-full" style={{ background: MA_COLORS.ma200 }} />
-        MA200 {ma.ma200 !== null ? formatChartPrice(ma.ma200, currency) : '—'}
       </span>
     </div>
   );

@@ -38,6 +38,8 @@ const csvHeaders: Array<[string, (report: ReportRow) => string | number | boolea
   ['목표 방향', (report) => report.targetDirection],
   ['제시 상승여력', (report) => report.targetUpsideAtPub],
   ['현재 수익률', (report) => report.currentReturn],
+  ['목표 잔여(추가 변화율)', (report) => report.targetRemainingPct],
+  ['달성률', (report) => report.targetProgressPct],
   ['최고 수익률', (report) => report.peakReturn],
   ['최저 수익률', (report) => report.troughReturn],
   ['목표 달성', (report) => report.targetHit],
@@ -119,11 +121,34 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         },
       },
       {
-        accessorKey: 'targetGapPct',
-        header: '목표가 괴리',
-        cell: ({ getValue }) => {
-          const value = getValue<number | null>();
-          return <span className={(value ?? 0) >= 0 ? 'good' : 'bad'}>{formatPercent(value)}</span>;
+        accessorKey: 'targetRemainingPct',
+        header: () => <span title="현재가 → 목표가까지 추가로 필요한 변화율">목표 잔여</span>,
+        cell: ({ row }) => {
+          const value = row.original.targetRemainingPct;
+          if (row.original.targetHit) {
+            return <span className="text-success">도달</span>;
+          }
+          if (value === null) return '—';
+          return <span className="text-primary">+{formatPercent(value)}</span>;
+        },
+      },
+      {
+        accessorKey: 'targetProgressPct',
+        header: () => <span title="현재가 ÷ 목표가 (목표 도달 시 100%)">달성률</span>,
+        cell: ({ row }) => {
+          const value = row.original.targetProgressPct;
+          if (value === null) return '—';
+          return (
+            <div className="flex items-center justify-end gap-2">
+              <span className="tabular-nums">{formatPercent(value)}</span>
+              <div className="h-1.5 w-12 rounded-full bg-base-200">
+                <div
+                  className="h-full rounded-full bg-primary"
+                  style={{ width: `${Math.min(100, Math.max(0, value * 100))}%` }}
+                />
+              </div>
+            </div>
+          );
         },
       },
       {
