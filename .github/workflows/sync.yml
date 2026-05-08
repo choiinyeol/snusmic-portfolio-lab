@@ -6,7 +6,7 @@ on:
       report_pages:
         description: "SNUSMIC research page range to sync"
         required: false
-        default: "1-7"
+        default: "auto"
       enable_hybrid_ocr:
         description: "Start OpenDataLoader hybrid OCR backend"
         required: false
@@ -73,7 +73,7 @@ jobs:
     if: needs.check.outputs.should_sync == 'true'
     runs-on: ubuntu-latest
     env:
-      REPORT_PAGES: ${{ github.event.inputs.report_pages || '1-7' }}
+      REPORT_PAGES: ${{ github.event.inputs.report_pages || 'auto' }}
       ENABLE_HYBRID_OCR: ${{ github.event.inputs.enable_hybrid_ocr || 'false' }}
     steps:
       - name: Check out repository
