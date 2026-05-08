@@ -36,7 +36,7 @@ from snusmic_pipeline.sim.visualize import (  # noqa: E402
     plot_portfolio_composition,
 )
 
-ROUND_NDIGITS = 2
+ROUND_NDIGITS = 4
 
 
 def _to_csv_rounded(df: pd.DataFrame, path: Path) -> None:
@@ -70,7 +70,7 @@ def _round_floats(value):
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--start", type=str, default="2021-01-04")
-    parser.add_argument("--end", type=str, default="2026-04-15")
+    parser.add_argument("--end", type=str, default=date.today().isoformat())
     parser.add_argument("--warehouse", type=Path, default=ROOT / "data" / "warehouse")
     parser.add_argument("--out", type=Path, default=ROOT / "data" / "sim")
     parser.add_argument(

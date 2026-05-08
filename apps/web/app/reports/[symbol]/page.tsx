@@ -21,7 +21,6 @@ import {
   buildPathEvidence,
   buildScenarioRows,
   buildTrendSnapshot,
-  oneYearBefore,
   targetStatus,
 } from '@/lib/report-view-model';
 
@@ -43,7 +42,10 @@ export default async function ReportDetailPage({ params }: { params: ReportParam
   const report = getReportBySymbol(reportSymbol);
   if (!report) notFound();
   const siblingReports = getReportsBySymbol(reportSymbol);
-  const prices = getPriceSeries(report.symbol, oneYearBefore(report.publicationDate), report.lastCloseDate);
+  // Show the full historical depth available in data/web/prices/{symbol}.json
+  // (warehouse stores from publication-820d). End-cap at lastCloseDate so
+  // expired reports stop at expiry and active reports run to today.
+  const prices = getPriceSeries(report.symbol, undefined, report.lastCloseDate);
   const snippet = getMarkdownSnippet(report);
   const pathEvidence = buildPathEvidence(prices, report);
   const scenarioRows = buildScenarioRows(prices, report);

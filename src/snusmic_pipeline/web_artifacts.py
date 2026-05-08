@@ -578,6 +578,8 @@ def _build_report_rows(
                 "peak_return": _number(perf.get("peak_return")),
                 "trough_return": _number(perf.get("trough_return")),
                 "target_gap_pct": _number(perf.get("target_gap_pct")),
+                "expiry_date": perf.get("expiry_date") or None,
+                "expired": _bool(perf.get("expired")),
                 "caveat_flags": sorted(set(caveats)),
             }
         )

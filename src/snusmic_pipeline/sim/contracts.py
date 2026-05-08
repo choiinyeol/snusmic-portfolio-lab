@@ -215,6 +215,12 @@ class SimulationConfig(_FrozenModel):
     )
     seed: int = 42  # used only for tie-breaking; the engine itself is deterministic.
 
+    # Report-level "valid for" window. After this many days past publication,
+    # a report is considered expired: target hits beyond this date no longer
+    # count, current_return is frozen at the close on the expiry date, and
+    # downstream views drop the position from the active portfolio.
+    report_expiry_days: Annotated[int, Field(ge=30, le=3650)] = 730
+
     @model_validator(mode="after")
     def _check_dates(self) -> SimulationConfig:
         if self.end_date <= self.start_date:
@@ -344,6 +350,8 @@ class ReportPerformance(_FrozenModel):
     peak_return: float | None
     trough_return: float | None
     target_gap_pct: float | None  # (last_close − target) / target
+    expiry_date: date | None = None  # publication_date + config.report_expiry_days
+    expired: bool = False  # True once today >= expiry_date and target was not hit in-window
 
 
 class ReportStats(_FrozenModel):

@@ -1058,48 +1058,10 @@ table tbody tr td:last-child { padding-right: 1rem; }
 .kpi-tile.tone-accent .kpi-tile__delta { color: var(--accent-strong); }
 
 /* ───────────────────────────────────────────────────────────────────────
-   Tabs — segmented control used to host portfolio sub-views and other
-   "this is one thing in three modes" patterns.
+   Tabs — daisyUI 5 owns the tabs container/items styling. We only ship a
+   panel wrapper to give the active tab body consistent vertical rhythm.
+   Do NOT add a `.tabs` rule here: it collides with daisyUI's flex tablist.
    ─────────────────────────────────────────────────────────────────── */
-.tabs { display: grid; gap: var(--space-4); }
-.tabs__bar {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: .25rem;
-  padding: .3rem;
-  background: var(--surface-sunken);
-  border-radius: var(--radius-pill);
-  width: max-content;
-  max-width: 100%;
-}
-.tabs__pill {
-  display: inline-flex;
-  align-items: baseline;
-  gap: .45rem;
-  border: 0;
-  padding: .55rem 1.05rem;
-  border-radius: var(--radius-pill);
-  background: transparent;
-  color: var(--muted);
-  font-weight: 600;
-  font-size: .9rem;
-  cursor: pointer;
-  transition: background-color .16s ease, color .16s ease, box-shadow .16s ease;
-}
-.tabs__pill:hover { color: var(--ink); background: rgba(255, 255, 255, .65); }
-.tabs__pill--active {
-  color: var(--accent-strong);
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
-}
-.tabs__meta {
-  font-family: var(--mono);
-  font-size: .72rem;
-  font-weight: 600;
-  color: var(--faint);
-  letter-spacing: .04em;
-}
-.tabs__pill--active .tabs__meta { color: var(--accent); }
 .tabs__panel { display: grid; gap: var(--space-4); }
 
 /* ───────────────────────────────────────────────────────────────────────
