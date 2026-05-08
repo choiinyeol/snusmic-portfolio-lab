@@ -1,8 +1,8 @@
 {
   "coverage": {
-    "report_performance_rows": 216,
+    "report_performance_rows": 221,
     "reports_without_performance": 0,
-    "warehouse_reports": 216
+    "warehouse_reports": 221
   },
   "extraction_quality": {
     "currency_counts": {

@@ -19188,6 +19188,19 @@
       "open": 69.48999786376953,
       "source_currency": "USD",
       "volume": 8588416.0
+    },
+    {
+      "close": 69.12999725341797,
+      "close_krw": 99854.8212,
+      "currency": "USD",
+      "date": "2026-05-07",
+      "display_currency": "USD",
+      "high": 73.58000183105469,
+      "krw_per_unit": 1444.449951171875,
+      "low": 68.19999694824217,
+      "open": 73.20999908447266,
+      "source_currency": "USD",
+      "volume": 8577000.0
     }
   ],
   "symbol": "MP"

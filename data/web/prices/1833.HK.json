@@ -24791,6 +24791,19 @@
       "open": 10.920000076293947,
       "source_currency": "HKD",
       "volume": 10373729.0
+    },
+    {
+      "close": 11.130000114440918,
+      "close_krw": 2079.3067,
+      "currency": "HKD",
+      "date": "2026-05-08",
+      "display_currency": "HKD",
+      "high": 11.140000343322754,
+      "krw_per_unit": 186.82000732421875,
+      "low": 10.869999885559084,
+      "open": 11.109999656677246,
+      "source_currency": "HKD",
+      "volume": 6969226.0
     }
   ],
   "symbol": "1833.HK"

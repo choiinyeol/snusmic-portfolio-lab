@@ -3022,5 +3022,85 @@
     "sha256": "4b84ae297a2c31ff2308b505fa674f7abe90d25ec70984bdbf59336c2ad273cf",
     "download_status": "downloaded",
     "download_note": ""
+  },
+  {
+    "meta": {
+      "page": 0,
+      "ordinal": 1,
+      "date": "2026-05-02T09:00:00",
+      "title": "Equity Research, 샘씨엔에스",
+      "company": "샘씨엔에스",
+      "slug": "샘씨엔에스",
+      "post_url": "manual:smic_2026_1_2_1",
+      "pdf_url": ""
+    },
+    "path": "/Users/qraft_inyeolchoi/Desktop/inyeol/code/snusmic-quant-terminal/data/pdfs/2026-05-02_equity-research-샘씨엔에스.pdf",
+    "sha256": "2b1f4dddf4c852924f326e083e5a9b89be7d423cb68c26bc4a0f74a939afd2ee",
+    "status": "manual",
+    "note": "manual ingest 26_1_2주차"
+  },
+  {
+    "meta": {
+      "page": 0,
+      "ordinal": 2,
+      "date": "2026-05-02T09:00:00",
+      "title": "Equity Research, 나노",
+      "company": "나노",
+      "slug": "나노",
+      "post_url": "manual:smic_2026_1_2_2",
+      "pdf_url": ""
+    },
+    "path": "/Users/qraft_inyeolchoi/Desktop/inyeol/code/snusmic-quant-terminal/data/pdfs/2026-05-02_equity-research-나노.pdf",
+    "sha256": "07089c9f5709cff49677f1fb83487684b3b49484af23b40f671a7fc3b736a407",
+    "status": "manual",
+    "note": "manual ingest 26_1_2주차"
+  },
+  {
+    "meta": {
+      "page": 0,
+      "ordinal": 3,
+      "date": "2026-05-02T09:00:00",
+      "title": "Equity Research, HD현대마린솔루션",
+      "company": "HD현대마린솔루션",
+      "slug": "hd현대마린솔루션",
+      "post_url": "manual:smic_2026_1_2_3",
+      "pdf_url": ""
+    },
+    "path": "/Users/qraft_inyeolchoi/Desktop/inyeol/code/snusmic-quant-terminal/data/pdfs/2026-05-02_equity-research-hd현대마린솔루션.pdf",
+    "sha256": "5e1ecc9fad548c2f3934205fad157a8a8b1d6bf67e4953a19d9c9fd8ef015674",
+    "status": "manual",
+    "note": "manual ingest 26_1_2주차"
+  },
+  {
+    "meta": {
+      "page": 0,
+      "ordinal": 4,
+      "date": "2026-05-02T09:00:00",
+      "title": "Equity Research, 코스텍시스",
+      "company": "코스텍시스",
+      "slug": "코스텍시스",
+      "post_url": "manual:smic_2026_1_2_4",
+      "pdf_url": ""
+    },
+    "path": "/Users/qraft_inyeolchoi/Desktop/inyeol/code/snusmic-quant-terminal/data/pdfs/2026-05-02_equity-research-코스텍시스.pdf",
+    "sha256": "be46ef3f254df9cbf5ac24a9a14fd0ff16781d6b3b3bb8a351ff1dceed69fe8e",
+    "status": "manual",
+    "note": "manual ingest 26_1_2주차"
+  },
+  {
+    "meta": {
+      "page": 0,
+      "ordinal": 5,
+      "date": "2026-05-06T09:00:00",
+      "title": "Equity Research, 덕산네오룩스",
+      "company": "덕산네오룩스",
+      "slug": "덕산네오룩스",
+      "post_url": "manual:smic_2026_1_2_5",
+      "pdf_url": ""
+    },
+    "path": "/Users/qraft_inyeolchoi/Desktop/inyeol/code/snusmic-quant-terminal/data/pdfs/2026-05-06_equity-research-덕산네오룩스.pdf",
+    "sha256": "eaee0079a0043b90214b506eb40523edc352509a5d43038d0dd68bda65ee18a8",
+    "status": "manual",
+    "note": "manual ingest 26_1_2주차"
   }
 ]
