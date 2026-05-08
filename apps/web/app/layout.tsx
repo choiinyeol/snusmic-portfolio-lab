@@ -18,7 +18,7 @@ const NAV = [
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ko" data-theme="corporate" data-scroll-behavior="smooth">
+    <html lang="ko" data-theme="snusmic" data-scroll-behavior="smooth">
       <head>
         <link
           rel="stylesheet"
@@ -31,7 +31,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body>
         <div className="site-shell">
-          <header className="topbar">
+          <header className="topbar navbar bg-base-100/85 text-base-content border-b border-base-300 backdrop-blur-xl">
             <Link className="brand" href="/" aria-label="SNUSMIC Portfolio 홈">
               <span className="brand__mark" aria-hidden="true" />
               <span className="brand__name">
@@ -39,7 +39,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 <span className="brand-kicker">research-driven allocation</span>
               </span>
             </Link>
-            <nav className="nav" aria-label="주요 탐색">
+            <nav className="nav menu menu-horizontal gap-1" aria-label="주요 탐색">
               {NAV.map((item) => (
                 <Link key={item.href} href={item.href} className="nav__item">
                   <span className="nav__label">{item.label}</span>
@@ -49,7 +49,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             </nav>
           </header>
           <main>{children}</main>
-          <footer className="footer-note">
+          <footer className="footer-note footer footer-center bg-base-200 text-base-content/60">
             정적 자산만 표시합니다. 모든 숫자는 커밋된 CSV/JSON에서 직접 계산되며, 시장 주문이나 실시간 갱신은 하지 않습니다.
           </footer>
         </div>

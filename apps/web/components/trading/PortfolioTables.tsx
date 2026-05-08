@@ -42,27 +42,29 @@ export function PortfolioTables({ holdings, personaLabels, capitalByPersona = {}
   };
 
   return (
-    <div className="grid" style={{ gap: '1rem' }}>
-      <section className="panel report-table-panel strategy-filter-panel">
-        <h2>전략 선택</h2>
-        <div className="strategy-tabs" role="group" aria-label="전략 선택">
+    <div className="grid gap-4">
+      <section className="card border border-base-300 bg-base-100 shadow-sm">
+        <div className="card-body gap-3 p-5"><h2 className="card-title">전략 선택</h2>
+        <div className="tabs tabs-box w-fit max-w-full overflow-x-auto bg-base-200" role="group" aria-label="전략 선택">
           {personas.map((item) => (
-            <button type="button" key={item} aria-pressed={persona === item} className={persona === item ? 'active' : ''} onClick={() => { setPersona(item); setPage(0); }}>
+            <button type="button" key={item} aria-pressed={persona === item} className={persona === item ? 'tab tab-active font-bold' : 'tab'} onClick={() => { setPersona(item); setPage(0); }}>
               {personaLabels[item] ?? item}
             </button>
           ))}
         </div>
-        <div className="table-toolbar" aria-label="포트폴리오 필터">
-          <button type="button" onClick={() => downloadHoldings(currentRows, targetsBySymbol)}>현재 포트폴리오 CSV</button>
+        <div className="flex flex-wrap gap-2" aria-label="포트폴리오 필터">
+          <button className="btn btn-sm btn-outline" type="button" onClick={() => downloadHoldings(currentRows, targetsBySymbol)}>현재 포트폴리오 CSV</button>
+        </div>
         </div>
       </section>
 
-      <section className="panel">
-        <h2>현재 보유 포트폴리오</h2>
-        <p className="muted">현재 어떤 종목을 얼마나 들고 있는지, 목표가·시장구분·평단·최근가·미실현 손익을 바로 확인합니다.</p>
+      <section className="card border border-base-300 bg-base-100 shadow-sm">
+        <div className="card-body gap-2 p-5">
+        <h2 className="card-title">현재 보유 포트폴리오</h2>
+        <p className="text-base-content/65">현재 어떤 종목을 얼마나 들고 있는지, 목표가·시장구분·평단·최근가·미실현 손익을 바로 확인합니다.</p>
         <PaginationControls page={page} pageCount={Math.ceil(currentRows.length / pageSize)} totalRows={currentRows.length} pageSize={pageSize} onPageChange={setPage} onPageSizeChange={(size) => { setPageSize(size); setPage(0); }} />
-        <div className="table-wrap inset">
-          <table>
+        <div className="table-wrap inset overflow-x-auto rounded-box border border-base-300 bg-base-100 shadow-sm">
+          <table className="table table-sm table-zebra">
             <thead><tr>
               <th><SortHeader label="전략" sortKey="strategy" sort={sort} onSort={updateSort} /></th>
               <th><SortHeader label="시장" sortKey="market" sort={sort} onSort={updateSort} /></th>
@@ -83,7 +85,7 @@ export function PortfolioTables({ holdings, personaLabels, capitalByPersona = {}
                 return (
                   <tr key={`${row.persona}-${row.symbol}`}>
                     <td>{personaLabels[row.persona] ?? row.persona}</td>
-                    <td><span className="pill">{marketLabel(target?.marketRegion)}</span></td>
+                    <td><span className="badge badge-ghost badge-sm">{marketLabel(target?.marketRegion)}</span></td>
                     <td><strong><Link href={`/reports/${row.symbol}`}>{row.company || row.symbol}</Link></strong><div className="muted">{row.symbol}</div></td>
                     <td>{formatTarget(target)}<div className="muted">{target?.publicationDate ?? '—'}</div></td>
                     <td>{row.qty?.toLocaleString('ko-KR') ?? '—'}</td>
@@ -116,6 +118,7 @@ export function PortfolioTables({ holdings, personaLabels, capitalByPersona = {}
               })}
             </tbody>
           </table>
+        </div>
         </div>
       </section>
     </div>

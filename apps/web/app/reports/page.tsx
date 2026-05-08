@@ -15,22 +15,22 @@ export default function ReportsPage() {
 
   return (
     <>
-      <section className="hero-summary">
-        <div className="hero-summary__lede">
-          <span className="hero-summary__eyebrow">Research archive</span>
-          <h1 className="display-1">SMIC 리포트의 사후 적중률과 가격 경로</h1>
-          <p className="hero-summary__sub">
-            SMIC가 발행한 모든 리포트의 발간 시점 목표가, 발간 이후 실제
-            가격 경로, 도달 여부를 정량 지표로 제공합니다. 상단의 핵심
-            지표 이후 표 단위로 행마다 깊이 검토할 수 있습니다.
-          </p>
-          <div className="hero-summary__signals">
-            <span>리포트 {reports.length}건</span>
-            <span>최신 발간일 {latestDate || '—'}</span>
-            <span>중앙 목표 도달일 {formatDays(overview.target_stats?.median_days_to_target)}</span>
+      <section className="hero overflow-hidden rounded-box border border-base-300 bg-base-100 shadow-sm">
+        <div className="hero-content grid w-full max-w-none gap-6 p-5 md:grid-cols-[minmax(0,1fr)_minmax(360px,.9fr)] md:p-8">
+          <div className="grid min-w-0 content-center gap-4">
+            <span className="badge badge-primary badge-soft w-fit tracking-[0.16em]">RESEARCH ARCHIVE</span>
+            <h1 className="max-w-4xl text-4xl font-black leading-[1.02] tracking-[-0.06em] text-base-content md:text-6xl">SMIC 리포트는 실제 가격으로 검증됩니다.</h1>
+            <p className="max-w-3xl text-lg leading-8 text-base-content/70">
+              발간 시점의 목표가, 이후 가격 경로, 목표 도달 여부를 한 화면에서 비교합니다.
+              리포트 아카이브가 아니라 사후 성과를 검토하는 검증 화면입니다.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <span className="badge badge-ghost">리포트 {reports.length}건</span>
+              <span className="badge badge-ghost">최신 발간일 {latestDate || '—'}</span>
+              <span className="badge badge-ghost">중앙 목표 도달일 {formatDays(overview.target_stats?.median_days_to_target)}</span>
+            </div>
           </div>
-        </div>
-        <div className="hero-summary__kpis">
+          <div className="grid min-w-0 gap-3 sm:grid-cols-2">
           <KpiTile
             label="목표가 적중률"
             value={<span className="display-num">{formatPercent(targetHitCount / Math.max(1, reports.length))}</span>}
@@ -54,6 +54,7 @@ export default function ReportsPage() {
             value={<span className="display-num">{formatDays(overview.target_stats?.avg_days_to_target)}</span>}
             delta={`중앙값 ${formatDays(overview.target_stats?.median_days_to_target)}`}
           />
+          </div>
         </div>
       </section>
 
@@ -62,11 +63,11 @@ export default function ReportsPage() {
         title="분포의 양 끝 — 최고 수익, 최저 수익, 최대 업사이드"
         caption="평균 지표만으로는 가려지는 꼬리 사례를 먼저 보여줍니다. 사후 검증의 강한 신호와 약한 신호가 모두 여기에 노출됩니다."
       >
-        <div className="grid two-col">
+        <div className="grid gap-4 lg:grid-cols-2">
           <RankingPanel title="가장 수익이 큰 리포트" rows={rankings.top_winners ?? []} metric="current" tone="good" />
           <RankingPanel title="가장 손실이 큰 리포트" rows={rankings.top_losers ?? []} metric="current" tone="bad" />
         </div>
-        <div style={{ marginTop: '1rem' }}>
+        <div className="mt-4">
           <RankingPanel title="가장 공격적인 목표가 (제시 업사이드)" rows={rankings.most_aggressive_targets ?? []} metric="upside" tone="warn" />
         </div>
       </Section>
@@ -94,10 +95,12 @@ function RankingPanel({
   tone: 'good' | 'bad' | 'warn' | 'accent';
 }) {
   return (
-    <article className="panel">
-      <h3>{title}</h3>
-      <div className="table-wrap" style={{ marginTop: '.65rem' }}>
-        <table>
+    <article className="card border border-base-300 bg-base-100 shadow-sm">
+      <div className="card-body gap-3 p-5">
+        <h3 className="card-title">{title}</h3>
+      </div>
+      <div className="overflow-x-auto border-t border-base-300">
+        <table className="table table-sm table-zebra">
           <thead>
             <tr>
               <th>회사</th>
@@ -113,21 +116,21 @@ function RankingPanel({
               return (
                 <tr key={row.report_id}>
                   <td>
-                    <Link href={`/reports/${row.symbol}`}>{row.company || row.symbol}</Link>
-                    <div className="muted" style={{ fontFamily: 'var(--mono)', fontSize: '.7rem' }}>{row.symbol}</div>
+                    <Link className="link link-hover font-bold" href={`/reports/${row.symbol}`}>{row.company || row.symbol}</Link>
+                    <div className="mt-1 font-mono text-xs text-base-content/50">{row.symbol}</div>
                   </td>
                   <td>{row.publication_date ?? row.date ?? '—'}</td>
-                  <td className={(value ?? 0) >= 0 ? 'good' : 'bad'} style={{ fontWeight: 700 }}>
+                  <td className={(value ?? 0) >= 0 ? 'text-success font-bold' : 'text-error font-bold'}>
                     {formatPercent(value)}
                   </td>
                   <td>{formatKrw(row.target_price_krw)}</td>
                   <td>
                     {(row.target_upside_at_pub ?? 0) <= 0 ? (
-                      <span className="pill tone-warn">비실행</span>
+                      <span className="badge badge-warning badge-soft badge-sm">비실행</span>
                     ) : row.target_hit ? (
-                      <span className={`pill tone-${tone === 'bad' ? 'bad' : 'good'}`}>도달</span>
+                      <span className={`badge badge-soft badge-sm ${tone === 'bad' ? 'badge-error' : 'badge-success'}`}>도달</span>
                     ) : (
-                      <span className="pill tone-accent">진행</span>
+                      <span className="badge badge-primary badge-soft badge-sm">진행</span>
                     )}
                   </td>
                 </tr>

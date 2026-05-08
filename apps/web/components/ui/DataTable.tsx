@@ -2,12 +2,12 @@ import type { ReactNode } from 'react';
 
 export function TableCard({ title, meta, children }: { title: string; meta?: ReactNode; children: ReactNode }) {
   return (
-    <div className="ledger-table-card">
-      <div className="ledger-table-card__head">
-        <h3>{title}</h3>
-        {meta ? <span>{meta}</span> : null}
+    <div className="ledger-table-card card bg-base-100 border border-base-300 shadow-sm">
+      <div className="ledger-table-card__head card-body gap-1 border-b border-base-300 p-4 md:p-5">
+        <h3 className="card-title text-base md:text-lg">{title}</h3>
+        {meta ? <span className="badge badge-ghost badge-sm w-fit">{meta}</span> : null}
       </div>
-      {children}
+      <div className="p-0">{children}</div>
     </div>
   );
 }
@@ -21,10 +21,10 @@ export function DataTable({
   compact?: boolean;
   className?: string;
 }) {
-  const classes = ['table-wrap', 'inset', 'data-table', compact ? 'compact-table' : '', className].filter(Boolean).join(' ');
+  const classes = ['table-wrap', 'overflow-x-auto', 'rounded-box', 'border', 'border-base-300', 'bg-base-100', 'shadow-sm', compact ? 'compact-table' : '', className].filter(Boolean).join(' ');
   return (
     <div className={classes}>
-      <table>{children}</table>
+      <table className={`table ${compact ? 'table-sm' : ''}`}>{children}</table>
     </div>
   );
 }
