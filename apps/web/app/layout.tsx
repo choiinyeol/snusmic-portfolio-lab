@@ -50,7 +50,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           </header>
           <main>{children}</main>
           <footer className="footer-note footer footer-center bg-base-200 text-base-content/60">
-            정적 자산만 표시합니다. 모든 숫자는 커밋된 CSV/JSON에서 직접 계산되며, 시장 주문이나 실시간 갱신은 하지 않습니다.
+            정적 자산만 표시합니다. 모든 숫자는 커밋된 CSV/JSON에서 직접 계산되며, 시장 주문이나 실시간 갱신은 하지
+            않습니다.
           </footer>
         </div>
       </body>

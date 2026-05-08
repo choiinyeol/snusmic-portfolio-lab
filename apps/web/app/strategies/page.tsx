@@ -4,7 +4,13 @@ import { StrategySummary } from '@/components/strategies/StrategySummary';
 import { KpiTile } from '@/components/ui/KpiTile';
 import { PageHero } from '@/components/ui/PageHero';
 import { Section } from '@/components/ui/Section';
-import { getEquityDaily, getParameterImportance, getPersonaLabel, getStrategyExperiment, getStrategyRuns } from '@/lib/artifacts';
+import {
+  getEquityDaily,
+  getParameterImportance,
+  getPersonaLabel,
+  getStrategyExperiment,
+  getStrategyRuns,
+} from '@/lib/artifacts';
 import { formatPercent } from '@/lib/format';
 
 export default function StrategiesPage() {
@@ -12,7 +18,9 @@ export default function StrategiesPage() {
   const importance = getParameterImportance();
   const bestRun = data.runs.find((run) => run.run_id === data.best_run_id) ?? data.runs[0];
   const chartSeries = buildStrategySeries(data.runs.slice(0, 3));
-  const riskNote = bestRun ? strategyRiskNote(bestRun.metrics.max_drawdown ?? bestRun.metrics.maxDrawdown) : '내보낸 전략이 없습니다.';
+  const riskNote = bestRun
+    ? strategyRiskNote(bestRun.metrics.max_drawdown ?? bestRun.metrics.maxDrawdown)
+    : '내보낸 전략이 없습니다.';
   const disclaimer = normalizeStrategyDisclaimer(data.disclaimer);
 
   return (
@@ -28,14 +36,34 @@ export default function StrategiesPage() {
         ]}
         actions={
           <>
-            <Link className="btn btn-sm btn-primary" href={bestRun ? `/strategies/${bestRun.run_id}` : '/strategies'}>최고 후보</Link>
-            <a className="btn btn-sm btn-outline" href="#strategy-board">리더보드</a>
+            <Link className="btn btn-sm btn-primary" href={bestRun ? `/strategies/${bestRun.run_id}` : '/strategies'}>
+              최고 후보
+            </Link>
+            <a className="btn btn-sm btn-outline" href="#strategy-board">
+              리더보드
+            </a>
           </>
         }
         kpis={
           <div className="grid min-w-0 gap-3 sm:grid-cols-2">
-            <KpiTile label="최고 후보" value={bestRun?.label ?? '—'} delta={bestRun ? `score ${formatPercent(bestRun.metrics.score)}` : '없음'} tone="good" />
-            <KpiTile label="최고 후보 MDD" value={formatPercent(typeof bestRun?.metrics.max_drawdown === 'number' ? bestRun.metrics.max_drawdown : null)} delta={riskNote} tone={(typeof bestRun?.metrics.max_drawdown === 'number' && bestRun.metrics.max_drawdown < -0.25) ? 'warn' : 'neutral'} />
+            <KpiTile
+              label="최고 후보"
+              value={bestRun?.label ?? '—'}
+              delta={bestRun ? `score ${formatPercent(bestRun.metrics.score)}` : '없음'}
+              tone="good"
+            />
+            <KpiTile
+              label="최고 후보 MDD"
+              value={formatPercent(
+                typeof bestRun?.metrics.max_drawdown === 'number' ? bestRun.metrics.max_drawdown : null,
+              )}
+              delta={riskNote}
+              tone={
+                typeof bestRun?.metrics.max_drawdown === 'number' && bestRun.metrics.max_drawdown < -0.25
+                  ? 'warn'
+                  : 'neutral'
+              }
+            />
           </div>
         }
       />
@@ -53,7 +81,10 @@ export default function StrategiesPage() {
           <article className="card border border-base-300 bg-base-100 shadow-sm">
             <div className="card-body gap-3 p-5">
               {importance.parameters.slice(0, 8).map((item) => (
-                <div className="grid gap-2 md:grid-cols-[minmax(120px,.35fr)_minmax(0,1fr)_auto] md:items-center" key={item.parameter}>
+                <div
+                  className="grid gap-2 md:grid-cols-[minmax(120px,.35fr)_minmax(0,1fr)_auto] md:items-center"
+                  key={item.parameter}
+                >
                   <span className="font-mono text-sm text-base-content/65">{item.parameter}</span>
                   <progress className="progress progress-primary" value={Math.max(0.01, item.importance)} max={1} />
                   <strong className="tabular-nums">{formatPercent(item.importance)}</strong>
@@ -66,9 +97,9 @@ export default function StrategiesPage() {
 
       <Section eyebrow="Leaderboard" title="전략 후보" id="strategy-board">
         <div className="grid gap-4 lg:grid-cols-2">
-          {data.runs.length ? data.runs.map((run) => (
-            <StrategySummary key={run.run_id} run={run} href={`/strategies/${run.run_id}`} />
-          )) : (
+          {data.runs.length ? (
+            data.runs.map((run) => <StrategySummary key={run.run_id} run={run} href={`/strategies/${run.run_id}`} />)
+          ) : (
             <div className="rounded-box border border-base-300 bg-base-100 p-5 text-sm text-base-content/65 shadow-sm">
               전략 아티팩트가 없습니다. 로컬 탐색/내보내기 스크립트를 실행한 뒤 JSON을 public artifacts에 복사하세요.
             </div>

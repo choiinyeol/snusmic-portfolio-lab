@@ -67,7 +67,9 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         cell: ({ row }) => (
           <div className="report-title-cell">
             <Link href={`/reports/${row.original.symbol}`}>{row.original.company}</Link>
-            <span className="text-xs text-base-content/55">{row.original.symbol} · {row.original.exchange || '—'}</span>
+            <span className="text-xs text-base-content/55">
+              {row.original.symbol} · {row.original.exchange || '—'}
+            </span>
           </div>
         ),
       },
@@ -75,7 +77,11 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         id: 'marketRegion',
         header: '시장',
         accessorFn: (report) => marketLabel(marketRegionForSymbol(report.symbol, report.exchange)),
-        cell: ({ row }) => <span className="badge badge-ghost badge-sm">{marketLabel(marketRegionForSymbol(row.original.symbol, row.original.exchange))}</span>,
+        cell: ({ row }) => (
+          <span className="badge badge-ghost badge-sm">
+            {marketLabel(marketRegionForSymbol(row.original.symbol, row.original.exchange))}
+          </span>
+        ),
       },
       { accessorKey: 'publicationDate', header: '게시일' },
       {
@@ -117,7 +123,9 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         cell: ({ row }) => {
           if (row.original.targetDirection === 'downside') {
             return row.original.targetHit ? (
-              <span className="badge badge-success badge-soft badge-sm">매도 적중 · {formatDays(row.original.daysToTarget)}</span>
+              <span className="badge badge-success badge-soft badge-sm">
+                매도 적중 · {formatDays(row.original.daysToTarget)}
+              </span>
             ) : (
               <span className="badge badge-warning badge-soft badge-sm">매도 의견 · 미달성</span>
             );
@@ -126,7 +134,9 @@ export function ReportsTable({ reports }: ReportsTableProps) {
             return <span className="badge badge-warning badge-soft badge-sm">이미 초과/비실행</span>;
           }
           return row.original.targetHit ? (
-            <span className="badge badge-success badge-soft badge-sm">달성 · {formatDays(row.original.daysToTarget)}</span>
+            <span className="badge badge-success badge-soft badge-sm">
+              달성 · {formatDays(row.original.daysToTarget)}
+            </span>
           ) : (
             <span className="badge badge-ghost badge-sm">미달성</span>
           );
@@ -166,7 +176,10 @@ export function ReportsTable({ reports }: ReportsTableProps) {
 
   return (
     <section className="report-table-panel card w-full min-w-0 rounded-box bg-base-100 border border-base-300 shadow-sm">
-      <div className="table-toolbar card-body sticky top-0 z-10 grid gap-3 rounded-t-box border-b border-base-300 bg-base-100/95 p-4 backdrop-blur md:grid-cols-[minmax(220px,1.3fr)_repeat(3,minmax(140px,.7fr))_auto]" aria-label="리포트 표 필터">
+      <div
+        className="table-toolbar card-body sticky top-0 z-10 grid gap-3 rounded-t-box border-b border-base-300 bg-base-100/95 p-4 backdrop-blur md:grid-cols-[minmax(220px,1.3fr)_repeat(3,minmax(140px,.7fr))_auto]"
+        aria-label="리포트 표 필터"
+      >
         <label>
           <span>검색</span>
           <input
@@ -178,15 +191,25 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         </label>
         <label>
           <span>거래소</span>
-          <select className="select select-sm select-bordered" value={exchangeFilter} onChange={(event) => setExchangeFilter(event.target.value)}>
+          <select
+            className="select select-sm select-bordered"
+            value={exchangeFilter}
+            onChange={(event) => setExchangeFilter(event.target.value)}
+          >
             {exchanges.map((exchange) => (
-              <option key={exchange} value={exchange}>{exchange === 'all' ? '전체' : exchange}</option>
+              <option key={exchange} value={exchange}>
+                {exchange === 'all' ? '전체' : exchange}
+              </option>
             ))}
           </select>
         </label>
         <label>
           <span>목표 달성</span>
-          <select className="select select-sm select-bordered" value={hitFilter} onChange={(event) => setHitFilter(event.target.value as HitFilter)}>
+          <select
+            className="select select-sm select-bordered"
+            value={hitFilter}
+            onChange={(event) => setHitFilter(event.target.value as HitFilter)}
+          >
             <option value="all">전체</option>
             <option value="hit">달성</option>
             <option value="open">미달성/진행</option>
@@ -194,24 +217,43 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         </label>
         <label>
           <span>현재 수익률</span>
-          <select className="select select-sm select-bordered" value={returnFilter} onChange={(event) => setReturnFilter(event.target.value as ReturnFilter)}>
+          <select
+            className="select select-sm select-bordered"
+            value={returnFilter}
+            onChange={(event) => setReturnFilter(event.target.value as ReturnFilter)}
+          >
             <option value="all">전체</option>
             <option value="positive">0% 이상</option>
             <option value="negative">0% 미만</option>
           </select>
         </label>
         <div className="download-actions">
-          <button className="btn btn-sm btn-outline" type="button" onClick={() => downloadCsv('snusmic-reports-all.csv', reports)}>
+          <button
+            className="btn btn-sm btn-outline"
+            type="button"
+            onClick={() => downloadCsv('snusmic-reports-all.csv', reports)}
+          >
             전체 CSV
           </button>
-          <button className="btn btn-sm btn-primary" type="button" onClick={() => downloadCsv('snusmic-reports-current.csv', filteredRows.map((row) => row.original))}>
+          <button
+            className="btn btn-sm btn-primary"
+            type="button"
+            onClick={() =>
+              downloadCsv(
+                'snusmic-reports-current.csv',
+                filteredRows.map((row) => row.original),
+              )
+            }
+          >
             현재 보기 CSV
           </button>
         </div>
       </div>
 
       <div className="table-meta flex flex-wrap justify-between gap-2 border-y border-base-300 bg-base-200/40 px-4 py-3 text-sm text-base-content/60">
-        <span>현재 {filteredRows.length.toLocaleString('ko-KR')}개 / 전체 {reports.length.toLocaleString('ko-KR')}개</span>
+        <span>
+          현재 {filteredRows.length.toLocaleString('ko-KR')}개 / 전체 {reports.length.toLocaleString('ko-KR')}개
+        </span>
         <span className="text-xs text-base-content/55">열 제목을 클릭해 정렬합니다.</span>
       </div>
 
@@ -297,6 +339,13 @@ function marketLabel(region: 'domestic' | 'overseas'): string {
 
 function marketRegionForSymbol(symbol: string, exchange?: string): 'domestic' | 'overseas' {
   const upperExchange = (exchange ?? '').toUpperCase();
-  if (symbol.endsWith('.KS') || symbol.endsWith('.KQ') || upperExchange === 'KRX' || upperExchange === 'KOSPI' || upperExchange === 'KOSDAQ') return 'domestic';
+  if (
+    symbol.endsWith('.KS') ||
+    symbol.endsWith('.KQ') ||
+    upperExchange === 'KRX' ||
+    upperExchange === 'KOSPI' ||
+    upperExchange === 'KOSDAQ'
+  )
+    return 'domestic';
   return 'overseas';
 }

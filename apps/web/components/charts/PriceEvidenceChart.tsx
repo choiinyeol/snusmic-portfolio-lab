@@ -80,11 +80,14 @@ export function PriceEvidenceChart({
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
   const candleData = useMemo(() => priceSeries.map(toCandlePoint), [priceSeries]);
   const volumeData = useMemo(() => priceSeries.map(toVolumePoint), [priceSeries]);
-  const movingAverageData = useMemo(() => ({
-    ma20: toMovingAverageData(priceSeries, 20),
-    ma60: toMovingAverageData(priceSeries, 60),
-    ma200: toMovingAverageData(priceSeries, 200),
-  }), [priceSeries]);
+  const movingAverageData = useMemo(
+    () => ({
+      ma20: toMovingAverageData(priceSeries, 20),
+      ma60: toMovingAverageData(priceSeries, 60),
+      ma200: toMovingAverageData(priceSeries, 200),
+    }),
+    [priceSeries],
+  );
   const priceByTime = useMemo(() => new Map(priceSeries.map((point) => [point.time, point])), [priceSeries]);
   const lastBar = useMemo(() => activeBarFromPoint(priceSeries.at(-1)), [priceSeries]);
   const [hoverBar, setHoverBar] = useState<OhlcState | null>(null);
@@ -143,7 +146,7 @@ export function PriceEvidenceChart({
         alignLabels: true,
         minimumWidth: 82,
         ticksVisible: true,
-        scaleMargins: { top: 0.10, bottom: 0.06 },
+        scaleMargins: { top: 0.1, bottom: 0.06 },
       },
       timeScale: { borderColor: '#eaedf2', timeVisible: true, secondsVisible: false, rightOffset: 8, barSpacing: 8 },
     });
@@ -161,7 +164,7 @@ export function PriceEvidenceChart({
       priceFormat: priceFormatForCurrency(currency),
       autoscaleInfoProvider,
     });
-    candleSeries.priceScale().applyOptions({ scaleMargins: { top: 0.10, bottom: 0.06 } });
+    candleSeries.priceScale().applyOptions({ scaleMargins: { top: 0.1, bottom: 0.06 } });
 
     candleSeries.setData(candleData);
 
@@ -196,13 +199,17 @@ export function PriceEvidenceChart({
     });
     ma200Series.setData(movingAverageData.ma200);
 
-    const volumeSeries = chart.addSeries(HistogramSeries, {
-      color: 'rgba(49, 130, 246, 0.28)',
-      priceFormat: { type: 'volume' },
-      lastValueVisible: false,
-      priceLineVisible: false,
-      title: '거래량',
-    }, 1);
+    const volumeSeries = chart.addSeries(
+      HistogramSeries,
+      {
+        color: 'rgba(49, 130, 246, 0.28)',
+        priceFormat: { type: 'volume' },
+        lastValueVisible: false,
+        priceLineVisible: false,
+        title: '거래량',
+      },
+      1,
+    );
     volumeSeries.priceScale().applyOptions({ scaleMargins: { top: 0.18, bottom: 0.06 }, ticksVisible: false });
     volumeSeries.setData(volumeData);
     chart.panes()[0]?.setHeight(450);
@@ -264,20 +271,42 @@ export function PriceEvidenceChart({
       chart.unsubscribeCrosshairMove(handleCrosshairMove);
       chart.remove();
     };
-  }, [candleData, chartMarkers, currency, entryPrice, movingAverageData, priceByTime, priceSeries.length, targetPrice, volumeData]);
+  }, [
+    candleData,
+    chartMarkers,
+    currency,
+    entryPrice,
+    movingAverageData,
+    priceByTime,
+    priceSeries.length,
+    targetPrice,
+    volumeData,
+  ]);
 
   if (priceSeries.length === 0) {
-    return <div className="rounded-box border border-base-300 bg-base-100 p-5 text-sm text-base-content/65 shadow-sm">이 리포트 종목의 가격 경로를 찾을 수 없습니다.</div>;
+    return (
+      <div className="rounded-box border border-base-300 bg-base-100 p-5 text-sm text-base-content/65 shadow-sm">
+        이 리포트 종목의 가격 경로를 찾을 수 없습니다.
+      </div>
+    );
   }
   return (
     <div className="chart-shell">
       {activeBar ? <OhlcLegend bar={activeBar} currency={currency} targetPrice={targetPrice} /> : null}
-      <div ref={ref} className="chart-box chart-box-fixed" aria-label="목표가 기준선, OHLC 캔들, 거래량, 발간·목표도달·고점·저점 마커가 포함된 가격 경로" />
+      <div
+        ref={ref}
+        className="chart-box chart-box-fixed"
+        aria-label="목표가 기준선, OHLC 캔들, 거래량, 발간·목표도달·고점·저점 마커가 포함된 가격 경로"
+      />
       {tooltip ? (
         <div className="chart-tooltip" style={{ left: tooltip.x, top: tooltip.y }}>
           <div className="tooltip-date">{tooltip.time}</div>
-          <div>O {formatChartPrice(tooltip.open, currency)} · H {formatChartPrice(tooltip.high, currency)}</div>
-          <div>L {formatChartPrice(tooltip.low, currency)} · C {formatChartPrice(tooltip.close, currency)}</div>
+          <div>
+            O {formatChartPrice(tooltip.open, currency)} · H {formatChartPrice(tooltip.high, currency)}
+          </div>
+          <div>
+            L {formatChartPrice(tooltip.low, currency)} · C {formatChartPrice(tooltip.close, currency)}
+          </div>
           <div>거래량 {formatVolume(tooltip.volume)}</div>
           <div>목표가 {formatChartPrice(tooltip.targetPrice, currency)}</div>
           <div className={tooltip.targetGapPct !== null && tooltip.targetGapPct <= 0 ? 'good' : 'warn'}>
@@ -343,9 +372,13 @@ function OhlcLegend({ bar, currency, targetPrice }: { bar: OhlcState; currency: 
         <span>H {formatChartPrice(bar.high, currency)}</span>
         <span>L {formatChartPrice(bar.low, currency)}</span>
         <span>C {formatChartPrice(bar.close, currency)}</span>
-        <span className={tone}>{formatChartPrice(change, currency)} ({formatPercent(changePct)})</span>
+        <span className={tone}>
+          {formatChartPrice(change, currency)} ({formatPercent(changePct)})
+        </span>
         <span>Vol {formatVolume(bar.volume)}</span>
-        <span>목표 {formatChartPrice(targetPrice, currency)} · Gap {formatPercent(gapPct)}</span>
+        <span>
+          목표 {formatChartPrice(targetPrice, currency)} · Gap {formatPercent(gapPct)}
+        </span>
       </div>
     </div>
   );
@@ -361,13 +394,22 @@ function priceFormatForCurrency(currency: string): PriceFormatCustom {
   };
 }
 
-
-function buildMarkers(publicationDate: string, targetHitDate: string | null, evidenceMarkers: EvidenceMarker[]): SeriesMarker<Time>[] {
+function buildMarkers(
+  publicationDate: string,
+  targetHitDate: string | null,
+  evidenceMarkers: EvidenceMarker[],
+): SeriesMarker<Time>[] {
   const markerByKey = new Map<string, SeriesMarker<Time>>();
   const addMarker = (marker: SeriesMarker<Time>) => markerByKey.set(`${String(marker.time)}-${marker.text}`, marker);
   addMarker({ time: publicationDate as Time, position: 'belowBar', color: '#f29423', shape: 'arrowUp', text: '발간' });
   if (targetHitDate) {
-    addMarker({ time: targetHitDate as Time, position: 'aboveBar', color: '#16a368', shape: 'circle', text: '목표 도달' });
+    addMarker({
+      time: targetHitDate as Time,
+      position: 'aboveBar',
+      color: '#16a368',
+      shape: 'circle',
+      text: '목표 도달',
+    });
   }
   for (const marker of evidenceMarkers) {
     const markerConfig = markerStyle(marker);
@@ -397,17 +439,28 @@ function activeBarFromPoint(point: PricePoint | undefined): OhlcState | null {
 }
 
 function readCrosshairCandle(seriesData: unknown, fallback: PricePoint | undefined): Omit<CandlePoint, 'time'> | null {
-  const closeRaw = isObjectWithNumber(seriesData, 'close') ? Number(seriesData.close) : (fallback?.close ?? fallback?.value);
+  const closeRaw = isObjectWithNumber(seriesData, 'close')
+    ? Number(seriesData.close)
+    : (fallback?.close ?? fallback?.value);
   const openRaw = isObjectWithNumber(seriesData, 'open') ? Number(seriesData.open) : (fallback?.open ?? closeRaw);
   const highRaw = isObjectWithNumber(seriesData, 'high') ? Number(seriesData.high) : (fallback?.high ?? closeRaw);
   const lowRaw = isObjectWithNumber(seriesData, 'low') ? Number(seriesData.low) : (fallback?.low ?? closeRaw);
   if (closeRaw === undefined || openRaw === undefined || highRaw === undefined || lowRaw === undefined) return null;
-  if (!Number.isFinite(closeRaw) || !Number.isFinite(openRaw) || !Number.isFinite(highRaw) || !Number.isFinite(lowRaw)) return null;
+  if (!Number.isFinite(closeRaw) || !Number.isFinite(openRaw) || !Number.isFinite(highRaw) || !Number.isFinite(lowRaw))
+    return null;
   return { open: openRaw, high: highRaw, low: lowRaw, close: closeRaw };
 }
 
-function isObjectWithNumber(value: unknown, key: 'open' | 'high' | 'low' | 'close'): value is Record<typeof key, number> {
-  return typeof value === 'object' && value !== null && key in value && Number.isFinite(Number((value as Record<typeof key, unknown>)[key]));
+function isObjectWithNumber(
+  value: unknown,
+  key: 'open' | 'high' | 'low' | 'close',
+): value is Record<typeof key, number> {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    key in value &&
+    Number.isFinite(Number((value as Record<typeof key, unknown>)[key]))
+  );
 }
 
 function markerStyle(marker: EvidenceMarker): MarkerStyle {
@@ -418,7 +471,6 @@ function markerStyle(marker: EvidenceMarker): MarkerStyle {
       return { color: '#3182f6', position: 'aboveBar', shape: 'arrowDown' };
     case 'trough':
       return { color: '#ef4452', position: 'belowBar', shape: 'arrowUp' };
-    case 'publication':
     default:
       return { color: '#f29423', position: 'belowBar', shape: 'arrowUp' };
   }
@@ -473,8 +525,10 @@ function currencySymbol(code: string): string {
 
 function formatVolume(value: number | null): string {
   if (value === null || !Number.isFinite(value)) return '—';
-  if (Math.abs(value) >= 1_000_000_000) return `${(value / 1_000_000_000).toLocaleString('ko-KR', { maximumFractionDigits: 1 })}B`;
-  if (Math.abs(value) >= 1_000_000) return `${(value / 1_000_000).toLocaleString('ko-KR', { maximumFractionDigits: 1 })}M`;
+  if (Math.abs(value) >= 1_000_000_000)
+    return `${(value / 1_000_000_000).toLocaleString('ko-KR', { maximumFractionDigits: 1 })}B`;
+  if (Math.abs(value) >= 1_000_000)
+    return `${(value / 1_000_000).toLocaleString('ko-KR', { maximumFractionDigits: 1 })}M`;
   if (Math.abs(value) >= 1_000) return `${(value / 1_000).toLocaleString('ko-KR', { maximumFractionDigits: 1 })}K`;
   return value.toLocaleString('ko-KR', { maximumFractionDigits: 0 });
 }

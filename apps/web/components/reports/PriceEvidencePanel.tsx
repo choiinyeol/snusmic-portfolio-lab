@@ -58,7 +58,11 @@ export function PriceEvidencePanel({ report, prices, pathEvidence, status }: Pro
         <KpiTile
           label="현재가"
           value={<span className="tabular-nums">{formatAssetPrice(report.lastCloseNative, report)}</span>}
-          delta={report.lastCloseDate ? `${report.lastCloseDate} · ${formatPercent(report.currentReturn)}` : formatPercent(report.currentReturn)}
+          delta={
+            report.lastCloseDate
+              ? `${report.lastCloseDate} · ${formatPercent(report.currentReturn)}`
+              : formatPercent(report.currentReturn)
+          }
           tone={(report.currentReturn ?? 0) >= 0 ? 'good' : 'bad'}
         />
         <KpiTile
@@ -72,9 +76,17 @@ export function PriceEvidencePanel({ report, prices, pathEvidence, status }: Pro
             <span className="text-xs font-semibold uppercase tracking-[0.18em] text-base-content/50">Path range</span>
             <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-sm">
               <dt className="text-base-content/60">관측 고점</dt>
-              <dd className="text-right tabular-nums text-base-content">{pathEvidence.peak ? `${formatAssetPrice(pathEvidence.peak.value, report)} · ${pathEvidence.peak.time}` : '—'}</dd>
+              <dd className="text-right tabular-nums text-base-content">
+                {pathEvidence.peak
+                  ? `${formatAssetPrice(pathEvidence.peak.value, report)} · ${pathEvidence.peak.time}`
+                  : '—'}
+              </dd>
               <dt className="text-base-content/60">관측 저점</dt>
-              <dd className="text-right tabular-nums text-base-content">{pathEvidence.trough ? `${formatAssetPrice(pathEvidence.trough.value, report)} · ${pathEvidence.trough.time}` : '—'}</dd>
+              <dd className="text-right tabular-nums text-base-content">
+                {pathEvidence.trough
+                  ? `${formatAssetPrice(pathEvidence.trough.value, report)} · ${pathEvidence.trough.time}`
+                  : '—'}
+              </dd>
             </dl>
           </div>
         </article>
