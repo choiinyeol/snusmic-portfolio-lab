@@ -1058,21 +1058,6 @@ table tbody tr td:last-child { padding-right: 1rem; }
 .kpi-tile.tone-accent .kpi-tile__delta { color: var(--accent-strong); }
 
 /* ───────────────────────────────────────────────────────────────────────
-   Sparkline — pure SVG, used inline in KPI tiles.
-   ─────────────────────────────────────────────────────────────────── */
-.sparkline { display: block; width: 100%; height: auto; }
-.sparkline--empty { height: 32px; background: var(--surface-sunken); border-radius: 6px; }
-.sparkline__stroke { fill: none; stroke: var(--accent); stroke-width: 1.6; vector-effect: non-scaling-stroke; }
-.sparkline__fill { fill: rgba(49, 130, 246, .12); stroke: none; }
-.sparkline__dot { fill: var(--accent); }
-.sparkline--good .sparkline__stroke { stroke: var(--good); }
-.sparkline--good .sparkline__fill { fill: rgba(22, 163, 104, .15); }
-.sparkline--good .sparkline__dot { fill: var(--good); }
-.sparkline--bad .sparkline__stroke { stroke: var(--bad); }
-.sparkline--bad .sparkline__fill { fill: rgba(239, 68, 82, .12); }
-.sparkline--bad .sparkline__dot { fill: var(--bad); }
-
-/* ───────────────────────────────────────────────────────────────────────
    Tabs — segmented control used to host portfolio sub-views and other
    "this is one thing in three modes" patterns.
    ─────────────────────────────────────────────────────────────────── */

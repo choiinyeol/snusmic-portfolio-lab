@@ -535,7 +535,9 @@ def _build_report_rows(
             caveats.append("price_scale_adjusted_target")
         target_upside_at_pub = _number(perf.get("target_upside_at_pub"))
         if price_currency == "KRW":
-            entry_price_native = entry_price_krw or _number(row.get("report_current_price_krw"))
+            entry_price_native = (
+                entry_price_native or _number(row.get("report_current_price_krw")) or entry_price_krw
+            )
         elif entry_price_native is None:
             entry_price_native = _infer_native_entry_from_target(target_price_native, target_upside_at_pub)
             if entry_price_native is not None:
