@@ -261,7 +261,6 @@ ul, ol { color: var(--muted); line-height: 1.7; }
 .terminal-link,
 .download-actions button,
 .pagination-bar button,
-.strategy-tabs button,
 .segmented-control button,
 .table-toolbar button {
   display: inline-flex;
@@ -364,8 +363,7 @@ select:focus-visible {
   box-shadow: 0 0 0 4px rgba(49, 130, 246, .14);
 }
 
-/* ─────────────────────  Tabs (segmented control)  ───────────────────── */
-.strategy-tabs,
+/* ─────────────────────  Segmented control (legacy non-tab pills)  ───────────────────── */
 .segmented-control {
   display: flex;
   flex-wrap: wrap;
@@ -377,9 +375,7 @@ select:focus-visible {
   width: max-content;
   max-width: 100%;
 }
-.strategy-tabs.compact,
 .segmented-control.compact { margin: .65rem 0; }
-.strategy-tabs button,
 .segmented-control button {
   border: 0;
   border-radius: var(--radius-pill);
@@ -390,10 +386,7 @@ select:focus-visible {
   font-size: .86rem;
   box-shadow: none;
 }
-.strategy-tabs button:hover,
 .segmented-control button:hover { color: var(--ink); background: rgba(255, 255, 255, .65); border-color: transparent; }
-.strategy-tabs button.active,
-.strategy-tabs button[aria-pressed="true"],
 .segmented-control button.active,
 .segmented-control button[aria-pressed="true"] {
   color: var(--accent-strong);
@@ -401,7 +394,6 @@ select:focus-visible {
   border-color: transparent;
   box-shadow: var(--shadow-sm);
 }
-.strategy-tabs.compact button,
 .segmented-control.compact button {
   padding: .42rem .8rem;
   font-size: .8rem;

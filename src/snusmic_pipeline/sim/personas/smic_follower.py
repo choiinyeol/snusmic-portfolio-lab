@@ -35,6 +35,8 @@ def simulate_smic_follower(
     reports: pd.DataFrame,
     cashflows: list[CashFlowEvent],
     trading_dates: list[date],
+    *,
+    expiry_days: int | None = None,
 ) -> PersonaRunOutput:
     return _simulate_follower(
         persona=config.persona_name,
@@ -48,6 +50,7 @@ def simulate_smic_follower(
         cashflows=cashflows,
         trading_dates=trading_dates,
         stop_loss_hook=None,
+        expiry_days=expiry_days,
     )
 
 
@@ -69,12 +72,18 @@ def _simulate_follower(
     cashflows: list[CashFlowEvent],
     trading_dates: list[date],
     stop_loss_hook,
+    expiry_days: int | None = None,
 ) -> PersonaRunOutput:
     """Engine shared by SMIC followers v1 and v2.
 
     ``stop_loss_hook`` is ``None`` for the true believer; v2 supplies a
     callable taking ``(account, day, board, reports, follower_state)`` that
     sells positions matching its rules and updates state.
+
+    ``expiry_days`` enforces the report's product-level validity window: if
+    the earliest open report on a held symbol is older than this many days,
+    the position is sold at the day's close before any other rule fires.
+    Pass ``None`` (or 0) to disable the engine-level expiry sweep.
     """
     account = Account(persona=persona, fees=fees)
     cashflow_by_date: dict[date, float] = {e.date: e.amount_krw for e in cashflows}
@@ -101,6 +110,8 @@ def _simulate_follower(
         deposit_today = cashflow_by_date.get(day, 0.0)
         if deposit_today > 0:
             account.deposit(day, deposit_today)
+        if expiry_days and expiry_days > 0:
+            _expire_stale_positions(account, day, board, state, expiry_days)
         if stop_loss_hook is not None:
             stop_loss_hook(account, day, board, reports, state)
         _check_target_hits(account, day, board, target_hit_multiplier, state)
@@ -188,6 +199,38 @@ def _rebalance_days(trading_dates: list[date], cadence: str) -> set[date]:
             seen_q.setdefault((d.year, (d.month - 1) // 3), d)
         return set(seen_q.values())
     raise ValueError(f"unknown follower cadence: {cadence}")
+
+
+def _expire_stale_positions(
+    account: Account,
+    day: date,
+    board: PriceBoard,
+    state: FollowerState,
+    expiry_days: int,
+) -> None:
+    """Sell any held symbol whose earliest open report is past its expiry.
+
+    Mirrors the report-level expiry applied in ``compute_report_performance``:
+    once a report is older than ``expiry_days`` and never resolved by a
+    target hit, the position is no longer the follower's responsibility.
+    Mark the symbol stopped-out so a strictly newer report is required to
+    re-enter — same convention as v2's other stop-loss rules.
+    """
+    for symbol in list(account.holdings):
+        lot = account.holdings[symbol]
+        if lot.qty <= 0:
+            continue
+        earliest_pub = state.earliest_publication(symbol)
+        if earliest_pub is None:
+            continue
+        if (day - earliest_pub).days < expiry_days:
+            continue
+        close = board.asof(day, symbol)
+        if close is None:
+            continue
+        account.sell_all(day, symbol, close, "stop_loss_report_age")
+        state.close_reports(symbol)
+        state.stopped_out[symbol] = day
 
 
 def _check_target_hits(
