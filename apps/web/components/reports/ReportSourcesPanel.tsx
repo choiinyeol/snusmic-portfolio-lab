@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { ReportRow } from '@/lib/artifacts';
 import type { KoreanInvestmentMemo } from '@/lib/report-view-model';
 
@@ -11,48 +12,55 @@ type Props = {
 
 export function ReportSourcesPanel({ siblingReports, memo, snippet, markdownHref, pdfHref }: Props) {
   return (
-    <>
-      <div className="grid two-col">
-        <article className="dossier-card">
-          <span className="dossier-card__label">투자 메모</span>
-          <p>{memo.summary}</p>
-          <ul>
+    <div className="grid gap-4">
+      <div className="grid gap-4 lg:grid-cols-2">
+        <SourcesCard label="투자 메모">
+          <p className="text-sm leading-relaxed text-base-content/75">{memo.summary}</p>
+          <ul className="grid gap-1.5 text-sm leading-relaxed text-base-content/75 marker:text-base-content/40 ml-4 list-disc">
             {memo.bullets.map((item) => (
-              <li key={item.label}><strong>{item.label}.</strong> {item.text}</li>
+              <li key={item.label}><strong className="text-base-content">{item.label}.</strong> {item.text}</li>
             ))}
           </ul>
-        </article>
+        </SourcesCard>
 
-        <article className="dossier-card">
-          <span className="dossier-card__label">추출 마크다운</span>
+        <SourcesCard label="추출 마크다운">
           <div className="markdown-snippet">{snippet}</div>
-        </article>
+        </SourcesCard>
       </div>
 
-      <div className="grid two-col source-history-grid">
-        <article className="dossier-card">
-          <span className="dossier-card__label">동일 티커 발간 이력</span>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <SourcesCard label="동일 티커 발간 이력">
           {siblingReports.length ? (
-            <ul>
+            <ul className="grid gap-1.5 text-sm leading-relaxed text-base-content/75 ml-4 list-disc">
               {siblingReports.map((item) => (
                 <li key={item.reportId}>
-                  <span className="muted source-date">{item.publicationDate}</span> · {item.title}
+                  <span className="font-mono text-xs text-base-content/55">{item.publicationDate}</span> · {item.title}
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="muted">해당 티커의 다른 SMIC 리포트는 아카이브에 없습니다.</p>
+            <p className="text-sm text-base-content/55">해당 티커의 다른 SMIC 리포트는 아카이브에 없습니다.</p>
           )}
-        </article>
+        </SourcesCard>
 
-        <article className="dossier-card">
-          <span className="dossier-card__label">원본 자료</span>
-          <ul>
-            <li><a href={markdownHref}>GitHub Markdown</a></li>
-            {pdfHref ? <li><a href={pdfHref}>GitHub PDF</a></li> : null}
+        <SourcesCard label="원본 자료">
+          <ul className="grid gap-1.5 text-sm">
+            <li><a className="link link-primary" href={markdownHref}>GitHub Markdown</a></li>
+            {pdfHref ? <li><a className="link link-primary" href={pdfHref}>GitHub PDF</a></li> : null}
           </ul>
-        </article>
+        </SourcesCard>
       </div>
-    </>
+    </div>
+  );
+}
+
+function SourcesCard({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <article className="card border border-base-300 bg-base-100 shadow-sm">
+      <div className="card-body gap-3 p-5">
+        <span className="text-xs font-semibold uppercase tracking-[0.18em] text-base-content/55">{label}</span>
+        {children}
+      </div>
+    </article>
   );
 }

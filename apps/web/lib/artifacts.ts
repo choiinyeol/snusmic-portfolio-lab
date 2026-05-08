@@ -6,8 +6,6 @@ const repoRoot = path.resolve(/* turbopackIgnore: true */ process.cwd(), '../..'
 
 type RawReport = Record<string, unknown>;
 
-type CsvRow = Record<string, string>;
-
 export type ReportRow = {
   reportId: string;
   symbol: string;
@@ -296,36 +294,6 @@ function readJson<T>(relativePath: string, fallback: T): T {
   const pathName = fullPath(relativePath);
   if (!fs.existsSync(pathName)) return fallback;
   return JSON.parse(fs.readFileSync(pathName, 'utf8')) as T;
-}
-
-function parseCsv(text: string): CsvRow[] {
-  const rows: string[][] = [];
-  let field = '';
-  let row: string[] = [];
-  let inQuotes = false;
-  for (let index = 0; index < text.length; index += 1) {
-    const char = text[index];
-    const next = text[index + 1];
-    if (char === '"') {
-      if (inQuotes && next === '"') { field += '"'; index += 1; } else { inQuotes = !inQuotes; }
-      continue;
-    }
-    if (char === ',' && !inQuotes) { row.push(field); field = ''; continue; }
-    if ((char === '\n' || char === '\r') && !inQuotes) {
-      if (char === '\r' && next === '\n') index += 1;
-      row.push(field);
-      if (row.some((cell) => cell.length > 0)) rows.push(row);
-      row = []; field = ''; continue;
-    }
-    field += char;
-  }
-  if (field.length > 0 || row.length > 0) {
-    row.push(field);
-    if (row.some((cell) => cell.length > 0)) rows.push(row);
-  }
-  const [headers, ...body] = rows;
-  if (!headers) return [];
-  return body.map((cells) => Object.fromEntries(headers.map((header, index) => [header, cells[index] ?? ''])));
 }
 
 function num(value: unknown): number | null {

@@ -165,8 +165,8 @@ export function ReportsTable({ reports }: ReportsTableProps) {
   });
 
   return (
-    <section className="report-table-panel card w-full min-w-0 overflow-hidden bg-base-100 border border-base-300 shadow-sm">
-      <div className="table-toolbar card-body grid gap-3 p-4 md:grid-cols-[minmax(220px,1.3fr)_repeat(3,minmax(140px,.7fr))_auto]" aria-label="리포트 표 필터">
+    <section className="report-table-panel card w-full min-w-0 rounded-box bg-base-100 border border-base-300 shadow-sm">
+      <div className="table-toolbar card-body sticky top-0 z-10 grid gap-3 rounded-t-box border-b border-base-300 bg-base-100/95 p-4 backdrop-blur md:grid-cols-[minmax(220px,1.3fr)_repeat(3,minmax(140px,.7fr))_auto]" aria-label="리포트 표 필터">
         <label>
           <span>검색</span>
           <input

@@ -60,6 +60,7 @@ type LinePoint = { time: Time; value: number };
 type Props = {
   priceSeries: PricePoint[];
   targetPrice: number | null;
+  entryPrice?: number | null;
   currency?: string;
   publicationDate: string;
   targetHitDate: string | null;
@@ -69,6 +70,7 @@ type Props = {
 export function PriceEvidenceChart({
   priceSeries,
   targetPrice,
+  entryPrice = null,
   currency = 'KRW',
   publicationDate,
   targetHitDate,
@@ -98,14 +100,14 @@ export function PriceEvidenceChart({
     const autoscaleInfoProvider: AutoscaleInfoProvider = (original) => {
       const info = original();
       if (!info?.priceRange) return info;
-      const minValue = Math.min(
+      const anchors = [
         info.priceRange.minValue,
-        isFinitePrice(targetPrice) ? targetPrice : info.priceRange.minValue,
-      );
-      const maxValue = Math.max(
         info.priceRange.maxValue,
-        isFinitePrice(targetPrice) ? targetPrice : info.priceRange.maxValue,
-      );
+        ...(isFinitePrice(targetPrice) ? [targetPrice] : []),
+        ...(isFinitePrice(entryPrice) ? [entryPrice] : []),
+      ];
+      const minValue = Math.min(...anchors);
+      const maxValue = Math.max(...anchors);
       const span = Math.max(maxValue - minValue, Math.abs(maxValue) * 0.02, Math.abs(minValue) * 0.02, 1);
       const paddedMin = minValue >= 0 ? Math.max(0, minValue - span * 0.04) : minValue - span * 0.04;
       return {
@@ -213,7 +215,17 @@ export function PriceEvidenceChart({
         lineWidth: 2,
         lineStyle: LineStyle.Dashed,
         axisLabelVisible: true,
-        title: '',
+        title: '목표',
+      });
+    }
+    if (isFinitePrice(entryPrice)) {
+      candleSeries.createPriceLine({
+        price: entryPrice,
+        color: '#f29423',
+        lineWidth: 1,
+        lineStyle: LineStyle.Dotted,
+        axisLabelVisible: true,
+        title: '발간',
       });
     }
 
@@ -252,7 +264,7 @@ export function PriceEvidenceChart({
       chart.unsubscribeCrosshairMove(handleCrosshairMove);
       chart.remove();
     };
-  }, [candleData, chartMarkers, currency, movingAverageData, priceByTime, priceSeries.length, targetPrice, volumeData]);
+  }, [candleData, chartMarkers, currency, entryPrice, movingAverageData, priceByTime, priceSeries.length, targetPrice, volumeData]);
 
   if (priceSeries.length === 0) {
     return <div className="panel chart-box">이 리포트 종목의 가격 경로를 찾을 수 없습니다.</div>;
