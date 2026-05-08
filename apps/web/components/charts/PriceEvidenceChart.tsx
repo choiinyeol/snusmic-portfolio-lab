@@ -267,7 +267,7 @@ export function PriceEvidenceChart({
   }, [candleData, chartMarkers, currency, entryPrice, movingAverageData, priceByTime, priceSeries.length, targetPrice, volumeData]);
 
   if (priceSeries.length === 0) {
-    return <div className="panel chart-box">이 리포트 종목의 가격 경로를 찾을 수 없습니다.</div>;
+    return <div className="rounded-box border border-base-300 bg-base-100 p-5 text-sm text-base-content/65 shadow-sm">이 리포트 종목의 가격 경로를 찾을 수 없습니다.</div>;
   }
   return (
     <div className="chart-shell">

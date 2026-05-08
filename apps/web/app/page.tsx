@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { KpiTile } from '@/components/ui/KpiTile';
+import { PageHero } from '@/components/ui/PageHero';
 import { Section } from '@/components/ui/Section';
 import { Sparkline } from '@/components/ui/Sparkline';
 import {
@@ -44,59 +45,49 @@ export default function DashboardPage() {
 
   return (
     <>
-      <section className="hero min-h-[520px] overflow-hidden rounded-box border border-base-300 bg-base-100 shadow-sm" aria-labelledby="dashboard-title">
-        <div className="hero-content grid w-full max-w-none gap-8 p-5 md:grid-cols-[minmax(0,1.18fr)_minmax(340px,.82fr)] md:p-8 xl:p-10">
-          <div className="grid content-center gap-5">
-            <div className="badge badge-primary badge-soft w-fit tracking-[0.18em]">RESEARCH VERIFICATION</div>
-            <div className="grid gap-3">
-              <h1 id="dashboard-title" className="max-w-5xl text-4xl font-black leading-[0.98] tracking-[-0.06em] text-base-content md:text-6xl">
-                리포트가 실제 성과로 이어졌는지, 포트폴리오 기준으로 확인하세요.
-              </h1>
-              <p className="max-w-3xl text-lg leading-8 text-base-content/70">
-                SMIC 리포트의 목표가 도달 여부, 현재 보유 종목, 전략 백테스트, 외화 자산 가격을 연결해 보여주는 리서치 검증 대시보드입니다. 수익률만 보여주지 않고 근거·검증·리스크를 함께 봅니다.
-              </p>
-            </div>
-            <div className="grid gap-2 sm:flex sm:flex-wrap" aria-label="주요 페이지 이동">
-              <Link className="btn btn-primary w-full sm:w-auto" href="/portfolio">현재 포트폴리오 보기</Link>
-              <Link className="btn btn-outline w-full sm:w-auto" href="/reports">리포트 검증 보기</Link>
-              <Link className="btn btn-ghost w-full sm:w-auto" href="/strategies">전략 백테스트 보기</Link>
-            </div>
-            <div className="stats stats-vertical w-full border border-base-300 bg-base-200/60 shadow-sm sm:stats-horizontal">
-              <div className="stat py-4"><div className="stat-title">기준일</div><div className="stat-value text-base">{formatDateKo(lastUpdated)}</div></div>
-              <div className="stat py-4"><div className="stat-title">보유</div><div className="stat-value text-base">{holdings.length}종목</div></div>
-              <div className="stat py-4"><div className="stat-title">외화</div><div className="stat-value text-base">{overseasCount}종목</div></div>
-              <div className="stat py-4"><div className="stat-title">전략</div><div className="stat-value text-base">{getPersonaLabel(PERSONA_PRIMARY)}</div></div>
-            </div>
-          </div>
+      <PageHero
+        eyebrow="DASHBOARD"
+        title="포트폴리오"
+        badges={[
+          { label: '기준일', value: formatDateKo(lastUpdated) },
+          { label: '보유', value: `${holdings.length}종목` },
+          { label: '외화', value: `${overseasCount}종목` },
+          { label: '전략', value: getPersonaLabel(PERSONA_PRIMARY) },
+        ]}
+        actions={
+          <>
+            <Link className="btn btn-sm btn-primary" href="/portfolio">포트폴리오</Link>
+            <Link className="btn btn-sm btn-outline" href="/reports">리포트</Link>
+            <Link className="btn btn-sm btn-ghost" href="/strategies">전략</Link>
+          </>
+        }
+      />
 
-          <aside className="card bg-base-200/70 shadow-sm">
-            <div className="card-body gap-5">
-              <div className="flex items-center justify-between gap-3">
-                <span className="font-semibold text-base-content/65">현재 계좌 스냅샷</span>
-                <span className={`badge ${trend.tone === 'good' ? 'badge-success' : trend.tone === 'bad' ? 'badge-error' : 'badge-warning'} badge-soft`}>{trend.mode}</span>
-              </div>
-              <div>
-                <div className="text-5xl font-black tracking-[-0.06em] text-base-content">{formatKrw(portfolio.marketValue)}</div>
-                <div className={`mt-2 font-bold ${portfolio.unrealizedPnl >= 0 ? 'text-success' : 'text-error'}`}>
-                  {formatKrw(portfolio.unrealizedPnl)} · {formatPercent(portfolio.unrealizedReturn)}
-                </div>
-              </div>
-              <Sparkline values={equitySpark} height={64} tone={trend.tone === 'bad' ? 'bad' : trend.tone === 'good' ? 'good' : 'accent'} />
-              <div className="grid grid-cols-2 gap-3">
-                <Metric label="MWR" value={formatPercent(persona?.moneyWeightedReturn ?? persona?.irr)} />
-                <Metric label="MDD" value={formatPercent(persona?.maxDrawdown)} />
-                <Metric label="Top5 집중" value={formatPercent(portfolio.top5Weight)} />
-                <Metric label="목표 적중" value={formatPercent(overview.target_stats?.target_hit_rate)} />
-              </div>
+      <article className="card border border-base-300 bg-base-100 shadow-sm">
+        <div className="card-body grid gap-5 p-5 md:grid-cols-[minmax(0,1fr)_minmax(280px,.6fr)]">
+          <div>
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-base-content/55">현재 계좌</span>
+              <span className={`badge ${trend.tone === 'good' ? 'badge-success' : trend.tone === 'bad' ? 'badge-error' : 'badge-warning'} badge-soft`}>{trend.mode}</span>
             </div>
-          </aside>
+            <div className="mt-2 text-4xl font-black tabular-nums tracking-[-0.04em] text-base-content md:text-5xl">{formatKrw(portfolio.marketValue)}</div>
+            <div className={`mt-1 font-bold tabular-nums ${portfolio.unrealizedPnl >= 0 ? 'text-success' : 'text-error'}`}>
+              {formatKrw(portfolio.unrealizedPnl)} · {formatPercent(portfolio.unrealizedReturn)}
+            </div>
+            <div className="mt-3"><Sparkline values={equitySpark} height={56} tone={trend.tone === 'bad' ? 'bad' : trend.tone === 'good' ? 'good' : 'accent'} /></div>
+          </div>
+          <div className="grid grid-cols-2 gap-2 self-center">
+            <Metric label="MWR" value={formatPercent(persona?.moneyWeightedReturn ?? persona?.irr)} />
+            <Metric label="MDD" value={formatPercent(persona?.maxDrawdown)} />
+            <Metric label="Top5 집중" value={formatPercent(portfolio.top5Weight)} />
+            <Metric label="목표 적중" value={formatPercent(overview.target_stats?.target_hit_rate)} />
+          </div>
         </div>
-      </section>
+      </article>
 
       <Section
         eyebrow="오늘의 판단"
         title="먼저 확인할 신호"
-        caption="사용자가 다음에 봐야 할 곳을 숫자와 이유로 연결합니다. 과장된 추천이 아니라, 검증 가능한 이상 신호와 우선순위입니다."
       >
         <div className="grid gap-4 md:grid-cols-3">
           {focus.map((item) => (
@@ -124,8 +115,7 @@ export default function DashboardPage() {
 
       <Section
         eyebrow="Positions"
-        title="보유 종목마다 리포트 근거와 현재 가격을 연결합니다"
-        caption="해외 자산은 USD·JPY 등 현지 통화를 우선 표시하고, 원화 환산액은 보조로만 붙였습니다."
+        title="현재 보유 — 상위 6종목"
         actions={<Link className="btn btn-sm btn-outline" href="/portfolio">전체 원장</Link>}
       >
         <div className="grid gap-3">
@@ -160,8 +150,7 @@ export default function DashboardPage() {
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(360px,.9fr)]">
         <Section
           eyebrow="Research"
-          title="최근 리포트 — 행동 신호만"
-          caption="최신 발간 순으로 현재 수익률, 목표까지 남은 거리, 실행 상태만 압축했습니다."
+          title="최근 리포트"
           actions={<Link className="btn btn-sm btn-outline" href="/reports">전체 리포트</Link>}
         >
           <div className="grid gap-3">
@@ -185,8 +174,7 @@ export default function DashboardPage() {
 
         <Section
           eyebrow="Validation"
-          title="전략은 수익률보다 검증 상태를 먼저 봅니다"
-          caption="추세 추종 모델은 기준선 대비 우위와 낙폭을 같이 봐야 합니다."
+          title="전략 검증"
           actions={<Link className="btn btn-sm btn-outline" href="/strategies">리더보드</Link>}
         >
           <article className="card border border-base-300 bg-base-100 shadow-sm">

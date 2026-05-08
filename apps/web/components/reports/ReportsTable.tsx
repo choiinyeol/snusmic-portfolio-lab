@@ -67,7 +67,7 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         cell: ({ row }) => (
           <div className="report-title-cell">
             <Link href={`/reports/${row.original.symbol}`}>{row.original.company}</Link>
-            <span className="muted">{row.original.symbol} · {row.original.exchange || '—'}</span>
+            <span className="text-xs text-base-content/55">{row.original.symbol} · {row.original.exchange || '—'}</span>
           </div>
         ),
       },
@@ -212,7 +212,7 @@ export function ReportsTable({ reports }: ReportsTableProps) {
 
       <div className="table-meta flex flex-wrap justify-between gap-2 border-y border-base-300 bg-base-200/40 px-4 py-3 text-sm text-base-content/60">
         <span>현재 {filteredRows.length.toLocaleString('ko-KR')}개 / 전체 {reports.length.toLocaleString('ko-KR')}개</span>
-        <span className="muted">열 제목을 클릭해 정렬합니다.</span>
+        <span className="text-xs text-base-content/55">열 제목을 클릭해 정렬합니다.</span>
       </div>
 
       <div className="table-wrap w-full min-w-0 overflow-x-auto rounded-none border-0 shadow-none">

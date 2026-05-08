@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useState } from 'react';
 import type { HoldingRow, ReportTargetDigest } from '@/lib/artifacts';
-import { formatDays, formatKrw, formatNativeWithKrw, formatPercent } from '@/lib/format';
+import { Money } from '@/components/ui/Money';
+import { formatDays, formatKrw, formatPercent } from '@/lib/format';
 import { PaginationControls, SortHeader, defaultPersonaFor, pageRows, sortRows, useUrlBackedStrategy, type SortState } from './TableControls';
 
 type Props = {
@@ -82,37 +83,32 @@ export function PortfolioTables({ holdings, personaLabels, capitalByPersona = {}
               {visibleRows.map((row) => {
                 const contribution = capitalContribution(row.unrealizedPnlKrw, capitalByPersona[row.persona]);
                 const target = targetsBySymbol[row.symbol];
+                const nativeValue = row.lastCloseNative !== null && row.qty !== null ? row.lastCloseNative * row.qty : null;
                 return (
                   <tr key={`${row.persona}-${row.symbol}`}>
                     <td>{personaLabels[row.persona] ?? row.persona}</td>
                     <td><span className="badge badge-ghost badge-sm">{marketLabel(target?.marketRegion)}</span></td>
-                    <td><strong><Link href={`/reports/${row.symbol}`}>{row.company || row.symbol}</Link></strong><div className="muted">{row.symbol}</div></td>
-                    <td>{formatTarget(target)}<div className="muted">{target?.publicationDate ?? '—'}</div></td>
-                    <td>{row.qty?.toLocaleString('ko-KR') ?? '—'}</td>
-                    <td>{formatHoldingPrice(nativeFromKrw(row.avgCostKrw, row.lastCloseNative, row.lastCloseKrw), row.avgCostKrw, row.currency)}</td>
-                    <td>{(() => {
-                      const { primary, secondary } = formatNativeWithKrw(row.lastCloseNative, row.lastCloseKrw, row.currency);
-                      return (
-                        <>
-                          {primary}
-                          {secondary ? <div className="muted" style={{ fontSize: '.74rem' }}>{secondary}</div> : null}
-                        </>
-                      );
-                    })()}</td>
-                    <td>{(() => {
-                      const nativeValue = row.lastCloseNative !== null && row.qty !== null ? row.lastCloseNative * row.qty : null;
-                      const { primary, secondary } = formatNativeWithKrw(nativeValue, row.marketValueKrw, row.currency);
-                      return (
-                        <>
-                          {primary}
-                          <div className="muted">{secondary ?? `손익 ${formatKrw(row.unrealizedPnlKrw)}`}</div>
-                          {secondary ? <div className="muted">손익 {formatKrw(row.unrealizedPnlKrw)}</div> : null}
-                        </>
-                      );
-                    })()}</td>
-                    <td className={(row.unrealizedReturn ?? 0) >= 0 ? 'good' : 'bad'}>{formatPercent(row.unrealizedReturn)}</td>
-                    <td className={(contribution ?? 0) >= 0 ? 'good' : 'bad'}>{formatPercent(contribution)}</td>
-                    <td>{row.firstBuyDate}<div className="muted">{formatDays(row.holdingDays)}</div></td>
+                    <td>
+                      <strong><Link href={`/reports/${row.symbol}`}>{row.company || row.symbol}</Link></strong>
+                      <div className="text-xs text-base-content/55">{row.symbol}</div>
+                    </td>
+                    <td>
+                      {target ? <Money native={target.targetPriceNative} krw={target.targetPriceKrw} currency={target.currency} /> : '—'}
+                      <div className="text-xs text-base-content/55">{target?.publicationDate ?? '—'}</div>
+                    </td>
+                    <td className="tabular-nums">{row.qty?.toLocaleString('ko-KR') ?? '—'}</td>
+                    <td><Money native={nativeFromKrw(row.avgCostKrw, row.lastCloseNative, row.lastCloseKrw)} krw={row.avgCostKrw} currency={row.currency} /></td>
+                    <td><Money native={row.lastCloseNative} krw={row.lastCloseKrw} currency={row.currency} /></td>
+                    <td>
+                      <Money native={nativeValue} krw={row.marketValueKrw} currency={row.currency} />
+                      <div className="text-xs text-base-content/55">손익 {formatKrw(row.unrealizedPnlKrw)}</div>
+                    </td>
+                    <td className={`tabular-nums ${(row.unrealizedReturn ?? 0) >= 0 ? 'text-success' : 'text-error'}`}>{formatPercent(row.unrealizedReturn)}</td>
+                    <td className={`tabular-nums ${(contribution ?? 0) >= 0 ? 'text-success' : 'text-error'}`}>{formatPercent(contribution)}</td>
+                    <td>
+                      <span className="tabular-nums">{row.firstBuyDate}</span>
+                      <div className="text-xs text-base-content/55">{formatDays(row.holdingDays)}</div>
+                    </td>
                   </tr>
                 );
               })}
@@ -154,31 +150,6 @@ function capitalContribution(pnl: number | null, capital: number | undefined): n
 
 function marketLabel(region: 'domestic' | 'overseas' | undefined): string {
   return region === 'domestic' ? '국내' : '해외';
-}
-
-function formatTarget(target: ReportTargetDigest | undefined): ReactNode {
-  if (!target) return '—';
-  const { primary, secondary } = formatNativeWithKrw(target.targetPriceNative, target.targetPriceKrw, target.currency);
-  return (
-    <>
-      {primary}
-      {secondary ? <div className="muted" style={{ fontSize: '.74rem' }}>{secondary}</div> : null}
-    </>
-  );
-}
-
-function formatHoldingPrice(
-  native: number | null,
-  krw: number | null,
-  currency: string,
-): ReactNode {
-  const { primary, secondary } = formatNativeWithKrw(native, krw, currency);
-  return (
-    <>
-      {primary}
-      {secondary ? <div className="muted" style={{ fontSize: '.74rem' }}>{secondary}</div> : null}
-    </>
-  );
 }
 
 function nativeFromKrw(
