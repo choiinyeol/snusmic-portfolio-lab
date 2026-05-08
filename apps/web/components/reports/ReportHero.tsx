@@ -12,16 +12,16 @@ type Props = {
 
 export function ReportHero({ report, status, markdownHref, pdfHref }: Props) {
   return (
-    <header className="page-header card border border-base-300 bg-base-100 shadow-sm">
-      <div className="card-body gap-5 p-5 md:p-8">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-          <div className="grid gap-3">
+    <header className="card border border-base-300 bg-base-100 shadow-sm">
+      <div className="card-body gap-4 p-5 md:p-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="grid gap-2">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="badge badge-primary badge-soft tracking-[0.16em]">REPORT DOSSIER</span>
+              <span className="badge badge-primary badge-soft tracking-[0.16em]">REPORT</span>
               <span className={`badge badge-soft ${status.tone === 'good' ? 'badge-success' : status.tone === 'bad' ? 'badge-error' : status.tone === 'warn' ? 'badge-warning' : 'badge-primary'}`}>{status.label}</span>
             </div>
-            <h1 className="page-header__title text-4xl font-black tracking-[-0.055em] text-base-content md:text-6xl">{report.company}</h1>
-            <p className="page-header__lede report-hero-compact__lede max-w-4xl text-lg leading-8 text-base-content/70">
+            <h1 className="text-3xl font-black tracking-[-0.04em] text-base-content md:text-4xl">{report.company}</h1>
+            <p className="max-w-4xl text-sm leading-relaxed text-base-content/70 md:text-base">
               {report.title || `${report.company} 리포트`} · 발간가 {formatAssetPrice(reportEntryPrice(report), report)} → 목표가 {formatAssetPrice(report.targetPriceNative, report)}
               <strong className="text-primary"> {formatPercent(report.targetUpsideAtPub)} {targetMoveLabel(report)}</strong>
             </p>
