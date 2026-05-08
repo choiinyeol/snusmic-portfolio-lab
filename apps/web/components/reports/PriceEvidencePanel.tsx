@@ -49,6 +49,7 @@ export function PriceEvidencePanel({ report, prices, pathEvidence, status }: Pro
             currency={report.currency}
             publicationDate={report.publicationDate}
             targetHitDate={report.targetHitDate}
+            expiryDate={report.expiryDate}
             evidenceMarkers={pathEvidence.markers}
           />
         </div>

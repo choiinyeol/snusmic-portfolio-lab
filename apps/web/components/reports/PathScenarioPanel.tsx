@@ -18,8 +18,12 @@ export function PathScenarioPanel({ report, scenarioRows, trend }: Props) {
           <header className="flex flex-col gap-1">
             <h3 className="text-lg font-bold tracking-tight">가격 레인지와 사후 수익률</h3>
             <p className="text-sm text-base-content/65">
-              발간 후 저점~고점 가격 범위를 4분위로 나눠, 25%/75% 가격 수준에 가장 가까운 관측 종가를 사용합니다. 모든
-              가격은 {report.currency} 기준입니다.
+              발간 후 저점~고점 구간을 4분위로 나눈 다섯 가격대입니다. 각 행의 % 는{' '}
+              <strong>이 가격에서 매수했다면 거두었을 수익률</strong>이며, 가격은 {report.currency} 기준입니다.
+            </p>
+            <p className="text-xs text-base-content/55">
+              · 회색 막대 <strong className="text-success">초록</strong>: 현재까지 수익률 ·{' '}
+              <strong className="text-primary">파랑</strong>: 목표가까지 수익률
             </p>
           </header>
           <PriceScenarioCards rows={scenarioRows} report={report} />
@@ -82,6 +86,20 @@ function PriceScenarioCards({ rows, report }: { rows: ScenarioRow[]; report: Rep
               {formatAssetPrice(row.point?.value, report)}
             </strong>
             <small className="text-xs text-base-content/55">{row.point?.time ?? '—'}</small>
+            {!isCurrent && (row.currentReturn !== null || row.targetReturn !== null) ? (
+              <div className="mt-1 flex flex-col gap-0.5 text-xs">
+                {row.currentReturn !== null ? (
+                  <span className={(row.currentReturn ?? 0) >= 0 ? 'text-success' : 'text-error'}>
+                    여기서 매수 → 현재 {formatPercent(row.currentReturn)}
+                  </span>
+                ) : null}
+                {row.targetReturn !== null ? (
+                  <span className={(row.targetReturn ?? 0) >= 0 ? 'text-primary' : 'text-error'}>
+                    여기서 매수 → 목표 {formatPercent(row.targetReturn)}
+                  </span>
+                ) : null}
+              </div>
+            ) : null}
           </div>
         );
       })}
@@ -90,30 +108,55 @@ function PriceScenarioCards({ rows, report }: { rows: ScenarioRow[]; report: Rep
 }
 
 function ScenarioReturnBars({ rows }: { rows: ScenarioRow[] }) {
-  const maxAbsReturn = Math.max(
+  const maxAbs = Math.max(
     0.01,
     ...rows.flatMap((row) => [Math.abs(row.currentReturn ?? 0), Math.abs(row.targetReturn ?? 0)]),
   );
   return (
-    <div className="grid gap-1.5">
-      {rows.map((row) => {
-        const value = row.currentReturn ?? 0;
-        const widthPct = Math.max(3, (Math.abs(value) / maxAbsReturn) * 100);
-        return (
-          <div key={`${row.label}-bar`} className="grid grid-cols-[7rem_1fr_4.5rem] items-center gap-3 text-sm">
-            <span className="text-base-content/70">{row.label}</span>
-            <div className="h-2 rounded-full bg-base-200">
-              <div
-                className={`h-full rounded-full ${value >= 0 ? 'bg-success' : 'bg-error'}`}
-                style={{ width: `${widthPct}%` }}
-              />
-            </div>
-            <strong className={`text-right tabular-nums ${value >= 0 ? 'text-success' : 'text-error'}`}>
-              {formatPercent(row.currentReturn)}
-            </strong>
-          </div>
-        );
-      })}
+    <div className="grid gap-3">
+      {rows.map((row) => (
+        <div key={`${row.label}-bar`} className="grid gap-1">
+          <span className="text-sm font-semibold text-base-content/70">{row.label}</span>
+          <ScenarioBar label="현재까지" value={row.currentReturn} maxAbs={maxAbs} positiveTone="success" />
+          <ScenarioBar label="목표가까지" value={row.targetReturn} maxAbs={maxAbs} positiveTone="primary" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ScenarioBar({
+  label,
+  value,
+  maxAbs,
+  positiveTone,
+}: {
+  label: string;
+  value: number | null;
+  maxAbs: number;
+  positiveTone: 'success' | 'primary';
+}) {
+  if (value === null) {
+    return (
+      <div className="grid grid-cols-[5rem_1fr_4.5rem] items-center gap-3 text-xs text-base-content/55">
+        <span>{label}</span>
+        <div className="h-1.5 rounded-full bg-base-200" />
+        <span className="text-right">—</span>
+      </div>
+    );
+  }
+  const widthPct = Math.max(2, (Math.abs(value) / maxAbs) * 100);
+  const positiveClass = positiveTone === 'success' ? 'bg-success' : 'bg-primary';
+  const positiveText = positiveTone === 'success' ? 'text-success' : 'text-primary';
+  const tone = value >= 0 ? positiveClass : 'bg-error';
+  const text = value >= 0 ? positiveText : 'text-error';
+  return (
+    <div className="grid grid-cols-[5rem_1fr_4.5rem] items-center gap-3 text-xs">
+      <span className="text-base-content/60">{label}</span>
+      <div className="h-1.5 rounded-full bg-base-200">
+        <div className={`h-full rounded-full ${tone}`} style={{ width: `${widthPct}%` }} />
+      </div>
+      <strong className={`text-right tabular-nums ${text}`}>{formatPercent(value)}</strong>
     </div>
   );
 }

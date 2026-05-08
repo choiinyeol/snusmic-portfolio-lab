@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
+import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
 import type { HoldingRow, ReportTargetDigest } from '@/lib/artifacts';
 import { Money } from '@/components/ui/Money';
 import { formatDays, formatKrw, formatPercent } from '@/lib/format';
@@ -113,6 +114,7 @@ export function PortfolioTables({ holdings, personaLabels, capitalByPersona = {}
           <p className="text-base-content/65">
             현재 어떤 종목을 얼마나 들고 있는지, 목표가·시장구분·평단·최근가·미실현 손익을 바로 확인합니다.
           </p>
+          <HoldingsTreemap holdings={currentRows} />
           <PaginationControls
             page={page}
             pageCount={Math.ceil(currentRows.length / pageSize)}
