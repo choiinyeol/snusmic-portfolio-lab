@@ -25,6 +25,9 @@ REQUIRED_ARTIFACTS = [
     "monthly-holdings.json",
     "missing-symbols.json",
     "data-quality.json",
+    "trades.json",
+    "position-episodes.json",
+    "equity-daily.json",
     "table-download-reports.csv",
     "table-download-strategies.csv",
     "data-quality-download.csv",
@@ -219,6 +222,9 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     monthly_holdings = _read_optional_csv(inputs.sim / "monthly_holdings.csv")
     report_performance = _read_csv(inputs.sim / "report_performance.csv")
     report_stats = _read_json(inputs.sim / "report_stats.json")
+    trades = _read_csv(inputs.sim / "trades.csv")
+    position_episodes = _read_csv(inputs.sim / "position_episodes.csv")
+    equity_daily = _read_csv(inputs.sim / "equity_daily.csv")
     extraction_quality = _read_json(inputs.extraction_quality) if inputs.extraction_quality.exists() else {}
 
     out = inputs.out
@@ -261,6 +267,9 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     )
     _write_json(out / "missing-symbols.json", [{"symbol": symbol} for symbol in missing_symbols])
     _write_json(out / "data-quality.json", data_quality)
+    _write_json(out / "trades.json", _records(trades))
+    _write_json(out / "position-episodes.json", _records(position_episodes))
+    _write_json(out / "equity-daily.json", _records(equity_daily))
     _write_download_csvs(out, report_rows, data_quality)
     _write_price_artifacts(prices, report_symbols - set(missing_symbols), prices_out)
 
