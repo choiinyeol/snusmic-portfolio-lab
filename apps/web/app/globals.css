@@ -281,7 +281,6 @@ ul, ol { color: var(--muted); line-height: 1.7; }
 .terminal-link:hover,
 .download-actions button:hover,
 .pagination-bar button:hover,
-.strategy-tabs button:hover,
 .segmented-control button:hover,
 .table-toolbar button:hover {
   color: var(--accent-strong);

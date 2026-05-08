@@ -78,12 +78,8 @@ def _simulate_follower(
 
     ``stop_loss_hook`` is ``None`` for the true believer; v2 supplies a
     callable taking ``(account, day, board, reports, follower_state)`` that
-    sells positions matching its rules and updates state.
-
-    ``expiry_days`` enforces the report's product-level validity window: if
-    the earliest open report on a held symbol is older than this many days,
-    the position is sold at the day's close before any other rule fires.
-    Pass ``None`` (or 0) to disable the engine-level expiry sweep.
+    sells positions matching its rules and updates state. ``expiry_days``
+    triggers the engine-level expiry sweep (see ``_expire_stale_positions``).
     """
     account = Account(persona=persona, fees=fees)
     cashflow_by_date: dict[date, float] = {e.date: e.amount_krw for e in cashflows}
@@ -208,13 +204,8 @@ def _expire_stale_positions(
     state: FollowerState,
     expiry_days: int,
 ) -> None:
-    """Sell any held symbol whose earliest open report is past its expiry.
-
-    Mirrors the report-level expiry applied in ``compute_report_performance``:
-    once a report is older than ``expiry_days`` and never resolved by a
-    target hit, the position is no longer the follower's responsibility.
-    Mark the symbol stopped-out so a strictly newer report is required to
-    re-enter — same convention as v2's other stop-loss rules.
+    """Sell holdings whose earliest open report is past expiry; mark stopped-out
+    so a strictly newer report is required to re-enter (same as other stops).
     """
     for symbol in list(account.holdings):
         lot = account.holdings[symbol]
