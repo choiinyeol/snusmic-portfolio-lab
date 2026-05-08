@@ -356,13 +356,8 @@ function positivePrice(value: unknown): number | undefined {
 let reportCache: ReportRow[] | undefined;
 export function getReportRows(): ReportRow[] {
   if (reportCache) return reportCache;
-  const raw = readJson<RawReport[]>('data/web/reports.json', []);
-  if (raw.length) {
-    reportCache = raw.map(fromRawReport).sort((a, b) => b.publicationDate.localeCompare(a.publicationDate) || a.company.localeCompare(b.company, 'ko-KR'));
-    return reportCache;
-  }
-  const reportMeta = new Map(parseCsv(readText('data/warehouse/reports.csv')).map((row) => [row.report_id, row]));
-  reportCache = parseCsv(readText('data/sim/report_performance.csv')).map((row) => fromRawReport({ ...reportMeta.get(row.report_id), ...row, date: row.publication_date })).sort((a, b) => b.publicationDate.localeCompare(a.publicationDate));
+  const raw = JSON.parse(readText('data/web/reports.json')) as RawReport[];
+  reportCache = raw.map(fromRawReport).sort((a, b) => b.publicationDate.localeCompare(a.publicationDate) || a.company.localeCompare(b.company, 'ko-KR'));
   return reportCache;
 }
 
@@ -551,31 +546,16 @@ export function getMarkdownSnippet(report: ReportRow): string {
 }
 
 export function getSummaryRows(): SummaryRow[] {
-  const overview = getOverview();
-  if (overview.baseline_personas?.length) {
-    return overview.baseline_personas.map((row) => ({
-      persona: row.persona,
-      label: row.label,
-      finalEquityKrw: num(row.final_equity_krw),
-      totalContributedKrw: num(row.total_contributed_krw),
-      netProfitKrw: num(row.net_profit_krw),
-      moneyWeightedReturn: num(row.money_weighted_return),
-      maxDrawdown: num(row.max_drawdown),
-      tradeCount: num(row.trade_count),
-    }));
-  }
-  if (!fs.existsSync(fullPath('data/sim/summary.csv'))) return [];
-  return parseCsv(readText('data/sim/summary.csv')).map((row) => ({
+  return getOverview().baseline_personas?.map((row) => ({
     persona: row.persona,
     label: row.label,
     finalEquityKrw: num(row.final_equity_krw),
     totalContributedKrw: num(row.total_contributed_krw),
-    cumulativeDepositsKrw: num(row.cumulative_deposits_krw),
     netProfitKrw: num(row.net_profit_krw),
-    irr: num(row.irr),
+    moneyWeightedReturn: num(row.money_weighted_return),
     maxDrawdown: num(row.max_drawdown),
     tradeCount: num(row.trade_count),
-  }));
+  })) ?? [];
 }
 
 export function getDataQuality(): DataQuality {
@@ -706,7 +686,7 @@ function buildMonthlyCostBasis(rows: RawReport[]): Map<string, number | null> {
     }))
     .filter((row) => row.persona && row.monthEnd && row.symbol)
     .sort((a, b) => a.monthEnd.localeCompare(b.monthEnd));
-  const trades = parseCsv(readText('data/sim/trades.csv')).map((row) => ({
+  const trades = (JSON.parse(readText('data/web/trades.json')) as RawReport[]).map((row) => ({
     persona: String(row.persona ?? ''),
     date: String(row.date ?? ''),
     symbol: String(row.symbol ?? ''),
@@ -748,7 +728,7 @@ function applyCostBasisTrade(state: Map<string, { qty: number; cost: number }>, 
 let tradesCache: TradeRow[] | undefined;
 export function getTrades(): TradeRow[] {
   if (tradesCache) return tradesCache;
-  tradesCache = parseCsv(readText('data/sim/trades.csv')).map((row) => {
+  tradesCache = (JSON.parse(readText('data/web/trades.json')) as RawReport[]).map((row) => {
     const symbol = String(row.symbol ?? '');
     const date = String(row.date ?? '');
     const fillPriceKrw = num(row.fill_price_krw);
@@ -776,7 +756,7 @@ export function getTrades(): TradeRow[] {
 let positionEpisodesCache: PositionEpisodeRow[] | undefined;
 export function getPositionEpisodes(): PositionEpisodeRow[] {
   if (positionEpisodesCache) return positionEpisodesCache;
-  positionEpisodesCache = parseCsv(readText('data/sim/position_episodes.csv')).map((row) => {
+  positionEpisodesCache = (JSON.parse(readText('data/web/position-episodes.json')) as RawReport[]).map((row) => {
     const symbol = String(row.symbol ?? '');
     const openDate = String(row.open_date ?? '');
     const closeDate = strOrNull(row.close_date);
@@ -818,8 +798,7 @@ export function getPersonaLabel(persona: string): string {
 let equityDailyCache: EquityPoint[] | undefined;
 export function getEquityDaily(): EquityPoint[] {
   if (equityDailyCache) return equityDailyCache;
-  if (!fs.existsSync(fullPath('data/sim/equity_daily.csv'))) return [];
-  equityDailyCache = parseCsv(readText('data/sim/equity_daily.csv')).map((row) => {
+  equityDailyCache = (JSON.parse(readText('data/web/equity-daily.json')) as RawReport[]).map((row) => {
     const equity = num(row.equity_krw);
     const contributed = num(row.contributed_capital_krw);
     return {
