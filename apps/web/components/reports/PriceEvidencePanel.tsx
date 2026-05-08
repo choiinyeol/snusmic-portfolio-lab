@@ -19,14 +19,24 @@ type Props = {
 
 export function PriceEvidencePanel({ report, prices, pathEvidence, status }: Props) {
   const entryPrice = reportEntryPrice(report);
-  const targetGapTone: 'good' | 'bad' | 'warn' | 'accent' = (() => {
-    const gap = report.targetGapPct;
-    if (gap === null) return 'accent';
-    if (report.targetDirection === 'upside') return gap > 0 ? 'good' : 'warn';
-    if (report.targetDirection === 'downside') return gap < 0 ? 'good' : 'warn';
-    return 'accent';
-  })();
-  const remainingLabel = report.targetDirection === 'downside' ? '목표가까지 하락 여지' : '목표가까지 잔여 업사이드';
+  const remainingTone: 'good' | 'bad' | 'warn' | 'accent' = report.targetHit
+    ? 'good'
+    : report.expired
+      ? 'bad'
+      : report.targetRemainingPct === null
+        ? 'accent'
+        : 'warn';
+  const remainingLabel = report.targetHit
+    ? '목표 도달'
+    : report.targetDirection === 'downside'
+      ? '목표가까지 추가 하락'
+      : '목표가까지 추가 상승';
+  const remainingValue = report.targetHit
+    ? '도달'
+    : report.targetRemainingPct === null
+      ? '—'
+      : `+${formatPercent(report.targetRemainingPct)}`;
+  const progressLabel = report.targetProgressPct === null ? null : `달성률 ${formatPercent(report.targetProgressPct)}`;
 
   return (
     <div className="grid gap-5 lg:grid-cols-5">
@@ -67,9 +77,9 @@ export function PriceEvidencePanel({ report, prices, pathEvidence, status }: Pro
         />
         <KpiTile
           label={remainingLabel}
-          value={<span className="tabular-nums">{formatPercent(report.targetGapPct)}</span>}
-          delta={status.label}
-          tone={targetGapTone}
+          value={<span className="tabular-nums">{remainingValue}</span>}
+          delta={progressLabel ?? status.label}
+          tone={remainingTone}
         />
         <article className="card border border-base-300 bg-base-100 shadow-sm">
           <div className="card-body gap-2 p-4">

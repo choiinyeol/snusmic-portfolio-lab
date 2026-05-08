@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { Tabs, type Tab } from '@/components/ui/Tabs';
 import type { ReportRow } from '@/lib/artifacts';
 import { formatDays, formatPercent } from '@/lib/format';
@@ -9,12 +9,9 @@ import { formatAssetPrice } from '@/lib/report-view-model';
 
 type Props = { reports: ReportRow[] };
 
-type Column =
-  | { id: 'currentReturn'; label: string }
-  | { id: 'targetUpsideAtPub'; label: string }
-  | { id: 'targetGapPct'; label: string }
-  | { id: 'daysToTarget'; label: string }
-  | { id: 'caveatFlags'; label: string };
+type MetricId = 'currentReturn' | 'targetUpsideAtPub' | 'targetRemainingPct' | 'daysToTarget' | 'caveatFlags';
+
+type Column = { id: MetricId; label: string };
 
 type Ranking = {
   id: string;
@@ -24,25 +21,34 @@ type Ranking = {
   metric: Column;
 };
 
+type SortColumn = 'company' | 'publicationDate' | 'targetPriceNative' | 'metric';
+type SortDir = 'asc' | 'desc';
+
+const PAGE_SIZE_OPTIONS = [10, 25, 50, 100] as const;
+type PageSize = (typeof PAGE_SIZE_OPTIONS)[number];
+
 export function RankingTabs({ reports }: Props) {
   const rankings = useMemo<Ranking[]>(() => {
-    const recent = [...reports].sort((a, b) => b.publicationDate.localeCompare(a.publicationDate)).slice(0, 8);
+    const recent = [...reports].sort((a, b) => b.publicationDate.localeCompare(a.publicationDate));
     const targetHits = reports
       .filter((report) => report.targetHit)
-      .sort((a, b) => (a.daysToTarget ?? Number.POSITIVE_INFINITY) - (b.daysToTarget ?? Number.POSITIVE_INFINITY))
-      .slice(0, 8);
+      .sort((a, b) => (a.daysToTarget ?? Number.POSITIVE_INFINITY) - (b.daysToTarget ?? Number.POSITIVE_INFINITY));
     const topReturns = reports
       .filter((report) => report.currentReturn !== null)
-      .sort((a, b) => (b.currentReturn ?? -Infinity) - (a.currentReturn ?? -Infinity))
-      .slice(0, 8);
+      .sort((a, b) => (b.currentReturn ?? -Infinity) - (a.currentReturn ?? -Infinity));
+    // 목표 도달까지 남은 변화율이 적은 순서 — 즉, "거의 도달" 리포트가 먼저.
     const targetGaps = reports
-      .filter((report) => !report.targetHit && report.targetGapPct !== null && (report.targetUpsideAtPub ?? 0) > 0)
-      .sort((a, b) => (b.targetGapPct ?? -Infinity) - (a.targetGapPct ?? -Infinity))
-      .slice(0, 8);
+      .filter(
+        (report) =>
+          !report.targetHit &&
+          !report.expired &&
+          report.targetRemainingPct !== null &&
+          (report.targetUpsideAtPub ?? 0) > 0,
+      )
+      .sort((a, b) => (a.targetRemainingPct ?? Infinity) - (b.targetRemainingPct ?? Infinity));
     const flagged = reports
       .filter((report) => report.caveatFlags.length > 0)
-      .sort((a, b) => b.caveatFlags.length - a.caveatFlags.length)
-      .slice(0, 8);
+      .sort((a, b) => b.caveatFlags.length - a.caveatFlags.length);
     return [
       {
         id: 'recent',
@@ -67,10 +73,10 @@ export function RankingTabs({ reports }: Props) {
       },
       {
         id: 'target-gaps',
-        label: '목표가 괴리',
-        caption: '아직 목표가에 도달하지 않은 리포트 중 잔여 업사이드가 큰 순서입니다.',
+        label: '도달까지 거리',
+        caption: '아직 목표가에 도달하지 않은 진행 리포트 중 추가 변화율이 적은 (가까운) 순서입니다.',
         rows: targetGaps,
-        metric: { id: 'targetGapPct', label: '잔여 업사이드' },
+        metric: { id: 'targetRemainingPct', label: '추가 변화율' },
       },
       {
         id: 'risk',
@@ -93,6 +99,32 @@ export function RankingTabs({ reports }: Props) {
 }
 
 function RankingTable({ ranking }: { ranking: Ranking }) {
+  const [sortBy, setSortBy] = useState<SortColumn>('metric');
+  const [sortDir, setSortDir] = useState<SortDir>(ranking.id === 'target-gaps' ? 'asc' : 'desc');
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState<PageSize>(10);
+
+  const sorted = useMemo(() => {
+    const rows = [...ranking.rows];
+    rows.sort((a, b) => {
+      const aValue = sortValueFor(a, sortBy, ranking.metric);
+      const bValue = sortValueFor(b, sortBy, ranking.metric);
+      if (aValue === null && bValue === null) return 0;
+      if (aValue === null) return 1;
+      if (bValue === null) return -1;
+      const comparison =
+        typeof aValue === 'string' && typeof bValue === 'string'
+          ? aValue.localeCompare(bValue)
+          : Number(aValue) - Number(bValue);
+      return sortDir === 'asc' ? comparison : -comparison;
+    });
+    return rows;
+  }, [ranking, sortBy, sortDir]);
+
+  const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
+  const safePage = Math.min(page, totalPages - 1);
+  const visible = sorted.slice(safePage * pageSize, safePage * pageSize + pageSize);
+
   if (ranking.rows.length === 0) {
     return (
       <p className="rounded-md border border-base-300 bg-base-100 p-5 text-sm text-base-content/65">
@@ -100,24 +132,79 @@ function RankingTable({ ranking }: { ranking: Ranking }) {
       </p>
     );
   }
+
+  const onSortClick = (column: SortColumn) => {
+    if (sortBy === column) {
+      setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(column);
+      setSortDir(column === 'metric' && ranking.id === 'target-gaps' ? 'asc' : 'desc');
+    }
+    setPage(0);
+  };
+
   return (
     <article className="card border border-base-300 bg-base-100 shadow-sm">
       <div className="card-body gap-1 p-5 pb-3">
         <p className="text-sm text-base-content/65">{ranking.caption}</p>
       </div>
-      <div className="overflow-x-auto border-t border-base-300">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-y border-base-300 bg-base-200/40 px-4 py-2 text-xs text-base-content/60">
+        <span>
+          {sorted.length.toLocaleString('ko-KR')}개 · 페이지 {safePage + 1} / {totalPages}
+        </span>
+        <label className="flex items-center gap-2">
+          <span>페이지 크기</span>
+          <select
+            className="select select-xs select-bordered"
+            value={pageSize}
+            onChange={(event) => {
+              setPageSize(Number(event.target.value) as PageSize);
+              setPage(0);
+            }}
+          >
+            {PAGE_SIZE_OPTIONS.map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <div className="overflow-x-auto">
         <table className="table table-sm table-zebra">
           <thead>
             <tr>
-              <th>회사</th>
-              <th>발간일</th>
-              <th className="text-right">목표가</th>
-              <th className="text-right">{ranking.metric.label}</th>
+              <SortableTh active={sortBy === 'company'} dir={sortDir} onClick={() => onSortClick('company')}>
+                회사
+              </SortableTh>
+              <SortableTh
+                active={sortBy === 'publicationDate'}
+                dir={sortDir}
+                onClick={() => onSortClick('publicationDate')}
+              >
+                발간일
+              </SortableTh>
+              <SortableTh
+                align="right"
+                active={sortBy === 'targetPriceNative'}
+                dir={sortDir}
+                onClick={() => onSortClick('targetPriceNative')}
+              >
+                목표가
+              </SortableTh>
+              <SortableTh
+                align="right"
+                active={sortBy === 'metric'}
+                dir={sortDir}
+                onClick={() => onSortClick('metric')}
+              >
+                {ranking.metric.label}
+              </SortableTh>
               <th>상태</th>
             </tr>
           </thead>
           <tbody>
-            {ranking.rows.map((report) => (
+            {visible.map((report) => (
               <tr key={report.reportId}>
                 <td>
                   <Link className="link link-hover font-bold" href={`/reports/${report.symbol}`}>
@@ -137,7 +224,72 @@ function RankingTable({ ranking }: { ranking: Ranking }) {
           </tbody>
         </table>
       </div>
+      <div className="flex items-center justify-between gap-2 border-t border-base-300 px-4 py-2">
+        <button
+          type="button"
+          className="btn btn-xs btn-ghost"
+          disabled={safePage === 0}
+          onClick={() => setPage((p) => Math.max(0, p - 1))}
+        >
+          ← 이전
+        </button>
+        <span className="text-xs text-base-content/55">
+          {safePage * pageSize + 1}–{Math.min(sorted.length, (safePage + 1) * pageSize)} / {sorted.length}
+        </span>
+        <button
+          type="button"
+          className="btn btn-xs btn-ghost"
+          disabled={safePage >= totalPages - 1}
+          onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+        >
+          다음 →
+        </button>
+      </div>
     </article>
+  );
+}
+
+function sortValueFor(report: ReportRow, column: SortColumn, metric: Column): number | string | null {
+  switch (column) {
+    case 'company':
+      return report.company || report.symbol;
+    case 'publicationDate':
+      return report.publicationDate;
+    case 'targetPriceNative':
+      return report.targetPriceNative ?? report.targetPriceKrw;
+    case 'metric': {
+      switch (metric.id) {
+        case 'currentReturn':
+          return report.currentReturn;
+        case 'targetUpsideAtPub':
+          return report.targetUpsideAtPub;
+        case 'targetRemainingPct':
+          return report.targetRemainingPct;
+        case 'daysToTarget':
+          return report.daysToTarget;
+        case 'caveatFlags':
+          return report.caveatFlags.length;
+      }
+    }
+  }
+}
+
+type SortableThProps = {
+  active: boolean;
+  dir: SortDir;
+  onClick: () => void;
+  align?: 'left' | 'right';
+  children: ReactNode;
+};
+
+function SortableTh({ active, dir, onClick, align = 'left', children }: SortableThProps) {
+  return (
+    <th className={align === 'right' ? 'text-right' : ''}>
+      <button type="button" className="link-hover inline-flex items-center gap-1 font-semibold" onClick={onClick}>
+        {children}
+        <span className="text-xs text-base-content/40">{active ? (dir === 'asc' ? '↑' : '↓') : '↕'}</span>
+      </button>
+    </th>
   );
 }
 
@@ -151,9 +303,10 @@ function renderMetric(column: Column, report: ReportRow): ReactNode {
     }
     case 'targetUpsideAtPub':
       return <span className="font-bold text-primary">{formatPercent(report.targetUpsideAtPub)}</span>;
-    case 'targetGapPct': {
-      const value = report.targetGapPct;
-      return <span className="font-bold text-primary">{formatPercent(value)}</span>;
+    case 'targetRemainingPct': {
+      const value = report.targetRemainingPct;
+      if (value === null) return '—';
+      return <span className="font-bold text-primary">+{formatPercent(value)}</span>;
     }
     case 'daysToTarget':
       return <span className="font-bold text-success">{formatDays(report.daysToTarget)}</span>;
@@ -172,17 +325,18 @@ function renderMetric(column: Column, report: ReportRow): ReactNode {
 
 function renderStatus(report: ReportRow): ReactNode {
   if (report.targetDirection === 'downside') {
-    return report.targetHit ? (
-      <span className="badge badge-success badge-soft badge-sm">매도 적중</span>
-    ) : (
-      <span className="badge badge-warning badge-soft badge-sm">매도 의견</span>
-    );
+    if (report.targetHit) return <span className="badge badge-success badge-soft badge-sm">매도 적중</span>;
+    if (report.expired) return <span className="badge badge-error badge-soft badge-sm">매도 만료</span>;
+    return <span className="badge badge-warning badge-soft badge-sm">매도 의견</span>;
   }
   if ((report.targetUpsideAtPub ?? 0) <= 0) {
     return <span className="badge badge-warning badge-soft badge-sm">비실행</span>;
   }
   if (report.targetHit) {
     return <span className="badge badge-success badge-soft badge-sm">도달 · {formatDays(report.daysToTarget)}</span>;
+  }
+  if (report.expired) {
+    return <span className="badge badge-error badge-soft badge-sm">만료</span>;
   }
   return <span className="badge badge-primary badge-soft badge-sm">진행</span>;
 }

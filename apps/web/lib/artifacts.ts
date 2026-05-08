@@ -34,6 +34,12 @@ export type ReportRow = {
   peakReturn: number | null;
   troughReturn: number | null;
   targetGapPct: number | null;
+  /** Additional move (always >= 0) the current price must make to reach
+   * the target. Null for hit/expired/no-target reports. */
+  targetRemainingPct: number | null;
+  /** Current price as a fraction of target price (0..1). For upside this is
+   * `current/target`; for downside `target/current`. Null when no target. */
+  targetProgressPct: number | null;
   expiryDate: string | null;
   expired: boolean;
   caveatFlags: string[];
@@ -370,13 +376,43 @@ function fromRawReport(row: RawReport): ReportRow {
     peakReturn: num(row.peak_return ?? row.peakReturn),
     troughReturn: num(row.trough_return ?? row.troughReturn),
     targetGapPct: num(row.target_gap_pct ?? row.targetGapPct),
+    targetRemainingPct: null,
+    targetProgressPct: null,
     expiryDate: strOrNull(row.expiry_date ?? row.expiryDate),
     expired: bool(row.expired),
     caveatFlags: Array.isArray(row.caveat_flags) ? row.caveat_flags : [],
   };
   const enriched = withLatestNativeClose(report);
   const hasTargetHitField = row.target_hit !== undefined || row.targetHit !== undefined;
-  return hasTargetHitField ? enriched : withOhlcTargetTouch(enriched);
+  const withHit = hasTargetHitField ? enriched : withOhlcTargetTouch(enriched);
+  return withTargetMetrics(withHit);
+}
+
+function withTargetMetrics(report: ReportRow): ReportRow {
+  const current = report.lastCloseNative ?? report.lastCloseKrw;
+  const target = report.targetPriceNative ?? report.targetPriceKrw;
+  if (!current || !target || current <= 0 || target <= 0) {
+    return { ...report, targetRemainingPct: null, targetProgressPct: null };
+  }
+  if (report.targetHit) {
+    // Resolved — no "remaining", show full progress.
+    return { ...report, targetRemainingPct: 0, targetProgressPct: 1 };
+  }
+  if (report.targetDirection === 'upside') {
+    return {
+      ...report,
+      targetRemainingPct: Math.max(0, target / current - 1),
+      targetProgressPct: Math.min(1, current / target),
+    };
+  }
+  if (report.targetDirection === 'downside') {
+    return {
+      ...report,
+      targetRemainingPct: Math.max(0, 1 - target / current),
+      targetProgressPct: Math.min(1, target / current),
+    };
+  }
+  return { ...report, targetRemainingPct: null, targetProgressPct: null };
 }
 
 function withOhlcTargetTouch(report: ReportRow): ReportRow {
