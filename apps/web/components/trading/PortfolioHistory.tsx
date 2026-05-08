@@ -4,18 +4,12 @@ import { useMemo, useState } from 'react';
 import type { MonthlyHoldingRow, ReportTargetDigest } from '@/lib/artifacts';
 import { Money } from '@/components/ui/Money';
 import { formatKrw, formatPercent } from '@/lib/format';
-import {
-  PaginationControls,
-  SortHeader,
-  defaultPersonaFor,
-  pageRows,
-  sortRows,
-  useUrlBackedStrategy,
-  type SortState,
-} from './TableControls';
+import { PaginationControls, SortHeader, pageRows, sortRows, type SortState } from './TableControls';
 
 type Props = {
   monthly: MonthlyHoldingRow[];
+  /** Strategy controlled by the parent — single source of truth. */
+  persona: string;
   personaLabels: Record<string, string>;
   targetsBySymbol: Record<string, ReportTargetDigest>;
 };
@@ -48,8 +42,7 @@ const STACK_COLORS = [
   '#cbd5e1',
 ];
 
-export function PortfolioHistory({ monthly, personaLabels, targetsBySymbol }: Props) {
-  const personas = useMemo(() => Array.from(new Set(monthly.map((row) => row.persona))).sort(), [monthly]);
+export function PortfolioHistory({ monthly, persona, personaLabels, targetsBySymbol }: Props) {
   const months = useMemo(
     () =>
       Array.from(new Set(monthly.map((row) => row.monthEnd)))
@@ -57,12 +50,10 @@ export function PortfolioHistory({ monthly, personaLabels, targetsBySymbol }: Pr
         .reverse(),
     [monthly],
   );
-  const [persona, setPersona] = useState(() => defaultPersonaFor(personas));
   const [month, setMonth] = useState(months[0] ?? '');
   const [sort, setSort] = useState<SortState<MonthlySortKey>>({ key: 'weight', direction: 'desc' });
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(25);
-  useUrlBackedStrategy(persona, setPersona, personas);
 
   const filtered = useMemo(
     () => monthly.filter((row) => row.persona === persona && (!month || row.monthEnd === month)),
@@ -99,27 +90,6 @@ export function PortfolioHistory({ monthly, personaLabels, targetsBySymbol }: Pr
     <div className="grid gap-4">
       <section className="card border border-base-300 bg-base-100 shadow-sm">
         <div className="card-body gap-3 p-5">
-          <h2 className="card-title">전략 선택</h2>
-          <div
-            className="tabs tabs-box w-fit max-w-full overflow-x-auto bg-base-200"
-            role="group"
-            aria-label="전략 선택"
-          >
-            {personas.map((item) => (
-              <button
-                type="button"
-                key={item}
-                aria-pressed={persona === item}
-                className={persona === item ? 'tab tab-active font-bold' : 'tab'}
-                onClick={() => {
-                  setPersona(item);
-                  setPage(0);
-                }}
-              >
-                {personaLabels[item] ?? item}
-              </button>
-            ))}
-          </div>
           <div className="flex flex-wrap items-end gap-3" aria-label="월말 포트폴리오 필터">
             <label className="form-control">
               <span className="label-text">월말 기준일</span>
