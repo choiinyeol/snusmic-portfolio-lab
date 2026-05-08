@@ -18278,6 +18278,19 @@
       "open": 133.57499694824222,
       "source_currency": "USD",
       "volume": 55456834.0
+    },
+    {
+      "close": 137.0500030517578,
+      "close_krw": 197961.8702,
+      "currency": "USD",
+      "date": "2026-05-07",
+      "display_currency": "USD",
+      "high": 140.9499969482422,
+      "krw_per_unit": 1444.449951171875,
+      "low": 134.77999877929685,
+      "open": 135.10000610351562,
+      "source_currency": "USD",
+      "volume": 49959100.0
     }
   ],
   "symbol": "PLTR"

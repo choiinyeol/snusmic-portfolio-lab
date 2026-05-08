@@ -22,45 +22,45 @@
     },
     {
       "bucket": "365일+",
-      "count": 38
+      "count": 39
     }
   ],
   "summary": {
-    "target_hit_count": 114,
-    "target_hit_rate": 0.527778,
-    "total_reports": 216
+    "target_hit_count": 115,
+    "target_hit_rate": 0.520362,
+    "total_reports": 221
   },
   "target_upside_buckets": [
     {
-      "avg_current_return": 0.612,
+      "avg_current_return": 0.616,
       "bucket": "0-25%",
       "count": 15,
       "target_hit_count": 14,
       "target_hit_rate": 0.933333
     },
     {
-      "avg_current_return": 1.324286,
+      "avg_current_return": 1.286197,
       "bucket": "25-50%",
-      "count": 70,
-      "target_hit_count": 53,
-      "target_hit_rate": 0.757143
+      "count": 71,
+      "target_hit_count": 54,
+      "target_hit_rate": 0.760563
     },
     {
-      "avg_current_return": 0.648375,
+      "avg_current_return": 0.63,
       "bucket": "50-100%",
-      "count": 80,
+      "count": 82,
       "target_hit_count": 32,
-      "target_hit_rate": 0.4
+      "target_hit_rate": 0.390244
     },
     {
-      "avg_current_return": 1.100417,
+      "avg_current_return": 1.041923,
       "bucket": "100-200%",
-      "count": 24,
+      "count": 26,
       "target_hit_count": 7,
-      "target_hit_rate": 0.291667
+      "target_hit_rate": 0.269231
     },
     {
-      "avg_current_return": 1.07,
+      "avg_current_return": 0.977857,
       "bucket": "200%+",
       "count": 14,
       "target_hit_count": 4,
