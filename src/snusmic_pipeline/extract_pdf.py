@@ -3,8 +3,6 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from pypdf import PdfReader
-
 from .currency import EXCHANGE_CURRENCIES, infer_exchange_from_text
 from .models import DownloadedPdf, ExtractedReport
 
@@ -238,10 +236,15 @@ def extract_investment_points(text: str) -> str:
     return snippet
 
 
-def extract_text_from_pdf(path: Path, max_pages: int | None = None) -> str:
-    reader = PdfReader(str(path))
-    pages = reader.pages[:max_pages] if max_pages else reader.pages
-    return "\n".join(page.extract_text() or "" for page in pages)
+def extract_pdf_markdown(path: Path, output_dir: Path | None = None) -> str:
+    """Convert PDF to markdown via OpenDataLoader. Raises if conversion fails."""
+    from .opendataloader_fallback import convert_pdfs_to_markdown
+
+    target_dir = output_dir or (path.parent.parent / "markdown")
+    converted = convert_pdfs_to_markdown([path], target_dir)
+    if path not in converted:
+        raise RuntimeError(f"OpenDataLoader produced no markdown for {path}")
+    return converted[path]
 
 
 def target_price_candidates(text: str) -> list[tuple[float, str]]:
@@ -500,7 +503,7 @@ def extract_report(download: DownloadedPdf, max_pages: int = 4) -> ExtractedRepo
         report.note = download.note
         return report
     try:
-        text = extract_text_from_pdf(download.path, max_pages=max_pages)
+        text = extract_pdf_markdown(download.path)
     except Exception as exc:  # noqa: BLE001 - keep one bad PDF from stopping the batch
         report.extraction_status = "text_extract_failed"
         report.note = str(exc)

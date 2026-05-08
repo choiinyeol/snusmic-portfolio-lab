@@ -2622,15 +2622,6 @@ wheels = [
 ]
 
 [[package]]
-name = "pypdf"
-version = "6.10.2"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/7b/3f/9f2167401c2e94833ca3b69535bad89e533b5de75fefe4197a2c224baec2/pypdf-6.10.2.tar.gz", hash = "sha256:7d09ce108eff6bf67465d461b6ef352dcb8d84f7a91befc02f904455c6eea11d", size = 5315679, upload-time = "2026-04-15T16:37:36.978Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/0c/d6/1d5c60cc17bbdf37c1552d9c03862fc6d32c5836732a0415b2d637edc2d0/pypdf-6.10.2-py3-none-any.whl", hash = "sha256:aa53be9826655b51c96741e5d7983ca224d898ac0a77896e64636810517624aa", size = 336308, upload-time = "2026-04-15T16:37:34.851Z" },
-]
-
-[[package]]
 name = "pypdfium2"
 version = "5.8.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3533,17 +3524,12 @@ dependencies = [
     { name = "duckdb" },
     { name = "matplotlib" },
     { name = "numpy" },
+    { name = "opendataloader-pdf", extra = ["hybrid"] },
     { name = "pandas" },
     { name = "pydantic" },
-    { name = "pypdf" },
     { name = "requests" },
     { name = "scipy" },
     { name = "yfinance" },
-]
-
-[package.optional-dependencies]
-ocr = [
-    { name = "opendataloader-pdf", extra = ["hybrid"] },
 ]
 
 [package.dev-dependencies]
@@ -3563,15 +3549,13 @@ requires-dist = [
     { name = "duckdb" },
     { name = "matplotlib", specifier = ">=3.7" },
     { name = "numpy" },
-    { name = "opendataloader-pdf", extras = ["hybrid"], marker = "extra == 'ocr'" },
+    { name = "opendataloader-pdf", extras = ["hybrid"], specifier = ">=2.4.3" },
     { name = "pandas" },
     { name = "pydantic", specifier = ">=2.6" },
-    { name = "pypdf" },
     { name = "requests" },
     { name = "scipy" },
     { name = "yfinance" },
 ]
-provides-extras = ["ocr"]
 
 [package.metadata.requires-dev]
 dev = [
