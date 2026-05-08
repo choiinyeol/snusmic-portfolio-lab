@@ -400,3 +400,29 @@ gh workflow run sync.yml --ref main -f report_pages=auto -f force_full=true
 - 차트 목표가가 y축 밖으로 사라지게 하지 말 것
 - 테이블/카드 alignment를 임시 CSS로 대충 맞추지 말 것
 - 일반 push에서 Python artifact refresh를 다시 켜지 말 것
+
+## 9. 리포트 라이프사이클 / 만료 정책
+
+리포트는 발간일 기준 **유효 기간**을 가진다. 기본값은 730일(약 2년)이며
+`SimulationConfig.report_expiry_days`로 조정한다.
+
+### 만료된 리포트의 정의
+- `pub_date + report_expiry_days <= 오늘` 이고
+- 해당 기간 안에 목표가가 한 번도 도달되지 않은 경우
+
+### 만료 시 동작
+- `compute_report_performance`의 평가 윈도우는 `[pub_date, min(end, pub_date + 730d)]`로 캡됨
+- `current_return` / `peak_return` / `trough_return` / `last_close_*` 는 만료일 종가에 동결됨
+- `target_hit_date` 는 만료 윈도우 내에서만 인정 (이후 도달은 무시)
+- `expired: true`, `expiry_date` 가 `data/web/reports.json` 에 노출됨
+- SMIC follower v1·v2 는 만료된 리포트의 보유 종목을 만료일 종가에 자동 청산
+  (`stop_loss_report_age` reason). 새 리포트가 다시 나오기 전엔 재진입 불가.
+
+### UI 표면
+- ReportsTable: "목표 달성" 컬럼에 "만료" 빨간 배지, "현재 수익률" 에 `(최종)` 접미사 + 만료일 툴팁
+- ReportsTable 필터 드롭다운: `진행 중` / `달성` / `만료` 3-state
+- 메인 대시보드 status 배지: `진행` / `도달` / `매도 적중` / `매도 만료` / `만료` / `비실행`
+- 만료된 보유 종목은 v1·v2 portfolio 화면에 나타나지 않음 (백엔드에서 청산됨)
+
+### 정책을 끄려면
+`SimulationConfig.report_expiry_days` 를 `None` 또는 `0` 으로 두면 만료 캡 없이 전체 윈도우 사용. `_simulate_follower` 의 expiry 스윕도 함께 자동으로 비활성화된다.
