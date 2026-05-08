@@ -331,10 +331,14 @@ export function PriceEvidenceChart({
 
     // Vertical lines (B-1): pub date and expiry date overlays. We compute the
     // x-coordinate via timeToCoordinate and re-position on every visible-range
-    // change so pan/zoom stays in sync.
+    // change so pan/zoom stays in sync. timeToCoordinate returns coordinates
+    // relative to the canvas plot area; we hide the line when it falls
+    // outside that area so it doesn't render against the legend or axis.
     const updateVerticalLines = () => {
-      const pubX = timeToCoordinateX(timeScale, publicationDate);
-      const expiryX = expiryDate ? timeToCoordinateX(timeScale, expiryDate) : null;
+      const width = container.clientWidth;
+      const inside = (x: number | null) => (x !== null && x >= 0 && x <= width ? x : null);
+      const pubX = inside(timeToCoordinateX(timeScale, publicationDate));
+      const expiryX = expiryDate ? inside(timeToCoordinateX(timeScale, expiryDate)) : null;
       setVerticalLines({ pub: pubX, expiry: expiryX });
     };
     updateVerticalLines();

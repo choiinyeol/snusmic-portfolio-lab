@@ -44,6 +44,7 @@ export function PaginationControls({
   pageSize,
   onPageChange,
   onPageSizeChange,
+  pageSizeOptions = [10, 25, 50, 100],
 }: {
   page: number;
   pageCount: number;
@@ -51,11 +52,10 @@ export function PaginationControls({
   pageSize: number;
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
+  pageSizeOptions?: readonly number[];
 }) {
   const lastPage = Math.max(0, pageCount - 1);
   const safePage = Math.min(Math.max(0, page), lastPage);
-  const hasPrevious = safePage > 0;
-  const hasNext = pageCount > 0 && safePage < lastPage;
   return (
     <nav className="pagination-bar" aria-label="페이지 이동">
       <span>
@@ -64,26 +64,87 @@ export function PaginationControls({
       <label className="page-size-label">
         <span>페이지당</span>
         <select value={pageSize} onChange={(event) => onPageSizeChange(Number(event.target.value))}>
-          {[10, 25, 50, 100].map((size) => (
+          {pageSizeOptions.map((size) => (
             <option key={size} value={size}>
               {size}
             </option>
           ))}
         </select>
       </label>
-      <button type="button" onClick={() => onPageChange(0)} disabled={!hasPrevious}>
-        처음
-      </button>
-      <button type="button" onClick={() => onPageChange(Math.max(0, safePage - 1))} disabled={!hasPrevious}>
-        이전
-      </button>
-      <button type="button" onClick={() => onPageChange(Math.min(lastPage, safePage + 1))} disabled={!hasNext}>
-        다음
-      </button>
-      <button type="button" onClick={() => onPageChange(lastPage)} disabled={!hasNext}>
-        끝
-      </button>
+      <BlockPagination page={safePage} pageCount={Math.max(1, pageCount)} onPageChange={onPageChange} />
     </nav>
+  );
+}
+
+/** Numbered pagination with a sliding window of page numbers (block
+ * pagination). Renders «« «  1 2 3 4 5  » »» with the visible block
+ * shifting as the active page leaves the window. */
+export function BlockPagination({
+  page,
+  pageCount,
+  onPageChange,
+  windowSize = 5,
+}: {
+  page: number;
+  pageCount: number;
+  onPageChange: (page: number) => void;
+  windowSize?: number;
+}) {
+  const lastPage = Math.max(0, pageCount - 1);
+  const safePage = Math.min(Math.max(0, page), lastPage);
+  const blockIndex = Math.floor(safePage / windowSize);
+  const blockStart = blockIndex * windowSize;
+  const blockEnd = Math.min(lastPage, blockStart + windowSize - 1);
+  const hasPrevBlock = blockStart > 0;
+  const hasNextBlock = blockEnd < lastPage;
+  const pages: number[] = [];
+  for (let i = blockStart; i <= blockEnd; i += 1) pages.push(i);
+  return (
+    <span className="block-pagination" role="group" aria-label="페이지 번호">
+      <button
+        type="button"
+        aria-label="이전 페이지 묶음"
+        onClick={() => onPageChange(Math.max(0, blockStart - windowSize))}
+        disabled={!hasPrevBlock}
+      >
+        ‹‹
+      </button>
+      <button
+        type="button"
+        aria-label="이전 페이지"
+        onClick={() => onPageChange(Math.max(0, safePage - 1))}
+        disabled={safePage === 0}
+      >
+        ‹
+      </button>
+      {pages.map((p) => (
+        <button
+          key={p}
+          type="button"
+          aria-current={p === safePage ? 'page' : undefined}
+          className={p === safePage ? 'active' : undefined}
+          onClick={() => onPageChange(p)}
+        >
+          {p + 1}
+        </button>
+      ))}
+      <button
+        type="button"
+        aria-label="다음 페이지"
+        onClick={() => onPageChange(Math.min(lastPage, safePage + 1))}
+        disabled={safePage >= lastPage}
+      >
+        ›
+      </button>
+      <button
+        type="button"
+        aria-label="다음 페이지 묶음"
+        onClick={() => onPageChange(Math.min(lastPage, blockStart + windowSize))}
+        disabled={!hasNextBlock}
+      >
+        ››
+      </button>
+    </span>
   );
 }
 
