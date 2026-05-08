@@ -160,7 +160,11 @@ class SmicFollowerConfig(_PersonaBase):
     persona_name: Literal["smic_follower"] = "smic_follower"
     label: str = "SMIC Follower (1/N)"
     target_hit_multiplier: Annotated[float, Field(gt=0.0, le=2.0)] = 1.0
-    rebalance: Literal["monthly", "quarterly"] = "monthly"
+    # SMIC reports drop on irregular dates, so the realistic baseline is to
+    # rebalance on every trading day — react when a new report arrives or a
+    # symbol's weight drifts. Use "monthly"/"quarterly" only when modelling a
+    # passive holder.
+    rebalance: Literal["daily", "monthly", "quarterly"] = "daily"
 
 
 class SmicFollowerV2Config(_PersonaBase):
@@ -169,7 +173,7 @@ class SmicFollowerV2Config(_PersonaBase):
     persona_name: Literal["smic_follower_v2"] = "smic_follower_v2"
     label: str = "SMIC Follower v2 (with stop-loss)"
     target_hit_multiplier: Annotated[float, Field(gt=0.0, le=2.0)] = 1.0
-    rebalance: Literal["monthly", "quarterly"] = "monthly"
+    rebalance: Literal["daily", "monthly", "quarterly"] = "daily"
 
     # Stop-loss rule (a): held this many days AND still at unrealized loss.
     time_loss_days: Annotated[int, Field(ge=30, le=2000)] = 365

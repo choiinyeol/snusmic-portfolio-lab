@@ -184,6 +184,8 @@ class FollowerState:
 
 
 def _rebalance_days(trading_dates: list[date], cadence: str) -> set[date]:
+    if cadence == "daily":
+        return set(trading_dates)
     if cadence == "monthly":
         seen: dict[tuple[int, int], date] = {}
         for d in trading_dates:
