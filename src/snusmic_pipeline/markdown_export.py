@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from .extract_pdf import extract_text_from_pdf
+from .github_urls import github_pdf_url
 from .models import ExtractedReport
 from .opendataloader_fallback import OpenDataLoaderUnavailable, convert_pdfs_to_markdown
 
@@ -21,7 +22,7 @@ def fallback_markdown(report: ExtractedReport) -> str:
         f"- Company: {report.meta.company}\n"
         f"- Report date: {report.meta.date}\n"
         f"- Ticker: {report.ticker}\n"
-        f"- Source PDF: {report.meta.pdf_url}\n\n"
+        f"- Source PDF: {github_pdf_url(report.pdf_filename)}\n\n"
         "> 해당 .md 을 ChatGPT, Claude에게 입력하여 인사이트를 얻으세요.\n\n"
         "## Extracted PDF Text\n\n"
         f"{text.strip()}\n"

@@ -56,7 +56,12 @@ export default async function ReportDetailPage({ params }: { params: ReportParam
 
   return (
     <>
-      <ReportHero report={report} status={status} markdownHref={githubBlobUrl(`data/markdown/${report.markdownFilename}`)} />
+      <ReportHero
+        report={report}
+        status={status}
+        markdownHref={githubBlobUrl(`data/markdown/${report.markdownFilename}`)}
+        pdfHref={report.pdfFilename ? githubBlobUrl(`data/pdfs/${report.pdfFilename}`) : null}
+      />
 
       <Section
         eyebrow="Price evidence"
@@ -93,7 +98,6 @@ export default async function ReportDetailPage({ params }: { params: ReportParam
         caption="투자 메모, 추출된 마크다운 발췌, 동일 종목의 다른 발간 이력을 함께 제공합니다."
       >
         <ReportSourcesPanel
-          report={report}
           siblingReports={siblingReports}
           memo={memo}
           snippet={snippet}

@@ -15,8 +15,6 @@ on:
         description: "Run even when no new report is detected"
         required: false
         default: "false"
-  schedule:
-    - cron: "30 23 * * *"
 
 permissions:
   contents: write

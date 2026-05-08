@@ -7,9 +7,10 @@ type Props = {
   report: ReportRow;
   status: TargetStatus;
   markdownHref: string;
+  pdfHref: string | null;
 };
 
-export function ReportHero({ report, status, markdownHref }: Props) {
+export function ReportHero({ report, status, markdownHref, pdfHref }: Props) {
   return (
     <header className="page-header card border border-base-300 bg-base-100 shadow-sm">
       <div className="card-body gap-5 p-5 md:p-8">
@@ -27,7 +28,7 @@ export function ReportHero({ report, status, markdownHref }: Props) {
           </div>
           <div className="flex flex-wrap gap-2">
             <Link className="btn btn-sm btn-outline" href="/reports">아카이브</Link>
-            {report.pdfUrl ? <a className="btn btn-sm btn-outline" href={report.pdfUrl}>원본 PDF</a> : null}
+            {pdfHref ? <a className="btn btn-sm btn-outline" href={pdfHref}>GitHub PDF</a> : null}
             <a className="btn btn-sm btn-ghost" href={markdownHref}>Markdown</a>
           </div>
         </div>
