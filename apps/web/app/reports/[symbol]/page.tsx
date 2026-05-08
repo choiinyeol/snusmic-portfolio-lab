@@ -60,7 +60,7 @@ export default async function ReportDetailPage({ params }: { params: ReportParam
         report={report}
         status={status}
         markdownHref={githubBlobUrl(`data/markdown/${report.markdownFilename}`)}
-        pdfHref={report.pdfFilename ? githubBlobUrl(`data/pdfs/${report.pdfFilename}`) : null}
+        pdfHref={pdfHrefFor(report)}
       />
 
       <Section eyebrow="Price evidence" title="가격 경로와 목표가">
@@ -86,7 +86,7 @@ export default async function ReportDetailPage({ params }: { params: ReportParam
           memo={memo}
           snippet={snippet}
           markdownHref={githubBlobUrl(`data/markdown/${report.markdownFilename}`)}
-          pdfHref={report.pdfFilename ? githubBlobUrl(`data/pdfs/${report.pdfFilename}`) : null}
+          pdfHref={pdfHrefFor(report)}
         />
       </Section>
     </>
@@ -95,4 +95,10 @@ export default async function ReportDetailPage({ params }: { params: ReportParam
 
 function githubBlobUrl(path: string): string {
   return `https://github.com/ChoiInYeol/snusmic-quant-terminal/blob/main/${encodeURI(path)}`;
+}
+
+function pdfHrefFor(report: { pdfFilename: string; pdfUrl: string }): string | null {
+  if (report.pdfFilename) return githubBlobUrl(`data/pdfs/${report.pdfFilename}`);
+  if (report.pdfUrl) return report.pdfUrl;
+  return null;
 }

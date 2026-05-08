@@ -19,8 +19,8 @@ export default function ReportsPage() {
   return (
     <>
       <PageHero
-        eyebrow="REPORTS"
-        title="리포트 검증"
+        eyebrow="RESEARCH"
+        title="리서치 — 리포트 성과"
         badges={[
           { label: '리포트', value: `${reports.length}건` },
           { label: '최신 발간', value: latestDate || '—' },
