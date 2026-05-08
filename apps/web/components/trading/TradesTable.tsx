@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { useDeferredValue, useMemo, useState } from 'react';
 import type { PositionEpisodeRow, ReportTargetDigest, TradeRow } from '@/lib/artifacts';
-import { formatDays, formatKrw, formatNativeWithKrw, formatPercent } from '@/lib/format';
+import { Money } from '@/components/ui/Money';
+import { formatDays, formatKrw, formatPercent } from '@/lib/format';
 import { PaginationControls, SortHeader, defaultPersonaFor, pageRows, sortRows, useUrlBackedStrategy, type SortState } from './TableControls';
 
 type Props = {
@@ -31,7 +32,6 @@ export function TradesTable({ trades, episodes, personaLabels, capitalByPersona 
   const [episodePageSize, setEpisodePageSize] = useState(25);
   const [tradePageSize, setTradePageSize] = useState(50);
   useUrlBackedStrategy(persona, setPersona, personas);
-
 
   const deferredQuery = useDeferredValue(query);
   const normalizedQuery = deferredQuery.trim().toLowerCase();
@@ -86,132 +86,151 @@ export function TradesTable({ trades, episodes, personaLabels, capitalByPersona 
   };
 
   return (
-    <div className="grid" style={{ gap: '1rem' }}>
-      <section className="panel report-table-panel strategy-filter-panel">
-        <h2>전략 선택</h2>
-        <div className="strategy-tabs" role="group" aria-label="전략 선택">
-          {personas.map((item) => (
-            <button
-              type="button"
-              key={item}
-              aria-pressed={persona === item}
-              className={persona === item ? 'active' : ''}
-              onClick={() => { setPersona(item); setEpisodePage(0); setTradePage(0); }}
-            >
-              {personaLabels[item] ?? item}
-            </button>
-          ))}
-        </div>
-        <div className="table-toolbar" aria-label="매매 필터">
-          <label>
-            <span>매수/매도</span>
-            <select value={side} onChange={(event) => { setSide(event.target.value); setTradePage(0); }}>
-              <option value="all">전체</option>
-              <option value="buy">매수</option>
-              <option value="sell">매도</option>
-            </select>
-          </label>
-          <label>
-            <span>검색</span>
-            <input value={query} onChange={(event) => { setQuery(event.target.value); setEpisodePage(0); setTradePage(0); }} placeholder="심볼, 사유, 리포트 ID" />
-          </label>
-          <button type="button" onClick={() => downloadTrades(sortedTrades)}>CSV 다운로드</button>
+    <div className="grid gap-4">
+      <section className="card border border-base-300 bg-base-100 shadow-sm">
+        <div className="card-body gap-3 p-5">
+          <h2 className="card-title">전략 선택</h2>
+          <div className="tabs tabs-box w-fit max-w-full overflow-x-auto bg-base-200" role="group" aria-label="전략 선택">
+            {personas.map((item) => (
+              <button
+                type="button"
+                key={item}
+                aria-pressed={persona === item}
+                className={persona === item ? 'tab tab-active font-bold' : 'tab'}
+                onClick={() => { setPersona(item); setEpisodePage(0); setTradePage(0); }}
+              >
+                {personaLabels[item] ?? item}
+              </button>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-end gap-3" aria-label="매매 필터">
+            <label className="form-control">
+              <span className="label-text">매수/매도</span>
+              <select className="select select-sm select-bordered" value={side} onChange={(event) => { setSide(event.target.value); setTradePage(0); }}>
+                <option value="all">전체</option>
+                <option value="buy">매수</option>
+                <option value="sell">매도</option>
+              </select>
+            </label>
+            <label className="form-control min-w-[260px]">
+              <span className="label-text">검색</span>
+              <input className="input input-sm input-bordered" value={query} onChange={(event) => { setQuery(event.target.value); setEpisodePage(0); setTradePage(0); }} placeholder="심볼, 사유, 리포트 ID" />
+            </label>
+            <button className="btn btn-sm btn-outline" type="button" onClick={() => downloadTrades(sortedTrades)}>CSV 다운로드</button>
+          </div>
         </div>
       </section>
 
-      <section className="panel">
-        <h2>포지션 단위 매수·매도 요약</h2>
-        <p className="muted">언제 열었고, 언제 닫았고, 어떤 사유로 청산됐는지 확인하는 핵심 테이블입니다.</p>
-        <PaginationControls page={episodePage} pageCount={Math.ceil(sortedEpisodes.length / episodePageSize)} totalRows={sortedEpisodes.length} pageSize={episodePageSize} onPageChange={setEpisodePage} onPageSizeChange={(size) => { setEpisodePageSize(size); setEpisodePage(0); }} />
-        <div className="table-wrap inset">
-          <table>
-            <thead><tr>
-              <th><SortHeader label="전략" sortKey="strategy" sort={episodeSort} onSort={updateEpisodeSort} /></th>
-              <th><SortHeader label="시장" sortKey="market" sort={episodeSort} onSort={updateEpisodeSort} /></th>
-              <th><SortHeader label="종목" sortKey="symbol" sort={episodeSort} onSort={updateEpisodeSort} /></th>
-              <th><SortHeader label="목표가" sortKey="target" sort={episodeSort} onSort={updateEpisodeSort} /></th>
-              <th><SortHeader label="매수 시작" sortKey="openDate" sort={episodeSort} onSort={updateEpisodeSort} /></th>
-              <th><SortHeader label="매도/상태" sortKey="closeDate" sort={episodeSort} onSort={updateEpisodeSort} /></th>
-              <th><SortHeader label="보유일" sortKey="holdingDays" sort={episodeSort} onSort={updateEpisodeSort} /></th>
-              <th><SortHeader label="평균 진입" sortKey="entry" sort={episodeSort} onSort={updateEpisodeSort} /></th>
-              <th><SortHeader label="평균 청산/최근" sortKey="exit" sort={episodeSort} onSort={updateEpisodeSort} /></th>
-              <th><SortHeader label="종목 수익률" sortKey="stockReturn" sort={episodeSort} onSort={updateEpisodeSort} /></th>
-              <th><SortHeader label="자본 기여" sortKey="contribution" sort={episodeSort} onSort={updateEpisodeSort} /></th>
-              <th><SortHeader label="매도 기준" sortKey="reason" sort={episodeSort} onSort={updateEpisodeSort} /></th>
-            </tr></thead>
-            <tbody>
-              {episodeRows.map((episode) => {
-                const pnl = episode.status === 'closed' ? episode.realizedPnlKrw : episode.unrealizedPnlKrw;
-                const stockReturn = positionReturn(episode);
-                const contribution = capitalContribution(pnl, capitalByPersona[episode.persona]);
-                const target = targetsBySymbol[episode.symbol];
-                return (
-                  <tr key={`${episode.persona}-${episode.symbol}-${episode.openDate}-${episode.closeDate ?? 'open'}`}>
-                    <td>{personaLabels[episode.persona] ?? episode.persona}</td>
-                    <td><span className="pill">{marketLabel(target?.marketRegion)}</span></td>
-                    <td><strong><Link href={`/reports/${episode.symbol}`}>{episode.company || episode.symbol}</Link></strong><div className="muted">{episode.symbol}</div></td>
-                    <td>{formatTarget(target)}<div className="muted">{target?.publicationDate ?? '—'}</div></td>
-                    <td>{episode.openDate}<div className="muted">{episode.buyFills ?? 0}회 매수</div></td>
-                    <td>{episode.closeDate ?? <span className="pill good">보유중</span>}<div className="muted">{episode.status}</div></td>
-                    <td>{formatDays(episode.holdingDays)}</td>
-                    <td>{formatAssetPrice(episode.avgEntryPriceNative, episode.avgEntryPriceKrw, episode.currency)}</td>
+      <section className="card border border-base-300 bg-base-100 shadow-sm">
+        <div className="card-body gap-2 p-5">
+          <h2 className="card-title">포지션 단위 매수·매도</h2>
+          <PaginationControls page={episodePage} pageCount={Math.ceil(sortedEpisodes.length / episodePageSize)} totalRows={sortedEpisodes.length} pageSize={episodePageSize} onPageChange={setEpisodePage} onPageSizeChange={(size) => { setEpisodePageSize(size); setEpisodePage(0); }} />
+          <div className="overflow-x-auto rounded-box border border-base-300 bg-base-100">
+            <table className="table table-sm table-zebra">
+              <thead><tr>
+                <th><SortHeader label="전략" sortKey="strategy" sort={episodeSort} onSort={updateEpisodeSort} /></th>
+                <th><SortHeader label="시장" sortKey="market" sort={episodeSort} onSort={updateEpisodeSort} /></th>
+                <th><SortHeader label="종목" sortKey="symbol" sort={episodeSort} onSort={updateEpisodeSort} /></th>
+                <th><SortHeader label="목표가" sortKey="target" sort={episodeSort} onSort={updateEpisodeSort} /></th>
+                <th><SortHeader label="매수 시작" sortKey="openDate" sort={episodeSort} onSort={updateEpisodeSort} /></th>
+                <th><SortHeader label="매도/상태" sortKey="closeDate" sort={episodeSort} onSort={updateEpisodeSort} /></th>
+                <th><SortHeader label="보유일" sortKey="holdingDays" sort={episodeSort} onSort={updateEpisodeSort} /></th>
+                <th><SortHeader label="평균 진입" sortKey="entry" sort={episodeSort} onSort={updateEpisodeSort} /></th>
+                <th><SortHeader label="평균 청산/최근" sortKey="exit" sort={episodeSort} onSort={updateEpisodeSort} /></th>
+                <th><SortHeader label="종목 수익률" sortKey="stockReturn" sort={episodeSort} onSort={updateEpisodeSort} /></th>
+                <th><SortHeader label="자본 기여" sortKey="contribution" sort={episodeSort} onSort={updateEpisodeSort} /></th>
+                <th><SortHeader label="매도 기준" sortKey="reason" sort={episodeSort} onSort={updateEpisodeSort} /></th>
+              </tr></thead>
+              <tbody>
+                {episodeRows.map((episode) => {
+                  const pnl = episode.status === 'closed' ? episode.realizedPnlKrw : episode.unrealizedPnlKrw;
+                  const stockReturn = positionReturn(episode);
+                  const contribution = capitalContribution(pnl, capitalByPersona[episode.persona]);
+                  const target = targetsBySymbol[episode.symbol];
+                  return (
+                    <tr key={`${episode.persona}-${episode.symbol}-${episode.openDate}-${episode.closeDate ?? 'open'}`}>
+                      <td>{personaLabels[episode.persona] ?? episode.persona}</td>
+                      <td><span className="badge badge-ghost badge-sm">{marketLabel(target?.marketRegion)}</span></td>
+                      <td>
+                        <strong><Link className="link link-hover" href={`/reports/${episode.symbol}`}>{episode.company || episode.symbol}</Link></strong>
+                        <div className="text-xs text-base-content/55">{episode.symbol}</div>
+                      </td>
+                      <td>
+                        {target ? <Money native={target.targetPriceNative} krw={target.targetPriceKrw} currency={target.currency} /> : '—'}
+                        <div className="text-xs text-base-content/55">{target?.publicationDate ?? '—'}</div>
+                      </td>
+                      <td>
+                        <span className="font-mono text-xs">{episode.openDate}</span>
+                        <div className="text-xs text-base-content/55">{episode.buyFills ?? 0}회 매수</div>
+                      </td>
+                      <td>
+                        {episode.closeDate ? <span className="font-mono text-xs">{episode.closeDate}</span> : <span className="badge badge-success badge-soft badge-sm">보유중</span>}
+                        <div className="text-xs text-base-content/55">{episode.status}</div>
+                      </td>
+                      <td className="tabular-nums">{formatDays(episode.holdingDays)}</td>
+                      <td><Money native={episode.avgEntryPriceNative} krw={episode.avgEntryPriceKrw} currency={episode.currency} /></td>
+                      <td>
+                        <Money native={episode.avgExitPriceNative ?? episode.lastCloseNative} krw={episode.avgExitPriceKrw ?? episode.lastCloseKrw} currency={episode.currency} />
+                        <div className="text-xs text-base-content/55">손익 {formatKrw(pnl)}</div>
+                      </td>
+                      <td className={`tabular-nums ${(stockReturn ?? 0) >= 0 ? 'text-success' : 'text-error'}`}>{formatPercent(stockReturn)}</td>
+                      <td className={`tabular-nums ${(contribution ?? 0) >= 0 ? 'text-success' : 'text-error'}`}>{formatPercent(contribution)}</td>
+                      <td className="text-sm">{humanReason(episode.exitReasons)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section className="card border border-base-300 bg-base-100 shadow-sm">
+        <div className="card-body gap-2 p-5">
+          <h2 className="card-title">체결 원장</h2>
+          <PaginationControls page={tradePage} pageCount={Math.ceil(sortedTrades.length / tradePageSize)} totalRows={sortedTrades.length} pageSize={tradePageSize} onPageChange={setTradePage} onPageSizeChange={(size) => { setTradePageSize(size); setTradePage(0); }} />
+          <div className="overflow-x-auto rounded-box border border-base-300 bg-base-100">
+            <table className="table table-sm table-zebra">
+              <thead><tr>
+                <th><SortHeader label="일자" sortKey="date" sort={tradeSort} onSort={updateTradeSort} /></th>
+                <th><SortHeader label="전략" sortKey="strategy" sort={tradeSort} onSort={updateTradeSort} /></th>
+                <th><SortHeader label="시장" sortKey="market" sort={tradeSort} onSort={updateTradeSort} /></th>
+                <th><SortHeader label="구분" sortKey="side" sort={tradeSort} onSort={updateTradeSort} /></th>
+                <th><SortHeader label="심볼" sortKey="symbol" sort={tradeSort} onSort={updateTradeSort} /></th>
+                <th><SortHeader label="목표가" sortKey="target" sort={tradeSort} onSort={updateTradeSort} /></th>
+                <th><SortHeader label="수량" sortKey="qty" sort={tradeSort} onSort={updateTradeSort} /></th>
+                <th><SortHeader label="체결가" sortKey="price" sort={tradeSort} onSort={updateTradeSort} /></th>
+                <th><SortHeader label="체결금액" sortKey="gross" sort={tradeSort} onSort={updateTradeSort} /></th>
+                <th><SortHeader label="현금잔고" sortKey="cash" sort={tradeSort} onSort={updateTradeSort} /></th>
+                <th><SortHeader label="사유" sortKey="reason" sort={tradeSort} onSort={updateTradeSort} /></th>
+                <th>근거</th>
+              </tr></thead>
+              <tbody>
+                {tradeRows.map((trade) => {
+                  const target = (trade.reportId ? targetsByReportId[trade.reportId] : undefined) ?? targetsBySymbol[trade.symbol];
+                  return (
+                  <tr key={`${trade.persona}-${trade.date}-${trade.symbol}-${trade.side}-${trade.qty ?? 'q'}-${trade.fillPriceKrw ?? 'p'}-${trade.grossKrw ?? 'g'}-${trade.reportId ?? 'no-report'}-${trade.cashAfterKrw ?? 'cash'}`}>
+                    <td className="font-mono text-xs">{trade.date}</td>
+                    <td>{personaLabels[trade.persona] ?? trade.persona}</td>
+                    <td><span className="badge badge-ghost badge-sm">{marketLabel(target?.marketRegion)}</span></td>
+                    <td><span className={`badge badge-soft badge-sm ${trade.side === 'buy' ? 'badge-success' : 'badge-warning'}`}>{trade.side === 'buy' ? '매수' : '매도'}</span></td>
+                    <td><Link className="link link-hover" href={`/reports/${trade.symbol}`}>{trade.symbol}</Link></td>
                     <td>
-                      {formatAssetPrice(episode.avgExitPriceNative ?? episode.lastCloseNative, episode.avgExitPriceKrw ?? episode.lastCloseKrw, episode.currency)}
-                      <div className="muted">손익 {formatKrw(pnl)}</div>
+                      {target ? <Money native={target.targetPriceNative} krw={target.targetPriceKrw} currency={target.currency} /> : '—'}
+                      <div className="text-xs text-base-content/55">{target?.publicationDate ?? '—'}</div>
                     </td>
-                    <td className={(stockReturn ?? 0) >= 0 ? 'good' : 'bad'}>{formatPercent(stockReturn)}</td>
-                    <td className={(contribution ?? 0) >= 0 ? 'good' : 'bad'}>{formatPercent(contribution)}</td>
-                    <td>{humanReason(episode.exitReasons)}</td>
+                    <td className="tabular-nums">{trade.qty?.toLocaleString('ko-KR') ?? '—'}</td>
+                    <td><Money native={trade.fillPriceNative} krw={trade.fillPriceKrw} currency={trade.currency} /></td>
+                    <td><Money native={trade.grossNative} krw={trade.grossKrw} currency={trade.currency} /></td>
+                    <td className="tabular-nums">{formatKrw(trade.cashAfterKrw)}</td>
+                    <td className="text-sm">{humanReason(trade.reason)}</td>
+                    <td>{trade.reportId && reportSymbolsById[trade.reportId] ? <Link className="link link-hover" href={`/reports/${reportSymbolsById[trade.reportId]}`}>리포트</Link> : '—'}</td>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section className="panel">
-        <h2>체결 원장</h2>
-        <p className="muted">실제 buy/sell fill 단위 원장입니다. 리포트 ID가 있는 행은 원문 근거로 이동합니다.</p>
-        <PaginationControls page={tradePage} pageCount={Math.ceil(sortedTrades.length / tradePageSize)} totalRows={sortedTrades.length} pageSize={tradePageSize} onPageChange={setTradePage} onPageSizeChange={(size) => { setTradePageSize(size); setTradePage(0); }} />
-        <div className="table-wrap inset">
-          <table>
-            <thead><tr>
-              <th><SortHeader label="일자" sortKey="date" sort={tradeSort} onSort={updateTradeSort} /></th>
-              <th><SortHeader label="전략" sortKey="strategy" sort={tradeSort} onSort={updateTradeSort} /></th>
-              <th><SortHeader label="시장" sortKey="market" sort={tradeSort} onSort={updateTradeSort} /></th>
-              <th><SortHeader label="구분" sortKey="side" sort={tradeSort} onSort={updateTradeSort} /></th>
-              <th><SortHeader label="심볼" sortKey="symbol" sort={tradeSort} onSort={updateTradeSort} /></th>
-              <th><SortHeader label="목표가" sortKey="target" sort={tradeSort} onSort={updateTradeSort} /></th>
-              <th><SortHeader label="수량" sortKey="qty" sort={tradeSort} onSort={updateTradeSort} /></th>
-              <th><SortHeader label="체결가" sortKey="price" sort={tradeSort} onSort={updateTradeSort} /></th>
-              <th><SortHeader label="체결금액" sortKey="gross" sort={tradeSort} onSort={updateTradeSort} /></th>
-              <th><SortHeader label="현금잔고" sortKey="cash" sort={tradeSort} onSort={updateTradeSort} /></th>
-              <th><SortHeader label="사유" sortKey="reason" sort={tradeSort} onSort={updateTradeSort} /></th>
-              <th>근거</th>
-            </tr></thead>
-            <tbody>
-              {tradeRows.map((trade) => {
-                const target = (trade.reportId ? targetsByReportId[trade.reportId] : undefined) ?? targetsBySymbol[trade.symbol];
-                return (
-                <tr key={`${trade.persona}-${trade.date}-${trade.symbol}-${trade.side}-${trade.qty ?? 'q'}-${trade.fillPriceKrw ?? 'p'}-${trade.grossKrw ?? 'g'}-${trade.reportId ?? 'no-report'}-${trade.cashAfterKrw ?? 'cash'}`}>
-                  <td>{trade.date}</td>
-                  <td>{personaLabels[trade.persona] ?? trade.persona}</td>
-                  <td><span className="pill">{marketLabel(target?.marketRegion)}</span></td>
-                  <td><span className={`pill ${trade.side === 'buy' ? 'good' : 'warn'}`}>{trade.side === 'buy' ? '매수' : '매도'}</span></td>
-                  <td><Link href={`/reports/${trade.symbol}`}>{trade.symbol}</Link></td>
-                  <td>{formatTarget(target)}<div className="muted">{target?.publicationDate ?? '—'}</div></td>
-                  <td>{trade.qty?.toLocaleString('ko-KR') ?? '—'}</td>
-                  <td>{formatAssetPrice(trade.fillPriceNative, trade.fillPriceKrw, trade.currency)}</td>
-                  <td>{formatAssetPrice(trade.grossNative, trade.grossKrw, trade.currency)}</td>
-                  <td>{formatKrw(trade.cashAfterKrw)}</td>
-                  <td>{humanReason(trade.reason)}</td>
-                  <td>{trade.reportId && reportSymbolsById[trade.reportId] ? <Link href={`/reports/${reportSymbolsById[trade.reportId]}`}>리포트</Link> : '—'}</td>
-                </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
     </div>
@@ -227,31 +246,10 @@ function humanReason(reason: string): string {
   return reason.replace(/[()']/g, '') || '—';
 }
 
-function formatTarget(target: ReportTargetDigest | undefined) {
-  if (!target) return '—';
-  const { primary, secondary } = formatNativeWithKrw(target.targetPriceNative, target.targetPriceKrw, target.currency);
-  return (
-    <>
-      {primary}
-      {secondary ? <div className="muted" style={{ fontSize: '.74rem' }}>{secondary}</div> : null}
-    </>
-  );
-}
-
-function formatAssetPrice(native: number | null, krw: number | null, currency: string) {
-  const { primary, secondary } = formatNativeWithKrw(native, krw, currency);
-  return (
-    <>
-      {primary}
-      {secondary ? <div className="muted" style={{ fontSize: '.74rem' }}>{secondary}</div> : null}
-    </>
-  );
-}
-
 function downloadTrades(rows: TradeRow[]) {
   const headers = ['date', 'persona', 'side', 'symbol', 'currency', 'qty', 'fill_price_native', 'fill_price_krw', 'gross_native', 'gross_krw', 'cash_after_krw', 'reason', 'report_id'];
   const csv = [headers.join(','), ...rows.map((row) => [row.date, row.persona, row.side, row.symbol, row.currency, row.qty ?? '', row.fillPriceNative ?? '', row.fillPriceKrw ?? '', row.grossNative ?? '', row.grossKrw ?? '', row.cashAfterKrw ?? '', row.reason, row.reportId ?? ''].map(csvEscape).join(','))].join('\n');
-  const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob([`﻿${csv}`], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;

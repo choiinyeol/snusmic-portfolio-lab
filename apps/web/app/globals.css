@@ -229,21 +229,6 @@ code, pre { font-family: var(--mono); }
 main { width: min(1480px, calc(100vw - 1.5rem)); margin: 0 auto; padding: clamp(1.2rem, 2.4vw, 2rem) 0 4rem; }
 
 /* ─────────────────────  Typography  ───────────────────── */
-.display-1 {
-  margin: 0;
-  font-family: var(--display);
-  font-size: clamp(2.4rem, 5vw, 3.8rem);
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -.045em;
-  color: var(--ink);
-  text-wrap: balance;
-}
-.display-num {
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum", "ss01";
-  letter-spacing: -.045em;
-}
 h1 {
   margin: 0;
   max-width: 1080px;
@@ -267,97 +252,10 @@ ul, ol { color: var(--muted); line-height: 1.7; }
   font-size: .72rem;
 }
 
-/* ─────────────────────  Hero / terminal-frame  ─────────────────────
-   The "terminal-frame" naming is preserved so existing pages keep
-   working, but it's now a soft, breathable hero card. */
-.terminal-frame {
-  position: relative;
-  overflow: hidden;
-  min-height: 132px;
-  padding: clamp(1.4rem, 2.6vw, 2rem);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background:
-    radial-gradient(640px 240px at 88% -20%, rgba(49,130,246,.08), transparent 60%),
-    radial-gradient(420px 280px at 8% 110%, rgba(0,194,179,.06), transparent 60%),
-    var(--surface);
-  box-shadow: var(--shadow);
-}
-.terminal-frame__bar { display: none; } /* legacy macOS dots — hide in light theme */
-.editorial-hero { min-height: 240px; margin-bottom: 1.2rem; }
-.editorial-hero h1 { max-width: 1040px; }
-.hero-copy { max-width: 820px; }
-.hero-copy p { margin: 0; color: var(--muted); font-size: clamp(.95rem, 1.1vw, 1.05rem); }
-.action-row { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; margin-top: .35rem; }
-
-/* ─────────────────────  Grids  ─────────────────────
-   Do not redefine Tailwind's .grid utility. Legacy layout helper classes
-   only add templates/gaps so Tailwind gap-* classes keep working. */
-.cards { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; }
-.bento-metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.bento-metrics > :first-child { grid-column: span 2; }
-.feature-grid > .panel:first-child { min-height: 240px; }
-.feature-grid > .panel:last-child { border-color: var(--accent-2-soft); }
-.two-col { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
-.dashboard-hero-grid { grid-template-columns: minmax(0, 1.45fr) minmax(320px, .75fr); gap: 1rem; }
-.dashboard-stats-grid { grid-template-columns: minmax(0, 1.25fr) minmax(360px, .75fr); gap: 1rem; }
-.dashboard-main-panel { min-height: 520px; }
-
-/* ─────────────────────  Card & panel  ───────────────────── */
-.legacy-card,
-.panel {
-  position: relative;
-  overflow: hidden;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 1.1rem 1.15rem;
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow .18s ease, border-color .18s ease;
-}
-.metric-card {
-  min-height: 116px;
-  display: grid;
-  align-content: space-between;
-  gap: .35rem;
-}
-.metric-card::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto;
-  height: 3px;
-  background: linear-gradient(90deg, var(--line-strong), transparent);
-  opacity: .8;
-}
-.metric {
-  margin-top: .15rem;
-  font-size: clamp(1.45rem, 2.4vw, 1.85rem);
-  font-weight: 800;
-  letter-spacing: -.04em;
-  color: var(--ink);
-  line-height: 1.05;
-  font-variant-numeric: tabular-nums;
-}
-.small-metric { font-size: clamp(1.2rem, 2vw, 1.45rem); }
-.muted { color: var(--muted); }
-.muted-soft { color: var(--faint); }
-
-.good, .tone-good .metric, .pill.tone-good, .pill.good { color: var(--good); }
-.bad, .tone-bad .metric, .pill.tone-bad { color: var(--bad); }
-.warn, .tone-warn .metric, .pill.tone-warn { color: var(--warn); }
-.tone-accent .metric, .pill.tone-accent { color: var(--accent); }
-
-.tone-good::before { background: linear-gradient(90deg, var(--good), transparent); }
-.tone-bad::before { background: linear-gradient(90deg, var(--bad), transparent); }
-.tone-warn::before { background: linear-gradient(90deg, var(--warn), transparent); }
-.tone-accent::before { background: linear-gradient(90deg, var(--accent), transparent); }
-
-.metric-card.tone-good { background: linear-gradient(180deg, var(--good-soft), var(--surface) 70%); }
-.metric-card.tone-bad { background: linear-gradient(180deg, var(--bad-soft), var(--surface) 70%); }
-.metric-card.tone-warn { background: linear-gradient(180deg, var(--warn-soft), var(--surface) 70%); }
-.metric-card.tone-accent { background: linear-gradient(180deg, var(--accent-soft), var(--surface) 70%); }
-
-.panel-caption { color: var(--muted); font-size: .85rem; margin-bottom: .8rem; }
+/* ─────────────────────  Tone utilities  ───────────────────── */
+.good { color: var(--good); }
+.bad { color: var(--bad); }
+.warn { color: var(--warn); }
 
 /* ─────────────────────  Buttons / links  ───────────────────── */
 .terminal-link,

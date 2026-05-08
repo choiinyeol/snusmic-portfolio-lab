@@ -46,24 +46,24 @@ export function PriceEvidencePanel({ report, prices, pathEvidence, status }: Pro
       <aside className="grid gap-3 lg:col-span-2" aria-label="리포트 핵심 가격 지표">
         <KpiTile
           label="발간가"
-          value={<span className="display-num">{formatAssetPrice(entryPrice, report)}</span>}
+          value={<span className="tabular-nums">{formatAssetPrice(entryPrice, report)}</span>}
           caption={`${report.publicationDate} 종가 기준`}
         />
         <KpiTile
           label="목표가"
-          value={<span className="display-num">{formatAssetPrice(report.targetPriceNative, report)}</span>}
+          value={<span className="tabular-nums">{formatAssetPrice(report.targetPriceNative, report)}</span>}
           delta={`${formatPercent(report.targetUpsideAtPub)} ${targetMoveLabel(report)}`}
           tone="accent"
         />
         <KpiTile
           label="현재가"
-          value={<span className="display-num">{formatAssetPrice(report.lastCloseNative, report)}</span>}
+          value={<span className="tabular-nums">{formatAssetPrice(report.lastCloseNative, report)}</span>}
           delta={report.lastCloseDate ? `${report.lastCloseDate} · ${formatPercent(report.currentReturn)}` : formatPercent(report.currentReturn)}
           tone={(report.currentReturn ?? 0) >= 0 ? 'good' : 'bad'}
         />
         <KpiTile
           label={remainingLabel}
-          value={<span className="display-num">{formatPercent(report.targetGapPct)}</span>}
+          value={<span className="tabular-nums">{formatPercent(report.targetGapPct)}</span>}
           delta={status.label}
           tone={targetGapTone}
         />

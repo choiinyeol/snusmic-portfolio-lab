@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { MetricCard, Panel, StatusPill } from '@/components/ui/Terminal';
 import { formatKrw, formatPercent } from '@/lib/format';
 
 type StrategyRun = {
@@ -29,40 +28,89 @@ const PARAM_LABELS: Record<string, string> = {
 
 export function StrategySummary({ run, href }: { run: StrategyRun; href?: string }) {
   const params = run.params ?? {};
-  const topParams = Object.keys(params).slice(0, 6);
+  const topParams = Object.keys(params).slice(0, 5);
+  const verdict = strategyVerdict(run);
+  const finalEquity = run.metrics.final_equity_krw ?? null;
+  const mwr = run.metrics.money_weighted_return ?? null;
+  const mdd = run.metrics.max_drawdown ?? null;
+  const hitRate = run.metrics.hit_rate ?? null;
+  const tradeCount = run.metrics.trade_count ?? null;
+  const openPositions = run.metrics.open_positions ?? null;
 
   return (
-    <Panel>
-      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-        <div>
-          <p className="badge badge-ghost badge-sm mb-2">{run.scope ?? 'local'} · {run.sampler ?? 'artifact'}{run.trial_number !== undefined ? ` · trial ${run.trial_number}` : ''}</p>
-          <h2 className="text-2xl font-black tracking-[-0.04em]">{href ? <Link className="link link-hover" href={href}>{run.label}</Link> : run.label}</h2>
-        </div>
-        <StatusPill tone="accent">score {formatPercent(run.metrics.score)}</StatusPill>
+    <article className="card border border-base-300 bg-base-100 shadow-sm transition hover:border-primary/40">
+      <div className="card-body gap-4 p-5">
+        <header className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <span className="text-xs font-mono uppercase tracking-[0.16em] text-base-content/55">
+              {run.scope ?? 'local'} · {run.sampler ?? 'artifact'}{run.trial_number !== undefined ? ` · trial ${run.trial_number}` : ''}
+            </span>
+            <h3 className="mt-1 text-xl font-black tracking-[-0.03em] md:text-2xl">
+              {href ? <Link className="link link-hover" href={href}>{run.label}</Link> : run.label}
+            </h3>
+          </div>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className={`badge badge-soft ${verdict.tone === 'good' ? 'badge-success' : verdict.tone === 'warn' ? 'badge-warning' : 'badge-ghost'}`}>{verdict.label}</span>
+            <span className="badge badge-primary badge-soft">score {formatPercent(run.metrics.score)}</span>
+          </div>
+        </header>
+
+        <dl className="grid grid-cols-2 gap-2 md:grid-cols-5">
+          <Stat label="최종 자산" value={finalEquity !== null ? formatKrw(finalEquity) : '—'} tone={(finalEquity ?? 0) > 0 ? 'good' : 'neutral'} />
+          <Stat label="MWR" value={formatPercent(mwr)} tone={(mwr ?? 0) >= 0 ? 'good' : 'bad'} />
+          <Stat label="MDD" value={formatPercent(mdd)} tone={(mdd ?? 0) < -0.25 ? 'bad' : 'warn'} />
+          <Stat label="거래" value={tradeCount !== null ? Number(tradeCount).toLocaleString('ko-KR') : '—'} />
+          <Stat label="보유" value={openPositions !== null ? Number(openPositions).toLocaleString('ko-KR') : '—'} />
+        </dl>
+
+        {hitRate !== null ? (
+          <div className="text-sm text-base-content/65">목표 도달률 <strong className="text-base-content tabular-nums">{formatPercent(hitRate)}</strong></div>
+        ) : null}
+
+        {topParams.length ? (
+          <div className="flex flex-wrap gap-1.5" aria-label="핵심 파라미터">
+            {topParams.map((key) => (
+              <span className="badge badge-outline badge-sm" key={key}>
+                {PARAM_LABELS[key] ?? key}: {formatParam(params[key])}
+              </span>
+            ))}
+          </div>
+        ) : null}
+
+        {run.warnings?.length ? (
+          <ul className="grid gap-1 text-xs text-warning">
+            {run.warnings.map((warning) => <li key={warning}>주의: {warning}</li>)}
+          </ul>
+        ) : null}
+
+        {href ? (
+          <div className="card-actions">
+            <Link className="btn btn-sm btn-primary" href={href}>매매·포트폴리오</Link>
+          </div>
+        ) : null}
       </div>
-      <dl className="mt-4 grid gap-3 md:grid-cols-4">
-        <MetricCard label="최종 자산" value={formatKrw(run.metrics.final_equity_krw)} tone="good" />
-        <MetricCard label="IRR proxy" value={formatPercent(run.metrics.money_weighted_return)} />
-        <MetricCard label="MDD" value={formatPercent(run.metrics.max_drawdown)} tone="bad" />
-        <MetricCard label="목표 도달률" value={formatPercent(run.metrics.hit_rate)} tone="accent" />
-      </dl>
-      {topParams.length ? (
-        <div className="mt-4 flex flex-wrap gap-2" aria-label="핵심 파라미터">
-          {topParams.map((key) => <span className="badge badge-outline" key={key}>{PARAM_LABELS[key] ?? key}: {formatParam(params[key])}</span>)}
-        </div>
-      ) : null}
-      {href ? (
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Link className="btn btn-sm btn-primary" href={href}>실험 포트폴리오·매매내역 보기</Link>
-        </div>
-      ) : null}
-      {run.warnings?.length ? (
-        <div className="mt-4 grid gap-2">
-          {run.warnings.map((warning) => <div className="alert alert-warning alert-soft py-2 text-sm" key={warning}>주의: {warning}</div>)}
-        </div>
-      ) : null}
-    </Panel>
+    </article>
   );
+}
+
+function Stat({ label, value, tone = 'neutral' }: { label: string; value: string; tone?: 'good' | 'bad' | 'warn' | 'neutral' }) {
+  const toneClass = tone === 'good' ? 'text-success' : tone === 'bad' ? 'text-error' : tone === 'warn' ? 'text-warning' : 'text-base-content';
+  return (
+    <div className="rounded-md border border-base-200 bg-base-100 px-3 py-2.5">
+      <dt className="text-xs uppercase tracking-[0.14em] text-base-content/55">{label}</dt>
+      <dd className={`mt-1 text-base font-bold tabular-nums ${toneClass}`}>{value}</dd>
+    </div>
+  );
+}
+
+function strategyVerdict(run: StrategyRun): { label: string; tone: 'good' | 'warn' | 'neutral' } {
+  const mdd = run.metrics.max_drawdown ?? null;
+  const mwr = run.metrics.money_weighted_return ?? null;
+  if (run.warnings?.length) return { label: '주의', tone: 'warn' };
+  if (mwr === null || mdd === null) return { label: '검토 필요', tone: 'neutral' };
+  if (mwr > 0 && mdd > -0.2) return { label: '강한 후보', tone: 'good' };
+  if (mdd < -0.25) return { label: '낙폭 큼', tone: 'warn' };
+  return { label: '검토 필요', tone: 'neutral' };
 }
 
 function formatParam(value: unknown): string {

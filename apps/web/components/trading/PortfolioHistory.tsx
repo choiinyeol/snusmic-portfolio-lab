@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import type { MonthlyHoldingRow, ReportTargetDigest } from '@/lib/artifacts';
-import { formatKrw, formatNativeWithKrw, formatPercent } from '@/lib/format';
+import { Money } from '@/components/ui/Money';
+import { formatKrw, formatPercent } from '@/lib/format';
 import { PaginationControls, SortHeader, defaultPersonaFor, pageRows, sortRows, useUrlBackedStrategy, type SortState } from './TableControls';
 
 type Props = {
@@ -50,97 +51,108 @@ export function PortfolioHistory({ monthly, personaLabels, targetsBySymbol }: Pr
   };
 
   return (
-    <div className="grid" style={{ gap: '1rem' }}>
-      <section className="panel report-table-panel strategy-filter-panel">
-        <h2>전략 선택</h2>
-        <div className="strategy-tabs" role="group" aria-label="전략 선택">
-          {personas.map((item) => (
-            <button type="button" key={item} aria-pressed={persona === item} className={persona === item ? 'active' : ''} onClick={() => { setPersona(item); setPage(0); }}>
-              {personaLabels[item] ?? item}
-            </button>
-          ))}
-        </div>
-        <div className="table-toolbar" aria-label="월말 포트폴리오 필터">
-          <label>
-            <span>월말 기준일</span>
-            <select value={month} onChange={(event) => { setMonth(event.target.value); setPage(0); }}>
-              {months.map((item) => <option key={item} value={item}>{item}</option>)}
-            </select>
-          </label>
-          <button type="button" onClick={() => downloadMonthly(sorted, targetsBySymbol)}>현재 보기 CSV</button>
+    <div className="grid gap-4">
+      <section className="card border border-base-300 bg-base-100 shadow-sm">
+        <div className="card-body gap-3 p-5">
+          <h2 className="card-title">전략 선택</h2>
+          <div className="tabs tabs-box w-fit max-w-full overflow-x-auto bg-base-200" role="group" aria-label="전략 선택">
+            {personas.map((item) => (
+              <button type="button" key={item} aria-pressed={persona === item} className={persona === item ? 'tab tab-active font-bold' : 'tab'} onClick={() => { setPersona(item); setPage(0); }}>
+                {personaLabels[item] ?? item}
+              </button>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-end gap-3" aria-label="월말 포트폴리오 필터">
+            <label className="form-control">
+              <span className="label-text">월말 기준일</span>
+              <select className="select select-sm select-bordered" value={month} onChange={(event) => { setMonth(event.target.value); setPage(0); }}>
+                {months.map((item) => <option key={item} value={item}>{item}</option>)}
+              </select>
+            </label>
+            <button className="btn btn-sm btn-outline" type="button" onClick={() => downloadMonthly(sorted, targetsBySymbol)}>현재 보기 CSV</button>
+          </div>
         </div>
       </section>
 
-      <section className="panel">
-        <h2>포트폴리오 비중 추이 · 100% 스택바</h2>
-        <p className="muted">선택한 전략의 월말 상위 8개 종목과 기타를 100%로 정규화해 보유 구조 변화를 보여줍니다.</p>
-        <div className="stacked-history" aria-label="월말 포트폴리오 비중 추이">
-          {stacks.map((stack) => (
-            <div className="stack-row" key={stack.month}>
-              <div className="stack-label">{stack.month}</div>
-              <div className="stack-bar">
-                {stack.segments.map((segment, index) => (
-                  <span
-                    key={`${stack.month}-${segment.symbol}`}
-                    style={{ width: `${Math.max(0, segment.weight * 100)}%`, background: STACK_COLORS[index % STACK_COLORS.length] }}
-                    title={`${segment.symbol}: ${formatPercent(segment.weight)}`}
-                  />
-                ))}
+      <section className="card border border-base-300 bg-base-100 shadow-sm">
+        <div className="card-body gap-3 p-5">
+          <h2 className="card-title">비중 추이 — 100% 스택</h2>
+          <div className="grid gap-1" aria-label="월말 포트폴리오 비중 추이">
+            {stacks.map((stack) => (
+              <div className="grid grid-cols-[6rem_1fr_minmax(140px,16rem)] items-center gap-3" key={stack.month}>
+                <div className="font-mono text-xs text-base-content/65">{stack.month}</div>
+                <div className="flex h-3 overflow-hidden rounded-full">
+                  {stack.segments.map((segment, index) => (
+                    <span
+                      key={`${stack.month}-${segment.symbol}`}
+                      style={{ width: `${Math.max(0, segment.weight * 100)}%`, background: STACK_COLORS[index % STACK_COLORS.length] }}
+                      title={`${segment.symbol}: ${formatPercent(segment.weight)}`}
+                    />
+                  ))}
+                </div>
+                <div className="truncate text-xs text-base-content/55">{stack.segments.slice(0, 4).map((segment) => segment.symbol).join(' · ')}</div>
               </div>
-              <div className="stack-legend-inline">{stack.segments.slice(0, 4).map((segment) => segment.symbol).join(' · ')}</div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="panel">
-        <h2>{month} 월말 포트폴리오</h2>
-        <p className="muted">과거 특정 시점에 어떤 포트폴리오였는지 확인하는 전용 페이지입니다.</p>
-        <PaginationControls page={page} pageCount={Math.ceil(sorted.length / pageSize)} totalRows={sorted.length} pageSize={pageSize} onPageChange={setPage} onPageSizeChange={(size) => { setPageSize(size); setPage(0); }} />
-        <div className="table-wrap inset">
-          <table>
-            <thead><tr>
-              <th><SortHeader label="월말" sortKey="month" sort={sort} onSort={updateSort} /></th>
-              <th><SortHeader label="전략" sortKey="strategy" sort={sort} onSort={updateSort} /></th>
-              <th><SortHeader label="시장" sortKey="market" sort={sort} onSort={updateSort} /></th>
-              <th><SortHeader label="심볼" sortKey="symbol" sort={sort} onSort={updateSort} /></th>
-              <th><SortHeader label="목표가" sortKey="target" sort={sort} onSort={updateSort} /></th>
-              <th><SortHeader label="수량" sortKey="qty" sort={sort} onSort={updateSort} /></th>
-              <th><SortHeader label="월말가" sortKey="monthClose" sort={sort} onSort={updateSort} /></th>
-              <th><SortHeader label="평단" sortKey="avgCost" sort={sort} onSort={updateSort} /></th>
-              <th><SortHeader label="평가액" sortKey="marketValue" sort={sort} onSort={updateSort} /></th>
-              <th><SortHeader label="미실현 손익" sortKey="unrealizedPnl" sort={sort} onSort={updateSort} /></th>
-              <th><SortHeader label="당시 수익률" sortKey="unrealizedReturn" sort={sort} onSort={updateSort} /></th>
-              <th><SortHeader label="목표까지" sortKey="targetGap" sort={sort} onSort={updateSort} /></th>
-              <th><SortHeader label="목표 달성 손익" sortKey="targetPnl" sort={sort} onSort={updateSort} /></th>
-              <th><SortHeader label="비중" sortKey="weight" sort={sort} onSort={updateSort} /></th>
-            </tr></thead>
-            <tbody>
-              {rows.map((row) => {
-                const target = targetsBySymbol[row.symbol];
-                const gap = targetGap(row, target);
-                const pnlToTarget = targetPnl(row, target);
-                return (
-                <tr key={`${row.persona}-${row.monthEnd}-${row.symbol}`}>
-                  <td>{row.monthEnd}</td>
-                  <td>{personaLabels[row.persona] ?? row.persona}</td>
-                  <td><span className="pill">{marketLabel(target?.marketRegion)}</span></td>
-                  <td>{row.company || row.symbol}<div className="muted"><a href={`/reports/${row.symbol}`}>{row.symbol}</a></div></td>
-                  <td>{formatTarget(target)}<div className="muted">{target?.publicationDate ?? '—'}</div></td>
-                  <td>{row.qty?.toLocaleString('ko-KR') ?? '—'}</td>
-                  <td>{formatMonthlyPrice(row.monthCloseNative, row.monthCloseKrw, row.currency)}</td>
-                  <td>{formatMonthlyPrice(nativeFromKrw(row.avgCostKrw, row.monthCloseNative, row.monthCloseKrw), row.avgCostKrw, row.currency)}</td>
-                  <td>{formatMonthlyPrice(row.monthCloseNative !== null && row.qty !== null ? row.monthCloseNative * row.qty : null, row.marketValueKrw, row.currency)}</td>
-                  <td className={(row.unrealizedPnlKrw ?? 0) >= 0 ? 'good' : 'bad'}>{formatKrw(row.unrealizedPnlKrw)}</td>
-                  <td className={(row.unrealizedReturn ?? 0) >= 0 ? 'good' : 'bad'}>{formatPercent(row.unrealizedReturn)}</td>
-                  <td className={(gap ?? 0) >= 0 ? 'good' : 'bad'}>{formatPercent(gap)}</td>
-                  <td className={(pnlToTarget ?? 0) >= 0 ? 'good' : 'bad'}>{formatKrw(pnlToTarget)}</td>
-                  <td>{formatPercent(row.weightInPortfolio)}</td>
-                </tr>
-                );
-              })}
-            </tbody>
-          </table>
+      <section className="card border border-base-300 bg-base-100 shadow-sm">
+        <div className="card-body gap-2 p-5">
+          <h2 className="card-title">{month} 월말 포트폴리오</h2>
+          <PaginationControls page={page} pageCount={Math.ceil(sorted.length / pageSize)} totalRows={sorted.length} pageSize={pageSize} onPageChange={setPage} onPageSizeChange={(size) => { setPageSize(size); setPage(0); }} />
+          <div className="overflow-x-auto rounded-box border border-base-300 bg-base-100">
+            <table className="table table-sm table-zebra">
+              <thead><tr>
+                <th><SortHeader label="월말" sortKey="month" sort={sort} onSort={updateSort} /></th>
+                <th><SortHeader label="전략" sortKey="strategy" sort={sort} onSort={updateSort} /></th>
+                <th><SortHeader label="시장" sortKey="market" sort={sort} onSort={updateSort} /></th>
+                <th><SortHeader label="심볼" sortKey="symbol" sort={sort} onSort={updateSort} /></th>
+                <th><SortHeader label="목표가" sortKey="target" sort={sort} onSort={updateSort} /></th>
+                <th><SortHeader label="수량" sortKey="qty" sort={sort} onSort={updateSort} /></th>
+                <th><SortHeader label="월말가" sortKey="monthClose" sort={sort} onSort={updateSort} /></th>
+                <th><SortHeader label="평단" sortKey="avgCost" sort={sort} onSort={updateSort} /></th>
+                <th><SortHeader label="평가액" sortKey="marketValue" sort={sort} onSort={updateSort} /></th>
+                <th><SortHeader label="미실현 손익" sortKey="unrealizedPnl" sort={sort} onSort={updateSort} /></th>
+                <th><SortHeader label="당시 수익률" sortKey="unrealizedReturn" sort={sort} onSort={updateSort} /></th>
+                <th><SortHeader label="목표까지" sortKey="targetGap" sort={sort} onSort={updateSort} /></th>
+                <th><SortHeader label="목표 달성 손익" sortKey="targetPnl" sort={sort} onSort={updateSort} /></th>
+                <th><SortHeader label="비중" sortKey="weight" sort={sort} onSort={updateSort} /></th>
+              </tr></thead>
+              <tbody>
+                {rows.map((row) => {
+                  const target = targetsBySymbol[row.symbol];
+                  const gap = targetGap(row, target);
+                  const pnlToTarget = targetPnl(row, target);
+                  const evalNative = row.monthCloseNative !== null && row.qty !== null ? row.monthCloseNative * row.qty : null;
+                  return (
+                  <tr key={`${row.persona}-${row.monthEnd}-${row.symbol}`}>
+                    <td className="font-mono text-xs">{row.monthEnd}</td>
+                    <td>{personaLabels[row.persona] ?? row.persona}</td>
+                    <td><span className="badge badge-ghost badge-sm">{marketLabel(target?.marketRegion)}</span></td>
+                    <td>
+                      {row.company || row.symbol}
+                      <div className="text-xs text-base-content/55"><a className="link link-hover" href={`/reports/${row.symbol}`}>{row.symbol}</a></div>
+                    </td>
+                    <td>
+                      {target ? <Money native={target.targetPriceNative} krw={target.targetPriceKrw} currency={target.currency} /> : '—'}
+                      <div className="text-xs text-base-content/55">{target?.publicationDate ?? '—'}</div>
+                    </td>
+                    <td className="tabular-nums">{row.qty?.toLocaleString('ko-KR') ?? '—'}</td>
+                    <td><Money native={row.monthCloseNative} krw={row.monthCloseKrw} currency={row.currency} /></td>
+                    <td><Money native={nativeFromKrw(row.avgCostKrw, row.monthCloseNative, row.monthCloseKrw)} krw={row.avgCostKrw} currency={row.currency} /></td>
+                    <td><Money native={evalNative} krw={row.marketValueKrw} currency={row.currency} /></td>
+                    <td className={`tabular-nums ${(row.unrealizedPnlKrw ?? 0) >= 0 ? 'text-success' : 'text-error'}`}>{formatKrw(row.unrealizedPnlKrw)}</td>
+                    <td className={`tabular-nums ${(row.unrealizedReturn ?? 0) >= 0 ? 'text-success' : 'text-error'}`}>{formatPercent(row.unrealizedReturn)}</td>
+                    <td className={`tabular-nums ${(gap ?? 0) >= 0 ? 'text-success' : 'text-error'}`}>{formatPercent(gap)}</td>
+                    <td className={`tabular-nums ${(pnlToTarget ?? 0) >= 0 ? 'text-success' : 'text-error'}`}>{formatKrw(pnlToTarget)}</td>
+                    <td className="tabular-nums">{formatPercent(row.weightInPortfolio)}</td>
+                  </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
     </div>
@@ -170,7 +182,7 @@ function downloadMonthly(rows: MonthlyHoldingRow[], targetsBySymbol: Record<stri
     const target = targetsBySymbol[row.symbol];
     return [row.monthEnd, row.persona, target?.marketRegion ?? '', row.symbol, row.company, target?.targetPriceKrw ?? '', target?.publicationDate ?? '', row.qty ?? '', row.monthCloseKrw ?? '', row.avgCostKrw ?? '', row.marketValueKrw ?? '', row.unrealizedPnlKrw ?? '', row.unrealizedReturn ?? '', targetGap(row, target) ?? '', targetPnl(row, target) ?? '', row.weightInPortfolio ?? ''].map(csvEscape).join(',');
   })].join('\n');
-  const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob([`﻿${csv}`], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -188,27 +200,6 @@ function csvEscape(value: unknown): string {
 
 function marketLabel(region: 'domestic' | 'overseas' | undefined): string {
   return region === 'domestic' ? '국내' : '해외';
-}
-
-function formatTarget(target: ReportTargetDigest | undefined) {
-  if (!target) return '—';
-  const { primary, secondary } = formatNativeWithKrw(target.targetPriceNative, target.targetPriceKrw, target.currency);
-  return (
-    <>
-      {primary}
-      {secondary ? <div className="muted" style={{ fontSize: '.74rem' }}>{secondary}</div> : null}
-    </>
-  );
-}
-
-function formatMonthlyPrice(native: number | null, krw: number | null, currency: string) {
-  const { primary, secondary } = formatNativeWithKrw(native, krw, currency);
-  return (
-    <>
-      {primary}
-      {secondary ? <div className="muted" style={{ fontSize: '.74rem' }}>{secondary}</div> : null}
-    </>
-  );
 }
 
 function nativeFromKrw(

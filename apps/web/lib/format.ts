@@ -38,6 +38,15 @@ export function signedClass(value: number | null | undefined): string {
   return value >= 0 ? 'good' : 'bad';
 }
 
+/** Tailwind class for numeric table cells: right align + tabular figures. */
+export const numCellClass = 'text-right tabular-nums';
+
+/** Tailwind class for signed numeric values (success/error tinting). */
+export function signedTextClass(value: number | null | undefined): string {
+  if (value === null || value === undefined || !Number.isFinite(value)) return 'text-base-content/55';
+  return value >= 0 ? 'text-success' : 'text-error';
+}
+
 const CURRENCY_SYMBOL: Record<string, string> = {
   KRW: '₩',
   USD: '$',

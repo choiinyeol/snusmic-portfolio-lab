@@ -6,7 +6,7 @@ import type { PositionEpisodeRow, TradeRow } from '@/lib/artifacts';
 import { formatDays, formatKrw, formatPercent } from '@/lib/format';
 import { DEFAULT_PERSONA } from '@/components/trading/TableControls';
 import { DataTable } from '@/components/ui/DataTable';
-import { Price } from '@/components/ui/Price';
+import { Money } from '@/components/ui/Money';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 
 type Props = {
@@ -81,7 +81,7 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
             <SummaryStat label="보유 포지션" value={openEpisodes.length ? `${openEpisodes.length}개` : '없음'} caption={openEpisodes.length ? `진입 ${openEpisodes[0]?.openDate ?? '—'}` : null} />
             <SummaryStat
               label="진입 평균가"
-              value={summaryAvgEntry?.avgEntryPriceKrw ? <Price native={summaryAvgEntry.avgEntryPriceNative} krw={summaryAvgEntry.avgEntryPriceKrw} currency={summaryAvgEntry.currency} /> : '—'}
+              value={summaryAvgEntry?.avgEntryPriceKrw ? <Money native={summaryAvgEntry.avgEntryPriceNative} krw={summaryAvgEntry.avgEntryPriceKrw} currency={summaryAvgEntry.currency} /> : '—'}
               caption={summaryAvgEntry ? `${summaryAvgEntry.totalQtyBought ?? 0}주 매입 · ${summaryAvgEntry.buyFills ?? 0}회 체결` : null}
             />
             <SummaryStat
@@ -130,11 +130,11 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
                     <div className="mt-2 grid grid-cols-2 gap-1.5 text-sm">
                       <div className="flex flex-col">
                         <em className="not-italic text-xs text-base-content/55">진입</em>
-                        <Price native={episode.avgEntryPriceNative} krw={episode.avgEntryPriceKrw} currency={episode.currency} />
+                        <Money native={episode.avgEntryPriceNative} krw={episode.avgEntryPriceKrw} currency={episode.currency} />
                       </div>
                       <div className="flex flex-col">
                         <em className="not-italic text-xs text-base-content/55">최근/청산</em>
-                        <Price native={episode.avgExitPriceNative ?? episode.lastCloseNative} krw={exitOrLast} currency={episode.currency} />
+                        <Money native={episode.avgExitPriceNative ?? episode.lastCloseNative} krw={exitOrLast} currency={episode.currency} />
                       </div>
                     </div>
                     <strong className={`mt-2 block text-right tabular-nums ${(stockReturn ?? 0) >= 0 ? 'text-success' : 'text-error'}`}>{formatPercent(stockReturn)}</strong>
@@ -158,7 +158,7 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
                     <span className="block truncate text-xs text-base-content/55">{trade.date} · {humanReason(trade.reason)}</span>
                   </div>
                   <span className="tabular-nums">
-                    <Price native={trade.fillPriceNative} krw={trade.fillPriceKrw} currency={trade.currency} />
+                    <Money native={trade.fillPriceNative} krw={trade.fillPriceKrw} currency={trade.currency} />
                   </span>
                 </div>
               ))}
@@ -187,8 +187,8 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
                   <td>{episode.closeDate ?? <span className="badge badge-success badge-soft">보유중</span>}<div className="text-xs text-base-content/55">{episode.status}</div></td>
                   <td className="num">{formatDays(episode.holdingDays)}</td>
                   <td className="num">{episode.buyFills ?? 0} / {episode.sellFills ?? 0}</td>
-                  <td className="num"><Price native={episode.avgEntryPriceNative} krw={episode.avgEntryPriceKrw} currency={episode.currency} /></td>
-                  <td className="num"><Price native={episode.avgExitPriceNative ?? episode.lastCloseNative} krw={exitOrLast} currency={episode.currency} /></td>
+                  <td className="num"><Money native={episode.avgEntryPriceNative} krw={episode.avgEntryPriceKrw} currency={episode.currency} /></td>
+                  <td className="num"><Money native={episode.avgExitPriceNative ?? episode.lastCloseNative} krw={exitOrLast} currency={episode.currency} /></td>
                   <td className={`num ${(stockReturn ?? 0) >= 0 ? 'good' : 'bad'}`}>{formatPercent(stockReturn)}</td>
                   <td className={`num ${(pnl ?? 0) >= 0 ? 'good' : 'bad'}`}>{formatKrw(pnl)}</td>
                   <td>{humanReason(episode.exitReasons)}</td>
@@ -214,8 +214,8 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
                 <td>{trade.date}</td>
                 <td><span className={`badge badge-soft ${trade.side === 'buy' ? 'badge-success' : 'badge-warning'}`}>{trade.side === 'buy' ? '매수' : '매도'}</span></td>
                 <td className="num">{trade.qty?.toLocaleString('ko-KR') ?? '—'}</td>
-                <td className="num"><Price native={trade.fillPriceNative} krw={trade.fillPriceKrw} currency={trade.currency} /></td>
-                <td className="num"><Price native={trade.grossNative} krw={trade.grossKrw} currency={trade.currency} /></td>
+                <td className="num"><Money native={trade.fillPriceNative} krw={trade.fillPriceKrw} currency={trade.currency} /></td>
+                <td className="num"><Money native={trade.grossNative} krw={trade.grossKrw} currency={trade.currency} /></td>
                 <td className="num">{formatKrw(trade.cashAfterKrw)}</td>
                 <td>{humanReason(trade.reason)}</td>
                 <td>{trade.reportId ?? '—'}</td>
