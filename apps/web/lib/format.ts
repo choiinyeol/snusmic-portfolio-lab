@@ -13,10 +13,6 @@ export function formatKrw(value: number | null | undefined): string {
   return `${Math.round(value).toLocaleString('ko-KR')}원`;
 }
 
-export function formatKrwMillions(value: number | null | undefined): string {
-  return formatKrw(value);
-}
-
 export function formatDays(value: number | null | undefined): string {
   if (value === null || value === undefined || !Number.isFinite(value)) return '—';
   return `${Math.round(value).toLocaleString('ko-KR')}거래일`;

@@ -35,14 +35,10 @@ def compute_report_performance(
 ) -> list[ReportPerformance]:
     """One :class:`ReportPerformance` row per (report_id) in ``reports``.
 
-    Reports without a tradable price after publication, or without a
-    valid target_price, still produce a row — but with ``None`` for the
-    fields that require either.
-
-    ``expiry_days`` defines the report's validity window: prices, target
-    hits, peaks/troughs and current returns are evaluated within
-    ``[publication_date, min(end_date, publication_date + expiry_days)]``.
-    Pass ``None`` (or ``0``) to disable the cap and use the full window.
+    Rows without a tradable price after publication still produce an entry
+    with ``None`` fields. ``expiry_days`` caps the evaluation window at
+    ``[pub_date, min(end_date, pub_date + expiry_days)]``; pass ``None``/``0``
+    to use the full window.
     """
     if reports.empty:
         return []
@@ -93,9 +89,7 @@ def compute_report_performance(
         else:
             target_gap_pct = None
 
-        # Expired = window already capped by expiry_day AND target wasn't hit
-        # within the validity window. A target-hit report is "resolved" not
-        # "expired", even if today is past pub+expiry_days.
+        # A hit report is "resolved", not "expired" — only never-hit windows expire.
         expired = bool(expiry_day is not None and end_date >= expiry_day and target_hit_date is None)
 
         out.append(

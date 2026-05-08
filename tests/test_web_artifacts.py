@@ -23,9 +23,7 @@ def test_export_web_artifacts_matches_baseline_counts(tmp_path: Path) -> None:
     assert overview["report_counts"] == {
         "extracted_reports": 221,
         "missing_price_symbols": 5,
-        # 215 = 221 minus the 5 missing-from-warehouse symbols and WOLF, whose
-        # 730-day expiry window (2022-11-25 → 2024-11-25) yields no first-close
-        # match in the price board after the issuer's late-2024 delisting.
+        # 221 - 5 missing - WOLF (post-bankruptcy delisting voids its expiry window).
         "price_matched_reports": 215,
         "report_stat_rows": 221,
         "web_report_rows": 221,
@@ -170,9 +168,7 @@ def test_reports_artifact_uses_adjusted_target_price_when_price_scale_changed(tm
 
     csv_text = (out / "table-download-reports.csv").read_text(encoding="utf-8")
     assert "7e687ca6a743eff4" in csv_text
-    # CSV stores the post-scale-adjustment target. The 4-digit ROUND_NDIGITS
-    # leaves the leading "7231.4" intact regardless of whether the trailing
-    # digits round to ".49xx" or ".48xx".
+    # Partial match — 4-digit ROUND_NDIGITS varies the trailing pair.
     assert "7231.4" in csv_text
     assert "103500" not in next(line for line in csv_text.splitlines() if "7e687ca6a743eff4" in line)
 

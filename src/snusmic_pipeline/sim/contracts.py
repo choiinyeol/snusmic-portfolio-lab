@@ -215,10 +215,8 @@ class SimulationConfig(_FrozenModel):
     )
     seed: int = 42  # used only for tie-breaking; the engine itself is deterministic.
 
-    # Report-level "valid for" window. After this many days past publication,
-    # a report is considered expired: target hits beyond this date no longer
-    # count, current_return is frozen at the close on the expiry date, and
-    # downstream views drop the position from the active portfolio.
+    # Report-level "valid for" window: target hits, current_return, and
+    # follower positions are all frozen / closed at pub_date + this many days.
     report_expiry_days: Annotated[int, Field(ge=30, le=3650)] = 730
 
     @model_validator(mode="after")

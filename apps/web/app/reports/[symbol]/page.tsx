@@ -42,9 +42,7 @@ export default async function ReportDetailPage({ params }: { params: ReportParam
   const report = getReportBySymbol(reportSymbol);
   if (!report) notFound();
   const siblingReports = getReportsBySymbol(reportSymbol);
-  // Show the full historical depth available in data/web/prices/{symbol}.json
-  // (warehouse stores from publication-820d). End-cap at lastCloseDate so
-  // expired reports stop at expiry and active reports run to today.
+  // End-cap at lastCloseDate so expired reports stop at expiry, not today.
   const prices = getPriceSeries(report.symbol, undefined, report.lastCloseDate);
   const snippet = getMarkdownSnippet(report);
   const pathEvidence = buildPathEvidence(prices, report);
