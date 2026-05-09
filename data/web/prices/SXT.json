@@ -25350,6 +25350,19 @@
       "open": 119.79000091552734,
       "source_currency": "USD",
       "volume": 271845.0
+    },
+    {
+      "close": 118.19999694824219,
+      "close_krw": 172746.9292,
+      "currency": "USD",
+      "date": "2026-05-08",
+      "display_currency": "USD",
+      "high": 119.66000366210938,
+      "krw_per_unit": 1461.47998046875,
+      "low": 117.5,
+      "open": 118.56999969482422,
+      "source_currency": "USD",
+      "volume": 358400.0
     }
   ],
   "symbol": "SXT"

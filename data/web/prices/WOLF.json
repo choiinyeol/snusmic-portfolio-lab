@@ -1986,9 +1986,22 @@
       "high": 49.0,
       "krw_per_unit": 1444.449951171875,
       "low": 43.160099029541016,
-      "open": 43.09000015258789,
+      "open": 43.0900001525879,
       "source_currency": "USD",
       "volume": 10581576.0
+    },
+    {
+      "close": 46.599998474121094,
+      "close_krw": 68104.9649,
+      "currency": "USD",
+      "date": "2026-05-08",
+      "display_currency": "USD",
+      "high": 50.987998962402344,
+      "krw_per_unit": 1461.47998046875,
+      "low": 45.619998931884766,
+      "open": 47.79999923706055,
+      "source_currency": "USD",
+      "volume": 6552200.0
     }
   ],
   "symbol": "WOLF"

@@ -6253,6 +6253,19 @@
       "open": 43.20000076293945,
       "source_currency": "USD",
       "volume": 748157.0
+    },
+    {
+      "close": 44.04999923706055,
+      "close_krw": 64378.192,
+      "currency": "USD",
+      "date": "2026-05-08",
+      "display_currency": "USD",
+      "high": 44.099998474121094,
+      "krw_per_unit": 1461.47998046875,
+      "low": 42.0,
+      "open": 43.0,
+      "source_currency": "USD",
+      "volume": 701300.0
     }
   ],
   "symbol": "LIF"
