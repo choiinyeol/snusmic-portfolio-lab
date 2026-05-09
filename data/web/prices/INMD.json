@@ -22048,6 +22048,19 @@
       "open": 13.59000015258789,
       "source_currency": "USD",
       "volume": 1529781.0
+    },
+    {
+      "close": 13.960000038146973,
+      "close_krw": 20402.2606,
+      "currency": "USD",
+      "date": "2026-05-08",
+      "display_currency": "USD",
+      "high": 14.149999618530273,
+      "krw_per_unit": 1461.47998046875,
+      "low": 13.850000381469728,
+      "open": 13.979999542236328,
+      "source_currency": "USD",
+      "volume": 1384500.0
     }
   ],
   "symbol": "INMD"

@@ -25350,6 +25350,19 @@
       "open": 53.54999923706055,
       "source_currency": "USD",
       "volume": 21204905.0
+    },
+    {
+      "close": 51.310001373291016,
+      "close_krw": 74988.5398,
+      "currency": "USD",
+      "date": "2026-05-08",
+      "display_currency": "USD",
+      "high": 53.0099983215332,
+      "krw_per_unit": 1461.47998046875,
+      "low": 51.099998474121094,
+      "open": 52.97999954223633,
+      "source_currency": "USD",
+      "volume": 36095100.0
     }
   ],
   "symbol": "BAC"
