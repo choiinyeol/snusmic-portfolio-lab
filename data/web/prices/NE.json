@@ -16049,12 +16049,12 @@
       "currency": "USD",
       "date": "2026-05-08",
       "display_currency": "USD",
-      "high": 51.029998779296875,
+      "high": 51.0,
       "krw_per_unit": 1461.47998046875,
       "low": 48.314998626708984,
       "open": 48.54999923706055,
       "source_currency": "USD",
-      "volume": 1481700.0
+      "volume": 1480758.0
     }
   ],
   "symbol": "NE"

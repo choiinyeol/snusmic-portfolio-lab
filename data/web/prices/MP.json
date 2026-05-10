@@ -19210,10 +19210,10 @@
       "display_currency": "USD",
       "high": 76.80000305175783,
       "krw_per_unit": 1461.47998046875,
-      "low": 66.51000213623048,
+      "low": 66.51200103759766,
       "open": 73.69999694824219,
       "source_currency": "USD",
-      "volume": 11589800.0
+      "volume": 11567822.0
     }
   ],
   "symbol": "MP"

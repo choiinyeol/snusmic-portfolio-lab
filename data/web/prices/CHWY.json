@@ -22549,12 +22549,12 @@
       "currency": "USD",
       "date": "2026-05-08",
       "display_currency": "USD",
-      "high": 23.704999923706055,
+      "high": 23.672199249267578,
       "krw_per_unit": 1461.47998046875,
-      "low": 22.469999313354492,
+      "low": 22.475000381469727,
       "open": 23.704999923706055,
       "source_currency": "USD",
-      "volume": 13911000.0
+      "volume": 13060373.0
     }
   ],
   "symbol": "CHWY"

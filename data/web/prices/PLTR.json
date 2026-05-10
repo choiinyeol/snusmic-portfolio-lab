@@ -18300,10 +18300,10 @@
       "display_currency": "USD",
       "high": 137.88000488281253,
       "krw_per_unit": 1461.47998046875,
-      "low": 133.02000427246094,
+      "low": 133.02999877929688,
       "open": 135.86500549316406,
       "source_currency": "USD",
-      "volume": 41598700.0
+      "volume": 41510617.0
     }
   ],
   "symbol": "PLTR"
