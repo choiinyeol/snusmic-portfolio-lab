@@ -19234,12 +19234,12 @@
       "currency": "USD",
       "date": "2026-05-08",
       "display_currency": "USD",
-      "high": 5.5,
+      "high": 5.494999885559082,
       "krw_per_unit": 1461.47998046875,
       "low": 4.78000020980835,
       "open": 5.349999904632568,
       "source_currency": "USD",
-      "volume": 53670000.0
+      "volume": 52964770.0
     }
   ],
   "symbol": "OPEN"
