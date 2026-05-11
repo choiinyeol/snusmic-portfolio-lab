@@ -25363,6 +25363,19 @@
       "open": 59.47999954223633,
       "source_currency": "USD",
       "volume": 2741564.0
+    },
+    {
+      "close": 61.220001220703125,
+      "close_krw": 89985.4429,
+      "currency": "USD",
+      "date": "2026-05-11",
+      "display_currency": "USD",
+      "high": 61.220001220703125,
+      "krw_per_unit": 1469.8699951171875,
+      "low": 60.65380096435547,
+      "open": 60.720001220703125,
+      "source_currency": "USD",
+      "volume": 212413.0
     }
   ],
   "symbol": "TS"

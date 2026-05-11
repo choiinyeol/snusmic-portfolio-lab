@@ -25363,6 +25363,19 @@
       "open": 87.38999938964844,
       "source_currency": "USD",
       "volume": 50763.0
+    },
+    {
+      "close": 86.2699966430664,
+      "close_krw": 126805.6795,
+      "currency": "USD",
+      "date": "2026-05-11",
+      "display_currency": "USD",
+      "high": 86.41000366210938,
+      "krw_per_unit": 1469.8699951171875,
+      "low": 86.2699966430664,
+      "open": 86.41000366210938,
+      "source_currency": "USD",
+      "volume": 2224.0
     }
   ],
   "symbol": "IRMD"
