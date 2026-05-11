@@ -25363,6 +25363,19 @@
       "open": 1.2999999523162842,
       "source_currency": "USD",
       "volume": 4182806.0
+    },
+    {
+      "close": 1.065000057220459,
+      "close_krw": 1565.4116,
+      "currency": "USD",
+      "date": "2026-05-11",
+      "display_currency": "USD",
+      "high": 1.1399999856948853,
+      "krw_per_unit": 1469.8699951171875,
+      "low": 1.059999942779541,
+      "open": 1.1299999952316284,
+      "source_currency": "USD",
+      "volume": 365137.0
     }
   ],
   "symbol": "CHGG"

@@ -24401,6 +24401,19 @@
       "open": 44.47999954223633,
       "source_currency": "CNY",
       "volume": 31723953.0
+    },
+    {
+      "close": 44.31999969482422,
+      "close_krw": 9588.9419,
+      "currency": "CNY",
+      "date": "2026-05-11",
+      "display_currency": "CNY",
+      "high": 45.099998474121094,
+      "krw_per_unit": 216.35699462890625,
+      "low": 43.200000762939446,
+      "open": 44.25,
+      "source_currency": "CNY",
+      "volume": 64378847.0
     }
   ],
   "symbol": "002714.SZ"
