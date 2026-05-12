@@ -975,9 +975,100 @@ function selectReportsForRun(reports: ReportRow[], params: Record<string, unknow
         if (universe === 'domestic' && !domestic) return false;
         if (universe === 'overseas' && domestic) return false;
       }
+      if (params.require_mtt === true && !passesMttFilter(report, params)) return false;
       return true;
     })
     .sort((a, b) => a.publicationDate.localeCompare(b.publicationDate) || a.reportId.localeCompare(b.reportId));
+}
+
+type TrendSnapshot = {
+  close: number;
+  ma50: number;
+  ma150: number;
+  ma200: number;
+  ma200OneMonthReturn: number;
+  priceVs52wLow: number;
+  pctBelow52wHigh: number;
+};
+
+const trendSnapshotCache = new Map<string, TrendSnapshot | null>();
+
+function passesMttFilter(report: ReportRow, params: Record<string, unknown>): boolean {
+  const snapshot = trendSnapshotForReport(report);
+  if (!snapshot) return false;
+  const minPriceVsLow = readParam(params, 'min_price_vs_52w_low', 0.3);
+  const maxBelowHigh = readParam(params, 'max_pct_below_52w_high', 0.25);
+  const minMa200Return = readParam(params, 'min_ma200_1m_return', 0);
+  return (
+    snapshot.close > snapshot.ma50 &&
+    snapshot.close > snapshot.ma150 &&
+    snapshot.close > snapshot.ma200 &&
+    snapshot.ma50 > snapshot.ma150 &&
+    snapshot.ma50 > snapshot.ma200 &&
+    snapshot.ma150 > snapshot.ma200 &&
+    snapshot.ma200OneMonthReturn >= minMa200Return &&
+    snapshot.priceVs52wLow >= minPriceVsLow &&
+    snapshot.pctBelow52wHigh <= maxBelowHigh
+  );
+}
+
+function trendSnapshotForReport(report: ReportRow): TrendSnapshot | null {
+  const key = `${report.symbol}|${report.publicationDate}`;
+  if (trendSnapshotCache.has(key)) return trendSnapshotCache.get(key) ?? null;
+  const prices = getPriceSeries(report.symbol).filter((point) => point.time <= report.publicationDate);
+  if (prices.length < 252) {
+    trendSnapshotCache.set(key, null);
+    return null;
+  }
+  const closeAt = (index: number): number | null => {
+    const point = prices.at(index);
+    const close = point?.closeKrw ?? point?.value ?? null;
+    return close !== null && close > 0 ? close : null;
+  };
+  const meanClose = (endIndex: number, window: number): number | null => {
+    const start = endIndex - window + 1;
+    if (start < 0) return null;
+    let sum = 0;
+    for (let index = start; index <= endIndex; index += 1) {
+      const close = closeAt(index);
+      if (close === null) return null;
+      sum += close;
+    }
+    return sum / window;
+  };
+  const endIndex = prices.length - 1;
+  const close = closeAt(endIndex);
+  const ma50 = meanClose(endIndex, 50);
+  const ma150 = meanClose(endIndex, 150);
+  const ma200 = meanClose(endIndex, 200);
+  const ma200Prev = meanClose(endIndex - 21, 200);
+  if (close === null || ma50 === null || ma150 === null || ma200 === null || ma200Prev === null || ma200Prev <= 0) {
+    trendSnapshotCache.set(key, null);
+    return null;
+  }
+  const lastYear = prices.slice(-252).map((_, offset) => closeAt(prices.length - 252 + offset));
+  if (lastYear.some((value) => value === null)) {
+    trendSnapshotCache.set(key, null);
+    return null;
+  }
+  const closes = lastYear as number[];
+  const low52w = Math.min(...closes);
+  const high52w = Math.max(...closes);
+  if (low52w <= 0 || high52w <= 0) {
+    trendSnapshotCache.set(key, null);
+    return null;
+  }
+  const snapshot = {
+    close,
+    ma50,
+    ma150,
+    ma200,
+    ma200OneMonthReturn: ma200 / ma200Prev - 1,
+    priceVs52wLow: close / low52w - 1,
+    pctBelow52wHigh: 1 - close / high52w,
+  };
+  trendSnapshotCache.set(key, snapshot);
+  return snapshot;
 }
 
 function weightsForRun(reports: ReportRow[], params: Record<string, unknown>): number[] {

@@ -42,12 +42,12 @@ SNUSMIC Quant Terminal은 서울대 SMIC 리서치 PDF에서 추출한 목표가
 
 - study: `smic-follower-v1`
 - sampler: `train-selected-grid`
-- train 후보군: 2,592개 grid 조합
+- train 후보군: 5,184개 grid 조합
 - 대시보드 후보: train 2021-01-01~2023-12-31 상위 5개를 full 2021-01-01~현재 + holdout 2024-01-01~현재로 재평가
-- best run: `smic-follower-v1-trial-2320`
+- best run: `smic-follower-v1-trial-2975`
 - 전략 아티팩트: `data/web/strategy-runs.json`, `data/web/optuna-trials.json`, `data/web/parameter-importance.json`
 
-전략 후보는 리포트별 사후 성과 테이블에서 파라미터 조합을 재구성한 실험입니다. 기본 탐색은 train 구간에서 후보를 선발한 뒤 full/holdout 구간에서 순위를 다시 매깁니다. 후보 그래프는 선택 종목의 실제 가격 경로를 이용해 일별 수익률을 재구성하지만, 실제 share-based 브로커 원장과 동일한 의미로 읽으면 안 됩니다.
+전략 후보는 리포트별 사후 성과 테이블에서 파라미터 조합을 재구성한 실험입니다. 기본 탐색은 목표가 업사이드와 MTT 가격 추세 조건을 포함해 train 구간에서 후보를 선발한 뒤 full/holdout 구간에서 순위를 다시 매깁니다. 후보 그래프는 선택 종목의 실제 가격 경로를 이용해 일별 수익률을 재구성하지만, 실제 share-based 브로커 원장과 동일한 의미로 읽으면 안 됩니다.
 
 ---
 

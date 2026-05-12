@@ -137,6 +137,10 @@ _PARAMETER_COLUMNS = [
     "universe",
     "exclude_missing_confidence_rows",
     "require_publication_price",
+    "require_mtt",
+    "min_price_vs_52w_low",
+    "max_pct_below_52w_high",
+    "min_ma200_1m_return",
 ]
 _METRIC_COLUMNS = [
     "score",

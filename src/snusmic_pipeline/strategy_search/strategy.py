@@ -13,6 +13,7 @@ from pydantic import BaseModel, ConfigDict
 
 from .configs import ParametricSmicFollowerConfig
 from .objective import score_metrics
+from .trend_features import TREND_FEATURE_COLUMNS
 
 
 class StrategyMetrics(BaseModel):
@@ -301,10 +302,37 @@ def _select_reports(frame: pd.DataFrame, config: ParametricSmicFollowerConfig) -
         selected = selected[is_domestic] if config.universe == "domestic" else selected[~is_domestic]
     if config.exclude_missing_confidence_rows:
         selected = selected.dropna(subset=["target_upside_at_pub", "current_return"])
+    if config.require_mtt:
+        selected = _apply_mtt_filter(selected, config)
     sort_cols = [col for col in ["publication_date", "report_id"] if col in selected.columns]
     if sort_cols:
         selected = selected.sort_values(sort_cols)
     return selected.reset_index(drop=True)
+
+
+def _apply_mtt_filter(selected: pd.DataFrame, config: ParametricSmicFollowerConfig) -> pd.DataFrame:
+    missing = [column for column in TREND_FEATURE_COLUMNS if column not in selected.columns]
+    if missing:
+        raise ValueError(f"MTT filter requires trend feature columns: {missing}")
+    close = pd.to_numeric(selected["trend_close"], errors="coerce")
+    ma50 = pd.to_numeric(selected["trend_ma50"], errors="coerce")
+    ma150 = pd.to_numeric(selected["trend_ma150"], errors="coerce")
+    ma200 = pd.to_numeric(selected["trend_ma200"], errors="coerce")
+    ma200_1m = pd.to_numeric(selected["trend_ma200_1m_return"], errors="coerce")
+    price_vs_low = pd.to_numeric(selected["trend_price_vs_52w_low"], errors="coerce")
+    below_high = pd.to_numeric(selected["trend_pct_below_52w_high"], errors="coerce")
+    mask = (
+        (close > ma50)
+        & (close > ma150)
+        & (close > ma200)
+        & (ma50 > ma150)
+        & (ma50 > ma200)
+        & (ma150 > ma200)
+        & (ma200_1m >= config.min_ma200_1m_return)
+        & (price_vs_low >= config.min_price_vs_52w_low)
+        & (below_high <= config.max_pct_below_52w_high)
+    )
+    return selected[mask].copy()
 
 
 def _strategy_returns(selected: pd.DataFrame, config: ParametricSmicFollowerConfig) -> pd.Series:
@@ -396,6 +424,7 @@ def _grid_configs() -> list[ParametricSmicFollowerConfig]:
         max_positions,
         weighting,
         universe,
+        require_mtt,
     ) in product(
         [0.10, 0.20, 0.30, 0.50],
         [180, 365, 730, 1095],
@@ -404,6 +433,7 @@ def _grid_configs() -> list[ParametricSmicFollowerConfig]:
         [10, 20, 40],
         ["equal", "capped_target_upside"],
         ["all", "domestic", "overseas"],
+        [False, True],
     ):
         configs.append(
             ParametricSmicFollowerConfig(
@@ -420,6 +450,7 @@ def _grid_configs() -> list[ParametricSmicFollowerConfig]:
                 universe=cast(Any, universe),
                 exclude_missing_confidence_rows=True,
                 require_publication_price=True,
+                require_mtt=require_mtt,
             )
         )
     return configs
