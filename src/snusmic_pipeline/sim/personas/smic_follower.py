@@ -51,6 +51,7 @@ def simulate_smic_follower(
         trading_dates=trading_dates,
         stop_loss_hook=None,
         expiry_days=expiry_days,
+        allow_rebalance_sells=False,
     )
 
 
@@ -73,6 +74,7 @@ def _simulate_follower(
     trading_dates: list[date],
     stop_loss_hook,
     expiry_days: int | None = None,
+    allow_rebalance_sells: bool = True,
 ) -> PersonaRunOutput:
     """Engine shared by SMIC followers v1 and v2.
 
@@ -80,6 +82,8 @@ def _simulate_follower(
     callable taking ``(account, day, board, reports, follower_state)`` that
     sells positions matching its rules and updates state. ``expiry_days``
     triggers the engine-level expiry sweep (see ``_expire_stale_positions``).
+    ``allow_rebalance_sells`` keeps v1 buy-only outside target hits while
+    preserving v2's full rebalance behavior.
     """
     account = Account(persona=persona, fees=fees)
     cashflow_by_date: dict[date, float] = {e.date: e.amount_krw for e in cashflows}
@@ -112,7 +116,14 @@ def _simulate_follower(
             stop_loss_hook(account, day, board, reports, state)
         _check_target_hits(account, day, board, target_hit_multiplier, state)
         if deposit_today > 0 or day in rebalance_days:
-            _rebalance_to_one_n(account, day, board, daily_closes[day], state)
+            _rebalance_to_one_n(
+                account,
+                day,
+                board,
+                daily_closes[day],
+                state,
+                allow_sells=allow_rebalance_sells,
+            )
         equity_points.append(
             record_equity_point(account, persona, day, daily_closes[day], contributions[day], board=board)
         )
@@ -255,14 +266,16 @@ def _rebalance_to_one_n(
     board: PriceBoard,
     prices_today: dict[str, float],
     state: FollowerState,
+    *,
+    allow_sells: bool = True,
 ) -> None:
     """Allocate the entire book equally across currently-active reports.
 
     True 1/N: every symbol the follower would still buy gets the same
-    target weight. Symbols held as legacy positions but no longer active
-    (e.g. only the v2 persona stops them out) are NOT rebalanced — they
-    keep their share count until a target hit or stop-loss closes them
-    out separately.
+    target weight. When ``allow_sells`` is false (v1), cash is allocated
+    toward underweight active symbols without selling any non-target-hit
+    position. When true (v2), overweight and inactive holdings may be sold
+    by the rebalance before buying back to target weights.
     """
     active = [s for s in state.active_symbols() if s in prices_today and prices_today[s] > 0]
     if not active:
@@ -277,4 +290,20 @@ def _rebalance_to_one_n(
             mid = board.asof(day, sym)
             if mid is not None:
                 prices[sym] = mid
-    account.rebalance_to_weights(day, weights, prices)
+    if allow_sells:
+        account.rebalance_to_weights(day, weights, prices)
+        return
+
+    equity = account.equity(prices)
+    target_value = equity / n
+    for sym in active:
+        mid = prices.get(sym)
+        if mid is None or mid <= 0:
+            continue
+        current_value = 0.0
+        held_lot = account.holdings.get(sym)
+        if held_lot is not None and held_lot.qty > 0:
+            current_value = held_lot.qty * mid
+        if current_value >= target_value:
+            continue
+        account.buy_value(day, sym, mid, target_value - current_value, "rebalance_buy")

@@ -55,7 +55,7 @@ def _enrich_holdings_with_native(
     if prices.empty or "symbol" not in prices.columns:
         out = holdings.copy()
         out["currency"] = out["symbol"].map(currency_for_symbol).fillna("KRW")
-        out["last_close_native"] = _fallback_native_from_krw(
+        out["last_close_native"] = _infer_native_from_krw(
             _holding_close_krw(out, close_column),
             out["currency"],
             fx_rates,
@@ -90,7 +90,7 @@ def _enrich_holdings_with_native(
         )
         out["last_close_native"] = out["symbol"].map(sym_to_native_close)
         missing_native = out["last_close_native"].isna()
-        out.loc[missing_native, "last_close_native"] = _fallback_native_from_krw(
+        out.loc[missing_native, "last_close_native"] = _infer_native_from_krw(
             pd.to_numeric(out.loc[missing_native, close_column], errors="coerce"),
             out.loc[missing_native, "currency"],
             fx_rates,
@@ -115,7 +115,7 @@ def _attach_monthly_native_close(
         if price_group.empty:
             missing = group.copy()
             missing["currency"] = missing["symbol"].map(currency_for_symbol).fillna("KRW")
-            missing["last_close_native"] = _fallback_native_from_krw(
+            missing["last_close_native"] = _infer_native_from_krw(
                 _holding_close_krw(missing, "month_close_krw"),
                 missing["currency"],
                 fx_rates,
@@ -161,13 +161,13 @@ def _native_close(close_krw: pd.Series, krw_per_unit: pd.Series, currency: pd.Se
     return native
 
 
-def _fallback_native_from_krw(
+def _infer_native_from_krw(
     close_krw: pd.Series,
     currency: pd.Series,
     fx_rates: pd.DataFrame,
     dates: pd.Series | None = None,
 ) -> pd.Series:
-    """Convert KRW-only benchmark holdings back to their inferred native currency."""
+    """Infer native quotes from KRW simulator values using explicit FX rates."""
 
     native = pd.to_numeric(close_krw, errors="coerce").copy()
     normalized = currency.fillna("KRW").astype(str).map(normalize_currency)
@@ -236,6 +236,12 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     price_symbols = set(prices["symbol"].dropna().astype(str)) if not prices.empty else set()
     report_symbols = set(reports["symbol"].dropna().astype(str)) if not reports.empty else set()
     report_symbols.discard("")
+    artifact_symbols = set(report_symbols)
+    for frame in (current_holdings, monthly_holdings, trades, position_episodes):
+        if not frame.empty and "symbol" in frame.columns:
+            artifact_symbols.update(
+                str(symbol) for symbol in frame["symbol"].dropna().astype(str) if str(symbol)
+            )
     missing_symbols = sorted(report_symbols - price_symbols)
 
     report_rows = _build_report_rows(reports, report_performance, extraction_quality, missing_symbols)
@@ -271,7 +277,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     _write_json(out / "position-episodes.json", _records(position_episodes))
     _write_json(out / "equity-daily.json", _records(equity_daily))
     _write_download_csvs(out, report_rows, data_quality)
-    _write_price_artifacts(prices, report_symbols - set(missing_symbols), prices_out)
+    _write_price_artifacts(prices, artifact_symbols, prices_out)
 
     written = sorted(
         str(path.relative_to(out)) for path in out.rglob("*") if path.suffix in {".json", ".csv"}
@@ -650,29 +656,27 @@ def _build_overview(
 
 
 def _build_rankings(report_stats: dict[str, Any], report_rows: list[dict[str, Any]]) -> dict[str, Any]:
-    """Build table-ready rankings with compatibility aliases for older stats keys."""
+    """Build table-ready rankings from the current report-stat schema."""
 
     rows_with_current = [row for row in report_rows if row.get("current_return") is not None]
-    rows_with_gap = [row for row in report_rows if row.get("target_gap_pct") is not None]
-    rows_with_upside = [row for row in report_rows if row.get("target_upside_at_pub") is not None]
-    hit_rows = [row for row in report_rows if row.get("target_hit") and row.get("days_to_target") is not None]
     return {
-        "top_winners": report_stats.get("top_winners") or _rank(rows_with_current, "current_return", True),
-        "top_losers": report_stats.get("top_losers") or _rank(rows_with_current, "current_return", False),
-        "fastest_hits": report_stats.get("fastest_hits")
-        or report_stats.get("fastest_target_hits")
-        or _rank(hit_rows, "days_to_target", False),
-        "slowest_hits": report_stats.get("slowest_target_hits") or _rank(hit_rows, "days_to_target", True),
-        "biggest_open_target_gaps": report_stats.get("biggest_open_target_gaps")
-        or report_stats.get("biggest_target_gaps_below")
-        or _rank(rows_with_gap, "target_gap_pct", True),
-        "biggest_target_overshoots": report_stats.get("biggest_target_overshoots")
-        or _rank(rows_with_gap, "target_gap_pct", False),
-        "most_aggressive_targets": report_stats.get("most_aggressive_targets")
-        or _rank(rows_with_upside, "target_upside_at_pub", True),
+        "top_winners": _required_ranking(report_stats, "top_winners"),
+        "top_losers": _required_ranking(report_stats, "top_losers"),
+        "fastest_hits": _required_ranking(report_stats, "fastest_target_hits"),
+        "slowest_hits": _required_ranking(report_stats, "slowest_target_hits"),
+        "biggest_open_target_gaps": _required_ranking(report_stats, "biggest_target_gaps_below"),
+        "biggest_target_overshoots": _required_ranking(report_stats, "biggest_target_overshoots"),
+        "most_aggressive_targets": _required_ranking(report_stats, "most_aggressive_targets"),
         "best_current_returns": _rank(rows_with_current, "current_return", True),
         "worst_current_returns": _rank(rows_with_current, "current_return", False),
     }
+
+
+def _required_ranking(report_stats: dict[str, Any], key: str) -> list[dict[str, Any]]:
+    value = report_stats.get(key)
+    if not isinstance(value, list):
+        raise KeyError(f"report_stats.{key} must be present as a list")
+    return value
 
 
 def _rank(rows: list[dict[str, Any]], metric: str, descending: bool, limit: int = 10) -> list[dict[str, Any]]:
@@ -1120,11 +1124,18 @@ def _csv_cell(value: Any) -> Any:
 
 def _write_price_artifacts(prices: pd.DataFrame, symbols: set[str], prices_out: Path) -> None:
     if prices.empty:
+        for symbol in sorted(str(symbol) for symbol in symbols):
+            _write_json(
+                prices_out / f"{symbol}.json",
+                {"symbol": symbol, "currency": "KRW", "missing_price": True, "prices": []},
+            )
         return
     filtered = _price_frame_with_native(prices)
     filtered = filtered[filtered["symbol"].astype(str).isin(symbols)].copy()
     filtered.sort_values(["symbol", "date"], inplace=True)
+    written: set[str] = set()
     for symbol, group in filtered.groupby("symbol", sort=True):
+        written.add(str(symbol))
         rows = []
         for row in group.to_dict(orient="records"):
             rows.append(
@@ -1144,3 +1155,8 @@ def _write_price_artifacts(prices: pd.DataFrame, symbols: set[str], prices_out: 
             )
         currency = str(group.iloc[-1].get("currency") or "KRW")
         _write_json(prices_out / f"{symbol}.json", {"symbol": symbol, "currency": currency, "prices": rows})
+    for symbol in sorted(str(symbol) for symbol in {str(symbol) for symbol in symbols} - written):
+        _write_json(
+            prices_out / f"{symbol}.json",
+            {"symbol": symbol, "currency": "KRW", "missing_price": True, "prices": []},
+        )

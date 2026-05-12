@@ -18,7 +18,7 @@ def parse_args() -> argparse.Namespace:
         "--study-db",
         type=Path,
         default=ROOT / "data" / "optuna" / "studies" / "smic_follower_v1.db",
-        help="Accepted for plan-compatible CLI; trials CSV is the artifact source in the fallback path.",
+        help="Accepted for plan-compatible CLI; trials CSV is the canonical artifact source.",
     )
     parser.add_argument(
         "--trials-csv", type=Path, default=ROOT / "data" / "optuna" / "exports" / "trials.csv"

@@ -1,4 +1,4 @@
-"""Deterministic local strategy evaluator and fallback random search."""
+"""Deterministic local strategy evaluator and explicit random search."""
 
 from __future__ import annotations
 
@@ -137,13 +137,13 @@ def run_random_search(
     trials: int = 20,
     seed: int = 42,
 ) -> list[dict[str, Any]]:
-    """Run deterministic fallback search without Optuna."""
+    """Run deterministic random search without pretending it is an Optuna run."""
     rng = random.Random(seed)
     rows: list[dict[str, Any]] = []
     for trial_number in range(trials):
         config = _sample_config(rng)
         metrics = evaluate_strategy(config, report_performance, baseline_summary=baseline_summary)
-        rows.append(_trial_row(trial_number, config, metrics, sampler="random-fallback"))
+        rows.append(_trial_row(trial_number, config, metrics, sampler="random-search"))
     return sorted(rows, key=lambda row: float(row["score"]), reverse=True)
 
 

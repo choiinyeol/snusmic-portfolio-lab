@@ -27,7 +27,7 @@ export default function StrategiesPage() {
     <>
       <PageHero
         eyebrow="STRATEGIES"
-        title="전략 백테스트"
+        title="보고서 성과 기반 후보 실험"
         subtitle={disclaimer}
         badges={[
           { label: '후보', value: data.runs.length },
@@ -59,7 +59,7 @@ export default function StrategiesPage() {
               )}
               delta={riskNote}
               tone={
-                typeof bestRun?.metrics.max_drawdown === 'number' && bestRun.metrics.max_drawdown < -0.25
+                typeof bestRun?.metrics.max_drawdown === 'number' && bestRun.metrics.max_drawdown > 0.25
                   ? 'warn'
                   : 'neutral'
               }
@@ -68,7 +68,7 @@ export default function StrategiesPage() {
         }
       />
 
-      <Section eyebrow="Curve" title="전략별 누적 수익률 비교">
+      <Section eyebrow="Curve" title="후보별 재구성 누적 수익률 비교">
         <article className="card border border-base-300 bg-base-100 shadow-sm">
           <div className="card-body p-3 md:p-4">
             <CumulativeReturnChart series={chartSeries} />
@@ -101,7 +101,7 @@ export default function StrategiesPage() {
             data.runs.map((run) => <StrategySummary key={run.run_id} run={run} href={`/strategies/${run.run_id}`} />)
           ) : (
             <div className="rounded-box border border-base-300 bg-base-100 p-5 text-sm text-base-content/65 shadow-sm">
-              전략 아티팩트가 없습니다. 로컬 탐색/내보내기 스크립트를 실행한 뒤 JSON을 public artifacts에 복사하세요.
+              후보 실험 데이터가 없습니다. canonical data/web/strategy-runs.json 내보내기를 먼저 생성하세요.
             </div>
           )}
         </div>
@@ -111,9 +111,9 @@ export default function StrategiesPage() {
 }
 
 function normalizeStrategyDisclaimer(value?: string | null): string {
-  if (!value) return '전략 탐색 결과는 사전에 계산된 정적 스냅샷입니다.';
+  if (!value) return '리포트 성과 테이블에서 파생한 후보 실험 스냅샷이며, 전체 브로커 원장 재현이 아닙니다.';
   if (/local-only|optuna|artifact/i.test(value)) {
-    return '전략 탐색 결과는 사전에 계산된 정적 스냅샷입니다.';
+    return '리포트 성과 테이블에서 파생한 후보 실험 스냅샷이며, 전체 브로커 원장 재현이 아닙니다.';
   }
   return value;
 }
@@ -121,7 +121,7 @@ function normalizeStrategyDisclaimer(value?: string | null): string {
 function strategyRiskNote(value: unknown): string {
   const drawdown = typeof value === 'number' && Number.isFinite(value) ? value : null;
   if (drawdown === null) return 'MDD 데이터가 없어 상세 후보에서 리스크를 별도로 확인해야 합니다.';
-  if (drawdown < -0.25) return `최고 후보도 MDD ${formatPercent(drawdown)}로 낙폭 점검이 필요합니다.`;
+  if (drawdown > 0.25) return `최고 후보도 MDD ${formatPercent(drawdown)}로 낙폭 점검이 필요합니다.`;
   return `최고 후보 MDD ${formatPercent(drawdown)} 수준으로 낙폭이 비교적 제한적입니다.`;
 }
 
