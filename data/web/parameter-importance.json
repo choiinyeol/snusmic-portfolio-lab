@@ -5,43 +5,35 @@
   "parameters": [
     {
       "parameter": "stop_loss_pct",
-      "importance": 0.6474972789848776
-    },
-    {
-      "parameter": "max_report_age_days",
-      "importance": 0.44315681210463687
+      "importance": 0.5904784026139779
     },
     {
       "parameter": "max_positions",
-      "importance": 0.4230639963539525
-    },
-    {
-      "parameter": "min_target_upside_at_pub",
-      "importance": 0.35838744420725
+      "importance": 0.30292809051028086
     },
     {
       "parameter": "take_profit_pct",
-      "importance": 0.2901160050086237
-    },
-    {
-      "parameter": "max_target_upside_at_pub",
-      "importance": 0.18747284024330368
-    },
-    {
-      "parameter": "require_publication_price",
-      "importance": 0.15185492606445608
-    },
-    {
-      "parameter": "exclude_missing_confidence_rows",
-      "importance": 0.032716030078812686
+      "importance": 0.16744598215606227
     },
     {
       "parameter": "time_loss_days",
-      "importance": 0.016707428949120515
+      "importance": 0.13220788375998593
+    },
+    {
+      "parameter": "max_report_age_days",
+      "importance": 0.12787063656527073
+    },
+    {
+      "parameter": "min_target_upside_at_pub",
+      "importance": 0.043452441243471245
     },
     {
       "parameter": "target_hit_multiplier",
-      "importance": 0.014806782792868196
+      "importance": 0.0
+    },
+    {
+      "parameter": "max_target_upside_at_pub",
+      "importance": 0.0
     },
     {
       "parameter": "rebalance",
@@ -53,6 +45,14 @@
     },
     {
       "parameter": "universe",
+      "importance": 0.0
+    },
+    {
+      "parameter": "exclude_missing_confidence_rows",
+      "importance": 0.0
+    },
+    {
+      "parameter": "require_publication_price",
       "importance": 0.0
     }
   ]

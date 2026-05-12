@@ -954,7 +954,7 @@ export function getStrategyExperiment(run: StrategyRunArtifact): StrategyExperim
     runId: run.run_id,
     positions,
     trades,
-    cumulativeReturnSeries: experimentCumulativeSeries(positions),
+    cumulativeReturnSeries: experimentCumulativeSeries(positions, stopLoss, takeProfit),
   };
 }
 
@@ -999,27 +999,62 @@ function weightsForRun(reports: ReportRow[], params: Record<string, unknown>): n
   return raw.map((value) => value / Math.max(total, Number.EPSILON));
 }
 
-function experimentCumulativeSeries(positions: StrategyExperimentPosition[]): PricePoint[] {
+function experimentCumulativeSeries(
+  positions: StrategyExperimentPosition[],
+  stopLoss: number,
+  takeProfit: number,
+): PricePoint[] {
   if (!positions.length) return [];
   const start = positions.reduce(
     (min, position) => (position.publicationDate < min ? position.publicationDate : min),
     positions[0].publicationDate,
   );
-  let cumulative = 0;
-  const points: PricePoint[] = [{ time: start, value: 0 }];
-  for (const position of [...positions].sort((a, b) =>
-    (a.exitDate ?? a.publicationDate).localeCompare(b.exitDate ?? b.publicationDate),
-  )) {
-    cumulative += position.weight * (position.realizedReturn ?? 0);
-    points.push({ time: position.exitDate ?? position.publicationDate, value: cumulative });
+  const pricePaths = positions.map((position) => ({
+    position,
+    prices: getPriceSeries(position.symbol, position.publicationDate, position.exitDate),
+  }));
+  const dates = new Set<string>([start]);
+  for (const { position, prices } of pricePaths) {
+    dates.add(position.publicationDate);
+    if (position.exitDate) dates.add(position.exitDate);
+    for (const point of prices) dates.add(point.time);
   }
-  return coalescePricePoints(points);
+  return [...dates]
+    .sort((a, b) => a.localeCompare(b))
+    .map((time) => ({
+      time,
+      value: pricePaths.reduce(
+        (sum, item) =>
+          sum + item.position.weight * positionReturnAt(item.position, item.prices, time, stopLoss, takeProfit),
+        0,
+      ),
+    }));
 }
 
-function coalescePricePoints(points: PricePoint[]): PricePoint[] {
-  const byTime = new Map<string, number>();
-  for (const point of points) byTime.set(point.time, point.value);
-  return [...byTime.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([time, value]) => ({ time, value }));
+function positionReturnAt(
+  position: StrategyExperimentPosition,
+  prices: PricePoint[],
+  time: string,
+  stopLoss: number,
+  takeProfit: number,
+): number {
+  if (time < position.publicationDate) return 0;
+  if (position.exitDate && time >= position.exitDate) return position.realizedReturn ?? 0;
+  const entry = position.entryPriceKrw;
+  if (entry === null || entry <= 0) return 0;
+  const point = priceAtOrBefore(prices, time);
+  const close = point?.closeKrw ?? point?.value ?? null;
+  if (close === null || close <= 0) return 0;
+  return clamp(close / entry - 1, -stopLoss, takeProfit);
+}
+
+function priceAtOrBefore(points: PricePoint[], time: string): PricePoint | undefined {
+  let current: PricePoint | undefined;
+  for (const point of points) {
+    if (point.time > time) break;
+    current = point;
+  }
+  return current;
 }
 
 function readParam(params: Record<string, unknown>, key: string, defaultValue: number): number {
