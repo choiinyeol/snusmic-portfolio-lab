@@ -69,7 +69,8 @@ def run_simulation(
     reports = align_report_targets_to_market_scale(reports, board, config.end_date)
 
     benchmark_board: PriceBoard | None = None
-    if any(isinstance(p, AllWeatherConfig) for p in config.personas):
+    benchmark_personas = {p.persona_name for p in config.personas if isinstance(p, AllWeatherConfig)}
+    if benchmark_personas:
         symbols_needed: set[str] = set()
         for p in config.personas:
             if isinstance(p, AllWeatherConfig):
@@ -96,10 +97,11 @@ def run_simulation(
     # universe for the four research personas; All-Weather basket for the
     # benchmark) so the unrealized PnL on still-open positions is correct.
     company_by_symbol = _company_lookup(reports)
+    benchmark_company_by_symbol = _benchmark_company_lookup(config.personas)
     last_day = trading_dates[-1]
     episodes = list(
         compute_position_episodes(
-            (t for t in trades if t.persona != "all_weather"),
+            (t for t in trades if t.persona not in benchmark_personas),
             board,
             last_day,
             company_by_symbol,
@@ -108,10 +110,10 @@ def run_simulation(
     if benchmark_board is not None:
         episodes.extend(
             compute_position_episodes(
-                (t for t in trades if t.persona == "all_weather"),
+                (t for t in trades if t.persona in benchmark_personas),
                 benchmark_board,
                 last_day,
-                _ALL_WEATHER_LABELS,
+                benchmark_company_by_symbol,
             )
         )
     episodes_tuple = tuple(episodes)
@@ -122,7 +124,8 @@ def run_simulation(
     # own price board; All-Weather goes to the benchmark board.
     boards_by_persona: dict[str, PriceBoard] = {p.persona_name: board for p in config.personas}
     if benchmark_board is not None and not benchmark_board.is_empty:
-        boards_by_persona["all_weather"] = benchmark_board
+        for persona_name in benchmark_personas:
+            boards_by_persona[persona_name] = benchmark_board
     monthly_df = compute_monthly_holdings(trades, boards_by_persona, last_day, company_by_symbol)
     monthly_holdings = (
         tuple(MonthlyHolding(**row) for row in monthly_df.to_dict("records")) if not monthly_df.empty else ()
@@ -154,6 +157,15 @@ _ALL_WEATHER_LABELS: dict[str, str] = {
     "SPY": "S&P 500 (SPY)",
     "069500.KS": "KOSPI 200 (069500.KS)",
 }
+
+
+def _benchmark_company_lookup(personas: tuple[PersonaConfig, ...]) -> dict[str, str]:
+    labels = dict(_ALL_WEATHER_LABELS)
+    for persona in personas:
+        if isinstance(persona, AllWeatherConfig):
+            for asset in persona.assets:
+                labels[asset.symbol] = asset.name
+    return labels
 
 
 def _company_lookup(reports: pd.DataFrame) -> dict[str, str]:
@@ -221,7 +233,12 @@ def _dispatch(
         if benchmark_board is None or benchmark_board.is_empty:
             raise RuntimeError("All-Weather persona requested but benchmark prices unavailable.")
         return simulate_all_weather(
-            persona, config.savings_plan, config.fees, benchmark_board, cashflows, trading_dates
+            persona,
+            config.savings_plan,
+            config.fees,
+            benchmark_board,
+            cashflows,
+            trading_dates,
         )
     raise TypeError(f"unknown persona config: {type(persona).__name__}")
 

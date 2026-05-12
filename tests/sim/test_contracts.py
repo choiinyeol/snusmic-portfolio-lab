@@ -43,6 +43,23 @@ def test_simulation_config_roundtrip():
     assert rebuilt == cfg
 
 
+def test_default_personas_are_benchmarks_plus_promotable_search_targets():
+    cfg = SimulationConfig(start_date=date(2021, 1, 4), end_date=date(2026, 4, 1))
+    names = [persona.persona_name for persona in cfg.personas]
+    assert names == [
+        "all_weather",
+        "benchmark_qqq",
+        "benchmark_spy",
+        "benchmark_kodex200",
+        "benchmark_gld",
+        "smic_follower",
+        "smic_follower_v2",
+        "weak_oracle",
+    ]
+    assert "oracle" not in names
+    assert "smic_mtt_strategy" not in names
+
+
 def test_simulation_config_rejects_inverted_dates():
     with pytest.raises(ValidationError):
         SimulationConfig(start_date=date(2026, 1, 1), end_date=date(2025, 1, 1))
