@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { BlockPagination } from '@/components/trading/TableControls';
 import {
   flexRender,
   getCoreRowModel,
@@ -17,6 +18,8 @@ import { formatDays, formatNative, formatPercent } from '@/lib/format';
 
 type HitFilter = 'all' | 'hit' | 'open' | 'expired';
 type ReturnFilter = 'all' | 'positive' | 'negative';
+const PAGE_SIZE_OPTIONS = [25, 50, 100, 200] as const;
+type PageSize = (typeof PAGE_SIZE_OPTIONS)[number];
 
 type ReportsTableProps = {
   reports: ReportRow[];
@@ -57,6 +60,8 @@ export function ReportsTable({ reports }: ReportsTableProps) {
   const [exchangeFilter, setExchangeFilter] = useState('all');
   const [hitFilter, setHitFilter] = useState<HitFilter>('all');
   const [returnFilter, setReturnFilter] = useState<ReturnFilter>('all');
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState<PageSize>(50);
 
   const exchanges = useMemo(
     () => ['all', ...Array.from(new Set(reports.map((report) => report.exchange).filter(Boolean))).sort()],
@@ -225,6 +230,12 @@ export function ReportsTable({ reports }: ReportsTableProps) {
     return true;
   });
 
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / pageSize));
+  const safePage = Math.min(page, totalPages - 1);
+  const visibleRows = filteredRows.slice(safePage * pageSize, safePage * pageSize + pageSize);
+
+  const resetPage = () => setPage(0);
+
   return (
     <section className="report-table-panel card w-full min-w-0 rounded-box bg-base-100 border border-base-300 shadow-sm">
       <div
@@ -236,7 +247,10 @@ export function ReportsTable({ reports }: ReportsTableProps) {
           <input
             className="input input-sm input-bordered"
             value={globalFilter ?? ''}
-            onChange={(event) => setGlobalFilter(event.target.value)}
+            onChange={(event) => {
+              setGlobalFilter(event.target.value);
+              resetPage();
+            }}
             placeholder="기업명, 심볼, 리포트 제목 검색"
           />
         </label>
@@ -245,7 +259,10 @@ export function ReportsTable({ reports }: ReportsTableProps) {
           <select
             className="select select-sm select-bordered"
             value={exchangeFilter}
-            onChange={(event) => setExchangeFilter(event.target.value)}
+            onChange={(event) => {
+              setExchangeFilter(event.target.value);
+              resetPage();
+            }}
           >
             {exchanges.map((exchange) => (
               <option key={exchange} value={exchange}>
@@ -259,7 +276,10 @@ export function ReportsTable({ reports }: ReportsTableProps) {
           <select
             className="select select-sm select-bordered"
             value={hitFilter}
-            onChange={(event) => setHitFilter(event.target.value as HitFilter)}
+            onChange={(event) => {
+              setHitFilter(event.target.value as HitFilter);
+              resetPage();
+            }}
           >
             <option value="all">전체</option>
             <option value="hit">달성</option>
@@ -272,7 +292,10 @@ export function ReportsTable({ reports }: ReportsTableProps) {
           <select
             className="select select-sm select-bordered"
             value={returnFilter}
-            onChange={(event) => setReturnFilter(event.target.value as ReturnFilter)}
+            onChange={(event) => {
+              setReturnFilter(event.target.value as ReturnFilter);
+              resetPage();
+            }}
           >
             <option value="all">전체</option>
             <option value="positive">0% 이상</option>
@@ -306,7 +329,23 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         <span>
           현재 {filteredRows.length.toLocaleString('ko-KR')}개 / 전체 {reports.length.toLocaleString('ko-KR')}개
         </span>
-        <span className="text-xs text-base-content/55">열 제목을 클릭해 정렬합니다.</span>
+        <label className="flex items-center gap-2 text-xs text-base-content/55">
+          <span>열 제목 정렬 · 페이지 크기</span>
+          <select
+            className="select select-xs select-bordered w-auto"
+            value={pageSize}
+            onChange={(event) => {
+              setPageSize(Number(event.target.value) as PageSize);
+              setPage(0);
+            }}
+          >
+            {PAGE_SIZE_OPTIONS.map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
 
       <div className="table-wrap w-full min-w-0 overflow-x-auto rounded-none border-0 shadow-none">
@@ -333,7 +372,7 @@ export function ReportsTable({ reports }: ReportsTableProps) {
             ))}
           </thead>
           <tbody>
-            {filteredRows.map((row) => (
+            {visibleRows.map((row) => (
               <tr key={row.id}>
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
@@ -342,6 +381,14 @@ export function ReportsTable({ reports }: ReportsTableProps) {
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-base-300 px-4 py-3">
+        <span className="text-xs text-base-content/55">
+          {filteredRows.length ? safePage * pageSize + 1 : 0}–{Math.min(filteredRows.length, (safePage + 1) * pageSize)}{' '}
+          / {filteredRows.length.toLocaleString('ko-KR')}
+        </span>
+        <BlockPagination page={safePage} pageCount={totalPages} onPageChange={setPage} />
       </div>
     </section>
   );

@@ -23,6 +23,8 @@ export default function ReportsPage() {
           { label: '리포트', value: `${stats.total}건` },
           { label: '최신 발간', value: formatDateKo(stats.latestPublicationDate) },
           { label: '활성 후보', value: `${candidates.length}개` },
+          { label: '중앙 도달일', value: formatDays(stats.medianDaysToTarget) },
+          { label: '가격 매칭', value: 'Canonical artifacts' },
         ]}
         kpis={
           <div className="grid min-w-0 gap-3 min-[1400px]:grid-cols-2">
@@ -48,6 +50,13 @@ export default function ReportsPage() {
               value={formatDays(overview.target_stats?.avg_days_to_target)}
               delta={`중앙값 ${formatDays(stats.medianDaysToTarget)}`}
             />
+            <KpiTile
+              label="평균 목표 진행"
+              value={formatPercent(stats.averageTargetProgress)}
+              delta="현재가-진입가 / 목표가-진입가"
+              tone="accent"
+            />
+            <KpiTile label="가격 매칭률" value="100%" delta="web artifact rows" tone="neutral" />
           </div>
         }
       />

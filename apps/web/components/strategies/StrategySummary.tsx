@@ -45,8 +45,8 @@ export function StrategySummary({ run, href }: { run: StrategyRun; href?: string
   const openPositions = run.metrics.open_positions ?? null;
 
   return (
-    <article className="card border border-base-300 bg-base-100 shadow-sm transition hover:border-primary/40">
-      <div className="card-body gap-4 p-5">
+    <article className="lab-panel transition hover:border-primary/40">
+      <div className="grid gap-4 p-5">
         <header className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
             <span className="text-xs font-mono uppercase tracking-[0.16em] text-base-content/55">
@@ -69,6 +69,7 @@ export function StrategySummary({ run, href }: { run: StrategyRun; href?: string
             >
               {verdict.label}
             </span>
+            {(mdd ?? 0) > 0.25 ? <span className="badge badge-warning badge-soft">낙폭 점검 필요</span> : null}
             <span className="badge badge-primary badge-soft">score {formatPercent(run.metrics.score)}</span>
           </div>
         </header>

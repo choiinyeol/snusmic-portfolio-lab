@@ -28,6 +28,7 @@ export default function ScreenerPage() {
           { label: '후보', value: `${candidates.length}개` },
           { label: '활성 리포트', value: `${stats.activeCount}개` },
           { label: '블랙박스', value: '사용 안 함' },
+          { label: 'Mode', value: 'Static Artifacts' },
         ]}
         kpis={
           <div className="grid min-w-0 gap-3 min-[1400px]:grid-cols-2">
@@ -60,11 +61,7 @@ export default function ScreenerPage() {
       >
         <div className="grid gap-3 lg:grid-cols-4">
           {Object.entries(buckets).map(([bucket, rows]) => (
-            <a
-              key={bucket}
-              className="rounded-2xl border border-base-300 bg-base-100 p-4 shadow-sm transition hover:border-primary/30"
-              href={`#${bucket}`}
-            >
+            <a key={bucket} className="lab-panel p-4" href={`#${bucket}`}>
               <div className="text-xs font-bold uppercase tracking-[0.16em] text-base-content/45">{bucket}</div>
               <div className="mt-2 text-xl font-black tracking-[-0.04em]">
                 {BUCKET_LABEL[bucket as ResearchCandidate['bucket']]}
@@ -112,10 +109,7 @@ function CandidateCard({
 }) {
   const report = candidate.report;
   return (
-    <Link
-      href={`/reports/${report.symbol}`}
-      className="rounded-2xl border border-base-300 bg-base-100 p-4 shadow-sm transition hover:border-primary/30 hover:shadow-md"
-    >
+    <Link href={`/reports/${report.symbol}`} className="lab-panel p-4">
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(420px,.9fr)] xl:items-center">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">

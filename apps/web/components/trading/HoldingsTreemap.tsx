@@ -1,31 +1,45 @@
 'use client';
 
 import * as d3 from 'd3';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type PointerEvent } from 'react';
 import type { HoldingRow } from '@/lib/artifacts';
-import { formatKrw, formatPercent } from '@/lib/format';
+import { formatKrw, formatNative, formatPercent } from '@/lib/format';
 
 type Props = {
   holdings: HoldingRow[];
+  height?: number;
+  compact?: boolean;
+  showLegend?: boolean;
+  showToolbar?: boolean;
+  caption?: string;
 };
 
 type LeafDatum = HoldingRow & { weight: number };
 type LeafNode = d3.HierarchyRectangularNode<LeafDatum>;
-
 type Tooltip = { x: number; y: number; row: LeafDatum } | null;
 
-/** Proportional capital-weight treemap, rendered with d3 squarify layout on
- * Canvas. Cell area = market value, cell color = unrealized return. Two
- * canvas layers (base + hover overlay) keep redraws cheap when only the
- * hovered tile changes. */
-export function HoldingsTreemap({ holdings }: Props) {
+/** Proportional capital-weight treemap rendered with d3 squarify on Canvas.
+ * Cell area = market value, cell color = unrealized return. Canvas keeps the
+ * dense dashboard fast while a DOM tooltip carries the detailed ledger fields. */
+export function HoldingsTreemap({
+  holdings,
+  height = 420,
+  compact = false,
+  showLegend = true,
+  showToolbar = true,
+  caption = '면적 = 평가액, 색 = 미실현 수익률. 호버하면 원장 세부값을 확인합니다.',
+}: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const baseCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const overlayCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  const [size, setSize] = useState({ width: 0, height: 340 });
+  const [size, setSize] = useState({ width: 0, height });
   const [tooltip, setTooltip] = useState<Tooltip>(null);
   const hoveredRef = useRef<LeafNode | null>(null);
+
+  useEffect(() => {
+    setSize((prev) => (prev.height === height ? prev : { ...prev, height }));
+  }, [height]);
 
   const totalValue = useMemo(
     () => holdings.reduce((sum, row) => sum + Math.max(0, row.marketValueKrw ?? 0), 0),
@@ -42,17 +56,19 @@ export function HoldingsTreemap({ holdings }: Props) {
       .hierarchy<{ children: LeafDatum[] } | LeafDatum>({ children: leaves })
       .sum((d) => ('marketValueKrw' in d ? Math.max(0, d.marketValueKrw ?? 0) : 0))
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
-    d3.treemap<{ children: LeafDatum[] } | LeafDatum>().size([size.width, size.height]).paddingInner(2).round(true)(
-      hierarchy,
-    );
+    d3
+      .treemap<{ children: LeafDatum[] } | LeafDatum>()
+      .size([size.width, size.height])
+      .paddingInner(compact ? 1 : 2)
+      .round(true)(hierarchy);
     return hierarchy as d3.HierarchyRectangularNode<{ children: LeafDatum[] }>;
-  }, [holdings, totalValue, size.width, size.height]);
+  }, [compact, holdings, totalValue, size.width, size.height]);
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const observer = new ResizeObserver(([entry]) => {
-      const width = Math.floor(entry.contentRect.width);
+      const width = Math.max(0, Math.floor(entry.contentRect.width));
       setSize((prev) => (prev.width === width ? prev : { ...prev, width }));
     });
     observer.observe(el);
@@ -65,13 +81,15 @@ export function HoldingsTreemap({ holdings }: Props) {
     if (!baseCanvas || !overlayCanvas || !root) return;
     const baseCtx = setupHiDpi(baseCanvas, size.width, size.height);
     const overlayCtx = setupHiDpi(overlayCanvas, size.width, size.height);
-    if (baseCtx) drawHeatmap(baseCtx, root, size.width, size.height);
+    if (baseCtx) drawHeatmap(baseCtx, root, size.width, size.height, compact);
     if (overlayCtx) overlayCtx.clearRect(0, 0, size.width, size.height);
-  }, [root, size.width, size.height]);
+  }, [compact, root, size.width, size.height]);
 
-  if (!holdings.length || totalValue <= 0) return null;
+  if (!holdings.length || totalValue <= 0) {
+    return <TreemapEmptyState height={height} />;
+  }
 
-  const handlePointerMove = (event: React.PointerEvent<HTMLCanvasElement>) => {
+  const handlePointerMove = (event: PointerEvent<HTMLCanvasElement>) => {
     const overlayCanvas = overlayCanvasRef.current;
     if (!overlayCanvas || !root) return;
     const rect = overlayCanvas.getBoundingClientRect();
@@ -79,9 +97,7 @@ export function HoldingsTreemap({ holdings }: Props) {
     const y = event.clientY - rect.top;
     const target = findLeafAt(root, x, y);
     if (target === hoveredRef.current) {
-      if (target) {
-        setTooltip({ x: x + 14, y: y + 14, row: target.data });
-      }
+      if (target) setTooltip({ x: x + 14, y: y + 14, row: target.data });
       return;
     }
     hoveredRef.current = target;
@@ -100,14 +116,24 @@ export function HoldingsTreemap({ holdings }: Props) {
   };
 
   return (
-    <div className="grid gap-2">
-      <div className="flex items-center justify-between text-xs text-base-content/55">
-        <span>비중 비례 타일 — 면적 = 평가액, 색 = 미실현 손익. 호버하면 상세.</span>
-        <span>합계 {formatKrw(totalValue)}</span>
-      </div>
+    <div className="grid gap-2" aria-label="포트폴리오 보유 종목 트리맵">
+      {showToolbar ? (
+        <div className="heatmap-toolbar">
+          <div className="min-w-0">
+            <p className="heatmap-caption">{caption}</p>
+            <p className="mt-1 font-mono text-xs text-base-content/55">합계 {formatKrw(totalValue)}</p>
+          </div>
+          <div className="flex shrink-0 flex-wrap justify-end gap-1.5" aria-label="트리맵 모드">
+            <span className="snapshot-pill">전체</span>
+            <span className="snapshot-pill">평가액</span>
+            <span className="snapshot-pill">미실현</span>
+            <span className="snapshot-pill">목표 진행</span>
+          </div>
+        </div>
+      ) : null}
       <div
         ref={containerRef}
-        className="relative w-full overflow-hidden rounded-lg border border-base-300 bg-base-200/30"
+        className="relative w-full overflow-hidden rounded-2xl border border-base-300 bg-base-200/30"
         style={{ height: size.height }}
       >
         <canvas
@@ -122,24 +148,80 @@ export function HoldingsTreemap({ holdings }: Props) {
           onPointerMove={handlePointerMove}
           onPointerLeave={handlePointerLeave}
         />
-        {tooltip ? (
-          <div
-            className="pointer-events-none absolute z-10 rounded-lg border border-base-300 bg-base-100/95 px-3 py-2 text-xs shadow-lg"
-            style={{ left: Math.min(tooltip.x, size.width - 220), top: Math.min(tooltip.y, size.height - 110) }}
-          >
-            <div className="font-bold">
-              {tooltip.row.company || tooltip.row.symbol}{' '}
-              <span className="font-mono text-base-content/55">· {tooltip.row.symbol}</span>
-            </div>
-            <div className="mt-1 text-base-content/65">
-              비중 {formatPercent(tooltip.row.weight)} · {formatKrw(tooltip.row.marketValueKrw)}
-            </div>
-            <div className={(tooltip.row.unrealizedReturn ?? 0) >= 0 ? 'text-success' : 'text-error'}>
-              미실현 {formatPercent(tooltip.row.unrealizedReturn)}
-            </div>
-          </div>
-        ) : null}
+        {tooltip ? <TreemapTooltip tooltip={tooltip} width={size.width} height={size.height} /> : null}
       </div>
+      {showLegend ? <TreemapLegend /> : null}
+    </div>
+  );
+}
+
+function TreemapEmptyState({ height }: { height: number }) {
+  return (
+    <div
+      className="grid place-items-center rounded-2xl border border-dashed border-base-300 bg-base-100 p-6 text-center shadow-sm"
+      style={{ minHeight: Math.max(240, height) }}
+    >
+      <div className="max-w-sm">
+        <div className="mx-auto mb-3 grid h-10 w-10 place-items-center rounded-2xl bg-primary/10 text-primary">▦</div>
+        <h3 className="text-base font-black tracking-[-0.02em]">표시할 보유 종목이 없습니다</h3>
+        <p className="mt-2 text-sm text-base-content/60">
+          선택된 원장에 평가액이 있는 포지션이 생성되면 면적 기반 트리맵으로 표시됩니다.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function TreemapTooltip({
+  tooltip,
+  width,
+  height,
+}: {
+  tooltip: Exclude<Tooltip, null>;
+  width: number;
+  height: number;
+}) {
+  const row = tooltip.row;
+  const left = Math.max(8, Math.min(tooltip.x, width - 260));
+  const top = Math.max(8, Math.min(tooltip.y, height - 174));
+  return (
+    <div
+      className="pointer-events-none absolute z-10 w-[252px] rounded-2xl border border-base-300 bg-base-100/95 px-3 py-2.5 text-xs shadow-lg backdrop-blur"
+      style={{ left, top }}
+    >
+      <div className="min-w-0 font-bold">
+        <span className="block truncate">{row.company || row.symbol}</span>
+        <span className="font-mono text-base-content/55">{row.symbol}</span>
+      </div>
+      <dl className="mt-2 grid gap-1.5 text-base-content/65">
+        <TooltipLine label="평가액" value={`${formatKrw(row.marketValueKrw)} · ${formatPercent(row.weight)}`} />
+        <TooltipLine
+          label="미실현"
+          value={`${formatKrw(row.unrealizedPnlKrw)} · ${formatPercent(row.unrealizedReturn)}`}
+        />
+        <TooltipLine label="수량" value={formatQuantity(row.qty)} />
+        <TooltipLine label="평단(KRW)" value={formatKrw(row.avgCostKrw)} />
+        <TooltipLine label="최근가" value={formatNative(row.lastCloseNative, row.currency)} />
+      </dl>
+    </div>
+  );
+}
+
+function TooltipLine({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="grid grid-cols-[4rem_minmax(0,1fr)] gap-2">
+      <dt className="text-base-content/45">{label}</dt>
+      <dd className="min-w-0 truncate text-right font-mono font-bold tabular-nums text-base-content">{value}</dd>
+    </div>
+  );
+}
+
+function TreemapLegend() {
+  return (
+    <div className="heatmap-legend" aria-label="트리맵 색상 범례">
+      <span className="legend-bad">손실 · -25%</span>
+      <span className="legend-neutral">보합 · 0%</span>
+      <span className="legend-good">수익 · +25%</span>
     </div>
   );
 }
@@ -161,6 +243,7 @@ function drawHeatmap(
   root: d3.HierarchyRectangularNode<{ children: LeafDatum[] }>,
   width: number,
   height: number,
+  compact: boolean,
 ): void {
   ctx.clearRect(0, 0, width, height);
   const leaves = root.leaves() as unknown as LeafNode[];
@@ -171,25 +254,37 @@ function drawHeatmap(
     const h = leaf.y1 - leaf.y0;
     if (w <= 1 || h <= 1) continue;
     ctx.fillStyle = colorForReturn(leaf.data.unrealizedReturn ?? 0);
-    drawRoundedRect(ctx, x + 1, y + 1, Math.max(0, w - 2), Math.max(0, h - 2), 4);
+    drawRoundedRect(ctx, x + 1, y + 1, Math.max(0, w - 2), Math.max(0, h - 2), compact ? 5 : 8);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
     ctx.lineWidth = 1;
     ctx.stroke();
-    if (w < 56 || h < 36) continue;
-    ctx.fillStyle = 'white';
-    ctx.textBaseline = 'top';
-    ctx.font = '700 13px system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-    ctx.fillText(leaf.data.company || leaf.data.symbol, x + 8, y + 6, w - 16);
-    if (w >= 70 && h >= 50) {
-      ctx.font = '500 11px system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-      ctx.fillText(formatPercent(leaf.data.weight), x + 8, y + 22, w - 16);
-    }
-    if (w >= 100 && h >= 70) {
-      ctx.fillStyle = 'rgba(255,255,255,0.86)';
-      ctx.font = '500 11px system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
-      ctx.fillText(formatPercent(leaf.data.unrealizedReturn), x + 8, y + 38, w - 16);
-    }
+    drawLabel(ctx, leaf, w, h, compact);
+  }
+}
+
+function drawLabel(ctx: CanvasRenderingContext2D, leaf: LeafNode, w: number, h: number, compact: boolean): void {
+  const x = leaf.x0;
+  const y = leaf.y0;
+  const symbol = leaf.data.symbol;
+  const company = leaf.data.company || symbol;
+  const pad = compact ? 6 : 8;
+  if (w < 42 || h < 24) return;
+
+  ctx.fillStyle = 'rgba(255,255,255,0.96)';
+  ctx.textBaseline = 'top';
+  ctx.font = `${compact ? 700 : 800} ${compact ? 11 : 13}px system-ui, -apple-system, BlinkMacSystemFont, sans-serif`;
+  ctx.fillText(w >= 92 && h >= 48 ? company : symbol, x + pad, y + pad, w - pad * 2);
+
+  if (w >= 70 && h >= 44) {
+    ctx.fillStyle = 'rgba(255,255,255,0.86)';
+    ctx.font = `600 ${compact ? 10 : 11}px system-ui, -apple-system, BlinkMacSystemFont, sans-serif`;
+    ctx.fillText(formatPercent(leaf.data.unrealizedReturn), x + pad, y + pad + 17, w - pad * 2);
+  }
+
+  if (w >= 118 && h >= 76) {
+    ctx.font = '600 11px system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.fillText(formatPercent(leaf.data.weight), x + pad, y + pad + 34, w - pad * 2);
   }
 }
 
@@ -201,9 +296,9 @@ function drawHoverOverlay(ctx: CanvasRenderingContext2D, target: LeafNode | null
   const w = target.x1 - target.x0;
   const h = target.y1 - target.y0;
   ctx.fillStyle = 'rgba(255,255,255,0.18)';
-  drawRoundedRect(ctx, x + 1, y + 1, Math.max(0, w - 2), Math.max(0, h - 2), 4);
+  drawRoundedRect(ctx, x + 1, y + 1, Math.max(0, w - 2), Math.max(0, h - 2), 8);
   ctx.fill();
-  ctx.strokeStyle = 'rgba(255,255,255,0.95)';
+  ctx.strokeStyle = 'rgba(255,255,255,0.98)';
   ctx.lineWidth = 2;
   ctx.stroke();
 }
@@ -235,14 +330,18 @@ function drawRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, w:
 }
 
 function colorForReturn(ret: number): string {
-  // Saturates around ±25%. daisyUI tone-aligned hex values.
   const mag = Math.min(1, Math.abs(ret) / 0.25);
   if (ret >= 0) {
-    if (mag > 0.66) return '#16a368';
-    if (mag > 0.33) return '#3aae74';
-    return '#67b88f';
+    if (mag > 0.66) return '#17a56a';
+    if (mag > 0.33) return '#43b87b';
+    return '#77c59b';
   }
-  if (mag > 0.66) return '#ef4452';
-  if (mag > 0.33) return '#e96872';
-  return '#dd8a92';
+  if (mag > 0.66) return '#ef4d5a';
+  if (mag > 0.33) return '#e97780';
+  return '#e3a0a6';
+}
+
+function formatQuantity(value: number | null | undefined): string {
+  if (value === null || value === undefined || !Number.isFinite(value)) return '—';
+  return value.toLocaleString('ko-KR', { maximumFractionDigits: 4 });
 }
