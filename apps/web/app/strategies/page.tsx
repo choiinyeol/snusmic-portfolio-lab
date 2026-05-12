@@ -4,25 +4,30 @@ import { StrategySummary } from '@/components/strategies/StrategySummary';
 import { KpiTile } from '@/components/ui/KpiTile';
 import { PageHero } from '@/components/ui/PageHero';
 import { Section } from '@/components/ui/Section';
-import {
-  getEquityDaily,
-  getParameterImportance,
-  getPersonaLabel,
-  getStrategyExperiment,
-  getStrategyRuns,
-} from '@/lib/artifacts';
+import { getEquityDaily, getParameterImportance, getStrategyExperiment, getStrategyRuns } from '@/lib/artifacts';
 import { formatPercent, signedTextClass } from '@/lib/format';
-import { getStrategyLeaderboard, type StrategyLeaderboardRow } from '@/lib/product-model';
+import {
+  BENCHMARK_IDS,
+  getBenchmarkRows,
+  getObjectivePassingRows,
+  getSelectableStrategyRows,
+  getStrategyLeaderboard,
+  OBJECTIVE_MAX_DRAWDOWN,
+  TARGET_BENCHMARK_ID,
+  type StrategyLeaderboardRow,
+} from '@/lib/product-model';
 
 export default function StrategiesPage() {
   const data = getStrategyRuns();
   const importance = getParameterImportance();
   const bestRun = data.runs.find((run) => run.run_id === data.best_run_id) ?? data.runs[0];
-  const chartSeries = buildStrategySeries(data.runs.slice(0, 3));
   const leaderboard = getStrategyLeaderboard();
-  const riskNote = bestRun
-    ? strategyRiskNote(bestRun.metrics.max_drawdown ?? bestRun.metrics.maxDrawdown)
-    : '내보낸 전략이 없습니다.';
+  const benchmarkRows = getBenchmarkRows(leaderboard);
+  const selectableRows = getSelectableStrategyRows(leaderboard);
+  const objectiveRows = getObjectivePassingRows(leaderboard);
+  const targetBenchmark = benchmarkRows.find((row) => row.id === TARGET_BENCHMARK_ID);
+  const bestSelectable = selectableRows[0];
+  const chartSeries = buildStrategySeries(leaderboard, data.runs.slice(0, 3));
   const disclaimer = normalizeStrategyDisclaimer(data.disclaimer);
 
   return (
@@ -33,9 +38,10 @@ export default function StrategiesPage() {
         subtitle={disclaimer}
         badges={[
           { label: '후보', value: data.runs.length },
+          { label: '벤치마크', value: benchmarkRows.length },
+          { label: '선택 전략', value: selectableRows.length },
           { label: '스터디', value: data.study_name ?? '—' },
           { label: '범위', value: data.scope ?? bestRun?.scope ?? 'local' },
-          { label: '선발', value: bestRun?.sampler ?? '—' },
           { label: 'Trading', value: 'No live trading' },
         ]}
         actions={
@@ -57,37 +63,26 @@ export default function StrategiesPage() {
               tone="good"
             />
             <KpiTile
-              label="최고 후보 MDD"
-              value={formatPercent(
-                typeof bestRun?.metrics.max_drawdown === 'number' ? bestRun.metrics.max_drawdown : null,
-              )}
-              delta={riskNote}
-              tone={
-                typeof bestRun?.metrics.max_drawdown === 'number' && bestRun.metrics.max_drawdown > 0.25
-                  ? 'warn'
-                  : 'neutral'
-              }
+              label="목표 게이트"
+              value={objectiveRows.length ? `${objectiveRows.length}개 통과` : '통과 없음'}
+              delta={`MDD ≤ ${formatPercent(OBJECTIVE_MAX_DRAWDOWN)} · KOSPI 초과`}
+              tone={objectiveRows.length ? 'good' : 'warn'}
             />
             <KpiTile
-              label="Full return"
-              value={formatPercent(
-                typeof bestRun?.metrics.full_money_weighted_return === 'number'
-                  ? bestRun.metrics.full_money_weighted_return
-                  : typeof bestRun?.metrics.money_weighted_return === 'number'
-                    ? bestRun.metrics.money_weighted_return
-                    : null,
-              )}
-              delta="전 구간 재평가"
+              label="KOSPI/KODEX 200"
+              value={formatPercent(targetBenchmark?.returnPct)}
+              delta={`MDD ${formatPercent(targetBenchmark?.maxDrawdown)}`}
               tone="accent"
             />
             <KpiTile
-              label="Holdout return"
-              value={formatPercent(
-                typeof bestRun?.metrics.holdout_money_weighted_return === 'number'
-                  ? bestRun.metrics.holdout_money_weighted_return
-                  : null,
-              )}
-              delta="훈련 밖 검증"
+              label="최상위 선택 전략"
+              value={bestSelectable?.label ?? '—'}
+              delta={
+                bestSelectable
+                  ? `KOSPI 대비 ${formatPercent(bestSelectable.objectiveReturnExcess)} · MDD ${formatPercent(bestSelectable.maxDrawdown)}`
+                  : '선택 가능 전략 없음'
+              }
+              tone={bestSelectable?.objectivePassed ? 'good' : 'neutral'}
             />
           </div>
         }
@@ -95,15 +90,28 @@ export default function StrategiesPage() {
 
       <Section
         eyebrow="Leaderboard"
-        title="전략·벤치마크 우열"
-        caption="수익률, Sharpe, Sortino, MDD, 최강 기준선 대비 초과수익을 같은 표에서 비교합니다."
+        title="목표 게이트 — MDD 15% 이하 + KOSPI 초과"
+        caption="개인 목표 조건을 먼저 검사합니다. 수익률이 높아도 MDD가 15%를 넘으면 통과로 표시하지 않습니다."
       >
-        <StrategyRiskTable rows={leaderboard.slice(0, 10)} />
+        <StrategyRiskTable rows={(objectiveRows.length ? objectiveRows : selectableRows).slice(0, 10)} />
       </Section>
 
-      <Section eyebrow="Curve" title="Train 선발 후보의 가격 경로 기반 재구성 수익률">
+      <Section
+        eyebrow="Benchmark Set"
+        title="벤치마크 세트"
+        caption="All-Weather, SMIC Follower v1/v2, KODEX200, QQQ, SPY, GLD, Weak Prophet은 비교 기준선입니다. Weak Prophet은 미래정보 상한선 성격입니다."
+      >
+        <StrategyRiskTable rows={benchmarkRows} />
+      </Section>
+
+      <Section eyebrow="Curve" title="벤치마크 세트와 선택 가능 전략의 누적 수익률">
         <article className="card border border-base-300 bg-base-100 shadow-sm">
-          <div className="card-body p-3 md:p-4">
+          <div className="card-body gap-3 p-3 md:p-4">
+            <div className="flex flex-wrap gap-2 text-xs">
+              <span className="snapshot-pill">벤치마크 {BENCHMARK_IDS.length}</span>
+              <span className="snapshot-pill">선택 가능 전략 {selectableRows.length}</span>
+              <span className="snapshot-pill">목표: MDD 15% 이하 · KOSPI 초과</span>
+            </div>
             <CumulativeReturnChart series={chartSeries} />
           </div>
         </article>
@@ -156,31 +164,27 @@ function normalizeStrategyDisclaimer(value?: string | null): string {
   return value;
 }
 
-function strategyRiskNote(value: unknown): string {
-  const drawdown = typeof value === 'number' && Number.isFinite(value) ? value : null;
-  if (drawdown === null) return 'MDD 데이터가 없어 상세 후보에서 리스크를 별도로 확인해야 합니다.';
-  if (drawdown > 0.25) return `최고 후보도 MDD ${formatPercent(drawdown)}로 낙폭 점검이 필요합니다.`;
-  return `최고 후보 MDD ${formatPercent(drawdown)} 수준으로 낙폭이 비교적 제한적입니다.`;
-}
-
-function buildStrategySeries(runs: ReturnType<typeof getStrategyRuns>['runs']): ReturnSeries[] {
-  const palette = ['#1b64da', '#16a368', '#7d6bff', '#f29423', '#ef4452', '#00a99a'];
-  const baselinePersonas = ['smic_follower', 'smic_follower_v2', 'all_weather'];
+function buildStrategySeries(
+  leaderboard: StrategyLeaderboardRow[],
+  runs: ReturnType<typeof getStrategyRuns>['runs'],
+): ReturnSeries[] {
+  const palette = ['#1b64da', '#16a368', '#7d6bff', '#f29423', '#ef4452', '#00a99a', '#94a3b8', '#111827'];
+  const personaRows = leaderboard.filter((row) => row.kind === 'benchmark' || row.kind === 'strategy').slice(0, 13);
   const equity = getEquityDaily();
-  const series: ReturnSeries[] = baselinePersonas.map((persona, index) => ({
-    id: persona,
-    label: getPersonaLabel(persona),
+  const series: ReturnSeries[] = personaRows.map((row, index) => ({
+    id: row.id,
+    label: row.kind === 'benchmark' ? `BM · ${row.label}` : `전략 · ${row.label}`,
     color: palette[index],
     points: equity
-      .filter((point) => point.persona === persona && point.cumulativeReturn !== null)
+      .filter((point) => point.persona === row.id && point.cumulativeReturn !== null)
       .map((point) => ({ time: point.date, value: point.cumulativeReturn ?? 0 })),
   }));
   return [
     ...series,
     ...runs.map((run, index) => ({
       id: run.run_id,
-      label: run.label,
-      color: palette[(index + baselinePersonas.length) % palette.length],
+      label: `실험 · ${run.label}`,
+      color: palette[(index + personaRows.length) % palette.length],
       points: getStrategyExperiment(run).cumulativeReturnSeries,
     })),
   ];
@@ -198,7 +202,8 @@ function StrategyRiskTable({ rows }: { rows: StrategyLeaderboardRow[] }) {
             <th className="text-right">Sharpe</th>
             <th className="text-right">Sortino</th>
             <th className="text-right">MDD</th>
-            <th className="text-right">초과수익</th>
+            <th className="text-right">KOSPI 초과</th>
+            <th className="text-right">목표</th>
             <th className="text-right">거래</th>
           </tr>
         </thead>
@@ -207,9 +212,9 @@ function StrategyRiskTable({ rows }: { rows: StrategyLeaderboardRow[] }) {
             <tr key={row.id}>
               <td>
                 <span
-                  className={`badge badge-sm ${row.kind === 'candidate' ? 'badge-primary badge-soft' : 'badge-ghost'}`}
+                  className={`badge badge-sm ${row.kind === 'benchmark' ? 'badge-ghost' : 'badge-primary badge-soft'}`}
                 >
-                  {row.kind === 'candidate' ? '후보' : '기준선'}
+                  {kindLabel(row.kind)}
                 </span>
               </td>
               <td className="min-w-[220px] max-w-[320px] truncate font-bold">
@@ -229,6 +234,15 @@ function StrategyRiskTable({ rows }: { rows: StrategyLeaderboardRow[] }) {
               <td className={`text-right font-mono font-bold tabular-nums ${signedTextClass(row.benchmarkExcess)}`}>
                 {formatPercent(row.benchmarkExcess)}
               </td>
+              <td className="text-right">
+                {row.kind === 'benchmark' ? (
+                  <span className="badge badge-ghost badge-xs">기준선</span>
+                ) : row.objectivePassed ? (
+                  <span className="badge badge-success badge-soft badge-xs">통과</span>
+                ) : (
+                  <span className="badge badge-warning badge-soft badge-xs">미달</span>
+                )}
+              </td>
               <td className="text-right font-mono tabular-nums">{row.tradeCount?.toLocaleString('ko-KR') ?? '—'}</td>
             </tr>
           ))}
@@ -236,6 +250,12 @@ function StrategyRiskTable({ rows }: { rows: StrategyLeaderboardRow[] }) {
       </table>
     </article>
   );
+}
+
+function kindLabel(kind: StrategyLeaderboardRow['kind']): string {
+  if (kind === 'benchmark') return '벤치마크';
+  if (kind === 'strategy') return '고유 전략';
+  return '후보 실험';
 }
 
 function formatNumber(value: number | null | undefined): string {

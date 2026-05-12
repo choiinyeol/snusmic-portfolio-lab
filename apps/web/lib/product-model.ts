@@ -17,6 +17,20 @@ import {
 } from '@/lib/artifacts';
 
 export const PRIMARY_PERSONA = 'smic_follower_v2';
+export const TARGET_BENCHMARK_ID = 'benchmark_kodex200';
+export const OBJECTIVE_MAX_DRAWDOWN = 0.15;
+export const BENCHMARK_IDS = [
+  'all_weather',
+  'smic_follower',
+  'smic_follower_v2',
+  TARGET_BENCHMARK_ID,
+  'benchmark_qqq',
+  'benchmark_spy',
+  'benchmark_gld',
+  'weak_oracle',
+] as const;
+
+export type StrategyKind = 'benchmark' | 'strategy' | 'experiment';
 
 export type PortfolioSnapshot = {
   persona: string;
@@ -49,7 +63,7 @@ export type ReportStats = {
 export type StrategyLeaderboardRow = {
   id: string;
   label: string;
-  kind: 'baseline' | 'candidate';
+  kind: StrategyKind;
   returnPct: number | null;
   maxDrawdown: number | null;
   sharpe: number | null;
@@ -57,6 +71,10 @@ export type StrategyLeaderboardRow = {
   tradeCount: number | null;
   benchmarkExcess: number | null;
   benchmarkLabel: string;
+  objectivePassed: boolean;
+  objectiveMddSlack: number | null;
+  objectiveReturnExcess: number | null;
+  sourceLabel: string;
   href: string;
 };
 
@@ -82,7 +100,7 @@ export function getExecutiveOverview(): ExecutiveOverview {
     snapshotDate: overview.simulation_window?.price_end ?? overview.simulation_window?.report_end ?? '',
     portfolio: getPortfolioSnapshot(PRIMARY_PERSONA),
     reportStats: buildReportStats(reports),
-    bestStrategies: getStrategyLeaderboard().slice(0, 5),
+    bestStrategies: getSelectableStrategyRows(getStrategyLeaderboard()).slice(0, 5),
     recentReports: [...reports].sort((a, b) => b.publicationDate.localeCompare(a.publicationDate)).slice(0, 6),
     researchCandidates: getResearchCandidates(),
   };
@@ -183,12 +201,31 @@ function basisSortValue(candidate: ResearchCandidate): number {
 export function getStrategyLeaderboard(): StrategyLeaderboardRow[] {
   const summaries = getSummaryRows();
   const equity = getEquityDaily();
-  const benchmark = bestBenchmark(summaries);
-  const baselineRows = summaries.map((summary) => strategyRowFromSummary(summary, equity, benchmark));
-  const strategyRows = getStrategyRuns().runs.map((run) => strategyRowFromRun(run, benchmark));
-  return [...strategyRows, ...baselineRows]
-    .map((row) => ({ ...row, benchmarkLabel: benchmark?.label ?? 'best baseline' }))
+  const benchmark = targetBenchmark(summaries);
+  const personaRows = summaries.map((summary) => strategyRowFromSummary(summary, equity, benchmark));
+  const experimentRows = getStrategyRuns().runs.map((run) => strategyRowFromRun(run, benchmark));
+  return [...personaRows, ...experimentRows]
+    .map((row) => ({ ...row, benchmarkLabel: benchmark?.label ?? 'KOSPI/KODEX 200' }))
     .sort((a, b) => (b.returnPct ?? Number.NEGATIVE_INFINITY) - (a.returnPct ?? Number.NEGATIVE_INFINITY));
+}
+
+export function getBenchmarkRows(rows = getStrategyLeaderboard()): StrategyLeaderboardRow[] {
+  const order = new Map<string, number>(BENCHMARK_IDS.map((id, index) => [id, index]));
+  return rows
+    .filter((row) => row.kind === 'benchmark')
+    .sort((a, b) => (order.get(a.id) ?? 999) - (order.get(b.id) ?? 999));
+}
+
+export function getSelectableStrategyRows(rows = getStrategyLeaderboard()): StrategyLeaderboardRow[] {
+  return rows.filter((row) => row.kind === 'strategy' || row.kind === 'experiment');
+}
+
+export function getObjectivePassingRows(rows = getStrategyLeaderboard()): StrategyLeaderboardRow[] {
+  return getSelectableStrategyRows(rows).filter((row) => row.objectivePassed);
+}
+
+export function isBenchmarkPersona(persona: string): boolean {
+  return (BENCHMARK_IDS as readonly string[]).includes(persona);
 }
 
 function strategyRowFromSummary(
@@ -201,11 +238,14 @@ function strategyRowFromSummary(
       .filter((point) => point.persona === summary.persona && point.cumulativeReturn !== null)
       .map((point) => point.cumulativeReturn ?? 0),
   );
+  const kind: StrategyKind = isBenchmarkPersona(summary.persona) ? 'benchmark' : 'strategy';
+  const returnPct = summary.moneyWeightedReturn ?? null;
+  const objective = objectiveGate(kind, returnPct, summary.maxDrawdown, benchmark?.moneyWeightedReturn ?? null);
   return {
     id: summary.persona,
     label: summary.label ?? getPersonaLabel(summary.persona),
-    kind: 'baseline',
-    returnPct: summary.moneyWeightedReturn ?? null,
+    kind,
+    returnPct,
     maxDrawdown: summary.maxDrawdown,
     sharpe: metrics.sharpe,
     sortino: metrics.sortino,
@@ -217,7 +257,11 @@ function strategyRowFromSummary(
       summary.moneyWeightedReturn !== undefined
         ? summary.moneyWeightedReturn - (benchmark.moneyWeightedReturn ?? 0)
         : null,
-    benchmarkLabel: benchmark?.label ?? 'best baseline',
+    benchmarkLabel: benchmark?.label ?? 'KOSPI/KODEX 200',
+    objectivePassed: objective.passed,
+    objectiveMddSlack: objective.mddSlack,
+    objectiveReturnExcess: objective.returnExcess,
+    sourceLabel: kind === 'benchmark' ? '벤치마크' : '고유 전략',
     href: '/portfolio',
   };
 }
@@ -226,32 +270,47 @@ function strategyRowFromRun(run: StrategyRunArtifact, benchmark: SummaryRow | un
   const series = getStrategyExperiment(run).cumulativeReturnSeries.map((point: PricePoint) => point.value);
   const metrics = riskMetricsFromCumulative(series);
   const m = run.metrics;
-  const returnPct = asNumber(m.money_weighted_return ?? m.full_money_weighted_return ?? m.score);
-  const maxDrawdown = asNumber(m.max_drawdown ?? m.full_max_drawdown);
-  const tradeCount = asNumber(m.trade_count ?? m.full_trade_count);
+  const returnPct = asNumber(m.full_money_weighted_return ?? m.money_weighted_return ?? m.score);
+  const maxDrawdown = asNumber(m.full_max_drawdown ?? m.max_drawdown);
+  const tradeCount = asNumber(m.full_trade_count ?? m.trade_count);
   const benchmarkReturn = benchmark?.moneyWeightedReturn ?? null;
+  const objective = objectiveGate('experiment', returnPct, maxDrawdown, benchmarkReturn);
   return {
     id: run.run_id,
     label: run.label,
-    kind: 'candidate',
+    kind: 'experiment',
     returnPct,
     maxDrawdown,
     sharpe: metrics.sharpe,
     sortino: metrics.sortino,
     tradeCount,
     benchmarkExcess: returnPct !== null && benchmarkReturn !== null ? returnPct - benchmarkReturn : null,
-    benchmarkLabel: benchmark?.label ?? 'best baseline',
+    benchmarkLabel: benchmark?.label ?? 'KOSPI/KODEX 200',
+    objectivePassed: objective.passed,
+    objectiveMddSlack: objective.mddSlack,
+    objectiveReturnExcess: objective.returnExcess,
+    sourceLabel: '후보 실험',
     href: `/strategies/${run.run_id}`,
   };
 }
 
-function bestBenchmark(summaries: SummaryRow[]): SummaryRow | undefined {
-  return summaries
-    .filter((row) => row.persona.startsWith('benchmark_') || row.persona === 'all_weather')
-    .sort(
-      (a, b) =>
-        (b.moneyWeightedReturn ?? Number.NEGATIVE_INFINITY) - (a.moneyWeightedReturn ?? Number.NEGATIVE_INFINITY),
-    )[0];
+function targetBenchmark(summaries: SummaryRow[]): SummaryRow | undefined {
+  return summaries.find((row) => row.persona === TARGET_BENCHMARK_ID);
+}
+
+function objectiveGate(
+  kind: StrategyKind,
+  returnPct: number | null,
+  maxDrawdown: number | null,
+  benchmarkReturn: number | null,
+): { passed: boolean; mddSlack: number | null; returnExcess: number | null } {
+  const mddSlack = maxDrawdown === null ? null : OBJECTIVE_MAX_DRAWDOWN - maxDrawdown;
+  const returnExcess = returnPct !== null && benchmarkReturn !== null ? returnPct - benchmarkReturn : null;
+  return {
+    passed: kind !== 'benchmark' && mddSlack !== null && mddSlack >= 0 && returnExcess !== null && returnExcess > 0,
+    mddSlack,
+    returnExcess,
+  };
 }
 
 function riskMetricsFromCumulative(cumulative: number[]): { sharpe: number | null; sortino: number | null } {

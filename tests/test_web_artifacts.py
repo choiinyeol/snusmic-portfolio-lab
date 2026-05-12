@@ -95,6 +95,31 @@ def test_extended_web_artifacts_support_insights_and_downloads(tmp_path: Path) -
     assert (out / "data-quality-download.csv").read_text(encoding="utf-8").startswith("section,metric,value")
 
 
+def test_manifest_records_snapshot_lineage_counts_and_checksums(tmp_path: Path) -> None:
+    out = tmp_path / "web"
+    export_web_artifacts(
+        ExportInputs(
+            warehouse=Path("data/warehouse"),
+            sim=Path("data/sim"),
+            out=out,
+            extraction_quality=Path("data/extraction_quality.json"),
+        )
+    )
+
+    manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["schema_version"] == "1.0.0"
+    assert manifest["artifact_root"] == "data/web"
+    assert manifest["report_range"] == {"start": "2020-10-31", "end": "2026-05-06"}
+    assert manifest["price_range"] == {"start": "2018-08-03", "end": "2026-05-11"}
+    assert manifest["row_counts"]["reports"] == 221
+    assert manifest["row_counts"]["personas"] == 13
+    assert manifest["data_quality"]["reports_with_prices"] == 215
+    assert manifest["data_quality"]["missing_price_symbols"] == 5
+    assert "reports.json" in manifest["artifacts"]
+    assert "prices/QQQ.json" not in manifest["checksums"]
+    assert len(manifest["checksums"]["reports.json"]) == 64
+
+
 def test_holdings_artifact_exposes_native_currency_for_foreign_positions(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(

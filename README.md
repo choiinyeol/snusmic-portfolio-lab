@@ -208,6 +208,7 @@ uv run python -m snusmic_pipeline export-web
 
 ### `data/web`
 
+- `manifest.json`: schema version, generated timestamp, report/price/simulation ranges, row counts, artifact checksums
 - `overview.json`: 대시보드 요약
 - `reports.json`, `report-rankings.json`, `report-detail-metrics.json`: 리포트 화면 데이터
 - `current-holdings.json`, `monthly-holdings.json`: 포트폴리오 화면 데이터
@@ -228,6 +229,7 @@ uv run python -m snusmic_pipeline export-web
 ```bash
 uv run pytest tests/sim tests/strategy_search tests/test_web_artifacts.py -q
 uv run ruff check src scripts tests
+pnpm --dir apps/web artifact:check
 pnpm --dir apps/web typecheck
 pnpm --dir apps/web exec biome check app/strategies app/reports lib/artifacts.ts components/strategies
 pnpm --dir apps/web build
@@ -248,6 +250,8 @@ pnpm --dir apps/web build
 ---
 
 ## 설계 원칙
+
+자세한 기술 구조와 벤치마크/전략 분리 원칙은 [`docs/technical-architecture.md`](docs/technical-architecture.md)에 정리되어 있습니다.
 
 1. **Share-based accounting**: 모든 페르소나는 정수 주식, 현금, 가중평균원가, 수수료/세금/슬리피지를 원장에 반영합니다.
 2. **Canonical artifacts**: 웹 전략 데이터는 `data/web`에서만 읽습니다.
