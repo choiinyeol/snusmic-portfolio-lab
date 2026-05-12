@@ -97,7 +97,7 @@ export default async function ReportDetailPage({ params }: { params: ReportParam
 }
 
 function githubBlobUrl(path: string): string {
-  return `https://github.com/ChoiInYeol/snusmic-quant-terminal/blob/main/${encodeURI(path)}`;
+  return `https://github.com/ChoiInYeol/snusmic-portfolio-lab/blob/main/${encodeURI(path)}`;
 }
 
 function pdfHrefFor(report: { pdfFilename: string; pdfUrl: string }): string | null {

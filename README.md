@@ -1,14 +1,24 @@
-# SNUSMIC Quant Terminal
+# SNUSMIC Portfolio Lab
 
-SNUSMIC Quant Terminal은 서울대 SMIC 리서치 PDF에서 추출한 목표가·티커·발간일 데이터와 KRW 환산 일봉 가격을 결합해, 리포트 기반 투자 페르소나와 전략 후보를 **재현 가능한 데이터 아티팩트**로 만드는 저장소입니다.
+SNUSMIC Portfolio Lab은 서울대 SMIC 리서치 PDF에서 추출한 목표가·티커·발간일 데이터와 KRW 환산 일봉 가격을 결합해, **리서치 추천 → share-based 원장 → 포트폴리오 성과 → 전략 검증**을 한 화면에서 추적하는 정적 스냅샷 기반 투자 리서치 대시보드입니다.
 
-현재 구조는 Python 데이터/시뮬레이션 파이프라인과 Next.js 정적 대시보드가 함께 동작합니다.
+현재 구조는 Python 데이터/시뮬레이션 파이프라인과 Next.js 정적 대시보드가 함께 동작합니다. 웹 제품명은 Portfolio Lab이며, 저장소/배포 이름도 `snusmic-portfolio-lab` / `smic-portfolio-lab`로 맞췄습니다.
 
 - Python: PDF/가격 웨어하우스, share-based 증권 원장, 페르소나 시뮬레이션, 전략 후보 탐색, 웹용 JSON/CSV 생성
-- Next.js: `data/web` canonical 아티팩트를 읽는 정적 리포트/포트폴리오/전략 대시보드
-- 원칙: 숨은 대체 경로 없이 빠르게 실패합니다. 웹은 `data/web`의 canonical 아티팩트를 요구하고, public 복사본을 전략 데이터의 출처로 쓰지 않습니다.
+- Next.js: `data/web` canonical 아티팩트를 읽는 정적 리포트/포트폴리오/전략 대시보드와 YASUN.GG 레퍼런스 기반의 light fintech SaaS UI
+- 원칙: 필수 아티팩트가 없으면 빠르게 실패합니다. 웹은 `data/web`의 canonical 아티팩트를 요구하고, public 복사본을 전략 데이터의 출처로 쓰지 않습니다.
 
 > 전략 페이지는 “브로커 원장 전체 백테스트”가 아니라 **보고서 성과 기반 후보 실험/재구성**입니다. 실제 계좌형 페르소나 성과는 `data/sim`의 share-based 시뮬레이션이 기준입니다.
+
+---
+
+## 제품 방향
+
+- 서비스명: **SNUSMIC Portfolio Lab**
+- GitHub 저장소명: `snusmic-portfolio-lab`
+- Vercel 프로젝트/도메인: `smic-portfolio-lab` / `https://smic-portfolio-lab.vercel.app`
+- 성격: 실시간 주문 터미널이 아니라, 커밋된 정적 아티팩트로 리포트 추천·포트폴리오 원장·전략 성과를 검증하는 대시보드
+- 핵심 화면: KPI 카드, 포트폴리오 treemap, 리스크 요약, 최근 리포트 피드, lightweight-charts 누적 수익률, 전략 성과표, “무엇을 어떻게 샀나” 포지션 테이프
 
 ---
 
@@ -225,13 +235,15 @@ pnpm --dir apps/web build
 
 최근 변경 검증 기록:
 
-- `uv run pytest tests/sim tests/strategy_search tests/test_web_artifacts.py -q` → 76 passed
-- `uv run mypy src/snusmic_pipeline/sim` → passed
-- `bash scripts/refresh_web_artifacts.sh` → passed, `SMIC MTT Optuna #1~#5` 포함 artifact 갱신
-- `uv run ruff check src scripts tests` → passed
-- `pnpm --dir apps/web typecheck` → passed
-- `pnpm --dir apps/web exec biome check ...` → passed
-- `pnpm --dir apps/web build` → passed
+- 2026-05-12 전략/아티팩트 갱신: `uv run pytest tests/sim tests/strategy_search tests/test_web_artifacts.py -q` → 76 passed
+- 2026-05-12 전략/아티팩트 갱신: `uv run mypy src/snusmic_pipeline/sim` → passed
+- 2026-05-12 전략/아티팩트 갱신: `bash scripts/refresh_web_artifacts.sh` → passed, `SMIC MTT Optuna #1~#5` 포함 artifact 갱신
+- 2026-05-12 UI 리브랜딩: `uv run ruff check src scripts tests` → passed
+- 2026-05-12 UI 리브랜딩: `uv run pytest tests/test_report_rows.py tests/test_web_artifacts.py -q` → 13 passed
+- 2026-05-12 UI 리브랜딩: `pnpm --dir apps/web typecheck` → passed
+- 2026-05-12 UI 리브랜딩: `pnpm --dir apps/web exec biome check ...` → passed
+- 2026-05-12 UI 리브랜딩: `pnpm --dir apps/web build` → passed
+- 2026-05-12 UI 리브랜딩: `python3 -m http.server 4311 --directory apps/web/out` + homepage text smoke → passed
 
 ---
 
@@ -239,7 +251,7 @@ pnpm --dir apps/web build
 
 1. **Share-based accounting**: 모든 페르소나는 정수 주식, 현금, 가중평균원가, 수수료/세금/슬리피지를 원장에 반영합니다.
 2. **Canonical artifacts**: 웹 전략 데이터는 `data/web`에서만 읽습니다.
-3. **Fast-fail**: 필수 아티팩트가 없거나 schema가 맞지 않으면 조용히 빈 화면을 만들지 않습니다.
+3. **Fast-fail**: 필수 아티팩트가 없거나 schema가 맞지 않으면 조용히 빈 화면을 만들지 않고 즉시 오류로 드러냅니다.
 4. **Real-account strategy first**: 실제 매매 전략은 `data/sim`의 원장 기반 페르소나로 평가하고, `data/web/personas.json`과 `trades.json`에 그대로 노출합니다.
 5. **Report-performance experiment 분리**: 전략 후보 페이지는 리포트 성과 기반 재구성 실험이며, 계좌형 페르소나 시뮬레이션과 구분합니다.
 6. **Positive MDD**: 최대낙폭은 양수 손실폭입니다.

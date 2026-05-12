@@ -25,7 +25,7 @@ Last updated: 2026-05-08
 
 ### 현재 서비스 / 배포
 
-- https://smic-portfolio.vercel.app/
+- https://smic-portfolio-lab.vercel.app/
 
 ### UI/UX 참고 서비스
 

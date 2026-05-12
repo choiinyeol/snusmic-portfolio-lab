@@ -82,7 +82,7 @@ def download_pdf(
     try:
         response = client.get(
             meta.pdf_url,
-            headers={"User-Agent": "Mozilla/5.0 snusmic-quant-terminal/0.1"},
+            headers={"User-Agent": "Mozilla/5.0 snusmic-portfolio-lab/0.1"},
             timeout=DEFAULT_TIMEOUT,
         )
         response.raise_for_status()

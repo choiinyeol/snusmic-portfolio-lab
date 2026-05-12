@@ -12,7 +12,7 @@ POSTS_ENDPOINT = "http://snusmic.com/wp-json/wp/v2/posts"
 RESEARCH_PAGE_URL = "http://snusmic.com/research/"
 PAGE_ONE_POST_LIMIT = 12
 DEFAULT_TIMEOUT = 30
-DEFAULT_USER_AGENT = "Mozilla/5.0 snusmic-quant-terminal/0.2"
+DEFAULT_USER_AGENT = "Mozilla/5.0 snusmic-portfolio-lab/0.2"
 
 _POST_LINK_RE = re.compile(r'href=["\'](http://snusmic\.com/equity-research-[^"\']+/)["\']')
 
