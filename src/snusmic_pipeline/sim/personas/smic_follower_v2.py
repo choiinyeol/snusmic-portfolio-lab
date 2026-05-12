@@ -1,8 +1,8 @@
-"""SMIC follower v2 — same as v1 plus three stop-loss escape hatches.
+"""SMIC follower v2 — same as v1 plus three daily sell-signal escape hatches.
 
-Rules (all evaluated **before** the daily target-hit check, so a stop-loss
-exits a paper-loss name even if it happens to also touch the target on
-the same day):
+Rules (all evaluated **before** the daily target-hit check, so a stop signal
+exits a paper-loss name even if it happens to also touch the target on the same
+day):
 
 * ``time_loss``: held ≥ ``time_loss_days`` AND unrealized return < 0.
 * ``averaged_down_stop``: more than one buy fill AND unrealized return
@@ -13,6 +13,9 @@ the same day):
 Once stopped out, the symbol is excluded from the active set until a
 *strictly newer* report is published — the FollowerState absorbs that
 upgrade automatically in the shared engine.
+
+Like v1, v2 does not sell merely to restore 1/N weights. Daily evaluation means
+daily signal checks, not daily full-weight turnover.
 """
 
 from __future__ import annotations
@@ -95,4 +98,5 @@ def simulate_smic_follower_v2(
         trading_dates=trading_dates,
         stop_loss_hook=stop_loss_hook,
         expiry_days=expiry_days,
+        allow_rebalance_sells=False,
     )

@@ -33,7 +33,7 @@
       "max_single_position_weight": 0.1762018008280631,
       "open_positions": 19,
       "excess_return_vs_smic_follower": 0.2538185327978312,
-      "excess_return_vs_smic_follower_v2": 0.3014185327978312,
+      "excess_return_vs_smic_follower_v2": 0.2417185327978312,
       "excess_return_vs_all_weather": 0.1299185327978312
     },
     {
@@ -67,7 +67,7 @@
       "max_single_position_weight": 0.0256410256410256,
       "open_positions": 39,
       "excess_return_vs_smic_follower": 0.0625865897435896,
-      "excess_return_vs_smic_follower_v2": 0.1101865897435896,
+      "excess_return_vs_smic_follower_v2": 0.0504865897435896,
       "excess_return_vs_all_weather": -0.0613134102564102
     },
     {
@@ -101,7 +101,7 @@
       "max_single_position_weight": 0.1122535342420548,
       "open_positions": 33,
       "excess_return_vs_smic_follower": 0.0943135363829355,
-      "excess_return_vs_smic_follower_v2": 0.1419135363829355,
+      "excess_return_vs_smic_follower_v2": 0.0822135363829355,
       "excess_return_vs_all_weather": -0.0295864636170644
     },
     {
@@ -135,7 +135,7 @@
       "max_single_position_weight": 0.0924133506914964,
       "open_positions": 14,
       "excess_return_vs_smic_follower": 0.0329087811928076,
-      "excess_return_vs_smic_follower_v2": 0.0805087811928076,
+      "excess_return_vs_smic_follower_v2": 0.0208087811928076,
       "excess_return_vs_all_weather": -0.0909912188071923
     },
     {
@@ -169,7 +169,7 @@
       "max_single_position_weight": 0.0175918742637129,
       "open_positions": 73,
       "excess_return_vs_smic_follower": -0.0037686154210843,
-      "excess_return_vs_smic_follower_v2": 0.0438313845789156,
+      "excess_return_vs_smic_follower_v2": -0.0158686154210843,
       "excess_return_vs_all_weather": -0.1276686154210843
     },
     {
@@ -203,7 +203,7 @@
       "max_single_position_weight": 0.1075303536532811,
       "open_positions": 35,
       "excess_return_vs_smic_follower": 0.0453515147421428,
-      "excess_return_vs_smic_follower_v2": 0.0929515147421428,
+      "excess_return_vs_smic_follower_v2": 0.0332515147421428,
       "excess_return_vs_all_weather": -0.0785484852578571
     },
     {
@@ -237,7 +237,7 @@
       "max_single_position_weight": 0.0909090909090909,
       "open_positions": 11,
       "excess_return_vs_smic_follower": -0.0666885454545454,
-      "excess_return_vs_smic_follower_v2": -0.0190885454545454,
+      "excess_return_vs_smic_follower_v2": -0.0787885454545454,
       "excess_return_vs_all_weather": -0.1905885454545454
     },
     {
@@ -271,7 +271,7 @@
       "max_single_position_weight": 0.0350777498325037,
       "open_positions": 50,
       "excess_return_vs_smic_follower": -0.0876023772191061,
-      "excess_return_vs_smic_follower_v2": -0.0400023772191061,
+      "excess_return_vs_smic_follower_v2": -0.0997023772191061,
       "excess_return_vs_all_weather": -0.2115023772191061
     },
     {
@@ -305,7 +305,7 @@
       "max_single_position_weight": 0.1254389360911404,
       "open_positions": 34,
       "excess_return_vs_smic_follower": -0.0499431784522736,
-      "excess_return_vs_smic_follower_v2": -0.0023431784522736,
+      "excess_return_vs_smic_follower_v2": -0.0620431784522736,
       "excess_return_vs_all_weather": -0.1738431784522736
     },
     {
@@ -339,7 +339,7 @@
       "max_single_position_weight": 0.0916800039810551,
       "open_positions": 56,
       "excess_return_vs_smic_follower": 0.0577618323028603,
-      "excess_return_vs_smic_follower_v2": 0.1053618323028603,
+      "excess_return_vs_smic_follower_v2": 0.0456618323028603,
       "excess_return_vs_all_weather": -0.0661381676971396
     },
     {
@@ -373,7 +373,7 @@
       "max_single_position_weight": 0.0824090606957133,
       "open_positions": 24,
       "excess_return_vs_smic_follower": -0.1227206064097384,
-      "excess_return_vs_smic_follower_v2": -0.0751206064097384,
+      "excess_return_vs_smic_follower_v2": -0.1348206064097384,
       "excess_return_vs_all_weather": -0.2466206064097384
     },
     {
@@ -407,7 +407,7 @@
       "max_single_position_weight": 0.0232558139534883,
       "open_positions": 43,
       "excess_return_vs_smic_follower": -0.0787981395348837,
-      "excess_return_vs_smic_follower_v2": -0.0311981395348837,
+      "excess_return_vs_smic_follower_v2": -0.0908981395348837,
       "excess_return_vs_all_weather": -0.2026981395348837
     },
     {
@@ -441,7 +441,7 @@
       "max_single_position_weight": 0.037037037037037,
       "open_positions": 27,
       "excess_return_vs_smic_follower": -0.0970206296296296,
-      "excess_return_vs_smic_follower_v2": -0.0494206296296296,
+      "excess_return_vs_smic_follower_v2": -0.1091206296296296,
       "excess_return_vs_all_weather": -0.2209206296296296
     },
     {
@@ -475,7 +475,7 @@
       "max_single_position_weight": 0.2049596549805231,
       "open_positions": 5,
       "excess_return_vs_smic_follower": -0.0942323828603227,
-      "excess_return_vs_smic_follower_v2": -0.0466323828603227,
+      "excess_return_vs_smic_follower_v2": -0.1063323828603227,
       "excess_return_vs_all_weather": -0.2181323828603227
     },
     {
@@ -509,7 +509,7 @@
       "max_single_position_weight": 0.0535838798848967,
       "open_positions": 41,
       "excess_return_vs_smic_follower": -0.1044143693815502,
-      "excess_return_vs_smic_follower_v2": -0.0568143693815502,
+      "excess_return_vs_smic_follower_v2": -0.1165143693815502,
       "excess_return_vs_all_weather": -0.2283143693815502
     },
     {
@@ -543,7 +543,7 @@
       "max_single_position_weight": 0.0136986301369863,
       "open_positions": 73,
       "excess_return_vs_smic_follower": -0.1467506849315068,
-      "excess_return_vs_smic_follower_v2": -0.0991506849315068,
+      "excess_return_vs_smic_follower_v2": -0.1588506849315068,
       "excess_return_vs_all_weather": -0.2706506849315068
     },
     {
@@ -577,7 +577,7 @@
       "max_single_position_weight": 0.1083866899495537,
       "open_positions": 36,
       "excess_return_vs_smic_follower": -0.3078150614935001,
-      "excess_return_vs_smic_follower_v2": -0.2602150614935001,
+      "excess_return_vs_smic_follower_v2": -0.3199150614935001,
       "excess_return_vs_all_weather": -0.4317150614935001
     },
     {
@@ -611,7 +611,7 @@
       "max_single_position_weight": 0.0288223321793156,
       "open_positions": 80,
       "excess_return_vs_smic_follower": -0.2708113677730497,
-      "excess_return_vs_smic_follower_v2": -0.2232113677730497,
+      "excess_return_vs_smic_follower_v2": -0.2829113677730497,
       "excess_return_vs_all_weather": -0.3947113677730497
     },
     {
@@ -645,7 +645,7 @@
       "max_single_position_weight": 0.0208633186391888,
       "open_positions": 74,
       "excess_return_vs_smic_follower": -0.3208372238006416,
-      "excess_return_vs_smic_follower_v2": -0.2732372238006416,
+      "excess_return_vs_smic_follower_v2": -0.3329372238006416,
       "excess_return_vs_all_weather": -0.4447372238006415
     },
     {
@@ -679,7 +679,7 @@
       "max_single_position_weight": 0.0149253731343283,
       "open_positions": 67,
       "excess_return_vs_smic_follower": -0.3628865671641791,
-      "excess_return_vs_smic_follower_v2": -0.3152865671641791,
+      "excess_return_vs_smic_follower_v2": -0.3749865671641791,
       "excess_return_vs_all_weather": -0.486786567164179
     }
   ]
