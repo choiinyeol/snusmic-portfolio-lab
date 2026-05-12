@@ -18,6 +18,7 @@ dependencies = [
   "duckdb",
   "pydantic>=2.6",
   "matplotlib>=3.7",
+  "optuna>=4.8.0",
 ]
 
 [project.scripts]

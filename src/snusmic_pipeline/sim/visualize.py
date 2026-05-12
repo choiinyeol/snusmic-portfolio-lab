@@ -35,6 +35,10 @@ PERSONA_COLORS = {
     "smic_follower_v2": "#dc2626",
     "smic_mtt_strategy": "#7c3aed",
     "all_weather": "#475569",
+    "benchmark_qqq": "#0ea5e9",
+    "benchmark_spy": "#64748b",
+    "benchmark_kodex200": "#22c55e",
+    "benchmark_gld": "#eab308",
 }
 
 

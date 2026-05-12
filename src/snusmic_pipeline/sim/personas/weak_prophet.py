@@ -1,4 +1,4 @@
-"""Weak prophet — 6-month forward look-ahead, max-Sharpe portfolio.
+"""Weak prophet — bounded forward look-ahead, max-Sharpe portfolio.
 
 The persona "knows" only the next ``lookahead_months`` of returns. At each
 rebalance date it computes realised daily returns over that window for the

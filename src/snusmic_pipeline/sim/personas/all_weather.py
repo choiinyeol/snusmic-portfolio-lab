@@ -41,9 +41,10 @@ def simulate_all_weather(
     benchmark_board: PriceBoard,
     cashflows: list[CashFlowEvent],
     trading_dates: list[date],
-    label: str = "All-Weather (25/25/25/25)",
+    label: str | None = None,
 ) -> PersonaRunOutput:
     persona = config.persona_name
+    label = config.label if label is None else label
     account = Account(persona=persona, fees=fees)
     cashflow_by_date: dict[date, float] = {e.date: e.amount_krw for e in cashflows}
 

@@ -21,23 +21,32 @@ SNUSMIC Quant Terminal은 서울대 SMIC 리서치 PDF에서 추출한 목표가
 - 목표가 도달률: 42.79% (92건)
 - 시뮬레이션 적립금: 초기 1,000만원 + 월 적립, 누적 1.02억원
 
-### 페르소나 성과 (`data/sim/summary.csv`)
+### 페르소나/벤치마크 성과 (`data/sim/summary.csv`)
 
 | 페르소나 | 최종 평가금 | 순이익 | 현금흐름 가중 수익률 | CAGR | MDD | 거래 수 | 열린 포지션 |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| Prophet | 11,739.21M | 11,637.21M | 228.96% | 142.92% | 20.41% | 542 | 2 |
-| Weak Prophet (6M look-ahead) | 2,661.38M | 2,559.38M | 140.49% | 84.04% | 22.09% | 1,185 | 0 |
-| SMIC Follower (1/N) | 165.91M | 63.91M | 18.87% | 9.53% | 19.17% | 2,005 | 37 |
-| SMIC Follower v2 (with stop-loss) | 171.17M | 69.17M | 20.08% | 10.17% | 18.85% | 1,513 | 10 |
-| SMIC MTT Strategy | 117.42M | 15.42M | 5.48% | 2.67% | 3.17% | 47 | 2 |
-| All-Weather (25/25/25/25) | 228.19M | 126.19M | 31.26% | 16.25% | 9.46% | 186 | 4 |
+| All-Weather (25/25/25/25) | 228.19M | +126.19M | 31.26% | 16.25% | 9.46% | 186 | 4 |
+| QQQ (NASDAQ-100) | 201.62M | +99.62M | 26.43% | 13.59% | 18.57% | 65 | 1 |
+| SPY (S&P 500) | 176.58M | +74.58M | 21.28% | 10.81% | 14.86% | 65 | 1 |
+| KODEX 200 (069500.KS) | 303.32M | +201.32M | 42.47% | 22.61% | 19.90% | 65 | 1 |
+| GLD (Gold ETF) | 233.96M | +131.96M | 32.24% | 16.80% | 14.83% | 65 | 1 |
+| SMIC Follower (1/N) | 165.91M | +63.91M | 18.87% | 9.53% | 19.17% | 2,005 | 37 |
+| SMIC Follower (SL) | 171.17M | +69.17M | 20.08% | 10.17% | 18.85% | 1,513 | 10 |
+| Weak Prophet (1M, capped) | 193.83M | +91.83M | 24.90% | 12.76% | 24.27% | 1,586 | 0 |
+| SMIC MTT Optuna #1 | 358.51M | +256.51M | 49.16% | 26.50% | 46.90% | 120 | 3 |
+| SMIC MTT Optuna #2 | 374.97M | +272.97M | 50.98% | 27.57% | 30.42% | 114 | 4 |
+| SMIC MTT Optuna #3 | 325.17M | +223.17M | 45.25% | 24.21% | 44.44% | 64 | 2 |
+| SMIC MTT Optuna #4 | 332.76M | +230.76M | 46.17% | 24.75% | 46.70% | 113 | 3 |
+| SMIC MTT Optuna #5 | 322.43M | +220.43M | 44.91% | 24.02% | 46.63% | 116 | 4 |
 
 해석상 주의:
 
-- Prophet/Weak Prophet은 룩어헤드가 들어간 상한선입니다.
+- 기본 벤치마크는 All-Weather, QQQ, SPY, KODEX 200, GLD, SMIC Follower, SMIC Follower (SL), Weak Prophet입니다. Prophet은 기본 비교군에서 제외했습니다.
+- KODEX 200이 이번 스냅샷의 최강 벤치마크입니다. Optuna로 선별된 `SMIC MTT Optuna #1~#5`는 모두 이 42.47% 현금흐름 가중 수익률을 초과해야만 `data/sim`과 `data/web`에 승격됩니다.
+- SMIC MTT는 벤치마크가 아니라 실제 매매 후보 전략군입니다. 정수 주식·현금·수수료·세금·슬리피지를 원장에 남기며, train 2021-01-01~2023-12-31에서 Optuna로 파라미터를 찾은 뒤 2021-01-04~현재 전체 구간으로 재평가합니다.
+- Optuna 후보는 전 구간에서 최강 벤치마크를 이기지 못하거나 이미 승격된 후보와 동일한 전 구간 매매결과를 내면 제외됩니다. 5개를 못 채우면 실행이 실패합니다.
 - SMIC Follower v1/v2는 목표가 미도달 종목을 리밸런싱 때문에 매도하지 않습니다. v2도 매일 손절/목표가 신호를 판단할 뿐, 일별 동일가중 매도 리밸런싱은 하지 않습니다.
-- SMIC MTT Strategy는 실제 계좌형 전략입니다. 정수 주식·현금·수수료·세금·슬리피지를 원장에 남기며, 발간일 목표가 업사이드 30~500%, MTT 가격 추세, 해외 종목, 최대 10개 슬롯, 10% 손절, 목표가/200% 익절, 730일 리포트 만료 규칙으로만 매매합니다.
-- Weak Prophet은 빈 target basket이 나오면 보유분을 명시적으로 현금화합니다.
+- Weak Prophet은 1개월 미래정보, 종목당 5% cap, 최소 22거래일 표본으로 약화한 상한선 성격의 벤치마크입니다.
 - MDD는 음수가 아니라 **양수 손실폭**으로 해석합니다.
 
 ### 전략 후보 탐색 (`data/web/strategy-runs.json`)
@@ -114,13 +123,14 @@ bash scripts/refresh_web_artifacts.sh
 3. `uv run python -m snusmic_pipeline export-web`
 4. `uv run python scripts/export_optuna_artifacts.py`
 
-기본 전략 탐색은 deterministic `robust-grid`입니다. Train 구간 상위 후보만 full/holdout 구간으로 재평가하며, plain Grid/Random/Optuna는 명시적으로 요청해야 합니다.
+`run-sim` 단계에서 실제 원장형 SMIC MTT 전략을 Optuna 400회로 탐색하고, 최강 벤치마크를 이긴 서로 다른 전 구간 결과 5개만 승격합니다. 별도의 `run_optuna_search.py` 단계는 `/strategies` 페이지용 리포트 성과 재구성 실험이며, 기본은 deterministic `robust-grid`입니다.
 
 ```bash
+SMIC_BROKER_STRATEGY_TRIALS=800 bash scripts/refresh_web_artifacts.sh
 STRATEGY_SAMPLER=optuna STRATEGY_TRIALS=100 bash scripts/refresh_web_artifacts.sh
 ```
 
-`--sampler optuna`는 optuna 패키지가 없으면 즉시 실패합니다.
+`SMIC_BROKER_STRATEGY_TRIALS`는 실제 원장형 MTT 승격 탐색, `STRATEGY_SAMPLER=optuna`는 `/strategies` 페이지용 리포트 성과 실험을 조정합니다. 필요한 패키지나 아티팩트가 없으면 즉시 실패합니다.
 
 ### 4. 로컬 웹 실행
 
@@ -153,7 +163,9 @@ uv run python scripts/run_persona_sim.py \
   --start 2021-01-04 \
   --end 2026-05-11 \
   --warehouse data/warehouse \
-  --out data/sim
+  --out data/sim \
+  --broker-strategy-trials 400 \
+  --broker-strategy-top 5
 ```
 
 ### 전략 후보 탐색
@@ -176,6 +188,7 @@ uv run python -m snusmic_pipeline export-web
 ### `data/sim`
 
 - `summary.csv`: 페르소나별 최종 성과
+- `broker_strategy_trials.csv`: Optuna 원장형 MTT 후보의 train rank, 전 구간 성과, 승격/제외 사유
 - `equity_daily.csv`: 일별 mark-to-market 곡선
 - `trades.csv`: 전체 매수/매도 체결 원장
 - `current_holdings.csv`: 마지막 영업일 보유 포지션
@@ -212,9 +225,9 @@ pnpm --dir apps/web build
 
 최근 변경 검증 기록:
 
-- `uv run pytest tests/sim tests/strategy_search tests/test_web_artifacts.py -q` → 75 passed
+- `uv run pytest tests/sim tests/strategy_search tests/test_web_artifacts.py -q` → 76 passed
 - `uv run mypy src/snusmic_pipeline/sim` → passed
-- `bash scripts/refresh_web_artifacts.sh` → passed, `smic_mtt_strategy` 포함 artifact 갱신
+- `bash scripts/refresh_web_artifacts.sh` → passed, `SMIC MTT Optuna #1~#5` 포함 artifact 갱신
 - `uv run ruff check src scripts tests` → passed
 - `pnpm --dir apps/web typecheck` → passed
 - `pnpm --dir apps/web exec biome check ...` → passed
@@ -237,7 +250,7 @@ pnpm --dir apps/web build
 ## 면책
 
 - 이 저장소는 투자 추천이 아닙니다.
-- Prophet/Weak Prophet은 미래 정보를 쓰는 상한선입니다.
+- Weak Prophet은 미래 정보를 쓰는 약화된 상한선 벤치마크입니다. Prophet은 기본 비교군에서 제외되어 있습니다.
 - SMIC Follower 계열은 리포트 발간 후 즉시 매수한다는 가상의 규칙을 평가합니다.
 - yfinance 가격과 환율 데이터 품질에 따라 결과가 달라질 수 있습니다.
 - 배당 재투자는 별도로 모델링하지 않습니다.

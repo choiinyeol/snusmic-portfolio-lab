@@ -3,7 +3,7 @@
 Run from the repo root::
 
     uv run python scripts/run_persona_sim.py \
-        --start 2021-01-04 --end 2026-04-15 \
+        --start 2021-01-04 --end 2026-05-11 \
         --warehouse data/warehouse \
         --out data/sim
 
@@ -15,6 +15,7 @@ Produces ``personas.json``, ``equity_daily.csv``, ``trades.csv``,
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from datetime import date
 from pathlib import Path
@@ -27,6 +28,7 @@ import json  # noqa: E402
 
 import pandas as pd  # noqa: E402
 
+from snusmic_pipeline.sim.broker_strategy_search import find_top_broker_strategy_configs  # noqa: E402
 from snusmic_pipeline.sim.contracts import SimulationConfig  # noqa: E402
 from snusmic_pipeline.sim.runner import run_simulation  # noqa: E402
 from snusmic_pipeline.sim.visualize import (  # noqa: E402
@@ -78,6 +80,36 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Force re-download of the All-Weather benchmark prices.",
     )
+    parser.add_argument(
+        "--disable-broker-strategy-search",
+        action="store_true",
+        help="Skip Optuna broker-ledger strategy promotion.",
+    )
+    parser.add_argument(
+        "--broker-strategy-trials",
+        type=int,
+        default=int(os.environ.get("SMIC_BROKER_STRATEGY_TRIALS", "400")),
+    )
+    parser.add_argument(
+        "--broker-strategy-top",
+        type=int,
+        default=int(os.environ.get("SMIC_BROKER_STRATEGY_TOP", "5")),
+    )
+    parser.add_argument(
+        "--broker-strategy-seed",
+        type=int,
+        default=int(os.environ.get("SMIC_BROKER_STRATEGY_SEED", "42")),
+    )
+    parser.add_argument(
+        "--broker-strategy-train-start",
+        type=str,
+        default=os.environ.get("SMIC_BROKER_STRATEGY_TRAIN_START", "2021-01-01"),
+    )
+    parser.add_argument(
+        "--broker-strategy-train-end",
+        type=str,
+        default=os.environ.get("SMIC_BROKER_STRATEGY_TRAIN_END", "2023-12-31"),
+    )
     return parser.parse_args()
 
 
@@ -89,6 +121,33 @@ def main() -> int:
         start_date=date.fromisoformat(args.start),
         end_date=date.fromisoformat(args.end),
     )
+    if not args.disable_broker_strategy_search:
+        print(
+            "Searching broker-ledger SMIC MTT strategies with Optuna "
+            f"({args.broker_strategy_trials} trials, top {args.broker_strategy_top})"
+        )
+        baseline_result = run_simulation(
+            config,
+            args.warehouse,
+            refresh_benchmark=args.refresh_benchmark,
+        )
+        benchmark = max(baseline_result.summaries, key=lambda summary: summary.money_weighted_return)
+        search = find_top_broker_strategy_configs(
+            warehouse_dir=args.warehouse,
+            start_date=config.start_date,
+            end_date=config.end_date,
+            train_start=date.fromisoformat(args.broker_strategy_train_start),
+            train_end=date.fromisoformat(args.broker_strategy_train_end),
+            plan=config.savings_plan,
+            fees=config.fees,
+            benchmark_money_weighted_return=benchmark.money_weighted_return,
+            trials=args.broker_strategy_trials,
+            top_n=args.broker_strategy_top,
+            seed=args.broker_strategy_seed,
+        )
+        _to_csv_rounded(search.trial_rows, out / "broker_strategy_trials.csv")
+        config = config.model_copy(update={"personas": (*config.personas, *search.configs)})
+
     print(f"Running simulation {config.start_date} → {config.end_date}")
     print(f"  warehouse: {args.warehouse}")
     print(f"  personas : {[p.persona_name for p in config.personas]}")

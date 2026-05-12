@@ -48,16 +48,15 @@ class MttStrategyState:
 
     def absorb_reports(
         self,
-        reports: pd.DataFrame,
+        report_rows: list[dict[str, Any]],
         cursor: int,
         day: date,
         board: PriceBoard,
         config: SmicMttStrategyConfig,
     ) -> tuple[int, bool]:
         added = False
-        rows = cast(list[dict[str, Any]], reports.to_dict("records"))
-        while cursor < len(rows) and rows[cursor]["_pub"] <= day:
-            record = rows[cursor]
+        while cursor < len(report_rows) and report_rows[cursor]["_pub"] <= day:
+            record = report_rows[cursor]
             cursor += 1
             candidate = _candidate_from_report(record, day, board, config)
             report_id = str(record["report_id"])
@@ -100,6 +99,7 @@ def simulate_smic_mtt_strategy(
         )
 
     reports = _prepare_reports(reports)
+    report_rows = cast(list[dict[str, Any]], reports.to_dict("records"))
     daily_closes = {d: board.close_on(d) for d in trading_dates}
     contributions = cumulative_contributions(cashflows, trading_dates)
     top_up_days = _top_up_days(trading_dates, config.top_up_cadence)
@@ -108,7 +108,7 @@ def simulate_smic_mtt_strategy(
     cursor = 0
 
     for day in trading_dates:
-        cursor, has_new_signal = state.absorb_reports(reports, cursor, day, board, config)
+        cursor, has_new_signal = state.absorb_reports(report_rows, cursor, day, board, config)
 
         deposit_today = cashflow_by_date.get(day, 0.0)
         if deposit_today > 0:
@@ -310,12 +310,6 @@ def _buy_or_top_up_slots(
     prices = _price_view(account, day, board)
     if not prices:
         return
-    equity = account.equity(prices)
-    if equity <= 0:
-        return
-    slot_value = equity / float(config.max_positions)
-    reason: TradeReason = "deposit_buy" if deposit_today else "rebalance_buy"
-
     candidates = [
         c
         for c in state.active.values()
@@ -324,6 +318,15 @@ def _buy_or_top_up_slots(
         and (not config.require_mtt or _passes_mtt(board, day, c.symbol, config))
     ]
     candidates.sort(key=lambda c: (-c.target_upside_at_pub, c.publication_date, c.symbol))
+    candidates = candidates[: config.max_positions]
+    if not candidates:
+        return
+
+    equity = account.equity(prices)
+    if equity <= 0:
+        return
+    slot_value = equity / float(len(candidates))
+    reason: TradeReason = "deposit_buy" if deposit_today else "rebalance_buy"
 
     for candidate in candidates:
         if account.open_position_count() >= config.max_positions:

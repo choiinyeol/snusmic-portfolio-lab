@@ -79,9 +79,10 @@ class BenchmarkAsset(_FrozenModel):
 
 
 class AllWeatherConfig(_FrozenModel):
-    """Buy-and-hold all-weather portfolio with monthly rebalance."""
+    """Buy-and-hold benchmark basket with monthly rebalance."""
 
-    persona_name: Literal["all_weather"] = "all_weather"
+    persona_name: Annotated[str, Field(pattern=r"^(all_weather|benchmark_[a-z0-9_]+)$")] = "all_weather"
+    label: str = "All-Weather (25/25/25/25)"
     assets: tuple[BenchmarkAsset, ...] = (
         BenchmarkAsset(name="Gold", symbol="GLD", weight=0.25),
         BenchmarkAsset(name="NASDAQ-100", symbol="QQQ", weight=0.25),
@@ -143,7 +144,7 @@ class ProphetConfig(_PersonaBase):
 
 
 class WeakProphetConfig(_PersonaBase):
-    """6-month look-ahead max-Sharpe."""
+    """Short-horizon look-ahead max-Sharpe benchmark."""
 
     persona_name: Literal["weak_oracle"] = "weak_oracle"
     label: str = "Weak Prophet (6M look-ahead)"
@@ -194,7 +195,9 @@ class SmicMttStrategyConfig(_PersonaBase):
     and report expiry.
     """
 
-    persona_name: Literal["smic_mtt_strategy"] = "smic_mtt_strategy"
+    persona_name: Annotated[str, Field(pattern=r"^smic_mtt_strategy(_optuna_top[0-9]+)?$")] = (
+        "smic_mtt_strategy"
+    )
     label: str = "SMIC MTT Strategy"
 
     # Report valuation gate, evaluated at publication using market prices.
@@ -215,6 +218,9 @@ class SmicMttStrategyConfig(_PersonaBase):
     stop_loss_pct: Annotated[float, Field(gt=0.0, lt=1.0)] = 0.10
     take_profit_pct: Annotated[float, Field(gt=0.0, le=10.0)] = 2.0
     report_age_stop_days: Annotated[int, Field(ge=30, le=3650)] = 730
+    source_trial_number: Annotated[int, Field(ge=0)] | None = None
+    selection_rank: Annotated[int, Field(ge=1)] | None = None
+    train_money_weighted_return: float | None = None
 
     @model_validator(mode="after")
     def _check_target_upside_band(self) -> SmicMttStrategyConfig:
@@ -242,6 +248,10 @@ PersonaName = Literal[
     "smic_follower_v2",
     "smic_mtt_strategy",
     "all_weather",
+    "benchmark_qqq",
+    "benchmark_spy",
+    "benchmark_kodex200",
+    "benchmark_gld",
 ]
 
 
@@ -258,12 +268,35 @@ class SimulationConfig(_FrozenModel):
     savings_plan: SavingsPlan = SavingsPlan()
     fees: BrokerageFees = BrokerageFees()
     personas: tuple[PersonaConfig, ...] = (
-        ProphetConfig(),
-        WeakProphetConfig(),
-        SmicFollowerConfig(),
-        SmicFollowerV2Config(),
-        SmicMttStrategyConfig(),
         AllWeatherConfig(),
+        AllWeatherConfig(
+            persona_name="benchmark_qqq",
+            label="QQQ (NASDAQ-100)",
+            assets=(BenchmarkAsset(name="NASDAQ-100", symbol="QQQ", weight=1.0),),
+        ),
+        AllWeatherConfig(
+            persona_name="benchmark_spy",
+            label="SPY (S&P 500)",
+            assets=(BenchmarkAsset(name="S&P 500", symbol="SPY", weight=1.0),),
+        ),
+        AllWeatherConfig(
+            persona_name="benchmark_kodex200",
+            label="KODEX 200 (069500.KS)",
+            assets=(BenchmarkAsset(name="KODEX 200", symbol="069500.KS", weight=1.0),),
+        ),
+        AllWeatherConfig(
+            persona_name="benchmark_gld",
+            label="GLD (Gold ETF)",
+            assets=(BenchmarkAsset(name="Gold", symbol="GLD", weight=1.0),),
+        ),
+        SmicFollowerConfig(),
+        SmicFollowerV2Config(label="SMIC Follower (SL)"),
+        WeakProphetConfig(
+            label="Weak Prophet (1M, capped)",
+            lookahead_months=1,
+            max_weight=0.05,
+            min_history_days=22,
+        ),
     )
     seed: int = 42  # used only for tie-breaking; the engine itself is deterministic.
 
@@ -502,4 +535,8 @@ PERSONA_REGISTRY_KEYS: tuple[str, ...] = (
     "smic_follower_v2",
     "smic_mtt_strategy",
     "all_weather",
+    "benchmark_qqq",
+    "benchmark_spy",
+    "benchmark_kodex200",
+    "benchmark_gld",
 )

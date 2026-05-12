@@ -7,6 +7,7 @@ import math
 import os
 import subprocess
 import sys
+from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -425,6 +426,22 @@ def run_persona_sim(args: argparse.Namespace) -> int:
     ]
     if args.refresh_benchmark:
         forwarded.append("--refresh-benchmark")
+    if args.disable_broker_strategy_search:
+        forwarded.append("--disable-broker-strategy-search")
+    forwarded.extend(
+        [
+            "--broker-strategy-trials",
+            str(args.broker_strategy_trials),
+            "--broker-strategy-top",
+            str(args.broker_strategy_top),
+            "--broker-strategy-seed",
+            str(args.broker_strategy_seed),
+            "--broker-strategy-train-start",
+            args.broker_strategy_train_start,
+            "--broker-strategy-train-end",
+            args.broker_strategy_train_end,
+        ]
+    )
     completed = subprocess.run(
         [sys.executable, str(PERSONA_SIM_SCRIPT), *forwarded],
         check=False,
@@ -553,13 +570,37 @@ def build_parser() -> argparse.ArgumentParser:
         "run-sim", help="Run the persona simulation (delegates to scripts/run_persona_sim.py)."
     )
     sim.add_argument("--start", default="2021-01-04")
-    sim.add_argument("--end", default="2026-04-15")
+    sim.add_argument("--end", default=date.today().isoformat())
     sim.add_argument("--warehouse", default=str(REPO_ROOT / "data" / "warehouse"))
     sim.add_argument("--out", default=str(REPO_ROOT / "data" / "sim"))
     sim.add_argument(
         "--refresh-benchmark",
         action="store_true",
         help="Force re-download of the All-Weather benchmark prices.",
+    )
+    sim.add_argument("--disable-broker-strategy-search", action="store_true")
+    sim.add_argument(
+        "--broker-strategy-trials",
+        type=int,
+        default=int(os.environ.get("SMIC_BROKER_STRATEGY_TRIALS", "400")),
+    )
+    sim.add_argument(
+        "--broker-strategy-top",
+        type=int,
+        default=int(os.environ.get("SMIC_BROKER_STRATEGY_TOP", "5")),
+    )
+    sim.add_argument(
+        "--broker-strategy-seed",
+        type=int,
+        default=int(os.environ.get("SMIC_BROKER_STRATEGY_SEED", "42")),
+    )
+    sim.add_argument(
+        "--broker-strategy-train-start",
+        default=os.environ.get("SMIC_BROKER_STRATEGY_TRAIN_START", "2021-01-01"),
+    )
+    sim.add_argument(
+        "--broker-strategy-train-end",
+        default=os.environ.get("SMIC_BROKER_STRATEGY_TRAIN_END", "2023-12-31"),
     )
     sim.set_defaults(func=run_persona_sim)
 
