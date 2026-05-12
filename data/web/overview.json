@@ -52,21 +52,21 @@
       "trade_count": 2005
     },
     {
-      "cagr": 0.0703,
-      "final_cash_krw": 409777.9786,
-      "final_equity_krw": 146707551.6449,
-      "final_holdings_value_krw": 146297773.6664,
+      "cagr": 0.1017,
+      "final_cash_krw": 4206.5162,
+      "final_equity_krw": 171169323.9374,
+      "final_holdings_value_krw": 171165117.4212,
       "initial_capital_krw": 10000000.0,
       "label": "SMIC Follower v2 (with stop-loss)",
-      "max_drawdown": 0.1674,
-      "money_weighted_return": 0.1411,
-      "net_profit_krw": 44707551.6449,
-      "open_positions": 19,
+      "max_drawdown": 0.1885,
+      "money_weighted_return": 0.2008,
+      "net_profit_krw": 69169323.9374,
+      "open_positions": 10,
       "persona": "smic_follower_v2",
-      "realized_pnl_krw": 47844484.8307,
-      "time_weighted_return": 0.4438,
+      "realized_pnl_krw": 54428019.0591,
+      "time_weighted_return": 0.9603,
       "total_contributed_krw": 102000000.0,
-      "trade_count": 21533
+      "trade_count": 1513
     },
     {
       "cagr": 0.1625,

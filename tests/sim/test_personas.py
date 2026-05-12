@@ -75,6 +75,9 @@ def test_smic_follower_v2_stops_out_long_held_loser(synthetic_board, synthetic_r
     reasons = {t.reason for t in sells}
     # At least one of the LOSS-driven stop-loss rules must have fired.
     assert reasons & {"stop_loss_time", "stop_loss_average_down", "stop_loss_report_age"}
+    # v2 evaluates sell signals daily, but it must not churn the book through
+    # daily equal-weight rebalance sells.
+    assert not any(t.reason == "rebalance_sell" for t in sells)
 
 
 def test_weak_prophet_empty_rebalance_sells_to_cash(synthetic_board, synthetic_reports):
