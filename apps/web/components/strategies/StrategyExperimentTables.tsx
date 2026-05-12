@@ -26,7 +26,7 @@ type Props = {
 
 export function StrategyExperimentTables({ runLabel, experiment }: Props) {
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
+    <div className="grid min-w-0 gap-4 lg:grid-cols-2">
       <PositionsTable runLabel={runLabel} positions={experiment.positions} />
       <TradesTable runLabel={runLabel} trades={experiment.trades} />
     </div>
@@ -53,8 +53,8 @@ function PositionsTable({ runLabel, positions }: { runLabel: string; positions: 
   ];
 
   return (
-    <article className="card border border-base-300 bg-base-100 shadow-sm">
-      <div className="card-body gap-3 p-5">
+    <article className="card min-w-0 border border-base-300 bg-base-100 shadow-sm">
+      <div className="card-body min-w-0 gap-3 p-5">
         <header className="flex flex-wrap items-baseline justify-between gap-3">
           <h3 className="card-title">실험 포트폴리오</h3>
           <div className="flex flex-wrap items-center gap-2">
@@ -68,7 +68,7 @@ function PositionsTable({ runLabel, positions }: { runLabel: string; positions: 
             </button>
           </div>
         </header>
-        <div className="overflow-x-auto rounded-box border border-base-300">
+        <div className="min-w-0 overflow-x-auto rounded-box border border-base-300">
           <table className="table table-sm table-zebra">
             <thead>
               <tr>
@@ -141,8 +141,8 @@ function TradesTable({ runLabel, trades }: { runLabel: string; trades: StrategyE
   ];
 
   return (
-    <article className="card border border-base-300 bg-base-100 shadow-sm">
-      <div className="card-body gap-3 p-5">
+    <article className="card min-w-0 border border-base-300 bg-base-100 shadow-sm">
+      <div className="card-body min-w-0 gap-3 p-5">
         <header className="flex flex-wrap items-baseline justify-between gap-3">
           <h3 className="card-title">실험 매매내역</h3>
           <div className="flex flex-wrap items-center gap-2">
@@ -156,7 +156,7 @@ function TradesTable({ runLabel, trades }: { runLabel: string; trades: StrategyE
             </button>
           </div>
         </header>
-        <div className="overflow-x-auto rounded-box border border-base-300">
+        <div className="min-w-0 overflow-x-auto rounded-box border border-base-300">
           <table className="table table-sm table-zebra">
             <thead>
               <tr>

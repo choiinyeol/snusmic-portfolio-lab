@@ -82,7 +82,7 @@ export default function DashboardPage() {
           </>
         }
         kpis={
-          <div className="grid min-w-0 gap-3 sm:grid-cols-2">
+          <div className="grid min-w-0 gap-3 min-[1400px]:grid-cols-2">
             <KpiTile
               label="현재 평가액"
               value={formatKrw(primarySummary?.finalEquityKrw ?? null)}
@@ -153,14 +153,16 @@ export default function DashboardPage() {
         </KpiTile>
       </div>
 
-      <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,.85fr)_minmax(320px,.85fr)]">
+      <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1.16fr)_minmax(320px,.84fr)]">
         <Section eyebrow="Portfolio" title="포트폴리오 구성">
           <article className="rounded-box border border-base-300 bg-base-100 p-4 shadow-sm">
             <HoldingsTreemap holdings={holdings} />
           </article>
         </Section>
-        <RiskSummaryPanel holdings={holdings} summaries={summaries} primarySummary={primarySummary} />
-        <RecentReportsPanel reports={newestReports.slice(0, 5)} />
+        <div className="grid min-w-0 gap-4">
+          <RiskSummaryPanel holdings={holdings} summaries={summaries} primarySummary={primarySummary} />
+          <RecentReportsPanel reports={newestReports.slice(0, 5)} />
+        </div>
       </div>
 
       <Section eyebrow="Board" title="전략·벤치마크 누적 경로">
@@ -183,7 +185,7 @@ export default function DashboardPage() {
         </article>
       </Section>
 
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(360px,.9fr)]">
+      <div className="grid gap-4 2xl:grid-cols-[minmax(0,1.08fr)_minmax(360px,.92fr)]">
         <Section
           eyebrow="Holdings"
           title={`현재 보유와 최신 목표가 컨텍스트 (${getPersonaLabel(PERSONA_PRIMARY)})`}
@@ -212,10 +214,10 @@ export default function DashboardPage() {
                   href={`/reports/${trade.symbol}`}
                   className="rounded-2xl border border-base-300 bg-base-100 p-3 shadow-sm transition hover:border-primary/30"
                 >
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(132px,auto)] sm:items-start">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <strong className="truncate">{displayTarget?.company ?? trade.symbol}</strong>
+                        <strong className="min-w-0 truncate">{displayTarget?.company ?? trade.symbol}</strong>
                         <span className="badge badge-ghost badge-sm font-mono">{trade.symbol}</span>
                       </div>
                       <div className="mt-1 text-xs text-base-content/55">
@@ -223,9 +225,9 @@ export default function DashboardPage() {
                         {trade.qty?.toLocaleString('ko-KR') ?? '—'}주
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="min-w-0 sm:text-right">
                       <Money native={trade.grossNative} krw={trade.grossKrw} currency={trade.currency} />
-                      <div className="text-xs text-base-content/55">
+                      <div className="mt-0.5 text-xs leading-snug text-base-content/55">
                         {tradeTarget ? `리포트 근거 ${tradeTarget.publicationDate}` : '원장 체결 · 최신 리포트 참고'}
                       </div>
                     </div>
@@ -329,7 +331,7 @@ function RecentReportsPanel({ reports }: { reports: ReportRow[] }) {
             href={`/reports/${report.symbol}`}
             className="rounded-2xl border border-base-300 bg-base-200/40 p-3 transition hover:border-primary/30"
           >
-            <div className="flex items-start justify-between gap-2">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
               <div className="min-w-0">
                 <div className="truncate text-sm font-black">{report.company || report.symbol}</div>
                 <div className="text-xs text-base-content/55">{formatDateKo(report.publicationDate)}</div>
@@ -363,8 +365,8 @@ function StrategyPerformancePanel({ summaries }: { summaries: SummaryRow[] }) {
 
   return (
     <Section eyebrow="Strategy" title="전략 성과 요약">
-      <article className="overflow-hidden rounded-box border border-base-300 bg-base-100 shadow-sm">
-        <table className="table table-sm">
+      <article className="overflow-x-auto rounded-box border border-base-300 bg-base-100 shadow-sm">
+        <table className="table table-sm min-w-[560px]">
           <thead>
             <tr>
               <th>전략</th>
@@ -420,7 +422,7 @@ function RecentUpdatesPanel({
         {updates.map((item) => (
           <div
             key={item.tag}
-            className="flex items-center justify-between gap-3 rounded-2xl bg-base-200/45 px-3 py-2 text-sm"
+            className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl bg-base-200/45 px-3 py-2 text-sm"
           >
             <div className="min-w-0 truncate">
               <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-primary align-middle" />
@@ -436,9 +438,9 @@ function RecentUpdatesPanel({
 
 function RiskLine({ label, value, tone = 'text-base-content' }: { label: string; value: string; tone?: string }) {
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-base-300 pb-2 last:border-b-0 last:pb-0">
+    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-base-300 pb-2 last:border-b-0 last:pb-0">
       <dt className="text-base-content/60">{label}</dt>
-      <dd className={`font-mono font-bold ${tone}`}>{value}</dd>
+      <dd className={`min-w-0 text-right font-mono font-bold ${tone}`}>{value}</dd>
     </div>
   );
 }
@@ -509,14 +511,14 @@ function HoldingTapeItem({
       href={`/reports/${row.symbol}`}
       className="rounded-2xl border border-base-300 bg-base-100 p-3 shadow-sm transition hover:border-primary/30 hover:shadow-md"
     >
-      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto]">
+      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(150px,auto)]">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <strong className="truncate text-base">{row.company || row.symbol}</strong>
+            <strong className="min-w-0 truncate text-base">{row.company || row.symbol}</strong>
             <span className="badge badge-ghost badge-sm font-mono">{row.symbol}</span>
             <span className="badge badge-outline badge-sm">{row.currency}</span>
           </div>
-          <div className="mt-2 grid grid-cols-3 gap-2 text-xs text-base-content/60">
+          <div className="mt-2 grid gap-2 text-xs text-base-content/60 sm:grid-cols-3">
             <span>
               수량 <b className="text-base-content">{row.qty?.toLocaleString('ko-KR') ?? '—'}</b>
             </span>
@@ -528,14 +530,16 @@ function HoldingTapeItem({
             </span>
           </div>
         </div>
-        <div className="text-left lg:text-right">
+        <div className="min-w-0 text-left lg:text-right">
           <Money native={nativeMarketValue} krw={row.marketValueKrw} currency={row.currency} />
-          <div className={`text-xs font-bold ${(row.unrealizedReturn ?? 0) >= 0 ? 'text-success' : 'text-error'}`}>
+          <div
+            className={`mt-0.5 text-xs font-bold leading-snug ${(row.unrealizedReturn ?? 0) >= 0 ? 'text-success' : 'text-error'}`}
+          >
             {formatPercent(row.unrealizedReturn)} · 손익 {formatKrw(row.unrealizedPnlKrw)}
           </div>
         </div>
       </div>
-      <div className="mt-3 flex items-center gap-3">
+      <div className="mt-3 grid gap-2 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center">
         <span className="badge badge-ghost badge-sm">최신 목표가 참고</span>
         <div className="h-2 flex-1 overflow-hidden rounded-full bg-base-200">
           <div
@@ -543,7 +547,7 @@ function HoldingTapeItem({
             style={{ width: `${Math.max(0, Math.min(100, (progress ?? 0) * 100))}%` }}
           />
         </div>
-        <span className="w-32 text-right text-xs font-bold tabular-nums text-base-content/70">
+        <span className="text-xs font-bold tabular-nums text-base-content/70 sm:text-right">
           목표 {progress === null ? '—' : formatPercent(progress)}
           {gap !== null ? ` · ${formatPercent(gap)}` : ''}
         </span>

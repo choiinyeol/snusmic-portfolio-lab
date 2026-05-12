@@ -51,7 +51,7 @@ export function PositionDecisionPanel({
         </div>
       </div>
 
-      <div className="grid gap-3 xl:grid-cols-2">
+      <div className="grid gap-3 2xl:grid-cols-2">
         {rows.map((row) => {
           const nativeMarketValue =
             row.holding.lastCloseNative !== null && row.holding.qty !== null
@@ -63,10 +63,13 @@ export function PositionDecisionPanel({
               key={`${row.holding.persona}-${row.holding.symbol}`}
               className="rounded-2xl border border-base-300 bg-base-100 p-3 shadow-sm transition hover:border-primary/30 hover:shadow-md"
             >
-              <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
+              <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(150px,auto)] lg:items-start">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <Link href={`/reports/${row.holding.symbol}`} className="truncate text-base font-black link-hover">
+                    <Link
+                      href={`/reports/${row.holding.symbol}`}
+                      className="min-w-0 truncate text-base font-black link-hover"
+                    >
                       {row.holding.company || row.holding.symbol}
                     </Link>
                     <span className="badge badge-ghost badge-sm font-mono">{row.holding.symbol}</span>
@@ -79,7 +82,7 @@ export function PositionDecisionPanel({
                     <Fact label="보유 기간" value={formatDays(row.holding.holdingDays)} />
                   </div>
                 </div>
-                <div className="text-left md:text-right">
+                <div className="min-w-0 text-left lg:text-right">
                   <div className="text-xs font-semibold text-base-content/50">평가액</div>
                   <Money native={nativeMarketValue} krw={row.holding.marketValueKrw} currency={row.holding.currency} />
                   <div className={(row.holding.unrealizedReturn ?? 0) >= 0 ? 'text-success' : 'text-error'}>
@@ -90,7 +93,7 @@ export function PositionDecisionPanel({
                 </div>
               </div>
 
-              <div className="mt-3 grid gap-2 rounded-xl bg-base-200/50 p-3 md:grid-cols-3">
+              <div className="mt-3 grid gap-2 rounded-xl bg-base-200/50 p-3 lg:grid-cols-3">
                 <PriceBlock label="평단" native={null} krw={row.holding.avgCostKrw} currency={row.holding.currency} />
                 <PriceBlock
                   label="현재가"
@@ -107,9 +110,9 @@ export function PositionDecisionPanel({
               </div>
 
               <div className="mt-3 grid gap-2">
-                <div className="flex items-center justify-between gap-2 text-xs">
+                <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                   <span className="font-semibold text-base-content/55">목표 진행률</span>
-                  <span className="font-bold tabular-nums text-base-content">
+                  <span className="text-right font-bold tabular-nums text-base-content">
                     {row.targetProgress === null ? '—' : formatPercent(row.targetProgress)}
                     {row.targetGap !== null ? ` · 목표까지 ${formatPercent(row.targetGap)}` : ''}
                   </span>
@@ -120,17 +123,19 @@ export function PositionDecisionPanel({
                     style={{ width: `${Math.max(0, Math.min(100, (row.targetProgress ?? 0) * 100))}%` }}
                   />
                 </div>
-                <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-base-content/60">
-                  <span>
+                <div className="grid gap-2 text-xs text-base-content/60 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+                  <span className="min-w-0">
                     최근 매수:{' '}
                     {row.lastBuy ? `${formatDateKo(row.lastBuy.date)} · ${humanReason(row.lastBuy.reason)}` : '—'}
                   </span>
-                  <span className="font-bold text-base-content/70">{sourceLabel(row.targetSource)}</span>
-                  {linkedSymbol ? (
-                    <Link className="font-bold text-primary link-hover" href={`/reports/${linkedSymbol}`}>
-                      {row.targetSource === 'trade_report' ? '리포트 근거 보기 →' : '최신 리포트 보기 →'}
-                    </Link>
-                  ) : null}
+                  <span className="flex flex-wrap items-center gap-2 sm:justify-end">
+                    <span className="font-bold text-base-content/70">{sourceLabel(row.targetSource)}</span>
+                    {linkedSymbol ? (
+                      <Link className="font-bold text-primary link-hover" href={`/reports/${linkedSymbol}`}>
+                        {row.targetSource === 'trade_report' ? '리포트 근거 보기 →' : '최신 리포트 보기 →'}
+                      </Link>
+                    ) : null}
+                  </span>
                 </div>
               </div>
             </article>
@@ -194,9 +199,9 @@ function targetGap(holding: HoldingRow, target: ReportTargetDigest | null): numb
 
 function Fact({ label, value }: { label: string; value: string }) {
   return (
-    <div>
+    <div className="min-w-0">
       <div className="font-semibold text-base-content/45">{label}</div>
-      <div className="mt-0.5 font-bold text-base-content">{value}</div>
+      <div className="mt-0.5 truncate font-bold text-base-content">{value}</div>
     </div>
   );
 }
@@ -213,7 +218,7 @@ function PriceBlock({
   currency: string;
 }) {
   return (
-    <div>
+    <div className="min-w-0">
       <div className="mb-0.5 text-xs font-semibold text-base-content/45">{label}</div>
       {krw !== null ? <Money native={native} krw={krw} currency={currency} /> : <div className="font-bold">—</div>}
     </div>

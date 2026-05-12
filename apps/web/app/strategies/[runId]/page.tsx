@@ -35,7 +35,7 @@ export default async function StrategyDetailPage({ params }: { params: StrategyP
           </Link>
         }
         kpis={
-          <div className="grid min-w-0 gap-3 sm:grid-cols-2">
+          <div className="grid min-w-0 gap-3 min-[1400px]:grid-cols-2">
             <KpiTile
               label="실험 선택 종목"
               value={experiment.positions.length.toLocaleString('ko-KR')}

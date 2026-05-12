@@ -271,9 +271,7 @@ export function PriceEvidenceChart({
 
     createSeriesMarkers(candleSeries, chartMarkers);
 
-    let latestParams: MouseEventParams<Time> | null = null;
     const handleCrosshairMove = (params: MouseEventParams<Time>) => {
-      latestParams = params;
       if (!params.point || !params.time || params.point.x < 0 || params.point.y < 0) {
         setTooltip(null);
         setHoverBar(null);

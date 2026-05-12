@@ -46,7 +46,7 @@ export default function StrategiesPage() {
           </>
         }
         kpis={
-          <div className="grid min-w-0 gap-3 sm:grid-cols-2">
+          <div className="grid min-w-0 gap-3 min-[1400px]:grid-cols-2">
             <KpiTile
               label="최고 후보"
               value={bestRun?.label ?? '—'}

@@ -69,14 +69,10 @@ export function PortfolioStrategyView({
   const sellCount = personaTrades.filter((t) => t.side === 'sell').length;
 
   return (
-    <div className="grid gap-4">
-      <div className="flex flex-wrap items-center gap-2">
+    <div className="grid min-w-0 gap-4">
+      <div className="flex min-w-0 flex-wrap items-center gap-2">
         <span className="text-xs font-semibold uppercase tracking-[0.18em] text-base-content/55">전략</span>
-        <div
-          className="tabs tabs-box w-fit max-w-full overflow-x-auto bg-base-200"
-          role="tablist"
-          aria-label="전략 선택"
-        >
+        <div className="tabs tabs-box min-w-0 flex-1 overflow-x-auto bg-base-200" role="tablist" aria-label="전략 선택">
           {personas.map((item) => (
             <button
               key={item}

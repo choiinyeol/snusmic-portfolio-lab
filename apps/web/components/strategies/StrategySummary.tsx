@@ -73,7 +73,7 @@ export function StrategySummary({ run, href }: { run: StrategyRun; href?: string
           </div>
         </header>
 
-        <dl className="grid grid-cols-2 gap-2 md:grid-cols-5">
+        <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3 2xl:grid-cols-5">
           <Stat
             label="최종 자산"
             value={finalEquity !== null ? formatKrw(finalEquity) : '—'}
@@ -153,9 +153,9 @@ function Stat({
           ? 'text-warning'
           : 'text-base-content';
   return (
-    <div className="rounded-md border border-base-200 bg-base-100 px-3 py-2.5">
+    <div className="min-w-0 rounded-md border border-base-200 bg-base-100 px-3 py-2.5">
       <dt className="text-xs uppercase tracking-[0.14em] text-base-content/55">{label}</dt>
-      <dd className={`mt-1 text-base font-bold tabular-nums ${toneClass}`}>{value}</dd>
+      <dd className={`mt-1 break-words text-sm font-bold tabular-nums sm:text-base ${toneClass}`}>{value}</dd>
     </div>
   );
 }

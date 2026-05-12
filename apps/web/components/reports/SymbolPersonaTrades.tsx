@@ -43,7 +43,7 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
 
   if (!personas.length) {
     return (
-      <section id="persona-trades" className="card border border-base-300 bg-base-100 shadow-sm">
+      <section id="persona-trades" className="card min-w-0 border border-base-300 bg-base-100 shadow-sm">
         <div className="card-body gap-2 p-5">
           <h2 className="text-lg font-bold tracking-tight">페르소나별 매매 내역</h2>
           <p className="text-sm text-base-content/65">{symbol}에 연결된 전략 매매 내역이 없습니다.</p>
@@ -53,7 +53,7 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
   }
 
   return (
-    <section id="persona-trades" className="grid gap-4">
+    <section id="persona-trades" className="grid min-w-0 gap-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold tracking-tight">페르소나별 매매 내역</h2>
@@ -73,8 +73,8 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
         options={personas.map((item) => ({ id: item, label: personaLabels[item] ?? item }))}
       />
 
-      <article className="card border border-base-300 bg-base-100 shadow-sm">
-        <div className="card-body gap-4 p-5">
+      <article className="card min-w-0 border border-base-300 bg-base-100 shadow-sm">
+        <div className="card-body min-w-0 gap-4 p-5">
           <header className="flex flex-wrap items-baseline justify-between gap-3">
             <div>
               <span className="text-xs font-semibold uppercase tracking-[0.18em] text-base-content/55">현재 상태</span>
@@ -143,8 +143,8 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
         </div>
       </article>
 
-      <article className="card border border-base-300 bg-base-100 shadow-sm">
-        <div className="card-body gap-4 p-5">
+      <article className="card min-w-0 border border-base-300 bg-base-100 shadow-sm">
+        <div className="card-body min-w-0 gap-4 p-5">
           <header className="flex flex-wrap items-baseline justify-between gap-2">
             <h3 className="text-base font-bold tracking-tight">포지션 생애주기</h3>
             <span className="text-xs text-base-content/55">
@@ -234,14 +234,14 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
         </div>
       </article>
 
-      <details className="card border border-base-300 bg-base-100 shadow-sm">
+      <details className="card min-w-0 border border-base-300 bg-base-100 shadow-sm">
         <summary className="cursor-pointer list-none p-5">
           <div className="flex flex-wrap items-baseline justify-between gap-3">
             <h3 className="text-base font-bold tracking-tight">전체 포지션 생애주기</h3>
             <span className="text-xs text-base-content/55">{selectedEpisodes.length}개 포지션 · 펼치기</span>
           </div>
         </summary>
-        <div className="px-5 pb-5">
+        <div className="min-w-0 px-5 pb-5">
           <DataTable compact className="ledger-table-wrap">
             <thead>
               <tr>
@@ -298,14 +298,14 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
         </div>
       </details>
 
-      <details className="card border border-base-300 bg-base-100 shadow-sm">
+      <details className="card min-w-0 border border-base-300 bg-base-100 shadow-sm">
         <summary className="cursor-pointer list-none p-5">
           <div className="flex flex-wrap items-baseline justify-between gap-3">
             <h3 className="text-base font-bold tracking-tight">체결 원장</h3>
             <span className="text-xs text-base-content/55">{selectedTrades.length}건 체결 · 펼치기</span>
           </div>
         </summary>
-        <div className="px-5 pb-5">
+        <div className="min-w-0 px-5 pb-5">
           <DataTable compact className="ledger-table-wrap">
             <thead>
               <tr>
