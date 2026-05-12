@@ -3618,7 +3618,7 @@ wheels = [
 ]
 
 [[package]]
-name = "snusmic-quant-terminal"
+name = "snusmic-portfolio-lab"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

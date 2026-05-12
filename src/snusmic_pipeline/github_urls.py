@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from urllib.parse import quote
 
-GITHUB_REPO = "ChoiInYeol/snusmic-quant-terminal"
+GITHUB_REPO = "ChoiInYeol/snusmic-portfolio-lab"
 GITHUB_RAW_BASE = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main"
 
 

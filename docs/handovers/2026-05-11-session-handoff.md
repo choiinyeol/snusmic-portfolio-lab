@@ -7,7 +7,7 @@
 - GitHub Actions on `main`:
   - `web` (Vercel build) — green
   - `ci` — **1 pytest snapshot failing** (daily-rebalance change shifted v1 trade ledger; deployment unaffected; see "Known issues" below)
-- Vercel production: `https://smic-portfolio.vercel.app/` — green, latest deploy reflects this commit
+- Vercel production: `https://smic-portfolio-lab.vercel.app/` — green, latest deploy reflects this commit
 - Working tree should be clean after this handoff commit. `.claude/` and `.omc/` are runtime artifacts.
 
 ## What this session delivered (rounds A → G + chart primitive)

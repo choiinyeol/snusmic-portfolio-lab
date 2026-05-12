@@ -10,9 +10,9 @@
   - `Sync SNUSMIC reports`
   - `Publish GitHub Pages mirror`
 - Vercel production HTTP check: 200
-  - `https://snusmic-quant-terminal-choiinyeols-projects.vercel.app/`
+  - `https://snusmic-portfolio-lab-choiinyeols-projects.vercel.app/`
 - GitHub Pages mirror HTTP check: 200
-  - `https://choiinyeol.github.io/snusmic-quant-terminal/`
+  - `https://choiinyeol.github.io/snusmic-portfolio-lab/`
 - Working tree after this handoff commit should be clean except ignored/untracked runtime artifacts such as `.omc/` and `apps/web/.omc/`.
 
 ## Product direction locked in this session
@@ -152,7 +152,7 @@ Local verification on commit `2666ee1`:
 - `npm --prefix apps/web run gen:types:check` → 5 schemas up to date
 - `python scripts/export_schemas.py --check` → 5 schemas up to date
 - `python scripts/check_schema_compat.py --base-ref HEAD` → no Principle-6 violations
-- `GITHUB_PAGES=true NEXT_PUBLIC_BASE_PATH=/snusmic-quant-terminal npm --prefix apps/web run build` → static build success
+- `GITHUB_PAGES=true NEXT_PUBLIC_BASE_PATH=/snusmic-portfolio-lab npm --prefix apps/web run build` → static build success
 - `python -m snusmic_pipeline build-site` → success
 
 Remote verification:

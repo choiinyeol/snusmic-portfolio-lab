@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useEffect } from 'react';
 import { DailyEquityHistory } from '@/components/trading/DailyEquityHistory';
+import { PositionDecisionPanel } from '@/components/trading/PositionDecisionPanel';
 import { PortfolioTables } from '@/components/trading/PortfolioTables';
 import { TradesTable } from '@/components/trading/TradesTable';
 import { KpiTile } from '@/components/ui/KpiTile';
@@ -111,6 +112,15 @@ export function PortfolioStrategyView({
           delta={`매수 ${buyCount} · 매도 ${sellCount}`}
         />
       </div>
+
+      <PositionDecisionPanel
+        holdings={holdings}
+        trades={trades}
+        persona={persona}
+        targetsBySymbol={targetsBySymbol}
+        targetsByReportId={targetsByReportId}
+        reportSymbolsById={reportSymbolsById}
+      />
 
       <Tabs
         tabs={[
