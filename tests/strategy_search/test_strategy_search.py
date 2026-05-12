@@ -32,6 +32,13 @@ def _reports() -> pd.DataFrame:
                 "days_to_target": 40,
                 "current_return": 0.12,
                 "trough_return": -0.08,
+                "trend_close": 130.0,
+                "trend_ma50": 120.0,
+                "trend_ma150": 110.0,
+                "trend_ma200": 100.0,
+                "trend_ma200_1m_return": 0.02,
+                "trend_price_vs_52w_low": 0.60,
+                "trend_pct_below_52w_high": 0.10,
             },
             {
                 "report_id": "r2",
@@ -43,6 +50,13 @@ def _reports() -> pd.DataFrame:
                 "days_to_target": None,
                 "current_return": -0.22,
                 "trough_return": -0.35,
+                "trend_close": 80.0,
+                "trend_ma50": 90.0,
+                "trend_ma150": 100.0,
+                "trend_ma200": 105.0,
+                "trend_ma200_1m_return": -0.01,
+                "trend_price_vs_52w_low": 0.10,
+                "trend_pct_below_52w_high": 0.40,
             },
             {
                 "report_id": "r3",
@@ -54,6 +68,13 @@ def _reports() -> pd.DataFrame:
                 "days_to_target": 80,
                 "current_return": 0.20,
                 "trough_return": -0.10,
+                "trend_close": 150.0,
+                "trend_ma50": 140.0,
+                "trend_ma150": 125.0,
+                "trend_ma200": 115.0,
+                "trend_ma200_1m_return": 0.03,
+                "trend_price_vs_52w_low": 0.80,
+                "trend_pct_below_52w_high": 0.05,
             },
         ]
     )
@@ -105,6 +126,13 @@ def test_grid_search_is_interpretable_and_sorted() -> None:
     assert {row["sampler"] for row in rows} == {"grid-search"}
     assert rows[0]["score"] >= rows[-1]["score"]
     assert len({row["trial_number"] for row in rows}) == len(rows)
+
+
+def test_mtt_filter_requires_uptrend_features() -> None:
+    config = ParametricSmicFollowerConfig(require_mtt=True, max_positions=10, weighting="equal")
+    metrics = evaluate_strategy(config, _reports(), baseline_summary=_summary())
+    assert metrics.trade_count == 4
+    assert metrics.hit_rate == pytest.approx(1.0)
 
 
 def test_train_selected_grid_search_ranks_full_and_holdout_evidence() -> None:

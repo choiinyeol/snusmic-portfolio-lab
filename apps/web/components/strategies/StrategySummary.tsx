@@ -24,6 +24,10 @@ const PARAM_LABELS: Record<string, string> = {
   rebalance: '리밸런싱',
   weighting: '비중 기준',
   universe: '유니버스',
+  require_mtt: 'MTT',
+  min_price_vs_52w_low: '52주 저점 대비',
+  max_pct_below_52w_high: '52주 고점 이격',
+  min_ma200_1m_return: '200일선 1M 추세',
 };
 
 export function StrategySummary({ run, href }: { run: StrategyRun; href?: string }) {

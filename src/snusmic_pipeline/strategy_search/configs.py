@@ -31,6 +31,10 @@ class ParametricSmicFollowerConfig(_StrictModel):
     universe: UniverseFilter = "all"
     exclude_missing_confidence_rows: bool = False
     require_publication_price: bool = True
+    require_mtt: bool = False
+    min_price_vs_52w_low: float = Field(default=0.30, ge=0.0, le=5.0)
+    max_pct_below_52w_high: float = Field(default=0.25, ge=0.0, le=1.0)
+    min_ma200_1m_return: float = Field(default=0.0, ge=-1.0, le=1.0)
 
     @model_validator(mode="after")
     def _check_ranges(self) -> ParametricSmicFollowerConfig:

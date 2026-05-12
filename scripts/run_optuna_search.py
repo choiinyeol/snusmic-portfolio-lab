@@ -25,6 +25,9 @@ from snusmic_pipeline.strategy_search.strategy import (  # noqa: E402
     run_random_search,
     run_train_selected_grid_search,
 )
+from snusmic_pipeline.strategy_search.trend_features import (  # noqa: E402
+    enrich_report_performance_with_trend_features,
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -55,7 +58,9 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    report_performance = pd.read_csv(args.sim_dir / "report_performance.csv")
+    report_performance = enrich_report_performance_with_trend_features(
+        pd.read_csv(args.sim_dir / "report_performance.csv"), args.warehouse
+    )
     summary_path = args.sim_dir / "summary.csv"
     baseline_summary = pd.read_csv(summary_path) if summary_path.exists() else None
     rows = _run_search(args, report_performance, baseline_summary)
@@ -129,6 +134,10 @@ def _run_search(
                 "exclude_missing_confidence_rows", [False, True]
             ),
             require_publication_price=trial.suggest_categorical("require_publication_price", [False, True]),
+            require_mtt=trial.suggest_categorical("require_mtt", [False, True]),
+            min_price_vs_52w_low=trial.suggest_float("min_price_vs_52w_low", 0.30, 1.00, step=0.10),
+            max_pct_below_52w_high=trial.suggest_float("max_pct_below_52w_high", 0.10, 0.25, step=0.05),
+            min_ma200_1m_return=trial.suggest_float("min_ma200_1m_return", 0.00, 0.05, step=0.01),
         )
         metrics = evaluate_strategy(config, report_performance, baseline_summary=baseline_summary)
         for key, value in {**config.model_dump(mode="json"), **metrics.model_dump(mode="json")}.items():

@@ -5,22 +5,18 @@
   "parameters": [
     {
       "parameter": "max_positions",
-      "importance": 0.9174553769498601
+      "importance": 0.74535599249993
     },
     {
-      "parameter": "min_target_upside_at_pub",
-      "importance": 0.9081683771424836
-    },
-    {
-      "parameter": "max_report_age_days",
-      "importance": 0.004643499903688374
-    },
-    {
-      "parameter": "time_loss_days",
-      "importance": 0.004643499903688327
+      "parameter": "take_profit_pct",
+      "importance": 0.16666666666666669
     },
     {
       "parameter": "target_hit_multiplier",
+      "importance": 0.0
+    },
+    {
+      "parameter": "min_target_upside_at_pub",
       "importance": 0.0
     },
     {
@@ -28,11 +24,15 @@
       "importance": 0.0
     },
     {
-      "parameter": "stop_loss_pct",
+      "parameter": "max_report_age_days",
       "importance": 0.0
     },
     {
-      "parameter": "take_profit_pct",
+      "parameter": "time_loss_days",
+      "importance": 0.0
+    },
+    {
+      "parameter": "stop_loss_pct",
       "importance": 0.0
     },
     {
@@ -53,6 +53,22 @@
     },
     {
       "parameter": "require_publication_price",
+      "importance": 0.0
+    },
+    {
+      "parameter": "require_mtt",
+      "importance": 0.0
+    },
+    {
+      "parameter": "min_price_vs_52w_low",
+      "importance": 0.0
+    },
+    {
+      "parameter": "max_pct_below_52w_high",
+      "importance": 0.0
+    },
+    {
+      "parameter": "min_ma200_1m_return",
       "importance": 0.0
     }
   ]
