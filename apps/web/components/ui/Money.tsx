@@ -35,18 +35,18 @@ export function Money({
   bold = false,
 }: Props) {
   const { primary, secondary } = formatNativeWithKrw(native, krw, currency);
-  const primaryClass = `tabular-nums ${toneClass[tone]} ${bold ? 'font-bold' : ''}`;
-  const secondaryClass = 'tabular-nums text-xs text-base-content/55';
+  const primaryClass = `break-words tabular-nums ${toneClass[tone]} ${bold ? 'font-bold' : ''}`;
+  const secondaryClass = 'break-words tabular-nums text-xs text-base-content/55';
   if (layout === 'inline') {
     return (
-      <span className="inline-flex items-baseline gap-1.5">
+      <span className="inline-flex max-w-full flex-wrap items-baseline gap-1.5">
         <span className={primaryClass}>{primary}</span>
         {showSecondary && secondary ? <span className={secondaryClass}>{secondary}</span> : null}
       </span>
     );
   }
   return (
-    <span className="inline-grid">
+    <span className="inline-grid max-w-full">
       <span className={primaryClass}>{primary}</span>
       {showSecondary && secondary ? <span className={secondaryClass}>{secondary}</span> : null}
     </span>

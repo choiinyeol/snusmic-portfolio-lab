@@ -32,9 +32,9 @@ export function KpiTile({
     <article
       className={`kpi-tile card bg-base-100 text-base-content border ${toneClass.border} shadow-sm ${emphasis ? 'kpi-tile--emphasis ring-1 ring-primary/10' : ''}`}
     >
-      <div className="card-body gap-2 p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="kpi-tile__label stat-title text-base-content/60">{label}</div>
+      <div className="card-body min-w-0 gap-2 p-5">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+          <div className="kpi-tile__label stat-title min-w-0 text-base-content/60">{label}</div>
           {tone !== 'neutral' ? <span className={`badge badge-sm ${toneClass.badge}`}>{toneLabel(tone)}</span> : null}
         </div>
         <div className={`kpi-tile__value stat-value leading-none ${toneClass.value}`}>{value}</div>

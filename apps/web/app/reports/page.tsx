@@ -27,7 +27,7 @@ export default function ReportsPage() {
           { label: '중앙 도달일', value: formatDays(overview.target_stats?.median_days_to_target) },
         ]}
         kpis={
-          <div className="grid min-w-0 gap-3 sm:grid-cols-2">
+          <div className="grid min-w-0 gap-3 min-[1400px]:grid-cols-2">
             <KpiTile
               label="목표가 적중률"
               value={formatPercent(targetHitCount / Math.max(1, reports.length))}

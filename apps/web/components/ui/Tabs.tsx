@@ -9,8 +9,8 @@ export function Tabs({ tabs, defaultTabId }: { tabs: Tab[]; defaultTabId?: strin
   const [active, setActive] = useState<string | undefined>(initial);
   const activeTab = tabs.find((t) => t.id === active) ?? tabs[0];
   return (
-    <div className="grid gap-4">
-      <div className="tabs tabs-box w-fit max-w-full overflow-x-auto bg-base-200" role="tablist">
+    <div className="grid min-w-0 gap-4">
+      <div className="tabs tabs-box w-full max-w-full overflow-x-auto bg-base-200" role="tablist">
         {tabs.map((tab) => {
           const tabId = `tab-${tab.id}`;
           const panelId = `panel-${tab.id}`;
@@ -35,7 +35,7 @@ export function Tabs({ tabs, defaultTabId }: { tabs: Tab[]; defaultTabId?: strin
         id={activeTab ? `panel-${activeTab.id}` : undefined}
         role="tabpanel"
         aria-labelledby={activeTab ? `tab-${activeTab.id}` : undefined}
-        className="tabs__panel"
+        className="tabs__panel min-w-0"
       >
         {activeTab?.content}
       </div>

@@ -12,9 +12,9 @@ type Props = {
 
 export function PathScenarioPanel({ report, scenarioRows, trend }: Props) {
   return (
-    <div className="grid gap-5 lg:grid-cols-3">
-      <article className="card border border-base-300 bg-base-100 shadow-sm lg:col-span-2">
-        <div className="card-body gap-4 p-5">
+    <div className="grid min-w-0 gap-5 lg:grid-cols-3">
+      <article className="card min-w-0 border border-base-300 bg-base-100 shadow-sm lg:col-span-2">
+        <div className="card-body min-w-0 gap-4 p-5">
           <header className="flex flex-col gap-1">
             <h3 className="text-lg font-bold tracking-tight">가격 레인지와 사후 수익률</h3>
             <p className="text-sm text-base-content/65">

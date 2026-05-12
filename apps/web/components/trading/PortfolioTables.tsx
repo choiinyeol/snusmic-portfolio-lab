@@ -64,7 +64,7 @@ export function PortfolioTables({ holdings, persona, personaLabels, capitalByPer
   };
 
   return (
-    <div className="grid gap-4">
+    <div className="grid min-w-0 gap-4">
       <div className="flex justify-end" aria-label="포트폴리오 필터">
         <button
           className="btn btn-sm btn-outline"
@@ -75,8 +75,8 @@ export function PortfolioTables({ holdings, persona, personaLabels, capitalByPer
         </button>
       </div>
 
-      <section className="card border border-base-300 bg-base-100 shadow-sm">
-        <div className="card-body gap-2 p-5">
+      <section className="card min-w-0 border border-base-300 bg-base-100 shadow-sm">
+        <div className="card-body min-w-0 gap-2 p-5">
           <h2 className="card-title">현재 보유 포트폴리오</h2>
           <p className="text-base-content/65">
             현재 어떤 종목을 얼마나 들고 있는지, 목표가·시장구분·평단·최근가·미실현 손익을 바로 확인합니다.
