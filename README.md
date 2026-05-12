@@ -41,13 +41,13 @@ SNUSMIC Quant Terminal은 서울대 SMIC 리서치 PDF에서 추출한 목표가
 ### 전략 후보 탐색 (`data/web/strategy-runs.json`)
 
 - study: `smic-follower-v1`
-- sampler: `grid-search`
-- grid 평가: 2,592개
-- 대시보드 후보: 상위 20개
-- best run: `smic-follower-v1-trial-2153`
+- sampler: `train-selected-grid`
+- train 후보군: 2,592개 grid 조합
+- 대시보드 후보: train 2021-01-01~2023-12-31 상위 5개를 full 2021-01-01~현재 + holdout 2024-01-01~현재로 재평가
+- best run: `smic-follower-v1-trial-2320`
 - 전략 아티팩트: `data/web/strategy-runs.json`, `data/web/optuna-trials.json`, `data/web/parameter-importance.json`
 
-전략 후보는 리포트별 사후 성과 테이블에서 파라미터 조합을 재구성한 실험입니다. 후보 그래프는 선택 종목의 실제 가격 경로를 이용해 일별 수익률을 재구성하지만, 실제 share-based 브로커 원장과 동일한 의미로 읽으면 안 됩니다.
+전략 후보는 리포트별 사후 성과 테이블에서 파라미터 조합을 재구성한 실험입니다. 기본 탐색은 train 구간에서 후보를 선발한 뒤 full/holdout 구간에서 순위를 다시 매깁니다. 후보 그래프는 선택 종목의 실제 가격 경로를 이용해 일별 수익률을 재구성하지만, 실제 share-based 브로커 원장과 동일한 의미로 읽으면 안 됩니다.
 
 ---
 
@@ -68,7 +68,7 @@ SNUSMIC Quant Terminal은 서울대 SMIC 리서치 PDF에서 추출한 목표가
 │   └── web/                          # Next.js가 읽는 canonical JSON/CSV/price artifacts
 ├── scripts/
 │   ├── run_persona_sim.py            # 페르소나 시뮬레이션
-│   ├── run_optuna_search.py          # 명시적 grid/random/optuna 전략 탐색
+│   ├── run_optuna_search.py          # robust-grid 기본, 명시적 grid/random/optuna 전략 탐색
 │   ├── export_optuna_artifacts.py    # 전략 탐색 결과 → data/web
 │   └── refresh_web_artifacts.sh      # sim/search/web artifacts 일괄 갱신
 ├── src/snusmic_pipeline/
@@ -108,11 +108,11 @@ bash scripts/refresh_web_artifacts.sh
 이 스크립트는 다음을 순서대로 실행합니다.
 
 1. `uv run python -m snusmic_pipeline run-sim`
-2. `uv run python scripts/run_optuna_search.py --sampler ${STRATEGY_SAMPLER:-grid}`
+2. `uv run python scripts/run_optuna_search.py --sampler ${STRATEGY_SAMPLER:-robust-grid}`
 3. `uv run python -m snusmic_pipeline export-web`
 4. `uv run python scripts/export_optuna_artifacts.py`
 
-기본 전략 탐색은 해석 가능한 deterministic `grid-search`입니다. Random/Optuna는 명시적으로 요청해야 합니다.
+기본 전략 탐색은 deterministic `robust-grid`입니다. Train 구간 상위 후보만 full/holdout 구간으로 재평가하며, plain Grid/Random/Optuna는 명시적으로 요청해야 합니다.
 
 ```bash
 STRATEGY_SAMPLER=optuna STRATEGY_TRIALS=100 bash scripts/refresh_web_artifacts.sh
@@ -157,7 +157,7 @@ uv run python scripts/run_persona_sim.py \
 ### 전략 후보 탐색
 
 ```bash
-uv run python scripts/run_optuna_search.py --sampler grid
+uv run python scripts/run_optuna_search.py --sampler robust-grid --train-start 2021-01-01 --train-end 2023-12-31 --full-start 2021-01-01 --top-candidates 5
 uv run python scripts/export_optuna_artifacts.py
 ```
 

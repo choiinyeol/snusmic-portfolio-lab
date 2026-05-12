@@ -1,7 +1,7 @@
 """Run local-only strategy search for SNUSMIC follower variants.
 
-The sampler is explicit: use deterministic grid search by default, request
-random sampling for a seeded smoke run, or request Optuna and fail fast if the
+The sampler is explicit: use train-selected robust grid search by default, request
+plain grid/random runs for inspection, or request Optuna and fail fast if the
 optional dependency is unavailable.
 """
 
@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +23,7 @@ from snusmic_pipeline.strategy_search.strategy import (  # noqa: E402
     evaluate_strategy,
     run_grid_search,
     run_random_search,
+    run_train_selected_grid_search,
 )
 
 
@@ -40,10 +42,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--out", type=Path, default=ROOT / "data" / "optuna")
     parser.add_argument(
         "--sampler",
-        choices=("grid", "random", "optuna"),
-        default="grid",
+        choices=("robust-grid", "grid", "random", "optuna"),
+        default="robust-grid",
         help="Search sampler. Optuna requires the optional optuna package and fails fast if missing.",
     )
+    parser.add_argument("--train-start", type=date.fromisoformat, default=date(2021, 1, 1))
+    parser.add_argument("--train-end", type=date.fromisoformat, default=date(2023, 12, 31))
+    parser.add_argument("--full-start", type=date.fromisoformat, default=date(2021, 1, 1))
+    parser.add_argument("--top-candidates", type=int, default=5)
     return parser.parse_args()
 
 
@@ -78,6 +84,15 @@ def main() -> int:
 def _run_search(
     args: argparse.Namespace, report_performance: pd.DataFrame, baseline_summary: pd.DataFrame | None
 ) -> list[dict[str, Any]]:
+    if args.sampler == "robust-grid":
+        return run_train_selected_grid_search(
+            report_performance,
+            baseline_summary=baseline_summary,
+            train_start=args.train_start,
+            train_end=args.train_end,
+            full_start=args.full_start,
+            top_candidates=args.top_candidates,
+        )
     if args.sampler == "grid":
         return run_grid_search(report_performance, baseline_summary=baseline_summary)
     if args.sampler == "random":

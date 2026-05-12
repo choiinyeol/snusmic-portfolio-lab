@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from datetime import date
 from pathlib import Path
 
 import pandas as pd
@@ -10,7 +11,12 @@ from pydantic import ValidationError
 from snusmic_pipeline.strategy_search.configs import ParametricSmicFollowerConfig
 from snusmic_pipeline.strategy_search.export import export_strategy_artifacts
 from snusmic_pipeline.strategy_search.objective import score_metrics
-from snusmic_pipeline.strategy_search.strategy import evaluate_strategy, run_grid_search, run_random_search
+from snusmic_pipeline.strategy_search.strategy import (
+    evaluate_strategy,
+    run_grid_search,
+    run_random_search,
+    run_train_selected_grid_search,
+)
 
 
 def _reports() -> pd.DataFrame:
@@ -37,6 +43,17 @@ def _reports() -> pd.DataFrame:
                 "days_to_target": None,
                 "current_return": -0.22,
                 "trough_return": -0.35,
+            },
+            {
+                "report_id": "r3",
+                "symbol": "XYZ",
+                "publication_date": "2025-01-01",
+                "entry_price_krw": 100.0,
+                "target_upside_at_pub": 0.50,
+                "target_hit": True,
+                "days_to_target": 80,
+                "current_return": 0.20,
+                "trough_return": -0.10,
             },
         ]
     )
@@ -69,10 +86,10 @@ def test_objective_score_formula_matches_plan() -> None:
 def test_evaluate_strategy_exports_raw_metrics_and_baseline_excess() -> None:
     config = ParametricSmicFollowerConfig(max_positions=10, weighting="equal")
     metrics = evaluate_strategy(config, _reports(), baseline_summary=_summary())
-    assert metrics.trade_count == 4
-    assert metrics.hit_rate == pytest.approx(0.5)
+    assert metrics.trade_count == 6
+    assert metrics.hit_rate == pytest.approx(2 / 3)
     assert metrics.excess_return_vs_smic_follower is not None
-    assert metrics.max_single_position_weight == pytest.approx(0.5)
+    assert metrics.max_single_position_weight == pytest.approx(1 / 3)
 
 
 def test_random_search_is_deterministic() -> None:
@@ -88,6 +105,24 @@ def test_grid_search_is_interpretable_and_sorted() -> None:
     assert {row["sampler"] for row in rows} == {"grid-search"}
     assert rows[0]["score"] >= rows[-1]["score"]
     assert len({row["trial_number"] for row in rows}) == len(rows)
+
+
+def test_train_selected_grid_search_ranks_full_and_holdout_evidence() -> None:
+    rows = run_train_selected_grid_search(
+        _reports(),
+        baseline_summary=_summary(),
+        train_start=date(2024, 1, 1),
+        train_end=date(2024, 12, 31),
+        full_start=date(2024, 1, 1),
+        top_candidates=3,
+    )
+    assert len(rows) == 3
+    assert {row["sampler"] for row in rows} == {"train-selected-grid"}
+    assert {row["scope"] for row in rows} == {"train-selected/full-evaluated"}
+    assert rows[0]["score"] >= rows[-1]["score"]
+    assert {row["selection_rank"] for row in rows} == {1, 2, 3}
+    assert all(row["train_start_date"] == "2024-01-01" for row in rows)
+    assert all("full_score" in row and "holdout_score" in row for row in rows)
 
 
 def test_export_strategy_artifacts(tmp_path: Path) -> None:

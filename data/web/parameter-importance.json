@@ -4,28 +4,20 @@
   "method": "absolute Pearson correlation with objective score over exported trials",
   "parameters": [
     {
-      "parameter": "stop_loss_pct",
-      "importance": 0.5904784026139779
-    },
-    {
       "parameter": "max_positions",
-      "importance": 0.30292809051028086
-    },
-    {
-      "parameter": "take_profit_pct",
-      "importance": 0.16744598215606227
-    },
-    {
-      "parameter": "time_loss_days",
-      "importance": 0.13220788375998593
-    },
-    {
-      "parameter": "max_report_age_days",
-      "importance": 0.12787063656527073
+      "importance": 0.9174553769498601
     },
     {
       "parameter": "min_target_upside_at_pub",
-      "importance": 0.043452441243471245
+      "importance": 0.9081683771424836
+    },
+    {
+      "parameter": "max_report_age_days",
+      "importance": 0.004643499903688374
+    },
+    {
+      "parameter": "time_loss_days",
+      "importance": 0.004643499903688327
     },
     {
       "parameter": "target_hit_multiplier",
@@ -33,6 +25,14 @@
     },
     {
       "parameter": "max_target_upside_at_pub",
+      "importance": 0.0
+    },
+    {
+      "parameter": "stop_loss_pct",
+      "importance": 0.0
+    },
+    {
+      "parameter": "take_profit_pct",
       "importance": 0.0
     },
     {
