@@ -11,12 +11,11 @@ export const metadata: Metadata = {
 };
 
 const NAV: SidebarNavItem[] = [
-  { href: '/', label: 'Dashboard', icon: '⌂' },
+  { href: '/', label: 'Overview', icon: '⌂' },
   { href: '/portfolio', label: 'Portfolio', icon: '◔' },
-  { href: '/reports', label: 'Reports', icon: '▤' },
-  { href: '/strategies', label: 'Strategies', icon: '⌁' },
-  { href: '/strategies#strategy-board', label: 'Backtests', icon: '△', activePath: null },
-  { href: '/reports', label: 'Data', icon: '◎', activePath: null },
+  { href: '/reports', label: 'Research', icon: '▤' },
+  { href: '/strategies', label: 'Strategy', icon: '⌁' },
+  { href: '/screener', label: 'Screener', icon: '◎' },
   { href: 'https://github.com/ChoiInYeol/snusmic-portfolio-lab', label: 'GitHub', icon: '◈' },
 ];
 
@@ -42,7 +41,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               <span className="brand__mark" aria-hidden="true" />
               <span className="brand__name">
                 <span>SNUSMIC Portfolio Lab</span>
-                <span className="brand-kicker">Research · Portfolio · Strategy</span>
+                <span className="brand-kicker">Overview · Portfolio · Research · Strategy · Screener</span>
               </span>
             </Link>
             <SidebarNav items={NAV} />
@@ -71,7 +70,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 <div className="text-sm font-black tracking-[-0.03em] text-base-content md:text-lg">
                   SNUSMIC Portfolio Lab
                 </div>
-                <div className="text-xs font-semibold text-base-content/50">Research · Portfolio · Strategy</div>
+                <div className="text-xs font-semibold text-base-content/50">
+                  Overview · Portfolio · Research · Strategy · Screener
+                </div>
               </div>
               <div className="flex flex-wrap items-center justify-end gap-2">
                 <div className="hidden items-center gap-2 text-xs font-semibold text-base-content/55 md:flex">

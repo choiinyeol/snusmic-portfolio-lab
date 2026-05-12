@@ -11,13 +11,15 @@ import {
   getStrategyExperiment,
   getStrategyRuns,
 } from '@/lib/artifacts';
-import { formatPercent } from '@/lib/format';
+import { formatPercent, signedTextClass } from '@/lib/format';
+import { getStrategyLeaderboard, type StrategyLeaderboardRow } from '@/lib/product-model';
 
 export default function StrategiesPage() {
   const data = getStrategyRuns();
   const importance = getParameterImportance();
   const bestRun = data.runs.find((run) => run.run_id === data.best_run_id) ?? data.runs[0];
   const chartSeries = buildStrategySeries(data.runs.slice(0, 3));
+  const leaderboard = getStrategyLeaderboard();
   const riskNote = bestRun
     ? strategyRiskNote(bestRun.metrics.max_drawdown ?? bestRun.metrics.maxDrawdown)
     : '내보낸 전략이 없습니다.';
@@ -27,7 +29,7 @@ export default function StrategiesPage() {
     <>
       <PageHero
         eyebrow="STRATEGIES"
-        title="보고서 성과 기반 후보 실험"
+        title="Strategy — 수익률·리스크 검증"
         subtitle={disclaimer}
         badges={[
           { label: '후보', value: data.runs.length },
@@ -68,6 +70,14 @@ export default function StrategiesPage() {
           </div>
         }
       />
+
+      <Section
+        eyebrow="Leaderboard"
+        title="전략·벤치마크 우열"
+        caption="수익률, Sharpe, Sortino, MDD, 최강 기준선 대비 초과수익을 같은 표에서 비교합니다."
+      >
+        <StrategyRiskTable rows={leaderboard.slice(0, 10)} />
+      </Section>
 
       <Section eyebrow="Curve" title="Train 선발 후보의 가격 경로 기반 재구성 수익률">
         <article className="card border border-base-300 bg-base-100 shadow-sm">
@@ -147,4 +157,56 @@ function buildStrategySeries(runs: ReturnType<typeof getStrategyRuns>['runs']): 
       points: getStrategyExperiment(run).cumulativeReturnSeries,
     })),
   ];
+}
+
+function StrategyRiskTable({ rows }: { rows: StrategyLeaderboardRow[] }) {
+  return (
+    <article className="overflow-x-auto rounded-box border border-base-300 bg-base-100 shadow-sm">
+      <table className="table table-sm w-full">
+        <thead>
+          <tr>
+            <th>구분</th>
+            <th>전략</th>
+            <th className="text-right">수익률</th>
+            <th className="text-right">Sharpe</th>
+            <th className="text-right">Sortino</th>
+            <th className="text-right">MDD</th>
+            <th className="text-right">초과수익</th>
+            <th className="text-right">거래</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.id}>
+              <td>
+                <span
+                  className={`badge badge-sm ${row.kind === 'candidate' ? 'badge-primary badge-soft' : 'badge-ghost'}`}
+                >
+                  {row.kind === 'candidate' ? '후보' : '기준선'}
+                </span>
+              </td>
+              <td className="min-w-[220px] max-w-[320px] truncate font-bold">
+                <Link href={row.href}>{row.label}</Link>
+              </td>
+              <td className={`text-right font-mono font-black tabular-nums ${signedTextClass(row.returnPct)}`}>
+                {formatPercent(row.returnPct)}
+              </td>
+              <td className="text-right font-mono tabular-nums">{formatNumber(row.sharpe)}</td>
+              <td className="text-right font-mono tabular-nums">{formatNumber(row.sortino)}</td>
+              <td className="text-right font-mono tabular-nums text-error">{formatPercent(row.maxDrawdown)}</td>
+              <td className={`text-right font-mono font-bold tabular-nums ${signedTextClass(row.benchmarkExcess)}`}>
+                {formatPercent(row.benchmarkExcess)}
+              </td>
+              <td className="text-right font-mono tabular-nums">{row.tradeCount?.toLocaleString('ko-KR') ?? '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </article>
+  );
+}
+
+function formatNumber(value: number | null | undefined): string {
+  if (value === null || value === undefined || !Number.isFinite(value)) return '—';
+  return value.toLocaleString('ko-KR', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
 }
