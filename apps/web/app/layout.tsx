@@ -13,9 +13,10 @@ export const metadata: Metadata = {
 const NAV: SidebarNavItem[] = [
   { href: '/', label: 'Overview', icon: '⌂' },
   { href: '/portfolio', label: 'Portfolio', icon: '◔' },
-  { href: '/reports', label: 'Research', icon: '▤' },
-  { href: '/strategies', label: 'Strategy', icon: '⌁' },
+  { href: '/reports', label: 'Reports', icon: '▤' },
+  { href: '/strategies', label: 'Strategies', icon: '⌁' },
   { href: '/screener', label: 'Screener', icon: '◎' },
+  { href: '/guide', label: 'Guide', icon: '?' },
   { href: 'https://github.com/ChoiInYeol/snusmic-portfolio-lab', label: 'GitHub', icon: '◈' },
 ];
 
@@ -42,7 +43,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               <span className="brand__mark" aria-hidden="true" />
               <span className="brand__name">
                 <span>SNUSMIC Portfolio Lab</span>
-                <span className="brand-kicker">Overview · Portfolio · Research · Strategy · Screener</span>
+                <span className="brand-kicker">Overview · Portfolio · Reports · Strategies · Screener</span>
               </span>
             </Link>
             <SidebarNav items={NAV} />
@@ -90,7 +91,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                   SNUSMIC Portfolio Lab
                 </div>
                 <div className="text-xs font-semibold text-base-content/50">
-                  Overview · Portfolio · Research · Strategy · Screener
+                  Overview · Portfolio · Reports · Strategies · Screener
                 </div>
               </div>
               <div className="flex flex-wrap items-center justify-end gap-2">

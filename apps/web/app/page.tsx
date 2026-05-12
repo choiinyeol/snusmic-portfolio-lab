@@ -19,6 +19,7 @@ import {
 import { formatDateKo, formatDays, formatKrw, formatPercent, signedTextClass } from '@/lib/format';
 import {
   BENCHMARK_IDS,
+  compactStrategyLabel,
   getBenchmarkRows,
   getExecutiveOverview,
   getObjectivePassingRows,
@@ -31,8 +32,19 @@ import {
   type StrategyLeaderboardRow,
 } from '@/lib/product-model';
 
-const DASHBOARD_SERIES = [...BENCHMARK_IDS, 'smic_mtt_strategy_optuna_top1', 'smic_mtt_strategy_optuna_top2'] as const;
-const SERIES_COLORS = ['#64748b', '#7c3aed', '#0ea5e9', '#f59e0b', '#2563eb', '#16a368', '#ef4444', '#111827'];
+const DASHBOARD_SERIES = [...BENCHMARK_IDS, 'smic_mtt_strategy_top1', 'smic_mtt_strategy_top2'] as const;
+const SERIES_COLORS = [
+  '#64748b',
+  '#7c3aed',
+  '#0ea5e9',
+  '#f59e0b',
+  '#2563eb',
+  '#16a368',
+  '#ef4444',
+  '#111827',
+  '#14b8a6',
+  '#a855f7',
+];
 
 export default function OverviewPage() {
   const overview = getExecutiveOverview();
@@ -153,7 +165,14 @@ export default function OverviewPage() {
               </span>
             </div>
             <div className="p-3 md:p-4">
-              <HoldingsTreemap holdings={overview.portfolio.holdings} height={450} />
+              <HoldingsTreemap
+                holdings={withCashHolding(
+                  overview.portfolio.holdings,
+                  overview.portfolio.cashKrw,
+                  overview.portfolio.persona,
+                )}
+                height={450}
+              />
             </div>
           </article>
           <RiskSummary holdings={overview.portfolio.holdings} rows={strategyRows} overview={overview} />
@@ -262,9 +281,13 @@ function RiskSummary({
   rows: StrategyLeaderboardRow[];
   overview: ReturnType<typeof getExecutiveOverview>;
 }) {
-  const totalValue = holdings.reduce((sum, row) => sum + (row.marketValueKrw ?? 0), 0);
+  const cashKrw = overview.portfolio.cashKrw ?? 0;
+  const totalValue = Math.max(
+    overview.portfolio.finalEquityKrw ?? 0,
+    holdings.reduce((sum, row) => sum + (row.marketValueKrw ?? 0), 0) + cashKrw,
+  );
   const top10Weight = topWeight(holdings, 10);
-  const currencyRows = currencyExposure(holdings, totalValue);
+  const currencyRows = currencyExposure(withCashHolding(holdings, cashKrw, overview.portfolio.persona), totalValue);
   const benchmarkCount = rows.filter((row) => row.kind === 'benchmark').length;
   return (
     <article className="lab-panel lab-panel--dense">
@@ -282,6 +305,7 @@ function RiskSummary({
         <dl className="grid gap-1 text-sm">
           <FactLine label="Top 5 비중" value={formatPercent(overview.portfolio.top5Weight)} />
           <FactLine label="Top 10 비중" value={formatPercent(top10Weight)} />
+          <FactLine label="현금 비중" value={formatPercent(overview.portfolio.cashWeight)} />
           <FactLine label="보유 종목" value={`${holdings.length}개`} />
           <FactLine
             label="수익 포지션"
@@ -316,7 +340,7 @@ function RecentReportsPanel({ reports }: { reports: ReportRow[] }) {
     <article className="lab-panel lab-panel--dense">
       <div className="lab-panel__head">
         <div className="min-w-0">
-          <div className="lab-panel__eyebrow">Research</div>
+          <div className="lab-panel__eyebrow">Reports</div>
           <h2 className="lab-panel__title">최근 발간 리포트</h2>
         </div>
         <Link className="lab-panel__action" href="/reports">
@@ -495,8 +519,7 @@ function StrategyLeaderboard({ rows }: { rows: StrategyLeaderboardRow[] }) {
 
 function strategyKindLabel(kind: StrategyLeaderboardRow['kind']): string {
   if (kind === 'benchmark') return '벤치마크';
-  if (kind === 'strategy') return '고유 전략';
-  return '후보 실험';
+  return '고유 전략';
 }
 
 function UpdateFeed({
@@ -521,7 +544,7 @@ function UpdateFeed({
       value: formatPercent(stats.targetHitRate),
     },
     {
-      tag: 'Research',
+      tag: 'Reports',
       text: `최신 발간 ${formatDateKo(stats.latestPublicationDate)} 기준 후보 갱신`,
       value: `${stats.activeCount} active`,
     },
@@ -602,12 +625,35 @@ function reportStatusBadge(report: ReportRow) {
 function buildDashboardSeries(equity: EquityPoint[]): ReturnSeries[] {
   return DASHBOARD_SERIES.map((persona, index) => ({
     id: persona,
-    label: getPersonaLabel(persona),
+    label: compactStrategyLabel(persona, getPersonaLabel(persona)),
+    shortLabel: compactStrategyLabel(persona, getPersonaLabel(persona)),
     color: SERIES_COLORS[index % SERIES_COLORS.length],
     points: equity
       .filter((point) => point.persona === persona && point.cumulativeReturn !== null)
       .map((point) => ({ time: point.date, value: point.cumulativeReturn ?? 0 })),
   })).filter((series) => series.points.length > 0);
+}
+
+function withCashHolding(holdings: HoldingRow[], cashKrw: number | null | undefined, persona: string): HoldingRow[] {
+  if (!cashKrw || cashKrw <= 0) return holdings;
+  return [
+    ...holdings,
+    {
+      persona,
+      symbol: 'CASH',
+      company: '현금',
+      qty: null,
+      avgCostKrw: null,
+      lastCloseKrw: 1,
+      lastCloseNative: 1,
+      currency: 'KRW',
+      marketValueKrw: cashKrw,
+      unrealizedPnlKrw: 0,
+      unrealizedReturn: 0,
+      holdingDays: null,
+      firstBuyDate: null,
+    },
+  ];
 }
 
 function latestReportBySymbol(reports: ReportRow[]): Map<string, ReportRow> {

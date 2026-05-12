@@ -5,14 +5,10 @@ import {
   getOverview,
   getPersonaLabel,
   getReportRows,
-  getStrategyExperiment,
-  getStrategyRuns,
   getSummaryRows,
   type EquityPoint,
   type HoldingRow,
-  type PricePoint,
   type ReportRow,
-  type StrategyRunArtifact,
   type SummaryRow,
 } from '@/lib/artifacts';
 
@@ -30,12 +26,15 @@ export const BENCHMARK_IDS = [
   'weak_oracle',
 ] as const;
 
-export type StrategyKind = 'benchmark' | 'strategy' | 'experiment';
+export type StrategyKind = 'benchmark' | 'strategy';
 
 export type PortfolioSnapshot = {
   persona: string;
   label: string;
   finalEquityKrw: number | null;
+  cashKrw: number | null;
+  holdingsValueKrw: number | null;
+  cashWeight: number | null;
   moneyWeightedReturn: number | null;
   maxDrawdown: number | null;
   unrealizedPnlKrw: number | null;
@@ -122,6 +121,16 @@ export function getPortfolioSnapshot(persona = PRIMARY_PERSONA): PortfolioSnapsh
     persona,
     label: getPersonaLabel(persona),
     finalEquityKrw: summary?.finalEquityKrw ?? null,
+    cashKrw: summary?.finalCashKrw ?? null,
+    holdingsValueKrw: summary?.finalHoldingsValueKrw ?? null,
+    cashWeight:
+      summary?.finalCashKrw !== null &&
+      summary?.finalCashKrw !== undefined &&
+      summary?.finalEquityKrw !== null &&
+      summary?.finalEquityKrw !== undefined &&
+      summary.finalEquityKrw > 0
+        ? summary.finalCashKrw / summary.finalEquityKrw
+        : null,
     moneyWeightedReturn: summary?.moneyWeightedReturn ?? null,
     maxDrawdown: summary?.maxDrawdown ?? null,
     unrealizedPnlKrw,
@@ -203,8 +212,7 @@ export function getStrategyLeaderboard(): StrategyLeaderboardRow[] {
   const equity = getEquityDaily();
   const benchmark = targetBenchmark(summaries);
   const personaRows = summaries.map((summary) => strategyRowFromSummary(summary, equity, benchmark));
-  const experimentRows = getStrategyRuns().runs.map((run) => strategyRowFromRun(run, benchmark));
-  return [...personaRows, ...experimentRows]
+  return personaRows
     .map((row) => ({ ...row, benchmarkLabel: benchmark?.label ?? 'KOSPI/KODEX 200' }))
     .sort((a, b) => (b.returnPct ?? Number.NEGATIVE_INFINITY) - (a.returnPct ?? Number.NEGATIVE_INFINITY));
 }
@@ -217,7 +225,7 @@ export function getBenchmarkRows(rows = getStrategyLeaderboard()): StrategyLeade
 }
 
 export function getSelectableStrategyRows(rows = getStrategyLeaderboard()): StrategyLeaderboardRow[] {
-  return rows.filter((row) => row.kind === 'strategy' || row.kind === 'experiment');
+  return rows.filter((row) => row.kind === 'strategy');
 }
 
 export function getObjectivePassingRows(rows = getStrategyLeaderboard()): StrategyLeaderboardRow[] {
@@ -243,7 +251,7 @@ function strategyRowFromSummary(
   const objective = objectiveGate(kind, returnPct, summary.maxDrawdown, benchmark?.moneyWeightedReturn ?? null);
   return {
     id: summary.persona,
-    label: summary.label ?? getPersonaLabel(summary.persona),
+    label: compactStrategyLabel(summary.persona, summary.label ?? getPersonaLabel(summary.persona)),
     kind,
     returnPct,
     maxDrawdown: summary.maxDrawdown,
@@ -263,34 +271,6 @@ function strategyRowFromSummary(
     objectiveReturnExcess: objective.returnExcess,
     sourceLabel: kind === 'benchmark' ? '벤치마크' : '고유 전략',
     href: '/portfolio',
-  };
-}
-
-function strategyRowFromRun(run: StrategyRunArtifact, benchmark: SummaryRow | undefined): StrategyLeaderboardRow {
-  const series = getStrategyExperiment(run).cumulativeReturnSeries.map((point: PricePoint) => point.value);
-  const metrics = riskMetricsFromCumulative(series);
-  const m = run.metrics;
-  const returnPct = asNumber(m.full_money_weighted_return ?? m.money_weighted_return ?? m.score);
-  const maxDrawdown = asNumber(m.full_max_drawdown ?? m.max_drawdown);
-  const tradeCount = asNumber(m.full_trade_count ?? m.trade_count);
-  const benchmarkReturn = benchmark?.moneyWeightedReturn ?? null;
-  const objective = objectiveGate('experiment', returnPct, maxDrawdown, benchmarkReturn);
-  return {
-    id: run.run_id,
-    label: run.label,
-    kind: 'experiment',
-    returnPct,
-    maxDrawdown,
-    sharpe: metrics.sharpe,
-    sortino: metrics.sortino,
-    tradeCount,
-    benchmarkExcess: returnPct !== null && benchmarkReturn !== null ? returnPct - benchmarkReturn : null,
-    benchmarkLabel: benchmark?.label ?? 'KOSPI/KODEX 200',
-    objectivePassed: objective.passed,
-    objectiveMddSlack: objective.mddSlack,
-    objectiveReturnExcess: objective.returnExcess,
-    sourceLabel: '후보 실험',
-    href: `/strategies/${run.run_id}`,
   };
 }
 
@@ -377,6 +357,16 @@ function isFiniteNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value);
 }
 
-function asNumber(value: unknown): number | null {
-  return isFiniteNumber(value) ? value : null;
+export function compactStrategyLabel(id: string, label: string): string {
+  if (id === 'all_weather') return 'All-Weather';
+  if (id === 'smic_follower') return 'Follower v1';
+  if (id === 'smic_follower_v2') return 'Follower SL';
+  if (id === 'benchmark_kodex200') return 'KODEX200';
+  if (id === 'benchmark_qqq') return 'QQQ';
+  if (id === 'benchmark_spy') return 'SPY';
+  if (id === 'benchmark_gld') return 'GLD';
+  if (id === 'weak_oracle') return 'Weak Prophet';
+  const match = id.match(/^smic_mtt_strategy_top([0-9]+)$/);
+  if (match) return `MTT #${match[1]}`;
+  return label.replace('SMIC MTT Strategy #', 'MTT #');
 }

@@ -20,6 +20,7 @@ type Props = {
   personaLabels: Record<string, string>;
   personaKinds: Record<string, string>;
   capitalByPersona: Record<string, number>;
+  cashByPersona: Record<string, number>;
   reportSymbolsById: Record<string, string>;
   targetsBySymbol: Record<string, ReportTargetDigest>;
   targetsByReportId: Record<string, ReportTargetDigest>;
@@ -36,6 +37,7 @@ export function PortfolioStrategyView({
   personaLabels,
   personaKinds,
   capitalByPersona,
+  cashByPersona,
   reportSymbolsById,
   targetsBySymbol,
   targetsByReportId,
@@ -60,10 +62,16 @@ export function PortfolioStrategyView({
   }, [persona]);
 
   const personaHoldings = useMemo(() => holdings.filter((row) => row.persona === persona), [holdings, persona]);
+  const cashKrw = cashByPersona[persona] ?? 0;
+  const treemapHoldings = useMemo(
+    () => withCashHolding(personaHoldings, cashKrw, persona),
+    [cashKrw, personaHoldings, persona],
+  );
   const personaEpisodes = useMemo(() => episodes.filter((row) => row.persona === persona), [episodes, persona]);
   const personaTrades = useMemo(() => trades.filter((row) => row.persona === persona), [trades, persona]);
 
-  const totalValue = personaHoldings.reduce((sum, row) => sum + (row.marketValueKrw ?? 0), 0);
+  const holdingsValue = personaHoldings.reduce((sum, row) => sum + (row.marketValueKrw ?? 0), 0);
+  const totalValue = holdingsValue + cashKrw;
   const totalPnl = personaHoldings.reduce((sum, row) => sum + (row.unrealizedPnlKrw ?? 0), 0);
   const cost = totalValue - totalPnl;
   const realizedPnl = personaEpisodes.reduce((sum, episode) => sum + (episode.realizedPnlKrw ?? 0), 0);
@@ -105,14 +113,15 @@ export function PortfolioStrategyView({
         </p>
       </div>
 
-      <div className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-5">
+      <div className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-6">
         <KpiTile
           compact
           label="평가액"
           value={formatKrw(totalValue)}
-          caption={`${personaHoldings.length}종목`}
+          caption={`${personaHoldings.length}종목 · 현금 ${formatPercent(totalValue > 0 ? cashKrw / totalValue : null)}`}
           tone="accent"
         />
+        <KpiTile compact label="현금" value={formatKrw(cashKrw)} delta="미투자 대기 자금" tone="neutral" />
         <KpiTile
           compact
           label="출자 원금"
@@ -149,7 +158,12 @@ export function PortfolioStrategyView({
           </div>
           <span className="snapshot-pill">면적=평가액</span>
         </div>
-        <HoldingsTreemap holdings={personaHoldings} height={360} compact />
+        <HoldingsTreemap holdings={treemapHoldings} height={360} compact />
+        <p className="mt-3 text-xs leading-5 text-base-content/55">
+          매도 후 즉시 다른 종목을 사지 않는 경우는 전략의 리밸런싱/입금 주기, 최대 보유 종목 수, MTT·업사이드·가격
+          조건을 동시에 만족하는 후보 부족 때문입니다. 그 구간의 미투자 금액은 현금으로 보존되어 평가액과 트리맵에
+          포함됩니다.
+        </p>
       </article>
 
       <PositionDecisionPanel
@@ -206,4 +220,26 @@ export function PortfolioStrategyView({
       />
     </div>
   );
+}
+
+function withCashHolding(holdings: HoldingRow[], cashKrw: number, persona: string): HoldingRow[] {
+  if (cashKrw <= 0) return holdings;
+  return [
+    ...holdings,
+    {
+      persona,
+      symbol: 'CASH',
+      company: '현금',
+      qty: null,
+      avgCostKrw: null,
+      lastCloseKrw: 1,
+      lastCloseNative: 1,
+      currency: 'KRW',
+      marketValueKrw: cashKrw,
+      unrealizedPnlKrw: 0,
+      unrealizedReturn: 0,
+      holdingDays: null,
+      firstBuyDate: null,
+    },
+  ];
 }

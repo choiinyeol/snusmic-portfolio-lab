@@ -12,7 +12,7 @@ It is:
 
 - 리서치 추천 성과 검증
 - share-based 포트폴리오 원장 뷰어
-- 전략/백테스트 후보 실험실
+- 벤치마크 대비 원장형 전략 검증
 - 커밋된 canonical artifact 기반 대시보드
 
 It is not:
@@ -28,7 +28,7 @@ Required visible language:
 - `Static Artifacts`, `No live trading`
 - `정적 스냅샷`, `커밋된 아티팩트 기준`
 - `리서치 추천`, `포트폴리오 원장`, `전략 검증`
-- `보고서 성과 기반 실험`, `가격 매칭`, `목표가 검증`
+- `원장형 성과`, `가격 매칭`, `목표가 검증`
 
 Avoid user-facing words that imply execution authority: `실시간 주문`, `체결 가능`, `지금 사라`, `수익 보장`, `라이브 거래`, `터미널`.
 
@@ -37,7 +37,7 @@ Avoid user-facing words that imply execution authority: `실시간 주문`, `체
 Primary navigation stays:
 
 ```text
-Overview → Portfolio → Research → Strategy → Screener
+Overview → Portfolio → Reports → Strategies → Screener
 ```
 
 Each page owns one product question:
@@ -46,8 +46,8 @@ Each page owns one product question:
 | --- | --- | --- |
 | Overview | “30초 안에 지금 상태가 좋은가?” | Project status, current portfolio, best strategy, latest research, key risks. |
 | Portfolio | “무엇을 어떻게 샀고 지금 원장은 어떤가?” | Persona selector, holdings, trades, position lifecycle, report basis. |
-| Research | “리포트가 실제로 맞았나?” | Target-price validation, post-publication return, hit status, ranking and archive. |
-| Strategy | “어떤 후보 전략이 기준선을 이겼나?” | Candidate leaderboard, MWR/MDD/Sharpe/Sortino, benchmark excess, parameter sensitivity. |
+| Reports | “리포트가 실제로 맞았나?” | Target-price validation, post-publication return, hit status, unified sortable table. |
+| Strategies | “어떤 고유 전략이 기준선을 이겼나?” | Benchmark set vs selectable broker-ledger strategies, MWR/MDD/Sharpe/Sortino, benchmark excess. |
 | Screener | “지금 검토할 리서치 후보는 무엇인가?” | Explainable report-derived candidate filters, not a black-box score. |
 
 A page should not duplicate another page's primary job. Link out instead.
@@ -64,9 +64,9 @@ When multiple views share the same underlying rows, do not split them into disco
 
 Examples:
 
-- Report rankings are views over `ReportRow`; use ranking tabs plus a single archive table.
+- Report rankings are views over `ReportRow`; use one shared-column table whose presets only change sort/filter state.
 - Portfolio holdings/trades should stay inside one persona-selected ledger context.
-- Strategy candidates and benchmarks should share one leaderboard when the user is comparing them.
+- Benchmarks and selectable strategies may share one comparison board, but must be visually labeled and semantically separated.
 
 ## 4. Table default contract
 
@@ -127,7 +127,7 @@ YASUN.GG is a reference for information density, cards, feed rails, treemap/heat
 
 Strategies and candidates are validation views, not instructions.
 
-- Strategy page must keep the “보고서 성과 기반 후보 실험” disclaimer visible.
+- Strategy page must separate benchmarks from selectable broker-ledger strategies.
 - Screener must not say “매수 추천” or imply execution.
 - Risk warnings use badges such as `낙폭 점검 필요`, not alarmist full-card styling.
 - No black-box score unless its ingredients and formula are visible.

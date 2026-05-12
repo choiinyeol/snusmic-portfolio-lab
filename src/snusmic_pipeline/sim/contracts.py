@@ -195,9 +195,7 @@ class SmicMttStrategyConfig(_PersonaBase):
     and report expiry.
     """
 
-    persona_name: Annotated[str, Field(pattern=r"^smic_mtt_strategy(_optuna_top[0-9]+)?$")] = (
-        "smic_mtt_strategy"
-    )
+    persona_name: Annotated[str, Field(pattern=r"^smic_mtt_strategy(_top[0-9]+)?$")] = "smic_mtt_strategy"
     label: str = "SMIC MTT Strategy"
 
     # Report valuation gate, evaluated at publication using market prices.

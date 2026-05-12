@@ -49,18 +49,6 @@
       "value": 5.8645
     },
     {
-      "company": "에이피알",
-      "current_return": 5.7812,
-      "date": "2024-05-09",
-      "days_to_target": 364.0,
-      "metric": "current_return",
-      "report_id": "d2fe718659694902",
-      "symbol": "278470.KS",
-      "target_gap_pct": 3.8648,
-      "target_hit": true,
-      "value": 5.7812
-    },
-    {
       "company": "한화엔진",
       "current_return": 4.1783,
       "date": "2024-12-05",
@@ -71,18 +59,6 @@
       "target_gap_pct": 2.2194,
       "target_hit": true,
       "value": 4.1783
-    },
-    {
-      "company": "Centrus Energy Corp",
-      "current_return": 3.5125,
-      "date": "2024-05-24",
-      "days_to_target": null,
-      "metric": "current_return",
-      "report_id": "978bb1d9f47f5b6d",
-      "symbol": "LEU",
-      "target_gap_pct": -0.8614,
-      "target_hit": false,
-      "value": 3.5125
     },
     {
       "company": "한화오션",
@@ -119,6 +95,30 @@
       "target_gap_pct": 1.9337,
       "target_hit": true,
       "value": 3.1775
+    },
+    {
+      "company": "파마리서치",
+      "current_return": 3.0397,
+      "date": "2023-04-13",
+      "days_to_target": 33.0,
+      "metric": "current_return",
+      "report_id": "e297c3688dff52fa",
+      "symbol": "214450.KQ",
+      "target_gap_pct": 2.2796,
+      "target_hit": true,
+      "value": 3.0397
+    },
+    {
+      "company": "SK하이닉스",
+      "current_return": 2.7033,
+      "date": "2023-10-19",
+      "days_to_target": 127.0,
+      "metric": "current_return",
+      "report_id": "0448a5a1bc4adf29",
+      "symbol": "000660.KS",
+      "target_gap_pct": 1.8281,
+      "target_hit": true,
+      "value": 2.7033
     }
   ],
   "biggest_open_target_gaps": [

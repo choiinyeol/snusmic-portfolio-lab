@@ -178,8 +178,8 @@ def find_top_broker_strategy_configs(
         selected.append(
             config.model_copy(
                 update={
-                    "persona_name": f"smic_mtt_strategy_optuna_top{rank}",
-                    "label": f"SMIC MTT Optuna #{rank}",
+                    "persona_name": f"smic_mtt_strategy_top{rank}",
+                    "label": f"SMIC MTT Strategy #{rank}",
                     "source_trial_number": trial.number,
                     "selection_rank": train_rank,
                     "train_money_weighted_return": trial.user_attrs["train_money_weighted_return"],

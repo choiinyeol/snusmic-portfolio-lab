@@ -21,8 +21,6 @@ Core frontend artifacts live in `data/web`:
 - `current-holdings.json` — current share-based holdings for each persona/strategy.
 - `trades.json` — share-based broker-ledger trade tape.
 - `equity-daily.json` — daily equity/return path by persona or benchmark.
-- `strategy-runs.json` — report-performance candidate experiment outputs.
-- `parameter-importance.json` — candidate search sensitivity summary.
 - `data-quality.json` — extraction and price-matching quality facts.
 
 Required artifacts must remain deterministic for identical inputs. Generated rows should be sorted deterministically before export.
@@ -46,7 +44,7 @@ These are benchmarks and should be shown as comparison lines/cards, not marketed
 
 ### Selectable strategies
 
-Every persona/row outside the benchmark set is a proprietary/selectable strategy or a report-performance experiment. UI should group these separately from benchmarks and make their methodology explicit.
+Every persona/row outside the benchmark set is a proprietary/selectable broker-ledger strategy. UI should group these separately from benchmarks and make their methodology explicit.
 
 ### Personal objective gate
 
@@ -62,10 +60,10 @@ Strategy tables and charts should surface this gate directly. If no candidate pa
 
 - Display MDD as a positive loss magnitude.
 - Show sample size for rankings and strategy comparisons.
-- Distinguish broker-ledger strategy results from report-performance candidate experiments.
-- Make train/full/holdout windows explicit when strategy-search artifacts provide them.
+- Distinguish benchmarks from selectable broker-ledger strategies.
+- Make search/evaluation windows explicit when strategy generation metadata is exposed.
 - Label Weak Prophet as a future-information baseline.
-- Show missing prices, missing targets, and price-matching gaps rather than hiding them.
+- Exclude missing-price/downside/non-actionable report rows from report validation tables, and expose the excluded symbol count in data-quality artifacts.
 - Do not imply investment advice, live execution, or guaranteed return.
 
 ## CI and validation contract
@@ -78,7 +76,7 @@ pnpm --dir apps/web typecheck
 pnpm --dir apps/web exec biome check .
 pnpm --dir apps/web build
 uv run ruff check src scripts tests
-uv run pytest tests/sim tests/strategy_search tests/test_web_artifacts.py -q
+uv run pytest tests/sim tests/test_web_artifacts.py -q
 ```
 
 Heavy full-pipeline regeneration can be manual or branch-gated, but artifact schema checks and web build must run on ordinary PRs.

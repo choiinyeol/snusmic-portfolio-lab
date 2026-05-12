@@ -1,25 +1,25 @@
 [
   {
     "id": "target-hit-rate",
-    "metric": 0.41629,
+    "metric": 0.410891,
     "related_report_ids": [],
-    "sentence": "가격 매칭 리포트 기준 목표가 도달률은 0.41629입니다.",
+    "sentence": "가격 매칭 리포트 기준 목표가 도달률은 0.410891입니다.",
     "title": "목표가 도달률"
   },
   {
     "id": "average-days-to-target",
-    "metric": 202.3587,
+    "metric": 207.6987951807229,
     "related_report_ids": [
       "bb032f63980dd892"
     ],
-    "sentence": "목표가에 도달한 리포트의 평균 소요 기간은 202.3587일입니다.",
+    "sentence": "목표가에 도달한 리포트의 평균 소요 기간은 207.6987951807229일입니다.",
     "title": "목표가 도달 속도"
   },
   {
     "id": "average-90d-return",
-    "metric": 0.068939,
+    "metric": 0.062865,
     "related_report_ids": [],
-    "sentence": "90일 가격 데이터가 있는 리포트의 평균 90일 수익률은 0.068939입니다.",
+    "sentence": "90일 가격 데이터가 있는 리포트의 평균 90일 수익률은 0.062865입니다.",
     "title": "발간 후 90일 성과"
   },
   {

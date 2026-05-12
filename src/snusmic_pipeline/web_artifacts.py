@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import math
 import shutil
+import statistics
 from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
@@ -229,6 +230,17 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     equity_daily = _read_csv(inputs.sim / "equity_daily.csv")
     extraction_quality = _read_json(inputs.extraction_quality) if inputs.extraction_quality.exists() else {}
 
+    _assert_no_stale_strategy_personas(
+        {
+            "summary": summary,
+            "current_holdings": current_holdings,
+            "monthly_holdings": monthly_holdings,
+            "trades": trades,
+            "position_episodes": position_episodes,
+            "equity_daily": equity_daily,
+        }
+    )
+
     out = inputs.out
     prices_out = out / "prices"
     if out.exists():
@@ -317,6 +329,22 @@ def check_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     return first
 
 
+def _assert_no_stale_strategy_personas(frames: dict[str, pd.DataFrame]) -> None:
+    stale_markers = ("smic_mtt_strategy_optuna_top", "SMIC MTT Optuna #")
+    for name, frame in frames.items():
+        if frame.empty:
+            continue
+        for column in ("persona", "label"):
+            if column not in frame.columns:
+                continue
+            values = frame[column].astype(str)
+            if values.str.contains("|".join(stale_markers), regex=True).any():
+                raise RuntimeError(
+                    f"{name}.{column} contains stale strategy persona labels; "
+                    "rerun `uv run python -m snusmic_pipeline run-sim` before export-web."
+                )
+
+
 def _read_csv(path: Path) -> pd.DataFrame:
     if not path.exists():
         raise FileNotFoundError(f"Missing required CSV: {path}")
@@ -377,14 +405,6 @@ def _build_manifest(out: Path, overview: dict[str, Any]) -> dict[str, Any]:
         "equity_daily": _json_row_count(out / "equity-daily.json"),
         "personas": _json_row_count(out / "personas.json"),
     }
-    for optional_name, artifact_name in (
-        ("strategy_runs", "strategy-runs.json"),
-        ("optuna_trials", "optuna-trials.json"),
-        ("parameter_importance", "parameter-importance.json"),
-    ):
-        artifact_path = out / artifact_name
-        if artifact_path.exists():
-            row_counts[optional_name] = _json_row_count(artifact_path)
     report_counts = overview.get("report_counts", {}) if isinstance(overview, dict) else {}
     target_stats = overview.get("target_stats", {}) if isinstance(overview, dict) else {}
     return {
@@ -423,10 +443,6 @@ def _json_row_count(path: Path) -> int:
     data = _read_json(path)
     if isinstance(data, list):
         return len(data)
-    if isinstance(data, dict) and isinstance(data.get("runs"), list):
-        return len(data["runs"])
-    if isinstance(data, dict) and isinstance(data.get("trials"), list):
-        return len(data["trials"])
     return 1
 
 
@@ -462,6 +478,14 @@ def _number(value: Any) -> float | None:
     if math.isnan(parsed) or math.isinf(parsed):
         return None
     return parsed
+
+
+def _mean(values: list[float]) -> float | None:
+    return sum(values) / len(values) if values else None
+
+
+def _median(values: list[float]) -> float | None:
+    return float(statistics.median(values)) if values else None
 
 
 def _round_number(value: Any, digits: int = 4) -> float | None:
@@ -589,11 +613,9 @@ def _build_report_rows(
         report_id = str(row["report_id"])
         perf = performance_by_id.get(report_id, {})
         symbol = str(row.get("symbol", ""))
+        if symbol in missing or not perf:
+            continue
         caveats = []
-        if symbol in missing:
-            caveats.append("missing_price_history")
-        if not perf:
-            caveats.append("missing_report_performance")
         caveats.extend(review_reasons.get(report_id, []))
         raw_target_price_krw = _number(row.get("target_price_krw"))
         perf_target_price_krw = _number(perf.get("target_price_krw"))
@@ -632,8 +654,14 @@ def _build_report_rows(
             if entry_price_native is not None:
                 caveats.append("entry_price_native_inferred")
         if target_upside_at_pub is not None and target_upside_at_pub <= 0:
-            caveats.append("target_below_entry_price")
+            continue
         target_direction = _target_direction(target_price_native, entry_price_native)
+        if target_direction != "upside":
+            continue
+        target_hit = _bool(perf.get("target_hit"))
+        days_to_target = _number(perf.get("days_to_target"))
+        if target_hit and days_to_target is not None and days_to_target <= 1:
+            continue
         rows.append(
             {
                 "report_id": report_id,
@@ -658,9 +686,9 @@ def _build_report_rows(
                 "entry_price_krw": entry_price_krw,
                 "entry_price_native": entry_price_native,
                 "target_upside_at_pub": target_upside_at_pub,
-                "target_hit": _bool(perf.get("target_hit")),
+                "target_hit": target_hit,
                 "target_hit_date": perf.get("target_hit_date") or None,
-                "days_to_target": _number(perf.get("days_to_target")),
+                "days_to_target": days_to_target,
                 "last_close_krw": _number(perf.get("last_close_krw")),
                 "last_close_date": perf.get("last_close_date") or None,
                 "current_return": _number(perf.get("current_return")),
@@ -706,6 +734,11 @@ def _build_overview(
 ) -> dict[str, Any]:
     dates = [str(row["date"]) for row in report_rows if row.get("date")]
     price_dates = prices["date"].tolist() if "date" in prices else []
+    target_hits = [row for row in report_rows if row.get("target_hit") is True]
+    days_to_target = [_number(row.get("days_to_target")) for row in target_hits]
+    days_to_target = [value for value in days_to_target if value is not None]
+    current_returns = [_number(row.get("current_return")) for row in report_rows]
+    current_returns = [value for value in current_returns if value is not None]
     return {
         "generated_from": {
             "warehouse_reports": "data/warehouse/reports.csv",
@@ -716,17 +749,17 @@ def _build_overview(
         "report_counts": {
             "extracted_reports": int(len(reports)),
             "report_stat_rows": int(report_stats.get("total_reports", 0)),
-            "price_matched_reports": int(report_stats.get("reports_with_prices", 0)),
+            "price_matched_reports": len(report_rows),
             "missing_price_symbols": len(missing_symbols),
             "web_report_rows": len(report_rows),
         },
         "target_stats": {
-            "target_hit_count": report_stats.get("target_hit_count"),
-            "target_hit_rate": report_stats.get("target_hit_rate"),
-            "avg_days_to_target": report_stats.get("avg_days_to_target"),
-            "median_days_to_target": report_stats.get("median_days_to_target"),
-            "avg_current_return": report_stats.get("avg_current_return"),
-            "median_current_return": report_stats.get("median_current_return"),
+            "target_hit_count": len(target_hits),
+            "target_hit_rate": len(target_hits) / max(1, len(report_rows)),
+            "avg_days_to_target": _mean(days_to_target),
+            "median_days_to_target": _median(days_to_target),
+            "avg_current_return": _mean(current_returns),
+            "median_current_return": _median(current_returns),
         },
         "baseline_personas": _records(summary),
         "simulation_window": {
@@ -1122,32 +1155,20 @@ def _write_download_csvs(out: Path, report_rows: list[dict[str, Any]], data_qual
     _write_csv(out / "table-download-reports.csv", report_download_rows, report_columns)
 
     strategy_rows = _strategy_download_rows()
-    strategy_columns = sorted({key for row in strategy_rows for key in row}) if strategy_rows else ["run_id"]
+    strategy_columns = (
+        sorted({key for row in strategy_rows for key in row}) if strategy_rows else ["strategy_id"]
+    )
     preferred_strategy_columns = [
-        "run_id",
-        "trial_number",
+        "strategy_id",
         "label",
-        "scope",
-        "sampler",
-        "score",
-        "robust_score",
-        "selection_rank",
-        "train_score",
-        "full_score",
-        "holdout_score",
-        "train_money_weighted_return",
-        "full_money_weighted_return",
-        "holdout_money_weighted_return",
-        "score_decay",
-        "train_to_holdout_score_decay",
+        "kind",
         "final_equity_krw",
-        "net_profit_krw",
+        "final_cash_krw",
+        "final_holdings_value_krw",
         "money_weighted_return",
         "cagr",
         "max_drawdown",
         "trade_count",
-        "win_rate",
-        "hit_rate",
         "open_positions",
     ]
     strategy_columns = [
@@ -1168,38 +1189,36 @@ def _write_download_csvs(out: Path, report_rows: list[dict[str, Any]], data_qual
 
 
 def _strategy_download_rows() -> list[dict[str, Any]]:
-    trials_csv = Path("data/optuna/exports/trials.csv")
-    if trials_csv.exists():
-        rows = _records(pd.read_csv(trials_csv, keep_default_na=False))
-        return [
-            {
-                "run_id": f"smic-follower-v1-trial-{row.get('trial_number')}",
-                "label": f"smic-follower-v1 trial {row.get('trial_number')}",
-                **row,
-            }
-            for row in rows
-        ]
-    strategy_path = Path("data/web/strategy-runs.json")
-    trials_path = Path("data/web/optuna-trials.json")
-    if strategy_path.exists():
-        data = _read_json(strategy_path)
-        rows = []
-        for run in data.get("runs", []) if isinstance(data, dict) else []:
-            row = {
-                "run_id": run.get("run_id"),
-                "trial_number": run.get("trial_number"),
-                "label": run.get("label"),
-                "scope": run.get("scope"),
-                "sampler": run.get("sampler"),
-            }
-            row.update(run.get("metrics", {}))
-            row.update({f"param_{key}": value for key, value in run.get("params", {}).items()})
-            rows.append(row)
-        return rows
-    if trials_path.exists():
-        data = _read_json(trials_path)
-        return data.get("trials", []) if isinstance(data, dict) else []
-    return []
+    summary_path = Path("data/sim/summary.csv")
+    if not summary_path.exists():
+        return []
+    rows = _records(pd.read_csv(summary_path, keep_default_na=False))
+    benchmark_ids = {
+        "all_weather",
+        "smic_follower",
+        "smic_follower_v2",
+        "benchmark_kodex200",
+        "benchmark_qqq",
+        "benchmark_spy",
+        "benchmark_gld",
+        "weak_oracle",
+    }
+    return [
+        {
+            "strategy_id": row.get("persona"),
+            "label": row.get("label"),
+            "kind": "benchmark" if row.get("persona") in benchmark_ids else "strategy",
+            "final_equity_krw": row.get("final_equity_krw"),
+            "final_cash_krw": row.get("final_cash_krw"),
+            "final_holdings_value_krw": row.get("final_holdings_value_krw"),
+            "money_weighted_return": row.get("money_weighted_return"),
+            "cagr": row.get("cagr"),
+            "max_drawdown": row.get("max_drawdown"),
+            "trade_count": row.get("trade_count"),
+            "open_positions": row.get("open_positions"),
+        }
+        for row in rows
+    ]
 
 
 def _write_csv(path: Path, rows: list[dict[str, Any]], columns: list[str]) -> None:

@@ -12,8 +12,6 @@ const required = [
   'trades.json',
   'equity-daily.json',
   'data-quality.json',
-  'strategy-runs.json',
-  'parameter-importance.json',
 ];
 
 function fail(message) {
@@ -36,8 +34,6 @@ function readJson(relativePath) {
 
 function rowCount(data) {
   if (Array.isArray(data)) return data.length;
-  if (data && typeof data === 'object' && Array.isArray(data.runs)) return data.runs.length;
-  if (data && typeof data === 'object' && Array.isArray(data.trials)) return data.trials.length;
   return 1;
 }
 
@@ -60,7 +56,6 @@ const countFiles = {
   trades: 'trades.json',
   equity_daily: 'equity-daily.json',
   personas: 'personas.json',
-  strategy_runs: 'strategy-runs.json',
 };
 
 for (const [key, file] of Object.entries(countFiles)) {
@@ -79,9 +74,27 @@ for (const [index, report] of reports.entries()) {
   if (!report.symbol) fail(`reports.json[${index}].symbol is missing`);
 }
 
-const strategyRuns = readJson('strategy-runs.json');
-if (!Array.isArray(strategyRuns.runs) || strategyRuns.runs.length === 0) fail('strategy-runs.json has no runs');
+const personas = readJson('personas.json');
+const benchmarkCount = personas.filter((row) =>
+  [
+    'all_weather',
+    'smic_follower',
+    'smic_follower_v2',
+    'benchmark_kodex200',
+    'benchmark_qqq',
+    'benchmark_spy',
+    'benchmark_gld',
+    'weak_oracle',
+  ].includes(row.persona),
+).length;
+const customStrategyCount = personas.filter(
+  (row) =>
+    !row.persona.startsWith('benchmark_') &&
+    !['all_weather', 'smic_follower', 'smic_follower_v2', 'weak_oracle'].includes(row.persona),
+).length;
+if (benchmarkCount < 8) fail(`expected at least 8 benchmark personas, got ${benchmarkCount}`);
+if (customStrategyCount < 1) fail('expected at least one custom strategy persona');
 
 console.log(
-  `[artifact-check] ok schema=${manifest.schema_version} reports=${reports.length} strategy_runs=${strategyRuns.runs.length} price_files=${manifest.price_artifact_count}`,
+  `[artifact-check] ok schema=${manifest.schema_version} reports=${reports.length} benchmarks=${benchmarkCount} strategies=${customStrategyCount} price_files=${manifest.price_artifact_count}`,
 );

@@ -33,6 +33,7 @@ export default function PortfolioPage() {
   const capitalByPersona = Object.fromEntries(
     summaries.map((row) => [row.persona, row.totalContributedKrw ?? row.finalEquityKrw ?? 0]),
   );
+  const cashByPersona = Object.fromEntries(summaries.map((row) => [row.persona, row.finalCashKrw ?? 0]));
   const reportSymbolsById = Object.fromEntries(
     Array.from(new Set(trades.map((trade) => trade.reportId).filter((value): value is string => Boolean(value))))
       .map((reportId) => [reportId, getReportSymbolById(reportId)])
@@ -65,6 +66,7 @@ export default function PortfolioPage() {
         personaLabels={personaLabels}
         personaKinds={personaKinds}
         capitalByPersona={capitalByPersona}
+        cashByPersona={cashByPersona}
         reportSymbolsById={reportSymbolsById}
         targetsBySymbol={targetsBySymbol}
         targetsByReportId={targetsByReportId}

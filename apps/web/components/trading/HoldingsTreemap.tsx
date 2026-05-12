@@ -253,7 +253,7 @@ function drawHeatmap(
     const w = leaf.x1 - leaf.x0;
     const h = leaf.y1 - leaf.y0;
     if (w <= 1 || h <= 1) continue;
-    ctx.fillStyle = colorForReturn(leaf.data.unrealizedReturn ?? 0);
+    ctx.fillStyle = colorForReturn(leaf.data.unrealizedReturn ?? 0, leaf.data.symbol);
     drawRoundedRect(ctx, x + 1, y + 1, Math.max(0, w - 2), Math.max(0, h - 2), compact ? 5 : 8);
     ctx.fill();
     ctx.strokeStyle = 'rgba(255,255,255,0.5)';
@@ -329,7 +329,8 @@ function drawRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, w:
   ctx.closePath();
 }
 
-function colorForReturn(ret: number): string {
+function colorForReturn(ret: number, symbol?: string): string {
+  if (symbol === 'CASH') return '#94a3b8';
   const mag = Math.min(1, Math.abs(ret) / 0.25);
   if (ret >= 0) {
     if (mag > 0.66) return '#17a56a';
