@@ -81,29 +81,17 @@ export default function DashboardPage() {
             </Link>
           </>
         }
-        kpis={
-          <div className="grid min-w-0 gap-3 min-[1400px]:grid-cols-2">
-            <KpiTile
-              label="현재 평가액"
-              value={formatKrw(primarySummary?.finalEquityKrw ?? null)}
-              delta={`${holdings.length}개 보유 · 체결 ${trades.filter((trade) => trade.persona === PERSONA_PRIMARY).length.toLocaleString('ko-KR')}건`}
-              tone="accent"
-            >
-              <MiniSparkline points={primarySeries} tone="accent" />
-            </KpiTile>
-            <KpiTile
-              label="최고 원장 전략"
-              value={bestStrategy?.label ?? '—'}
-              delta={bestStrategy ? formatPercent(bestStrategy.moneyWeightedReturn) : '—'}
-              tone="good"
-            >
-              <MiniSparkline points={seriesPoints(equity, bestStrategy?.persona)} tone="good" />
-            </KpiTile>
-          </div>
-        }
       />
 
-      <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
+        <KpiTile
+          label="현재 평가액"
+          value={formatKrw(primarySummary?.finalEquityKrw ?? null)}
+          delta={`${holdings.length}개 보유 · 체결 ${trades.filter((trade) => trade.persona === PERSONA_PRIMARY).length.toLocaleString('ko-KR')}건`}
+          tone="accent"
+        >
+          <MiniSparkline points={primarySeries} tone="accent" />
+        </KpiTile>
         <KpiTile
           label="Primary MWR"
           value={formatPercent(primarySummary?.moneyWeightedReturn ?? null)}
@@ -113,6 +101,20 @@ export default function DashboardPage() {
           <MiniSparkline
             points={primarySeries}
             tone={(primarySummary?.moneyWeightedReturn ?? 0) >= 0 ? 'good' : 'bad'}
+          />
+        </KpiTile>
+        <KpiTile
+          label="현재 보유 손익"
+          value={formatKrw(holdings.reduce((sum, row) => sum + (row.unrealizedPnlKrw ?? 0), 0))}
+          delta={`상위 5 비중 ${formatPercent(topWeight(holdings, 5))}`}
+          tone={holdings.reduce((sum, row) => sum + (row.unrealizedPnlKrw ?? 0), 0) >= 0 ? 'good' : 'bad'}
+        >
+          <MiniSparkline
+            points={holdings.map((row, index) => ({
+              time: row.symbol || String(index),
+              value: row.unrealizedReturn ?? 0,
+            }))}
+            tone={holdings.reduce((sum, row) => sum + (row.unrealizedPnlKrw ?? 0), 0) >= 0 ? 'good' : 'bad'}
           />
         </KpiTile>
         <KpiTile
@@ -138,18 +140,12 @@ export default function DashboardPage() {
           />
         </KpiTile>
         <KpiTile
-          label="현재 보유 손익"
-          value={formatKrw(holdings.reduce((sum, row) => sum + (row.unrealizedPnlKrw ?? 0), 0))}
-          delta={`상위 5 비중 ${formatPercent(topWeight(holdings, 5))}`}
-          tone={holdings.reduce((sum, row) => sum + (row.unrealizedPnlKrw ?? 0), 0) >= 0 ? 'good' : 'bad'}
+          label="최고 원장 전략"
+          value={bestStrategy?.label ?? '—'}
+          delta={bestStrategy ? formatPercent(bestStrategy.moneyWeightedReturn) : '—'}
+          tone="good"
         >
-          <MiniSparkline
-            points={holdings.map((row, index) => ({
-              time: row.symbol || String(index),
-              value: row.unrealizedReturn ?? 0,
-            }))}
-            tone={holdings.reduce((sum, row) => sum + (row.unrealizedPnlKrw ?? 0), 0) >= 0 ? 'good' : 'bad'}
-          />
+          <MiniSparkline points={seriesPoints(equity, bestStrategy?.persona)} tone="good" />
         </KpiTile>
       </div>
 
@@ -166,20 +162,17 @@ export default function DashboardPage() {
       </div>
 
       <Section eyebrow="Board" title="전략·벤치마크 누적 경로">
-        <article className="rounded-box border border-base-300 bg-base-100 p-3 shadow-sm md:p-4">
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-2 px-1">
-            <div className="flex flex-wrap gap-1.5">
-              {chartSeries.map((series) => (
-                <span
-                  key={series.id}
-                  className="rounded-full border border-base-300 bg-base-200/60 px-2.5 py-1 text-xs"
-                >
-                  <span className="mr-1 inline-block h-2 w-2 rounded-full" style={{ background: series.color }} />
-                  {series.label}
-                </span>
-              ))}
+        <article className="rounded-box border border-base-300 bg-base-100 p-4 shadow-sm md:p-5">
+          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-3 px-1">
+            <div>
+              <div className="font-mono text-[0.68rem] font-bold uppercase tracking-[0.14em] text-base-content/45">
+                Cumulative return path
+              </div>
+              <div className="text-sm text-base-content/55">벤치마크·전략 누적 수익률 · static artifact</div>
             </div>
-            <span className="text-xs font-semibold text-base-content/50">lightweight-charts · static artifact</span>
+            <span className="rounded-full border border-base-300 bg-base-200/60 px-2.5 py-1 font-mono text-[0.7rem] text-base-content/60">
+              {chartSeries[0]?.points.length ?? 0} pts
+            </span>
           </div>
           <CumulativeReturnChart series={chartSeries} />
         </article>
@@ -329,19 +322,17 @@ function RecentReportsPanel({ reports }: { reports: ReportRow[] }) {
           <Link
             key={`${report.symbol}-${report.publicationDate}-compact`}
             href={`/reports/${report.symbol}`}
-            className="rounded-2xl border border-base-300 bg-base-200/40 p-3 transition hover:border-primary/30"
+            className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2 border-b border-base-200 px-3 py-2.5 transition last:border-b-0 hover:bg-base-200/45"
           >
-            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
-              <div className="min-w-0">
-                <div className="truncate text-sm font-black">{report.company || report.symbol}</div>
-                <div className="text-xs text-base-content/55">{formatDateKo(report.publicationDate)}</div>
-              </div>
-              <strong
-                className={`text-xs tabular-nums ${(report.currentReturn ?? 0) >= 0 ? 'text-success' : 'text-error'}`}
-              >
-                {formatPercent(report.currentReturn)}
-              </strong>
+            <div className="min-w-0">
+              <div className="truncate text-sm font-black">{report.company || report.symbol}</div>
+              <div className="text-xs text-base-content/55">{formatDateKo(report.publicationDate)}</div>
             </div>
+            <strong
+              className={`text-xs tabular-nums ${(report.currentReturn ?? 0) >= 0 ? 'text-success' : 'text-error'}`}
+            >
+              {formatPercent(report.currentReturn)}
+            </strong>
           </Link>
         ))}
       </article>
@@ -366,7 +357,7 @@ function StrategyPerformancePanel({ summaries }: { summaries: SummaryRow[] }) {
   return (
     <Section eyebrow="Strategy" title="전략 성과 요약">
       <article className="overflow-x-auto rounded-box border border-base-300 bg-base-100 shadow-sm">
-        <table className="table table-sm min-w-[560px]">
+        <table className="table table-sm w-full">
           <thead>
             <tr>
               <th>전략</th>
@@ -378,7 +369,7 @@ function StrategyPerformancePanel({ summaries }: { summaries: SummaryRow[] }) {
           <tbody>
             {rows.map((row) => (
               <tr key={row.persona}>
-                <td className="max-w-[260px] truncate font-bold">{row.label ?? getPersonaLabel(row.persona)}</td>
+                <td className="truncate font-bold">{row.label ?? getPersonaLabel(row.persona)}</td>
                 <td
                   className={`text-right font-mono font-bold ${(row.moneyWeightedReturn ?? 0) >= 0 ? 'text-success' : 'text-error'}`}
                 >
@@ -422,12 +413,10 @@ function RecentUpdatesPanel({
         {updates.map((item) => (
           <div
             key={item.tag}
-            className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl bg-base-200/45 px-3 py-2 text-sm"
+            className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b border-base-200 px-1 py-2.5 text-sm last:border-b-0"
           >
-            <div className="min-w-0 truncate">
-              <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-primary align-middle" />
-              {item.text}
-            </div>
+            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+            <div className="min-w-0 truncate">{item.text}</div>
             <span className="badge badge-primary badge-soft badge-sm shrink-0">{item.tag}</span>
           </div>
         ))}
@@ -438,7 +427,7 @@ function RecentUpdatesPanel({
 
 function RiskLine({ label, value, tone = 'text-base-content' }: { label: string; value: string; tone?: string }) {
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-base-300 pb-2 last:border-b-0 last:pb-0">
+    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-base-200 px-1 py-2.5 first:pt-0 last:border-b-0 last:pb-0">
       <dt className="text-base-content/60">{label}</dt>
       <dd className={`min-w-0 text-right font-mono font-bold ${tone}`}>{value}</dd>
     </div>
@@ -488,7 +477,8 @@ function MiniSparkline({
   const color = tone === 'bad' ? '#ef4444' : tone === 'warn' ? '#f59e0b' : tone === 'good' ? '#16a368' : '#4f7cff';
   return (
     <svg className="h-8 w-full overflow-visible" viewBox="0 0 100 32" role="img" aria-label="mini trend">
-      <path d={d} fill="none" stroke={color} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" />
+      <path d={`${d} L 100 32 L 0 32 Z`} fill={color} fillOpacity="0.08" stroke="none" />
+      <path d={d} fill="none" stroke={color} strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
     </svg>
   );
 }

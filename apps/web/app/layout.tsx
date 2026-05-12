@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { SidebarNav, type SidebarNavItem } from '@/components/ui/SidebarNav';
 import { getOverview } from '@/lib/artifacts';
 import './globals.css';
 import './reports/report-detail.css';
@@ -9,13 +10,13 @@ export const metadata: Metadata = {
   description: '리서치 추천, 포트폴리오 원장, 전략 검증을 한 곳에서 추적하는 정적 스냅샷 기반 투자 리서치 대시보드.',
 };
 
-const NAV = [
+const NAV: SidebarNavItem[] = [
   { href: '/', label: 'Dashboard', icon: '⌂' },
   { href: '/portfolio', label: 'Portfolio', icon: '◔' },
   { href: '/reports', label: 'Reports', icon: '▤' },
   { href: '/strategies', label: 'Strategies', icon: '⌁' },
-  { href: '/strategies', label: 'Backtests', icon: '△' },
-  { href: '/reports', label: 'Data', icon: '◎' },
+  { href: '/strategies#strategy-board', label: 'Backtests', icon: '△', activePath: null },
+  { href: '/reports', label: 'Data', icon: '◎', activePath: null },
   { href: 'https://github.com/ChoiInYeol/snusmic-portfolio-lab', label: 'GitHub', icon: '◈' },
 ];
 
@@ -44,16 +45,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 <span className="brand-kicker">Research · Portfolio · Strategy</span>
               </span>
             </Link>
-            <nav className="side-nav" aria-label="주요 탐색">
-              {NAV.map((item) => (
-                <Link key={`${item.href}-${item.label}`} href={item.href} className="side-nav__item">
-                  <span className="side-nav__icon" aria-hidden="true">
-                    {item.icon}
-                  </span>
-                  <span>{item.label}</span>
-                </Link>
-              ))}
-            </nav>
+            <SidebarNav items={NAV} />
             <div className="sidebar-card">
               <div className="text-xs font-bold uppercase tracking-[0.18em] text-base-content/40">Snapshot Info</div>
               <dl className="mt-4 grid gap-2 text-xs text-base-content/60">
