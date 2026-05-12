@@ -29,12 +29,14 @@ SNUSMIC Quant Terminal은 서울대 SMIC 리서치 PDF에서 추출한 목표가
 | Weak Prophet (6M look-ahead) | 2,661.38M | 2,559.38M | 140.49% | 84.04% | 22.09% | 1,185 | 0 |
 | SMIC Follower (1/N) | 165.91M | 63.91M | 18.87% | 9.53% | 19.17% | 2,005 | 37 |
 | SMIC Follower v2 (with stop-loss) | 171.17M | 69.17M | 20.08% | 10.17% | 18.85% | 1,513 | 10 |
+| SMIC MTT Strategy | 117.42M | 15.42M | 5.48% | 2.67% | 3.17% | 47 | 2 |
 | All-Weather (25/25/25/25) | 228.19M | 126.19M | 31.26% | 16.25% | 9.46% | 186 | 4 |
 
 해석상 주의:
 
 - Prophet/Weak Prophet은 룩어헤드가 들어간 상한선입니다.
 - SMIC Follower v1/v2는 목표가 미도달 종목을 리밸런싱 때문에 매도하지 않습니다. v2도 매일 손절/목표가 신호를 판단할 뿐, 일별 동일가중 매도 리밸런싱은 하지 않습니다.
+- SMIC MTT Strategy는 실제 계좌형 전략입니다. 정수 주식·현금·수수료·세금·슬리피지를 원장에 남기며, 발간일 목표가 업사이드 30~500%, MTT 가격 추세, 해외 종목, 최대 10개 슬롯, 10% 손절, 목표가/200% 익절, 730일 리포트 만료 규칙으로만 매매합니다.
 - Weak Prophet은 빈 target basket이 나오면 보유분을 명시적으로 현금화합니다.
 - MDD는 음수가 아니라 **양수 손실폭**으로 해석합니다.
 
@@ -79,7 +81,7 @@ SNUSMIC Quant Terminal은 서울대 SMIC 리서치 PDF에서 추출한 목표가
 │       ├── brokerage.py              # 정수 주식, 수수료, 세금, 슬리피지 원장
 │       ├── market.py                 # PriceBoard / as-of 가격 조회
 │       ├── runner.py                 # SimulationConfig dispatch
-│       └── personas/                 # Prophet, Weak Prophet, SMIC Follower, All-Weather
+│       └── personas/                 # Prophet, Weak Prophet, SMIC Follower, SMIC MTT, All-Weather
 └── tests/                            # Python 회귀 테스트
 ```
 
@@ -210,9 +212,10 @@ pnpm --dir apps/web build
 
 최근 변경 검증 기록:
 
-- `uv run pytest tests/test_web_artifacts.py tests/sim tests/strategy_search -q` → 70 passed
-- `uv run pytest tests/sim/test_personas.py -q` → 7 passed
-- `uv run ruff check ...` → passed
+- `uv run pytest tests/sim tests/strategy_search tests/test_web_artifacts.py -q` → 75 passed
+- `uv run mypy src/snusmic_pipeline/sim` → passed
+- `bash scripts/refresh_web_artifacts.sh` → passed, `smic_mtt_strategy` 포함 artifact 갱신
+- `uv run ruff check src scripts tests` → passed
 - `pnpm --dir apps/web typecheck` → passed
 - `pnpm --dir apps/web exec biome check ...` → passed
 - `pnpm --dir apps/web build` → passed
@@ -224,9 +227,10 @@ pnpm --dir apps/web build
 1. **Share-based accounting**: 모든 페르소나는 정수 주식, 현금, 가중평균원가, 수수료/세금/슬리피지를 원장에 반영합니다.
 2. **Canonical artifacts**: 웹 전략 데이터는 `data/web`에서만 읽습니다.
 3. **Fast-fail**: 필수 아티팩트가 없거나 schema가 맞지 않으면 조용히 빈 화면을 만들지 않습니다.
-4. **Report-performance experiment 분리**: 전략 후보 페이지는 리포트 성과 기반 재구성 실험이며, 계좌형 페르소나 시뮬레이션과 구분합니다.
-5. **Positive MDD**: 최대낙폭은 양수 손실폭입니다.
-6. **Generated data is reviewable**: `data/sim`, `data/web`, 다운로드 CSV를 같이 갱신해 대시보드와 저장소 상태를 맞춥니다.
+4. **Real-account strategy first**: 실제 매매 전략은 `data/sim`의 원장 기반 페르소나로 평가하고, `data/web/personas.json`과 `trades.json`에 그대로 노출합니다.
+5. **Report-performance experiment 분리**: 전략 후보 페이지는 리포트 성과 기반 재구성 실험이며, 계좌형 페르소나 시뮬레이션과 구분합니다.
+6. **Positive MDD**: 최대낙폭은 양수 손실폭입니다.
+7. **Generated data is reviewable**: `data/sim`, `data/web`, 다운로드 CSV를 같이 갱신해 대시보드와 저장소 상태를 맞춥니다.
 
 ---
 

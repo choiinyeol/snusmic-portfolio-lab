@@ -68,6 +68,23 @@
     "trade_count": 1513
   },
   {
+    "cagr": 0.0267,
+    "final_cash_krw": 92509521.5801,
+    "final_equity_krw": 117415534.946,
+    "final_holdings_value_krw": 24906013.3659,
+    "initial_capital_krw": 10000000.0,
+    "label": "SMIC MTT Strategy",
+    "max_drawdown": 0.0317,
+    "money_weighted_return": 0.0548,
+    "net_profit_krw": 15415534.946,
+    "open_positions": 2,
+    "persona": "smic_mtt_strategy",
+    "realized_pnl_krw": 13097229.691,
+    "time_weighted_return": 0.24,
+    "total_contributed_krw": 102000000.0,
+    "trade_count": 47
+  },
+  {
     "cagr": 0.1625,
     "final_cash_krw": 8377731.5547,
     "final_equity_krw": 228186604.2447,

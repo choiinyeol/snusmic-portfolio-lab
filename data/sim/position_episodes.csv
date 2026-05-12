@@ -496,6 +496,23 @@ smic_follower_v2,LITE,Lumentum Holdings Inc,2026-01-09,2026-02-05,27,3,1,16,16,5
 smic_follower_v2,SXT,Sensient Technologies Corp,2026-01-09,,122,8,0,149,0,136735.3606,,0.0,5482825.6228,173532.848,open,()
 smic_follower_v2,CAMT,Camtek,2026-05-01,,10,1,0,7,0,275258.5633,,0.0,224844.5004,307379.2062,open,()
 smic_follower_v2,187790.KS,나노,2026-05-04,,7,1,0,2,0,6364.1345,,0.0,-588.269,6070.0,open,()
+smic_mtt_strategy,SE,SEA ltd.,2021-01-04,2021-06-17,164,2,1,5,5,227155.1835,316578.628,447117.2226,,,closed,"('target_hit',)"
+smic_mtt_strategy,4751.T,Cyber Agent,2021-05-31,2021-10-25,147,3,1,83,83,22382.245,20094.6873,-189867.2897,,,closed,"('stop_loss_price',)"
+smic_mtt_strategy,SBLK,Star Bulk Carriers,2021-06-01,2021-07-16,45,2,1,69,69,22142.9148,19879.8176,-156153.7049,,,closed,"('stop_loss_price',)"
+smic_mtt_strategy,4689.T,Z-holdings,2021-11-30,2021-12-17,17,2,1,271,271,7867.9015,7063.7695,-217919.7641,,,closed,"('stop_loss_price',)"
+smic_mtt_strategy,STNG,Scorpio Tankers Inc.,2022-05-25,2022-08-10,77,1,1,64,64,39873.1879,56177.8941,1043501.199,,,closed,"('target_hit',)"
+smic_mtt_strategy,VRT,Vertiv Holdings Co.,2023-11-22,2024-02-02,72,2,1,90,90,56462.6924,80066.3548,2124329.6114,,,closed,"('target_hit',)"
+smic_mtt_strategy,GRND,Grindr Inc.,2024-11-21,2025-05-08,168,2,1,337,337,20882.1424,33934.7596,4398732.0041,,,closed,"('target_hit',)"
+smic_mtt_strategy,6857.T,Advantest Corporation,2024-12-05,2024-12-20,15,1,1,83,83,85413.7326,76684.097,-724559.7539,,,closed,"('stop_loss_price',)"
+smic_mtt_strategy,SRAD,Sportradar,2025-06-02,2025-11-20,171,1,1,261,261,33203.1505,29809.6516,-885703.2027,,,closed,"('stop_loss_price',)"
+smic_mtt_strategy,GLW,Corning,2025-10-23,2026-02-23,123,2,1,80,80,122833.1909,205473.1592,6611197.4618,,,closed,"('target_hit',)"
+smic_mtt_strategy,2124.T,JAC recruitment Co. Ltd,2025-12-01,2026-01-29,59,2,1,958,958,10205.2714,9162.2506,-999213.9392,,,closed,"('stop_loss_price',)"
+smic_mtt_strategy,ESTA,Establishment Labs Holdings,2025-12-01,2026-03-23,112,4,1,105,105,99745.8133,89551.38,-1070415.4991,,,closed,"('stop_loss_price',)"
+smic_mtt_strategy,IMAX,IMAX Corp,2025-12-01,2025-12-04,3,2,1,181,181,54028.5406,48506.601,-999471.0649,,,closed,"('stop_loss_price',)"
+smic_mtt_strategy,IRMD,Iradimed Corporation,2025-12-01,2026-04-29,149,3,1,77,77,136134.3049,122220.8178,-1071338.5127,,,closed,"('stop_loss_price',)"
+smic_mtt_strategy,LITE,Lumentum Holdings Inc,2025-12-15,2026-02-05,52,1,1,20,20,493288.7293,732638.4754,4786994.9234,,,closed,"('target_hit',)"
+smic_mtt_strategy,CAMT,Camtek,2026-04-16,,25,1,0,42,0,266432.5642,,0.0,1719758.9637,307379.2062,open,()
+smic_mtt_strategy,GLNG,Golar LNG,2026-04-16,,25,1,0,145,0,78603.727,,0.0,598546.2913,82731.6325,open,()
 weak_oracle,BILI,Bili bili,2021-01-04,2021-02-01,28,1,1,16,16,102834.1225,135591.3093,524114.989,,,closed,"('rebalance_sell',)"
 weak_oracle,ROKU,Roku,2021-01-04,2021-03-01,56,1,2,12,12,345059.8232,465114.0692,1440650.9518,,,closed,"('rebalance_sell',)"
 weak_oracle,SE,SEA ltd.,2021-01-04,2021-07-01,178,4,3,39,39,242849.4594,279329.1792,1422709.0755,,,closed,"('rebalance_sell',)"

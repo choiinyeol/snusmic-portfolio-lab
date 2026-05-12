@@ -16,6 +16,7 @@ from snusmic_pipeline.sim.contracts import (
     SimulationConfig,
     SmicFollowerConfig,
     SmicFollowerV2Config,
+    SmicMttStrategyConfig,
     WeakProphetConfig,
 )
 from snusmic_pipeline.sim.runner import run_simulation
@@ -115,6 +116,7 @@ def _config_without_all_weather() -> SimulationConfig:
             WeakProphetConfig(lookahead_months=3, min_history_days=30),
             SmicFollowerConfig(),
             SmicFollowerV2Config(time_loss_days=200, report_age_stop_days=600),
+            SmicMttStrategyConfig(require_mtt=False, universe="all"),
         ),
     )
 
@@ -122,9 +124,15 @@ def _config_without_all_weather() -> SimulationConfig:
 def test_runner_returns_one_summary_per_persona(fake_warehouse: Path):
     cfg = _config_without_all_weather()
     result = run_simulation(cfg, fake_warehouse)
-    assert len(result.summaries) == 4
+    assert len(result.summaries) == 5
     by_name = {s.persona for s in result.summaries}
-    assert by_name == {"oracle", "weak_oracle", "smic_follower", "smic_follower_v2"}
+    assert by_name == {
+        "oracle",
+        "weak_oracle",
+        "smic_follower",
+        "smic_follower_v2",
+        "smic_mtt_strategy",
+    }
 
 
 def test_runner_is_deterministic_across_repeated_runs(fake_warehouse: Path):
@@ -144,6 +152,7 @@ def test_runner_serialises_to_json(fake_warehouse: Path):
     payload = result.model_dump_json()
     assert "oracle" in payload
     assert "smic_follower_v2" in payload
+    assert "smic_mtt_strategy" in payload
 
 
 def test_prophet_beats_smic_follower_on_synthetic_universe(fake_warehouse: Path):

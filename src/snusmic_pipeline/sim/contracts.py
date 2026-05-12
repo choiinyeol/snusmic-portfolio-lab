@@ -185,8 +185,54 @@ class SmicFollowerV2Config(_PersonaBase):
     report_age_stop_days: Annotated[int, Field(ge=30, le=3650)] = 730
 
 
+class SmicMttStrategyConfig(_PersonaBase):
+    """Share-ledger SMIC strategy with MTT trend filters and bounded slots.
+
+    This is the practical strategy persona: it trades actual integer shares,
+    keeps cash, pays costs, never sells just to restore weights, and only acts
+    on report-day signals, deposits, scheduled top-ups, target hits, stops,
+    and report expiry.
+    """
+
+    persona_name: Literal["smic_mtt_strategy"] = "smic_mtt_strategy"
+    label: str = "SMIC MTT Strategy"
+
+    # Report valuation gate, evaluated at publication using market prices.
+    min_target_upside_at_pub: Annotated[float, Field(ge=0.0, le=10.0)] = 0.30
+    max_target_upside_at_pub: Annotated[float, Field(gt=0.0, le=20.0)] = 5.0
+    target_hit_multiplier: Annotated[float, Field(gt=0.0, le=2.0)] = 1.0
+
+    # Minervini-style trend template, implemented only with local OHLC history.
+    require_mtt: bool = True
+    min_price_vs_52w_low: Annotated[float, Field(ge=0.0, le=10.0)] = 0.30
+    max_pct_below_52w_high: Annotated[float, Field(ge=0.0, le=1.0)] = 0.25
+    min_ma200_1m_return: Annotated[float, Field(ge=-1.0, le=1.0)] = 0.0
+
+    # Real account controls.
+    max_positions: Annotated[int, Field(ge=1, le=200)] = 10
+    universe: Literal["all", "domestic", "overseas"] = "overseas"
+    top_up_cadence: Literal["deposit_only", "monthly", "quarterly"] = "monthly"
+    stop_loss_pct: Annotated[float, Field(gt=0.0, lt=1.0)] = 0.10
+    take_profit_pct: Annotated[float, Field(gt=0.0, le=10.0)] = 2.0
+    report_age_stop_days: Annotated[int, Field(ge=30, le=3650)] = 730
+
+    @model_validator(mode="after")
+    def _check_target_upside_band(self) -> SmicMttStrategyConfig:
+        if self.max_target_upside_at_pub <= self.min_target_upside_at_pub:
+            raise ValueError(
+                "max_target_upside_at_pub must exceed min_target_upside_at_pub; "
+                f"got {self.max_target_upside_at_pub} <= {self.min_target_upside_at_pub}"
+            )
+        return self
+
+
 PersonaConfig = (
-    ProphetConfig | WeakProphetConfig | SmicFollowerConfig | SmicFollowerV2Config | AllWeatherConfig
+    ProphetConfig
+    | WeakProphetConfig
+    | SmicFollowerConfig
+    | SmicFollowerV2Config
+    | SmicMttStrategyConfig
+    | AllWeatherConfig
 )
 
 PersonaName = Literal[
@@ -194,6 +240,7 @@ PersonaName = Literal[
     "weak_oracle",
     "smic_follower",
     "smic_follower_v2",
+    "smic_mtt_strategy",
     "all_weather",
 ]
 
@@ -215,6 +262,7 @@ class SimulationConfig(_FrozenModel):
         WeakProphetConfig(),
         SmicFollowerConfig(),
         SmicFollowerV2Config(),
+        SmicMttStrategyConfig(),
         AllWeatherConfig(),
     )
     seed: int = 42  # used only for tie-breaking; the engine itself is deterministic.
@@ -247,6 +295,7 @@ TradeReason = Literal[
     "stop_loss_time",
     "stop_loss_average_down",
     "stop_loss_report_age",
+    "stop_loss_price",
     "end_of_sim",
 ]
 
@@ -451,5 +500,6 @@ PERSONA_REGISTRY_KEYS: tuple[str, ...] = (
     "weak_oracle",
     "smic_follower",
     "smic_follower_v2",
+    "smic_mtt_strategy",
     "all_weather",
 )
