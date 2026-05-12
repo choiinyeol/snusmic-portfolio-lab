@@ -33,6 +33,7 @@ export default function StrategiesPage() {
           { label: '후보', value: data.runs.length },
           { label: '스터디', value: data.study_name ?? '—' },
           { label: '범위', value: data.scope ?? bestRun?.scope ?? 'local' },
+          { label: '선발', value: bestRun?.sampler ?? '—' },
         ]}
         actions={
           <>
@@ -68,7 +69,7 @@ export default function StrategiesPage() {
         }
       />
 
-      <Section eyebrow="Curve" title="후보별 가격 경로 기반 재구성 수익률">
+      <Section eyebrow="Curve" title="Train 선발 후보의 가격 경로 기반 재구성 수익률">
         <article className="card border border-base-300 bg-base-100 shadow-sm">
           <div className="card-body p-3 md:p-4">
             <CumulativeReturnChart series={chartSeries} />

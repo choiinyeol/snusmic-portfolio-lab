@@ -21,10 +21,11 @@ def export_strategy_artifacts(
         raise ValueError(f"No trials found in {trials_csv}")
     trials = trials.sort_values("score", ascending=False).reset_index(drop=True)
     best = trials.iloc[0].to_dict()
+    scope = str(best.get("scope", "unknown"))
     strategy_runs = {
         "schema_version": 1,
         "study_name": study_name,
-        "scope": "in-sample",
+        "scope": scope,
         "disclaimer": "Local-only research artifact. Strategy search is generated offline and is not run by the web app.",
         "best_run_id": _run_id(study_name, int(best["trial_number"])),
         "runs": [
@@ -72,7 +73,7 @@ def _strategy_run(study_name: str, row: dict[str, Any]) -> dict[str, Any]:
 
 
 def _warnings(metrics: dict[str, Any]) -> list[str]:
-    warnings = ["in-sample search result; validate out-of-sample before trusting"]
+    warnings = ["train-selected research result; validate against live forward data before trusting"]
     mdd = metrics.get("max_drawdown")
     max_weight = metrics.get("max_single_position_weight")
     if isinstance(mdd, (int, float)) and mdd > 0.35:
@@ -154,4 +155,27 @@ _METRIC_COLUMNS = [
     "excess_return_vs_smic_follower",
     "excess_return_vs_smic_follower_v2",
     "excess_return_vs_all_weather",
+    "robust_score",
+    "selection_rank",
+    "candidate_pool_size",
+    "selected_candidate_count",
+    "train_score",
+    "train_money_weighted_return",
+    "train_max_drawdown",
+    "train_trade_count",
+    "train_turnover",
+    "full_score",
+    "full_money_weighted_return",
+    "full_max_drawdown",
+    "full_trade_count",
+    "full_turnover",
+    "holdout_score",
+    "holdout_money_weighted_return",
+    "holdout_max_drawdown",
+    "holdout_trade_count",
+    "holdout_turnover",
+    "score_decay",
+    "return_decay",
+    "train_to_holdout_score_decay",
+    "train_to_holdout_return_decay",
 ]

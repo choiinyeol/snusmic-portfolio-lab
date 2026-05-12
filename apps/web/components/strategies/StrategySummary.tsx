@@ -34,6 +34,9 @@ export function StrategySummary({ run, href }: { run: StrategyRun; href?: string
   const mwr = run.metrics.money_weighted_return ?? null;
   const mdd = run.metrics.max_drawdown ?? null;
   const hitRate = run.metrics.hit_rate ?? null;
+  const trainMwr = run.metrics.train_money_weighted_return ?? null;
+  const fullMwr = run.metrics.full_money_weighted_return ?? run.metrics.money_weighted_return ?? null;
+  const holdoutMwr = run.metrics.holdout_money_weighted_return ?? null;
   const tradeCount = run.metrics.trade_count ?? null;
   const openPositions = run.metrics.open_positions ?? null;
 
@@ -77,6 +80,20 @@ export function StrategySummary({ run, href }: { run: StrategyRun; href?: string
           <Stat label="거래" value={tradeCount !== null ? Number(tradeCount).toLocaleString('ko-KR') : '—'} />
           <Stat label="보유" value={openPositions !== null ? Number(openPositions).toLocaleString('ko-KR') : '—'} />
         </dl>
+
+        {trainMwr !== null || holdoutMwr !== null ? (
+          <div className="grid gap-2 rounded-md border border-base-200 bg-base-200/35 p-3 text-sm text-base-content/70 md:grid-cols-3">
+            <span>
+              Train MWR <strong className="text-base-content tabular-nums">{formatPercent(trainMwr)}</strong>
+            </span>
+            <span>
+              Full MWR <strong className="text-base-content tabular-nums">{formatPercent(fullMwr)}</strong>
+            </span>
+            <span>
+              Holdout MWR <strong className="text-base-content tabular-nums">{formatPercent(holdoutMwr)}</strong>
+            </span>
+          </div>
+        ) : null}
 
         {hitRate !== null ? (
           <div className="text-sm text-base-content/65">

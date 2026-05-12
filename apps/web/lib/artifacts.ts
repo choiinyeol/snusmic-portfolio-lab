@@ -962,7 +962,6 @@ function selectReportsForRun(reports: ReportRow[], params: Record<string, unknow
   const minUpside = readParam(params, 'min_target_upside_at_pub', 0.05);
   const maxUpside = readParam(params, 'max_target_upside_at_pub', 5);
   const maxReportAgeDays = readParam(params, 'max_report_age_days', 1500);
-  const maxPositions = Math.max(1, Math.round(readParam(params, 'max_positions', 30)));
   const universe = String(params.universe ?? 'all');
   const requirePublicationPrice = Boolean(params.require_publication_price);
   return reports
@@ -978,8 +977,7 @@ function selectReportsForRun(reports: ReportRow[], params: Record<string, unknow
       }
       return true;
     })
-    .sort((a, b) => a.publicationDate.localeCompare(b.publicationDate) || a.reportId.localeCompare(b.reportId))
-    .slice(0, maxPositions);
+    .sort((a, b) => a.publicationDate.localeCompare(b.publicationDate) || a.reportId.localeCompare(b.reportId));
 }
 
 function weightsForRun(reports: ReportRow[], params: Record<string, unknown>): number[] {
@@ -989,9 +987,6 @@ function weightsForRun(reports: ReportRow[], params: Record<string, unknown>): n
     if (weighting === 'target_upside' || weighting === 'capped_target_upside') {
       const value = Math.max(0.01, report.targetUpsideAtPub ?? 0.01);
       return weighting === 'capped_target_upside' ? Math.min(1, value) : value;
-    }
-    if (weighting === 'inverse_volatility') {
-      return 1 / Math.max(0.05, Math.abs(report.troughReturn ?? -0.2));
     }
     return 1;
   });

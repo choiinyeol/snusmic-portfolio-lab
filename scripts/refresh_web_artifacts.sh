@@ -23,7 +23,7 @@ PY
 )"
 
 uv run python -m snusmic_pipeline run-sim --start "${SIM_START:-2021-01-04}" --end "$PRICE_END"
-uv run python scripts/run_optuna_search.py --sampler "${STRATEGY_SAMPLER:-grid}" --trials "${STRATEGY_TRIALS:-20}" --seed "${STRATEGY_SEED:-42}"
+uv run python scripts/run_optuna_search.py --sampler "${STRATEGY_SAMPLER:-robust-grid}" --trials "${STRATEGY_TRIALS:-20}" --seed "${STRATEGY_SEED:-42}" --train-start "${STRATEGY_TRAIN_START:-2021-01-01}" --train-end "${STRATEGY_TRAIN_END:-2023-12-31}" --full-start "${STRATEGY_FULL_START:-2021-01-01}" --top-candidates "${STRATEGY_TOP_CANDIDATES:-5}"
 uv run python -m snusmic_pipeline export-web --warehouse data/warehouse --sim data/sim --out data/web
 uv run python scripts/export_optuna_artifacts.py --trials-csv data/optuna/exports/trials.csv --out data/web
 
