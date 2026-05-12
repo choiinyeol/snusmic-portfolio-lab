@@ -5,8 +5,9 @@ rebalance date it computes realised daily returns over that window for the
 candidate universe, then solves a long-only max-Sharpe problem (sum to 1,
 optionally capped per name) and rebalances the book.
 
-Solved with ``scipy.optimize.minimize`` (SLSQP). When the optimiser fails
-or the universe is empty we fall back to equal-weight on the survivors.
+Solved with ``scipy.optimize.minimize`` (SLSQP). At a rebalance date, an
+empty target portfolio is explicit: the book is rebalanced to cash rather
+than carrying stale holdings.
 """
 
 from __future__ import annotations
@@ -59,14 +60,17 @@ def simulate_weak_prophet(
             weights = _solve_target_weights(
                 config=config, board=board, reports=reports, day=day, end_date=trading_dates[-1]
             )
-            if weights:
-                prices = daily_closes[day]
-                tradable = {sym: w for sym, w in weights.items() if sym in prices and prices[sym] > 0}
-                if tradable:
-                    s = sum(tradable.values())
-                    if s > 0:
-                        tradable = {sym: w / s for sym, w in tradable.items()}
-                    account.rebalance_to_weights(day, tradable, prices)
+            prices = daily_closes[day]
+            tradable = {sym: w for sym, w in weights.items() if sym in prices and prices[sym] > 0}
+            s = sum(tradable.values())
+            if s > 0:
+                tradable = {sym: w / s for sym, w in tradable.items()}
+                account.rebalance_to_weights(day, tradable, prices)
+            else:
+                for symbol in sorted(account.holdings):
+                    mid = prices.get(symbol) or board.asof(day, symbol)
+                    if mid is not None and mid > 0:
+                        account.sell_all(day, symbol, mid, "rebalance_sell")
         equity_points.append(
             record_equity_point(account, persona, day, daily_closes[day], contributions[day], board=board)
         )

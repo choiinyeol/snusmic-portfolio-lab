@@ -44,8 +44,8 @@ export type ReportRow = {
   /** Additional move (always >= 0) the current price must make to reach
    * the target. Null for hit/expired/no-target reports. */
   targetRemainingPct: number | null;
-  /** Current price as a fraction of target price (0..1). For upside this is
-   * `current/target`; for downside `target/current`. Null when no target. */
+  /** Progress from entry price to target price, capped to 0..1.
+   * Formula: `(current - entry) / (target - entry)`. Null when no target. */
   targetProgressPct: number | null;
   expiryDate: string | null;
   expired: boolean;
@@ -310,10 +310,8 @@ function readText(relativePath: string): string {
   return fs.readFileSync(fullPath(relativePath), 'utf8');
 }
 
-function readJson<T>(relativePath: string, fallback: T): T {
-  const pathName = fullPath(relativePath);
-  if (!fs.existsSync(pathName)) return fallback;
-  return JSON.parse(fs.readFileSync(pathName, 'utf8')) as T;
+function readRequiredJson<T>(relativePath: string): T {
+  return JSON.parse(readText(relativePath)) as T;
 }
 
 function num(value: unknown): number | null {
@@ -405,21 +403,49 @@ function withTargetMetrics(report: ReportRow): ReportRow {
     // Resolved — no "remaining", show full progress.
     return { ...report, targetRemainingPct: 0, targetProgressPct: 1 };
   }
+  const targetProgressPct = targetProgressFromEntry(report);
   if (report.targetDirection === 'upside') {
     return {
       ...report,
       targetRemainingPct: Math.max(0, target / current - 1),
-      targetProgressPct: Math.min(1, current / target),
+      targetProgressPct,
     };
   }
   if (report.targetDirection === 'downside') {
     return {
       ...report,
       targetRemainingPct: Math.max(0, 1 - target / current),
-      targetProgressPct: Math.min(1, target / current),
+      targetProgressPct,
     };
   }
   return { ...report, targetRemainingPct: null, targetProgressPct: null };
+}
+
+function targetProgressFromEntry(report: ReportRow): number | null {
+  const nativePrices =
+    report.lastCloseNative !== null && report.targetPriceNative !== null && report.entryPriceNative !== null
+      ? {
+          current: report.lastCloseNative,
+          target: report.targetPriceNative,
+          entry: report.entryPriceNative,
+        }
+      : null;
+  const krwPrices =
+    report.lastCloseKrw !== null && report.targetPriceKrw !== null && report.entryPriceKrw !== null
+      ? {
+          current: report.lastCloseKrw,
+          target: report.targetPriceKrw,
+          entry: report.entryPriceKrw,
+        }
+      : null;
+  const prices = nativePrices ?? krwPrices;
+  if (!prices || prices.current <= 0 || prices.target <= 0 || prices.entry <= 0) return null;
+
+  const targetMove = prices.target - prices.entry;
+  if (targetMove === 0) return null;
+
+  const progress = (prices.current - prices.entry) / targetMove;
+  return Math.max(0, Math.min(1, progress));
 }
 
 function withOhlcTargetTouch(report: ReportRow): ReportRow {
@@ -510,6 +536,10 @@ export function getReportTargetsById(): Record<string, ReportTargetDigest> {
   return Object.fromEntries(getReportTargetDigests().map((report) => [report.reportId, report]));
 }
 
+export function hasPriceArtifact(symbol: string): boolean {
+  return fs.existsSync(fullPath(`data/web/prices/${symbol}.json`));
+}
+
 export function marketRegionForSymbol(symbol: string, exchange?: string): 'domestic' | 'overseas' {
   const upperExchange = (exchange ?? '').toUpperCase();
   if (
@@ -524,9 +554,8 @@ export function marketRegionForSymbol(symbol: string, exchange?: string): 'domes
 }
 
 export function getPriceSeries(symbol: string, startDate?: string, endDate?: string | null): PricePoint[] {
-  const artifact = readJson<{ currency?: string; prices: Array<Record<string, unknown>> }>(
+  const artifact = readRequiredJson<{ currency?: string; prices: Array<Record<string, unknown>> }>(
     `data/web/prices/${symbol}.json`,
-    { prices: [] },
   );
   const stop = endDate ?? '9999-99-99';
   return artifact.prices
@@ -610,22 +639,15 @@ export function getDataQuality(): DataQuality {
 }
 
 export function getWebDataQuality(): WebDataQuality {
-  return readJson<WebDataQuality>('data/web/data-quality.json', {});
+  return readRequiredJson<WebDataQuality>('data/web/data-quality.json');
 }
 
 export function getOverview(): WebOverview {
-  return readJson<WebOverview>('data/web/overview.json', {
-    baseline_personas: [],
-    report_counts: { price_matched_reports: getReportRows().length },
-    target_stats: {
-      target_hit_rate: getDataQuality().targetHitRate,
-      target_hit_count: getReportRows().filter((report) => report.targetHit).length,
-    },
-  });
+  return readRequiredJson<WebOverview>('data/web/overview.json');
 }
 
 export function getReportRankings(): WebReportRankings {
-  const raw = readJson<WebReportRankings>('data/web/report-rankings.json', {});
+  const raw = readRequiredJson<WebReportRankings>('data/web/report-rankings.json');
   return {
     ...raw,
     top_winners: raw.top_winners ?? raw.best_current_returns,
@@ -636,24 +658,15 @@ export function getReportRankings(): WebReportRankings {
 export const getRankings = getReportRankings;
 
 export function getInsights(): Insight[] {
-  return readJson<Insight[]>('data/web/insights.json', []);
+  return readRequiredJson<Insight[]>('data/web/insights.json');
 }
 
 export function getStrategyRuns(): StrategyRunsArtifact {
-  return readJson<StrategyRunsArtifact>(
-    'data/web/strategy-runs.json',
-    readJson<StrategyRunsArtifact>('apps/web/public/artifacts/strategy-runs.json', {
-      runs: [],
-      study_name: 'No local export yet',
-    }),
-  );
+  return JSON.parse(readText('data/web/strategy-runs.json')) as StrategyRunsArtifact;
 }
 
 export function getParameterImportance(): ParameterImportanceArtifact {
-  return readJson<ParameterImportanceArtifact>(
-    'data/web/parameter-importance.json',
-    readJson<ParameterImportanceArtifact>('apps/web/public/artifacts/parameter-importance.json', { parameters: [] }),
-  );
+  return JSON.parse(readText('data/web/parameter-importance.json')) as ParameterImportanceArtifact;
 }
 
 export function getDownloadHref(fileName: string): string {
@@ -695,7 +708,7 @@ export function getCurrentHoldings(): HoldingRow[] {
 let monthlyHoldingsCache: MonthlyHoldingRow[] | undefined;
 export function getMonthlyHoldings(): MonthlyHoldingRow[] {
   if (monthlyHoldingsCache) return monthlyHoldingsCache;
-  const raw = readJson<RawReport[]>('data/web/monthly-holdings.json', []);
+  const raw = readRequiredJson<RawReport[]>('data/web/monthly-holdings.json');
   const costBySnapshot = buildMonthlyCostBasis(raw);
   monthlyHoldingsCache = raw
     .map((row) => ({
@@ -881,6 +894,8 @@ export function getEquityDaily(): EquityPoint[] {
 
 export function getStrategyExperiment(run: StrategyRunArtifact): StrategyExperiment {
   const params = run.params ?? {};
+  // This is a report-performance-derived reconstruction for UI inspection,
+  // not a broker ledger replay or full portfolio accounting simulation.
   const selected = selectReportsForRun(getReportRows(), params);
   const weights = weightsForRun(selected, params);
   const multiplier = readParam(params, 'target_hit_multiplier', 1);
@@ -906,6 +921,8 @@ export function getStrategyExperiment(run: StrategyRunArtifact): StrategyExperim
   });
   const trades = positions
     .flatMap((position) => {
+      // Approximate buy/sell events from selected reports and observed target
+      // outcomes so the UI can explain each candidate experiment.
       const out: StrategyExperimentTrade[] = [
         {
           runId: run.run_id,
@@ -1005,9 +1022,9 @@ function coalescePricePoints(points: PricePoint[]): PricePoint[] {
   return [...byTime.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([time, value]) => ({ time, value }));
 }
 
-function readParam(params: Record<string, unknown>, key: string, fallback: number): number {
+function readParam(params: Record<string, unknown>, key: string, defaultValue: number): number {
   const value = params[key];
-  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+  return typeof value === 'number' && Number.isFinite(value) ? value : defaultValue;
 }
 
 function clamp(value: number, min: number, max: number): number {

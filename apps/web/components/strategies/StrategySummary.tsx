@@ -73,7 +73,7 @@ export function StrategySummary({ run, href }: { run: StrategyRun; href?: string
             tone={(finalEquity ?? 0) > 0 ? 'good' : 'neutral'}
           />
           <Stat label="MWR" value={formatPercent(mwr)} tone={(mwr ?? 0) >= 0 ? 'good' : 'bad'} />
-          <Stat label="MDD" value={formatPercent(mdd)} tone={(mdd ?? 0) < -0.25 ? 'bad' : 'warn'} />
+          <Stat label="MDD" value={formatPercent(mdd)} tone={(mdd ?? 0) > 0.25 ? 'bad' : 'warn'} />
           <Stat label="거래" value={tradeCount !== null ? Number(tradeCount).toLocaleString('ko-KR') : '—'} />
           <Stat label="보유" value={openPositions !== null ? Number(openPositions).toLocaleString('ko-KR') : '—'} />
         </dl>
@@ -105,7 +105,7 @@ export function StrategySummary({ run, href }: { run: StrategyRun; href?: string
         {href ? (
           <div className="card-actions">
             <Link className="btn btn-sm btn-primary" href={href}>
-              매매·포트폴리오
+              재구성 이벤트
             </Link>
           </div>
         ) : null}
@@ -144,8 +144,8 @@ function strategyVerdict(run: StrategyRun): { label: string; tone: 'good' | 'war
   const mwr = run.metrics.money_weighted_return ?? null;
   if (run.warnings?.length) return { label: '주의', tone: 'warn' };
   if (mwr === null || mdd === null) return { label: '검토 필요', tone: 'neutral' };
-  if (mwr > 0 && mdd > -0.2) return { label: '강한 후보', tone: 'good' };
-  if (mdd < -0.25) return { label: '낙폭 큼', tone: 'warn' };
+  if (mwr > 0 && mdd < 0.2) return { label: '강한 후보', tone: 'good' };
+  if (mdd > 0.25) return { label: '낙폭 큼', tone: 'warn' };
   return { label: '검토 필요', tone: 'neutral' };
 }
 

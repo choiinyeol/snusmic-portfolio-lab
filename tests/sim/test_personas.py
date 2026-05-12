@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import date
+
 from snusmic_pipeline.sim.contracts import (
     BrokerageFees,
     ProphetConfig,
@@ -59,6 +61,7 @@ def test_smic_follower_holds_losers_and_sells_only_at_target(
     # must NOT have sold it for any reason other than the end-of-sim cleanup.
     loss_sells = [t for t in sells if t.symbol == "LOSS" and t.reason != "end_of_sim"]
     assert loss_sells == []
+    assert not any(t.symbol == "LOSS" and t.reason == "rebalance_sell" for t in sells)
 
 
 def test_smic_follower_v2_stops_out_long_held_loser(synthetic_board, synthetic_reports, synthetic_dates):
@@ -72,6 +75,18 @@ def test_smic_follower_v2_stops_out_long_held_loser(synthetic_board, synthetic_r
     reasons = {t.reason for t in sells}
     # At least one of the LOSS-driven stop-loss rules must have fired.
     assert reasons & {"stop_loss_time", "stop_loss_average_down", "stop_loss_report_age"}
+
+
+def test_weak_prophet_empty_rebalance_sells_to_cash(synthetic_board, synthetic_reports):
+    trading_dates = [date(2024, 1, 2), date(2024, 2, 1)]
+    plan, fees, cashflows = _common_inputs(trading_dates)
+    cfg = WeakProphetConfig(lookahead_months=3, max_weight=1.0, min_history_days=20)
+    out = simulate_weak_prophet(cfg, plan, fees, synthetic_board, synthetic_reports, cashflows, trading_dates)
+
+    assert any(t.side == "buy" for t in out.account.trades)
+    assert any(t.side == "sell" and t.reason == "rebalance_sell" for t in out.account.trades)
+    assert out.account.open_position_count() == 0
+    assert out.account.cash_krw > 0
 
 
 def test_weak_prophet_runs_and_picks_winners(synthetic_board, synthetic_reports, synthetic_dates):

@@ -23,24 +23,14 @@ PY
 )"
 
 uv run python -m snusmic_pipeline run-sim --start "${SIM_START:-2021-01-04}" --end "$PRICE_END"
+uv run python scripts/run_optuna_search.py --sampler "${STRATEGY_SAMPLER:-random}" --trials "${STRATEGY_TRIALS:-20}" --seed "${STRATEGY_SEED:-42}"
 uv run python -m snusmic_pipeline export-web --warehouse data/warehouse --sim data/sim --out data/web
+uv run python scripts/export_optuna_artifacts.py --trials-csv data/optuna/exports/trials.csv --out data/web
 
-# Strategy-search artifacts are optional in local clones, but when the Optuna
-# export exists the product pages should use the same source-of-truth data/web
-# artifact as the rest of the dashboard.
-if [ -f data/optuna/exports/trials.csv ]; then
-  uv run python scripts/export_optuna_artifacts.py --trials-csv data/optuna/exports/trials.csv --out data/web
-fi
-
-mkdir -p apps/web/public/downloads apps/web/public/artifacts
+mkdir -p apps/web/public/downloads
 cp data/web/table-download-reports.csv apps/web/public/downloads/snusmic-reports.csv
 cp data/web/table-download-strategies.csv apps/web/public/downloads/snusmic-strategies.csv
 cp data/web/data-quality-download.csv apps/web/public/downloads/snusmic-data-quality.csv
 
-for artifact in strategy-runs.json optuna-trials.json parameter-importance.json; do
-  if [ -f "data/web/$artifact" ]; then
-    cp "data/web/$artifact" "apps/web/public/artifacts/$artifact"
-  fi
-done
 
 printf 'Refreshed web artifacts through %s\n' "$PRICE_END"

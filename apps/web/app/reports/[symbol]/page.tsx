@@ -10,6 +10,7 @@ import {
   getMarkdownSnippet,
   getPositionEpisodes,
   getPriceSeries,
+  hasPriceArtifact,
   getReportBySymbol,
   getReportRows,
   getReportsBySymbol,
@@ -27,7 +28,9 @@ import {
 type ReportParams = Promise<{ symbol: string }>;
 
 export function generateStaticParams() {
-  return Array.from(new Set(getReportRows().map((report) => report.symbol))).map((symbol) => ({ symbol }));
+  return Array.from(new Set(getReportRows().map((report) => report.symbol)))
+    .filter((symbol) => hasPriceArtifact(symbol))
+    .map((symbol) => ({ symbol }));
 }
 
 export async function generateMetadata({ params }: { params: ReportParams }): Promise<Metadata> {

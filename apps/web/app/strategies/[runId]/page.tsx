@@ -28,10 +28,10 @@ export default async function StrategyDetailPage({ params }: { params: StrategyP
       <PageHero
         eyebrow="STRATEGY"
         title={run.label}
-        subtitle="0.01 단위 이산 파라미터로 실험한 로컬 후보입니다."
+        subtitle="선택된 리포트 성과에서 재구성한 후보 실험입니다. 전체 브로커 원장 재현이 아닙니다."
         actions={
           <Link className="btn btn-sm btn-ghost" href="/strategies">
-            ← 전략 기준
+            ← 후보 목록
           </Link>
         }
         kpis={
@@ -53,7 +53,7 @@ export default async function StrategyDetailPage({ params }: { params: StrategyP
 
       <StrategySummary run={run} />
 
-      <Section eyebrow="Curve" title="누적 수익률 경로">
+      <Section eyebrow="Curve" title="재구성 누적 수익률 경로">
         <article className="card border border-base-300 bg-base-100 shadow-sm">
           <div className="card-body p-3 md:p-4">
             <CumulativeReturnChart
@@ -65,7 +65,7 @@ export default async function StrategyDetailPage({ params }: { params: StrategyP
         </article>
       </Section>
 
-      <Section eyebrow="Ledger" title="실험 포트폴리오 · 매매내역">
+      <Section eyebrow="Derived events" title="후보 포트폴리오 · 재구성 이벤트">
         <StrategyExperimentTables runLabel={run.run_id} experiment={experiment} />
       </Section>
 

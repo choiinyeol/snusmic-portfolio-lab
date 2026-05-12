@@ -1,8 +1,7 @@
 """Run local-only strategy search for SNUSMIC follower variants.
 
-Optuna is optional. If unavailable, this script uses a deterministic random
-fallback so tests and lightweight local smoke runs still pass without making the
-web runtime depend on Optuna.
+The sampler is explicit: use deterministic random search by default, or request
+Optuna and fail fast if the optional dependency is unavailable.
 """
 
 from __future__ import annotations
@@ -35,9 +34,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--sim-dir", type=Path, default=ROOT / "data" / "sim")
     parser.add_argument("--out", type=Path, default=ROOT / "data" / "optuna")
     parser.add_argument(
-        "--prefer-optuna",
-        action="store_true",
-        help="Use Optuna if installed; otherwise fallback remains deterministic.",
+        "--sampler",
+        choices=("random", "optuna"),
+        default="random",
+        help="Search sampler. Optuna requires the optional optuna package and fails fast if missing.",
     )
     return parser.parse_args()
 
@@ -53,10 +53,15 @@ def main() -> int:
     exports.mkdir(parents=True, exist_ok=True)
     studies.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(rows).to_csv(exports / "trials.csv", index=False)
-    # Fallback/stub study marker documents whether a real Optuna DB was produced.
     marker = studies / f"{args.study.replace('-', '_')}.json"
     marker.write_text(
-        '{\n  "study": "' + args.study + '",\n  "trials": ' + str(len(rows)) + ',\n  "local_only": true\n}\n',
+        '{\n  "study": "'
+        + args.study
+        + '",\n  "trials": '
+        + str(len(rows))
+        + ',\n  "sampler": "'
+        + args.sampler
+        + '"\n}\n',
         encoding="utf-8",
     )
     print(f"Trials: {len(rows)}")
@@ -68,17 +73,14 @@ def main() -> int:
 def _run_search(
     args: argparse.Namespace, report_performance: pd.DataFrame, baseline_summary: pd.DataFrame | None
 ) -> list[dict[str, Any]]:
-    if not args.prefer_optuna:
+    if args.sampler == "random":
         return run_random_search(
             report_performance, baseline_summary=baseline_summary, trials=args.trials, seed=args.seed
         )
     try:
         import optuna  # type: ignore[import-not-found]
-    except Exception as exc:  # pragma: no cover - depends on local optional package
-        print(f"Optuna unavailable ({exc}); using deterministic random fallback.")
-        return run_random_search(
-            report_performance, baseline_summary=baseline_summary, trials=args.trials, seed=args.seed
-        )
+    except ImportError as exc:  # pragma: no cover - depends on local optional package
+        raise RuntimeError("--sampler optuna requires the optional optuna package") from exc
 
     sampler = optuna.samplers.TPESampler(seed=args.seed)
     study = optuna.create_study(direction="maximize", sampler=sampler, study_name=args.study)

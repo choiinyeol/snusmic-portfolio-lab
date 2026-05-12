@@ -24642,10 +24642,10 @@
       "currency": "JPY",
       "date": "2026-05-11",
       "display_currency": "JPY",
-      "high": 2677.0,
+      "high": 2676.9999999999995,
       "krw_per_unit": 9.338000297546388,
       "low": 2562.9999999999995,
-      "open": 2569.999999999999,
+      "open": 2570.0,
       "source_currency": "JPY",
       "volume": 755500.0
     }
