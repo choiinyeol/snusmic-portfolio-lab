@@ -4,18 +4,22 @@ from __future__ import annotations
 
 from datetime import date
 
+import pandas as pd
+
 from snusmic_pipeline.sim.contracts import (
     BrokerageFees,
     ProphetConfig,
     SavingsPlan,
     SmicFollowerConfig,
     SmicFollowerV2Config,
+    SmicMttStrategyConfig,
     WeakProphetConfig,
 )
 from snusmic_pipeline.sim.personas import (
     simulate_prophet,
     simulate_smic_follower,
     simulate_smic_follower_v2,
+    simulate_smic_mtt_strategy,
     simulate_weak_prophet,
 )
 from snusmic_pipeline.sim.savings import build_cash_flow_schedule
@@ -78,6 +82,68 @@ def test_smic_follower_v2_stops_out_long_held_loser(synthetic_board, synthetic_r
     # v2 evaluates sell signals daily, but it must not churn the book through
     # daily equal-weight rebalance sells.
     assert not any(t.reason == "rebalance_sell" for t in sells)
+
+
+def test_smic_mtt_strategy_uses_broker_slots_without_rebalance_sells(
+    synthetic_board, synthetic_reports, synthetic_dates
+):
+    plan, fees, cashflows = _common_inputs(synthetic_dates)
+    cfg = SmicMttStrategyConfig(
+        require_mtt=False,
+        universe="all",
+        min_target_upside_at_pub=0.05,
+        max_positions=1,
+        target_hit_multiplier=2.0,
+        take_profit_pct=3.0,
+        top_up_cadence="deposit_only",
+    )
+    out = simulate_smic_mtt_strategy(
+        cfg, plan, fees, synthetic_board, synthetic_reports, cashflows, synthetic_dates
+    )
+
+    buys = [t for t in out.account.trades if t.side == "buy"]
+    sells = [t for t in out.account.trades if t.side == "sell"]
+    assert buys
+    assert {t.symbol for t in buys} == {"WIN"}
+    assert not any(t.reason == "rebalance_sell" for t in sells)
+    assert max(ep.open_positions for ep in out.equity_points) <= 1
+
+
+def test_smic_mtt_strategy_filters_non_mtt_reports(synthetic_board, synthetic_dates):
+    plan, fees, cashflows = _common_inputs(synthetic_dates)
+    reports = pd.DataFrame(
+        [
+            {
+                "report_id": "mtt-win",
+                "symbol": "WIN",
+                "company": "Winners Co",
+                "exchange": "NASDAQ",
+                "publication_date": pd.Timestamp("2025-03-03"),
+                "target_price": 250.0,
+            },
+            {
+                "report_id": "mtt-loss",
+                "symbol": "LOSS",
+                "company": "Losers Co",
+                "exchange": "NASDAQ",
+                "publication_date": pd.Timestamp("2025-03-03"),
+                "target_price": 130.0,
+            },
+        ]
+    )
+    cfg = SmicMttStrategyConfig(
+        universe="all",
+        min_target_upside_at_pub=0.05,
+        max_positions=2,
+        top_up_cadence="deposit_only",
+        target_hit_multiplier=2.0,
+        take_profit_pct=3.0,
+    )
+    out = simulate_smic_mtt_strategy(cfg, plan, fees, synthetic_board, reports, cashflows, synthetic_dates)
+
+    buys = [t for t in out.account.trades if t.side == "buy"]
+    assert any(t.symbol == "WIN" for t in buys)
+    assert not any(t.symbol == "LOSS" for t in buys)
 
 
 def test_weak_prophet_empty_rebalance_sells_to_cash(synthetic_board, synthetic_reports):

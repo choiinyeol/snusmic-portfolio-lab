@@ -793,5 +793,35 @@
     "symbol": "187790.KS",
     "unrealized_pnl_krw": -588.269,
     "unrealized_return": -0.0462
+  },
+  {
+    "avg_cost_krw": 266432.5642,
+    "company": "Camtek",
+    "currency": "USD",
+    "first_buy_date": "2026-04-16",
+    "holding_days": 25,
+    "last_close_krw": 307379.2062,
+    "last_close_native": 209.1199951171875,
+    "market_value_krw": 12909926.6605,
+    "persona": "smic_mtt_strategy",
+    "qty": 42,
+    "symbol": "CAMT",
+    "unrealized_pnl_krw": 1719758.9637,
+    "unrealized_return": 0.1537
+  },
+  {
+    "avg_cost_krw": 78603.727,
+    "company": "Golar LNG",
+    "currency": "USD",
+    "first_buy_date": "2026-04-16",
+    "holding_days": 25,
+    "last_close_krw": 82731.6325,
+    "last_close_native": 56.28499984741211,
+    "market_value_krw": 11996086.7054,
+    "persona": "smic_mtt_strategy",
+    "qty": 145,
+    "symbol": "GLNG",
+    "unrealized_pnl_krw": 598546.2913,
+    "unrealized_return": 0.0525
   }
 ]

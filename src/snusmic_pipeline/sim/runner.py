@@ -21,6 +21,7 @@ from .contracts import (
     SimulationResult,
     SmicFollowerConfig,
     SmicFollowerV2Config,
+    SmicMttStrategyConfig,
     WeakProphetConfig,
 )
 from .holdings import (
@@ -36,6 +37,7 @@ from .personas import (
     simulate_prophet,
     simulate_smic_follower,
     simulate_smic_follower_v2,
+    simulate_smic_mtt_strategy,
     simulate_weak_prophet,
 )
 from .report_stats import aggregate_report_stats, compute_report_performance
@@ -204,6 +206,16 @@ def _dispatch(
             cashflows,
             trading_dates,
             expiry_days=config.report_expiry_days,
+        )
+    if isinstance(persona, SmicMttStrategyConfig):
+        return simulate_smic_mtt_strategy(
+            persona,
+            config.savings_plan,
+            config.fees,
+            board,
+            reports,
+            cashflows,
+            trading_dates,
         )
     if isinstance(persona, AllWeatherConfig):
         if benchmark_board is None or benchmark_board.is_empty:
