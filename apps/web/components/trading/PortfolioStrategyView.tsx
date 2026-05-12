@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useEffect } from 'react';
 import { DailyEquityHistory } from '@/components/trading/DailyEquityHistory';
+import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
 import { PositionDecisionPanel } from '@/components/trading/PositionDecisionPanel';
 import { PortfolioTables } from '@/components/trading/PortfolioTables';
 import { TradesTable } from '@/components/trading/TradesTable';
@@ -70,44 +71,80 @@ export function PortfolioStrategyView({
 
   return (
     <div className="grid min-w-0 gap-4">
-      <div className="flex min-w-0 flex-wrap items-center gap-2">
-        <span className="text-xs font-semibold uppercase tracking-[0.18em] text-base-content/55">전략</span>
-        <div className="tabs tabs-box min-w-0 flex-1 overflow-x-auto bg-base-200" role="tablist" aria-label="전략 선택">
-          {personas.map((item) => (
-            <button
-              key={item}
-              type="button"
-              role="tab"
-              aria-selected={persona === item}
-              className={persona === item ? 'tab tab-active font-bold' : 'tab'}
-              onClick={() => setPersona(item)}
-            >
-              {personaLabels[item] ?? item}
-            </button>
-          ))}
+      <div className="lab-panel p-3">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <span className="snapshot-pill">Persona</span>
+          <div
+            className="tabs tabs-box min-w-0 flex-1 overflow-x-auto bg-base-200"
+            role="tablist"
+            aria-label="전략 선택"
+          >
+            {personas.map((item) => (
+              <button
+                key={item}
+                type="button"
+                role="tab"
+                aria-selected={persona === item}
+                className={persona === item ? 'tab tab-active font-bold' : 'tab'}
+                onClick={() => setPersona(item)}
+              >
+                {personaLabels[item] ?? item}
+              </button>
+            ))}
+          </div>
         </div>
+        <p className="m-0 mt-2 text-xs text-base-content/55">
+          선택된 원장: <strong className="text-base-content">{personaLabels[persona] ?? persona}</strong> · URL의
+          strategy 파라미터와 동기화됩니다.
+        </p>
       </div>
 
-      <div className="grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiTile label="평가액" value={formatKrw(totalValue)} caption={`${personaHoldings.length}종목`} tone="accent" />
+      <div className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-5">
         <KpiTile
+          compact
+          label="평가액"
+          value={formatKrw(totalValue)}
+          caption={`${personaHoldings.length}종목`}
+          tone="accent"
+        />
+        <KpiTile
+          compact
+          label="출자 원금"
+          value={formatKrw(capitalByPersona[persona] ?? null)}
+          delta="summary artifact"
+        />
+        <KpiTile
+          compact
           label="미실현 손익"
           value={formatKrw(totalPnl)}
           delta={formatPercent(cost > 0 ? totalPnl / cost : null)}
           tone={totalPnl >= 0 ? 'good' : 'bad'}
         />
         <KpiTile
+          compact
           label="실현 손익"
           value={formatKrw(realizedPnl)}
           delta={`${closedCount}건 청산`}
           tone={realizedPnl >= 0 ? 'good' : 'bad'}
         />
         <KpiTile
+          compact
           label="체결"
           value={personaTrades.length.toLocaleString('ko-KR')}
           delta={`매수 ${buyCount} · 매도 ${sellCount}`}
         />
       </div>
+
+      <article className="lab-panel p-3 md:p-4">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <div className="lab-panel__eyebrow">Current holdings</div>
+            <h2 className="lab-panel__title">현재 보유 트리맵</h2>
+          </div>
+          <span className="snapshot-pill">면적=평가액</span>
+        </div>
+        <HoldingsTreemap holdings={personaHoldings} height={360} compact />
+      </article>
 
       <PositionDecisionPanel
         holdings={holdings}

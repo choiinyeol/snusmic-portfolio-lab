@@ -37,12 +37,14 @@ export default function PortfolioPage() {
     <>
       <PageHero
         eyebrow="PORTFOLIO"
-        title="Portfolio — 보유와 원장"
-        subtitle="현재 보유, 체결 원장, 리포트 근거, 포지션 에피소드를 한 화면에서 추적합니다."
+        title="Portfolio — 원장형 보유 대시보드"
+        subtitle="전략별 share-based 원장, 현재 보유, 체결 기록, 리포트 근거를 한 화면에서 추적합니다."
         badges={[
           { label: '전략', value: `${personas.length}개` },
           { label: '체결', value: trades.length.toLocaleString('ko-KR') },
           { label: '최근 평가', value: latestEquity || '—' },
+          { label: 'Mode', value: 'Static Artifacts' },
+          { label: 'Trading', value: 'No live trading' },
         ]}
       />
 

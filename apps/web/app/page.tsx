@@ -2,10 +2,20 @@ import Link from 'next/link';
 import { CumulativeReturnChart, type ReturnSeries } from '@/components/charts/CumulativeReturnChart';
 import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
 import { KpiTile } from '@/components/ui/KpiTile';
+import { MiniSparkline } from '@/components/ui/MiniSparkline';
 import { Money } from '@/components/ui/Money';
 import { PageHero } from '@/components/ui/PageHero';
 import { Section } from '@/components/ui/Section';
-import { getEquityDaily, getPersonaLabel, type EquityPoint, type HoldingRow, type ReportRow } from '@/lib/artifacts';
+import {
+  getEquityDaily,
+  getPersonaLabel,
+  getReportRows,
+  getTrades,
+  type EquityPoint,
+  type HoldingRow,
+  type ReportRow,
+  type TradeRow,
+} from '@/lib/artifacts';
 import { formatDateKo, formatDays, formatKrw, formatPercent, signedTextClass } from '@/lib/format';
 import {
   getExecutiveOverview,
@@ -21,263 +31,392 @@ const SERIES_COLORS = ['#64748b', '#7c3aed', '#0ea5e9', '#f59e0b', '#2563eb'];
 export default function OverviewPage() {
   const overview = getExecutiveOverview();
   const strategyRows = getStrategyLeaderboard();
+  const trades = getTrades();
+  const reports = getReportRows();
+  const latestReportsBySymbol = latestReportBySymbol(reports);
   const equity = getEquityDaily();
   const chartSeries = buildDashboardSeries(equity);
   const primarySeries = chartSeries.find((series) => series.id === PRIMARY_PERSONA)?.points ?? [];
   const benchmarkToBeat = strategyRows.find((row) => row.id.startsWith('benchmark_') || row.id === 'all_weather');
-  const bestCandidate = strategyRows.find((row) => row.kind === 'candidate');
+  const bestCandidate = strategyRows.find((row) => row.kind === 'candidate') ?? strategyRows[0];
+  const recentBuys = trades
+    .filter((trade) => trade.persona === PRIMARY_PERSONA && trade.side === 'buy')
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 7);
 
   return (
     <>
       <PageHero
-        eyebrow="OVERVIEW"
-        title="30초 안에 보는 Portfolio Lab"
-        subtitle="정적 리서치 아티팩트로 포트폴리오, 전략 성과, 리포트 후보를 검증합니다."
+        eyebrow="PORTFOLIO LAB"
+        title="SNUSMIC Portfolio Lab"
+        subtitle="리서치 추천, 포트폴리오 원장, 전략 검증을 한 곳에서 추적하는 정적 스냅샷 기반 투자 리서치 대시보드입니다."
         badges={[
           { label: 'Snapshot', value: overview.snapshotDate || '—' },
-          { label: 'Mode', value: 'Static artifacts' },
-          { label: 'Trading', value: 'No live orders' },
+          { label: 'Reports', value: `${overview.reportStats.total}건` },
+          { label: 'Price matched', value: 'Canonical artifacts' },
           { label: 'Primary book', value: overview.portfolio.label },
+          { label: 'Mode', value: 'Static Artifacts' },
+          { label: 'Trading', value: 'No live trading' },
         ]}
         actions={
           <>
             <Link className="btn btn-sm btn-primary" href="/portfolio">
               원장 보기
             </Link>
-            <Link className="btn btn-sm btn-outline" href="/strategies">
-              전략 비교
+            <Link className="btn btn-sm btn-outline" href="/reports">
+              리포트 검증
             </Link>
-            <Link className="btn btn-sm btn-ghost" href="/screener">
-              후보 탐색
+            <Link className="btn btn-sm btn-ghost" href="/strategies">
+              전략 실험
             </Link>
           </>
         }
         kpis={
-          <div className="grid min-w-0 gap-3 min-[1400px]:grid-cols-2">
+          <div className="metric-strip">
             <KpiTile
+              compact
               label="현재 평가액"
               value={formatKrw(overview.portfolio.finalEquityKrw)}
               delta={`${overview.portfolio.holdingCount}개 보유`}
               tone="accent"
+              showToneBadge={false}
             >
-              <MiniSparkline points={primarySeries} tone="accent" />
+              <MiniSparkline points={primarySeries} tone="accent" label="Primary portfolio trend" />
             </KpiTile>
             <KpiTile
+              compact
               label="Primary MWR"
               value={formatPercent(overview.portfolio.moneyWeightedReturn)}
               delta={`MDD ${formatPercent(overview.portfolio.maxDrawdown)}`}
               tone={(overview.portfolio.moneyWeightedReturn ?? 0) >= 0 ? 'good' : 'bad'}
+              showToneBadge={false}
             />
             <KpiTile
-              label="리포트 적중률"
+              compact
+              label="현재 보유 손익"
+              value={formatKrw(overview.portfolio.unrealizedPnlKrw)}
+              delta={`${overview.portfolio.positiveHoldingCount}/${overview.portfolio.holdingCount} 수익 포지션`}
+              tone={(overview.portfolio.unrealizedPnlKrw ?? 0) >= 0 ? 'good' : 'bad'}
+              showToneBadge={false}
+            />
+            <KpiTile
+              compact
+              label="최강 벤치마크"
+              value={benchmarkToBeat?.label ?? '—'}
+              delta={formatPercent(benchmarkToBeat?.returnPct)}
+              tone="neutral"
+              valueClassName="text-base"
+            />
+            <KpiTile
+              compact
+              label="목표가 도달률"
               value={formatPercent(overview.reportStats.targetHitRate)}
               delta={`${overview.reportStats.hitCount}/${overview.reportStats.total}`}
               tone="good"
+              showToneBadge={false}
             />
             <KpiTile
-              label="활성 후보"
-              value={`${overview.researchCandidates.length}개`}
-              delta="리포트 기반 Screener"
-              tone="warn"
+              compact
+              label="최고 후보 전략"
+              value={bestCandidate?.label ?? '—'}
+              delta={formatPercent(bestCandidate?.returnPct)}
+              tone={bestCandidate?.kind === 'candidate' ? 'accent' : 'neutral'}
+              valueClassName="truncate text-base"
+              showToneBadge={false}
             />
           </div>
         }
       />
 
       <Section
-        eyebrow="Executive Board"
-        title="핵심 상태 네 가지"
-        caption="프로젝트 개요 → 포트폴리오 상태 → 우수 전략 → 최근 리포트 순서로 읽히도록 고정했습니다."
+        eyebrow="Snapshot Board"
+        title="현재 상태 대시보드"
+        caption="YASUN식 정보 밀도는 빌리되, 실시간 매매가 아닌 정적 리서치 검증 흐름으로 재구성했습니다."
       >
-        <div className="grid gap-4 xl:grid-cols-[minmax(260px,.85fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(300px,.9fr)]">
-          <ProjectBrief snapshotDate={overview.snapshotDate} />
-          <PortfolioBrief holdings={overview.portfolio.holdings} />
-          <StrategyBrief bestCandidate={bestCandidate} benchmark={benchmarkToBeat} />
-          <RecentReportBrief reports={overview.recentReports.slice(0, 4)} />
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(300px,.55fr)_minmax(300px,.55fr)]">
+          <article className="lab-panel">
+            <div className="lab-panel__head">
+              <div className="min-w-0">
+                <div className="lab-panel__eyebrow">Portfolio</div>
+                <h2 className="lab-panel__title">포트폴리오 구성</h2>
+              </div>
+              <span className="artifact-status">
+                <span className="status-dot" aria-hidden="true" /> 정적 스냅샷
+              </span>
+            </div>
+            <div className="p-3 md:p-4">
+              <HoldingsTreemap holdings={overview.portfolio.holdings} height={450} />
+            </div>
+          </article>
+          <RiskSummary holdings={overview.portfolio.holdings} rows={strategyRows} overview={overview} />
+          <RecentReportsPanel reports={overview.recentReports.slice(0, 7)} />
         </div>
       </Section>
 
-      <div className="grid gap-4 2xl:grid-cols-[minmax(0,1.12fr)_minmax(420px,.88fr)]">
-        <Section
-          eyebrow="Portfolio"
-          title="현재 보유 구성"
-          actions={
-            <Link className="btn btn-sm btn-outline" href="/portfolio">
-              Portfolio →
-            </Link>
-          }
-        >
-          <article className="rounded-box border border-base-300 bg-base-100 p-4 shadow-sm">
-            <HoldingsTreemap holdings={overview.portfolio.holdings} />
-          </article>
-        </Section>
-
-        <Section
-          eyebrow="Strategy"
-          title="수익률·리스크 리더보드"
-          actions={
-            <Link className="btn btn-sm btn-outline" href="/strategies">
-              Strategy →
-            </Link>
-          }
-        >
-          <StrategyLeaderboard rows={strategyRows.slice(0, 6)} />
-        </Section>
-      </div>
-
-      <Section eyebrow="Performance" title="포트폴리오와 벤치마크 누적 경로">
-        <article className="rounded-box border border-base-300 bg-base-100 p-4 shadow-sm md:p-5">
+      <Section
+        eyebrow="Performance"
+        title="전략·벤치마크 누적 경로"
+        caption="벤치마크·페르소나·원장형 후보 전략의 누적 수익률 경로입니다."
+        actions={
+          <div className="flex flex-wrap gap-1.5" aria-label="기간 필터">
+            {['3M', '6M', 'YTD', '1Y', '전체'].map((label) => (
+              <span className="snapshot-pill" key={label}>
+                {label}
+              </span>
+            ))}
+          </div>
+        }
+      >
+        <article className="lab-panel p-3 md:p-4">
           <CumulativeReturnChart series={chartSeries} />
         </article>
       </Section>
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(360px,.72fr)]">
         <Section
-          eyebrow="Screener"
-          title="리포트 기반 후보"
+          eyebrow="Holdings"
+          title="현재 보유와 최신 목표가 컨텍스트"
           actions={
-            <Link className="btn btn-sm btn-outline" href="/screener">
-              Screener →
+            <Link className="btn btn-sm btn-outline" href="/portfolio">
+              Portfolio →
             </Link>
           }
         >
-          <div className="grid gap-3 lg:grid-cols-2">
-            {overview.researchCandidates.slice(0, 6).map((candidate, index) => (
-              <CandidateMiniCard key={candidate.report.reportId} candidate={candidate} rank={index + 1} />
-            ))}
-          </div>
+          <HoldingContext holdings={overview.portfolio.holdings.slice(0, 8)} reportsBySymbol={latestReportsBySymbol} />
         </Section>
 
         <Section
-          eyebrow="Research Stats"
-          title="리포트 검증 통계"
+          eyebrow="Tape"
+          title="최근 매수 체결"
           actions={
-            <Link className="btn btn-sm btn-outline" href="/reports">
-              Research →
+            <Link className="btn btn-sm btn-outline" href="/portfolio">
+              원장 →
             </Link>
           }
         >
-          <article className="rounded-box border border-base-300 bg-base-100 p-4 shadow-sm">
-            <dl className="grid gap-3 text-sm">
-              <FactLine label="총 리포트" value={`${overview.reportStats.total.toLocaleString('ko-KR')}건`} />
-              <FactLine
-                label="목표가 도달"
-                value={`${overview.reportStats.hitCount.toLocaleString('ko-KR')}건`}
-                tone="text-success"
-              />
-              <FactLine label="진행 중 후보" value={`${overview.reportStats.activeCount.toLocaleString('ko-KR')}건`} />
-              <FactLine
-                label="현재 플러스"
-                value={formatPercent(overview.reportStats.positiveReturnRate)}
-                tone="text-success"
-              />
-              <FactLine
-                label="평균 현재 수익률"
-                value={formatPercent(overview.reportStats.averageCurrentReturn)}
-                tone={signedTextClass(overview.reportStats.averageCurrentReturn)}
-              />
-              <FactLine label="중앙 목표 도달일" value={formatDays(overview.reportStats.medianDaysToTarget)} />
-            </dl>
-          </article>
+          <BuyTape trades={recentBuys} />
         </Section>
       </div>
+
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(360px,.72fr)]">
+        <Section
+          eyebrow="Strategy"
+          title="전략 성과 요약"
+          actions={
+            <Link className="btn btn-sm btn-outline" href="/strategies">
+              Strategy →
+            </Link>
+          }
+        >
+          <StrategyLeaderboard rows={strategyRows.slice(0, 7)} />
+        </Section>
+
+        <Section eyebrow="Updates" title="최근 업데이트">
+          <UpdateFeed
+            snapshotDate={overview.snapshotDate}
+            stats={overview.reportStats}
+            portfolio={overview.portfolio}
+          />
+        </Section>
+      </div>
+
+      <Section
+        eyebrow="Screener"
+        title="리포트 기반 후보 랭킹"
+        caption="블랙박스 점수가 아니라 최근성, 목표 업사이드, 목표 진행률, 미도달·미만료 상태로 설명 가능한 후보입니다."
+        actions={
+          <Link className="btn btn-sm btn-outline" href="/screener">
+            Screener →
+          </Link>
+        }
+      >
+        <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-4">
+          {overview.researchCandidates.slice(0, 8).map((candidate, index) => (
+            <CandidateMiniCard key={candidate.report.reportId} candidate={candidate} rank={index + 1} />
+          ))}
+        </div>
+      </Section>
     </>
   );
 }
 
-function ProjectBrief({ snapshotDate }: { snapshotDate: string }) {
-  return (
-    <article className="rounded-box border border-primary/20 bg-primary/5 p-5 shadow-sm">
-      <div className="badge badge-primary badge-soft badge-sm">Project</div>
-      <h2 className="mt-3 text-xl font-black tracking-[-0.04em]">정적 스냅샷 검증 랩</h2>
-      <p className="mt-2 text-sm leading-6 text-base-content/65">
-        리서치 추천, 원장 기반 포트폴리오, 전략 백테스트를 한 흐름에서 검증합니다. 실시간 시세·주문·브로커 연동은
-        없습니다.
-      </p>
-      <dl className="mt-4 grid gap-2 text-xs">
-        <FactLine label="Snapshot" value={snapshotDate || '—'} />
-        <FactLine label="IA" value="Overview → Portfolio → Research → Strategy → Screener" />
-      </dl>
-    </article>
-  );
-}
-
-function PortfolioBrief({ holdings }: { holdings: HoldingRow[] }) {
-  const totalValue = holdings.reduce((sum, row) => sum + (row.marketValueKrw ?? 0), 0);
-  const top = holdings[0];
-  const topWeight = top?.marketValueKrw && totalValue > 0 ? top.marketValueKrw / totalValue : null;
-  const pnl = holdings.reduce((sum, row) => sum + (row.unrealizedPnlKrw ?? 0), 0);
-  return (
-    <article className="rounded-box border border-base-300 bg-base-100 p-5 shadow-sm">
-      <div className="badge badge-primary badge-soft badge-sm">Portfolio</div>
-      <div className="mt-3 text-sm text-base-content/55">현재 보유 손익</div>
-      <div className={`mt-1 break-words font-mono text-2xl font-black tabular-nums ${signedTextClass(pnl)}`}>
-        {formatKrw(pnl)}
-      </div>
-      <dl className="mt-4 grid gap-2 text-xs">
-        <FactLine label="보유 종목" value={`${holdings.length}개`} />
-        <FactLine label="최대 보유" value={top ? `${top.company} · ${formatPercent(topWeight)}` : '—'} />
-        <FactLine
-          label="수익 포지션"
-          value={`${holdings.filter((row) => (row.unrealizedReturn ?? 0) > 0).length}/${holdings.length}`}
-        />
-      </dl>
-    </article>
-  );
-}
-
-function StrategyBrief({
-  bestCandidate,
-  benchmark,
+function RiskSummary({
+  holdings,
+  rows,
+  overview,
 }: {
-  bestCandidate?: StrategyLeaderboardRow;
-  benchmark?: StrategyLeaderboardRow;
+  holdings: HoldingRow[];
+  rows: StrategyLeaderboardRow[];
+  overview: ReturnType<typeof getExecutiveOverview>;
 }) {
+  const totalValue = holdings.reduce((sum, row) => sum + (row.marketValueKrw ?? 0), 0);
+  const top10Weight = topWeight(holdings, 10);
+  const currencyRows = currencyExposure(holdings, totalValue);
+  const baselineCount = rows.filter((row) => row.kind === 'baseline').length;
   return (
-    <article className="rounded-box border border-base-300 bg-base-100 p-5 shadow-sm">
-      <div className="badge badge-success badge-soft badge-sm">Strategy</div>
-      <div className="mt-3 text-sm text-base-content/55">최고 후보 vs 기준선</div>
-      <h2 className="mt-1 truncate text-xl font-black tracking-[-0.04em]">{bestCandidate?.label ?? '—'}</h2>
-      <dl className="mt-4 grid gap-2 text-xs">
-        <FactLine
-          label="후보 수익률"
-          value={formatPercent(bestCandidate?.returnPct)}
-          tone={signedTextClass(bestCandidate?.returnPct)}
-        />
-        <FactLine label="MDD" value={formatPercent(bestCandidate?.maxDrawdown)} tone="text-error" />
-        <FactLine label="기준선" value={`${benchmark?.label ?? '—'} · ${formatPercent(benchmark?.returnPct)}`} />
-        <FactLine
-          label="초과수익"
-          value={formatPercent(bestCandidate?.benchmarkExcess)}
-          tone={signedTextClass(bestCandidate?.benchmarkExcess)}
-        />
-      </dl>
-    </article>
-  );
-}
-
-function RecentReportBrief({ reports }: { reports: ReportRow[] }) {
-  return (
-    <article className="rounded-box border border-base-300 bg-base-100 p-5 shadow-sm">
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <span className="badge badge-primary badge-soft badge-sm">Research</span>
-        <Link className="text-xs font-bold text-primary" href="/reports">
-          전체 →
+    <article className="lab-panel lab-panel--dense">
+      <div className="lab-panel__head">
+        <div className="min-w-0">
+          <div className="lab-panel__eyebrow">Risk</div>
+          <h2 className="lab-panel__title">리스크 요약</h2>
+        </div>
+        <Link className="lab-panel__action" href="/portfolio">
+          상세 보기
         </Link>
       </div>
-      <div className="grid gap-2">
+      <div className="grid gap-3 p-4">
+        <p className="m-0 text-sm leading-6 text-base-content/62">상위 포지션 쏠림과 현금/통화 노출을 점검합니다.</p>
+        <dl className="grid gap-1 text-sm">
+          <FactLine label="Top 5 비중" value={formatPercent(overview.portfolio.top5Weight)} />
+          <FactLine label="Top 10 비중" value={formatPercent(top10Weight)} />
+          <FactLine label="보유 종목" value={`${holdings.length}개`} />
+          <FactLine
+            label="수익 포지션"
+            value={`${overview.portfolio.positiveHoldingCount}/${overview.portfolio.holdingCount}`}
+            tone="text-success"
+          />
+          <FactLine label="Primary MDD" value={formatPercent(overview.portfolio.maxDrawdown)} tone="text-error" />
+          <FactLine label="벤치마크 수" value={`${baselineCount}개`} />
+        </dl>
+        <div className="grid gap-2 pt-2">
+          <div className="text-xs font-bold uppercase tracking-[0.14em] text-base-content/45">Currency exposure</div>
+          {currencyRows.map((row) => (
+            <div className="grid grid-cols-[4rem_minmax(0,1fr)_3.5rem] items-center gap-2" key={row.currency}>
+              <span className="font-mono text-xs font-bold text-base-content/65">{row.currency}</span>
+              <div className="h-2 rounded-full bg-base-200">
+                <div
+                  className="h-full rounded-full bg-primary"
+                  style={{ width: `${Math.min(100, row.weight * 100)}%` }}
+                />
+              </div>
+              <span className="text-right font-mono text-xs font-bold tabular-nums">{formatPercent(row.weight)}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function RecentReportsPanel({ reports }: { reports: ReportRow[] }) {
+  return (
+    <article className="lab-panel lab-panel--dense">
+      <div className="lab-panel__head">
+        <div className="min-w-0">
+          <div className="lab-panel__eyebrow">Research</div>
+          <h2 className="lab-panel__title">최근 발간 리포트</h2>
+        </div>
+        <Link className="lab-panel__action" href="/reports">
+          전체 보기
+        </Link>
+      </div>
+      <div className="feed-list p-3">
         {reports.map((report) => (
+          <Link key={report.reportId} href={`/reports/${report.symbol}`} className="feed-item">
+            <div className="min-w-0">
+              <div className="truncate font-bold text-sm">{report.company || report.symbol}</div>
+              <div className="feed-item__meta">
+                {formatDateKo(report.publicationDate)} · {report.symbol} · 진행{' '}
+                {formatPercent(report.targetProgressPct)}
+              </div>
+            </div>
+            <div className="grid justify-items-end gap-1">
+              <span className={`feed-item__value ${signedTextClass(report.currentReturn)}`}>
+                {formatPercent(report.currentReturn)}
+              </span>
+              {reportStatusBadge(report)}
+            </div>
+          </Link>
+        ))}
+      </div>
+    </article>
+  );
+}
+
+function HoldingContext({
+  holdings,
+  reportsBySymbol,
+}: {
+  holdings: HoldingRow[];
+  reportsBySymbol: Map<string, ReportRow>;
+}) {
+  if (!holdings.length) {
+    return <article className="lab-panel p-5 text-sm text-base-content/60">현재 보유 포지션이 없습니다.</article>;
+  }
+  return (
+    <div className="grid gap-3 md:grid-cols-2">
+      {holdings.map((holding) => {
+        const report = reportsBySymbol.get(holding.symbol);
+        const progress = report?.targetProgressPct ?? null;
+        return (
           <Link
-            key={report.reportId}
-            href={`/reports/${report.symbol}`}
-            className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-2 rounded-xl bg-base-200/55 p-3 text-sm transition hover:bg-primary/10"
+            key={`${holding.persona}-${holding.symbol}`}
+            href={`/reports/${holding.symbol}`}
+            className="lab-panel p-4"
           >
-            <span className="min-w-0 truncate font-bold">{report.company || report.symbol}</span>
-            <span className={`font-mono font-black tabular-nums ${signedTextClass(report.currentReturn)}`}>
-              {formatPercent(report.currentReturn)}
-            </span>
-            <span className="text-xs text-base-content/50">{formatDateKo(report.publicationDate)}</span>
-            <span className="text-xs text-base-content/50">진행 {formatPercent(report.targetProgressPct)}</span>
+            <div className="flex min-w-0 items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="truncate text-sm font-black">{holding.company || holding.symbol}</div>
+                <div className="mt-1 flex flex-wrap gap-1.5">
+                  <span className="badge badge-ghost badge-sm font-mono">{holding.symbol}</span>
+                  <span className="badge badge-outline badge-sm">{holding.currency}</span>
+                  <span className="badge badge-primary badge-soft badge-sm">{formatDays(holding.holdingDays)}</span>
+                </div>
+              </div>
+              <div className={`font-mono text-sm font-black tabular-nums ${signedTextClass(holding.unrealizedReturn)}`}>
+                {formatPercent(holding.unrealizedReturn)}
+              </div>
+            </div>
+            <dl className="mt-3 grid grid-cols-2 gap-2 text-xs lg:grid-cols-3">
+              <Metric label="수량" value={formatQuantity(holding.qty)} />
+              <Metric label="평가액" value={formatKrw(holding.marketValueKrw)} />
+              <Metric label="평단(KRW)" value={formatKrw(holding.avgCostKrw)} />
+              <Metric
+                label="미실현"
+                value={formatKrw(holding.unrealizedPnlKrw)}
+                tone={signedTextClass(holding.unrealizedPnlKrw)}
+              />
+              <Metric label="최신 목표가" value={report ? formatAssetTarget(report) : '—'} />
+              <Metric label="목표 진행" value={formatPercent(progress)} />
+            </dl>
+            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-base-200" aria-label="목표 진행률">
+              <div
+                className="h-full rounded-full bg-primary"
+                style={{ width: `${Math.min(100, Math.max(4, (progress ?? 0) * 100))}%` }}
+              />
+            </div>
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
+function BuyTape({ trades }: { trades: TradeRow[] }) {
+  if (!trades.length)
+    return <article className="lab-panel p-5 text-sm text-base-content/60">최근 매수 체결이 없습니다.</article>;
+  return (
+    <article className="lab-panel p-3">
+      <div className="feed-list">
+        {trades.map((trade, index) => (
+          <Link
+            key={`${trade.persona}-${trade.date}-${trade.symbol}-${index}`}
+            href={`/reports/${trade.symbol}`}
+            className="feed-item"
+          >
+            <div className="min-w-0">
+              <div className="flex min-w-0 items-center gap-2">
+                <span className="badge badge-success badge-soft badge-sm">BUY</span>
+                <span className="truncate font-bold text-sm">{trade.symbol}</span>
+              </div>
+              <div className="feed-item__meta">
+                {formatDateKo(trade.date)} · {trade.reason || 'report-linked'} · {formatQuantity(trade.qty)}주
+              </div>
+            </div>
+            <div className="grid justify-items-end gap-1 text-right">
+              <span className="feed-item__value">{formatKrw(trade.grossKrw)}</span>
+              <Money native={trade.grossNative} krw={trade.grossKrw} currency={trade.currency} layout="inline" />
+            </div>
           </Link>
         ))}
       </div>
@@ -287,8 +426,8 @@ function RecentReportBrief({ reports }: { reports: ReportRow[] }) {
 
 function StrategyLeaderboard({ rows }: { rows: StrategyLeaderboardRow[] }) {
   return (
-    <article className="overflow-x-auto rounded-box border border-base-300 bg-base-100 shadow-sm">
-      <table className="table table-sm w-full">
+    <article className="board-table-wrap">
+      <table className="board-table table table-sm table-density-compact w-full">
         <thead>
           <tr>
             <th>전략</th>
@@ -297,13 +436,21 @@ function StrategyLeaderboard({ rows }: { rows: StrategyLeaderboardRow[] }) {
             <th className="text-right">Sortino</th>
             <th className="text-right">MDD</th>
             <th className="text-right">초과</th>
+            <th className="text-right">거래</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((row) => (
             <tr key={row.id}>
-              <td className="min-w-[180px] max-w-[260px] truncate font-bold">
+              <td className="min-w-[210px] max-w-[320px] truncate font-bold">
                 <Link href={row.href}>{row.label}</Link>
+                <div className="mt-1">
+                  <span
+                    className={`badge badge-sm ${row.kind === 'candidate' ? 'badge-primary badge-soft' : 'badge-ghost'}`}
+                  >
+                    {row.kind === 'candidate' ? '후보' : '기준선'}
+                  </span>
+                </div>
               </td>
               <td className={`text-right font-mono font-black tabular-nums ${signedTextClass(row.returnPct)}`}>
                 {formatPercent(row.returnPct)}
@@ -314,6 +461,7 @@ function StrategyLeaderboard({ rows }: { rows: StrategyLeaderboardRow[] }) {
               <td className={`text-right font-mono font-bold tabular-nums ${signedTextClass(row.benchmarkExcess)}`}>
                 {formatPercent(row.benchmarkExcess)}
               </td>
+              <td className="text-right font-mono tabular-nums">{row.tradeCount?.toLocaleString('ko-KR') ?? '—'}</td>
             </tr>
           ))}
         </tbody>
@@ -322,23 +470,68 @@ function StrategyLeaderboard({ rows }: { rows: StrategyLeaderboardRow[] }) {
   );
 }
 
+function UpdateFeed({
+  snapshotDate,
+  stats,
+  portfolio,
+}: {
+  snapshotDate: string;
+  stats: ReturnType<typeof getExecutiveOverview>['reportStats'];
+  portfolio: ReturnType<typeof getExecutiveOverview>['portfolio'];
+}) {
+  const items = [
+    { tag: 'Snapshot', text: `기준일 ${snapshotDate || '—'} 정적 스냅샷 반영`, value: 'Artifact' },
+    {
+      tag: 'Portfolio',
+      text: `${portfolio.holdingCount}개 현재 보유와 원장형 손익 동기화`,
+      value: formatKrw(portfolio.unrealizedPnlKrw),
+    },
+    {
+      tag: 'Target',
+      text: `목표가 도달 ${stats.hitCount}/${stats.total}건 검증`,
+      value: formatPercent(stats.targetHitRate),
+    },
+    {
+      tag: 'Research',
+      text: `최신 발간 ${formatDateKo(stats.latestPublicationDate)} 기준 후보 갱신`,
+      value: `${stats.activeCount} active`,
+    },
+    { tag: 'Artifact', text: '외부 실시간 호출 없이 canonical data/web 산출물 사용', value: 'No live' },
+  ];
+  return (
+    <article className="lab-panel p-3">
+      <div className="feed-list">
+        {items.map((item) => (
+          <div className="feed-item" key={item.tag}>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="status-dot text-primary" aria-hidden="true" />
+                <span className="truncate text-sm font-bold">{item.text}</span>
+              </div>
+              <div className="feed-item__meta">{item.tag}</div>
+            </div>
+            <span className="feed-item__value text-base-content/70">{item.value}</span>
+          </div>
+        ))}
+      </div>
+    </article>
+  );
+}
+
 function CandidateMiniCard({ candidate, rank }: { candidate: ResearchCandidate; rank: number }) {
   const report = candidate.report;
   return (
-    <Link
-      href={`/reports/${report.symbol}`}
-      className="rounded-2xl border border-base-300 bg-base-100 p-4 shadow-sm transition hover:border-primary/30 hover:shadow-md"
-    >
+    <Link href={`/reports/${report.symbol}`} className="lab-panel p-4">
       <div className="flex flex-wrap items-center gap-2">
         <span className="badge badge-primary badge-soft badge-sm">#{rank}</span>
         <span className="badge badge-ghost badge-sm font-mono">{report.symbol}</span>
         <span className="badge badge-outline badge-sm">{candidate.rankBasis}</span>
       </div>
       <h3 className="mt-2 truncate text-lg font-black tracking-[-0.035em]">{report.company || report.symbol}</h3>
-      <div className="mt-3 grid gap-3 sm:grid-cols-3">
+      <div className="mt-3 grid gap-2 sm:grid-cols-3">
         <Metric label="현재" value={formatPercent(report.currentReturn)} tone={signedTextClass(report.currentReturn)} />
         <Metric label="업사이드" value={formatPercent(report.targetUpsideAtPub)} />
-        <Metric label="진행" value={formatPercent(report.targetProgressPct)} />
+        <Metric label="목표 진행" value={formatPercent(report.targetProgressPct)} />
       </div>
       <div className="mt-3 text-xs text-base-content/55">
         <Money native={report.lastCloseNative} krw={report.lastCloseKrw} currency={report.currency} layout="inline" />
@@ -367,33 +560,14 @@ function FactLine({ label, value, tone = 'text-base-content' }: { label: string;
   );
 }
 
-function MiniSparkline({
-  points,
-  tone,
-}: {
-  points: { value: number | null }[];
-  tone: 'good' | 'bad' | 'warn' | 'accent';
-}) {
-  const values = points.map((point) => point.value).filter((value): value is number => Number.isFinite(value));
-  if (values.length < 2) return <div className="h-8 rounded-xl bg-base-200/70" />;
-  const sampled = values.filter((_, index) => index % Math.max(1, Math.floor(values.length / 36)) === 0).slice(-36);
-  const min = Math.min(...sampled);
-  const max = Math.max(...sampled);
-  const span = max - min || 1;
-  const d = sampled
-    .map((value, index) => {
-      const x = (index / Math.max(1, sampled.length - 1)) * 100;
-      const y = 28 - ((value - min) / span) * 24;
-      return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
-    })
-    .join(' ');
-  const color = tone === 'bad' ? '#ef4444' : tone === 'warn' ? '#f59e0b' : tone === 'good' ? '#16a368' : '#4f7cff';
-  return (
-    <svg className="h-8 w-full overflow-visible" viewBox="0 0 100 32" role="img" aria-label="mini trend">
-      <path d={`${d} L 100 32 L 0 32 Z`} fill={color} fillOpacity="0.08" stroke="none" />
-      <path d={d} fill="none" stroke={color} strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
-    </svg>
-  );
+function reportStatusBadge(report: ReportRow) {
+  if (report.targetDirection === 'downside')
+    return <span className="badge badge-warning badge-soft badge-sm">매도 의견</span>;
+  if ((report.targetUpsideAtPub ?? 0) <= 0)
+    return <span className="badge badge-warning badge-soft badge-sm">비실행</span>;
+  if (report.targetHit) return <span className="badge badge-success badge-soft badge-sm">도달</span>;
+  if (report.expired) return <span className="badge badge-error badge-soft badge-sm">만료</span>;
+  return <span className="badge badge-primary badge-soft badge-sm">진행 중</span>;
 }
 
 function buildDashboardSeries(equity: EquityPoint[]): ReturnSeries[] {
@@ -407,7 +581,53 @@ function buildDashboardSeries(equity: EquityPoint[]): ReturnSeries[] {
   })).filter((series) => series.points.length > 0);
 }
 
+function latestReportBySymbol(reports: ReportRow[]): Map<string, ReportRow> {
+  const map = new Map<string, ReportRow>();
+  for (const report of reports) {
+    const current = map.get(report.symbol);
+    if (!current || report.publicationDate > current.publicationDate) map.set(report.symbol, report);
+  }
+  return map;
+}
+
+function formatAssetTarget(report: ReportRow): string {
+  if (
+    report.targetPriceNative === null ||
+    report.targetPriceNative === undefined ||
+    !Number.isFinite(report.targetPriceNative)
+  ) {
+    return '—';
+  }
+  return `${report.targetPriceNative.toLocaleString('ko-KR', { maximumFractionDigits: 2 })} ${report.currency}`;
+}
+
+function topWeight(holdings: HoldingRow[], count: number): number | null {
+  const total = holdings.reduce((sum, row) => sum + (row.marketValueKrw ?? 0), 0);
+  if (total <= 0) return null;
+  return holdings.slice(0, count).reduce((sum, row) => sum + (row.marketValueKrw ?? 0), 0) / total;
+}
+
+function currencyExposure(holdings: HoldingRow[], totalValue: number): Array<{ currency: string; weight: number }> {
+  if (totalValue <= 0) return [];
+  const grouped = new Map<string, number>();
+  for (const holding of holdings) {
+    grouped.set(
+      holding.currency || 'Other',
+      (grouped.get(holding.currency || 'Other') ?? 0) + (holding.marketValueKrw ?? 0),
+    );
+  }
+  return [...grouped.entries()]
+    .map(([currency, value]) => ({ currency, weight: value / totalValue }))
+    .sort((a, b) => b.weight - a.weight)
+    .slice(0, 5);
+}
+
 function formatNumber(value: number | null | undefined): string {
   if (value === null || value === undefined || !Number.isFinite(value)) return '—';
   return value.toLocaleString('ko-KR', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+}
+
+function formatQuantity(value: number | null | undefined): string {
+  if (value === null || value === undefined || !Number.isFinite(value)) return '—';
+  return value.toLocaleString('ko-KR', { maximumFractionDigits: 4 });
 }

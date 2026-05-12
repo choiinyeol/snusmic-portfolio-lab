@@ -29,13 +29,14 @@ export default function StrategiesPage() {
     <>
       <PageHero
         eyebrow="STRATEGIES"
-        title="Strategy — 수익률·리스크 검증"
+        title="Strategy Lab — 보고서 성과 기반 후보 실험"
         subtitle={disclaimer}
         badges={[
           { label: '후보', value: data.runs.length },
           { label: '스터디', value: data.study_name ?? '—' },
           { label: '범위', value: data.scope ?? bestRun?.scope ?? 'local' },
           { label: '선발', value: bestRun?.sampler ?? '—' },
+          { label: 'Trading', value: 'No live trading' },
         ]}
         actions={
           <>
@@ -67,6 +68,27 @@ export default function StrategiesPage() {
                   : 'neutral'
               }
             />
+            <KpiTile
+              label="Full return"
+              value={formatPercent(
+                typeof bestRun?.metrics.full_money_weighted_return === 'number'
+                  ? bestRun.metrics.full_money_weighted_return
+                  : typeof bestRun?.metrics.money_weighted_return === 'number'
+                    ? bestRun.metrics.money_weighted_return
+                    : null,
+              )}
+              delta="전 구간 재평가"
+              tone="accent"
+            />
+            <KpiTile
+              label="Holdout return"
+              value={formatPercent(
+                typeof bestRun?.metrics.holdout_money_weighted_return === 'number'
+                  ? bestRun.metrics.holdout_money_weighted_return
+                  : null,
+              )}
+              delta="훈련 밖 검증"
+            />
           </div>
         }
       />
@@ -89,15 +111,20 @@ export default function StrategiesPage() {
 
       {importance.parameters?.length ? (
         <Section eyebrow="Sensitivity" title="파라미터 중요도">
-          <article className="card border border-base-300 bg-base-100 shadow-sm">
-            <div className="card-body gap-3 p-5">
+          <article className="lab-panel p-4 md:p-5">
+            <div className="grid gap-3">
               {importance.parameters.slice(0, 8).map((item) => (
                 <div
                   className="grid gap-2 md:grid-cols-[minmax(120px,.35fr)_minmax(0,1fr)_auto] md:items-center"
                   key={item.parameter}
                 >
                   <span className="font-mono text-sm text-base-content/65">{item.parameter}</span>
-                  <progress className="progress progress-primary" value={Math.max(0.01, item.importance)} max={1} />
+                  <div className="h-2 overflow-hidden rounded-full bg-base-200">
+                    <div
+                      className="h-full rounded-full bg-primary"
+                      style={{ width: `${Math.max(1, item.importance * 100)}%` }}
+                    />
+                  </div>
                   <strong className="tabular-nums">{formatPercent(item.importance)}</strong>
                 </div>
               ))}
@@ -161,8 +188,8 @@ function buildStrategySeries(runs: ReturnType<typeof getStrategyRuns>['runs']): 
 
 function StrategyRiskTable({ rows }: { rows: StrategyLeaderboardRow[] }) {
   return (
-    <article className="overflow-x-auto rounded-box border border-base-300 bg-base-100 shadow-sm">
-      <table className="table table-sm w-full">
+    <article className="board-table-wrap">
+      <table className="board-table table table-sm table-density-compact w-full">
         <thead>
           <tr>
             <th>구분</th>
@@ -193,7 +220,12 @@ function StrategyRiskTable({ rows }: { rows: StrategyLeaderboardRow[] }) {
               </td>
               <td className="text-right font-mono tabular-nums">{formatNumber(row.sharpe)}</td>
               <td className="text-right font-mono tabular-nums">{formatNumber(row.sortino)}</td>
-              <td className="text-right font-mono tabular-nums text-error">{formatPercent(row.maxDrawdown)}</td>
+              <td className="text-right font-mono tabular-nums text-error">
+                {formatPercent(row.maxDrawdown)}
+                {(row.maxDrawdown ?? 0) > 0.25 ? (
+                  <span className="ml-1 badge badge-warning badge-soft badge-xs">낙폭 점검</span>
+                ) : null}
+              </td>
               <td className={`text-right font-mono font-bold tabular-nums ${signedTextClass(row.benchmarkExcess)}`}>
                 {formatPercent(row.benchmarkExcess)}
               </td>

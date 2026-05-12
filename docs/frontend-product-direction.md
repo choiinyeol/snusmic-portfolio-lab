@@ -45,6 +45,11 @@ Overview → Portfolio → Research → Strategy → Screener
 
 > 첫 화면에서 30초 안에 이 프로젝트가 무엇이고, 포트폴리오/전략/리포트 상태가 좋은지 나쁜지 이해된다.
 
+
+## 1.2 UI/UX 원칙 문서
+
+구현 전술과 반복 방지 규칙은 [`docs/ui-ux-principles.md`](./ui-ux-principles.md)를 canonical UI/UX contract로 둔다. 특히 표는 기본적으로 정렬/필터/페이지네이션을 갖추고, 같은 데이터를 공유하는 표는 뷰를 분리하지 말고 탭·필터·정렬로 통합한다.
+
 ## 2. 사용자가 전달한 레퍼런스 링크
 
 ### 현재 서비스 / 배포
