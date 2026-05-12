@@ -1,0 +1,87 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
+const repoRoot = path.resolve(process.cwd(), '../..');
+const webRoot = path.join(repoRoot, 'data/web');
+const required = [
+  'manifest.json',
+  'overview.json',
+  'personas.json',
+  'reports.json',
+  'current-holdings.json',
+  'trades.json',
+  'equity-daily.json',
+  'data-quality.json',
+  'strategy-runs.json',
+  'parameter-importance.json',
+];
+
+function fail(message) {
+  throw new Error(`[artifact-check] ${message}`);
+}
+
+function readJson(relativePath) {
+  const full = path.join(webRoot, relativePath);
+  if (!fs.existsSync(full)) fail(`missing required artifact: data/web/${relativePath}`);
+  const text = fs.readFileSync(full, 'utf8');
+  if (/\bNaN\b|\bInfinity\b|-Infinity\b/.test(text)) {
+    fail(`non-JSON numeric sentinel found in data/web/${relativePath}`);
+  }
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    fail(`invalid JSON in data/web/${relativePath}: ${error.message}`);
+  }
+}
+
+function rowCount(data) {
+  if (Array.isArray(data)) return data.length;
+  if (data && typeof data === 'object' && Array.isArray(data.runs)) return data.runs.length;
+  if (data && typeof data === 'object' && Array.isArray(data.trials)) return data.trials.length;
+  return 1;
+}
+
+for (const file of required) {
+  if (!fs.existsSync(path.join(webRoot, file))) fail(`missing required artifact: data/web/${file}`);
+}
+
+const manifest = readJson('manifest.json');
+if (manifest.schema_version !== '1.0.0') fail(`unsupported manifest schema_version: ${manifest.schema_version}`);
+if (manifest.artifact_root !== 'data/web') fail(`unexpected artifact_root: ${manifest.artifact_root}`);
+if (!manifest.report_range?.start || !manifest.report_range?.end) fail('manifest report_range is incomplete');
+if (!manifest.price_range?.start || !manifest.price_range?.end) fail('manifest price_range is incomplete');
+if (!manifest.simulation_range?.start || !manifest.simulation_range?.end) {
+  fail('manifest simulation_range is incomplete');
+}
+
+const countFiles = {
+  reports: 'reports.json',
+  current_holdings: 'current-holdings.json',
+  trades: 'trades.json',
+  equity_daily: 'equity-daily.json',
+  personas: 'personas.json',
+  strategy_runs: 'strategy-runs.json',
+};
+
+for (const [key, file] of Object.entries(countFiles)) {
+  const expected = manifest.row_counts?.[key];
+  if (typeof expected !== 'number') fail(`manifest row_counts.${key} is missing`);
+  const actual = rowCount(readJson(file));
+  if (actual !== expected) fail(`manifest row_counts.${key}=${expected}, actual ${actual} in ${file}`);
+}
+
+const reports = readJson('reports.json');
+const reportIds = new Set();
+for (const [index, report] of reports.entries()) {
+  if (!report.report_id) fail(`reports.json[${index}].report_id is missing`);
+  if (reportIds.has(report.report_id)) fail(`duplicate report_id: ${report.report_id}`);
+  reportIds.add(report.report_id);
+  if (!report.symbol) fail(`reports.json[${index}].symbol is missing`);
+}
+
+const strategyRuns = readJson('strategy-runs.json');
+if (!Array.isArray(strategyRuns.runs) || strategyRuns.runs.length === 0) fail('strategy-runs.json has no runs');
+
+console.log(
+  `[artifact-check] ok schema=${manifest.schema_version} reports=${reports.length} strategy_runs=${strategyRuns.runs.length} price_files=${manifest.price_artifact_count}`,
+);

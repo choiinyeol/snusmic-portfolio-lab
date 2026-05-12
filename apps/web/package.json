@@ -11,7 +11,8 @@
     "format:check": "biome format .",
     "check": "biome check .",
     "check:fix": "biome check --write .",
-    "check:report-ui": "node scripts/check-report-ui.mjs"
+    "check:report-ui": "node scripts/check-report-ui.mjs",
+    "artifact:check": "node scripts/validate-artifacts.mjs"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.2.4",

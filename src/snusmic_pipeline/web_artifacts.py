@@ -4,6 +4,7 @@ import json
 import math
 import shutil
 from dataclasses import dataclass
+from hashlib import sha256
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
@@ -13,6 +14,7 @@ import pandas as pd
 from .currency import currency_for_symbol, normalize_currency
 
 REQUIRED_ARTIFACTS = [
+    "manifest.json",
     "overview.json",
     "personas.json",
     "reports.json",
@@ -278,6 +280,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     _write_json(out / "equity-daily.json", _records(equity_daily))
     _write_download_csvs(out, report_rows, data_quality)
     _write_price_artifacts(prices, artifact_symbols, prices_out)
+    write_web_manifest(out)
 
     written = sorted(
         str(path.relative_to(out)) for path in out.rglob("*") if path.suffix in {".json", ".csv"}
@@ -345,6 +348,86 @@ def _snapshot_json_bytes(root: Path) -> dict[str, bytes]:
         for path in sorted(root.rglob("*"))
         if path.suffix in {".json", ".csv"}
     }
+
+
+def write_web_manifest(out: Path) -> Path:
+    """Write the deterministic web artifact manifest after all exports finish."""
+
+    overview = _read_json(out / "overview.json")
+    _write_json(out / "manifest.json", _build_manifest(out, overview))
+    return out / "manifest.json"
+
+
+def _build_manifest(out: Path, overview: dict[str, Any]) -> dict[str, Any]:
+    simulation_window = overview.get("simulation_window", {}) if isinstance(overview, dict) else {}
+    price_end = simulation_window.get("price_end") if isinstance(simulation_window, dict) else None
+    generated_at = f"{price_end}T00:00:00+09:00" if price_end else None
+    artifacts = sorted(
+        str(path.relative_to(out))
+        for path in out.rglob("*")
+        if path.suffix in {".json", ".csv"} and path.name != "manifest.json"
+    )
+    top_level_artifacts = [name for name in artifacts if not name.startswith("prices/")]
+    row_counts = {
+        "reports": _json_row_count(out / "reports.json"),
+        "current_holdings": _json_row_count(out / "current-holdings.json"),
+        "monthly_holdings": _json_row_count(out / "monthly-holdings.json"),
+        "trades": _json_row_count(out / "trades.json"),
+        "position_episodes": _json_row_count(out / "position-episodes.json"),
+        "equity_daily": _json_row_count(out / "equity-daily.json"),
+        "personas": _json_row_count(out / "personas.json"),
+    }
+    for optional_name, artifact_name in (
+        ("strategy_runs", "strategy-runs.json"),
+        ("optuna_trials", "optuna-trials.json"),
+        ("parameter_importance", "parameter-importance.json"),
+    ):
+        artifact_path = out / artifact_name
+        if artifact_path.exists():
+            row_counts[optional_name] = _json_row_count(artifact_path)
+    report_counts = overview.get("report_counts", {}) if isinstance(overview, dict) else {}
+    target_stats = overview.get("target_stats", {}) if isinstance(overview, dict) else {}
+    return {
+        "schema_version": "1.0.0",
+        "generated_at": generated_at,
+        "artifact_root": "data/web",
+        "report_range": _range(simulation_window, "report_start", "report_end"),
+        "price_range": _range(simulation_window, "price_start", "price_end"),
+        "simulation_range": _range(simulation_window, "report_start", "price_end"),
+        "row_counts": row_counts,
+        "data_quality": {
+            "total_reports": report_counts.get("web_report_rows"),
+            "reports_with_prices": report_counts.get("price_matched_reports"),
+            "missing_price_symbols": report_counts.get("missing_price_symbols"),
+            "target_hit_count": target_stats.get("target_hit_count"),
+        },
+        "artifacts": top_level_artifacts,
+        "price_artifact_count": sum(1 for name in artifacts if name.startswith("prices/")),
+        "checksums": {
+            name: sha256((out / name).read_bytes()).hexdigest()
+            for name in top_level_artifacts
+            if (out / name).is_file()
+        },
+    }
+
+
+def _range(mapping: Any, start_key: str, end_key: str) -> dict[str, Any]:
+    if not isinstance(mapping, dict):
+        return {"start": None, "end": None}
+    return {"start": mapping.get(start_key), "end": mapping.get(end_key)}
+
+
+def _json_row_count(path: Path) -> int:
+    if not path.exists():
+        return 0
+    data = _read_json(path)
+    if isinstance(data, list):
+        return len(data)
+    if isinstance(data, dict) and isinstance(data.get("runs"), list):
+        return len(data["runs"])
+    if isinstance(data, dict) and isinstance(data.get("trials"), list):
+        return len(data["trials"])
+    return 1
 
 
 def _records(df: pd.DataFrame) -> list[dict[str, Any]]:

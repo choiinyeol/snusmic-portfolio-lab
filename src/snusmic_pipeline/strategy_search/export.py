@@ -8,6 +8,8 @@ from typing import Any, cast
 
 import pandas as pd
 
+from snusmic_pipeline.web_artifacts import write_web_manifest
+
 
 def export_strategy_artifacts(
     trials_csv: Path, out_dir: Path, *, study_name: str = "smic-follower-v1", top_n: int = 20
@@ -54,6 +56,8 @@ def export_strategy_artifacts(
         },
     )
     _write_json(paths["parameter_importance"], importance)
+    if (out_dir / "overview.json").exists():
+        write_web_manifest(out_dir)
     return paths
 
 

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { SidebarNav, type SidebarNavItem } from '@/components/ui/SidebarNav';
-import { getOverview } from '@/lib/artifacts';
+import { getArtifactManifest, getOverview } from '@/lib/artifacts';
 import './globals.css';
 import './reports/report-detail.css';
 
@@ -21,6 +21,7 @@ const NAV: SidebarNavItem[] = [
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const overview = getOverview();
+  const manifest = getArtifactManifest();
   const snapshotDate = overview.simulation_window?.price_end ?? overview.simulation_window?.report_end ?? '—';
   return (
     <html lang="ko" data-theme="snusmic" data-scroll-behavior="smooth">
@@ -54,7 +55,25 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 </div>
                 <div>
                   <dt>데이터</dt>
-                  <dd className="font-bold text-base-content">Static Artifacts</dd>
+                  <dd className="font-bold text-base-content">Static Artifacts · v{manifest.schema_version}</dd>
+                </div>
+                <div>
+                  <dt>리포트 범위</dt>
+                  <dd className="font-mono font-bold text-base-content">
+                    {manifest.report_range.start} → {manifest.report_range.end}
+                  </dd>
+                </div>
+                <div>
+                  <dt>가격 범위</dt>
+                  <dd className="font-mono font-bold text-base-content">
+                    {manifest.price_range.start} → {manifest.price_range.end}
+                  </dd>
+                </div>
+                <div>
+                  <dt>아티팩트</dt>
+                  <dd className="font-bold text-base-content">
+                    {manifest.artifacts.length} files · reports {manifest.row_counts.reports}
+                  </dd>
                 </div>
                 <div>
                   <dt>거래</dt>

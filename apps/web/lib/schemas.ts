@@ -92,6 +92,106 @@ export const RawEquityPointSchema = z
   })
   .passthrough();
 
+export const WebPersonaSchema = z
+  .object({
+    persona: z.string(),
+    label: z.string().optional(),
+    final_equity_krw: NullableNumber,
+    total_contributed_krw: NullableNumber.optional(),
+    cumulative_deposits_krw: NullableNumber.optional(),
+    net_profit_krw: NullableNumber,
+    money_weighted_return: NullableNumber.optional(),
+    cagr: NullableNumber.optional(),
+    max_drawdown: NullableNumber,
+    trade_count: NullableNumber,
+    open_positions: NullableNumber.optional(),
+  })
+  .passthrough();
+
+export const WebOverviewSchema = z
+  .object({
+    generated_from: z.record(z.string(), z.string()).optional(),
+    report_counts: z.record(z.string(), z.number()).optional(),
+    target_stats: z.record(z.string(), NullableNumber).optional(),
+    baseline_personas: z.array(WebPersonaSchema),
+    simulation_window: z.record(z.string(), z.union([z.string(), z.null()])).optional(),
+  })
+  .passthrough();
+
+export const WebDataQualitySchema = z
+  .object({
+    coverage: z.record(z.string(), z.number()).optional(),
+    extraction_quality: z.record(z.string(), z.unknown()).optional(),
+    missing_symbols: z
+      .array(
+        z
+          .object({
+            symbol: z.string(),
+            company: z.string().optional(),
+            reason: z.string().optional(),
+          })
+          .passthrough(),
+      )
+      .optional(),
+  })
+  .passthrough();
+
+export const StrategyRunSchema = z
+  .object({
+    run_id: z.string(),
+    trial_number: z.number().optional(),
+    label: z.string(),
+    scope: z.string().optional(),
+    sampler: z.string().optional(),
+    params: z.record(z.string(), z.unknown()).optional(),
+    metrics: z.record(z.string(), z.union([z.number(), z.null(), z.undefined()])),
+    warnings: z.array(z.string()).optional(),
+  })
+  .passthrough();
+
+export const StrategyRunsSchema = z
+  .object({
+    schema_version: z.number().optional(),
+    study_name: z.string().optional(),
+    scope: z.string().optional(),
+    disclaimer: z.string().optional(),
+    best_run_id: z.string().optional(),
+    runs: z.array(StrategyRunSchema),
+  })
+  .passthrough();
+
+export const ParameterImportanceSchema = z
+  .object({
+    schema_version: z.number().optional(),
+    study_name: z.string().optional(),
+    method: z.string().optional(),
+    parameters: z.array(z.object({ parameter: z.string(), importance: z.number() }).passthrough()).optional(),
+  })
+  .passthrough();
+
+export const ArtifactManifestSchema = z
+  .object({
+    schema_version: z.string(),
+    generated_at: z.string().nullable(),
+    artifact_root: z.string(),
+    report_range: z.object({ start: NullableString, end: NullableString }),
+    price_range: z.object({ start: NullableString, end: NullableString }),
+    simulation_range: z.object({ start: NullableString, end: NullableString }),
+    row_counts: z.record(z.string(), z.number()),
+    data_quality: z
+      .object({
+        total_reports: NullableNumber.optional(),
+        reports_with_prices: NullableNumber.optional(),
+        missing_price_symbols: NullableNumber.optional(),
+        target_hit_count: NullableNumber.optional(),
+      })
+      .passthrough(),
+    artifacts: z.array(z.string()),
+    price_artifact_count: z.number(),
+    checksums: z.record(z.string(), z.string()),
+  })
+  .passthrough();
+
 /** Parse a JSON array against a zod schema and throw a build-time-friendly
  * error when validation fails. The error names the file and the row index +
  * field path so a Python-side schema drift is unambiguous in CI logs. */
@@ -112,4 +212,17 @@ export function parseRows<T>(label: string, schema: z.ZodType<T>, raw: unknown):
     }
     return result.data;
   });
+}
+
+export function parseArtifact<T>(label: string, schema: z.ZodType<T>, raw: unknown): T {
+  const result = schema.safeParse(raw);
+  if (!result.success) {
+    const issue = result.error.issues[0];
+    const path = issue?.path.join('.') || '<root>';
+    throw new Error(
+      `Schema mismatch in ${label}.${path}: ${issue?.message ?? 'unknown'} ` +
+        `(code: ${issue?.code ?? 'unknown'}). Rebuild data/web or update lib/schemas.ts to match the artifact contract.`,
+    );
+  }
+  return result.data;
 }

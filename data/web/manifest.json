@@ -1,0 +1,82 @@
+{
+  "artifact_root": "data/web",
+  "artifacts": [
+    "current-holdings.json",
+    "data-quality-download.csv",
+    "data-quality.json",
+    "equity-daily.json",
+    "insights.json",
+    "missing-symbols.json",
+    "monthly-holdings.json",
+    "optuna-trials.json",
+    "overview.json",
+    "parameter-importance.json",
+    "personas.json",
+    "position-episodes.json",
+    "report-detail-metrics.json",
+    "report-rankings.json",
+    "reports.json",
+    "return-windows.json",
+    "strategy-runs.json",
+    "table-download-reports.csv",
+    "table-download-strategies.csv",
+    "target-hit-distribution.json",
+    "trades.json"
+  ],
+  "checksums": {
+    "current-holdings.json": "01fbeb32d6d578689e7773f721dfc38ef3ef5cf5971e458b776d914c2decaabe",
+    "data-quality-download.csv": "ca7f934a6b3fa8912033689acfee50812f02bb02851d03eed268a1cb9d5ba524",
+    "data-quality.json": "482975246b00224f9f018444859569e532e5c7776b32ea76aec5cd08509762cd",
+    "equity-daily.json": "edb7b7ec9affd1756df35c4e3fca5dc2406685895e3214ffff0c33e5f27da3a7",
+    "insights.json": "0d2d5eea7d74617f4dadb0bcfb249e82f9b751917d9870ab10e58c1d05d76c83",
+    "missing-symbols.json": "76e0e0e7bd8a1632afc95ad3663c599b99c261ed711ea4e04a51f88942b71254",
+    "monthly-holdings.json": "2a2ad67c65c386fbcc6cdc9cfd96baa8f1b4b034cc167595b59db41cf237956c",
+    "optuna-trials.json": "e3bec071dbcf8c5f5118118a3f105eddf62bc5aeed196489bbed9ff4ff04c09e",
+    "overview.json": "4724120e8c00f19da683c3fc6c77aac0700cd51968ccc2cf0c28049f7f4aa08d",
+    "parameter-importance.json": "6eae368320500aadc28bf2a80d4865f974f5f5e47f31b1b22a847e562cc16211",
+    "personas.json": "2f70f6199a465002de2ba0344fbd06ae5f7d4597f86c40e44137d9850455d566",
+    "position-episodes.json": "f48686c52dc0b8127ed361de7392af79be45cb3847e8c0b9fa980766d55f1a79",
+    "report-detail-metrics.json": "7858c4c48942acf1c0d6eadd647047b39df5ae84661bfae0b7532fd5cb4a06fe",
+    "report-rankings.json": "7bd78a27bfbd84526cd191cd75b939311defb506fe4bccaf1cdcc0b862c77099",
+    "reports.json": "c9f21e1351313213a8cb7b095a84cdf89c8729c937a417e57a7ed8bcb6fab40a",
+    "return-windows.json": "6b574f4bc3828033a514b4d8019f6810daeb415e332790abda039e287f428ebd",
+    "strategy-runs.json": "960ad6ec0255cd30d626381f81590765685765d12d7fe20fff2f2f0619d37dfb",
+    "table-download-reports.csv": "0a9ea1ef6fafe9c0a37af70b28757f3c6c0f2e2f46103d8c6cc3433bfa2982f8",
+    "table-download-strategies.csv": "f17c120963849d5fe9a0439352dcc999ec0560874c708e2d56fc531209ab4ff0",
+    "target-hit-distribution.json": "06ac36eef2bfff20ecbedc7d71fc10d505b67cb955cde9f3baf3d7c494de30c0",
+    "trades.json": "08bad46bffc59351e6cf047c46230e0931ffeb78fd6bfbcd6007b57e8cea2391"
+  },
+  "data_quality": {
+    "missing_price_symbols": 5,
+    "reports_with_prices": 215,
+    "target_hit_count": 92,
+    "total_reports": 221
+  },
+  "generated_at": "2026-05-11T00:00:00+09:00",
+  "price_artifact_count": 212,
+  "price_range": {
+    "end": "2026-05-11",
+    "start": "2018-08-03"
+  },
+  "report_range": {
+    "end": "2026-05-06",
+    "start": "2020-10-31"
+  },
+  "row_counts": {
+    "current_holdings": 71,
+    "equity_daily": 18109,
+    "monthly_holdings": 5450,
+    "optuna_trials": 5,
+    "parameter_importance": 1,
+    "personas": 13,
+    "position_episodes": 1359,
+    "reports": 221,
+    "strategy_runs": 5,
+    "trades": 6077
+  },
+  "schema_version": "1.0.0",
+  "simulation_range": {
+    "end": "2026-05-11",
+    "start": "2020-10-31"
+  }
+}

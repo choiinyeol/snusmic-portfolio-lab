@@ -2,11 +2,17 @@ import 'server-only';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
+  ArtifactManifestSchema,
+  ParameterImportanceSchema,
+  parseArtifact,
   parseRows,
   RawEquityPointSchema,
   RawHoldingRowSchema,
   RawReportRowSchema,
   RawTradeRowSchema,
+  StrategyRunsSchema,
+  WebDataQualitySchema,
+  WebOverviewSchema,
 } from '@/lib/schemas';
 
 const repoRoot = path.resolve(/* turbopackIgnore: true */ process.cwd(), '../..');
@@ -178,15 +184,16 @@ export type DataQuality = {
 
 export type WebPersona = {
   persona: string;
-  label: string;
-  final_equity_krw: number;
-  total_contributed_krw?: number;
-  net_profit_krw: number;
-  money_weighted_return: number;
-  cagr: number;
-  max_drawdown: number;
-  trade_count: number;
-  open_positions: number;
+  label?: string;
+  final_equity_krw: number | null;
+  total_contributed_krw?: number | null;
+  cumulative_deposits_krw?: number | null;
+  net_profit_krw: number | null;
+  money_weighted_return?: number | null;
+  cagr?: number | null;
+  max_drawdown: number | null;
+  trade_count: number | null;
+  open_positions?: number | null;
 };
 
 export type WebReportRankingRow = {
@@ -292,6 +299,25 @@ export type WebDataQuality = {
   coverage?: Record<string, number>;
   extraction_quality?: Record<string, unknown>;
   missing_symbols?: { symbol: string; company?: string; reason?: string }[];
+};
+
+export type ArtifactManifest = {
+  schema_version: string;
+  generated_at: string | null;
+  artifact_root: string;
+  report_range: { start: string | null; end: string | null };
+  price_range: { start: string | null; end: string | null };
+  simulation_range: { start: string | null; end: string | null };
+  row_counts: Record<string, number>;
+  data_quality: {
+    total_reports?: number | null;
+    reports_with_prices?: number | null;
+    missing_price_symbols?: number | null;
+    target_hit_count?: number | null;
+  };
+  artifacts: string[];
+  price_artifact_count: number;
+  checksums: Record<string, string>;
 };
 
 export type Insight = {
@@ -639,11 +665,19 @@ export function getDataQuality(): DataQuality {
 }
 
 export function getWebDataQuality(): WebDataQuality {
-  return readRequiredJson<WebDataQuality>('data/web/data-quality.json');
+  return parseArtifact(
+    'data-quality.json',
+    WebDataQualitySchema,
+    readRequiredJson<unknown>('data/web/data-quality.json'),
+  );
 }
 
 export function getOverview(): WebOverview {
-  return readRequiredJson<WebOverview>('data/web/overview.json');
+  return parseArtifact('overview.json', WebOverviewSchema, readRequiredJson<unknown>('data/web/overview.json'));
+}
+
+export function getArtifactManifest(): ArtifactManifest {
+  return parseArtifact('manifest.json', ArtifactManifestSchema, readRequiredJson<unknown>('data/web/manifest.json'));
 }
 
 export function getReportRankings(): WebReportRankings {
@@ -662,11 +696,19 @@ export function getInsights(): Insight[] {
 }
 
 export function getStrategyRuns(): StrategyRunsArtifact {
-  return JSON.parse(readText('data/web/strategy-runs.json')) as StrategyRunsArtifact;
+  return parseArtifact(
+    'strategy-runs.json',
+    StrategyRunsSchema,
+    readRequiredJson<unknown>('data/web/strategy-runs.json'),
+  );
 }
 
 export function getParameterImportance(): ParameterImportanceArtifact {
-  return JSON.parse(readText('data/web/parameter-importance.json')) as ParameterImportanceArtifact;
+  return parseArtifact(
+    'parameter-importance.json',
+    ParameterImportanceSchema,
+    readRequiredJson<unknown>('data/web/parameter-importance.json'),
+  );
 }
 
 export function getDownloadHref(fileName: string): string {

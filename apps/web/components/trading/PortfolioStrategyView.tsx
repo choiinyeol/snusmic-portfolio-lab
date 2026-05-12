@@ -18,6 +18,7 @@ type Props = {
   episodes: PositionEpisodeRow[];
   personas: string[];
   personaLabels: Record<string, string>;
+  personaKinds: Record<string, string>;
   capitalByPersona: Record<string, number>;
   reportSymbolsById: Record<string, string>;
   targetsBySymbol: Record<string, ReportTargetDigest>;
@@ -33,6 +34,7 @@ export function PortfolioStrategyView({
   episodes,
   personas,
   personaLabels,
+  personaKinds,
   capitalByPersona,
   reportSymbolsById,
   targetsBySymbol,
@@ -73,7 +75,7 @@ export function PortfolioStrategyView({
     <div className="grid min-w-0 gap-4">
       <div className="lab-panel p-3">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
-          <span className="snapshot-pill">Persona</span>
+          <span className="snapshot-pill">Strategy selector</span>
           <div
             className="tabs tabs-box min-w-0 flex-1 overflow-x-auto bg-base-200"
             role="tablist"
@@ -89,13 +91,17 @@ export function PortfolioStrategyView({
                 onClick={() => setPersona(item)}
               >
                 {personaLabels[item] ?? item}
+                <span className="ml-2 badge badge-ghost badge-xs">
+                  {personaKinds[item] === 'benchmark' ? 'BM' : '전략'}
+                </span>
               </button>
             ))}
           </div>
         </div>
         <p className="m-0 mt-2 text-xs text-base-content/55">
           선택된 원장: <strong className="text-base-content">{personaLabels[persona] ?? persona}</strong> · URL의
-          strategy 파라미터와 동기화됩니다.
+          strategy 파라미터와 동기화됩니다. BM은 비교 기준선이고, 전략 표시는 사용자가 선택해 검토할 수 있는 고유
+          원장입니다.
         </p>
       </div>
 
