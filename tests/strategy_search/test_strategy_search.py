@@ -10,7 +10,7 @@ from pydantic import ValidationError
 from snusmic_pipeline.strategy_search.configs import ParametricSmicFollowerConfig
 from snusmic_pipeline.strategy_search.export import export_strategy_artifacts
 from snusmic_pipeline.strategy_search.objective import score_metrics
-from snusmic_pipeline.strategy_search.strategy import evaluate_strategy, run_random_search
+from snusmic_pipeline.strategy_search.strategy import evaluate_strategy, run_grid_search, run_random_search
 
 
 def _reports() -> pd.DataFrame:
@@ -80,6 +80,14 @@ def test_random_search_is_deterministic() -> None:
     second = run_random_search(_reports(), baseline_summary=_summary(), trials=5, seed=7)
     assert first == second
     assert first[0]["score"] >= first[-1]["score"]
+
+
+def test_grid_search_is_interpretable_and_sorted() -> None:
+    rows = run_grid_search(_reports(), baseline_summary=_summary())
+    assert rows
+    assert {row["sampler"] for row in rows} == {"grid-search"}
+    assert rows[0]["score"] >= rows[-1]["score"]
+    assert len({row["trial_number"] for row in rows}) == len(rows)
 
 
 def test_export_strategy_artifacts(tmp_path: Path) -> None:

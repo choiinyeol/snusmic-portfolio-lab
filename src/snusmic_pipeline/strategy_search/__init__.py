@@ -2,7 +2,7 @@
 
 from .configs import ParametricSmicFollowerConfig, SearchSpace
 from .objective import ObjectiveWeights, score_metrics
-from .strategy import StrategyMetrics, evaluate_strategy, run_random_search
+from .strategy import StrategyMetrics, evaluate_strategy, run_grid_search, run_random_search
 
 __all__ = [
     "ObjectiveWeights",
@@ -10,6 +10,7 @@ __all__ = [
     "SearchSpace",
     "StrategyMetrics",
     "evaluate_strategy",
+    "run_grid_search",
     "run_random_search",
     "score_metrics",
 ]

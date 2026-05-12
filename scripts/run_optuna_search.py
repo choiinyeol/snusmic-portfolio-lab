@@ -1,7 +1,8 @@
 """Run local-only strategy search for SNUSMIC follower variants.
 
-The sampler is explicit: use deterministic random search by default, or request
-Optuna and fail fast if the optional dependency is unavailable.
+The sampler is explicit: use deterministic grid search by default, request
+random sampling for a seeded smoke run, or request Optuna and fail fast if the
+optional dependency is unavailable.
 """
 
 from __future__ import annotations
@@ -17,7 +18,11 @@ sys.path.insert(0, str(ROOT / "src"))
 import pandas as pd  # noqa: E402
 
 from snusmic_pipeline.strategy_search.configs import ParametricSmicFollowerConfig  # noqa: E402
-from snusmic_pipeline.strategy_search.strategy import evaluate_strategy, run_random_search  # noqa: E402
+from snusmic_pipeline.strategy_search.strategy import (  # noqa: E402
+    evaluate_strategy,
+    run_grid_search,
+    run_random_search,
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -35,8 +40,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--out", type=Path, default=ROOT / "data" / "optuna")
     parser.add_argument(
         "--sampler",
-        choices=("random", "optuna"),
-        default="random",
+        choices=("grid", "random", "optuna"),
+        default="grid",
         help="Search sampler. Optuna requires the optional optuna package and fails fast if missing.",
     )
     return parser.parse_args()
@@ -73,6 +78,8 @@ def main() -> int:
 def _run_search(
     args: argparse.Namespace, report_performance: pd.DataFrame, baseline_summary: pd.DataFrame | None
 ) -> list[dict[str, Any]]:
+    if args.sampler == "grid":
+        return run_grid_search(report_performance, baseline_summary=baseline_summary)
     if args.sampler == "random":
         return run_random_search(
             report_performance, baseline_summary=baseline_summary, trials=args.trials, seed=args.seed

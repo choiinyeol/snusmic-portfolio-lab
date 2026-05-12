@@ -68,7 +68,7 @@ export default function StrategiesPage() {
         }
       />
 
-      <Section eyebrow="Curve" title="후보별 재구성 누적 수익률 비교">
+      <Section eyebrow="Curve" title="후보별 가격 경로 기반 재구성 수익률">
         <article className="card border border-base-300 bg-base-100 shadow-sm">
           <div className="card-body p-3 md:p-4">
             <CumulativeReturnChart series={chartSeries} />

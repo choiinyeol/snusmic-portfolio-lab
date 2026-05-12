@@ -25,7 +25,7 @@ def export_strategy_artifacts(
         "schema_version": 1,
         "study_name": study_name,
         "scope": "in-sample",
-        "disclaimer": "Local-only research artifact. Optuna/random search is not run by the web app.",
+        "disclaimer": "Local-only research artifact. Strategy search is generated offline and is not run by the web app.",
         "best_run_id": _run_id(study_name, int(best["trial_number"])),
         "runs": [
             _strategy_run(study_name, cast(dict[str, Any], row))

@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import random
 from dataclasses import dataclass
-from typing import Any
+from itertools import product
+from typing import Any, cast
 
 import pandas as pd
 from pydantic import BaseModel, ConfigDict
@@ -147,6 +148,19 @@ def run_random_search(
     return sorted(rows, key=lambda row: float(row["score"]), reverse=True)
 
 
+def run_grid_search(
+    report_performance: pd.DataFrame,
+    *,
+    baseline_summary: pd.DataFrame | None = None,
+) -> list[dict[str, Any]]:
+    """Run a deterministic, interpretable grid of strategy candidates."""
+    rows: list[dict[str, Any]] = []
+    for trial_number, config in enumerate(_grid_configs()):
+        metrics = evaluate_strategy(config, report_performance, baseline_summary=baseline_summary)
+        rows.append(_trial_row(trial_number, config, metrics, sampler="grid-search"))
+    return sorted(rows, key=lambda row: float(row["score"]), reverse=True)
+
+
 def _select_reports(frame: pd.DataFrame, config: ParametricSmicFollowerConfig) -> pd.DataFrame:
     if frame.empty:
         return frame.copy()
@@ -251,6 +265,45 @@ def _sample_config(rng: random.Random) -> ParametricSmicFollowerConfig:
         exclude_missing_confidence_rows=rng.choice([False, True]),
         require_publication_price=rng.choice([False, True]),
     )
+
+
+def _grid_configs() -> list[ParametricSmicFollowerConfig]:
+    configs: list[ParametricSmicFollowerConfig] = []
+    for (
+        min_upside,
+        max_report_age_days,
+        stop_loss_pct,
+        take_profit_pct,
+        max_positions,
+        weighting,
+        universe,
+    ) in product(
+        [0.10, 0.20, 0.30, 0.50],
+        [180, 365, 730, 1095],
+        [0.10, 0.20, 0.30],
+        [0.50, 1.00, 2.00],
+        [10, 20, 40],
+        ["equal", "inverse_volatility"],
+        ["all", "domestic", "overseas"],
+    ):
+        configs.append(
+            ParametricSmicFollowerConfig(
+                target_hit_multiplier=1.0,
+                min_target_upside_at_pub=min_upside,
+                max_target_upside_at_pub=5.0,
+                max_report_age_days=max_report_age_days,
+                time_loss_days=min(max_report_age_days, 1000),
+                stop_loss_pct=stop_loss_pct,
+                take_profit_pct=take_profit_pct,
+                rebalance="monthly",
+                max_positions=max_positions,
+                weighting=cast(Any, weighting),
+                universe=cast(Any, universe),
+                exclude_missing_confidence_rows=True,
+                require_publication_price=True,
+            )
+        )
+    return configs
 
 
 def _sample_step(rng: random.Random, low: float, high: float, step: float) -> float:
