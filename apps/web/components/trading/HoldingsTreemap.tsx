@@ -23,7 +23,7 @@ export function HoldingsTreemap({ holdings }: Props) {
   const baseCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const overlayCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  const [size, setSize] = useState({ width: 0, height: 220 });
+  const [size, setSize] = useState({ width: 0, height: 340 });
   const [tooltip, setTooltip] = useState<Tooltip>(null);
   const hoveredRef = useRef<LeafNode | null>(null);
 
@@ -179,14 +179,14 @@ function drawHeatmap(
     if (w < 56 || h < 36) continue;
     ctx.fillStyle = 'white';
     ctx.textBaseline = 'top';
-    ctx.font = '700 12px system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.font = '700 13px system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
     ctx.fillText(leaf.data.company || leaf.data.symbol, x + 8, y + 6, w - 16);
     if (w >= 70 && h >= 50) {
       ctx.font = '500 11px system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
       ctx.fillText(formatPercent(leaf.data.weight), x + 8, y + 22, w - 16);
     }
     if (w >= 100 && h >= 70) {
-      ctx.fillStyle = 'rgba(255,255,255,0.78)';
+      ctx.fillStyle = 'rgba(255,255,255,0.86)';
       ctx.font = '500 11px system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
       ctx.fillText(formatPercent(leaf.data.unrealizedReturn), x + 8, y + 38, w - 16);
     }

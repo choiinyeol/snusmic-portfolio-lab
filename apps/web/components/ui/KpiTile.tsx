@@ -30,15 +30,18 @@ export function KpiTile({
   const toneClass = toneClasses[tone];
   return (
     <article
-      className={`kpi-tile card bg-base-100 text-base-content border ${toneClass.border} shadow-sm ${emphasis ? 'kpi-tile--emphasis ring-1 ring-primary/10' : ''}`}
+      data-tone={tone}
+      className={`kpi-tile card overflow-hidden bg-base-100/95 text-base-content border ${toneClass.border} shadow-sm ${emphasis ? 'kpi-tile--emphasis ring-1 ring-primary/10' : ''}`}
     >
-      <div className="card-body min-w-0 gap-2 p-5">
+      <div className="card-body min-w-0 gap-2 p-4">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
-          <div className="kpi-tile__label stat-title min-w-0 text-base-content/60">{label}</div>
+          <div className="kpi-tile__label min-w-0 font-semibold uppercase tracking-[0.08em] text-base-content/55">
+            {label}
+          </div>
           {tone !== 'neutral' ? <span className={`badge badge-sm ${toneClass.badge}`}>{toneLabel(tone)}</span> : null}
         </div>
-        <div className={`kpi-tile__value stat-value leading-none ${toneClass.value}`}>{value}</div>
-        {delta ? <div className="kpi-tile__delta stat-desc font-semibold text-base-content/70">{delta}</div> : null}
+        <div className={`kpi-tile__value ${toneClass.value}`}>{value}</div>
+        {delta ? <div className="kpi-tile__delta font-semibold text-base-content/65">{delta}</div> : null}
         {caption ? (
           <div className="kpi-tile__caption text-sm leading-relaxed text-base-content/55">{caption}</div>
         ) : null}
