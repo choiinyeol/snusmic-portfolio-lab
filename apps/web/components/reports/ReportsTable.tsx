@@ -20,6 +20,7 @@ type HitFilter = 'all' | 'hit' | 'open' | 'expired';
 type ReturnFilter = 'all' | 'positive' | 'negative';
 const PAGE_SIZE_OPTIONS = [25, 50, 100, 200] as const;
 type PageSize = (typeof PAGE_SIZE_OPTIONS)[number];
+type SortPresetId = 'recent' | 'target-hit' | 'top-return' | 'near-target' | 'upside';
 
 type ReportsTableProps = {
   reports: ReportRow[];
@@ -56,6 +57,7 @@ const csvHeaders: Array<[string, (report: ReportRow) => string | number | boolea
 
 export function ReportsTable({ reports }: ReportsTableProps) {
   const [sorting, setSorting] = useState<SortingState>([{ id: 'publicationDate', desc: true }]);
+  const [activePreset, setActivePreset] = useState<SortPresetId>('recent');
   const [globalFilter, setGlobalFilter] = useState('');
   const [exchangeFilter, setExchangeFilter] = useState('all');
   const [hitFilter, setHitFilter] = useState<HitFilter>('all');
@@ -139,7 +141,7 @@ export function ReportsTable({ reports }: ReportsTableProps) {
       },
       {
         accessorKey: 'targetProgressPct',
-        header: () => <span title="현재가 ÷ 목표가 (목표 도달 시 100%)">달성률</span>,
+        header: () => <span title="(현재가 - 진입가) / (목표가 - 진입가), 목표 도달 시 100%">달성률</span>,
         cell: ({ row }) => {
           const value = row.original.targetProgressPct;
           if (value === null) return '—';
@@ -198,6 +200,18 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         },
       },
       {
+        accessorKey: 'daysToTarget',
+        header: '도달 소요일',
+        cell: ({ row }) =>
+          row.original.targetHit ? (
+            <span className="font-mono font-bold text-success tabular-nums">
+              {formatDays(row.original.daysToTarget)}
+            </span>
+          ) : (
+            <span className="text-base-content/35">—</span>
+          ),
+      },
+      {
         accessorKey: 'lastCloseDate',
         header: () => <span title="만료 행은 만료일 = 최근 가격일">최근 가격일</span>,
       },
@@ -236,12 +250,61 @@ export function ReportsTable({ reports }: ReportsTableProps) {
 
   const resetPage = () => setPage(0);
 
+  const applyPreset = (preset: SortPresetId) => {
+    setActivePreset(preset);
+    setReturnFilter('all');
+    switch (preset) {
+      case 'recent':
+        setHitFilter('all');
+        setSorting([{ id: 'publicationDate', desc: true }]);
+        break;
+      case 'target-hit':
+        setHitFilter('hit');
+        setSorting([{ id: 'daysToTarget', desc: false }]);
+        break;
+      case 'top-return':
+        setHitFilter('all');
+        setSorting([{ id: 'currentReturn', desc: true }]);
+        break;
+      case 'near-target':
+        setHitFilter('open');
+        setSorting([{ id: 'targetRemainingPct', desc: false }]);
+        break;
+      case 'upside':
+        setHitFilter('all');
+        setSorting([{ id: 'targetUpsideAtPub', desc: true }]);
+        break;
+    }
+    setPage(0);
+  };
+
   return (
     <section className="report-table-panel card w-full min-w-0 rounded-box bg-base-100 border border-base-300 shadow-sm">
       <div
         className="table-toolbar card-body sticky top-0 z-10 grid gap-3 rounded-t-box border-b border-base-300 bg-base-100/95 p-4 backdrop-blur md:grid-cols-[minmax(220px,1.3fr)_repeat(3,minmax(140px,.7fr))_auto]"
         aria-label="리포트 표 필터"
       >
+        <div className="md:col-span-full">
+          <div className="flex flex-wrap items-center gap-2" aria-label="관심별 정렬 프리셋">
+            <span className="mr-1 text-xs font-black uppercase tracking-[0.16em] text-base-content/45">
+              Sort presets
+            </span>
+            {SORT_PRESETS.map((preset) => (
+              <button
+                key={preset.id}
+                className={`btn btn-xs ${activePreset === preset.id ? 'btn-primary' : 'btn-ghost'}`}
+                type="button"
+                title={preset.caption}
+                onClick={() => applyPreset(preset.id)}
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-base-content/55">
+            모든 프리셋은 동일한 컬럼을 사용합니다. 관심별 뷰는 별도 표가 아니라 정렬·필터 조건만 바꿉니다.
+          </p>
+        </div>
         <label>
           <span>검색</span>
           <input
@@ -408,6 +471,14 @@ function sortIndicator(direction: false | 'asc' | 'desc'): string {
   if (direction === 'desc') return ' ↓';
   return ' ↕';
 }
+
+const SORT_PRESETS: Array<{ id: SortPresetId; label: string; caption: string }> = [
+  { id: 'recent', label: '최근 발간', caption: '발간일 최신순' },
+  { id: 'target-hit', label: '목표 도달', caption: '목표를 달성한 리포트를 도달 소요일 오름차순으로 표시' },
+  { id: 'top-return', label: '현재 수익 상위', caption: '현재 수익률 내림차순' },
+  { id: 'near-target', label: '목표 근접', caption: '진행 중 리포트 중 목표 잔여 변화율이 낮은 순서' },
+  { id: 'upside', label: '업사이드 상위', caption: '발간 시점 제시 상승여력 내림차순' },
+];
 
 function downloadCsv(filename: string, rows: ReportRow[]) {
   const csv = [

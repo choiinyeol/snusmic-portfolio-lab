@@ -1,5 +1,0 @@
-{
-  "study": "smic-follower-v1",
-  "trials": 5,
-  "sampler": "robust-grid"
-}

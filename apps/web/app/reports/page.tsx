@@ -1,4 +1,3 @@
-import { RankingTabs } from '@/components/reports/RankingTabs';
 import { ReportsTable } from '@/components/reports/ReportsTable';
 import { KpiTile } from '@/components/ui/KpiTile';
 import { PageHero } from '@/components/ui/PageHero';
@@ -16,8 +15,8 @@ export default function ReportsPage() {
   return (
     <>
       <PageHero
-        eyebrow="RESEARCH"
-        title="Research — 리포트 검증"
+        eyebrow="REPORTS"
+        title="Reports — 리포트 검증"
         subtitle="발간 후 가격 경로, 목표가 진행률, 적중/실패 상태를 검증합니다."
         badges={[
           { label: '리포트', value: `${stats.total}건` },
@@ -61,11 +60,11 @@ export default function ReportsPage() {
         }
       />
 
-      <Section eyebrow="Rankings" title="관점별 정렬">
-        <RankingTabs reports={reports} />
-      </Section>
-
-      <Section eyebrow="Archive" title="전체 표">
+      <Section
+        eyebrow="Reports Table"
+        title="리포트 통합 테이블"
+        caption="관심별 정렬은 같은 컬럼을 공유하고, 정렬·필터 프리셋만 바꿉니다. 표는 항상 검색, 정렬, 필터, 페이지네이션을 제공합니다."
+      >
         <ReportsTable reports={reports} />
       </Section>
     </>

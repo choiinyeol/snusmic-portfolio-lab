@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from 'react';
 import { formatPercent } from '@/lib/format';
 
 type Point = { time: string; value: number };
-export type ReturnSeries = { id: string; label: string; color: string; points: Point[] };
+export type ReturnSeries = { id: string; label: string; shortLabel?: string; color: string; points: Point[] };
 
 type Tooltip = { x: number; y: number; time: string; rows: Array<{ label: string; value: number; color: string }> };
 
@@ -45,8 +45,8 @@ export function CumulativeReturnChart({ series }: { series: ReturnSeries[] }) {
         lineWidth: 2,
         priceFormat: { type: 'percent', precision: 2, minMove: 0.01 },
         priceLineVisible: false,
-        lastValueVisible: true,
-        title: item.label,
+        lastValueVisible: false,
+        title: item.shortLabel ?? item.label,
       });
       line.setData(item.points.map((point) => ({ time: point.time as Time, value: point.value * 100 })));
       apiByLabel.set(line, item);
@@ -60,7 +60,7 @@ export function CumulativeReturnChart({ series }: { series: ReturnSeries[] }) {
       for (const [line, item] of apiByLabel.entries()) {
         const data = params.seriesData.get(line);
         if (typeof data === 'object' && data && 'value' in data && Number.isFinite(Number(data.value))) {
-          rows.push({ label: item.label, value: Number(data.value) / 100, color: item.color });
+          rows.push({ label: item.shortLabel ?? item.label, value: Number(data.value) / 100, color: item.color });
         }
       }
       setTooltip({
@@ -82,6 +82,17 @@ export function CumulativeReturnChart({ series }: { series: ReturnSeries[] }) {
     return <div className="chart-box empty-chart">수익률 경로 데이터가 없습니다.</div>;
   return (
     <div className="chart-shell">
+      <div className="chart-legend mb-2 flex flex-wrap gap-x-3 gap-y-1 px-1 text-xs">
+        {series
+          .filter((item) => item.points.length)
+          .slice(0, 14)
+          .map((item) => (
+            <span className="inline-flex items-center gap-1.5 whitespace-nowrap" key={item.id} title={item.label}>
+              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
+              <span className="font-semibold text-base-content/65">{item.shortLabel ?? item.label}</span>
+            </span>
+          ))}
+      </div>
       <div ref={ref} className="chart-box chart-box-fixed chart-box-return" aria-label="전략 누적 수익률 비교 차트" />
       {tooltip ? (
         <div className="chart-tooltip" style={{ left: tooltip.x, top: tooltip.y }}>

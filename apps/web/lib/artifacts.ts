@@ -3,14 +3,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {
   ArtifactManifestSchema,
-  ParameterImportanceSchema,
   parseArtifact,
   parseRows,
   RawEquityPointSchema,
   RawHoldingRowSchema,
   RawReportRowSchema,
   RawTradeRowSchema,
-  StrategyRunsSchema,
   WebDataQualitySchema,
   WebOverviewSchema,
 } from '@/lib/schemas';
@@ -165,6 +163,8 @@ export type SummaryRow = {
   persona: string;
   label?: string;
   finalEquityKrw: number | null;
+  finalCashKrw?: number | null;
+  finalHoldingsValueKrw?: number | null;
   totalContributedKrw: number | null;
   cumulativeDepositsKrw?: number | null;
   netProfitKrw: number | null;
@@ -186,6 +186,8 @@ export type WebPersona = {
   persona: string;
   label?: string;
   final_equity_krw: number | null;
+  final_cash_krw?: number | null;
+  final_holdings_value_krw?: number | null;
   total_contributed_krw?: number | null;
   cumulative_deposits_krw?: number | null;
   net_profit_krw: number | null;
@@ -233,66 +235,6 @@ export type WebReportRankings = {
   biggest_open_target_gaps?: WebReportRankingRow[];
   best_current_returns?: WebReportRankingRow[];
   worst_current_returns?: WebReportRankingRow[];
-};
-
-export type StrategyRunArtifact = {
-  run_id: string;
-  trial_number?: number;
-  label: string;
-  scope?: string;
-  sampler?: string;
-  params?: Record<string, unknown>;
-  metrics: Record<string, number | null | undefined>;
-  warnings?: string[];
-};
-
-export type StrategyRunsArtifact = {
-  schema_version?: number;
-  study_name?: string;
-  scope?: string;
-  disclaimer?: string;
-  best_run_id?: string;
-  runs: StrategyRunArtifact[];
-};
-
-export type StrategyExperimentPosition = {
-  runId: string;
-  symbol: string;
-  company: string;
-  publicationDate: string;
-  exitDate: string | null;
-  status: 'closed' | 'open';
-  weight: number;
-  entryPriceKrw: number | null;
-  targetPriceKrw: number | null;
-  expectedReturn: number | null;
-  realizedReturn: number | null;
-  targetHit: boolean;
-};
-
-export type StrategyExperimentTrade = {
-  runId: string;
-  date: string;
-  side: 'buy' | 'sell';
-  symbol: string;
-  company: string;
-  weight: number;
-  referencePriceKrw: number | null;
-  reason: string;
-};
-
-export type StrategyExperiment = {
-  runId: string;
-  positions: StrategyExperimentPosition[];
-  trades: StrategyExperimentTrade[];
-  cumulativeReturnSeries: PricePoint[];
-};
-
-export type ParameterImportanceArtifact = {
-  schema_version?: number;
-  study_name?: string;
-  method?: string;
-  parameters?: { parameter: string; importance: number }[];
 };
 
 export type WebDataQuality = {
@@ -641,6 +583,8 @@ export function getSummaryRows(): SummaryRow[] {
       persona: row.persona,
       label: row.label,
       finalEquityKrw: num(row.final_equity_krw),
+      finalCashKrw: num(row.final_cash_krw),
+      finalHoldingsValueKrw: num(row.final_holdings_value_krw),
       totalContributedKrw: num(row.total_contributed_krw),
       netProfitKrw: num(row.net_profit_krw),
       moneyWeightedReturn: num(row.money_weighted_return),
@@ -693,22 +637,6 @@ export const getRankings = getReportRankings;
 
 export function getInsights(): Insight[] {
   return readRequiredJson<Insight[]>('data/web/insights.json');
-}
-
-export function getStrategyRuns(): StrategyRunsArtifact {
-  return parseArtifact(
-    'strategy-runs.json',
-    StrategyRunsSchema,
-    readRequiredJson<unknown>('data/web/strategy-runs.json'),
-  );
-}
-
-export function getParameterImportance(): ParameterImportanceArtifact {
-  return parseArtifact(
-    'parameter-importance.json',
-    ParameterImportanceSchema,
-    readRequiredJson<unknown>('data/web/parameter-importance.json'),
-  );
 }
 
 export function getDownloadHref(fileName: string): string {
@@ -932,264 +860,4 @@ export function getEquityDaily(): EquityPoint[] {
         : null,
   }));
   return equityDailyCache;
-}
-
-export function getStrategyExperiment(run: StrategyRunArtifact): StrategyExperiment {
-  const params = run.params ?? {};
-  // This is a report-performance-derived reconstruction for UI inspection,
-  // not a broker ledger replay or full portfolio accounting simulation.
-  const selected = selectReportsForRun(getReportRows(), params);
-  const weights = weightsForRun(selected, params);
-  const multiplier = readParam(params, 'target_hit_multiplier', 1);
-  const takeProfit = readParam(params, 'take_profit_pct', Number.POSITIVE_INFINITY);
-  const stopLoss = readParam(params, 'stop_loss_pct', 1);
-  const positions = selected.map((report, index) => {
-    const targetReturn = clamp((report.targetUpsideAtPub ?? 0) * multiplier, -stopLoss, takeProfit);
-    const observedReturn = report.targetHit ? targetReturn : clamp(report.currentReturn ?? 0, -stopLoss, takeProfit);
-    return {
-      runId: run.run_id,
-      symbol: report.symbol,
-      company: report.company,
-      publicationDate: report.publicationDate,
-      exitDate: report.targetHitDate ?? report.lastCloseDate,
-      status: report.targetHit ? ('closed' as const) : ('open' as const),
-      weight: weights[index] ?? 0,
-      entryPriceKrw: report.entryPriceKrw,
-      targetPriceKrw: report.targetPriceKrw,
-      expectedReturn: targetReturn,
-      realizedReturn: observedReturn,
-      targetHit: report.targetHit,
-    };
-  });
-  const trades = positions
-    .flatMap((position) => {
-      // Approximate buy/sell events from selected reports and observed target
-      // outcomes so the UI can explain each candidate experiment.
-      const out: StrategyExperimentTrade[] = [
-        {
-          runId: run.run_id,
-          date: position.publicationDate,
-          side: 'buy',
-          symbol: position.symbol,
-          company: position.company,
-          weight: position.weight,
-          referencePriceKrw: position.entryPriceKrw,
-          reason: '조건 충족 리포트 발간 후 매수',
-        },
-      ];
-      if (position.status === 'closed' && position.exitDate) {
-        out.push({
-          runId: run.run_id,
-          date: position.exitDate,
-          side: 'sell',
-          symbol: position.symbol,
-          company: position.company,
-          weight: position.weight,
-          referencePriceKrw: position.targetPriceKrw,
-          reason: '목표가 도달 청산',
-        });
-      }
-      return out;
-    })
-    .sort((a, b) => b.date.localeCompare(a.date));
-  return {
-    runId: run.run_id,
-    positions,
-    trades,
-    cumulativeReturnSeries: experimentCumulativeSeries(positions, stopLoss, takeProfit),
-  };
-}
-
-function selectReportsForRun(reports: ReportRow[], params: Record<string, unknown>): ReportRow[] {
-  const minUpside = readParam(params, 'min_target_upside_at_pub', 0.05);
-  const maxUpside = readParam(params, 'max_target_upside_at_pub', 5);
-  const maxReportAgeDays = readParam(params, 'max_report_age_days', 1500);
-  const universe = String(params.universe ?? 'all');
-  const requirePublicationPrice = Boolean(params.require_publication_price);
-  return reports
-    .filter((report) => {
-      if (requirePublicationPrice && !report.entryPriceKrw) return false;
-      if ((report.targetUpsideAtPub ?? Number.NaN) < minUpside || (report.targetUpsideAtPub ?? Number.NaN) > maxUpside)
-        return false;
-      if (report.daysToTarget !== null && report.daysToTarget > maxReportAgeDays) return false;
-      if (universe !== 'all') {
-        const domestic = report.symbol.endsWith('.KS') || report.symbol.endsWith('.KQ');
-        if (universe === 'domestic' && !domestic) return false;
-        if (universe === 'overseas' && domestic) return false;
-      }
-      if (params.require_mtt === true && !passesMttFilter(report, params)) return false;
-      return true;
-    })
-    .sort((a, b) => a.publicationDate.localeCompare(b.publicationDate) || a.reportId.localeCompare(b.reportId));
-}
-
-type TrendSnapshot = {
-  close: number;
-  ma50: number;
-  ma150: number;
-  ma200: number;
-  ma200OneMonthReturn: number;
-  priceVs52wLow: number;
-  pctBelow52wHigh: number;
-};
-
-const trendSnapshotCache = new Map<string, TrendSnapshot | null>();
-
-function passesMttFilter(report: ReportRow, params: Record<string, unknown>): boolean {
-  const snapshot = trendSnapshotForReport(report);
-  if (!snapshot) return false;
-  const minPriceVsLow = readParam(params, 'min_price_vs_52w_low', 0.3);
-  const maxBelowHigh = readParam(params, 'max_pct_below_52w_high', 0.25);
-  const minMa200Return = readParam(params, 'min_ma200_1m_return', 0);
-  return (
-    snapshot.close > snapshot.ma50 &&
-    snapshot.close > snapshot.ma150 &&
-    snapshot.close > snapshot.ma200 &&
-    snapshot.ma50 > snapshot.ma150 &&
-    snapshot.ma50 > snapshot.ma200 &&
-    snapshot.ma150 > snapshot.ma200 &&
-    snapshot.ma200OneMonthReturn >= minMa200Return &&
-    snapshot.priceVs52wLow >= minPriceVsLow &&
-    snapshot.pctBelow52wHigh <= maxBelowHigh
-  );
-}
-
-function trendSnapshotForReport(report: ReportRow): TrendSnapshot | null {
-  const key = `${report.symbol}|${report.publicationDate}`;
-  if (trendSnapshotCache.has(key)) return trendSnapshotCache.get(key) ?? null;
-  const prices = getPriceSeries(report.symbol).filter((point) => point.time <= report.publicationDate);
-  if (prices.length < 252) {
-    trendSnapshotCache.set(key, null);
-    return null;
-  }
-  const closeAt = (index: number): number | null => {
-    const point = prices.at(index);
-    const close = point?.closeKrw ?? point?.value ?? null;
-    return close !== null && close > 0 ? close : null;
-  };
-  const meanClose = (endIndex: number, window: number): number | null => {
-    const start = endIndex - window + 1;
-    if (start < 0) return null;
-    let sum = 0;
-    for (let index = start; index <= endIndex; index += 1) {
-      const close = closeAt(index);
-      if (close === null) return null;
-      sum += close;
-    }
-    return sum / window;
-  };
-  const endIndex = prices.length - 1;
-  const close = closeAt(endIndex);
-  const ma50 = meanClose(endIndex, 50);
-  const ma150 = meanClose(endIndex, 150);
-  const ma200 = meanClose(endIndex, 200);
-  const ma200Prev = meanClose(endIndex - 21, 200);
-  if (close === null || ma50 === null || ma150 === null || ma200 === null || ma200Prev === null || ma200Prev <= 0) {
-    trendSnapshotCache.set(key, null);
-    return null;
-  }
-  const lastYear = prices.slice(-252).map((_, offset) => closeAt(prices.length - 252 + offset));
-  if (lastYear.some((value) => value === null)) {
-    trendSnapshotCache.set(key, null);
-    return null;
-  }
-  const closes = lastYear as number[];
-  const low52w = Math.min(...closes);
-  const high52w = Math.max(...closes);
-  if (low52w <= 0 || high52w <= 0) {
-    trendSnapshotCache.set(key, null);
-    return null;
-  }
-  const snapshot = {
-    close,
-    ma50,
-    ma150,
-    ma200,
-    ma200OneMonthReturn: ma200 / ma200Prev - 1,
-    priceVs52wLow: close / low52w - 1,
-    pctBelow52wHigh: 1 - close / high52w,
-  };
-  trendSnapshotCache.set(key, snapshot);
-  return snapshot;
-}
-
-function weightsForRun(reports: ReportRow[], params: Record<string, unknown>): number[] {
-  if (!reports.length) return [];
-  const weighting = String(params.weighting ?? 'equal');
-  const raw = reports.map((report) => {
-    if (weighting === 'target_upside' || weighting === 'capped_target_upside') {
-      const value = Math.max(0.01, report.targetUpsideAtPub ?? 0.01);
-      return weighting === 'capped_target_upside' ? Math.min(1, value) : value;
-    }
-    return 1;
-  });
-  const total = raw.reduce((sum, value) => sum + value, 0);
-  return raw.map((value) => value / Math.max(total, Number.EPSILON));
-}
-
-function experimentCumulativeSeries(
-  positions: StrategyExperimentPosition[],
-  stopLoss: number,
-  takeProfit: number,
-): PricePoint[] {
-  if (!positions.length) return [];
-  const start = positions.reduce(
-    (min, position) => (position.publicationDate < min ? position.publicationDate : min),
-    positions[0].publicationDate,
-  );
-  const pricePaths = positions.map((position) => ({
-    position,
-    prices: getPriceSeries(position.symbol, position.publicationDate, position.exitDate),
-  }));
-  const dates = new Set<string>([start]);
-  for (const { position, prices } of pricePaths) {
-    dates.add(position.publicationDate);
-    if (position.exitDate) dates.add(position.exitDate);
-    for (const point of prices) dates.add(point.time);
-  }
-  return [...dates]
-    .sort((a, b) => a.localeCompare(b))
-    .map((time) => ({
-      time,
-      value: pricePaths.reduce(
-        (sum, item) =>
-          sum + item.position.weight * positionReturnAt(item.position, item.prices, time, stopLoss, takeProfit),
-        0,
-      ),
-    }));
-}
-
-function positionReturnAt(
-  position: StrategyExperimentPosition,
-  prices: PricePoint[],
-  time: string,
-  stopLoss: number,
-  takeProfit: number,
-): number {
-  if (time < position.publicationDate) return 0;
-  if (position.exitDate && time >= position.exitDate) return position.realizedReturn ?? 0;
-  const entry = position.entryPriceKrw;
-  if (entry === null || entry <= 0) return 0;
-  const point = priceAtOrBefore(prices, time);
-  const close = point?.closeKrw ?? point?.value ?? null;
-  if (close === null || close <= 0) return 0;
-  return clamp(close / entry - 1, -stopLoss, takeProfit);
-}
-
-function priceAtOrBefore(points: PricePoint[], time: string): PricePoint | undefined {
-  let current: PricePoint | undefined;
-  for (const point of points) {
-    if (point.time > time) break;
-    current = point;
-  }
-  return current;
-}
-
-function readParam(params: Record<string, unknown>, key: string, defaultValue: number): number {
-  const value = params[key];
-  return typeof value === 'number' && Number.isFinite(value) ? value : defaultValue;
-}
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value));
 }

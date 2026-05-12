@@ -26,13 +26,13 @@ Last updated: 2026-05-13
 Deep interview 결과, 프론트엔드는 다음 1차 내비게이션 흐름으로 고정한다.
 
 ```text
-Overview → Portfolio → Research → Strategy → Screener
+Overview → Portfolio → Reports → Strategies → Screener
 ```
 
 - **Overview**: 30초 안에 프로젝트 개요, 현재 포트폴리오, 우수 전략, 최근 리포트를 이해시키는 executive summary.
 - **Portfolio**: 보유/원장/포지션 생애주기/리포트 근거.
-- **Research**: 리포트 발간 후 가격 경로, 목표가 진행률, 적중/실패 통계.
-- **Strategy**: 수익률, Sharpe, Sortino, MDD, 벤치마크 아웃퍼폼을 같은 표에서 비교.
+- **Reports**: 리포트 발간 후 가격 경로, 목표가 진행률, 적중/실패 통계를 하나의 공유 컬럼 테이블에서 정렬·필터링.
+- **Strategies**: 벤치마크 세트와 고유 원장형 전략을 분리해 수익률, Sharpe, Sortino, MDD, 벤치마크 아웃퍼폼을 비교.
 - **Screener**: 리포트 기반 후보 탐색. 전략 매수 신호나 포트폴리오 액션 추천이 아니라, 최근성/업사이드/목표 진행률/미도달·미만료 상태만으로 설명 가능한 후보를 보여준다.
 
 명시적 비목표:

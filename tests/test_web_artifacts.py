@@ -23,10 +23,9 @@ def test_export_web_artifacts_matches_baseline_counts(tmp_path: Path) -> None:
     assert overview["report_counts"] == {
         "extracted_reports": 221,
         "missing_price_symbols": 5,
-        # 221 - 5 missing - WOLF (post-bankruptcy delisting voids its expiry window).
-        "price_matched_reports": 215,
+        "price_matched_reports": 202,
         "report_stat_rows": 221,
-        "web_report_rows": 221,
+        "web_report_rows": 202,
     }
     assert result["missing_symbols"] == ["003410.KS", "010620.KS", "287410.KQ", "NETI", "VTNR"]
 
@@ -85,13 +84,13 @@ def test_extended_web_artifacts_support_insights_and_downloads(tmp_path: Path) -
     assert len(insights) >= 6
     assert "6615fd1894ed9c54" in detail_metrics
     assert detail_metrics["6615fd1894ed9c54"]["markers"]
-    assert len(return_windows) == 221
+    assert len(return_windows) == 202
     assert {"return_30d", "return_60d", "return_90d", "return_180d"} <= set(return_windows[0])
-    assert target_distribution["summary"]["total_reports"] == 221
+    assert target_distribution["summary"]["total_reports"] == 202
     assert rankings["fastest_hits"]
     assert rankings["best_current_returns"]
     assert (out / "table-download-reports.csv").read_text(encoding="utf-8").startswith("report_id,date")
-    assert (out / "table-download-strategies.csv").read_text(encoding="utf-8").startswith("run_id")
+    assert (out / "table-download-strategies.csv").read_text(encoding="utf-8").startswith("strategy_id,label")
     assert (out / "data-quality-download.csv").read_text(encoding="utf-8").startswith("section,metric,value")
 
 
@@ -109,11 +108,11 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(tmp_path: Path) 
     manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
     assert manifest["schema_version"] == "1.0.0"
     assert manifest["artifact_root"] == "data/web"
-    assert manifest["report_range"] == {"start": "2020-10-31", "end": "2026-05-06"}
+    assert manifest["report_range"] == {"start": "2020-12-05", "end": "2026-05-06"}
     assert manifest["price_range"] == {"start": "2018-08-03", "end": "2026-05-11"}
-    assert manifest["row_counts"]["reports"] == 221
+    assert manifest["row_counts"]["reports"] == 202
     assert manifest["row_counts"]["personas"] == 13
-    assert manifest["data_quality"]["reports_with_prices"] == 215
+    assert manifest["data_quality"]["reports_with_prices"] == 202
     assert manifest["data_quality"]["missing_price_symbols"] == 5
     assert "reports.json" in manifest["artifacts"]
     assert "prices/QQQ.json" not in manifest["checksums"]
@@ -176,7 +175,7 @@ def test_price_artifacts_keep_asset_prices_native_and_krw_for_valuation_only(tmp
     assert camt["target_hit_date"] is None
 
 
-def test_reports_artifact_uses_adjusted_target_price_when_price_scale_changed(tmp_path: Path) -> None:
+def test_reports_artifact_excludes_scaled_target_that_is_not_actionable(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
         ExportInputs(
@@ -188,22 +187,13 @@ def test_reports_artifact_uses_adjusted_target_price_when_price_scale_changed(tm
     )
 
     reports = json.loads((out / "reports.json").read_text(encoding="utf-8"))
-    ezbio = next(row for row in reports if row["symbol"] == "353810.KQ")
-    assert ezbio["company"] == "이지바이오"
-    assert ezbio["entry_price_krw"] == pytest.approx(5379.95, abs=0.01)
-    assert ezbio["target_price_krw"] == pytest.approx(7231.49, abs=0.01)
-    assert ezbio["target_price"] == pytest.approx(7231.49, abs=0.01)
-    assert ezbio["target_upside_at_pub"] == pytest.approx(0.34, abs=0.005)
-    assert "price_scale_adjusted_target" in ezbio["caveat_flags"]
+    assert all(row["symbol"] != "353810.KQ" for row in reports)
 
     csv_text = (out / "table-download-reports.csv").read_text(encoding="utf-8")
-    assert "7e687ca6a743eff4" in csv_text
-    # Partial match — 4-digit ROUND_NDIGITS varies the trailing pair.
-    assert "7231.4" in csv_text
-    assert "103500" not in next(line for line in csv_text.splitlines() if "7e687ca6a743eff4" in line)
+    assert "7e687ca6a743eff4" not in csv_text
 
 
-def test_reports_artifact_marks_target_below_entry_as_non_actionable(tmp_path: Path) -> None:
+def test_reports_artifact_excludes_target_below_entry_rows(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
         ExportInputs(
@@ -215,14 +205,7 @@ def test_reports_artifact_marks_target_below_entry_as_non_actionable(tmp_path: P
     )
 
     reports = json.loads((out / "reports.json").read_text(encoding="utf-8"))
-    rznomics = next(row for row in reports if row["symbol"] == "476830.KQ")
-    assert rznomics["company"] == "알지노믹스"
-    upside = rznomics["target_upside_at_pub"]
-    assert upside is not None and -0.2 < upside < 0
-    assert rznomics["target_hit"] is False
-    assert rznomics["target_hit_date"] is None
-    assert rznomics["days_to_target"] is None
-    assert "target_below_entry_price" in rznomics["caveat_flags"]
+    assert all(row["symbol"] != "476830.KQ" for row in reports)
 
 
 def test_reports_artifact_infers_native_entry_for_foreign_report_display_ssot(tmp_path: Path) -> None:

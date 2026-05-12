@@ -97,6 +97,8 @@ export const WebPersonaSchema = z
     persona: z.string(),
     label: z.string().optional(),
     final_equity_krw: NullableNumber,
+    final_cash_krw: NullableNumber.optional(),
+    final_holdings_value_krw: NullableNumber.optional(),
     total_contributed_krw: NullableNumber.optional(),
     cumulative_deposits_krw: NullableNumber.optional(),
     net_profit_krw: NullableNumber,
@@ -133,39 +135,6 @@ export const WebDataQualitySchema = z
           .passthrough(),
       )
       .optional(),
-  })
-  .passthrough();
-
-export const StrategyRunSchema = z
-  .object({
-    run_id: z.string(),
-    trial_number: z.number().optional(),
-    label: z.string(),
-    scope: z.string().optional(),
-    sampler: z.string().optional(),
-    params: z.record(z.string(), z.unknown()).optional(),
-    metrics: z.record(z.string(), z.union([z.number(), z.null(), z.undefined()])),
-    warnings: z.array(z.string()).optional(),
-  })
-  .passthrough();
-
-export const StrategyRunsSchema = z
-  .object({
-    schema_version: z.number().optional(),
-    study_name: z.string().optional(),
-    scope: z.string().optional(),
-    disclaimer: z.string().optional(),
-    best_run_id: z.string().optional(),
-    runs: z.array(StrategyRunSchema),
-  })
-  .passthrough();
-
-export const ParameterImportanceSchema = z
-  .object({
-    schema_version: z.number().optional(),
-    study_name: z.string().optional(),
-    method: z.string().optional(),
-    parameters: z.array(z.object({ parameter: z.string(), importance: z.number() }).passthrough()).optional(),
   })
   .passthrough();
 

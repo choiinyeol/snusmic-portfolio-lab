@@ -44566,7 +44566,7 @@
     "last_close_native": 216.71000671386722,
     "market_value_krw": 11088041.5643,
     "month_end": "2021-01-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.9855
@@ -44577,7 +44577,7 @@
     "last_close_native": 32666.666015625,
     "market_value_krw": 163333.3301,
     "month_end": "2021-01-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 5,
     "symbol": "285490.KQ",
     "weight_in_portfolio": 0.0145
@@ -44588,7 +44588,7 @@
     "last_close_native": 235.69000244140625,
     "market_value_krw": 12133316.6648,
     "month_end": "2021-02-28",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.8938
@@ -44599,7 +44599,7 @@
     "last_close_native": 363500.0,
     "market_value_krw": 1090500.0,
     "month_end": "2021-02-28",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 3,
     "symbol": "006650.KS",
     "weight_in_portfolio": 0.0803
@@ -44610,7 +44610,7 @@
     "last_close_native": 36300.0,
     "market_value_krw": 181500.0,
     "month_end": "2021-02-28",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 5,
     "symbol": "166090.KQ",
     "weight_in_portfolio": 0.0134
@@ -44621,7 +44621,7 @@
     "last_close_native": 34000.0,
     "market_value_krw": 170000.0,
     "month_end": "2021-02-28",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 5,
     "symbol": "285490.KQ",
     "weight_in_portfolio": 0.0125
@@ -44632,7 +44632,7 @@
     "last_close_native": 223.22999572753906,
     "market_value_krw": 11627317.7315,
     "month_end": "2021-03-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.845
@@ -44643,7 +44643,7 @@
     "last_close_native": 325500.0,
     "market_value_krw": 1627500.0,
     "month_end": "2021-03-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 5,
     "symbol": "006650.KS",
     "weight_in_portfolio": 0.1183
@@ -44654,7 +44654,7 @@
     "last_close_native": 38850.0,
     "market_value_krw": 505050.0,
     "month_end": "2021-03-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 13,
     "symbol": "166090.KQ",
     "weight_in_portfolio": 0.0367
@@ -44665,7 +44665,7 @@
     "last_close_native": 252.5399932861328,
     "market_value_krw": 12855543.3642,
     "month_end": "2021-04-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.7828
@@ -44676,7 +44676,7 @@
     "last_close_native": 67717.328125,
     "market_value_krw": 1963802.5156,
     "month_end": "2021-04-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 29,
     "symbol": "007690.KS",
     "weight_in_portfolio": 0.1196
@@ -44687,7 +44687,7 @@
     "last_close_native": 315000.0,
     "market_value_krw": 1575000.0,
     "month_end": "2021-04-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 5,
     "symbol": "006650.KS",
     "weight_in_portfolio": 0.0959
@@ -44698,7 +44698,7 @@
     "last_close_native": 13700.0,
     "market_value_krw": 27400.0,
     "month_end": "2021-04-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 2,
     "symbol": "060150.KQ",
     "weight_in_portfolio": 0.0017
@@ -44709,7 +44709,7 @@
     "last_close_native": 253.24000549316406,
     "market_value_krw": 13015473.2431,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.7653
@@ -44720,7 +44720,7 @@
     "last_close_native": 56693.57421875,
     "market_value_krw": 1644113.6523,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 29,
     "symbol": "007690.KS",
     "weight_in_portfolio": 0.0967
@@ -44731,7 +44731,7 @@
     "last_close_native": 64100.0,
     "market_value_krw": 1346100.0,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 21,
     "symbol": "344820.KQ",
     "weight_in_portfolio": 0.0791
@@ -44742,7 +44742,7 @@
     "last_close_native": 53400.0,
     "market_value_krw": 961200.0,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 18,
     "symbol": "004020.KS",
     "weight_in_portfolio": 0.0565
@@ -44753,7 +44753,7 @@
     "last_close_native": 13200.0,
     "market_value_krw": 26400.0,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 2,
     "symbol": "060150.KQ",
     "weight_in_portfolio": 0.0016
@@ -44764,7 +44764,7 @@
     "last_close_native": 14600.0,
     "market_value_krw": 14600.0,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 1,
     "symbol": "017650.KS",
     "weight_in_portfolio": 0.0009
@@ -44775,7 +44775,7 @@
     "last_close_native": 274.6000061035156,
     "market_value_krw": 14280150.5568,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.8035
@@ -44786,7 +44786,7 @@
     "last_close_native": 62700.0,
     "market_value_krw": 1316700.0,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 21,
     "symbol": "344820.KQ",
     "weight_in_portfolio": 0.0741
@@ -44797,7 +44797,7 @@
     "last_close_native": 22.950000762939453,
     "market_value_krw": 1167534.2514,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 45,
     "symbol": "SBLK",
     "weight_in_portfolio": 0.0657
@@ -44808,7 +44808,7 @@
     "last_close_native": 53700.0,
     "market_value_krw": 966600.0,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 18,
     "symbol": "004020.KS",
     "weight_in_portfolio": 0.0544
@@ -44819,7 +44819,7 @@
     "last_close_native": 13250.0,
     "market_value_krw": 26500.0,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 2,
     "symbol": "060150.KQ",
     "weight_in_portfolio": 0.0015
@@ -44830,7 +44830,7 @@
     "last_close_native": 14300.0,
     "market_value_krw": 14300.0,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 1,
     "symbol": "017650.KS",
     "weight_in_portfolio": 0.0008
@@ -44841,7 +44841,7 @@
     "last_close_native": 276.1600036621094,
     "market_value_krw": 14508761.6536,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.7123
@@ -44852,7 +44852,7 @@
     "last_close_native": 33000.0,
     "market_value_krw": 2310000.0,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 70,
     "symbol": "005850.KS",
     "weight_in_portfolio": 0.1134
@@ -44863,7 +44863,7 @@
     "last_close_native": 74300.0,
     "market_value_krw": 1560300.0,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 21,
     "symbol": "344820.KQ",
     "weight_in_portfolio": 0.0766
@@ -44874,7 +44874,7 @@
     "last_close_native": 19.030000686645504,
     "market_value_krw": 978054.4931,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 45,
     "symbol": "SBLK",
     "weight_in_portfolio": 0.048
@@ -44885,7 +44885,7 @@
     "last_close_native": 54000.0,
     "market_value_krw": 972000.0,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 18,
     "symbol": "004020.KS",
     "weight_in_portfolio": 0.0477
@@ -44896,7 +44896,7 @@
     "last_close_native": 12550.0,
     "market_value_krw": 25100.0,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 2,
     "symbol": "060150.KQ",
     "weight_in_portfolio": 0.0012
@@ -44907,7 +44907,7 @@
     "last_close_native": 14100.0,
     "market_value_krw": 14100.0,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 1,
     "symbol": "017650.KS",
     "weight_in_portfolio": 0.0007
@@ -44918,7 +44918,7 @@
     "last_close_native": 74500.0,
     "market_value_krw": 1564500.0,
     "month_end": "2021-08-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 21,
     "symbol": "344820.KQ",
     "weight_in_portfolio": 0.5639
@@ -44929,7 +44929,7 @@
     "last_close_native": 23.06999969482422,
     "market_value_krw": 1209974.2006,
     "month_end": "2021-08-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 45,
     "symbol": "SBLK",
     "weight_in_portfolio": 0.4361
@@ -44940,7 +44940,7 @@
     "last_close_native": 24.040000915527344,
     "market_value_krw": 12588706.434,
     "month_end": "2021-09-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 441,
     "symbol": "SBLK",
     "weight_in_portfolio": 0.5423
@@ -44951,7 +44951,7 @@
     "last_close_native": 69000.0,
     "market_value_krw": 10626000.0,
     "month_end": "2021-09-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 154,
     "symbol": "344820.KQ",
     "weight_in_portfolio": 0.4577
@@ -44962,7 +44962,7 @@
     "last_close_native": 349000.0,
     "market_value_krw": 8376000.0,
     "month_end": "2021-12-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 24,
     "symbol": "352820.KS",
     "weight_in_portfolio": 0.5084
@@ -44973,7 +44973,7 @@
     "last_close_native": 91000.0,
     "market_value_krw": 8099000.0,
     "month_end": "2021-12-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 89,
     "symbol": "293490.KQ",
     "weight_in_portfolio": 0.4916
@@ -44984,7 +44984,7 @@
     "last_close_native": 33.04999923706055,
     "market_value_krw": 33501443.5876,
     "month_end": "2022-05-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 820,
     "symbol": "STNG",
     "weight_in_portfolio": 1.0
@@ -44995,7 +44995,7 @@
     "last_close_native": 34.5099983215332,
     "market_value_krw": 37869835.6288,
     "month_end": "2022-06-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 843,
     "symbol": "STNG",
     "weight_in_portfolio": 1.0
@@ -45006,7 +45006,7 @@
     "last_close_native": 38.61000061035156,
     "market_value_krw": 43304973.6399,
     "month_end": "2022-07-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 866,
     "symbol": "STNG",
     "weight_in_portfolio": 1.0
@@ -45017,7 +45017,7 @@
     "last_close_native": 41.599998474121094,
     "market_value_krw": 49708591.0595,
     "month_end": "2022-08-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 885,
     "symbol": "STNG",
     "weight_in_portfolio": 1.0
@@ -45028,7 +45028,7 @@
     "last_close_native": 37.130001068115234,
     "market_value_krw": 59151609.1799,
     "month_end": "2022-11-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 1202,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -45039,7 +45039,7 @@
     "last_close_native": 37.709999084472656,
     "market_value_krw": 57124333.385,
     "month_end": "2022-12-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 1202,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -45050,7 +45050,7 @@
     "last_close_native": 40.689998626708984,
     "market_value_krw": 60231899.4372,
     "month_end": "2023-01-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 1202,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -45061,7 +45061,7 @@
     "last_close_native": 41.689998626708984,
     "market_value_krw": 66064334.4234,
     "month_end": "2023-02-28",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 1202,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -45072,7 +45072,7 @@
     "last_close_native": 39.470001220703125,
     "market_value_krw": 61509773.6123,
     "month_end": "2023-03-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 1202,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -45083,7 +45083,7 @@
     "last_close_native": 38.45000076293945,
     "market_value_krw": 61902455.5963,
     "month_end": "2023-04-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 1202,
     "symbol": "NE",
     "weight_in_portfolio": 0.9998
@@ -45094,7 +45094,7 @@
     "last_close_native": 12900.0,
     "market_value_krw": 12900.0,
     "month_end": "2023-04-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 1,
     "symbol": "159010.KQ",
     "weight_in_portfolio": 0.0002
@@ -45105,7 +45105,7 @@
     "last_close_native": 37.7400016784668,
     "market_value_krw": 59870271.7039,
     "month_end": "2023-05-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 1202,
     "symbol": "NE",
     "weight_in_portfolio": 0.8872
@@ -45116,7 +45116,7 @@
     "last_close_native": 13940.0,
     "market_value_krw": 7611240.0,
     "month_end": "2023-05-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 546,
     "symbol": "159010.KQ",
     "weight_in_portfolio": 0.1128
@@ -45127,7 +45127,7 @@
     "last_close_native": 41.310001373291016,
     "market_value_krw": 65696537.6004,
     "month_end": "2023-06-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 1202,
     "symbol": "NE",
     "weight_in_portfolio": 0.873
@@ -45138,7 +45138,7 @@
     "last_close_native": 14850.0,
     "market_value_krw": 8108100.0,
     "month_end": "2023-06-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 546,
     "symbol": "159010.KQ",
     "weight_in_portfolio": 0.1077
@@ -45149,7 +45149,7 @@
     "last_close_native": 36150.0,
     "market_value_krw": 1446000.0,
     "month_end": "2023-06-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 40,
     "symbol": "228670.KQ",
     "weight_in_portfolio": 0.0192
@@ -45160,7 +45160,7 @@
     "last_close_native": 52.27000045776367,
     "market_value_krw": 79942407.631,
     "month_end": "2023-07-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 1202,
     "symbol": "NE",
     "weight_in_portfolio": 0.8979
@@ -45171,7 +45171,7 @@
     "last_close_native": 13750.0,
     "market_value_krw": 7507500.0,
     "month_end": "2023-07-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 546,
     "symbol": "159010.KQ",
     "weight_in_portfolio": 0.0843
@@ -45182,7 +45182,7 @@
     "last_close_native": 39500.0,
     "market_value_krw": 1580000.0,
     "month_end": "2023-07-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 40,
     "symbol": "228670.KQ",
     "weight_in_portfolio": 0.0177
@@ -45193,7 +45193,7 @@
     "last_close_native": 12560.0,
     "market_value_krw": 6857760.0,
     "month_end": "2023-08-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 546,
     "symbol": "159010.KQ",
     "weight_in_portfolio": 1.0
@@ -45204,7 +45204,7 @@
     "last_close_native": 75000.0,
     "market_value_krw": 100050000.0,
     "month_end": "2023-10-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 1334,
     "symbol": "267260.KS",
     "weight_in_portfolio": 1.0
@@ -45215,7 +45215,7 @@
     "last_close_native": 84100.0,
     "market_value_krw": 113787300.0,
     "month_end": "2023-11-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 1353,
     "symbol": "267260.KS",
     "weight_in_portfolio": 1.0
@@ -45226,7 +45226,7 @@
     "last_close_native": 82200.0,
     "market_value_krw": 111216600.0,
     "month_end": "2023-12-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 1353,
     "symbol": "267260.KS",
     "weight_in_portfolio": 0.9864
@@ -45237,7 +45237,7 @@
     "last_close_native": 48.029998779296875,
     "market_value_krw": 1534366.3,
     "month_end": "2023-12-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 25,
     "symbol": "VRT",
     "weight_in_portfolio": 0.0136
@@ -45248,7 +45248,7 @@
     "last_close_native": 102700.0,
     "market_value_krw": 138953100.0,
     "month_end": "2024-01-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 1353,
     "symbol": "267260.KS",
     "weight_in_portfolio": 0.9867
@@ -45259,7 +45259,7 @@
     "last_close_native": 56.33000183105469,
     "market_value_krw": 1868212.6689,
     "month_end": "2024-01-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 25,
     "symbol": "VRT",
     "weight_in_portfolio": 0.0133
@@ -45270,7 +45270,7 @@
     "last_close_native": 124400.0,
     "market_value_krw": 168313200.0,
     "month_end": "2024-02-29",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 1353,
     "symbol": "267260.KS",
     "weight_in_portfolio": 0.9824
@@ -45281,7 +45281,7 @@
     "last_close_native": 753.6799926757811,
     "market_value_krw": 3014825.4969,
     "month_end": "2024-02-29",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 3,
     "symbol": "LLY",
     "weight_in_portfolio": 0.0176
@@ -45292,7 +45292,7 @@
     "last_close_native": 331000.0,
     "market_value_krw": 223094000.0,
     "month_end": "2024-10-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 674,
     "symbol": "259960.KQ",
     "weight_in_portfolio": 1.0
@@ -45303,7 +45303,7 @@
     "last_close_native": 15.09000015258789,
     "market_value_krw": 192630115.0126,
     "month_end": "2024-11-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 9162,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9932
@@ -45314,7 +45314,7 @@
     "last_close_native": 29100.0,
     "market_value_krw": 1309500.0,
     "month_end": "2024-11-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 45,
     "symbol": "018290.KS",
     "weight_in_portfolio": 0.0068
@@ -45325,7 +45325,7 @@
     "last_close_native": 17.84000015258789,
     "market_value_krw": 243248188.288,
     "month_end": "2024-12-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 9292,
     "symbol": "GRND",
     "weight_in_portfolio": 1.0
@@ -45336,7 +45336,7 @@
     "last_close_native": 17.84000015258789,
     "market_value_krw": 240423223.9677,
     "month_end": "2025-01-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 9348,
     "symbol": "GRND",
     "weight_in_portfolio": 1.0
@@ -45347,7 +45347,7 @@
     "last_close_native": 18.350000381469727,
     "market_value_krw": 250724872.423,
     "month_end": "2025-02-28",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 9424,
     "symbol": "GRND",
     "weight_in_portfolio": 1.0
@@ -45358,7 +45358,7 @@
     "last_close_native": 17.89999961853027,
     "market_value_krw": 249820566.1091,
     "month_end": "2025-03-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 9498,
     "symbol": "GRND",
     "weight_in_portfolio": 1.0
@@ -45369,7 +45369,7 @@
     "last_close_native": 21.969999313354496,
     "market_value_krw": 300936980.7309,
     "month_end": "2025-04-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 9571,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9999
@@ -45380,7 +45380,7 @@
     "last_close_native": 22700.0,
     "market_value_krw": 22700.0,
     "month_end": "2025-04-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 1,
     "symbol": "119850.KQ",
     "weight_in_portfolio": 0.0001
@@ -45391,7 +45391,7 @@
     "last_close_native": 24.420000076293945,
     "market_value_krw": 320297469.1555,
     "month_end": "2025-05-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 9571,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9928
@@ -45402,7 +45402,7 @@
     "last_close_native": 26000.0,
     "market_value_krw": 2314000.0,
     "month_end": "2025-05-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 89,
     "symbol": "119850.KQ",
     "weight_in_portfolio": 0.0072
@@ -45413,7 +45413,7 @@
     "last_close_native": 22.700000762939457,
     "market_value_krw": 296255884.0341,
     "month_end": "2025-06-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 9571,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9818
@@ -45424,7 +45424,7 @@
     "last_close_native": 35950.0,
     "market_value_krw": 3199550.0,
     "month_end": "2025-06-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 89,
     "symbol": "119850.KQ",
     "weight_in_portfolio": 0.0106
@@ -45435,7 +45435,7 @@
     "last_close_native": 28.079999923706055,
     "market_value_krw": 2297376.3682,
     "month_end": "2025-06-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 60,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0076
@@ -45446,7 +45446,7 @@
     "last_close_native": 17.479999542236328,
     "market_value_krw": 232970097.0882,
     "month_end": "2025-07-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 9571,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9693
@@ -45457,7 +45457,7 @@
     "last_close_native": 34050.0,
     "market_value_krw": 4903200.0,
     "month_end": "2025-07-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 144,
     "symbol": "119850.KQ",
     "weight_in_portfolio": 0.0204
@@ -45468,7 +45468,7 @@
     "last_close_native": 29.56999969482422,
     "market_value_krw": 2470608.9932,
     "month_end": "2025-07-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 60,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0103
@@ -45479,7 +45479,7 @@
     "last_close_native": 15.640000343322749,
     "market_value_krw": 207232951.7059,
     "month_end": "2025-08-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 9571,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9582
@@ -45490,7 +45490,7 @@
     "last_close_native": 28750.0,
     "market_value_krw": 4168750.0,
     "month_end": "2025-08-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 145,
     "symbol": "119850.KQ",
     "weight_in_portfolio": 0.0193
@@ -45501,7 +45501,7 @@
     "last_close_native": 30.940000534057617,
     "market_value_krw": 2570018.8318,
     "month_end": "2025-08-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 60,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0119
@@ -45512,7 +45512,7 @@
     "last_close_native": 11675.0,
     "market_value_krw": 2311954.9643,
     "month_end": "2025-08-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 21,
     "symbol": "6857.T",
     "weight_in_portfolio": 0.0107
@@ -45523,7 +45523,7 @@
     "last_close_native": 15.020000457763672,
     "market_value_krw": 201162671.012,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 9571,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9433
@@ -45534,7 +45534,7 @@
     "last_close_native": 31450.0,
     "market_value_krw": 4560250.0,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 145,
     "symbol": "119850.KQ",
     "weight_in_portfolio": 0.0214
@@ -45545,7 +45545,7 @@
     "last_close_native": 14650.0,
     "market_value_krw": 2897045.5195,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 21,
     "symbol": "6857.T",
     "weight_in_portfolio": 0.0136
@@ -45556,7 +45556,7 @@
     "last_close_native": 26.899999618530273,
     "market_value_krw": 2409086.4182,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 64,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0113
@@ -45567,7 +45567,7 @@
     "last_close_native": 1107000.0,
     "market_value_krw": 2214000.0,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 2,
     "symbol": "012450.KS",
     "weight_in_portfolio": 0.0104
@@ -45578,7 +45578,7 @@
     "last_close_native": 220500.0,
     "market_value_krw": 43879500.0,
     "month_end": "2025-10-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 199,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.2852
@@ -45589,7 +45589,7 @@
     "last_close_native": 89.08000183105469,
     "market_value_krw": 38436066.902,
     "month_end": "2025-10-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 303,
     "symbol": "GLW",
     "weight_in_portfolio": 0.2498
@@ -45600,7 +45600,7 @@
     "last_close_native": 26850.0,
     "market_value_krw": 36891900.0,
     "month_end": "2025-10-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 1374,
     "symbol": "098120.KQ",
     "weight_in_portfolio": 0.2398
@@ -45611,7 +45611,7 @@
     "last_close_native": 979000.0,
     "market_value_krw": 32307000.0,
     "month_end": "2025-10-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 33,
     "symbol": "012450.KS",
     "weight_in_portfolio": 0.21
@@ -45622,7 +45622,7 @@
     "last_close_native": 25.610000610351562,
     "market_value_krw": 2334025.8284,
     "month_end": "2025-10-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 64,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0152
@@ -45633,7 +45633,7 @@
     "last_close_native": 84.19999694824219,
     "market_value_krw": 51803998.4678,
     "month_end": "2025-11-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 421,
     "symbol": "GLW",
     "weight_in_portfolio": 0.5129
@@ -45644,7 +45644,7 @@
     "last_close_native": 233500.0,
     "market_value_krw": 46466500.0,
     "month_end": "2025-11-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 199,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.46
@@ -45655,7 +45655,7 @@
     "last_close_native": 21.999999999999996,
     "market_value_krw": 2057651.2344,
     "month_end": "2025-11-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 64,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0204
@@ -45666,7 +45666,7 @@
     "last_close_native": 85400.0,
     "market_value_krw": 683200.0,
     "month_end": "2025-11-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 8,
     "symbol": "950160.KQ",
     "weight_in_portfolio": 0.0068
@@ -45677,7 +45677,7 @@
     "last_close_native": 87.55999755859375,
     "market_value_krw": 53005331.0136,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 421,
     "symbol": "GLW",
     "weight_in_portfolio": 0.2916
@@ -45688,7 +45688,7 @@
     "last_close_native": 261000.0,
     "market_value_krw": 51939000.0,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 199,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.2857
@@ -45699,7 +45699,7 @@
     "last_close_native": 72.87999725341797,
     "market_value_krw": 39507669.5118,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 377,
     "symbol": "ESTA",
     "weight_in_portfolio": 0.2173
@@ -45710,7 +45710,7 @@
     "last_close_native": 781000.0,
     "market_value_krw": 35145000.0,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 45,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.1933
@@ -45721,7 +45721,7 @@
     "last_close_native": 23.770000457763672,
     "market_value_krw": 2187463.8189,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 64,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.012
@@ -45732,7 +45732,7 @@
     "last_close_native": 338500.0,
     "market_value_krw": 67361500.0,
     "month_end": "2026-01-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 199,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.3287
@@ -45743,7 +45743,7 @@
     "last_close_native": 103.25,
     "market_value_krw": 62105697.2945,
     "month_end": "2026-01-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 421,
     "symbol": "GLW",
     "weight_in_portfolio": 0.303
@@ -45754,7 +45754,7 @@
     "last_close_native": 851000.0,
     "market_value_krw": 38295000.0,
     "month_end": "2026-01-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 45,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.1868
@@ -45765,7 +45765,7 @@
     "last_close_native": 68.1500015258789,
     "market_value_krw": 37195338.795,
     "month_end": "2026-01-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 382,
     "symbol": "ESTA",
     "weight_in_portfolio": 0.1815
@@ -45776,7 +45776,7 @@
     "last_close_native": 288500.0,
     "market_value_krw": 68663000.0,
     "month_end": "2026-02-28",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 238,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.3988
@@ -45787,7 +45787,7 @@
     "last_close_native": 1278000.0,
     "market_value_krw": 57510000.0,
     "month_end": "2026-02-28",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 45,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.334
@@ -45798,7 +45798,7 @@
     "last_close_native": 78.6999969482422,
     "market_value_krw": 45991218.764,
     "month_end": "2026-02-28",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 408,
     "symbol": "ESTA",
     "weight_in_portfolio": 0.2671
@@ -45809,7 +45809,7 @@
     "last_close_native": 241000.0,
     "market_value_krw": 74469000.0,
     "month_end": "2026-03-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 309,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.5126
@@ -45820,7 +45820,7 @@
     "last_close_native": 1026000.0,
     "market_value_krw": 70794000.0,
     "month_end": "2026-03-31",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 69,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.4874
@@ -45831,7 +45831,7 @@
     "last_close_native": 1596000.0,
     "market_value_krw": 218652000.0,
     "month_end": "2026-04-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 137,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.691
@@ -45842,7 +45842,7 @@
     "last_close_native": 316500.0,
     "market_value_krw": 97798500.0,
     "month_end": "2026-04-30",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 309,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.309
@@ -45853,7 +45853,7 @@
     "last_close_native": 1720000.0,
     "market_value_krw": 235640000.0,
     "month_end": "2026-05-11",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 137,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.9906
@@ -45864,7 +45864,7 @@
     "last_close_native": 209.1199951171875,
     "market_value_krw": 2151654.4434,
     "month_end": "2026-05-11",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 7,
     "symbol": "CAMT",
     "weight_in_portfolio": 0.009
@@ -45875,7 +45875,7 @@
     "last_close_native": 6070.0,
     "market_value_krw": 72840.0,
     "month_end": "2026-05-11",
-    "persona": "smic_mtt_strategy_optuna_top1",
+    "persona": "smic_mtt_strategy_top1",
     "qty": 12,
     "symbol": "187790.KS",
     "weight_in_portfolio": 0.0003
@@ -45886,7 +45886,7 @@
     "last_close_native": 216.71000671386722,
     "market_value_krw": 11088041.5643,
     "month_end": "2021-01-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.9855
@@ -45897,7 +45897,7 @@
     "last_close_native": 32666.666015625,
     "market_value_krw": 163333.3301,
     "month_end": "2021-01-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 5,
     "symbol": "285490.KQ",
     "weight_in_portfolio": 0.0145
@@ -45908,7 +45908,7 @@
     "last_close_native": 235.69000244140625,
     "market_value_krw": 12133316.6648,
     "month_end": "2021-02-28",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.8938
@@ -45919,7 +45919,7 @@
     "last_close_native": 363500.0,
     "market_value_krw": 1090500.0,
     "month_end": "2021-02-28",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 3,
     "symbol": "006650.KS",
     "weight_in_portfolio": 0.0803
@@ -45930,7 +45930,7 @@
     "last_close_native": 36300.0,
     "market_value_krw": 181500.0,
     "month_end": "2021-02-28",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 5,
     "symbol": "166090.KQ",
     "weight_in_portfolio": 0.0134
@@ -45941,7 +45941,7 @@
     "last_close_native": 34000.0,
     "market_value_krw": 170000.0,
     "month_end": "2021-02-28",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 5,
     "symbol": "285490.KQ",
     "weight_in_portfolio": 0.0125
@@ -45952,7 +45952,7 @@
     "last_close_native": 223.22999572753906,
     "market_value_krw": 11627317.7315,
     "month_end": "2021-03-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.8338
@@ -45963,7 +45963,7 @@
     "last_close_native": 325500.0,
     "market_value_krw": 1627500.0,
     "month_end": "2021-03-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 5,
     "symbol": "006650.KS",
     "weight_in_portfolio": 0.1167
@@ -45974,7 +45974,7 @@
     "last_close_native": 38850.0,
     "market_value_krw": 505050.0,
     "month_end": "2021-03-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 13,
     "symbol": "166090.KQ",
     "weight_in_portfolio": 0.0362
@@ -45985,7 +45985,7 @@
     "last_close_native": 36952.3828125,
     "market_value_krw": 184761.9141,
     "month_end": "2021-03-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 5,
     "symbol": "285490.KQ",
     "weight_in_portfolio": 0.0132
@@ -45996,7 +45996,7 @@
     "last_close_native": 252.5399932861328,
     "market_value_krw": 12855543.3642,
     "month_end": "2021-04-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.7799
@@ -46007,7 +46007,7 @@
     "last_close_native": 315000.0,
     "market_value_krw": 1575000.0,
     "month_end": "2021-04-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 5,
     "symbol": "006650.KS",
     "weight_in_portfolio": 0.0955
@@ -46018,7 +46018,7 @@
     "last_close_native": 44380.953125,
     "market_value_krw": 1375809.5469,
     "month_end": "2021-04-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 31,
     "symbol": "285490.KQ",
     "weight_in_portfolio": 0.0835
@@ -46029,7 +46029,7 @@
     "last_close_native": 67717.328125,
     "market_value_krw": 677173.2812,
     "month_end": "2021-04-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 10,
     "symbol": "007690.KS",
     "weight_in_portfolio": 0.0411
@@ -46040,7 +46040,7 @@
     "last_close_native": 253.24000549316406,
     "market_value_krw": 13015473.2431,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.7632
@@ -46051,7 +46051,7 @@
     "last_close_native": 266500.0,
     "market_value_krw": 1332500.0,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 5,
     "symbol": "006650.KS",
     "weight_in_portfolio": 0.0781
@@ -46062,7 +46062,7 @@
     "last_close_native": 38000.0,
     "market_value_krw": 1178000.0,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 31,
     "symbol": "285490.KQ",
     "weight_in_portfolio": 0.0691
@@ -46073,7 +46073,7 @@
     "last_close_native": 53400.0,
     "market_value_krw": 961200.0,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 18,
     "symbol": "004020.KS",
     "weight_in_portfolio": 0.0564
@@ -46084,7 +46084,7 @@
     "last_close_native": 56693.57421875,
     "market_value_krw": 566935.7422,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 10,
     "symbol": "007690.KS",
     "weight_in_portfolio": 0.0332
@@ -46095,7 +46095,7 @@
     "last_close_native": 274.6000061035156,
     "market_value_krw": 14280150.5568,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.7364
@@ -46106,7 +46106,7 @@
     "last_close_native": 238000.0,
     "market_value_krw": 1190000.0,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 5,
     "symbol": "006650.KS",
     "weight_in_portfolio": 0.0614
@@ -46117,7 +46117,7 @@
     "last_close_native": 38333.33203125,
     "market_value_krw": 1188333.293,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 31,
     "symbol": "285490.KQ",
     "weight_in_portfolio": 0.0613
@@ -46128,7 +46128,7 @@
     "last_close_native": 22.950000762939453,
     "market_value_krw": 1167534.2514,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 45,
     "symbol": "SBLK",
     "weight_in_portfolio": 0.0602
@@ -46139,7 +46139,7 @@
     "last_close_native": 53700.0,
     "market_value_krw": 966600.0,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 18,
     "symbol": "004020.KS",
     "weight_in_portfolio": 0.0498
@@ -46150,7 +46150,7 @@
     "last_close_native": 59993.19921875,
     "market_value_krw": 599931.9922,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 10,
     "symbol": "007690.KS",
     "weight_in_portfolio": 0.0309
@@ -46161,7 +46161,7 @@
     "last_close_native": 276.1600036621094,
     "market_value_krw": 14508761.6536,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.7547
@@ -46172,7 +46172,7 @@
     "last_close_native": 35190.4765625,
     "market_value_krw": 1090904.7734,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 31,
     "symbol": "285490.KQ",
     "weight_in_portfolio": 0.0567
@@ -46183,7 +46183,7 @@
     "last_close_native": 19.030000686645504,
     "market_value_krw": 978054.4931,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 45,
     "symbol": "SBLK",
     "weight_in_portfolio": 0.0509
@@ -46194,7 +46194,7 @@
     "last_close_native": 54000.0,
     "market_value_krw": 972000.0,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 18,
     "symbol": "004020.KS",
     "weight_in_portfolio": 0.0506
@@ -46205,7 +46205,7 @@
     "last_close_native": 33000.0,
     "market_value_krw": 924000.0,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 28,
     "symbol": "005850.KS",
     "weight_in_portfolio": 0.0481
@@ -46216,7 +46216,7 @@
     "last_close_native": 75086.2421875,
     "market_value_krw": 750862.4219,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 10,
     "symbol": "007690.KS",
     "weight_in_portfolio": 0.0391
@@ -46227,7 +46227,7 @@
     "last_close_native": 74500.0,
     "market_value_krw": 2160500.0,
     "month_end": "2021-08-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 29,
     "symbol": "344820.KQ",
     "weight_in_portfolio": 0.3614
@@ -46238,7 +46238,7 @@
     "last_close_native": 23.06999969482422,
     "market_value_krw": 1209974.2006,
     "month_end": "2021-08-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 45,
     "symbol": "SBLK",
     "weight_in_portfolio": 0.2024
@@ -46249,7 +46249,7 @@
     "last_close_native": 32380.953125,
     "market_value_krw": 1003809.5469,
     "month_end": "2021-08-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 31,
     "symbol": "285490.KQ",
     "weight_in_portfolio": 0.1679
@@ -46260,7 +46260,7 @@
     "last_close_native": 51000.0,
     "market_value_krw": 969000.0,
     "month_end": "2021-08-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 19,
     "symbol": "004020.KS",
     "weight_in_portfolio": 0.1621
@@ -46271,7 +46271,7 @@
     "last_close_native": 63495.14453125,
     "market_value_krw": 634951.4453,
     "month_end": "2021-08-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 10,
     "symbol": "007690.KS",
     "weight_in_portfolio": 0.1062
@@ -46282,7 +46282,7 @@
     "last_close_native": 24.040000915527344,
     "market_value_krw": 8421016.7756,
     "month_end": "2021-09-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 295,
     "symbol": "SBLK",
     "weight_in_portfolio": 0.3515
@@ -46293,7 +46293,7 @@
     "last_close_native": 71359.2265625,
     "market_value_krw": 8277670.2812,
     "month_end": "2021-09-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 116,
     "symbol": "007690.KS",
     "weight_in_portfolio": 0.3456
@@ -46304,7 +46304,7 @@
     "last_close_native": 69000.0,
     "market_value_krw": 5382000.0,
     "month_end": "2021-09-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 78,
     "symbol": "344820.KQ",
     "weight_in_portfolio": 0.2247
@@ -46315,7 +46315,7 @@
     "last_close_native": 31428.572265625,
     "market_value_krw": 974285.7402,
     "month_end": "2021-09-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 31,
     "symbol": "285490.KQ",
     "weight_in_portfolio": 0.0407
@@ -46326,7 +46326,7 @@
     "last_close_native": 47350.0,
     "market_value_krw": 899650.0,
     "month_end": "2021-09-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 19,
     "symbol": "004020.KS",
     "weight_in_portfolio": 0.0376
@@ -46337,7 +46337,7 @@
     "last_close_native": 20.690000534057617,
     "market_value_krw": 7922146.5498,
     "month_end": "2021-10-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 328,
     "symbol": "SBLK",
     "weight_in_portfolio": 0.3613
@@ -46348,7 +46348,7 @@
     "last_close_native": 64951.45703125,
     "market_value_krw": 7534369.0156,
     "month_end": "2021-10-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 116,
     "symbol": "007690.KS",
     "weight_in_portfolio": 0.3436
@@ -46359,7 +46359,7 @@
     "last_close_native": 60100.0,
     "market_value_krw": 4687800.0,
     "month_end": "2021-10-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 78,
     "symbol": "344820.KQ",
     "weight_in_portfolio": 0.2138
@@ -46370,7 +46370,7 @@
     "last_close_native": 30333.333984375,
     "market_value_krw": 940333.3535,
     "month_end": "2021-10-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 31,
     "symbol": "285490.KQ",
     "weight_in_portfolio": 0.0429
@@ -46381,7 +46381,7 @@
     "last_close_native": 44450.0,
     "market_value_krw": 844550.0,
     "month_end": "2021-10-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 19,
     "symbol": "004020.KS",
     "weight_in_portfolio": 0.0385
@@ -46392,7 +46392,7 @@
     "last_close_native": 21.01000022888184,
     "market_value_krw": 8205722.7693,
     "month_end": "2021-11-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 328,
     "symbol": "SBLK",
     "weight_in_portfolio": 0.4258
@@ -46403,7 +46403,7 @@
     "last_close_native": 50485.4375,
     "market_value_krw": 5856310.75,
     "month_end": "2021-11-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 116,
     "symbol": "007690.KS",
     "weight_in_portfolio": 0.3039
@@ -46414,7 +46414,7 @@
     "last_close_native": 52900.0,
     "market_value_krw": 4126200.0,
     "month_end": "2021-11-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 78,
     "symbol": "344820.KQ",
     "weight_in_portfolio": 0.2141
@@ -46425,7 +46425,7 @@
     "last_close_native": 33952.3828125,
     "market_value_krw": 1052523.8672,
     "month_end": "2021-11-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 31,
     "symbol": "285490.KQ",
     "weight_in_portfolio": 0.0546
@@ -46436,7 +46436,7 @@
     "last_close_native": 6290.0,
     "market_value_krw": 31450.0,
     "month_end": "2021-11-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 5,
     "symbol": "004250.KS",
     "weight_in_portfolio": 0.0016
@@ -46447,7 +46447,7 @@
     "last_close_native": 22.67000007629394,
     "market_value_krw": 8847736.6051,
     "month_end": "2021-12-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 328,
     "symbol": "SBLK",
     "weight_in_portfolio": 0.3777
@@ -46458,7 +46458,7 @@
     "last_close_native": 349000.0,
     "market_value_krw": 6631000.0,
     "month_end": "2021-12-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 19,
     "symbol": "352820.KS",
     "weight_in_portfolio": 0.2831
@@ -46469,7 +46469,7 @@
     "last_close_native": 54854.3671875,
     "market_value_krw": 6363106.5938,
     "month_end": "2021-12-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 116,
     "symbol": "007690.KS",
     "weight_in_portfolio": 0.2717
@@ -46480,7 +46480,7 @@
     "last_close_native": 42200.0,
     "market_value_krw": 1308200.0,
     "month_end": "2021-12-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 31,
     "symbol": "285490.KQ",
     "weight_in_portfolio": 0.0559
@@ -46491,7 +46491,7 @@
     "last_close_native": 91000.0,
     "market_value_krw": 273000.0,
     "month_end": "2021-12-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 3,
     "symbol": "293490.KQ",
     "weight_in_portfolio": 0.0117
@@ -46502,7 +46502,7 @@
     "last_close_native": 22.239999771118164,
     "market_value_krw": 8809905.9156,
     "month_end": "2022-01-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 328,
     "symbol": "SBLK",
     "weight_in_portfolio": 0.5998
@@ -46513,7 +46513,7 @@
     "last_close_native": 50679.61328125,
     "market_value_krw": 5878835.1406,
     "month_end": "2022-01-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 116,
     "symbol": "007690.KS",
     "weight_in_portfolio": 0.4002
@@ -46524,7 +46524,7 @@
     "last_close_native": 30.079999923706055,
     "market_value_krw": 11815709.9944,
     "month_end": "2022-02-28",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 328,
     "symbol": "SBLK",
     "weight_in_portfolio": 0.6673
@@ -46535,7 +46535,7 @@
     "last_close_native": 50776.69921875,
     "market_value_krw": 5890097.1094,
     "month_end": "2022-02-28",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 116,
     "symbol": "007690.KS",
     "weight_in_portfolio": 0.3327
@@ -46546,7 +46546,7 @@
     "last_close_native": 29.690000534057617,
     "market_value_krw": 11787651.7022,
     "month_end": "2022-03-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 328,
     "symbol": "SBLK",
     "weight_in_portfolio": 0.6423
@@ -46557,7 +46557,7 @@
     "last_close_native": 56601.94140625,
     "market_value_krw": 6565825.2031,
     "month_end": "2022-03-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 116,
     "symbol": "007690.KS",
     "weight_in_portfolio": 0.3577
@@ -46568,7 +46568,7 @@
     "last_close_native": 28.100000381469727,
     "market_value_krw": 11726442.9912,
     "month_end": "2022-04-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 328,
     "symbol": "SBLK",
     "weight_in_portfolio": 1.0
@@ -46579,7 +46579,7 @@
     "last_close_native": 33.04999923706055,
     "market_value_krw": 15811047.1566,
     "month_end": "2022-05-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 387,
     "symbol": "STNG",
     "weight_in_portfolio": 1.0
@@ -46590,7 +46590,7 @@
     "last_close_native": 34.5099983215332,
     "market_value_krw": 34500633.1707,
     "month_end": "2022-06-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 768,
     "symbol": "STNG",
     "weight_in_portfolio": 1.0
@@ -46601,7 +46601,7 @@
     "last_close_native": 38.61000061035156,
     "market_value_krw": 39504537.1542,
     "month_end": "2022-07-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 790,
     "symbol": "STNG",
     "weight_in_portfolio": 1.0
@@ -46612,7 +46612,7 @@
     "last_close_native": 41.599998474121094,
     "market_value_krw": 45439830.6973,
     "month_end": "2022-08-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 809,
     "symbol": "STNG",
     "weight_in_portfolio": 1.0
@@ -46623,7 +46623,7 @@
     "last_close_native": 37.130001068115234,
     "market_value_krw": 54378143.2145,
     "month_end": "2022-11-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 1105,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -46634,7 +46634,7 @@
     "last_close_native": 37.709999084472656,
     "market_value_krw": 52514466.215,
     "month_end": "2022-12-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 1105,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -46645,7 +46645,7 @@
     "last_close_native": 40.689998626708984,
     "market_value_krw": 55371255.3062,
     "month_end": "2023-01-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 1105,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -46656,7 +46656,7 @@
     "last_close_native": 41.689998626708984,
     "market_value_krw": 60733019.5822,
     "month_end": "2023-02-28",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 1105,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -46667,7 +46667,7 @@
     "last_close_native": 39.470001220703125,
     "market_value_krw": 56546006.5238,
     "month_end": "2023-03-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 1105,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -46678,7 +46678,7 @@
     "last_close_native": 38.45000076293945,
     "market_value_krw": 56906999.529,
     "month_end": "2023-04-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 1105,
     "symbol": "NE",
     "weight_in_portfolio": 0.9066
@@ -46689,7 +46689,7 @@
     "last_close_native": 23450.0,
     "market_value_krw": 5862500.0,
     "month_end": "2023-04-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 250,
     "symbol": "182360.KQ",
     "weight_in_portfolio": 0.0934
@@ -46700,7 +46700,7 @@
     "last_close_native": 37.7400016784668,
     "market_value_krw": 55038810.5098,
     "month_end": "2023-05-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 1105,
     "symbol": "NE",
     "weight_in_portfolio": 0.8985
@@ -46711,7 +46711,7 @@
     "last_close_native": 19800.0,
     "market_value_krw": 6217200.0,
     "month_end": "2023-05-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 314,
     "symbol": "182360.KQ",
     "weight_in_portfolio": 0.1015
@@ -46722,7 +46722,7 @@
     "last_close_native": 41.310001373291016,
     "market_value_krw": 60394903.5345,
     "month_end": "2023-06-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 1105,
     "symbol": "NE",
     "weight_in_portfolio": 0.8654
@@ -46733,7 +46733,7 @@
     "last_close_native": 25300.0,
     "market_value_krw": 7944200.0,
     "month_end": "2023-06-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 314,
     "symbol": "182360.KQ",
     "weight_in_portfolio": 0.1138
@@ -46744,7 +46744,7 @@
     "last_close_native": 36150.0,
     "market_value_krw": 1446000.0,
     "month_end": "2023-06-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 40,
     "symbol": "228670.KQ",
     "weight_in_portfolio": 0.0207
@@ -46755,7 +46755,7 @@
     "last_close_native": 52.27000045776367,
     "market_value_krw": 73491148.4462,
     "month_end": "2023-07-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 1105,
     "symbol": "NE",
     "weight_in_portfolio": 0.8868
@@ -46766,7 +46766,7 @@
     "last_close_native": 20850.0,
     "market_value_krw": 7797900.0,
     "month_end": "2023-07-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 374,
     "symbol": "182360.KQ",
     "weight_in_portfolio": 0.0941
@@ -46777,7 +46777,7 @@
     "last_close_native": 39500.0,
     "market_value_krw": 1580000.0,
     "month_end": "2023-07-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 40,
     "symbol": "228670.KQ",
     "weight_in_portfolio": 0.0191
@@ -46788,7 +46788,7 @@
     "last_close_native": 19800.0,
     "market_value_krw": 7405200.0,
     "month_end": "2023-08-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 374,
     "symbol": "182360.KQ",
     "weight_in_portfolio": 1.0
@@ -46799,7 +46799,7 @@
     "last_close_native": 19900.0,
     "market_value_krw": 7442600.0,
     "month_end": "2023-09-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 374,
     "symbol": "182360.KQ",
     "weight_in_portfolio": 1.0
@@ -46810,7 +46810,7 @@
     "last_close_native": 75000.0,
     "market_value_krw": 91950000.0,
     "month_end": "2023-10-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 1226,
     "symbol": "267260.KS",
     "weight_in_portfolio": 1.0
@@ -46821,7 +46821,7 @@
     "last_close_native": 84100.0,
     "market_value_krw": 104704500.0,
     "month_end": "2023-11-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 1245,
     "symbol": "267260.KS",
     "weight_in_portfolio": 1.0
@@ -46832,7 +46832,7 @@
     "last_close_native": 82200.0,
     "market_value_krw": 102339000.0,
     "month_end": "2023-12-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 1245,
     "symbol": "267260.KS",
     "weight_in_portfolio": 0.9852
@@ -46843,7 +46843,7 @@
     "last_close_native": 48.029998779296875,
     "market_value_krw": 1534366.3,
     "month_end": "2023-12-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 25,
     "symbol": "VRT",
     "weight_in_portfolio": 0.0148
@@ -46854,7 +46854,7 @@
     "last_close_native": 102700.0,
     "market_value_krw": 127861500.0,
     "month_end": "2024-01-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 1245,
     "symbol": "267260.KS",
     "weight_in_portfolio": 0.9771
@@ -46865,7 +46865,7 @@
     "last_close_native": 56.33000183105469,
     "market_value_krw": 1868212.6689,
     "month_end": "2024-01-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 25,
     "symbol": "VRT",
     "weight_in_portfolio": 0.0143
@@ -46876,7 +46876,7 @@
     "last_close_native": 45050.0,
     "market_value_krw": 1126250.0,
     "month_end": "2024-01-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 25,
     "symbol": "131970.KQ",
     "weight_in_portfolio": 0.0086
@@ -46887,7 +46887,7 @@
     "last_close_native": 124400.0,
     "market_value_krw": 154878000.0,
     "month_end": "2024-02-29",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 1245,
     "symbol": "267260.KS",
     "weight_in_portfolio": 0.9936
@@ -46898,7 +46898,7 @@
     "last_close_native": 753.6799926757811,
     "market_value_krw": 1004941.8323,
     "month_end": "2024-02-29",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 1,
     "symbol": "LLY",
     "weight_in_portfolio": 0.0064
@@ -46909,7 +46909,7 @@
     "last_close_native": 331000.0,
     "market_value_krw": 205882000.0,
     "month_end": "2024-10-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 622,
     "symbol": "259960.KQ",
     "weight_in_portfolio": 1.0
@@ -46920,7 +46920,7 @@
     "last_close_native": 312000.0,
     "market_value_krw": 194064000.0,
     "month_end": "2024-11-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 622,
     "symbol": "259960.KQ",
     "weight_in_portfolio": 0.9918
@@ -46931,7 +46931,7 @@
     "last_close_native": 29100.0,
     "market_value_krw": 1600500.0,
     "month_end": "2024-11-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 55,
     "symbol": "018290.KS",
     "weight_in_portfolio": 0.0082
@@ -46942,7 +46942,7 @@
     "last_close_native": 312500.0,
     "market_value_krw": 194375000.0,
     "month_end": "2024-12-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 622,
     "symbol": "259960.KQ",
     "weight_in_portfolio": 0.9797
@@ -46953,7 +46953,7 @@
     "last_close_native": 40000.0,
     "market_value_krw": 2200000.0,
     "month_end": "2024-12-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 55,
     "symbol": "018290.KS",
     "weight_in_portfolio": 0.0111
@@ -46964,7 +46964,7 @@
     "last_close_native": 17.84000015258789,
     "market_value_krw": 1832476.666,
     "month_end": "2024-12-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 70,
     "symbol": "GRND",
     "weight_in_portfolio": 0.0092
@@ -46975,7 +46975,7 @@
     "last_close_native": 364000.0,
     "market_value_krw": 226408000.0,
     "month_end": "2025-01-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 622,
     "symbol": "259960.KQ",
     "weight_in_portfolio": 0.9794
@@ -46986,7 +46986,7 @@
     "last_close_native": 32250.0,
     "market_value_krw": 2967000.0,
     "month_end": "2025-01-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 92,
     "symbol": "018290.KS",
     "weight_in_portfolio": 0.0128
@@ -46997,7 +46997,7 @@
     "last_close_native": 17.84000015258789,
     "market_value_krw": 1800345.0661,
     "month_end": "2025-01-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 70,
     "symbol": "GRND",
     "weight_in_portfolio": 0.0078
@@ -47008,7 +47008,7 @@
     "last_close_native": 343500.0,
     "market_value_krw": 213657000.0,
     "month_end": "2025-02-28",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 622,
     "symbol": "259960.KQ",
     "weight_in_portfolio": 0.9683
@@ -47019,7 +47019,7 @@
     "last_close_native": 18.350000381469727,
     "market_value_krw": 3884319.9675,
     "month_end": "2025-02-28",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 146,
     "symbol": "GRND",
     "weight_in_portfolio": 0.0176
@@ -47030,7 +47030,7 @@
     "last_close_native": 33850.0,
     "market_value_krw": 3114200.0,
     "month_end": "2025-02-28",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 92,
     "symbol": "018290.KS",
     "weight_in_portfolio": 0.0141
@@ -47041,7 +47041,7 @@
     "last_close_native": 334500.0,
     "market_value_krw": 208059000.0,
     "month_end": "2025-03-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 622,
     "symbol": "259960.KQ",
     "weight_in_portfolio": 0.9602
@@ -47052,7 +47052,7 @@
     "last_close_native": 17.89999961853027,
     "market_value_krw": 5760234.1522,
     "month_end": "2025-03-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 219,
     "symbol": "GRND",
     "weight_in_portfolio": 0.0266
@@ -47063,7 +47063,7 @@
     "last_close_native": 31050.0,
     "market_value_krw": 2856600.0,
     "month_end": "2025-03-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 92,
     "symbol": "018290.KS",
     "weight_in_portfolio": 0.0132
@@ -47074,7 +47074,7 @@
     "last_close_native": 371500.0,
     "market_value_krw": 231073000.0,
     "month_end": "2025-04-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 622,
     "symbol": "259960.KQ",
     "weight_in_portfolio": 0.9478
@@ -47085,7 +47085,7 @@
     "last_close_native": 21.969999313354496,
     "market_value_krw": 9212677.3957,
     "month_end": "2025-04-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 293,
     "symbol": "GRND",
     "weight_in_portfolio": 0.0378
@@ -47096,7 +47096,7 @@
     "last_close_native": 38300.0,
     "market_value_krw": 3523600.0,
     "month_end": "2025-04-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 92,
     "symbol": "018290.KS",
     "weight_in_portfolio": 0.0145
@@ -47107,7 +47107,7 @@
     "last_close_native": 369000.0,
     "market_value_krw": 229518000.0,
     "month_end": "2025-05-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 622,
     "symbol": "259960.KQ",
     "weight_in_portfolio": 0.9361
@@ -47118,7 +47118,7 @@
     "last_close_native": 24.420000076293945,
     "market_value_krw": 11913687.0776,
     "month_end": "2025-05-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 356,
     "symbol": "GRND",
     "weight_in_portfolio": 0.0486
@@ -47129,7 +47129,7 @@
     "last_close_native": 40800.0,
     "market_value_krw": 3753600.0,
     "month_end": "2025-05-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 92,
     "symbol": "018290.KS",
     "weight_in_portfolio": 0.0153
@@ -47140,7 +47140,7 @@
     "last_close_native": 363000.0,
     "market_value_krw": 225786000.0,
     "month_end": "2025-06-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 622,
     "symbol": "259960.KQ",
     "weight_in_portfolio": 0.9303
@@ -47151,7 +47151,7 @@
     "last_close_native": 22.700000762939457,
     "market_value_krw": 11019443.6021,
     "month_end": "2025-06-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 356,
     "symbol": "GRND",
     "weight_in_portfolio": 0.0454
@@ -47162,7 +47162,7 @@
     "last_close_native": 35300.0,
     "market_value_krw": 3247600.0,
     "month_end": "2025-06-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 92,
     "symbol": "018290.KS",
     "weight_in_portfolio": 0.0134
@@ -47173,7 +47173,7 @@
     "last_close_native": 35950.0,
     "market_value_krw": 2660300.0,
     "month_end": "2025-06-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 74,
     "symbol": "119850.KQ",
     "weight_in_portfolio": 0.011
@@ -47184,7 +47184,7 @@
     "last_close_native": 328500.0,
     "market_value_krw": 204327000.0,
     "month_end": "2025-07-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 622,
     "symbol": "259960.KQ",
     "weight_in_portfolio": 0.9245
@@ -47195,7 +47195,7 @@
     "last_close_native": 17.479999542236328,
     "market_value_krw": 8665484.7522,
     "month_end": "2025-07-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 356,
     "symbol": "GRND",
     "weight_in_portfolio": 0.0392
@@ -47206,7 +47206,7 @@
     "last_close_native": 36100.0,
     "market_value_krw": 3321200.0,
     "month_end": "2025-07-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 92,
     "symbol": "018290.KS",
     "weight_in_portfolio": 0.015
@@ -47217,7 +47217,7 @@
     "last_close_native": 34050.0,
     "market_value_krw": 2519700.0,
     "month_end": "2025-07-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 74,
     "symbol": "119850.KQ",
     "weight_in_portfolio": 0.0114
@@ -47228,7 +47228,7 @@
     "last_close_native": 29.56999969482422,
     "market_value_krw": 2182371.2773,
     "month_end": "2025-07-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 53,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0099
@@ -47239,7 +47239,7 @@
     "last_close_native": 327500.0,
     "market_value_krw": 203705000.0,
     "month_end": "2025-08-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 622,
     "symbol": "259960.KQ",
     "weight_in_portfolio": 0.9195
@@ -47250,7 +47250,7 @@
     "last_close_native": 15.640000343322749,
     "market_value_krw": 7708173.7339,
     "month_end": "2025-08-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 356,
     "symbol": "GRND",
     "weight_in_portfolio": 0.0348
@@ -47261,7 +47261,7 @@
     "last_close_native": 36750.0,
     "market_value_krw": 3381000.0,
     "month_end": "2025-08-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 92,
     "symbol": "018290.KS",
     "weight_in_portfolio": 0.0153
@@ -47272,7 +47272,7 @@
     "last_close_native": 11675.0,
     "market_value_krw": 2311954.9643,
     "month_end": "2025-08-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 21,
     "symbol": "6857.T",
     "weight_in_portfolio": 0.0104
@@ -47283,7 +47283,7 @@
     "last_close_native": 30.940000534057617,
     "market_value_krw": 2270183.3014,
     "month_end": "2025-08-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 53,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0102
@@ -47294,7 +47294,7 @@
     "last_close_native": 28750.0,
     "market_value_krw": 2156250.0,
     "month_end": "2025-08-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 75,
     "symbol": "119850.KQ",
     "weight_in_portfolio": 0.0097
@@ -47305,7 +47305,7 @@
     "last_close_native": 292500.0,
     "market_value_krw": 181935000.0,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 622,
     "symbol": "259960.KQ",
     "weight_in_portfolio": 0.9014
@@ -47316,7 +47316,7 @@
     "last_close_native": 15.020000457763672,
     "market_value_krw": 7482385.4227,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 356,
     "symbol": "GRND",
     "weight_in_portfolio": 0.0371
@@ -47327,7 +47327,7 @@
     "last_close_native": 14650.0,
     "market_value_krw": 2897045.5195,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 21,
     "symbol": "6857.T",
     "weight_in_portfolio": 0.0144
@@ -47338,7 +47338,7 @@
     "last_close_native": 30350.0,
     "market_value_krw": 2792200.0,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 92,
     "symbol": "018290.KS",
     "weight_in_portfolio": 0.0138
@@ -47349,7 +47349,7 @@
     "last_close_native": 31450.0,
     "market_value_krw": 2358750.0,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 75,
     "symbol": "119850.KQ",
     "weight_in_portfolio": 0.0117
@@ -47360,7 +47360,7 @@
     "last_close_native": 1107000.0,
     "market_value_krw": 2214000.0,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 2,
     "symbol": "012450.KS",
     "weight_in_portfolio": 0.011
@@ -47371,7 +47371,7 @@
     "last_close_native": 26.899999618530273,
     "market_value_krw": 2145592.5912,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 57,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0106
@@ -47382,7 +47382,7 @@
     "last_close_native": 220500.0,
     "market_value_krw": 46746000.0,
     "month_end": "2025-10-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 212,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.2899
@@ -47393,7 +47393,7 @@
     "last_close_native": 89.08000183105469,
     "market_value_krw": 40846249.315,
     "month_end": "2025-10-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 322,
     "symbol": "GLW",
     "weight_in_portfolio": 0.2533
@@ -47404,7 +47404,7 @@
     "last_close_native": 26850.0,
     "market_value_krw": 39281550.0,
     "month_end": "2025-10-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 1463,
     "symbol": "098120.KQ",
     "weight_in_portfolio": 0.2436
@@ -47415,7 +47415,7 @@
     "last_close_native": 979000.0,
     "market_value_krw": 32307000.0,
     "month_end": "2025-10-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 33,
     "symbol": "012450.KS",
     "weight_in_portfolio": 0.2003
@@ -47426,7 +47426,7 @@
     "last_close_native": 25.610000610351562,
     "market_value_krw": 2078741.7535,
     "month_end": "2025-10-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 57,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0129
@@ -47437,7 +47437,7 @@
     "last_close_native": 84.19999694824219,
     "market_value_krw": 55126345.1629,
     "month_end": "2025-11-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 448,
     "symbol": "GLW",
     "weight_in_portfolio": 0.369
@@ -47448,7 +47448,7 @@
     "last_close_native": 233500.0,
     "market_value_krw": 49502000.0,
     "month_end": "2025-11-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 212,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.3313
@@ -47459,7 +47459,7 @@
     "last_close_native": 852000.0,
     "market_value_krw": 41748000.0,
     "month_end": "2025-11-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 49,
     "symbol": "012450.KS",
     "weight_in_portfolio": 0.2794
@@ -47470,7 +47470,7 @@
     "last_close_native": 21.999999999999996,
     "market_value_krw": 1832595.6306,
     "month_end": "2025-11-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 57,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0123
@@ -47481,7 +47481,7 @@
     "last_close_native": 85400.0,
     "market_value_krw": 1195600.0,
     "month_end": "2025-11-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 14,
     "symbol": "950160.KQ",
     "weight_in_portfolio": 0.008
@@ -47492,7 +47492,7 @@
     "last_close_native": 87.55999755859375,
     "market_value_krw": 56404722.7888,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 448,
     "symbol": "GLW",
     "weight_in_portfolio": 0.2814
@@ -47503,7 +47503,7 @@
     "last_close_native": 261000.0,
     "market_value_krw": 55332000.0,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 212,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.276
@@ -47514,7 +47514,7 @@
     "last_close_native": 941000.0,
     "market_value_krw": 46109000.0,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 49,
     "symbol": "012450.KS",
     "weight_in_portfolio": 0.23
@@ -47525,7 +47525,7 @@
     "last_close_native": 781000.0,
     "market_value_krw": 35145000.0,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 45,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.1753
@@ -47536,7 +47536,7 @@
     "last_close_native": 72.87999725341797,
     "market_value_krw": 4401384.9324,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 42,
     "symbol": "ESTA",
     "weight_in_portfolio": 0.022
@@ -47547,7 +47547,7 @@
     "last_close_native": 23.770000457763672,
     "market_value_krw": 1948209.9637,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 57,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0097
@@ -47558,7 +47558,7 @@
     "last_close_native": 79600.0,
     "market_value_krw": 1114400.0,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 14,
     "symbol": "950160.KQ",
     "weight_in_portfolio": 0.0056
@@ -47569,7 +47569,7 @@
     "last_close_native": 338500.0,
     "market_value_krw": 71762000.0,
     "month_end": "2026-01-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 212,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.3902
@@ -47580,7 +47580,7 @@
     "last_close_native": 103.25,
     "market_value_krw": 66088723.0117,
     "month_end": "2026-01-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 448,
     "symbol": "GLW",
     "weight_in_portfolio": 0.3594
@@ -47591,7 +47591,7 @@
     "last_close_native": 851000.0,
     "market_value_krw": 38295000.0,
     "month_end": "2026-01-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 45,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.2082
@@ -47602,7 +47602,7 @@
     "last_close_native": 68.1500015258789,
     "market_value_krw": 4089539.8675,
     "month_end": "2026-01-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 42,
     "symbol": "ESTA",
     "weight_in_portfolio": 0.0222
@@ -47613,7 +47613,7 @@
     "last_close_native": 105000.0,
     "market_value_krw": 1995000.0,
     "month_end": "2026-01-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 19,
     "symbol": "950160.KQ",
     "weight_in_portfolio": 0.0108
@@ -47624,7 +47624,7 @@
     "last_close_native": 391.8399963378906,
     "market_value_krw": 1679535.951,
     "month_end": "2026-01-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 3,
     "symbol": "LITE",
     "weight_in_portfolio": 0.0091
@@ -47635,7 +47635,7 @@
     "last_close_native": 288500.0,
     "market_value_krw": 61162000.0,
     "month_end": "2026-02-28",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 212,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.3097
@@ -47646,7 +47646,7 @@
     "last_close_native": 1278000.0,
     "market_value_krw": 57510000.0,
     "month_end": "2026-02-28",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 45,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.2912
@@ -47657,7 +47657,7 @@
     "last_close_native": 107000.0,
     "market_value_krw": 52109000.0,
     "month_end": "2026-02-28",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 487,
     "symbol": "950160.KQ",
     "weight_in_portfolio": 0.2638
@@ -47668,7 +47668,7 @@
     "last_close_native": 78.6999969482422,
     "market_value_krw": 26715487.3702,
     "month_end": "2026-02-28",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 237,
     "symbol": "ESTA",
     "weight_in_portfolio": 0.1353
@@ -47679,7 +47679,7 @@
     "last_close_native": 106700.0,
     "market_value_krw": 75330200.0,
     "month_end": "2026-03-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 706,
     "symbol": "950160.KQ",
     "weight_in_portfolio": 0.2915
@@ -47690,7 +47690,7 @@
     "last_close_native": 241000.0,
     "market_value_krw": 63142000.0,
     "month_end": "2026-03-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 262,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.2444
@@ -47701,7 +47701,7 @@
     "last_close_native": 1026000.0,
     "market_value_krw": 60534000.0,
     "month_end": "2026-03-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 59,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.2343
@@ -47712,7 +47712,7 @@
     "last_close_native": 56.779998779296875,
     "market_value_krw": 59399243.2803,
     "month_end": "2026-03-31",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 690,
     "symbol": "ESTA",
     "weight_in_portfolio": 0.2299
@@ -47723,7 +47723,7 @@
     "last_close_native": 1596000.0,
     "market_value_krw": 94164000.0,
     "month_end": "2026-04-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 59,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.2928
@@ -47734,7 +47734,7 @@
     "last_close_native": 316500.0,
     "market_value_krw": 82923000.0,
     "month_end": "2026-04-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 262,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.2578
@@ -47745,7 +47745,7 @@
     "last_close_native": 102000.0,
     "market_value_krw": 74052000.0,
     "month_end": "2026-04-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 726,
     "symbol": "950160.KQ",
     "weight_in_portfolio": 0.2302
@@ -47756,7 +47756,7 @@
     "last_close_native": 68.62999725341798,
     "market_value_krw": 70434431.0984,
     "month_end": "2026-04-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 690,
     "symbol": "ESTA",
     "weight_in_portfolio": 0.219
@@ -47767,7 +47767,7 @@
     "last_close_native": 57000.0,
     "market_value_krw": 57000.0,
     "month_end": "2026-04-30",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 1,
     "symbol": "082920.KS",
     "weight_in_portfolio": 0.0002
@@ -47778,7 +47778,7 @@
     "last_close_native": 1720000.0,
     "market_value_krw": 101480000.0,
     "month_end": "2026-05-11",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 59,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.5757
@@ -47789,7 +47789,7 @@
     "last_close_native": 71.45999908447266,
     "market_value_krw": 72475466.8687,
     "month_end": "2026-05-11",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 690,
     "symbol": "ESTA",
     "weight_in_portfolio": 0.4111
@@ -47800,7 +47800,7 @@
     "last_close_native": 209.1199951171875,
     "market_value_krw": 2151654.4434,
     "month_end": "2026-05-11",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 7,
     "symbol": "CAMT",
     "weight_in_portfolio": 0.0122
@@ -47811,7 +47811,7 @@
     "last_close_native": 59000.0,
     "market_value_krw": 177000.0,
     "month_end": "2026-05-11",
-    "persona": "smic_mtt_strategy_optuna_top2",
+    "persona": "smic_mtt_strategy_top2",
     "qty": 3,
     "symbol": "082920.KS",
     "weight_in_portfolio": 0.001
@@ -47822,7 +47822,7 @@
     "last_close_native": 216.71000671386722,
     "market_value_krw": 11088041.5643,
     "month_end": "2021-01-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 1.0
@@ -47833,7 +47833,7 @@
     "last_close_native": 235.69000244140625,
     "market_value_krw": 13188387.6792,
     "month_end": "2021-02-28",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 50,
     "symbol": "SE",
     "weight_in_portfolio": 1.0
@@ -47844,7 +47844,7 @@
     "last_close_native": 223.22999572753906,
     "market_value_krw": 13649459.9457,
     "month_end": "2021-03-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 54,
     "symbol": "SE",
     "weight_in_portfolio": 1.0
@@ -47855,7 +47855,7 @@
     "last_close_native": 252.5399932861328,
     "market_value_krw": 15929695.0382,
     "month_end": "2021-04-30",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 57,
     "symbol": "SE",
     "weight_in_portfolio": 1.0
@@ -47866,7 +47866,7 @@
     "last_close_native": 253.24000549316406,
     "market_value_krw": 17259649.3007,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 61,
     "symbol": "SE",
     "weight_in_portfolio": 1.0
@@ -47877,7 +47877,7 @@
     "last_close_native": 274.6000061035156,
     "market_value_krw": 18936721.3905,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 61,
     "symbol": "SE",
     "weight_in_portfolio": 0.9359
@@ -47888,7 +47888,7 @@
     "last_close_native": 22.950000762939453,
     "market_value_krw": 1297260.2793,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 50,
     "symbol": "SBLK",
     "weight_in_portfolio": 0.0641
@@ -47899,7 +47899,7 @@
     "last_close_native": 276.1600036621094,
     "market_value_krw": 19239879.5841,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 61,
     "symbol": "SE",
     "weight_in_portfolio": 1.0
@@ -47910,7 +47910,7 @@
     "last_close_native": 33.04999923706055,
     "market_value_krw": 34114274.8727,
     "month_end": "2022-05-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 835,
     "symbol": "STNG",
     "weight_in_portfolio": 1.0
@@ -47921,7 +47921,7 @@
     "last_close_native": 34.5099983215332,
     "market_value_krw": 38588598.8199,
     "month_end": "2022-06-30",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 859,
     "symbol": "STNG",
     "weight_in_portfolio": 1.0
@@ -47932,7 +47932,7 @@
     "last_close_native": 38.61000061035156,
     "market_value_krw": 44055059.7884,
     "month_end": "2022-07-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 881,
     "symbol": "STNG",
     "weight_in_portfolio": 1.0
@@ -47943,7 +47943,7 @@
     "last_close_native": 41.599998474121094,
     "market_value_krw": 50551109.552,
     "month_end": "2022-08-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 900,
     "symbol": "STNG",
     "weight_in_portfolio": 1.0
@@ -47954,7 +47954,7 @@
     "last_close_native": 37.130001068115234,
     "market_value_krw": 60135828.9666,
     "month_end": "2022-11-30",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 1222,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -47965,7 +47965,7 @@
     "last_close_native": 37.709999084472656,
     "market_value_krw": 58074821.4613,
     "month_end": "2022-12-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 1222,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -47976,7 +47976,7 @@
     "last_close_native": 40.689998626708984,
     "market_value_krw": 61234094.1033,
     "month_end": "2023-01-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 1222,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -47987,7 +47987,7 @@
     "last_close_native": 41.689998626708984,
     "market_value_krw": 67163574.5968,
     "month_end": "2023-02-28",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 1222,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -47998,7 +47998,7 @@
     "last_close_native": 39.470001220703125,
     "market_value_krw": 62533230.744,
     "month_end": "2023-03-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 1222,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -48009,7 +48009,7 @@
     "last_close_native": 38.45000076293945,
     "market_value_krw": 62932446.538,
     "month_end": "2023-04-30",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 1222,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -48020,7 +48020,7 @@
     "last_close_native": 37.7400016784668,
     "market_value_krw": 60866449.2697,
     "month_end": "2023-05-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 1222,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -48031,7 +48031,7 @@
     "last_close_native": 41.310001373291016,
     "market_value_krw": 66789658.0264,
     "month_end": "2023-06-30",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 1222,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -48042,7 +48042,7 @@
     "last_close_native": 52.27000045776367,
     "market_value_krw": 81272564.164,
     "month_end": "2023-07-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 1222,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -48053,7 +48053,7 @@
     "last_close_native": 43.65999984741211,
     "market_value_krw": 50231068.5101,
     "month_end": "2023-11-30",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 893,
     "symbol": "VRT",
     "weight_in_portfolio": 0.5037
@@ -48064,7 +48064,7 @@
     "last_close_native": 591.0399780273438,
     "market_value_krw": 49495696.7332,
     "month_end": "2023-11-30",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 65,
     "symbol": "LLY",
     "weight_in_portfolio": 0.4963
@@ -48075,7 +48075,7 @@
     "last_close_native": 48.029998779296875,
     "market_value_krw": 56587429.1426,
     "month_end": "2023-12-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 922,
     "symbol": "VRT",
     "weight_in_portfolio": 0.5389
@@ -48086,7 +48086,7 @@
     "last_close_native": 582.9199829101562,
     "market_value_krw": 48417099.3175,
     "month_end": "2023-12-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 65,
     "symbol": "LLY",
     "weight_in_portfolio": 0.4611
@@ -48097,7 +48097,7 @@
     "last_close_native": 56.33000183105469,
     "market_value_krw": 70767895.8961,
     "month_end": "2024-01-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 947,
     "symbol": "VRT",
     "weight_in_portfolio": 0.5597
@@ -48108,7 +48108,7 @@
     "last_close_native": 645.6099853515625,
     "market_value_krw": 55671142.515,
     "month_end": "2024-01-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 65,
     "symbol": "LLY",
     "weight_in_portfolio": 0.4403
@@ -48119,7 +48119,7 @@
     "last_close_native": 753.6799926757811,
     "market_value_krw": 66326160.9327,
     "month_end": "2024-02-29",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 66,
     "symbol": "LLY",
     "weight_in_portfolio": 1.0
@@ -48130,7 +48130,7 @@
     "last_close_native": 15.09000015258789,
     "market_value_krw": 169755026.0436,
     "month_end": "2024-11-30",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 8074,
     "symbol": "GRND",
     "weight_in_portfolio": 1.0
@@ -48141,7 +48141,7 @@
     "last_close_native": 17.84000015258789,
     "market_value_krw": 213221749.2042,
     "month_end": "2024-12-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 8145,
     "symbol": "GRND",
     "weight_in_portfolio": 1.0
@@ -48152,7 +48152,7 @@
     "last_close_native": 17.84000015258789,
     "market_value_krw": 210923284.0991,
     "month_end": "2025-01-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 8201,
     "symbol": "GRND",
     "weight_in_portfolio": 1.0
@@ -48163,7 +48163,7 @@
     "last_close_native": 18.350000381469727,
     "market_value_krw": 220209016.24,
     "month_end": "2025-02-28",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 8277,
     "symbol": "GRND",
     "weight_in_portfolio": 1.0
@@ -48174,7 +48174,7 @@
     "last_close_native": 17.89999961853027,
     "market_value_krw": 219651668.5172,
     "month_end": "2025-03-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 8351,
     "symbol": "GRND",
     "weight_in_portfolio": 1.0
@@ -48185,7 +48185,7 @@
     "last_close_native": 21.969999313354496,
     "market_value_krw": 264872335.7724,
     "month_end": "2025-04-30",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 8424,
     "symbol": "GRND",
     "weight_in_portfolio": 1.0
@@ -48196,7 +48196,7 @@
     "last_close_native": 24.420000076293945,
     "market_value_krw": 284020961.3126,
     "month_end": "2025-05-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 8487,
     "symbol": "GRND",
     "weight_in_portfolio": 1.0
@@ -48207,7 +48207,7 @@
     "last_close_native": 22.700000762939457,
     "market_value_krw": 262702297.3355,
     "month_end": "2025-06-30",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 8487,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9913
@@ -48218,7 +48218,7 @@
     "last_close_native": 28.079999923706055,
     "market_value_krw": 2297376.3682,
     "month_end": "2025-06-30",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 60,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0087
@@ -48229,7 +48229,7 @@
     "last_close_native": 17.479999542236328,
     "market_value_krw": 206584182.8427,
     "month_end": "2025-07-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 8487,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9778
@@ -48240,7 +48240,7 @@
     "last_close_native": 29.56999969482422,
     "market_value_krw": 4694157.087,
     "month_end": "2025-07-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 114,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0222
@@ -48251,7 +48251,7 @@
     "last_close_native": 15.640000343322749,
     "market_value_krw": 183761995.7296,
     "month_end": "2025-08-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 8487,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9623
@@ -48262,7 +48262,7 @@
     "last_close_native": 30.940000534057617,
     "market_value_krw": 4883035.7804,
     "month_end": "2025-08-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 114,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0256
@@ -48273,7 +48273,7 @@
     "last_close_native": 11675.0,
     "market_value_krw": 2311954.9643,
     "month_end": "2025-08-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 21,
     "symbol": "6857.T",
     "weight_in_portfolio": 0.0121
@@ -48284,7 +48284,7 @@
     "last_close_native": 15.020000457763672,
     "market_value_krw": 178379227.7587,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 8487,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9522
@@ -48295,7 +48295,7 @@
     "last_close_native": 26.899999618530273,
     "market_value_krw": 6060358.0207,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 161,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0324
@@ -48306,7 +48306,7 @@
     "last_close_native": 14650.0,
     "market_value_krw": 2897045.5195,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 21,
     "symbol": "6857.T",
     "weight_in_portfolio": 0.0155
@@ -48317,7 +48317,7 @@
     "last_close_native": 89.08000183105469,
     "market_value_krw": 171884061.5586,
     "month_end": "2025-10-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 1355,
     "symbol": "GLW",
     "weight_in_portfolio": 0.967
@@ -48328,7 +48328,7 @@
     "last_close_native": 25.610000610351562,
     "market_value_krw": 5871533.7247,
     "month_end": "2025-10-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 161,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.033
@@ -48339,7 +48339,7 @@
     "last_close_native": 84.19999694824219,
     "market_value_krw": 168701382.1839,
     "month_end": "2025-11-30",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 1371,
     "symbol": "GLW",
     "weight_in_portfolio": 1.0
@@ -48350,7 +48350,7 @@
     "last_close_native": 87.55999755859375,
     "market_value_krw": 172613560.1418,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 1371,
     "symbol": "GLW",
     "weight_in_portfolio": 0.9567
@@ -48361,7 +48361,7 @@
     "last_close_native": 72.87999725341797,
     "market_value_krw": 7754821.0713,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 74,
     "symbol": "ESTA",
     "weight_in_portfolio": 0.043
@@ -48372,7 +48372,7 @@
     "last_close_native": 1065.0,
     "market_value_krw": 58718.4482,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 6,
     "symbol": "2124.T",
     "weight_in_portfolio": 0.0003
@@ -48383,7 +48383,7 @@
     "last_close_native": 103.25,
     "market_value_krw": 202249194.7524,
     "month_end": "2026-01-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 1371,
     "symbol": "GLW",
     "weight_in_portfolio": 0.9564
@@ -48394,7 +48394,7 @@
     "last_close_native": 68.1500015258789,
     "market_value_krw": 7205379.7666,
     "month_end": "2026-01-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 74,
     "symbol": "ESTA",
     "weight_in_portfolio": 0.0341
@@ -48405,7 +48405,7 @@
     "last_close_native": 97.87999725341797,
     "market_value_krw": 1957858.3616,
     "month_end": "2026-01-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 14,
     "symbol": "IRMD",
     "weight_in_portfolio": 0.0093
@@ -48416,7 +48416,7 @@
     "last_close_native": 34.90999984741211,
     "market_value_krw": 49878.0117,
     "month_end": "2026-01-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 1,
     "symbol": "IMAX",
     "weight_in_portfolio": 0.0002
@@ -48427,7 +48427,7 @@
     "last_close_native": 78.6999969482422,
     "market_value_krw": 8566991.7305,
     "month_end": "2026-02-28",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 76,
     "symbol": "ESTA",
     "weight_in_portfolio": 0.8003
@@ -48438,7 +48438,7 @@
     "last_close_native": 103.52999877929688,
     "market_value_krw": 2076033.1521,
     "month_end": "2026-02-28",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 14,
     "symbol": "IRMD",
     "weight_in_portfolio": 0.1939
@@ -48449,7 +48449,7 @@
     "last_close_native": 42.83000183105469,
     "market_value_krw": 61346.2659,
     "month_end": "2026-02-28",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 1,
     "symbol": "IMAX",
     "weight_in_portfolio": 0.0057
@@ -48460,7 +48460,7 @@
     "last_close_native": 96.26000213623047,
     "market_value_krw": 105808441.1939,
     "month_end": "2026-03-31",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 725,
     "symbol": "IRMD",
     "weight_in_portfolio": 1.0
@@ -48471,7 +48471,7 @@
     "last_close_native": 191.9199981689453,
     "market_value_krw": 156716424.3297,
     "month_end": "2026-04-30",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 549,
     "symbol": "CAMT",
     "weight_in_portfolio": 0.507
@@ -48482,7 +48482,7 @@
     "last_close_native": 54.9900016784668,
     "market_value_krw": 152376686.9618,
     "month_end": "2026-04-30",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 1863,
     "symbol": "GLNG",
     "weight_in_portfolio": 0.493
@@ -48493,7 +48493,7 @@
     "last_close_native": 209.1199951171875,
     "market_value_krw": 170902838.6482,
     "month_end": "2026-05-11",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 556,
     "symbol": "CAMT",
     "weight_in_portfolio": 0.5258
@@ -48504,7 +48504,7 @@
     "last_close_native": 56.28499984741211,
     "market_value_krw": 154129031.256,
     "month_end": "2026-05-11",
-    "persona": "smic_mtt_strategy_optuna_top3",
+    "persona": "smic_mtt_strategy_top3",
     "qty": 1863,
     "symbol": "GLNG",
     "weight_in_portfolio": 0.4742
@@ -48515,7 +48515,7 @@
     "last_close_native": 216.71000671386722,
     "market_value_krw": 11088041.5643,
     "month_end": "2021-01-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.9855
@@ -48526,7 +48526,7 @@
     "last_close_native": 32666.666015625,
     "market_value_krw": 163333.3301,
     "month_end": "2021-01-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 5,
     "symbol": "285490.KQ",
     "weight_in_portfolio": 0.0145
@@ -48537,7 +48537,7 @@
     "last_close_native": 235.69000244140625,
     "market_value_krw": 12133316.6648,
     "month_end": "2021-02-28",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.8938
@@ -48548,7 +48548,7 @@
     "last_close_native": 363500.0,
     "market_value_krw": 1090500.0,
     "month_end": "2021-02-28",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 3,
     "symbol": "006650.KS",
     "weight_in_portfolio": 0.0803
@@ -48559,7 +48559,7 @@
     "last_close_native": 36300.0,
     "market_value_krw": 181500.0,
     "month_end": "2021-02-28",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 5,
     "symbol": "166090.KQ",
     "weight_in_portfolio": 0.0134
@@ -48570,7 +48570,7 @@
     "last_close_native": 34000.0,
     "market_value_krw": 170000.0,
     "month_end": "2021-02-28",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 5,
     "symbol": "285490.KQ",
     "weight_in_portfolio": 0.0125
@@ -48581,7 +48581,7 @@
     "last_close_native": 223.22999572753906,
     "market_value_krw": 11627317.7315,
     "month_end": "2021-03-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.845
@@ -48592,7 +48592,7 @@
     "last_close_native": 325500.0,
     "market_value_krw": 1627500.0,
     "month_end": "2021-03-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 5,
     "symbol": "006650.KS",
     "weight_in_portfolio": 0.1183
@@ -48603,7 +48603,7 @@
     "last_close_native": 38850.0,
     "market_value_krw": 505050.0,
     "month_end": "2021-03-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 13,
     "symbol": "166090.KQ",
     "weight_in_portfolio": 0.0367
@@ -48614,7 +48614,7 @@
     "last_close_native": 252.5399932861328,
     "market_value_krw": 12855543.3642,
     "month_end": "2021-04-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.7973
@@ -48625,7 +48625,7 @@
     "last_close_native": 315000.0,
     "market_value_krw": 1575000.0,
     "month_end": "2021-04-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 5,
     "symbol": "006650.KS",
     "weight_in_portfolio": 0.0977
@@ -48636,7 +48636,7 @@
     "last_close_native": 50983.8359375,
     "market_value_krw": 1070660.5547,
     "month_end": "2021-04-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 21,
     "symbol": "009830.KS",
     "weight_in_portfolio": 0.0664
@@ -48647,7 +48647,7 @@
     "last_close_native": 67717.328125,
     "market_value_krw": 609455.9531,
     "month_end": "2021-04-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 9,
     "symbol": "007690.KS",
     "weight_in_portfolio": 0.0378
@@ -48658,7 +48658,7 @@
     "last_close_native": 13700.0,
     "market_value_krw": 13700.0,
     "month_end": "2021-04-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1,
     "symbol": "060150.KQ",
     "weight_in_portfolio": 0.0008
@@ -48669,7 +48669,7 @@
     "last_close_native": 253.24000549316406,
     "market_value_krw": 13015473.2431,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.7735
@@ -48680,7 +48680,7 @@
     "last_close_native": 56693.57421875,
     "market_value_krw": 1417339.3555,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 25,
     "symbol": "007690.KS",
     "weight_in_portfolio": 0.0842
@@ -48691,7 +48691,7 @@
     "last_close_native": 53400.0,
     "market_value_krw": 1335000.0,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 25,
     "symbol": "004020.KS",
     "weight_in_portfolio": 0.0793
@@ -48702,7 +48702,7 @@
     "last_close_native": 49821.33984375,
     "market_value_krw": 1046248.1367,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 21,
     "symbol": "009830.KS",
     "weight_in_portfolio": 0.0622
@@ -48713,7 +48713,7 @@
     "last_close_native": 13200.0,
     "market_value_krw": 13200.0,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1,
     "symbol": "060150.KQ",
     "weight_in_portfolio": 0.0008
@@ -48724,7 +48724,7 @@
     "last_close_native": 274.6000061035156,
     "market_value_krw": 14280150.5568,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.8096
@@ -48735,7 +48735,7 @@
     "last_close_native": 53700.0,
     "market_value_krw": 2309100.0,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 43,
     "symbol": "004020.KS",
     "weight_in_portfolio": 0.1309
@@ -48746,7 +48746,7 @@
     "last_close_native": 49323.125,
     "market_value_krw": 1035785.625,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 21,
     "symbol": "009830.KS",
     "weight_in_portfolio": 0.0587
@@ -48757,7 +48757,7 @@
     "last_close_native": 13250.0,
     "market_value_krw": 13250.0,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1,
     "symbol": "060150.KQ",
     "weight_in_portfolio": 0.0008
@@ -48768,7 +48768,7 @@
     "last_close_native": 276.1600036621094,
     "market_value_krw": 14508761.6536,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.8614
@@ -48779,7 +48779,7 @@
     "last_close_native": 54000.0,
     "market_value_krw": 2322000.0,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 43,
     "symbol": "004020.KS",
     "weight_in_portfolio": 0.1379
@@ -48790,7 +48790,7 @@
     "last_close_native": 12550.0,
     "market_value_krw": 12550.0,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1,
     "symbol": "060150.KQ",
     "weight_in_portfolio": 0.0007
@@ -48801,7 +48801,7 @@
     "last_close_native": 74500.0,
     "market_value_krw": 4172000.0,
     "month_end": "2021-08-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 56,
     "symbol": "344820.KQ",
     "weight_in_portfolio": 1.0
@@ -48812,7 +48812,7 @@
     "last_close_native": 69000.0,
     "market_value_krw": 20907000.0,
     "month_end": "2021-09-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 303,
     "symbol": "344820.KQ",
     "weight_in_portfolio": 1.0
@@ -48823,7 +48823,7 @@
     "last_close_native": 349000.0,
     "market_value_krw": 13611000.0,
     "month_end": "2021-12-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 39,
     "symbol": "352820.KS",
     "weight_in_portfolio": 0.5112
@@ -48834,7 +48834,7 @@
     "last_close_native": 91000.0,
     "market_value_krw": 13013000.0,
     "month_end": "2021-12-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 143,
     "symbol": "293490.KQ",
     "weight_in_portfolio": 0.4888
@@ -48845,7 +48845,7 @@
     "last_close_native": 33.04999923706055,
     "market_value_krw": 29170769.1726,
     "month_end": "2022-05-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 714,
     "symbol": "STNG",
     "weight_in_portfolio": 1.0
@@ -48856,7 +48856,7 @@
     "last_close_native": 34.5099983215332,
     "market_value_krw": 33152952.1875,
     "month_end": "2022-06-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 738,
     "symbol": "STNG",
     "weight_in_portfolio": 1.0
@@ -48867,7 +48867,7 @@
     "last_close_native": 38.61000061035156,
     "market_value_krw": 38004364.8572,
     "month_end": "2022-07-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 760,
     "symbol": "STNG",
     "weight_in_portfolio": 1.0
@@ -48878,7 +48878,7 @@
     "last_close_native": 41.599998474121094,
     "market_value_krw": 43754793.7123,
     "month_end": "2022-08-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 779,
     "symbol": "STNG",
     "weight_in_portfolio": 1.0
@@ -48889,7 +48889,7 @@
     "last_close_native": 37.130001068115234,
     "market_value_krw": 52508125.6198,
     "month_end": "2022-11-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1067,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -48900,7 +48900,7 @@
     "last_close_native": 37.709999084472656,
     "market_value_krw": 50708538.87,
     "month_end": "2022-12-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1067,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -48911,7 +48911,7 @@
     "last_close_native": 40.689998626708984,
     "market_value_krw": 53467085.4405,
     "month_end": "2023-01-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1067,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -48922,7 +48922,7 @@
     "last_close_native": 41.689998626708984,
     "market_value_krw": 58644463.2527,
     "month_end": "2023-02-28",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1067,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -48933,7 +48933,7 @@
     "last_close_native": 39.470001220703125,
     "market_value_krw": 54601437.9737,
     "month_end": "2023-03-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1067,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -48944,7 +48944,7 @@
     "last_close_native": 38.45000076293945,
     "market_value_krw": 54950016.7398,
     "month_end": "2023-04-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1067,
     "symbol": "NE",
     "weight_in_portfolio": 0.9998
@@ -48955,7 +48955,7 @@
     "last_close_native": 12900.0,
     "market_value_krw": 12900.0,
     "month_end": "2023-04-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1,
     "symbol": "159010.KQ",
     "weight_in_portfolio": 0.0002
@@ -48966,7 +48966,7 @@
     "last_close_native": 37.7400016784668,
     "market_value_krw": 53146073.1348,
     "month_end": "2023-05-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1067,
     "symbol": "NE",
     "weight_in_portfolio": 0.8753
@@ -48977,7 +48977,7 @@
     "last_close_native": 13940.0,
     "market_value_krw": 7569420.0,
     "month_end": "2023-05-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 543,
     "symbol": "159010.KQ",
     "weight_in_portfolio": 0.1247
@@ -48988,7 +48988,7 @@
     "last_close_native": 41.310001373291016,
     "market_value_krw": 58317974.7251,
     "month_end": "2023-06-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1067,
     "symbol": "NE",
     "weight_in_portfolio": 0.8598
@@ -48999,7 +48999,7 @@
     "last_close_native": 14850.0,
     "market_value_krw": 8063550.0,
     "month_end": "2023-06-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 543,
     "symbol": "159010.KQ",
     "weight_in_portfolio": 0.1189
@@ -49010,7 +49010,7 @@
     "last_close_native": 36150.0,
     "market_value_krw": 1446000.0,
     "month_end": "2023-06-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 40,
     "symbol": "228670.KQ",
     "weight_in_portfolio": 0.0213
@@ -49021,7 +49021,7 @@
     "last_close_native": 52.27000045776367,
     "market_value_krw": 70963851.0336,
     "month_end": "2023-07-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1067,
     "symbol": "NE",
     "weight_in_portfolio": 0.8869
@@ -49032,7 +49032,7 @@
     "last_close_native": 13750.0,
     "market_value_krw": 7466250.0,
     "month_end": "2023-07-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 543,
     "symbol": "159010.KQ",
     "weight_in_portfolio": 0.0933
@@ -49043,7 +49043,7 @@
     "last_close_native": 39500.0,
     "market_value_krw": 1580000.0,
     "month_end": "2023-07-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 40,
     "symbol": "228670.KQ",
     "weight_in_portfolio": 0.0197
@@ -49054,7 +49054,7 @@
     "last_close_native": 12560.0,
     "market_value_krw": 6820080.0,
     "month_end": "2023-08-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 543,
     "symbol": "159010.KQ",
     "weight_in_portfolio": 1.0
@@ -49065,7 +49065,7 @@
     "last_close_native": 75000.0,
     "market_value_krw": 90225000.0,
     "month_end": "2023-10-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1203,
     "symbol": "267260.KS",
     "weight_in_portfolio": 1.0
@@ -49076,7 +49076,7 @@
     "last_close_native": 84100.0,
     "market_value_krw": 102770200.0,
     "month_end": "2023-11-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1222,
     "symbol": "267260.KS",
     "weight_in_portfolio": 0.9994
@@ -49087,7 +49087,7 @@
     "last_close_native": 63400.0,
     "market_value_krw": 63400.0,
     "month_end": "2023-11-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1,
     "symbol": "131970.KQ",
     "weight_in_portfolio": 0.0006
@@ -49098,7 +49098,7 @@
     "last_close_native": 82200.0,
     "market_value_krw": 100448400.0,
     "month_end": "2023-12-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1222,
     "symbol": "267260.KS",
     "weight_in_portfolio": 0.9844
@@ -49109,7 +49109,7 @@
     "last_close_native": 48.029998779296875,
     "market_value_krw": 1534366.3,
     "month_end": "2023-12-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 25,
     "symbol": "VRT",
     "weight_in_portfolio": 0.015
@@ -49120,7 +49120,7 @@
     "last_close_native": 58600.0,
     "market_value_krw": 58600.0,
     "month_end": "2023-12-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1,
     "symbol": "131970.KQ",
     "weight_in_portfolio": 0.0006
@@ -49131,7 +49131,7 @@
     "last_close_native": 102700.0,
     "market_value_krw": 125499400.0,
     "month_end": "2024-01-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1222,
     "symbol": "267260.KS",
     "weight_in_portfolio": 0.9705
@@ -49142,7 +49142,7 @@
     "last_close_native": 56.33000183105469,
     "market_value_krw": 3811153.8445,
     "month_end": "2024-01-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 51,
     "symbol": "VRT",
     "weight_in_portfolio": 0.0295
@@ -49153,7 +49153,7 @@
     "last_close_native": 124400.0,
     "market_value_krw": 152016800.0,
     "month_end": "2024-02-29",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1222,
     "symbol": "267260.KS",
     "weight_in_portfolio": 0.9934
@@ -49164,7 +49164,7 @@
     "last_close_native": 753.6799926757811,
     "market_value_krw": 1004941.8323,
     "month_end": "2024-02-29",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1,
     "symbol": "LLY",
     "weight_in_portfolio": 0.0066
@@ -49175,7 +49175,7 @@
     "last_close_native": 331000.0,
     "market_value_krw": 203896000.0,
     "month_end": "2024-10-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 616,
     "symbol": "259960.KQ",
     "weight_in_portfolio": 1.0
@@ -49186,7 +49186,7 @@
     "last_close_native": 15.09000015258789,
     "market_value_krw": 176041470.5305,
     "month_end": "2024-11-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 8373,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9923
@@ -49197,7 +49197,7 @@
     "last_close_native": 29100.0,
     "market_value_krw": 1367700.0,
     "month_end": "2024-11-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 47,
     "symbol": "018290.KS",
     "weight_in_portfolio": 0.0077
@@ -49208,7 +49208,7 @@
     "last_close_native": 17.84000015258789,
     "market_value_krw": 222672093.153,
     "month_end": "2024-12-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 8506,
     "symbol": "GRND",
     "weight_in_portfolio": 1.0
@@ -49219,7 +49219,7 @@
     "last_close_native": 17.84000015258789,
     "market_value_krw": 220207920.7971,
     "month_end": "2025-01-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 8562,
     "symbol": "GRND",
     "weight_in_portfolio": 1.0
@@ -49230,7 +49230,7 @@
     "last_close_native": 18.350000381469727,
     "market_value_krw": 229813396.4336,
     "month_end": "2025-02-28",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 8638,
     "symbol": "GRND",
     "weight_in_portfolio": 1.0
@@ -49241,7 +49241,7 @@
     "last_close_native": 17.89999961853027,
     "market_value_krw": 229146849.0148,
     "month_end": "2025-03-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 8712,
     "symbol": "GRND",
     "weight_in_portfolio": 1.0
@@ -49252,7 +49252,7 @@
     "last_close_native": 21.969999313354496,
     "market_value_krw": 276223108.9459,
     "month_end": "2025-04-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 8785,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9999
@@ -49263,7 +49263,7 @@
     "last_close_native": 22700.0,
     "market_value_krw": 22700.0,
     "month_end": "2025-04-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1,
     "symbol": "119850.KQ",
     "weight_in_portfolio": 0.0001
@@ -49274,7 +49274,7 @@
     "last_close_native": 24.420000076293945,
     "market_value_krw": 293993654.4281,
     "month_end": "2025-05-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 8785,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9922
@@ -49285,7 +49285,7 @@
     "last_close_native": 26000.0,
     "market_value_krw": 2314000.0,
     "month_end": "2025-05-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 89,
     "symbol": "119850.KQ",
     "weight_in_portfolio": 0.0078
@@ -49296,7 +49296,7 @@
     "last_close_native": 22.700000762939457,
     "market_value_krw": 271926438.3283,
     "month_end": "2025-06-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 8785,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9802
@@ -49307,7 +49307,7 @@
     "last_close_native": 35950.0,
     "market_value_krw": 3199550.0,
     "month_end": "2025-06-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 89,
     "symbol": "119850.KQ",
     "weight_in_portfolio": 0.0115
@@ -49318,7 +49318,7 @@
     "last_close_native": 28.079999923706055,
     "market_value_krw": 2297376.3682,
     "month_end": "2025-06-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 60,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0083
@@ -49329,7 +49329,7 @@
     "last_close_native": 17.479999542236328,
     "market_value_krw": 213837875.1353,
     "month_end": "2025-07-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 8785,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9667
@@ -49340,7 +49340,7 @@
     "last_close_native": 34050.0,
     "market_value_krw": 4903200.0,
     "month_end": "2025-07-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 144,
     "symbol": "119850.KQ",
     "weight_in_portfolio": 0.0222
@@ -49351,7 +49351,7 @@
     "last_close_native": 29.56999969482422,
     "market_value_krw": 2470608.9932,
     "month_end": "2025-07-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 60,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0112
@@ -49362,7 +49362,7 @@
     "last_close_native": 15.640000343322749,
     "market_value_krw": 190214343.4057,
     "month_end": "2025-08-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 8785,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9546
@@ -49373,7 +49373,7 @@
     "last_close_native": 28750.0,
     "market_value_krw": 4168750.0,
     "month_end": "2025-08-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 145,
     "symbol": "119850.KQ",
     "weight_in_portfolio": 0.0209
@@ -49384,7 +49384,7 @@
     "last_close_native": 30.940000534057617,
     "market_value_krw": 2570018.8318,
     "month_end": "2025-08-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 60,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0129
@@ -49395,7 +49395,7 @@
     "last_close_native": 11675.0,
     "market_value_krw": 2311954.9643,
     "month_end": "2025-08-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 21,
     "symbol": "6857.T",
     "weight_in_portfolio": 0.0116
@@ -49406,7 +49406,7 @@
     "last_close_native": 15.020000457763672,
     "market_value_krw": 184642572.8597,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 8785,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9386
@@ -49417,7 +49417,7 @@
     "last_close_native": 31450.0,
     "market_value_krw": 4560250.0,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 145,
     "symbol": "119850.KQ",
     "weight_in_portfolio": 0.0232
@@ -49428,7 +49428,7 @@
     "last_close_native": 14650.0,
     "market_value_krw": 2897045.5195,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 21,
     "symbol": "6857.T",
     "weight_in_portfolio": 0.0147
@@ -49439,7 +49439,7 @@
     "last_close_native": 26.899999618530273,
     "market_value_krw": 2409086.4182,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 64,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0122
@@ -49450,7 +49450,7 @@
     "last_close_native": 1107000.0,
     "market_value_krw": 2214000.0,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 2,
     "symbol": "012450.KS",
     "weight_in_portfolio": 0.0113
@@ -49461,7 +49461,7 @@
     "last_close_native": 220500.0,
     "market_value_krw": 40572000.0,
     "month_end": "2025-10-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 184,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.3744
@@ -49472,7 +49472,7 @@
     "last_close_native": 26850.0,
     "market_value_krw": 34126350.0,
     "month_end": "2025-10-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 1271,
     "symbol": "098120.KQ",
     "weight_in_portfolio": 0.3149
@@ -49483,7 +49483,7 @@
     "last_close_native": 979000.0,
     "market_value_krw": 31328000.0,
     "month_end": "2025-10-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 32,
     "symbol": "012450.KS",
     "weight_in_portfolio": 0.2891
@@ -49494,7 +49494,7 @@
     "last_close_native": 25.610000610351562,
     "market_value_krw": 2334025.8284,
     "month_end": "2025-10-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 64,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0215
@@ -49505,7 +49505,7 @@
     "last_close_native": 84.19999694824219,
     "market_value_krw": 47866402.3848,
     "month_end": "2025-11-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 389,
     "symbol": "GLW",
     "weight_in_portfolio": 0.5153
@@ -49516,7 +49516,7 @@
     "last_close_native": 233500.0,
     "market_value_krw": 42964000.0,
     "month_end": "2025-11-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 184,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.4625
@@ -49527,7 +49527,7 @@
     "last_close_native": 21.999999999999996,
     "market_value_krw": 2057651.2344,
     "month_end": "2025-11-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 64,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0222
@@ -49538,7 +49538,7 @@
     "last_close_native": 87.55999755859375,
     "market_value_krw": 48976422.243,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 389,
     "symbol": "GLW",
     "weight_in_portfolio": 0.3667
@@ -49549,7 +49549,7 @@
     "last_close_native": 261000.0,
     "market_value_krw": 48024000.0,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 184,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.3596
@@ -49560,7 +49560,7 @@
     "last_close_native": 781000.0,
     "market_value_krw": 34364000.0,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 44,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.2573
@@ -49571,7 +49571,7 @@
     "last_close_native": 23.770000457763672,
     "market_value_krw": 2187463.8189,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 64,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0164
@@ -49582,7 +49582,7 @@
     "last_close_native": 338500.0,
     "market_value_krw": 62284000.0,
     "month_end": "2026-01-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 184,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.3164
@@ -49593,7 +49593,7 @@
     "last_close_native": 103.25,
     "market_value_krw": 57385074.2222,
     "month_end": "2026-01-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 389,
     "symbol": "GLW",
     "weight_in_portfolio": 0.2915
@@ -49604,7 +49604,7 @@
     "last_close_native": 68.1500015258789,
     "market_value_krw": 39726958.713,
     "month_end": "2026-01-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 408,
     "symbol": "ESTA",
     "weight_in_portfolio": 0.2018
@@ -49615,7 +49615,7 @@
     "last_close_native": 851000.0,
     "market_value_krw": 37444000.0,
     "month_end": "2026-01-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 44,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.1902
@@ -49626,7 +49626,7 @@
     "last_close_native": 1278000.0,
     "market_value_krw": 56232000.0,
     "month_end": "2026-02-28",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 44,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.3618
@@ -49637,7 +49637,7 @@
     "last_close_native": 288500.0,
     "market_value_krw": 53084000.0,
     "month_end": "2026-02-28",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 184,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.3416
@@ -49648,7 +49648,7 @@
     "last_close_native": 78.6999969482422,
     "market_value_krw": 46103942.3394,
     "month_end": "2026-02-28",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 409,
     "symbol": "ESTA",
     "weight_in_portfolio": 0.2966
@@ -49659,7 +49659,7 @@
     "last_close_native": 241000.0,
     "market_value_krw": 69167000.0,
     "month_end": "2026-03-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 287,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.513
@@ -49670,7 +49670,7 @@
     "last_close_native": 1026000.0,
     "market_value_krw": 65664000.0,
     "month_end": "2026-03-31",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 64,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.487
@@ -49681,7 +49681,7 @@
     "last_close_native": 1596000.0,
     "market_value_krw": 202692000.0,
     "month_end": "2026-04-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 127,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.6905
@@ -49692,7 +49692,7 @@
     "last_close_native": 316500.0,
     "market_value_krw": 90835500.0,
     "month_end": "2026-04-30",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 287,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.3095
@@ -49703,7 +49703,7 @@
     "last_close_native": 1720000.0,
     "market_value_krw": 218440000.0,
     "month_end": "2026-05-11",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 127,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.9897
@@ -49714,7 +49714,7 @@
     "last_close_native": 209.1199951171875,
     "market_value_krw": 2151654.4434,
     "month_end": "2026-05-11",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 7,
     "symbol": "CAMT",
     "weight_in_portfolio": 0.0097
@@ -49725,7 +49725,7 @@
     "last_close_native": 6070.0,
     "market_value_krw": 115330.0,
     "month_end": "2026-05-11",
-    "persona": "smic_mtt_strategy_optuna_top4",
+    "persona": "smic_mtt_strategy_top4",
     "qty": 19,
     "symbol": "187790.KS",
     "weight_in_portfolio": 0.0005
@@ -49736,7 +49736,7 @@
     "last_close_native": 216.71000671386722,
     "market_value_krw": 11088041.5643,
     "month_end": "2021-01-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 1.0
@@ -49747,7 +49747,7 @@
     "last_close_native": 235.69000244140625,
     "market_value_krw": 12133316.6648,
     "month_end": "2021-02-28",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.893
@@ -49758,7 +49758,7 @@
     "last_close_native": 363500.0,
     "market_value_krw": 1454000.0,
     "month_end": "2021-02-28",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 4,
     "symbol": "006650.KS",
     "weight_in_portfolio": 0.107
@@ -49769,7 +49769,7 @@
     "last_close_native": 223.22999572753906,
     "market_value_krw": 11627317.7315,
     "month_end": "2021-03-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 46,
     "symbol": "SE",
     "weight_in_portfolio": 0.8562
@@ -49780,7 +49780,7 @@
     "last_close_native": 325500.0,
     "market_value_krw": 1953000.0,
     "month_end": "2021-03-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 6,
     "symbol": "006650.KS",
     "weight_in_portfolio": 0.1438
@@ -49791,7 +49791,7 @@
     "last_close_native": 252.5399932861328,
     "market_value_krw": 13973416.7002,
     "month_end": "2021-04-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 50,
     "symbol": "SE",
     "weight_in_portfolio": 0.8667
@@ -49802,7 +49802,7 @@
     "last_close_native": 315000.0,
     "market_value_krw": 1890000.0,
     "month_end": "2021-04-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 6,
     "symbol": "006650.KS",
     "weight_in_portfolio": 0.1172
@@ -49813,7 +49813,7 @@
     "last_close_native": 67717.328125,
     "market_value_krw": 203151.9844,
     "month_end": "2021-04-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 3,
     "symbol": "007690.KS",
     "weight_in_portfolio": 0.0126
@@ -49824,7 +49824,7 @@
     "last_close_native": 55500.0,
     "market_value_krw": 55500.0,
     "month_end": "2021-04-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1,
     "symbol": "004020.KS",
     "weight_in_portfolio": 0.0034
@@ -49835,7 +49835,7 @@
     "last_close_native": 253.24000549316406,
     "market_value_krw": 14147253.5251,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 50,
     "symbol": "SE",
     "weight_in_portfolio": 0.8356
@@ -49846,7 +49846,7 @@
     "last_close_native": 64100.0,
     "market_value_krw": 1538400.0,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 24,
     "symbol": "344820.KQ",
     "weight_in_portfolio": 0.0909
@@ -49857,7 +49857,7 @@
     "last_close_native": 13200.0,
     "market_value_krw": 963600.0,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 73,
     "symbol": "060150.KQ",
     "weight_in_portfolio": 0.0569
@@ -49868,7 +49868,7 @@
     "last_close_native": 56693.57421875,
     "market_value_krw": 170080.7227,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 3,
     "symbol": "007690.KS",
     "weight_in_portfolio": 0.01
@@ -49879,7 +49879,7 @@
     "last_close_native": 14600.0,
     "market_value_krw": 58400.0,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 4,
     "symbol": "017650.KS",
     "weight_in_portfolio": 0.0034
@@ -49890,7 +49890,7 @@
     "last_close_native": 53400.0,
     "market_value_krw": 53400.0,
     "month_end": "2021-05-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1,
     "symbol": "004020.KS",
     "weight_in_portfolio": 0.0032
@@ -49901,7 +49901,7 @@
     "last_close_native": 274.6000061035156,
     "market_value_krw": 15521902.7791,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 50,
     "symbol": "SE",
     "weight_in_portfolio": 0.8054
@@ -49912,7 +49912,7 @@
     "last_close_native": 62700.0,
     "market_value_krw": 1504800.0,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 24,
     "symbol": "344820.KQ",
     "weight_in_portfolio": 0.0781
@@ -49923,7 +49923,7 @@
     "last_close_native": 22.950000762939453,
     "market_value_krw": 1167534.2514,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 45,
     "symbol": "SBLK",
     "weight_in_portfolio": 0.0606
@@ -49934,7 +49934,7 @@
     "last_close_native": 13250.0,
     "market_value_krw": 967250.0,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 73,
     "symbol": "060150.KQ",
     "weight_in_portfolio": 0.0502
@@ -49945,7 +49945,7 @@
     "last_close_native": 14300.0,
     "market_value_krw": 57200.0,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 4,
     "symbol": "017650.KS",
     "weight_in_portfolio": 0.003
@@ -49956,7 +49956,7 @@
     "last_close_native": 53700.0,
     "market_value_krw": 53700.0,
     "month_end": "2021-06-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1,
     "symbol": "004020.KS",
     "weight_in_portfolio": 0.0028
@@ -49967,7 +49967,7 @@
     "last_close_native": 276.1600036621094,
     "market_value_krw": 15770393.1017,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 50,
     "symbol": "SE",
     "weight_in_portfolio": 0.765
@@ -49978,7 +49978,7 @@
     "last_close_native": 74300.0,
     "market_value_krw": 1783200.0,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 24,
     "symbol": "344820.KQ",
     "weight_in_portfolio": 0.0865
@@ -49989,7 +49989,7 @@
     "last_close_native": 33000.0,
     "market_value_krw": 1056000.0,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 32,
     "symbol": "005850.KS",
     "weight_in_portfolio": 0.0512
@@ -50000,7 +50000,7 @@
     "last_close_native": 19.030000686645504,
     "market_value_krw": 978054.4931,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 45,
     "symbol": "SBLK",
     "weight_in_portfolio": 0.0474
@@ -50011,7 +50011,7 @@
     "last_close_native": 12550.0,
     "market_value_krw": 916150.0,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 73,
     "symbol": "060150.KQ",
     "weight_in_portfolio": 0.0444
@@ -50022,7 +50022,7 @@
     "last_close_native": 14100.0,
     "market_value_krw": 56400.0,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 4,
     "symbol": "017650.KS",
     "weight_in_portfolio": 0.0027
@@ -50033,7 +50033,7 @@
     "last_close_native": 54000.0,
     "market_value_krw": 54000.0,
     "month_end": "2021-07-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1,
     "symbol": "004020.KS",
     "weight_in_portfolio": 0.0026
@@ -50044,7 +50044,7 @@
     "last_close_native": 74500.0,
     "market_value_krw": 1788000.0,
     "month_end": "2021-08-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 24,
     "symbol": "344820.KQ",
     "weight_in_portfolio": 0.5674
@@ -50055,7 +50055,7 @@
     "last_close_native": 23.06999969482422,
     "market_value_krw": 1209974.2006,
     "month_end": "2021-08-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 45,
     "symbol": "SBLK",
     "weight_in_portfolio": 0.384
@@ -50066,7 +50066,7 @@
     "last_close_native": 51000.0,
     "market_value_krw": 153000.0,
     "month_end": "2021-08-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 3,
     "symbol": "004020.KS",
     "weight_in_portfolio": 0.0486
@@ -50077,7 +50077,7 @@
     "last_close_native": 24.040000915527344,
     "market_value_krw": 12874164.6298,
     "month_end": "2021-09-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 451,
     "symbol": "SBLK",
     "weight_in_portfolio": 0.5414
@@ -50088,7 +50088,7 @@
     "last_close_native": 69000.0,
     "market_value_krw": 10764000.0,
     "month_end": "2021-09-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 156,
     "symbol": "344820.KQ",
     "weight_in_portfolio": 0.4526
@@ -50099,7 +50099,7 @@
     "last_close_native": 47350.0,
     "market_value_krw": 142050.0,
     "month_end": "2021-09-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 3,
     "symbol": "004020.KS",
     "weight_in_portfolio": 0.006
@@ -50110,7 +50110,7 @@
     "last_close_native": 349000.0,
     "market_value_krw": 12913000.0,
     "month_end": "2021-12-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 37,
     "symbol": "352820.KS",
     "weight_in_portfolio": 0.5106
@@ -50121,7 +50121,7 @@
     "last_close_native": 91000.0,
     "market_value_krw": 12376000.0,
     "month_end": "2021-12-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 136,
     "symbol": "293490.KQ",
     "weight_in_portfolio": 0.4894
@@ -50132,7 +50132,7 @@
     "last_close_native": 33.04999923706055,
     "market_value_krw": 28108528.2784,
     "month_end": "2022-05-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 688,
     "symbol": "STNG",
     "weight_in_portfolio": 1.0
@@ -50143,7 +50143,7 @@
     "last_close_native": 34.5099983215332,
     "market_value_krw": 31984962.002,
     "month_end": "2022-06-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 712,
     "symbol": "STNG",
     "weight_in_portfolio": 1.0
@@ -50154,7 +50154,7 @@
     "last_close_native": 38.61000061035156,
     "market_value_krw": 36704215.5331,
     "month_end": "2022-07-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 734,
     "symbol": "STNG",
     "weight_in_portfolio": 1.0
@@ -50165,7 +50165,7 @@
     "last_close_native": 41.599998474121094,
     "market_value_krw": 42294428.3252,
     "month_end": "2022-08-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 753,
     "symbol": "STNG",
     "weight_in_portfolio": 1.0
@@ -50176,7 +50176,7 @@
     "last_close_native": 37.130001068115234,
     "market_value_krw": 50834951.9824,
     "month_end": "2022-11-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1033,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -50187,7 +50187,7 @@
     "last_close_native": 37.709999084472656,
     "market_value_krw": 49092709.1403,
     "month_end": "2022-12-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1033,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -50198,7 +50198,7 @@
     "last_close_native": 40.689998626708984,
     "market_value_krw": 51763354.508,
     "month_end": "2023-01-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1033,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -50209,7 +50209,7 @@
     "last_close_native": 41.689998626708984,
     "market_value_krw": 56775754.9579,
     "month_end": "2023-02-28",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1033,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -50220,7 +50220,7 @@
     "last_close_native": 39.470001220703125,
     "market_value_krw": 52861560.8499,
     "month_end": "2023-03-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1033,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -50231,7 +50231,7 @@
     "last_close_native": 38.45000076293945,
     "market_value_krw": 53199032.1389,
     "month_end": "2023-04-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1033,
     "symbol": "NE",
     "weight_in_portfolio": 1.0
@@ -50242,7 +50242,7 @@
     "last_close_native": 37.7400016784668,
     "market_value_krw": 51452571.273,
     "month_end": "2023-05-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1033,
     "symbol": "NE",
     "weight_in_portfolio": 0.8731
@@ -50253,7 +50253,7 @@
     "last_close_native": 36250.0,
     "market_value_krw": 7467500.0,
     "month_end": "2023-05-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 206,
     "symbol": "228670.KQ",
     "weight_in_portfolio": 0.1267
@@ -50264,7 +50264,7 @@
     "last_close_native": 13940.0,
     "market_value_krw": 13940.0,
     "month_end": "2023-05-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1,
     "symbol": "159010.KQ",
     "weight_in_portfolio": 0.0002
@@ -50275,7 +50275,7 @@
     "last_close_native": 41.310001373291016,
     "market_value_krw": 56459670.001,
     "month_end": "2023-06-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1033,
     "symbol": "NE",
     "weight_in_portfolio": 0.8637
@@ -50286,7 +50286,7 @@
     "last_close_native": 36150.0,
     "market_value_krw": 8892900.0,
     "month_end": "2023-06-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 246,
     "symbol": "228670.KQ",
     "weight_in_portfolio": 0.136
@@ -50297,7 +50297,7 @@
     "last_close_native": 14850.0,
     "market_value_krw": 14850.0,
     "month_end": "2023-06-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1,
     "symbol": "159010.KQ",
     "weight_in_portfolio": 0.0002
@@ -50308,7 +50308,7 @@
     "last_close_native": 52.27000045776367,
     "market_value_krw": 68702584.9275,
     "month_end": "2023-07-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1033,
     "symbol": "NE",
     "weight_in_portfolio": 0.8759
@@ -50319,7 +50319,7 @@
     "last_close_native": 39500.0,
     "market_value_krw": 9717000.0,
     "month_end": "2023-07-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 246,
     "symbol": "228670.KQ",
     "weight_in_portfolio": 0.1239
@@ -50330,7 +50330,7 @@
     "last_close_native": 13750.0,
     "market_value_krw": 13750.0,
     "month_end": "2023-07-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1,
     "symbol": "159010.KQ",
     "weight_in_portfolio": 0.0002
@@ -50341,7 +50341,7 @@
     "last_close_native": 75000.0,
     "market_value_krw": 87825000.0,
     "month_end": "2023-10-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1171,
     "symbol": "267260.KS",
     "weight_in_portfolio": 1.0
@@ -50352,7 +50352,7 @@
     "last_close_native": 84100.0,
     "market_value_krw": 100079000.0,
     "month_end": "2023-11-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1190,
     "symbol": "267260.KS",
     "weight_in_portfolio": 1.0
@@ -50363,7 +50363,7 @@
     "last_close_native": 82200.0,
     "market_value_krw": 97818000.0,
     "month_end": "2023-12-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1190,
     "symbol": "267260.KS",
     "weight_in_portfolio": 0.9839
@@ -50374,7 +50374,7 @@
     "last_close_native": 48.029998779296875,
     "market_value_krw": 1595740.952,
     "month_end": "2023-12-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 26,
     "symbol": "VRT",
     "weight_in_portfolio": 0.0161
@@ -50385,7 +50385,7 @@
     "last_close_native": 102700.0,
     "market_value_krw": 122213000.0,
     "month_end": "2024-01-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1190,
     "symbol": "267260.KS",
     "weight_in_portfolio": 0.9844
@@ -50396,7 +50396,7 @@
     "last_close_native": 56.33000183105469,
     "market_value_krw": 1942941.1756,
     "month_end": "2024-01-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 26,
     "symbol": "VRT",
     "weight_in_portfolio": 0.0156
@@ -50407,7 +50407,7 @@
     "last_close_native": 124400.0,
     "market_value_krw": 148036000.0,
     "month_end": "2024-02-29",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1190,
     "symbol": "267260.KS",
     "weight_in_portfolio": 0.98
@@ -50418,7 +50418,7 @@
     "last_close_native": 753.6799926757811,
     "market_value_krw": 3014825.4969,
     "month_end": "2024-02-29",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 3,
     "symbol": "LLY",
     "weight_in_portfolio": 0.02
@@ -50429,7 +50429,7 @@
     "last_close_native": 331000.0,
     "market_value_krw": 198269000.0,
     "month_end": "2024-10-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 599,
     "symbol": "259960.KQ",
     "weight_in_portfolio": 1.0
@@ -50440,7 +50440,7 @@
     "last_close_native": 15.09000015258789,
     "market_value_krw": 171205744.0021,
     "month_end": "2024-11-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 8143,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9919
@@ -50451,7 +50451,7 @@
     "last_close_native": 29100.0,
     "market_value_krw": 1396800.0,
     "month_end": "2024-11-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 48,
     "symbol": "018290.KS",
     "weight_in_portfolio": 0.0081
@@ -50462,7 +50462,7 @@
     "last_close_native": 17.84000015258789,
     "market_value_krw": 216677276.6315,
     "month_end": "2024-12-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 8277,
     "symbol": "GRND",
     "weight_in_portfolio": 1.0
@@ -50473,7 +50473,7 @@
     "last_close_native": 17.84000015258789,
     "market_value_krw": 214318220.5095,
     "month_end": "2025-01-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 8333,
     "symbol": "GRND",
     "weight_in_portfolio": 1.0
@@ -50484,7 +50484,7 @@
     "last_close_native": 18.350000381469727,
     "market_value_krw": 223720867.1695,
     "month_end": "2025-02-28",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 8409,
     "symbol": "GRND",
     "weight_in_portfolio": 1.0
@@ -50495,7 +50495,7 @@
     "last_close_native": 17.89999961853027,
     "market_value_krw": 223123590.472,
     "month_end": "2025-03-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 8483,
     "symbol": "GRND",
     "weight_in_portfolio": 1.0
@@ -50506,7 +50506,7 @@
     "last_close_native": 21.969999313354496,
     "market_value_krw": 269022756.9882,
     "month_end": "2025-04-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 8556,
     "symbol": "GRND",
     "weight_in_portfolio": 1.0
@@ -50517,7 +50517,7 @@
     "last_close_native": 24.420000076293945,
     "market_value_krw": 288438395.847,
     "month_end": "2025-05-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 8619,
     "symbol": "GRND",
     "weight_in_portfolio": 1.0
@@ -50528,7 +50528,7 @@
     "last_close_native": 22.700000762939457,
     "market_value_krw": 266788158.4464,
     "month_end": "2025-06-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 8619,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9901
@@ -50539,7 +50539,7 @@
     "last_close_native": 35950.0,
     "market_value_krw": 2660300.0,
     "month_end": "2025-06-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 74,
     "symbol": "119850.KQ",
     "weight_in_portfolio": 0.0099
@@ -50550,7 +50550,7 @@
     "last_close_native": 17.479999542236328,
     "market_value_krw": 209797227.7508,
     "month_end": "2025-07-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 8619,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9779
@@ -50561,7 +50561,7 @@
     "last_close_native": 34050.0,
     "market_value_krw": 2519700.0,
     "month_end": "2025-07-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 74,
     "symbol": "119850.KQ",
     "weight_in_portfolio": 0.0117
@@ -50572,7 +50572,7 @@
     "last_close_native": 29.56999969482422,
     "market_value_krw": 2223548.0938,
     "month_end": "2025-07-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 54,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0104
@@ -50583,7 +50583,7 @@
     "last_close_native": 15.640000343322749,
     "market_value_krw": 186620082.6197,
     "month_end": "2025-08-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 8619,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9651
@@ -50594,7 +50594,7 @@
     "last_close_native": 30.940000534057617,
     "market_value_krw": 2313016.9486,
     "month_end": "2025-08-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 54,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.012
@@ -50605,7 +50605,7 @@
     "last_close_native": 11675.0,
     "market_value_krw": 2311954.9643,
     "month_end": "2025-08-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 21,
     "symbol": "6857.T",
     "weight_in_portfolio": 0.012
@@ -50616,7 +50616,7 @@
     "last_close_native": 28750.0,
     "market_value_krw": 2127500.0,
     "month_end": "2025-08-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 74,
     "symbol": "119850.KQ",
     "weight_in_portfolio": 0.011
@@ -50627,7 +50627,7 @@
     "last_close_native": 15.020000457763672,
     "market_value_krw": 181153595.3874,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 8619,
     "symbol": "GRND",
     "weight_in_portfolio": 0.9496
@@ -50638,7 +50638,7 @@
     "last_close_native": 14650.0,
     "market_value_krw": 2897045.5195,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 21,
     "symbol": "6857.T",
     "weight_in_portfolio": 0.0152
@@ -50649,7 +50649,7 @@
     "last_close_native": 31450.0,
     "market_value_krw": 2327300.0,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 74,
     "symbol": "119850.KQ",
     "weight_in_portfolio": 0.0122
@@ -50660,7 +50660,7 @@
     "last_close_native": 1107000.0,
     "market_value_krw": 2214000.0,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 2,
     "symbol": "012450.KS",
     "weight_in_portfolio": 0.0116
@@ -50671,7 +50671,7 @@
     "last_close_native": 26.899999618530273,
     "market_value_krw": 2183234.5665,
     "month_end": "2025-09-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 58,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0114
@@ -50682,7 +50682,7 @@
     "last_close_native": 220500.0,
     "market_value_krw": 39249000.0,
     "month_end": "2025-10-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 178,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.2858
@@ -50693,7 +50693,7 @@
     "last_close_native": 89.08000183105469,
     "market_value_krw": 34503664.0177,
     "month_end": "2025-10-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 272,
     "symbol": "GLW",
     "weight_in_portfolio": 0.2512
@@ -50704,7 +50704,7 @@
     "last_close_native": 26850.0,
     "market_value_krw": 33079200.0,
     "month_end": "2025-10-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1232,
     "symbol": "098120.KQ",
     "weight_in_portfolio": 0.2409
@@ -50715,7 +50715,7 @@
     "last_close_native": 979000.0,
     "market_value_krw": 28391000.0,
     "month_end": "2025-10-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 29,
     "symbol": "012450.KS",
     "weight_in_portfolio": 0.2067
@@ -50726,7 +50726,7 @@
     "last_close_native": 25.610000610351562,
     "market_value_krw": 2115210.907,
     "month_end": "2025-10-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 58,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0154
@@ -50737,7 +50737,7 @@
     "last_close_native": 84.19999694824219,
     "market_value_krw": 46512853.7312,
     "month_end": "2025-11-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 378,
     "symbol": "GLW",
     "weight_in_portfolio": 0.5195
@@ -50748,7 +50748,7 @@
     "last_close_native": 233500.0,
     "market_value_krw": 41563000.0,
     "month_end": "2025-11-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 178,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.4642
@@ -50759,7 +50759,7 @@
     "last_close_native": 85400.0,
     "market_value_krw": 1451800.0,
     "month_end": "2025-11-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 17,
     "symbol": "950160.KQ",
     "weight_in_portfolio": 0.0162
@@ -50770,7 +50770,7 @@
     "last_close_native": 87.55999755859375,
     "market_value_krw": 47591484.8531,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 378,
     "symbol": "GLW",
     "weight_in_portfolio": 0.2957
@@ -50781,7 +50781,7 @@
     "last_close_native": 261000.0,
     "market_value_krw": 46458000.0,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 178,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.2887
@@ -50792,7 +50792,7 @@
     "last_close_native": 72.87999725341797,
     "market_value_krw": 35630258.9762,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 340,
     "symbol": "ESTA",
     "weight_in_portfolio": 0.2214
@@ -50803,7 +50803,7 @@
     "last_close_native": 781000.0,
     "market_value_krw": 31240000.0,
     "month_end": "2025-12-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 40,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.1941
@@ -50814,7 +50814,7 @@
     "last_close_native": 338500.0,
     "market_value_krw": 60253000.0,
     "month_end": "2026-01-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 178,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.3284
@@ -50825,7 +50825,7 @@
     "last_close_native": 103.25,
     "market_value_krw": 55762360.0411,
     "month_end": "2026-01-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 378,
     "symbol": "GLW",
     "weight_in_portfolio": 0.304
@@ -50836,7 +50836,7 @@
     "last_close_native": 851000.0,
     "market_value_krw": 34040000.0,
     "month_end": "2026-01-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 40,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.1856
@@ -50847,7 +50847,7 @@
     "last_close_native": 68.1500015258789,
     "market_value_krw": 33397908.9181,
     "month_end": "2026-01-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 343,
     "symbol": "ESTA",
     "weight_in_portfolio": 0.1821
@@ -50858,7 +50858,7 @@
     "last_close_native": 288500.0,
     "market_value_krw": 61739000.0,
     "month_end": "2026-02-28",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 214,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.3997
@@ -50869,7 +50869,7 @@
     "last_close_native": 1278000.0,
     "market_value_krw": 51120000.0,
     "month_end": "2026-02-28",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 40,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.331
@@ -50880,7 +50880,7 @@
     "last_close_native": 78.6999969482422,
     "market_value_krw": 41594999.3233,
     "month_end": "2026-02-28",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 369,
     "symbol": "ESTA",
     "weight_in_portfolio": 0.2693
@@ -50891,7 +50891,7 @@
     "last_close_native": 241000.0,
     "market_value_krw": 66998000.0,
     "month_end": "2026-03-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 278,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.513
@@ -50902,7 +50902,7 @@
     "last_close_native": 1026000.0,
     "market_value_krw": 63612000.0,
     "month_end": "2026-03-31",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 62,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.487
@@ -50913,7 +50913,7 @@
     "last_close_native": 1596000.0,
     "market_value_krw": 196308000.0,
     "month_end": "2026-04-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 123,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.6904
@@ -50924,7 +50924,7 @@
     "last_close_native": 316500.0,
     "market_value_krw": 87987000.0,
     "month_end": "2026-04-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 278,
     "symbol": "108490.KQ",
     "weight_in_portfolio": 0.3094
@@ -50935,7 +50935,7 @@
     "last_close_native": 57000.0,
     "market_value_krw": 57000.0,
     "month_end": "2026-04-30",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1,
     "symbol": "082920.KS",
     "weight_in_portfolio": 0.0002
@@ -50946,7 +50946,7 @@
     "last_close_native": 1720000.0,
     "market_value_krw": 211560000.0,
     "month_end": "2026-05-11",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 123,
     "symbol": "000150.KS",
     "weight_in_portfolio": 0.9891
@@ -50957,7 +50957,7 @@
     "last_close_native": 209.1199951171875,
     "market_value_krw": 2151654.4434,
     "month_end": "2026-05-11",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 7,
     "symbol": "CAMT",
     "weight_in_portfolio": 0.0101
@@ -50968,7 +50968,7 @@
     "last_close_native": 59000.0,
     "market_value_krw": 177000.0,
     "month_end": "2026-05-11",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 3,
     "symbol": "082920.KS",
     "weight_in_portfolio": 0.0008
@@ -50979,7 +50979,7 @@
     "last_close_native": 6070.0,
     "market_value_krw": 6070.0,
     "month_end": "2026-05-11",
-    "persona": "smic_mtt_strategy_optuna_top5",
+    "persona": "smic_mtt_strategy_top5",
     "qty": 1,
     "symbol": "187790.KS",
     "weight_in_portfolio": 0.0
