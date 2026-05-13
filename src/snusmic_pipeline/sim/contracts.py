@@ -290,10 +290,10 @@ class SimulationConfig(_FrozenModel):
         SmicFollowerConfig(),
         SmicFollowerV2Config(label="SMIC Follower (SL)"),
         WeakProphetConfig(
-            label="Weak Prophet (1M, capped)",
-            lookahead_months=1,
-            max_weight=0.05,
-            min_history_days=22,
+            label="Weak Prophet (6M look-ahead)",
+            lookahead_months=6,
+            max_weight=0.40,
+            min_history_days=60,
         ),
     )
     seed: int = 42  # used only for tie-breaking; the engine itself is deterministic.

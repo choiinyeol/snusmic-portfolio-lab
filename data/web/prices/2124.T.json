@@ -24648,6 +24648,32 @@
       "open": 845.9999999999999,
       "source_currency": "JPY",
       "volume": 277600.0
+    },
+    {
+      "close": 841.0,
+      "close_krw": 7881.0738,
+      "currency": "JPY",
+      "date": "2026-05-12",
+      "display_currency": "JPY",
+      "high": 856.0,
+      "krw_per_unit": 9.371074676513672,
+      "low": 839.0,
+      "open": 853.0,
+      "source_currency": "JPY",
+      "volume": 256900.0
+    },
+    {
+      "close": 842.9999999999999,
+      "close_krw": 7972.2508,
+      "currency": "JPY",
+      "date": "2026-05-13",
+      "display_currency": "JPY",
+      "high": 842.9999999999999,
+      "krw_per_unit": 9.45699977874756,
+      "low": 835.9999999999999,
+      "open": 840.9999999999999,
+      "source_currency": "JPY",
+      "volume": 129100.0
     }
   ],
   "symbol": "2124.T"

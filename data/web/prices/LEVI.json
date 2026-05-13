@@ -23335,6 +23335,19 @@
       "open": 22.6299991607666,
       "source_currency": "USD",
       "volume": 168857.0
+    },
+    {
+      "close": 21.559999465942383,
+      "close_krw": 31789.1402,
+      "currency": "USD",
+      "date": "2026-05-12",
+      "display_currency": "USD",
+      "high": 21.860000610351562,
+      "krw_per_unit": 1474.449951171875,
+      "low": 21.3799991607666,
+      "open": 21.690000534057617,
+      "source_currency": "USD",
+      "volume": 3942100.0
     }
   ],
   "symbol": "LEVI"

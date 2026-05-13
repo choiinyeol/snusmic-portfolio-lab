@@ -25376,6 +25376,19 @@
       "open": 204.86000061035156,
       "source_currency": "USD",
       "volume": 245221.0
+    },
+    {
+      "close": 202.33999633789062,
+      "close_krw": 298340.1977,
+      "currency": "USD",
+      "date": "2026-05-12",
+      "display_currency": "USD",
+      "high": 210.39999389648438,
+      "krw_per_unit": 1474.449951171875,
+      "low": 197.27999877929688,
+      "open": 208.0,
+      "source_currency": "USD",
+      "volume": 766200.0
     }
   ],
   "symbol": "LEU"

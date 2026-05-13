@@ -11,7 +11,7 @@ import {
   getSummaryRows,
   getTrades,
 } from '@/lib/artifacts';
-import { isBenchmarkPersona } from '@/lib/product-model';
+import { getDefaultPortfolioPersona, getStrategyLeaderboard, isBenchmarkPersona } from '@/lib/product-model';
 
 export default function PortfolioPage() {
   const holdings = getCurrentHoldings();
@@ -21,6 +21,8 @@ export default function PortfolioPage() {
   const episodes = getPositionEpisodes();
   const targetsBySymbol = getLatestReportTargetsBySymbol();
   const targetsByReportId = getReportTargetsById();
+  const strategyRows = getStrategyLeaderboard();
+  const defaultPersona = getDefaultPortfolioPersona();
 
   const allPersonas = Array.from(new Set(holdings.map((row) => row.persona))).sort();
   const benchmarkPersonas = allPersonas.filter(isBenchmarkPersona);
@@ -34,6 +36,17 @@ export default function PortfolioPage() {
     summaries.map((row) => [row.persona, row.totalContributedKrw ?? row.finalEquityKrw ?? 0]),
   );
   const cashByPersona = Object.fromEntries(summaries.map((row) => [row.persona, row.finalCashKrw ?? 0]));
+  const methodsByPersona = Object.fromEntries(
+    strategyRows.map((row) => [
+      row.id,
+      {
+        summary: row.methodologySummary,
+        buyRules: row.buyRules,
+        sellRules: row.sellRules,
+        riskControls: row.riskControls,
+      },
+    ]),
+  );
   const reportSymbolsById = Object.fromEntries(
     Array.from(new Set(trades.map((trade) => trade.reportId).filter((value): value is string => Boolean(value))))
       .map((reportId) => [reportId, getReportSymbolById(reportId)])
@@ -65,6 +78,8 @@ export default function PortfolioPage() {
         personas={personas}
         personaLabels={personaLabels}
         personaKinds={personaKinds}
+        defaultPersona={defaultPersona}
+        methodsByPersona={methodsByPersona}
         capitalByPersona={capitalByPersona}
         cashByPersona={cashByPersona}
         reportSymbolsById={reportSymbolsById}

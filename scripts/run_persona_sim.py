@@ -93,8 +93,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--broker-strategy-top",
         type=int,
-        default=int(os.environ.get("SMIC_BROKER_STRATEGY_TOP", "5")),
-        help="Maximum number of benchmark-beating broker-ledger strategies to promote.",
+        default=int(os.environ.get("SMIC_BROKER_STRATEGY_TOP", "0")),
+        help="Maximum number of benchmark-beating broker-ledger strategies to promote. Use 0 for every qualifying strategy.",
     )
     parser.add_argument(
         "--broker-strategy-seed",
@@ -132,7 +132,16 @@ def main() -> int:
             args.warehouse,
             refresh_benchmark=args.refresh_benchmark,
         )
-        benchmark = max(baseline_result.summaries, key=lambda summary: summary.money_weighted_return)
+        tradable_benchmarks = [
+            summary for summary in baseline_result.summaries if summary.persona != "weak_oracle"
+        ]
+        if not tradable_benchmarks:
+            raise RuntimeError("No tradable benchmark summaries available for broker strategy admission.")
+        benchmark = max(tradable_benchmarks, key=lambda summary: summary.money_weighted_return)
+        print(
+            "  admission benchmark: "
+            f"{benchmark.label} ({benchmark.money_weighted_return:.2%}); Weak Prophet is oracle-only."
+        )
         search = find_top_broker_strategy_configs(
             warehouse_dir=args.warehouse,
             start_date=config.start_date,

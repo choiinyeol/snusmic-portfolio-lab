@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pandas as pd
 import pytest
 
 from snusmic_pipeline.web_artifacts import ExportInputs, check_web_artifacts, export_web_artifacts
@@ -106,12 +107,17 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(tmp_path: Path) 
     )
 
     manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
+    warehouse_prices = pd.read_csv(Path("data/warehouse") / "daily_prices.csv", usecols=["date"])
     assert manifest["schema_version"] == "1.0.0"
     assert manifest["artifact_root"] == "data/web"
     assert manifest["report_range"] == {"start": "2020-12-05", "end": "2026-05-06"}
-    assert manifest["price_range"] == {"start": "2018-08-03", "end": "2026-05-11"}
+    assert manifest["price_range"] == {
+        "start": warehouse_prices["date"].astype(str).min(),
+        "end": warehouse_prices["date"].astype(str).max(),
+    }
     assert manifest["row_counts"]["reports"] == 202
-    assert manifest["row_counts"]["personas"] == 13
+    assert manifest["row_counts"]["personas"] == 39
+    assert manifest["row_counts"]["strategy_catalog"] == 39
     assert manifest["data_quality"]["reports_with_prices"] == 202
     assert manifest["data_quality"]["missing_price_symbols"] == 5
     assert "reports.json" in manifest["artifacts"]

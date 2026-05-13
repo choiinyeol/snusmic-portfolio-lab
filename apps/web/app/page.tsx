@@ -1,12 +1,12 @@
 import Link from 'next/link';
-import { CumulativeReturnChart, type ReturnSeries } from '@/components/charts/CumulativeReturnChart';
+import type { ReturnSeries } from '@/components/charts/CumulativeReturnChart';
+import { SeriesToggleChart } from '@/components/charts/SeriesToggleChart';
 import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
 import { Money } from '@/components/ui/Money';
 import { PageHero } from '@/components/ui/PageHero';
 import { Section } from '@/components/ui/Section';
 import {
   getEquityDaily,
-  getPersonaLabel,
   getReportRows,
   getTrades,
   type EquityPoint,
@@ -16,21 +16,18 @@ import {
 } from '@/lib/artifacts';
 import { formatDateKo, formatDays, formatKrw, formatPercent, signedTextClass } from '@/lib/format';
 import {
-  BENCHMARK_IDS,
-  compactStrategyLabel,
   getBenchmarkRows,
+  getDefaultPortfolioPersona,
   getExecutiveOverview,
   getObjectivePassingRows,
   getSelectableStrategyRows,
   getStrategyLeaderboard,
   OBJECTIVE_MAX_DRAWDOWN,
-  PRIMARY_PERSONA,
   TARGET_BENCHMARK_ID,
   type ResearchCandidate,
   type StrategyLeaderboardRow,
 } from '@/lib/product-model';
 
-const DASHBOARD_SERIES = [...BENCHMARK_IDS, 'smic_mtt_strategy_top1', 'smic_mtt_strategy_top2'] as const;
 const SERIES_COLORS = [
   '#64748b',
   '#7c3aed',
@@ -45,19 +42,21 @@ const SERIES_COLORS = [
 ];
 
 export default function OverviewPage() {
-  const overview = getExecutiveOverview();
   const strategyRows = getStrategyLeaderboard();
+  const selectedPersona = getDefaultPortfolioPersona();
+  const overview = getExecutiveOverview(selectedPersona);
   const trades = getTrades();
   const reports = getReportRows();
   const latestReportsBySymbol = latestReportBySymbol(reports);
   const equity = getEquityDaily();
-  const chartSeries = buildDashboardSeries(equity);
   const benchmarkRows = getBenchmarkRows(strategyRows);
   const selectableRows = getSelectableStrategyRows(strategyRows);
+  const selectedStrategy = selectableRows.find((row) => row.id === selectedPersona);
+  const chartSeries = buildDashboardSeries(equity, benchmarkRows, selectedStrategy, selectableRows);
   const objectiveRows = getObjectivePassingRows(strategyRows);
   const benchmarkToBeat = benchmarkRows.find((row) => row.id === TARGET_BENCHMARK_ID);
   const recentBuys = trades
-    .filter((trade) => trade.persona === PRIMARY_PERSONA && trade.side === 'buy')
+    .filter((trade) => trade.persona === selectedPersona && trade.side === 'buy')
     .sort((a, b) => b.date.localeCompare(a.date))
     .slice(0, 7);
 
@@ -94,7 +93,8 @@ export default function OverviewPage() {
       <Section
         eyebrow="Portfolio"
         title="현재 상태 대시보드"
-        caption="포트폴리오 구성, 현금 비중, 최근 리포트 상태를 한 번에 확인합니다."
+        caption="현재 최고 전략의 평가액, 보유 구성, 현금 비중, 최근 리포트 상태를 한 번에 확인합니다. 다른 전략은 원장 화면에서 바로 전환합니다."
+        actions={<StrategyPills rows={selectableRows.slice(0, 10)} selectedId={selectedPersona} />}
       >
         <div className="grid gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(300px,.55fr)_minmax(300px,.55fr)]">
           <article className="lab-panel">
@@ -143,7 +143,7 @@ export default function OverviewPage() {
             <span className="snapshot-pill">선택 전략 {selectableRows.length}</span>
             <span className="snapshot-pill">목표: MDD 15% 이하 · KOSPI 초과</span>
           </div>
-          <CumulativeReturnChart series={chartSeries} />
+          <SeriesToggleChart series={chartSeries} />
         </article>
       </Section>
 
@@ -269,6 +269,23 @@ function OverviewDigest({
         />
       </article>
     </section>
+  );
+}
+
+function StrategyPills({ rows, selectedId }: { rows: StrategyLeaderboardRow[]; selectedId: string }) {
+  return (
+    <div className="flex max-w-full flex-wrap gap-1.5" aria-label="대표 전략 선택">
+      {rows.map((row) => (
+        <Link
+          className={`snapshot-pill ${row.id === selectedId ? 'border-primary/30 bg-primary/10 text-primary' : ''}`}
+          href={`/portfolio?strategy=${encodeURIComponent(row.id)}`}
+          key={row.id}
+          title={row.label}
+        >
+          {row.shortLabel}
+        </Link>
+      ))}
+    </div>
   );
 }
 
@@ -642,16 +659,40 @@ function reportStatusBadge(report: ReportRow) {
   return <span className="badge badge-primary badge-soft badge-sm">진행 중</span>;
 }
 
-function buildDashboardSeries(equity: EquityPoint[]): ReturnSeries[] {
-  return DASHBOARD_SERIES.map((persona, index) => ({
-    id: persona,
-    label: compactStrategyLabel(persona, getPersonaLabel(persona)),
-    shortLabel: compactStrategyLabel(persona, getPersonaLabel(persona)),
-    color: SERIES_COLORS[index % SERIES_COLORS.length],
-    points: equity
-      .filter((point) => point.persona === persona && point.cumulativeReturn !== null)
-      .map((point) => ({ time: point.date, value: point.cumulativeReturn ?? 0 })),
-  })).filter((series) => series.points.length > 0);
+function buildDashboardSeries(
+  equity: EquityPoint[],
+  benchmarks: StrategyLeaderboardRow[],
+  selected: StrategyLeaderboardRow | undefined,
+  selectable: StrategyLeaderboardRow[],
+): ReturnSeries[] {
+  const rows = uniqueSeriesRows([
+    ...benchmarks,
+    ...(selected ? [selected] : []),
+    ...selectable.filter((row) => row.objectivePassed).slice(0, 3),
+    ...selectable.slice(0, 3),
+  ]);
+  return rows
+    .map((row, index) => ({
+      id: row.id,
+      label: row.label,
+      shortLabel: row.shortLabel,
+      color: SERIES_COLORS[index % SERIES_COLORS.length],
+      points: equity
+        .filter((point) => point.persona === row.id && point.cumulativeReturn !== null)
+        .map((point) => ({ time: point.date, value: point.cumulativeReturn ?? 0 })),
+    }))
+    .filter((series) => series.points.length > 0);
+}
+
+function uniqueSeriesRows(rows: StrategyLeaderboardRow[]): StrategyLeaderboardRow[] {
+  const seen = new Set<string>();
+  const out: StrategyLeaderboardRow[] = [];
+  for (const row of rows) {
+    if (seen.has(row.id)) continue;
+    seen.add(row.id);
+    out.push(row);
+  }
+  return out;
 }
 
 function withCashHolding(holdings: HoldingRow[], cashKrw: number | null | undefined, persona: string): HoldingRow[] {

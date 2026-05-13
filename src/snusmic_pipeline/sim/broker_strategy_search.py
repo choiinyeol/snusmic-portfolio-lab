@@ -47,11 +47,12 @@ def find_top_broker_strategy_configs(
     2. Candidate configs are replayed on the full window and only accepted
        when they beat the strongest benchmark by ``min_excess_return``.
 
-    ``top_n`` is a cap, not a quota. If the current market snapshot only
-    produces fewer qualifying strategies, return those strategies and keep the
-    rejected candidates in ``trial_rows`` with an explicit admission status.
+    ``top_n`` is optional. When it is positive, it caps the promoted strategy
+    count; when it is zero or negative, every qualifying distinct strategy is
+    promoted. Rejected candidates stay in ``trial_rows`` with an explicit
+    admission status.
     """
-    if trials < top_n:
+    if top_n > 0 and trials < top_n:
         raise ValueError(f"trials ({trials}) must be >= top_n ({top_n})")
     if train_end < train_start:
         raise ValueError(f"train_end {train_end} must be on or after train_start {train_start}")
@@ -190,7 +191,7 @@ def find_top_broker_strategy_configs(
                 }
             )
         )
-        if len(selected) >= top_n:
+        if top_n > 0 and len(selected) >= top_n:
             break
 
     return BrokerStrategySearchResult(configs=tuple(selected), trial_rows=pd.DataFrame(rows))

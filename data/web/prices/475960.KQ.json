@@ -4745,6 +4745,32 @@
       "open": 55500.0,
       "source_currency": "KRW",
       "volume": 122472.0
+    },
+    {
+      "close": 52900.0,
+      "close_krw": 52900.0,
+      "currency": "KRW",
+      "date": "2026-05-12",
+      "display_currency": "KRW",
+      "high": 55800.0,
+      "krw_per_unit": 1.0,
+      "low": 50800.0,
+      "open": 54500.0,
+      "source_currency": "KRW",
+      "volume": 140312.0
+    },
+    {
+      "close": 51600.0,
+      "close_krw": 51600.0,
+      "currency": "KRW",
+      "date": "2026-05-13",
+      "display_currency": "KRW",
+      "high": 52700.0,
+      "krw_per_unit": 1.0,
+      "low": 50900.0,
+      "open": 52700.0,
+      "source_currency": "KRW",
+      "volume": 60772.0
     }
   ],
   "symbol": "475960.KQ"

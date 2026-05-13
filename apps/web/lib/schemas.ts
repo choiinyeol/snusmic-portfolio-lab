@@ -138,6 +138,38 @@ export const WebDataQualitySchema = z
   })
   .passthrough();
 
+export const StrategyCatalogRowSchema = z
+  .object({
+    strategy_id: z.string(),
+    label: z.string(),
+    short_label: z.string(),
+    kind: z.enum(['benchmark', 'strategy', 'oracle']),
+    benchmark_group: z.string().nullable(),
+    is_selectable: z.boolean(),
+    is_default_candidate: z.boolean(),
+    objective_passed: z.boolean(),
+    objective_return_excess: NullableNumber,
+    objective_mdd_slack: NullableNumber,
+    methodology_summary: z.string(),
+    buy_rules: z.array(z.string()),
+    sell_rules: z.array(z.string()),
+    risk_controls: z.array(z.string()),
+    params: z.record(z.string(), z.unknown()),
+    metrics: z
+      .object({
+        final_equity_krw: NullableNumber,
+        final_cash_krw: NullableNumber,
+        final_holdings_value_krw: NullableNumber,
+        money_weighted_return: NullableNumber,
+        cagr: NullableNumber,
+        max_drawdown: NullableNumber,
+        trade_count: NullableNumber,
+        open_positions: NullableNumber,
+      })
+      .passthrough(),
+  })
+  .passthrough();
+
 export const ArtifactManifestSchema = z
   .object({
     schema_version: z.string(),

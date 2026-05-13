@@ -24700,6 +24700,32 @@
       "open": 29050.0,
       "source_currency": "KRW",
       "volume": 34648.0
+    },
+    {
+      "close": 29350.0,
+      "close_krw": 29350.0,
+      "currency": "KRW",
+      "date": "2026-05-11",
+      "display_currency": "KRW",
+      "high": 29600.0,
+      "krw_per_unit": 1.0,
+      "low": 29050.0,
+      "open": 29600.0,
+      "source_currency": "KRW",
+      "volume": 22927.0
+    },
+    {
+      "close": 28150.0,
+      "close_krw": 28150.0,
+      "currency": "KRW",
+      "date": "2026-05-12",
+      "display_currency": "KRW",
+      "high": 29250.0,
+      "krw_per_unit": 1.0,
+      "low": 27800.0,
+      "open": 29250.0,
+      "source_currency": "KRW",
+      "volume": 81187.0
     }
   ],
   "symbol": "192400.KQ"

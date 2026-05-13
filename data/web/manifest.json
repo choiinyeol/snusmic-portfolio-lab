@@ -15,30 +15,32 @@
     "report-rankings.json",
     "reports.json",
     "return-windows.json",
+    "strategies/catalog.json",
     "table-download-reports.csv",
     "table-download-strategies.csv",
     "target-hit-distribution.json",
     "trades.json"
   ],
   "checksums": {
-    "current-holdings.json": "d34acfd910e455c0438bfb6d73c0a8ab79be7779c9c8c52e1227d2cef9766969",
+    "current-holdings.json": "ec79b3ad353f73b431bafd4b78310842f5613c97a4877e78b36b3d717fdb51fb",
     "data-quality-download.csv": "ca7f934a6b3fa8912033689acfee50812f02bb02851d03eed268a1cb9d5ba524",
     "data-quality.json": "482975246b00224f9f018444859569e532e5c7776b32ea76aec5cd08509762cd",
-    "equity-daily.json": "286599348e6b8d419ee7c81ee092f2e9586ebc6157247b5caea9968f23ad469c",
+    "equity-daily.json": "ba6076b88b20989ae757e5391e68107cc299cae31370a2865c77e9400f181914",
     "insights.json": "b601fb7474417ad5983d0ce51d29cbf2c6a540dcb4c5023bb1ddc826bc94c8b5",
     "missing-symbols.json": "76e0e0e7bd8a1632afc95ad3663c599b99c261ed711ea4e04a51f88942b71254",
-    "monthly-holdings.json": "98ff21ff5928fe5085ad7562fdf1e456945d106f383bfe0d2e13f16fcf77cfcf",
-    "overview.json": "582bbba29047a4454b05b9243c822a59ff4cc84f4bfbc368bf6c59324aafca50",
-    "personas.json": "7e39d53230290519b507d1db758687c416be3768caed1991400b7a9d6d0af047",
-    "position-episodes.json": "b1c2adfd7243528df1f810fbd3ad2e911a06c6f67268ec34a36000568b74eb3c",
-    "report-detail-metrics.json": "d37d94e97d4a671f413674af182c3b95c7737cfb26cf207d0006548b1294cd68",
-    "report-rankings.json": "1948559a4b1230910936a6d0174ad800cb126a768075c048dc64a769da3740a8",
-    "reports.json": "fc1ae61af0c439bb28cb6364da4e029c298092396f8010695bec1defc7854169",
+    "monthly-holdings.json": "6cc2e575bd9dc749979a5c32e83887261b35fe608f219fab7679b6c1cf2545a5",
+    "overview.json": "1502449d8c570bfdda1bd476996ed548b7b4a6079735d2f03711b3a79072ea22",
+    "personas.json": "95cd9a8b2ebc81e0bdd3abc46fb10bc83c02b8cab45b60d962c1e301cd18b107",
+    "position-episodes.json": "2f3b467cae10efddf64c62184aa14fb173f0bd11939f7448aff39849e99ec78f",
+    "report-detail-metrics.json": "e5ec7cbf52fbf2113a5d3d3a8fbac90fc0dff7bd6ca647b1630836b51bcf5647",
+    "report-rankings.json": "4ceb5adb1c9412c1872dbe514a6a5890df7b078cb2c1e4cf71db4e4898f1f992",
+    "reports.json": "d6356960b4dcc7310c7c004cc7c13eada503feceddc47ce57a48deacab16e07d",
     "return-windows.json": "b4e688dbd01a6c85413ca799bc86ee87a5e81c0fdd2a68f4a89428e9fd5974ff",
-    "table-download-reports.csv": "e8b9eeaa3205604b4a118b3fd3f9b0f58c63f7451a98562538d4f42648f99c78",
-    "table-download-strategies.csv": "306df8398f57f6c86d9a841d2fe28975f4f6518b132e6eba17ff6669c631e062",
-    "target-hit-distribution.json": "f50c80e7cdcf9490b73c0686325f45693f825a702dba3cac10335aeada2fc6e2",
-    "trades.json": "21d3a450d21adfc5f123dd059a144dcfa28fd2530d5736c3ac7bd06d2f53894c"
+    "strategies/catalog.json": "306aa892aee7e3d81684288faf669790b9fc881e770bf8dfad8987c56d710fb8",
+    "table-download-reports.csv": "a40e0687b128bcb24a7eb1e267d52305468898288db17657aabcb44913b6e2f8",
+    "table-download-strategies.csv": "736651af3d7d50a228e7400cdee8abcc399e4a2b213c660dc2d5eb8d8797b3e0",
+    "target-hit-distribution.json": "604987bf5db71e520faf84ed0589d1d4b2b44e0ef059ba7d4f218c5278e84ec3",
+    "trades.json": "439a043ab53ff9caf4e3d5071a5cc31bf4dac8b9b6089f266db2d1c0537ff4e0"
   },
   "data_quality": {
     "missing_price_symbols": 5,
@@ -46,10 +48,10 @@
     "target_hit_count": 83,
     "total_reports": 202
   },
-  "generated_at": "2026-05-11T00:00:00+09:00",
+  "generated_at": "2026-05-13T00:00:00+09:00",
   "price_artifact_count": 212,
   "price_range": {
-    "end": "2026-05-11",
+    "end": "2026-05-13",
     "start": "2018-08-03"
   },
   "report_range": {
@@ -57,17 +59,18 @@
     "start": "2020-12-05"
   },
   "row_counts": {
-    "current_holdings": 71,
-    "equity_daily": 18109,
-    "monthly_holdings": 5450,
-    "personas": 13,
-    "position_episodes": 1359,
+    "current_holdings": 140,
+    "equity_daily": 54405,
+    "monthly_holdings": 8470,
+    "personas": 39,
+    "position_episodes": 1992,
     "reports": 202,
-    "trades": 6077
+    "strategy_catalog": 39,
+    "trades": 8799
   },
   "schema_version": "1.0.0",
   "simulation_range": {
-    "end": "2026-05-11",
+    "end": "2026-05-13",
     "start": "2020-12-05"
   }
 }

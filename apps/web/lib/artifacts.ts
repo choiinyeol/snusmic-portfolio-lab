@@ -9,6 +9,7 @@ import {
   RawHoldingRowSchema,
   RawReportRowSchema,
   RawTradeRowSchema,
+  StrategyCatalogRowSchema,
   WebDataQualitySchema,
   WebOverviewSchema,
 } from '@/lib/schemas';
@@ -180,6 +181,34 @@ export type DataQuality = {
   targetHitRate: number;
   missingPriceSymbols: number;
   extractionQuality: Record<string, unknown>;
+};
+
+export type StrategyCatalogRow = {
+  strategyId: string;
+  label: string;
+  shortLabel: string;
+  kind: 'benchmark' | 'strategy' | 'oracle';
+  benchmarkGroup: string | null;
+  isSelectable: boolean;
+  isDefaultCandidate: boolean;
+  objectivePassed: boolean;
+  objectiveReturnExcess: number | null;
+  objectiveMddSlack: number | null;
+  methodologySummary: string;
+  buyRules: string[];
+  sellRules: string[];
+  riskControls: string[];
+  params: Record<string, unknown>;
+  metrics: {
+    finalEquityKrw: number | null;
+    finalCashKrw: number | null;
+    finalHoldingsValueKrw: number | null;
+    moneyWeightedReturn: number | null;
+    cagr: number | null;
+    maxDrawdown: number | null;
+    tradeCount: number | null;
+    openPositions: number | null;
+  };
 };
 
 export type WebPersona = {
@@ -618,6 +647,44 @@ export function getWebDataQuality(): WebDataQuality {
 
 export function getOverview(): WebOverview {
   return parseArtifact('overview.json', WebOverviewSchema, readRequiredJson<unknown>('data/web/overview.json'));
+}
+
+let strategyCatalogCache: StrategyCatalogRow[] | undefined;
+export function getStrategyCatalog(): StrategyCatalogRow[] {
+  if (strategyCatalogCache) return strategyCatalogCache;
+  const raw = parseRows(
+    'strategies/catalog.json',
+    StrategyCatalogRowSchema,
+    readRequiredJson<unknown>('data/web/strategies/catalog.json'),
+  );
+  strategyCatalogCache = raw.map((row) => ({
+    strategyId: row.strategy_id,
+    label: row.label,
+    shortLabel: row.short_label,
+    kind: row.kind,
+    benchmarkGroup: row.benchmark_group,
+    isSelectable: row.is_selectable,
+    isDefaultCandidate: row.is_default_candidate,
+    objectivePassed: row.objective_passed,
+    objectiveReturnExcess: row.objective_return_excess,
+    objectiveMddSlack: row.objective_mdd_slack,
+    methodologySummary: row.methodology_summary,
+    buyRules: row.buy_rules,
+    sellRules: row.sell_rules,
+    riskControls: row.risk_controls,
+    params: row.params,
+    metrics: {
+      finalEquityKrw: row.metrics.final_equity_krw,
+      finalCashKrw: row.metrics.final_cash_krw,
+      finalHoldingsValueKrw: row.metrics.final_holdings_value_krw,
+      moneyWeightedReturn: row.metrics.money_weighted_return,
+      cagr: row.metrics.cagr,
+      maxDrawdown: row.metrics.max_drawdown,
+      tradeCount: row.metrics.trade_count,
+      openPositions: row.metrics.open_positions,
+    },
+  }));
+  return strategyCatalogCache;
 }
 
 export function getArtifactManifest(): ArtifactManifest {

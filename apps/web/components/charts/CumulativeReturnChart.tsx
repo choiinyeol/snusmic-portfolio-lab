@@ -17,7 +17,7 @@ export type ReturnSeries = { id: string; label: string; shortLabel?: string; col
 
 type Tooltip = { x: number; y: number; time: string; rows: Array<{ label: string; value: number; color: string }> };
 
-export function CumulativeReturnChart({ series }: { series: ReturnSeries[] }) {
+export function CumulativeReturnChart({ series, showLegend = true }: { series: ReturnSeries[]; showLegend?: boolean }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
 
@@ -82,17 +82,19 @@ export function CumulativeReturnChart({ series }: { series: ReturnSeries[] }) {
     return <div className="chart-box empty-chart">수익률 경로 데이터가 없습니다.</div>;
   return (
     <div className="chart-shell">
-      <div className="chart-legend mb-2 flex flex-wrap gap-x-3 gap-y-1 px-1 text-xs">
-        {series
-          .filter((item) => item.points.length)
-          .slice(0, 14)
-          .map((item) => (
-            <span className="inline-flex items-center gap-1.5 whitespace-nowrap" key={item.id} title={item.label}>
-              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
-              <span className="font-semibold text-base-content/65">{item.shortLabel ?? item.label}</span>
-            </span>
-          ))}
-      </div>
+      {showLegend ? (
+        <div className="chart-legend mb-2 flex flex-wrap gap-x-3 gap-y-1 px-1 text-xs">
+          {series
+            .filter((item) => item.points.length)
+            .slice(0, 14)
+            .map((item) => (
+              <span className="inline-flex items-center gap-1.5 whitespace-nowrap" key={item.id} title={item.label}>
+                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
+                <span className="font-semibold text-base-content/65">{item.shortLabel ?? item.label}</span>
+              </span>
+            ))}
+        </div>
+      ) : null}
       <div ref={ref} className="chart-box chart-box-fixed chart-box-return" aria-label="전략 누적 수익률 비교 차트" />
       {tooltip ? (
         <div className="chart-tooltip" style={{ left: tooltip.x, top: tooltip.y }}>
