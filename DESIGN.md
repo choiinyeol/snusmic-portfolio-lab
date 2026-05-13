@@ -1,6 +1,6 @@
 # SNUSMIC Portfolio Lab Design Contract
 
-Last updated: 2026-05-13
+Last updated: 2026-05-14
 
 This document is the source of truth for product, IA, data ownership, UI/UX, and content decisions in this repository. It supersedes ad-hoc page-level interpretations when they conflict.
 
@@ -268,6 +268,20 @@ This composition may vary by implementation. The hierarchy matters more than exa
 - Benchmarks, selectable strategies, oracle baselines, current holdings, and report target outcomes must remain visually distinct.
 - Dense desktop layouts must collapse into summary-first mobile sections; do not create page-level horizontal scroll.
 - Charts show trends and comparison; tables show auditability; cards show current state. Avoid repeating the same metric everywhere.
+
+### 7.4 V3 research archive correction
+
+The V3 correction intentionally rejects the earlier glossy dashboard direction when it feels like AI-generated SaaS decoration. The overview should read as a **research archive / command ledger**, not a hero-led marketing dashboard.
+
+Rules for this lane:
+
+- Keep the H1 short and literal. Avoid motivational or editorial headlines such as “오늘 이 스냅샷은…” or “이렇게 읽습니다.”
+- Prefer noun-heavy Korean labels: 원장 요약, 포트폴리오 비중, 노출 점검, 전략 순위, 검증 테이프.
+- Use low-radius panels, hairline dividers, tabular numbers, compact rows, and restrained monochrome accents.
+- Data can create the visual texture: tables, ledgers, progress bars, facts, and grid lines are preferable to shadows, gradients, and decorative cards.
+- `/compare` must not be a product page that explains why one branch is better than another. If comparison returns, it should compare strategies, reports, or artifact versions using product data.
+- Empty data is a first-class state. If the selected book has no active holdings, show a cash/reserve ledger instead of an empty treemap.
+- Reference sites and generated images are guidance, not a target to copy. The product should look deliberate and finance-native even if it diverges from the prompt image.
 
 ### 7.4 Implementation sequencing for major redesign
 
