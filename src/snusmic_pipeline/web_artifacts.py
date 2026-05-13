@@ -16,9 +16,26 @@ from .currency import currency_for_symbol, normalize_currency
 
 REQUIRED_ARTIFACTS = [
     "manifest.json",
+    "overview/snapshot.json",
+    "overview/research-pulse.json",
+    "overview/data-quality.json",
+    "portfolio/personas.json",
+    "portfolio/holdings.json",
+    "portfolio/monthly-holdings.json",
+    "portfolio/trades.json",
+    "portfolio/episodes.json",
+    "portfolio/equity-daily.json",
+    "reports/table.json",
+    "reports/rankings.json",
+    "reports/detail-metrics.json",
+    "reports/return-windows.json",
+    "reports/target-hit-distribution.json",
+    "strategies/catalog.json",
+    "strategies/leaderboard.json",
+    "strategies/curves.json",
+    "screener/candidates.json",
     "overview.json",
     "personas.json",
-    "strategies/catalog.json",
     "reports.json",
     "report-rankings.json",
     "report-detail-metrics.json",
@@ -269,9 +286,38 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     data_quality = _build_data_quality(extraction_quality, missing_symbols, reports, report_performance)
     insights = _build_insights(overview, rankings, target_distribution, return_windows, data_quality)
 
+    persona_rows = _records(summary)
+    enriched_current_holdings = _records(_enrich_holdings_with_native(current_holdings, prices, fx_rates))
+    enriched_monthly_holdings = _records(
+        _enrich_holdings_with_native(monthly_holdings, prices, fx_rates, close_column="month_close_krw")
+    )
+    trade_rows = _records(trades)
+    episode_rows = _records(position_episodes)
+    equity_rows = _records(equity_daily)
+    screener_candidates = _build_screener_candidates(report_rows)
+
+    _write_page_bundles(
+        out,
+        overview=overview,
+        insights=insights,
+        data_quality=data_quality,
+        personas=persona_rows,
+        holdings=enriched_current_holdings,
+        monthly_holdings=enriched_monthly_holdings,
+        trades=trade_rows,
+        episodes=episode_rows,
+        equity_daily=equity_rows,
+        reports=report_rows,
+        rankings=rankings,
+        detail_metrics=detail_metrics,
+        return_windows=return_windows,
+        target_distribution=target_distribution,
+        strategy_catalog=strategy_catalog,
+        screener_candidates=screener_candidates,
+    )
+
     _write_json(out / "overview.json", overview)
-    _write_json(out / "personas.json", _records(summary))
-    _write_json(out / "strategies" / "catalog.json", strategy_catalog)
+    _write_json(out / "personas.json", persona_rows)
     _write_json(out / "reports.json", report_rows)
     _write_json(out / "report-rankings.json", rankings)
     _write_json(out / "report-detail-metrics.json", detail_metrics)
@@ -280,19 +326,17 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     _write_json(out / "insights.json", insights)
     _write_json(
         out / "current-holdings.json",
-        _records(_enrich_holdings_with_native(current_holdings, prices, fx_rates)),
+        enriched_current_holdings,
     )
     _write_json(
         out / "monthly-holdings.json",
-        _records(
-            _enrich_holdings_with_native(monthly_holdings, prices, fx_rates, close_column="month_close_krw")
-        ),
+        enriched_monthly_holdings,
     )
     _write_json(out / "missing-symbols.json", [{"symbol": symbol} for symbol in missing_symbols])
     _write_json(out / "data-quality.json", data_quality)
-    _write_json(out / "trades.json", _records(trades))
-    _write_json(out / "position-episodes.json", _records(position_episodes))
-    _write_json(out / "equity-daily.json", _records(equity_daily))
+    _write_json(out / "trades.json", trade_rows)
+    _write_json(out / "position-episodes.json", episode_rows)
+    _write_json(out / "equity-daily.json", equity_rows)
     _write_download_csvs(out, report_rows, data_quality)
     _write_price_artifacts(prices, artifact_symbols, prices_out)
     write_web_manifest(out)
@@ -373,6 +417,190 @@ def _write_json(path: Path, data: Any) -> None:
     )
 
 
+def _write_product_json(path: Path, data: Any) -> None:
+    """Write route-owned product data without duplicating raw artifact bulk.
+
+    Top-level artifacts are intentionally readable snapshots. Page bundles are
+    build/runtime product contracts, so they are compact and field-scoped to
+    keep the committed web surface small enough for normal Git workflows.
+    """
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(_clean(data), ensure_ascii=False, separators=(",", ":"), sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
+def _write_page_bundles(
+    out: Path,
+    *,
+    overview: dict[str, Any],
+    insights: list[dict[str, Any]],
+    data_quality: dict[str, Any],
+    personas: list[dict[str, Any]],
+    holdings: list[dict[str, Any]],
+    monthly_holdings: list[dict[str, Any]],
+    trades: list[dict[str, Any]],
+    episodes: list[dict[str, Any]],
+    equity_daily: list[dict[str, Any]],
+    reports: list[dict[str, Any]],
+    rankings: dict[str, Any],
+    detail_metrics: dict[str, Any],
+    return_windows: list[dict[str, Any]],
+    target_distribution: dict[str, Any],
+    strategy_catalog: list[dict[str, Any]],
+    screener_candidates: list[dict[str, Any]],
+) -> None:
+    """Write page-owned product bundles.
+
+    Top-level JSON artifacts remain exported as raw downloadable/source files,
+    but the web app should consume these page bundles so each route has a clear
+    data owner and future UI work does not rebuild the same meaning locally.
+    """
+
+    _write_product_json(out / "overview" / "snapshot.json", overview)
+    _write_product_json(out / "overview" / "research-pulse.json", insights)
+    _write_product_json(out / "overview" / "data-quality.json", data_quality)
+
+    _write_product_json(out / "portfolio" / "personas.json", personas)
+    _write_product_json(out / "portfolio" / "holdings.json", holdings)
+    _write_product_json(
+        out / "portfolio" / "monthly-holdings.json", _compact_monthly_holdings(monthly_holdings)
+    )
+    _write_product_json(out / "portfolio" / "trades.json", _compact_trades(trades))
+    _write_product_json(out / "portfolio" / "episodes.json", _compact_episodes(episodes))
+    _write_product_json(out / "portfolio" / "equity-daily.json", _compact_equity_curves(equity_daily))
+
+    _write_product_json(out / "reports" / "table.json", reports)
+    _write_product_json(out / "reports" / "rankings.json", rankings)
+    _write_product_json(out / "reports" / "detail-metrics.json", detail_metrics)
+    _write_product_json(out / "reports" / "return-windows.json", return_windows)
+    _write_product_json(out / "reports" / "target-hit-distribution.json", target_distribution)
+
+    _write_product_json(out / "strategies" / "catalog.json", strategy_catalog)
+    _write_product_json(out / "strategies" / "leaderboard.json", personas)
+    _write_product_json(out / "strategies" / "curves.json", _compact_equity_curves(equity_daily))
+
+    _write_product_json(out / "screener" / "candidates.json", screener_candidates)
+
+
+def _compact_monthly_holdings(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    columns = [
+        "persona",
+        "month_end",
+        "symbol",
+        "company",
+        "qty",
+        "market_value_krw",
+        "last_close_native",
+        "currency",
+        "weight_in_portfolio",
+    ]
+    return _compact_table(rows, columns)
+
+
+def _compact_trades(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    columns = [
+        "persona",
+        "date",
+        "symbol",
+        "side",
+        "qty",
+        "fill_price_krw",
+        "gross_krw",
+        "cash_after_krw",
+        "reason",
+        "report_id",
+    ]
+    return _compact_table(rows, columns)
+
+
+def _compact_episodes(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    columns = [
+        "persona",
+        "symbol",
+        "company",
+        "open_date",
+        "close_date",
+        "holding_days",
+        "buy_fills",
+        "sell_fills",
+        "total_qty_bought",
+        "total_qty_sold",
+        "avg_entry_price_krw",
+        "avg_exit_price_krw",
+        "realized_pnl_krw",
+        "unrealized_pnl_krw",
+        "last_close_krw",
+        "status",
+        "exit_reasons",
+    ]
+    return _compact_table(rows, columns)
+
+
+def _compact_table(rows: list[dict[str, Any]], columns: list[str]) -> dict[str, Any]:
+    return {
+        "columns": columns,
+        "rows": [[_compact_cell(row.get(column)) for column in columns] for row in rows],
+    }
+
+
+def _compact_equity_curves(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    dates = sorted({str(row.get("date", "")) for row in rows if row.get("date")})
+    date_index = {date: index for index, date in enumerate(dates)}
+    by_persona: dict[str, list[dict[str, Any] | None]] = {}
+    for row in rows:
+        persona = str(row.get("persona", ""))
+        date = str(row.get("date", ""))
+        if not persona or date not in date_index:
+            continue
+        by_persona.setdefault(persona, [None] * len(dates))[date_index[date]] = row
+
+    series = []
+    for persona in sorted(by_persona):
+        equity_values: list[int | None] = []
+        return_values: list[float | None] = []
+        for row in by_persona[persona]:
+            if row is None:
+                equity_values.append(None)
+                return_values.append(None)
+                continue
+            equity = _numeric_or_none(row.get("equity_krw"))
+            capital = _numeric_or_none(row.get("contributed_capital_krw"))
+            equity_values.append(None if equity is None else int(round(equity)))
+            if equity is None or capital is None or capital <= 0:
+                return_values.append(None)
+            else:
+                return_values.append(round(equity / capital - 1, 6))
+        series.append({"persona": persona, "equity_krw": equity_values, "cumulative_return": return_values})
+    return {"dates": dates, "series": series}
+
+
+def _compact_cell(value: Any) -> Any:
+    if value in {"", None}:
+        return None
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            return None
+        return round(value, 4)
+    if isinstance(value, int):
+        return value
+    return value
+
+
+def _numeric_or_none(value: Any) -> float | None:
+    if value in {"", None}:
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(number):
+        return None
+    return number
+
+
 def _snapshot_json_bytes(root: Path) -> dict[str, bytes]:
     return {
         str(path.relative_to(root)): path.read_bytes()
@@ -400,14 +628,15 @@ def _build_manifest(out: Path, overview: dict[str, Any]) -> dict[str, Any]:
     )
     top_level_artifacts = [name for name in artifacts if not name.startswith("prices/")]
     row_counts = {
-        "reports": _json_row_count(out / "reports.json"),
-        "current_holdings": _json_row_count(out / "current-holdings.json"),
-        "monthly_holdings": _json_row_count(out / "monthly-holdings.json"),
-        "trades": _json_row_count(out / "trades.json"),
-        "position_episodes": _json_row_count(out / "position-episodes.json"),
-        "equity_daily": _json_row_count(out / "equity-daily.json"),
-        "personas": _json_row_count(out / "personas.json"),
+        "reports": _json_row_count(out / "reports" / "table.json"),
+        "current_holdings": _json_row_count(out / "portfolio" / "holdings.json"),
+        "monthly_holdings": _json_row_count(out / "portfolio" / "monthly-holdings.json"),
+        "trades": _json_row_count(out / "portfolio" / "trades.json"),
+        "position_episodes": _json_row_count(out / "portfolio" / "episodes.json"),
+        "equity_daily": _json_row_count(out / "portfolio" / "equity-daily.json"),
+        "personas": _json_row_count(out / "portfolio" / "personas.json"),
         "strategy_catalog": _json_row_count(out / "strategies" / "catalog.json"),
+        "screener_candidates": _json_row_count(out / "screener" / "candidates.json"),
     }
     report_counts = overview.get("report_counts", {}) if isinstance(overview, dict) else {}
     target_stats = overview.get("target_stats", {}) if isinstance(overview, dict) else {}
@@ -1358,6 +1587,66 @@ def _build_insights(
             "related_report_ids": [],
         },
     ]
+
+
+def _build_screener_candidates(report_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    candidates: list[dict[str, Any]] = []
+    latest_date = max((str(row.get("date") or "") for row in report_rows), default="")
+    for row in report_rows:
+        if row.get("target_direction") != "upside":
+            continue
+        if _bool(row.get("target_hit")) or _bool(row.get("expired")):
+            continue
+        target_upside = _number(row.get("target_upside_at_pub"))
+        current_return = _number(row.get("current_return"))
+        target_gap = _number(row.get("target_gap_pct"))
+        if target_upside is None or target_upside <= 0 or current_return is None or target_gap is None:
+            continue
+        age_days = _date_diff_days(str(row.get("date") or ""), latest_date)
+        if age_days is not None and age_days <= 120:
+            bucket = "fresh"
+            rank_basis = f"최근 {age_days}일 리포트"
+        elif target_upside >= 0.5:
+            bucket = "large-upside"
+            rank_basis = "목표 업사이드 50% 이상"
+        elif target_gap <= 0.2:
+            bucket = "near-target"
+            rank_basis = "목표가 20% 이내"
+        else:
+            bucket = "active"
+            rank_basis = "미도달·미만료 활성 리포트"
+        score = (target_upside * 1.4) + max(0.0, current_return) - max(0.0, target_gap * 0.25)
+        candidates.append(
+            {
+                "report_id": row.get("report_id"),
+                "symbol": row.get("symbol"),
+                "company": row.get("company"),
+                "date": row.get("date"),
+                "bucket": bucket,
+                "rank_basis": rank_basis,
+                "score": round(score, 6),
+                "target_upside_at_pub": target_upside,
+                "current_return": current_return,
+                "target_gap_pct": target_gap,
+            }
+        )
+    return sorted(
+        candidates,
+        key=lambda item: (
+            -(_number(item.get("score")) or 0),
+            str(item.get("date") or ""),
+            str(item.get("symbol") or ""),
+        ),
+    )
+
+
+def _date_diff_days(start: str, end: str) -> int | None:
+    if not start or not end:
+        return None
+    try:
+        return (pd.Timestamp(end).date() - pd.Timestamp(start).date()).days
+    except (TypeError, ValueError):
+        return None
 
 
 def _build_data_quality(

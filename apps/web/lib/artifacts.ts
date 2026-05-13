@@ -3,13 +3,16 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {
   ArtifactManifestSchema,
+  CompactEquityArtifactSchema,
+  CompactTableArtifactSchema,
   parseArtifact,
   parseRows,
-  RawEquityPointSchema,
   RawHoldingRowSchema,
   RawReportRowSchema,
+  ScreenerCandidateSchema,
   RawTradeRowSchema,
   StrategyCatalogRowSchema,
+  WebPersonaSchema,
   WebDataQualitySchema,
   WebOverviewSchema,
 } from '@/lib/schemas';
@@ -17,6 +20,10 @@ import {
 const repoRoot = path.resolve(/* turbopackIgnore: true */ process.cwd(), '../..');
 
 type RawReport = Record<string, unknown>;
+type CompactTableArtifact = {
+  columns: string[];
+  rows: unknown[][];
+};
 
 export type ReportRow = {
   reportId: string;
@@ -211,6 +218,19 @@ export type StrategyCatalogRow = {
   };
 };
 
+export type ScreenerCandidateRow = {
+  reportId: string;
+  symbol: string;
+  company: string;
+  publicationDate: string;
+  bucket: 'fresh' | 'large-upside' | 'near-target' | 'active';
+  rankBasis: string;
+  score: number;
+  targetUpsideAtPub: number | null;
+  currentReturn: number | null;
+  targetGapPct: number | null;
+};
+
 export type WebPersona = {
   persona: string;
   label?: string;
@@ -339,7 +359,7 @@ function positivePrice(value: unknown): number | undefined {
 let reportCache: ReportRow[] | undefined;
 export function getReportRows(): ReportRow[] {
   if (reportCache) return reportCache;
-  const raw = parseRows('reports.json', RawReportRowSchema, JSON.parse(readText('data/web/reports.json')));
+  const raw = parseRows('reports/table.json', RawReportRowSchema, JSON.parse(readText('data/web/reports/table.json')));
   reportCache = raw
     .map((row) => fromRawReport(row as RawReport))
     .sort((a, b) => b.publicationDate.localeCompare(a.publicationDate) || a.company.localeCompare(b.company, 'ko-KR'));
@@ -607,8 +627,13 @@ export function getMarkdownSnippet(report: ReportRow): string {
 }
 
 export function getSummaryRows(): SummaryRow[] {
+  const raw = parseRows(
+    'portfolio/personas.json',
+    WebPersonaSchema,
+    readRequiredJson<unknown>('data/web/portfolio/personas.json'),
+  );
   return (
-    getOverview().baseline_personas?.map((row) => ({
+    raw?.map((row) => ({
       persona: row.persona,
       label: row.label,
       finalEquityKrw: num(row.final_equity_krw),
@@ -639,14 +664,18 @@ export function getDataQuality(): DataQuality {
 
 export function getWebDataQuality(): WebDataQuality {
   return parseArtifact(
-    'data-quality.json',
+    'overview/data-quality.json',
     WebDataQualitySchema,
-    readRequiredJson<unknown>('data/web/data-quality.json'),
+    readRequiredJson<unknown>('data/web/overview/data-quality.json'),
   );
 }
 
 export function getOverview(): WebOverview {
-  return parseArtifact('overview.json', WebOverviewSchema, readRequiredJson<unknown>('data/web/overview.json'));
+  return parseArtifact(
+    'overview/snapshot.json',
+    WebOverviewSchema,
+    readRequiredJson<unknown>('data/web/overview/snapshot.json'),
+  );
 }
 
 let strategyCatalogCache: StrategyCatalogRow[] | undefined;
@@ -692,7 +721,7 @@ export function getArtifactManifest(): ArtifactManifest {
 }
 
 export function getReportRankings(): WebReportRankings {
-  const raw = readRequiredJson<WebReportRankings>('data/web/report-rankings.json');
+  const raw = readRequiredJson<WebReportRankings>('data/web/reports/rankings.json');
   return {
     ...raw,
     top_winners: raw.top_winners ?? raw.best_current_returns,
@@ -703,7 +732,30 @@ export function getReportRankings(): WebReportRankings {
 export const getRankings = getReportRankings;
 
 export function getInsights(): Insight[] {
-  return readRequiredJson<Insight[]>('data/web/insights.json');
+  return readRequiredJson<Insight[]>('data/web/overview/research-pulse.json');
+}
+
+let screenerCandidateCache: ScreenerCandidateRow[] | undefined;
+export function getScreenerCandidates(): ScreenerCandidateRow[] {
+  if (screenerCandidateCache) return screenerCandidateCache;
+  const raw = parseRows(
+    'screener/candidates.json',
+    ScreenerCandidateSchema,
+    readRequiredJson<unknown>('data/web/screener/candidates.json'),
+  );
+  screenerCandidateCache = raw.map((row) => ({
+    reportId: row.report_id,
+    symbol: row.symbol,
+    company: row.company,
+    publicationDate: row.date,
+    bucket: row.bucket,
+    rankBasis: row.rank_basis,
+    score: row.score,
+    targetUpsideAtPub: row.target_upside_at_pub,
+    currentReturn: row.current_return,
+    targetGapPct: row.target_gap_pct,
+  }));
+  return screenerCandidateCache;
 }
 
 export function getDownloadHref(fileName: string): string {
@@ -718,9 +770,9 @@ let holdingsCache: HoldingRow[] | undefined;
 export function getCurrentHoldings(): HoldingRow[] {
   if (holdingsCache) return holdingsCache;
   const raw = parseRows(
-    'current-holdings.json',
+    'portfolio/holdings.json',
     RawHoldingRowSchema,
-    JSON.parse(readText('data/web/current-holdings.json')),
+    JSON.parse(readText('data/web/portfolio/holdings.json')),
   );
   holdingsCache = raw
     .map((row) => ({
@@ -745,7 +797,17 @@ export function getCurrentHoldings(): HoldingRow[] {
 let monthlyHoldingsCache: MonthlyHoldingRow[] | undefined;
 export function getMonthlyHoldings(): MonthlyHoldingRow[] {
   if (monthlyHoldingsCache) return monthlyHoldingsCache;
-  const raw = readRequiredJson<RawReport[]>('data/web/monthly-holdings.json');
+  const raw = readCompactTable('data/web/portfolio/monthly-holdings.json', [
+    'persona',
+    'month_end',
+    'symbol',
+    'company',
+    'qty',
+    'market_value_krw',
+    'last_close_native',
+    'currency',
+    'weight_in_portfolio',
+  ]);
   const costBySnapshot = buildMonthlyCostBasis(raw);
   monthlyHoldingsCache = raw
     .map((row) => ({
@@ -796,7 +858,18 @@ function buildMonthlyCostBasis(rows: RawReport[]): Map<string, number | null> {
     }))
     .filter((row) => row.persona && row.monthEnd && row.symbol)
     .sort((a, b) => a.monthEnd.localeCompare(b.monthEnd));
-  const trades = (JSON.parse(readText('data/web/trades.json')) as RawReport[])
+  const trades = readCompactTable('data/web/portfolio/trades.json', [
+    'persona',
+    'date',
+    'symbol',
+    'side',
+    'qty',
+    'fill_price_krw',
+    'gross_krw',
+    'cash_after_krw',
+    'reason',
+    'report_id',
+  ])
     .map((row) => ({
       persona: String(row.persona ?? ''),
       date: String(row.date ?? ''),
@@ -844,7 +917,22 @@ function applyCostBasisTrade(
 let tradesCache: TradeRow[] | undefined;
 export function getTrades(): TradeRow[] {
   if (tradesCache) return tradesCache;
-  const raw = parseRows('trades.json', RawTradeRowSchema, JSON.parse(readText('data/web/trades.json')));
+  const raw = parseRows(
+    'portfolio/trades.json',
+    RawTradeRowSchema,
+    readCompactTable('data/web/portfolio/trades.json', [
+      'persona',
+      'date',
+      'symbol',
+      'side',
+      'qty',
+      'fill_price_krw',
+      'gross_krw',
+      'cash_after_krw',
+      'reason',
+      'report_id',
+    ]),
+  );
   tradesCache = raw
     .map((row) => {
       const fillPriceNative = nativeFromKrwAtSymbolDate(row.symbol, row.date, row.fill_price_krw);
@@ -871,7 +959,25 @@ export function getTrades(): TradeRow[] {
 let positionEpisodesCache: PositionEpisodeRow[] | undefined;
 export function getPositionEpisodes(): PositionEpisodeRow[] {
   if (positionEpisodesCache) return positionEpisodesCache;
-  positionEpisodesCache = (JSON.parse(readText('data/web/position-episodes.json')) as RawReport[])
+  positionEpisodesCache = readCompactTable('data/web/portfolio/episodes.json', [
+    'persona',
+    'symbol',
+    'company',
+    'open_date',
+    'close_date',
+    'holding_days',
+    'buy_fills',
+    'sell_fills',
+    'total_qty_bought',
+    'total_qty_sold',
+    'avg_entry_price_krw',
+    'avg_exit_price_krw',
+    'realized_pnl_krw',
+    'unrealized_pnl_krw',
+    'last_close_krw',
+    'status',
+    'exit_reasons',
+  ])
     .map((row) => {
       const symbol = String(row.symbol ?? '');
       const openDate = String(row.open_date ?? '');
@@ -915,16 +1021,66 @@ export function getPersonaLabel(persona: string): string {
 let equityDailyCache: EquityPoint[] | undefined;
 export function getEquityDaily(): EquityPoint[] {
   if (equityDailyCache) return equityDailyCache;
-  const raw = parseRows('equity-daily.json', RawEquityPointSchema, JSON.parse(readText('data/web/equity-daily.json')));
-  equityDailyCache = raw.map((row) => ({
-    persona: row.persona,
-    date: row.date,
-    equityKrw: row.equity_krw,
-    contributedCapitalKrw: row.contributed_capital_krw,
-    cumulativeReturn:
-      row.equity_krw !== null && row.contributed_capital_krw !== null && row.contributed_capital_krw > 0
-        ? row.equity_krw / row.contributed_capital_krw - 1
-        : null,
-  }));
+  equityDailyCache = readCompactEquityCurves('data/web/portfolio/equity-daily.json');
   return equityDailyCache;
+}
+
+let strategyCurvesCache: EquityPoint[] | undefined;
+export function getStrategyCurves(): EquityPoint[] {
+  if (strategyCurvesCache) return strategyCurvesCache;
+  strategyCurvesCache = readCompactEquityCurves('data/web/strategies/curves.json');
+  return strategyCurvesCache;
+}
+
+function readCompactTable(filePath: string, expectedColumns: string[]): RawReport[] {
+  const artifact = parseArtifact<CompactTableArtifact>(
+    filePath,
+    CompactTableArtifactSchema,
+    readRequiredJson<unknown>(filePath),
+  );
+  const missing = expectedColumns.filter((column) => !artifact.columns.includes(column));
+  if (missing.length > 0) {
+    throw new Error(`Schema mismatch in ${filePath}: missing compact columns ${missing.join(', ')}.`);
+  }
+  const indexes = Object.fromEntries(artifact.columns.map((column, index) => [column, index]));
+  return artifact.rows.map((row, rowIndex) => {
+    const out: RawReport = {};
+    for (const column of expectedColumns) {
+      const index = indexes[column];
+      out[column] = row[index] ?? null;
+    }
+    if (row.length !== artifact.columns.length) {
+      throw new Error(
+        `Schema mismatch in ${filePath}[${rowIndex}]: row has ${row.length} values but ${artifact.columns.length} columns.`,
+      );
+    }
+    return out;
+  });
+}
+
+function readCompactEquityCurves(filePath: string): EquityPoint[] {
+  const artifact = parseArtifact(filePath, CompactEquityArtifactSchema, readRequiredJson<unknown>(filePath));
+  const rows: EquityPoint[] = [];
+  for (const series of artifact.series) {
+    if (series.equity_krw.length !== artifact.dates.length) {
+      throw new Error(
+        `Schema mismatch in ${filePath}.${series.persona}.equity_krw: expected ${artifact.dates.length} points, got ${series.equity_krw.length}.`,
+      );
+    }
+    if (series.cumulative_return.length !== artifact.dates.length) {
+      throw new Error(
+        `Schema mismatch in ${filePath}.${series.persona}.cumulative_return: expected ${artifact.dates.length} points, got ${series.cumulative_return.length}.`,
+      );
+    }
+    artifact.dates.forEach((date, index) => {
+      rows.push({
+        persona: series.persona,
+        date,
+        equityKrw: series.equity_krw[index] ?? null,
+        contributedCapitalKrw: null,
+        cumulativeReturn: series.cumulative_return[index] ?? null,
+      });
+    });
+  }
+  return rows;
 }

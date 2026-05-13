@@ -6,8 +6,8 @@ import { Money } from '@/components/ui/Money';
 import { PageHero } from '@/components/ui/PageHero';
 import { Section } from '@/components/ui/Section';
 import {
-  getEquityDaily,
   getReportRows,
+  getStrategyCurves,
   getTrades,
   type EquityPoint,
   type HoldingRow,
@@ -48,7 +48,7 @@ export default function OverviewPage() {
   const trades = getTrades();
   const reports = getReportRows();
   const latestReportsBySymbol = latestReportBySymbol(reports);
-  const equity = getEquityDaily();
+  const equity = getStrategyCurves();
   const benchmarkRows = getBenchmarkRows(strategyRows);
   const selectableRows = getSelectableStrategyRows(strategyRows);
   const selectedStrategy = selectableRows.find((row) => row.id === selectedPersona);

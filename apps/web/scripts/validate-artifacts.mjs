@@ -5,13 +5,18 @@ const repoRoot = path.resolve(process.cwd(), '../..');
 const webRoot = path.join(repoRoot, 'data/web');
 const required = [
   'manifest.json',
-  'overview.json',
-  'personas.json',
-  'reports.json',
-  'current-holdings.json',
-  'trades.json',
-  'equity-daily.json',
-  'data-quality.json',
+  'overview/snapshot.json',
+  'overview/research-pulse.json',
+  'overview/data-quality.json',
+  'portfolio/personas.json',
+  'portfolio/holdings.json',
+  'portfolio/trades.json',
+  'portfolio/equity-daily.json',
+  'reports/table.json',
+  'reports/rankings.json',
+  'strategies/catalog.json',
+  'strategies/curves.json',
+  'screener/candidates.json',
 ];
 
 function fail(message) {
@@ -51,11 +56,13 @@ if (!manifest.simulation_range?.start || !manifest.simulation_range?.end) {
 }
 
 const countFiles = {
-  reports: 'reports.json',
-  current_holdings: 'current-holdings.json',
-  trades: 'trades.json',
-  equity_daily: 'equity-daily.json',
-  personas: 'personas.json',
+  reports: 'reports/table.json',
+  current_holdings: 'portfolio/holdings.json',
+  trades: 'portfolio/trades.json',
+  equity_daily: 'portfolio/equity-daily.json',
+  personas: 'portfolio/personas.json',
+  strategy_catalog: 'strategies/catalog.json',
+  screener_candidates: 'screener/candidates.json',
 };
 
 for (const [key, file] of Object.entries(countFiles)) {
@@ -65,16 +72,16 @@ for (const [key, file] of Object.entries(countFiles)) {
   if (actual !== expected) fail(`manifest row_counts.${key}=${expected}, actual ${actual} in ${file}`);
 }
 
-const reports = readJson('reports.json');
+const reports = readJson('reports/table.json');
 const reportIds = new Set();
 for (const [index, report] of reports.entries()) {
-  if (!report.report_id) fail(`reports.json[${index}].report_id is missing`);
+  if (!report.report_id) fail(`reports/table.json[${index}].report_id is missing`);
   if (reportIds.has(report.report_id)) fail(`duplicate report_id: ${report.report_id}`);
   reportIds.add(report.report_id);
-  if (!report.symbol) fail(`reports.json[${index}].symbol is missing`);
+  if (!report.symbol) fail(`reports/table.json[${index}].symbol is missing`);
 }
 
-const personas = readJson('personas.json');
+const personas = readJson('portfolio/personas.json');
 const benchmarkCount = personas.filter((row) =>
   [
     'all_weather',

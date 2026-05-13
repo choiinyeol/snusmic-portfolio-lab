@@ -92,6 +92,28 @@ export const RawEquityPointSchema = z
   })
   .passthrough();
 
+export const CompactTableArtifactSchema = z
+  .object({
+    columns: z.array(z.string()),
+    rows: z.array(z.array(z.unknown())),
+  })
+  .passthrough();
+
+export const CompactEquityArtifactSchema = z
+  .object({
+    dates: z.array(z.string()),
+    series: z.array(
+      z
+        .object({
+          persona: z.string(),
+          equity_krw: z.array(NullableNumber),
+          cumulative_return: z.array(NullableNumber),
+        })
+        .passthrough(),
+    ),
+  })
+  .passthrough();
+
 export const WebPersonaSchema = z
   .object({
     persona: z.string(),
@@ -167,6 +189,21 @@ export const StrategyCatalogRowSchema = z
         open_positions: NullableNumber,
       })
       .passthrough(),
+  })
+  .passthrough();
+
+export const ScreenerCandidateSchema = z
+  .object({
+    report_id: z.string(),
+    symbol: z.string(),
+    company: z.string(),
+    date: z.string(),
+    bucket: z.enum(['fresh', 'large-upside', 'near-target', 'active']),
+    rank_basis: z.string(),
+    score: z.number(),
+    target_upside_at_pub: NullableNumber,
+    current_return: NullableNumber,
+    target_gap_pct: NullableNumber,
   })
   .passthrough();
 
