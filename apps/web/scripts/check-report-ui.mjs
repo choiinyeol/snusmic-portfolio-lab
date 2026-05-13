@@ -4,6 +4,7 @@ import { join } from 'node:path';
 const root = new URL('..', import.meta.url).pathname;
 const repoRoot = join(root, '..', '..');
 const sxtHtml = readFileSync(join(root, 'out/reports/SXT/index.html'), 'utf8');
+const reportsCsv = readFileSync(join(root, 'public/downloads/snusmic-reports.csv'), 'utf8');
 const reportPagePath = join(root, 'app/reports/[symbol]/page.tsx');
 const reportDetailCssPath = join(root, 'app/reports/report-detail.css');
 
@@ -15,16 +16,24 @@ const structuralFiles = [
   ['ReportSourcesPanel', join(root, 'components/reports/ReportSourcesPanel.tsx')],
 ];
 
+const sxtReport = parseCsv(reportsCsv).find((row) => row.symbol === 'SXT');
+if (!sxtReport) {
+  throw new Error('Missing SXT row in public report artifact');
+}
+
+const expectedEntryPrice = formatNative(Number(sxtReport.entry_price_native), sxtReport.currency);
+const expectedTargetPrice = formatNative(Number(sxtReport.target_price_native), sxtReport.currency);
+
 const required = [
   '25% 가격 수준',
   '75% 가격 수준',
-  '$95.58',
-  '$238.00',
+  expectedEntryPrice,
+  expectedTargetPrice,
   '페르소나별 매매 내역',
   '가격 레인지와 사후 수익률',
   'Trend following',
   'MA20',
-  'Strategy activity',
+  '페르소나별 매매',
   '최근 체결 흐름',
 ];
 const forbidden = ['25% 경과', '75% 경과', '25%%', '75%%'];
@@ -71,3 +80,80 @@ for (const selector of forbiddenGlobalSelectors) {
 }
 
 console.log('report-ui contract check passed');
+
+function parseCsv(source) {
+  const [headerLine, ...lines] = source.trim().split(/\r?\n/);
+  const headers = parseCsvLine(headerLine);
+  return lines.map((line) => {
+    const cells = parseCsvLine(line);
+    return Object.fromEntries(headers.map((header, index) => [header, cells[index] ?? '']));
+  });
+}
+
+function parseCsvLine(line) {
+  const cells = [];
+  let cell = '';
+  let quoted = false;
+
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index];
+    const next = line[index + 1];
+
+    if (char === '"' && quoted && next === '"') {
+      cell += '"';
+      index += 1;
+      continue;
+    }
+    if (char === '"') {
+      quoted = !quoted;
+      continue;
+    }
+    if (char === ',' && !quoted) {
+      cells.push(cell);
+      cell = '';
+      continue;
+    }
+    cell += char;
+  }
+
+  cells.push(cell);
+  return cells;
+}
+
+function formatNative(value, currency) {
+  if (!Number.isFinite(value)) return '—';
+  const code = (currency || 'KRW').toUpperCase();
+  const symbol =
+    {
+      KRW: '₩',
+      USD: '$',
+      JPY: '¥',
+      HKD: 'HK$',
+      CNY: '¥',
+      EUR: '€',
+      CHF: 'CHF ',
+      GBP: '£',
+      CAD: 'C$',
+      AUD: 'A$',
+    }[code] ?? `${code} `;
+  const digits =
+    {
+      KRW: 0,
+      JPY: 0,
+      HKD: 2,
+      USD: 2,
+      EUR: 2,
+      CHF: 2,
+      GBP: 2,
+      CAD: 2,
+      AUD: 2,
+      CNY: 2,
+    }[code] ?? 2;
+  const locale =
+    {
+      KRW: 'ko-KR',
+      JPY: 'ja-JP',
+      USD: 'en-US',
+    }[code] ?? 'en-US';
+  return `${symbol}${value.toLocaleString(locale, { maximumFractionDigits: digits, minimumFractionDigits: digits })}`;
+}

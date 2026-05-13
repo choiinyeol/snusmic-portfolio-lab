@@ -1,496 +1,241 @@
+import { ArrowUpRight, DatabaseZap, FileText, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
-import { PerformanceChartPanel } from '@/components/charts/PerformanceChartPanel';
-import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
-import { StrategyRiskTable } from '@/components/trading/StrategyRiskTable';
-import type { HoldingRow, ReportRow, TradeRow } from '@/lib/artifacts';
-import { currencyExposure, getDashboardViewModel, topWeight, withCashHolding } from '@/lib/dashboard-view-model';
-import { formatDateKo, formatDays, formatKrw, formatPercent, signedTextClass } from '@/lib/format';
-import type { getExecutiveOverview, StrategyLeaderboardRow } from '@/lib/product-model';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
+import { buildDecisionBrief, type DecisionTone } from '@/lib/decision-brief';
+import { getDashboardViewModel } from '@/lib/dashboard-view-model';
+import { formatKrw, formatPercent } from '@/lib/format';
 
 export default function OverviewPage() {
-  const {
-    strategyRows,
-    overview,
-    priceMatchedReports,
-    sourceReports,
-    latestReportsBySymbol,
-    reportHrefBySymbol,
-    benchmarkRows,
-    selectableRows,
-    selectedStrategy,
-    chartSeries,
-    objectiveRows,
-    benchmarkToBeat,
-    recentBuys,
-  } = getDashboardViewModel();
-
-  const treemapHoldings = withCashHolding(
-    overview.portfolio.holdings,
-    overview.portfolio.cashKrw,
-    overview.portfolio.persona,
-  );
+  const view = getDashboardViewModel();
+  const brief = buildDecisionBrief(view);
+  const { overview, selectedStrategy } = view;
 
   return (
-    <div className="archive-page">
-      <header className="archive-command" aria-labelledby="archive-title">
-        <div className="archive-command__identity">
-          <span className="archive-command__kicker">SNUSMIC / STATIC RESEARCH LEDGER</span>
-          <h1 id="archive-title">원장 요약</h1>
-          <p>리포트, 보유, 전략 성과를 기준 스냅샷으로 대조합니다. 주문·호가·실시간 매매 화면이 아닙니다.</p>
+    <div className="grid gap-5">
+      <header className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="grid gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="outline">기준일 {overview.snapshotDate || '—'}</Badge>
+              <Badge variant="success">읽기 전용</Badge>
+              <Badge variant="secondary">{selectedStrategy?.shortLabel || overview.portfolio.label}</Badge>
+            </div>
+            <div>
+              <h1 className="text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">스냅샷</h1>
+              <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">
+                오늘 확인할 원장 상태, 재검토 항목, 데이터 신뢰도를 먼저 보여줍니다. 세부 차트와 표는 각
+                원장·리포트·전략 화면에서 확인합니다.
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild variant="outline">
+              <Link href="/reports">리포트 확인</Link>
+            </Button>
+            <Button asChild variant="secondary">
+              <Link href="/portfolio">
+                원장 열기 <ArrowUpRight />
+              </Link>
+            </Button>
+          </div>
         </div>
-        <dl className="archive-factbar" aria-label="스냅샷 핵심 수치">
-          <Fact label="SNAPSHOT" value={overview.snapshotDate || '—'} />
-          <Fact label="EQUITY" value={formatKrw(overview.portfolio.finalEquityKrw)} strong />
-          <Fact label="MWR" value={formatPercent(overview.portfolio.moneyWeightedReturn)} tone="good" />
-          <Fact label="MDD" value={formatPercent(overview.portfolio.maxDrawdown)} tone="bad" />
-          <Fact label="TARGET HIT" value={formatPercent(overview.reportStats.targetHitRate)} />
-          <Fact label="REPORTS" value={`${overview.reportStats.total.toLocaleString('ko-KR')}건`} />
-          <Fact label="MATCHED" value={`${priceMatchedReports}/${sourceReports}`} />
-          <Fact label="BOOK" value={selectedStrategy?.shortLabel || overview.portfolio.label} />
-        </dl>
       </header>
 
-      <section className="archive-layout archive-layout--primary" aria-label="포트폴리오와 전략 요약">
-        <ArchivePane
-          action={<Link href="/portfolio">원장</Link>}
-          className="archive-pane--treemap"
-          eyebrow="COMPOSITION"
-          title="포트폴리오 비중"
-        >
-          <PortfolioComposition
-            holdings={overview.portfolio.holdings}
-            overview={overview}
-            reportHrefBySymbol={reportHrefBySymbol}
-            treemapHoldings={treemapHoldings}
-          />
-        </ArchivePane>
-
-        <ArchivePane action={<Link href="/strategies">전략</Link>} eyebrow="STRATEGY" title="전략 순위">
-          <StrategyLedger
-            benchmark={benchmarkToBeat}
-            objectiveCount={objectiveRows.length}
-            rows={strategyRows.slice(0, 9)}
-          />
-        </ArchivePane>
+      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-5" aria-label="상태 판정">
+        {brief.state.map((item) => (
+          <Card className="shadow-sm" key={item.label}>
+            <CardHeader className="pb-2">
+              <CardDescription>{item.label}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className={`font-mono text-xl font-semibold tabular-nums ${toneText(item.tone)}`}>{item.value}</div>
+              <p className="mt-1 truncate text-xs text-slate-500">{item.caption}</p>
+            </CardContent>
+          </Card>
+        ))}
       </section>
 
-      <section className="archive-layout archive-layout--secondary" aria-label="리스크와 최근 리포트">
-        <ArchivePane action={<Link href="/portfolio">상세</Link>} eyebrow="RISK" title="노출 점검">
-          <RiskLedger holdings={overview.portfolio.holdings} overview={overview} rows={strategyRows} />
-        </ArchivePane>
-
-        <ArchivePane action={<Link href="/reports">전체</Link>} eyebrow="REPORTS" title="최근 리포트">
-          <ReportLedger reports={overview.recentReports.slice(0, 8)} />
-        </ArchivePane>
-
-        <ArchivePane action={<Link href="/screener">후보</Link>} eyebrow="CANDIDATES" title="재검토 후보">
-          <CandidateLedger reports={overview.researchCandidates.slice(0, 7).map((candidate) => candidate.report)} />
-        </ArchivePane>
-      </section>
-
-      <section className="archive-layout archive-layout--performance" aria-label="성과와 이벤트">
-        <ArchivePane
-          action={
-            <div className="archive-segments" aria-label="기간 필터">
-              {['3M', '6M', 'YTD', '1Y', 'ALL'].map((label) => (
-                <span key={label}>{label}</span>
+      <section className="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(360px,.65fr)]">
+        <Card className="overflow-hidden">
+          <CardHeader className="border-b border-slate-100">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <CardTitle>확인할 항목</CardTitle>
+                <CardDescription>보유, 후보, 만료, 데이터 플래그를 하나의 검토 대기열로 정리합니다.</CardDescription>
+              </div>
+              <Badge variant="outline">{brief.decisions.length.toLocaleString('ko-KR')}개</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="divide-y divide-slate-100">
+              {brief.decisions.map((item) => (
+                <Link
+                  className="grid gap-3 p-4 transition-colors hover:bg-slate-50 sm:grid-cols-[9rem_minmax(0,1fr)_auto] sm:items-center"
+                  href={item.href}
+                  key={item.id}
+                >
+                  <div>
+                    <Badge variant={badgeVariant(item.tone)}>{item.label}</Badge>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium text-slate-950">{item.title}</div>
+                    <div className="mt-1 text-sm leading-5 text-slate-500">{item.reason}</div>
+                  </div>
+                  <div className={`font-mono text-sm font-semibold tabular-nums ${toneText(item.tone)}`}>
+                    {item.metric}
+                  </div>
+                </Link>
               ))}
             </div>
-          }
-          className="archive-pane--chart"
-          eyebrow="PERFORMANCE"
-          title="전략 / 벤치마크 누적 수익률"
-        >
-          <PerformanceChartPanel
-            benchmarkCount={benchmarkRows.length}
-            objectiveLabel="목표: MDD 15% 이하 · KODEX 200 초과"
-            series={chartSeries}
-            strategyCount={selectableRows.length}
-          />
-        </ArchivePane>
+          </CardContent>
+        </Card>
 
-        <ArchivePane action={<Link href="/reports">검증</Link>} eyebrow="ACTIVITY" title="검증 테이프">
-          <ActivityTape buys={recentBuys} reports={overview.recentReports.slice(0, 5)} />
-        </ArchivePane>
+        <div className="grid gap-5">
+          <Card>
+            <CardHeader className="border-b border-slate-100">
+              <CardTitle>원장 상태</CardTitle>
+              <CardDescription>홈에서는 위험 판정만 보여주고, 보유 상세는 원장에서 확인합니다.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4 p-4">
+              <div className="grid gap-2">
+                <div className="flex items-center justify-between gap-3 text-sm">
+                  <span className="text-slate-500">평가액</span>
+                  <strong className="font-mono tabular-nums">{formatKrw(overview.portfolio.finalEquityKrw)}</strong>
+                </div>
+                <div className="flex items-center justify-between gap-3 text-sm">
+                  <span className="text-slate-500">현금</span>
+                  <strong className="font-mono tabular-nums">{formatKrw(overview.portfolio.cashKrw)}</strong>
+                </div>
+                <div className="flex items-center justify-between gap-3 text-sm">
+                  <span className="text-slate-500">현재 보유</span>
+                  <strong className="font-mono tabular-nums">
+                    {overview.portfolio.holdingCount.toLocaleString('ko-KR')}개
+                  </strong>
+                </div>
+              </div>
+              <Separator />
+              <div className="grid gap-2">
+                <div className="flex items-end justify-between gap-3">
+                  <span className="text-sm text-slate-500">현금 비중</span>
+                  <strong className="font-mono text-3xl font-semibold tracking-tight tabular-nums">
+                    {formatPercent(overview.portfolio.cashWeight)}
+                  </strong>
+                </div>
+                <Progress value={(overview.portfolio.cashWeight ?? 0) * 100} />
+                <p className="text-xs leading-5 text-slate-500">
+                  현재 선택 원장은 보유 종목보다 현금 대기가 핵심 상태입니다. 보유/체결 원인은 원장 화면에서 추적합니다.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="border-b border-slate-100">
+              <CardTitle>바로가기</CardTitle>
+              <CardDescription>세부 분석은 전용 화면에서만 다룹니다.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-2 p-3">
+              <Drilldown href="/portfolio" icon={<ShieldCheck />} title="원장" caption="보유·현금·체결·포지션 근거" />
+              <Drilldown href="/reports" icon={<FileText />} title="리포트" caption="목표가 검증·재검토 후보" />
+              <Drilldown href="/strategies" icon={<DatabaseZap />} title="전략" caption="벤치마크·규칙·위험 성과" />
+            </CardContent>
+          </Card>
+        </div>
       </section>
 
-      <section className="archive-layout archive-layout--evidence" aria-label="보유와 목표가 검증 근거">
-        <ArchivePane action={<Link href="/portfolio">보유</Link>} eyebrow="HOLDINGS" title="상위 보유">
-          <HoldingLedger holdings={overview.portfolio.holdings.slice(0, 10)} reportsBySymbol={latestReportsBySymbol} />
-        </ArchivePane>
-
-        <ArchivePane action={<Link href="/strategies">매트릭스</Link>} eyebrow="MATRIX" title="전략 성과 표">
-          <StrategyRiskTable rows={strategyRows.slice(0, 8)} />
-        </ArchivePane>
-      </section>
-    </div>
-  );
-}
-
-function PortfolioComposition({
-  holdings,
-  overview,
-  reportHrefBySymbol,
-  treemapHoldings,
-}: {
-  holdings: HoldingRow[];
-  overview: ReturnType<typeof getExecutiveOverview>;
-  reportHrefBySymbol: Record<string, string>;
-  treemapHoldings: HoldingRow[];
-}) {
-  if (holdings.length > 0) {
-    return (
-      <HoldingsTreemap
-        caption="면적은 평가액, 색상은 미실현 수익률입니다. CASH는 남은 현금입니다."
-        height={505}
-        holdings={treemapHoldings}
-        hrefBySymbol={reportHrefBySymbol}
-        showToolbar={false}
-      />
-    );
-  }
-
-  return (
-    <div className="archive-cash-state">
-      <div className="archive-cash-state__header">
-        <span>NO ACTIVE POSITIONS</span>
-        <strong>{overview.portfolio.label}</strong>
-      </div>
-      <dl className="archive-cash-grid">
-        <Row label="평가액" value={formatKrw(overview.portfolio.finalEquityKrw)} />
-        <Row label="현금" value={formatKrw(overview.portfolio.cashKrw)} />
-        <Row label="현금 비중" value={formatPercent(overview.portfolio.cashWeight)} />
-        <Row label="MWR" tone="good" value={formatPercent(overview.portfolio.moneyWeightedReturn)} />
-        <Row label="MDD" tone="bad" value={formatPercent(overview.portfolio.maxDrawdown)} />
-        <Row label="미실현 손익" value={formatKrw(overview.portfolio.unrealizedPnlKrw)} />
-      </dl>
-      <div className="archive-cash-block" aria-label="현금 비중 블록">
-        <span>CASH RESERVE</span>
-        <strong>{formatPercent(overview.portfolio.cashWeight)}</strong>
-        <i style={{ width: `${Math.max(3, Math.min(100, (overview.portfolio.cashWeight ?? 0) * 100))}%` }} />
-      </div>
-      <div className="archive-cash-state__note">
-        이 원장은 기준일 현재 보유 종목이 없습니다. 포트폴리오 비중 대신 현금·성과·낙폭을 원장 상태로 표시합니다.
-      </div>
-    </div>
-  );
-}
-
-function Fact({
-  label,
-  value,
-  tone,
-  strong = false,
-}: {
-  label: string;
-  value: string;
-  tone?: 'good' | 'bad';
-  strong?: boolean;
-}) {
-  return (
-    <div className="archive-fact" data-strong={strong || undefined} data-tone={tone}>
-      <dt>{label}</dt>
-      <dd>{value}</dd>
-    </div>
-  );
-}
-
-function ArchivePane({
-  eyebrow,
-  title,
-  action,
-  className = '',
-  children,
-}: {
-  eyebrow: string;
-  title: string;
-  action?: React.ReactNode;
-  className?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <article className={`archive-pane ${className}`}>
-      <div className="archive-pane__head">
-        <div>
-          <div className="archive-pane__eyebrow">{eyebrow}</div>
-          <h2>{title}</h2>
-        </div>
-        {action ? <div className="archive-pane__action">{action}</div> : null}
-      </div>
-      <div className="archive-pane__body">{children}</div>
-    </article>
-  );
-}
-
-function StrategyLedger({
-  rows,
-  benchmark,
-  objectiveCount,
-}: {
-  rows: StrategyLeaderboardRow[];
-  benchmark: StrategyLeaderboardRow | undefined;
-  objectiveCount: number;
-}) {
-  return (
-    <div className="archive-stack">
-      <dl className="archive-mini-summary">
-        <div>
-          <dt>기준선</dt>
-          <dd>{benchmark?.shortLabel || benchmark?.label || '—'}</dd>
-        </div>
-        <div>
-          <dt>목표 통과</dt>
-          <dd>{objectiveCount.toLocaleString('ko-KR')}개</dd>
-        </div>
-      </dl>
-      <div className="archive-table-wrap">
-        <table className="archive-table">
-          <thead>
-            <tr>
-              <th>전략</th>
-              <th className="num">MWR</th>
-              <th className="num">MDD</th>
-              <th className="num">Sharpe</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.id}>
-                <td>
-                  <Link href={row.href}>
-                    <strong>{row.shortLabel || row.label}</strong>
-                    <span>{kindLabel(row.kind)}</span>
-                  </Link>
-                </td>
-                <td className={`num ${signedTextClass(row.returnPct)}`}>{formatPercent(row.returnPct)}</td>
-                <td className="num text-error">{formatPercent(row.maxDrawdown)}</td>
-                <td className="num">{formatNumber(row.sharpe)}</td>
-              </tr>
+      <section className="grid gap-5 xl:grid-cols-[minmax(0,.65fr)_minmax(0,.85fr)]">
+        <Card>
+          <CardHeader className="border-b border-slate-100">
+            <CardTitle>리포트 품질</CardTitle>
+            <CardDescription>후보를 보기 전에 제외·누락·검토 플래그를 먼저 확인합니다.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-3 p-4">
+            {brief.quality.map((item) => (
+              <div
+                className="flex items-start justify-between gap-4 rounded-lg border border-slate-100 p-3"
+                key={item.label}
+              >
+                <div className="min-w-0">
+                  <div className="text-sm font-medium text-slate-950">{item.label}</div>
+                  <div className="mt-1 text-xs text-slate-500">{item.caption}</div>
+                </div>
+                <div className={`font-mono text-sm font-semibold tabular-nums ${toneText(item.tone)}`}>
+                  {item.value}
+                </div>
+              </div>
             ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
+          </CardContent>
+        </Card>
 
-function RiskLedger({
-  holdings,
-  rows,
-  overview,
-}: {
-  holdings: HoldingRow[];
-  rows: StrategyLeaderboardRow[];
-  overview: ReturnType<typeof getExecutiveOverview>;
-}) {
-  const cashKrw = overview.portfolio.cashKrw ?? 0;
-  const totalValue = Math.max(
-    overview.portfolio.finalEquityKrw ?? 0,
-    holdings.reduce((sum, row) => sum + (row.marketValueKrw ?? 0), 0) + cashKrw,
-  );
-  const currencyRows = currencyExposure(withCashHolding(holdings, cashKrw, overview.portfolio.persona), totalValue);
-  const benchmarkCount = rows.filter((row) => row.kind === 'benchmark').length;
-
-  return (
-    <div className="archive-stack">
-      <dl className="archive-ledger">
-        <Row label="현금 비중" value={formatPercent(overview.portfolio.cashWeight)} />
-        <Row label="Top 5 비중" value={formatPercent(overview.portfolio.top5Weight)} />
-        <Row label="Top 10 비중" value={formatPercent(topWeight(holdings, 10))} />
-        <Row label="보유 종목" value={`${holdings.length.toLocaleString('ko-KR')}개`} />
-        <Row
-          label="수익 포지션"
-          tone="good"
-          value={`${overview.portfolio.positiveHoldingCount}/${overview.portfolio.holdingCount}`}
-        />
-        <Row label="벤치마크" value={`${benchmarkCount.toLocaleString('ko-KR')}개`} />
-      </dl>
-      <div className="archive-bars" aria-label="통화 노출">
-        {currencyRows.map((row) => (
-          <div className="archive-bar" key={row.currency}>
-            <span>{row.currency}</span>
-            <div>
-              <i style={{ width: `${Math.min(100, row.weight * 100)}%` }} />
+        <Card>
+          <CardHeader className="border-b border-slate-100">
+            <CardTitle>최근 변경</CardTitle>
+            <CardDescription>새로 반영된 리포트, 후보, 원장 이벤트입니다.</CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="divide-y divide-slate-100">
+              {brief.changes.map((item) => (
+                <Link
+                  className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 p-4 transition-colors hover:bg-slate-50"
+                  href={item.href}
+                  key={`${item.title}-${item.caption}`}
+                >
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium text-slate-950">{item.title}</div>
+                    <div className="mt-1 truncate font-mono text-xs text-slate-500">{item.caption}</div>
+                  </div>
+                  <ArrowUpRight className="size-4 text-slate-400" />
+                </Link>
+              ))}
             </div>
-            <strong>{formatPercent(row.weight)}</strong>
-          </div>
-        ))}
-      </div>
+          </CardContent>
+        </Card>
+      </section>
     </div>
   );
 }
 
-function ReportLedger({ reports }: { reports: ReportRow[] }) {
-  if (!reports.length) return <EmptyState label="최근 리포트가 없습니다." />;
-  return (
-    <div className="archive-row-list">
-      {reports.map((report) => (
-        <Link className="archive-row" href={`/reports/${encodeURIComponent(report.symbol)}`} key={report.reportId}>
-          <div className="archive-row__main">
-            <strong>{report.company || report.symbol}</strong>
-            <span>
-              {formatDateKo(report.publicationDate)} · {report.symbol} · {statusText(report)}
-            </span>
-          </div>
-          <div className="archive-row__meta">
-            <b className={signedTextClass(report.currentReturn)}>{formatPercent(report.currentReturn)}</b>
-            <span>{formatPercent(report.targetProgressPct)}</span>
-          </div>
-        </Link>
-      ))}
-    </div>
-  );
-}
-
-function CandidateLedger({ reports }: { reports: ReportRow[] }) {
-  if (!reports.length) return <EmptyState label="재검토 후보가 없습니다." />;
-  return (
-    <div className="archive-row-list">
-      {reports.map((report, index) => (
-        <Link className="archive-row" href={`/reports/${encodeURIComponent(report.symbol)}`} key={report.reportId}>
-          <div className="archive-rank">{String(index + 1).padStart(2, '0')}</div>
-          <div className="archive-row__main">
-            <strong>{report.company || report.symbol}</strong>
-            <span>
-              {report.symbol} · 잔여 {formatPercent(report.targetRemainingPct)}
-            </span>
-          </div>
-          <div className="archive-progress" aria-label="목표 진행률">
-            <i style={{ width: `${progressWidth(report)}%` }} />
-          </div>
-        </Link>
-      ))}
-    </div>
-  );
-}
-
-function ActivityTape({ buys, reports }: { buys: TradeRow[]; reports: ReportRow[] }) {
-  const items = [
-    ...buys.slice(0, 5).map((trade, index) => ({
-      id: `buy-${trade.date}-${trade.symbol}-${index}`,
-      href: `/reports/${encodeURIComponent(trade.symbol)}`,
-      type: 'BUY',
-      date: trade.date,
-      title: trade.symbol,
-      caption: `${formatQuantity(trade.qty)}주 · ${trade.reason || 'report-linked'}`,
-      value: formatKrw(trade.grossKrw),
-      tone: undefined as 'good' | 'bad' | undefined,
-    })),
-    ...reports.slice(0, 5).map((report) => ({
-      id: `report-${report.reportId}`,
-      href: `/reports/${encodeURIComponent(report.symbol)}`,
-      type: statusText(report).toUpperCase(),
-      date: report.publicationDate,
-      title: report.company || report.symbol,
-      caption: `${report.symbol} · 진행 ${formatPercent(report.targetProgressPct)}`,
-      value: formatPercent(report.currentReturn),
-      tone: (report.currentReturn ?? 0) >= 0 ? ('good' as const) : ('bad' as const),
-    })),
-  ].sort((a, b) => b.date.localeCompare(a.date));
-
-  if (!items.length) return <EmptyState label="검증 이벤트가 없습니다." />;
-  return (
-    <div className="archive-row-list archive-row-list--tape">
-      {items.slice(0, 10).map((item) => (
-        <Link className="archive-row" href={item.href} key={item.id}>
-          <span className="archive-token">{item.type}</span>
-          <div className="archive-row__main">
-            <strong>{item.title}</strong>
-            <span>
-              {formatDateKo(item.date)} · {item.caption}
-            </span>
-          </div>
-          <div className="archive-row__meta">
-            <b data-tone={item.tone}>{item.value}</b>
-          </div>
-        </Link>
-      ))}
-    </div>
-  );
-}
-
-function HoldingLedger({
-  holdings,
-  reportsBySymbol,
+function Drilldown({
+  href,
+  icon,
+  title,
+  caption,
 }: {
-  holdings: HoldingRow[];
-  reportsBySymbol: Map<string, ReportRow>;
+  href: string;
+  icon: React.ReactNode;
+  title: string;
+  caption: string;
 }) {
-  if (!holdings.length) return <EmptyState label="현재 보유 포지션이 없습니다." />;
   return (
-    <div className="archive-table-wrap">
-      <table className="archive-table">
-        <thead>
-          <tr>
-            <th>종목</th>
-            <th className="num">평가액</th>
-            <th className="num">미실현</th>
-            <th className="num">목표 진행</th>
-          </tr>
-        </thead>
-        <tbody>
-          {holdings.map((holding) => {
-            const report = reportsBySymbol.get(holding.symbol);
-            return (
-              <tr key={`${holding.persona}-${holding.symbol}`}>
-                <td>
-                  <Link href={`/reports/${encodeURIComponent(holding.symbol)}`}>
-                    <strong>{holding.symbol}</strong>
-                    <span>{holding.company || formatDays(holding.holdingDays)}</span>
-                  </Link>
-                </td>
-                <td className="num">{formatKrw(holding.marketValueKrw)}</td>
-                <td className={`num ${signedTextClass(holding.unrealizedReturn)}`}>
-                  {formatPercent(holding.unrealizedReturn)}
-                </td>
-                <td className="num">{formatPercent(report?.targetProgressPct)}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+    <Button asChild className="h-auto justify-start p-3" variant="ghost">
+      <Link href={href}>
+        <span className="grid size-8 place-items-center rounded-md border border-slate-200 bg-white text-slate-500 [&_svg]:size-4">
+          {icon}
+        </span>
+        <span className="grid min-w-0 gap-0.5 text-left">
+          <span className="font-medium text-slate-950">{title}</span>
+          <span className="truncate text-xs font-normal text-slate-500">{caption}</span>
+        </span>
+      </Link>
+    </Button>
   );
 }
 
-function Row({ label, value, tone }: { label: string; value: string; tone?: 'good' | 'bad' }) {
-  return (
-    <div data-tone={tone}>
-      <dt>{label}</dt>
-      <dd>{value}</dd>
-    </div>
-  );
+function toneText(tone?: DecisionTone) {
+  if (tone === 'ok') return 'text-emerald-600';
+  if (tone === 'review') return 'text-amber-600';
+  if (tone === 'risk') return 'text-red-600';
+  if (tone === 'data') return 'text-indigo-600';
+  return 'text-slate-950';
 }
 
-function EmptyState({ label }: { label: string }) {
-  return <div className="archive-empty">{label}</div>;
-}
-
-function kindLabel(kind: StrategyLeaderboardRow['kind']): string {
-  if (kind === 'strategy') return '전략';
-  if (kind === 'oracle') return '상한선';
-  return '벤치마크';
-}
-
-function statusText(report: ReportRow): string {
-  if (report.targetDirection === 'downside') return '매도 의견';
-  if ((report.targetUpsideAtPub ?? 0) <= 0) return '비실행';
-  if (report.targetHit) return '도달';
-  if (report.expired) return '만료';
-  return '진행';
-}
-
-function progressWidth(report: ReportRow): number {
-  const progress = report.targetProgressPct ?? (report.targetHit ? 1 : 0);
-  return Math.max(3, Math.min(100, progress * 100));
-}
-
-function formatNumber(value: number | null | undefined): string {
-  if (value === null || value === undefined || !Number.isFinite(value)) return '—';
-  return value.toFixed(2);
-}
-
-function formatQuantity(value: number | null | undefined): string {
-  if (value === null || value === undefined || !Number.isFinite(value)) return '—';
-  return value.toLocaleString('ko-KR', { maximumFractionDigits: 4 });
+function badgeVariant(tone: DecisionTone) {
+  if (tone === 'ok') return 'success';
+  if (tone === 'risk' || tone === 'review') return 'destructive';
+  if (tone === 'data') return 'outline';
+  return 'secondary';
 }

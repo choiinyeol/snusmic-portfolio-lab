@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { GeistMono } from 'geist/font/mono';
+import { GeistSans } from 'geist/font/sans';
 import { AppShell } from '@/components/ui/AppShell';
 import { getArtifactManifest, getOverview, getPersonaLabel } from '@/lib/artifacts';
 import { getDefaultPortfolioPersona } from '@/lib/product-model';
@@ -17,17 +19,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   const primaryBookLabel = getPersonaLabel(getDefaultPortfolioPersona());
 
   return (
-    <html lang="ko" data-theme="snusmic" data-scroll-behavior="smooth">
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css"
-        />
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css"
-        />
-      </head>
+    <html
+      lang="ko"
+      className={`${GeistSans.variable} ${GeistMono.variable}`}
+      data-theme="snusmic"
+      data-scroll-behavior="smooth"
+    >
       <body>
         <AppShell
           priceRange={manifest.price_range}

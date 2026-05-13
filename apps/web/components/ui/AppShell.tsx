@@ -1,7 +1,11 @@
+import { ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { APP_NAV, GITHUB_NAV_ITEM } from '@/components/ui/app-shell-nav';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { SidebarNav } from '@/components/ui/SidebarNav';
-import { StatusChip } from '@/components/ui/StatusChip';
 
 type ShellMetric = {
   label: string;
@@ -29,58 +33,75 @@ export function AppShell({
   primaryBookLabel,
 }: AppShellProps) {
   const sidebarMetrics: ShellMetric[] = [
-    { label: 'SNAPSHOT', value: snapshotDate || '—' },
-    { label: 'REPORTS', value: `${reportCount.toLocaleString('ko-KR')}`, caption: reportRangeLabel(reportRange) },
-    { label: 'PRICE', value: priceRange.end || '—', caption: reportRangeLabel(priceRange) },
-    { label: 'BOOKS', value: `${strategyCount.toLocaleString('ko-KR')}`, caption: primaryBookLabel },
+    { label: '기준일', value: snapshotDate || '—' },
+    { label: '리포트', value: reportCount.toLocaleString('ko-KR'), caption: reportRangeLabel(reportRange) },
+    { label: '가격', value: priceRange.end || '—', caption: reportRangeLabel(priceRange) },
+    { label: '전략 수', value: strategyCount.toLocaleString('ko-KR'), caption: primaryBookLabel },
   ];
 
   return (
-    <div className="site-shell site-shell--archive">
-      <aside className="sidebar archive-sidebar border-r border-base-300 bg-base-100">
-        <Link className="brand brand--archive" href="/" aria-label="SNUSMIC Portfolio Lab 홈">
-          <span className="brand__mark" aria-hidden="true" />
-          <span className="brand__name">
-            <span>SNUSMIC</span>
-            <span className="brand-kicker">Research Archive</span>
+    <div className="ui-shell min-h-dvh bg-slate-50 text-slate-950">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 border-r border-slate-200 bg-white/95 px-3 py-4 lg:flex lg:flex-col">
+        <Link className="flex items-center gap-3 rounded-lg px-2 py-2" href="/" aria-label="SNUSMIC 리서치 원장 홈">
+          <span className="grid size-8 place-items-center rounded-md bg-slate-950 text-xs font-semibold text-white">
+            SM
+          </span>
+          <span className="grid min-w-0 gap-0.5">
+            <span className="truncate text-sm font-semibold tracking-tight">SNUSMIC</span>
+            <span className="truncate font-mono text-[11px] uppercase tracking-[0.12em] text-slate-500">
+              리서치 원장
+            </span>
           </span>
         </Link>
+
+        <Separator className="my-3" />
         <SidebarNav items={APP_NAV} />
-        <section className="archive-sidebar__facts" aria-label="스냅샷 정보">
-          {sidebarMetrics.map((metric) => (
-            <div key={metric.label}>
-              <span>{metric.label}</span>
-              <strong>{metric.value}</strong>
-              {metric.caption ? <em>{metric.caption}</em> : null}
-            </div>
-          ))}
-        </section>
-        <SidebarNav className="side-nav--utility" items={[GITHUB_NAV_ITEM]} />
+
+        <div className="mt-auto grid gap-3">
+          <Card className="rounded-lg shadow-none">
+            <CardContent className="grid gap-3 p-3">
+              {sidebarMetrics.map((metric) => (
+                <div className="grid gap-1" key={metric.label}>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-slate-500">
+                      {metric.label}
+                    </span>
+                    <strong className="truncate font-mono text-xs tabular-nums text-slate-950">{metric.value}</strong>
+                  </div>
+                  {metric.caption ? (
+                    <div className="truncate font-mono text-[10px] text-slate-400">{metric.caption}</div>
+                  ) : null}
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+          <Button asChild className="justify-start" size="sm" variant="outline">
+            <Link href={GITHUB_NAV_ITEM.href} target="_blank" rel="noreferrer">
+              GitHub <ExternalLink className="ml-auto size-3.5" />
+            </Link>
+          </Button>
+        </div>
       </aside>
 
-      <div className="workspace workspace--archive">
-        <header className="topbar topbar--archive border-b border-base-300 bg-base-100">
-          <div className="topbar--archive__left">
-            <span>SNUSMIC Portfolio Lab</span>
-            <strong>정적 산출물 / 읽기 전용</strong>
-          </div>
-          <div className="topbar--archive__right">
-            <StatusChip className="hidden md:inline-flex" tone="info">
-              <span className="text-base-content/55">SNAPSHOT</span>
-              <span className="font-mono text-base-content">{snapshotDate || '—'}</span>
-            </StatusChip>
-            <StatusChip tone="success" dot>
-              No live trading
-            </StatusChip>
-            <Link className="archive-link-button" href="/guide">
-              읽는 법
-            </Link>
+      <div className="min-w-0 lg:pl-64">
+        <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/80 backdrop-blur-xl">
+          <div className="flex min-h-14 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+            <div className="min-w-0">
+              <div className="truncate text-sm font-medium text-slate-950">SNUSMIC 리서치 원장</div>
+              <div className="hidden truncate text-xs text-slate-500 sm:block">정적 리서치·원장 검증</div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge className="hidden font-mono sm:inline-flex" variant="outline">
+                {snapshotDate || '—'}
+              </Badge>
+              <Badge variant="success">읽기 전용</Badge>
+              <Button asChild size="sm" variant="outline">
+                <Link href="/guide">읽는 법</Link>
+              </Button>
+            </div>
           </div>
         </header>
-        <main>{children}</main>
-        <footer className="footer-note footer footer-center bg-base-200 text-base-content/60">
-          Static research artifacts only. No order entry, quote stream, or investment advice.
-        </footer>
+        <main className="mx-auto w-full max-w-[1500px] px-4 py-5 sm:px-6 lg:px-8">{children}</main>
       </div>
     </div>
   );
