@@ -25363,6 +25363,19 @@
       "open": 472.29998779296875,
       "source_currency": "CHF",
       "volume": 113794.0
+    },
+    {
+      "close": 473.39999389648443,
+      "close_krw": 902380.8872,
+      "currency": "CHF",
+      "date": "2026-05-13",
+      "display_currency": "CHF",
+      "high": 478.89999389648443,
+      "krw_per_unit": 1906.1700439453125,
+      "low": 472.20001220703125,
+      "open": 478.1000061035156,
+      "source_currency": "CHF",
+      "volume": 36847.0
     }
   ],
   "symbol": "LONN.SW"

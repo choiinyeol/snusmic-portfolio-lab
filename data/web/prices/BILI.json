@@ -25385,10 +25385,10 @@
       "display_currency": "USD",
       "high": 21.929000854492188,
       "krw_per_unit": 1474.449951171875,
-      "low": 21.280000686645508,
+      "low": 21.280000686645504,
       "open": 21.908000946044922,
       "source_currency": "USD",
-      "volume": 1424800.0
+      "volume": 1423053.0
     }
   ],
   "symbol": "BILI"

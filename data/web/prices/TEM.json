@@ -6208,12 +6208,12 @@
       "currency": "USD",
       "date": "2026-05-12",
       "display_currency": "USD",
-      "high": 48.125999450683594,
+      "high": 48.12590026855469,
       "krw_per_unit": 1474.449951171875,
       "low": 45.724998474121094,
-      "open": 48.09000015258789,
+      "open": 48.040000915527344,
       "source_currency": "USD",
-      "volume": 6389700.0
+      "volume": 5992133.0
     }
   ],
   "symbol": "TEM"

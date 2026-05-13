@@ -25385,10 +25385,10 @@
       "display_currency": "USD",
       "high": 370.2650146484375,
       "krw_per_unit": 1474.449951171875,
-      "low": 349.01998901367193,
+      "low": 349.0299987792969,
       "open": 361.32000732421875,
       "source_currency": "USD",
-      "volume": 6544200.0
+      "volume": 6532017.0
     }
   ],
   "symbol": "VRT"

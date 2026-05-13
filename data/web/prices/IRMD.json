@@ -25385,10 +25385,10 @@
       "display_currency": "USD",
       "high": 84.94999694824219,
       "krw_per_unit": 1474.449951171875,
-      "low": 83.09999847412108,
+      "low": 83.20999908447267,
       "open": 84.75,
       "source_currency": "USD",
-      "volume": 109700.0
+      "volume": 106583.0
     }
   ],
   "symbol": "IRMD"

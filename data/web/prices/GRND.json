@@ -17364,7 +17364,7 @@
       "display_currency": "USD",
       "high": 15.039999961853027,
       "krw_per_unit": 1469.8699951171875,
-      "low": 14.75,
+      "low": 14.750000000000002,
       "open": 15.079999923706055,
       "source_currency": "USD",
       "volume": 119801.0
@@ -17380,7 +17380,7 @@
       "low": 13.949999809265137,
       "open": 14.550000190734863,
       "source_currency": "USD",
-      "volume": 1520300.0
+      "volume": 1520275.0
     }
   ],
   "symbol": "GRND"

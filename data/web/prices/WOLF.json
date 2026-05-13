@@ -2022,12 +2022,12 @@
       "currency": "USD",
       "date": "2026-05-12",
       "display_currency": "USD",
-      "high": 53.97999954223633,
+      "high": 53.939998626708984,
       "krw_per_unit": 1474.449951171875,
       "low": 45.20000076293945,
       "open": 49.2400016784668,
       "source_currency": "USD",
-      "volume": 12110100.0
+      "volume": 12075825.0
     }
   ],
   "symbol": "WOLF"
