@@ -2,6 +2,7 @@ import 'server-only';
 import type { ReturnSeries } from '@/components/charts/CumulativeReturnChart';
 import {
   getDataQuality,
+  getOverview,
   getReportRows,
   getStrategyCurves,
   getTrades,
@@ -39,9 +40,12 @@ export function getDashboardViewModel() {
   const strategyRows = getStrategyLeaderboard();
   const selectedPersona = getDefaultPortfolioPersona();
   const overview = getExecutiveOverview(selectedPersona);
+  const artifactOverview = getOverview();
   const trades = getTrades();
   const reports = getReportRows();
   const dataQuality = getDataQuality();
+  const priceMatchedReports = artifactOverview.report_counts?.price_matched_reports ?? dataQuality.reportsWithPrices;
+  const sourceReports = artifactOverview.report_counts?.extracted_reports ?? dataQuality.totalReports;
   const latestReportsBySymbol = latestReportBySymbol(reports);
   const reportHrefBySymbol = Object.fromEntries(
     [...latestReportsBySymbol.keys()].map((symbol) => [symbol, `/reports/${encodeURIComponent(symbol)}`]),
@@ -64,6 +68,8 @@ export function getDashboardViewModel() {
     overview,
     reports,
     dataQuality,
+    priceMatchedReports,
+    sourceReports,
     latestReportsBySymbol,
     reportHrefBySymbol,
     equity,

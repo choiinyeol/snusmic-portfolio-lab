@@ -85,15 +85,15 @@ export default function PortfolioPage() {
   return (
     <>
       <PageHero
-        eyebrow="PORTFOLIO"
-        title="Portfolio — 원장형 보유 대시보드"
-        subtitle="전략별 share-based 원장, 현재 보유, 체결 기록, 리포트 근거를 한 화면에서 추적합니다."
+        eyebrow="Portfolio Ledger"
+        title="포트폴리오 원장"
+        subtitle="전략별 보유, 체결, 현금 흐름, 연결 리포트 근거를 정적 스냅샷으로 확인합니다."
         badges={[
           { label: '선택 전략', value: `${strategyPersonas.length}개` },
           { label: '벤치마크', value: `${benchmarkPersonas.length}개` },
           { label: '체결', value: trades.length.toLocaleString('ko-KR') },
           { label: '최근 평가', value: latestEquity || '—' },
-          { label: '데이터', value: '기준 데이터' },
+          { label: '데이터', value: '정적 스냅샷' },
           { label: '거래', value: '실시간 매매 아님' },
         ]}
       />

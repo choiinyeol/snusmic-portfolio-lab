@@ -31,9 +31,9 @@ export default function StrategiesPage() {
   return (
     <>
       <PageHero
-        eyebrow="STRATEGIES"
-        title="Strategies — 벤치마크와 고유 전략"
-        subtitle="All-Weather, SMIC Follower v1/v2, KODEX200, QQQ, SPY, GLD, Weak Prophet은 비교 기준선입니다. 나머지는 사용자가 선택해 검토할 수 있는 원장형 고유 전략입니다."
+        eyebrow="Strategy Lab"
+        title="전략 비교"
+        subtitle="벤치마크, 오라클, 선택 가능한 원장 전략을 분리해 성과·낙폭·규칙을 비교합니다."
         badges={[
           { label: '벤치마크', value: benchmarkRows.length },
           { label: '고유 전략', value: selectableRows.length },
@@ -44,10 +44,10 @@ export default function StrategiesPage() {
         actions={
           <>
             <Link className="btn btn-sm btn-primary" href="/portfolio">
-              전략 선택하기
+              원장으로 이동
             </Link>
             <a className="btn btn-sm btn-outline" href="#strategy-board">
-              리더보드
+              전략 리더보드
             </a>
           </>
         }
@@ -97,7 +97,7 @@ export default function StrategiesPage() {
         <StrategyRiskTable rows={selectableRows} />
       </Section>
 
-      <Section eyebrow="성과 경로" title="벤치마크 세트와 고유 전략의 누적 수익률">
+      <Section eyebrow="Performance" title="벤치마크 세트와 고유 전략의 누적 수익률">
         <PerformanceChartPanel
           benchmarkCount={BENCHMARK_IDS.length}
           series={chartSeries}
@@ -106,7 +106,7 @@ export default function StrategiesPage() {
       </Section>
 
       <Section
-        eyebrow="운용 규칙"
+        eyebrow="Rules"
         title="고유 전략 매수·매도 규칙"
         caption="MTT 전략은 수익률 숫자만 보는 대상이 아니라, 어떤 조건에서 현금을 보유하고 어떤 조건에서 매수·매도하는지 함께 읽어야 합니다."
       >

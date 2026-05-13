@@ -20,7 +20,8 @@ export default function OverviewPage() {
     strategyRows,
     selectedPersona,
     overview,
-    dataQuality,
+    priceMatchedReports,
+    sourceReports,
     latestReportsBySymbol,
     reportHrefBySymbol,
     benchmarkRows,
@@ -41,7 +42,7 @@ export default function OverviewPage() {
         badges={[
           { label: '기준일', value: overview.snapshotDate || '—' },
           { label: '리포트', value: `${overview.reportStats.total}건` },
-          { label: '가격 매칭', value: `${dataQuality.reportsWithPrices}/${dataQuality.totalReports}` },
+          { label: '가격 매칭', value: `${priceMatchedReports}/${sourceReports}` },
           { label: '보유', value: `${overview.portfolio.holdingCount}개` },
           { label: '원장', value: overview.portfolio.label },
           { label: '거래', value: '실시간 매매 아님' },

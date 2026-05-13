@@ -43,11 +43,11 @@ export default function GuidePage() {
   return (
     <>
       <PageHero
-        eyebrow="GUIDE"
-        title="SNUSMIC Portfolio Lab 사용 가이드"
-        subtitle="리서치, 포트폴리오, 전략 화면을 30초 안에 이해하고 각 화면에서 무엇을 봐야 하는지 익힙니다."
+        eyebrow="How to read"
+        title="읽는 법"
+        subtitle="정적 스냅샷 기반 리서치·포트폴리오·전략 화면을 어떤 순서로 읽을지 정리합니다."
         badges={[
-          { label: '데이터', value: '기준 데이터' },
+          { label: '데이터', value: '정적 스냅샷' },
           { label: '거래', value: '읽기 전용' },
           { label: '표', value: '정렬 · 필터 · 페이지' },
           { label: '목표', value: `MDD ≤ ${formatPercent(OBJECTIVE_MAX_DRAWDOWN)}` },
@@ -55,10 +55,10 @@ export default function GuidePage() {
         actions={
           <>
             <Link className="btn btn-sm btn-primary" href="/portfolio">
-              Portfolio 시작
+              포트폴리오로 이동
             </Link>
             <Link className="btn btn-sm btn-outline" href="/reports">
-              Reports 보기
+              리포트 검증
             </Link>
           </>
         }
