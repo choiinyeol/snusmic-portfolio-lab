@@ -2829,7 +2829,7 @@
   {
     "company": "",
     "currency": "USD",
-    "last_close_native": 686.0514665503437,
+    "last_close_native": 687.6292416613395,
     "market_value_krw": 56404543.2945,
     "month_end": "2026-05-13",
     "persona": "all_weather",
@@ -2840,7 +2840,7 @@
   {
     "company": "",
     "currency": "USD",
-    "last_close_native": 723.5798400201579,
+    "last_close_native": 725.2439225534155,
     "market_value_krw": 54081803.1662,
     "month_end": "2026-05-13",
     "persona": "all_weather",
@@ -2851,7 +2851,7 @@
   {
     "company": "",
     "currency": "USD",
-    "last_close_native": 424.9403191611411,
+    "last_close_native": 425.9175931586771,
     "market_value_krw": 49546986.2293,
     "month_end": "2026-05-13",
     "persona": "all_weather",
@@ -3566,7 +3566,7 @@
   {
     "company": "",
     "currency": "USD",
-    "last_close_native": 424.9403191612343,
+    "last_close_native": 425.9175931587705,
     "market_value_krw": 233760140.1588,
     "month_end": "2026-05-13",
     "persona": "benchmark_gld",
@@ -4996,7 +4996,7 @@
   {
     "company": "",
     "currency": "USD",
-    "last_close_native": 686.0514665507469,
+    "last_close_native": 687.6292416617438,
     "market_value_krw": 201005281.5587,
     "month_end": "2026-05-13",
     "persona": "benchmark_qqq",
@@ -5711,7 +5711,7 @@
   {
     "company": "",
     "currency": "USD",
-    "last_close_native": 723.5798400205191,
+    "last_close_native": 725.2439225537775,
     "market_value_krw": 176306678.3219,
     "month_end": "2026-05-13",
     "persona": "benchmark_spy",
@@ -44552,7 +44552,7 @@
   {
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 174.63000488281253,
+    "last_close_native": 174.625,
     "market_value_krw": 1802382.4152,
     "month_end": "2026-05-13",
     "persona": "smic_follower_v2",
@@ -45872,7 +45872,7 @@
   {
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 174.63000488281253,
+    "last_close_native": 174.625,
     "market_value_krw": 1802382.4152,
     "month_end": "2026-05-13",
     "persona": "smic_mtt_strategy_top1",
@@ -46928,7 +46928,7 @@
   {
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 174.63000488281253,
+    "last_close_native": 174.625,
     "market_value_krw": 1802382.4152,
     "month_end": "2026-05-13",
     "persona": "smic_mtt_strategy_top10",
@@ -47984,7 +47984,7 @@
   {
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 174.63000488281253,
+    "last_close_native": 174.625,
     "market_value_krw": 1802382.4152,
     "month_end": "2026-05-13",
     "persona": "smic_mtt_strategy_top11",
@@ -49502,7 +49502,7 @@
   {
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 174.63000488281253,
+    "last_close_native": 174.625,
     "market_value_krw": 1802382.4152,
     "month_end": "2026-05-13",
     "persona": "smic_mtt_strategy_top12",
@@ -50162,7 +50162,7 @@
   {
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 174.63000488281253,
+    "last_close_native": 174.625,
     "market_value_krw": 145992975.6319,
     "month_end": "2026-05-13",
     "persona": "smic_mtt_strategy_top13",
@@ -51119,7 +51119,7 @@
   {
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 174.63000488281253,
+    "last_close_native": 174.625,
     "market_value_krw": 1802382.4152,
     "month_end": "2026-05-13",
     "persona": "smic_mtt_strategy_top14",
@@ -52362,7 +52362,7 @@
   {
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 174.63000488281253,
+    "last_close_native": 174.625,
     "market_value_krw": 119729689.0103,
     "month_end": "2026-05-13",
     "persona": "smic_mtt_strategy_top15",
@@ -53638,7 +53638,7 @@
   {
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 174.63000488281253,
+    "last_close_native": 174.625,
     "market_value_krw": 119729689.0103,
     "month_end": "2026-05-13",
     "persona": "smic_mtt_strategy_top16",
@@ -58830,7 +58830,7 @@
   {
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 174.63000488281253,
+    "last_close_native": 174.625,
     "market_value_krw": 118184789.7972,
     "month_end": "2026-05-13",
     "persona": "smic_mtt_strategy_top19",
@@ -60777,7 +60777,7 @@
   {
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 174.63000488281253,
+    "last_close_native": 174.625,
     "market_value_krw": 1802382.4152,
     "month_end": "2026-05-13",
     "persona": "smic_mtt_strategy_top2",
@@ -62922,7 +62922,7 @@
   {
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 174.63000488281253,
+    "last_close_native": 174.625,
     "market_value_krw": 43514661.1672,
     "month_end": "2026-05-13",
     "persona": "smic_mtt_strategy_top20",
@@ -66827,7 +66827,7 @@
   {
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 174.63000488281253,
+    "last_close_native": 174.625,
     "market_value_krw": 142388210.8015,
     "month_end": "2026-05-13",
     "persona": "smic_mtt_strategy_top23",
@@ -67784,7 +67784,7 @@
   {
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 174.63000488281253,
+    "last_close_native": 174.625,
     "market_value_krw": 49436774.8171,
     "month_end": "2026-05-13",
     "persona": "smic_mtt_strategy_top24",
@@ -72107,7 +72107,7 @@
   {
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 174.63000488281253,
+    "last_close_native": 174.625,
     "market_value_krw": 1802382.4152,
     "month_end": "2026-05-13",
     "persona": "smic_mtt_strategy_top3",
@@ -75055,7 +75055,7 @@
   {
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 174.63000488281253,
+    "last_close_native": 174.625,
     "market_value_krw": 1802382.4152,
     "month_end": "2026-05-13",
     "persona": "smic_mtt_strategy_top4",
@@ -76430,7 +76430,7 @@
   {
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 174.63000488281253,
+    "last_close_native": 174.625,
     "market_value_krw": 1802382.4152,
     "month_end": "2026-05-13",
     "persona": "smic_mtt_strategy_top5",
@@ -77783,7 +77783,7 @@
   {
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 174.63000488281253,
+    "last_close_native": 174.625,
     "market_value_krw": 1802382.4152,
     "month_end": "2026-05-13",
     "persona": "smic_mtt_strategy_top6",
@@ -79103,7 +79103,7 @@
   {
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 174.63000488281253,
+    "last_close_native": 174.625,
     "market_value_krw": 1802382.4152,
     "month_end": "2026-05-13",
     "persona": "smic_mtt_strategy_top7",
@@ -80181,7 +80181,7 @@
   {
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 174.63000488281253,
+    "last_close_native": 174.625,
     "market_value_krw": 1802382.4152,
     "month_end": "2026-05-13",
     "persona": "smic_mtt_strategy_top8",
@@ -81281,7 +81281,7 @@
   {
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 174.63000488281253,
+    "last_close_native": 174.625,
     "market_value_krw": 1802382.4152,
     "month_end": "2026-05-13",
     "persona": "smic_mtt_strategy_top9",
