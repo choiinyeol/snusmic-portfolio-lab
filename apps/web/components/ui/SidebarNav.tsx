@@ -3,7 +3,15 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-export type NavIconKey = 'dashboard' | 'portfolio' | 'reports' | 'strategies' | 'screener' | 'guide' | 'github';
+export type NavIconKey =
+  | 'dashboard'
+  | 'portfolio'
+  | 'reports'
+  | 'strategies'
+  | 'screener'
+  | 'guide'
+  | 'compare'
+  | 'github';
 
 export type SidebarNavItem = {
   href: string;
@@ -117,6 +125,18 @@ function NavIcon({ icon }: { icon: NavIconKey }) {
           <path d="M5 5.5V22" />
           <path d="M9 7h6" />
           <path d="M9 11h7" />
+        </svg>
+      );
+    case 'compare':
+      return (
+        <svg {...common}>
+          <title>비교</title>
+          <path d="M4 5h7v14H4z" />
+          <path d="M13 5h7v14h-7z" />
+          <path d="M8 9h-.01" />
+          <path d="M8 13h-.01" />
+          <path d="M16 9h.01" />
+          <path d="M16 13h.01" />
         </svg>
       );
     case 'github':

@@ -12,6 +12,7 @@ flowchart LR
   Sidebar --> Strategies["전략 비교 /strategies"]
   Sidebar --> Screener["후보 탐색 /screener"]
   Sidebar --> Guide["읽는 법 /guide"]
+  Sidebar --> Compare["V2 비교 /compare"]
 
   Overview -->|current/best strategy| PortfolioStrategy["/portfolio?strategy=:id"]
   Overview -->|recent reports| ReportDetail["/reports/:symbol"]
@@ -37,6 +38,8 @@ flowchart LR
   Guide --> Reports
   Guide --> Strategies
   Guide --> Screener
+  Compare --> Overview
+  Compare --> Guide
 ```
 
 ## Link Rules
@@ -46,6 +49,7 @@ flowchart LR
 3. **Heatmaps are drill-down surfaces.** A clickable holding tile opens the latest available report detail for that symbol. Cash and non-report benchmark holdings stay non-clickable.
 4. **Ranking views do not create new destinations.** Ranking presets change sort/filter state over the unified Reports table, then rows still open `/reports/:symbol`.
 5. **Guide links are onboarding shortcuts only.** Guide cards should not duplicate every dashboard CTA; they should teach the main product flow.
+6. **Compare is a branch decision surface.** `/compare` explains V1/v0.13.0 versus V2 branch differences and links back into the product surfaces used for inspection.
 
 ## Simplification Plan
 
@@ -54,3 +58,4 @@ flowchart LR
 3. Remove duplicated CTA clusters that point to the same page without adding a distinct user job.
 4. Keep Reports ranking modes as presets on the unified table; do not add parallel ranking destinations.
 5. Keep external PDF/markdown links only inside report detail source panels.
+6. Keep `/compare` lightweight and branch-scoped; it should help the user decide whether V2 is better, not become another analytics dashboard.

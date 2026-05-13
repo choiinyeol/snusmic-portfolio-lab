@@ -310,7 +310,42 @@ Do not create page-specific duplicates when one shared domain component would ke
 - Fast-fail required artifacts. Do not add fallback/legacy/deprecated branches.
 - Prefer deletion and consolidation over wrapper layers.
 
-## 11. Open direction
+## 11. V2 redesign branch contract
+
+Branch: `redesign/v2-product-shell`
+Baseline for comparison: pushed `main` / tag `v0.13.0`.
+
+The V2 branch exists because the current interface still reads like assembled
+dashboard parts rather than a product designed from first principles. V2 is not
+a skin over the existing shell. It is an experiment to test whether a smaller,
+more opinionated frontend frame produces a meaningfully better product.
+
+### V2 principles
+
+1. **Judgment before inventory.** The first screen should answer “what should I
+   conclude from this snapshot?” before listing every artifact.
+2. **Fewer surfaces, stronger ownership.** Prefer one large decision area, one
+   supporting context rail, and one evidence ledger over many equal cards.
+3. **Editorial finance, not template dashboard.** Use precise hierarchy, calm
+   typography, and restrained surfaces. Avoid generic SaaS gradients, noisy KPI
+   strips, repeated badges, and decorative card chrome.
+4. **Comparison is a product feature.** The branch must expose a `/compare`
+   surface that names what V1 did, what V2 changes, and how the user should judge
+   whether the rewrite is better.
+5. **Code/artifacts remain the truth.** V2 may change presentation and component
+   ownership, but data semantics still come from `apps/web/lib/artifacts.ts`,
+   `apps/web/lib/product-model.ts`, and exported `data/web/**`.
+
+### V2 acceptance criteria
+
+- The user can compare V1/v0.13.0 and V2 from inside the app.
+- The home route no longer depends on a generic hero + card strip mental model.
+- The design system has a smaller set of primitives with clearer hierarchy.
+- Navigation remains read-only, research-oriented, and non-trading.
+- Verification includes artifact check, typecheck, and a build or documented
+  equivalent, plus final cleanup and code review.
+
+## 12. Open direction
 
 The current codebase can evolve through staged cuts rather than a one-shot rewrite:
 

@@ -7,6 +7,7 @@ export const APP_NAV: SidebarNavItem[] = [
   { href: '/strategies', label: '전략 비교', description: '성과·위험', icon: 'strategies' },
   { href: '/screener', label: '후보 탐색', description: '리서치 후보', icon: 'screener' },
   { href: '/guide', label: '읽는 법', description: '방법론', icon: 'guide' },
+  { href: '/compare', label: '개편 비교', description: 'V1/V2 판단', icon: 'compare' },
 ];
 
 export const GITHUB_NAV_ITEM: SidebarNavItem = {
