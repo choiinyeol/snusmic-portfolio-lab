@@ -187,6 +187,7 @@ export type DataQuality = {
   totalReports: number;
   targetHitRate: number;
   missingPriceSymbols: number;
+  reportExclusions: Record<string, number>;
   extractionQuality: Record<string, unknown>;
 };
 
@@ -289,6 +290,7 @@ export type WebReportRankings = {
 export type WebDataQuality = {
   coverage?: Record<string, number>;
   extraction_quality?: Record<string, unknown>;
+  report_exclusions?: Record<string, number>;
   missing_symbols?: { symbol: string; company?: string; reason?: string }[];
 };
 
@@ -658,6 +660,7 @@ export function getDataQuality(): DataQuality {
     totalReports: Number(web.coverage?.warehouse_reports ?? reports.length),
     targetHitRate: targetHitCount / Math.max(1, reports.length),
     missingPriceSymbols: web.missing_symbols?.length ?? 0,
+    reportExclusions: web.report_exclusions ?? {},
     extractionQuality: web.extraction_quality ?? {},
   };
 }

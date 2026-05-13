@@ -114,7 +114,7 @@ export function PortfolioStrategyView({
         </div>
         <p className="m-0 mt-2 text-xs text-base-content/55">
           <strong className="text-base-content">{personaLabels[persona] ?? persona}</strong>의 보유·현금·체결·매수/매도
-          규칙을 함께 봅니다. BM과 상한선은 비교 기준이고, 고유 전략은 선택해 검토할 수 있는 원장입니다.
+          규칙을 함께 봅니다. 기준선과 상한선은 비교용이고, 고유 전략만 선택해 검토할 수 있는 원장입니다.
         </p>
       </div>
 

@@ -146,6 +146,7 @@ export const WebDataQualitySchema = z
   .object({
     coverage: z.record(z.string(), z.number()).optional(),
     extraction_quality: z.record(z.string(), z.unknown()).optional(),
+    report_exclusions: z.record(z.string(), z.number()).optional(),
     missing_symbols: z
       .array(
         z

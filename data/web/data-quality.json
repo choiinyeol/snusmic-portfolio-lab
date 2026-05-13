@@ -451,5 +451,16 @@
     {
       "symbol": "VTNR"
     }
-  ]
+  ],
+  "report_exclusions": {
+    "downside_target": 5,
+    "excluded_reports": 19,
+    "included_reports": 202,
+    "instant_target_hit": 1,
+    "missing_performance": 0,
+    "missing_price": 5,
+    "non_positive_upside": 8,
+    "sell_opinion": 0,
+    "source_reports": 221
+  }
 }

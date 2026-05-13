@@ -285,7 +285,7 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         <div className="md:col-span-full">
           <div className="flex flex-wrap items-center gap-2" aria-label="관심별 정렬 프리셋">
             <span className="mr-1 text-xs font-black uppercase tracking-[0.16em] text-base-content/45">
-              Sort presets
+              관심별 정렬
             </span>
             {SORT_PRESETS.map((preset) => (
               <button
