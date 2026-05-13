@@ -94,6 +94,7 @@ def parse_args() -> argparse.Namespace:
         "--broker-strategy-top",
         type=int,
         default=int(os.environ.get("SMIC_BROKER_STRATEGY_TOP", "5")),
+        help="Maximum number of benchmark-beating broker-ledger strategies to promote.",
     )
     parser.add_argument(
         "--broker-strategy-seed",
@@ -146,6 +147,12 @@ def main() -> int:
             seed=args.broker_strategy_seed,
         )
         _to_csv_rounded(search.trial_rows, out / "broker_strategy_trials.csv")
+        if len(search.configs) < args.broker_strategy_top:
+            print(
+                "Promoted "
+                f"{len(search.configs)}/{args.broker_strategy_top} broker-ledger strategies; "
+                "non-qualifying candidates remain in broker_strategy_trials.csv."
+            )
         config = config.model_copy(update={"personas": (*config.personas, *search.configs)})
 
     print(f"Running simulation {config.start_date} → {config.end_date}")

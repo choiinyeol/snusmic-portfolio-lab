@@ -95,6 +95,9 @@ uv run python scripts/run_persona_sim.py \
   --broker-strategy-trials 400 \
   --broker-strategy-top 5
 
+# broker-strategy-top은 승격 한도입니다.
+# full-period에서 가장 강한 벤치마크를 이긴 후보만 최대 5개까지 승격합니다.
+
 # 웹 아티팩트만 재생성
 uv run python -m snusmic_pipeline export-web --warehouse data/warehouse --sim data/sim --out data/web
 ```
