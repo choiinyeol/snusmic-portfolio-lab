@@ -4,8 +4,11 @@ import { PerformanceChartPanel } from '@/components/charts/PerformanceChartPanel
 import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
 import { StrategyRiskTable } from '@/components/trading/StrategyRiskTable';
 import { StrategySelector } from '@/components/trading/StrategySelector';
+import { KpiTile } from '@/components/ui/KpiTile';
+import { MiniSparkline } from '@/components/ui/MiniSparkline';
 import { Money } from '@/components/ui/Money';
 import { PageHero } from '@/components/ui/PageHero';
+import { Panel } from '@/components/ui/Panel';
 import { Section } from '@/components/ui/Section';
 import {
   getReportRows,
@@ -24,7 +27,6 @@ import {
   getObjectivePassingRows,
   getSelectableStrategyRows,
   getStrategyLeaderboard,
-  OBJECTIVE_MAX_DRAWDOWN,
   TARGET_BENCHMARK_ID,
   type ResearchCandidate,
   type StrategyLeaderboardRow,
@@ -93,7 +95,13 @@ export default function OverviewPage() {
         }
       />
 
-      <OverviewDigest benchmark={benchmarkToBeat} objectiveCount={objectiveRows.length} overview={overview} />
+      <CommandKpiStrip
+        benchmark={benchmarkToBeat}
+        chartSeries={chartSeries}
+        objectiveCount={objectiveRows.length}
+        overview={overview}
+        selectedStrategy={selectedStrategy}
+      />
 
       <Section
         eyebrow="Portfolio"
@@ -130,9 +138,9 @@ export default function OverviewPage() {
       </Section>
 
       <Section
-        eyebrow="성과 경로"
-        title="벤치마크 세트와 선택 가능 전략의 누적 경로"
-        caption="비교 기준선과 선택 가능한 전략을 분리해 성과와 낙폭을 함께 봅니다."
+        eyebrow="Performance"
+        title="전략 · 벤치마크 누적 수익률"
+        caption="대표 전략, 벤치마크, 목표 조건 통과 전략을 한 줄의 성과 보드에서 비교합니다."
         actions={
           <div className="flex flex-wrap gap-1.5" aria-label="기간 필터">
             {['3M', '6M', 'YTD', '1Y', '전체'].map((label) => (
@@ -143,60 +151,81 @@ export default function OverviewPage() {
           </div>
         }
       >
-        <PerformanceChartPanel
-          benchmarkCount={benchmarkRows.length}
-          series={chartSeries}
-          strategyCount={selectableRows.length}
-        />
+        <div className="grid gap-4 2xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,.58fr)_minmax(320px,.48fr)]">
+          <PerformanceChartPanel
+            benchmarkCount={benchmarkRows.length}
+            series={chartSeries}
+            strategyCount={selectableRows.length}
+          />
+          <Panel
+            actions={
+              <Link className="lab-panel__action" href="/strategies">
+                더보기
+              </Link>
+            }
+            bodyClassName="p-0"
+            eyebrow="Strategy"
+            title="전략 성과 요약"
+          >
+            <StrategyRiskTable rows={strategyRows.slice(0, 7)} />
+          </Panel>
+          <Panel eyebrow="Updates" title="최근 업데이트" bodyClassName="p-3">
+            <UpdateFeed
+              snapshotDate={overview.snapshotDate}
+              stats={overview.reportStats}
+              portfolio={overview.portfolio}
+            />
+          </Panel>
+        </div>
       </Section>
 
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(360px,.72fr)]">
-        <Section
-          eyebrow="보유"
-          title="현재 보유와 최신 목표가 컨텍스트"
-          actions={
-            <Link className="btn btn-sm btn-outline" href="/portfolio">
-              Portfolio →
-            </Link>
-          }
-        >
-          <HoldingContext holdings={overview.portfolio.holdings.slice(0, 8)} reportsBySymbol={latestReportsBySymbol} />
-        </Section>
-
-        <Section
-          eyebrow="체결"
-          title="최근 매수 체결"
-          actions={
-            <Link className="btn btn-sm btn-outline" href="/portfolio">
-              원장 →
-            </Link>
-          }
-        >
-          <BuyTape trades={recentBuys} />
-        </Section>
-      </div>
-
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(360px,.72fr)]">
-        <Section
-          eyebrow="전략"
-          title="전략 성과 요약"
-          actions={
-            <Link className="btn btn-sm btn-outline" href="/strategies">
-              Strategy →
-            </Link>
-          }
-        >
-          <StrategyRiskTable rows={strategyRows.slice(0, 7)} />
-        </Section>
-
-        <Section eyebrow="갱신 내역" title="최근 업데이트">
-          <UpdateFeed
-            snapshotDate={overview.snapshotDate}
-            stats={overview.reportStats}
-            portfolio={overview.portfolio}
-          />
-        </Section>
-      </div>
+      <Section
+        eyebrow="Evidence"
+        title="원장과 목표가 검증 근거"
+        caption="현재 보유, 최근 매수, 목표가 진행률을 분리해 리서치 스냅샷의 근거를 추적합니다."
+      >
+        <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_minmax(340px,.5fr)_minmax(340px,.5fr)]">
+          <Panel
+            actions={
+              <Link className="lab-panel__action" href="/portfolio">
+                Portfolio
+              </Link>
+            }
+            bodyClassName="p-3"
+            eyebrow="Holdings"
+            title="현재 보유 상위 종목"
+          >
+            <HoldingContext
+              holdings={overview.portfolio.holdings.slice(0, 8)}
+              reportsBySymbol={latestReportsBySymbol}
+            />
+          </Panel>
+          <Panel
+            actions={
+              <Link className="lab-panel__action" href="/portfolio">
+                원장
+              </Link>
+            }
+            bodyClassName="p-3"
+            eyebrow="Buy tape"
+            title="최근 매수 체결"
+          >
+            <BuyTape trades={recentBuys} />
+          </Panel>
+          <Panel
+            actions={
+              <Link className="lab-panel__action" href="/reports">
+                리포트
+              </Link>
+            }
+            bodyClassName="p-3"
+            eyebrow="Targets"
+            title="목표가 검증 피드"
+          >
+            <TargetValidationFeed reports={overview.recentReports.slice(0, 6)} />
+          </Panel>
+        </div>
+      </Section>
 
       <Section
         eyebrow="후보 탐색"
@@ -218,59 +247,94 @@ export default function OverviewPage() {
   );
 }
 
-function OverviewDigest({
+function CommandKpiStrip({
   overview,
   benchmark,
   objectiveCount,
+  selectedStrategy,
+  chartSeries,
 }: {
   overview: ReturnType<typeof getExecutiveOverview>;
   benchmark: StrategyLeaderboardRow | undefined;
   objectiveCount: number;
+  selectedStrategy: StrategyLeaderboardRow | undefined;
+  chartSeries: ReturnSeries[];
 }) {
+  const selectedTrend = chartSeries.find((series) => series.id === overview.portfolio.persona)?.points ?? [];
+  const benchmarkTrend = benchmark ? (chartSeries.find((series) => series.id === benchmark.id)?.points ?? []) : [];
+  const targetProgressPoints = overview.recentReports
+    .map((report) => ({ value: report.targetProgressPct }))
+    .filter((point) => point.value !== null);
+  const bestStrategyLabel = selectedStrategy?.shortLabel || selectedStrategy?.label || overview.portfolio.label;
   return (
-    <section className="overview-digest" aria-label="오늘의 요약">
-      <article className="overview-digest__hero">
-        <div>
-          <span className="overview-digest__label">현재 평가액</span>
-          <strong>{formatKrw(overview.portfolio.finalEquityKrw)}</strong>
-          <p>
-            {overview.portfolio.holdingCount}개 보유 · 현금 비중 {formatPercent(overview.portfolio.cashWeight)}
-          </p>
-        </div>
-        <div className="overview-digest__pnl">
-          <span>현재 보유 손익</span>
-          <strong className={signedTextClass(overview.portfolio.unrealizedPnlKrw)}>
-            {formatKrw(overview.portfolio.unrealizedPnlKrw)}
-          </strong>
-          <p>
-            {overview.portfolio.positiveHoldingCount}/{overview.portfolio.holdingCount} 수익 포지션
-          </p>
-        </div>
-      </article>
-
-      <article className="overview-digest__panel">
-        <DigestMetric label="MWR" value={formatPercent(overview.portfolio.moneyWeightedReturn)} />
-        <DigestMetric label="MDD" value={formatPercent(overview.portfolio.maxDrawdown)} tone="text-error" />
-        <DigestMetric
-          label="목표가 도달"
-          value={formatPercent(overview.reportStats.targetHitRate)}
-          caption={`${overview.reportStats.hitCount}/${overview.reportStats.total}`}
+    <section className="command-kpi-strip" aria-label="핵심 KPI">
+      <KpiTile
+        caption={`${overview.portfolio.holdingCount}개 보유 · 현금 ${formatPercent(overview.portfolio.cashWeight)}`}
+        delta={`${overview.portfolio.label} 원장`}
+        emphasis
+        label="현재 평가액"
+        tone="accent"
+        value={formatKrw(overview.portfolio.finalEquityKrw)}
+      >
+        <MiniSparkline label="대표 전략 평가액 추세" points={selectedTrend} tone="accent" />
+      </KpiTile>
+      <KpiTile
+        caption="입출금 반영 수익률"
+        delta={selectedStrategy ? `MDD ${formatPercent(selectedStrategy.maxDrawdown)}` : undefined}
+        label="Primary MWR"
+        tone="good"
+        value={formatPercent(overview.portfolio.moneyWeightedReturn)}
+      >
+        <MiniSparkline label="Primary MWR sparkline" points={selectedTrend} tone="good" />
+      </KpiTile>
+      <KpiTile
+        caption={`${overview.portfolio.positiveHoldingCount}/${overview.portfolio.holdingCount} 수익 포지션`}
+        label="현재 보유 손익"
+        tone={(overview.portfolio.unrealizedPnlKrw ?? 0) >= 0 ? 'good' : 'bad'}
+        value={formatKrw(overview.portfolio.unrealizedPnlKrw)}
+      >
+        <MiniSparkline label="보유 손익 추세" points={selectedTrend} tone="good" />
+      </KpiTile>
+      <KpiTile
+        caption="원장 기준 최대 낙폭"
+        label="Primary MDD"
+        tone="bad"
+        value={formatPercent(overview.portfolio.maxDrawdown)}
+      >
+        <MiniSparkline
+          label="벤치마크 경로"
+          points={benchmarkTrend.length ? benchmarkTrend : selectedTrend}
+          tone="bad"
         />
-      </article>
-
-      <article className="overview-digest__panel">
-        <DigestMetric
-          label="기준선"
-          value={benchmark?.label ?? '—'}
-          caption={`수익률 ${formatPercent(benchmark?.returnPct)} · MDD ${formatPercent(benchmark?.maxDrawdown)}`}
+      </KpiTile>
+      <KpiTile
+        caption={`${overview.reportStats.hitCount}/${overview.reportStats.total}건 도달`}
+        label="목표가 도달률"
+        tone="accent"
+        value={formatPercent(overview.reportStats.targetHitRate)}
+      >
+        <MiniSparkline label="최근 리포트 목표 진행률" points={targetProgressPoints} tone="accent" />
+      </KpiTile>
+      <KpiTile
+        caption={`${overview.reportStats.activeCount}건 진행 중 · 최신 ${formatDateKo(overview.reportStats.latestPublicationDate)}`}
+        label="리포트"
+        value={`${overview.reportStats.total.toLocaleString('ko-KR')}건`}
+      >
+        <MiniSparkline
+          label="리포트 현재 수익률"
+          points={overview.recentReports.map((report) => ({ value: report.currentReturn }))}
+          tone="neutral"
         />
-        <DigestMetric
-          label="목표 조건"
-          value={objectiveCount ? `${objectiveCount}개 통과` : '통과 없음'}
-          caption={`MDD ≤ ${formatPercent(OBJECTIVE_MAX_DRAWDOWN)} · KOSPI 초과`}
-          tone={objectiveCount ? 'text-success' : 'text-warning'}
-        />
-      </article>
+      </KpiTile>
+      <KpiTile
+        caption={objectiveCount ? `${objectiveCount}개 전략이 목표 조건 통과` : '목표 조건 통과 전략 없음'}
+        delta={benchmark ? `기준선 ${benchmark.shortLabel || benchmark.label}` : undefined}
+        label="최고 원장 전략"
+        tone="warn"
+        value={bestStrategyLabel}
+      >
+        <MiniSparkline label="최고 원장 전략 추세" points={selectedTrend} tone="warn" />
+      </KpiTile>
     </section>
   );
 }
@@ -288,26 +352,6 @@ function StrategyPills({ rows, selectedId }: { rows: StrategyLeaderboardRow[]; s
       }))}
       value={selectedId}
     />
-  );
-}
-
-function DigestMetric({
-  label,
-  value,
-  caption,
-  tone = 'text-base-content',
-}: {
-  label: string;
-  value: string;
-  caption?: string;
-  tone?: string;
-}) {
-  return (
-    <div className="overview-digest__metric">
-      <span>{label}</span>
-      <strong className={tone}>{value}</strong>
-      {caption ? <p>{caption}</p> : null}
-    </div>
   );
 }
 
@@ -529,22 +573,20 @@ function UpdateFeed({
     { tag: '거래', text: '실제 주문이나 실시간 매매 기능은 제공하지 않습니다', value: '읽기 전용' },
   ];
   return (
-    <article className="lab-panel p-3">
-      <div className="feed-list">
-        {items.map((item) => (
-          <div className="feed-item" key={item.tag}>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="status-dot text-primary" aria-hidden="true" />
-                <span className="truncate text-sm font-bold">{item.text}</span>
-              </div>
-              <div className="feed-item__meta">{item.tag}</div>
+    <div className="feed-list">
+      {items.map((item) => (
+        <div className="feed-item" key={item.tag}>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="status-dot text-primary" aria-hidden="true" />
+              <span className="truncate text-sm font-bold">{item.text}</span>
             </div>
-            <span className="feed-item__value text-base-content/70">{item.value}</span>
+            <div className="feed-item__meta">{item.tag}</div>
           </div>
-        ))}
-      </div>
-    </article>
+          <span className="feed-item__value text-base-content/70">{item.value}</span>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -598,6 +640,45 @@ function reportStatusBadge(report: ReportRow) {
   if (report.targetHit) return <span className="badge badge-success badge-soft badge-sm">도달</span>;
   if (report.expired) return <span className="badge badge-error badge-soft badge-sm">만료</span>;
   return <span className="badge badge-primary badge-soft badge-sm">진행 중</span>;
+}
+
+function TargetValidationFeed({ reports }: { reports: ReportRow[] }) {
+  if (!reports.length) {
+    return <div className="text-sm text-base-content/60">검증할 최근 리포트가 없습니다.</div>;
+  }
+  return (
+    <div className="feed-list">
+      {reports.map((report) => {
+        const progress = Math.max(0, Math.min(1, report.targetProgressPct ?? (report.targetHit ? 1 : 0)));
+        return (
+          <Link key={report.reportId} href={`/reports/${report.symbol}`} className="feed-item feed-item--stacked">
+            <div className="min-w-0">
+              <div className="flex min-w-0 items-center gap-2">
+                <span className="truncate text-sm font-bold">{report.company || report.symbol}</span>
+                <span className="badge badge-ghost badge-sm font-mono">{report.symbol}</span>
+              </div>
+              <div className="feed-item__meta">
+                {formatDateKo(report.publicationDate)} · 현재 {formatPercent(report.currentReturn)} · 진행{' '}
+                {formatPercent(report.targetProgressPct)}
+              </div>
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-base-200" aria-label="목표가 진행률">
+                <div
+                  className={`h-full rounded-full ${report.targetHit ? 'bg-success' : report.expired ? 'bg-error' : 'bg-primary'}`}
+                  style={{ width: `${Math.max(4, progress * 100)}%` }}
+                />
+              </div>
+            </div>
+            <div className="grid justify-items-end gap-1 text-right">
+              {reportStatusBadge(report)}
+              <span className="feed-item__value text-base-content/55">
+                {report.daysToTarget !== null ? formatDays(report.daysToTarget) : report.expired ? '만료' : '진행'}
+              </span>
+            </div>
+          </Link>
+        );
+      })}
+    </div>
+  );
 }
 
 function buildDashboardSeries(
