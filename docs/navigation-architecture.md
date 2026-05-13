@@ -52,5 +52,5 @@ flowchart LR
 1. Replace generic strategy links with `/portfolio?strategy=:id`.
 2. Make report-backed heatmap tiles open `/reports/:symbol`.
 3. Remove duplicated CTA clusters that point to the same page without adding a distinct user job.
-4. Consolidate Reports ranking cards and table rows into one preset-driven table.
+4. Keep Reports ranking modes as presets on the unified table; do not add parallel ranking destinations.
 5. Keep external PDF/markdown links only inside report detail source panels.
