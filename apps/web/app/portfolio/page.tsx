@@ -11,7 +11,13 @@ import {
   getSummaryRows,
   getTrades,
 } from '@/lib/artifacts';
-import { getDefaultPortfolioPersona, getStrategyLeaderboard, isBenchmarkPersona } from '@/lib/product-model';
+import {
+  getDefaultPortfolioPersona,
+  getStrategyLeaderboard,
+  isBenchmarkPersona,
+  portfolioStrategyHref,
+  type StrategyKind,
+} from '@/lib/product-model';
 
 export default function PortfolioPage() {
   const holdings = getCurrentHoldings();
@@ -24,14 +30,36 @@ export default function PortfolioPage() {
   const strategyRows = getStrategyLeaderboard();
   const defaultPersona = getDefaultPortfolioPersona();
 
-  const allPersonas = Array.from(new Set(holdings.map((row) => row.persona))).sort();
-  const benchmarkPersonas = allPersonas.filter(isBenchmarkPersona);
-  const strategyPersonas = allPersonas.filter((persona) => !isBenchmarkPersona(persona));
-  const personas = [...strategyPersonas, ...benchmarkPersonas];
-  const personaLabels = Object.fromEntries(personas.map((persona) => [persona, getPersonaLabel(persona)]));
-  const personaKinds = Object.fromEntries(
-    personas.map((persona) => [persona, isBenchmarkPersona(persona) ? 'benchmark' : 'strategy']),
+  const strategyById = new Map(strategyRows.map((row) => [row.id, row]));
+  const allPersonas = Array.from(
+    new Set([
+      ...summaries.map((row) => row.persona),
+      ...holdings.map((row) => row.persona),
+      ...trades.map((row) => row.persona),
+      ...equity.map((row) => row.persona),
+    ]),
   );
+  const personas = [
+    ...strategyRows.map((row) => row.id).filter((persona) => allPersonas.includes(persona)),
+    ...allPersonas.filter((persona) => !strategyById.has(persona)).sort(),
+  ];
+  const strategyPersonas = personas.filter((persona) => (strategyById.get(persona)?.kind ?? 'strategy') === 'strategy');
+  const benchmarkPersonas = personas.filter(
+    (persona) => (strategyById.get(persona)?.kind ?? inferPersonaKind(persona)) !== 'strategy',
+  );
+  const personaLabels = Object.fromEntries(
+    personas.map((persona) => [persona, strategyById.get(persona)?.label ?? getPersonaLabel(persona)]),
+  );
+  const strategyOptions = personas.map((persona) => {
+    const row = strategyById.get(persona);
+    return {
+      id: persona,
+      label: row?.label ?? getPersonaLabel(persona),
+      shortLabel: row?.shortLabel ?? getPersonaLabel(persona),
+      kind: row?.kind ?? inferPersonaKind(persona),
+      href: portfolioStrategyHref(persona),
+    };
+  });
   const capitalByPersona = Object.fromEntries(
     summaries.map((row) => [row.persona, row.totalContributedKrw ?? row.finalEquityKrw ?? 0]),
   );
@@ -77,7 +105,7 @@ export default function PortfolioPage() {
         episodes={episodes}
         personas={personas}
         personaLabels={personaLabels}
-        personaKinds={personaKinds}
+        strategyOptions={strategyOptions}
         defaultPersona={defaultPersona}
         methodsByPersona={methodsByPersona}
         capitalByPersona={capitalByPersona}
@@ -88,4 +116,8 @@ export default function PortfolioPage() {
       />
     </>
   );
+}
+
+function inferPersonaKind(persona: string): StrategyKind {
+  return isBenchmarkPersona(persona) ? 'benchmark' : 'strategy';
 }

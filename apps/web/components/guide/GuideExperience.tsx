@@ -213,7 +213,7 @@ export function GuideExperience() {
         </article>
 
         <article className="lab-panel p-4 md:p-5">
-          <div className="lab-panel__eyebrow">Objective Gate</div>
+          <div className="lab-panel__eyebrow">목표 조건</div>
           <h2 className="mt-1 text-xl font-black tracking-[-0.04em]">개인 목표 게이트</h2>
           <p className="mt-2 text-sm leading-6 text-base-content/62">
             목표는 MDD 15% 이하이면서 KOSPI/KODEX200보다 더 많이 오르는 전략입니다.
