@@ -91,10 +91,9 @@ export function GuideExperience() {
       <section className="guide-hero-3d lab-panel p-4 md:p-5" aria-label="Portfolio Lab interactive overview">
         <div className="guide-hero-copy">
           <span className="snapshot-pill">Interactive guide</span>
-          <h2>정적 아티팩트를 SaaS 제품처럼 읽는 방법</h2>
+          <h2>Portfolio Lab을 읽는 방법</h2>
           <p>
-            이 페이지는 튜토리얼입니다. 데이터를 실시간으로 가져오지 않고, 화면에서 어떤 질문을 던져야 하는지 인터랙티브
-            예시로 보여줍니다.
+            이 페이지는 튜토리얼입니다. 포트폴리오, 리포트, 전략 화면에서 어떤 질문을 던져야 하는지 예시로 보여줍니다.
           </p>
           <div className="guide-chip-row" aria-label="Core principles">
             <span>Reports = 링크명 일치</span>
@@ -176,8 +175,8 @@ export function GuideExperience() {
               <strong>벤치마크/전략/현금 분리</strong>
             </div>
             <div className="guide-stack__layer guide-stack__layer--bottom">
-              <span>Artifacts</span>
-              <strong>data/web canonical snapshot</strong>
+              <span>Data</span>
+              <strong>기준일 데이터</strong>
             </div>
           </div>
           <p className="mt-5 text-sm leading-6 text-base-content/62">

@@ -23,12 +23,12 @@ export default function ScreenerPage() {
       <PageHero
         eyebrow="SCREENER"
         title="리서치 후보 탐색"
-        subtitle="최근 리포트와 목표가 진행률만으로 설명 가능한 후보를 필터링합니다."
+        subtitle="최근 리포트, 목표가 진행률, 남은 업사이드를 기준으로 후보를 추립니다."
         badges={[
           { label: '후보', value: `${candidates.length}개` },
           { label: '활성 리포트', value: `${stats.activeCount}개` },
-          { label: '블랙박스', value: '사용 안 함' },
-          { label: 'Mode', value: 'Static Artifacts' },
+          { label: '정렬 기준', value: '공개 지표' },
+          { label: '데이터', value: '기준 데이터' },
         ]}
         kpis={
           <div className="grid min-w-0 gap-3 min-[1400px]:grid-cols-2">
@@ -57,7 +57,7 @@ export default function ScreenerPage() {
       <Section
         eyebrow="Rules"
         title="추천이 아니라 설명 가능한 리포트 후보"
-        caption="정렬 근거는 최근성, 목표 업사이드, 목표 진행률, 미도달/미만료 상태입니다. 전략 신호·주문 추천·블랙박스 점수는 사용하지 않습니다."
+        caption="정렬 기준은 최근성, 목표 업사이드, 목표 진행률, 미도달/미만료 상태입니다. 주문 추천이 아니라 다시 확인할 후보를 보여줍니다."
       >
         <div className="grid gap-3 lg:grid-cols-4">
           {Object.entries(buckets).map(([bucket, rows]) => (

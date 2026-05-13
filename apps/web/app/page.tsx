@@ -1,8 +1,6 @@
 import Link from 'next/link';
 import { CumulativeReturnChart, type ReturnSeries } from '@/components/charts/CumulativeReturnChart';
 import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
-import { KpiTile } from '@/components/ui/KpiTile';
-import { MiniSparkline } from '@/components/ui/MiniSparkline';
 import { Money } from '@/components/ui/Money';
 import { PageHero } from '@/components/ui/PageHero';
 import { Section } from '@/components/ui/Section';
@@ -54,7 +52,6 @@ export default function OverviewPage() {
   const latestReportsBySymbol = latestReportBySymbol(reports);
   const equity = getEquityDaily();
   const chartSeries = buildDashboardSeries(equity);
-  const primarySeries = chartSeries.find((series) => series.id === PRIMARY_PERSONA)?.points ?? [];
   const benchmarkRows = getBenchmarkRows(strategyRows);
   const selectableRows = getSelectableStrategyRows(strategyRows);
   const objectiveRows = getObjectivePassingRows(strategyRows);
@@ -69,14 +66,13 @@ export default function OverviewPage() {
       <PageHero
         eyebrow="PORTFOLIO LAB"
         title="SNUSMIC Portfolio Lab"
-        subtitle="리서치 추천, 포트폴리오 원장, 전략 검증을 한 곳에서 추적하는 정적 스냅샷 기반 투자 리서치 대시보드입니다."
+        subtitle="리서치 발간 이후의 가격 흐름, 현재 보유, 전략 성과를 한 화면에서 확인합니다."
         badges={[
-          { label: 'Snapshot', value: overview.snapshotDate || '—' },
-          { label: 'Reports', value: `${overview.reportStats.total}건` },
-          { label: 'Price matched', value: 'Canonical artifacts' },
-          { label: 'Primary book', value: overview.portfolio.label },
-          { label: 'Mode', value: 'Static Artifacts' },
-          { label: 'Trading', value: 'No live trading' },
+          { label: '기준일', value: overview.snapshotDate || '—' },
+          { label: '리포트', value: `${overview.reportStats.total}건` },
+          { label: '보유', value: `${overview.portfolio.holdingCount}개` },
+          { label: '원장', value: overview.portfolio.label },
+          { label: '거래', value: '실시간 매매 아님' },
         ]}
         actions={
           <>
@@ -91,67 +87,14 @@ export default function OverviewPage() {
             </Link>
           </>
         }
-        kpis={
-          <div className="metric-strip">
-            <KpiTile
-              compact
-              label="현재 평가액"
-              value={formatKrw(overview.portfolio.finalEquityKrw)}
-              delta={`${overview.portfolio.holdingCount}개 보유`}
-              tone="accent"
-              showToneBadge={false}
-            >
-              <MiniSparkline points={primarySeries} tone="accent" label="Primary portfolio trend" />
-            </KpiTile>
-            <KpiTile
-              compact
-              label="Primary MWR"
-              value={formatPercent(overview.portfolio.moneyWeightedReturn)}
-              delta={`MDD ${formatPercent(overview.portfolio.maxDrawdown)}`}
-              tone={(overview.portfolio.moneyWeightedReturn ?? 0) >= 0 ? 'good' : 'bad'}
-              showToneBadge={false}
-            />
-            <KpiTile
-              compact
-              label="현재 보유 손익"
-              value={formatKrw(overview.portfolio.unrealizedPnlKrw)}
-              delta={`${overview.portfolio.positiveHoldingCount}/${overview.portfolio.holdingCount} 수익 포지션`}
-              tone={(overview.portfolio.unrealizedPnlKrw ?? 0) >= 0 ? 'good' : 'bad'}
-              showToneBadge={false}
-            />
-            <KpiTile
-              compact
-              label="KOSPI 기준선"
-              value={benchmarkToBeat?.label ?? '—'}
-              delta={`수익률 ${formatPercent(benchmarkToBeat?.returnPct)} · MDD ${formatPercent(benchmarkToBeat?.maxDrawdown)}`}
-              tone="neutral"
-              valueClassName="text-base"
-            />
-            <KpiTile
-              compact
-              label="목표가 도달률"
-              value={formatPercent(overview.reportStats.targetHitRate)}
-              delta={`${overview.reportStats.hitCount}/${overview.reportStats.total}`}
-              tone="good"
-              showToneBadge={false}
-            />
-            <KpiTile
-              compact
-              label="목표 게이트"
-              value={objectiveRows.length ? `${objectiveRows.length}개 통과` : '통과 없음'}
-              delta={`MDD ≤ ${formatPercent(OBJECTIVE_MAX_DRAWDOWN)} · KOSPI 초과`}
-              tone={objectiveRows.length ? 'good' : 'warn'}
-              valueClassName="truncate text-base"
-              showToneBadge={false}
-            />
-          </div>
-        }
       />
 
+      <OverviewDigest benchmark={benchmarkToBeat} objectiveCount={objectiveRows.length} overview={overview} />
+
       <Section
-        eyebrow="Snapshot Board"
+        eyebrow="Portfolio"
         title="현재 상태 대시보드"
-        caption="YASUN식 정보 밀도는 빌리되, 실시간 매매가 아닌 정적 리서치 검증 흐름으로 재구성했습니다."
+        caption="포트폴리오 구성, 현금 비중, 최근 리포트 상태를 한 번에 확인합니다."
       >
         <div className="grid gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(300px,.55fr)_minmax(300px,.55fr)]">
           <article className="lab-panel">
@@ -161,7 +104,7 @@ export default function OverviewPage() {
                 <h2 className="lab-panel__title">포트폴리오 구성</h2>
               </div>
               <span className="artifact-status">
-                <span className="status-dot" aria-hidden="true" /> 정적 스냅샷
+                <span className="status-dot" aria-hidden="true" /> 기준 데이터
               </span>
             </div>
             <div className="p-3 md:p-4">
@@ -183,7 +126,7 @@ export default function OverviewPage() {
       <Section
         eyebrow="Performance"
         title="벤치마크 세트와 선택 가능 전략의 누적 경로"
-        caption="All-Weather, SMIC Follower, KOSPI/QQQ/SPY/GLD/Weak Prophet은 기준선이고, SMIC MTT 계열은 별도 선택 가능 전략입니다."
+        caption="비교 기준선과 선택 가능한 전략을 분리해 성과와 낙폭을 함께 봅니다."
         actions={
           <div className="flex flex-wrap gap-1.5" aria-label="기간 필터">
             {['3M', '6M', 'YTD', '1Y', '전체'].map((label) => (
@@ -255,7 +198,7 @@ export default function OverviewPage() {
       <Section
         eyebrow="Screener"
         title="리포트 기반 후보 랭킹"
-        caption="블랙박스 점수가 아니라 최근성, 목표 업사이드, 목표 진행률, 미도달·미만료 상태로 설명 가능한 후보입니다."
+        caption="아직 목표가에 도달하지 않은 리포트 중 현재 상황을 다시 확인할 만한 후보입니다."
         actions={
           <Link className="btn btn-sm btn-outline" href="/screener">
             Screener →
@@ -269,6 +212,83 @@ export default function OverviewPage() {
         </div>
       </Section>
     </>
+  );
+}
+
+function OverviewDigest({
+  overview,
+  benchmark,
+  objectiveCount,
+}: {
+  overview: ReturnType<typeof getExecutiveOverview>;
+  benchmark: StrategyLeaderboardRow | undefined;
+  objectiveCount: number;
+}) {
+  return (
+    <section className="overview-digest" aria-label="오늘의 요약">
+      <article className="overview-digest__hero">
+        <div>
+          <span className="overview-digest__label">현재 평가액</span>
+          <strong>{formatKrw(overview.portfolio.finalEquityKrw)}</strong>
+          <p>
+            {overview.portfolio.holdingCount}개 보유 · 현금 비중 {formatPercent(overview.portfolio.cashWeight)}
+          </p>
+        </div>
+        <div className="overview-digest__pnl">
+          <span>현재 보유 손익</span>
+          <strong className={signedTextClass(overview.portfolio.unrealizedPnlKrw)}>
+            {formatKrw(overview.portfolio.unrealizedPnlKrw)}
+          </strong>
+          <p>
+            {overview.portfolio.positiveHoldingCount}/{overview.portfolio.holdingCount} 수익 포지션
+          </p>
+        </div>
+      </article>
+
+      <article className="overview-digest__panel">
+        <DigestMetric label="MWR" value={formatPercent(overview.portfolio.moneyWeightedReturn)} />
+        <DigestMetric label="MDD" value={formatPercent(overview.portfolio.maxDrawdown)} tone="text-error" />
+        <DigestMetric
+          label="목표가 도달"
+          value={formatPercent(overview.reportStats.targetHitRate)}
+          caption={`${overview.reportStats.hitCount}/${overview.reportStats.total}`}
+        />
+      </article>
+
+      <article className="overview-digest__panel">
+        <DigestMetric
+          label="기준선"
+          value={benchmark?.label ?? '—'}
+          caption={`수익률 ${formatPercent(benchmark?.returnPct)} · MDD ${formatPercent(benchmark?.maxDrawdown)}`}
+        />
+        <DigestMetric
+          label="목표 조건"
+          value={objectiveCount ? `${objectiveCount}개 통과` : '통과 없음'}
+          caption={`MDD ≤ ${formatPercent(OBJECTIVE_MAX_DRAWDOWN)} · KOSPI 초과`}
+          tone={objectiveCount ? 'text-success' : 'text-warning'}
+        />
+      </article>
+    </section>
+  );
+}
+
+function DigestMetric({
+  label,
+  value,
+  caption,
+  tone = 'text-base-content',
+}: {
+  label: string;
+  value: string;
+  caption?: string;
+  tone?: string;
+}) {
+  return (
+    <div className="overview-digest__metric">
+      <span>{label}</span>
+      <strong className={tone}>{value}</strong>
+      {caption ? <p>{caption}</p> : null}
+    </div>
   );
 }
 
@@ -312,7 +332,7 @@ function RiskSummary({
             value={`${overview.portfolio.positiveHoldingCount}/${overview.portfolio.holdingCount}`}
             tone="text-success"
           />
-          <FactLine label="Primary MDD" value={formatPercent(overview.portfolio.maxDrawdown)} tone="text-error" />
+          <FactLine label="원장 MDD" value={formatPercent(overview.portfolio.maxDrawdown)} tone="text-error" />
           <FactLine label="벤치마크 수" value={`${benchmarkCount}개`} />
         </dl>
         <div className="grid gap-2 pt-2">
@@ -532,7 +552,7 @@ function UpdateFeed({
   portfolio: ReturnType<typeof getExecutiveOverview>['portfolio'];
 }) {
   const items = [
-    { tag: 'Snapshot', text: `기준일 ${snapshotDate || '—'} 정적 스냅샷 반영`, value: 'Artifact' },
+    { tag: '기준일', text: `${snapshotDate || '—'} 기준으로 화면을 갱신했습니다`, value: '확정' },
     {
       tag: 'Portfolio',
       text: `${portfolio.holdingCount}개 현재 보유와 원장형 손익 동기화`,
@@ -544,11 +564,11 @@ function UpdateFeed({
       value: formatPercent(stats.targetHitRate),
     },
     {
-      tag: 'Reports',
-      text: `최신 발간 ${formatDateKo(stats.latestPublicationDate)} 기준 후보 갱신`,
-      value: `${stats.activeCount} active`,
+      tag: '리포트',
+      text: `최근 발간 ${formatDateKo(stats.latestPublicationDate)}까지 반영`,
+      value: `${stats.activeCount}건 진행 중`,
     },
-    { tag: 'Artifact', text: '외부 실시간 호출 없이 canonical data/web 산출물 사용', value: 'No live' },
+    { tag: '거래', text: '실제 주문이나 실시간 매매 기능은 제공하지 않습니다', value: '읽기 전용' },
   ];
   return (
     <article className="lab-panel p-3">

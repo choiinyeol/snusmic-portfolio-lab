@@ -52,8 +52,8 @@ export default function PortfolioPage() {
           { label: '벤치마크', value: `${benchmarkPersonas.length}개` },
           { label: '체결', value: trades.length.toLocaleString('ko-KR') },
           { label: '최근 평가', value: latestEquity || '—' },
-          { label: 'Mode', value: 'Static Artifacts' },
-          { label: 'Trading', value: 'No live trading' },
+          { label: '데이터', value: '기준 데이터' },
+          { label: '거래', value: '실시간 매매 아님' },
         ]}
       />
 

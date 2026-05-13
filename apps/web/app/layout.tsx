@@ -48,7 +48,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             </Link>
             <SidebarNav items={NAV} />
             <div className="sidebar-card">
-              <div className="text-xs font-bold uppercase tracking-[0.18em] text-base-content/40">Snapshot Info</div>
+              <div className="text-xs font-bold uppercase tracking-[0.18em] text-base-content/40">기준 정보</div>
               <dl className="mt-4 grid gap-2 text-xs text-base-content/60">
                 <div>
                   <dt>기준일</dt>
@@ -56,7 +56,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 </div>
                 <div>
                   <dt>데이터</dt>
-                  <dd className="font-bold text-base-content">Static Artifacts · v{manifest.schema_version}</dd>
+                  <dd className="font-bold text-base-content">기준 데이터 · v{manifest.schema_version}</dd>
                 </div>
                 <div>
                   <dt>리포트 범위</dt>
@@ -71,14 +71,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                   </dd>
                 </div>
                 <div>
-                  <dt>아티팩트</dt>
+                  <dt>파일</dt>
                   <dd className="font-bold text-base-content">
                     {manifest.artifacts.length} files · reports {manifest.row_counts.reports}
                   </dd>
                 </div>
                 <div>
                   <dt>거래</dt>
-                  <dd className="font-bold text-base-content">No live trading</dd>
+                  <dd className="font-bold text-base-content">실시간 매매 아님</dd>
                 </div>
               </dl>
             </div>
@@ -96,13 +96,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               </div>
               <div className="flex flex-wrap items-center justify-end gap-2">
                 <div className="hidden items-center gap-2 text-xs font-semibold text-base-content/55 md:flex">
-                  <span>Snapshot</span>
+                  <span>기준일</span>
                   <span className="rounded-full border border-base-300 bg-base-200/70 px-3 py-1 font-mono font-bold text-base-content">
                     {snapshotDate}
                   </span>
                 </div>
                 <span className="rounded-full border border-success/15 bg-success/10 px-3 py-1 text-xs font-bold text-success">
-                  Static Artifacts · No live trading
+                  기준 데이터 · 실시간 매매 아님
                 </span>
                 <Link className="btn btn-sm btn-outline" href="/reports">
                   About SMIC →
@@ -111,8 +111,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             </header>
             <main>{children}</main>
             <footer className="footer-note footer footer-center bg-base-200 text-base-content/60">
-              SNUSMIC Portfolio Lab · 모든 수치는 커밋된 정적 아티팩트에서 산출되며, 실시간 거래나 외부 데이터 호출은
-              하지 않습니다.
+              SNUSMIC Portfolio Lab · 화면의 수치는 기준 데이터로 계산되며, 실시간 주문이나 매매 기능은 제공하지
+              않습니다.
             </footer>
           </div>
         </div>

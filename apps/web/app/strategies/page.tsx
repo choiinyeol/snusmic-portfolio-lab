@@ -37,7 +37,7 @@ export default function StrategiesPage() {
           { label: '고유 전략', value: selectableRows.length },
           { label: '목표', value: `MDD ≤ ${formatPercent(OBJECTIVE_MAX_DRAWDOWN)}` },
           { label: '수익 기준', value: 'KOSPI 초과' },
-          { label: 'Trading', value: 'No live trading' },
+          { label: '거래', value: '실시간 매매 아님' },
         ]}
         actions={
           <>
