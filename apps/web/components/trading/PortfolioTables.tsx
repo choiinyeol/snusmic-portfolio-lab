@@ -58,6 +58,13 @@ export function PortfolioTables({ holdings, persona, personaLabels, capitalByPer
     [capitalByPersona, holdings, persona, personaLabels, sort, targetsBySymbol],
   );
   const visibleRows = useMemo(() => pageRows(currentRows, page, pageSize), [currentRows, page, pageSize]);
+  const reportHrefBySymbol = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.keys(targetsBySymbol).map((symbol) => [symbol, `/reports/${encodeURIComponent(symbol)}`]),
+      ),
+    [targetsBySymbol],
+  );
   const updateSort = (key: HoldingSortKey) => {
     setSort((current) => ({ key, direction: current.key === key && current.direction === 'desc' ? 'asc' : 'desc' }));
     setPage(0);
@@ -81,7 +88,7 @@ export function PortfolioTables({ holdings, persona, personaLabels, capitalByPer
           <p className="text-base-content/65">
             현재 어떤 종목을 얼마나 들고 있는지, 목표가·시장구분·평단·최근가·미실현 손익을 바로 확인합니다.
           </p>
-          <HoldingsTreemap holdings={currentRows} />
+          <HoldingsTreemap holdings={currentRows} hrefBySymbol={reportHrefBySymbol} />
           <PaginationControls
             page={page}
             pageCount={Math.ceil(currentRows.length / pageSize)}

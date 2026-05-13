@@ -76,6 +76,13 @@ export function PortfolioStrategyView({
   );
   const personaEpisodes = useMemo(() => episodes.filter((row) => row.persona === persona), [episodes, persona]);
   const personaTrades = useMemo(() => trades.filter((row) => row.persona === persona), [trades, persona]);
+  const reportHrefBySymbol = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.keys(targetsBySymbol).map((symbol) => [symbol, `/reports/${encodeURIComponent(symbol)}`]),
+      ),
+    [targetsBySymbol],
+  );
 
   const holdingsValue = personaHoldings.reduce((sum, row) => sum + (row.marketValueKrw ?? 0), 0);
   const totalValue = holdingsValue + cashKrw;
@@ -165,7 +172,7 @@ export function PortfolioStrategyView({
           </div>
           <span className="snapshot-pill">면적=평가액</span>
         </div>
-        <HoldingsTreemap holdings={treemapHoldings} height={360} compact />
+        <HoldingsTreemap holdings={treemapHoldings} height={360} compact hrefBySymbol={reportHrefBySymbol} />
         <p className="mt-3 text-xs leading-5 text-base-content/55">
           매도 후 즉시 다른 종목을 사지 않는 경우는 전략의 리밸런싱/입금 주기, 최대 보유 종목 수, MTT·업사이드·가격
           조건을 동시에 만족하는 후보 부족 때문입니다. 그 구간의 미투자 금액은 현금으로 보존되어 평가액과 트리맵에

@@ -160,6 +160,30 @@ This gate must be shown on strategy comparisons and should drive the default “
 9. **No silent exclusions.** If missing-price, sell-opinion, or instant-listing-hit reports are excluded from validation, expose counts in data quality, but keep the user table focused on actionable rows.
 10. **Interactivity teaches.** Guide/onboarding should use interactive examples, not a static wall of documentation.
 
+## 6.1 Navigation contract
+
+The canonical route/link map lives in `docs/navigation-architecture.md`.
+
+```mermaid
+flowchart LR
+  Overview["Overview /"] --> Portfolio["/portfolio?strategy=:id"]
+  Overview --> ReportDetail["/reports/:symbol"]
+  Portfolio --> ReportDetail
+  Reports["Reports /reports"] --> ReportDetail
+  Screener["Screener /screener"] --> ReportDetail
+  Strategies["Strategies /strategies"] --> Portfolio
+  ReportDetail --> Reports
+  ReportDetail --> Portfolio
+  Guide["Guide /guide"] --> Overview
+```
+
+Navigation rules:
+
+- Strategy and benchmark rows open the selected ledger view: `/portfolio?strategy=:id`.
+- Report rows, screener candidates, trade-basis links, and report-backed heatmap tiles open `/reports/:symbol`.
+- Cash and benchmark-only holdings without a matched report stay non-clickable.
+- Guide links are onboarding shortcuts, not duplicated primary CTAs.
+
 ## 7. Visual language
 
 Light fintech SaaS. White panels, soft blue-gray background, restrained blue/purple accents, strong tabular numbers, compact badges, clear section hierarchy. Avoid dark HTS/Bloomberg clone aesthetics.
@@ -202,7 +226,8 @@ Do not create page-specific duplicates when one shared domain component would ke
 
 The current codebase can evolve through staged cuts rather than a one-shot rewrite:
 
-1. Replace duplicated strategy selectors/tables with shared components.
-2. Collapse remaining top-level raw artifacts into download-only surfaces.
-3. Add the interactive Guide page after the data and taxonomy contracts are stable.
-4. Continue removing primary-page developer copy in favor of user-facing finance language.
+1. Consolidate Reports ranking cards and the Reports table into one preset-driven table.
+2. Replace duplicated strategy selectors/tables with shared components.
+3. Collapse remaining top-level raw artifacts into download-only surfaces.
+4. Keep the interactive Guide page aligned with the navigation contract.
+5. Continue removing primary-page developer copy in favor of user-facing finance language.

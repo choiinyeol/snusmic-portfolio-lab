@@ -1,6 +1,7 @@
 'use client';
 
 import * as d3 from 'd3';
+import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, type PointerEvent } from 'react';
 import type { HoldingRow } from '@/lib/artifacts';
 import { formatKrw, formatNative, formatPercent } from '@/lib/format';
@@ -12,6 +13,7 @@ type Props = {
   showLegend?: boolean;
   showToolbar?: boolean;
   caption?: string;
+  hrefBySymbol?: Record<string, string>;
 };
 
 type LeafDatum = HoldingRow & { weight: number };
@@ -27,8 +29,10 @@ export function HoldingsTreemap({
   compact = false,
   showLegend = true,
   showToolbar = true,
-  caption = '면적 = 평가액, 색 = 미실현 수익률. 호버하면 원장 세부값을 확인합니다.',
+  caption = '면적 = 평가액, 색 = 미실현 수익률. 종목을 선택하면 연결된 리포트 분석으로 이동합니다.',
+  hrefBySymbol,
 }: Props) {
+  const router = useRouter();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const baseCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const overlayCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -115,6 +119,14 @@ export function HoldingsTreemap({
     if (ctx) ctx.clearRect(0, 0, size.width, size.height);
   };
 
+  const handleClick = () => {
+    const target = hoveredRef.current ?? (root?.leaves() as unknown as LeafNode[] | undefined)?.[0] ?? null;
+    if (!target) return;
+    const href = holdingHref(target.data, hrefBySymbol);
+    if (!href) return;
+    router.push(href);
+  };
+
   return (
     <div className="grid gap-2" aria-label="포트폴리오 보유 종목 트리맵">
       {showToolbar ? (
@@ -147,8 +159,17 @@ export function HoldingsTreemap({
           style={{ width: size.width, height: size.height }}
           onPointerMove={handlePointerMove}
           onPointerLeave={handlePointerLeave}
+          onClick={handleClick}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') handleClick();
+          }}
+          tabIndex={0}
+          role="button"
+          aria-label="포트폴리오 보유 종목 트리맵. 연결된 리포트가 있는 종목은 선택하면 상세 분석으로 이동합니다."
         />
-        {tooltip ? <TreemapTooltip tooltip={tooltip} width={size.width} height={size.height} /> : null}
+        {tooltip ? (
+          <TreemapTooltip tooltip={tooltip} width={size.width} height={size.height} hrefBySymbol={hrefBySymbol} />
+        ) : null}
       </div>
       {showLegend ? <TreemapLegend /> : null}
     </div>
@@ -176,14 +197,17 @@ function TreemapTooltip({
   tooltip,
   width,
   height,
+  hrefBySymbol,
 }: {
   tooltip: Exclude<Tooltip, null>;
   width: number;
   height: number;
+  hrefBySymbol?: Record<string, string>;
 }) {
   const row = tooltip.row;
   const left = Math.max(8, Math.min(tooltip.x, width - 260));
   const top = Math.max(8, Math.min(tooltip.y, height - 174));
+  const href = holdingHref(row, hrefBySymbol);
   return (
     <div
       className="pointer-events-none absolute z-10 w-[252px] rounded-2xl border border-base-300 bg-base-100/95 px-3 py-2.5 text-xs shadow-lg backdrop-blur"
@@ -202,6 +226,7 @@ function TreemapTooltip({
         <TooltipLine label="수량" value={formatQuantity(row.qty)} />
         <TooltipLine label="평단(KRW)" value={formatKrw(row.avgCostKrw)} />
         <TooltipLine label="최근가" value={formatNative(row.lastCloseNative, row.currency)} />
+        {href ? <TooltipLine label="동선" value="상세 분석으로 이동" /> : null}
       </dl>
     </div>
   );
@@ -345,4 +370,10 @@ function colorForReturn(ret: number, symbol?: string): string {
 function formatQuantity(value: number | null | undefined): string {
   if (value === null || value === undefined || !Number.isFinite(value)) return '—';
   return value.toLocaleString('ko-KR', { maximumFractionDigits: 4 });
+}
+
+function holdingHref(row: HoldingRow, hrefBySymbol: Record<string, string> | undefined): string | null {
+  if (hrefBySymbol) return hrefBySymbol[row.symbol] ?? null;
+  if (!row.symbol || row.symbol === 'CASH') return null;
+  return `/reports/${encodeURIComponent(row.symbol)}`;
 }

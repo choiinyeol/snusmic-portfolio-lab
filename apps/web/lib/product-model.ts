@@ -79,6 +79,10 @@ export type StrategyLeaderboardRow = {
   href: string;
 };
 
+export function portfolioStrategyHref(strategyId: string): string {
+  return `/portfolio?strategy=${encodeURIComponent(strategyId)}`;
+}
+
 export type ResearchCandidate = {
   report: ReportRow;
   rankBasis: string;
@@ -274,7 +278,7 @@ function strategyRowFromSummary(
     sellRules: catalog?.sellRules ?? [],
     riskControls: catalog?.riskControls ?? [],
     params: catalog?.params ?? {},
-    href: '/portfolio',
+    href: portfolioStrategyHref(summary.persona),
   };
 }
 
