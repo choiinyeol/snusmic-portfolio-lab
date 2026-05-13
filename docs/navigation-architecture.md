@@ -6,12 +6,12 @@ Last updated: 2026-05-13
 
 ```mermaid
 flowchart LR
-  Sidebar[Global navigation] --> Overview["Overview /"]
-  Sidebar --> Portfolio["Portfolio /portfolio"]
-  Sidebar --> Reports["Reports /reports"]
-  Sidebar --> Strategies["Strategies /strategies"]
-  Sidebar --> Screener["Screener /screener"]
-  Sidebar --> Guide["Guide /guide"]
+  Sidebar[Global navigation] --> Overview["스냅샷 /"]
+  Sidebar --> Portfolio["포트폴리오 /portfolio"]
+  Sidebar --> Reports["리포트 검증 /reports"]
+  Sidebar --> Strategies["전략 비교 /strategies"]
+  Sidebar --> Screener["후보 탐색 /screener"]
+  Sidebar --> Guide["읽는 법 /guide"]
 
   Overview -->|current/best strategy| PortfolioStrategy["/portfolio?strategy=:id"]
   Overview -->|recent reports| ReportDetail["/reports/:symbol"]
@@ -41,7 +41,7 @@ flowchart LR
 
 ## Link Rules
 
-1. **One route, one job.** `/portfolio` owns selected strategy ledgers; `/reports/:symbol` owns stock/report detail analysis.
+1. **One route, one job.** `/` is the snapshot board; `/portfolio` owns selected strategy ledgers; `/reports/:symbol` owns stock/report detail analysis.
 2. **Rows choose the most specific destination.** Strategy rows go to `/portfolio?strategy=:id`; report, screener, trade-basis, and report-backed holding rows go to `/reports/:symbol`.
 3. **Heatmaps are drill-down surfaces.** A clickable holding tile opens the latest available report detail for that symbol. Cash and non-report benchmark holdings stay non-clickable.
 4. **Ranking views do not create new destinations.** Ranking presets change sort/filter state over the unified Reports table, then rows still open `/reports/:symbol`.

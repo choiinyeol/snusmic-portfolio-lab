@@ -26,14 +26,15 @@ Last updated: 2026-05-13
 Deep interview 결과, 프론트엔드는 다음 1차 내비게이션 흐름으로 고정한다.
 
 ```text
-Overview → Portfolio → Reports → Strategies → Screener
+스냅샷(/) → 포트폴리오(/portfolio) → 리포트 검증(/reports) → 전략 비교(/strategies) → 후보 탐색(/screener) → 읽는 법(/guide)
 ```
 
-- **Overview**: 30초 안에 프로젝트 개요, 현재 포트폴리오, 우수 전략, 최근 리포트를 이해시키는 executive summary.
-- **Portfolio**: 보유/원장/포지션 생애주기/리포트 근거.
-- **Reports**: 리포트 발간 후 가격 경로, 목표가 진행률, 적중/실패 통계를 하나의 공유 컬럼 테이블에서 정렬·필터링.
-- **Strategies**: 벤치마크 세트와 고유 원장형 전략을 분리해 수익률, Sharpe, Sortino, MDD, 벤치마크 아웃퍼폼을 비교.
-- **Screener**: 리포트 기반 후보 탐색. 전략 매수 신호나 포트폴리오 액션 추천이 아니라, 최근성/업사이드/목표 진행률/미도달·미만료 상태만으로 설명 가능한 후보를 보여준다.
+- **스냅샷**: 30초 안에 프로젝트 개요, 현재 포트폴리오, 우수 전략, 최근 리포트를 이해시키는 executive summary.
+- **포트폴리오**: 보유/원장/포지션 생애주기/리포트 근거.
+- **리포트 검증**: 리포트 발간 후 가격 경로, 목표가 진행률, 적중/실패 통계를 하나의 공유 컬럼 테이블에서 정렬·필터링.
+- **전략 비교**: 벤치마크 세트와 고유 원장형 전략을 분리해 수익률, Sharpe, Sortino, MDD, 벤치마크 아웃퍼폼을 비교.
+- **후보 탐색**: 리포트 기반 후보 탐색. 전략 매수 신호나 포트폴리오 액션 추천이 아니라, 최근성/업사이드/목표 진행률/미도달·미만료 상태만으로 설명 가능한 후보를 보여준다.
+- **읽는 법**: 데이터 생성 방식, 제한, 용어, 읽기 전용 성격을 설명한다.
 
 명시적 비목표:
 
@@ -332,7 +333,7 @@ Overview → Portfolio → Reports → Strategies → Screener
 
 - Next.js는 `data/web`만 읽기
 - `data/sim/*.csv` 직접 참조 제거
-- 필요한 trades/equity/monthly holdings를 Python export 단계에서 `data/web/*.json`으로 생성
+- 필요한 trades/equity/monthly holdings를 Python export 단계에서 `data/web/portfolio/*.json`으로 생성
 
 이유:
 
@@ -443,7 +444,7 @@ gh workflow run sync.yml --ref main -f report_pages=auto -f force_full=true
 - `compute_report_performance`의 평가 윈도우는 `[pub_date, min(end, pub_date + 730d)]`로 캡됨
 - `current_return` / `peak_return` / `trough_return` / `last_close_*` 는 만료일 종가에 동결됨
 - `target_hit_date` 는 만료 윈도우 내에서만 인정 (이후 도달은 무시)
-- `expired: true`, `expiry_date` 가 `data/web/reports.json` 에 노출됨
+- `expired: true`, `expiry_date` 가 `data/web/reports/table.json` 에 노출됨
 - SMIC follower v1·v2 는 만료된 리포트의 보유 종목을 만료일 종가에 자동 청산
   (`stop_loss_report_age` reason). 새 리포트가 다시 나오기 전엔 재진입 불가.
 

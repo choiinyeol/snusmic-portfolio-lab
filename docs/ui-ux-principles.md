@@ -35,21 +35,22 @@ Implementation words such as `Static Artifacts`, `canonical`, `schema`, `data/we
 
 ## 2. Information architecture ownership
 
-Primary navigation stays:
+Primary navigation follows the current app shell labels:
 
 ```text
-Overview → Portfolio → Reports → Strategies → Screener
+스냅샷(/) → 포트폴리오(/portfolio) → 리포트 검증(/reports) → 전략 비교(/strategies) → 후보 탐색(/screener) → 읽는 법(/guide)
 ```
 
 Each page owns one product question:
 
 | Page | User question | UI responsibility |
 | --- | --- | --- |
-| Overview | “30초 안에 지금 상태가 좋은가?” | Project status, current portfolio, best strategy, latest research, key risks. |
-| Portfolio | “무엇을 어떻게 샀고 지금 원장은 어떤가?” | Persona selector, holdings, trades, position lifecycle, report basis. |
-| Reports | “리포트가 실제로 맞았나?” | Target-price validation, post-publication return, hit status, unified sortable table. |
-| Strategies | “어떤 고유 전략이 기준선을 이겼나?” | Benchmark set vs selectable broker-ledger strategies, MWR/MDD/Sharpe/Sortino, benchmark excess. |
-| Screener | “지금 검토할 리서치 후보는 무엇인가?” | Explainable report-derived candidate filters, not a black-box score. |
+| 스냅샷 | “30초 안에 지금 상태가 좋은가?” | Project status, current portfolio, best strategy, latest research, key risks. |
+| 포트폴리오 | “무엇을 어떻게 샀고 지금 원장은 어떤가?” | Persona selector, holdings, trades, position lifecycle, report basis. |
+| 리포트 검증 | “리포트가 실제로 맞았나?” | Target-price validation, post-publication return, hit status, unified sortable table. |
+| 전략 비교 | “어떤 고유 전략이 기준선을 이겼나?” | Benchmark set vs selectable broker-ledger strategies, MWR/MDD/Sharpe/Sortino, benchmark excess. |
+| 후보 탐색 | “지금 검토할 리서치 후보는 무엇인가?” | Explainable report-derived candidate filters, not a black-box score. |
+| 읽는 법 | “이 데이터를 어떻게 해석해야 하나?” | Methodology, caveats, navigation shortcuts, and read-only framing. |
 
 A page should not duplicate another page's primary job. Link out instead.
 
@@ -140,7 +141,7 @@ Before shipping frontend UI changes, verify:
 - [ ] App still says `SNUSMIC Portfolio Lab`.
 - [ ] No user-facing “Terminal” framing was introduced.
 - [ ] Primary copy says read-only/basis data in user language, not developer artifact language.
-- [ ] Overview answers the product state in about 30 seconds.
+- [ ] 스냅샷 화면이 제품 상태를 약 30초 안에 설명한다.
 - [ ] Tables with scale have sorting/filtering/pagination or a documented fixed-preview reason.
 - [ ] Shared data is unified through tabs/filters, not duplicated into conflicting views.
 - [ ] No external realtime data fetches were introduced.
