@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { ReturnSeries } from '@/components/charts/CumulativeReturnChart';
-import { SeriesToggleChart } from '@/components/charts/SeriesToggleChart';
+import { PerformanceChartPanel } from '@/components/charts/PerformanceChartPanel';
 import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
 import { StrategyRiskTable } from '@/components/trading/StrategyRiskTable';
 import { StrategySelector } from '@/components/trading/StrategySelector';
@@ -143,14 +143,11 @@ export default function OverviewPage() {
           </div>
         }
       >
-        <article className="lab-panel p-3 md:p-4">
-          <div className="mb-3 flex flex-wrap gap-2 text-xs">
-            <span className="snapshot-pill">벤치마크 {benchmarkRows.length}</span>
-            <span className="snapshot-pill">선택 전략 {selectableRows.length}</span>
-            <span className="snapshot-pill">목표: MDD 15% 이하 · KOSPI 초과</span>
-          </div>
-          <SeriesToggleChart series={chartSeries} />
-        </article>
+        <PerformanceChartPanel
+          benchmarkCount={benchmarkRows.length}
+          series={chartSeries}
+          strategyCount={selectableRows.length}
+        />
       </Section>
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(360px,.72fr)]">

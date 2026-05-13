@@ -144,15 +144,21 @@ class ProphetConfig(_PersonaBase):
 
 
 class WeakProphetConfig(_PersonaBase):
-    """Short-horizon look-ahead max-Sharpe benchmark."""
+    """Forward-looking max-Sharpe oracle benchmark.
+
+    It is deliberately stronger than realistic strategies: the benchmark can
+    see a future return window and concentrate in the names that the optimizer
+    prefers. The web catalog marks it as ``oracle`` so it is never presented as
+    a tradable strategy.
+    """
 
     persona_name: Literal["weak_oracle"] = "weak_oracle"
-    label: str = "Weak Prophet (6M look-ahead)"
-    lookahead_months: Annotated[int, Field(ge=1, le=24)] = 6
-    risk_free_rate: Annotated[float, Field(ge=0.0, le=0.20)] = 0.03
-    max_weight: Annotated[float, Field(gt=0.0, le=1.0)] = 0.40
+    label: str = "Weak Prophet (3M oracle)"
+    lookahead_months: Annotated[int, Field(ge=1, le=24)] = 3
+    risk_free_rate: Annotated[float, Field(ge=0.0, le=0.20)] = 0.0
+    max_weight: Annotated[float, Field(gt=0.0, le=1.0)] = 1.0
     rebalance: Literal["monthly", "quarterly"] = "monthly"
-    min_history_days: Annotated[int, Field(ge=20, le=252)] = 60
+    min_history_days: Annotated[int, Field(ge=20, le=252)] = 20
 
 
 class SmicFollowerConfig(_PersonaBase):
@@ -290,10 +296,11 @@ class SimulationConfig(_FrozenModel):
         SmicFollowerConfig(),
         SmicFollowerV2Config(label="SMIC Follower (SL)"),
         WeakProphetConfig(
-            label="Weak Prophet (6M look-ahead)",
-            lookahead_months=6,
-            max_weight=0.40,
-            min_history_days=60,
+            label="Weak Prophet (3M oracle)",
+            lookahead_months=3,
+            risk_free_rate=0.0,
+            max_weight=1.0,
+            min_history_days=20,
         ),
     )
     seed: int = 42  # used only for tie-breaking; the engine itself is deterministic.

@@ -107,7 +107,6 @@ uv run python -m snusmic_pipeline export-web --warehouse data/warehouse --sim da
 ### `data/sim`
 
 - `summary.csv`: 페르소나별 최종 성과, 현금, 보유 평가액
-- `broker_strategy_trials.csv`: 원장형 MTT 후보의 평가 결과와 승격/제외 사유
 - `equity_daily.csv`: 일별 mark-to-market 곡선
 - `trades.csv`: 매수/매도 체결 원장
 - `current_holdings.csv`: 마지막 영업일 보유 포지션

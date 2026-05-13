@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { ReturnSeries } from '@/components/charts/CumulativeReturnChart';
-import { SeriesToggleChart } from '@/components/charts/SeriesToggleChart';
+import { PerformanceChartPanel } from '@/components/charts/PerformanceChartPanel';
 import { StrategyRiskTable } from '@/components/trading/StrategyRiskTable';
 import { KpiTile } from '@/components/ui/KpiTile';
 import { PageHero } from '@/components/ui/PageHero';
@@ -98,16 +98,11 @@ export default function StrategiesPage() {
       </Section>
 
       <Section eyebrow="성과 경로" title="벤치마크 세트와 고유 전략의 누적 수익률">
-        <article className="card border border-base-300 bg-base-100 shadow-sm">
-          <div className="card-body gap-3 p-3 md:p-4">
-            <div className="flex flex-wrap gap-2 text-xs">
-              <span className="snapshot-pill">벤치마크 {BENCHMARK_IDS.length}</span>
-              <span className="snapshot-pill">고유 전략 {selectableRows.length}</span>
-              <span className="snapshot-pill">목표: MDD 15% 이하 · KOSPI 초과</span>
-            </div>
-            <SeriesToggleChart series={chartSeries} />
-          </div>
-        </article>
+        <PerformanceChartPanel
+          benchmarkCount={BENCHMARK_IDS.length}
+          series={chartSeries}
+          strategyCount={selectableRows.length}
+        />
       </Section>
 
       <Section

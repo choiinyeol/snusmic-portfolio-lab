@@ -140,7 +140,7 @@ def main() -> int:
     if not args.disable_broker_strategy_search:
         print(
             "Searching broker-ledger SMIC MTT strategies with Optuna "
-            f"({args.broker_strategy_trials} trials, top {args.broker_strategy_top})"
+            f"({args.broker_strategy_trials} evaluations, promotion limit {args.broker_strategy_top})"
         )
         baseline_result = run_simulation(
             config,
@@ -170,12 +170,11 @@ def main() -> int:
             top_n=args.broker_strategy_top,
             seed=args.broker_strategy_seed,
         )
-        _to_csv_rounded(search.trial_rows, out / "broker_strategy_trials.csv")
         if len(search.configs) < args.broker_strategy_top:
             print(
                 "Promoted "
                 f"{len(search.configs)}/{args.broker_strategy_top} broker-ledger strategies; "
-                "non-qualifying candidates remain in broker_strategy_trials.csv."
+                "non-qualifying candidate rows are intentionally not exported."
             )
         config = config.model_copy(update={"personas": (*config.personas, *search.configs)})
 

@@ -64,7 +64,7 @@ export default function GuidePage() {
         }
       />
 
-      <Section eyebrow="Interactive Tutorial" title="3D Lab Guide">
+      <Section eyebrow="사용 흐름" title="Portfolio Lab을 읽는 순서">
         <GuideExperience />
       </Section>
 

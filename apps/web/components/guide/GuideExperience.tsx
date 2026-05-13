@@ -90,7 +90,7 @@ export function GuideExperience() {
     <div className="grid gap-5">
       <section className="guide-hero-3d lab-panel p-4 md:p-5" aria-label="Portfolio Lab interactive overview">
         <div className="guide-hero-copy">
-          <span className="snapshot-pill">Interactive guide</span>
+          <span className="snapshot-pill">따라 해보기</span>
           <h2>Portfolio Lab을 읽는 방법</h2>
           <p>
             이 페이지는 튜토리얼입니다. 포트폴리오, 리포트, 전략 화면에서 어떤 질문을 던져야 하는지 예시로 보여줍니다.
@@ -121,7 +121,7 @@ export function GuideExperience() {
 
       <section className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(320px,.95fr)]">
         <article className="lab-panel p-4 md:p-5">
-          <div className="lab-panel__eyebrow">Lab Flow</div>
+          <div className="lab-panel__eyebrow">화면 흐름</div>
           <h2 className="mt-1 text-xl font-black tracking-[-0.04em]">클릭해서 화면별 목적 보기</h2>
           <div className="guide-step-tabs" role="tablist" aria-label="Guide sections">
             {LAB_STEPS.map((item) => (
@@ -163,7 +163,7 @@ export function GuideExperience() {
         </article>
 
         <article className="guide-tilt-card lab-panel p-4 md:p-5">
-          <div className="lab-panel__eyebrow">3D Mental Model</div>
+          <div className="lab-panel__eyebrow">해석 구조</div>
           <h2 className="mt-1 text-xl font-black tracking-[-0.04em]">세 레이어로 해석하세요</h2>
           <div className="guide-stack" aria-label="Three layer model">
             <div className="guide-stack__layer guide-stack__layer--top">

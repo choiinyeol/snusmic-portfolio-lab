@@ -18,6 +18,7 @@ data/sim/equity_daily.csv
 data/sim/trades.csv
 data/sim/personas.json
 data/sim/monthly_holdings.csv
+data/sim/broker_strategy_trials.csv
 .omc/
 apps/web/.next/
 apps/web/node_modules/
