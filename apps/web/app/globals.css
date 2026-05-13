@@ -389,7 +389,7 @@ main { width: min(100% - clamp(1rem, 3vw, 2rem), 1500px); margin: 0 auto; paddin
 
 .command-kpi-strip {
   display: grid;
-  grid-template-columns: repeat(7, minmax(160px, 1fr));
+  grid-template-columns: repeat(8, minmax(150px, 1fr));
   gap: .8rem;
   margin-top: var(--space-4);
 }
