@@ -10,12 +10,20 @@ import { StrategySelector, type StrategySelectorOption } from '@/components/trad
 import { TradesTable } from '@/components/trading/TradesTable';
 import { KpiTile } from '@/components/ui/KpiTile';
 import { Tabs } from '@/components/ui/Tabs';
-import type { EquityPoint, HoldingRow, PositionEpisodeRow, ReportTargetDigest, TradeRow } from '@/lib/artifacts';
+import type {
+  AccountingReconciliationRow,
+  EquityPoint,
+  HoldingRow,
+  PositionEpisodeRow,
+  ReportTargetDigest,
+  TradeRow,
+} from '@/lib/artifacts';
 import { formatKrw, formatPercent } from '@/lib/format';
 import type { StrategyLeaderboardRow } from '@/lib/product-model';
 
 type Props = {
   holdings: HoldingRow[];
+  accounting: AccountingReconciliationRow[];
   equity: EquityPoint[];
   trades: TradeRow[];
   episodes: PositionEpisodeRow[];
@@ -39,6 +47,7 @@ const URL_STRATEGY_PARAM = 'strategy';
 
 export function PortfolioStrategyView({
   holdings,
+  accounting,
   equity,
   trades,
   episodes,
@@ -81,6 +90,7 @@ export function PortfolioStrategyView({
   );
   const personaEpisodes = useMemo(() => episodes.filter((row) => row.persona === persona), [episodes, persona]);
   const personaTrades = useMemo(() => trades.filter((row) => row.persona === persona), [trades, persona]);
+  const personaAccounting = useMemo(() => accounting.find((row) => row.persona === persona), [accounting, persona]);
   const reportHrefBySymbol = useMemo(
     () =>
       Object.fromEntries(
@@ -110,7 +120,7 @@ export function PortfolioStrategyView({
             </span>
           </div>
           <StrategySelector
-            ariaLabel="원장 전략 선택"
+            ariaLabel="포트폴리오 전략 선택"
             onChange={setPersona}
             options={strategyOptions}
             value={persona}
@@ -118,7 +128,7 @@ export function PortfolioStrategyView({
         </div>
         <p className="m-0 mt-2 text-xs text-base-content/55">
           <strong className="text-base-content">{personaLabels[persona] ?? persona}</strong>의 보유·현금·체결·매수/매도
-          규칙을 함께 봅니다. 기준선과 상한선은 비교용이고, 고유 전략만 선택해 검토할 수 있는 원장입니다.
+          규칙을 함께 봅니다. 기준선과 상한선은 비교용이고, 고유 전략만 선택해 검토할 수 있는 포트폴리오 전략입니다.
         </p>
       </div>
 
@@ -141,7 +151,7 @@ export function PortfolioStrategyView({
         />
         <KpiTile
           compact
-          label="실현 손익"
+          label="확정 손익"
           value={formatKrw(realizedPnl)}
           delta={`${closedCount}건 청산`}
           tone={realizedPnl >= 0 ? 'good' : 'bad'}
@@ -155,6 +165,8 @@ export function PortfolioStrategyView({
       </div>
 
       <PortfolioAnalyticsPanel equity={equity} persona={persona} rows={strategyRows} personaLabels={personaLabels} />
+
+      <AccountingExplanationPanel row={personaAccounting} />
 
       <article className="lab-panel p-3 md:p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
@@ -209,7 +221,7 @@ export function PortfolioStrategyView({
           },
           {
             id: 'trades',
-            label: '체결 원장',
+            label: '매매내역',
             meta: personaTrades.length.toString(),
             content: (
               <TradesTable
@@ -251,6 +263,67 @@ function StrategyMethodPanel({
         <RuleList title="위험 관리" items={method.riskControls} />
       </div>
     </article>
+  );
+}
+
+function AccountingExplanationPanel({ row }: { row: AccountingReconciliationRow | undefined }) {
+  if (!row) return null;
+  const realizedOverCash = (row.realizedPnlKrw ?? 0) > (row.finalCashKrw ?? 0);
+  return (
+    <article className="lab-panel p-4">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_28rem] xl:items-start">
+        <div>
+          <div className="lab-panel__eyebrow">현금 검산</div>
+          <h2 className="lab-panel__title">확정 손익과 현금은 같은 숫자가 아닙니다</h2>
+          <p className="mt-2 text-sm leading-6 text-base-content/65">
+            {row.explanationKo} 이 검산은 저장된 매매내역과 현재 보유 포지션을 이용해 만든 파생 데이터입니다. 현금은
+            “입금액 + 실현손익 − 아직 들고 있는 주식의 매입 원가”로 다시 계산하며, 평가액은 현금과 보유 주식의 현재
+            가치가 합쳐진 값입니다.
+          </p>
+          {realizedOverCash ? (
+            <p className="mt-2 text-sm leading-6 text-base-content/65">
+              따라서 MTT #22처럼 확정 손익이 약 {formatKrw(row.realizedPnlKrw)}인데 현금이 {formatKrw(row.finalCashKrw)}
+              로 보이는 상황은, 약 {formatKrw(row.openCostBasisKrw)}가 현재 보유 종목의 원가로 묶여 있으면 회계적으로
+              자연스럽습니다.
+            </p>
+          ) : null}
+        </div>
+        <dl className="grid gap-2 rounded-xl border border-base-300 bg-base-100 p-3 text-sm">
+          <AccountingLine label="입금 누계" value={row.totalContributedKrw} />
+          <AccountingLine label="+ 확정 손익" value={row.realizedPnlKrw} />
+          <AccountingLine label="- 보유 원가" value={row.openCostBasisKrw === null ? null : -row.openCostBasisKrw} />
+          <AccountingLine label="= 계산 현금" value={row.expectedCashKrw} strong />
+          <AccountingLine label="표시 현금" value={row.finalCashKrw} />
+          <AccountingLine
+            label="검산 차이"
+            value={row.cashGapKrw}
+            tone={Math.abs(row.cashGapKrw ?? 0) > 5000 ? 'bad' : 'good'}
+          />
+        </dl>
+      </div>
+    </article>
+  );
+}
+
+function AccountingLine({
+  label,
+  value,
+  strong,
+  tone,
+}: {
+  label: string;
+  value: number | null;
+  strong?: boolean;
+  tone?: 'good' | 'bad';
+}) {
+  const color = tone === 'bad' ? 'text-error' : tone === 'good' ? 'text-success' : 'text-base-content';
+  return (
+    <div className="flex items-center justify-between gap-3 border-b border-base-200 pb-2 last:border-b-0 last:pb-0">
+      <dt className="text-base-content/55">{label}</dt>
+      <dd className={`font-mono tabular-nums ${strong ? 'font-black' : 'font-semibold'} ${color}`}>
+        {formatKrw(value)}
+      </dd>
+    </div>
   );
 }
 

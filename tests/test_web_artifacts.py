@@ -192,6 +192,44 @@ def test_holdings_artifact_exposes_native_currency_for_foreign_positions(tmp_pat
     assert qqq["last_close_krw"] > 100_000
 
 
+def test_holdings_are_rebuilt_from_open_position_episodes_for_all_personas(tmp_path: Path) -> None:
+    out = tmp_path / "web"
+    export_web_artifacts(
+        ExportInputs(
+            warehouse=Path("data/warehouse"),
+            sim=Path("data/sim"),
+            out=out,
+            extraction_quality=Path("data/extraction_quality.json"),
+        )
+    )
+
+    holdings = json.loads((out / "current-holdings.json").read_text(encoding="utf-8"))
+    mtt22 = [row for row in holdings if row["persona"] == "smic_mtt_strategy_top22"]
+    assert len(mtt22) == 1
+    assert mtt22[0]["symbol"] == "187790.KS"
+    assert mtt22[0]["market_value_krw"] == pytest.approx(157_109_820.0)
+
+
+def test_accounting_reconciliation_explains_mtt22_cash_vs_realized_pnl(tmp_path: Path) -> None:
+    out = tmp_path / "web"
+    export_web_artifacts(
+        ExportInputs(
+            warehouse=Path("data/warehouse"),
+            sim=Path("data/sim"),
+            out=out,
+            extraction_quality=Path("data/extraction_quality.json"),
+        )
+    )
+
+    rows = json.loads((out / "portfolio" / "accounting-reconciliation.json").read_text(encoding="utf-8"))
+    mtt22 = next(row for row in rows if row["persona"] == "smic_mtt_strategy_top22")
+    assert mtt22["status"] == "ok"
+    assert mtt22["realized_pnl_krw"] > mtt22["final_cash_krw"]
+    assert mtt22["open_cost_basis_krw"] > 150_000_000
+    assert abs(mtt22["cash_gap_krw"]) < 5_000
+    assert "매입 원가" in mtt22["explanation_ko"]
+
+
 def test_price_artifacts_keep_asset_prices_native_and_krw_for_valuation_only(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(

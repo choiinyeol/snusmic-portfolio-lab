@@ -22,7 +22,7 @@ export default function GuidePage() {
     ['목표가 도달', `${reportStats.hitCount}/${reportStats.total}`, `도달률 ${formatPercent(reportStats.hitRate)}`],
     ['목표 근접', `${reportStats.nearTargetCount}/${reportStats.activeCount}`, '미도달 활성 표본 중 80%+ 진행'],
     ['손실 군집', `${reportStats.deepLoserCount}건`, '현재 수익률 -20% 이하'],
-    ['기본 원장', portfolio.label, `${portfolio.holdingCount}종목 · 현금 ${formatPercent(portfolio.cashWeight)}`],
+    ['기본 포트폴리오', portfolio.label, `${portfolio.holdingCount}종목 · 현금 ${formatPercent(portfolio.cashWeight)}`],
   ];
 
   return (
@@ -49,7 +49,7 @@ export default function GuidePage() {
               </Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link href="/portfolio">원장 보기</Link>
+              <Link href="/portfolio">포트폴리오 보기</Link>
             </Button>
           </div>
         </div>
@@ -108,8 +108,8 @@ export default function GuidePage() {
         </div>
       </section>
 
-      <section className="grid gap-3" aria-label="전략 원장">
-        <SectionHeader eyebrow="전략 원장" title="벤치마크를 이겼는지, 위험을 얼마 냈는지" />
+      <section className="grid gap-3" aria-label="전략 포트폴리오">
+        <SectionHeader eyebrow="전략 포트폴리오" title="벤치마크를 이겼는지, 위험을 얼마 냈는지" />
         <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
           <StrategyRow
             label="상위 고유 전략"
@@ -118,10 +118,10 @@ export default function GuidePage() {
             detail="수익률만 높다고 좋은 전략이 아닙니다. MDD, Sharpe, 체결 수, 현금 대기까지 같이 봅니다."
           />
           <StrategyRow
-            label="기본 검토 원장"
+            label="기본 검토 포트폴리오"
             name={portfolio.label}
             metric={`MWR ${formatPercent(follower?.returnPct)} · 보유 ${portfolio.holdingCount}개`}
-            detail="현재 기본 원장은 실제 보유 종목을 보여줘야 합니다. 트리맵이 현금뿐이면 데이터 선택/기본값 문제로 간주합니다."
+            detail="현재 기본 포트폴리오는 실제 보유 종목을 보여줘야 합니다. 트리맵이 현금뿐이면 데이터 선택/기본값 문제로 간주합니다."
           />
           <StrategyRow
             label="시장 기준선"

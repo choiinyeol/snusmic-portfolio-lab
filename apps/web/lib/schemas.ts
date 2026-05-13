@@ -132,6 +132,27 @@ export const WebPersonaSchema = z
   })
   .passthrough();
 
+export const AccountingReconciliationRowSchema = z
+  .object({
+    persona: z.string(),
+    label: z.string().optional(),
+    total_contributed_krw: NullableNumber,
+    realized_pnl_krw: NullableNumber,
+    final_cash_krw: NullableNumber,
+    open_cost_basis_krw: NullableNumber,
+    open_market_value_krw: NullableNumber,
+    unrealized_pnl_krw: NullableNumber,
+    final_equity_krw: NullableNumber,
+    net_profit_krw: NullableNumber,
+    expected_cash_krw: NullableNumber,
+    cash_gap_krw: NullableNumber,
+    equity_gap_krw: NullableNumber,
+    profit_gap_krw: NullableNumber,
+    status: z.enum(['ok', 'warning']),
+    explanation_ko: z.string(),
+  })
+  .passthrough();
+
 const WebReportCountsSchema = z
   .object({
     extracted_reports: z.number().optional(),

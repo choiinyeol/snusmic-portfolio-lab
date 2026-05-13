@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {
   ArtifactManifestSchema,
+  AccountingReconciliationRowSchema,
   CompactEquityArtifactSchema,
   CompactTableArtifactSchema,
   parseArtifact,
@@ -180,6 +181,25 @@ export type SummaryRow = {
   moneyWeightedReturn?: number | null;
   maxDrawdown: number | null;
   tradeCount: number | null;
+};
+
+export type AccountingReconciliationRow = {
+  persona: string;
+  label?: string;
+  totalContributedKrw: number | null;
+  realizedPnlKrw: number | null;
+  finalCashKrw: number | null;
+  openCostBasisKrw: number | null;
+  openMarketValueKrw: number | null;
+  unrealizedPnlKrw: number | null;
+  finalEquityKrw: number | null;
+  netProfitKrw: number | null;
+  expectedCashKrw: number | null;
+  cashGapKrw: number | null;
+  equityGapKrw: number | null;
+  profitGapKrw: number | null;
+  status: 'ok' | 'warning';
+  explanationKo: string;
 };
 export type DataQuality = {
   extractedReports: number;
@@ -662,6 +682,32 @@ export function getSummaryRows(): SummaryRow[] {
       tradeCount: num(row.trade_count),
     })) ?? []
   );
+}
+
+export function getAccountingReconciliations(): AccountingReconciliationRow[] {
+  const raw = parseRows(
+    'portfolio/accounting-reconciliation.json',
+    AccountingReconciliationRowSchema,
+    readRequiredJson<unknown>('data/web/portfolio/accounting-reconciliation.json'),
+  );
+  return raw.map((row) => ({
+    persona: row.persona,
+    label: row.label,
+    totalContributedKrw: row.total_contributed_krw,
+    realizedPnlKrw: row.realized_pnl_krw,
+    finalCashKrw: row.final_cash_krw,
+    openCostBasisKrw: row.open_cost_basis_krw,
+    openMarketValueKrw: row.open_market_value_krw,
+    unrealizedPnlKrw: row.unrealized_pnl_krw,
+    finalEquityKrw: row.final_equity_krw,
+    netProfitKrw: row.net_profit_krw,
+    expectedCashKrw: row.expected_cash_krw,
+    cashGapKrw: row.cash_gap_krw,
+    equityGapKrw: row.equity_gap_krw,
+    profitGapKrw: row.profit_gap_krw,
+    status: row.status,
+    explanationKo: row.explanation_ko,
+  }));
 }
 
 export function getDataQuality(): DataQuality {

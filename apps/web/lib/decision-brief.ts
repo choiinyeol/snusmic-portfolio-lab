@@ -149,8 +149,8 @@ function buildDecisionItems({
     const trade = recentBuys[0];
     items.push({
       id: `trade-${trade.date}-${trade.symbol}`,
-      title: `${trade.symbol} 최근 원장 체결`,
-      label: '원장 확인',
+      title: `${trade.symbol} 최근 매매`,
+      label: '매매 확인',
       reason: `${formatDateKo(trade.date)} 체결 기록입니다. 실시간 주문 신호가 아닙니다.`,
       metric: formatKrw(trade.grossKrw),
       href: `/reports/${encodeURIComponent(trade.symbol)}`,
@@ -196,7 +196,7 @@ function buildChanges({
       href: `/reports/${encodeURIComponent(report.symbol)}`,
     })),
     ...recentBuys.slice(0, 1).map((trade) => ({
-      title: `${trade.symbol} 원장 체결`,
+      title: `${trade.symbol} 매매 기록`,
       caption: `${formatDateKo(trade.date)} · ${formatKrw(trade.grossKrw)}`,
       href: `/reports/${encodeURIComponent(trade.symbol)}`,
     })),

@@ -21,7 +21,7 @@ export default function ScreenerPage() {
     ['목표가 도달률', formatPercent(stats.targetHitRate), `${stats.hitCount}/${stats.total}건`],
     ['평균 목표 진행', formatPercent(stats.averageTargetProgress), '진행 중 포함'],
     ['현재 플러스', formatPercent(stats.positiveReturnRate), `${stats.positiveReturnCount}개 리포트`],
-    ['최신 발간', formatDateKo(stats.latestPublicationDate), '정적 스냅샷 기준'],
+    ['최신 발간', formatDateKo(stats.latestPublicationDate), '저장 데이터 기준'],
   ];
 
   return (

@@ -242,5 +242,5 @@ function humanReason(reason: string): string {
 function sourceLabel(source: DecisionRow['targetSource']): string {
   if (source === 'trade_report') return '리포트 근거';
   if (source === 'latest_symbol_report') return '최신 리포트 목표가 참고';
-  return '원장 체결';
+  return '매매 기록';
 }

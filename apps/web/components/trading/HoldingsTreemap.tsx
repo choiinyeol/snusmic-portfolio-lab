@@ -186,7 +186,7 @@ function TreemapEmptyState({ height }: { height: number }) {
         <div className="mx-auto mb-3 grid h-10 w-10 place-items-center rounded-2xl bg-primary/10 text-primary">▦</div>
         <h3 className="text-base font-black tracking-[-0.02em]">표시할 보유 종목이 없습니다</h3>
         <p className="mt-2 text-sm text-base-content/60">
-          선택된 원장에 평가액이 있는 포지션이 생성되면 면적 기반 트리맵으로 표시됩니다.
+          선택한 전략에 평가액이 있는 포지션이 생성되면 면적 기반 트리맵으로 표시됩니다.
         </p>
       </div>
     </div>

@@ -6,14 +6,14 @@ import { formatKrw, formatPercent } from '@/lib/format';
 import { getExecutiveOverview } from '@/lib/product-model';
 
 const principles = [
-  '정적 스냅샷으로 리포트 목표가와 원장 체결을 대조',
+  '저장된 데이터로 리포트 목표가와 실제 매매를 대조',
   '전략 성과, 낙폭, 현금 대기를 같은 기준으로 비교',
   '불완전한 데이터와 제외 사유를 후보보다 먼저 노출',
 ];
 
 const links = [
-  { href: '/snapshot', label: '스냅샷', caption: '오늘 확인할 검토 대기열', icon: ShieldCheck },
-  { href: '/portfolio', label: '원장', caption: '보유·현금·체결 근거', icon: BarChart3 },
+  { href: '/main', label: '메인화면', caption: '오늘 확인할 검토 대기열', icon: ShieldCheck },
+  { href: '/portfolio', label: '포트폴리오', caption: '보유·현금·매매내역', icon: BarChart3 },
   { href: '/reports', label: '리포트', caption: '목표가 검증과 제외 사유', icon: FileText },
   { href: '/strategies', label: '전략', caption: '벤치마크 대비 성과와 위험', icon: Database },
 ];
@@ -40,14 +40,14 @@ export default function LandingPage() {
             리포트
           </Link>
           <Link className="hover:text-slate-950" href="/portfolio">
-            원장
+            포트폴리오
           </Link>
           <Link className="hover:text-slate-950" href="/strategies">
             전략
           </Link>
         </nav>
         <Button asChild size="sm" variant="secondary">
-          <Link href="/snapshot">
+          <Link href="/main">
             앱 열기 <ArrowRight />
           </Link>
         </Button>
@@ -56,20 +56,19 @@ export default function LandingPage() {
       <section className="mx-auto grid max-w-7xl gap-12 px-5 py-14 sm:px-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(420px,.95fr)] lg:items-center lg:py-24">
         <div className="max-w-3xl">
           <p className="mb-5 inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">
-            정적 투자 리서치 · 원장 검증 · 전략 비교
+            투자 리서치 · 포트폴리오 분석 · 전략 비교
           </p>
           <h1 className="text-5xl font-semibold tracking-[-0.055em] text-slate-950 sm:text-6xl lg:text-7xl">
-            리포트가 맞았는지,
-            <br /> 원장이 벌었는지.
+            SNUSMIC Portfolio Lab
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-            SNUSMIC Portfolio Lab은 리서치 리포트, 목표가, 체결 원장, 전략 성과를 읽기 전용 스냅샷으로 묶어 오늘 봐야 할
-            검토 항목과 아직 믿으면 안 되는 데이터를 먼저 보여줍니다.
+            SNUSMIC Portfolio Lab은 리서치 리포트, 목표가, 매매내역, 전략 성과를 저장된 데이터 기준으로 묶어 오늘 봐야
+            할 검토 항목과 아직 믿으면 안 되는 데이터를 먼저 보여줍니다.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg" variant="secondary">
-              <Link href="/snapshot">
-                스냅샷 보기 <ArrowRight />
+              <Link href="/main">
+                메인화면 보기 <ArrowRight />
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline">
@@ -90,7 +89,7 @@ export default function LandingPage() {
           <div className="border-b border-slate-200 px-4 py-3">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <div className="text-sm font-semibold">검증 스냅샷</div>
+                <div className="text-sm font-semibold">검증 기준</div>
                 <div className="mt-1 font-mono text-xs text-slate-500">
                   {overview.snapshotDate || manifest.price_range.end}
                 </div>

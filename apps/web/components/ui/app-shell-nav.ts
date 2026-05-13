@@ -1,8 +1,8 @@
 import type { SidebarNavItem } from '@/components/ui/SidebarNav';
 
 export const APP_NAV: SidebarNavItem[] = [
-  { href: '/snapshot', label: '스냅샷', description: '오늘 확인', icon: 'dashboard' },
-  { href: '/portfolio', label: '원장', description: '보유·체결', icon: 'portfolio' },
+  { href: '/main', label: '메인화면', description: '오늘 확인', icon: 'dashboard', activePath: '/main' },
+  { href: '/portfolio', label: '포트폴리오', description: '보유·매매', icon: 'portfolio' },
   { href: '/reports', label: '리포트', description: '검증·후보', icon: 'reports' },
   { href: '/strategies', label: '전략', description: '성과·위험', icon: 'strategies' },
   { href: '/screener', label: '후보', description: '재검토', icon: 'screener' },

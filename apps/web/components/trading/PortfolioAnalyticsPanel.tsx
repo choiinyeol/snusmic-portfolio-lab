@@ -51,7 +51,7 @@ export function PortfolioAnalyticsPanel({ equity, persona, rows, personaLabels }
         <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
           <div>
             <div className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">성과 경로</div>
-            <h2 className="mt-1 text-base font-semibold tracking-tight text-slate-950">선택 원장 vs 기준선</h2>
+            <h2 className="mt-1 text-base font-semibold tracking-tight text-slate-950">선택 전략 vs 기준선</h2>
           </div>
           <div className="text-right text-xs text-slate-500">
             TradingView lightweight-charts

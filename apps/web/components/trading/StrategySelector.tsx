@@ -87,7 +87,7 @@ function kindBadge(
   label: string;
   variant: 'secondary' | 'warning' | 'outline';
 } {
-  if (id === 'smic_follower_v2') return { label: '원장', variant: 'outline' };
+  if (id === 'smic_follower_v2') return { label: '기본', variant: 'outline' };
   if (kind === 'strategy') return { label: '전략', variant: 'outline' };
   if (kind === 'oracle') return { label: '상한', variant: 'warning' };
   return { label: '기준', variant: 'secondary' };

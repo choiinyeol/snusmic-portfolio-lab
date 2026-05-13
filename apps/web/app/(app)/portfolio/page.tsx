@@ -2,6 +2,7 @@ import { PortfolioStrategyView } from '@/components/trading/PortfolioStrategyVie
 import { PageHero } from '@/components/ui/PageHero';
 import {
   getCurrentHoldings,
+  getAccountingReconciliations,
   getEquityDaily,
   getLatestReportTargetsBySymbol,
   getPersonaLabel,
@@ -21,6 +22,7 @@ import {
 
 export default function PortfolioPage() {
   const holdings = getCurrentHoldings();
+  const accounting = getAccountingReconciliations();
   const equity = getEquityDaily();
   const summaries = getSummaryRows();
   const trades = getTrades();
@@ -91,21 +93,22 @@ export default function PortfolioPage() {
   return (
     <>
       <PageHero
-        eyebrow="원장 스냅샷"
-        title="원장"
-        subtitle="보유, 체결, 현금 흐름, 연결 리포트 근거를 같은 기준일의 정적 스냅샷으로 확인합니다."
+        eyebrow="보유 현황"
+        title="포트폴리오"
+        subtitle="보유 종목, 매매내역, 현금 흐름, 연결 리포트 근거를 저장된 데이터 기준으로 확인합니다."
         badges={[
           { label: '선택 전략', value: `${strategyPersonas.length}개` },
           { label: '벤치마크', value: `${benchmarkPersonas.length}개` },
-          { label: '체결', value: trades.length.toLocaleString('ko-KR') },
+          { label: '매매내역', value: trades.length.toLocaleString('ko-KR') },
           { label: '최근 평가', value: latestEquity || '—' },
-          { label: '데이터', value: '정적 스냅샷' },
+          { label: '데이터', value: '저장 기준' },
           { label: '거래', value: '실시간 매매 아님' },
         ]}
       />
 
       <PortfolioStrategyView
         holdings={holdings}
+        accounting={accounting}
         equity={equity}
         trades={trades}
         episodes={episodes}

@@ -339,7 +339,7 @@ export function TradesTable({
 
       <section className="card border border-base-300 bg-base-100 shadow-sm">
         <div className="card-body gap-2 p-5">
-          <h2 className="card-title">체결 원장</h2>
+          <h2 className="card-title">매매내역</h2>
           <PaginationControls
             page={tradePage}
             pageCount={Math.ceil(sortedTrades.length / tradePageSize)}

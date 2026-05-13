@@ -44,8 +44,8 @@ export function AppShell({
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 border-r border-slate-200 bg-white/95 px-3 py-4 lg:flex lg:flex-col">
         <Link
           className="flex items-center gap-3 rounded-lg px-2 py-2"
-          href="/snapshot"
-          aria-label="SNUSMIC 리서치 원장 홈"
+          href="/main"
+          aria-label="SNUSMIC Portfolio Lab 메인"
         >
           <span className="grid size-8 place-items-center rounded-md bg-slate-950 text-xs font-semibold text-white">
             SM
@@ -53,7 +53,7 @@ export function AppShell({
           <span className="grid min-w-0 gap-0.5">
             <span className="truncate text-sm font-semibold tracking-tight">SNUSMIC</span>
             <span className="truncate font-mono text-[11px] uppercase tracking-[0.12em] text-slate-500">
-              리서치 원장
+              Portfolio Lab
             </span>
           </span>
         </Link>
@@ -91,8 +91,8 @@ export function AppShell({
         <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/80 backdrop-blur-xl">
           <div className="flex min-h-14 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
             <div className="min-w-0">
-              <div className="truncate text-sm font-medium text-slate-950">SNUSMIC 리서치 원장</div>
-              <div className="hidden truncate text-xs text-slate-500 sm:block">정적 리서치·원장 검증</div>
+              <div className="truncate text-sm font-medium text-slate-950">SNUSMIC Portfolio Lab</div>
+              <div className="hidden truncate text-xs text-slate-500 sm:block">리포트·포트폴리오 분석</div>
             </div>
             <div className="flex items-center gap-2">
               <Badge className="hidden font-mono sm:inline-flex" variant="outline">

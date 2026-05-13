@@ -25,6 +25,7 @@ REQUIRED_ARTIFACTS = [
     "portfolio/trades.json",
     "portfolio/episodes.json",
     "portfolio/equity-daily.json",
+    "portfolio/accounting-reconciliation.json",
     "reports/table.json",
     "reports/rankings.json",
     "reports/detail-metrics.json",
@@ -49,6 +50,7 @@ REQUIRED_ARTIFACTS = [
     "trades.json",
     "position-episodes.json",
     "equity-daily.json",
+    "accounting-reconciliation.json",
     "table-download-reports.csv",
     "table-download-strategies.csv",
     "data-quality-download.csv",
@@ -291,6 +293,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     )
     insights = _build_insights(overview, rankings, target_distribution, return_windows, data_quality)
 
+    current_holdings = _current_holdings_from_open_episodes(position_episodes, current_holdings)
     persona_rows = _records(summary)
     enriched_current_holdings = _records(_enrich_holdings_with_native(current_holdings, prices, fx_rates))
     enriched_monthly_holdings = _records(
@@ -299,6 +302,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     trade_rows = _records(trades)
     episode_rows = _records(position_episodes)
     equity_rows = _records(equity_daily)
+    accounting_rows = _build_accounting_reconciliation(persona_rows, enriched_current_holdings)
     screener_candidates = _build_screener_candidates(report_rows)
 
     _write_page_bundles(
@@ -312,6 +316,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
         trades=trade_rows,
         episodes=episode_rows,
         equity_daily=equity_rows,
+        accounting_reconciliation=accounting_rows,
         reports=report_rows,
         rankings=rankings,
         detail_metrics=detail_metrics,
@@ -342,6 +347,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     _write_json(out / "trades.json", trade_rows)
     _write_json(out / "position-episodes.json", episode_rows)
     _write_json(out / "equity-daily.json", equity_rows)
+    _write_json(out / "accounting-reconciliation.json", accounting_rows)
     _write_download_csvs(out, report_rows, data_quality)
     _write_price_artifacts(prices, artifact_symbols, prices_out)
     write_web_manifest(out)
@@ -414,6 +420,110 @@ def _read_json(path: Path) -> Any:
         return json.load(handle)
 
 
+def _current_holdings_from_open_episodes(
+    position_episodes: pd.DataFrame, existing_holdings: pd.DataFrame
+) -> pd.DataFrame:
+    """Rebuild current holdings from open position episodes.
+
+    ``position_episodes.csv`` is reconstructed from the trade ledger and is
+    therefore the safest local source of truth for "what is still held now".
+    ``current_holdings.csv`` can lag when a strategy-search export adds more
+    promoted MTT personas after the first simulation pass. Rebuilding here
+    prevents the web app from showing those personas as 100% cash while their
+    summary row still reports open positions and non-zero holdings value.
+    """
+
+    if position_episodes.empty or "status" not in position_episodes.columns:
+        return existing_holdings
+    open_rows = position_episodes[position_episodes["status"].astype(str).eq("open")].copy()
+    if open_rows.empty:
+        return existing_holdings
+
+    qty_bought = pd.to_numeric(open_rows.get("total_qty_bought"), errors="coerce").fillna(0)
+    qty_sold = pd.to_numeric(open_rows.get("total_qty_sold"), errors="coerce").fillna(0)
+    qty = qty_bought - qty_sold
+    avg_cost = pd.to_numeric(open_rows.get("avg_entry_price_krw"), errors="coerce")
+    last_close = pd.to_numeric(open_rows.get("last_close_krw"), errors="coerce").fillna(avg_cost)
+    market_value = qty * last_close
+    cost_value = qty * avg_cost
+    unrealized = pd.to_numeric(open_rows.get("unrealized_pnl_krw"), errors="coerce")
+    unrealized = unrealized.fillna(market_value - cost_value)
+
+    rebuilt = pd.DataFrame(
+        {
+            "persona": open_rows.get("persona"),
+            "symbol": open_rows.get("symbol"),
+            "company": open_rows.get("company"),
+            "qty": qty,
+            "avg_cost_krw": avg_cost,
+            "last_close_krw": last_close,
+            "market_value_krw": market_value,
+            "unrealized_pnl_krw": unrealized,
+            "unrealized_return": (last_close / avg_cost - 1).where(avg_cost.gt(0)),
+            "holding_days": pd.to_numeric(open_rows.get("holding_days"), errors="coerce"),
+            "first_buy_date": open_rows.get("open_date"),
+        }
+    )
+    return rebuilt[rebuilt["qty"].gt(0)].sort_values(["persona", "market_value_krw"], ascending=[True, False])
+
+
+def _build_accounting_reconciliation(
+    persona_rows: list[dict[str, Any]], holdings: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    holdings_by_persona: dict[str, list[dict[str, Any]]] = {}
+    for row in holdings:
+        holdings_by_persona.setdefault(str(row.get("persona") or ""), []).append(row)
+
+    rows: list[dict[str, Any]] = []
+    tolerance = 5_000.0
+    for persona in persona_rows:
+        persona_id = str(persona.get("persona") or "")
+        persona_holdings = holdings_by_persona.get(persona_id, [])
+        contributed = _number(persona.get("total_contributed_krw")) or 0.0
+        realized = _number(persona.get("realized_pnl_krw")) or 0.0
+        cash = _number(persona.get("final_cash_krw")) or 0.0
+        equity = _number(persona.get("final_equity_krw")) or 0.0
+        holdings_value = _number(persona.get("final_holdings_value_krw")) or 0.0
+        net_profit = _number(persona.get("net_profit_krw")) or 0.0
+        open_cost = sum(
+            ((_number(row.get("avg_cost_krw")) or 0.0) * (_number(row.get("qty")) or 0.0))
+            for row in persona_holdings
+        )
+        unrealized = sum(_number(row.get("unrealized_pnl_krw")) or 0.0 for row in persona_holdings)
+        expected_cash = contributed + realized - open_cost
+        cash_gap = cash - expected_cash
+        equity_gap = equity - (cash + holdings_value)
+        profit_gap = net_profit - (realized + unrealized)
+        explain_cash = cash < realized and open_cost > 0
+        status = "ok" if max(abs(cash_gap), abs(equity_gap), abs(profit_gap)) <= tolerance else "warning"
+        rows.append(
+            {
+                "persona": persona_id,
+                "label": persona.get("label"),
+                "total_contributed_krw": contributed,
+                "realized_pnl_krw": realized,
+                "final_cash_krw": cash,
+                "open_cost_basis_krw": open_cost,
+                "open_market_value_krw": holdings_value,
+                "unrealized_pnl_krw": unrealized,
+                "final_equity_krw": equity,
+                "net_profit_krw": net_profit,
+                "expected_cash_krw": expected_cash,
+                "cash_gap_krw": cash_gap,
+                "equity_gap_krw": equity_gap,
+                "profit_gap_krw": profit_gap,
+                "status": status,
+                "explanation_ko": (
+                    "확정 손익이 현금보다 커 보이는 이유는 현재 보유 중인 포지션의 매입 원가가 현금에서 빠져 있기 때문입니다. "
+                    "현금은 출자금과 청산손익의 누계가 아니라, 그 금액에서 아직 들고 있는 주식의 원가를 차감한 잔액입니다."
+                    if explain_cash
+                    else "현금, 보유 평가액, 확정·미실현 손익의 관계가 허용 오차 안에서 맞습니다."
+                ),
+            }
+        )
+    return rows
+
+
 def _write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
@@ -449,6 +559,7 @@ def _write_page_bundles(
     trades: list[dict[str, Any]],
     episodes: list[dict[str, Any]],
     equity_daily: list[dict[str, Any]],
+    accounting_reconciliation: list[dict[str, Any]],
     reports: list[dict[str, Any]],
     rankings: dict[str, Any],
     detail_metrics: dict[str, Any],
@@ -476,6 +587,7 @@ def _write_page_bundles(
     _write_product_json(out / "portfolio" / "trades.json", _compact_trades(trades))
     _write_product_json(out / "portfolio" / "episodes.json", _compact_episodes(episodes))
     _write_product_json(out / "portfolio" / "equity-daily.json", _compact_equity_curves(equity_daily))
+    _write_product_json(out / "portfolio" / "accounting-reconciliation.json", accounting_reconciliation)
 
     _write_product_json(out / "reports" / "table.json", reports)
     _write_product_json(out / "reports" / "rankings.json", rankings)
@@ -1257,12 +1369,14 @@ def _methodology_summary(strategy_id: str, config: dict[str, Any]) -> str:
             "미래 가격 정보를 일부 사용하는 강한 상한선 기준입니다. 투자 가능한 전략으로 해석하지 않습니다."
         )
     if strategy_id.startswith("smic_mtt_strategy"):
-        return "리포트 업사이드와 MTT 추세 조건을 통과한 종목만 실제 주식 수량 단위로 매수·보유·매도하는 원장형 전략입니다."
-    return "시뮬레이션 원장에 포함된 전략입니다."
+        return "리포트 업사이드와 가격 추세 조건을 통과한 종목만 실제 주식 수량 단위로 매수·보유·매도하는 포트폴리오 전략입니다."
+    return "시뮬레이션에 포함된 전략입니다."
 
 
 def _buy_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
     if strategy_id.startswith("smic_mtt_strategy"):
+        if not config:
+            return ["세부 조건 artifact 없음", "성과·보유·매매내역만 검증 가능"]
         rules = [
             f"발간 시 목표 업사이드 {_pct(config.get('min_target_upside_at_pub'))} 이상",
             f"목표 업사이드 {_pct(config.get('max_target_upside_at_pub'))} 이하",
@@ -1294,6 +1408,8 @@ def _buy_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
 
 def _sell_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
     if strategy_id.startswith("smic_mtt_strategy"):
+        if not config:
+            return ["세부 조건 artifact 없음", "매도 사유는 매매내역과 포지션 기록에서 확인"]
         return [
             f"손절 {_pct(config.get('stop_loss_pct'))}",
             f"익절 {_pct(config.get('take_profit_pct'))}",
@@ -1315,6 +1431,8 @@ def _sell_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
 
 def _risk_controls(strategy_id: str, config: dict[str, Any]) -> list[str]:
     if strategy_id.startswith("smic_mtt_strategy"):
+        if not config:
+            return ["정수 주식 수량 기반 체결", "수수료·세금 반영", "누락된 조건은 데이터 품질 항목으로 표시"]
         cadence = config.get("top_up_cadence", "monthly")
         return [
             f"추가 매수 주기: {cadence}",

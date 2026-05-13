@@ -35,7 +35,7 @@ export default function StrategiesPage() {
       <PageHero
         eyebrow="전략 실험실"
         title="전략 비교"
-        subtitle="벤치마크, 오라클, 선택 가능한 원장 전략을 분리해 성과·낙폭·규칙을 비교합니다."
+        subtitle="벤치마크, 오라클, 선택 가능한 포트폴리오 전략을 분리해 성과·낙폭·규칙을 비교합니다."
         badges={[
           { label: '벤치마크', value: benchmarkRows.length },
           { label: '고유 전략', value: selectableRows.length },
@@ -46,7 +46,7 @@ export default function StrategiesPage() {
         actions={
           <>
             <Button asChild size="sm" variant="secondary">
-              <Link href="/portfolio">원장으로 이동</Link>
+              <Link href="/portfolio">포트폴리오로 이동</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
               <a href="#strategy-board">전략 리더보드</a>

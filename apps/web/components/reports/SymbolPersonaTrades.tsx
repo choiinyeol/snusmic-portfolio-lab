@@ -62,7 +62,7 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
           </p>
         </div>
         <Link className="btn btn-sm btn-ghost" href={`/portfolio?strategy=${persona}`}>
-          포트폴리오 원장 →
+          포트폴리오 보기 →
         </Link>
       </div>
       <SegmentedControl
@@ -301,7 +301,7 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
       <details className="card min-w-0 border border-base-300 bg-base-100 shadow-sm">
         <summary className="cursor-pointer list-none p-5">
           <div className="flex flex-wrap items-baseline justify-between gap-3">
-            <h3 className="text-base font-bold tracking-tight">체결 원장</h3>
+            <h3 className="text-base font-bold tracking-tight">매매내역</h3>
             <span className="text-xs text-base-content/55">{selectedTrades.length}건 체결 · 펼치기</span>
           </div>
         </summary>

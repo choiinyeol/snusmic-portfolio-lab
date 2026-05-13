@@ -23,10 +23,10 @@ export default function OverviewPage() {
               <Badge variant="success">읽기 전용</Badge>
               <Badge variant="secondary">{selectedStrategy?.shortLabel || overview.portfolio.label}</Badge>
             </div>
-            <h1 className="text-3xl font-semibold tracking-[-0.045em] text-slate-950 md:text-4xl">스냅샷</h1>
+            <h1 className="text-3xl font-semibold tracking-[-0.045em] text-slate-950 md:text-4xl">메인화면</h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-              홈은 모든 차트를 압축하지 않습니다. 오늘 봐야 할 원장 상태, 재검토 항목, 데이터 신뢰도만 먼저 정리하고
-              세부 분석은 전용 화면으로 넘깁니다.
+              홈은 모든 차트를 압축하지 않습니다. 오늘 봐야 할 포트폴리오 상태, 재검토 항목, 데이터 신뢰도만 먼저
+              정리하고 세부 분석은 전용 화면으로 넘깁니다.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -35,7 +35,7 @@ export default function OverviewPage() {
             </Button>
             <Button asChild size="sm" variant="secondary">
               <Link href="/portfolio">
-                원장 열기 <ArrowUpRight />
+                포트폴리오 열기 <ArrowUpRight />
               </Link>
             </Button>
           </div>
@@ -93,7 +93,7 @@ export default function OverviewPage() {
         <div className="grid gap-5">
           <div className="rounded-xl border border-slate-200 bg-white p-4">
             <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3">
-              <h2 className="text-base font-semibold text-slate-950">원장 상태</h2>
+              <h2 className="text-base font-semibold text-slate-950">포트폴리오 상태</h2>
               <Button asChild size="sm" variant="ghost">
                 <Link href="/portfolio">상세</Link>
               </Button>
@@ -112,8 +112,8 @@ export default function OverviewPage() {
               </div>
               <Progress className="mt-2" value={(overview.portfolio.cashWeight ?? 0) * 100} />
               <p className="mt-2 text-xs leading-5 text-slate-500">
-                기본 원장은 실제 보유 종목을 우선합니다. 현금 비중이 크면 원장 화면에서 체결·후보 부족·리밸런싱 조건을
-                확인합니다.
+                기본 포트폴리오는 실제 보유 종목을 우선합니다. 현금 비중이 크면 포트폴리오 화면에서 매매내역·후보
+                부족·리밸런싱 조건을 확인합니다.
               </p>
             </div>
           </div>
@@ -124,7 +124,12 @@ export default function OverviewPage() {
               <p className="mt-1 text-xs text-slate-500">세부 분석은 전용 화면에서만 다룹니다.</p>
             </div>
             <div className="grid p-2">
-              <Drilldown href="/portfolio" icon={<ShieldCheck />} title="원장" caption="보유·현금·체결·포지션 근거" />
+              <Drilldown
+                href="/portfolio"
+                icon={<ShieldCheck />}
+                title="포트폴리오"
+                caption="보유·현금·매매내역·근거"
+              />
               <Drilldown href="/reports" icon={<FileText />} title="리포트" caption="목표가 검증·재검토 후보" />
               <Drilldown href="/strategies" icon={<DatabaseZap />} title="전략" caption="벤치마크·규칙·위험 성과" />
             </div>
@@ -156,7 +161,7 @@ export default function OverviewPage() {
         <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
           <div className="border-b border-slate-200 px-4 py-3">
             <h2 className="text-base font-semibold text-slate-950">최근 변경</h2>
-            <p className="mt-1 text-xs text-slate-500">새로 반영된 리포트, 후보, 원장 이벤트입니다.</p>
+            <p className="mt-1 text-xs text-slate-500">새로 반영된 리포트, 후보, 매매 이벤트입니다.</p>
           </div>
           <div className="divide-y divide-slate-100">
             {brief.changes.map((item) => (

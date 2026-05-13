@@ -1,6 +1,7 @@
 {
   "artifact_root": "data/web",
   "artifacts": [
+    "accounting-reconciliation.json",
     "current-holdings.json",
     "data-quality-download.csv",
     "data-quality.json",
@@ -13,6 +14,7 @@
     "overview/research-pulse.json",
     "overview/snapshot.json",
     "personas.json",
+    "portfolio/accounting-reconciliation.json",
     "portfolio/episodes.json",
     "portfolio/equity-daily.json",
     "portfolio/holdings.json",
@@ -39,7 +41,8 @@
     "trades.json"
   ],
   "checksums": {
-    "current-holdings.json": "851e78823fdb42aec569c757d8b28849132c98af21b60407f8adb1f655a00929",
+    "accounting-reconciliation.json": "f623d6a43d2613e99d3733fdf84fb3596b768aaffbacfc723d3c56003790e9e3",
+    "current-holdings.json": "c7bb839f138d8727013990d893d8ef42e60ceaadb4a74e2dcf7b5104acd03f77",
     "data-quality-download.csv": "ca7f934a6b3fa8912033689acfee50812f02bb02851d03eed268a1cb9d5ba524",
     "data-quality.json": "fcd4b63301f1c79cf9f89f512ded3ee059491e57c3f7ddf6547edf1d9eaa385b",
     "equity-daily.json": "406ba444145628a902711ab544b10511675789ab5c675910493bc51bdf1d4cba",
@@ -51,9 +54,10 @@
     "overview/research-pulse.json": "a42526ea0d6af856a910865cf44377c82ed23b0ae3b55d8097db5c3cddd247c4",
     "overview/snapshot.json": "855fcd8efb909d455c118715d98c06ee6b38f054c0056b799b5f39b1782187d2",
     "personas.json": "183703a274b28fe3b5b78308def4643ea4c80904c74120fc9336c89c8767e05a",
+    "portfolio/accounting-reconciliation.json": "3c66d233e283317155054097748becf03fcbe2c88ed00f3cec76f9be89a86235",
     "portfolio/episodes.json": "c3bcd2ca6ee65c1cbe22688d141a0b82720d62e13ee09986ec73219f22fd4994",
     "portfolio/equity-daily.json": "0f331b1b201ed618ed020f17b5ca6394adbca9922397bb9b66bcf8264b01dd95",
-    "portfolio/holdings.json": "3032366112ce987d6332ef7a12fa48c85ea1588db99b971be9c943f5c7d52ef2",
+    "portfolio/holdings.json": "a74f43950652c93f14d53e19a2cefd41751282e1cec0b3add6b064f2938cc3db",
     "portfolio/monthly-holdings.json": "8f191339b7013cbc829c9aea628f3a8e3fc5697e2624f6093a42419fb2a9573e",
     "portfolio/personas.json": "69cead87fc7656db55cc3b780c16742705bc9f9f3fcc9157b1466141e3dfcb4b",
     "portfolio/trades.json": "ddc2a8c19dcd073ba4266682e3c5e6cf0d1460653a899fbcd47f5a4d0ebf6176",
@@ -68,7 +72,7 @@
     "reports/target-hit-distribution.json": "ea82df48e8b2f01b0d115547319a1d570acc7c8d076a393025a8ed46162a575f",
     "return-windows.json": "b4e688dbd01a6c85413ca799bc86ee87a5e81c0fdd2a68f4a89428e9fd5974ff",
     "screener/candidates.json": "6a322af0b6aeba2c4597092f7907aeed2872af2c7284dceac209c418bd903a2c",
-    "strategies/catalog.json": "771dfe23d497b25fe18bdde3f53ec4b51a1f8f3cb7fb8a391ef705bf62b115ef",
+    "strategies/catalog.json": "f521316ea8dc52ecdf5c4f28627f33a7bbd5f48d41d253ad636acea1b61dfdfa",
     "strategies/curves.json": "0f331b1b201ed618ed020f17b5ca6394adbca9922397bb9b66bcf8264b01dd95",
     "strategies/leaderboard.json": "69cead87fc7656db55cc3b780c16742705bc9f9f3fcc9157b1466141e3dfcb4b",
     "table-download-reports.csv": "1c988864cd4e8eacbdbe1dd6d5eaab32d53dfec5da58bbed3462be91481de3d1",
@@ -93,7 +97,7 @@
     "start": "2020-12-05"
   },
   "row_counts": {
-    "current_holdings": 65,
+    "current_holdings": 140,
     "equity_daily": 1,
     "monthly_holdings": 1,
     "personas": 39,
