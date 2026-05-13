@@ -80,5 +80,5 @@ export function StrategySelector({
 function kindBadge(kind: StrategySelectorOption['kind']): { label: string; className: string } {
   if (kind === 'strategy') return { label: '전략', className: 'badge-primary badge-soft' };
   if (kind === 'oracle') return { label: '상한', className: 'badge-warning badge-soft' };
-  return { label: 'BM', className: 'badge-ghost' };
+  return { label: '기준', className: 'badge-ghost' };
 }

@@ -18,7 +18,7 @@ const terms = [
     body: '고점 대비 최대 낙폭입니다. 이 프로젝트의 개인 목표는 MDD 15% 이하에서 KOSPI/KODEX200보다 높은 수익률입니다.',
   },
   {
-    term: 'Target Progress',
+    term: '목표 진행률',
     title: '목표가 진행률',
     body: '공식은 (현재가 - 진입가) / (목표가 - 진입가)입니다. 목표가를 이미 넘으면 도달 상태로 해석합니다.',
   },
@@ -49,8 +49,8 @@ export default function GuidePage() {
         badges={[
           { label: '데이터', value: '기준 데이터' },
           { label: '거래', value: '읽기 전용' },
-          { label: 'Tables', value: 'Sort · Filter · Pagination' },
-          { label: 'Objective', value: `MDD ≤ ${formatPercent(OBJECTIVE_MAX_DRAWDOWN)}` },
+          { label: '표', value: '정렬 · 필터 · 페이지' },
+          { label: '목표', value: `MDD ≤ ${formatPercent(OBJECTIVE_MAX_DRAWDOWN)}` },
         ]}
         actions={
           <>
@@ -68,7 +68,7 @@ export default function GuidePage() {
         <GuideExperience />
       </Section>
 
-      <Section eyebrow="Principles" title="제품 UI/UX 원칙">
+      <Section eyebrow="읽는 원칙" title="제품 화면을 해석하는 기준">
         <div className="grid gap-3 lg:grid-cols-3">
           <KpiTile
             label="표 기본 원칙"
@@ -86,7 +86,7 @@ export default function GuidePage() {
         </div>
       </Section>
 
-      <Section eyebrow="Glossary" title="금융·포트폴리오 용어">
+      <Section eyebrow="용어 사전" title="금융·포트폴리오 용어">
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {terms.map((item) => (
             <article className="guide-term-card lab-panel p-4" key={item.term}>
@@ -100,7 +100,7 @@ export default function GuidePage() {
         </div>
       </Section>
 
-      <Section eyebrow="Do not misread" title="이렇게 해석하면 안 됩니다">
+      <Section eyebrow="주의할 해석" title="이렇게 해석하면 안 됩니다">
         <div className="grid gap-3 lg:grid-cols-3">
           <GuideWarning title="투자 조언이 아닙니다">
             후보·전략·리포트 검증은 학습과 사후 분석을 위한 것입니다.

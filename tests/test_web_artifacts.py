@@ -22,6 +22,13 @@ def test_export_web_artifacts_matches_baseline_counts(tmp_path: Path) -> None:
 
     overview = json.loads((out / "overview.json").read_text(encoding="utf-8"))
     assert overview["report_counts"] == {
+        "excluded_downside_target": 5,
+        "excluded_instant_target_hit": 1,
+        "excluded_missing_performance": 0,
+        "excluded_missing_price": 5,
+        "excluded_non_positive_upside": 8,
+        "excluded_reports": 19,
+        "excluded_sell_opinion": 0,
         "extracted_reports": 221,
         "missing_price_symbols": 5,
         "price_matched_reports": 202,
@@ -100,6 +107,18 @@ def test_extended_web_artifacts_support_insights_and_downloads(tmp_path: Path) -
     assert {"return_30d", "return_60d", "return_90d", "return_180d"} <= set(return_windows[0])
     assert target_distribution["summary"]["total_reports"] == 202
     assert page_target_distribution == target_distribution
+    data_quality = json.loads((out / "overview" / "data-quality.json").read_text(encoding="utf-8"))
+    assert data_quality["report_exclusions"] == {
+        "downside_target": 5,
+        "excluded_reports": 19,
+        "included_reports": 202,
+        "instant_target_hit": 1,
+        "missing_performance": 0,
+        "missing_price": 5,
+        "non_positive_upside": 8,
+        "sell_opinion": 0,
+        "source_reports": 221,
+    }
     assert rankings["fastest_hits"]
     assert rankings["best_current_returns"]
     assert page_rankings == rankings

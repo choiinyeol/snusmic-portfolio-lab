@@ -50,7 +50,7 @@ const LAB_STEPS = [
     details: [
       '벤치마크는 비교 기준선이지 선택 전략이 아님',
       'Weak Prophet은 미래정보 상한선으로만 해석',
-      '고유 전략은 broker-ledger 기반 persona에서 승격',
+      '고유 전략은 실제 보유·체결 원장으로 행동을 확인',
     ],
   },
   {
@@ -96,7 +96,7 @@ export function GuideExperience() {
             이 페이지는 튜토리얼입니다. 포트폴리오, 리포트, 전략 화면에서 어떤 질문을 던져야 하는지 예시로 보여줍니다.
           </p>
           <div className="guide-chip-row" aria-label="Core principles">
-            <span>Reports = 링크명 일치</span>
+            <span>리포트 행 → 상세 분석</span>
             <span>표 = 공유 컬럼</span>
             <span>현금 = 평가액 포함</span>
             <span>벤치마크 ≠ 선택 전략</span>
@@ -167,15 +167,15 @@ export function GuideExperience() {
           <h2 className="mt-1 text-xl font-black tracking-[-0.04em]">세 레이어로 해석하세요</h2>
           <div className="guide-stack" aria-label="Three layer model">
             <div className="guide-stack__layer guide-stack__layer--top">
-              <span>UI</span>
+              <span>화면</span>
               <strong>정렬·필터·차트</strong>
             </div>
             <div className="guide-stack__layer guide-stack__layer--middle">
-              <span>Semantics</span>
+              <span>의미</span>
               <strong>벤치마크/전략/현금 분리</strong>
             </div>
             <div className="guide-stack__layer guide-stack__layer--bottom">
-              <span>Data</span>
+              <span>데이터</span>
               <strong>기준일 데이터</strong>
             </div>
           </div>
@@ -188,7 +188,7 @@ export function GuideExperience() {
 
       <section className="grid gap-4 lg:grid-cols-2">
         <article className="lab-panel p-4 md:p-5">
-          <div className="lab-panel__eyebrow">Target Progress Simulator</div>
+          <div className="lab-panel__eyebrow">목표가 계산기</div>
           <h2 className="mt-1 text-xl font-black tracking-[-0.04em]">목표가 달성률 공식 체험</h2>
           <p className="mt-2 text-sm leading-6 text-base-content/62">
             달성률 = (현재가 - 진입가) / (목표가 - 진입가). 단순 현재가/목표가가 아닙니다.
@@ -254,7 +254,7 @@ export function GuideExperience() {
 
       <section className="grid gap-4 lg:grid-cols-2">
         <article className="lab-panel p-4 md:p-5">
-          <div className="lab-panel__eyebrow">Benchmark Map</div>
+          <div className="lab-panel__eyebrow">비교 기준선</div>
           <h2 className="mt-1 text-xl font-black tracking-[-0.04em]">비교 기준선</h2>
           <div className="guide-token-grid">
             {BENCHMARKS.map((item) => (
@@ -265,7 +265,7 @@ export function GuideExperience() {
           </div>
         </article>
         <article className="lab-panel p-4 md:p-5">
-          <div className="lab-panel__eyebrow">Selectable Strategies</div>
+          <div className="lab-panel__eyebrow">선택 가능 전략</div>
           <h2 className="mt-1 text-xl font-black tracking-[-0.04em]">사용자가 검토할 고유 전략</h2>
           <div className="guide-token-grid">
             {STRATEGIES.map((item) => (

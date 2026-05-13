@@ -671,6 +671,13 @@
     "warehouse_reports": "data/warehouse/reports.csv"
   },
   "report_counts": {
+    "excluded_downside_target": 5,
+    "excluded_instant_target_hit": 1,
+    "excluded_missing_performance": 0,
+    "excluded_missing_price": 5,
+    "excluded_non_positive_upside": 8,
+    "excluded_reports": 19,
+    "excluded_sell_opinion": 0,
     "extracted_reports": 221,
     "missing_price_symbols": 5,
     "price_matched_reports": 202,

@@ -277,13 +277,18 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     missing_symbols = sorted(report_symbols - price_symbols)
 
     report_rows = _build_report_rows(reports, report_performance, extraction_quality, missing_symbols)
-    overview = _build_overview(reports, prices, summary, report_stats, missing_symbols, report_rows)
+    report_exclusions = _build_report_exclusion_counts(reports, report_performance, missing_symbols)
+    overview = _build_overview(
+        reports, prices, summary, report_stats, missing_symbols, report_rows, report_exclusions
+    )
     strategy_catalog = _build_strategy_catalog(summary, inputs.sim / "persona-configs.json")
     return_windows = _build_return_windows(report_rows, prices)
     detail_metrics = _build_detail_metrics(report_rows, prices, return_windows)
     target_distribution = _build_target_hit_distribution(report_rows)
     rankings = _build_rankings(report_stats, report_rows)
-    data_quality = _build_data_quality(extraction_quality, missing_symbols, reports, report_performance)
+    data_quality = _build_data_quality(
+        extraction_quality, missing_symbols, reports, report_performance, report_exclusions
+    )
     insights = _build_insights(overview, rankings, target_distribution, return_windows, data_quality)
 
     persona_rows = _records(summary)
@@ -834,6 +839,48 @@ def _is_sell_opinion(value: Any) -> bool:
     return str(value or "").strip().casefold() in {"sell", "매도"}
 
 
+def _report_price_context(row: dict[str, Any], perf: dict[str, Any], symbol: str) -> dict[str, Any]:
+    raw_target_price_krw = _number(row.get("target_price_krw"))
+    perf_target_price_krw = _number(perf.get("target_price_krw"))
+    target_price_krw = perf_target_price_krw if perf_target_price_krw is not None else raw_target_price_krw
+    price_currency = normalize_currency(
+        row.get("price_currency") or row.get("target_currency") or currency_for_symbol(symbol) or "KRW"
+    )
+    target_currency = normalize_currency(row.get("target_currency") or price_currency)
+    raw_target_price = _number(row.get("target_price_local")) or _number(row.get("target_price"))
+    entry_price_native = _number(row.get("report_current_price"))
+    inferred_entry_price_native = False
+    entry_price_krw = _number(perf.get("entry_price_krw")) or _number(row.get("report_current_price_krw"))
+    if price_currency == "KRW":
+        target_price_native = target_price_krw
+    elif raw_target_price is not None and target_currency == price_currency:
+        target_price_native = raw_target_price
+    elif entry_price_native is not None and entry_price_krw and target_price_krw:
+        target_price_native = entry_price_native * target_price_krw / entry_price_krw
+    else:
+        target_price_native = raw_target_price
+    target_upside_at_pub = _number(perf.get("target_upside_at_pub"))
+    if price_currency == "KRW":
+        entry_price_native = (
+            entry_price_native or _number(row.get("report_current_price_krw")) or entry_price_krw
+        )
+    elif entry_price_native is None:
+        entry_price_native = _infer_native_entry_from_target(target_price_native, target_upside_at_pub)
+        inferred_entry_price_native = entry_price_native is not None
+    return {
+        "raw_target_price_krw": raw_target_price_krw,
+        "target_price_krw": target_price_krw,
+        "target_price_native": target_price_native,
+        "target_price": target_price_native if target_price_native is not None else target_price_krw,
+        "price_currency": price_currency,
+        "target_currency": target_currency,
+        "entry_price_krw": entry_price_krw,
+        "entry_price_native": entry_price_native,
+        "entry_price_native_inferred": inferred_entry_price_native,
+        "target_upside_at_pub": target_upside_at_pub,
+    }
+
+
 def _build_report_rows(
     reports: pd.DataFrame,
     report_performance: pd.DataFrame,
@@ -856,42 +903,24 @@ def _build_report_rows(
             continue
         caveats = []
         caveats.extend(review_reasons.get(report_id, []))
-        raw_target_price_krw = _number(row.get("target_price_krw"))
-        perf_target_price_krw = _number(perf.get("target_price_krw"))
-        target_price_krw = (
-            perf_target_price_krw if perf_target_price_krw is not None else raw_target_price_krw
-        )
-        price_currency = normalize_currency(
-            row.get("price_currency") or row.get("target_currency") or currency_for_symbol(symbol) or "KRW"
-        )
-        target_currency = normalize_currency(row.get("target_currency") or price_currency)
-        raw_target_price = _number(row.get("target_price_local")) or _number(row.get("target_price"))
-        entry_price_native = _number(row.get("report_current_price"))
-        entry_price_krw = _number(perf.get("entry_price_krw")) or _number(row.get("report_current_price_krw"))
-        if price_currency == "KRW":
-            target_price_native = target_price_krw
-        elif raw_target_price is not None and target_currency == price_currency:
-            target_price_native = raw_target_price
-        elif entry_price_native is not None and entry_price_krw and target_price_krw:
-            target_price_native = entry_price_native * target_price_krw / entry_price_krw
-        else:
-            target_price_native = raw_target_price
-        target_price = target_price_native if target_price_native is not None else target_price_krw
+        context = _report_price_context(row, perf, symbol)
+        raw_target_price_krw = context["raw_target_price_krw"]
+        target_price_krw = context["target_price_krw"]
+        target_price_native = context["target_price_native"]
+        target_price = context["target_price"]
+        price_currency = context["price_currency"]
+        target_currency = context["target_currency"]
+        entry_price_krw = context["entry_price_krw"]
+        entry_price_native = context["entry_price_native"]
+        target_upside_at_pub = context["target_upside_at_pub"]
         if (
             raw_target_price_krw is not None
             and target_price_krw is not None
             and not math.isclose(raw_target_price_krw, target_price_krw, rel_tol=1e-9, abs_tol=0.01)
         ):
             caveats.append("price_scale_adjusted_target")
-        target_upside_at_pub = _number(perf.get("target_upside_at_pub"))
-        if price_currency == "KRW":
-            entry_price_native = (
-                entry_price_native or _number(row.get("report_current_price_krw")) or entry_price_krw
-            )
-        elif entry_price_native is None:
-            entry_price_native = _infer_native_entry_from_target(target_price_native, target_upside_at_pub)
-            if entry_price_native is not None:
-                caveats.append("entry_price_native_inferred")
+        if context["entry_price_native_inferred"]:
+            caveats.append("entry_price_native_inferred")
         if target_upside_at_pub is not None and target_upside_at_pub <= 0:
             continue
         target_direction = _target_direction(target_price_native, entry_price_native)
@@ -942,6 +971,59 @@ def _build_report_rows(
     return rows
 
 
+def _build_report_exclusion_counts(
+    reports: pd.DataFrame, report_performance: pd.DataFrame, missing_symbols: list[str]
+) -> dict[str, int]:
+    performance_by_id = {str(row["report_id"]): row for row in report_performance.to_dict(orient="records")}
+    missing = set(missing_symbols)
+    counts = {
+        "missing_price": 0,
+        "missing_performance": 0,
+        "sell_opinion": 0,
+        "non_positive_upside": 0,
+        "downside_target": 0,
+        "instant_target_hit": 0,
+    }
+    included = 0
+    for row in reports.sort_values(["publication_date", "page", "ordinal", "report_id"]).to_dict(
+        orient="records"
+    ):
+        report_id = str(row["report_id"])
+        perf = performance_by_id.get(report_id, {})
+        symbol = str(row.get("symbol", ""))
+        if symbol in missing:
+            counts["missing_price"] += 1
+            continue
+        if not perf:
+            counts["missing_performance"] += 1
+            continue
+        if _is_sell_opinion(row.get("rating")):
+            counts["sell_opinion"] += 1
+            continue
+
+        context = _report_price_context(row, perf, symbol)
+        target_upside_at_pub = context["target_upside_at_pub"]
+        if target_upside_at_pub is not None and target_upside_at_pub <= 0:
+            counts["non_positive_upside"] += 1
+            continue
+        if _target_direction(context["target_price_native"], context["entry_price_native"]) != "upside":
+            counts["downside_target"] += 1
+            continue
+        target_hit = _bool(perf.get("target_hit"))
+        days_to_target = _number(perf.get("days_to_target"))
+        if target_hit and days_to_target is not None and days_to_target <= 1:
+            counts["instant_target_hit"] += 1
+            continue
+        included += 1
+    excluded_total = sum(counts.values())
+    return {
+        **counts,
+        "included_reports": included,
+        "excluded_reports": excluded_total,
+        "source_reports": included + excluded_total,
+    }
+
+
 def _review_reasons_by_report(
     reports: pd.DataFrame, extraction_quality: dict[str, Any]
 ) -> dict[str, list[str]]:
@@ -970,6 +1052,7 @@ def _build_overview(
     report_stats: dict[str, Any],
     missing_symbols: list[str],
     report_rows: list[dict[str, Any]],
+    report_exclusions: dict[str, int],
 ) -> dict[str, Any]:
     dates = [str(row["date"]) for row in report_rows if row.get("date")]
     price_dates = prices["date"].tolist() if "date" in prices else []
@@ -991,6 +1074,13 @@ def _build_overview(
             "price_matched_reports": len(report_rows),
             "missing_price_symbols": len(missing_symbols),
             "web_report_rows": len(report_rows),
+            "excluded_reports": report_exclusions["excluded_reports"],
+            "excluded_missing_price": report_exclusions["missing_price"],
+            "excluded_missing_performance": report_exclusions["missing_performance"],
+            "excluded_sell_opinion": report_exclusions["sell_opinion"],
+            "excluded_non_positive_upside": report_exclusions["non_positive_upside"],
+            "excluded_downside_target": report_exclusions["downside_target"],
+            "excluded_instant_target_hit": report_exclusions["instant_target_hit"],
         },
         "target_stats": {
             "target_hit_count": len(target_hits),
@@ -1703,6 +1793,7 @@ def _build_data_quality(
     missing_symbols: list[str],
     reports: pd.DataFrame,
     report_performance: pd.DataFrame,
+    report_exclusions: dict[str, int],
 ) -> dict[str, Any]:
     performance_ids = (
         set(report_performance["report_id"].astype(str)) if not report_performance.empty else set()
@@ -1710,6 +1801,7 @@ def _build_data_quality(
     report_ids = set(reports["report_id"].astype(str)) if not reports.empty else set()
     return {
         "extraction_quality": extraction_quality,
+        "report_exclusions": report_exclusions,
         "missing_symbols": [{"symbol": symbol} for symbol in missing_symbols],
         "coverage": {
             "warehouse_reports": len(report_ids),

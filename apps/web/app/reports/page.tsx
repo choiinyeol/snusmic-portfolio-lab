@@ -14,11 +14,19 @@ export default function ReportsPage() {
   const candidates = getResearchCandidates();
   const extractedReports = overview.report_counts?.extracted_reports ?? quality.extractedReports;
   const visibleReports = overview.report_counts?.web_report_rows ?? stats.total;
-  const excludedReports = Math.max(0, extractedReports - visibleReports);
+  const excludedReports =
+    overview.report_counts?.excluded_reports ??
+    quality.reportExclusions.excluded_reports ??
+    Math.max(0, extractedReports - visibleReports);
   const priceMatchedReports = overview.report_counts?.price_matched_reports ?? visibleReports;
   const priceMatchRate = extractedReports > 0 ? priceMatchedReports / extractedReports : null;
-  const nonBuyRatingCount = extractionSummaryNumber(quality.extractionQuality, 'non_buy_rating');
-  const sellOpinionCount = extractionRatingCount(quality.extractionQuality, 'Sell');
+  const missingPriceRows =
+    overview.report_counts?.excluded_missing_price ?? quality.reportExclusions.missing_price ?? 0;
+  const sellOpinionRows = overview.report_counts?.excluded_sell_opinion ?? quality.reportExclusions.sell_opinion ?? 0;
+  const nonExecutableRows =
+    (overview.report_counts?.excluded_non_positive_upside ?? quality.reportExclusions.non_positive_upside ?? 0) +
+    (overview.report_counts?.excluded_downside_target ?? quality.reportExclusions.downside_target ?? 0) +
+    (overview.report_counts?.excluded_instant_target_hit ?? quality.reportExclusions.instant_target_hit ?? 0);
 
   return (
     <>
@@ -72,7 +80,7 @@ export default function ReportsPage() {
             <KpiTile
               label="검증 제외"
               value={`${excludedReports.toLocaleString('ko-KR')}건`}
-              delta={`가격 없음 ${quality.missingPriceSymbols}종목 · 매도/중립 ${nonBuyRatingCount}건 · Sell ${sellOpinionCount}건`}
+              delta={`가격 없음 ${missingPriceRows}건 · 매도 의견 ${sellOpinionRows}건 · 비실행 ${nonExecutableRows}건`}
               tone="warn"
             />
           </div>
@@ -82,24 +90,10 @@ export default function ReportsPage() {
       <Section
         eyebrow="Reports Table"
         title="리포트 통합 테이블"
-        caption="관심별 정렬은 같은 컬럼을 공유하고, 정렬·필터 프리셋만 바꿉니다. 표는 항상 검색, 정렬, 필터, 페이지네이션을 제공합니다."
+        caption={`가격 없음·매도 의견·상장 직후 목표 도달처럼 사후 검증이 어려운 ${excludedReports.toLocaleString('ko-KR')}건은 제외하고, 같은 컬럼 테이블에서 정렬·필터 프리셋만 바꿉니다.`}
       >
         <ReportsTable reports={reports} />
       </Section>
     </>
   );
-}
-
-function extractionSummaryNumber(extractionQuality: Record<string, unknown>, key: string): number {
-  const summary = extractionQuality.summary;
-  if (!summary || typeof summary !== 'object') return 0;
-  const value = (summary as Record<string, unknown>)[key];
-  return typeof value === 'number' && Number.isFinite(value) ? value : 0;
-}
-
-function extractionRatingCount(extractionQuality: Record<string, unknown>, key: string): number {
-  const counts = extractionQuality.rating_counts;
-  if (!counts || typeof counts !== 'object') return 0;
-  const value = (counts as Record<string, unknown>)[key];
-  return typeof value === 'number' && Number.isFinite(value) ? value : 0;
 }

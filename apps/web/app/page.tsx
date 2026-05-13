@@ -130,7 +130,7 @@ export default function OverviewPage() {
       </Section>
 
       <Section
-        eyebrow="Performance"
+        eyebrow="성과 경로"
         title="벤치마크 세트와 선택 가능 전략의 누적 경로"
         caption="비교 기준선과 선택 가능한 전략을 분리해 성과와 낙폭을 함께 봅니다."
         actions={
@@ -152,7 +152,7 @@ export default function OverviewPage() {
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(360px,.72fr)]">
         <Section
-          eyebrow="Holdings"
+          eyebrow="보유"
           title="현재 보유와 최신 목표가 컨텍스트"
           actions={
             <Link className="btn btn-sm btn-outline" href="/portfolio">
@@ -164,7 +164,7 @@ export default function OverviewPage() {
         </Section>
 
         <Section
-          eyebrow="Tape"
+          eyebrow="체결"
           title="최근 매수 체결"
           actions={
             <Link className="btn btn-sm btn-outline" href="/portfolio">
@@ -178,7 +178,7 @@ export default function OverviewPage() {
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(360px,.72fr)]">
         <Section
-          eyebrow="Strategy"
+          eyebrow="전략"
           title="전략 성과 요약"
           actions={
             <Link className="btn btn-sm btn-outline" href="/strategies">
@@ -189,7 +189,7 @@ export default function OverviewPage() {
           <StrategyRiskTable rows={strategyRows.slice(0, 7)} />
         </Section>
 
-        <Section eyebrow="Updates" title="최근 업데이트">
+        <Section eyebrow="갱신 내역" title="최근 업데이트">
           <UpdateFeed
             snapshotDate={overview.snapshotDate}
             stats={overview.reportStats}
@@ -199,7 +199,7 @@ export default function OverviewPage() {
       </div>
 
       <Section
-        eyebrow="Screener"
+        eyebrow="후보 탐색"
         title="리포트 기반 후보 랭킹"
         caption="아직 목표가에 도달하지 않은 리포트 중 현재 상황을 다시 확인할 만한 후보입니다."
         actions={
@@ -355,7 +355,7 @@ function RiskSummary({
           <FactLine label="벤치마크 수" value={`${benchmarkCount}개`} />
         </dl>
         <div className="grid gap-2 pt-2">
-          <div className="text-xs font-bold uppercase tracking-[0.14em] text-base-content/45">Currency exposure</div>
+          <div className="text-xs font-bold uppercase tracking-[0.14em] text-base-content/45">통화 노출</div>
           {currencyRows.map((row) => (
             <div className="grid grid-cols-[4rem_minmax(0,1fr)_3.5rem] items-center gap-2" key={row.currency}>
               <span className="font-mono text-xs font-bold text-base-content/65">{row.currency}</span>
