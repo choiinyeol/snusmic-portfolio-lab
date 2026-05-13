@@ -138,7 +138,7 @@ function buildDecisionItems({
       id: `candidate-${report.reportId}`,
       title: `${report.company || report.symbol}`,
       label: '후보 관찰',
-      reason: `목표 잔여 ${formatPercent(report.targetRemainingPct)}, 현재 수익률 ${formatPercent(report.currentReturn)}. 추천이 아니라 검토 대기열입니다.`,
+      reason: `목표 잔여 ${formatPercent(report.targetRemainingPct)}, 현재 수익률 ${formatPercent(report.currentReturn)}. 매수 신호가 아닌 검토 대기열입니다.`,
       metric: report.symbol,
       href: `/reports/${encodeURIComponent(report.symbol)}`,
       tone: 'watch',

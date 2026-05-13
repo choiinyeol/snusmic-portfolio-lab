@@ -31,7 +31,7 @@ export default function ReportsPage() {
   return (
     <>
       <PageHero
-        eyebrow="Report Validation"
+        eyebrow="리포트 검증"
         title="리포트 검증"
         subtitle="발간 이후 가격 경로, 목표가 진행률, 제외 사유를 같은 기준으로 검증합니다."
         badges={[
@@ -88,7 +88,7 @@ export default function ReportsPage() {
       />
 
       <Section
-        eyebrow="Validation Table"
+        eyebrow="검증 표"
         title="리포트 통합 테이블"
         caption={`가격 없음·매도 의견·상장 직후 목표 도달처럼 사후 검증이 어려운 ${excludedReports.toLocaleString('ko-KR')}건은 제외하고, 같은 컬럼 테이블에서 정렬·필터 프리셋만 바꿉니다.`}
       >

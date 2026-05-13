@@ -4,6 +4,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { DailyEquityHistory } from '@/components/trading/DailyEquityHistory';
 import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
 import { PositionDecisionPanel } from '@/components/trading/PositionDecisionPanel';
+import { PortfolioAnalyticsPanel } from '@/components/trading/PortfolioAnalyticsPanel';
 import { PortfolioTables } from '@/components/trading/PortfolioTables';
 import { StrategySelector, type StrategySelectorOption } from '@/components/trading/StrategySelector';
 import { TradesTable } from '@/components/trading/TradesTable';
@@ -11,6 +12,7 @@ import { KpiTile } from '@/components/ui/KpiTile';
 import { Tabs } from '@/components/ui/Tabs';
 import type { EquityPoint, HoldingRow, PositionEpisodeRow, ReportTargetDigest, TradeRow } from '@/lib/artifacts';
 import { formatKrw, formatPercent } from '@/lib/format';
+import type { StrategyLeaderboardRow } from '@/lib/product-model';
 
 type Props = {
   holdings: HoldingRow[];
@@ -20,6 +22,7 @@ type Props = {
   personas: string[];
   personaLabels: Record<string, string>;
   strategyOptions: StrategySelectorOption[];
+  strategyRows: StrategyLeaderboardRow[];
   defaultPersona: string;
   methodsByPersona: Record<
     string,
@@ -42,6 +45,7 @@ export function PortfolioStrategyView({
   personas,
   personaLabels,
   strategyOptions,
+  strategyRows,
   defaultPersona,
   methodsByPersona,
   capitalByPersona,
@@ -149,6 +153,8 @@ export function PortfolioStrategyView({
           delta={`매수 ${buyCount} · 매도 ${sellCount}`}
         />
       </div>
+
+      <PortfolioAnalyticsPanel equity={equity} persona={persona} rows={strategyRows} personaLabels={personaLabels} />
 
       <article className="lab-panel p-3 md:p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">

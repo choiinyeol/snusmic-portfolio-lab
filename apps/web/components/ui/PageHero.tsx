@@ -1,12 +1,13 @@
 import type { ReactNode } from 'react';
+import { Badge } from '@/components/ui/badge';
 
-type Badge = { label: string; value?: string | number | null };
+type HeroBadge = { label: string; value?: string | number | null };
 
 type Props = {
   eyebrow?: string;
   title: string;
   subtitle?: string;
-  badges?: Badge[];
+  badges?: HeroBadge[];
   actions?: ReactNode;
   kpis?: ReactNode;
 };
@@ -14,40 +15,33 @@ type Props = {
 export function PageHero({ eyebrow, title, subtitle, badges, actions, kpis }: Props) {
   const hasRightRail = Boolean(kpis);
   return (
-    <header className="overflow-hidden rounded-box border border-base-300 bg-[linear-gradient(135deg,#ffffff_0%,#f7faff_62%,#eef5ff_100%)] shadow-sm">
+    <header className="border-b border-slate-200 pb-5">
       <div
-        className={`relative grid overflow-hidden gap-5 p-5 md:p-6 ${hasRightRail ? 'md:grid-cols-[minmax(0,1fr)_minmax(320px,.85fr)]' : ''}`}
+        className={`grid gap-5 ${hasRightRail ? 'xl:grid-cols-[minmax(0,1fr)_minmax(420px,.85fr)] xl:items-end' : ''}`}
       >
-        <div className="pointer-events-none absolute -right-24 -top-28 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-32 left-1/3 h-64 w-64 rounded-full bg-accent/10 blur-3xl" />
-        <div className="relative grid min-w-0 content-center gap-3">
+        <div className="grid min-w-0 gap-3">
           {eyebrow ? (
-            <span className="badge badge-primary badge-soft w-fit text-xs tracking-[0.18em]">{eyebrow}</span>
+            <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+              {eyebrow}
+            </div>
           ) : null}
-          <h1 className="text-3xl font-black tracking-[-0.055em] text-base-content md:text-4xl">{title}</h1>
-          {subtitle ? (
-            <p className="max-w-3xl break-words text-sm leading-relaxed text-base-content/65 md:text-[0.98rem]">
-              {subtitle}
-            </p>
-          ) : null}
+          <h1 className="text-3xl font-semibold tracking-[-0.045em] text-slate-950 md:text-4xl">{title}</h1>
+          {subtitle ? <p className="max-w-3xl text-sm leading-6 text-slate-600">{subtitle}</p> : null}
           {badges?.length ? (
             <dl className="flex min-w-0 flex-wrap gap-1.5">
               {badges.map((badge) => (
-                <span
-                  key={badge.label}
-                  className="inline-flex max-w-full items-center gap-1 rounded-full border border-base-300 bg-white/70 px-2.5 py-1 text-xs shadow-sm"
-                >
-                  <dt className="shrink-0 text-base-content/55">{badge.label}</dt>
+                <Badge className="gap-1.5 font-normal" key={badge.label} variant="outline">
+                  <dt className="text-slate-500">{badge.label}</dt>
                   {badge.value !== undefined && badge.value !== null && badge.value !== '' ? (
-                    <dd className="min-w-0 truncate font-semibold text-base-content">{badge.value}</dd>
+                    <dd className="font-semibold text-slate-950">{badge.value}</dd>
                   ) : null}
-                </span>
+                </Badge>
               ))}
             </dl>
           ) : null}
           {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
         </div>
-        {kpis ? <div className="relative min-w-0">{kpis}</div> : null}
+        {kpis ? <div className="min-w-0">{kpis}</div> : null}
       </div>
     </header>
   );

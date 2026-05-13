@@ -98,18 +98,26 @@ export type ExecutiveOverview = {
   researchCandidates: ResearchCandidate[];
 };
 
+export const DEFAULT_PORTFOLIO_PERSONA = 'smic_follower_v2';
+
 export function getDefaultPortfolioPersona(): string {
-  const selectable = getStrategyLeaderboard().filter((row) => row.kind === 'strategy');
-  const best = [...selectable].sort((a, b) => {
-    if (a.objectivePassed !== b.objectivePassed) return a.objectivePassed ? -1 : 1;
-    const returnDelta = (b.returnPct ?? Number.NEGATIVE_INFINITY) - (a.returnPct ?? Number.NEGATIVE_INFINITY);
-    if (returnDelta !== 0) return returnDelta;
-    return (a.maxDrawdown ?? Number.POSITIVE_INFINITY) - (b.maxDrawdown ?? Number.POSITIVE_INFINITY);
-  })[0];
-  if (!best) {
+  const summaries = getSummaryRows();
+  const holdings = getCurrentHoldings();
+  const preferred = summaries.find((row) => row.persona === DEFAULT_PORTFOLIO_PERSONA);
+  if (preferred && holdings.some((row) => row.persona === DEFAULT_PORTFOLIO_PERSONA)) {
+    return DEFAULT_PORTFOLIO_PERSONA;
+  }
+  const withOpenHoldings = summaries
+    .filter((summary) => holdings.some((holding) => holding.persona === summary.persona))
+    .sort(
+      (a, b) =>
+        (b.moneyWeightedReturn ?? Number.NEGATIVE_INFINITY) - (a.moneyWeightedReturn ?? Number.NEGATIVE_INFINITY),
+    );
+  const fallback = withOpenHoldings[0] ?? summaries[0];
+  if (!fallback) {
     throw new Error('Strategy catalog has no selectable strategy for the default portfolio view.');
   }
-  return best.id;
+  return fallback.persona;
 }
 
 export function getExecutiveOverview(persona = getDefaultPortfolioPersona()): ExecutiveOverview {
