@@ -1,12 +1,12 @@
 # SNUSMIC Portfolio Lab
 
-SNUSMIC Portfolio Lab은 서울대 SMIC 리서치 PDF에서 추출한 목표가·티커·발간일 데이터와 KRW 환산 일봉 가격을 결합해, **리서치 추천 → share-based 원장 → 포트폴리오 성과 → 전략 검증**을 추적하는 정적 스냅샷 기반 투자 리서치 대시보드입니다.
+SNUSMIC Portfolio Lab은 서울대 SMIC 리서치 PDF에서 추출한 목표가·티커·발간일 데이터와 KRW 환산 일봉 가격을 결합해, **리서치 추천 → share-based 원장 → 포트폴리오 성과 → 전략 검증**을 추적하는 읽기 전용 투자 리서치 대시보드입니다.
 
 - Python: PDF/가격 웨어하우스, share-based 증권 원장, 페르소나 시뮬레이션, 웹용 JSON/CSV 생성
-- Next.js: `data/web` canonical artifacts를 읽는 정적 Reports/Portfolio/Strategies 대시보드
+- Next.js: `data/web` 기준 데이터를 읽는 정적 Reports/Portfolio/Strategies 대시보드
 - 원칙: 필수 아티팩트가 없거나 schema가 맞지 않으면 빠르게 실패합니다. `public/downloads`는 내려받기용 복사본일 뿐 source of truth가 아닙니다.
 
-이 프로젝트는 실시간 주문·체결 제품이 아니며, 모든 화면은 커밋된 정적 아티팩트에서 계산됩니다.
+이 프로젝트는 실시간 주문·체결 제품이 아니며, 모든 화면은 가격 확인이 끝난 기준 데이터에서 계산됩니다.
 
 ## 제품 방향
 
@@ -93,10 +93,10 @@ uv run python scripts/run_persona_sim.py \
   --warehouse data/warehouse \
   --out data/sim \
   --broker-strategy-trials 400 \
-  --broker-strategy-top 5
+  --broker-strategy-top 0
 
-# broker-strategy-top은 승격 한도입니다.
-# full-period에서 가장 강한 벤치마크를 이긴 후보만 최대 5개까지 승격합니다.
+# broker-strategy-top은 승격 한도입니다. 0이면 조건을 통과한 모든 고유 전략을 승격합니다.
+# Weak Prophet은 미래정보 상한선이므로 전략 선발 기준에서는 제외하고, 거래 가능한 벤치마크를 기준으로 삼습니다.
 
 # 웹 아티팩트만 재생성
 uv run python -m snusmic_pipeline export-web --warehouse data/warehouse --sim data/sim --out data/web
@@ -116,6 +116,7 @@ uv run python -m snusmic_pipeline export-web --warehouse data/warehouse --sim da
 ### `data/web`
 
 - `manifest.json`: schema version, generated timestamp, date ranges, row counts, checksums
+- `strategies/catalog.json`: 벤치마크/오라클/고유 전략 분류, 짧은 라벨, 매수·매도 규칙, 리스크 제어, 핵심 지표
 - `overview.json`, `personas.json`: 대시보드/전략 요약
 - `reports.json`, `report-rankings.json`, `report-detail-metrics.json`: Reports 화면 데이터
 - `current-holdings.json`, `monthly-holdings.json`: Portfolio 화면 데이터
@@ -137,6 +138,8 @@ pnpm --dir apps/web build
 
 자세한 기술 구조와 UI/UX 원칙은 아래 문서를 따릅니다.
 
+- [`DESIGN.md`](DESIGN.md)
+- [`docs/data-surface-architecture.md`](docs/data-surface-architecture.md)
 - [`docs/technical-architecture.md`](docs/technical-architecture.md)
 - [`docs/ui-ux-principles.md`](docs/ui-ux-principles.md)
 

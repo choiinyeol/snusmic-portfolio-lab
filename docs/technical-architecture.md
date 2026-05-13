@@ -5,7 +5,7 @@ SNUSMIC Portfolio Lab is an artifact-backed research, portfolio, and strategy va
 ## Product contract
 
 - **Artifact-first:** `data/web` is the frontend source of truth. The web runtime must not read `public/downloads` or remote market data as source data.
-- **Static snapshot:** pages present a dated snapshot, not a live broker view. User-facing copy must preserve `Static Artifacts`, `No live trading`, and Korean equivalents such as `정적 스냅샷` and `커밋된 아티팩트 기준`.
+- **Read-only snapshot:** pages present a dated basis-data view, not a live broker view. Primary product copy should use user language such as `기준 데이터`, `읽기 전용`, `가격 확인`, and `전략 비교`; implementation labels such as `Static Artifacts`, `canonical`, and `data/web` belong in technical/data-quality surfaces.
 - **Fast-fail schema boundary:** required artifacts are validated at read/build time. A required schema mismatch should stop the build with an actionable path, not render misleading empty analytics.
 - **Server-first frontend:** Server Components read artifacts, compute static summaries, and render cards/tables. Client islands are reserved for charts, treemaps, and table interactions.
 - **No runtime market calls:** market/FX refresh belongs to the Python pipeline before build. Next.js rendering must not call live market APIs.
@@ -16,6 +16,7 @@ SNUSMIC Portfolio Lab is an artifact-backed research, portfolio, and strategy va
 Core frontend artifacts live in `data/web`:
 
 - `manifest.json` — snapshot schema version, generated timestamp, row counts, date ranges, and checksums.
+- `strategies/catalog.json` — benchmark/strategy/oracle taxonomy, labels, default-candidate metadata, methodology summaries, buy/sell rules, risk controls, params, and core metrics.
 - `overview.json` — snapshot windows, summary rows, report statistics, and benchmark summary.
 - `reports.json` — report-level target/price validation rows.
 - `current-holdings.json` — current share-based holdings for each persona/strategy.
@@ -44,7 +45,7 @@ These are benchmarks and should be shown as comparison lines/cards, not marketed
 
 ### Selectable strategies
 
-Every persona/row outside the benchmark set is a proprietary/selectable broker-ledger strategy. UI should group these separately from benchmarks and make their methodology explicit.
+Every persona/row outside the benchmark set is a proprietary/selectable broker-ledger strategy. UI should group these separately from benchmarks and make their methodology explicit. The frontend must read this taxonomy from `strategies/catalog.json` instead of hardcoding business meaning from persona IDs.
 
 ### Personal objective gate
 

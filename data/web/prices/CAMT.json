@@ -25376,6 +25376,19 @@
       "open": 206.00999450683594,
       "source_currency": "USD",
       "volume": 57939.0
+    },
+    {
+      "close": 174.63000488281253,
+      "close_krw": 257483.2022,
+      "currency": "USD",
+      "date": "2026-05-12",
+      "display_currency": "USD",
+      "high": 192.9199981689453,
+      "krw_per_unit": 1474.449951171875,
+      "low": 168.07000732421875,
+      "open": 192.36000061035156,
+      "source_currency": "USD",
+      "volume": 1400300.0
     }
   ],
   "symbol": "CAMT"

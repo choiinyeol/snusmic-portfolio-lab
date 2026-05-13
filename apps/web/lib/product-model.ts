@@ -5,28 +5,22 @@ import {
   getOverview,
   getPersonaLabel,
   getReportRows,
+  getStrategyCatalog,
   getSummaryRows,
   type EquityPoint,
   type HoldingRow,
   type ReportRow,
+  type StrategyCatalogRow,
   type SummaryRow,
 } from '@/lib/artifacts';
 
-export const PRIMARY_PERSONA = 'smic_follower_v2';
 export const TARGET_BENCHMARK_ID = 'benchmark_kodex200';
 export const OBJECTIVE_MAX_DRAWDOWN = 0.15;
-export const BENCHMARK_IDS = [
-  'all_weather',
-  'smic_follower',
-  'smic_follower_v2',
-  TARGET_BENCHMARK_ID,
-  'benchmark_qqq',
-  'benchmark_spy',
-  'benchmark_gld',
-  'weak_oracle',
-] as const;
+export const BENCHMARK_IDS = getStrategyCatalog()
+  .filter((row) => row.kind !== 'strategy')
+  .map((row) => row.strategyId);
 
-export type StrategyKind = 'benchmark' | 'strategy';
+export type StrategyKind = 'benchmark' | 'strategy' | 'oracle';
 
 export type PortfolioSnapshot = {
   persona: string;
@@ -62,7 +56,9 @@ export type ReportStats = {
 export type StrategyLeaderboardRow = {
   id: string;
   label: string;
+  shortLabel: string;
   kind: StrategyKind;
+  benchmarkGroup: string | null;
   returnPct: number | null;
   maxDrawdown: number | null;
   sharpe: number | null;
@@ -74,6 +70,11 @@ export type StrategyLeaderboardRow = {
   objectiveMddSlack: number | null;
   objectiveReturnExcess: number | null;
   sourceLabel: string;
+  methodologySummary: string;
+  buyRules: string[];
+  sellRules: string[];
+  riskControls: string[];
+  params: Record<string, unknown>;
   href: string;
 };
 
@@ -92,12 +93,26 @@ export type ExecutiveOverview = {
   researchCandidates: ResearchCandidate[];
 };
 
-export function getExecutiveOverview(): ExecutiveOverview {
+export function getDefaultPortfolioPersona(): string {
+  const selectable = getStrategyLeaderboard().filter((row) => row.kind === 'strategy');
+  const best = [...selectable].sort((a, b) => {
+    if (a.objectivePassed !== b.objectivePassed) return a.objectivePassed ? -1 : 1;
+    const returnDelta = (b.returnPct ?? Number.NEGATIVE_INFINITY) - (a.returnPct ?? Number.NEGATIVE_INFINITY);
+    if (returnDelta !== 0) return returnDelta;
+    return (a.maxDrawdown ?? Number.POSITIVE_INFINITY) - (b.maxDrawdown ?? Number.POSITIVE_INFINITY);
+  })[0];
+  if (!best) {
+    throw new Error('Strategy catalog has no selectable strategy for the default portfolio view.');
+  }
+  return best.id;
+}
+
+export function getExecutiveOverview(persona = getDefaultPortfolioPersona()): ExecutiveOverview {
   const overview = getOverview();
   const reports = getReportRows();
   return {
     snapshotDate: overview.simulation_window?.price_end ?? overview.simulation_window?.report_end ?? '',
-    portfolio: getPortfolioSnapshot(PRIMARY_PERSONA),
+    portfolio: getPortfolioSnapshot(persona),
     reportStats: buildReportStats(reports),
     bestStrategies: getSelectableStrategyRows(getStrategyLeaderboard()).slice(0, 5),
     recentReports: [...reports].sort((a, b) => b.publicationDate.localeCompare(a.publicationDate)).slice(0, 6),
@@ -107,11 +122,11 @@ export function getExecutiveOverview(): ExecutiveOverview {
 
 export function getPrimaryHoldings(): HoldingRow[] {
   return getCurrentHoldings()
-    .filter((row) => row.persona === PRIMARY_PERSONA)
+    .filter((row) => row.persona === getDefaultPortfolioPersona())
     .sort((a, b) => (b.marketValueKrw ?? 0) - (a.marketValueKrw ?? 0));
 }
 
-export function getPortfolioSnapshot(persona = PRIMARY_PERSONA): PortfolioSnapshot {
+export function getPortfolioSnapshot(persona = getDefaultPortfolioPersona()): PortfolioSnapshot {
   const holdings = getCurrentHoldings()
     .filter((row) => row.persona === persona)
     .sort((a, b) => (b.marketValueKrw ?? 0) - (a.marketValueKrw ?? 0));
@@ -211,7 +226,8 @@ export function getStrategyLeaderboard(): StrategyLeaderboardRow[] {
   const summaries = getSummaryRows();
   const equity = getEquityDaily();
   const benchmark = targetBenchmark(summaries);
-  const personaRows = summaries.map((summary) => strategyRowFromSummary(summary, equity, benchmark));
+  const catalogById = new Map(getStrategyCatalog().map((row) => [row.strategyId, row]));
+  const personaRows = summaries.map((summary) => strategyRowFromSummary(summary, equity, benchmark, catalogById));
   return personaRows
     .map((row) => ({ ...row, benchmarkLabel: benchmark?.label ?? 'KOSPI/KODEX 200' }))
     .sort((a, b) => (b.returnPct ?? Number.NEGATIVE_INFINITY) - (a.returnPct ?? Number.NEGATIVE_INFINITY));
@@ -220,7 +236,7 @@ export function getStrategyLeaderboard(): StrategyLeaderboardRow[] {
 export function getBenchmarkRows(rows = getStrategyLeaderboard()): StrategyLeaderboardRow[] {
   const order = new Map<string, number>(BENCHMARK_IDS.map((id, index) => [id, index]));
   return rows
-    .filter((row) => row.kind === 'benchmark')
+    .filter((row) => row.kind !== 'strategy')
     .sort((a, b) => (order.get(a.id) ?? 999) - (order.get(b.id) ?? 999));
 }
 
@@ -233,26 +249,31 @@ export function getObjectivePassingRows(rows = getStrategyLeaderboard()): Strate
 }
 
 export function isBenchmarkPersona(persona: string): boolean {
-  return (BENCHMARK_IDS as readonly string[]).includes(persona);
+  return getStrategyCatalog().some((row) => row.strategyId === persona && row.kind !== 'strategy');
 }
 
 function strategyRowFromSummary(
   summary: SummaryRow,
   equity: EquityPoint[],
   benchmark: SummaryRow | undefined,
+  catalogById: Map<string, StrategyCatalogRow>,
 ): StrategyLeaderboardRow {
+  const catalog = catalogById.get(summary.persona);
   const metrics = riskMetricsFromCumulative(
     equity
       .filter((point) => point.persona === summary.persona && point.cumulativeReturn !== null)
       .map((point) => point.cumulativeReturn ?? 0),
   );
-  const kind: StrategyKind = isBenchmarkPersona(summary.persona) ? 'benchmark' : 'strategy';
+  const kind: StrategyKind = catalog?.kind ?? (isBenchmarkPersona(summary.persona) ? 'benchmark' : 'strategy');
   const returnPct = summary.moneyWeightedReturn ?? null;
   const objective = objectiveGate(kind, returnPct, summary.maxDrawdown, benchmark?.moneyWeightedReturn ?? null);
+  const label = catalog?.label ?? summary.label ?? getPersonaLabel(summary.persona);
   return {
     id: summary.persona,
-    label: compactStrategyLabel(summary.persona, summary.label ?? getPersonaLabel(summary.persona)),
+    label,
+    shortLabel: catalog?.shortLabel ?? compactStrategyLabel(summary.persona, label),
     kind,
+    benchmarkGroup: catalog?.benchmarkGroup ?? null,
     returnPct,
     maxDrawdown: summary.maxDrawdown,
     sharpe: metrics.sharpe,
@@ -266,10 +287,15 @@ function strategyRowFromSummary(
         ? summary.moneyWeightedReturn - (benchmark.moneyWeightedReturn ?? 0)
         : null,
     benchmarkLabel: benchmark?.label ?? 'KOSPI/KODEX 200',
-    objectivePassed: objective.passed,
-    objectiveMddSlack: objective.mddSlack,
-    objectiveReturnExcess: objective.returnExcess,
-    sourceLabel: kind === 'benchmark' ? '벤치마크' : '고유 전략',
+    objectivePassed: catalog?.objectivePassed ?? objective.passed,
+    objectiveMddSlack: catalog?.objectiveMddSlack ?? objective.mddSlack,
+    objectiveReturnExcess: catalog?.objectiveReturnExcess ?? objective.returnExcess,
+    sourceLabel: kind === 'strategy' ? '고유 전략' : kind === 'oracle' ? '오라클 기준선' : '벤치마크',
+    methodologySummary: catalog?.methodologySummary ?? '',
+    buyRules: catalog?.buyRules ?? [],
+    sellRules: catalog?.sellRules ?? [],
+    riskControls: catalog?.riskControls ?? [],
+    params: catalog?.params ?? {},
     href: '/portfolio',
   };
 }
@@ -287,7 +313,7 @@ function objectiveGate(
   const mddSlack = maxDrawdown === null ? null : OBJECTIVE_MAX_DRAWDOWN - maxDrawdown;
   const returnExcess = returnPct !== null && benchmarkReturn !== null ? returnPct - benchmarkReturn : null;
   return {
-    passed: kind !== 'benchmark' && mddSlack !== null && mddSlack >= 0 && returnExcess !== null && returnExcess > 0,
+    passed: kind === 'strategy' && mddSlack !== null && mddSlack >= 0 && returnExcess !== null && returnExcess > 0,
     mddSlack,
     returnExcess,
   };

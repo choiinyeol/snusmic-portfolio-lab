@@ -19,6 +19,11 @@ type Props = {
   personas: string[];
   personaLabels: Record<string, string>;
   personaKinds: Record<string, string>;
+  defaultPersona: string;
+  methodsByPersona: Record<
+    string,
+    { summary: string; buyRules: string[]; sellRules: string[]; riskControls: string[] }
+  >;
   capitalByPersona: Record<string, number>;
   cashByPersona: Record<string, number>;
   reportSymbolsById: Record<string, string>;
@@ -36,18 +41,20 @@ export function PortfolioStrategyView({
   personas,
   personaLabels,
   personaKinds,
+  defaultPersona,
+  methodsByPersona,
   capitalByPersona,
   cashByPersona,
   reportSymbolsById,
   targetsBySymbol,
   targetsByReportId,
 }: Props) {
-  const defaultPersona = personas.includes('smic_follower_v2') ? 'smic_follower_v2' : (personas[0] ?? '');
+  const resolvedDefaultPersona = personas.includes(defaultPersona) ? defaultPersona : (personas[0] ?? '');
   const [persona, setPersona] = useState<string>(() => {
-    if (typeof window === 'undefined') return defaultPersona;
+    if (typeof window === 'undefined') return resolvedDefaultPersona;
     const params = new URLSearchParams(window.location.search);
     const fromUrl = params.get(URL_STRATEGY_PARAM);
-    return fromUrl && personas.includes(fromUrl) ? fromUrl : defaultPersona;
+    return fromUrl && personas.includes(fromUrl) ? fromUrl : resolvedDefaultPersona;
   });
 
   useEffect(() => {
@@ -166,6 +173,8 @@ export function PortfolioStrategyView({
         </p>
       </article>
 
+      <StrategyMethodPanel method={methodsByPersona[persona]} personaLabel={personaLabels[persona] ?? persona} />
+
       <PositionDecisionPanel
         holdings={holdings}
         trades={trades}
@@ -218,6 +227,45 @@ export function PortfolioStrategyView({
           },
         ]}
       />
+    </div>
+  );
+}
+
+function StrategyMethodPanel({
+  method,
+  personaLabel,
+}: {
+  method: { summary: string; buyRules: string[]; sellRules: string[]; riskControls: string[] } | undefined;
+  personaLabel: string;
+}) {
+  if (!method) return null;
+  return (
+    <article className="lab-panel p-4">
+      <div className="mb-3">
+        <div className="lab-panel__eyebrow">Strategy method</div>
+        <h2 className="lab-panel__title">{personaLabel} 매수·매도 규칙</h2>
+        <p className="mt-2 text-sm leading-6 text-base-content/62">{method.summary}</p>
+      </div>
+      <div className="grid gap-3 md:grid-cols-3">
+        <RuleList title="매수 판단" items={method.buyRules} />
+        <RuleList title="매도 판단" items={method.sellRules} />
+        <RuleList title="위험 관리" items={method.riskControls} />
+      </div>
+    </article>
+  );
+}
+
+function RuleList({ title, items }: { title: string; items: string[] }) {
+  return (
+    <div className="rounded-2xl border border-base-300 bg-base-100 p-3">
+      <h3 className="text-sm font-black">{title}</h3>
+      <ul className="mt-2 grid gap-1.5 text-sm leading-5 text-base-content/65">
+        {items.length ? (
+          items.map((item) => <li key={item}>• {item}</li>)
+        ) : (
+          <li className="text-base-content/45">기록된 규칙이 없습니다.</li>
+        )}
+      </ul>
     </div>
   );
 }

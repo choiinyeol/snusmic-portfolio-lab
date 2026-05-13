@@ -24414,6 +24414,32 @@
       "open": 9.060000419616697,
       "source_currency": "CNY",
       "volume": 211078762.0
+    },
+    {
+      "close": 8.720000267028809,
+      "close_krw": 1920.022,
+      "currency": "CNY",
+      "date": "2026-05-12",
+      "display_currency": "CNY",
+      "high": 9.100000381469727,
+      "krw_per_unit": 220.18600463867188,
+      "low": 8.699999809265135,
+      "open": 9.069999694824219,
+      "source_currency": "CNY",
+      "volume": 230814594.0
+    },
+    {
+      "close": 8.840000152587892,
+      "close_krw": 1946.4443,
+      "currency": "CNY",
+      "date": "2026-05-13",
+      "display_currency": "CNY",
+      "high": 9.03999996185303,
+      "krw_per_unit": 220.18600463867188,
+      "low": 8.720000267028809,
+      "open": 9.0600004196167,
+      "source_currency": "CNY",
+      "volume": 144552421.0
     }
   ],
   "symbol": "002340.SZ"

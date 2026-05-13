@@ -18,6 +18,7 @@ REQUIRED_ARTIFACTS = [
     "manifest.json",
     "overview.json",
     "personas.json",
+    "strategies/catalog.json",
     "reports.json",
     "report-rankings.json",
     "report-detail-metrics.json",
@@ -260,6 +261,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
 
     report_rows = _build_report_rows(reports, report_performance, extraction_quality, missing_symbols)
     overview = _build_overview(reports, prices, summary, report_stats, missing_symbols, report_rows)
+    strategy_catalog = _build_strategy_catalog(summary, inputs.sim / "personas.json")
     return_windows = _build_return_windows(report_rows, prices)
     detail_metrics = _build_detail_metrics(report_rows, prices, return_windows)
     target_distribution = _build_target_hit_distribution(report_rows)
@@ -269,6 +271,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
 
     _write_json(out / "overview.json", overview)
     _write_json(out / "personas.json", _records(summary))
+    _write_json(out / "strategies" / "catalog.json", strategy_catalog)
     _write_json(out / "reports.json", report_rows)
     _write_json(out / "report-rankings.json", rankings)
     _write_json(out / "report-detail-metrics.json", detail_metrics)
@@ -404,6 +407,7 @@ def _build_manifest(out: Path, overview: dict[str, Any]) -> dict[str, Any]:
         "position_episodes": _json_row_count(out / "position-episodes.json"),
         "equity_daily": _json_row_count(out / "equity-daily.json"),
         "personas": _json_row_count(out / "personas.json"),
+        "strategy_catalog": _json_row_count(out / "strategies" / "catalog.json"),
     }
     report_counts = overview.get("report_counts", {}) if isinstance(overview, dict) else {}
     target_stats = overview.get("target_stats", {}) if isinstance(overview, dict) else {}
@@ -769,6 +773,268 @@ def _build_overview(
             "price_end": max(price_dates) if price_dates else None,
         },
     }
+
+
+BENCHMARK_PERSONA_IDS = {
+    "all_weather",
+    "smic_follower",
+    "smic_follower_v2",
+    "benchmark_kodex200",
+    "benchmark_qqq",
+    "benchmark_spy",
+    "benchmark_gld",
+    "weak_oracle",
+}
+
+TARGET_BENCHMARK_ID = "benchmark_kodex200"
+OBJECTIVE_MAX_DRAWDOWN = 0.15
+
+
+def _build_strategy_catalog(summary: pd.DataFrame, sim_config_path: Path) -> list[dict[str, Any]]:
+    """Build the frontend strategy taxonomy and methodology contract.
+
+    The UI must not infer benchmark/strategy meaning from fragile string
+    prefixes. This catalog is the product boundary: labels, short labels,
+    benchmark groups, strategy rules, objective gate, and searchable params are
+    exported together with the simulation output.
+    """
+
+    config_by_id = _persona_config_by_id(sim_config_path)
+    summary_rows = _records(summary)
+    summary_by_id = {str(row.get("persona")): row for row in summary_rows if row.get("persona")}
+    benchmark_return = _number(summary_by_id.get(TARGET_BENCHMARK_ID, {}).get("money_weighted_return"))
+    rows: list[dict[str, Any]] = []
+
+    for row in summary_rows:
+        strategy_id = str(row.get("persona") or "")
+        if not strategy_id:
+            continue
+        config = config_by_id.get(strategy_id, {})
+        kind = _strategy_kind(strategy_id)
+        return_pct = _number(row.get("money_weighted_return"))
+        max_drawdown = _number(row.get("max_drawdown"))
+        return_excess = (
+            return_pct - benchmark_return
+            if return_pct is not None and benchmark_return is not None and strategy_id != TARGET_BENCHMARK_ID
+            else None
+        )
+        mdd_slack = OBJECTIVE_MAX_DRAWDOWN - max_drawdown if max_drawdown is not None else None
+        objective_passed = (
+            kind == "strategy"
+            and return_excess is not None
+            and return_excess > 0
+            and mdd_slack is not None
+            and mdd_slack >= 0
+        )
+        label = str(row.get("label") or config.get("label") or strategy_id)
+        rows.append(
+            {
+                "strategy_id": strategy_id,
+                "label": label,
+                "short_label": _strategy_short_label(strategy_id, label),
+                "kind": kind,
+                "benchmark_group": _benchmark_group(strategy_id),
+                "is_selectable": kind == "strategy",
+                "is_default_candidate": kind == "strategy",
+                "objective_passed": objective_passed,
+                "objective_return_excess": return_excess,
+                "objective_mdd_slack": mdd_slack,
+                "methodology_summary": _methodology_summary(strategy_id, config),
+                "buy_rules": _buy_rules(strategy_id, config),
+                "sell_rules": _sell_rules(strategy_id, config),
+                "risk_controls": _risk_controls(strategy_id, config),
+                "params": _strategy_params(config),
+                "metrics": {
+                    "final_equity_krw": _number(row.get("final_equity_krw")),
+                    "final_cash_krw": _number(row.get("final_cash_krw")),
+                    "final_holdings_value_krw": _number(row.get("final_holdings_value_krw")),
+                    "money_weighted_return": return_pct,
+                    "cagr": _number(row.get("cagr")),
+                    "max_drawdown": max_drawdown,
+                    "trade_count": _number(row.get("trade_count")),
+                    "open_positions": _number(row.get("open_positions")),
+                },
+            }
+        )
+
+    return sorted(rows, key=_strategy_catalog_sort_key)
+
+
+def _persona_config_by_id(path: Path) -> dict[str, dict[str, Any]]:
+    if not path.exists():
+        raise RuntimeError(f"Required simulation config artifact is missing: {path}")
+    data = _read_json(path)
+    config = data.get("config") if isinstance(data, dict) else None
+    personas = config.get("personas") if isinstance(config, dict) else None
+    if not isinstance(personas, list):
+        raise RuntimeError(f"{path} must contain config.personas for strategy catalog export.")
+    out: dict[str, dict[str, Any]] = {}
+    for item in personas:
+        if not isinstance(item, dict):
+            continue
+        strategy_id = item.get("persona_name")
+        if strategy_id:
+            out[str(strategy_id)] = _clean(item)
+    return out
+
+
+def _strategy_kind(strategy_id: str) -> str:
+    if strategy_id == "weak_oracle":
+        return "oracle"
+    if strategy_id in BENCHMARK_PERSONA_IDS:
+        return "benchmark"
+    return "strategy"
+
+
+def _benchmark_group(strategy_id: str) -> str | None:
+    if strategy_id == "all_weather":
+        return "allocation"
+    if strategy_id in {"smic_follower", "smic_follower_v2"}:
+        return "follower"
+    if strategy_id in {"benchmark_kodex200", "benchmark_qqq", "benchmark_spy", "benchmark_gld"}:
+        return "market"
+    if strategy_id == "weak_oracle":
+        return "oracle"
+    return None
+
+
+def _strategy_short_label(strategy_id: str, label: str) -> str:
+    labels = {
+        "all_weather": "All-Weather",
+        "smic_follower": "Follower v1",
+        "smic_follower_v2": "Follower SL",
+        "benchmark_kodex200": "KODEX200",
+        "benchmark_qqq": "QQQ",
+        "benchmark_spy": "SPY",
+        "benchmark_gld": "GLD",
+        "weak_oracle": "Weak Prophet",
+    }
+    if strategy_id in labels:
+        return labels[strategy_id]
+    prefix = "smic_mtt_strategy_top"
+    if strategy_id.startswith(prefix):
+        return f"MTT #{strategy_id.removeprefix(prefix)}"
+    return label.replace("SMIC MTT Strategy #", "MTT #")
+
+
+def _methodology_summary(strategy_id: str, config: dict[str, Any]) -> str:
+    if strategy_id == "all_weather":
+        return "GLD, QQQ, SPY, KODEX200을 같은 비중으로 보유하며 월 단위로 리밸런싱하는 분산 기준선입니다."
+    if strategy_id.startswith("benchmark_"):
+        assets = config.get("assets") if isinstance(config.get("assets"), list) else []
+        name = assets[0].get("name") if assets and isinstance(assets[0], dict) else strategy_id
+        return f"{name} 단일 자산을 추적하는 시장 기준선입니다."
+    if strategy_id == "smic_follower":
+        return "가격 매칭된 상승 리포트를 1/N으로 추종하는 단순 기준선입니다."
+    if strategy_id == "smic_follower_v2":
+        return "SMIC Follower에 시간 손실, 물타기 손실, 리포트 만료 손절 규칙을 추가한 기준선입니다."
+    if strategy_id == "weak_oracle":
+        return (
+            "미래 가격 정보를 일부 사용하는 강한 상한선 기준입니다. 투자 가능한 전략으로 해석하지 않습니다."
+        )
+    if strategy_id.startswith("smic_mtt_strategy"):
+        return "리포트 업사이드와 MTT 추세 조건을 통과한 종목만 실제 주식 수량 단위로 매수·보유·매도하는 원장형 전략입니다."
+    return "시뮬레이션 원장에 포함된 전략입니다."
+
+
+def _buy_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
+    if strategy_id.startswith("smic_mtt_strategy"):
+        rules = [
+            f"발간 시 목표 업사이드 {_pct(config.get('min_target_upside_at_pub'))} 이상",
+            f"목표 업사이드 {_pct(config.get('max_target_upside_at_pub'))} 이하",
+            f"최대 보유 {int(config.get('max_positions') or 0)}개 슬롯",
+            f"투자 유니버스: {config.get('universe', 'all')}",
+        ]
+        if config.get("require_mtt"):
+            rules.extend(
+                [
+                    f"52주 저점 대비 {_pct(config.get('min_price_vs_52w_low'))} 이상",
+                    f"52주 고점 대비 {_pct(config.get('max_pct_below_52w_high'))} 이내",
+                    f"200일선 1개월 변화율 {_pct(config.get('min_ma200_1m_return'))} 이상",
+                ]
+            )
+        return rules
+    if strategy_id == "smic_follower":
+        return ["상승 목표가가 있는 가격 매칭 리포트를 1/N으로 편입"]
+    if strategy_id == "smic_follower_v2":
+        return [
+            "상승 목표가가 있는 가격 매칭 리포트를 1/N으로 편입",
+            "리포트/가격 조건에 따라 일별로 매수 판단",
+        ]
+    if strategy_id == "weak_oracle":
+        return [f"{int(config.get('lookahead_months') or 0)}개월 앞 수익률 정보를 사용해 월간 비중 산정"]
+    if strategy_id in BENCHMARK_PERSONA_IDS:
+        return ["정해진 기준 자산을 월간 리밸런싱"]
+    return []
+
+
+def _sell_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
+    if strategy_id.startswith("smic_mtt_strategy"):
+        return [
+            f"손절 {_pct(config.get('stop_loss_pct'))}",
+            f"익절 {_pct(config.get('take_profit_pct'))}",
+            f"리포트 발간 후 {int(config.get('report_age_stop_days') or 0)}일 경과",
+            f"목표가 도달 배수 {float(config.get('target_hit_multiplier') or 1):.2f}x",
+        ]
+    if strategy_id == "smic_follower_v2":
+        return [
+            f"{int(config.get('time_loss_days') or 0)}일 보유 후 손실이면 정리",
+            f"물타기 포지션 손실 {_pct(config.get('averaged_down_stop_pct'))} 초과 시 정리",
+            f"리포트 발간 후 {int(config.get('report_age_stop_days') or 0)}일 경과",
+        ]
+    if strategy_id == "smic_follower":
+        return ["목표가 도달 또는 리포트 만료 기준으로 정리"]
+    if strategy_id in BENCHMARK_PERSONA_IDS:
+        return ["월간 리밸런싱으로 비중 조정"]
+    return []
+
+
+def _risk_controls(strategy_id: str, config: dict[str, Any]) -> list[str]:
+    if strategy_id.startswith("smic_mtt_strategy"):
+        cadence = config.get("top_up_cadence", "monthly")
+        return [
+            f"추가 매수 주기: {cadence}",
+            "정수 주식 수량 기반 체결",
+            "수수료·세금 반영",
+            "미충족 후보가 없으면 현금 보유",
+        ]
+    if strategy_id == "weak_oracle":
+        return [
+            f"개별 자산 최대 비중 {_pct(config.get('max_weight'))}",
+            "미래정보 사용 기준선",
+        ]
+    return ["벤치마크 비교용 기준선"] if strategy_id in BENCHMARK_PERSONA_IDS else []
+
+
+def _strategy_params(config: dict[str, Any]) -> dict[str, Any]:
+    excluded = {"persona_name", "label", "assets"}
+    return {key: value for key, value in config.items() if key not in excluded}
+
+
+def _strategy_catalog_sort_key(row: dict[str, Any]) -> tuple[int, float, str]:
+    strategy_id = str(row.get("strategy_id") or "")
+    order = {
+        "all_weather": 0,
+        "smic_follower": 1,
+        "smic_follower_v2": 2,
+        "benchmark_kodex200": 3,
+        "benchmark_qqq": 4,
+        "benchmark_spy": 5,
+        "benchmark_gld": 6,
+        "weak_oracle": 7,
+    }
+    if strategy_id in order:
+        return (order[strategy_id], 0.0, strategy_id)
+    metrics = row.get("metrics") if isinstance(row.get("metrics"), dict) else {}
+    ret = _number(metrics.get("money_weighted_return")) if isinstance(metrics, dict) else None
+    return (100, -(ret if ret is not None else -999.0), strategy_id)
+
+
+def _pct(value: Any) -> str:
+    number = _number(value)
+    if number is None:
+        return "—"
+    return f"{number * 100:.0f}%"
 
 
 def _build_rankings(report_stats: dict[str, Any], report_rows: list[dict[str, Any]]) -> dict[str, Any]:
@@ -1207,7 +1473,13 @@ def _strategy_download_rows() -> list[dict[str, Any]]:
         {
             "strategy_id": row.get("persona"),
             "label": row.get("label"),
-            "kind": "benchmark" if row.get("persona") in benchmark_ids else "strategy",
+            "kind": (
+                "oracle"
+                if row.get("persona") == "weak_oracle"
+                else "benchmark"
+                if row.get("persona") in benchmark_ids
+                else "strategy"
+            ),
             "final_equity_krw": row.get("final_equity_krw"),
             "final_cash_krw": row.get("final_cash_krw"),
             "final_holdings_value_krw": row.get("final_holdings_value_krw"),

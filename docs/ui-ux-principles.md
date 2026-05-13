@@ -6,14 +6,14 @@ This document is the durable product-design contract for `apps/web`. It translat
 
 ## 1. Product frame
 
-SNUSMIC Portfolio Lab is a **static snapshot-based investment research dashboard**.
+SNUSMIC Portfolio Lab is a **read-only investment research and portfolio validation dashboard**.
 
 It is:
 
 - 리서치 추천 성과 검증
 - share-based 포트폴리오 원장 뷰어
 - 벤치마크 대비 원장형 전략 검증
-- 커밋된 canonical artifact 기반 대시보드
+- 가격 확인이 끝난 기준 데이터 기반 대시보드
 
 It is not:
 
@@ -23,14 +23,15 @@ It is not:
 - Bloomberg/HTS clone
 - black-box buy/sell recommender
 
-Required visible language:
+Preferred user-facing language:
 
-- `Static Artifacts`, `No live trading`
-- `정적 스냅샷`, `커밋된 아티팩트 기준`
-- `리서치 추천`, `포트폴리오 원장`, `전략 검증`
-- `원장형 성과`, `가격 매칭`, `목표가 검증`
+- `기준 데이터`, `읽기 전용`
+- `리포트 검증`, `포트폴리오 원장`, `전략 비교`
+- `가격 확인`, `목표가 진행`, `낙폭 점검`
 
 Avoid user-facing words that imply execution authority: `실시간 주문`, `체결 가능`, `지금 사라`, `수익 보장`, `라이브 거래`, `터미널`.
+
+Implementation words such as `Static Artifacts`, `canonical`, `schema`, `data/web`, or `커밋된 아티팩트` belong in technical/data-quality documentation, not in primary SaaS copy.
 
 ## 2. Information architecture ownership
 
@@ -115,7 +116,7 @@ YASUN.GG is a reference for information density, cards, feed rails, treemap/heat
 
 ## 8. Data/artifact integrity
 
-`apps/web/lib/artifacts.ts` and derived product-model helpers remain the web source of truth.
+Page-owned artifacts and shared domain readers remain the web source of truth. `apps/web/lib/product-model.ts` should not become a second database or invent taxonomy locally.
 
 - Do not add realtime fetches or live market APIs.
 - Do not make `public/downloads` the source of truth.
@@ -138,7 +139,7 @@ Before shipping frontend UI changes, verify:
 
 - [ ] App still says `SNUSMIC Portfolio Lab`.
 - [ ] No user-facing “Terminal” framing was introduced.
-- [ ] `Static Artifacts · No live trading` remains visible.
+- [ ] Primary copy says read-only/basis data in user language, not developer artifact language.
 - [ ] Overview answers the product state in about 30 seconds.
 - [ ] Tables with scale have sorting/filtering/pagination or a documented fixed-preview reason.
 - [ ] Shared data is unified through tabs/filters, not duplicated into conflicting views.

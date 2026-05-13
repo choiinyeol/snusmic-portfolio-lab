@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { CumulativeReturnChart, type ReturnSeries } from '@/components/charts/CumulativeReturnChart';
+import type { ReturnSeries } from '@/components/charts/CumulativeReturnChart';
+import { SeriesToggleChart } from '@/components/charts/SeriesToggleChart';
 import { KpiTile } from '@/components/ui/KpiTile';
 import { PageHero } from '@/components/ui/PageHero';
 import { Section } from '@/components/ui/Section';
@@ -103,9 +104,21 @@ export default function StrategiesPage() {
               <span className="snapshot-pill">고유 전략 {selectableRows.length}</span>
               <span className="snapshot-pill">목표: MDD 15% 이하 · KOSPI 초과</span>
             </div>
-            <CumulativeReturnChart series={chartSeries} />
+            <SeriesToggleChart series={chartSeries} />
           </div>
         </article>
+      </Section>
+
+      <Section
+        eyebrow="Method"
+        title="고유 전략 매수·매도 규칙"
+        caption="MTT 전략은 수익률 숫자만 보는 대상이 아니라, 어떤 조건에서 현금을 보유하고 어떤 조건에서 매수·매도하는지 함께 읽어야 합니다."
+      >
+        <div className="grid gap-3 lg:grid-cols-2">
+          {selectableRows.slice(0, 6).map((row) => (
+            <StrategyMethodCard key={row.id} row={row} />
+          ))}
+        </div>
       </Section>
     </>
   );
@@ -117,7 +130,7 @@ function buildStrategySeries(rows: StrategyLeaderboardRow[]): ReturnSeries[] {
   return rows.map((row, index) => ({
     id: row.id,
     label: row.label,
-    shortLabel: compactStrategyLabel(row.id, row.label),
+    shortLabel: row.shortLabel || compactStrategyLabel(row.id, row.label),
     color: palette[index % palette.length],
     points: equity
       .filter((point) => point.persona === row.id && point.cumulativeReturn !== null)
@@ -149,7 +162,7 @@ function StrategyRiskTable({ rows }: { rows: StrategyLeaderboardRow[] }) {
                 <span
                   className={`badge badge-sm ${row.kind === 'benchmark' ? 'badge-ghost' : 'badge-primary badge-soft'}`}
                 >
-                  {row.kind === 'benchmark' ? '벤치마크' : '고유 전략'}
+                  {row.kind === 'strategy' ? '고유 전략' : row.kind === 'oracle' ? '오라클' : '벤치마크'}
                 </span>
               </td>
               <td className="min-w-[160px] max-w-[240px] truncate font-bold">
@@ -174,6 +187,8 @@ function StrategyRiskTable({ rows }: { rows: StrategyLeaderboardRow[] }) {
               <td className="text-right">
                 {row.kind === 'benchmark' ? (
                   <span className="badge badge-ghost badge-xs">기준선</span>
+                ) : row.kind === 'oracle' ? (
+                  <span className="badge badge-warning badge-soft badge-xs">상한선</span>
                 ) : row.objectivePassed ? (
                   <span className="badge badge-success badge-soft badge-xs">통과</span>
                 ) : (
@@ -186,6 +201,43 @@ function StrategyRiskTable({ rows }: { rows: StrategyLeaderboardRow[] }) {
         </tbody>
       </table>
     </article>
+  );
+}
+
+function StrategyMethodCard({ row }: { row: StrategyLeaderboardRow }) {
+  return (
+    <article className="lab-panel p-4">
+      <div className="flex min-w-0 items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="lab-panel__eyebrow">{row.shortLabel}</div>
+          <h3 className="truncate text-lg font-black tracking-[-0.035em]" title={row.label}>
+            {row.label}
+          </h3>
+        </div>
+        <span
+          className={`badge badge-sm ${row.objectivePassed ? 'badge-success badge-soft' : 'badge-warning badge-soft'}`}
+        >
+          {row.objectivePassed ? '목표 통과' : '목표 미달'}
+        </span>
+      </div>
+      <p className="mt-3 text-sm leading-6 text-base-content/65">{row.methodologySummary}</p>
+      <div className="mt-4 grid gap-3 md:grid-cols-3">
+        <RuleList title="매수" items={row.buyRules} />
+        <RuleList title="매도" items={row.sellRules} />
+        <RuleList title="리스크" items={row.riskControls} />
+      </div>
+    </article>
+  );
+}
+
+function RuleList({ title, items }: { title: string; items: string[] }) {
+  return (
+    <div className="rounded-2xl border border-base-300 bg-base-100 p-3">
+      <h4 className="text-xs font-black uppercase tracking-[0.14em] text-base-content/45">{title}</h4>
+      <ul className="mt-2 grid gap-1 text-sm leading-5 text-base-content/65">
+        {items.length ? items.map((item) => <li key={item}>• {item}</li>) : <li>—</li>}
+      </ul>
+    </div>
   );
 }
 

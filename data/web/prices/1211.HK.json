@@ -24817,6 +24817,32 @@
       "open": 99.75,
       "source_currency": "HKD",
       "volume": 23621592.0
+    },
+    {
+      "close": 99.8499984741211,
+      "close_krw": 18793.8156,
+      "currency": "HKD",
+      "date": "2026-05-12",
+      "display_currency": "HKD",
+      "high": 102.9000015258789,
+      "krw_per_unit": 188.22048950195312,
+      "low": 99.3499984741211,
+      "open": 101.19999694824219,
+      "source_currency": "HKD",
+      "volume": 16569346.0
+    },
+    {
+      "close": 97.94999694824219,
+      "close_krw": 18662.4128,
+      "currency": "HKD",
+      "date": "2026-05-13",
+      "display_currency": "HKD",
+      "high": 99.80000305175781,
+      "krw_per_unit": 190.52999877929688,
+      "low": 96.25,
+      "open": 99.5999984741211,
+      "source_currency": "HKD",
+      "volume": 15136880.0
     }
   ],
   "symbol": "1211.HK"
