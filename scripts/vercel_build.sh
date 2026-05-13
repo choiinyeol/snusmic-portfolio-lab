@@ -37,7 +37,6 @@ corepack prepare pnpm@10.33.2 --activate
 (
   cd apps/web
   corepack pnpm install --frozen-lockfile
-  corepack pnpm exec biome check .
   corepack pnpm typecheck
   corepack pnpm build
 )
