@@ -830,6 +830,10 @@ def _infer_native_entry_from_target(
     return target_price_native / divisor
 
 
+def _is_sell_opinion(value: Any) -> bool:
+    return str(value or "").strip().casefold() in {"sell", "매도"}
+
+
 def _build_report_rows(
     reports: pd.DataFrame,
     report_performance: pd.DataFrame,
@@ -847,6 +851,8 @@ def _build_report_rows(
         perf = performance_by_id.get(report_id, {})
         symbol = str(row.get("symbol", ""))
         if symbol in missing or not perf:
+            continue
+        if _is_sell_opinion(row.get("rating")):
             continue
         caveats = []
         caveats.extend(review_reasons.get(report_id, []))
@@ -1266,17 +1272,51 @@ def _pct(value: Any) -> str:
 
 
 def _build_rankings(report_stats: dict[str, Any], report_rows: list[dict[str, Any]]) -> dict[str, Any]:
-    """Build table-ready rankings from the current report-stat schema."""
+    """Build table-ready rankings from the canonical web report rows.
 
+    ``report_stats`` is still required as an upstream-contract check, but the
+    public ranking artifact must share the same filtered universe as
+    ``reports.json``. That keeps price-missing rows, sell opinions, and
+    same/next-day target hits out of every report view.
+    """
+
+    for key in (
+        "top_winners",
+        "top_losers",
+        "fastest_target_hits",
+        "slowest_target_hits",
+        "biggest_target_gaps_below",
+        "biggest_target_overshoots",
+        "most_aggressive_targets",
+    ):
+        _required_ranking(report_stats, key)
     rows_with_current = [row for row in report_rows if row.get("current_return") is not None]
+    hit_rows = [
+        row
+        for row in report_rows
+        if row.get("target_hit") is True and _number(row.get("days_to_target")) is not None
+    ]
+    open_gap_rows = [
+        row
+        for row in report_rows
+        if row.get("target_hit") is not True
+        and _number(row.get("target_gap_pct")) is not None
+        and (_number(row.get("target_gap_pct")) or 0) < 0
+    ]
+    overshoot_rows = [
+        row
+        for row in report_rows
+        if _number(row.get("target_gap_pct")) is not None and (_number(row.get("target_gap_pct")) or 0) > 0
+    ]
+    aggressive_rows = [row for row in report_rows if _number(row.get("target_upside_at_pub")) is not None]
     return {
-        "top_winners": _required_ranking(report_stats, "top_winners"),
-        "top_losers": _required_ranking(report_stats, "top_losers"),
-        "fastest_hits": _required_ranking(report_stats, "fastest_target_hits"),
-        "slowest_hits": _required_ranking(report_stats, "slowest_target_hits"),
-        "biggest_open_target_gaps": _required_ranking(report_stats, "biggest_target_gaps_below"),
-        "biggest_target_overshoots": _required_ranking(report_stats, "biggest_target_overshoots"),
-        "most_aggressive_targets": _required_ranking(report_stats, "most_aggressive_targets"),
+        "top_winners": _rank(rows_with_current, "current_return", True),
+        "top_losers": _rank(rows_with_current, "current_return", False),
+        "fastest_hits": _rank(hit_rows, "days_to_target", False),
+        "slowest_hits": _rank(hit_rows, "days_to_target", True),
+        "biggest_open_target_gaps": _rank(open_gap_rows, "target_gap_pct", False),
+        "biggest_target_overshoots": _rank(overshoot_rows, "target_gap_pct", True),
+        "most_aggressive_targets": _rank(aggressive_rows, "target_upside_at_pub", True),
         "best_current_returns": _rank(rows_with_current, "current_return", True),
         "worst_current_returns": _rank(rows_with_current, "current_return", False),
     }
@@ -1295,13 +1335,22 @@ def _rank(rows: list[dict[str, Any]], metric: str, descending: bool, limit: int 
         {
             "report_id": row.get("report_id"),
             "date": row.get("date"),
+            "publication_date": row.get("date"),
             "company": row.get("company"),
             "symbol": row.get("symbol"),
             "metric": metric,
             "value": _number(row.get(metric)),
+            "entry_price_krw": _number(row.get("entry_price_krw")),
+            "target_price_krw": _number(row.get("target_price_krw")),
+            "target_upside_at_pub": _number(row.get("target_upside_at_pub")),
             "current_return": _number(row.get("current_return")),
             "target_hit": _bool(row.get("target_hit")),
+            "target_hit_date": row.get("target_hit_date"),
             "days_to_target": _number(row.get("days_to_target")),
+            "last_close_krw": _number(row.get("last_close_krw")),
+            "last_close_date": row.get("last_close_date"),
+            "peak_return": _number(row.get("peak_return")),
+            "trough_return": _number(row.get("trough_return")),
             "target_gap_pct": _number(row.get("target_gap_pct")),
         }
         for row in ranked[:limit]

@@ -91,13 +91,13 @@
       "time_loss_days": 365
     },
     {
-      "label": "Weak Prophet (6M look-ahead)",
-      "lookahead_months": 6,
-      "max_weight": 0.4,
-      "min_history_days": 60,
+      "label": "Weak Prophet (3M oracle)",
+      "lookahead_months": 3,
+      "max_weight": 1.0,
+      "min_history_days": 20,
       "persona_name": "weak_oracle",
       "rebalance": "monthly",
-      "risk_free_rate": 0.03
+      "risk_free_rate": 0.0
     },
     {
       "label": "SMIC MTT Strategy #1",
