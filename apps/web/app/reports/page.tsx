@@ -23,7 +23,7 @@ export default function ReportsPage() {
           { label: '최신 발간', value: formatDateKo(stats.latestPublicationDate) },
           { label: '활성 후보', value: `${candidates.length}개` },
           { label: '중앙 도달일', value: formatDays(stats.medianDaysToTarget) },
-          { label: '가격 매칭', value: 'Canonical artifacts' },
+          { label: '가격 확인', value: '기준 데이터' },
         ]}
         kpis={
           <div className="grid min-w-0 gap-3 min-[1400px]:grid-cols-2">

@@ -33,9 +33,9 @@ const terms = [
     body: '수량, 현금, 평균단가, 매도·매수 내역을 보존하는 방식입니다. 단순 누적 수익률 차트보다 실제 매매 해석에 가깝습니다.',
   },
   {
-    term: 'No live trading',
-    title: '실시간 거래 아님',
-    body: '웹 런타임은 외부 시세를 호출하지 않습니다. Python 파이프라인이 만든 canonical data/web 스냅샷만 읽습니다.',
+    term: 'Read-only',
+    title: '읽기 전용 대시보드',
+    body: '실시간 주문·체결 기능은 없습니다. 정해진 기준일의 데이터로 리포트와 포트폴리오를 다시 읽는 화면입니다.',
   },
 ] as const;
 
@@ -45,10 +45,10 @@ export default function GuidePage() {
       <PageHero
         eyebrow="GUIDE"
         title="SNUSMIC Portfolio Lab 사용 가이드"
-        subtitle="정적 아티팩트 기반 리서치·포트폴리오·전략 검증 시스템을 30초 안에 이해하고, 각 화면에서 무엇을 봐야 하는지 인터랙티브하게 익힙니다."
+        subtitle="리서치, 포트폴리오, 전략 화면을 30초 안에 이해하고 각 화면에서 무엇을 봐야 하는지 익힙니다."
         badges={[
-          { label: 'Mode', value: 'Static Artifacts' },
-          { label: 'Trading', value: 'No live trading' },
+          { label: '데이터', value: '기준 데이터' },
+          { label: '거래', value: '읽기 전용' },
           { label: 'Tables', value: 'Sort · Filter · Pagination' },
           { label: 'Objective', value: `MDD ≤ ${formatPercent(OBJECTIVE_MAX_DRAWDOWN)}` },
         ]}

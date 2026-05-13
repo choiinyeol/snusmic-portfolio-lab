@@ -26,18 +26,20 @@ export function PageHero({ eyebrow, title, subtitle, badges, actions, kpis }: Pr
           ) : null}
           <h1 className="text-3xl font-black tracking-[-0.055em] text-base-content md:text-4xl">{title}</h1>
           {subtitle ? (
-            <p className="max-w-3xl text-sm leading-relaxed text-base-content/65 md:text-[0.98rem]">{subtitle}</p>
+            <p className="max-w-3xl break-words text-sm leading-relaxed text-base-content/65 md:text-[0.98rem]">
+              {subtitle}
+            </p>
           ) : null}
           {badges?.length ? (
-            <dl className="flex flex-wrap gap-1.5">
+            <dl className="flex min-w-0 flex-wrap gap-1.5">
               {badges.map((badge) => (
                 <span
                   key={badge.label}
-                  className="inline-flex items-center gap-1 rounded-full border border-base-300 bg-white/70 px-2.5 py-1 text-xs shadow-sm"
+                  className="inline-flex max-w-full items-center gap-1 rounded-full border border-base-300 bg-white/70 px-2.5 py-1 text-xs shadow-sm"
                 >
-                  <dt className="text-base-content/55">{badge.label}</dt>
+                  <dt className="shrink-0 text-base-content/55">{badge.label}</dt>
                   {badge.value !== undefined && badge.value !== null && badge.value !== '' ? (
-                    <dd className="font-semibold text-base-content">{badge.value}</dd>
+                    <dd className="min-w-0 truncate font-semibold text-base-content">{badge.value}</dd>
                   ) : null}
                 </span>
               ))}
