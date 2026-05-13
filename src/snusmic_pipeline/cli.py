@@ -588,6 +588,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--broker-strategy-top",
         type=int,
         default=int(os.environ.get("SMIC_BROKER_STRATEGY_TOP", "5")),
+        help="Maximum number of benchmark-beating broker-ledger strategies to promote.",
     )
     sim.add_argument(
         "--broker-strategy-seed",

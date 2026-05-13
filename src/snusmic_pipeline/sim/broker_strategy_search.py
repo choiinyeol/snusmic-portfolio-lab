@@ -40,12 +40,16 @@ def find_top_broker_strategy_configs(
     seed: int = 42,
     min_excess_return: float = 0.0,
 ) -> BrokerStrategySearchResult:
-    """Select Optuna train winners, then admit only full-period winners.
+    """Select Optuna train winners, then admit up to ``top_n`` full-period winners.
 
     Selection is intentionally two-stage:
     1. Optuna maximizes actual train-period broker-ledger performance.
     2. Candidate configs are replayed on the full window and only accepted
        when they beat the strongest benchmark by ``min_excess_return``.
+
+    ``top_n`` is a cap, not a quota. If the current market snapshot only
+    produces fewer qualifying strategies, return those strategies and keep the
+    rejected candidates in ``trial_rows`` with an explicit admission status.
     """
     if trials < top_n:
         raise ValueError(f"trials ({trials}) must be >= top_n ({top_n})")
@@ -188,12 +192,6 @@ def find_top_broker_strategy_configs(
         )
         if len(selected) >= top_n:
             break
-
-    if len(selected) < top_n:
-        raise RuntimeError(
-            f"Only {len(selected)} optimized broker-ledger strategies beat the strongest benchmark; "
-            f"required {top_n}. Increase trials or revise the search space."
-        )
 
     return BrokerStrategySearchResult(configs=tuple(selected), trial_rows=pd.DataFrame(rows))
 
