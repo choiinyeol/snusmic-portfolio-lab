@@ -7,9 +7,9 @@ Run from the repo root::
         --warehouse data/warehouse \
         --out data/sim
 
-Produces ``personas.json``, ``equity_daily.csv``, ``trades.csv``,
-``summary.csv``, ``equity_curves.png``, ``net_profit_bar.png``, and
-``drawdowns.png``.
+Produces ``personas.json``, ``persona-configs.json``, ``equity_daily.csv``,
+``trades.csv``, ``summary.csv``, ``equity_curves.png``,
+``net_profit_bar.png``, and ``drawdowns.png``.
 """
 
 from __future__ import annotations
@@ -67,6 +67,21 @@ def _round_floats(value):
     if isinstance(value, tuple):
         return tuple(_round_floats(v) for v in value)
     return value
+
+
+def _persona_config_artifact(config: SimulationConfig) -> dict[str, object]:
+    """Return the compact strategy-method contract needed by web export.
+
+    ``personas.json`` is a full simulation dump and is intentionally ignored by
+    git because it is large and mostly ledger state. The web strategy catalog
+    only needs the declared persona configurations, so this separate artifact is
+    the small, reviewable boundary between simulation and product UI.
+    """
+
+    return {
+        "schema_version": "1.0.0",
+        "personas": [_round_floats(persona.model_dump(mode="json")) for persona in config.personas],
+    }
 
 
 def parse_args() -> argparse.Namespace:
@@ -172,6 +187,10 @@ def main() -> int:
 
     (out / "personas.json").write_text(
         json.dumps(_round_floats(result.model_dump(mode="json")), ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    (out / "persona-configs.json").write_text(
+        json.dumps(_persona_config_artifact(config), ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
     _to_csv_rounded(pd.DataFrame([s.model_dump() for s in result.summaries]), out / "summary.csv")
