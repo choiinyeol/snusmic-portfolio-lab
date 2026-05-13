@@ -55,7 +55,7 @@ export default function ReportsPage() {
               delta="현재가-진입가 / 목표가-진입가"
               tone="accent"
             />
-            <KpiTile label="가격 매칭률" value="100%" delta="web artifact rows" tone="neutral" />
+            <KpiTile label="가격 매칭률" value="100%" delta="검증 테이블 기준" tone="neutral" />
           </div>
         }
       />

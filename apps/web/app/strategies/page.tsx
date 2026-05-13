@@ -4,7 +4,7 @@ import { SeriesToggleChart } from '@/components/charts/SeriesToggleChart';
 import { KpiTile } from '@/components/ui/KpiTile';
 import { PageHero } from '@/components/ui/PageHero';
 import { Section } from '@/components/ui/Section';
-import { getEquityDaily } from '@/lib/artifacts';
+import { getStrategyCurves } from '@/lib/artifacts';
 import { formatPercent, signedTextClass } from '@/lib/format';
 import {
   BENCHMARK_IDS,
@@ -126,7 +126,7 @@ export default function StrategiesPage() {
 
 function buildStrategySeries(rows: StrategyLeaderboardRow[]): ReturnSeries[] {
   const palette = ['#1b64da', '#16a368', '#7d6bff', '#f29423', '#ef4452', '#00a99a', '#94a3b8', '#111827'];
-  const equity = getEquityDaily();
+  const equity = getStrategyCurves();
   return rows.map((row, index) => ({
     id: row.id,
     label: row.label,

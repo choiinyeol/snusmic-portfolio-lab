@@ -49,7 +49,7 @@ export default function ScreenerPage() {
               value={formatPercent(stats.positiveReturnRate)}
               delta={`${stats.positiveReturnCount}개 리포트`}
             />
-            <KpiTile label="최신 발간" value={formatDateKo(stats.latestPublicationDate)} delta="정적 스냅샷" />
+            <KpiTile label="최신 발간" value={formatDateKo(stats.latestPublicationDate)} delta="읽기 전용 기준" />
           </div>
         }
       />

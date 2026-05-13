@@ -1,11 +1,12 @@
 import 'server-only';
 import {
   getCurrentHoldings,
-  getEquityDaily,
   getOverview,
   getPersonaLabel,
   getReportRows,
+  getScreenerCandidates,
   getStrategyCatalog,
+  getStrategyCurves,
   getSummaryRows,
   type EquityPoint,
   type HoldingRow,
@@ -185,46 +186,23 @@ export function buildReportStats(reports = getReportRows()): ReportStats {
 }
 
 export function getResearchCandidates(): ResearchCandidate[] {
-  const now = latestReportDate();
-  return getReportRows()
-    .filter((report) => {
-      if (report.targetDirection !== 'upside') return false;
-      if (report.targetHit || report.expired) return false;
-      if (!isFiniteNumber(report.targetUpsideAtPub) || report.targetUpsideAtPub <= 0) return false;
-      if (!isFiniteNumber(report.currentReturn) || !isFiniteNumber(report.targetProgressPct)) return false;
-      return true;
-    })
-    .map((report) => toResearchCandidate(report, daysBetween(report.publicationDate, now)))
-    .sort((a, b) => {
-      const basisDelta = basisSortValue(b) - basisSortValue(a);
-      if (basisDelta !== 0) return basisDelta;
-      return b.report.publicationDate.localeCompare(a.report.publicationDate);
-    });
-}
-
-function toResearchCandidate(report: ReportRow, ageDays: number | null): ResearchCandidate {
-  if (ageDays !== null && ageDays <= 120) {
-    return { report, bucket: 'fresh', rankBasis: `최근 ${ageDays}일 리포트 · 업사이드 우선` };
-  }
-  if ((report.targetUpsideAtPub ?? 0) >= 0.5) {
-    return { report, bucket: 'large-upside', rankBasis: '목표 업사이드 50% 이상' };
-  }
-  if ((report.targetProgressPct ?? 0) >= 0.7) {
-    return { report, bucket: 'near-target', rankBasis: '목표 진행률 70% 이상' };
-  }
-  return { report, bucket: 'active', rankBasis: '미도달·미만료 활성 리포트' };
-}
-
-function basisSortValue(candidate: ResearchCandidate): number {
-  if (candidate.bucket === 'fresh') return 10 + (candidate.report.targetUpsideAtPub ?? 0);
-  if (candidate.bucket === 'large-upside') return 8 + (candidate.report.targetUpsideAtPub ?? 0);
-  if (candidate.bucket === 'near-target') return 6 + (candidate.report.targetProgressPct ?? 0);
-  return candidate.report.targetUpsideAtPub ?? 0;
+  const reportsById = new Map(getReportRows().map((report) => [report.reportId, report]));
+  return getScreenerCandidates().map((candidate) => {
+    const report = reportsById.get(candidate.reportId);
+    if (!report) {
+      throw new Error(`Screener candidate references missing report_id: ${candidate.reportId}`);
+    }
+    return {
+      report,
+      bucket: candidate.bucket,
+      rankBasis: candidate.rankBasis,
+    };
+  });
 }
 
 export function getStrategyLeaderboard(): StrategyLeaderboardRow[] {
   const summaries = getSummaryRows();
-  const equity = getEquityDaily();
+  const equity = getStrategyCurves();
   const benchmark = targetBenchmark(summaries);
   const catalogById = new Map(getStrategyCatalog().map((row) => [row.strategyId, row]));
   const personaRows = summaries.map((summary) => strategyRowFromSummary(summary, equity, benchmark, catalogById));
@@ -344,20 +322,6 @@ function standardDeviation(values: number[], center: number): number | null {
   if (values.length < 2) return null;
   const variance = values.reduce((sum, value) => sum + (value - center) ** 2, 0) / (values.length - 1);
   return Math.sqrt(variance);
-}
-
-function latestReportDate(): string {
-  return getReportRows().reduce(
-    (latest, report) => (report.publicationDate > latest ? report.publicationDate : latest),
-    '',
-  );
-}
-
-function daysBetween(start: string, end: string): number | null {
-  const startMs = Date.parse(`${start}T00:00:00Z`);
-  const endMs = Date.parse(`${end}T00:00:00Z`);
-  if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) return null;
-  return Math.max(0, Math.round((endMs - startMs) / 86_400_000));
 }
 
 function topWeight(rows: HoldingRow[], count: number): number | null {

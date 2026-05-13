@@ -77,19 +77,33 @@ def test_extended_web_artifacts_support_insights_and_downloads(tmp_path: Path) -
     )
 
     insights = json.loads((out / "insights.json").read_text(encoding="utf-8"))
+    overview_insights = json.loads((out / "overview" / "research-pulse.json").read_text(encoding="utf-8"))
     detail_metrics = json.loads((out / "report-detail-metrics.json").read_text(encoding="utf-8"))
+    page_detail_metrics = json.loads((out / "reports" / "detail-metrics.json").read_text(encoding="utf-8"))
     return_windows = json.loads((out / "return-windows.json").read_text(encoding="utf-8"))
+    page_return_windows = json.loads((out / "reports" / "return-windows.json").read_text(encoding="utf-8"))
     target_distribution = json.loads((out / "target-hit-distribution.json").read_text(encoding="utf-8"))
+    page_target_distribution = json.loads(
+        (out / "reports" / "target-hit-distribution.json").read_text(encoding="utf-8")
+    )
     rankings = json.loads((out / "report-rankings.json").read_text(encoding="utf-8"))
+    page_rankings = json.loads((out / "reports" / "rankings.json").read_text(encoding="utf-8"))
+    screener_candidates = json.loads((out / "screener" / "candidates.json").read_text(encoding="utf-8"))
 
     assert len(insights) >= 6
+    assert overview_insights == insights
     assert "6615fd1894ed9c54" in detail_metrics
     assert detail_metrics["6615fd1894ed9c54"]["markers"]
+    assert page_detail_metrics == detail_metrics
     assert len(return_windows) == 202
+    assert page_return_windows == return_windows
     assert {"return_30d", "return_60d", "return_90d", "return_180d"} <= set(return_windows[0])
     assert target_distribution["summary"]["total_reports"] == 202
+    assert page_target_distribution == target_distribution
     assert rankings["fastest_hits"]
     assert rankings["best_current_returns"]
+    assert page_rankings == rankings
+    assert screener_candidates
     assert (out / "table-download-reports.csv").read_text(encoding="utf-8").startswith("report_id,date")
     assert (out / "table-download-strategies.csv").read_text(encoding="utf-8").startswith("strategy_id,label")
     assert (out / "data-quality-download.csv").read_text(encoding="utf-8").startswith("section,metric,value")
@@ -118,10 +132,17 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(tmp_path: Path) 
     assert manifest["row_counts"]["reports"] == 202
     assert manifest["row_counts"]["personas"] == 39
     assert manifest["row_counts"]["strategy_catalog"] == 39
+    assert manifest["row_counts"]["screener_candidates"] > 0
     assert manifest["data_quality"]["reports_with_prices"] == 202
     assert manifest["data_quality"]["missing_price_symbols"] == 5
+    assert "overview/snapshot.json" in manifest["artifacts"]
+    assert "portfolio/holdings.json" in manifest["artifacts"]
+    assert "reports/table.json" in manifest["artifacts"]
+    assert "strategies/catalog.json" in manifest["artifacts"]
+    assert "screener/candidates.json" in manifest["artifacts"]
     assert "reports.json" in manifest["artifacts"]
     assert "prices/QQQ.json" not in manifest["checksums"]
+    assert len(manifest["checksums"]["reports/table.json"]) == 64
     assert len(manifest["checksums"]["reports.json"]) == 64
 
 

@@ -7,7 +7,7 @@ import './reports/report-detail.css';
 
 export const metadata: Metadata = {
   title: 'SNUSMIC Portfolio Lab',
-  description: '리서치 추천, 포트폴리오 원장, 전략 검증을 한 곳에서 추적하는 정적 스냅샷 기반 투자 리서치 대시보드.',
+  description: '리서치 추천, 포트폴리오 원장, 전략 검증을 한 곳에서 추적하는 읽기 전용 투자 리서치 대시보드.',
 };
 
 const NAV: SidebarNavItem[] = [
@@ -56,7 +56,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 </div>
                 <div>
                   <dt>데이터</dt>
-                  <dd className="font-bold text-base-content">기준 데이터 · v{manifest.schema_version}</dd>
+                  <dd className="font-bold text-base-content">기준 데이터</dd>
                 </div>
                 <div>
                   <dt>리포트 범위</dt>
@@ -71,9 +71,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                   </dd>
                 </div>
                 <div>
-                  <dt>파일</dt>
+                  <dt>검증 대상</dt>
                   <dd className="font-bold text-base-content">
-                    {manifest.artifacts.length} files · reports {manifest.row_counts.reports}
+                    리포트 {manifest.row_counts.reports}건 · 전략 {manifest.row_counts.strategy_catalog}개
                   </dd>
                 </div>
                 <div>

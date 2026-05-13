@@ -67,18 +67,19 @@ Menu labels and route labels must match. If the route is `/reports`, the sidebar
 
 The frontend should not assemble page products by pulling every artifact into one giant model. Export page-oriented bundles that preserve domain boundaries.
 
-Target physical data surface:
+Current physical data surface:
 
 ```text
 data/web/
   manifest.json
   overview/
     snapshot.json
-    performance.json
     research-pulse.json
+    data-quality.json
   portfolio/
     personas.json
     holdings.json
+    monthly-holdings.json
     trades.json
     episodes.json
     equity-daily.json
@@ -86,6 +87,8 @@ data/web/
     table.json
     rankings.json
     detail-metrics.json
+    return-windows.json
+    target-hit-distribution.json
   strategies/
     catalog.json
     leaderboard.json
@@ -94,7 +97,7 @@ data/web/
     candidates.json
 ```
 
-A compatibility period may keep existing top-level artifacts, but new code should move toward page-owned readers. Do not introduce legacy/fallback/deprecated wrappers. If the new artifact is required, validate it and fail clearly when missing.
+Top-level artifacts may remain as raw/download surfaces during the cutover, but route-level product code should use page-owned readers. Do not introduce legacy/fallback/deprecated wrappers. If the new artifact is required, validate it and fail clearly when missing.
 
 The most important new contract is the **strategy catalog**:
 
@@ -199,8 +202,7 @@ Do not create page-specific duplicates when one shared domain component would ke
 
 The current codebase can evolve through staged cuts rather than a one-shot rewrite:
 
-1. Export and consume `strategies/catalog.json`.
-2. Remove hardcoded primary persona and benchmark taxonomy from the frontend.
-3. Replace duplicated strategy selectors/tables with shared components.
-4. Split page-owned artifacts physically under `data/web/<page>/`.
-5. Add the interactive Guide page after the data and taxonomy contracts are stable.
+1. Replace duplicated strategy selectors/tables with shared components.
+2. Collapse remaining top-level raw artifacts into download-only surfaces.
+3. Add the interactive Guide page after the data and taxonomy contracts are stable.
+4. Continue removing primary-page developer copy in favor of user-facing finance language.

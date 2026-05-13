@@ -92,11 +92,23 @@ Consumes curated examples or small derived samples, not raw full artifacts. It e
 - Long chart legends without series visibility controls.
 - Developer-facing copy in primary SaaS surfaces.
 
-## First implementation slice
+## Implemented slices
 
-1. Add `strategies/catalog.json` export.
-2. Add zod schema and reader.
-3. Select default overview strategy from catalog.
-4. Add visible strategy method summaries for MTT strategies.
-5. Add toggleable performance chart shell.
-6. Keep current top-level artifacts temporarily only as existing raw sources; do not add compatibility aliases.
+1. `strategies/catalog.json` export defines benchmark / strategy / oracle taxonomy.
+2. Zod readers validate the strategy catalog and required app artifacts.
+3. Overview default strategy is selected from the catalog rather than a hardcoded persona.
+4. MTT strategy method summaries are rendered from exported rules and params.
+5. Performance charts use visible series controls.
+6. Page-owned bundles now exist under:
+
+```text
+data/web/overview/
+data/web/portfolio/
+data/web/reports/
+data/web/strategies/
+data/web/screener/
+```
+
+7. The frontend readers now consume those page bundles for overview, portfolio, reports, strategies, and screener data.
+
+Top-level artifacts are still exported as raw/download surfaces during the cutover, but route-level product code should read the page-owned bundles first.
