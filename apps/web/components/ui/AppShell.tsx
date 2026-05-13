@@ -42,7 +42,11 @@ export function AppShell({
   return (
     <div className="ui-shell min-h-dvh bg-slate-50 text-slate-950">
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 border-r border-slate-200 bg-white/95 px-3 py-4 lg:flex lg:flex-col">
-        <Link className="flex items-center gap-3 rounded-lg px-2 py-2" href="/" aria-label="SNUSMIC 리서치 원장 홈">
+        <Link
+          className="flex items-center gap-3 rounded-lg px-2 py-2"
+          href="/snapshot"
+          aria-label="SNUSMIC 리서치 원장 홈"
+        >
           <span className="grid size-8 place-items-center rounded-md bg-slate-950 text-xs font-semibold text-white">
             SM
           </span>

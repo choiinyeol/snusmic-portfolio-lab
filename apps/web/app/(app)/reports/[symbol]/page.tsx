@@ -66,15 +66,15 @@ export default async function ReportDetailPage({ params }: { params: ReportParam
         pdfHref={pdfHrefFor(report)}
       />
 
-      <Section eyebrow="Price evidence" title="가격 경로와 목표가">
+      <Section eyebrow="가격 근거" title="가격 경로와 목표가">
         <PriceEvidencePanel report={report} prices={prices} pathEvidence={pathEvidence} status={status} />
       </Section>
 
-      <Section eyebrow="Path observations" title="가격대별 시나리오">
+      <Section eyebrow="가격 경로" title="가격대별 시나리오">
         <PathScenarioPanel report={report} scenarioRows={scenarioRows} trend={trendSnapshot} />
       </Section>
 
-      <Section eyebrow="Trades" title="페르소나별 매매">
+      <Section eyebrow="체결" title="페르소나별 매매">
         <SymbolPersonaTrades
           symbol={report.symbol}
           episodes={symbolEpisodes}
@@ -83,7 +83,7 @@ export default async function ReportDetailPage({ params }: { params: ReportParam
         />
       </Section>
 
-      <Section eyebrow="Sources" title="원문과 메타">
+      <Section eyebrow="원문" title="원문과 메타">
         <ReportSourcesPanel
           siblingReports={siblingReports}
           memo={memo}

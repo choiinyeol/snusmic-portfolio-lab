@@ -5,8 +5,8 @@ const root = new URL('..', import.meta.url).pathname;
 const repoRoot = join(root, '..', '..');
 const sxtHtml = readFileSync(join(root, 'out/reports/SXT/index.html'), 'utf8');
 const reportsCsv = readFileSync(join(root, 'public/downloads/snusmic-reports.csv'), 'utf8');
-const reportPagePath = join(root, 'app/reports/[symbol]/page.tsx');
-const reportDetailCssPath = join(root, 'app/reports/report-detail.css');
+const reportPagePath = join(root, 'app/(app)/reports/[symbol]/page.tsx');
+const reportDetailCssPath = join(root, 'app/(app)/reports/report-detail.css');
 
 const structuralFiles = [
   ['ReportHero', join(root, 'components/reports/ReportHero.tsx')],
@@ -52,7 +52,7 @@ for (const text of forbidden) {
 }
 
 if (!existsSync(reportDetailCssPath)) {
-  throw new Error('Missing report detail stylesheet: app/reports/report-detail.css');
+  throw new Error('Missing report detail stylesheet: app/(app)/reports/report-detail.css');
 }
 
 const pageSource = readFileSync(reportPagePath, 'utf8');

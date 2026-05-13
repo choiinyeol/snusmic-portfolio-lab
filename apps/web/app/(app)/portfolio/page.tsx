@@ -39,8 +39,14 @@ export default function PortfolioPage() {
       ...equity.map((row) => row.persona),
     ]),
   );
+  const orderedStrategyIds = [
+    defaultPersona,
+    ...strategyRows.filter((row) => row.kind === 'strategy' && row.id !== defaultPersona).map((row) => row.id),
+    ...strategyRows.filter((row) => row.kind === 'benchmark').map((row) => row.id),
+    ...strategyRows.filter((row) => row.kind === 'oracle').map((row) => row.id),
+  ];
   const personas = [
-    ...strategyRows.map((row) => row.id).filter((persona) => allPersonas.includes(persona)),
+    ...Array.from(new Set(orderedStrategyIds)).filter((persona) => allPersonas.includes(persona)),
     ...allPersonas.filter((persona) => !strategyById.has(persona)).sort(),
   ];
   const strategyPersonas = personas.filter((persona) => (strategyById.get(persona)?.kind ?? 'strategy') === 'strategy');
@@ -85,9 +91,9 @@ export default function PortfolioPage() {
   return (
     <>
       <PageHero
-        eyebrow="Portfolio Ledger"
-        title="포트폴리오 원장"
-        subtitle="전략별 보유, 체결, 현금 흐름, 연결 리포트 근거를 정적 스냅샷으로 확인합니다."
+        eyebrow="원장 스냅샷"
+        title="원장"
+        subtitle="보유, 체결, 현금 흐름, 연결 리포트 근거를 같은 기준일의 정적 스냅샷으로 확인합니다."
         badges={[
           { label: '선택 전략', value: `${strategyPersonas.length}개` },
           { label: '벤치마크', value: `${benchmarkPersonas.length}개` },
@@ -106,6 +112,7 @@ export default function PortfolioPage() {
         personas={personas}
         personaLabels={personaLabels}
         strategyOptions={strategyOptions}
+        strategyRows={strategyRows}
         defaultPersona={defaultPersona}
         methodsByPersona={methodsByPersona}
         capitalByPersona={capitalByPersona}

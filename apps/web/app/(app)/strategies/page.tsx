@@ -2,6 +2,8 @@ import Link from 'next/link';
 import type { ReturnSeries } from '@/components/charts/CumulativeReturnChart';
 import { PerformanceChartPanel } from '@/components/charts/PerformanceChartPanel';
 import { StrategyRiskTable } from '@/components/trading/StrategyRiskTable';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { KpiTile } from '@/components/ui/KpiTile';
 import { PageHero } from '@/components/ui/PageHero';
 import { Section } from '@/components/ui/Section';
@@ -31,7 +33,7 @@ export default function StrategiesPage() {
   return (
     <>
       <PageHero
-        eyebrow="Strategy Lab"
+        eyebrow="전략 실험실"
         title="전략 비교"
         subtitle="벤치마크, 오라클, 선택 가능한 원장 전략을 분리해 성과·낙폭·규칙을 비교합니다."
         badges={[
@@ -43,12 +45,12 @@ export default function StrategiesPage() {
         ]}
         actions={
           <>
-            <Link className="btn btn-sm btn-primary" href="/portfolio">
-              원장으로 이동
-            </Link>
-            <a className="btn btn-sm btn-outline" href="#strategy-board">
-              전략 리더보드
-            </a>
+            <Button asChild size="sm" variant="secondary">
+              <Link href="/portfolio">원장으로 이동</Link>
+            </Button>
+            <Button asChild size="sm" variant="outline">
+              <a href="#strategy-board">전략 리더보드</a>
+            </Button>
           </>
         }
         kpis={
@@ -97,7 +99,7 @@ export default function StrategiesPage() {
         <StrategyRiskTable rows={selectableRows} />
       </Section>
 
-      <Section eyebrow="Performance" title="벤치마크 세트와 고유 전략의 누적 수익률">
+      <Section eyebrow="성과 경로" title="벤치마크 세트와 고유 전략의 누적 수익률">
         <PerformanceChartPanel
           benchmarkCount={BENCHMARK_IDS.length}
           series={chartSeries}
@@ -106,7 +108,7 @@ export default function StrategiesPage() {
       </Section>
 
       <Section
-        eyebrow="Rules"
+        eyebrow="운용 규칙"
         title="고유 전략 매수·매도 규칙"
         caption="MTT 전략은 수익률 숫자만 보는 대상이 아니라, 어떤 조건에서 현금을 보유하고 어떤 조건에서 매수·매도하는지 함께 읽어야 합니다."
       >
@@ -144,11 +146,9 @@ function StrategyMethodCard({ row }: { row: StrategyLeaderboardRow }) {
             {row.label}
           </h3>
         </div>
-        <span
-          className={`badge badge-sm ${row.objectivePassed ? 'badge-success badge-soft' : 'badge-warning badge-soft'}`}
-        >
+        <Badge variant={row.objectivePassed ? 'success' : 'warning'}>
           {row.objectivePassed ? '목표 통과' : '목표 미달'}
-        </span>
+        </Badge>
       </div>
       <p className="mt-3 text-sm leading-6 text-base-content/65">{row.methodologySummary}</p>
       <div className="mt-4 grid gap-3 md:grid-cols-3">

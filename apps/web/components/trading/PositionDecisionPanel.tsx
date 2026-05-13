@@ -37,16 +37,16 @@ export function PositionDecisionPanel({
   if (!rows.length) return null;
 
   return (
-    <section className="grid gap-3 rounded-box border border-base-300 bg-base-100 p-4 shadow-sm md:p-5">
+    <section className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 md:p-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary/70">Position tape</p>
-          <h2 className="mt-1 text-lg font-black tracking-[-0.03em] text-base-content">무엇을 어떻게 샀나</h2>
-          <p className="mt-1 text-sm leading-relaxed text-base-content/60">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">보유 근거</p>
+          <h2 className="mt-1 text-lg font-semibold tracking-tight text-slate-950">무엇을 어떻게 샀나</h2>
+          <p className="mt-1 text-sm leading-relaxed text-slate-600">
             현재 보유 상위 종목을 매수 체결, 리포트 목표가, 평단, 현재가 순서로 압축해 보여줍니다.
           </p>
         </div>
-        <div className="rounded-full border border-base-300 bg-base-200/60 px-3 py-1 text-xs font-semibold text-base-content/60">
+        <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600">
           현재 보유 {rows.length.toLocaleString('ko-KR')}개 요약
         </div>
       </div>
@@ -61,7 +61,7 @@ export function PositionDecisionPanel({
           return (
             <article
               key={`${row.holding.persona}-${row.holding.symbol}`}
-              className="rounded-2xl border border-base-300 bg-base-100 p-3 shadow-sm transition hover:border-primary/30 hover:shadow-md"
+              className="rounded-xl border border-slate-200 bg-white p-3 transition-colors hover:bg-slate-50"
             >
               <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(150px,auto)] lg:items-start">
                 <div className="min-w-0">
@@ -93,7 +93,7 @@ export function PositionDecisionPanel({
                 </div>
               </div>
 
-              <div className="mt-3 grid gap-2 rounded-xl bg-base-200/50 p-3 lg:grid-cols-3">
+              <div className="mt-3 grid gap-2 rounded-lg bg-slate-50 p-3 lg:grid-cols-3">
                 <PriceBlock label="평단" native={null} krw={row.holding.avgCostKrw} currency={row.holding.currency} />
                 <PriceBlock
                   label="현재가"
@@ -117,9 +117,9 @@ export function PositionDecisionPanel({
                     {row.targetGap !== null ? ` · 목표까지 ${formatPercent(row.targetGap)}` : ''}
                   </span>
                 </div>
-                <div className="h-2 overflow-hidden rounded-full bg-base-200">
+                <div className="h-2 overflow-hidden rounded-full bg-slate-100">
                   <div
-                    className="h-full rounded-full bg-primary"
+                    className="h-full rounded-full bg-slate-900"
                     style={{ width: `${Math.max(0, Math.min(100, (row.targetProgress ?? 0) * 100))}%` }}
                   />
                 </div>

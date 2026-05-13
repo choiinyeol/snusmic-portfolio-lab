@@ -1,241 +1,143 @@
-import { ArrowUpRight, DatabaseZap, FileText, ShieldCheck } from 'lucide-react';
+import { ArrowRight, BarChart3, CheckCircle2, Database, FileText, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
-import { buildDecisionBrief, type DecisionTone } from '@/lib/decision-brief';
-import { getDashboardViewModel } from '@/lib/dashboard-view-model';
+import { getArtifactManifest } from '@/lib/artifacts';
 import { formatKrw, formatPercent } from '@/lib/format';
+import { getExecutiveOverview } from '@/lib/product-model';
 
-export default function OverviewPage() {
-  const view = getDashboardViewModel();
-  const brief = buildDecisionBrief(view);
-  const { overview, selectedStrategy } = view;
+const principles = [
+  '정적 스냅샷으로 리포트 목표가와 원장 체결을 대조',
+  '전략 성과, 낙폭, 현금 대기를 같은 기준으로 비교',
+  '불완전한 데이터와 제외 사유를 후보보다 먼저 노출',
+];
+
+const links = [
+  { href: '/snapshot', label: '스냅샷', caption: '오늘 확인할 검토 대기열', icon: ShieldCheck },
+  { href: '/portfolio', label: '원장', caption: '보유·현금·체결 근거', icon: BarChart3 },
+  { href: '/reports', label: '리포트', caption: '목표가 검증과 제외 사유', icon: FileText },
+  { href: '/strategies', label: '전략', caption: '벤치마크 대비 성과와 위험', icon: Database },
+];
+
+export default function LandingPage() {
+  const overview = getExecutiveOverview();
+  const manifest = getArtifactManifest();
+  const portfolio = overview.portfolio;
 
   return (
-    <div className="grid gap-5">
-      <header className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="grid gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="outline">기준일 {overview.snapshotDate || '—'}</Badge>
-              <Badge variant="success">읽기 전용</Badge>
-              <Badge variant="secondary">{selectedStrategy?.shortLabel || overview.portfolio.label}</Badge>
-            </div>
-            <div>
-              <h1 className="text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">스냅샷</h1>
-              <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">
-                오늘 확인할 원장 상태, 재검토 항목, 데이터 신뢰도를 먼저 보여줍니다. 세부 차트와 표는 각
-                원장·리포트·전략 화면에서 확인합니다.
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button asChild variant="outline">
-              <Link href="/reports">리포트 확인</Link>
-            </Button>
-            <Button asChild variant="secondary">
-              <Link href="/portfolio">
-                원장 열기 <ArrowUpRight />
-              </Link>
-            </Button>
-          </div>
-        </div>
+    <main className="min-h-dvh bg-[#f7f8fb] text-slate-950">
+      <header className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-5 sm:px-8">
+        <Link className="flex items-center gap-3" href="/" aria-label="SNUSMIC Portfolio Lab">
+          <span className="grid size-8 place-items-center rounded-lg bg-slate-950 text-xs font-semibold text-white">
+            SM
+          </span>
+          <span className="grid leading-tight">
+            <span className="text-sm font-semibold tracking-tight">SNUSMIC</span>
+            <span className="text-xs text-slate-500">Portfolio Lab</span>
+          </span>
+        </Link>
+        <nav className="hidden items-center gap-6 text-sm text-slate-600 md:flex" aria-label="주요 링크">
+          <Link className="hover:text-slate-950" href="/reports">
+            리포트
+          </Link>
+          <Link className="hover:text-slate-950" href="/portfolio">
+            원장
+          </Link>
+          <Link className="hover:text-slate-950" href="/strategies">
+            전략
+          </Link>
+        </nav>
+        <Button asChild size="sm" variant="secondary">
+          <Link href="/snapshot">
+            앱 열기 <ArrowRight />
+          </Link>
+        </Button>
       </header>
 
-      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-5" aria-label="상태 판정">
-        {brief.state.map((item) => (
-          <Card className="shadow-sm" key={item.label}>
-            <CardHeader className="pb-2">
-              <CardDescription>{item.label}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className={`font-mono text-xl font-semibold tabular-nums ${toneText(item.tone)}`}>{item.value}</div>
-              <p className="mt-1 truncate text-xs text-slate-500">{item.caption}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </section>
+      <section className="mx-auto grid max-w-7xl gap-12 px-5 py-14 sm:px-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(420px,.95fr)] lg:items-center lg:py-24">
+        <div className="max-w-3xl">
+          <p className="mb-5 inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">
+            정적 투자 리서치 · 원장 검증 · 전략 비교
+          </p>
+          <h1 className="text-5xl font-semibold tracking-[-0.055em] text-slate-950 sm:text-6xl lg:text-7xl">
+            리포트가 맞았는지,
+            <br /> 원장이 벌었는지.
+          </h1>
+          <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
+            SNUSMIC Portfolio Lab은 리서치 리포트, 목표가, 체결 원장, 전략 성과를 읽기 전용 스냅샷으로 묶어 오늘 봐야 할
+            검토 항목과 아직 믿으면 안 되는 데이터를 먼저 보여줍니다.
+          </p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <Button asChild size="lg" variant="secondary">
+              <Link href="/snapshot">
+                스냅샷 보기 <ArrowRight />
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="outline">
+              <Link href="/guide">읽는 법</Link>
+            </Button>
+          </div>
+          <ul className="mt-10 grid gap-3 text-sm text-slate-600">
+            {principles.map((item) => (
+              <li className="flex items-start gap-3" key={item}>
+                <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-600" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-      <section className="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(360px,.65fr)]">
-        <Card className="overflow-hidden">
-          <CardHeader className="border-b border-slate-100">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="border-y border-slate-200 bg-white/70 py-3">
+          <div className="border-b border-slate-200 px-4 py-3">
+            <div className="flex items-center justify-between gap-4">
               <div>
-                <CardTitle>확인할 항목</CardTitle>
-                <CardDescription>보유, 후보, 만료, 데이터 플래그를 하나의 검토 대기열로 정리합니다.</CardDescription>
+                <div className="text-sm font-semibold">검증 스냅샷</div>
+                <div className="mt-1 font-mono text-xs text-slate-500">
+                  {overview.snapshotDate || manifest.price_range.end}
+                </div>
               </div>
-              <Badge variant="outline">{brief.decisions.length.toLocaleString('ko-KR')}개</Badge>
+              <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
+                읽기 전용
+              </span>
             </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="divide-y divide-slate-100">
-              {brief.decisions.map((item) => (
+          </div>
+          <div className="grid divide-y divide-slate-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+            <Metric label="평가액" value={formatKrw(portfolio.finalEquityKrw)} />
+            <Metric label="현금 비중" value={formatPercent(portfolio.cashWeight)} />
+            <Metric label="리포트" value={`${manifest.row_counts.reports.toLocaleString('ko-KR')}건`} />
+            <Metric label="전략" value={`${manifest.row_counts.strategy_catalog.toLocaleString('ko-KR')}개`} />
+          </div>
+          <div className="grid gap-1 border-t border-slate-200 p-3">
+            {links.map((item) => {
+              const Icon = item.icon;
+              return (
                 <Link
-                  className="grid gap-3 p-4 transition-colors hover:bg-slate-50 sm:grid-cols-[9rem_minmax(0,1fr)_auto] sm:items-center"
+                  className="grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-slate-50"
                   href={item.href}
-                  key={item.id}
+                  key={item.href}
                 >
-                  <div>
-                    <Badge variant={badgeVariant(item.tone)}>{item.label}</Badge>
-                  </div>
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-medium text-slate-950">{item.title}</div>
-                    <div className="mt-1 text-sm leading-5 text-slate-500">{item.reason}</div>
-                  </div>
-                  <div className={`font-mono text-sm font-semibold tabular-nums ${toneText(item.tone)}`}>
-                    {item.metric}
-                  </div>
+                  <span className="grid size-8 place-items-center rounded-md border border-slate-200 bg-white text-slate-500">
+                    <Icon className="size-4" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-sm font-medium text-slate-950">{item.label}</span>
+                    <span className="block truncate text-xs text-slate-500">{item.caption}</span>
+                  </span>
+                  <ArrowRight className="size-4 text-slate-400" />
                 </Link>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="grid gap-5">
-          <Card>
-            <CardHeader className="border-b border-slate-100">
-              <CardTitle>원장 상태</CardTitle>
-              <CardDescription>홈에서는 위험 판정만 보여주고, 보유 상세는 원장에서 확인합니다.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4 p-4">
-              <div className="grid gap-2">
-                <div className="flex items-center justify-between gap-3 text-sm">
-                  <span className="text-slate-500">평가액</span>
-                  <strong className="font-mono tabular-nums">{formatKrw(overview.portfolio.finalEquityKrw)}</strong>
-                </div>
-                <div className="flex items-center justify-between gap-3 text-sm">
-                  <span className="text-slate-500">현금</span>
-                  <strong className="font-mono tabular-nums">{formatKrw(overview.portfolio.cashKrw)}</strong>
-                </div>
-                <div className="flex items-center justify-between gap-3 text-sm">
-                  <span className="text-slate-500">현재 보유</span>
-                  <strong className="font-mono tabular-nums">
-                    {overview.portfolio.holdingCount.toLocaleString('ko-KR')}개
-                  </strong>
-                </div>
-              </div>
-              <Separator />
-              <div className="grid gap-2">
-                <div className="flex items-end justify-between gap-3">
-                  <span className="text-sm text-slate-500">현금 비중</span>
-                  <strong className="font-mono text-3xl font-semibold tracking-tight tabular-nums">
-                    {formatPercent(overview.portfolio.cashWeight)}
-                  </strong>
-                </div>
-                <Progress value={(overview.portfolio.cashWeight ?? 0) * 100} />
-                <p className="text-xs leading-5 text-slate-500">
-                  현재 선택 원장은 보유 종목보다 현금 대기가 핵심 상태입니다. 보유/체결 원인은 원장 화면에서 추적합니다.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="border-b border-slate-100">
-              <CardTitle>바로가기</CardTitle>
-              <CardDescription>세부 분석은 전용 화면에서만 다룹니다.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-2 p-3">
-              <Drilldown href="/portfolio" icon={<ShieldCheck />} title="원장" caption="보유·현금·체결·포지션 근거" />
-              <Drilldown href="/reports" icon={<FileText />} title="리포트" caption="목표가 검증·재검토 후보" />
-              <Drilldown href="/strategies" icon={<DatabaseZap />} title="전략" caption="벤치마크·규칙·위험 성과" />
-            </CardContent>
-          </Card>
+              );
+            })}
+          </div>
         </div>
       </section>
+    </main>
+  );
+}
 
-      <section className="grid gap-5 xl:grid-cols-[minmax(0,.65fr)_minmax(0,.85fr)]">
-        <Card>
-          <CardHeader className="border-b border-slate-100">
-            <CardTitle>리포트 품질</CardTitle>
-            <CardDescription>후보를 보기 전에 제외·누락·검토 플래그를 먼저 확인합니다.</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-3 p-4">
-            {brief.quality.map((item) => (
-              <div
-                className="flex items-start justify-between gap-4 rounded-lg border border-slate-100 p-3"
-                key={item.label}
-              >
-                <div className="min-w-0">
-                  <div className="text-sm font-medium text-slate-950">{item.label}</div>
-                  <div className="mt-1 text-xs text-slate-500">{item.caption}</div>
-                </div>
-                <div className={`font-mono text-sm font-semibold tabular-nums ${toneText(item.tone)}`}>
-                  {item.value}
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="border-b border-slate-100">
-            <CardTitle>최근 변경</CardTitle>
-            <CardDescription>새로 반영된 리포트, 후보, 원장 이벤트입니다.</CardDescription>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="divide-y divide-slate-100">
-              {brief.changes.map((item) => (
-                <Link
-                  className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 p-4 transition-colors hover:bg-slate-50"
-                  href={item.href}
-                  key={`${item.title}-${item.caption}`}
-                >
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-medium text-slate-950">{item.title}</div>
-                    <div className="mt-1 truncate font-mono text-xs text-slate-500">{item.caption}</div>
-                  </div>
-                  <ArrowUpRight className="size-4 text-slate-400" />
-                </Link>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </section>
+function Metric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-0 p-4">
+      <div className="text-xs text-slate-500">{label}</div>
+      <div className="mt-2 truncate font-mono text-xl font-semibold tabular-nums text-slate-950">{value}</div>
     </div>
   );
-}
-
-function Drilldown({
-  href,
-  icon,
-  title,
-  caption,
-}: {
-  href: string;
-  icon: React.ReactNode;
-  title: string;
-  caption: string;
-}) {
-  return (
-    <Button asChild className="h-auto justify-start p-3" variant="ghost">
-      <Link href={href}>
-        <span className="grid size-8 place-items-center rounded-md border border-slate-200 bg-white text-slate-500 [&_svg]:size-4">
-          {icon}
-        </span>
-        <span className="grid min-w-0 gap-0.5 text-left">
-          <span className="font-medium text-slate-950">{title}</span>
-          <span className="truncate text-xs font-normal text-slate-500">{caption}</span>
-        </span>
-      </Link>
-    </Button>
-  );
-}
-
-function toneText(tone?: DecisionTone) {
-  if (tone === 'ok') return 'text-emerald-600';
-  if (tone === 'review') return 'text-amber-600';
-  if (tone === 'risk') return 'text-red-600';
-  if (tone === 'data') return 'text-indigo-600';
-  return 'text-slate-950';
-}
-
-function badgeVariant(tone: DecisionTone) {
-  if (tone === 'ok') return 'success';
-  if (tone === 'risk' || tone === 'review') return 'destructive';
-  if (tone === 'data') return 'outline';
-  return 'secondary';
 }

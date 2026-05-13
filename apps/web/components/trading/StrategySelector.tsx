@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { Badge } from '@/components/ui/badge';
 
 export type StrategySelectorOption = {
   id: string;
@@ -23,26 +24,28 @@ export function StrategySelector({
 }) {
   return (
     <div
-      className="min-w-0 overflow-x-auto rounded-2xl border border-base-300 bg-base-200/70 p-1"
+      className="min-w-0 overflow-x-auto border-y border-slate-200 bg-white py-1"
       role="tablist"
       aria-label={ariaLabel}
     >
-      <div className="flex min-w-max gap-1">
+      <div className="flex min-w-max gap-1 px-1">
         {options.map((option) => {
           const active = option.id === value;
-          const badge = kindBadge(option.kind);
+          const badge = kindBadge(option.kind, option.id);
           const className = [
-            'inline-flex min-w-0 max-w-[12rem] items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-black transition',
+            'inline-flex min-w-0 max-w-[13rem] items-center gap-1.5 rounded-md px-3 py-2 text-xs font-semibold transition-colors',
             active
-              ? 'bg-base-100 text-primary shadow-sm ring-1 ring-primary/15'
-              : 'text-base-content/62 hover:bg-base-100/70 hover:text-base-content',
+              ? 'bg-slate-950 text-white [&_[data-slot=badge]]:border-white/20 [&_[data-slot=badge]]:bg-white/10 [&_[data-slot=badge]]:text-white'
+              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950',
           ].join(' ');
           const content = (
             <>
               <span className="truncate" title={option.label}>
                 {option.shortLabel}
               </span>
-              <span className={`badge badge-xs shrink-0 ${badge.className}`}>{badge.label}</span>
+              <Badge className="shrink-0" variant={badge.variant}>
+                {badge.label}
+              </Badge>
             </>
           );
           if (onChange) {
@@ -77,8 +80,15 @@ export function StrategySelector({
   );
 }
 
-function kindBadge(kind: StrategySelectorOption['kind']): { label: string; className: string } {
-  if (kind === 'strategy') return { label: '전략', className: 'badge-primary badge-soft' };
-  if (kind === 'oracle') return { label: '상한', className: 'badge-warning badge-soft' };
-  return { label: '기준', className: 'badge-ghost' };
+function kindBadge(
+  kind: StrategySelectorOption['kind'],
+  id: string,
+): {
+  label: string;
+  variant: 'secondary' | 'warning' | 'outline';
+} {
+  if (id === 'smic_follower_v2') return { label: '원장', variant: 'outline' };
+  if (kind === 'strategy') return { label: '전략', variant: 'outline' };
+  if (kind === 'oracle') return { label: '상한', variant: 'warning' };
+  return { label: '기준', variant: 'secondary' };
 }
