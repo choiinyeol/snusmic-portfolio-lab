@@ -48,6 +48,9 @@ export default function OverviewPage() {
   const trades = getTrades();
   const reports = getReportRows();
   const latestReportsBySymbol = latestReportBySymbol(reports);
+  const reportHrefBySymbol = Object.fromEntries(
+    [...latestReportsBySymbol.keys()].map((symbol) => [symbol, `/reports/${encodeURIComponent(symbol)}`]),
+  );
   const equity = getStrategyCurves();
   const benchmarkRows = getBenchmarkRows(strategyRows);
   const selectableRows = getSelectableStrategyRows(strategyRows);
@@ -115,6 +118,7 @@ export default function OverviewPage() {
                   overview.portfolio.persona,
                 )}
                 height={450}
+                hrefBySymbol={reportHrefBySymbol}
               />
             </div>
           </article>
