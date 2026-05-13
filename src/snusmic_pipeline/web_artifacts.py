@@ -261,7 +261,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
 
     report_rows = _build_report_rows(reports, report_performance, extraction_quality, missing_symbols)
     overview = _build_overview(reports, prices, summary, report_stats, missing_symbols, report_rows)
-    strategy_catalog = _build_strategy_catalog(summary, inputs.sim / "personas.json")
+    strategy_catalog = _build_strategy_catalog(summary, inputs.sim / "persona-configs.json")
     return_windows = _build_return_windows(report_rows, prices)
     detail_metrics = _build_detail_metrics(report_rows, prices, return_windows)
     target_distribution = _build_target_hit_distribution(report_rows)
@@ -864,10 +864,9 @@ def _persona_config_by_id(path: Path) -> dict[str, dict[str, Any]]:
     if not path.exists():
         raise RuntimeError(f"Required simulation config artifact is missing: {path}")
     data = _read_json(path)
-    config = data.get("config") if isinstance(data, dict) else None
-    personas = config.get("personas") if isinstance(config, dict) else None
+    personas = data.get("personas") if isinstance(data, dict) else None
     if not isinstance(personas, list):
-        raise RuntimeError(f"{path} must contain config.personas for strategy catalog export.")
+        raise RuntimeError(f"{path} must contain personas for strategy catalog export.")
     out: dict[str, dict[str, Any]] = {}
     for item in personas:
         if not isinstance(item, dict):
