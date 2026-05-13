@@ -13,16 +13,23 @@ SNUSMIC Portfolio Lab is an artifact-backed research, portfolio, and strategy va
 
 ## Canonical artifacts
 
-Core frontend artifacts live in `data/web`:
+Core frontend artifacts live in `data/web`. The current Next.js reader treats
+page-owned bundle paths as canonical:
 
-- `manifest.json` — snapshot schema version, generated timestamp, row counts, date ranges, and checksums.
-- `strategies/catalog.json` — benchmark/strategy/oracle taxonomy, labels, default-candidate metadata, methodology summaries, buy/sell rules, risk controls, params, and core metrics.
-- `overview.json` — snapshot windows, summary rows, report statistics, and benchmark summary.
-- `reports.json` — report-level target/price validation rows.
-- `current-holdings.json` — current share-based holdings for each persona/strategy.
-- `trades.json` — share-based broker-ledger trade tape.
-- `equity-daily.json` — daily equity/return path by persona or benchmark.
-- `data-quality.json` — extraction and price-matching quality facts.
+- `manifest.json` — snapshot schema version, generated timestamp, row counts, date ranges, checksums, and artifact inventory.
+- `overview/snapshot.json` — snapshot windows, summary rows, report statistics, and benchmark summary.
+- `overview/research-pulse.json` — compact insight/feed rows for the snapshot board.
+- `overview/data-quality.json` — extraction, report-exclusion, and price-matching quality facts.
+- `reports/table.json` — report-level target/price validation rows.
+- `reports/rankings.json`, `reports/detail-metrics.json`, `reports/return-windows.json`, `reports/target-hit-distribution.json` — reports page presets and detail modules.
+- `portfolio/personas.json`, `portfolio/holdings.json`, `portfolio/monthly-holdings.json`, `portfolio/trades.json`, `portfolio/episodes.json`, `portfolio/equity-daily.json` — share-based ledger, holdings, episodes, and equity paths.
+- `strategies/catalog.json`, `strategies/leaderboard.json`, `strategies/curves.json` — benchmark/strategy/oracle taxonomy, metrics, and chart curves.
+- `screener/candidates.json` — report-derived candidate rows.
+- `prices/*.json` — symbol price series for chart/detail pages.
+
+Top-level compatibility exports such as `overview.json`, `reports.json`, and
+`personas.json` remain part of the exporter/test/download contract, but they are
+not the primary frontend read paths.
 
 Required artifacts must remain deterministic for identical inputs. Generated rows should be sorted deterministically before export.
 
