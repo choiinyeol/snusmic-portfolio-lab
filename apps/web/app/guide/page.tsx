@@ -1,17 +1,10 @@
 import Link from 'next/link';
+import { GuideExperience } from '@/components/guide/GuideExperience';
 import { KpiTile } from '@/components/ui/KpiTile';
 import { PageHero } from '@/components/ui/PageHero';
 import { Section } from '@/components/ui/Section';
 import { formatPercent } from '@/lib/format';
 import { OBJECTIVE_MAX_DRAWDOWN } from '@/lib/product-model';
-
-const flow = [
-  ['1', 'Overview', '현재 평가액, 현금, 목표가 적중률, 벤치마크 대비 성과를 30초 안에 확인합니다.'],
-  ['2', 'Portfolio', '전략별 share-based 원장, 현금 비중, 현재 보유, 체결 기록을 검토합니다.'],
-  ['3', 'Reports', '발간가→현재가→목표가 흐름을 같은 컬럼 테이블에서 정렬·필터링합니다.'],
-  ['4', 'Strategies', '벤치마크와 고유 전략을 분리하고, MDD 15% 이하 + KOSPI 초과 목표를 확인합니다.'],
-  ['5', 'Screener', '미도달·미만료 리포트 중 업사이드와 목표 진행률이 설명 가능한 후보를 찾습니다.'],
-] as const;
 
 const terms = [
   {
@@ -27,12 +20,22 @@ const terms = [
   {
     term: 'Target Progress',
     title: '목표가 진행률',
-    body: '공식은 (현재가 - 진입가) / (목표가 - 진입가)입니다. 목표가를 이미 넘으면 100% 이상이 아니라 도달 상태로 해석합니다.',
+    body: '공식은 (현재가 - 진입가) / (목표가 - 진입가)입니다. 목표가를 이미 넘으면 도달 상태로 해석합니다.',
   },
   {
     term: 'Benchmark',
     title: '비교 기준선',
-    body: 'All-Weather, SMIC Follower v1/v2, KODEX200, QQQ, SPY, GLD, Weak Prophet은 전략이 아니라 비교 기준입니다.',
+    body: 'All-Weather, SMIC Follower v1/v2, KODEX200, QQQ, SPY, GLD, Weak Prophet은 전략 선택지가 아니라 성과 비교 기준입니다.',
+  },
+  {
+    term: 'Ledger',
+    title: 'Share-based 원장',
+    body: '수량, 현금, 평균단가, 매도·매수 내역을 보존하는 방식입니다. 단순 누적 수익률 차트보다 실제 매매 해석에 가깝습니다.',
+  },
+  {
+    term: 'No live trading',
+    title: '실시간 거래 아님',
+    body: '웹 런타임은 외부 시세를 호출하지 않습니다. Python 파이프라인이 만든 canonical data/web 스냅샷만 읽습니다.',
   },
 ] as const;
 
@@ -42,7 +45,7 @@ export default function GuidePage() {
       <PageHero
         eyebrow="GUIDE"
         title="SNUSMIC Portfolio Lab 사용 가이드"
-        subtitle="이 서비스는 실시간 거래 도구가 아니라, 커밋된 정적 아티팩트로 리서치 추천·포트폴리오 원장·전략 성과를 검증하는 대시보드입니다."
+        subtitle="정적 아티팩트 기반 리서치·포트폴리오·전략 검증 시스템을 30초 안에 이해하고, 각 화면에서 무엇을 봐야 하는지 인터랙티브하게 익힙니다."
         badges={[
           { label: 'Mode', value: 'Static Artifacts' },
           { label: 'Trading', value: 'No live trading' },
@@ -61,21 +64,11 @@ export default function GuidePage() {
         }
       />
 
-      <Section eyebrow="Workflow" title="30초 이해 플로우">
-        <div className="grid gap-3 md:grid-cols-5">
-          {flow.map(([step, title, body]) => (
-            <article className="lab-panel p-4" key={title}>
-              <div className="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 font-mono font-black text-primary">
-                {step}
-              </div>
-              <h2 className="text-base font-black tracking-[-0.02em]">{title}</h2>
-              <p className="mt-2 text-sm leading-6 text-base-content/60">{body}</p>
-            </article>
-          ))}
-        </div>
+      <Section eyebrow="Interactive Tutorial" title="3D Lab Guide">
+        <GuideExperience />
       </Section>
 
-      <Section eyebrow="Principles" title="화면을 읽는 원칙">
+      <Section eyebrow="Principles" title="제품 UI/UX 원칙">
         <div className="grid gap-3 lg:grid-cols-3">
           <KpiTile
             label="표 기본 원칙"
@@ -93,27 +86,10 @@ export default function GuidePage() {
         </div>
       </Section>
 
-      <Section eyebrow="Interactive examples" title="예시로 보는 해석">
-        <div className="grid gap-3 lg:grid-cols-3">
-          <GuideDetail title="목표가 진행률이 60%라면?">
-            진입가 10,000원, 목표가 15,000원, 현재가 13,000원이면 (13,000 - 10,000) / (15,000 - 10,000) = 60%입니다.
-            목표가에 가까워질수록 추가 상승 여력은 줄어듭니다.
-          </GuideDetail>
-          <GuideDetail title="팔았는데 왜 현금으로 남나요?">
-            원장 전략은 항상 즉시 재매수하지 않습니다. 리밸런싱 주기, 최대 보유 종목 수, MTT/업사이드/가격 조건을 모두
-            통과한 후보가 없으면 현금으로 대기합니다.
-          </GuideDetail>
-          <GuideDetail title="Weak Prophet은 왜 벤치마크인가요?">
-            미래정보 상한선에 가까운 비교 기준입니다. 현실적인 매매 전략처럼 선택하는 대상이 아니라, 다른 전략이 얼마나
-            과장되었는지 감지하기 위한 기준선입니다.
-          </GuideDetail>
-        </div>
-      </Section>
-
       <Section eyebrow="Glossary" title="금융·포트폴리오 용어">
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {terms.map((item) => (
-            <article className="lab-panel p-4" key={item.term}>
+            <article className="guide-term-card lab-panel p-4" key={item.term}>
               <div className="flex items-center gap-2">
                 <span className="badge badge-primary badge-soft">{item.term}</span>
                 <h2 className="font-black">{item.title}</h2>
@@ -123,15 +99,28 @@ export default function GuidePage() {
           ))}
         </div>
       </Section>
+
+      <Section eyebrow="Do not misread" title="이렇게 해석하면 안 됩니다">
+        <div className="grid gap-3 lg:grid-cols-3">
+          <GuideWarning title="투자 조언이 아닙니다">
+            후보·전략·리포트 검증은 학습과 사후 분석을 위한 것입니다.
+          </GuideWarning>
+          <GuideWarning title="Weak Prophet은 전략이 아닙니다">미래정보 상한선 성격의 벤치마크입니다.</GuideWarning>
+          <GuideWarning title="차트만 보지 않습니다">
+            수익률은 MDD, 현금 비중, 거래 횟수, 표본 수와 함께 봅니다.
+          </GuideWarning>
+        </div>
+      </Section>
     </>
   );
 }
 
-function GuideDetail({ title, children }: { title: string; children: React.ReactNode }) {
+function GuideWarning({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <details className="lab-panel p-4" open>
-      <summary className="cursor-pointer text-sm font-black tracking-[-0.01em]">{title}</summary>
-      <p className="mt-3 text-sm leading-6 text-base-content/62">{children}</p>
-    </details>
+    <article className="lab-panel border-warning/25 bg-warning/5 p-4">
+      <span className="badge badge-warning badge-soft">주의</span>
+      <h2 className="mt-3 font-black tracking-[-0.02em]">{title}</h2>
+      <p className="mt-2 text-sm leading-6 text-base-content/62">{children}</p>
+    </article>
   );
 }
