@@ -20,7 +20,16 @@ type HitFilter = 'all' | 'hit' | 'open' | 'expired';
 type ReturnFilter = 'all' | 'positive' | 'negative';
 const PAGE_SIZE_OPTIONS = [25, 50, 100, 200] as const;
 type PageSize = (typeof PAGE_SIZE_OPTIONS)[number];
-type SortPresetId = 'recent' | 'target-hit' | 'top-return' | 'near-target' | 'upside';
+type SortPresetId = 'recent' | 'target-hit' | 'top-return' | 'target-progress' | 'near-target' | 'upside';
+type SortPreset = {
+  id: SortPresetId;
+  label: string;
+  caption: string;
+  sort: SortingState;
+  hitFilter: HitFilter;
+  returnFilter: ReturnFilter;
+  count: (report: ReportRow) => boolean;
+};
 
 type ReportsTableProps = {
   reports: ReportRow[];
@@ -69,6 +78,11 @@ export function ReportsTable({ reports }: ReportsTableProps) {
     () => ['all', ...Array.from(new Set(reports.map((report) => report.exchange).filter(Boolean))).sort()],
     [reports],
   );
+  const presetCounts = useMemo(
+    () => Object.fromEntries(SORT_PRESETS.map((preset) => [preset.id, reports.filter(preset.count).length])),
+    [reports],
+  );
+  const activePresetConfig = SORT_PRESETS.find((preset) => preset.id === activePreset) ?? SORT_PRESETS[0];
 
   const columns = useMemo<ColumnDef<ReportRow>[]>(
     () => [
@@ -251,30 +265,14 @@ export function ReportsTable({ reports }: ReportsTableProps) {
   const resetPage = () => setPage(0);
 
   const applyPreset = (preset: SortPresetId) => {
-    setActivePreset(preset);
-    setReturnFilter('all');
-    switch (preset) {
-      case 'recent':
-        setHitFilter('all');
-        setSorting([{ id: 'publicationDate', desc: true }]);
-        break;
-      case 'target-hit':
-        setHitFilter('hit');
-        setSorting([{ id: 'daysToTarget', desc: false }]);
-        break;
-      case 'top-return':
-        setHitFilter('all');
-        setSorting([{ id: 'currentReturn', desc: true }]);
-        break;
-      case 'near-target':
-        setHitFilter('open');
-        setSorting([{ id: 'targetRemainingPct', desc: false }]);
-        break;
-      case 'upside':
-        setHitFilter('all');
-        setSorting([{ id: 'targetUpsideAtPub', desc: true }]);
-        break;
+    const config = SORT_PRESETS.find((item) => item.id === preset);
+    if (!config) {
+      throw new Error(`Unknown reports table preset: ${preset}`);
     }
+    setActivePreset(config.id);
+    setHitFilter(config.hitFilter);
+    setReturnFilter(config.returnFilter);
+    setSorting(config.sort);
     setPage(0);
   };
 
@@ -292,17 +290,21 @@ export function ReportsTable({ reports }: ReportsTableProps) {
             {SORT_PRESETS.map((preset) => (
               <button
                 key={preset.id}
-                className={`btn btn-xs ${activePreset === preset.id ? 'btn-primary' : 'btn-ghost'}`}
+                className={`btn btn-xs gap-1.5 ${activePreset === preset.id ? 'btn-primary' : 'btn-ghost'}`}
                 type="button"
                 title={preset.caption}
                 onClick={() => applyPreset(preset.id)}
               >
                 {preset.label}
+                <span className="badge badge-xs border-0 bg-base-100/70 text-current">
+                  {presetCounts[preset.id]?.toLocaleString('ko-KR') ?? 0}
+                </span>
               </button>
             ))}
           </div>
           <p className="mt-2 text-xs text-base-content/55">
-            모든 프리셋은 동일한 컬럼을 사용합니다. 관심별 뷰는 별도 표가 아니라 정렬·필터 조건만 바꿉니다.
+            {activePresetConfig.caption} · 모든 프리셋은 동일한 컬럼을 사용합니다. 관심별 뷰는 별도 표가 아니라
+            정렬·필터 조건만 바꿉니다.
           </p>
         </div>
         <label>
@@ -472,12 +474,61 @@ function sortIndicator(direction: false | 'asc' | 'desc'): string {
   return ' ↕';
 }
 
-const SORT_PRESETS: Array<{ id: SortPresetId; label: string; caption: string }> = [
-  { id: 'recent', label: '최근 발간', caption: '발간일 최신순' },
-  { id: 'target-hit', label: '목표 도달', caption: '목표를 달성한 리포트를 도달 소요일 오름차순으로 표시' },
-  { id: 'top-return', label: '현재 수익 상위', caption: '현재 수익률 내림차순' },
-  { id: 'near-target', label: '목표 근접', caption: '진행 중 리포트 중 목표 잔여 변화율이 낮은 순서' },
-  { id: 'upside', label: '업사이드 상위', caption: '발간 시점 제시 상승여력 내림차순' },
+const SORT_PRESETS: SortPreset[] = [
+  {
+    id: 'recent',
+    label: '최근 발간',
+    caption: '발간일 최신순',
+    sort: [{ id: 'publicationDate', desc: true }],
+    hitFilter: 'all',
+    returnFilter: 'all',
+    count: () => true,
+  },
+  {
+    id: 'target-hit',
+    label: '목표 도달',
+    caption: '목표를 달성한 리포트를 도달 소요일 오름차순으로 표시',
+    sort: [{ id: 'daysToTarget', desc: false }],
+    hitFilter: 'hit',
+    returnFilter: 'all',
+    count: (report) => report.targetHit,
+  },
+  {
+    id: 'top-return',
+    label: '현재 수익률',
+    caption: '현재 수익률 내림차순',
+    sort: [{ id: 'currentReturn', desc: true }],
+    hitFilter: 'all',
+    returnFilter: 'all',
+    count: (report) => report.currentReturn !== null,
+  },
+  {
+    id: 'target-progress',
+    label: '목표 진행률',
+    caption: '진입가 대비 목표가까지의 진행률 내림차순',
+    sort: [{ id: 'targetProgressPct', desc: true }],
+    hitFilter: 'all',
+    returnFilter: 'all',
+    count: (report) => report.targetProgressPct !== null,
+  },
+  {
+    id: 'near-target',
+    label: '목표 근접',
+    caption: '진행 중 리포트 중 목표 잔여 변화율이 낮은 순서',
+    sort: [{ id: 'targetRemainingPct', desc: false }],
+    hitFilter: 'open',
+    returnFilter: 'all',
+    count: (report) => !report.targetHit && !report.expired && report.targetRemainingPct !== null,
+  },
+  {
+    id: 'upside',
+    label: '업사이드',
+    caption: '발간 시점 제시 상승여력 내림차순',
+    sort: [{ id: 'targetUpsideAtPub', desc: true }],
+    hitFilter: 'all',
+    returnFilter: 'all',
+    count: (report) => report.targetUpsideAtPub !== null,
+  },
 ];
 
 function downloadCsv(filename: string, rows: ReportRow[]) {

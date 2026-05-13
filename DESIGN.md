@@ -150,6 +150,7 @@ This gate must be shown on strategy comparisons and should drive the default “
 ## 6. UI/UX principles
 
 1. **One data set, one table.** Ranking modes change sort/filter state on a unified table. They do not create different columns for the same rows.
+   Reports ranking presets are part of the table contract: add a preset, not another card grid or table.
 2. **Every scalable table has controls.** Search/filter, sortable headers, pagination or row windowing, sticky header, right-aligned numeric cells, internal horizontal scroll.
 3. **No page-level horizontal overflow.** Long strategy names, Korean labels, and company names must truncate or wrap within their container.
 4. **Cards summarize; tables decide.** Cards can preview top-N, but the full decision surface is a unified table.
@@ -226,8 +227,7 @@ Do not create page-specific duplicates when one shared domain component would ke
 
 The current codebase can evolve through staged cuts rather than a one-shot rewrite:
 
-1. Consolidate Reports ranking cards and the Reports table into one preset-driven table.
-2. Replace duplicated strategy selectors/tables with shared components.
-3. Collapse remaining top-level raw artifacts into download-only surfaces.
-4. Keep the interactive Guide page aligned with the navigation contract.
-5. Continue removing primary-page developer copy in favor of user-facing finance language.
+1. Replace duplicated strategy selectors/tables with shared components.
+2. Collapse remaining top-level raw artifacts into download-only surfaces.
+3. Keep the interactive Guide page aligned with the navigation contract.
+4. Continue removing primary-page developer copy in favor of user-facing finance language.

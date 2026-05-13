@@ -110,5 +110,6 @@ data/web/screener/
 ```
 
 7. The frontend readers now consume those page bundles for overview, portfolio, reports, strategies, and screener data.
+8. Reports ranking modes are implemented as presets over one sortable/filterable/paginated table. The presets share columns and only change default sort/filter state.
 
 Top-level artifacts are still exported as raw/download surfaces during the cutover, but route-level product code should read the page-owned bundles first.
