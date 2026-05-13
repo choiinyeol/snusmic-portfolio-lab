@@ -191,6 +191,93 @@ Light fintech SaaS. White panels, soft blue-gray background, restrained blue/pur
 
 Overview should not feel like a developer status page. If the top cards become too small to read, collapse them into a single executive summary panel or remove them.
 
+### 7.1 Major redesign direction — research command board
+
+The next major UI/UX direction is a **Korean fintech research command board**:
+
+- high-density but calm,
+- light-mode only,
+- left navigation plus persistent snapshot/status context,
+- KPI strip for current state,
+- portfolio treemap and cumulative return chart as the main visual anchors,
+- right-side or secondary rails for recent reports, updates, strategy summaries, and validation feeds,
+- compact tables and feeds for auditability.
+
+Reference imagery and YASUN.GG are **guidelines, not pixel targets**. Borrow:
+
+- dashboard rhythm,
+- compact status chips,
+- market-like KPI cards,
+- prominent heatmap/treemap,
+- ranking/feed panel density,
+- fast scanability.
+
+Do not copy:
+
+- dark terminal aesthetics,
+- live trading urgency,
+- order/quote UI,
+- chat/community affordances,
+- prediction/gambling framing,
+- exact card positions or exact visual proportions.
+
+The guiding product sentence remains:
+
+> SNUSMIC Portfolio Lab is not a trading terminal. It is a static snapshot-based investment research dashboard for tracking research reports, portfolio holdings, strategy performance, backtest results, target price validation, and portfolio risk.
+
+### 7.2 Target desktop composition
+
+The desktop dashboard should feel like a plausible production SaaS screenshot, not a wireframe and not a clone. Preferred composition:
+
+1. **App shell**
+   - fixed left sidebar,
+   - product identity,
+   - Korean primary navigation,
+   - bottom source/GitHub/data card,
+   - compact top status area with snapshot date and read-only status.
+2. **KPI command strip**
+   - current equity,
+   - MWR,
+   - unrealized PnL,
+   - MDD,
+   - target hit rate,
+   - report count,
+   - selected/default strategy.
+3. **Primary board**
+   - treemap as the largest first visual anchor,
+   - risk summary and currency exposure next to it,
+   - recent reports feed as a compact scan panel.
+4. **Performance board**
+   - cumulative return chart as second visual anchor,
+   - strategy performance table next to or below it,
+   - recent updates/feed rail.
+5. **Evidence board**
+   - recent simulated trades,
+   - top current holdings,
+   - target validation feed/progress rows.
+
+This composition may vary by implementation. The hierarchy matters more than exact layout.
+
+### 7.3 Redesign constraints
+
+- Every visible metric needs a source field, calculation meaning, time window, null behavior, responsive behavior, and non-trading framing.
+- Do not invent unsupported market metrics such as bid/ask, live volume, VaR, beta, analyst consensus, AI signal, realtime alerts, or order flow.
+- Do not rank strategies as if higher return alone is “better”; show MDD and benchmark context.
+- MDD is risk/loss magnitude and must not be visually framed as positive.
+- Target hit rate is report validation, not trading win rate.
+- Benchmarks, selectable strategies, oracle baselines, current holdings, and report target outcomes must remain visually distinct.
+- Dense desktop layouts must collapse into summary-first mobile sections; do not create page-level horizontal scroll.
+- Charts show trends and comparison; tables show auditability; cards show current state. Avoid repeating the same metric everywhere.
+
+### 7.4 Implementation sequencing for major redesign
+
+1. **Shell pass** — extract and redesign app shell/sidebar/topbar/navigation without changing data semantics.
+2. **Primitive pass** — add/strengthen reusable `Panel`, KPI grid, feed row, status chip, and table chrome patterns.
+3. **Overview pass** — rebuild `/` around KPI strip, treemap anchor, risk/feed rail, cumulative chart, strategy table, and evidence board.
+4. **Artifact pass** — add product-owned artifacts where React currently recomputes UI meaning: overview dashboard summary, feeds, strategy diagnostics, validation exclusions, treemap leaves, risk metrics, and snapshot status.
+5. **Route alignment pass** — update Reports, Screener, Strategies, Portfolio, and Guide to use the same visual language and Korean product copy.
+6. **Responsive/visual QA pass** — validate desktop and mobile screenshots, overflow, contrast, keyboard focus, build, typecheck, artifact check, and route smoke.
+
 ## 8. Component ownership
 
 Preferred shared components:
