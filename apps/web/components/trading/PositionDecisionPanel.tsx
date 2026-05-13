@@ -67,7 +67,7 @@ export function PositionDecisionPanel({
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <Link
-                      href={`/reports/${row.holding.symbol}`}
+                      href={`/reports/${encodeURIComponent(row.holding.symbol)}`}
                       className="min-w-0 truncate text-base font-black link-hover"
                     >
                       {row.holding.company || row.holding.symbol}
@@ -131,7 +131,10 @@ export function PositionDecisionPanel({
                   <span className="flex flex-wrap items-center gap-2 sm:justify-end">
                     <span className="font-bold text-base-content/70">{sourceLabel(row.targetSource)}</span>
                     {linkedSymbol ? (
-                      <Link className="font-bold text-primary link-hover" href={`/reports/${linkedSymbol}`}>
+                      <Link
+                        className="font-bold text-primary link-hover"
+                        href={`/reports/${encodeURIComponent(linkedSymbol)}`}
+                      >
                         {row.targetSource === 'trade_report' ? '리포트 근거 보기 →' : '최신 리포트 보기 →'}
                       </Link>
                     ) : null}

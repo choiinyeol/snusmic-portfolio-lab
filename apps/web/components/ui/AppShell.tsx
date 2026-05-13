@@ -45,13 +45,13 @@ export function AppShell({
             <span className="brand-kicker">Portfolio Lab</span>
           </span>
         </Link>
-        <div className="sidebar__tagline">Research · Portfolio · Strategy</div>
+        <div className="sidebar__tagline">리서치 · 원장 · 검증</div>
         <SidebarNav items={APP_NAV} />
         <section className="sidebar-card" aria-label="스냅샷 정보">
           <div className="flex items-center justify-between gap-2">
             <div className="text-xs font-black tracking-[-0.02em] text-base-content">스냅샷 정보</div>
             <StatusChip tone="success" dot>
-              Static
+              정적
             </StatusChip>
           </div>
           <dl className="mt-4 grid gap-2 text-xs text-base-content/60">
@@ -81,7 +81,7 @@ export function AppShell({
               SNUSMIC Portfolio Lab
             </div>
             <div className="max-w-4xl truncate text-xs font-semibold text-base-content/55 md:text-sm">
-              리서치 추천과 포트폴리오 성과, 전략 검증을 한 곳에서 추적하는 정적 스냅샷 기반 투자 리서치 대시보드
+              리서치 리포트 검증, 포트폴리오 원장, 전략 성과를 한 곳에서 추적하는 정적 스냅샷 기반 투자 리서치 대시보드
             </div>
           </div>
           <div className="flex flex-wrap items-center justify-end gap-2">
@@ -90,10 +90,10 @@ export function AppShell({
               <span className="font-mono text-base-content">{snapshotDate || '—'}</span>
             </StatusChip>
             <StatusChip tone="success" dot>
-              Static Artifacts · No live trading
+              정적 스냅샷 · 읽기 전용
             </StatusChip>
             <Link className="btn btn-sm btn-outline" href="/guide">
-              About SMIC ↗
+              읽는 법
             </Link>
           </div>
         </header>

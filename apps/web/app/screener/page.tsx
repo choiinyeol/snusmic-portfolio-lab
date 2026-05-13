@@ -109,7 +109,7 @@ function CandidateCard({
 }) {
   const report = candidate.report;
   return (
-    <Link href={`/reports/${report.symbol}`} className="lab-panel p-4">
+    <Link href={`/reports/${encodeURIComponent(report.symbol)}`} className="lab-panel p-4">
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(420px,.9fr)] xl:items-center">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
