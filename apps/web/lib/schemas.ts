@@ -132,10 +132,25 @@ export const WebPersonaSchema = z
   })
   .passthrough();
 
+const WebReportCountsSchema = z
+  .object({
+    extracted_reports: z.number().optional(),
+    web_report_rows: z.number().optional(),
+    price_matched_reports: z.number().optional(),
+    excluded_reports: z.number().optional(),
+    excluded_missing_price: z.number().optional(),
+    excluded_missing_performance: z.number().optional(),
+    excluded_sell_opinion: z.number().optional(),
+    excluded_non_positive_upside: z.number().optional(),
+    excluded_downside_target: z.number().optional(),
+    excluded_instant_target_hit: z.number().optional(),
+  })
+  .catchall(z.number());
+
 export const WebOverviewSchema = z
   .object({
     generated_from: z.record(z.string(), z.string()).optional(),
-    report_counts: z.record(z.string(), z.number()).optional(),
+    report_counts: WebReportCountsSchema.optional(),
     target_stats: z.record(z.string(), NullableNumber).optional(),
     baseline_personas: z.array(WebPersonaSchema),
     simulation_window: z.record(z.string(), z.union([z.string(), z.null()])).optional(),

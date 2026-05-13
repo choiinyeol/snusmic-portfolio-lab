@@ -275,7 +275,7 @@ export function TradesTable({
                       </td>
                       <td>
                         <strong>
-                          <Link className="link link-hover" href={`/reports/${episode.symbol}`}>
+                          <Link className="link link-hover" href={`/reports/${encodeURIComponent(episode.symbol)}`}>
                             {episode.company || episode.symbol}
                           </Link>
                         </strong>
@@ -412,7 +412,7 @@ export function TradesTable({
                         </span>
                       </td>
                       <td>
-                        <Link className="link link-hover" href={`/reports/${trade.symbol}`}>
+                        <Link className="link link-hover" href={`/reports/${encodeURIComponent(trade.symbol)}`}>
                           {trade.symbol}
                         </Link>
                       </td>
@@ -439,7 +439,10 @@ export function TradesTable({
                       <td className="text-sm">{humanReason(trade.reason)}</td>
                       <td>
                         {trade.reportId && reportSymbolsById[trade.reportId] ? (
-                          <Link className="link link-hover" href={`/reports/${reportSymbolsById[trade.reportId]}`}>
+                          <Link
+                            className="link link-hover"
+                            href={`/reports/${encodeURIComponent(reportSymbolsById[trade.reportId])}`}
+                          >
                             리포트
                           </Link>
                         ) : (

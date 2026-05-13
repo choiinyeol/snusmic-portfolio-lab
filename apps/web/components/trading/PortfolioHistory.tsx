@@ -229,7 +229,7 @@ export function PortfolioHistory({ monthly, persona, personaLabels, targetsBySym
                       <td>
                         {row.company || row.symbol}
                         <div className="text-xs text-base-content/55">
-                          <a className="link link-hover" href={`/reports/${row.symbol}`}>
+                          <a className="link link-hover" href={`/reports/${encodeURIComponent(row.symbol)}`}>
                             {row.symbol}
                           </a>
                         </div>

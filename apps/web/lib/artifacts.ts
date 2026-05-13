@@ -269,10 +269,24 @@ export type WebReportRankingRow = {
   value?: number | null;
 };
 
+export type ReportCounts = {
+  extracted_reports?: number;
+  web_report_rows?: number;
+  price_matched_reports?: number;
+  excluded_reports?: number;
+  excluded_missing_price?: number;
+  excluded_missing_performance?: number;
+  excluded_sell_opinion?: number;
+  excluded_non_positive_upside?: number;
+  excluded_downside_target?: number;
+  excluded_instant_target_hit?: number;
+  [key: string]: number | undefined;
+};
+
 export type WebOverview = {
   baseline_personas: WebPersona[];
   generated_from?: Record<string, string>;
-  report_counts?: Record<string, number>;
+  report_counts?: ReportCounts;
   simulation_window?: Record<string, string | null>;
   target_stats?: Record<string, number | null>;
 };

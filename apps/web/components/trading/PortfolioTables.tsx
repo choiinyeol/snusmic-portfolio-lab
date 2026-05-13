@@ -153,7 +153,7 @@ export function PortfolioTables({ holdings, persona, personaLabels, capitalByPer
                       </td>
                       <td>
                         <strong>
-                          <Link href={`/reports/${row.symbol}`}>{row.company || row.symbol}</Link>
+                          <Link href={`/reports/${encodeURIComponent(row.symbol)}`}>{row.company || row.symbol}</Link>
                         </strong>
                         <div className="text-xs text-base-content/55">{row.symbol}</div>
                       </td>

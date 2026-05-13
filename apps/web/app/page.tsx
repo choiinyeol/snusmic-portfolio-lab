@@ -399,7 +399,7 @@ function RecentReportsPanel({ reports }: { reports: ReportRow[] }) {
       </div>
       <div className="feed-list p-3">
         {reports.map((report) => (
-          <Link key={report.reportId} href={`/reports/${report.symbol}`} className="feed-item">
+          <Link key={report.reportId} href={`/reports/${encodeURIComponent(report.symbol)}`} className="feed-item">
             <div className="min-w-0">
               <div className="truncate font-bold text-sm">{report.company || report.symbol}</div>
               <div className="feed-item__meta">
@@ -438,7 +438,7 @@ function HoldingContext({
         return (
           <Link
             key={`${holding.persona}-${holding.symbol}`}
-            href={`/reports/${holding.symbol}`}
+            href={`/reports/${encodeURIComponent(holding.symbol)}`}
             className="lab-panel p-4"
           >
             <div className="flex min-w-0 items-start justify-between gap-3">
@@ -488,7 +488,7 @@ function BuyTape({ trades }: { trades: TradeRow[] }) {
         {trades.map((trade, index) => (
           <Link
             key={`${trade.persona}-${trade.date}-${trade.symbol}-${index}`}
-            href={`/reports/${trade.symbol}`}
+            href={`/reports/${encodeURIComponent(trade.symbol)}`}
             className="feed-item"
           >
             <div className="min-w-0">
@@ -560,7 +560,7 @@ function UpdateFeed({
 function CandidateMiniCard({ candidate, rank }: { candidate: ResearchCandidate; rank: number }) {
   const report = candidate.report;
   return (
-    <Link href={`/reports/${report.symbol}`} className="lab-panel p-4">
+    <Link href={`/reports/${encodeURIComponent(report.symbol)}`} className="lab-panel p-4">
       <div className="flex flex-wrap items-center gap-2">
         <span className="badge badge-primary badge-soft badge-sm">#{rank}</span>
         <span className="badge badge-ghost badge-sm font-mono">{report.symbol}</span>
@@ -618,7 +618,11 @@ function TargetValidationFeed({ reports }: { reports: ReportRow[] }) {
       {reports.map((report) => {
         const progress = Math.max(0, Math.min(1, report.targetProgressPct ?? (report.targetHit ? 1 : 0)));
         return (
-          <Link key={report.reportId} href={`/reports/${report.symbol}`} className="feed-item feed-item--stacked">
+          <Link
+            key={report.reportId}
+            href={`/reports/${encodeURIComponent(report.symbol)}`}
+            className="feed-item feed-item--stacked"
+          >
             <div className="min-w-0">
               <div className="flex min-w-0 items-center gap-2">
                 <span className="truncate text-sm font-bold">{report.company || report.symbol}</span>
