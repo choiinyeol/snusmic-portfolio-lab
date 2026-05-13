@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import type { ReturnSeries } from '@/components/charts/CumulativeReturnChart';
 import { SeriesToggleChart } from '@/components/charts/SeriesToggleChart';
+import { StrategyRiskTable } from '@/components/trading/StrategyRiskTable';
 import { KpiTile } from '@/components/ui/KpiTile';
 import { PageHero } from '@/components/ui/PageHero';
 import { Section } from '@/components/ui/Section';
 import { getStrategyCurves } from '@/lib/artifacts';
-import { formatPercent, signedTextClass } from '@/lib/format';
+import { formatPercent } from '@/lib/format';
 import {
   BENCHMARK_IDS,
   compactStrategyLabel,
@@ -80,7 +81,7 @@ export default function StrategiesPage() {
       />
 
       <Section
-        eyebrow="Benchmark Set"
+        eyebrow="비교 기준"
         title="벤치마크 세트"
         caption="벤치마크는 성과 비교 기준입니다. Weak Prophet은 미래정보 상한선 성격이므로 투자 가능한 전략처럼 해석하지 않습니다."
       >
@@ -88,7 +89,7 @@ export default function StrategiesPage() {
       </Section>
 
       <Section
-        eyebrow="Objective Gate"
+        eyebrow="목표 조건"
         title="고유 전략 — MDD 15% 이하 + KOSPI 초과"
         caption="개인 목표 조건을 먼저 검사합니다. 수익률이 높아도 MDD가 15%를 넘으면 통과로 표시하지 않습니다."
         id="strategy-board"
@@ -96,7 +97,7 @@ export default function StrategiesPage() {
         <StrategyRiskTable rows={selectableRows} />
       </Section>
 
-      <Section eyebrow="Curve" title="벤치마크 세트와 고유 전략의 누적 수익률">
+      <Section eyebrow="성과 경로" title="벤치마크 세트와 고유 전략의 누적 수익률">
         <article className="card border border-base-300 bg-base-100 shadow-sm">
           <div className="card-body gap-3 p-3 md:p-4">
             <div className="flex flex-wrap gap-2 text-xs">
@@ -110,7 +111,7 @@ export default function StrategiesPage() {
       </Section>
 
       <Section
-        eyebrow="Method"
+        eyebrow="운용 규칙"
         title="고유 전략 매수·매도 규칙"
         caption="MTT 전략은 수익률 숫자만 보는 대상이 아니라, 어떤 조건에서 현금을 보유하고 어떤 조건에서 매수·매도하는지 함께 읽어야 합니다."
       >
@@ -136,72 +137,6 @@ function buildStrategySeries(rows: StrategyLeaderboardRow[]): ReturnSeries[] {
       .filter((point) => point.persona === row.id && point.cumulativeReturn !== null)
       .map((point) => ({ time: point.date, value: point.cumulativeReturn ?? 0 })),
   }));
-}
-
-function StrategyRiskTable({ rows }: { rows: StrategyLeaderboardRow[] }) {
-  return (
-    <article className="board-table-wrap">
-      <table className="board-table table table-sm table-density-compact w-full">
-        <thead>
-          <tr>
-            <th>구분</th>
-            <th>이름</th>
-            <th className="text-right">수익률</th>
-            <th className="text-right">Sharpe</th>
-            <th className="text-right">Sortino</th>
-            <th className="text-right">MDD</th>
-            <th className="text-right">KOSPI 초과</th>
-            <th className="text-right">목표</th>
-            <th className="text-right">거래</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.id}>
-              <td>
-                <span
-                  className={`badge badge-sm ${row.kind === 'benchmark' ? 'badge-ghost' : 'badge-primary badge-soft'}`}
-                >
-                  {row.kind === 'strategy' ? '고유 전략' : row.kind === 'oracle' ? '오라클' : '벤치마크'}
-                </span>
-              </td>
-              <td className="min-w-[160px] max-w-[240px] truncate font-bold">
-                <Link href={row.href} title={row.label}>
-                  {row.label}
-                </Link>
-              </td>
-              <td className={`text-right font-mono font-black tabular-nums ${signedTextClass(row.returnPct)}`}>
-                {formatPercent(row.returnPct)}
-              </td>
-              <td className="text-right font-mono tabular-nums">{formatNumber(row.sharpe)}</td>
-              <td className="text-right font-mono tabular-nums">{formatNumber(row.sortino)}</td>
-              <td className="text-right font-mono tabular-nums text-error">
-                {formatPercent(row.maxDrawdown)}
-                {(row.maxDrawdown ?? 0) > 0.25 ? (
-                  <span className="ml-1 badge badge-warning badge-soft badge-xs">낙폭 점검</span>
-                ) : null}
-              </td>
-              <td className={`text-right font-mono font-bold tabular-nums ${signedTextClass(row.benchmarkExcess)}`}>
-                {formatPercent(row.benchmarkExcess)}
-              </td>
-              <td className="text-right">
-                {row.kind === 'benchmark' ? (
-                  <span className="badge badge-ghost badge-xs">기준선</span>
-                ) : row.kind === 'oracle' ? (
-                  <span className="badge badge-warning badge-soft badge-xs">상한선</span>
-                ) : row.objectivePassed ? (
-                  <span className="badge badge-success badge-soft badge-xs">통과</span>
-                ) : (
-                  <span className="badge badge-warning badge-soft badge-xs">미달</span>
-                )}
-              </td>
-              <td className="text-right font-mono tabular-nums">{row.tradeCount?.toLocaleString('ko-KR') ?? '—'}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </article>
-  );
 }
 
 function StrategyMethodCard({ row }: { row: StrategyLeaderboardRow }) {
@@ -239,9 +174,4 @@ function RuleList({ title, items }: { title: string; items: string[] }) {
       </ul>
     </div>
   );
-}
-
-function formatNumber(value: number | null): string {
-  if (value === null || !Number.isFinite(value)) return '—';
-  return value.toFixed(2);
 }

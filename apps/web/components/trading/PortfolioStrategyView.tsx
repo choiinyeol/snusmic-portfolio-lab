@@ -5,6 +5,7 @@ import { DailyEquityHistory } from '@/components/trading/DailyEquityHistory';
 import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
 import { PositionDecisionPanel } from '@/components/trading/PositionDecisionPanel';
 import { PortfolioTables } from '@/components/trading/PortfolioTables';
+import { StrategySelector, type StrategySelectorOption } from '@/components/trading/StrategySelector';
 import { TradesTable } from '@/components/trading/TradesTable';
 import { KpiTile } from '@/components/ui/KpiTile';
 import { Tabs } from '@/components/ui/Tabs';
@@ -18,7 +19,7 @@ type Props = {
   episodes: PositionEpisodeRow[];
   personas: string[];
   personaLabels: Record<string, string>;
-  personaKinds: Record<string, string>;
+  strategyOptions: StrategySelectorOption[];
   defaultPersona: string;
   methodsByPersona: Record<
     string,
@@ -40,7 +41,7 @@ export function PortfolioStrategyView({
   episodes,
   personas,
   personaLabels,
-  personaKinds,
+  strategyOptions,
   defaultPersona,
   methodsByPersona,
   capitalByPersona,
@@ -95,35 +96,25 @@ export function PortfolioStrategyView({
 
   return (
     <div className="grid min-w-0 gap-4">
-      <div className="lab-panel p-3">
-        <div className="flex min-w-0 flex-wrap items-center gap-2">
-          <span className="snapshot-pill">Strategy selector</span>
-          <div
-            className="tabs tabs-box min-w-0 flex-1 overflow-x-auto bg-base-200"
-            role="tablist"
-            aria-label="전략 선택"
-          >
-            {personas.map((item) => (
-              <button
-                key={item}
-                type="button"
-                role="tab"
-                aria-selected={persona === item}
-                className={persona === item ? 'tab tab-active font-bold' : 'tab'}
-                onClick={() => setPersona(item)}
-              >
-                {personaLabels[item] ?? item}
-                <span className="ml-2 badge badge-ghost badge-xs">
-                  {personaKinds[item] === 'benchmark' ? 'BM' : '전략'}
-                </span>
-              </button>
-            ))}
+      <div className="lab-panel p-3 md:p-4">
+        <div className="grid min-w-0 gap-2">
+          <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
+            <span className="snapshot-pill">전략 선택</span>
+            <span className="text-xs font-bold text-base-content/45">
+              고유 전략 {strategyOptions.filter((item) => item.kind === 'strategy').length} · 기준선{' '}
+              {strategyOptions.filter((item) => item.kind !== 'strategy').length}
+            </span>
           </div>
+          <StrategySelector
+            ariaLabel="원장 전략 선택"
+            onChange={setPersona}
+            options={strategyOptions}
+            value={persona}
+          />
         </div>
         <p className="m-0 mt-2 text-xs text-base-content/55">
-          선택된 원장: <strong className="text-base-content">{personaLabels[persona] ?? persona}</strong> · URL의
-          strategy 파라미터와 동기화됩니다. BM은 비교 기준선이고, 전략 표시는 사용자가 선택해 검토할 수 있는 고유
-          원장입니다.
+          <strong className="text-base-content">{personaLabels[persona] ?? persona}</strong>의 보유·현금·체결·매수/매도
+          규칙을 함께 봅니다. BM과 상한선은 비교 기준이고, 고유 전략은 선택해 검토할 수 있는 원장입니다.
         </p>
       </div>
 
@@ -136,12 +127,7 @@ export function PortfolioStrategyView({
           tone="accent"
         />
         <KpiTile compact label="현금" value={formatKrw(cashKrw)} delta="미투자 대기 자금" tone="neutral" />
-        <KpiTile
-          compact
-          label="출자 원금"
-          value={formatKrw(capitalByPersona[persona] ?? null)}
-          delta="summary artifact"
-        />
+        <KpiTile compact label="출자 원금" value={formatKrw(capitalByPersona[persona] ?? null)} delta="입금 기준" />
         <KpiTile
           compact
           label="미실현 손익"
@@ -167,7 +153,7 @@ export function PortfolioStrategyView({
       <article className="lab-panel p-3 md:p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <div>
-            <div className="lab-panel__eyebrow">Current holdings</div>
+            <div className="lab-panel__eyebrow">보유 현황</div>
             <h2 className="lab-panel__title">현재 보유 트리맵</h2>
           </div>
           <span className="snapshot-pill">면적=평가액</span>
@@ -249,7 +235,7 @@ function StrategyMethodPanel({
   return (
     <article className="lab-panel p-4">
       <div className="mb-3">
-        <div className="lab-panel__eyebrow">Strategy method</div>
+        <div className="lab-panel__eyebrow">운용 규칙</div>
         <h2 className="lab-panel__title">{personaLabel} 매수·매도 규칙</h2>
         <p className="mt-2 text-sm leading-6 text-base-content/62">{method.summary}</p>
       </div>

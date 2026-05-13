@@ -2,6 +2,8 @@ import Link from 'next/link';
 import type { ReturnSeries } from '@/components/charts/CumulativeReturnChart';
 import { SeriesToggleChart } from '@/components/charts/SeriesToggleChart';
 import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
+import { StrategyRiskTable } from '@/components/trading/StrategyRiskTable';
+import { StrategySelector } from '@/components/trading/StrategySelector';
 import { Money } from '@/components/ui/Money';
 import { PageHero } from '@/components/ui/PageHero';
 import { Section } from '@/components/ui/Section';
@@ -187,7 +189,7 @@ export default function OverviewPage() {
             </Link>
           }
         >
-          <StrategyLeaderboard rows={strategyRows.slice(0, 7)} />
+          <StrategyRiskTable rows={strategyRows.slice(0, 7)} />
         </Section>
 
         <Section eyebrow="Updates" title="최근 업데이트">
@@ -278,18 +280,17 @@ function OverviewDigest({
 
 function StrategyPills({ rows, selectedId }: { rows: StrategyLeaderboardRow[]; selectedId: string }) {
   return (
-    <div className="flex max-w-full flex-wrap gap-1.5" aria-label="대표 전략 선택">
-      {rows.map((row) => (
-        <Link
-          className={`snapshot-pill ${row.id === selectedId ? 'border-primary/30 bg-primary/10 text-primary' : ''}`}
-          href={`/portfolio?strategy=${encodeURIComponent(row.id)}`}
-          key={row.id}
-          title={row.label}
-        >
-          {row.shortLabel}
-        </Link>
-      ))}
-    </div>
+    <StrategySelector
+      ariaLabel="대표 전략 선택"
+      options={rows.map((row) => ({
+        id: row.id,
+        label: row.label,
+        shortLabel: row.shortLabel,
+        kind: row.kind,
+        href: row.href,
+      }))}
+      value={selectedId}
+    />
   );
 }
 
@@ -502,67 +503,6 @@ function BuyTape({ trades }: { trades: TradeRow[] }) {
   );
 }
 
-function StrategyLeaderboard({ rows }: { rows: StrategyLeaderboardRow[] }) {
-  return (
-    <article className="board-table-wrap">
-      <table className="board-table table table-sm table-density-compact w-full">
-        <thead>
-          <tr>
-            <th>전략</th>
-            <th className="text-right">수익률</th>
-            <th className="text-right">Sharpe</th>
-            <th className="text-right">Sortino</th>
-            <th className="text-right">MDD</th>
-            <th className="text-right">KOSPI 초과</th>
-            <th className="text-right">목표</th>
-            <th className="text-right">거래</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.id}>
-              <td className="min-w-[210px] max-w-[320px] truncate font-bold">
-                <Link href={row.href}>{row.label}</Link>
-                <div className="mt-1">
-                  <span
-                    className={`badge badge-sm ${row.kind === 'benchmark' ? 'badge-ghost' : 'badge-primary badge-soft'}`}
-                  >
-                    {strategyKindLabel(row.kind)}
-                  </span>
-                </div>
-              </td>
-              <td className={`text-right font-mono font-black tabular-nums ${signedTextClass(row.returnPct)}`}>
-                {formatPercent(row.returnPct)}
-              </td>
-              <td className="text-right font-mono tabular-nums">{formatNumber(row.sharpe)}</td>
-              <td className="text-right font-mono tabular-nums">{formatNumber(row.sortino)}</td>
-              <td className="text-right font-mono tabular-nums text-error">{formatPercent(row.maxDrawdown)}</td>
-              <td className={`text-right font-mono font-bold tabular-nums ${signedTextClass(row.benchmarkExcess)}`}>
-                {formatPercent(row.benchmarkExcess)}
-              </td>
-              <td className="text-right">
-                {row.kind === 'benchmark' ? (
-                  <span className="badge badge-ghost badge-xs">기준선</span>
-                ) : row.objectivePassed ? (
-                  <span className="badge badge-success badge-soft badge-xs">통과</span>
-                ) : (
-                  <span className="badge badge-warning badge-soft badge-xs">미달</span>
-                )}
-              </td>
-              <td className="text-right font-mono tabular-nums">{row.tradeCount?.toLocaleString('ko-KR') ?? '—'}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </article>
-  );
-}
-
-function strategyKindLabel(kind: StrategyLeaderboardRow['kind']): string {
-  if (kind === 'benchmark') return '벤치마크';
-  return '고유 전략';
-}
-
 function UpdateFeed({
   snapshotDate,
   stats,
@@ -760,11 +700,6 @@ function currencyExposure(holdings: HoldingRow[], totalValue: number): Array<{ c
     .map(([currency, value]) => ({ currency, weight: value / totalValue }))
     .sort((a, b) => b.weight - a.weight)
     .slice(0, 5);
-}
-
-function formatNumber(value: number | null | undefined): string {
-  if (value === null || value === undefined || !Number.isFinite(value)) return '—';
-  return value.toLocaleString('ko-KR', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
 }
 
 function formatQuantity(value: number | null | undefined): string {
