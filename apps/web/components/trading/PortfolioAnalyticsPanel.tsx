@@ -70,7 +70,7 @@ export function PortfolioAnalyticsPanel({ equity, persona, rows, personaLabels }
             x축은 최대낙폭, y축은 MWR입니다. 선은 실제 전략 조합 최적화가 아니라 현재 산출물의 위험-수익 상단입니다.
           </p>
         </div>
-        <FrontierSvg rows={frontierRows} efficientIds={efficientIds} selectedId={persona} />
+        <FrontierPlot rows={frontierRows} efficientIds={efficientIds} selectedId={persona} />
         <div className="mt-4 grid grid-cols-3 gap-2 text-sm">
           <Stat label="선택 MWR" value={formatPercent(selected?.returnPct)} />
           <Stat label="선택 MDD" value={formatPercent(selected?.maxDrawdown)} />
@@ -81,7 +81,7 @@ export function PortfolioAnalyticsPanel({ equity, persona, rows, personaLabels }
   );
 }
 
-function FrontierSvg({
+function FrontierPlot({
   rows,
   efficientIds,
   selectedId,
@@ -90,72 +90,139 @@ function FrontierSvg({
   efficientIds: Set<string>;
   selectedId: string;
 }) {
-  const width = 520;
-  const height = 280;
-  const pad = { left: 42, right: 18, top: 18, bottom: 34 };
   const xs = rows.map((row) => row.maxDrawdown ?? 0);
   const ys = rows.map((row) => row.returnPct ?? 0);
   const maxX = Math.max(0.01, ...xs) * 1.08;
   const minY = Math.min(0, ...ys) * 1.08;
   const maxY = Math.max(0.01, ...ys) * 1.08;
-  const x = (value: number) => pad.left + (value / maxX) * (width - pad.left - pad.right);
-  const y = (value: number) =>
-    height - pad.bottom - ((value - minY) / (maxY - minY || 1)) * (height - pad.top - pad.bottom);
   const frontier = rows.filter((row) => efficientIds.has(row.id));
-  const path = frontier
-    .map((row, index) => `${index === 0 ? 'M' : 'L'} ${x(row.maxDrawdown ?? 0)} ${y(row.returnPct ?? 0)}`)
-    .join(' ');
 
   return (
-    <svg
-      className="h-auto w-full overflow-visible"
-      viewBox={`0 0 ${width} ${height}`}
-      role="img"
-      aria-label="전략별 최대낙폭과 수익률 프론티어"
-    >
-      <rect width={width} height={height} rx="18" fill="#f8fafc" />
-      {[0.1, 0.2, 0.3, 0.4].map((tick) => (
-        <g key={`x-${tick}`}>
-          <line x1={x(tick)} x2={x(tick)} y1={pad.top} y2={height - pad.bottom} stroke="#e5e7eb" />
-          <text x={x(tick)} y={height - 12} textAnchor="middle" className="fill-slate-400 text-[10px]">
-            {Math.round(tick * 100)}%
-          </text>
-        </g>
-      ))}
-      {[0, 0.25, 0.5, 0.75].map((tick) => (
-        <g key={`y-${tick}`}>
-          <line x1={pad.left} x2={width - pad.right} y1={y(tick)} y2={y(tick)} stroke="#e5e7eb" />
-          <text x={10} y={y(tick) + 4} className="fill-slate-400 text-[10px]">
-            {Math.round(tick * 100)}%
-          </text>
-        </g>
-      ))}
-      {path ? <path d={path} fill="none" stroke="#2563eb" strokeWidth="2" strokeDasharray="4 4" /> : null}
+    <div className="relative h-[280px] rounded-2xl border border-slate-100 bg-[linear-gradient(to_right,rgba(226,232,240,.8)_1px,transparent_1px),linear-gradient(to_bottom,rgba(226,232,240,.8)_1px,transparent_1px)] bg-[size:20%_25%] px-5 py-5">
+      <div className="absolute bottom-3 left-5 right-5 flex justify-between font-mono text-[10px] text-slate-400">
+        <span>낮은 MDD</span>
+        <span>높은 MDD</span>
+      </div>
+      <div className="absolute left-4 top-3 text-[10px] text-slate-400">높은 MWR</div>
+      {frontier.map((row, index) => {
+        const next = frontier[index + 1];
+        if (!next) return null;
+        const x1 = xScale(row.maxDrawdown ?? 0, 0, maxX);
+        const y1 = 100 - xScale(row.returnPct ?? 0, minY, maxY);
+        const x2 = xScale(next.maxDrawdown ?? 0, 0, maxX);
+        const y2 = 100 - xScale(next.returnPct ?? 0, minY, maxY);
+        return <FrontierSegment key={`${row.id}-${next.id}`} x1={x1} x2={x2} y1={y1} y2={y2} />;
+      })}
       {rows.map((row) => {
         const selected = row.id === selectedId;
         const efficient = efficientIds.has(row.id);
+        const tone = selected
+          ? 'selected'
+          : efficient
+            ? 'efficient'
+            : row.kind === 'benchmark'
+              ? 'benchmark'
+              : 'strategy';
         return (
-          <g key={row.id}>
-            <circle
-              cx={x(row.maxDrawdown ?? 0)}
-              cy={y(row.returnPct ?? 0)}
-              fill={selected ? '#111827' : efficient ? '#2563eb' : row.kind === 'benchmark' ? '#94a3b8' : '#10b981'}
-              r={selected ? 5.5 : efficient ? 4.5 : 3.5}
-            />
-            {selected || efficient ? (
-              <text
-                x={x(row.maxDrawdown ?? 0) + 7}
-                y={y(row.returnPct ?? 0) - 6}
-                className="fill-slate-700 text-[10px] font-medium"
-              >
-                {row.shortLabel}
-              </text>
-            ) : null}
-          </g>
+          <FrontierPoint
+            key={row.id}
+            label={row.shortLabel || row.label}
+            meta={row.label}
+            tone={tone}
+            x={xScale(row.maxDrawdown ?? 0, 0, maxX)}
+            y={100 - xScale(row.returnPct ?? 0, minY, maxY)}
+            rows={[
+              ['MWR', formatPercent(row.returnPct)],
+              ['MDD', formatPercent(row.maxDrawdown)],
+              ['Sharpe', formatNumber(row.sharpe)],
+              ['거래 수', row.tradeCount?.toLocaleString('ko-KR') ?? '—'],
+            ]}
+          />
         );
       })}
-    </svg>
+    </div>
   );
+}
+
+function FrontierSegment({ x1, y1, x2, y2 }: { x1: number; y1: number; x2: number; y2: number }) {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const length = Math.hypot(dx, dy);
+  const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+  return (
+    <span
+      className="pointer-events-none absolute h-px origin-left border-t border-dashed border-blue-500/70"
+      style={{
+        left: `calc(1.25rem + ${x1} * (100% - 2.5rem) / 100)`,
+        top: `calc(1.25rem + ${y1} * (100% - 2.5rem) / 100)`,
+        transform: `rotate(${angle}deg)`,
+        width: `calc(${length} * (100% - 2.5rem) / 100)`,
+      }}
+    />
+  );
+}
+
+function FrontierPoint({
+  x,
+  y,
+  label,
+  meta,
+  tone,
+  rows,
+}: {
+  x: number;
+  y: number;
+  label: string;
+  meta: string;
+  tone: 'selected' | 'efficient' | 'benchmark' | 'strategy';
+  rows: Array<[string, string]>;
+}) {
+  const colorClass =
+    tone === 'selected'
+      ? 'bg-slate-950 ring-slate-200'
+      : tone === 'efficient'
+        ? 'bg-blue-600 ring-blue-100'
+        : tone === 'benchmark'
+          ? 'bg-slate-400 ring-slate-100'
+          : 'bg-emerald-600 ring-emerald-100';
+
+  return (
+    <button
+      aria-label={`${meta} ${rows.map(([key, value]) => `${key} ${value}`).join(', ')}`}
+      className="group absolute z-10 grid size-6 -translate-x-1/2 -translate-y-1/2 place-items-center outline-none"
+      style={{
+        left: `calc(1.25rem + ${x} * (100% - 2.5rem) / 100)`,
+        top: `calc(1.25rem + ${y} * (100% - 2.5rem) / 100)`,
+      }}
+      type="button"
+    >
+      <span
+        className={`size-2.5 rounded-full ring-4 transition-transform group-hover:scale-150 group-focus-visible:scale-150 ${colorClass}`}
+      />
+      {tone === 'selected' || tone === 'efficient' ? (
+        <span className="pointer-events-none absolute left-4 top-0 max-w-28 truncate rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-medium text-slate-700 shadow-sm">
+          {label}
+        </span>
+      ) : null}
+      <span className="pointer-events-none absolute bottom-7 left-1/2 z-30 hidden w-64 -translate-x-1/2 rounded-xl border border-slate-200 bg-white p-3 text-left text-xs shadow-xl group-hover:block group-focus-visible:block">
+        <span className="block font-semibold text-slate-950">{label}</span>
+        <span className="mt-0.5 block truncate text-[11px] text-slate-500">{meta}</span>
+        <span className="mt-2 grid gap-1">
+          {rows.map(([key, value]) => (
+            <span className="flex items-center justify-between gap-3" key={key}>
+              <span className="text-slate-500">{key}</span>
+              <span className="font-mono font-semibold tabular-nums text-slate-950">{value}</span>
+            </span>
+          ))}
+        </span>
+      </span>
+    </button>
+  );
+}
+
+function xScale(value: number, min: number, max: number): number {
+  if (max <= min) return 50;
+  return Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
 }
 
 function efficientFrontierIds(rows: StrategyLeaderboardRow[]): Set<string> {

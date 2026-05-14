@@ -27,15 +27,19 @@ const ICONS: Record<NavIconKey, LucideIcon> = {
 
 export function SidebarNav({ items, className = '' }: { items: SidebarNavItem[]; className?: string }) {
   const pathname = usePathname();
+  const bestActivePath = items
+    .map((item) => (item.href.startsWith('/') ? (item.activePath === undefined ? item.href : item.activePath) : null))
+    .filter((activePath): activePath is string =>
+      Boolean(activePath && (pathname === activePath || (activePath !== '/' && pathname.startsWith(activePath)))),
+    )
+    .sort((a, b) => b.length - a.length)[0];
+
   return (
     <nav className={cn('grid gap-1', className)} aria-label="주요 탐색">
       {items.map((item) => {
         const isInternal = item.href.startsWith('/');
         const activePath = item.activePath === undefined ? item.href : item.activePath;
-        const isCurrent =
-          isInternal &&
-          activePath !== null &&
-          (pathname === activePath || (activePath !== '/' && pathname.startsWith(activePath)));
+        const isCurrent = isInternal && activePath !== null && activePath === bestActivePath;
         const Icon = ICONS[item.icon];
         return (
           <Link

@@ -25,6 +25,15 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
   const medianReturn = quantile(currentReturns, 0.5);
   const deepLosers = currentReturns.filter((value) => value <= -0.2).length;
   const bigWinners = currentReturns.filter((value) => value >= 0.2).length;
+  const returnQuantiles = {
+    min: quantile(currentReturns, 0),
+    p10: quantile(currentReturns, 0.1),
+    p25: quantile(currentReturns, 0.25),
+    median: medianReturn,
+    p75: quantile(currentReturns, 0.75),
+    p90: quantile(currentReturns, 0.9),
+    max: quantile(currentReturns, 1),
+  };
 
   return (
     <div className="grid gap-14">
@@ -37,9 +46,9 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
             평균보다 먼저 볼 것은 분포입니다
           </h1>
           <p className="mt-5 text-base leading-8 text-slate-600">
-            {summary.sample.eligibleReportCount.toLocaleString('ko-KR')}건의 가격 경로를 다시 계산했습니다. 목표가
-            도달률만 보면 엄격해 보이지만, 0.8배 목표·진입 타이밍·목표 도달 후 흐름을 함께 보면 투자 규칙으로 바꿀 수
-            있는 질문이 더 선명해집니다.
+            {summary.sample.eligibleReportCount.toLocaleString('ko-KR')}건의 가격 경로를 다시 계산했습니다. 주식
+            수익률은 꼬리가 두꺼워 평균과 표준편차만으로 보기 어렵습니다. 그래서 이 페이지는 정규분포를 가정하지 않고
+            전체 표본의 순위, 분위수, 꼬리, 경로를 먼저 보여줍니다.
           </p>
         </div>
         <DistributionSignature
@@ -51,7 +60,20 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
       </section>
 
       <StorySection
-        kicker="01 · 목표가를 더 현실적으로 보기"
+        kicker="01 · 전체 표본 지도"
+        title="정규분포 대신 모든 리포트를 한 줄로 펼쳐 봅니다"
+        body="표본이 fat-tail이면 평균은 대표값이 아니라 꼬리의 흔적일 수 있습니다. 먼저 가격 경로가 연결된 리포트를 현재 수익률 순서대로 놓고, 분위수와 극단값이 어디에 있는지 봅니다."
+      >
+        <WholeSampleMap rows={summary.riskScatter} quantiles={returnQuantiles} />
+        <InsightLine>
+          하위 10%는 <strong>{formatPercent(returnQuantiles.p10)}</strong> 이하, 상위 10%는{' '}
+          <strong>{formatPercent(returnQuantiles.p90)}</strong> 이상입니다. 이 정도 꼬리에서는 “평균 수익률”보다
+          “중앙값·사분위·극단 손실을 통과하는 규칙”을 먼저 봐야 합니다.
+        </InsightLine>
+      </StorySection>
+
+      <StorySection
+        kicker="02 · 목표가를 더 현실적으로 보기"
         title="목표가 100%가 아니라 80%에 닿았는지도 봅니다"
         body="분석가 목표가는 단일 정답이 아니라 파라미터입니다. 원래 목표가의 60%, 80%, 100%에 해당하는 가격을 각각 계산하면 ‘완전 적중’보다 더 실용적인 성과 경로가 보입니다."
       >
@@ -70,7 +92,7 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
       </StorySection>
 
       <StorySection
-        kicker="02 · 읽고 바로 사야 했나"
+        kicker="03 · 읽고 바로 사야 했나"
         title="발간 후 며칠 기다리면 결과가 달라졌나"
         body="리포트를 당일에 읽지 못한 개인투자자가 더 현실적입니다. 1·3·5·10·20거래일 뒤 진입했을 때의 중앙 수익률과 0.8x 목표 도달률을 같은 방식으로 다시 계산했습니다."
       >
@@ -89,7 +111,7 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
       </StorySection>
 
       <StorySection
-        kicker="03 · 눌림목인가 확인 매수인가"
+        kicker="04 · 눌림목인가 확인 매수인가"
         title="하락을 기다릴수록 참여율은 낮아지고, 돌파를 기다릴수록 가짜 돌파가 생깁니다"
         body="발간 후 20거래일 안에 -3/-5/-10% 눌림목이 오면 매수하는 규칙과 +3/+5/+10% 상승 확인 후 매수하는 규칙을 비교했습니다."
       >
@@ -97,7 +119,7 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
       </StorySection>
 
       <StorySection
-        kicker="04 · 목표가에 닿은 뒤"
+        kicker="05 · 목표가에 닿은 뒤"
         title="목표가는 끝이 아니라 분기점이었습니다"
         body="목표가에 처음 닿은 날을 0일로 놓고, 이후 5·20·60·120거래일을 더 보유했을 때의 중앙값과 사분위 범위를 계산했습니다."
       >
@@ -114,7 +136,7 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
       </StorySection>
 
       <StorySection
-        kicker="05 · 역사적 익절선"
+        kicker="06 · 역사적 익절선"
         title="이 표본에서 안정적이었던 익절선은 낮은 목표 배수 쪽이었습니다"
         body="목표가의 일부에 도달하면 익절하고, 아니면 250거래일 후 청산한다고 가정했습니다. 최고 평균이 아니라 중앙 수익률·도달률·하방 위험을 함께 본 보상/신뢰 점수를 봅니다."
       >
@@ -127,9 +149,9 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
       </StorySection>
 
       <StorySection
-        kicker="06 · 경로의 고통"
+        kicker="07 · 경로의 고통"
         title="맞은 리포트도 중간 손실을 견뎌야 했습니다"
-        body="각 리포트의 발간 이후 최대 상승폭과 최대 하락폭을 동시에 놓으면, 성공 표본이 얼마나 불편한 경로를 거쳤는지 보입니다."
+        body="각 리포트의 발간 이후 최대 상승폭과 최대 하락폭을 전체 표본으로 동시에 놓으면, 성공 표본이 얼마나 불편한 경로를 거쳤는지 보입니다."
       >
         <RiskScatter rows={summary.riskScatter} />
       </StorySection>
@@ -190,6 +212,119 @@ function Marker({ x, label, value, tone }: { x: number; label: string; value: st
       <div className="absolute top-2 w-28 -translate-x-1/2 rounded-md bg-white/90 px-2 py-1 text-center shadow-sm">
         <div className="text-[11px] text-slate-500">{label}</div>
         <div className="font-mono text-xs font-semibold text-slate-950">{value}</div>
+      </div>
+    </div>
+  );
+}
+
+type ReturnQuantiles = {
+  min: number | null;
+  p10: number | null;
+  p25: number | null;
+  median: number | null;
+  p75: number | null;
+  p90: number | null;
+  max: number | null;
+};
+
+function WholeSampleMap({
+  rows,
+  quantiles,
+}: {
+  rows: ReportStatisticsLabSummary['riskScatter'];
+  quantiles: ReturnQuantiles;
+}) {
+  const sortedRows = rows
+    .filter((row) => isNumber(row.currentReturn))
+    .sort((a, b) => (a.currentReturn ?? 0) - (b.currentReturn ?? 0));
+  const tails = [
+    { label: '-50% 이하', count: sortedRows.filter((row) => (row.currentReturn ?? 0) <= -0.5).length, tone: 'bad' },
+    { label: '-20% 이하', count: sortedRows.filter((row) => (row.currentReturn ?? 0) <= -0.2).length, tone: 'bad' },
+    { label: '+20% 이상', count: sortedRows.filter((row) => (row.currentReturn ?? 0) >= 0.2).length, tone: 'good' },
+    { label: '+100% 이상', count: sortedRows.filter((row) => (row.currentReturn ?? 0) >= 1).length, tone: 'good' },
+  ] as const;
+
+  return (
+    <div className="grid gap-4">
+      <div className="rounded-2xl border border-slate-200 bg-white p-5">
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h3 className="text-sm font-semibold text-slate-950">전체 현재 수익률 지도</h3>
+            <p className="mt-1 text-xs text-slate-500">
+              각 점은 리포트 1건입니다. 왼쪽부터 현재 수익률이 낮은 순서입니다.
+            </p>
+          </div>
+          <span className="rounded-md bg-slate-100 px-2 py-1 font-mono text-[11px] text-slate-500">
+            n={sortedRows.length.toLocaleString('ko-KR')}
+          </span>
+        </div>
+        <div className="relative h-80 rounded-xl border border-slate-100 bg-[linear-gradient(to_right,rgba(226,232,240,.7)_1px,transparent_1px),linear-gradient(to_bottom,rgba(226,232,240,.7)_1px,transparent_1px)] bg-[size:12.5%_25%] px-4 py-5">
+          <div className="absolute left-4 right-4 top-[53.33%] h-px bg-slate-950/25" />
+          <div className="absolute left-4 top-[51%] rounded bg-white/90 px-1.5 py-0.5 font-mono text-[10px] text-slate-500">
+            0%
+          </div>
+          {sortedRows.map((row, index) => {
+            const value = row.currentReturn ?? 0;
+            const x = sortedRows.length <= 1 ? 50 : (index / (sortedRows.length - 1)) * 100;
+            const y = 100 - xScale(Math.max(-0.8, Math.min(1.5, value)), -0.8, 1.5);
+            const tone = value <= -0.2 ? 'bad' : value >= 0.2 ? 'good' : 'neutral';
+            return (
+              <DataPoint
+                key={row.reportId}
+                label={`${row.company} (${row.symbol})`}
+                meta={`${row.publicationDate} · 순위 ${index + 1}/${sortedRows.length}`}
+                tone={tone}
+                x={x}
+                y={y}
+                rows={[
+                  ['현재 수익률', formatPercent(row.currentReturn)],
+                  ['최대 상승폭', formatPercent(row.maxFavorableExcursion)],
+                  ['최대 하락폭', formatPercent(row.maxAdverseExcursion)],
+                  ['목표 도달', targetHitLabel(row)],
+                ]}
+              />
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_18rem]">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <h3 className="text-sm font-semibold text-slate-950">분위수로 본 표본</h3>
+          <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-7">
+            {[
+              ['최저', quantiles.min],
+              ['P10', quantiles.p10],
+              ['P25', quantiles.p25],
+              ['중앙', quantiles.median],
+              ['P75', quantiles.p75],
+              ['P90', quantiles.p90],
+              ['최고', quantiles.max],
+            ].map(([label, value]) => (
+              <div className="rounded-xl border border-slate-100 bg-slate-50 p-3" key={label as string}>
+                <div className="font-mono text-[11px] uppercase text-slate-500">{label}</div>
+                <div className="mt-2 font-mono text-sm font-semibold tabular-nums text-slate-950">
+                  {formatPercent(value as number | null)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <h3 className="text-sm font-semibold text-slate-950">꼬리 개수</h3>
+          <div className="mt-4 grid gap-2">
+            {tails.map((tail) => (
+              <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2" key={tail.label}>
+                <span className="text-xs text-slate-500">{tail.label}</span>
+                <span
+                  className={`font-mono text-sm font-semibold ${tail.tone === 'good' ? 'text-blue-600' : 'text-rose-600'}`}
+                >
+                  {tail.count.toLocaleString('ko-KR')}건
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -362,36 +497,52 @@ function PostTargetDrift({ rows }: { rows: ReportStatisticsLabSummary['postTarge
 }
 
 function TargetMultipleCurve({ rows }: { rows: ReportStatisticsLabSummary['optimalTargetMultiples'] }) {
-  const width = 720;
-  const height = 260;
-  const points = rows.map((row) => ({
-    x: xScale(row.targetMultiple, 0.35, 1.25),
-    y: 100 - xScale(row.rewardReliabilityScore ?? 0, -0.1, 0.45),
-    row,
-  }));
-  const line = points
-    .map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x * (width / 100)} ${point.y * (height / 100)}`)
-    .join(' ');
+  const scores = rows.map((row) => row.rewardReliabilityScore ?? 0);
+  const minScore = Math.min(-0.05, ...scores);
+  const maxScore = Math.max(0.05, ...scores);
+
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-5">
-      <svg
-        className="h-auto w-full"
-        viewBox={`0 0 ${width} ${height}`}
-        role="img"
-        aria-label="목표 배수별 보상 신뢰 점수"
-      >
-        <path d="M 40 220 H 690" stroke="#e2e8f0" />
-        <path d="M 40 30 V 220" stroke="#e2e8f0" />
-        <path d={line} fill="none" stroke="#0f172a" strokeWidth="3" />
-        {points.map((point) => (
-          <g key={point.row.targetMultiple}>
-            <circle cx={point.x * (width / 100)} cy={point.y * (height / 100)} fill="#0f172a" r="5" />
-            <text x={point.x * (width / 100)} y="245" fill="#64748b" fontSize="11" textAnchor="middle">
-              {point.row.targetMultiple.toFixed(1)}x
-            </text>
-          </g>
-        ))}
-      </svg>
+    <div className="rounded-2xl border border-slate-200 bg-white p-5">
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h3 className="text-sm font-semibold text-slate-950">목표 배수별 보상/신뢰 지도</h3>
+          <p className="mt-1 text-xs text-slate-500">
+            점에 마우스를 올리면 도달률, 중앙 수익률, 하위 25% 손실을 같이 봅니다.
+          </p>
+        </div>
+        <span className="rounded-md bg-slate-100 px-2 py-1 text-[11px] text-slate-500">250거래일 청산 가정</span>
+      </div>
+      <div className="relative h-72 rounded-xl border border-slate-100 bg-[linear-gradient(to_right,rgba(226,232,240,.7)_1px,transparent_1px),linear-gradient(to_bottom,rgba(226,232,240,.7)_1px,transparent_1px)] bg-[size:12.5%_25%] px-5 py-5">
+        <div className="absolute bottom-10 left-5 right-5 h-px bg-slate-950/20" />
+        {rows.map((row) => {
+          const x = xScale(row.targetMultiple, 0.35, 1.25);
+          const y = 100 - xScale(row.rewardReliabilityScore ?? 0, minScore, maxScore);
+          const positive = (row.rewardReliabilityScore ?? 0) >= 0;
+          return (
+            <DataPoint
+              key={row.targetMultiple}
+              label={`${row.targetMultiple.toFixed(1)}x 목표`}
+              meta={`표본 ${row.sampleSize.toLocaleString('ko-KR')}건`}
+              tone={positive ? 'good' : 'bad'}
+              x={x}
+              y={y}
+              rows={[
+                ['보상/신뢰 점수', formatNumber(row.rewardReliabilityScore)],
+                ['도달률', formatPercent(row.hitRate)],
+                ['중앙 수익률', formatPercent(row.medianReturn)],
+                ['하위 25%', formatPercent(row.p25Return)],
+              ]}
+            />
+          );
+        })}
+        <div className="absolute bottom-3 left-5 right-5 flex justify-between font-mono text-[10px] text-slate-400">
+          <span>0.4x</span>
+          <span>0.6x</span>
+          <span>0.8x</span>
+          <span>1.0x</span>
+          <span>1.2x</span>
+        </div>
+      </div>
       <div className="mt-2 text-xs text-slate-500">점수 = 중앙 수익률 × 도달률 / (하위 25% 손실 + 5% 완충)</div>
     </div>
   );
@@ -400,26 +551,44 @@ function TargetMultipleCurve({ rows }: { rows: ReportStatisticsLabSummary['optim
 function RiskScatter({ rows }: { rows: ReportStatisticsLabSummary['riskScatter'] }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5">
-      <svg className="h-auto w-full" viewBox="0 0 760 340" role="img" aria-label="최대 하락폭과 최대 상승폭 산점도">
-        <path d="M 60 290 H 730" stroke="#e2e8f0" />
-        <path d="M 60 30 V 290" stroke="#e2e8f0" />
-        <text x="60" y="320" fill="#64748b" fontSize="12">
-          최대 하락폭
-        </text>
-        <text x="10" y="35" fill="#64748b" fontSize="12">
-          최대 상승폭
-        </text>
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h3 className="text-sm font-semibold text-slate-950">전체 표본의 최대 상승폭·최대 하락폭</h3>
+          <p className="mt-1 text-xs text-slate-500">
+            오른쪽으로 갈수록 중간 손실이 작고, 위로 갈수록 발간 이후 상승 여지가 컸습니다.
+          </p>
+        </div>
+        <span className="rounded-md bg-slate-100 px-2 py-1 font-mono text-[11px] text-slate-500">
+          n={rows.length.toLocaleString('ko-KR')}
+        </span>
+      </div>
+      <div className="relative h-80 rounded-xl border border-slate-100 bg-[linear-gradient(to_right,rgba(226,232,240,.7)_1px,transparent_1px),linear-gradient(to_bottom,rgba(226,232,240,.7)_1px,transparent_1px)] bg-[size:12.5%_25%] px-5 py-5">
+        <div className="absolute bottom-8 left-5 text-[11px] text-slate-500">최대 하락폭</div>
+        <div className="absolute left-5 top-3 text-[11px] text-slate-500">최대 상승폭</div>
         {rows.map((row) => {
-          const x = 60 + xScale(row.maxAdverseExcursion ?? 0, -0.8, 0) * 6.7;
-          const y = 290 - xScale(Math.min(row.maxFavorableExcursion ?? 0, 1.5), 0, 1.5) * 1.73;
-          const fill = row.hit10 ? '#2563eb' : row.hit08 ? '#7c3aed' : row.hit06 ? '#0f766e' : '#cbd5e1';
+          const adverse = Math.max(-0.8, Math.min(0, row.maxAdverseExcursion ?? 0));
+          const favorable = Math.max(0, Math.min(1.5, row.maxFavorableExcursion ?? 0));
+          const x = xScale(adverse, -0.8, 0);
+          const y = 100 - xScale(favorable, 0, 1.5);
+          const tone = row.hit10 ? 'good' : row.hit08 ? 'accent' : row.hit06 ? 'teal' : 'neutral';
           return (
-            <circle cx={x} cy={y} fill={fill} key={row.reportId} opacity="0.72" r="4">
-              <title>{`${row.company} (${row.symbol}) 상승 ${formatPercent(row.maxFavorableExcursion)} / 하락 ${formatPercent(row.maxAdverseExcursion)}`}</title>
-            </circle>
+            <DataPoint
+              key={row.reportId}
+              label={`${row.company} (${row.symbol})`}
+              meta={row.publicationDate}
+              tone={tone}
+              x={x}
+              y={y}
+              rows={[
+                ['최대 상승폭', formatPercent(row.maxFavorableExcursion)],
+                ['최대 하락폭', formatPercent(row.maxAdverseExcursion)],
+                ['현재 수익률', formatPercent(row.currentReturn)],
+                ['목표 도달', targetHitLabel(row)],
+              ]}
+            />
           );
         })}
-      </svg>
+      </div>
       <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-500">
         <span>파랑: 1.0x 도달</span>
         <span>보라: 0.8x 도달</span>
@@ -428,6 +597,68 @@ function RiskScatter({ rows }: { rows: ReportStatisticsLabSummary['riskScatter']
       </div>
     </div>
   );
+}
+
+function DataPoint({
+  x,
+  y,
+  label,
+  meta,
+  tone,
+  rows,
+}: {
+  x: number;
+  y: number;
+  label: string;
+  meta: string;
+  tone: 'good' | 'bad' | 'neutral' | 'accent' | 'teal';
+  rows: Array<[string, string]>;
+}) {
+  const colorClass =
+    tone === 'good'
+      ? 'bg-blue-600 ring-blue-100'
+      : tone === 'bad'
+        ? 'bg-rose-600 ring-rose-100'
+        : tone === 'accent'
+          ? 'bg-violet-600 ring-violet-100'
+          : tone === 'teal'
+            ? 'bg-teal-600 ring-teal-100'
+            : 'bg-slate-400 ring-slate-100';
+
+  return (
+    <button
+      aria-label={`${label} ${rows.map(([key, value]) => `${key} ${value}`).join(', ')}`}
+      className="group absolute z-10 grid size-5 -translate-x-1/2 -translate-y-1/2 place-items-center outline-none"
+      style={{
+        left: `calc(1.25rem + ${x} * (100% - 2.5rem) / 100)`,
+        top: `calc(1.25rem + ${y} * (100% - 2.5rem) / 100)`,
+      }}
+      type="button"
+    >
+      <span
+        className={`size-2.5 rounded-full ring-4 transition-transform group-hover:scale-150 group-focus-visible:scale-150 ${colorClass}`}
+      />
+      <span className="pointer-events-none absolute bottom-6 left-1/2 z-30 hidden w-64 -translate-x-1/2 rounded-xl border border-slate-200 bg-white p-3 text-left text-xs shadow-xl group-hover:block group-focus-visible:block">
+        <span className="block font-semibold text-slate-950">{label}</span>
+        <span className="mt-0.5 block font-mono text-[11px] text-slate-500">{meta}</span>
+        <span className="mt-2 grid gap-1">
+          {rows.map(([key, value]) => (
+            <span className="flex items-center justify-between gap-3" key={key}>
+              <span className="text-slate-500">{key}</span>
+              <span className="font-mono font-semibold tabular-nums text-slate-950">{value}</span>
+            </span>
+          ))}
+        </span>
+      </span>
+    </button>
+  );
+}
+
+function targetHitLabel(row: ReportStatisticsLabSummary['riskScatter'][number]): string {
+  if (row.hit10) return '1.0x';
+  if (row.hit08) return '0.8x';
+  if (row.hit06) return '0.6x';
+  return '미도달';
 }
 
 function RangeBar({
@@ -472,6 +703,11 @@ function xScale(value: number, min: number, max: number): number {
 
 function isNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value);
+}
+
+function formatNumber(value: number | null | undefined): string {
+  if (value === null || value === undefined || !Number.isFinite(value)) return '—';
+  return value.toLocaleString('ko-KR', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
 }
 
 function mean(values: number[]): number | null {
