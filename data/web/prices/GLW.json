@@ -25383,12 +25383,25 @@
       "currency": "USD",
       "date": "2026-05-12",
       "display_currency": "USD",
-      "high": 205.32000732421875,
+      "high": 205.32000732421872,
       "krw_per_unit": 1474.449951171875,
       "low": 188.2899932861328,
       "open": 204.33999633789062,
       "source_currency": "USD",
       "volume": 22896524.0
+    },
+    {
+      "close": 206.50999450683594,
+      "close_krw": 308317.3547,
+      "currency": "USD",
+      "date": "2026-05-13",
+      "display_currency": "USD",
+      "high": 211.7899932861328,
+      "krw_per_unit": 1492.989990234375,
+      "low": 196.0800018310547,
+      "open": 207.83999633789062,
+      "source_currency": "USD",
+      "volume": 15405400.0
     }
   ],
   "symbol": "GLW"

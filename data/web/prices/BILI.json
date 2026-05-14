@@ -25385,10 +25385,23 @@
       "display_currency": "USD",
       "high": 21.929000854492188,
       "krw_per_unit": 1474.449951171875,
-      "low": 21.280000686645508,
+      "low": 21.280000686645504,
       "open": 21.908000946044922,
       "source_currency": "USD",
       "volume": 1423053.0
+    },
+    {
+      "close": 22.34000015258789,
+      "close_krw": 33353.3966,
+      "currency": "USD",
+      "date": "2026-05-13",
+      "display_currency": "USD",
+      "high": 22.704999923706055,
+      "krw_per_unit": 1492.989990234375,
+      "low": 21.239999771118164,
+      "open": 21.420000076293945,
+      "source_currency": "USD",
+      "volume": 4695700.0
     }
   ],
   "symbol": "BILI"

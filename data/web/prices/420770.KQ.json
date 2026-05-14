@@ -9373,6 +9373,19 @@
       "open": 109600.0,
       "source_currency": "KRW",
       "volume": 176284.0
+    },
+    {
+      "close": 126000.0,
+      "close_krw": 126000.0,
+      "currency": "KRW",
+      "date": "2026-05-14",
+      "display_currency": "KRW",
+      "high": 129000.0,
+      "krw_per_unit": 1.0,
+      "low": 123600.0,
+      "open": 126400.0,
+      "source_currency": "KRW",
+      "volume": 71750.0
     }
   ],
   "symbol": "420770.KQ"

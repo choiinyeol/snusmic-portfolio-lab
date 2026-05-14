@@ -25383,12 +25383,25 @@
       "currency": "USD",
       "date": "2026-05-12",
       "display_currency": "USD",
-      "high": 34.439998626708984,
+      "high": 34.43999862670898,
       "krw_per_unit": 1474.449951171875,
       "low": 33.56999969482422,
       "open": 33.959999084472656,
       "source_currency": "USD",
       "volume": 949141.0
+    },
+    {
+      "close": 33.790000915527344,
+      "close_krw": 50448.1331,
+      "currency": "USD",
+      "date": "2026-05-13",
+      "display_currency": "USD",
+      "high": 34.09000015258789,
+      "krw_per_unit": 1492.989990234375,
+      "low": 33.369998931884766,
+      "open": 33.58000183105469,
+      "source_currency": "USD",
+      "volume": 1004900.0
     }
   ],
   "symbol": "IMAX"
