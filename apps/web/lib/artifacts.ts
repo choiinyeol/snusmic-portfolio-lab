@@ -359,8 +359,37 @@ function fullPath(relativePath: string): string {
   return path.join(repoRoot, relativePath);
 }
 
-function artifactCacheEnabled(): boolean {
-  return process.env.NODE_ENV === 'production';
+let artifactCacheStamp: number | undefined;
+
+function artifactCacheValid(): boolean {
+  if (process.env.NODE_ENV === 'production') return true;
+
+  const stamp = currentArtifactStamp();
+  if (artifactCacheStamp === stamp) return true;
+
+  clearArtifactCaches();
+  artifactCacheStamp = stamp;
+  return false;
+}
+
+function currentArtifactStamp(): number {
+  try {
+    return fs.statSync(fullPath('data/web/artifact-manifest.json')).mtimeMs;
+  } catch {
+    return Date.now();
+  }
+}
+
+function clearArtifactCaches() {
+  reportCache = undefined;
+  strategyCatalogCache = undefined;
+  screenerCandidateCache = undefined;
+  holdingsCache = undefined;
+  monthlyHoldingsCache = undefined;
+  tradesCache = undefined;
+  positionEpisodesCache = undefined;
+  equityDailyCache = undefined;
+  strategyCurvesCache = undefined;
 }
 
 function readText(relativePath: string): string {
@@ -398,7 +427,7 @@ function positivePrice(value: unknown): number | undefined {
 
 let reportCache: ReportRow[] | undefined;
 export function getReportRows(): ReportRow[] {
-  if (artifactCacheEnabled() && reportCache) return reportCache;
+  if (artifactCacheValid() && reportCache) return reportCache;
   const raw = parseRows('reports/table.json', RawReportRowSchema, JSON.parse(readText('data/web/reports/table.json')));
   reportCache = raw
     .map((row) => fromRawReport(row as RawReport))
@@ -747,7 +776,7 @@ export function getOverview(): WebOverview {
 
 let strategyCatalogCache: StrategyCatalogRow[] | undefined;
 export function getStrategyCatalog(): StrategyCatalogRow[] {
-  if (artifactCacheEnabled() && strategyCatalogCache) return strategyCatalogCache;
+  if (artifactCacheValid() && strategyCatalogCache) return strategyCatalogCache;
   const raw = parseRows(
     'strategies/catalog.json',
     StrategyCatalogRowSchema,
@@ -804,7 +833,7 @@ export function getInsights(): Insight[] {
 
 let screenerCandidateCache: ScreenerCandidateRow[] | undefined;
 export function getScreenerCandidates(): ScreenerCandidateRow[] {
-  if (artifactCacheEnabled() && screenerCandidateCache) return screenerCandidateCache;
+  if (artifactCacheValid() && screenerCandidateCache) return screenerCandidateCache;
   const raw = parseRows(
     'screener/candidates.json',
     ScreenerCandidateSchema,
@@ -835,7 +864,7 @@ export function readDownloadCsv(fileName: string): string {
 
 let holdingsCache: HoldingRow[] | undefined;
 export function getCurrentHoldings(): HoldingRow[] {
-  if (artifactCacheEnabled() && holdingsCache) return holdingsCache;
+  if (artifactCacheValid() && holdingsCache) return holdingsCache;
   const raw = parseRows(
     'portfolio/holdings.json',
     RawHoldingRowSchema,
@@ -863,7 +892,7 @@ export function getCurrentHoldings(): HoldingRow[] {
 
 let monthlyHoldingsCache: MonthlyHoldingRow[] | undefined;
 export function getMonthlyHoldings(): MonthlyHoldingRow[] {
-  if (artifactCacheEnabled() && monthlyHoldingsCache) return monthlyHoldingsCache;
+  if (artifactCacheValid() && monthlyHoldingsCache) return monthlyHoldingsCache;
   const raw = readCompactTable('data/web/portfolio/monthly-holdings.json', [
     'persona',
     'month_end',
@@ -983,7 +1012,7 @@ function applyCostBasisTrade(
 
 let tradesCache: TradeRow[] | undefined;
 export function getTrades(): TradeRow[] {
-  if (artifactCacheEnabled() && tradesCache) return tradesCache;
+  if (artifactCacheValid() && tradesCache) return tradesCache;
   const raw = parseRows(
     'portfolio/trades.json',
     RawTradeRowSchema,
@@ -1025,7 +1054,7 @@ export function getTrades(): TradeRow[] {
 
 let positionEpisodesCache: PositionEpisodeRow[] | undefined;
 export function getPositionEpisodes(): PositionEpisodeRow[] {
-  if (artifactCacheEnabled() && positionEpisodesCache) return positionEpisodesCache;
+  if (artifactCacheValid() && positionEpisodesCache) return positionEpisodesCache;
   positionEpisodesCache = readCompactTable('data/web/portfolio/episodes.json', [
     'persona',
     'symbol',
@@ -1087,14 +1116,14 @@ export function getPersonaLabel(persona: string): string {
 
 let equityDailyCache: EquityPoint[] | undefined;
 export function getEquityDaily(): EquityPoint[] {
-  if (artifactCacheEnabled() && equityDailyCache) return equityDailyCache;
+  if (artifactCacheValid() && equityDailyCache) return equityDailyCache;
   equityDailyCache = readCompactEquityCurves('data/web/portfolio/equity-daily.json');
   return equityDailyCache;
 }
 
 let strategyCurvesCache: EquityPoint[] | undefined;
 export function getStrategyCurves(): EquityPoint[] {
-  if (artifactCacheEnabled() && strategyCurvesCache) return strategyCurvesCache;
+  if (artifactCacheValid() && strategyCurvesCache) return strategyCurvesCache;
   strategyCurvesCache = readCompactEquityCurves('data/web/strategies/curves.json');
   return strategyCurvesCache;
 }
