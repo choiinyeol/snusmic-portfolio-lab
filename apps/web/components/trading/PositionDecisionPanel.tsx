@@ -191,8 +191,7 @@ function targetProgress(holding: HoldingRow, target: ReportTargetDigest | null):
   if (!target?.targetPriceKrw || !holding.avgCostKrw || !holding.lastCloseKrw) return null;
   const targetMove = target.targetPriceKrw - holding.avgCostKrw;
   if (targetMove === 0) return null;
-  const progress = (holding.lastCloseKrw - holding.avgCostKrw) / targetMove;
-  return Math.max(0, Math.min(1, progress));
+  return (holding.lastCloseKrw - holding.avgCostKrw) / targetMove;
 }
 
 function targetGap(holding: HoldingRow, target: ReportTargetDigest | null): number | null {

@@ -18,8 +18,7 @@ import { formatDays, formatNative, formatPercent } from '@/lib/format';
 
 type HitFilter = 'all' | 'hit' | 'open' | 'expired';
 type ReturnFilter = 'all' | 'positive' | 'negative';
-const PAGE_SIZE_OPTIONS = [25, 50, 100, 200] as const;
-type PageSize = (typeof PAGE_SIZE_OPTIONS)[number];
+const PAGE_SIZE = 20;
 type SortPresetId = 'recent' | 'review' | 'target-hit' | 'top-return' | 'target-progress' | 'near-target' | 'upside';
 type SortPreset = {
   id: SortPresetId;
@@ -43,7 +42,6 @@ export function ReportsTable({ reports }: ReportsTableProps) {
   const [hitFilter, setHitFilter] = useState<HitFilter>('all');
   const [returnFilter, setReturnFilter] = useState<ReturnFilter>('all');
   const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState<PageSize>(50);
 
   const exchanges = useMemo(
     () => ['all', ...Array.from(new Set(reports.map((report) => report.exchange).filter(Boolean))).sort()],
@@ -126,18 +124,21 @@ export function ReportsTable({ reports }: ReportsTableProps) {
       },
       {
         accessorKey: 'targetProgressPct',
-        header: () => <span title="(현재가 - 진입가) / (목표가 - 진입가), 목표 도달 시 100%">달성률</span>,
+        header: () => (
+          <span title="(현재가 - 진입가) / (목표가 - 진입가). 음수는 목표 반대 방향, 100% 초과는 목표가 이후 초과 이동입니다.">
+            달성률
+          </span>
+        ),
         cell: ({ row }) => {
           const value = row.original.targetProgressPct;
           if (value === null) return '—';
+          const tone = value < 0 ? 'bg-rose-500' : value >= 1 ? 'bg-blue-600' : 'bg-slate-950';
           return (
             <div className="flex items-center justify-end gap-2">
               <span className="tabular-nums">{formatPercent(value)}</span>
-              <div className="h-1.5 w-12 rounded-full bg-base-200">
-                <div
-                  className="h-full rounded-full bg-primary"
-                  style={{ width: `${Math.min(100, Math.max(0, value * 100))}%` }}
-                />
+              <div className="relative h-1.5 w-14 rounded-full bg-slate-100">
+                <div className="absolute left-1/2 top-0 h-full w-px bg-slate-300" />
+                <div className={`absolute top-0 h-full rounded-full ${tone}`} style={progressBarStyle(value)} />
               </div>
             </div>
           );
@@ -229,9 +230,9 @@ export function ReportsTable({ reports }: ReportsTableProps) {
     return true;
   });
 
-  const totalPages = Math.max(1, Math.ceil(filteredRows.length / pageSize));
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages - 1);
-  const visibleRows = filteredRows.slice(safePage * pageSize, safePage * pageSize + pageSize);
+  const visibleRows = filteredRows.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
 
   const resetPage = () => setPage(0);
 
@@ -352,24 +353,7 @@ export function ReportsTable({ reports }: ReportsTableProps) {
 
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs text-slate-500">
         <span>열 제목을 누르면 오름차순·내림차순으로 정렬됩니다.</span>
-        <label className="flex items-center gap-2">
-          <span>페이지당</span>
-          <select
-            className="h-8 rounded-md border border-slate-200 bg-white px-2 font-mono text-xs text-slate-950 outline-none"
-            value={pageSize}
-            onChange={(event) => {
-              setPageSize(Number(event.target.value) as PageSize);
-              setPage(0);
-            }}
-          >
-            {PAGE_SIZE_OPTIONS.map((size) => (
-              <option key={size} value={size}>
-                {size}
-              </option>
-            ))}
-          </select>
-          <span>개</span>
-        </label>
+        <span>페이지당 {PAGE_SIZE}개</span>
       </div>
 
       <div className="w-full min-w-0 overflow-x-auto">
@@ -407,12 +391,15 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         </table>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 px-4 py-3">
-        <span className="text-xs text-slate-500">
-          {filteredRows.length ? safePage * pageSize + 1 : 0}–{Math.min(filteredRows.length, (safePage + 1) * pageSize)}{' '}
-          / {filteredRows.length.toLocaleString('ko-KR')}
+      <div className="grid gap-2 border-t border-slate-200 px-4 py-3 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+        <span className="text-center text-xs text-slate-500 sm:text-left">
+          {filteredRows.length ? safePage * PAGE_SIZE + 1 : 0}–
+          {Math.min(filteredRows.length, (safePage + 1) * PAGE_SIZE)} / {filteredRows.length.toLocaleString('ko-KR')}
         </span>
-        <BlockPagination page={safePage} pageCount={totalPages} onPageChange={setPage} />
+        <div className="flex justify-center">
+          <BlockPagination page={safePage} pageCount={totalPages} onPageChange={setPage} />
+        </div>
+        <span aria-hidden="true" />
       </div>
     </section>
   );
@@ -431,6 +418,14 @@ function sortIndicator(direction: false | 'asc' | 'desc'): string {
   if (direction === 'asc') return ' ↑';
   if (direction === 'desc') return ' ↓';
   return ' ↕';
+}
+
+function progressBarStyle(value: number): { left: string; width: string } {
+  const bounded = Math.max(-1, Math.min(1, value));
+  if (bounded >= 0) {
+    return { left: '50%', width: `${Math.max(2, bounded * 50)}%` };
+  }
+  return { left: `${50 + bounded * 50}%`, width: `${Math.max(2, Math.abs(bounded) * 50)}%` };
 }
 
 const SORT_PRESETS: SortPreset[] = [

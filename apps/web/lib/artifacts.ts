@@ -355,6 +355,90 @@ export type Insight = {
   related_report_ids?: string[];
 };
 
+export type ReportStatisticsLabSummary = {
+  generatedAt: string;
+  sample: {
+    reportCount: number;
+    eligibleReportCount: number;
+    tickerCount: number;
+    startDate: string;
+    endDate: string;
+    exclusions: Record<string, number>;
+  };
+  fractionalHitRates: Array<{
+    threshold: number;
+    horizonDays: number;
+    hitRate: number | null;
+    sampleSize: number;
+    hitCount: number;
+    medianDaysToHit: number | null;
+    ci95: [number | null, number | null];
+  }>;
+  delayedEntry: Array<{
+    delayDays: number;
+    horizonDays: number;
+    sampleSize: number;
+    medianReturn: number | null;
+    meanReturn: number | null;
+    p25Return: number | null;
+    p75Return: number | null;
+    winRate: number | null;
+    hitRate08: number | null;
+    medianDrawdown: number | null;
+  }>;
+  entryTriggers: Array<{
+    type: 'dip' | 'rally';
+    triggerPct: number;
+    horizonDays: number;
+    entryRate: number | null;
+    sampleSize: number;
+    enteredCount: number;
+    medianReturn: number | null;
+    meanReturn: number | null;
+    hitRate08: number | null;
+    medianDrawdown: number | null;
+    missedOpportunityRate: number | null;
+    falseBreakoutRate: number | null;
+  }>;
+  postTargetDrift: Array<{
+    daysAfterTarget: number;
+    sampleSize: number;
+    medianReturn: number | null;
+    meanReturn: number | null;
+    p25Return: number | null;
+    p75Return: number | null;
+    p10Return: number | null;
+    p90Return: number | null;
+    sharePositive: number | null;
+  }>;
+  optimalTargetMultiples: Array<{
+    targetMultiple: number;
+    horizonDays: number;
+    hitRate: number | null;
+    sampleSize: number;
+    medianReturn: number | null;
+    meanReturn: number | null;
+    p25Return: number | null;
+    downsideRisk: number | null;
+    rewardReliabilityScore: number | null;
+  }>;
+  riskScatter: Array<{
+    reportId: string;
+    symbol: string;
+    company: string;
+    publicationDate: string;
+    maxFavorableExcursion: number | null;
+    maxAdverseExcursion: number | null;
+    upsideCaptureRatio: number | null;
+    targetReturn: number | null;
+    currentReturn: number | null;
+    hit06: boolean;
+    hit08: boolean;
+    hit10: boolean;
+  }>;
+  topExamples: Record<string, Array<Record<string, unknown>>>;
+};
+
 function fullPath(relativePath: string): string {
   return path.join(repoRoot, relativePath);
 }
@@ -486,8 +570,8 @@ function withTargetMetrics(report: ReportRow): ReportRow {
     return { ...report, targetRemainingPct: null, targetProgressPct: null };
   }
   if (report.targetHit) {
-    // Resolved — no "remaining", show full progress.
-    return { ...report, targetRemainingPct: 0, targetProgressPct: 1 };
+    // Resolved — no "remaining"; keep progress uncapped so overshoot remains visible.
+    return { ...report, targetRemainingPct: 0, targetProgressPct: targetProgressFromEntry(report) ?? 1 };
   }
   const targetProgressPct = targetProgressFromEntry(report);
   if (report.targetDirection === 'upside') {
@@ -531,7 +615,7 @@ function targetProgressFromEntry(report: ReportRow): number | null {
   if (targetMove === 0) return null;
 
   const progress = (prices.current - prices.entry) / targetMove;
-  return Math.max(0, Math.min(1, progress));
+  return progress;
 }
 
 function withOhlcTargetTouch(report: ReportRow): ReportRow {
@@ -826,6 +910,11 @@ export function getReportRankings(): WebReportRankings {
 }
 
 export const getRankings = getReportRankings;
+
+export function getReportStatisticsLabSummary(): ReportStatisticsLabSummary {
+  const raw = readRequiredJson<{ summary: ReportStatisticsLabSummary }>('data/web/report-statistics-lab.json');
+  return raw.summary;
+}
 
 export function getInsights(): Insight[] {
   return readRequiredJson<Insight[]>('data/web/overview/research-pulse.json');
