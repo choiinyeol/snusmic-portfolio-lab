@@ -45,7 +45,7 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
     return (
       <section id="persona-trades" className="min-w-0 rounded-xl border border-slate-200 bg-white">
         <div className="grid gap-2 p-5">
-          <h2 className="text-lg font-bold tracking-tight">페르소나별 매매 내역</h2>
+          <h2 className="text-lg font-bold tracking-tight">전략별 매매내역</h2>
           <p className="text-sm text-slate-600">{symbol}에 연결된 전략 매매 내역이 없습니다.</p>
         </div>
       </section>
@@ -56,7 +56,7 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
     <section id="persona-trades" className="grid min-w-0 gap-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold tracking-tight">페르소나별 매매 내역</h2>
+          <h2 className="text-xl font-bold tracking-tight">전략별 매매내역</h2>
           <p className="mt-1 text-sm text-slate-600">
             전략별로 {symbol}을 어떻게 진입·증액·축소했는지 한 화면에서 비교합니다.
           </p>
@@ -69,7 +69,7 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
         </Link>
       </div>
       <SegmentedControl
-        ariaLabel="페르소나 선택"
+        ariaLabel="전략 선택"
         className="compact"
         value={persona}
         onChange={setPersona}
@@ -374,8 +374,8 @@ function humanReason(reason: string): string {
 
 function strategyDescription(persona: string): string {
   if (persona.includes('stop-loss') || persona.includes('stop_loss'))
-    return '리포트 추종을 기본으로 하되 손절 기준을 함께 적용해 하방 훼손을 제한하는 전략입니다.';
+    return '리포트 추종을 기본으로 하되 손절 기준을 함께 적용해 중간 손실을 제한하는 전략입니다.';
   if (persona.includes('1/N')) return '동일 비중으로 리포트 종목을 분산 보유하는 단순 추종 전략입니다.';
-  if (persona.includes('look-ahead')) return '사후적으로 유리한 구간을 확인하는 비교용 약한 예언자 벤치마크입니다.';
+  if (persona.includes('look-ahead')) return '사후적으로 유리한 구간을 확인하는 비교용 벤치마크입니다.';
   return '선택한 페르소나의 종목별 진입·청산 활동입니다.';
 }

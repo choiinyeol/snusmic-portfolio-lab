@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { useState } from 'react';
+import Link from 'next/link';
 import type { ReportStatisticsLabSummary } from '@/lib/artifacts';
 import { formatDays, formatPercent } from '@/lib/format';
 
@@ -78,11 +79,11 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
       <StorySection
         kicker="02 · 경로별 표본 분해"
         title="같은 수익률도 전혀 다른 길로 도착했습니다"
-        body="전체 지도가 분포의 모양을 보여준다면, 이 섹션은 개인투자자가 실제로 겪었을 경로를 보여줍니다. 빠른 적중, 큰 초과상승, 고통스러운 승자, 손실 꼬리를 나눠 보면 ‘맞았다/틀렸다’보다 중요한 것은 중간 손실과 기다린 시간입니다."
+        body="전체 지도가 분포의 모양을 보여준다면, 이 섹션은 개인투자자가 실제로 겪었을 경로를 보여줍니다. 빠른 적중, 큰 초과상승, 큰 손실 후 적중, 손실 꼬리를 나눠 보면 ‘맞았다/틀렸다’보다 중요한 것은 중간 손실과 기다린 시간입니다."
       >
         <PathBucketPanel buckets={pathBuckets} exampleMetaById={exampleMetaById} total={eligiblePathCount} />
         <InsightLine>
-          이 표는 예측 라벨이 아니라 <strong>검정 대기열</strong>입니다. “고통스러운 승자”는 손절 규칙을 너무 촘촘하게
+          이 표는 예측 라벨이 아니라 <strong>검정 대기열</strong>입니다. “큰 손실 후 적중”는 손절 규칙을 너무 촘촘하게
           만들면 놓칠 표본이고, “반납한 표본”은 목표가 이후 보유 규칙을 따로 검정해야 하는 이유입니다.
         </InsightLine>
       </StorySection>
@@ -401,8 +402,9 @@ function PathBucketPanel({
                 bucket.examples.map((row) => {
                   const meta = exampleMetaById.get(row.reportId);
                   return (
-                    <div
-                      className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 rounded-lg bg-white px-3 py-2 text-xs"
+                    <Link
+                      className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 rounded-lg bg-white px-3 py-2 text-xs transition hover:bg-blue-50/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500"
+                      href={`/reports/${encodeURIComponent(row.symbol)}/${encodeURIComponent(row.reportId)}`}
                       key={`${bucket.id}-${row.reportId}`}
                     >
                       <div className="min-w-0">
@@ -410,7 +412,7 @@ function PathBucketPanel({
                           {row.company} <span className="font-mono text-slate-500">{row.symbol}</span>
                         </div>
                         <div className="mt-0.5 font-mono text-[11px] text-slate-500">
-                          {row.publicationDate} · {targetHitDetail(row, meta)}
+                          {row.publicationDate} · {targetHitDetail(row, meta)} · 상세 보기
                         </div>
                       </div>
                       <div className="grid grid-cols-4 gap-3 text-right font-mono tabular-nums">
@@ -423,7 +425,7 @@ function PathBucketPanel({
                         <MetricMini label="하락" value={formatPercent(row.maxAdverseExcursion)} tone="bad" />
                         <MetricMini label="목표대비" value={formatMultiple(row.upsideCaptureRatio)} tone="neutral" />
                       </div>
-                    </div>
+                    </Link>
                   );
                 })
               ) : (
@@ -531,7 +533,7 @@ function buildPathBuckets(rows: RiskScatterRow[]): PathBucket[] {
     ),
     bucket(
       'painful-winners',
-      '고통스러운 승자',
+      '큰 손실 후 적중',
       '목표에 닿았지만 중간 손실이 컸던 표본입니다. 손절 규칙 검정에 중요합니다.',
       'warn',
       '0.8x 이상 도달 · 중간 손실 -20% 이하',

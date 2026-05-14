@@ -30,8 +30,8 @@ export function PriceEvidencePanel({ report, prices, pathEvidence, status }: Pro
       : `+${formatPercent(report.targetRemainingPct)}`;
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_18rem]">
-      <div className="min-w-0 rounded-xl border border-slate-200 bg-white p-3">
+    <div className="grid gap-3">
+      <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3">
         <PriceEvidenceChart
           priceSeries={prices}
           targetPrice={report.targetPriceNative}
@@ -43,7 +43,7 @@ export function PriceEvidencePanel({ report, prices, pathEvidence, status }: Pro
           evidenceMarkers={pathEvidence.markers}
         />
       </div>
-      <aside className="grid content-start gap-3">
+      <div className="grid gap-0 divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white md:grid-cols-4 md:divide-x md:divide-y-0">
         <MetricLine
           label="발간가"
           value={formatAssetPrice(entryPrice, report)}
@@ -61,14 +61,11 @@ export function PriceEvidencePanel({ report, prices, pathEvidence, status }: Pro
           tone={(report.currentReturn ?? 0) >= 0 ? 'good' : 'bad'}
         />
         <MetricLine label={remainingLabel} value={remainingValue} caption={status.label} tone={status.tone} />
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm">
-          <div className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">관측 범위</div>
-          <dl className="mt-3 grid gap-2">
-            <RangeLine label="고점" point={pathEvidence.peak} report={report} />
-            <RangeLine label="저점" point={pathEvidence.trough} report={report} />
-          </dl>
-        </div>
-      </aside>
+      </div>
+      <div className="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm md:grid-cols-2">
+        <RangeLine label="발간 후 고점" point={pathEvidence.peak} report={report} />
+        <RangeLine label="발간 후 저점" point={pathEvidence.trough} report={report} />
+      </div>
     </div>
   );
 }
@@ -85,10 +82,10 @@ function MetricLine({
   tone?: 'good' | 'bad' | 'warn' | 'accent';
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
+    <div className="min-w-0 p-4">
       <div className="text-xs font-medium text-slate-500">{label}</div>
-      <div className={`mt-1 font-mono text-xl font-semibold tabular-nums ${toneClass(tone)}`}>{value}</div>
-      <div className="mt-1 text-xs text-slate-500">{caption}</div>
+      <div className={`mt-1 truncate font-mono text-lg font-semibold tabular-nums ${toneClass(tone)}`}>{value}</div>
+      <div className="mt-1 truncate text-xs text-slate-500">{caption}</div>
     </div>
   );
 }

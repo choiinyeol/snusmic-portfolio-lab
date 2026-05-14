@@ -28,9 +28,8 @@ export function ReportHero({ report, status, markdownHref, pdfHref }: Props) {
             {report.company}
           </h1>
           <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-600 md:text-base">
-            {report.title || `${report.company} 리포트`}를 발간가, 현재가, 목표가, 실제 전략 매매까지 한 화면에서 다시
-            검증합니다. 핵심은 “맞았나”보다{' '}
-            <strong className="font-semibold text-slate-950">언제 사고 얼마나 기다렸을 때 유리했는지</strong>입니다.
+            {report.title || `${report.company} 리포트`}의 발간일 가격, 목표가, 이후 가격 경로, 연결된 매매내역을 같은
+            기준으로 정리했습니다. 목표 도달 여부는 결과의 일부이고, 아래에서는 중간 손실과 현재 위치를 함께 봅니다.
           </p>
           <div className="mt-4 grid gap-2 text-sm sm:grid-cols-3">
             <Fact
@@ -53,11 +52,11 @@ export function ReportHero({ report, status, markdownHref, pdfHref }: Props) {
 
         <aside className="grid gap-3 border-t border-slate-200 pt-4 xl:border-t-0 xl:pt-0">
           <div className="rounded-xl border border-slate-200 bg-white p-4">
-            <div className="text-xs font-medium text-slate-500">판정</div>
+            <div className="text-xs font-medium text-slate-500">결과</div>
             <div className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">{status.detail}</div>
             <p className="mt-2 text-sm leading-6 text-slate-600">
               발간일 {formatDateKo(report.publicationDate)}부터 최근 종가 {formatDateKo(report.lastCloseDate)}까지의
-              가격 경로를 기준으로 계산합니다.
+              가격 경로를 기준으로 봅니다.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
