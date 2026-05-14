@@ -64,15 +64,26 @@ export function PortfolioStrategyView({
   targetsByReportId,
 }: Props) {
   const resolvedDefaultPersona = personas.includes(defaultPersona) ? defaultPersona : (personas[0] ?? '');
-  const [persona, setPersona] = useState<string>(() => {
-    if (typeof window === 'undefined') return resolvedDefaultPersona;
-    const params = new URLSearchParams(window.location.search);
-    const fromUrl = params.get(URL_STRATEGY_PARAM);
-    return fromUrl && personas.includes(fromUrl) ? fromUrl : resolvedDefaultPersona;
-  });
+  const [persona, setPersona] = useState<string>(resolvedDefaultPersona);
+  const [urlStateReady, setUrlStateReady] = useState(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+
+    const syncPersonaFromUrl = () => {
+      const params = new URLSearchParams(window.location.search);
+      const fromUrl = params.get(URL_STRATEGY_PARAM);
+      setPersona(fromUrl && personas.includes(fromUrl) ? fromUrl : resolvedDefaultPersona);
+      setUrlStateReady(true);
+    };
+
+    syncPersonaFromUrl();
+    window.addEventListener('popstate', syncPersonaFromUrl);
+    return () => window.removeEventListener('popstate', syncPersonaFromUrl);
+  }, [personas, resolvedDefaultPersona]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !urlStateReady) return;
     const params = new URLSearchParams(window.location.search);
     const current = params.get(URL_STRATEGY_PARAM);
     if (current === persona) return;
@@ -80,7 +91,7 @@ export function PortfolioStrategyView({
     else params.delete(URL_STRATEGY_PARAM);
     const url = `${window.location.pathname}${params.toString() ? `?${params}` : ''}`;
     window.history.replaceState(null, '', url);
-  }, [persona]);
+  }, [persona, urlStateReady]);
 
   const personaHoldings = useMemo(() => holdings.filter((row) => row.persona === persona), [holdings, persona]);
   const cashKrw = cashByPersona[persona] ?? 0;
