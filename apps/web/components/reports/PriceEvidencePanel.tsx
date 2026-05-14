@@ -1,7 +1,6 @@
 import { PriceEvidenceChart } from '@/components/charts/PriceEvidenceChart';
-import { KpiTile } from '@/components/ui/KpiTile';
 import type { PricePoint, ReportRow } from '@/lib/artifacts';
-import { formatPercent } from '@/lib/format';
+import { formatDateKo, formatPercent } from '@/lib/format';
 import {
   formatAssetPrice,
   reportEntryPrice,
@@ -19,13 +18,6 @@ type Props = {
 
 export function PriceEvidencePanel({ report, prices, pathEvidence, status }: Props) {
   const entryPrice = reportEntryPrice(report);
-  const remainingTone: 'good' | 'bad' | 'warn' | 'accent' = report.targetHit
-    ? 'good'
-    : report.expired
-      ? 'bad'
-      : report.targetRemainingPct === null
-        ? 'accent'
-        : 'warn';
   const remainingLabel = report.targetHit
     ? '목표 도달'
     : report.targetDirection === 'downside'
@@ -36,72 +28,86 @@ export function PriceEvidencePanel({ report, prices, pathEvidence, status }: Pro
     : report.targetRemainingPct === null
       ? '—'
       : `+${formatPercent(report.targetRemainingPct)}`;
-  const progressLabel = report.targetProgressPct === null ? null : `달성률 ${formatPercent(report.targetProgressPct)}`;
 
   return (
-    <div className="grid gap-5 lg:grid-cols-5">
-      <div className="card border border-base-300 bg-base-100 shadow-sm lg:col-span-3">
-        <div className="card-body p-3 md:p-4">
-          <PriceEvidenceChart
-            priceSeries={prices}
-            targetPrice={report.targetPriceNative}
-            entryPrice={entryPrice}
-            currency={report.currency}
-            publicationDate={report.publicationDate}
-            targetHitDate={report.targetHitDate}
-            expiryDate={report.expiryDate}
-            evidenceMarkers={pathEvidence.markers}
-          />
-        </div>
+    <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_18rem]">
+      <div className="min-w-0 rounded-xl border border-slate-200 bg-white p-3">
+        <PriceEvidenceChart
+          priceSeries={prices}
+          targetPrice={report.targetPriceNative}
+          entryPrice={entryPrice}
+          currency={report.currency}
+          publicationDate={report.publicationDate}
+          targetHitDate={report.targetHitDate}
+          expiryDate={report.expiryDate}
+          evidenceMarkers={pathEvidence.markers}
+        />
       </div>
-      <aside className="grid gap-3 lg:col-span-2" aria-label="리포트 핵심 가격 지표">
-        <KpiTile
+      <aside className="grid content-start gap-3">
+        <MetricLine
           label="발간가"
-          value={<span className="tabular-nums">{formatAssetPrice(entryPrice, report)}</span>}
-          caption={`${report.publicationDate} 종가 기준`}
+          value={formatAssetPrice(entryPrice, report)}
+          caption={`${formatDateKo(report.publicationDate)} 종가`}
         />
-        <KpiTile
+        <MetricLine
           label="목표가"
-          value={<span className="tabular-nums">{formatAssetPrice(report.targetPriceNative, report)}</span>}
-          delta={`${formatPercent(report.targetUpsideAtPub)} ${targetMoveLabel(report)}`}
-          tone="accent"
+          value={formatAssetPrice(report.targetPriceNative, report)}
+          caption={`${formatPercent(report.targetUpsideAtPub)} ${targetMoveLabel(report)}`}
         />
-        <KpiTile
+        <MetricLine
           label="현재가"
-          value={<span className="tabular-nums">{formatAssetPrice(report.lastCloseNative, report)}</span>}
-          delta={
-            report.lastCloseDate
-              ? `${report.lastCloseDate} · ${formatPercent(report.currentReturn)}`
-              : formatPercent(report.currentReturn)
-          }
+          value={formatAssetPrice(report.lastCloseNative, report)}
+          caption={`${formatDateKo(report.lastCloseDate)} · ${formatPercent(report.currentReturn)}`}
           tone={(report.currentReturn ?? 0) >= 0 ? 'good' : 'bad'}
         />
-        <KpiTile
-          label={remainingLabel}
-          value={<span className="tabular-nums">{remainingValue}</span>}
-          delta={progressLabel ?? status.label}
-          tone={remainingTone}
-        />
-        <article className="card border border-base-300 bg-base-100 shadow-sm">
-          <div className="card-body gap-2 p-4">
-            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-base-content/50">Path range</span>
-            <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-sm">
-              <dt className="text-base-content/60">관측 고점</dt>
-              <dd className="text-right tabular-nums text-base-content">
-                {pathEvidence.peak
-                  ? `${formatAssetPrice(pathEvidence.peak.value, report)} · ${pathEvidence.peak.time}`
-                  : '—'}
-              </dd>
-              <dt className="text-base-content/60">관측 저점</dt>
-              <dd className="text-right tabular-nums text-base-content">
-                {pathEvidence.trough
-                  ? `${formatAssetPrice(pathEvidence.trough.value, report)} · ${pathEvidence.trough.time}`
-                  : '—'}
-              </dd>
-            </dl>
-          </div>
-        </article>
+        <MetricLine label={remainingLabel} value={remainingValue} caption={status.label} tone={status.tone} />
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm">
+          <div className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">관측 범위</div>
+          <dl className="mt-3 grid gap-2">
+            <RangeLine label="고점" point={pathEvidence.peak} report={report} />
+            <RangeLine label="저점" point={pathEvidence.trough} report={report} />
+          </dl>
+        </div>
       </aside>
     </div>
   );
+}
+
+function MetricLine({
+  label,
+  value,
+  caption,
+  tone,
+}: {
+  label: string;
+  value: string;
+  caption: string;
+  tone?: 'good' | 'bad' | 'warn' | 'accent';
+}) {
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white p-4">
+      <div className="text-xs font-medium text-slate-500">{label}</div>
+      <div className={`mt-1 font-mono text-xl font-semibold tabular-nums ${toneClass(tone)}`}>{value}</div>
+      <div className="mt-1 text-xs text-slate-500">{caption}</div>
+    </div>
+  );
+}
+
+function RangeLine({ label, point, report }: { label: string; point: PricePoint | null; report: ReportRow }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <dt className="text-slate-500">{label}</dt>
+      <dd className="text-right font-mono text-xs font-semibold tabular-nums text-slate-950">
+        {point ? `${formatAssetPrice(point.value, report)} · ${formatDateKo(point.time)}` : '—'}
+      </dd>
+    </div>
+  );
+}
+
+function toneClass(tone?: 'good' | 'bad' | 'warn' | 'accent') {
+  if (tone === 'good') return 'text-emerald-600';
+  if (tone === 'bad') return 'text-red-600';
+  if (tone === 'warn') return 'text-amber-600';
+  if (tone === 'accent') return 'text-blue-600';
+  return 'text-slate-950';
 }

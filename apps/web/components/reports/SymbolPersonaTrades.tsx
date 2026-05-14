@@ -43,10 +43,10 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
 
   if (!personas.length) {
     return (
-      <section id="persona-trades" className="card min-w-0 border border-base-300 bg-base-100 shadow-sm">
-        <div className="card-body gap-2 p-5">
+      <section id="persona-trades" className="min-w-0 rounded-xl border border-slate-200 bg-white">
+        <div className="grid gap-2 p-5">
           <h2 className="text-lg font-bold tracking-tight">페르소나별 매매 내역</h2>
-          <p className="text-sm text-base-content/65">{symbol}에 연결된 전략 매매 내역이 없습니다.</p>
+          <p className="text-sm text-slate-600">{symbol}에 연결된 전략 매매 내역이 없습니다.</p>
         </div>
       </section>
     );
@@ -57,11 +57,14 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold tracking-tight">페르소나별 매매 내역</h2>
-          <p className="mt-1 text-sm text-base-content/65">
+          <p className="mt-1 text-sm text-slate-600">
             전략별로 {symbol}을 어떻게 진입·증액·축소했는지 한 화면에서 비교합니다.
           </p>
         </div>
-        <Link className="btn btn-sm btn-ghost" href={`/portfolio?strategy=${persona}`}>
+        <Link
+          className="inline-flex h-8 items-center rounded-md px-3 text-xs font-medium text-slate-700 hover:bg-slate-100"
+          href={`/portfolio?strategy=${persona}`}
+        >
           포트폴리오 보기 →
         </Link>
       </div>
@@ -73,20 +76,22 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
         options={personas.map((item) => ({ id: item, label: personaLabels[item] ?? item }))}
       />
 
-      <article className="card min-w-0 border border-base-300 bg-base-100 shadow-sm">
-        <div className="card-body min-w-0 gap-4 p-5">
+      <article className="min-w-0 rounded-xl border border-slate-200 bg-white">
+        <div className="grid min-w-0 gap-4 p-5">
           <header className="flex flex-wrap items-baseline justify-between gap-3">
             <div>
-              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-base-content/55">현재 상태</span>
+              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">현재 상태</span>
               <h3 className="mt-1 text-lg font-bold tracking-tight">{personaLabels[persona] ?? persona}</h3>
-              <p className="mt-1 text-sm text-base-content/65">{strategyDescription(persona)}</p>
+              <p className="mt-1 text-sm text-slate-600">{strategyDescription(persona)}</p>
             </div>
             <div className="flex flex-col items-end">
-              <span className="text-xs uppercase tracking-[0.18em] text-base-content/55">총 손익</span>
-              <strong className={`text-2xl font-black tabular-nums ${totalPnl >= 0 ? 'text-success' : 'text-error'}`}>
+              <span className="text-xs uppercase tracking-[0.18em] text-slate-500">총 손익</span>
+              <strong
+                className={`text-2xl font-black tabular-nums ${totalPnl >= 0 ? 'text-emerald-600' : 'text-red-600'}`}
+              >
                 {formatKrw(totalPnl)}
               </strong>
-              <span className="text-xs text-base-content/55">
+              <span className="text-xs text-slate-500">
                 실현 {formatKrw(realizedPnl)} · 미실현 {formatKrw(unrealizedPnl)}
               </span>
             </div>
@@ -132,10 +137,10 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
             />
           </dl>
           {lastClosedEpisode ? (
-            <div className="rounded-lg border border-base-300 bg-base-200/40 px-4 py-3 text-sm text-base-content/75">
-              <span className="font-semibold text-base-content">최근 청산 사유</span>
+            <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+              <span className="font-semibold text-slate-950">최근 청산 사유</span>
               <span className="ml-2">{humanReason(lastClosedEpisode.exitReasons)}</span>
-              <span className="ml-2 text-base-content/55">
+              <span className="ml-2 text-slate-500">
                 · {lastClosedEpisode.closeDate ?? '—'} · {formatDays(lastClosedEpisode.holdingDays)} 보유
               </span>
             </div>
@@ -143,11 +148,11 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
         </div>
       </article>
 
-      <article className="card min-w-0 border border-base-300 bg-base-100 shadow-sm">
-        <div className="card-body min-w-0 gap-4 p-5">
+      <article className="min-w-0 rounded-xl border border-slate-200 bg-white">
+        <div className="grid min-w-0 gap-4 p-5">
           <header className="flex flex-wrap items-baseline justify-between gap-2">
             <h3 className="text-base font-bold tracking-tight">포지션 생애주기</h3>
-            <span className="text-xs text-base-content/55">
+            <span className="text-xs text-slate-500">
               {selectedEpisodes.length}개 포지션 · 최근 체결 {recentTrades.length}건
             </span>
           </header>
@@ -159,23 +164,21 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
                   episode.avgEntryPriceKrw && exitOrLast ? exitOrLast / episode.avgEntryPriceKrw - 1 : null;
                 return (
                   <article
-                    className="rounded-lg border border-base-300 bg-base-100 p-3"
+                    className="rounded-lg border border-slate-200 bg-white p-3"
                     key={`${episode.persona}-${episode.symbol}-${episode.openDate}`}
                   >
-                    <div className="flex items-center justify-between text-xs uppercase tracking-[0.16em] text-base-content/55">
-                      <strong className="text-base-content">
-                        {episode.status === 'open' ? '보유 중' : '청산 완료'}
-                      </strong>
+                    <div className="flex items-center justify-between text-xs uppercase tracking-[0.16em] text-slate-500">
+                      <strong className="text-slate-950">{episode.status === 'open' ? '보유 중' : '청산 완료'}</strong>
                       <span>{formatDays(episode.holdingDays)}</span>
                     </div>
-                    <div className="mt-2 flex items-center gap-2 text-xs text-base-content/65">
+                    <div className="mt-2 flex items-center gap-2 text-xs text-slate-600">
                       <span>{episode.openDate}</span>
-                      <span aria-hidden className="h-px flex-1 bg-base-300" />
+                      <span aria-hidden className="h-px flex-1 bg-slate-200" />
                       <span>{episode.closeDate ?? '현재'}</span>
                     </div>
                     <div className="mt-2 grid grid-cols-2 gap-1.5 text-sm">
                       <div className="flex flex-col">
-                        <em className="not-italic text-xs text-base-content/55">진입</em>
+                        <em className="not-italic text-xs text-slate-500">진입</em>
                         <Money
                           native={episode.avgEntryPriceNative}
                           krw={episode.avgEntryPriceKrw}
@@ -183,7 +186,7 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
                         />
                       </div>
                       <div className="flex flex-col">
-                        <em className="not-italic text-xs text-base-content/55">최근/청산</em>
+                        <em className="not-italic text-xs text-slate-500">최근/청산</em>
                         <Money
                           native={episode.avgExitPriceNative ?? episode.lastCloseNative}
                           krw={exitOrLast}
@@ -192,7 +195,7 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
                       </div>
                     </div>
                     <strong
-                      className={`mt-2 block text-right tabular-nums ${(stockReturn ?? 0) >= 0 ? 'text-success' : 'text-error'}`}
+                      className={`mt-2 block text-right tabular-nums ${(stockReturn ?? 0) >= 0 ? 'text-emerald-600' : 'text-red-600'}`}
                     >
                       {formatPercent(stockReturn)}
                     </strong>
@@ -200,27 +203,27 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
                 );
               })}
               {selectedEpisodes.length > 3 ? (
-                <p className="text-xs text-base-content/55">
+                <p className="text-xs text-slate-500">
                   아래 표에서 전체 {selectedEpisodes.length}개 포지션을 확인할 수 있습니다.
                 </p>
               ) : null}
             </div>
             <div className="grid gap-1.5" aria-label="최근 체결 활동">
               <div className="flex items-baseline justify-between text-xs">
-                <strong className="text-base-content">최근 체결 흐름</strong>
-                <span className="text-base-content/55">{recentTrades.length}건 표시</span>
+                <strong className="text-slate-950">최근 체결 흐름</strong>
+                <span className="text-slate-500">{recentTrades.length}건 표시</span>
               </div>
               {recentTrades.map((trade) => (
                 <div
-                  className="grid grid-cols-[auto_1fr_auto] items-center gap-2.5 rounded-md border border-base-200 px-3 py-2 text-sm"
+                  className="grid grid-cols-[auto_1fr_auto] items-center gap-2.5 rounded-md border border-slate-200 px-3 py-2 text-sm"
                   key={`event-${trade.persona}-${trade.date}-${trade.side}-${trade.qty}-${trade.fillPriceKrw}`}
                 >
-                  <span className={`h-2 w-2 rounded-full ${trade.side === 'buy' ? 'bg-success' : 'bg-error'}`} />
+                  <span className={`h-2 w-2 rounded-full ${trade.side === 'buy' ? 'bg-emerald-500' : 'bg-red-500'}`} />
                   <div className="min-w-0">
-                    <strong className="block truncate text-base-content">
+                    <strong className="block truncate text-slate-950">
                       {trade.side === 'buy' ? '매수' : '매도'} {trade.qty?.toLocaleString('ko-KR') ?? '—'}주
                     </strong>
-                    <span className="block truncate text-xs text-base-content/55">
+                    <span className="block truncate text-xs text-slate-500">
                       {trade.date} · {humanReason(trade.reason)}
                     </span>
                   </div>
@@ -234,11 +237,11 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
         </div>
       </article>
 
-      <details className="card min-w-0 border border-base-300 bg-base-100 shadow-sm">
+      <details className="min-w-0 rounded-xl border border-slate-200 bg-white">
         <summary className="cursor-pointer list-none p-5">
           <div className="flex flex-wrap items-baseline justify-between gap-3">
             <h3 className="text-base font-bold tracking-tight">전체 포지션 생애주기</h3>
-            <span className="text-xs text-base-content/55">{selectedEpisodes.length}개 포지션 · 펼치기</span>
+            <span className="text-xs text-slate-500">{selectedEpisodes.length}개 포지션 · 펼치기</span>
           </div>
         </summary>
         <div className="min-w-0 px-5 pb-5">
@@ -267,7 +270,7 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
                     <td>{episode.openDate}</td>
                     <td>
                       {episode.closeDate ?? <span className="badge badge-success badge-soft">보유중</span>}
-                      <div className="text-xs text-base-content/55">{episode.status}</div>
+                      <div className="text-xs text-slate-500">{episode.status}</div>
                     </td>
                     <td className="num">{formatDays(episode.holdingDays)}</td>
                     <td className="num">
@@ -298,11 +301,11 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
         </div>
       </details>
 
-      <details className="card min-w-0 border border-base-300 bg-base-100 shadow-sm">
+      <details className="min-w-0 rounded-xl border border-slate-200 bg-white">
         <summary className="cursor-pointer list-none p-5">
           <div className="flex flex-wrap items-baseline justify-between gap-3">
             <h3 className="text-base font-bold tracking-tight">매매내역</h3>
-            <span className="text-xs text-base-content/55">{selectedTrades.length}건 체결 · 펼치기</span>
+            <span className="text-xs text-slate-500">{selectedTrades.length}건 체결 · 펼치기</span>
           </div>
         </summary>
         <div className="min-w-0 px-5 pb-5">
@@ -352,10 +355,10 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
 
 function SummaryStat({ label, value, caption }: { label: string; value: ReactNode; caption: string | null }) {
   return (
-    <div className="rounded-md border border-base-200 bg-base-100 px-3 py-2.5">
-      <dt className="text-xs uppercase tracking-[0.16em] text-base-content/55">{label}</dt>
-      <dd className="mt-1 text-base font-bold tabular-nums text-base-content">{value}</dd>
-      {caption ? <dd className="mt-0.5 text-xs text-base-content/55">{caption}</dd> : null}
+    <div className="rounded-md border border-slate-200 bg-white px-3 py-2.5">
+      <dt className="text-xs uppercase tracking-[0.16em] text-slate-500">{label}</dt>
+      <dd className="mt-1 text-base font-bold tabular-nums text-slate-950">{value}</dd>
+      {caption ? <dd className="mt-0.5 text-xs text-slate-500">{caption}</dd> : null}
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import type { ReportRow } from '@/lib/artifacts';
-import { formatPercent } from '@/lib/format';
+import { formatDateKo, formatPercent } from '@/lib/format';
 import { formatAssetPrice, reportEntryPrice, targetMoveLabel, type TargetStatus } from '@/lib/report-view-model';
 
 type Props = {
@@ -11,61 +13,85 @@ type Props = {
 };
 
 export function ReportHero({ report, status, markdownHref, pdfHref }: Props) {
+  const entryPrice = reportEntryPrice(report);
   return (
-    <header className="card border border-base-300 bg-base-100 shadow-sm">
-      <div className="card-body gap-4 p-5 md:p-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div className="grid gap-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="badge badge-primary badge-soft tracking-[0.16em]">REPORT</span>
-              <span
-                className={`badge badge-soft ${status.tone === 'good' ? 'badge-success' : status.tone === 'bad' ? 'badge-error' : status.tone === 'warn' ? 'badge-warning' : 'badge-primary'}`}
-              >
-                {status.label}
-              </span>
-            </div>
-            <h1 className="text-3xl font-black tracking-[-0.04em] text-base-content md:text-4xl">{report.company}</h1>
-            <p className="max-w-4xl text-sm leading-relaxed text-base-content/70 md:text-base">
-              {report.title || `${report.company} 리포트`} · 발간가 {formatAssetPrice(reportEntryPrice(report), report)}{' '}
-              → 목표가 {formatAssetPrice(report.targetPriceNative, report)}
-              <strong className="text-primary">
-                {' '}
-                {formatPercent(report.targetUpsideAtPub)} {targetMoveLabel(report)}
-              </strong>
+    <header className="border-b border-slate-200 pb-5">
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_24rem] xl:items-end">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="outline">{report.symbol}</Badge>
+            <Badge variant={badgeVariant(status.tone)}>{status.label}</Badge>
+            {report.exchange ? <Badge variant="secondary">{report.exchange}</Badge> : null}
+            <Badge variant="secondary">{report.currency}</Badge>
+          </div>
+          <h1 className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-slate-950 md:text-5xl">
+            {report.company}
+          </h1>
+          <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-600 md:text-base">
+            {report.title || `${report.company} 리포트`}를 발간가, 현재가, 목표가, 실제 전략 매매까지 한 화면에서 다시
+            검증합니다. 핵심은 “맞았나”보다{' '}
+            <strong className="font-semibold text-slate-950">언제 사고 얼마나 기다렸을 때 유리했는지</strong>입니다.
+          </p>
+          <div className="mt-4 grid gap-2 text-sm sm:grid-cols-3">
+            <Fact
+              label="발간가"
+              value={formatAssetPrice(entryPrice, report)}
+              caption={formatDateKo(report.publicationDate)}
+            />
+            <Fact
+              label="목표가"
+              value={formatAssetPrice(report.targetPriceNative, report)}
+              caption={`${formatPercent(report.targetUpsideAtPub)} ${targetMoveLabel(report)}`}
+            />
+            <Fact
+              label="현재가"
+              value={formatAssetPrice(report.lastCloseNative, report)}
+              caption={`${formatDateKo(report.lastCloseDate)} · ${formatPercent(report.currentReturn)}`}
+            />
+          </div>
+        </div>
+
+        <aside className="grid gap-3 border-t border-slate-200 pt-4 xl:border-t-0 xl:pt-0">
+          <div className="rounded-xl border border-slate-200 bg-white p-4">
+            <div className="text-xs font-medium text-slate-500">판정</div>
+            <div className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">{status.detail}</div>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              발간일 {formatDateKo(report.publicationDate)}부터 최근 종가 {formatDateKo(report.lastCloseDate)}까지의
+              가격 경로를 기준으로 계산합니다.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Link className="btn btn-sm btn-outline" href="/reports">
-              아카이브
-            </Link>
+            <Button asChild size="sm" variant="outline">
+              <Link href="/reports">목록</Link>
+            </Button>
             {pdfHref ? (
-              <a className="btn btn-sm btn-outline" href={pdfHref}>
-                GitHub PDF
-              </a>
+              <Button asChild size="sm" variant="outline">
+                <a href={pdfHref}>PDF</a>
+              </Button>
             ) : null}
-            <a className="btn btn-sm btn-ghost" href={markdownHref}>
-              Markdown
-            </a>
+            <Button asChild size="sm" variant="ghost">
+              <a href={markdownHref}>Markdown</a>
+            </Button>
           </div>
-        </div>
-        <dl className="flex flex-wrap gap-2">
-          <Meta label="티커" value={report.symbol} />
-          {report.exchange ? <Meta label="거래소" value={report.exchange} /> : null}
-          <Meta label="통화" value={report.currency} />
-          <Meta label="발간일" value={report.publicationDate} />
-          {report.lastCloseDate ? <Meta label="최근 종가일" value={report.lastCloseDate} /> : null}
-          <Meta label="상태" value={status.detail} />
-        </dl>
+        </aside>
       </div>
     </header>
   );
 }
 
-function Meta({ label, value }: { label: string; value: string }) {
+function Fact({ label, value, caption }: { label: string; value: string; caption: string }) {
   return (
-    <span className="badge badge-outline gap-1 py-3 text-sm">
-      <span className="text-base-content/45">{label}</span>
-      <strong className="text-base-content">{value}</strong>
-    </span>
+    <div className="min-w-0 border-l border-slate-200 pl-3">
+      <div className="text-xs font-medium text-slate-500">{label}</div>
+      <div className="mt-1 truncate font-mono text-lg font-semibold tabular-nums text-slate-950">{value}</div>
+      <div className="mt-0.5 truncate text-xs text-slate-500">{caption}</div>
+    </div>
   );
+}
+
+function badgeVariant(tone: TargetStatus['tone']): 'success' | 'warning' | 'destructive' | 'default' {
+  if (tone === 'good') return 'success';
+  if (tone === 'bad') return 'destructive';
+  if (tone === 'warn') return 'warning';
+  return 'default';
 }
