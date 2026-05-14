@@ -20,7 +20,7 @@ type HitFilter = 'all' | 'hit' | 'open' | 'expired';
 type ReturnFilter = 'all' | 'positive' | 'negative';
 const PAGE_SIZE_OPTIONS = [25, 50, 100, 200] as const;
 type PageSize = (typeof PAGE_SIZE_OPTIONS)[number];
-type SortPresetId = 'recent' | 'target-hit' | 'top-return' | 'target-progress' | 'near-target' | 'upside';
+type SortPresetId = 'recent' | 'review' | 'target-hit' | 'top-return' | 'target-progress' | 'near-target' | 'upside';
 type SortPreset = {
   id: SortPresetId;
   label: string;
@@ -34,35 +34,6 @@ type SortPreset = {
 type ReportsTableProps = {
   reports: ReportRow[];
 };
-
-const csvHeaders: Array<[string, (report: ReportRow) => string | number | boolean | null]> = [
-  ['리포트 ID', (report) => report.reportId],
-  ['기업명', (report) => report.company],
-  ['심볼', (report) => report.symbol],
-  ['거래소', (report) => report.exchange],
-  ['시장구분', (report) => marketLabel(marketRegionForSymbol(report.symbol, report.exchange))],
-  ['게시일', (report) => report.publicationDate],
-  ['통화', (report) => report.currency],
-  ['표시통화', (report) => report.displayCurrency],
-  ['진입가(표시통화)', (report) => report.entryPriceNative],
-  ['목표가(표시통화)', (report) => report.targetPriceNative],
-  ['진입가(KRW 환산)', (report) => report.entryPriceKrw],
-  ['목표가(KRW 환산)', (report) => report.targetPriceKrw],
-  ['목표 방향', (report) => report.targetDirection],
-  ['제시 상승여력', (report) => report.targetUpsideAtPub],
-  ['현재 수익률', (report) => report.currentReturn],
-  ['목표 잔여(추가 변화율)', (report) => report.targetRemainingPct],
-  ['달성률', (report) => report.targetProgressPct],
-  ['최고 수익률', (report) => report.peakReturn],
-  ['최저 수익률', (report) => report.troughReturn],
-  ['목표 달성', (report) => report.targetHit],
-  ['목표 달성일', (report) => report.targetHitDate],
-  ['달성 소요일', (report) => report.daysToTarget],
-  ['만료', (report) => report.expired],
-  ['만료 예정일', (report) => report.expiryDate],
-  ['최근 종가일', (report) => report.lastCloseDate],
-  ['PDF URL', (report) => report.pdfUrl],
-];
 
 export function ReportsTable({ reports }: ReportsTableProps) {
   const [sorting, setSorting] = useState<SortingState>([{ id: 'publicationDate', desc: true }]);
@@ -277,127 +248,114 @@ export function ReportsTable({ reports }: ReportsTableProps) {
   };
 
   return (
-    <section className="report-table-panel card w-full min-w-0 rounded-box bg-base-100 border border-base-300 shadow-sm">
-      <div
-        className="table-toolbar card-body sticky top-0 z-10 grid gap-3 rounded-t-box border-b border-base-300 bg-base-100/95 p-4 backdrop-blur md:grid-cols-[minmax(220px,1.3fr)_repeat(3,minmax(140px,.7fr))_auto]"
-        aria-label="리포트 표 필터"
-      >
-        <div className="md:col-span-full">
-          <div className="flex flex-wrap items-center gap-2" aria-label="관심별 정렬 프리셋">
-            <span className="mr-1 text-xs font-black uppercase tracking-[0.16em] text-base-content/45">
-              관심별 정렬
-            </span>
-            {SORT_PRESETS.map((preset) => (
-              <button
-                key={preset.id}
-                className={`btn btn-xs gap-1.5 ${activePreset === preset.id ? 'btn-primary' : 'btn-ghost'}`}
-                type="button"
-                title={preset.caption}
-                onClick={() => applyPreset(preset.id)}
-              >
-                {preset.label}
-                <span className="badge badge-xs border-0 bg-base-100/70 text-current">
-                  {presetCounts[preset.id]?.toLocaleString('ko-KR') ?? 0}
-                </span>
-              </button>
-            ))}
+    <section className="w-full min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white">
+      <div className="grid gap-4 border-b border-slate-200 bg-white p-4" aria-label="리포트 표 필터">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">보기 방식</div>
+            <div className="mt-2 flex flex-wrap gap-1.5" aria-label="관심별 정렬 프리셋">
+              {SORT_PRESETS.map((preset) => (
+                <button
+                  key={preset.id}
+                  className={[
+                    'inline-flex h-8 items-center gap-1.5 rounded-md border px-2.5 text-xs font-semibold transition-colors',
+                    activePreset === preset.id
+                      ? 'border-slate-950 bg-slate-950 text-white'
+                      : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-950',
+                  ].join(' ')}
+                  type="button"
+                  title={preset.caption}
+                  onClick={() => applyPreset(preset.id)}
+                >
+                  {preset.label}
+                  <span className="font-mono text-[11px] opacity-70 tabular-nums">
+                    {presetCounts[preset.id]?.toLocaleString('ko-KR') ?? 0}
+                  </span>
+                </button>
+              ))}
+            </div>
+            <p className="mt-2 max-w-3xl text-xs leading-5 text-slate-500">
+              {activePresetConfig.caption}. 후보 탐색, 전체 리포트, 목표가 검증은 같은 표에서 정렬 조건만 바꿔 봅니다.
+            </p>
           </div>
-          <p className="mt-2 text-xs text-base-content/55">
-            {activePresetConfig.caption} · 모든 프리셋은 동일한 컬럼을 사용합니다. 관심별 뷰는 별도 표가 아니라
-            정렬·필터 조건만 바꿉니다.
-          </p>
+          <div className="shrink-0 rounded-md bg-slate-50 px-3 py-2 text-xs text-slate-600">
+            <span className="font-mono font-semibold tabular-nums text-slate-950">
+              {filteredRows.length.toLocaleString('ko-KR')}
+            </span>
+            개 표시 · 전체 {reports.length.toLocaleString('ko-KR')}개
+          </div>
         </div>
-        <label>
-          <span>검색</span>
-          <input
-            className="input input-sm input-bordered"
-            value={globalFilter ?? ''}
-            onChange={(event) => {
-              setGlobalFilter(event.target.value);
-              resetPage();
-            }}
-            placeholder="기업명, 심볼, 리포트 제목 검색"
-          />
-        </label>
-        <label>
-          <span>거래소</span>
-          <select
-            className="select select-sm select-bordered"
-            value={exchangeFilter}
-            onChange={(event) => {
-              setExchangeFilter(event.target.value);
-              resetPage();
-            }}
-          >
-            {exchanges.map((exchange) => (
-              <option key={exchange} value={exchange}>
-                {exchange === 'all' ? '전체' : exchange}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          <span>목표 달성</span>
-          <select
-            className="select select-sm select-bordered"
-            value={hitFilter}
-            onChange={(event) => {
-              setHitFilter(event.target.value as HitFilter);
-              resetPage();
-            }}
-          >
-            <option value="all">전체</option>
-            <option value="hit">달성</option>
-            <option value="open">진행 중</option>
-            <option value="expired">만료</option>
-          </select>
-        </label>
-        <label>
-          <span>현재 수익률</span>
-          <select
-            className="select select-sm select-bordered"
-            value={returnFilter}
-            onChange={(event) => {
-              setReturnFilter(event.target.value as ReturnFilter);
-              resetPage();
-            }}
-          >
-            <option value="all">전체</option>
-            <option value="positive">0% 이상</option>
-            <option value="negative">0% 미만</option>
-          </select>
-        </label>
-        <div className="download-actions">
-          <button
-            className="btn btn-sm btn-outline"
-            type="button"
-            onClick={() => downloadCsv('snusmic-reports-all.csv', reports)}
-          >
-            전체 CSV
-          </button>
-          <button
-            className="btn btn-sm btn-primary"
-            type="button"
-            onClick={() =>
-              downloadCsv(
-                'snusmic-reports-current.csv',
-                filteredRows.map((row) => row.original),
-              )
-            }
-          >
-            현재 보기 CSV
-          </button>
+
+        <div className="grid gap-2 md:grid-cols-[minmax(240px,1.4fr)_repeat(3,minmax(0,.7fr))]">
+          <label className="grid gap-1 text-xs font-medium text-slate-500">
+            <span>검색</span>
+            <input
+              className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-950 outline-none transition-colors placeholder:text-slate-400 focus:border-slate-400"
+              value={globalFilter ?? ''}
+              onChange={(event) => {
+                setGlobalFilter(event.target.value);
+                resetPage();
+              }}
+              placeholder="기업명, 심볼, 제목"
+            />
+          </label>
+          <label className="grid gap-1 text-xs font-medium text-slate-500">
+            <span>거래소</span>
+            <select
+              className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-950 outline-none transition-colors focus:border-slate-400"
+              value={exchangeFilter}
+              onChange={(event) => {
+                setExchangeFilter(event.target.value);
+                resetPage();
+              }}
+            >
+              {exchanges.map((exchange) => (
+                <option key={exchange} value={exchange}>
+                  {exchange === 'all' ? '전체' : exchange}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="grid gap-1 text-xs font-medium text-slate-500">
+            <span>목표 달성</span>
+            <select
+              className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-950 outline-none transition-colors focus:border-slate-400"
+              value={hitFilter}
+              onChange={(event) => {
+                setHitFilter(event.target.value as HitFilter);
+                resetPage();
+              }}
+            >
+              <option value="all">전체</option>
+              <option value="hit">달성</option>
+              <option value="open">진행 중</option>
+              <option value="expired">만료</option>
+            </select>
+          </label>
+          <label className="grid gap-1 text-xs font-medium text-slate-500">
+            <span>현재 수익률</span>
+            <select
+              className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-950 outline-none transition-colors focus:border-slate-400"
+              value={returnFilter}
+              onChange={(event) => {
+                setReturnFilter(event.target.value as ReturnFilter);
+                resetPage();
+              }}
+            >
+              <option value="all">전체</option>
+              <option value="positive">0% 이상</option>
+              <option value="negative">0% 미만</option>
+            </select>
+          </label>
         </div>
       </div>
 
-      <div className="table-meta flex flex-wrap justify-between gap-2 border-y border-base-300 bg-base-200/40 px-4 py-3 text-sm text-base-content/60">
-        <span>
-          현재 {filteredRows.length.toLocaleString('ko-KR')}개 / 전체 {reports.length.toLocaleString('ko-KR')}개
-        </span>
-        <label className="flex items-center gap-2 text-xs text-base-content/55">
-          <span>열 제목 정렬 · 페이지 크기</span>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs text-slate-500">
+        <span>열 제목을 누르면 오름차순·내림차순으로 정렬됩니다.</span>
+        <label className="flex items-center gap-2">
+          <span>페이지당</span>
           <select
-            className="select select-xs select-bordered w-auto"
+            className="h-8 rounded-md border border-slate-200 bg-white px-2 font-mono text-xs text-slate-950 outline-none"
             value={pageSize}
             onChange={(event) => {
               setPageSize(Number(event.target.value) as PageSize);
@@ -410,11 +368,12 @@ export function ReportsTable({ reports }: ReportsTableProps) {
               </option>
             ))}
           </select>
+          <span>개</span>
         </label>
       </div>
 
-      <div className="table-wrap w-full min-w-0 overflow-x-auto rounded-none border-0 shadow-none">
-        <table className="table table-sm table-zebra">
+      <div className="w-full min-w-0 overflow-x-auto">
+        <table className="w-full min-w-[1120px] text-sm [&_td]:border-b [&_td]:border-slate-100 [&_td]:px-3 [&_td]:py-3 [&_th]:border-b [&_th]:border-slate-200 [&_th]:bg-white [&_th]:px-3 [&_th]:py-2 [&_tr:hover_td]:bg-slate-50">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
@@ -448,8 +407,8 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         </table>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-base-300 px-4 py-3">
-        <span className="text-xs text-base-content/55">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 px-4 py-3">
+        <span className="text-xs text-slate-500">
           {filteredRows.length ? safePage * pageSize + 1 : 0}–{Math.min(filteredRows.length, (safePage + 1) * pageSize)}{' '}
           / {filteredRows.length.toLocaleString('ko-KR')}
         </span>
@@ -483,6 +442,15 @@ const SORT_PRESETS: SortPreset[] = [
     hitFilter: 'all',
     returnFilter: 'all',
     count: () => true,
+  },
+  {
+    id: 'review',
+    label: '검토 후보',
+    caption: '아직 목표에 닿지 않았고 만료되지 않은 표본을 목표 진행률 높은 순으로 표시',
+    sort: [{ id: 'targetProgressPct', desc: true }],
+    hitFilter: 'open',
+    returnFilter: 'all',
+    count: (report) => !report.targetHit && !report.expired && (report.targetUpsideAtPub ?? 0) > 0,
   },
   {
     id: 'target-hit',
@@ -530,29 +498,6 @@ const SORT_PRESETS: SortPreset[] = [
     count: (report) => report.targetUpsideAtPub !== null,
   },
 ];
-
-function downloadCsv(filename: string, rows: ReportRow[]) {
-  const csv = [
-    csvHeaders.map(([label]) => escapeCsv(label)).join(','),
-    ...rows.map((report) => csvHeaders.map(([, read]) => escapeCsv(read(report))).join(',')),
-  ].join('\n');
-  const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement('a');
-  anchor.href = url;
-  anchor.download = filename;
-  document.body.append(anchor);
-  anchor.click();
-  anchor.remove();
-  URL.revokeObjectURL(url);
-}
-
-function escapeCsv(value: string | number | boolean | null): string {
-  if (value === null) return '';
-  const text = String(value);
-  if (!/[",\n\r]/.test(text)) return text;
-  return `"${text.replaceAll('"', '""')}"`;
-}
 
 function marketLabel(region: 'domestic' | 'overseas'): string {
   return region === 'domestic' ? '국내' : '해외';

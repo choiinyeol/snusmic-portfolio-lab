@@ -98,14 +98,19 @@ export type ExecutiveOverview = {
   researchCandidates: ResearchCandidate[];
 };
 
-export const DEFAULT_PORTFOLIO_PERSONA = 'smic_follower_v2';
-
 export function getDefaultPortfolioPersona(): string {
   const summaries = getSummaryRows();
   const holdings = getCurrentHoldings();
-  const preferred = summaries.find((row) => row.persona === DEFAULT_PORTFOLIO_PERSONA);
-  if (preferred && holdings.some((row) => row.persona === DEFAULT_PORTFOLIO_PERSONA)) {
-    return DEFAULT_PORTFOLIO_PERSONA;
+  const summaryIds = new Set(summaries.map((row) => row.persona));
+  const personasWithOpenHoldings = new Set(holdings.map((row) => row.persona));
+  const rankedStrategies = getSelectableStrategyRows(getStrategyLeaderboard()).filter((row) => summaryIds.has(row.id));
+  const topWithOpenHoldings = rankedStrategies.find((row) => personasWithOpenHoldings.has(row.id));
+  if (topWithOpenHoldings) {
+    return topWithOpenHoldings.id;
+  }
+  const topStrategy = rankedStrategies[0];
+  if (topStrategy) {
+    return topStrategy.id;
   }
   const withOpenHoldings = summaries
     .filter((summary) => holdings.some((holding) => holding.persona === summary.persona))

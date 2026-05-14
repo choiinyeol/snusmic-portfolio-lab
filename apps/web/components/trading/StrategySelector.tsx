@@ -9,6 +9,7 @@ export type StrategySelectorOption = {
   shortLabel: string;
   kind: 'benchmark' | 'strategy' | 'oracle';
   href?: string;
+  isDefault?: boolean;
 };
 
 export function StrategySelector({
@@ -31,7 +32,7 @@ export function StrategySelector({
       <div className="flex min-w-max gap-1 px-1">
         {options.map((option) => {
           const active = option.id === value;
-          const badge = kindBadge(option.kind, option.id);
+          const badge = kindBadge(option.kind, option.isDefault);
           const className = [
             'inline-flex min-w-0 max-w-[13rem] items-center gap-1.5 rounded-md px-3 py-2 text-xs font-semibold transition-colors',
             active
@@ -82,12 +83,12 @@ export function StrategySelector({
 
 function kindBadge(
   kind: StrategySelectorOption['kind'],
-  id: string,
+  isDefault?: boolean,
 ): {
   label: string;
   variant: 'secondary' | 'warning' | 'outline';
 } {
-  if (id === 'smic_follower_v2') return { label: '기본', variant: 'outline' };
+  if (isDefault) return { label: '기본', variant: 'outline' };
   if (kind === 'strategy') return { label: '전략', variant: 'outline' };
   if (kind === 'oracle') return { label: '상한', variant: 'warning' };
   return { label: '기준', variant: 'secondary' };

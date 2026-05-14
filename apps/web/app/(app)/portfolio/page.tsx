@@ -66,6 +66,7 @@ export default function PortfolioPage() {
       shortLabel: row?.shortLabel ?? getPersonaLabel(persona),
       kind: row?.kind ?? inferPersonaKind(persona),
       href: portfolioStrategyHref(persona),
+      isDefault: persona === defaultPersona,
     };
   });
   const capitalByPersona = Object.fromEntries(

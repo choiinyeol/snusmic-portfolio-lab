@@ -67,8 +67,8 @@ export default function GuidePage() {
         </div>
       </section>
 
-      <section className="grid gap-3" aria-label="돈 되는 질문">
-        <SectionHeader eyebrow="돈 되는 질문" title="규칙으로 바꿀 수 있는 검정 항목" />
+      <section className="grid gap-3" aria-label="검증 질문">
+        <SectionHeader eyebrow="검증 질문" title="투자 규칙으로 바꾸기 전에 확인할 항목" />
         <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
           <EvidenceRow
             state="현재 검증됨"
@@ -89,7 +89,7 @@ export default function GuidePage() {
             title="오르는 건 계속 오르는가"
             metric={`${reportStats.nearTargetCount}개 목표 근접`}
             body="목표 진행률이 높은 미도달 리포트는 추세 지속 검정의 우선 표본입니다. ‘매수 추천’이 아니라, 상승 지속성이 통계적으로 남는지 확인할 후보입니다."
-            href="/screener"
+            href="/reports"
           />
           <EvidenceRow
             state="손실 군집"
