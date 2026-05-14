@@ -34,6 +34,9 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
     p90: quantile(currentReturns, 0.9),
     max: quantile(currentReturns, 1),
   };
+  const eligiblePathCount = currentReturns.length;
+  const pathBuckets = buildPathBuckets(summary.riskScatter);
+  const exampleMetaById = buildExampleMetaById(summary.topExamples);
 
   return (
     <div className="grid gap-14">
@@ -73,7 +76,19 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
       </StorySection>
 
       <StorySection
-        kicker="02 · 목표가를 더 현실적으로 보기"
+        kicker="02 · 경로별 표본 분해"
+        title="같은 수익률도 전혀 다른 길로 도착했습니다"
+        body="전체 지도가 분포의 모양을 보여준다면, 이 섹션은 개인투자자가 실제로 겪었을 경로를 보여줍니다. 빠른 적중, 큰 초과상승, 고통스러운 승자, 손실 꼬리를 나눠 보면 ‘맞았다/틀렸다’보다 중요한 것은 중간 손실과 기다린 시간입니다."
+      >
+        <PathBucketPanel buckets={pathBuckets} exampleMetaById={exampleMetaById} total={eligiblePathCount} />
+        <InsightLine>
+          이 표는 예측 라벨이 아니라 <strong>검정 대기열</strong>입니다. “고통스러운 승자”는 손절 규칙을 너무 촘촘하게
+          만들면 놓칠 표본이고, “반납한 표본”은 목표가 이후 보유 규칙을 따로 검정해야 하는 이유입니다.
+        </InsightLine>
+      </StorySection>
+
+      <StorySection
+        kicker="03 · 목표가를 더 현실적으로 보기"
         title="목표가 100%가 아니라 80%에 닿았는지도 봅니다"
         body="분석가 목표가는 단일 정답이 아니라 파라미터입니다. 원래 목표가의 60%, 80%, 100%에 해당하는 가격을 각각 계산하면 ‘완전 적중’보다 더 실용적인 성과 경로가 보입니다."
       >
@@ -92,7 +107,7 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
       </StorySection>
 
       <StorySection
-        kicker="03 · 읽고 바로 사야 했나"
+        kicker="04 · 읽고 바로 사야 했나"
         title="발간 후 며칠 기다리면 결과가 달라졌나"
         body="리포트를 당일에 읽지 못한 개인투자자가 더 현실적입니다. 1·3·5·10·20거래일 뒤 진입했을 때의 중앙 수익률과 0.8x 목표 도달률을 같은 방식으로 다시 계산했습니다."
       >
@@ -111,7 +126,7 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
       </StorySection>
 
       <StorySection
-        kicker="04 · 눌림목인가 확인 매수인가"
+        kicker="05 · 눌림목인가 확인 매수인가"
         title="하락을 기다릴수록 참여율은 낮아지고, 돌파를 기다릴수록 가짜 돌파가 생깁니다"
         body="발간 후 20거래일 안에 -3/-5/-10% 눌림목이 오면 매수하는 규칙과 +3/+5/+10% 상승 확인 후 매수하는 규칙을 비교했습니다."
       >
@@ -119,7 +134,7 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
       </StorySection>
 
       <StorySection
-        kicker="05 · 목표가에 닿은 뒤"
+        kicker="06 · 목표가에 닿은 뒤"
         title="목표가는 끝이 아니라 분기점이었습니다"
         body="목표가에 처음 닿은 날을 0일로 놓고, 이후 5·20·60·120거래일을 더 보유했을 때의 중앙값과 사분위 범위를 계산했습니다."
       >
@@ -136,7 +151,7 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
       </StorySection>
 
       <StorySection
-        kicker="06 · 역사적 익절선"
+        kicker="07 · 역사적 익절선"
         title="이 표본에서 안정적이었던 익절선은 낮은 목표 배수 쪽이었습니다"
         body="목표가의 일부에 도달하면 익절하고, 아니면 250거래일 후 청산한다고 가정했습니다. 최고 평균이 아니라 중앙 수익률·도달률·하방 위험을 함께 본 보상/신뢰 점수를 봅니다."
       >
@@ -149,7 +164,7 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
       </StorySection>
 
       <StorySection
-        kicker="07 · 경로의 고통"
+        kicker="08 · 경로의 고통"
         title="맞은 리포트도 중간 손실을 견뎌야 했습니다"
         body="각 리포트의 발간 이후 최대 상승폭과 최대 하락폭을 전체 표본으로 동시에 놓으면, 성공 표본이 얼마나 불편한 경로를 거쳤는지 보입니다."
       >
@@ -328,6 +343,227 @@ function WholeSampleMap({
       </div>
     </div>
   );
+}
+
+type RiskScatterRow = ReportStatisticsLabSummary['riskScatter'][number];
+
+type PathBucket = {
+  id: string;
+  label: string;
+  question: string;
+  count: number;
+  share: number | null;
+  tone: 'good' | 'bad' | 'warn' | 'neutral';
+  rule: string;
+  examples: RiskScatterRow[];
+};
+
+function PathBucketPanel({
+  buckets,
+  exampleMetaById,
+  total,
+}: {
+  buckets: PathBucket[];
+  exampleMetaById: Map<string, ExampleMeta>;
+  total: number;
+}) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-5">
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h3 className="text-sm font-semibold text-slate-950">경로 진단 태그</h3>
+          <p className="mt-1 text-xs text-slate-500">
+            태그는 서로 겹칠 수 있습니다. 대표 사례는 추천 종목이 아니라 경로를 읽기 위한 예시입니다.
+          </p>
+        </div>
+        <span className="rounded-md bg-slate-100 px-2 py-1 font-mono text-[11px] text-slate-500">
+          전체 {total.toLocaleString('ko-KR')}건
+        </span>
+      </div>
+      <div className="grid gap-3 xl:grid-cols-2">
+        {buckets.map((bucket) => (
+          <div className="rounded-xl border border-slate-100 bg-slate-50 p-4" key={bucket.id}>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="text-sm font-semibold text-slate-950">{bucket.label}</div>
+                <p className="mt-1 text-xs leading-5 text-slate-500">{bucket.question}</p>
+              </div>
+              <div className="text-right">
+                <div className={`font-mono text-xl font-semibold ${bucketToneClass(bucket.tone)}`}>
+                  {bucket.count.toLocaleString('ko-KR')}
+                </div>
+                <div className="font-mono text-[11px] text-slate-500">{formatPercent(bucket.share, 1)}</div>
+              </div>
+            </div>
+            <div className="mt-3 rounded-lg bg-white px-3 py-2 font-mono text-[11px] text-slate-500">{bucket.rule}</div>
+            <div className="mt-3 grid gap-2">
+              {bucket.examples.length ? (
+                bucket.examples.map((row) => {
+                  const meta = exampleMetaById.get(row.reportId);
+                  return (
+                    <div
+                      className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 rounded-lg bg-white px-3 py-2 text-xs"
+                      key={`${bucket.id}-${row.reportId}`}
+                    >
+                      <div className="min-w-0">
+                        <div className="truncate font-semibold text-slate-950">
+                          {row.company} <span className="font-mono text-slate-500">{row.symbol}</span>
+                        </div>
+                        <div className="mt-0.5 font-mono text-[11px] text-slate-500">
+                          {row.publicationDate} · {targetHitDetail(row, meta)}
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-4 gap-3 text-right font-mono tabular-nums">
+                        <MetricMini
+                          label="현재"
+                          value={formatPercent(row.currentReturn)}
+                          tone={(row.currentReturn ?? 0) >= 0 ? 'good' : 'bad'}
+                        />
+                        <MetricMini label="상승" value={formatPercent(row.maxFavorableExcursion)} tone="good" />
+                        <MetricMini label="하락" value={formatPercent(row.maxAdverseExcursion)} tone="bad" />
+                        <MetricMini label="목표대비" value={formatMultiple(row.upsideCaptureRatio)} tone="neutral" />
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="rounded-lg bg-white px-3 py-2 text-xs text-slate-500">표본 부족</div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MetricMini({ label, value, tone }: { label: string; value: string; tone: 'good' | 'bad' | 'neutral' }) {
+  return (
+    <div>
+      <div className="text-[10px] text-slate-400">{label}</div>
+      <div className={tone === 'good' ? 'text-blue-600' : tone === 'bad' ? 'text-rose-600' : 'text-slate-700'}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
+type ExampleMeta = {
+  hit08Days: number | null;
+  hit10Days: number | null;
+};
+
+function buildExampleMetaById(topExamples: ReportStatisticsLabSummary['topExamples']): Map<string, ExampleMeta> {
+  const map = new Map<string, ExampleMeta>();
+  Object.values(topExamples).forEach((examples) => {
+    examples.forEach((example) => {
+      const reportId = typeof example.reportId === 'string' ? example.reportId : null;
+      if (!reportId) return;
+      map.set(reportId, {
+        hit08Days: readHitDays(example, '0.8'),
+        hit10Days: readHitDays(example, '1'),
+      });
+    });
+  });
+  return map;
+}
+
+function readHitDays(example: Record<string, unknown>, key: '0.8' | '1'): number | null {
+  const hit = example.hit;
+  if (!hit || typeof hit !== 'object') return null;
+  const target = (hit as Record<string, unknown>)[key];
+  if (!target || typeof target !== 'object') return null;
+  const days = (target as Record<string, unknown>).days;
+  return typeof days === 'number' && Number.isFinite(days) ? days : null;
+}
+
+function targetHitDetail(row: RiskScatterRow, meta: ExampleMeta | undefined): string {
+  if (row.hit10) return `1.0x 도달${formatHitDays(meta?.hit10Days)}`;
+  if (row.hit08) return `0.8x 도달${formatHitDays(meta?.hit08Days)}`;
+  if (row.hit06) return '0.6x 도달';
+  return '목표 미도달';
+}
+
+function formatHitDays(days: number | null | undefined): string {
+  if (days === null || days === undefined) return '';
+  if (days === 0) return ' · 발간일 고가 기준';
+  return ` · ${days.toLocaleString('ko-KR')}거래일`;
+}
+
+function formatMultiple(value: number | null | undefined): string {
+  if (value === null || value === undefined || !Number.isFinite(value)) return '—';
+  return `${value.toLocaleString('ko-KR', { maximumFractionDigits: 1 })}x`;
+}
+
+function buildPathBuckets(rows: RiskScatterRow[]): PathBucket[] {
+  const eligible = rows.filter((row) => isNumber(row.currentReturn));
+  const bucket = (
+    id: string,
+    label: string,
+    question: string,
+    tone: PathBucket['tone'],
+    rule: string,
+    predicate: (row: RiskScatterRow) => boolean,
+    sort: (a: RiskScatterRow, b: RiskScatterRow) => number,
+  ): PathBucket => {
+    const members = eligible.filter(predicate).sort(sort);
+    return {
+      id,
+      label,
+      question,
+      count: members.length,
+      share: eligible.length ? members.length / eligible.length : null,
+      tone,
+      rule,
+      examples: members.slice(0, 3),
+    };
+  };
+
+  return [
+    bucket(
+      'clean-winners',
+      '빠른 적중에 가까운 승자',
+      '0.8x 목표에 닿았고 현재도 의미 있게 오른 표본입니다. 기다림보다 실행 가능성을 보는 후보입니다.',
+      'good',
+      '0.8x 도달 · 현재 +20% 이상 · 중간 손실 -10% 이내',
+      (row) => row.hit08 && (row.currentReturn ?? 0) >= 0.2 && (row.maxAdverseExcursion ?? 0) >= -0.1,
+      (a, b) => (b.currentReturn ?? 0) - (a.currentReturn ?? 0),
+    ),
+    bucket(
+      'painful-winners',
+      '고통스러운 승자',
+      '목표에 닿았지만 중간 손실이 컸던 표본입니다. 손절 규칙 검정에 중요합니다.',
+      'warn',
+      '0.8x 이상 도달 · 중간 손실 -20% 이하',
+      (row) => row.hit08 && (row.maxAdverseExcursion ?? 0) <= -0.2,
+      (a, b) => (a.maxAdverseExcursion ?? 0) - (b.maxAdverseExcursion ?? 0),
+    ),
+    bucket(
+      'round-trips',
+      '큰 초과상승 뒤 반납',
+      '발간 후 한때 크게 올랐지만 현재 수익이 약하거나 음수인 표본입니다.',
+      'neutral',
+      '최대 상승 +50% 이상 · 현재 +10% 미만',
+      (row) => (row.maxFavorableExcursion ?? 0) >= 0.5 && (row.currentReturn ?? 0) < 0.1,
+      (a, b) => (b.maxFavorableExcursion ?? 0) - (a.maxFavorableExcursion ?? 0),
+    ),
+    bucket(
+      'persistent-losers',
+      '손실 꼬리',
+      '평균 속에 숨기면 안 되는 실패 데이터입니다. 제외 조건과 시간 손절 후보입니다.',
+      'bad',
+      '현재 -20% 이하 · 최대 상승 +20% 미만',
+      (row) => (row.currentReturn ?? 0) <= -0.2 && (row.maxFavorableExcursion ?? 0) < 0.2,
+      (a, b) => (a.currentReturn ?? 0) - (b.currentReturn ?? 0),
+    ),
+  ];
+}
+
+function bucketToneClass(tone: PathBucket['tone']): string {
+  if (tone === 'good') return 'text-blue-600';
+  if (tone === 'bad') return 'text-rose-600';
+  if (tone === 'warn') return 'text-amber-600';
+  return 'text-slate-700';
 }
 
 function StorySection({
