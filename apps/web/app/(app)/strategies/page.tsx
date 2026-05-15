@@ -150,7 +150,7 @@ function StrategyMethodCard({ row }: { row: StrategyLeaderboardRow }) {
           {row.objectivePassed ? '목표 통과' : '목표 미달'}
         </Badge>
       </div>
-      <p className="mt-3 text-sm leading-6 text-base-content/65">{row.methodologySummary}</p>
+      <p className="mt-3 text-sm leading-6 text-slate-500">{row.methodologySummary}</p>
       <div className="mt-4 grid gap-3 md:grid-cols-3">
         <RuleList title="매수" items={row.buyRules} />
         <RuleList title="매도" items={row.sellRules} />
@@ -162,9 +162,9 @@ function StrategyMethodCard({ row }: { row: StrategyLeaderboardRow }) {
 
 function RuleList({ title, items }: { title: string; items: string[] }) {
   return (
-    <div className="rounded-2xl border border-base-300 bg-base-100 p-3">
-      <h4 className="text-xs font-black uppercase tracking-[0.14em] text-base-content/45">{title}</h4>
-      <ul className="mt-2 grid gap-1 text-sm leading-5 text-base-content/65">
+    <div className="rounded-2xl border border-slate-200 bg-white p-3">
+      <h4 className="text-xs font-black uppercase tracking-[0.14em] text-slate-950/45">{title}</h4>
+      <ul className="mt-2 grid gap-1 text-sm leading-5 text-slate-500">
         {items.length ? items.map((item) => <li key={item}>• {item}</li>) : <li>—</li>}
       </ul>
     </div>

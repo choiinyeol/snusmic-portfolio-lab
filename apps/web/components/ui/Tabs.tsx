@@ -10,7 +10,10 @@ export function Tabs({ tabs, defaultTabId }: { tabs: Tab[]; defaultTabId?: strin
   const activeTab = tabs.find((t) => t.id === active) ?? tabs[0];
   return (
     <div className="grid min-w-0 gap-4">
-      <div className="tabs tabs-box w-full max-w-full overflow-x-auto bg-base-200" role="tablist">
+      <div
+        className="inline-flex w-full max-w-full gap-1 overflow-x-auto rounded-2xl border border-slate-200 bg-slate-100 p-1"
+        role="tablist"
+      >
         {tabs.map((tab) => {
           const tabId = `tab-${tab.id}`;
           const panelId = `panel-${tab.id}`;
@@ -22,11 +25,15 @@ export function Tabs({ tabs, defaultTabId }: { tabs: Tab[]; defaultTabId?: strin
               type="button"
               aria-selected={tab.id === active}
               aria-controls={panelId}
-              className={`tab gap-2 ${tab.id === active ? 'tab-active font-bold' : ''}`}
+              className={`inline-flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition ${tab.id === active ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:bg-white/70 hover:text-slate-900'}`}
               onClick={() => setActive(tab.id)}
             >
               {tab.label}
-              {tab.meta ? <span className="badge badge-xs badge-ghost">{tab.meta}</span> : null}
+              {tab.meta ? (
+                <span className="rounded-full border border-slate-200 bg-white px-1.5 py-0.5 text-[10px] text-slate-500">
+                  {tab.meta}
+                </span>
+              ) : null}
             </button>
           );
         })}
@@ -35,7 +42,7 @@ export function Tabs({ tabs, defaultTabId }: { tabs: Tab[]; defaultTabId?: strin
         id={activeTab ? `panel-${activeTab.id}` : undefined}
         role="tabpanel"
         aria-labelledby={activeTab ? `tab-${activeTab.id}` : undefined}
-        className="tabs__panel min-w-0"
+        className="grid min-w-0 gap-4"
       >
         {activeTab?.content}
       </div>

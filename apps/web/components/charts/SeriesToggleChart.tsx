@@ -34,7 +34,7 @@ export function SeriesToggleChart({ series }: { series: ReturnSeries[] }) {
     <div className="grid gap-3">
       <div className="grid min-w-0 gap-2">
         <div className="flex min-w-0 items-center justify-between gap-2">
-          <div className="text-xs font-bold text-base-content/45">
+          <div className="text-xs font-bold text-slate-950/45">
             표시 {activeSeries.length.toLocaleString('ko-KR')} · 숨김 {hiddenCount.toLocaleString('ko-KR')}
           </div>
           <div className="flex shrink-0 gap-1.5">
@@ -51,7 +51,7 @@ export function SeriesToggleChart({ series }: { series: ReturnSeries[] }) {
             const active = activeIds.has(item.id);
             return (
               <button
-                className={`snapshot-pill max-w-[9.5rem] shrink-0 border transition ${active ? 'border-primary/30 bg-primary/10 text-primary' : 'opacity-55'}`}
+                className={`snapshot-pill max-w-[9.5rem] shrink-0 border transition ${active ? 'border-blue-200 bg-blue-50 text-blue-600' : 'opacity-55'}`}
                 key={item.id}
                 onClick={() => toggle(item.id)}
                 title={item.label}

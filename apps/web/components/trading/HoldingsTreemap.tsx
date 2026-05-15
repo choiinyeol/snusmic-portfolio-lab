@@ -133,7 +133,7 @@ export function HoldingsTreemap({
         <div className="heatmap-toolbar">
           <div className="min-w-0">
             <p className="heatmap-caption">{caption}</p>
-            <p className="mt-1 font-mono text-xs text-base-content/55">합계 {formatKrw(totalValue)}</p>
+            <p className="mt-1 font-mono text-xs text-slate-950/55">합계 {formatKrw(totalValue)}</p>
           </div>
           <div className="flex shrink-0 flex-wrap justify-end gap-1.5" aria-label="트리맵 모드">
             <span className="snapshot-pill">전체</span>
@@ -145,7 +145,7 @@ export function HoldingsTreemap({
       ) : null}
       <div
         ref={containerRef}
-        className="relative w-full overflow-hidden rounded-2xl border border-base-300 bg-base-200/30"
+        className="relative w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100/30"
         style={{ height: size.height }}
       >
         <canvas
@@ -179,13 +179,13 @@ export function HoldingsTreemap({
 function TreemapEmptyState({ height }: { height: number }) {
   return (
     <div
-      className="grid place-items-center rounded-2xl border border-dashed border-base-300 bg-base-100 p-6 text-center shadow-sm"
+      className="grid place-items-center rounded-2xl border border-dashed border-slate-200 bg-white p-6 text-center shadow-sm"
       style={{ minHeight: Math.max(240, height) }}
     >
       <div className="max-w-sm">
-        <div className="mx-auto mb-3 grid h-10 w-10 place-items-center rounded-2xl bg-primary/10 text-primary">▦</div>
+        <div className="mx-auto mb-3 grid h-10 w-10 place-items-center rounded-2xl bg-blue-50 text-blue-600">▦</div>
         <h3 className="text-base font-black tracking-[-0.02em]">표시할 보유 종목이 없습니다</h3>
-        <p className="mt-2 text-sm text-base-content/60">
+        <p className="mt-2 text-sm text-slate-950/60">
           선택한 전략에 평가액이 있는 포지션이 생성되면 면적 기반 트리맵으로 표시됩니다.
         </p>
       </div>
@@ -210,14 +210,14 @@ function TreemapTooltip({
   const href = holdingHref(row, hrefBySymbol);
   return (
     <div
-      className="pointer-events-none absolute z-10 w-[252px] rounded-2xl border border-base-300 bg-base-100/95 px-3 py-2.5 text-xs shadow-lg backdrop-blur"
+      className="pointer-events-none absolute z-10 w-[252px] rounded-2xl border border-slate-200 bg-white/95 px-3 py-2.5 text-xs shadow-lg backdrop-blur"
       style={{ left, top }}
     >
       <div className="min-w-0 font-bold">
         <span className="block truncate">{row.company || row.symbol}</span>
-        <span className="font-mono text-base-content/55">{row.symbol}</span>
+        <span className="font-mono text-slate-950/55">{row.symbol}</span>
       </div>
-      <dl className="mt-2 grid gap-1.5 text-base-content/65">
+      <dl className="mt-2 grid gap-1.5 text-slate-500">
         <TooltipLine label="평가액" value={`${formatKrw(row.marketValueKrw)} · ${formatPercent(row.weight)}`} />
         <TooltipLine
           label="미실현"
@@ -235,8 +235,8 @@ function TreemapTooltip({
 function TooltipLine({ label, value }: { label: string; value: string }) {
   return (
     <div className="grid grid-cols-[4rem_minmax(0,1fr)] gap-2">
-      <dt className="text-base-content/45">{label}</dt>
-      <dd className="min-w-0 truncate text-right font-mono font-bold tabular-nums text-base-content">{value}</dd>
+      <dt className="text-slate-950/45">{label}</dt>
+      <dd className="min-w-0 truncate text-right font-mono font-bold tabular-nums text-slate-950">{value}</dd>
     </div>
   );
 }

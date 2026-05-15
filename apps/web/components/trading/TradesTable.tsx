@@ -157,8 +157,8 @@ export function TradesTable({
 
   return (
     <div className="grid gap-4">
-      <section className="card border border-base-300 bg-base-100 shadow-sm">
-        <div className="card-body gap-3 p-5">
+      <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex flex-col gap-3 p-5">
           <div className="flex flex-wrap items-end gap-3" aria-label="매매 필터">
             <label className="form-control">
               <span className="label-text">매수/매도</span>
@@ -195,9 +195,9 @@ export function TradesTable({
         </div>
       </section>
 
-      <section className="card border border-base-300 bg-base-100 shadow-sm">
-        <div className="card-body gap-2 p-5">
-          <h2 className="card-title">포지션 단위 매수·매도</h2>
+      <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex flex-col gap-2 p-5">
+          <h2 className="text-base font-semibold text-slate-950">포지션 단위 매수·매도</h2>
           <PaginationControls
             page={episodePage}
             pageCount={Math.ceil(sortedEpisodes.length / episodePageSize)}
@@ -209,7 +209,7 @@ export function TradesTable({
               setEpisodePage(0);
             }}
           />
-          <div className="overflow-x-auto rounded-box border border-base-300 bg-base-100">
+          <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
             <table className="table table-sm table-zebra">
               <thead>
                 <tr>
@@ -275,11 +275,14 @@ export function TradesTable({
                       </td>
                       <td>
                         <strong>
-                          <Link className="link link-hover" href={`/reports/${encodeURIComponent(episode.symbol)}`}>
+                          <Link
+                            className="link hover:underline"
+                            href={`/reports/${encodeURIComponent(episode.symbol)}`}
+                          >
                             {episode.company || episode.symbol}
                           </Link>
                         </strong>
-                        <div className="text-xs text-base-content/55">{episode.symbol}</div>
+                        <div className="text-xs text-slate-950/55">{episode.symbol}</div>
                       </td>
                       <td>
                         {target ? (
@@ -291,11 +294,11 @@ export function TradesTable({
                         ) : (
                           '—'
                         )}
-                        <div className="text-xs text-base-content/55">{target?.publicationDate ?? '—'}</div>
+                        <div className="text-xs text-slate-950/55">{target?.publicationDate ?? '—'}</div>
                       </td>
                       <td>
                         <span className="font-mono text-xs">{episode.openDate}</span>
-                        <div className="text-xs text-base-content/55">{episode.buyFills ?? 0}회 매수</div>
+                        <div className="text-xs text-slate-950/55">{episode.buyFills ?? 0}회 매수</div>
                       </td>
                       <td>
                         {episode.closeDate ? (
@@ -303,7 +306,7 @@ export function TradesTable({
                         ) : (
                           <span className="badge badge-success badge-soft badge-sm">보유중</span>
                         )}
-                        <div className="text-xs text-base-content/55">{episode.status}</div>
+                        <div className="text-xs text-slate-950/55">{episode.status}</div>
                       </td>
                       <td className="tabular-nums">{formatDays(episode.holdingDays)}</td>
                       <td>
@@ -319,12 +322,12 @@ export function TradesTable({
                           krw={episode.avgExitPriceKrw ?? episode.lastCloseKrw}
                           currency={episode.currency}
                         />
-                        <div className="text-xs text-base-content/55">손익 {formatKrw(pnl)}</div>
+                        <div className="text-xs text-slate-950/55">손익 {formatKrw(pnl)}</div>
                       </td>
-                      <td className={`tabular-nums ${(stockReturn ?? 0) >= 0 ? 'text-success' : 'text-error'}`}>
+                      <td className={`tabular-nums ${(stockReturn ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                         {formatPercent(stockReturn)}
                       </td>
-                      <td className={`tabular-nums ${(contribution ?? 0) >= 0 ? 'text-success' : 'text-error'}`}>
+                      <td className={`tabular-nums ${(contribution ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                         {formatPercent(contribution)}
                       </td>
                       <td className="text-sm">{humanReason(episode.exitReasons)}</td>
@@ -337,9 +340,9 @@ export function TradesTable({
         </div>
       </section>
 
-      <section className="card border border-base-300 bg-base-100 shadow-sm">
-        <div className="card-body gap-2 p-5">
-          <h2 className="card-title">매매내역</h2>
+      <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex flex-col gap-2 p-5">
+          <h2 className="text-base font-semibold text-slate-950">매매내역</h2>
           <PaginationControls
             page={tradePage}
             pageCount={Math.ceil(sortedTrades.length / tradePageSize)}
@@ -351,7 +354,7 @@ export function TradesTable({
               setTradePage(0);
             }}
           />
-          <div className="overflow-x-auto rounded-box border border-base-300 bg-base-100">
+          <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
             <table className="table table-sm table-zebra">
               <thead>
                 <tr>
@@ -412,7 +415,7 @@ export function TradesTable({
                         </span>
                       </td>
                       <td>
-                        <Link className="link link-hover" href={`/reports/${encodeURIComponent(trade.symbol)}`}>
+                        <Link className="link hover:underline" href={`/reports/${encodeURIComponent(trade.symbol)}`}>
                           {trade.symbol}
                         </Link>
                       </td>
@@ -426,7 +429,7 @@ export function TradesTable({
                         ) : (
                           '—'
                         )}
-                        <div className="text-xs text-base-content/55">{target?.publicationDate ?? '—'}</div>
+                        <div className="text-xs text-slate-950/55">{target?.publicationDate ?? '—'}</div>
                       </td>
                       <td className="tabular-nums">{trade.qty?.toLocaleString('ko-KR') ?? '—'}</td>
                       <td>
@@ -440,7 +443,7 @@ export function TradesTable({
                       <td>
                         {trade.reportId && reportSymbolsById[trade.reportId] ? (
                           <Link
-                            className="link link-hover"
+                            className="link hover:underline"
                             href={`/reports/${encodeURIComponent(reportSymbolsById[trade.reportId])}`}
                           >
                             리포트

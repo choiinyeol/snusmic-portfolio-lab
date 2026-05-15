@@ -60,8 +60,8 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         header: '리포트',
         cell: ({ row }) => (
           <div className="report-title-cell">
-            <Link href={`/reports/${encodeURIComponent(row.original.symbol)}`}>{row.original.company}</Link>
-            <span className="text-xs text-base-content/55">
+            <Link href={reportDetailHref(row.original)}>{row.original.company}</Link>
+            <span className="text-xs text-slate-950/55">
               {row.original.symbol} · {row.original.exchange || '—'}
             </span>
           </div>
@@ -103,7 +103,7 @@ export function ReportsTable({ reports }: ReportsTableProps) {
             return (
               <span className={className} title={`만료(${row.original.expiryDate ?? ''}) 종가 기준 최종 수익률`}>
                 {formatPercent(value)}
-                <span className="ml-1 text-xs text-base-content/55">(최종)</span>
+                <span className="ml-1 text-xs text-slate-950/55">(최종)</span>
               </span>
             );
           }
@@ -116,10 +116,10 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         cell: ({ row }) => {
           const value = row.original.targetRemainingPct;
           if (row.original.targetHit) {
-            return <span className="text-success">도달</span>;
+            return <span className="text-emerald-600">도달</span>;
           }
           if (value === null) return '—';
-          return <span className="text-primary">+{formatPercent(value)}</span>;
+          return <span className="text-blue-600">+{formatPercent(value)}</span>;
         },
       },
       {
@@ -190,11 +190,11 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         header: '도달 소요일',
         cell: ({ row }) =>
           row.original.targetHit ? (
-            <span className="font-mono font-bold text-success tabular-nums">
+            <span className="font-mono font-bold text-emerald-600 tabular-nums">
               {formatDays(row.original.daysToTarget)}
             </span>
           ) : (
-            <span className="text-base-content/35">—</span>
+            <span className="text-slate-950/35">—</span>
           ),
       },
       {
@@ -418,6 +418,13 @@ function sortIndicator(direction: false | 'asc' | 'desc'): string {
   if (direction === 'asc') return ' ↑';
   if (direction === 'desc') return ' ↓';
   return ' ↕';
+}
+
+function reportDetailHref(report: ReportRow): string {
+  if (!report.reportId) {
+    throw new Error(`Report table row is missing reportId for ${report.symbol}`);
+  }
+  return `/reports/${encodeURIComponent(report.symbol)}/${encodeURIComponent(report.reportId)}`;
 }
 
 function progressBarStyle(value: number): { left: string; width: string } {

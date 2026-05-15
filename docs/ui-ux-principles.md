@@ -1,6 +1,6 @@
 # SNUSMIC Portfolio Lab UI/UX Principles
 
-Last updated: 2026-05-13
+Last updated: 2026-05-15
 
 This document is the durable product-design contract for `apps/web`. It translates the user's repeated UI/UX feedback into rules future changes must follow. The goal is not to copy YASUN.GG, Toss, Moneytoring, or Butler; it is to adapt their information density, scan rhythm, and financial-product clarity to SNUSMIC's static research-validation product.
 
@@ -38,19 +38,19 @@ Implementation words such as `Static Artifacts`, `canonical`, `schema`, `data/we
 Primary navigation follows the current app shell labels:
 
 ```text
-스냅샷(/) → 포트폴리오(/portfolio) → 리포트 검증(/reports) → 전략 비교(/strategies) → 후보 탐색(/screener) → 읽는 법(/guide)
+메인화면(/main) → 포트폴리오(/portfolio) → 리포트(/reports) → 리포트 통계(/reports/statistics) → 전략(/strategies) → 가이드(/guide)
 ```
 
 Each page owns one product question:
 
 | Page | User question | UI responsibility |
 | --- | --- | --- |
-| 스냅샷 | “30초 안에 지금 상태가 좋은가?” | Project status, current portfolio, best strategy, latest research, key risks. |
+| 메인화면 | “30초 안에 지금 상태가 좋은가?” | Review queue, portfolio state, report-statistics entry points, data caveats. |
 | 포트폴리오 | “무엇을 어떻게 샀고 지금 원장은 어떤가?” | Persona selector, holdings, trades, position lifecycle, report basis. |
-| 리포트 검증 | “리포트가 실제로 맞았나?” | Target-price validation, post-publication return, hit status, unified sortable table. |
-| 전략 비교 | “어떤 고유 전략이 기준선을 이겼나?” | Benchmark set vs selectable broker-ledger strategies, MWR/MDD/Sharpe/Sortino, benchmark excess. |
-| 후보 탐색 | “지금 검토할 리서치 후보는 무엇인가?” | Explainable report-derived candidate filters, not a black-box score. |
-| 읽는 법 | “이 데이터를 어떻게 해석해야 하나?” | Methodology, caveats, navigation shortcuts, and read-only framing. |
+| 리포트 | “리포트가 실제로 맞았나?” | Target-price validation, post-publication return, hit status, unified sortable table, candidate presets. |
+| 리포트 통계 | “전체 표본에서 어떤 규칙을 검정할 수 있나?” | Fat-tail distribution, target multiples, path pain, delayed-entry/post-hit hypotheses. |
+| 전략 | “어떤 고유 전략이 기준선을 이겼나?” | Benchmark set vs selectable broker-ledger strategies, MWR/MDD/Sharpe/Sortino, benchmark excess. |
+| 가이드 | “이 데이터를 어떻게 해석해야 하나?” | Methodology, caveats, navigation shortcuts, and read-only framing. |
 
 A page should not duplicate another page's primary job. Link out instead.
 

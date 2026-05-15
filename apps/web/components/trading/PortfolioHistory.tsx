@@ -88,8 +88,8 @@ export function PortfolioHistory({ monthly, persona, personaLabels, targetsBySym
 
   return (
     <div className="grid gap-4">
-      <section className="card border border-base-300 bg-base-100 shadow-sm">
-        <div className="card-body gap-3 p-5">
+      <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex flex-col gap-3 p-5">
           <div className="flex flex-wrap items-end gap-3" aria-label="월말 포트폴리오 필터">
             <label className="form-control">
               <span className="label-text">월말 기준일</span>
@@ -119,13 +119,13 @@ export function PortfolioHistory({ monthly, persona, personaLabels, targetsBySym
         </div>
       </section>
 
-      <section className="card border border-base-300 bg-base-100 shadow-sm">
-        <div className="card-body gap-3 p-5">
-          <h2 className="card-title">비중 추이 — 100% 스택</h2>
+      <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex flex-col gap-3 p-5">
+          <h2 className="text-base font-semibold text-slate-950">비중 추이 — 100% 스택</h2>
           <div className="grid gap-1" aria-label="월말 포트폴리오 비중 추이">
             {stacks.map((stack) => (
               <div className="grid grid-cols-[6rem_1fr_minmax(140px,16rem)] items-center gap-3" key={stack.month}>
-                <div className="font-mono text-xs text-base-content/65">{stack.month}</div>
+                <div className="font-mono text-xs text-slate-500">{stack.month}</div>
                 <div className="flex h-3 overflow-hidden rounded-full">
                   {stack.segments.map((segment, index) => (
                     <span
@@ -138,7 +138,7 @@ export function PortfolioHistory({ monthly, persona, personaLabels, targetsBySym
                     />
                   ))}
                 </div>
-                <div className="truncate text-xs text-base-content/55">
+                <div className="truncate text-xs text-slate-950/55">
                   {stack.segments
                     .slice(0, 4)
                     .map((segment) => segment.symbol)
@@ -150,9 +150,9 @@ export function PortfolioHistory({ monthly, persona, personaLabels, targetsBySym
         </div>
       </section>
 
-      <section className="card border border-base-300 bg-base-100 shadow-sm">
-        <div className="card-body gap-2 p-5">
-          <h2 className="card-title">{month} 월말 포트폴리오</h2>
+      <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex flex-col gap-2 p-5">
+          <h2 className="text-base font-semibold text-slate-950">{month} 월말 포트폴리오</h2>
           <PaginationControls
             page={page}
             pageCount={Math.ceil(sorted.length / pageSize)}
@@ -164,7 +164,7 @@ export function PortfolioHistory({ monthly, persona, personaLabels, targetsBySym
               setPage(0);
             }}
           />
-          <div className="overflow-x-auto rounded-box border border-base-300 bg-base-100">
+          <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
             <table className="table table-sm table-zebra">
               <thead>
                 <tr>
@@ -228,8 +228,8 @@ export function PortfolioHistory({ monthly, persona, personaLabels, targetsBySym
                       </td>
                       <td>
                         {row.company || row.symbol}
-                        <div className="text-xs text-base-content/55">
-                          <a className="link link-hover" href={`/reports/${encodeURIComponent(row.symbol)}`}>
+                        <div className="text-xs text-slate-950/55">
+                          <a className="link hover:underline" href={`/reports/${encodeURIComponent(row.symbol)}`}>
                             {row.symbol}
                           </a>
                         </div>
@@ -244,7 +244,7 @@ export function PortfolioHistory({ monthly, persona, personaLabels, targetsBySym
                         ) : (
                           '—'
                         )}
-                        <div className="text-xs text-base-content/55">{target?.publicationDate ?? '—'}</div>
+                        <div className="text-xs text-slate-950/55">{target?.publicationDate ?? '—'}</div>
                       </td>
                       <td className="tabular-nums">{row.qty?.toLocaleString('ko-KR') ?? '—'}</td>
                       <td>
@@ -261,19 +261,19 @@ export function PortfolioHistory({ monthly, persona, personaLabels, targetsBySym
                         <Money native={evalNative} krw={row.marketValueKrw} currency={row.currency} />
                       </td>
                       <td
-                        className={`tabular-nums ${(row.unrealizedPnlKrw ?? 0) >= 0 ? 'text-success' : 'text-error'}`}
+                        className={`tabular-nums ${(row.unrealizedPnlKrw ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}
                       >
                         {formatKrw(row.unrealizedPnlKrw)}
                       </td>
                       <td
-                        className={`tabular-nums ${(row.unrealizedReturn ?? 0) >= 0 ? 'text-success' : 'text-error'}`}
+                        className={`tabular-nums ${(row.unrealizedReturn ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}
                       >
                         {formatPercent(row.unrealizedReturn)}
                       </td>
-                      <td className={`tabular-nums ${(gap ?? 0) >= 0 ? 'text-success' : 'text-error'}`}>
+                      <td className={`tabular-nums ${(gap ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                         {formatPercent(gap)}
                       </td>
-                      <td className={`tabular-nums ${(pnlToTarget ?? 0) >= 0 ? 'text-success' : 'text-error'}`}>
+                      <td className={`tabular-nums ${(pnlToTarget ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                         {formatKrw(pnlToTarget)}
                       </td>
                       <td className="tabular-nums">{formatPercent(row.weightInPortfolio)}</td>

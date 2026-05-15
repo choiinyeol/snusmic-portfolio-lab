@@ -1,6 +1,6 @@
 # V4 Design Council — Decision Brief Redesign
 
-Date: 2026-05-14
+Date: 2026-05-15
 Branch: `redesign/v4-formal-ui-kit`
 
 ## Council outcome
@@ -9,7 +9,7 @@ The previous overview failed because it was a compressed copy of every downstrea
 
 V4 changes the product stance from “dashboard of available artifacts” to **Decision Brief**:
 
-1. **Today / 스냅샷** answers: current state, review items, activation candidates, data caveats.
+1. **Main / 메인화면** answers: current state, review items, activation candidates, data caveats.
 2. **Portfolio / 원장** owns holdings, cash, treemap, trades, position evidence.
 3. **Research Inbox / 리포트 검증** owns report validation and candidate filters.
 4. **Strategy Lab / 전략 비교** owns benchmarks, strategy risk-return, drawdown, and future efficient-frontier work.
@@ -53,7 +53,7 @@ V4 uses a shadcn-style component layer:
 - Lucide icons.
 - Tailwind utilities at call sites instead of new global CSS.
 
-`daisyUI` and legacy global CSS remain only as migration debt for old routes. New V4 surfaces should not add new `btn`, `badge`, `lab-panel`, `archive-*`, or page-specific global classes.
+`daisyUI` is no longer a runtime dependency. New V4 surfaces should not add `btn`, `badge`, `lab-panel`, `archive-*`, or page-specific global classes.
 
 ### 4. No fake signal language
 
@@ -82,7 +82,7 @@ Do not show a decorative frontier without covariance, assumptions, constraints, 
   3. What can be activated or watched?
   4. What data should be distrusted?
 - Every decision item has state, reason, evidence path, and source metric.
-- Primary route smoke passes for `/`, `/portfolio`, `/reports`, `/strategies`, `/screener`, `/guide`.
+- Primary route smoke passes for `/`, `/main`, `/portfolio`, `/reports`, `/reports/statistics`, `/strategies`, `/guide`; deleted `/snapshot` and `/screener` do not appear in build routes.
 - No page-level horizontal overflow at 390px, 768px, 1440px.
 - `pnpm --dir apps/web check`, `typecheck`, `artifact:check`, `check:report-ui`, and `build` pass.
 

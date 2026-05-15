@@ -28,7 +28,7 @@ export function StrategyRiskTable({ rows }: { rows: StrategyLeaderboardRow[] }) 
               <td className="min-w-[130px] max-w-[230px]">
                 <Link className="block min-w-0" href={row.href} title={row.label}>
                   <span className="block truncate font-bold">{row.shortLabel || row.label}</span>
-                  <span className="block truncate text-[11px] font-medium text-base-content/45">{row.label}</span>
+                  <span className="block truncate text-[11px] font-medium text-slate-950/45">{row.label}</span>
                 </Link>
               </td>
               <td className={`text-right font-mono font-black tabular-nums ${signedTextClass(row.returnPct)}`}>
@@ -36,7 +36,7 @@ export function StrategyRiskTable({ rows }: { rows: StrategyLeaderboardRow[] }) 
               </td>
               <td className="text-right font-mono tabular-nums">{formatNumber(row.sharpe)}</td>
               <td className="text-right font-mono tabular-nums">{formatNumber(row.sortino)}</td>
-              <td className="text-right font-mono tabular-nums text-error">
+              <td className="text-right font-mono tabular-nums text-rose-600">
                 {formatPercent(row.maxDrawdown)}
                 {(row.maxDrawdown ?? 0) > 0.25 ? (
                   <span className="ml-1 badge badge-warning badge-soft badge-xs">낙폭 점검</span>

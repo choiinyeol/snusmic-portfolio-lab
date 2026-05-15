@@ -4,10 +4,10 @@ type Tone = 'neutral' | 'good' | 'bad' | 'warn';
 type Layout = 'stacked' | 'inline';
 
 const toneClass: Record<Tone, string> = {
-  neutral: 'text-base-content',
-  good: 'text-success',
-  bad: 'text-error',
-  warn: 'text-warning',
+  neutral: 'text-slate-950',
+  good: 'text-emerald-600',
+  bad: 'text-rose-600',
+  warn: 'text-amber-600',
 };
 
 type Props = {
@@ -36,7 +36,7 @@ export function Money({
 }: Props) {
   const { primary, secondary } = formatNativeWithKrw(native, krw, currency);
   const primaryClass = `break-words tabular-nums ${toneClass[tone]} ${bold ? 'font-bold' : ''}`;
-  const secondaryClass = 'break-words tabular-nums text-xs text-base-content/55';
+  const secondaryClass = 'break-words tabular-nums text-xs text-slate-950/55';
   if (layout === 'inline') {
     return (
       <span className="inline-flex max-w-full flex-wrap items-baseline gap-1.5">

@@ -1,0 +1,5042 @@
+{
+  "summary": {
+    "generatedAt": "2026-05-15T03:07:38.685Z",
+    "sample": {
+      "reportCount": 202,
+      "eligibleReportCount": 194,
+      "tickerCount": 181,
+      "startDate": "2020-12-05",
+      "endDate": "2026-04-16",
+      "exclusions": {
+        "missing_price": 0,
+        "non_upside_target": 0,
+        "missing_entry_or_target": 0,
+        "short_history": 8
+      }
+    },
+    "fractionalHitRates": [
+      {
+        "threshold": 0.6,
+        "horizonDays": 30,
+        "hitRate": 0.164948,
+        "sampleSize": 194,
+        "hitCount": 32,
+        "medianDaysToHit": 13.5,
+        "ci95": [
+          0.11933,
+          0.223578
+        ]
+      },
+      {
+        "threshold": 0.6,
+        "horizonDays": 60,
+        "hitRate": 0.304124,
+        "sampleSize": 194,
+        "hitCount": 59,
+        "medianDaysToHit": 23,
+        "ci95": [
+          0.24371,
+          0.372144
+        ]
+      },
+      {
+        "threshold": 0.6,
+        "horizonDays": 120,
+        "hitRate": 0.417526,
+        "sampleSize": 194,
+        "hitCount": 81,
+        "medianDaysToHit": 37,
+        "ci95": [
+          0.350389,
+          0.487865
+        ]
+      },
+      {
+        "threshold": 0.6,
+        "horizonDays": 250,
+        "hitRate": 0.489691,
+        "sampleSize": 194,
+        "hitCount": 95,
+        "medianDaysToHit": 44,
+        "ci95": [
+          0.420232,
+          0.55955
+        ]
+      },
+      {
+        "threshold": 0.8,
+        "horizonDays": 30,
+        "hitRate": 0.097938,
+        "sampleSize": 194,
+        "hitCount": 19,
+        "medianDaysToHit": 17,
+        "ci95": [
+          0.063598,
+          0.147893
+        ]
+      },
+      {
+        "threshold": 0.8,
+        "horizonDays": 60,
+        "hitRate": 0.206186,
+        "sampleSize": 194,
+        "hitCount": 40,
+        "medianDaysToHit": 32.5,
+        "ci95": [
+          0.155228,
+          0.268554
+        ]
+      },
+      {
+        "threshold": 0.8,
+        "horizonDays": 120,
+        "hitRate": 0.335052,
+        "sampleSize": 194,
+        "hitCount": 65,
+        "medianDaysToHit": 43,
+        "ci95": [
+          0.272404,
+          0.404105
+        ]
+      },
+      {
+        "threshold": 0.8,
+        "horizonDays": 250,
+        "hitRate": 0.402062,
+        "sampleSize": 194,
+        "hitCount": 78,
+        "medianDaysToHit": 56.5,
+        "ci95": [
+          0.335613,
+          0.472314
+        ]
+      },
+      {
+        "threshold": 1,
+        "horizonDays": 30,
+        "hitRate": 0.056701,
+        "sampleSize": 194,
+        "hitCount": 11,
+        "medianDaysToHit": 19,
+        "ci95": [
+          0.031952,
+          0.098665
+        ]
+      },
+      {
+        "threshold": 1,
+        "horizonDays": 60,
+        "hitRate": 0.123711,
+        "sampleSize": 194,
+        "hitCount": 24,
+        "medianDaysToHit": 32.5,
+        "ci95": [
+          0.08456,
+          0.177476
+        ]
+      },
+      {
+        "threshold": 1,
+        "horizonDays": 120,
+        "hitRate": 0.268041,
+        "sampleSize": 194,
+        "hitCount": 52,
+        "medianDaysToHit": 64.5,
+        "ci95": [
+          0.210659,
+          0.334432
+        ]
+      },
+      {
+        "threshold": 1,
+        "horizonDays": 250,
+        "hitRate": 0.350515,
+        "sampleSize": 194,
+        "hitCount": 68,
+        "medianDaysToHit": 78,
+        "ci95": [
+          0.286868,
+          0.419968
+        ]
+      }
+    ],
+    "delayedEntry": [
+      {
+        "delayDays": 0,
+        "horizonDays": 30,
+        "sampleSize": 194,
+        "medianReturn": 0.016092,
+        "meanReturn": 0.045122,
+        "p25Return": -0.083833,
+        "p75Return": 0.133166,
+        "winRate": 0.546392,
+        "hitRate08": 0.097938,
+        "medianDrawdown": -0.089885
+      },
+      {
+        "delayDays": 0,
+        "horizonDays": 60,
+        "sampleSize": 194,
+        "medianReturn": 0.035048,
+        "meanReturn": 0.053819,
+        "p25Return": -0.112589,
+        "p75Return": 0.169111,
+        "winRate": 0.546392,
+        "hitRate08": 0.221649,
+        "medianDrawdown": -0.119657
+      },
+      {
+        "delayDays": 0,
+        "horizonDays": 120,
+        "sampleSize": 194,
+        "medianReturn": -0.005538,
+        "meanReturn": 0.08794,
+        "p25Return": -0.163612,
+        "p75Return": 0.237165,
+        "winRate": 0.484536,
+        "hitRate08": 0.335052,
+        "medianDrawdown": -0.16943
+      },
+      {
+        "delayDays": 0,
+        "horizonDays": 250,
+        "sampleSize": 194,
+        "medianReturn": -0.066971,
+        "meanReturn": 0.146622,
+        "p25Return": -0.295457,
+        "p75Return": 0.297931,
+        "winRate": 0.438144,
+        "hitRate08": 0.412371,
+        "medianDrawdown": -0.238784
+      },
+      {
+        "delayDays": 1,
+        "horizonDays": 30,
+        "sampleSize": 194,
+        "medianReturn": 0.004653,
+        "meanReturn": 0.0358,
+        "p25Return": -0.086991,
+        "p75Return": 0.136304,
+        "winRate": 0.520619,
+        "hitRate08": 0.092784,
+        "medianDrawdown": -0.095059
+      },
+      {
+        "delayDays": 1,
+        "horizonDays": 60,
+        "sampleSize": 194,
+        "medianReturn": 0.012071,
+        "meanReturn": 0.051418,
+        "p25Return": -0.111378,
+        "p75Return": 0.161429,
+        "winRate": 0.530928,
+        "hitRate08": 0.216495,
+        "medianDrawdown": -0.129014
+      },
+      {
+        "delayDays": 1,
+        "horizonDays": 120,
+        "sampleSize": 194,
+        "medianReturn": -0.008872,
+        "meanReturn": 0.076852,
+        "p25Return": -0.175278,
+        "p75Return": 0.220201,
+        "winRate": 0.484536,
+        "hitRate08": 0.329897,
+        "medianDrawdown": -0.174328
+      },
+      {
+        "delayDays": 1,
+        "horizonDays": 250,
+        "sampleSize": 194,
+        "medianReturn": -0.062815,
+        "meanReturn": 0.131895,
+        "p25Return": -0.310902,
+        "p75Return": 0.294807,
+        "winRate": 0.43299,
+        "hitRate08": 0.407216,
+        "medianDrawdown": -0.243743
+      },
+      {
+        "delayDays": 3,
+        "horizonDays": 30,
+        "sampleSize": 194,
+        "medianReturn": -0.007435,
+        "meanReturn": 0.029145,
+        "p25Return": -0.103319,
+        "p75Return": 0.10116,
+        "winRate": 0.479381,
+        "hitRate08": 0.097938,
+        "medianDrawdown": -0.094434
+      },
+      {
+        "delayDays": 3,
+        "horizonDays": 60,
+        "sampleSize": 194,
+        "medianReturn": 0.012476,
+        "meanReturn": 0.051999,
+        "p25Return": -0.127894,
+        "p75Return": 0.180059,
+        "winRate": 0.525773,
+        "hitRate08": 0.206186,
+        "medianDrawdown": -0.123314
+      },
+      {
+        "delayDays": 3,
+        "horizonDays": 120,
+        "sampleSize": 194,
+        "medianReturn": -0.015559,
+        "meanReturn": 0.07507,
+        "p25Return": -0.1928,
+        "p75Return": 0.22498,
+        "winRate": 0.469072,
+        "hitRate08": 0.319588,
+        "medianDrawdown": -0.172795
+      },
+      {
+        "delayDays": 3,
+        "horizonDays": 250,
+        "sampleSize": 194,
+        "medianReturn": -0.080346,
+        "meanReturn": 0.137853,
+        "p25Return": -0.290124,
+        "p75Return": 0.297234,
+        "winRate": 0.427835,
+        "hitRate08": 0.396907,
+        "medianDrawdown": -0.250687
+      },
+      {
+        "delayDays": 5,
+        "horizonDays": 30,
+        "sampleSize": 194,
+        "medianReturn": -0.011911,
+        "meanReturn": 0.018475,
+        "p25Return": -0.098766,
+        "p75Return": 0.11338,
+        "winRate": 0.474227,
+        "hitRate08": 0.108247,
+        "medianDrawdown": -0.094922
+      },
+      {
+        "delayDays": 5,
+        "horizonDays": 60,
+        "sampleSize": 194,
+        "medianReturn": 0.011067,
+        "meanReturn": 0.048821,
+        "p25Return": -0.128317,
+        "p75Return": 0.175276,
+        "winRate": 0.520619,
+        "hitRate08": 0.201031,
+        "medianDrawdown": -0.130531
+      },
+      {
+        "delayDays": 5,
+        "horizonDays": 120,
+        "sampleSize": 194,
+        "medianReturn": -0.006904,
+        "meanReturn": 0.067159,
+        "p25Return": -0.201932,
+        "p75Return": 0.228982,
+        "winRate": 0.494845,
+        "hitRate08": 0.319588,
+        "medianDrawdown": -0.174686
+      },
+      {
+        "delayDays": 5,
+        "horizonDays": 250,
+        "sampleSize": 194,
+        "medianReturn": -0.080416,
+        "meanReturn": 0.125354,
+        "p25Return": -0.319087,
+        "p75Return": 0.296257,
+        "winRate": 0.443299,
+        "hitRate08": 0.396907,
+        "medianDrawdown": -0.25194
+      },
+      {
+        "delayDays": 10,
+        "horizonDays": 30,
+        "sampleSize": 194,
+        "medianReturn": -0.004006,
+        "meanReturn": 0.019208,
+        "p25Return": -0.086297,
+        "p75Return": 0.106582,
+        "winRate": 0.484536,
+        "hitRate08": 0.128866,
+        "medianDrawdown": -0.094219
+      },
+      {
+        "delayDays": 10,
+        "horizonDays": 60,
+        "sampleSize": 194,
+        "medianReturn": -0.012259,
+        "meanReturn": 0.041094,
+        "p25Return": -0.121532,
+        "p75Return": 0.145103,
+        "winRate": 0.489691,
+        "hitRate08": 0.221649,
+        "medianDrawdown": -0.143352
+      },
+      {
+        "delayDays": 10,
+        "horizonDays": 120,
+        "sampleSize": 194,
+        "medianReturn": -0.019647,
+        "meanReturn": 0.064044,
+        "p25Return": -0.175477,
+        "p75Return": 0.265847,
+        "winRate": 0.469072,
+        "hitRate08": 0.319588,
+        "medianDrawdown": -0.182822
+      },
+      {
+        "delayDays": 10,
+        "horizonDays": 250,
+        "sampleSize": 194,
+        "medianReturn": -0.093131,
+        "meanReturn": 0.119002,
+        "p25Return": -0.340629,
+        "p75Return": 0.321882,
+        "winRate": 0.42268,
+        "hitRate08": 0.396907,
+        "medianDrawdown": -0.253339
+      },
+      {
+        "delayDays": 20,
+        "horizonDays": 30,
+        "sampleSize": 194,
+        "medianReturn": 0.013078,
+        "meanReturn": 0.029975,
+        "p25Return": -0.076913,
+        "p75Return": 0.110458,
+        "winRate": 0.541237,
+        "hitRate08": 0.14433,
+        "medianDrawdown": -0.088312
+      },
+      {
+        "delayDays": 20,
+        "horizonDays": 60,
+        "sampleSize": 194,
+        "medianReturn": 0.009866,
+        "meanReturn": 0.059455,
+        "p25Return": -0.097978,
+        "p75Return": 0.182001,
+        "winRate": 0.515464,
+        "hitRate08": 0.247423,
+        "medianDrawdown": -0.12835
+      },
+      {
+        "delayDays": 20,
+        "horizonDays": 120,
+        "sampleSize": 194,
+        "medianReturn": -0.024424,
+        "meanReturn": 0.06785,
+        "p25Return": -0.196349,
+        "p75Return": 0.254243,
+        "winRate": 0.479381,
+        "hitRate08": 0.319588,
+        "medianDrawdown": -0.180304
+      },
+      {
+        "delayDays": 20,
+        "horizonDays": 250,
+        "sampleSize": 194,
+        "medianReturn": -0.088661,
+        "meanReturn": 0.118905,
+        "p25Return": -0.304349,
+        "p75Return": 0.335061,
+        "winRate": 0.427835,
+        "hitRate08": 0.407216,
+        "medianDrawdown": -0.263767
+      }
+    ],
+    "entryTriggers": [
+      {
+        "type": "dip",
+        "triggerPct": 0.03,
+        "horizonDays": 30,
+        "entryRate": 0.731959,
+        "sampleSize": 194,
+        "enteredCount": 142,
+        "medianReturn": 0.016897,
+        "meanReturn": 0.035528,
+        "hitRate08": 0.042254,
+        "medianDrawdown": -0.08928,
+        "missedOpportunityRate": 0.046392,
+        "falseBreakoutRate": null
+      },
+      {
+        "type": "dip",
+        "triggerPct": 0.03,
+        "horizonDays": 60,
+        "entryRate": 0.731959,
+        "sampleSize": 194,
+        "enteredCount": 142,
+        "medianReturn": 0.036564,
+        "meanReturn": 0.051749,
+        "hitRate08": 0.147887,
+        "medianDrawdown": -0.119657,
+        "missedOpportunityRate": 0.046392,
+        "falseBreakoutRate": null
+      },
+      {
+        "type": "dip",
+        "triggerPct": 0.03,
+        "horizonDays": 120,
+        "entryRate": 0.731959,
+        "sampleSize": 194,
+        "enteredCount": 142,
+        "medianReturn": 0.023732,
+        "meanReturn": 0.097755,
+        "hitRate08": 0.274648,
+        "medianDrawdown": -0.165225,
+        "missedOpportunityRate": 0.046392,
+        "falseBreakoutRate": null
+      },
+      {
+        "type": "dip",
+        "triggerPct": 0.03,
+        "horizonDays": 250,
+        "entryRate": 0.731959,
+        "sampleSize": 194,
+        "enteredCount": 142,
+        "medianReturn": -0.039808,
+        "meanReturn": 0.163954,
+        "hitRate08": 0.330986,
+        "medianDrawdown": -0.233024,
+        "missedOpportunityRate": 0.046392,
+        "falseBreakoutRate": null
+      },
+      {
+        "type": "dip",
+        "triggerPct": 0.05,
+        "horizonDays": 30,
+        "entryRate": 0.613402,
+        "sampleSize": 194,
+        "enteredCount": 119,
+        "medianReturn": 0.00999,
+        "meanReturn": 0.037431,
+        "hitRate08": 0.042017,
+        "medianDrawdown": -0.101655,
+        "missedOpportunityRate": 0.046392,
+        "falseBreakoutRate": null
+      },
+      {
+        "type": "dip",
+        "triggerPct": 0.05,
+        "horizonDays": 60,
+        "entryRate": 0.613402,
+        "sampleSize": 194,
+        "enteredCount": 119,
+        "medianReturn": 0.013245,
+        "meanReturn": 0.053331,
+        "hitRate08": 0.134454,
+        "medianDrawdown": -0.126126,
+        "missedOpportunityRate": 0.046392,
+        "falseBreakoutRate": null
+      },
+      {
+        "type": "dip",
+        "triggerPct": 0.05,
+        "horizonDays": 120,
+        "entryRate": 0.613402,
+        "sampleSize": 194,
+        "enteredCount": 119,
+        "medianReturn": 0.011374,
+        "meanReturn": 0.089059,
+        "hitRate08": 0.243697,
+        "medianDrawdown": -0.180835,
+        "missedOpportunityRate": 0.046392,
+        "falseBreakoutRate": null
+      },
+      {
+        "type": "dip",
+        "triggerPct": 0.05,
+        "horizonDays": 250,
+        "entryRate": 0.613402,
+        "sampleSize": 194,
+        "enteredCount": 119,
+        "medianReturn": -0.036735,
+        "meanReturn": 0.142958,
+        "hitRate08": 0.310924,
+        "medianDrawdown": -0.228102,
+        "missedOpportunityRate": 0.046392,
+        "falseBreakoutRate": null
+      },
+      {
+        "type": "dip",
+        "triggerPct": 0.1,
+        "horizonDays": 30,
+        "entryRate": 0.407216,
+        "sampleSize": 194,
+        "enteredCount": 79,
+        "medianReturn": 0.003727,
+        "meanReturn": 0.044737,
+        "hitRate08": 0.088608,
+        "medianDrawdown": -0.097403,
+        "missedOpportunityRate": 0.051546,
+        "falseBreakoutRate": null
+      },
+      {
+        "type": "dip",
+        "triggerPct": 0.1,
+        "horizonDays": 60,
+        "entryRate": 0.407216,
+        "sampleSize": 194,
+        "enteredCount": 79,
+        "medianReturn": 0.003989,
+        "meanReturn": 0.065102,
+        "hitRate08": 0.151899,
+        "medianDrawdown": -0.14152,
+        "missedOpportunityRate": 0.051546,
+        "falseBreakoutRate": null
+      },
+      {
+        "type": "dip",
+        "triggerPct": 0.1,
+        "horizonDays": 120,
+        "entryRate": 0.407216,
+        "sampleSize": 194,
+        "enteredCount": 79,
+        "medianReturn": 0.014663,
+        "meanReturn": 0.102143,
+        "hitRate08": 0.253165,
+        "medianDrawdown": -0.171586,
+        "missedOpportunityRate": 0.051546,
+        "falseBreakoutRate": null
+      },
+      {
+        "type": "dip",
+        "triggerPct": 0.1,
+        "horizonDays": 250,
+        "entryRate": 0.407216,
+        "sampleSize": 194,
+        "enteredCount": 79,
+        "medianReturn": -0.042882,
+        "meanReturn": 0.116782,
+        "hitRate08": 0.291139,
+        "medianDrawdown": -0.228102,
+        "missedOpportunityRate": 0.051546,
+        "falseBreakoutRate": null
+      },
+      {
+        "type": "rally",
+        "triggerPct": 0.03,
+        "horizonDays": 30,
+        "entryRate": 0.742268,
+        "sampleSize": 194,
+        "enteredCount": 144,
+        "medianReturn": 0.021955,
+        "meanReturn": 0.053078,
+        "hitRate08": 0.145833,
+        "medianDrawdown": -0.088873,
+        "missedOpportunityRate": null,
+        "falseBreakoutRate": 0.388889
+      },
+      {
+        "type": "rally",
+        "triggerPct": 0.03,
+        "horizonDays": 60,
+        "entryRate": 0.742268,
+        "sampleSize": 194,
+        "enteredCount": 144,
+        "medianReturn": 0.038328,
+        "meanReturn": 0.066706,
+        "hitRate08": 0.263889,
+        "medianDrawdown": -0.113044,
+        "missedOpportunityRate": null,
+        "falseBreakoutRate": 0.465278
+      },
+      {
+        "type": "rally",
+        "triggerPct": 0.03,
+        "horizonDays": 120,
+        "entryRate": 0.742268,
+        "sampleSize": 194,
+        "enteredCount": 144,
+        "medianReturn": -0.003428,
+        "meanReturn": 0.108981,
+        "hitRate08": 0.381944,
+        "medianDrawdown": -0.168719,
+        "missedOpportunityRate": null,
+        "falseBreakoutRate": 0.513889
+      },
+      {
+        "type": "rally",
+        "triggerPct": 0.03,
+        "horizonDays": 250,
+        "entryRate": 0.742268,
+        "sampleSize": 194,
+        "enteredCount": 144,
+        "medianReturn": -0.07558,
+        "meanReturn": 0.181055,
+        "hitRate08": 0.465278,
+        "medianDrawdown": -0.27451,
+        "missedOpportunityRate": null,
+        "falseBreakoutRate": 0.5
+      },
+      {
+        "type": "rally",
+        "triggerPct": 0.05,
+        "horizonDays": 30,
+        "entryRate": 0.659794,
+        "sampleSize": 194,
+        "enteredCount": 128,
+        "medianReturn": 0.031996,
+        "meanReturn": 0.054762,
+        "hitRate08": 0.148438,
+        "medianDrawdown": -0.09152,
+        "missedOpportunityRate": null,
+        "falseBreakoutRate": 0.390625
+      },
+      {
+        "type": "rally",
+        "triggerPct": 0.05,
+        "horizonDays": 60,
+        "entryRate": 0.659794,
+        "sampleSize": 194,
+        "enteredCount": 128,
+        "medianReturn": 0.034394,
+        "meanReturn": 0.078104,
+        "hitRate08": 0.273438,
+        "medianDrawdown": -0.114291,
+        "missedOpportunityRate": null,
+        "falseBreakoutRate": 0.484375
+      },
+      {
+        "type": "rally",
+        "triggerPct": 0.05,
+        "horizonDays": 120,
+        "entryRate": 0.659794,
+        "sampleSize": 194,
+        "enteredCount": 128,
+        "medianReturn": -0.028331,
+        "meanReturn": 0.116795,
+        "hitRate08": 0.382813,
+        "medianDrawdown": -0.168898,
+        "missedOpportunityRate": null,
+        "falseBreakoutRate": 0.53125
+      },
+      {
+        "type": "rally",
+        "triggerPct": 0.05,
+        "horizonDays": 250,
+        "entryRate": 0.659794,
+        "sampleSize": 194,
+        "enteredCount": 128,
+        "medianReturn": -0.102825,
+        "meanReturn": 0.184989,
+        "hitRate08": 0.460938,
+        "medianDrawdown": -0.27451,
+        "missedOpportunityRate": null,
+        "falseBreakoutRate": 0.507813
+      },
+      {
+        "type": "rally",
+        "triggerPct": 0.1,
+        "horizonDays": 30,
+        "entryRate": 0.520619,
+        "sampleSize": 194,
+        "enteredCount": 101,
+        "medianReturn": 0.003356,
+        "meanReturn": 0.050441,
+        "hitRate08": 0.207921,
+        "medianDrawdown": -0.096561,
+        "missedOpportunityRate": null,
+        "falseBreakoutRate": 0.405941
+      },
+      {
+        "type": "rally",
+        "triggerPct": 0.1,
+        "horizonDays": 60,
+        "entryRate": 0.520619,
+        "sampleSize": 194,
+        "enteredCount": 101,
+        "medianReturn": 0.000874,
+        "meanReturn": 0.061368,
+        "hitRate08": 0.336634,
+        "medianDrawdown": -0.131741,
+        "missedOpportunityRate": null,
+        "falseBreakoutRate": 0.50495
+      },
+      {
+        "type": "rally",
+        "triggerPct": 0.1,
+        "horizonDays": 120,
+        "entryRate": 0.520619,
+        "sampleSize": 194,
+        "enteredCount": 101,
+        "medianReturn": -0.047601,
+        "meanReturn": 0.112145,
+        "hitRate08": 0.435644,
+        "medianDrawdown": -0.187675,
+        "missedOpportunityRate": null,
+        "falseBreakoutRate": 0.524752
+      },
+      {
+        "type": "rally",
+        "triggerPct": 0.1,
+        "horizonDays": 250,
+        "entryRate": 0.520619,
+        "sampleSize": 194,
+        "enteredCount": 101,
+        "medianReturn": -0.129751,
+        "meanReturn": 0.179015,
+        "hitRate08": 0.514851,
+        "medianDrawdown": -0.286938,
+        "missedOpportunityRate": null,
+        "falseBreakoutRate": 0.475248
+      }
+    ],
+    "postTargetDrift": [
+      {
+        "daysAfterTarget": 5,
+        "sampleSize": 103,
+        "medianReturn": -0.008929,
+        "meanReturn": -0.009277,
+        "p25Return": -0.0554,
+        "p75Return": 0.033516,
+        "p10Return": -0.129689,
+        "p90Return": 0.077638,
+        "sharePositive": 0.466019
+      },
+      {
+        "daysAfterTarget": 20,
+        "sampleSize": 98,
+        "medianReturn": 0.018466,
+        "meanReturn": 0.027282,
+        "p25Return": -0.096676,
+        "p75Return": 0.119459,
+        "p10Return": -0.241382,
+        "p90Return": 0.289482,
+        "sharePositive": 0.530612
+      },
+      {
+        "daysAfterTarget": 60,
+        "sampleSize": 91,
+        "medianReturn": 0.048,
+        "meanReturn": 0.112881,
+        "p25Return": -0.153527,
+        "p75Return": 0.236729,
+        "p10Return": -0.2804,
+        "p90Return": 0.638043,
+        "sharePositive": 0.538462
+      },
+      {
+        "daysAfterTarget": 120,
+        "sampleSize": 77,
+        "medianReturn": 0.026903,
+        "meanReturn": 0.114634,
+        "p25Return": -0.210608,
+        "p75Return": 0.266582,
+        "p10Return": -0.395577,
+        "p90Return": 0.567019,
+        "sharePositive": 0.545455
+      }
+    ],
+    "optimalTargetMultiples": [
+      {
+        "targetMultiple": 0.4,
+        "horizonDays": 30,
+        "hitRate": 0.293814,
+        "sampleSize": 194,
+        "medianReturn": 0.041617,
+        "meanReturn": 4.005961,
+        "p25Return": -0.07829,
+        "downsideRisk": 0.07829,
+        "rewardReliabilityScore": 0.095313
+      },
+      {
+        "targetMultiple": 0.4,
+        "horizonDays": 60,
+        "hitRate": 0.396907,
+        "sampleSize": 194,
+        "medianReturn": 0.064741,
+        "meanReturn": 4.006853,
+        "p25Return": -0.116296,
+        "downsideRisk": 0.116296,
+        "rewardReliabilityScore": 0.154521
+      },
+      {
+        "targetMultiple": 0.4,
+        "horizonDays": 120,
+        "hitRate": 0.525773,
+        "sampleSize": 194,
+        "medianReturn": 0.112543,
+        "meanReturn": 4.023108,
+        "p25Return": -0.118255,
+        "downsideRisk": 0.118255,
+        "rewardReliabilityScore": 0.351681
+      },
+      {
+        "targetMultiple": 0.4,
+        "horizonDays": 250,
+        "hitRate": 0.623711,
+        "sampleSize": 194,
+        "medianReturn": 0.144909,
+        "meanReturn": 4.025523,
+        "p25Return": -0.18448,
+        "downsideRisk": 0.18448,
+        "rewardReliabilityScore": 0.385454
+      },
+      {
+        "targetMultiple": 0.5,
+        "horizonDays": 30,
+        "hitRate": 0.231959,
+        "sampleSize": 194,
+        "medianReturn": 0.031683,
+        "meanReturn": 5.010396,
+        "p25Return": -0.087723,
+        "downsideRisk": 0.087723,
+        "rewardReliabilityScore": 0.053362
+      },
+      {
+        "targetMultiple": 0.5,
+        "horizonDays": 60,
+        "hitRate": 0.345361,
+        "sampleSize": 194,
+        "medianReturn": 0.060299,
+        "meanReturn": 5.015089,
+        "p25Return": -0.118139,
+        "downsideRisk": 0.118139,
+        "rewardReliabilityScore": 0.123855
+      },
+      {
+        "targetMultiple": 0.5,
+        "horizonDays": 120,
+        "hitRate": 0.469072,
+        "sampleSize": 194,
+        "medianReturn": 0.106561,
+        "meanReturn": 5.029973,
+        "p25Return": -0.159653,
+        "downsideRisk": 0.159653,
+        "rewardReliabilityScore": 0.238417
+      },
+      {
+        "targetMultiple": 0.5,
+        "horizonDays": 250,
+        "hitRate": 0.551546,
+        "sampleSize": 194,
+        "medianReturn": 0.145442,
+        "meanReturn": 5.034539,
+        "p25Return": -0.204215,
+        "downsideRisk": 0.204215,
+        "rewardReliabilityScore": 0.315552
+      },
+      {
+        "targetMultiple": 0.6,
+        "horizonDays": 30,
+        "hitRate": 0.164948,
+        "sampleSize": 194,
+        "medianReturn": 0.024639,
+        "meanReturn": 6.009257,
+        "p25Return": -0.087723,
+        "downsideRisk": 0.087723,
+        "rewardReliabilityScore": 0.02951
+      },
+      {
+        "targetMultiple": 0.6,
+        "horizonDays": 60,
+        "hitRate": 0.304124,
+        "sampleSize": 194,
+        "medianReturn": 0.05722,
+        "meanReturn": 6.022063,
+        "p25Return": -0.118139,
+        "downsideRisk": 0.118139,
+        "rewardReliabilityScore": 0.103498
+      },
+      {
+        "targetMultiple": 0.6,
+        "horizonDays": 120,
+        "hitRate": 0.417526,
+        "sampleSize": 194,
+        "medianReturn": 0.085948,
+        "meanReturn": 6.037665,
+        "p25Return": -0.164818,
+        "downsideRisk": 0.164818,
+        "rewardReliabilityScore": 0.167051
+      },
+      {
+        "targetMultiple": 0.6,
+        "horizonDays": 250,
+        "hitRate": 0.489691,
+        "sampleSize": 194,
+        "medianReturn": 0.149123,
+        "meanReturn": 6.024925,
+        "p25Return": -0.260158,
+        "downsideRisk": 0.260158,
+        "rewardReliabilityScore": 0.235442
+      },
+      {
+        "targetMultiple": 0.7,
+        "horizonDays": 30,
+        "hitRate": 0.097938,
+        "sampleSize": 194,
+        "medianReturn": 0.021952,
+        "meanReturn": 6.0635,
+        "p25Return": -0.087723,
+        "downsideRisk": 0.087723,
+        "rewardReliabilityScore": 0.015611
+      },
+      {
+        "targetMultiple": 0.7,
+        "horizonDays": 60,
+        "hitRate": 0.257732,
+        "sampleSize": 194,
+        "medianReturn": 0.048943,
+        "meanReturn": 7.023933,
+        "p25Return": -0.120493,
+        "downsideRisk": 0.120493,
+        "rewardReliabilityScore": 0.073986
+      },
+      {
+        "targetMultiple": 0.7,
+        "horizonDays": 120,
+        "hitRate": 0.376289,
+        "sampleSize": 194,
+        "medianReturn": 0.066768,
+        "meanReturn": 7.042286,
+        "p25Return": -0.165612,
+        "downsideRisk": 0.165612,
+        "rewardReliabilityScore": 0.116524
+      },
+      {
+        "targetMultiple": 0.7,
+        "horizonDays": 250,
+        "hitRate": 0.453608,
+        "sampleSize": 194,
+        "medianReturn": 0.117946,
+        "meanReturn": 7.033925,
+        "p25Return": -0.260867,
+        "downsideRisk": 0.260867,
+        "rewardReliabilityScore": 0.172103
+      },
+      {
+        "targetMultiple": 0.8,
+        "horizonDays": 30,
+        "hitRate": 0.097938,
+        "sampleSize": 194,
+        "medianReturn": 0.021952,
+        "meanReturn": 6.067601,
+        "p25Return": -0.087723,
+        "downsideRisk": 0.087723,
+        "rewardReliabilityScore": 0.015611
+      },
+      {
+        "targetMultiple": 0.8,
+        "horizonDays": 60,
+        "hitRate": 0.206186,
+        "sampleSize": 194,
+        "medianReturn": 0.038331,
+        "meanReturn": 6.006015,
+        "p25Return": -0.120493,
+        "downsideRisk": 0.120493,
+        "rewardReliabilityScore": 0.046356
+      },
+      {
+        "targetMultiple": 0.8,
+        "horizonDays": 120,
+        "hitRate": 0.335052,
+        "sampleSize": 194,
+        "medianReturn": 0.043252,
+        "meanReturn": 8.036533,
+        "p25Return": -0.175564,
+        "downsideRisk": 0.175564,
+        "rewardReliabilityScore": 0.064246
+      },
+      {
+        "targetMultiple": 0.8,
+        "horizonDays": 250,
+        "hitRate": 0.402062,
+        "sampleSize": 194,
+        "medianReturn": 0.069578,
+        "meanReturn": 8.032932,
+        "p25Return": -0.261862,
+        "downsideRisk": 0.261862,
+        "rewardReliabilityScore": 0.089702
+      },
+      {
+        "targetMultiple": 0.9,
+        "horizonDays": 30,
+        "hitRate": 0.082474,
+        "sampleSize": 194,
+        "medianReturn": 0.020005,
+        "meanReturn": 6.06976,
+        "p25Return": -0.087723,
+        "downsideRisk": 0.087723,
+        "rewardReliabilityScore": 0.01198
+      },
+      {
+        "targetMultiple": 0.9,
+        "horizonDays": 60,
+        "hitRate": 0.170103,
+        "sampleSize": 194,
+        "medianReturn": 0.02285,
+        "meanReturn": 6.003967,
+        "p25Return": -0.126486,
+        "downsideRisk": 0.126486,
+        "rewardReliabilityScore": 0.022024
+      },
+      {
+        "targetMultiple": 0.9,
+        "horizonDays": 120,
+        "hitRate": 0.298969,
+        "sampleSize": 194,
+        "medianReturn": 0.03194,
+        "meanReturn": 9.04366,
+        "p25Return": -0.181713,
+        "downsideRisk": 0.181713,
+        "rewardReliabilityScore": 0.041211
+      },
+      {
+        "targetMultiple": 0.9,
+        "horizonDays": 250,
+        "hitRate": 0.376289,
+        "sampleSize": 194,
+        "medianReturn": 0.043276,
+        "meanReturn": 9.038407,
+        "p25Return": -0.286353,
+        "downsideRisk": 0.286353,
+        "rewardReliabilityScore": 0.048414
+      },
+      {
+        "targetMultiple": 1,
+        "horizonDays": 30,
+        "hitRate": 0.056701,
+        "sampleSize": 194,
+        "medianReturn": 0.020005,
+        "meanReturn": 6.067984,
+        "p25Return": -0.087723,
+        "downsideRisk": 0.087723,
+        "rewardReliabilityScore": 0.008236
+      },
+      {
+        "targetMultiple": 1,
+        "horizonDays": 60,
+        "hitRate": 0.123711,
+        "sampleSize": 194,
+        "medianReturn": 0.013223,
+        "meanReturn": 5.99919,
+        "p25Return": -0.126486,
+        "downsideRisk": 0.126486,
+        "rewardReliabilityScore": 0.009269
+      },
+      {
+        "targetMultiple": 1,
+        "horizonDays": 120,
+        "hitRate": 0.268041,
+        "sampleSize": 194,
+        "medianReturn": 0.029578,
+        "meanReturn": 10.043029,
+        "p25Return": -0.197802,
+        "downsideRisk": 0.197802,
+        "rewardReliabilityScore": 0.031994
+      },
+      {
+        "targetMultiple": 1,
+        "horizonDays": 250,
+        "hitRate": 0.350515,
+        "sampleSize": 194,
+        "medianReturn": -0.023678,
+        "meanReturn": 10.040734,
+        "p25Return": -0.30277,
+        "downsideRisk": 0.30277,
+        "rewardReliabilityScore": -0.023527
+      },
+      {
+        "targetMultiple": 1.1,
+        "horizonDays": 30,
+        "hitRate": 0.046392,
+        "sampleSize": 194,
+        "medianReturn": 0.020005,
+        "meanReturn": 6.068251,
+        "p25Return": -0.087723,
+        "downsideRisk": 0.087723,
+        "rewardReliabilityScore": 0.006739
+      },
+      {
+        "targetMultiple": 1.1,
+        "horizonDays": 60,
+        "hitRate": 0.113402,
+        "sampleSize": 194,
+        "medianReturn": 0.013223,
+        "meanReturn": 6.000715,
+        "p25Return": -0.126486,
+        "downsideRisk": 0.126486,
+        "rewardReliabilityScore": 0.008497
+      },
+      {
+        "targetMultiple": 1.1,
+        "horizonDays": 120,
+        "hitRate": 0.231959,
+        "sampleSize": 194,
+        "medianReturn": 0.024065,
+        "meanReturn": 11.038746,
+        "p25Return": -0.197802,
+        "downsideRisk": 0.197802,
+        "rewardReliabilityScore": 0.022526
+      },
+      {
+        "targetMultiple": 1.1,
+        "horizonDays": 250,
+        "hitRate": 0.309278,
+        "sampleSize": 194,
+        "medianReturn": -0.0438,
+        "meanReturn": 11.027388,
+        "p25Return": -0.304285,
+        "downsideRisk": 0.304285,
+        "rewardReliabilityScore": -0.038236
+      },
+      {
+        "targetMultiple": 1.2,
+        "horizonDays": 30,
+        "hitRate": 0.046392,
+        "sampleSize": 194,
+        "medianReturn": 0.020005,
+        "meanReturn": 6.070195,
+        "p25Return": -0.087723,
+        "downsideRisk": 0.087723,
+        "rewardReliabilityScore": 0.006739
+      },
+      {
+        "targetMultiple": 1.2,
+        "horizonDays": 60,
+        "hitRate": 0.103093,
+        "sampleSize": 194,
+        "medianReturn": 0.013223,
+        "meanReturn": 6.002942,
+        "p25Return": -0.126486,
+        "downsideRisk": 0.126486,
+        "rewardReliabilityScore": 0.007724
+      },
+      {
+        "targetMultiple": 1.2,
+        "horizonDays": 120,
+        "hitRate": 0.195876,
+        "sampleSize": 194,
+        "medianReturn": 0.010397,
+        "meanReturn": 7.765682,
+        "p25Return": -0.197802,
+        "downsideRisk": 0.197802,
+        "rewardReliabilityScore": 0.008218
+      },
+      {
+        "targetMultiple": 1.2,
+        "horizonDays": 250,
+        "hitRate": 0.28866,
+        "sampleSize": 194,
+        "medianReturn": -0.044685,
+        "meanReturn": 4.714967,
+        "p25Return": -0.304285,
+        "downsideRisk": 0.304285,
+        "rewardReliabilityScore": -0.036408
+      }
+    ],
+    "riskScatter": [
+      {
+        "reportId": "02f44f98e36b5ee9",
+        "symbol": "GTT.PA",
+        "company": "Gaztransport&technigaz",
+        "publicationDate": "2020-12-05",
+        "maxFavorableExcursion": 1.664188,
+        "maxAdverseExcursion": -0.232342,
+        "upsideCaptureRatio": 8.881471,
+        "targetReturn": 0.187378,
+        "currentReturn": 0.3768,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "044fd5b652cd7b71",
+        "symbol": "ROKU",
+        "company": "Roku",
+        "publicationDate": "2020-12-05",
+        "maxFavorableExcursion": 1.133743,
+        "maxAdverseExcursion": -0.833652,
+        "upsideCaptureRatio": 2.671183,
+        "targetReturn": 0.424435,
+        "currentReturn": -0.7745,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "aca3b0e80e5d334c",
+        "symbol": "SE",
+        "company": "SEA ltd.",
+        "publicationDate": "2020-12-05",
+        "maxFavorableExcursion": 1.035389,
+        "maxAdverseExcursion": -0.812408,
+        "upsideCaptureRatio": 1.760517,
+        "targetReturn": 0.588116,
+        "currentReturn": -0.6437,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "5d0752b834ca2cb9",
+        "symbol": "BILI",
+        "company": "Bili bili",
+        "publicationDate": "2020-12-05",
+        "maxFavorableExcursion": 2.434858,
+        "maxAdverseExcursion": -0.820697,
+        "upsideCaptureRatio": 4.131607,
+        "targetReturn": 0.589325,
+        "currentReturn": -0.6747,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "fb850fafdb38be16",
+        "symbol": "166090.KQ",
+        "company": "하나머티리얼즈",
+        "publicationDate": "2021-01-16",
+        "maxFavorableExcursion": 2.381526,
+        "maxAdverseExcursion": -0.12249,
+        "upsideCaptureRatio": 3.825806,
+        "targetReturn": 0.62249,
+        "currentReturn": 0.1981,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "16ef439296056ba9",
+        "symbol": "006650.KS",
+        "company": "대한유화",
+        "publicationDate": "2021-01-16",
+        "maxFavorableExcursion": 0.622,
+        "maxAdverseExcursion": -0.7264,
+        "upsideCaptureRatio": 1.076125,
+        "targetReturn": 0.578,
+        "currentReturn": -0.3303,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "61b8145c6d332ac7",
+        "symbol": "009830.KS",
+        "company": "한화솔루션",
+        "publicationDate": "2021-01-16",
+        "maxFavorableExcursion": 0.312416,
+        "maxAdverseExcursion": -0.698886,
+        "upsideCaptureRatio": 1.35839,
+        "targetReturn": 0.22999,
+        "currentReturn": -0.0944,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "6078643ec9d84be5",
+        "symbol": "285490.KQ",
+        "company": "노바텍",
+        "publicationDate": "2021-01-16",
+        "maxFavorableExcursion": -0.180289,
+        "maxAdverseExcursion": -0.831509,
+        "upsideCaptureRatio": -0.137787,
+        "targetReturn": 1.308458,
+        "currentReturn": -0.3901,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "74fbe4ce4444129a",
+        "symbol": "170790.KQ",
+        "company": "파이오링크",
+        "publicationDate": "2021-01-16",
+        "maxFavorableExcursion": 0.298305,
+        "maxAdverseExcursion": -0.578983,
+        "upsideCaptureRatio": 0.778761,
+        "targetReturn": 0.383051,
+        "currentReturn": 0.064,
+        "hit06": true,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "9ef8e475c404c2f2",
+        "symbol": "060150.KQ",
+        "company": "인선이엔티",
+        "publicationDate": "2021-04-15",
+        "maxFavorableExcursion": 0.024138,
+        "maxAdverseExcursion": -0.736207,
+        "upsideCaptureRatio": 0.048276,
+        "targetReturn": 0.5,
+        "currentReturn": -0.4082,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "82013abc077ec06a",
+        "symbol": "007690.KS",
+        "company": "국도화학",
+        "publicationDate": "2021-04-15",
+        "maxFavorableExcursion": 0.229862,
+        "maxAdverseExcursion": -0.64937,
+        "upsideCaptureRatio": 0.230493,
+        "targetReturn": 0.997264,
+        "currentReturn": -0.2798,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "b97e4a85c6c1ec4e",
+        "symbol": "017650.KS",
+        "company": "대림제지",
+        "publicationDate": "2021-04-15",
+        "maxFavorableExcursion": 0.195652,
+        "maxAdverseExcursion": -0.555797,
+        "upsideCaptureRatio": 0.350649,
+        "targetReturn": 0.557971,
+        "currentReturn": -0.4272,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "1195e33544158456",
+        "symbol": "004020.KS",
+        "company": "현대제철",
+        "publicationDate": "2021-04-15",
+        "maxFavorableExcursion": 0.245059,
+        "maxAdverseExcursion": -0.606719,
+        "upsideCaptureRatio": 0.287037,
+        "targetReturn": 0.853755,
+        "currentReturn": -0.2586,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "d862376b69a0899b",
+        "symbol": "248070.KS",
+        "company": "솔루엠",
+        "publicationDate": "2021-05-06",
+        "maxFavorableExcursion": 0.331337,
+        "maxAdverseExcursion": -0.446307,
+        "upsideCaptureRatio": 0.700421,
+        "targetReturn": 0.473054,
+        "currentReturn": 0.0918,
+        "hit06": true,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "ba5672804816e8f8",
+        "symbol": "053030.KQ",
+        "company": "바이넥스",
+        "publicationDate": "2021-05-06",
+        "maxFavorableExcursion": -0.056995,
+        "maxAdverseExcursion": -0.749914,
+        "upsideCaptureRatio": -0.111487,
+        "targetReturn": 0.511226,
+        "currentReturn": -0.582,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "786a5c9006c4a1d7",
+        "symbol": "194480.KQ",
+        "company": "데브시스터즈",
+        "publicationDate": "2021-05-06",
+        "maxFavorableExcursion": 0.748466,
+        "maxAdverseExcursion": -0.844259,
+        "upsideCaptureRatio": 1.017878,
+        "targetReturn": 0.73532,
+        "currentReturn": -0.4936,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "0bb8a0b98b8d77ac",
+        "symbol": "284740.KS",
+        "company": "쿠쿠홈시스",
+        "publicationDate": "2021-05-06",
+        "maxFavorableExcursion": 0.244076,
+        "maxAdverseExcursion": -0.552133,
+        "upsideCaptureRatio": 0.423869,
+        "targetReturn": 0.575829,
+        "currentReturn": -0.3966,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "a9abf8131be0116b",
+        "symbol": "344820.KQ",
+        "company": "케이씨씨글라스",
+        "publicationDate": "2021-05-06",
+        "maxFavorableExcursion": 0.374161,
+        "maxAdverseExcursion": -0.589765,
+        "upsideCaptureRatio": 0.460744,
+        "targetReturn": 0.812081,
+        "currentReturn": -0.3051,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "d524f1b9b99a53af",
+        "symbol": "GLW",
+        "company": "Corning",
+        "publicationDate": "2021-05-31",
+        "maxFavorableExcursion": 3.862029,
+        "maxAdverseExcursion": -0.42011,
+        "upsideCaptureRatio": 12.517112,
+        "targetReturn": 0.30854,
+        "currentReturn": -0.1481,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "c899a139ba93106b",
+        "symbol": "1833.HK",
+        "company": "Ping An Healthcare & Technology",
+        "publicationDate": "2021-05-31",
+        "maxFavorableExcursion": 0.070225,
+        "maxAdverseExcursion": -0.939299,
+        "upsideCaptureRatio": 0.108623,
+        "targetReturn": 0.6465,
+        "currentReturn": -0.7671,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "65b98e5336bd59f3",
+        "symbol": "WFG",
+        "company": "West Fraser Timber. Co. Ltd",
+        "publicationDate": "2021-05-31",
+        "maxFavorableExcursion": 0.32,
+        "maxAdverseExcursion": -0.264872,
+        "upsideCaptureRatio": 0.423051,
+        "targetReturn": 0.75641,
+        "currentReturn": 0.0407,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "1488bad8a01bf103",
+        "symbol": "SBLK",
+        "company": "Star Bulk Carriers",
+        "publicationDate": "2021-05-31",
+        "maxFavorableExcursion": 0.58093,
+        "maxAdverseExcursion": -0.43907,
+        "upsideCaptureRatio": 0.766257,
+        "targetReturn": 0.75814,
+        "currentReturn": 0.0217,
+        "hit06": true,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "32a42b5c3654e918",
+        "symbol": "4751.T",
+        "company": "Cyber Agent",
+        "publicationDate": "2021-05-31",
+        "maxFavorableExcursion": 0.162935,
+        "maxAdverseExcursion": -0.639686,
+        "upsideCaptureRatio": 0.226341,
+        "targetReturn": 0.719867,
+        "currentReturn": -0.5808,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "f69bbabda26dd3de",
+        "symbol": "032640.KS",
+        "company": "LG유플러스",
+        "publicationDate": "2021-06-06",
+        "maxFavorableExcursion": 0.275862,
+        "maxAdverseExcursion": -0.344138,
+        "upsideCaptureRatio": 0.334728,
+        "targetReturn": 0.824138,
+        "currentReturn": -0.2747,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "65e4ae8e1e885829",
+        "symbol": "005850.KS",
+        "company": "에스엘",
+        "publicationDate": "2021-06-06",
+        "maxFavorableExcursion": 1.480769,
+        "maxAdverseExcursion": -0.291667,
+        "upsideCaptureRatio": 2.457446,
+        "targetReturn": 0.602564,
+        "currentReturn": 0.0657,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "ddf3b21845907899",
+        "symbol": "298020.KQ",
+        "company": "효성티앤씨",
+        "publicationDate": "2021-06-06",
+        "maxFavorableExcursion": 0.356338,
+        "maxAdverseExcursion": -0.737324,
+        "upsideCaptureRatio": 0.954717,
+        "targetReturn": 0.373239,
+        "currentReturn": -0.469,
+        "hit06": true,
+        "hit08": true,
+        "hit10": false
+      },
+      {
+        "reportId": "ee12b562184f3778",
+        "symbol": "036420.KS",
+        "company": "제이콘텐트리",
+        "publicationDate": "2021-06-06",
+        "maxFavorableExcursion": 0.620755,
+        "maxAdverseExcursion": -0.902075,
+        "upsideCaptureRatio": 1.530233,
+        "targetReturn": 0.40566,
+        "currentReturn": -0.5543,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "1600f5644e55a037",
+        "symbol": "348210.KQ",
+        "company": "넥스틴",
+        "publicationDate": "2021-11-03",
+        "maxFavorableExcursion": 0.901515,
+        "maxAdverseExcursion": -0.235795,
+        "upsideCaptureRatio": 2.428571,
+        "targetReturn": 0.371212,
+        "currentReturn": 0.1426,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "7d7e2a6e32013f08",
+        "symbol": "148150.KQ",
+        "company": "세경하이테크",
+        "publicationDate": "2021-11-03",
+        "maxFavorableExcursion": -0.467735,
+        "maxAdverseExcursion": -0.866399,
+        "upsideCaptureRatio": -1.161193,
+        "targetReturn": 0.402806,
+        "currentReturn": -0.5068,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "037076d05c1f75ac",
+        "symbol": "054780.KQ",
+        "company": "키이스트",
+        "publicationDate": "2021-11-03",
+        "maxFavorableExcursion": 0.036667,
+        "maxAdverseExcursion": -0.859,
+        "upsideCaptureRatio": 0.094828,
+        "targetReturn": 0.386667,
+        "currentReturn": -0.5546,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "d4a970fee900b949",
+        "symbol": "036930.KQ",
+        "company": "주성엔지니어링",
+        "publicationDate": "2021-11-03",
+        "maxFavorableExcursion": 14.785714,
+        "maxAdverseExcursion": -0.089286,
+        "upsideCaptureRatio": 10.683871,
+        "targetReturn": 1.383929,
+        "currentReturn": 1.4537,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "89f9f72c18472c7f",
+        "symbol": "004250.KS",
+        "company": "NPC",
+        "publicationDate": "2021-11-19",
+        "maxFavorableExcursion": 1.233503,
+        "maxAdverseExcursion": -0.41286,
+        "upsideCaptureRatio": 2.156806,
+        "targetReturn": 0.571912,
+        "currentReturn": -0.3077,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "3ae2cd0fef5cc5b6",
+        "symbol": "376980.KQ",
+        "company": "원티드랩",
+        "publicationDate": "2021-11-19",
+        "maxFavorableExcursion": 0.169014,
+        "maxAdverseExcursion": -0.912676,
+        "upsideCaptureRatio": 0.38961,
+        "targetReturn": 0.433803,
+        "currentReturn": -0.7814,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "6c3673eec1694092",
+        "symbol": "293490.KQ",
+        "company": "카카오게임즈",
+        "publicationDate": "2021-11-19",
+        "maxFavorableExcursion": 0.15526,
+        "maxAdverseExcursion": -0.892646,
+        "upsideCaptureRatio": 0.284643,
+        "targetReturn": 0.545455,
+        "currentReturn": -0.7712,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "9afa1ee48cb453eb",
+        "symbol": "122640.KQ",
+        "company": "예스티",
+        "publicationDate": "2021-11-19",
+        "maxFavorableExcursion": 1.305147,
+        "maxAdverseExcursion": -0.561765,
+        "upsideCaptureRatio": 1.517094,
+        "targetReturn": 0.860294,
+        "currentReturn": -0.0082,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "c94768069dbf6dbd",
+        "symbol": "352820.KS",
+        "company": "하이브",
+        "publicationDate": "2021-11-19",
+        "maxFavorableExcursion": 0.084746,
+        "maxAdverseExcursion": -0.720991,
+        "upsideCaptureRatio": 0.132925,
+        "targetReturn": 0.637549,
+        "currentReturn": -0.5248,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "e4f61fb5a56f7d82",
+        "symbol": "INMD",
+        "company": "Inmode",
+        "publicationDate": "2021-11-30",
+        "maxFavorableExcursion": 0.074734,
+        "maxAdverseExcursion": -0.832632,
+        "upsideCaptureRatio": 0.059097,
+        "targetReturn": 1.2646,
+        "currentReturn": -0.6619,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "ab2a3cd1f6220db2",
+        "symbol": "OPEN",
+        "company": "Opendoor",
+        "publicationDate": "2021-11-30",
+        "maxFavorableExcursion": -0.202519,
+        "maxAdverseExcursion": -0.975388,
+        "upsideCaptureRatio": -0.283774,
+        "targetReturn": 0.713663,
+        "currentReturn": -0.7944,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "235ca36dccfc1783",
+        "symbol": "4689.T",
+        "company": "Z-holdings",
+        "publicationDate": "2021-11-30",
+        "maxFavorableExcursion": -0.06917,
+        "maxAdverseExcursion": -0.605088,
+        "upsideCaptureRatio": -0.148504,
+        "targetReturn": 0.465778,
+        "currentReturn": -0.5204,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "27fa19d322870ea6",
+        "symbol": "002714.SZ",
+        "company": "Muyuan foods co ltd",
+        "publicationDate": "2021-11-30",
+        "maxFavorableExcursion": 0.178393,
+        "maxAdverseExcursion": -0.443393,
+        "upsideCaptureRatio": 0.161625,
+        "targetReturn": 1.103747,
+        "currentReturn": -0.2542,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "cefde513c9366947",
+        "symbol": "CHGG",
+        "company": "Chegg",
+        "publicationDate": "2021-11-30",
+        "maxFavorableExcursion": 0.387906,
+        "maxAdverseExcursion": -0.983776,
+        "upsideCaptureRatio": 0.642247,
+        "targetReturn": 0.603982,
+        "currentReturn": -0.6142,
+        "hit06": true,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "8b301da5f9cbeb69",
+        "symbol": "294570.KQ",
+        "company": "쿠콘",
+        "publicationDate": "2021-12-13",
+        "maxFavorableExcursion": 0.011553,
+        "maxAdverseExcursion": -0.86932,
+        "upsideCaptureRatio": 0.03435,
+        "targetReturn": 0.336329,
+        "currentReturn": -0.7204,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "ed3298464b2f98d5",
+        "symbol": "189300.KQ",
+        "company": "인텔리안테크",
+        "publicationDate": "2021-12-13",
+        "maxFavorableExcursion": 1.241294,
+        "maxAdverseExcursion": -0.616915,
+        "upsideCaptureRatio": 2.399039,
+        "targetReturn": 0.517413,
+        "currentReturn": -0.1389,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "53c1821b2b5f4ebd",
+        "symbol": "003030.KS",
+        "company": "세아제강지주",
+        "publicationDate": "2021-12-13",
+        "maxFavorableExcursion": 1.659091,
+        "maxAdverseExcursion": -0.140909,
+        "upsideCaptureRatio": 4.147728,
+        "targetReturn": 0.4,
+        "currentReturn": 0.7454,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "771f0f6cabce8bfa",
+        "symbol": "348370.KQ",
+        "company": "엔켐",
+        "publicationDate": "2021-12-13",
+        "maxFavorableExcursion": 2.632597,
+        "maxAdverseExcursion": -0.724217,
+        "upsideCaptureRatio": 4.312218,
+        "targetReturn": 0.610497,
+        "currentReturn": -0.2977,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "7df7f3246b237d57",
+        "symbol": "237690.KQ",
+        "company": "에스티팜",
+        "publicationDate": "2021-12-13",
+        "maxFavorableExcursion": 0.344531,
+        "maxAdverseExcursion": -0.532031,
+        "upsideCaptureRatio": 0.773684,
+        "targetReturn": 0.445313,
+        "currentReturn": -0.5146,
+        "hit06": true,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "104c5fd3af9d4aab",
+        "symbol": "035900.KQ",
+        "company": "JYP Ent.",
+        "publicationDate": "2022-04-16",
+        "maxFavorableExcursion": 1.265842,
+        "maxAdverseExcursion": -0.333849,
+        "upsideCaptureRatio": 2.956678,
+        "targetReturn": 0.42813,
+        "currentReturn": 0.0969,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "838c8ba80222a6dd",
+        "symbol": "119610.KQ",
+        "company": "인터로조",
+        "publicationDate": "2022-04-16",
+        "maxFavorableExcursion": 0.239234,
+        "maxAdverseExcursion": -0.525678,
+        "upsideCaptureRatio": 0.530034,
+        "targetReturn": 0.451356,
+        "currentReturn": -0.2687,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "d26e5d6dca5fdc4c",
+        "symbol": "089860.KQ",
+        "company": "롯데렌탈",
+        "publicationDate": "2022-04-16",
+        "maxFavorableExcursion": 0.042035,
+        "maxAdverseExcursion": -0.440265,
+        "upsideCaptureRatio": 0.10366,
+        "targetReturn": 0.405509,
+        "currentReturn": -0.4015,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "0498c71baf800437",
+        "symbol": "043650.KQ",
+        "company": "국순당",
+        "publicationDate": "2022-04-16",
+        "maxFavorableExcursion": 0.204651,
+        "maxAdverseExcursion": -0.642326,
+        "upsideCaptureRatio": 0.879999,
+        "targetReturn": 0.232558,
+        "currentReturn": -0.5018,
+        "hit06": true,
+        "hit08": true,
+        "hit10": false
+      },
+      {
+        "reportId": "c3c2941d58fd09db",
+        "symbol": "215000.KQ",
+        "company": "골프존",
+        "publicationDate": "2022-05-12",
+        "maxFavorableExcursion": 0.002235,
+        "maxAdverseExcursion": -0.736313,
+        "upsideCaptureRatio": 0.00448,
+        "targetReturn": 0.498883,
+        "currentReturn": -0.5516,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "d02635fcf57c9831",
+        "symbol": "041830.KQ",
+        "company": "인바디",
+        "publicationDate": "2022-05-12",
+        "maxFavorableExcursion": 0.727768,
+        "maxAdverseExcursion": -0.353902,
+        "upsideCaptureRatio": 1.865117,
+        "targetReturn": 0.3902,
+        "currentReturn": -0.0159,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "cf6e90784928ec2e",
+        "symbol": "007210.KS",
+        "company": "벽산",
+        "publicationDate": "2022-05-12",
+        "maxFavorableExcursion": 0.20339,
+        "maxAdverseExcursion": -0.55226,
+        "upsideCaptureRatio": 0.409091,
+        "targetReturn": 0.497175,
+        "currentReturn": -0.3559,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "3d0eef9651bbf5f3",
+        "symbol": "310200.KQ",
+        "company": "애니플러스",
+        "publicationDate": "2022-05-12",
+        "maxFavorableExcursion": 0.525504,
+        "maxAdverseExcursion": -0.475682,
+        "upsideCaptureRatio": 2.02283,
+        "targetReturn": 0.259786,
+        "currentReturn": -0.2526,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "26bc78e8280443fa",
+        "symbol": "114810.KQ",
+        "company": "아이원스",
+        "publicationDate": "2022-05-12",
+        "maxFavorableExcursion": 1.062176,
+        "maxAdverseExcursion": -0.445596,
+        "upsideCaptureRatio": 1.507353,
+        "targetReturn": 0.704663,
+        "currentReturn": 0.348,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "ae2cc012ee18fbdb",
+        "symbol": "EAF",
+        "company": "GrafTech International Ltd.",
+        "publicationDate": "2022-05-25",
+        "maxFavorableExcursion": 10.236363,
+        "maxAdverseExcursion": -0.403636,
+        "upsideCaptureRatio": 17.41237,
+        "targetReturn": 0.587879,
+        "currentReturn": -0.7729,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "c631200d3a42357e",
+        "symbol": "002340.SZ",
+        "company": "GEM Co., Ltd.",
+        "publicationDate": "2022-05-25",
+        "maxFavorableExcursion": 0.355177,
+        "maxAdverseExcursion": -0.482307,
+        "upsideCaptureRatio": 0.044322,
+        "targetReturn": 8.013595,
+        "currentReturn": -0.1156,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "ce21d8373593ec16",
+        "symbol": "TSM",
+        "company": "TSMC",
+        "publicationDate": "2022-05-25",
+        "maxFavorableExcursion": -0.207547,
+        "maxAdverseExcursion": -0.887868,
+        "upsideCaptureRatio": -0.470085,
+        "targetReturn": 0.441509,
+        "currentReturn": 0.9194,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "6405448206fb6311",
+        "symbol": "STNG",
+        "company": "Scorpio Tankers Inc.",
+        "publicationDate": "2022-05-25",
+        "maxFavorableExcursion": 2.002061,
+        "maxAdverseExcursion": -0.020955,
+        "upsideCaptureRatio": 3.74791,
+        "targetReturn": 0.534181,
+        "currentReturn": 1.7934,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "4945335edf0a3d6d",
+        "symbol": "000640.KS",
+        "company": "동아쏘시오홀딩스",
+        "publicationDate": "2022-06-08",
+        "maxFavorableExcursion": 0.138735,
+        "maxAdverseExcursion": -0.323445,
+        "upsideCaptureRatio": 0.306075,
+        "targetReturn": 0.453271,
+        "currentReturn": -0.0396,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "a9a5c7d8c6e6995d",
+        "symbol": "009970.KS",
+        "company": "영원무역홀딩스",
+        "publicationDate": "2022-06-08",
+        "maxFavorableExcursion": 3.540728,
+        "maxAdverseExcursion": -0.209705,
+        "upsideCaptureRatio": 7.483517,
+        "targetReturn": 0.473137,
+        "currentReturn": 0.4506,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "c82e104c235c6247",
+        "symbol": "363280.KS",
+        "company": "티와이홀딩스",
+        "publicationDate": "2022-06-08",
+        "maxFavorableExcursion": 0.005905,
+        "maxAdverseExcursion": -0.921304,
+        "upsideCaptureRatio": 0.011672,
+        "targetReturn": 0.505929,
+        "currentReturn": -0.8594,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "6e5ccfe04b55d4c4",
+        "symbol": "000210.KS",
+        "company": "DL",
+        "publicationDate": "2022-06-08",
+        "maxFavorableExcursion": 0.142647,
+        "maxAdverseExcursion": -0.589706,
+        "upsideCaptureRatio": 0.285294,
+        "targetReturn": 0.5,
+        "currentReturn": -0.1209,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "c57f20ad93adf797",
+        "symbol": "006260.KS",
+        "company": "LS",
+        "publicationDate": "2022-06-08",
+        "maxFavorableExcursion": 7.8006,
+        "maxAdverseExcursion": -0.250375,
+        "upsideCaptureRatio": 5.402908,
+        "targetReturn": 1.443778,
+        "currentReturn": 1.182,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "c36f87938dfe83da",
+        "symbol": "368600.KQ",
+        "company": "아이씨에이치",
+        "publicationDate": "2022-10-13",
+        "maxFavorableExcursion": -0.614702,
+        "maxAdverseExcursion": -0.976388,
+        "upsideCaptureRatio": -3.368055,
+        "targetReturn": 0.18251,
+        "currentReturn": -0.5878,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "abf8b4129d0067a3",
+        "symbol": "067160.KQ",
+        "company": "아프리카TV",
+        "publicationDate": "2022-10-13",
+        "maxFavorableExcursion": 0.904636,
+        "maxAdverseExcursion": -0.319205,
+        "upsideCaptureRatio": 2.626924,
+        "targetReturn": 0.344371,
+        "currentReturn": 0.3492,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "269ab4f8ab06ddcc",
+        "symbol": "089600.KQ",
+        "company": "나스미디어",
+        "publicationDate": "2022-10-13",
+        "maxFavorableExcursion": 0.089063,
+        "maxAdverseExcursion": -0.620981,
+        "upsideCaptureRatio": 0.165004,
+        "targetReturn": 0.539763,
+        "currentReturn": -0.4292,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "23dfbf83613d3029",
+        "symbol": "322000.KS",
+        "company": "현대에너지솔루션",
+        "publicationDate": "2022-11-13",
+        "maxFavorableExcursion": 3.522968,
+        "maxAdverseExcursion": -0.671555,
+        "upsideCaptureRatio": 7.639846,
+        "targetReturn": 0.461131,
+        "currentReturn": -0.6607,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "165ce2f1aeafe7fe",
+        "symbol": "054210.KQ",
+        "company": "이랜텍",
+        "publicationDate": "2022-11-13",
+        "maxFavorableExcursion": 0.316735,
+        "maxAdverseExcursion": -0.669388,
+        "upsideCaptureRatio": 0.739048,
+        "targetReturn": 0.428571,
+        "currentReturn": -0.5976,
+        "hit06": true,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "3ce25880fb8c6a07",
+        "symbol": "316140.KS",
+        "company": "우리금융지주",
+        "publicationDate": "2022-11-13",
+        "maxFavorableExcursion": 2.624454,
+        "maxAdverseExcursion": -0.049782,
+        "upsideCaptureRatio": 9.246153,
+        "targetReturn": 0.283843,
+        "currentReturn": 0.3538,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "d1a34670c737d9ac",
+        "symbol": "010950.KS",
+        "company": "S-OIL",
+        "publicationDate": "2022-11-13",
+        "maxFavorableExcursion": 0.929194,
+        "maxAdverseExcursion": -0.455338,
+        "upsideCaptureRatio": 2.778502,
+        "targetReturn": 0.334423,
+        "currentReturn": -0.3864,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "fea27bf20d0f8d88",
+        "symbol": "007660.KS",
+        "company": "이수페타시스",
+        "publicationDate": "2022-11-13",
+        "maxFavorableExcursion": 29,
+        "maxAdverseExcursion": -0.038321,
+        "upsideCaptureRatio": 74.962264,
+        "targetReturn": 0.386861,
+        "currentReturn": 3.3019,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "4be410cfa6fd46e4",
+        "symbol": "NE",
+        "company": "Noble Corporation PLC",
+        "publicationDate": "2022-11-25",
+        "maxFavorableExcursion": 0.446419,
+        "maxAdverseExcursion": -0.545217,
+        "upsideCaptureRatio": 1.9191,
+        "targetReturn": 0.232619,
+        "currentReturn": 0.0317,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "2dcae6668e7aa836",
+        "symbol": "MP",
+        "company": "MP Materials",
+        "publicationDate": "2022-11-25",
+        "maxFavorableExcursion": 2.087496,
+        "maxAdverseExcursion": -0.691407,
+        "upsideCaptureRatio": 3.580613,
+        "targetReturn": 0.583,
+        "currentReturn": -0.3731,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "e48aad623ee4de4e",
+        "symbol": "WOLF",
+        "company": "Wolfspeed",
+        "publicationDate": "2022-11-25",
+        "maxFavorableExcursion": -0.162616,
+        "maxAdverseExcursion": -0.908585,
+        "upsideCaptureRatio": -0.662348,
+        "targetReturn": 0.245514,
+        "currentReturn": null,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "9ad4504d75edadfa",
+        "symbol": "ANET",
+        "company": "Arista Networks",
+        "publicationDate": "2022-11-25",
+        "maxFavorableExcursion": 0.361502,
+        "maxAdverseExcursion": -0.793825,
+        "upsideCaptureRatio": 1.337628,
+        "targetReturn": 0.270256,
+        "currentReturn": 2.1797,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "d9b3d180a37a3af7",
+        "symbol": "005490.KS",
+        "company": "포스코홀딩스",
+        "publicationDate": "2022-12-08",
+        "maxFavorableExcursion": 1.589831,
+        "maxAdverseExcursion": -0.228814,
+        "upsideCaptureRatio": 6.700002,
+        "targetReturn": 0.237288,
+        "currentReturn": -0.0733,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "756754d30bf2606b",
+        "symbol": "028050.KS",
+        "company": "삼성엔지니어링",
+        "publicationDate": "2022-12-08",
+        "maxFavorableExcursion": 1.839662,
+        "maxAdverseExcursion": -0.312236,
+        "upsideCaptureRatio": 4.316831,
+        "targetReturn": 0.42616,
+        "currentReturn": -0.2518,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "9b739307066946a9",
+        "symbol": "100840.KQ",
+        "company": "SNT에너지",
+        "publicationDate": "2022-12-08",
+        "maxFavorableExcursion": 1.971554,
+        "maxAdverseExcursion": -0.748359,
+        "upsideCaptureRatio": 3.561266,
+        "targetReturn": 0.553611,
+        "currentReturn": 1.464,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "b52b85860ebe5b2f",
+        "symbol": "068270.KS",
+        "company": "셀트리온",
+        "publicationDate": "2022-12-08",
+        "maxFavorableExcursion": 0.442529,
+        "maxAdverseExcursion": -0.310555,
+        "upsideCaptureRatio": 1.604168,
+        "targetReturn": 0.275862,
+        "currentReturn": 0.0612,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "65d963a7cd1c0daa",
+        "symbol": "047810.KS",
+        "company": "한국항공우주",
+        "publicationDate": "2022-12-08",
+        "maxFavorableExcursion": 3.585106,
+        "maxAdverseExcursion": -0.117021,
+        "upsideCaptureRatio": 8.424999,
+        "targetReturn": 0.425532,
+        "currentReturn": 0.1961,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "e297c3688dff52fa",
+        "symbol": "214450.KQ",
+        "company": "파마리서치",
+        "publicationDate": "2023-04-13",
+        "maxFavorableExcursion": 7.214286,
+        "maxAdverseExcursion": 0,
+        "upsideCaptureRatio": 25.250001,
+        "targetReturn": 0.285714,
+        "currentReturn": 3.0397,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "a49675bcf9654922",
+        "symbol": "159010.KQ",
+        "company": "아스플로",
+        "publicationDate": "2023-04-13",
+        "maxFavorableExcursion": 0.287407,
+        "maxAdverseExcursion": -0.747037,
+        "upsideCaptureRatio": 0.570587,
+        "targetReturn": 0.503704,
+        "currentReturn": -0.6419,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "2b7cda74f6f72d97",
+        "symbol": "950170.KQ",
+        "company": "JTC",
+        "publicationDate": "2023-04-13",
+        "maxFavorableExcursion": 0.845399,
+        "maxAdverseExcursion": -0.198773,
+        "upsideCaptureRatio": 1.138843,
+        "targetReturn": 0.742331,
+        "currentReturn": 0.2444,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "c356d64193bfcf87",
+        "symbol": "204620.KQ",
+        "company": "글로벌텍스프리",
+        "publicationDate": "2023-04-13",
+        "maxFavorableExcursion": 1.060526,
+        "maxAdverseExcursion": -0.292291,
+        "upsideCaptureRatio": 3.582221,
+        "targetReturn": 0.296053,
+        "currentReturn": 0.6086,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "d5e61dbccad3af20",
+        "symbol": "182360.KQ",
+        "company": "큐브엔터",
+        "publicationDate": "2023-04-13",
+        "maxFavorableExcursion": 0.165289,
+        "maxAdverseExcursion": -0.655785,
+        "upsideCaptureRatio": 0.225988,
+        "targetReturn": 0.731405,
+        "currentReturn": -0.3862,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "901dc44d3eedc130",
+        "symbol": "023160.KS",
+        "company": "태광",
+        "publicationDate": "2023-05-11",
+        "maxFavorableExcursion": 1.831126,
+        "maxAdverseExcursion": -0.385762,
+        "upsideCaptureRatio": 3.09515,
+        "targetReturn": 0.591611,
+        "currentReturn": 0.1232,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "28902e013d64471e",
+        "symbol": "363250.KQ",
+        "company": "진시스템",
+        "publicationDate": "2023-05-11",
+        "maxFavorableExcursion": 0.778766,
+        "maxAdverseExcursion": -0.806559,
+        "upsideCaptureRatio": 0.945982,
+        "targetReturn": 0.823235,
+        "currentReturn": -0.4369,
+        "hit06": true,
+        "hit08": true,
+        "hit10": false
+      },
+      {
+        "reportId": "cc7b035df24effd5",
+        "symbol": "044490.KQ",
+        "company": "태웅",
+        "publicationDate": "2023-05-11",
+        "maxFavorableExcursion": 3.474453,
+        "maxAdverseExcursion": -0.329197,
+        "upsideCaptureRatio": 3.194631,
+        "targetReturn": 1.087591,
+        "currentReturn": 0.1208,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "bf9bbe66a98dea96",
+        "symbol": "210980.KS",
+        "company": "SK디앤디",
+        "publicationDate": "2023-05-11",
+        "maxFavorableExcursion": 0.622709,
+        "maxAdverseExcursion": -0.716143,
+        "upsideCaptureRatio": 0.884485,
+        "targetReturn": 0.704036,
+        "currentReturn": -0.6154,
+        "hit06": true,
+        "hit08": true,
+        "hit10": false
+      },
+      {
+        "reportId": "c80230176ec588e2",
+        "symbol": "228670.KQ",
+        "company": "레이",
+        "publicationDate": "2023-05-11",
+        "maxFavorableExcursion": 0.219971,
+        "maxAdverseExcursion": -0.883068,
+        "upsideCaptureRatio": 0.194125,
+        "targetReturn": 1.13314,
+        "currentReturn": -0.7374,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "2937539ac8e17f5c",
+        "symbol": "BAC",
+        "company": "Bank of America Corp.",
+        "publicationDate": "2023-05-25",
+        "maxFavorableExcursion": 1.021426,
+        "maxAdverseExcursion": -0.123288,
+        "upsideCaptureRatio": 6.187234,
+        "targetReturn": 0.165086,
+        "currentReturn": 0.6066,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "73eb3af5c6c360ec",
+        "symbol": "328130.KQ",
+        "company": "루닛",
+        "publicationDate": "2023-05-25",
+        "maxFavorableExcursion": 1.03125,
+        "maxAdverseExcursion": -0.747384,
+        "upsideCaptureRatio": 1.316327,
+        "targetReturn": 0.78343,
+        "currentReturn": 0.1592,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "93c78f6ec8b53672",
+        "symbol": "001060.KS",
+        "company": "JW중외제약",
+        "publicationDate": "2023-05-25",
+        "maxFavorableExcursion": 1.0923,
+        "maxAdverseExcursion": -0.203252,
+        "upsideCaptureRatio": 2.44278,
+        "targetReturn": 0.447154,
+        "currentReturn": -0.0746,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "f676409a881dd9d4",
+        "symbol": "280360.KQ",
+        "company": "롯데웰푸드",
+        "publicationDate": "2023-06-09",
+        "maxFavorableExcursion": 0.948598,
+        "maxAdverseExcursion": -0.149533,
+        "upsideCaptureRatio": 0.894273,
+        "targetReturn": 1.060748,
+        "currentReturn": 0.1032,
+        "hit06": true,
+        "hit08": true,
+        "hit10": false
+      },
+      {
+        "reportId": "5d9c4bc6c432e222",
+        "symbol": "453340.KQ",
+        "company": "현대그린푸드",
+        "publicationDate": "2023-06-09",
+        "maxFavorableExcursion": 0.653233,
+        "maxAdverseExcursion": -0.156171,
+        "upsideCaptureRatio": 0.80289,
+        "targetReturn": 0.813602,
+        "currentReturn": 0.4411,
+        "hit06": true,
+        "hit08": true,
+        "hit10": false
+      },
+      {
+        "reportId": "07c7395490c32f67",
+        "symbol": "001530.KS",
+        "company": "DI동일",
+        "publicationDate": "2023-06-09",
+        "maxFavorableExcursion": 1.346109,
+        "maxAdverseExcursion": -0.269222,
+        "upsideCaptureRatio": 2.705415,
+        "targetReturn": 0.497561,
+        "currentReturn": 0.7559,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "9dd7015afab39338",
+        "symbol": "408920.KQ",
+        "company": "메쎄이상",
+        "publicationDate": "2023-06-09",
+        "maxFavorableExcursion": 0.552212,
+        "maxAdverseExcursion": -0.310796,
+        "upsideCaptureRatio": 0.86908,
+        "targetReturn": 0.635398,
+        "currentReturn": -0.1852,
+        "hit06": true,
+        "hit08": true,
+        "hit10": false
+      },
+      {
+        "reportId": "0448a5a1bc4adf29",
+        "symbol": "000660.KS",
+        "company": "SK하이닉스",
+        "publicationDate": "2023-10-19",
+        "maxFavorableExcursion": 14.990377,
+        "maxAdverseExcursion": -0.067362,
+        "upsideCaptureRatio": 46.849624,
+        "targetReturn": 0.319968,
+        "currentReturn": 2.7033,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "6d9d512e26b0f33c",
+        "symbol": "200710.KQ",
+        "company": "에이디테크놀로지",
+        "publicationDate": "2023-10-19",
+        "maxFavorableExcursion": 1.672414,
+        "maxAdverseExcursion": -0.480172,
+        "upsideCaptureRatio": 0.747592,
+        "targetReturn": 2.237069,
+        "currentReturn": 0.1926,
+        "hit06": true,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "a5904b4b761c1514",
+        "symbol": "089890.KQ",
+        "company": "코세스",
+        "publicationDate": "2023-10-19",
+        "maxFavorableExcursion": 5353.166667,
+        "maxAdverseExcursion": 600.041667,
+        "upsideCaptureRatio": 2.764351,
+        "targetReturn": 1936.5,
+        "currentReturn": 1.6276,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "98f5913a5681e6f8",
+        "symbol": "267260.KS",
+        "company": "HD현대일렉트릭",
+        "publicationDate": "2023-10-19",
+        "maxFavorableExcursion": 18.972067,
+        "maxAdverseExcursion": -0.085196,
+        "upsideCaptureRatio": 19.830657,
+        "targetReturn": 0.956704,
+        "currentReturn": 8.3944,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "43cf21f96cadad79",
+        "symbol": "352820.KS",
+        "company": "하이브",
+        "publicationDate": "2023-10-19",
+        "maxFavorableExcursion": 0.658487,
+        "maxAdverseExcursion": -0.35501,
+        "upsideCaptureRatio": 1.78889,
+        "targetReturn": 0.368098,
+        "currentReturn": 0.1846,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "f02894f6b517e70d",
+        "symbol": "440110.KQ",
+        "company": "파두",
+        "publicationDate": "2023-11-12",
+        "maxFavorableExcursion": 2.090909,
+        "maxAdverseExcursion": -0.740686,
+        "upsideCaptureRatio": 66.809521,
+        "targetReturn": 0.031297,
+        "currentReturn": 0.3655,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "89d8aced121019d6",
+        "symbol": "375500.KS",
+        "company": "DL이앤씨",
+        "publicationDate": "2023-11-12",
+        "maxFavorableExcursion": 2.063218,
+        "maxAdverseExcursion": -0.178161,
+        "upsideCaptureRatio": 1.502092,
+        "targetReturn": 1.373563,
+        "currentReturn": 0.1111,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "252af1ebaf6e7424",
+        "symbol": "298020.KQ",
+        "company": "효성티앤씨",
+        "publicationDate": "2023-11-12",
+        "maxFavorableExcursion": 0.528121,
+        "maxAdverseExcursion": -0.48834,
+        "upsideCaptureRatio": 1.287626,
+        "targetReturn": 0.410151,
+        "currentReturn": -0.4297,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "6288504ba75cd344",
+        "symbol": "131970.KQ",
+        "company": "두산테스나",
+        "publicationDate": "2023-11-12",
+        "maxFavorableExcursion": 2.750476,
+        "maxAdverseExcursion": -0.58,
+        "upsideCaptureRatio": 10.314285,
+        "targetReturn": 0.266667,
+        "currentReturn": -0.1354,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "f6ba22fa65ef060a",
+        "symbol": "1211.HK",
+        "company": "BYD",
+        "publicationDate": "2023-11-22",
+        "maxFavorableExcursion": -0.333333,
+        "maxAdverseExcursion": -0.765282,
+        "upsideCaptureRatio": -0.850463,
+        "targetReturn": 0.391943,
+        "currentReturn": 0.3209,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "2706f0a40fb7c071",
+        "symbol": "LLY",
+        "company": "Eli Lilly & Co.",
+        "publicationDate": "2023-11-22",
+        "maxFavorableExcursion": 0.925866,
+        "maxAdverseExcursion": -0.046111,
+        "upsideCaptureRatio": 3.485613,
+        "targetReturn": 0.265625,
+        "currentReturn": 1.0256,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "616b5a7fe9444744",
+        "symbol": "VRT",
+        "company": "Vertiv Holdings Co.",
+        "publicationDate": "2023-11-22",
+        "maxFavorableExcursion": 7.81816,
+        "maxAdverseExcursion": -0.042717,
+        "upsideCaptureRatio": 17.508101,
+        "targetReturn": 0.446545,
+        "currentReturn": 3.1775,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "2123a3988d72c5e2",
+        "symbol": "LONN.SW",
+        "company": "Lonza Group AG",
+        "publicationDate": "2023-11-22",
+        "maxFavorableExcursion": 0.743561,
+        "maxAdverseExcursion": -0.106708,
+        "upsideCaptureRatio": 4.447138,
+        "targetReturn": 0.1672,
+        "currentReturn": 0.8941,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "17625b05df5d5a99",
+        "symbol": "BESI.AS",
+        "company": "BE Semiconductor Industries N.V.",
+        "publicationDate": "2023-11-22",
+        "maxFavorableExcursion": 1.246622,
+        "maxAdverseExcursion": -0.327534,
+        "upsideCaptureRatio": 4.4536,
+        "targetReturn": 0.279913,
+        "currentReturn": 0.2363,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "8756207870a55bd2",
+        "symbol": "192820.KS",
+        "company": "코스맥스",
+        "publicationDate": "2023-12-06",
+        "maxFavorableExcursion": 1.551111,
+        "maxAdverseExcursion": -0.112889,
+        "upsideCaptureRatio": 5.915254,
+        "targetReturn": 0.262222,
+        "currentReturn": 0.3653,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "87b49960c560227a",
+        "symbol": "006060.KS",
+        "company": "화승인더",
+        "publicationDate": "2023-12-06",
+        "maxFavorableExcursion": 0.514979,
+        "maxAdverseExcursion": -0.119829,
+        "upsideCaptureRatio": 0.564946,
+        "targetReturn": 0.911555,
+        "currentReturn": 0.1284,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "15968b8b703279d7",
+        "symbol": "025980.KS",
+        "company": "아난티",
+        "publicationDate": "2023-12-06",
+        "maxFavorableExcursion": 0.817485,
+        "maxAdverseExcursion": -0.305982,
+        "upsideCaptureRatio": 0.86246,
+        "targetReturn": 0.947853,
+        "currentReturn": 0.1652,
+        "hit06": true,
+        "hit08": true,
+        "hit10": false
+      },
+      {
+        "reportId": "125064b6b657b898",
+        "symbol": "005290.KS",
+        "company": "동진쎄미켐",
+        "publicationDate": "2023-12-06",
+        "maxFavorableExcursion": 0.72423,
+        "maxAdverseExcursion": -0.45917,
+        "upsideCaptureRatio": 1.05664,
+        "targetReturn": 0.685408,
+        "currentReturn": -0.0515,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "6615fd1894ed9c54",
+        "symbol": "090460.KS",
+        "company": "비에이치",
+        "publicationDate": "2023-12-06",
+        "maxFavorableExcursion": 0.811765,
+        "maxAdverseExcursion": -0.480941,
+        "upsideCaptureRatio": 1.769231,
+        "targetReturn": 0.458824,
+        "currentReturn": -0.1537,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "f4b4743cad6757a2",
+        "symbol": "005380.KS",
+        "company": "현대차",
+        "publicationDate": "2024-04-17",
+        "maxFavorableExcursion": 2.067227,
+        "maxAdverseExcursion": -0.261345,
+        "upsideCaptureRatio": 6.39792,
+        "targetReturn": 0.323109,
+        "currentReturn": 1.3041,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "2ad3482d1c1cdd6b",
+        "symbol": "237690.KQ",
+        "company": "에스티팜",
+        "publicationDate": "2024-04-17",
+        "maxFavorableExcursion": 1.066026,
+        "maxAdverseExcursion": -0.20048,
+        "upsideCaptureRatio": 2.864423,
+        "targetReturn": 0.372161,
+        "currentReturn": 0.7429,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "d49f749544244267",
+        "symbol": "052690.KS",
+        "company": "한전기술",
+        "publicationDate": "2024-04-17",
+        "maxFavorableExcursion": 2.367347,
+        "maxAdverseExcursion": -0.162415,
+        "upsideCaptureRatio": 3.845304,
+        "targetReturn": 0.615646,
+        "currentReturn": 2.364,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "b0158f20a113fb69",
+        "symbol": "042660.KS",
+        "company": "한화오션",
+        "publicationDate": "2024-04-17",
+        "maxFavorableExcursion": 4.431579,
+        "maxAdverseExcursion": -0.108772,
+        "upsideCaptureRatio": 5.847222,
+        "targetReturn": 0.757895,
+        "currentReturn": 3.4828,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "254371e2fffbde07",
+        "symbol": "078350.KS",
+        "company": "한양디지텍",
+        "publicationDate": "2024-04-17",
+        "maxFavorableExcursion": 0.599099,
+        "maxAdverseExcursion": -0.666667,
+        "upsideCaptureRatio": 0.519531,
+        "targetReturn": 1.153153,
+        "currentReturn": 0.2022,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "900365bad5804ccf",
+        "symbol": "032350.KS",
+        "company": "롯데관광개발",
+        "publicationDate": "2024-05-09",
+        "maxFavorableExcursion": 1.729064,
+        "maxAdverseExcursion": -0.304433,
+        "upsideCaptureRatio": 1.93495,
+        "targetReturn": 0.893596,
+        "currentReturn": 1.0448,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "da8ce74880802085",
+        "symbol": "008730.KS",
+        "company": "율촌화학",
+        "publicationDate": "2024-05-09",
+        "maxFavorableExcursion": 0.319938,
+        "maxAdverseExcursion": -0.4034,
+        "upsideCaptureRatio": 0.282401,
+        "targetReturn": 1.132921,
+        "currentReturn": -0.258,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "7eaa6f87b4ef8f44",
+        "symbol": "196170.KQ",
+        "company": "알테오젠",
+        "publicationDate": "2024-05-09",
+        "maxFavorableExcursion": 2.147124,
+        "maxAdverseExcursion": -0.118363,
+        "upsideCaptureRatio": 6.322476,
+        "targetReturn": 0.339602,
+        "currentReturn": 1.0041,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "5acb22971c94d24f",
+        "symbol": "194480.KQ",
+        "company": "데브시스터즈",
+        "publicationDate": "2024-05-09",
+        "maxFavorableExcursion": 0.619958,
+        "maxAdverseExcursion": -0.622718,
+        "upsideCaptureRatio": 0.719212,
+        "targetReturn": 0.861996,
+        "currentReturn": -0.5925,
+        "hit06": true,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "edabc743b3fa8967",
+        "symbol": "ISRG",
+        "company": "Intuitive Surgical",
+        "publicationDate": "2024-05-24",
+        "maxFavorableExcursion": 0.553868,
+        "maxAdverseExcursion": -0.000706,
+        "upsideCaptureRatio": 1.723874,
+        "targetReturn": 0.321293,
+        "currentReturn": 0.1656,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "bafddc2de3fbd482",
+        "symbol": "5726.T",
+        "company": "OSAKA Titanium Technologies Co.,Ltd.",
+        "publicationDate": "2024-05-24",
+        "maxFavorableExcursion": 0.379518,
+        "maxAdverseExcursion": -0.480723,
+        "upsideCaptureRatio": 0.522099,
+        "targetReturn": 0.726908,
+        "currentReturn": 0.1715,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "6c514ea82bbdec4a",
+        "symbol": "PLTR",
+        "company": "Palantir Technologies Inc.",
+        "publicationDate": "2024-05-24",
+        "maxFavorableExcursion": 8.58522,
+        "maxAdverseExcursion": -0.046651,
+        "upsideCaptureRatio": 9.660604,
+        "targetReturn": 0.888684,
+        "currentReturn": 5.7573,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "1986a142e4bb3a97",
+        "symbol": "FLNC",
+        "company": "Fluence Energy Inc.",
+        "publicationDate": "2024-05-24",
+        "maxFavorableExcursion": 0.837171,
+        "maxAdverseExcursion": -0.810307,
+        "upsideCaptureRatio": 1.042321,
+        "targetReturn": 0.80318,
+        "currentReturn": 0.0377,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "807e330510c4104c",
+        "symbol": "192400.KQ",
+        "company": "쿠쿠홀딩스",
+        "publicationDate": "2024-06-07",
+        "maxFavorableExcursion": 0.681499,
+        "maxAdverseExcursion": -0.065105,
+        "upsideCaptureRatio": 1.927153,
+        "targetReturn": 0.35363,
+        "currentReturn": 0.2603,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "76e64766d8e46565",
+        "symbol": "029460.KS",
+        "company": "케이씨",
+        "publicationDate": "2024-06-07",
+        "maxFavorableExcursion": 0.99536,
+        "maxAdverseExcursion": -0.279814,
+        "upsideCaptureRatio": 3.27481,
+        "targetReturn": 0.303944,
+        "currentReturn": 0.8873,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "6b2cc6f2924c7060",
+        "symbol": "005720.KS",
+        "company": "넥센",
+        "publicationDate": "2024-06-07",
+        "maxFavorableExcursion": 0.824126,
+        "maxAdverseExcursion": -0.05186,
+        "upsideCaptureRatio": 2.221884,
+        "targetReturn": 0.370913,
+        "currentReturn": 0.5517,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "44609d0e5c225983",
+        "symbol": "016380.KS",
+        "company": "KG스틸",
+        "publicationDate": "2024-06-07",
+        "maxFavorableExcursion": 0.089838,
+        "maxAdverseExcursion": -0.257732,
+        "upsideCaptureRatio": 0.217082,
+        "targetReturn": 0.413844,
+        "currentReturn": 0.0604,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "ff506c1298a97f9a",
+        "symbol": "271560.KS",
+        "company": "오리온",
+        "publicationDate": "2024-06-07",
+        "maxFavorableExcursion": 0.62975,
+        "maxAdverseExcursion": -0.111835,
+        "upsideCaptureRatio": 2.406638,
+        "targetReturn": 0.261672,
+        "currentReturn": 0.5498,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "4cf882eed5b38e99",
+        "symbol": "294870.KS",
+        "company": "HDC현대산업개발",
+        "publicationDate": "2024-10-17",
+        "maxFavorableExcursion": 0.257336,
+        "maxAdverseExcursion": -0.283521,
+        "upsideCaptureRatio": 0.423791,
+        "targetReturn": 0.607223,
+        "currentReturn": 0.0469,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "4c2dc334664b299b",
+        "symbol": "067160.KQ",
+        "company": "SOOP",
+        "publicationDate": "2024-10-17",
+        "maxFavorableExcursion": 0.412682,
+        "maxAdverseExcursion": -0.465696,
+        "upsideCaptureRatio": 0.460023,
+        "targetReturn": 0.897089,
+        "currentReturn": -0.4162,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "a5af3dc5e4745791",
+        "symbol": "259960.KQ",
+        "company": "크래프톤",
+        "publicationDate": "2024-10-17",
+        "maxFavorableExcursion": 0.18552,
+        "maxAdverseExcursion": -0.371041,
+        "upsideCaptureRatio": 0.228624,
+        "targetReturn": 0.811463,
+        "currentReturn": -0.1599,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "19571cb8a9cccd3f",
+        "symbol": "211050.KQ",
+        "company": "인카금융서비스",
+        "publicationDate": "2024-10-17",
+        "maxFavorableExcursion": 2.411417,
+        "maxAdverseExcursion": -0.017717,
+        "upsideCaptureRatio": 4.056291,
+        "targetReturn": 0.594488,
+        "currentReturn": 1.0269,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "f40ba70b1416ef74",
+        "symbol": "112610.KS",
+        "company": "씨에스윈드",
+        "publicationDate": "2024-10-17",
+        "maxFavorableExcursion": 0.291057,
+        "maxAdverseExcursion": -0.511382,
+        "upsideCaptureRatio": 0.245542,
+        "targetReturn": 1.185366,
+        "currentReturn": -0.1023,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "bfea9c6b92abf111",
+        "symbol": "234300.KQ",
+        "company": "에스트래픽",
+        "publicationDate": "2024-11-07",
+        "maxFavorableExcursion": 0.06988,
+        "maxAdverseExcursion": -0.23012,
+        "upsideCaptureRatio": 0.105455,
+        "targetReturn": 0.662651,
+        "currentReturn": -0.1836,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "e4e7907cde7ff1a7",
+        "symbol": "356860.KQ",
+        "company": "티엘비",
+        "publicationDate": "2024-11-07",
+        "maxFavorableExcursion": 7.191882,
+        "maxAdverseExcursion": -0.214022,
+        "upsideCaptureRatio": 7.827309,
+        "targetReturn": 0.918819,
+        "currentReturn": 6.9422,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "b76ee313aed5d2f4",
+        "symbol": "012330.KS",
+        "company": "현대모비스",
+        "publicationDate": "2024-11-07",
+        "maxFavorableExcursion": 1.764588,
+        "maxAdverseExcursion": -0.066398,
+        "upsideCaptureRatio": 3.186774,
+        "targetReturn": 0.553722,
+        "currentReturn": 1.6804,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "98b34d5d521966a4",
+        "symbol": "018290.KS",
+        "company": "브이티",
+        "publicationDate": "2024-11-07",
+        "maxFavorableExcursion": 0.401538,
+        "maxAdverseExcursion": -0.567692,
+        "upsideCaptureRatio": 0.562499,
+        "targetReturn": 0.713846,
+        "currentReturn": -0.5233,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "23d9adf40ef1d062",
+        "symbol": "015760.KS",
+        "company": "한국전력",
+        "publicationDate": "2024-11-07",
+        "maxFavorableExcursion": 2.015184,
+        "maxAdverseExcursion": -0.158351,
+        "upsideCaptureRatio": 3.18587,
+        "targetReturn": 0.632538,
+        "currentReturn": 0.739,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "b3f38ee317977754",
+        "symbol": "4680.T",
+        "company": "Round One Corp",
+        "publicationDate": "2024-11-21",
+        "maxFavorableExcursion": 0.559737,
+        "maxAdverseExcursion": -0.299153,
+        "upsideCaptureRatio": 1.76558,
+        "targetReturn": 0.317027,
+        "currentReturn": -0.1599,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "3871aacd23309b30",
+        "symbol": "5253.T",
+        "company": "Cover Corp",
+        "publicationDate": "2024-11-21",
+        "maxFavorableExcursion": 0.323529,
+        "maxAdverseExcursion": -0.492647,
+        "upsideCaptureRatio": 0.198292,
+        "targetReturn": 1.631579,
+        "currentReturn": -0.4454,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "42bfead83e507f2d",
+        "symbol": "GRND",
+        "company": "Grindr Inc.",
+        "publicationDate": "2024-11-21",
+        "maxFavorableExcursion": 0.754888,
+        "maxAdverseExcursion": -0.320391,
+        "upsideCaptureRatio": 1.078842,
+        "targetReturn": 0.699721,
+        "currentReturn": 0.0453,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "3d77b9f898008ae2",
+        "symbol": "FNKO",
+        "company": "Funko Inc.",
+        "publicationDate": "2024-11-21",
+        "maxFavorableExcursion": 0.423712,
+        "maxAdverseExcursion": -0.784257,
+        "upsideCaptureRatio": 0.75043,
+        "targetReturn": 0.564626,
+        "currentReturn": -0.4581,
+        "hit06": true,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "d06874cf9f0f98b8",
+        "symbol": "LEVI",
+        "company": "Levi Strauss & Co",
+        "publicationDate": "2024-11-21",
+        "maxFavorableExcursion": 0.480907,
+        "maxAdverseExcursion": -0.273866,
+        "upsideCaptureRatio": 0.842215,
+        "targetReturn": 0.571002,
+        "currentReturn": 0.4294,
+        "hit06": true,
+        "hit08": true,
+        "hit10": false
+      },
+      {
+        "reportId": "c6d191d72b2077ce",
+        "symbol": "035900.KQ",
+        "company": "JYP Ent.",
+        "publicationDate": "2024-12-05",
+        "maxFavorableExcursion": 0.158377,
+        "maxAdverseExcursion": -0.260471,
+        "upsideCaptureRatio": 0.300965,
+        "targetReturn": 0.52623,
+        "currentReturn": -0.1862,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "a7d2436e22605d74",
+        "symbol": "082740.KS",
+        "company": "한화엔진",
+        "publicationDate": "2024-12-05",
+        "maxFavorableExcursion": 4.859714,
+        "maxAdverseExcursion": -0.128492,
+        "upsideCaptureRatio": 9.498907,
+        "targetReturn": 0.511608,
+        "currentReturn": 4.1123,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "918efca8ecaf4fcc",
+        "symbol": "6857.T",
+        "company": "Advantest Corporation",
+        "publicationDate": "2024-12-05",
+        "maxFavorableExcursion": 2.932039,
+        "maxAdverseExcursion": -0.429248,
+        "upsideCaptureRatio": 3.882372,
+        "targetReturn": 0.755218,
+        "currentReturn": 2.1582,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "d035a6ff1fc0c798",
+        "symbol": "033500.KQ",
+        "company": "동성화인텍",
+        "publicationDate": "2024-12-05",
+        "maxFavorableExcursion": 1.396925,
+        "maxAdverseExcursion": -0.109015,
+        "upsideCaptureRatio": 3.17806,
+        "targetReturn": 0.439553,
+        "currentReturn": 0.723,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "151f576bb9361278",
+        "symbol": "218410.KQ",
+        "company": "RFHIC",
+        "publicationDate": "2024-12-05",
+        "maxFavorableExcursion": 9.367647,
+        "maxAdverseExcursion": -0.129902,
+        "upsideCaptureRatio": 21.194085,
+        "targetReturn": 0.441993,
+        "currentReturn": 8.1429,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "d10fea659a518441",
+        "symbol": "012450.KS",
+        "company": "한화에어로스페이스",
+        "publicationDate": "2025-04-19",
+        "maxFavorableExcursion": 1.124519,
+        "maxAdverseExcursion": -0.035944,
+        "upsideCaptureRatio": 2.056339,
+        "targetReturn": 0.546855,
+        "currentReturn": 0.5735,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "9d989772df4a7b0f",
+        "symbol": "119850.KQ",
+        "company": "지엔씨에너지",
+        "publicationDate": "2025-04-19",
+        "maxFavorableExcursion": 1.758112,
+        "maxAdverseExcursion": 0.116224,
+        "upsideCaptureRatio": 1.315093,
+        "targetReturn": 1.336873,
+        "currentReturn": 0.8,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "dc9c54887b60b8a3",
+        "symbol": "473980.KQ",
+        "company": "노머스",
+        "publicationDate": "2025-04-19",
+        "maxFavorableExcursion": 0.560575,
+        "maxAdverseExcursion": -0.366735,
+        "upsideCaptureRatio": 1.003677,
+        "targetReturn": 0.558522,
+        "currentReturn": -0.3228,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "8b7a226ac2c09a02",
+        "symbol": "489790.KS",
+        "company": "한화비전",
+        "publicationDate": "2025-04-19",
+        "maxFavorableExcursion": 0.799632,
+        "maxAdverseExcursion": -0.344669,
+        "upsideCaptureRatio": 0.760489,
+        "targetReturn": 1.051471,
+        "currentReturn": 0.3989,
+        "hit06": true,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "24474fb2032a5660",
+        "symbol": "001040.KS",
+        "company": "CJ",
+        "publicationDate": "2025-04-19",
+        "maxFavorableExcursion": 1.01371,
+        "maxAdverseExcursion": -0.045416,
+        "upsideCaptureRatio": 4.382129,
+        "targetReturn": 0.231328,
+        "currentReturn": 0.8668,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "93ea8d6194cfd690",
+        "symbol": "009830.KS",
+        "company": "한화솔루션",
+        "publicationDate": "2025-05-11",
+        "maxFavorableExcursion": 0.957096,
+        "maxAdverseExcursion": -0.151815,
+        "upsideCaptureRatio": 1.277533,
+        "targetReturn": 0.749175,
+        "currentReturn": 0.4573,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "074acdbfeb5be678",
+        "symbol": "475960.KQ",
+        "company": "토모큐브",
+        "publicationDate": "2025-05-11",
+        "maxFavorableExcursion": 2.491246,
+        "maxAdverseExcursion": -0.014933,
+        "upsideCaptureRatio": 1.072014,
+        "targetReturn": 2.323893,
+        "currentReturn": 1.4857,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "d8688cca92a9f924",
+        "symbol": "101490.KQ",
+        "company": "에스앤에스텍",
+        "publicationDate": "2025-05-11",
+        "maxFavorableExcursion": 2.128427,
+        "maxAdverseExcursion": -0.082251,
+        "upsideCaptureRatio": 3.678304,
+        "targetReturn": 0.578644,
+        "currentReturn": 1.3961,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "b28f6fdfc2ee056e",
+        "symbol": "LIF",
+        "company": "Life360 Inc",
+        "publicationDate": "2025-05-25",
+        "maxFavorableExcursion": 0.813701,
+        "maxAdverseExcursion": -0.403545,
+        "upsideCaptureRatio": 1.22104,
+        "targetReturn": 0.6664,
+        "currentReturn": -0.3005,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "afafe74c5dc92db9",
+        "symbol": "DOCS",
+        "company": "Doximity",
+        "publicationDate": "2025-05-25",
+        "maxFavorableExcursion": 0.65427,
+        "maxAdverseExcursion": -0.555676,
+        "upsideCaptureRatio": 0.530598,
+        "targetReturn": 1.233081,
+        "currentReturn": -0.5101,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "bb8b54c6c0db0df2",
+        "symbol": "SRAD",
+        "company": "Sportradar",
+        "publicationDate": "2025-05-25",
+        "maxFavorableExcursion": 0.358347,
+        "maxAdverseExcursion": -0.508432,
+        "upsideCaptureRatio": 0.598591,
+        "targetReturn": 0.598651,
+        "currentReturn": -0.4299,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "91d1a46a03353151",
+        "symbol": "TEM",
+        "company": "Tempus AI Inc",
+        "publicationDate": "2025-05-25",
+        "maxFavorableExcursion": 0.666454,
+        "maxAdverseExcursion": -0.333387,
+        "upsideCaptureRatio": 0.251477,
+        "targetReturn": 2.65016,
+        "currentReturn": -0.2396,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "a3c8fafb9892885e",
+        "symbol": "CLBT",
+        "company": "Cellebrite DI",
+        "publicationDate": "2025-05-25",
+        "maxFavorableExcursion": 0.156919,
+        "maxAdverseExcursion": -0.361899,
+        "upsideCaptureRatio": 0.21802,
+        "targetReturn": 0.719745,
+        "currentReturn": -0.2305,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "6045b80eb31dfc42",
+        "symbol": "310200.KQ",
+        "company": "애니플러스",
+        "publicationDate": "2025-06-10",
+        "maxFavorableExcursion": 0.811268,
+        "maxAdverseExcursion": -0.283099,
+        "upsideCaptureRatio": 0.697337,
+        "targetReturn": 1.16338,
+        "currentReturn": -0.3417,
+        "hit06": true,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "3dd9258766a7bcef",
+        "symbol": "101160.KQ",
+        "company": "월덱스",
+        "publicationDate": "2025-06-10",
+        "maxFavorableExcursion": 0.862178,
+        "maxAdverseExcursion": 0.018411,
+        "upsideCaptureRatio": 2.263813,
+        "targetReturn": 0.380852,
+        "currentReturn": 0.588,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "891215e30e9ee8b4",
+        "symbol": "472850.KQ",
+        "company": "폰드그룹",
+        "publicationDate": "2025-06-10",
+        "maxFavorableExcursion": -0.109691,
+        "maxAdverseExcursion": -0.491915,
+        "upsideCaptureRatio": -0.122764,
+        "targetReturn": 0.893514,
+        "currentReturn": 0.1085,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "abbac514215ca627",
+        "symbol": "049720.KQ",
+        "company": "고려신용정보",
+        "publicationDate": "2025-06-10",
+        "maxFavorableExcursion": 0.086538,
+        "maxAdverseExcursion": -0.059615,
+        "upsideCaptureRatio": 0.109756,
+        "targetReturn": 0.788462,
+        "currentReturn": -0.003,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "444fe65d5237a1d8",
+        "symbol": "461300.KQ",
+        "company": "아이스크림미디어",
+        "publicationDate": "2025-06-10",
+        "maxFavorableExcursion": 0.745881,
+        "maxAdverseExcursion": -0.104563,
+        "upsideCaptureRatio": 1.186492,
+        "targetReturn": 0.628644,
+        "currentReturn": -0.0767,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "9ea31c54d63ef212",
+        "symbol": "108490.KQ",
+        "company": "로보티즈",
+        "publicationDate": "2025-10-23",
+        "maxFavorableExcursion": 1.049948,
+        "maxAdverseExcursion": -0.07128,
+        "upsideCaptureRatio": 1.233496,
+        "targetReturn": 0.851197,
+        "currentReturn": 0.8235,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "2427c05877a23528",
+        "symbol": "098120.KQ",
+        "company": "마이크로컨텍솔",
+        "publicationDate": "2025-10-23",
+        "maxFavorableExcursion": 0.541825,
+        "maxAdverseExcursion": -0.404943,
+        "upsideCaptureRatio": 0.446708,
+        "targetReturn": 1.212928,
+        "currentReturn": 0.4649,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "b8e4eb25010494a7",
+        "symbol": "CRWV",
+        "company": "Coreweave",
+        "publicationDate": "2025-10-23",
+        "maxFavorableExcursion": 0.012786,
+        "maxAdverseExcursion": -0.544286,
+        "upsideCaptureRatio": 0.017723,
+        "targetReturn": 0.721429,
+        "currentReturn": -0.058,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "a45f9d90222e517c",
+        "symbol": "GLW",
+        "company": "Corning",
+        "publicationDate": "2025-10-23",
+        "maxFavorableExcursion": 1.455821,
+        "maxAdverseExcursion": -0.102621,
+        "upsideCaptureRatio": 2.17365,
+        "targetReturn": 0.669759,
+        "currentReturn": 1.511,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "590bbdbb186eccf6",
+        "symbol": "352820.KS",
+        "company": "하이브",
+        "publicationDate": "2025-10-23",
+        "maxFavorableExcursion": 0.504638,
+        "maxAdverseExcursion": -0.153989,
+        "upsideCaptureRatio": 1.101214,
+        "targetReturn": 0.458256,
+        "currentReturn": -0.1438,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "370191c7afc9d3fc",
+        "symbol": "000150.KS",
+        "company": "두산",
+        "publicationDate": "2025-11-11",
+        "maxFavorableExcursion": 1.002107,
+        "maxAdverseExcursion": -0.226554,
+        "upsideCaptureRatio": 1.028108,
+        "targetReturn": 0.97471,
+        "currentReturn": 0.6795,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "f0cba38be64424ad",
+        "symbol": "017960.KS",
+        "company": "한국카본",
+        "publicationDate": "2025-11-11",
+        "maxFavorableExcursion": 0.478142,
+        "maxAdverseExcursion": -0.295082,
+        "upsideCaptureRatio": 0.638686,
+        "targetReturn": 0.748634,
+        "currentReturn": 0.2797,
+        "hit06": true,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "9783da1e007737e2",
+        "symbol": "950160.KQ",
+        "company": "코오롱티슈진",
+        "publicationDate": "2025-11-11",
+        "maxFavorableExcursion": 2.325893,
+        "maxAdverseExcursion": 0.044643,
+        "upsideCaptureRatio": 1.367454,
+        "targetReturn": 1.700893,
+        "currentReturn": 1.4013,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "26a1eefc429193c6",
+        "symbol": "456160.KQ",
+        "company": "지투지바이오",
+        "publicationDate": "2025-11-11",
+        "maxFavorableExcursion": 1.226372,
+        "maxAdverseExcursion": 0.097027,
+        "upsideCaptureRatio": 0.258625,
+        "targetReturn": 4.741885,
+        "currentReturn": -0.2098,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "98a3453a7f6ebe08",
+        "symbol": "103140.KS",
+        "company": "풍산",
+        "publicationDate": "2025-11-11",
+        "maxFavorableExcursion": 0.447273,
+        "maxAdverseExcursion": -0.218182,
+        "upsideCaptureRatio": 4.598134,
+        "targetReturn": 0.097273,
+        "currentReturn": -0.092,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "cfa62286ec8e7734",
+        "symbol": "IRMD",
+        "company": "Iradimed Corporation",
+        "publicationDate": "2025-12-01",
+        "maxFavorableExcursion": 0.168867,
+        "maxAdverseExcursion": -0.16641,
+        "upsideCaptureRatio": 0.290349,
+        "targetReturn": 0.5816,
+        "currentReturn": -0.059,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "3b0f47d453265251",
+        "symbol": "SXT",
+        "company": "Sensient Technologies Corp",
+        "publicationDate": "2025-12-01",
+        "maxFavorableExcursion": 0.352305,
+        "maxAdverseExcursion": -0.136448,
+        "upsideCaptureRatio": 0.236732,
+        "targetReturn": 1.4882,
+        "currentReturn": 0.2328,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "554d2e862320e96a",
+        "symbol": "IMAX",
+        "company": "IMAX Corp",
+        "publicationDate": "2025-12-01",
+        "maxFavorableExcursion": 0.219209,
+        "maxAdverseExcursion": -0.067797,
+        "upsideCaptureRatio": 0.404167,
+        "targetReturn": 0.542373,
+        "currentReturn": -0.0657,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "25e4f4697656dffa",
+        "symbol": "2124.T",
+        "company": "JAC recruitment Co. Ltd",
+        "publicationDate": "2025-12-01",
+        "maxFavorableExcursion": 0.00722,
+        "maxAdverseExcursion": -0.259928,
+        "upsideCaptureRatio": 0.01384,
+        "targetReturn": 0.521661,
+        "currentReturn": -0.2388,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "69575019ea6dce78",
+        "symbol": "ESTA",
+        "company": "Establishment Labs Holdings",
+        "publicationDate": "2025-12-01",
+        "maxFavorableExcursion": 0.261317,
+        "maxAdverseExcursion": -0.195155,
+        "upsideCaptureRatio": 0.327452,
+        "targetReturn": 0.798032,
+        "currentReturn": 0.0381,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "afb1d9eef8e32a49",
+        "symbol": "010950.KS",
+        "company": "S-oil",
+        "publicationDate": "2025-12-15",
+        "maxFavorableExcursion": 1.2,
+        "maxAdverseExcursion": -0.012422,
+        "upsideCaptureRatio": 2.016701,
+        "targetReturn": 0.595031,
+        "currentReturn": 0.331,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "33e51b94729d7750",
+        "symbol": "122640.KQ",
+        "company": "예스티",
+        "publicationDate": "2025-12-15",
+        "maxFavorableExcursion": 0.65,
+        "maxAdverseExcursion": -0.167895,
+        "upsideCaptureRatio": 0.574419,
+        "targetReturn": 1.131579,
+        "currentReturn": 0.4997,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "81b5548d4613ed52",
+        "symbol": "214450.KQ",
+        "company": "파마리서치",
+        "publicationDate": "2025-12-15",
+        "maxFavorableExcursion": 0.39726,
+        "maxAdverseExcursion": -0.306351,
+        "upsideCaptureRatio": 0.395291,
+        "targetReturn": 1.004981,
+        "currentReturn": -0.0775,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "b724efa4bec6fd8e",
+        "symbol": "LITE",
+        "company": "Lumentum Holdings Inc",
+        "publicationDate": "2025-12-15",
+        "maxFavorableExcursion": 2.311515,
+        "maxAdverseExcursion": -0.057282,
+        "upsideCaptureRatio": 4.437465,
+        "targetReturn": 0.520909,
+        "currentReturn": 2.1205,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
+      },
+      {
+        "reportId": "cfc5e7b11b6755e1",
+        "symbol": "GLNG",
+        "company": "Golar LNG",
+        "publicationDate": "2026-04-16",
+        "maxFavorableExcursion": 0.084419,
+        "maxAdverseExcursion": -0.048999,
+        "upsideCaptureRatio": 0.101076,
+        "targetReturn": 0.8352,
+        "currentReturn": 0.0773,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      },
+      {
+        "reportId": "23d6d08a6edd02cd",
+        "symbol": "CAMT",
+        "company": "Camtek",
+        "publicationDate": "2026-04-16",
+        "maxFavorableExcursion": 0.190867,
+        "maxAdverseExcursion": -0.074783,
+        "upsideCaptureRatio": 0.541987,
+        "targetReturn": 0.352161,
+        "currentReturn": -0.053,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
+      }
+    ],
+    "topExamples": {
+      "upsideCapture": [
+        {
+          "reportId": "fea27bf20d0f8d88",
+          "symbol": "007660.KS",
+          "company": "이수페타시스",
+          "publicationDate": "2022-11-13",
+          "entryPrice": 5480,
+          "targetPrice": 7600,
+          "targetReturn": 0.386861,
+          "currentReturn": 3.3019,
+          "maxFavorableExcursion": 29,
+          "maxAdverseExcursion": -0.038321,
+          "upsideCaptureRatio": 74.962264,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 52,
+              "within": {
+                "30": false,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 49,
+              "within": {
+                "30": false,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 52,
+              "within": {
+                "30": false,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            }
+          }
+        },
+        {
+          "reportId": "f02894f6b517e70d",
+          "symbol": "440110.KQ",
+          "company": "파두",
+          "publicationDate": "2023-11-12",
+          "entryPrice": 33550,
+          "targetPrice": 34600,
+          "targetReturn": 0.031297,
+          "currentReturn": 0.3655,
+          "maxFavorableExcursion": 2.090909,
+          "maxAdverseExcursion": -0.740686,
+          "upsideCaptureRatio": 66.809521,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 541,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": false,
+                "250": false
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 541,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": false,
+                "250": false
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 541,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": false,
+                "250": false
+              }
+            }
+          }
+        },
+        {
+          "reportId": "0448a5a1bc4adf29",
+          "symbol": "000660.KS",
+          "company": "SK하이닉스",
+          "publicationDate": "2023-10-19",
+          "entryPrice": 124700,
+          "targetPrice": 164600,
+          "targetReturn": 0.319968,
+          "currentReturn": 2.7033,
+          "maxFavorableExcursion": 14.990377,
+          "maxAdverseExcursion": -0.067362,
+          "upsideCaptureRatio": 46.849624,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 86,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 78,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 86,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": true,
+                "250": true
+              }
+            }
+          }
+        },
+        {
+          "reportId": "e297c3688dff52fa",
+          "symbol": "214450.KQ",
+          "company": "파마리서치",
+          "publicationDate": "2023-04-13",
+          "entryPrice": 86800,
+          "targetPrice": 111600,
+          "targetReturn": 0.285714,
+          "currentReturn": 3.0397,
+          "maxFavorableExcursion": 7.214286,
+          "maxAdverseExcursion": 0,
+          "upsideCaptureRatio": 25.250001,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 21,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 3,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 4,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            }
+          }
+        },
+        {
+          "reportId": "151f576bb9361278",
+          "symbol": "218410.KQ",
+          "company": "RFHIC",
+          "publicationDate": "2024-12-05",
+          "entryPrice": 12240,
+          "targetPrice": 17650,
+          "targetReturn": 0.441993,
+          "currentReturn": 8.1429,
+          "maxFavorableExcursion": 9.367647,
+          "maxAdverseExcursion": -0.129902,
+          "upsideCaptureRatio": 21.194085,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 36,
+              "within": {
+                "30": false,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 32,
+              "within": {
+                "30": false,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 32,
+              "within": {
+                "30": false,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            }
+          }
+        },
+        {
+          "reportId": "98f5913a5681e6f8",
+          "symbol": "267260.KS",
+          "company": "HD현대일렉트릭",
+          "publicationDate": "2023-10-19",
+          "entryPrice": 71600,
+          "targetPrice": 140100,
+          "targetReturn": 0.956704,
+          "currentReturn": 8.3944,
+          "maxFavorableExcursion": 18.972067,
+          "maxAdverseExcursion": -0.085196,
+          "upsideCaptureRatio": 19.830657,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 87,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 79,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 83,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": true,
+                "250": true
+              }
+            }
+          }
+        },
+        {
+          "reportId": "616b5a7fe9444744",
+          "symbol": "VRT",
+          "company": "Vertiv Holdings Co.",
+          "publicationDate": "2023-11-22",
+          "entryPrice": 42.84,
+          "targetPrice": 61.97,
+          "targetReturn": 0.446545,
+          "currentReturn": 3.1775,
+          "maxFavorableExcursion": 7.81816,
+          "maxAdverseExcursion": -0.042717,
+          "upsideCaptureRatio": 17.508101,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 48,
+              "within": {
+                "30": false,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 39,
+              "within": {
+                "30": false,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 47,
+              "within": {
+                "30": false,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            }
+          }
+        },
+        {
+          "reportId": "ae2cc012ee18fbdb",
+          "symbol": "EAF",
+          "company": "GrafTech International Ltd.",
+          "publicationDate": "2022-05-25",
+          "entryPrice": 8.25,
+          "targetPrice": 13.1,
+          "targetReturn": 0.587879,
+          "currentReturn": -0.7729,
+          "maxFavorableExcursion": 10.236363,
+          "maxAdverseExcursion": -0.403636,
+          "upsideCaptureRatio": 17.41237,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 0,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 0,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 0,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            }
+          }
+        }
+      ],
+      "fast08": [
+        {
+          "reportId": "5d0752b834ca2cb9",
+          "symbol": "BILI",
+          "company": "Bili bili",
+          "publicationDate": "2020-12-05",
+          "entryPrice": 45.9,
+          "targetPrice": 72.95,
+          "targetReturn": 0.589325,
+          "currentReturn": -0.6747,
+          "maxFavorableExcursion": 2.434858,
+          "maxAdverseExcursion": -0.820697,
+          "upsideCaptureRatio": 4.131607,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 0,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 0,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 0,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            }
+          }
+        },
+        {
+          "reportId": "61b8145c6d332ac7",
+          "symbol": "009830.KS",
+          "company": "한화솔루션",
+          "publicationDate": "2021-01-16",
+          "entryPrice": 49350,
+          "targetPrice": 60700,
+          "targetReturn": 0.22999,
+          "currentReturn": -0.0944,
+          "maxFavorableExcursion": 0.312416,
+          "maxAdverseExcursion": -0.698886,
+          "upsideCaptureRatio": 1.35839,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 1,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 0,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 0,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            }
+          }
+        },
+        {
+          "reportId": "ae2cc012ee18fbdb",
+          "symbol": "EAF",
+          "company": "GrafTech International Ltd.",
+          "publicationDate": "2022-05-25",
+          "entryPrice": 8.25,
+          "targetPrice": 13.1,
+          "targetReturn": 0.587879,
+          "currentReturn": -0.7729,
+          "maxFavorableExcursion": 10.236363,
+          "maxAdverseExcursion": -0.403636,
+          "upsideCaptureRatio": 17.41237,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 0,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 0,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 0,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            }
+          }
+        },
+        {
+          "reportId": "0498c71baf800437",
+          "symbol": "043650.KQ",
+          "company": "국순당",
+          "publicationDate": "2022-04-16",
+          "entryPrice": 10750,
+          "targetPrice": 13250,
+          "targetReturn": 0.232558,
+          "currentReturn": -0.5018,
+          "maxFavorableExcursion": 0.204651,
+          "maxAdverseExcursion": -0.642326,
+          "upsideCaptureRatio": 0.879999,
+          "hit": {
+            "1": {
+              "hit": false,
+              "days": null,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": false,
+                "250": false
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 1,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 1,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            }
+          }
+        },
+        {
+          "reportId": "044fd5b652cd7b71",
+          "symbol": "ROKU",
+          "company": "Roku",
+          "publicationDate": "2020-12-05",
+          "entryPrice": 230,
+          "targetPrice": 327.62,
+          "targetReturn": 0.424435,
+          "currentReturn": -0.7745,
+          "maxFavorableExcursion": 1.133743,
+          "maxAdverseExcursion": -0.833652,
+          "upsideCaptureRatio": 2.671183,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 2,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 0,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 2,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            }
+          }
+        },
+        {
+          "reportId": "e297c3688dff52fa",
+          "symbol": "214450.KQ",
+          "company": "파마리서치",
+          "publicationDate": "2023-04-13",
+          "entryPrice": 86800,
+          "targetPrice": 111600,
+          "targetReturn": 0.285714,
+          "currentReturn": 3.0397,
+          "maxFavorableExcursion": 7.214286,
+          "maxAdverseExcursion": 0,
+          "upsideCaptureRatio": 25.250001,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 21,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 3,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 4,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            }
+          }
+        },
+        {
+          "reportId": "6288504ba75cd344",
+          "symbol": "131970.KQ",
+          "company": "두산테스나",
+          "publicationDate": "2023-11-12",
+          "entryPrice": 52500,
+          "targetPrice": 66500,
+          "targetReturn": 0.266667,
+          "currentReturn": -0.1354,
+          "maxFavorableExcursion": 2.750476,
+          "maxAdverseExcursion": -0.58,
+          "upsideCaptureRatio": 10.314285,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 537,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": false,
+                "250": false
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 4,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 13,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            }
+          }
+        },
+        {
+          "reportId": "b3f38ee317977754",
+          "symbol": "4680.T",
+          "company": "Round One Corp",
+          "publicationDate": "2024-11-21",
+          "entryPrice": 1063,
+          "targetPrice": 1400,
+          "targetReturn": 0.317027,
+          "currentReturn": -0.1599,
+          "maxFavorableExcursion": 0.559737,
+          "maxAdverseExcursion": -0.299153,
+          "upsideCaptureRatio": 1.76558,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 51,
+              "within": {
+                "30": false,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 11,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 16,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            }
+          }
+        }
+      ],
+      "painfulWinners": [
+        {
+          "reportId": "ee12b562184f3778",
+          "symbol": "036420.KS",
+          "company": "제이콘텐트리",
+          "publicationDate": "2021-06-06",
+          "entryPrice": 53000,
+          "targetPrice": 74500,
+          "targetReturn": 0.40566,
+          "currentReturn": -0.5543,
+          "maxFavorableExcursion": 0.620755,
+          "maxAdverseExcursion": -0.902075,
+          "upsideCaptureRatio": 1.530233,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 114,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 90,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 97,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": true,
+                "250": true
+              }
+            }
+          }
+        },
+        {
+          "reportId": "786a5c9006c4a1d7",
+          "symbol": "194480.KQ",
+          "company": "데브시스터즈",
+          "publicationDate": "2021-05-06",
+          "entryPrice": 114100,
+          "targetPrice": 198000,
+          "targetReturn": 0.73532,
+          "currentReturn": -0.4936,
+          "maxFavorableExcursion": 0.748466,
+          "maxAdverseExcursion": -0.844259,
+          "upsideCaptureRatio": 1.017878,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 97,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 94,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 95,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": true,
+                "250": true
+              }
+            }
+          }
+        },
+        {
+          "reportId": "044fd5b652cd7b71",
+          "symbol": "ROKU",
+          "company": "Roku",
+          "publicationDate": "2020-12-05",
+          "entryPrice": 230,
+          "targetPrice": 327.62,
+          "targetReturn": 0.424435,
+          "currentReturn": -0.7745,
+          "maxFavorableExcursion": 1.133743,
+          "maxAdverseExcursion": -0.833652,
+          "upsideCaptureRatio": 2.671183,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 2,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 0,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 2,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            }
+          }
+        },
+        {
+          "reportId": "5d0752b834ca2cb9",
+          "symbol": "BILI",
+          "company": "Bili bili",
+          "publicationDate": "2020-12-05",
+          "entryPrice": 45.9,
+          "targetPrice": 72.95,
+          "targetReturn": 0.589325,
+          "currentReturn": -0.6747,
+          "maxFavorableExcursion": 2.434858,
+          "maxAdverseExcursion": -0.820697,
+          "upsideCaptureRatio": 4.131607,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 0,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 0,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 0,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            }
+          }
+        },
+        {
+          "reportId": "aca3b0e80e5d334c",
+          "symbol": "SE",
+          "company": "SEA ltd.",
+          "publicationDate": "2020-12-05",
+          "entryPrice": 183.11,
+          "targetPrice": 290.8,
+          "targetReturn": 0.588116,
+          "currentReturn": -0.6437,
+          "maxFavorableExcursion": 1.035389,
+          "maxAdverseExcursion": -0.812408,
+          "upsideCaptureRatio": 1.760517,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 137,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": false,
+                "250": true
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 41,
+              "within": {
+                "30": false,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 43,
+              "within": {
+                "30": false,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            }
+          }
+        },
+        {
+          "reportId": "1986a142e4bb3a97",
+          "symbol": "FLNC",
+          "company": "Fluence Energy Inc.",
+          "publicationDate": "2024-05-24",
+          "entryPrice": 18.24,
+          "targetPrice": 32.89,
+          "targetReturn": 0.80318,
+          "currentReturn": 0.0377,
+          "maxFavorableExcursion": 0.837171,
+          "maxAdverseExcursion": -0.810307,
+          "upsideCaptureRatio": 1.042321,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 421,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": false,
+                "250": false
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 412,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": false,
+                "250": false
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 418,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": false,
+                "250": false
+              }
+            }
+          }
+        },
+        {
+          "reportId": "28902e013d64471e",
+          "symbol": "363250.KQ",
+          "company": "진시스템",
+          "publicationDate": "2023-05-11",
+          "entryPrice": 17990,
+          "targetPrice": 32800,
+          "targetReturn": 0.823235,
+          "currentReturn": -0.4369,
+          "maxFavorableExcursion": 0.778766,
+          "maxAdverseExcursion": -0.806559,
+          "upsideCaptureRatio": 0.945982,
+          "hit": {
+            "1": {
+              "hit": false,
+              "days": null,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": false,
+                "250": false
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 35,
+              "within": {
+                "30": false,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 37,
+              "within": {
+                "30": false,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            }
+          }
+        },
+        {
+          "reportId": "9ad4504d75edadfa",
+          "symbol": "ANET",
+          "company": "Arista Networks",
+          "publicationDate": "2022-11-25",
+          "entryPrice": 132.06,
+          "targetPrice": 167.75,
+          "targetReturn": 0.270256,
+          "currentReturn": 2.1797,
+          "maxFavorableExcursion": 0.361502,
+          "maxAdverseExcursion": -0.793825,
+          "upsideCaptureRatio": 1.337628,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 850,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": false,
+                "250": false
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 699,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": false,
+                "250": false
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 720,
+              "within": {
+                "30": false,
+                "60": false,
+                "120": false,
+                "250": false
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

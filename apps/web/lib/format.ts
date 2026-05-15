@@ -35,8 +35,8 @@ export const numCellClass = 'text-right tabular-nums';
 
 /** Tailwind class for signed numeric values (success/error tinting). */
 export function signedTextClass(value: number | null | undefined): string {
-  if (value === null || value === undefined || !Number.isFinite(value)) return 'text-base-content/55';
-  return value >= 0 ? 'text-success' : 'text-error';
+  if (value === null || value === undefined || !Number.isFinite(value)) return 'text-slate-950/55';
+  return value >= 0 ? 'text-emerald-600' : 'text-rose-600';
 }
 
 const CURRENCY_SYMBOL: Record<string, string> = {

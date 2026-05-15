@@ -125,7 +125,7 @@ export function PortfolioStrategyView({
         <div className="grid min-w-0 gap-2">
           <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
             <span className="snapshot-pill">전략 선택</span>
-            <span className="text-xs font-bold text-base-content/45">
+            <span className="text-xs font-bold text-slate-950/45">
               고유 전략 {strategyOptions.filter((item) => item.kind === 'strategy').length} · 기준선{' '}
               {strategyOptions.filter((item) => item.kind !== 'strategy').length}
             </span>
@@ -137,8 +137,8 @@ export function PortfolioStrategyView({
             value={persona}
           />
         </div>
-        <p className="m-0 mt-2 text-xs text-base-content/55">
-          <strong className="text-base-content">{personaLabels[persona] ?? persona}</strong>의 보유·현금·체결·매수/매도
+        <p className="m-0 mt-2 text-xs text-slate-950/55">
+          <strong className="text-slate-950">{personaLabels[persona] ?? persona}</strong>의 보유·현금·체결·매수/매도
           규칙을 함께 봅니다. 기준선과 상한선은 비교용이고, 고유 전략만 선택해 검토할 수 있는 포트폴리오 전략입니다.
         </p>
       </div>
@@ -188,7 +188,7 @@ export function PortfolioStrategyView({
           <span className="snapshot-pill">면적=평가액</span>
         </div>
         <HoldingsTreemap holdings={treemapHoldings} height={360} compact hrefBySymbol={reportHrefBySymbol} />
-        <p className="mt-3 text-xs leading-5 text-base-content/55">
+        <p className="mt-3 text-xs leading-5 text-slate-950/55">
           매도 후 즉시 다른 종목을 사지 않는 경우는 전략의 리밸런싱/입금 주기, 최대 보유 종목 수, MTT·업사이드·가격
           조건을 동시에 만족하는 후보 부족 때문입니다. 그 구간의 미투자 금액은 현금으로 보존되어 평가액과 트리맵에
           포함됩니다.
@@ -266,7 +266,7 @@ function StrategyMethodPanel({
       <div className="mb-3">
         <div className="lab-panel__eyebrow">운용 규칙</div>
         <h2 className="lab-panel__title">{personaLabel} 매수·매도 규칙</h2>
-        <p className="mt-2 text-sm leading-6 text-base-content/62">{method.summary}</p>
+        <p className="mt-2 text-sm leading-6 text-slate-950/62">{method.summary}</p>
       </div>
       <div className="grid gap-3 md:grid-cols-3">
         <RuleList title="매수 판단" items={method.buyRules} />
@@ -286,20 +286,20 @@ function AccountingExplanationPanel({ row }: { row: AccountingReconciliationRow 
         <div>
           <div className="lab-panel__eyebrow">현금 검산</div>
           <h2 className="lab-panel__title">확정 손익과 현금은 같은 숫자가 아닙니다</h2>
-          <p className="mt-2 text-sm leading-6 text-base-content/65">
+          <p className="mt-2 text-sm leading-6 text-slate-500">
             {row.explanationKo} 이 검산은 저장된 매매내역과 현재 보유 포지션을 이용해 만든 파생 데이터입니다. 현금은
             “입금액 + 실현손익 − 아직 들고 있는 주식의 매입 원가”로 다시 계산하며, 평가액은 현금과 보유 주식의 현재
             가치가 합쳐진 값입니다.
           </p>
           {realizedOverCash ? (
-            <p className="mt-2 text-sm leading-6 text-base-content/65">
+            <p className="mt-2 text-sm leading-6 text-slate-500">
               따라서 MTT #22처럼 확정 손익이 약 {formatKrw(row.realizedPnlKrw)}인데 현금이 {formatKrw(row.finalCashKrw)}
               로 보이는 상황은, 약 {formatKrw(row.openCostBasisKrw)}가 현재 보유 종목의 원가로 묶여 있으면 회계적으로
               자연스럽습니다.
             </p>
           ) : null}
         </div>
-        <dl className="grid gap-2 rounded-xl border border-base-300 bg-base-100 p-3 text-sm">
+        <dl className="grid gap-2 rounded-xl border border-slate-200 bg-white p-3 text-sm">
           <AccountingLine label="입금 누계" value={row.totalContributedKrw} />
           <AccountingLine label="+ 확정 손익" value={row.realizedPnlKrw} />
           <AccountingLine label="- 보유 원가" value={row.openCostBasisKrw === null ? null : -row.openCostBasisKrw} />
@@ -327,10 +327,10 @@ function AccountingLine({
   strong?: boolean;
   tone?: 'good' | 'bad';
 }) {
-  const color = tone === 'bad' ? 'text-error' : tone === 'good' ? 'text-success' : 'text-base-content';
+  const color = tone === 'bad' ? 'text-rose-600' : tone === 'good' ? 'text-emerald-600' : 'text-slate-950';
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-base-200 pb-2 last:border-b-0 last:pb-0">
-      <dt className="text-base-content/55">{label}</dt>
+    <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-2 last:border-b-0 last:pb-0">
+      <dt className="text-slate-950/55">{label}</dt>
       <dd className={`font-mono tabular-nums ${strong ? 'font-black' : 'font-semibold'} ${color}`}>
         {formatKrw(value)}
       </dd>
@@ -340,13 +340,13 @@ function AccountingLine({
 
 function RuleList({ title, items }: { title: string; items: string[] }) {
   return (
-    <div className="rounded-2xl border border-base-300 bg-base-100 p-3">
+    <div className="rounded-2xl border border-slate-200 bg-white p-3">
       <h3 className="text-sm font-black">{title}</h3>
-      <ul className="mt-2 grid gap-1.5 text-sm leading-5 text-base-content/65">
+      <ul className="mt-2 grid gap-1.5 text-sm leading-5 text-slate-500">
         {items.length ? (
           items.map((item) => <li key={item}>• {item}</li>)
         ) : (
-          <li className="text-base-content/45">기록된 규칙이 없습니다.</li>
+          <li className="text-slate-950/45">기록된 규칙이 없습니다.</li>
         )}
       </ul>
     </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { CumulativeReturnChart, type ReturnSeries } from '@/components/charts/CumulativeReturnChart';
 import type { EquityPoint } from '@/lib/artifacts';
 import { formatPercent } from '@/lib/format';
@@ -90,56 +90,96 @@ function FrontierPlot({
   efficientIds: Set<string>;
   selectedId: string;
 }) {
-  const xs = rows.map((row) => row.maxDrawdown ?? 0);
-  const ys = rows.map((row) => row.returnPct ?? 0);
+  const [riskWindow, setRiskWindow] = useState<'all' | 'focused'>('all');
+  const [pinnedId, setPinnedId] = useState(selectedId);
+  const visibleRows = rows.filter((row) => riskWindow === 'all' || (row.maxDrawdown ?? 0) <= 0.3);
+  const xs = visibleRows.map((row) => row.maxDrawdown ?? 0);
+  const ys = visibleRows.map((row) => row.returnPct ?? 0);
   const maxX = Math.max(0.01, ...xs) * 1.08;
   const minY = Math.min(0, ...ys) * 1.08;
   const maxY = Math.max(0.01, ...ys) * 1.08;
-  const frontier = rows.filter((row) => efficientIds.has(row.id));
+  const frontier = visibleRows.filter((row) => efficientIds.has(row.id));
+  const pinned = rows.find((row) => row.id === pinnedId) ?? rows.find((row) => row.id === selectedId) ?? null;
 
   return (
-    <div className="relative h-[280px] rounded-2xl border border-slate-100 bg-[linear-gradient(to_right,rgba(226,232,240,.8)_1px,transparent_1px),linear-gradient(to_bottom,rgba(226,232,240,.8)_1px,transparent_1px)] bg-[size:20%_25%] px-5 py-5">
-      <div className="absolute bottom-3 left-5 right-5 flex justify-between font-mono text-[10px] text-slate-400">
-        <span>낮은 MDD</span>
-        <span>높은 MDD</span>
+    <div className="grid gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+        <span className="text-slate-500">점을 누르면 아래에 전략이 고정됩니다.</span>
+        <div className="flex rounded-md border border-slate-200 bg-white p-0.5">
+          {[
+            ['all', '전체'],
+            ['focused', 'MDD 30% 이하'],
+          ].map(([id, label]) => (
+            <button
+              className={[
+                'h-7 rounded px-2 text-[11px] font-semibold transition-colors',
+                riskWindow === id ? 'bg-slate-950 text-white' : 'text-slate-500 hover:bg-slate-50',
+              ].join(' ')}
+              key={id}
+              type="button"
+              onClick={() => setRiskWindow(id as typeof riskWindow)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
-      <div className="absolute left-4 top-3 text-[10px] text-slate-400">높은 MWR</div>
-      {frontier.map((row, index) => {
-        const next = frontier[index + 1];
-        if (!next) return null;
-        const x1 = xScale(row.maxDrawdown ?? 0, 0, maxX);
-        const y1 = 100 - xScale(row.returnPct ?? 0, minY, maxY);
-        const x2 = xScale(next.maxDrawdown ?? 0, 0, maxX);
-        const y2 = 100 - xScale(next.returnPct ?? 0, minY, maxY);
-        return <FrontierSegment key={`${row.id}-${next.id}`} x1={x1} x2={x2} y1={y1} y2={y2} />;
-      })}
-      {rows.map((row) => {
-        const selected = row.id === selectedId;
-        const efficient = efficientIds.has(row.id);
-        const tone = selected
-          ? 'selected'
-          : efficient
-            ? 'efficient'
-            : row.kind === 'benchmark'
-              ? 'benchmark'
-              : 'strategy';
-        return (
-          <FrontierPoint
-            key={row.id}
-            label={row.shortLabel || row.label}
-            meta={row.label}
-            tone={tone}
-            x={xScale(row.maxDrawdown ?? 0, 0, maxX)}
-            y={100 - xScale(row.returnPct ?? 0, minY, maxY)}
-            rows={[
-              ['MWR', formatPercent(row.returnPct)],
-              ['MDD', formatPercent(row.maxDrawdown)],
-              ['Sharpe', formatNumber(row.sharpe)],
-              ['거래 수', row.tradeCount?.toLocaleString('ko-KR') ?? '—'],
-            ]}
-          />
-        );
-      })}
+      <div className="relative h-[280px] rounded-2xl border border-slate-100 bg-[linear-gradient(to_right,rgba(226,232,240,.8)_1px,transparent_1px),linear-gradient(to_bottom,rgba(226,232,240,.8)_1px,transparent_1px)] bg-[size:20%_25%] px-5 py-5">
+        <div className="absolute bottom-3 left-5 right-5 flex justify-between font-mono text-[10px] text-slate-400">
+          <span>낮은 MDD</span>
+          <span>{riskWindow === 'focused' ? 'MDD 30%' : '높은 MDD'}</span>
+        </div>
+        <div className="absolute left-4 top-3 text-[10px] text-slate-400">높은 MWR</div>
+        {frontier.map((row, index) => {
+          const next = frontier[index + 1];
+          if (!next) return null;
+          const x1 = xScale(row.maxDrawdown ?? 0, 0, maxX);
+          const y1 = 100 - xScale(row.returnPct ?? 0, minY, maxY);
+          const x2 = xScale(next.maxDrawdown ?? 0, 0, maxX);
+          const y2 = 100 - xScale(next.returnPct ?? 0, minY, maxY);
+          return <FrontierSegment key={`${row.id}-${next.id}`} x1={x1} x2={x2} y1={y1} y2={y2} />;
+        })}
+        {visibleRows.map((row) => {
+          const selected = row.id === selectedId;
+          const efficient = efficientIds.has(row.id);
+          const tone = selected
+            ? 'selected'
+            : efficient
+              ? 'efficient'
+              : row.kind === 'benchmark'
+                ? 'benchmark'
+                : 'strategy';
+          return (
+            <FrontierPoint
+              key={row.id}
+              label={row.shortLabel || row.label}
+              meta={row.label}
+              tone={tone}
+              pinned={row.id === pinned?.id}
+              x={xScale(row.maxDrawdown ?? 0, 0, maxX)}
+              y={100 - xScale(row.returnPct ?? 0, minY, maxY)}
+              rows={[
+                ['MWR', formatPercent(row.returnPct)],
+                ['MDD', formatPercent(row.maxDrawdown)],
+                ['Sharpe', formatNumber(row.sharpe)],
+                ['거래 수', row.tradeCount?.toLocaleString('ko-KR') ?? '—'],
+              ]}
+              onSelect={() => setPinnedId(row.id)}
+            />
+          );
+        })}
+      </div>
+      {pinned ? (
+        <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 text-xs">
+          <div className="font-semibold text-slate-950">{pinned.label}</div>
+          <div className="mt-2 grid gap-2 font-mono tabular-nums sm:grid-cols-4">
+            <span>MWR {formatPercent(pinned.returnPct)}</span>
+            <span>MDD {formatPercent(pinned.maxDrawdown)}</span>
+            <span>Sharpe {formatNumber(pinned.sharpe)}</span>
+            <span>{pinned.sourceLabel}</span>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -168,14 +208,18 @@ function FrontierPoint({
   label,
   meta,
   tone,
+  pinned = false,
   rows,
+  onSelect,
 }: {
   x: number;
   y: number;
   label: string;
   meta: string;
   tone: 'selected' | 'efficient' | 'benchmark' | 'strategy';
+  pinned?: boolean;
   rows: Array<[string, string]>;
+  onSelect: () => void;
 }) {
   const colorClass =
     tone === 'selected'
@@ -195,9 +239,14 @@ function FrontierPoint({
         top: `calc(1.25rem + ${y} * (100% - 2.5rem) / 100)`,
       }}
       type="button"
+      onClick={onSelect}
     >
       <span
-        className={`size-2.5 rounded-full ring-4 transition-transform group-hover:scale-150 group-focus-visible:scale-150 ${colorClass}`}
+        className={[
+          'size-2.5 rounded-full ring-4 transition-transform group-hover:scale-150 group-focus-visible:scale-150',
+          pinned ? 'scale-150 ring-slate-950/20' : '',
+          colorClass,
+        ].join(' ')}
       />
       {tone === 'selected' || tone === 'efficient' ? (
         <span className="pointer-events-none absolute left-4 top-0 max-w-28 truncate rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-medium text-slate-700 shadow-sm">

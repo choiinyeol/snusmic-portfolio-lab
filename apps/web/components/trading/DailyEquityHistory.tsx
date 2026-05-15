@@ -69,7 +69,7 @@ export function DailyEquityHistory({ equity, trades, persona, personaLabels }: P
 
   if (!summary) {
     return (
-      <p className="rounded-md border border-base-300 bg-base-100 p-5 text-sm text-base-content/65">
+      <p className="rounded-md border border-slate-200 bg-white p-5 text-sm text-slate-500">
         해당 전략의 일별 평가 데이터가 없습니다.
       </p>
     );
@@ -101,21 +101,21 @@ export function DailyEquityHistory({ equity, trades, persona, personaLabels }: P
         />
       </div>
 
-      <section className="card border border-base-300 bg-base-100 shadow-sm">
-        <div className="card-body gap-2 p-4">
+      <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex flex-col gap-2 p-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-base-content/70">누적 수익률 (일별)</h3>
-            <span className="text-xs text-base-content/55">{personaEquity.length.toLocaleString('ko-KR')}거래일</span>
+            <h3 className="text-sm font-semibold text-slate-600">누적 수익률 (일별)</h3>
+            <span className="text-xs text-slate-950/55">{personaEquity.length.toLocaleString('ko-KR')}거래일</span>
           </div>
           <CumulativeReturnChart series={chartSeries} />
         </div>
       </section>
 
-      <section className="card border border-base-300 bg-base-100 shadow-sm">
-        <div className="card-body gap-2 p-4">
+      <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex flex-col gap-2 p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 className="text-sm font-semibold text-base-content/70">최근 일별 평가</h3>
-            <label className="flex items-center gap-2 text-xs text-base-content/55">
+            <h3 className="text-sm font-semibold text-slate-600">최근 일별 평가</h3>
+            <label className="flex items-center gap-2 text-xs text-slate-950/55">
               <span>일수</span>
               <select
                 className="select select-xs select-bordered"
@@ -146,13 +146,11 @@ export function DailyEquityHistory({ equity, trades, persona, personaLabels }: P
                     <td className="whitespace-nowrap font-mono text-xs">{row.date}</td>
                     <td className="text-right tabular-nums">{formatKrw(row.equityKrw)}</td>
                     <td
-                      className={`text-right tabular-nums ${(row.cumulativeReturn ?? 0) >= 0 ? 'text-success' : 'text-error'}`}
+                      className={`text-right tabular-nums ${(row.cumulativeReturn ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}
                     >
                       {formatPercent(row.cumulativeReturn)}
                     </td>
-                    <td className="text-right tabular-nums text-base-content/65">
-                      {tradeCountByDate.get(row.date) ?? '—'}
-                    </td>
+                    <td className="text-right tabular-nums text-slate-500">{tradeCountByDate.get(row.date) ?? '—'}</td>
                   </tr>
                 ))}
               </tbody>

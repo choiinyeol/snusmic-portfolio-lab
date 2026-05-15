@@ -90,7 +90,7 @@ export function CumulativeReturnChart({ series, showLegend = true }: { series: R
             .map((item) => (
               <span className="inline-flex items-center gap-1.5 whitespace-nowrap" key={item.id} title={item.label}>
                 <span className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
-                <span className="font-semibold text-base-content/65">{item.shortLabel ?? item.label}</span>
+                <span className="font-semibold text-slate-500">{item.shortLabel ?? item.label}</span>
               </span>
             ))}
         </div>

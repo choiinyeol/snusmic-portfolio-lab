@@ -10,12 +10,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="ko"
-      className={`${GeistSans.variable} ${GeistMono.variable}`}
-      data-theme="snusmic"
-      data-scroll-behavior="smooth"
-    >
+    <html lang="ko" className={`${GeistSans.variable} ${GeistMono.variable}`} data-scroll-behavior="smooth">
       <body>{children}</body>
     </html>
   );

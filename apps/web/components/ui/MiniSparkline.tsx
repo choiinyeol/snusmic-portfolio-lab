@@ -30,7 +30,7 @@ export function MiniSparkline({
 }: MiniSparklineProps) {
   const values = points.map((point) => point.value).filter((value): value is number => Number.isFinite(value));
   if (values.length < 2) {
-    return <div className="h-8 rounded-xl bg-base-200/70" aria-label={`${label}: insufficient data`} />;
+    return <div className="h-8 rounded-xl bg-slate-100/70" aria-label={`${label}: insufficient data`} />;
   }
 
   const step = Math.max(1, Math.floor(values.length / maxPoints));

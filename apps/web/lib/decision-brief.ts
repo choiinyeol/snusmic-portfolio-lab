@@ -128,7 +128,7 @@ function buildDecisionItems({
         ? `최신 리포트 ${formatDateKo(report.publicationDate)}, 목표 진행 ${formatPercent(progress)}.`
         : '연결된 최신 리포트가 없어 근거 확인이 필요합니다.',
       metric: formatPercent(holding.unrealizedReturn),
-      href: `/reports/${encodeURIComponent(holding.symbol)}`,
+      href: report ? exactReportHref(report) : `/reports/${encodeURIComponent(holding.symbol)}`,
       tone: needsReview ? 'review' : 'ok',
     });
   }
@@ -140,7 +140,7 @@ function buildDecisionItems({
       label: '후보 관찰',
       reason: `목표 잔여 ${formatPercent(report.targetRemainingPct)}, 현재 수익률 ${formatPercent(report.currentReturn)}. 매수 신호가 아닌 검토 대기열입니다.`,
       metric: report.symbol,
-      href: `/reports/${encodeURIComponent(report.symbol)}`,
+      href: exactReportHref(report),
       tone: 'watch',
     });
   }
@@ -153,7 +153,7 @@ function buildDecisionItems({
       label: '매매 확인',
       reason: `${formatDateKo(trade.date)} 체결 기록입니다. 실시간 주문 신호가 아닙니다.`,
       metric: formatKrw(trade.grossKrw),
-      href: `/reports/${encodeURIComponent(trade.symbol)}`,
+      href: exactTradeReportHref(trade),
       tone: 'data',
     });
   }
@@ -165,7 +165,7 @@ function buildDecisionItems({
       label: report.targetHit ? '도달 확인' : '만료 확인',
       reason: `${formatDateKo(report.publicationDate)} 리포트의 목표가 상태를 확인합니다.`,
       metric: report.targetHit ? '도달' : '만료',
-      href: `/reports/${encodeURIComponent(report.symbol)}`,
+      href: exactReportHref(report),
       tone: report.targetHit ? 'ok' : 'review',
     });
   }
@@ -188,17 +188,17 @@ function buildChanges({
     ...reports.slice(0, 2).map((report) => ({
       title: `${report.company || report.symbol} 리포트 반영`,
       caption: `${formatDateKo(report.publicationDate)} · ${report.symbol} · 현재 ${formatPercent(report.currentReturn)}`,
-      href: `/reports/${encodeURIComponent(report.symbol)}`,
+      href: exactReportHref(report),
     })),
     ...candidates.slice(0, 2).map((report) => ({
       title: `${report.company || report.symbol} 후보 대기`,
       caption: `${report.symbol} · 목표 잔여 ${formatPercent(report.targetRemainingPct)}`,
-      href: `/reports/${encodeURIComponent(report.symbol)}`,
+      href: exactReportHref(report),
     })),
     ...recentBuys.slice(0, 1).map((trade) => ({
       title: `${trade.symbol} 매매 기록`,
       caption: `${formatDateKo(trade.date)} · ${formatKrw(trade.grossKrw)}`,
-      href: `/reports/${encodeURIComponent(trade.symbol)}`,
+      href: exactTradeReportHref(trade),
     })),
     ...insights.slice(0, 2).map((insight) => ({
       title: insight.title,
@@ -207,6 +207,20 @@ function buildChanges({
     })),
   ];
   return rows.slice(0, 5);
+}
+
+function exactReportHref(report: ReportRow): string {
+  if (!report.reportId) {
+    throw new Error(`Report link requires reportId for ${report.symbol}`);
+  }
+  return `/reports/${encodeURIComponent(report.symbol)}/${encodeURIComponent(report.reportId)}`;
+}
+
+function exactTradeReportHref(trade: TradeRow): string {
+  if (!trade.reportId) {
+    throw new Error(`Trade report link requires reportId for ${trade.symbol} on ${trade.date}`);
+  }
+  return `/reports/${encodeURIComponent(trade.symbol)}/${encodeURIComponent(trade.reportId)}`;
 }
 
 function extractReviewFlagCount(value: Record<string, unknown>): number {

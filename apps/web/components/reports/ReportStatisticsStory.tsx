@@ -735,9 +735,11 @@ function PostTargetDrift({ rows }: { rows: ReportStatisticsLabSummary['postTarge
 }
 
 function TargetMultipleCurve({ rows }: { rows: ReportStatisticsLabSummary['optimalTargetMultiples'] }) {
+  const [selectedMultiple, setSelectedMultiple] = useState<number | null>(rows[0]?.targetMultiple ?? null);
   const scores = rows.map((row) => row.rewardReliabilityScore ?? 0);
   const minScore = Math.min(-0.05, ...scores);
   const maxScore = Math.max(0.05, ...scores);
+  const selected = rows.find((row) => row.targetMultiple === selectedMultiple) ?? rows[0] ?? null;
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5">
@@ -764,6 +766,8 @@ function TargetMultipleCurve({ rows }: { rows: ReportStatisticsLabSummary['optim
               tone={positive ? 'good' : 'bad'}
               x={x}
               y={y}
+              selected={row.targetMultiple === selected?.targetMultiple}
+              onSelect={() => setSelectedMultiple(row.targetMultiple)}
               rows={[
                 ['보상/신뢰 점수', formatNumber(row.rewardReliabilityScore)],
                 ['도달률', formatPercent(row.hitRate)],
@@ -781,12 +785,34 @@ function TargetMultipleCurve({ rows }: { rows: ReportStatisticsLabSummary['optim
           <span>1.2x</span>
         </div>
       </div>
-      <div className="mt-2 text-xs text-slate-500">점수 = 중앙 수익률 × 도달률 / (하위 25% 손실 + 5% 완충)</div>
+      <div className="mt-3 grid gap-3 border-t border-slate-100 pt-3 text-xs text-slate-500 md:grid-cols-[minmax(0,1fr)_18rem] md:items-start">
+        <p>점수 = 중앙 수익률 × 도달률 / (하위 25% 손실 + 5% 완충). 점을 누르면 비교 기준이 고정됩니다.</p>
+        {selected ? (
+          <div className="rounded-xl bg-slate-50 p-3">
+            <div className="font-semibold text-slate-950">{selected.targetMultiple.toFixed(1)}x 선택</div>
+            <div className="mt-2 grid gap-1 font-mono tabular-nums">
+              <span>도달률 {formatPercent(selected.hitRate)}</span>
+              <span>중앙 {formatPercent(selected.medianReturn)}</span>
+              <span>하위 25% {formatPercent(selected.p25Return)}</span>
+            </div>
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }
 
 function RiskScatter({ rows }: { rows: ReportStatisticsLabSummary['riskScatter'] }) {
+  const [view, setView] = useState<'all' | 'hit10' | 'partial' | 'lossTail'>('all');
+  const [selectedId, setSelectedId] = useState<string | null>(rows[0]?.reportId ?? null);
+  const visibleRows = rows.filter((row) => {
+    if (view === 'hit10') return row.hit10;
+    if (view === 'partial') return row.hit08 && !row.hit10;
+    if (view === 'lossTail') return (row.maxAdverseExcursion ?? 0) <= -0.5 || (row.currentReturn ?? 0) <= -0.3;
+    return true;
+  });
+  const selected = rows.find((row) => row.reportId === selectedId) ?? visibleRows[0] ?? null;
+
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5">
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
@@ -796,14 +822,36 @@ function RiskScatter({ rows }: { rows: ReportStatisticsLabSummary['riskScatter']
             오른쪽으로 갈수록 중간 손실이 작고, 위로 갈수록 발간 이후 상승 여지가 컸습니다.
           </p>
         </div>
-        <span className="rounded-md bg-slate-100 px-2 py-1 font-mono text-[11px] text-slate-500">
-          n={rows.length.toLocaleString('ko-KR')}
-        </span>
+        <div className="flex flex-wrap items-center gap-1.5">
+          {[
+            ['all', '전체'],
+            ['hit10', '1.0x'],
+            ['partial', '0.8x만'],
+            ['lossTail', '손실 꼬리'],
+          ].map(([id, label]) => (
+            <button
+              className={[
+                'h-7 rounded-md border px-2 text-[11px] font-semibold transition-colors',
+                view === id
+                  ? 'border-slate-950 bg-slate-950 text-white'
+                  : 'border-slate-200 bg-white text-slate-500 hover:bg-slate-50',
+              ].join(' ')}
+              key={id}
+              type="button"
+              onClick={() => setView(id as typeof view)}
+            >
+              {label}
+            </button>
+          ))}
+          <span className="rounded-md bg-slate-100 px-2 py-1 font-mono text-[11px] text-slate-500">
+            n={visibleRows.length.toLocaleString('ko-KR')}
+          </span>
+        </div>
       </div>
       <div className="relative h-80 rounded-xl border border-slate-100 bg-[linear-gradient(to_right,rgba(226,232,240,.7)_1px,transparent_1px),linear-gradient(to_bottom,rgba(226,232,240,.7)_1px,transparent_1px)] bg-[size:12.5%_25%] px-5 py-5">
         <div className="absolute bottom-8 left-5 text-[11px] text-slate-500">최대 하락폭</div>
         <div className="absolute left-5 top-3 text-[11px] text-slate-500">최대 상승폭</div>
-        {rows.map((row) => {
+        {visibleRows.map((row) => {
           const adverse = Math.max(-0.8, Math.min(0, row.maxAdverseExcursion ?? 0));
           const favorable = Math.max(0, Math.min(1.5, row.maxFavorableExcursion ?? 0));
           const x = xScale(adverse, -0.8, 0);
@@ -817,6 +865,8 @@ function RiskScatter({ rows }: { rows: ReportStatisticsLabSummary['riskScatter']
               tone={tone}
               x={x}
               y={y}
+              selected={row.reportId === selected?.reportId}
+              onSelect={() => setSelectedId(row.reportId)}
               rows={[
                 ['최대 상승폭', formatPercent(row.maxFavorableExcursion)],
                 ['최대 하락폭', formatPercent(row.maxAdverseExcursion)],
@@ -833,6 +883,24 @@ function RiskScatter({ rows }: { rows: ReportStatisticsLabSummary['riskScatter']
         <span>청록: 0.6x 도달</span>
         <span>회색: 미도달</span>
       </div>
+      {selected ? (
+        <div className="mt-4 grid gap-3 rounded-xl border border-slate-100 bg-slate-50 p-4 text-sm md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+          <div className="min-w-0">
+            <div className="font-semibold text-slate-950">
+              {selected.company} ({selected.symbol})
+            </div>
+            <p className="mt-1 text-xs leading-5 text-slate-500">
+              {selected.publicationDate} 발간 · 목표 {targetHitLabel(selected)} · 현재{' '}
+              {formatPercent(selected.currentReturn)}
+            </p>
+          </div>
+          <div className="grid grid-cols-3 gap-3 font-mono text-xs tabular-nums text-slate-700">
+            <span>최대상승 {formatPercent(selected.maxFavorableExcursion)}</span>
+            <span>최대하락 {formatPercent(selected.maxAdverseExcursion)}</span>
+            <span>포착률 {formatNumber(selected.upsideCaptureRatio)}x</span>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -844,6 +912,8 @@ function DataPoint({
   meta,
   tone,
   rows,
+  selected = false,
+  onSelect,
 }: {
   x: number;
   y: number;
@@ -851,6 +921,8 @@ function DataPoint({
   meta: string;
   tone: 'good' | 'bad' | 'neutral' | 'accent' | 'teal';
   rows: Array<[string, string]>;
+  selected?: boolean;
+  onSelect?: () => void;
 }) {
   const colorClass =
     tone === 'good'
@@ -866,15 +938,20 @@ function DataPoint({
   return (
     <button
       aria-label={`${label} ${rows.map(([key, value]) => `${key} ${value}`).join(', ')}`}
-      className="group absolute z-10 grid size-5 -translate-x-1/2 -translate-y-1/2 place-items-center outline-none"
+      className="group absolute z-10 grid size-6 -translate-x-1/2 -translate-y-1/2 place-items-center outline-none"
       style={{
         left: `calc(1.25rem + ${x} * (100% - 2.5rem) / 100)`,
         top: `calc(1.25rem + ${y} * (100% - 2.5rem) / 100)`,
       }}
       type="button"
+      onClick={onSelect}
     >
       <span
-        className={`size-2.5 rounded-full ring-4 transition-transform group-hover:scale-150 group-focus-visible:scale-150 ${colorClass}`}
+        className={[
+          'size-2.5 rounded-full ring-4 transition-transform group-hover:scale-150 group-focus-visible:scale-150',
+          selected ? 'scale-150 ring-slate-950/20' : '',
+          colorClass,
+        ].join(' ')}
       />
       <span className="pointer-events-none absolute bottom-6 left-1/2 z-30 hidden w-64 -translate-x-1/2 rounded-xl border border-slate-200 bg-white p-3 text-left text-xs shadow-xl group-hover:block group-focus-visible:block">
         <span className="block font-semibold text-slate-950">{label}</span>

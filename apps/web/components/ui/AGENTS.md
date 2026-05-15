@@ -13,9 +13,9 @@ This folder holds the small set of components every page must reuse. The user ha
 ## Don't
 
 - ❌ New `<section className="hero ...">` blocks. Use `PageHero`.
-- ❌ Inline `<div>` "stat-like" cards built from raw daisyUI `stats`. Use `KpiTile`.
+- ❌ Inline `<div>` "stat-like" cards built from raw legacy stats classes. Use `KpiTile`.
 - ❌ `<span className="display-num">{formatKrw(price)}</span>` for an asset price. Use `<Money native krw currency>`.
-- ❌ New custom CSS classes (`.muted`, `.panel`, `.dossier-card`, `.display-num`, `.display-1`, `.trend-*`). Use Tailwind/daisyUI utilities.
+- ❌ New custom CSS classes (`.muted`, `.panel`, `.dossier-card`, `.display-num`, `.display-1`, `.trend-*`). Use Tailwind utilities and local UI primitives.
 - ❌ Marketing copy on internal pages ("…를 한 화면에서 검증합니다.", "수익률보다 …", "성과의 원인을 …").
 
 ## Number/currency rule
@@ -32,5 +32,5 @@ Per [`docs/frontend-product-direction.md`](../../../docs/frontend-product-direct
 ## Tone tokens
 
 When you need success/warn/error coloring on a number or badge:
-- daisyUI: `text-success`, `text-error`, `text-warning`, `text-primary`
+- Tailwind: `text-emerald-600`, `text-rose-600`, `text-amber-600`, `text-blue-600`
 - Don't introduce `.good` / `.bad` / `.warn` shortcut classes anywhere new (existing ones get cleaned in P-E).

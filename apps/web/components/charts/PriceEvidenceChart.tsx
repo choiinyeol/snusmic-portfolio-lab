@@ -388,7 +388,7 @@ export function PriceEvidenceChart({
 
   if (priceSeries.length === 0) {
     return (
-      <div className="rounded-box border border-base-300 bg-base-100 p-5 text-sm text-base-content/65 shadow-sm">
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm">
         이 리포트 종목의 가격 경로를 찾을 수 없습니다.
       </div>
     );
@@ -496,7 +496,7 @@ export function PriceEvidenceChart({
       <button
         type="button"
         className={`absolute right-3 top-3 z-20 rounded-md px-2 py-1 text-[11px] font-semibold shadow-sm ${
-          measureMode ? 'bg-primary text-primary-content' : 'bg-base-100/85 text-base-content/65'
+          measureMode ? 'bg-blue-600 text-white' : 'bg-white/85 text-slate-500'
         }`}
         aria-pressed={measureMode}
         onClick={() => {
@@ -507,7 +507,7 @@ export function PriceEvidenceChart({
         {measureMode ? '측정 모드 ●' : '측정 모드'}
       </button>
       {measureMode ? (
-        <div className="pointer-events-none absolute left-1/2 bottom-3 z-10 -translate-x-1/2 rounded-md bg-base-100/95 px-3 py-1 text-[11px] font-semibold text-base-content/70 shadow">
+        <div className="pointer-events-none absolute left-1/2 bottom-3 z-10 -translate-x-1/2 rounded-md bg-white/95 px-3 py-1 text-[11px] font-semibold text-slate-600 shadow">
           드래그하여 두 시점의 수익률 측정
         </div>
       ) : null}

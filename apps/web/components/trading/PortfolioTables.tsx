@@ -82,10 +82,10 @@ export function PortfolioTables({ holdings, persona, personaLabels, capitalByPer
         </button>
       </div>
 
-      <section className="card min-w-0 border border-base-300 bg-base-100 shadow-sm">
-        <div className="card-body min-w-0 gap-2 p-5">
-          <h2 className="card-title">현재 보유 포트폴리오</h2>
-          <p className="text-base-content/65">
+      <section className="rounded-2xl min-w-0 border border-slate-200 bg-white shadow-sm">
+        <div className="flex flex-col min-w-0 gap-2 p-5">
+          <h2 className="text-base font-semibold text-slate-950">현재 보유 포트폴리오</h2>
+          <p className="text-slate-500">
             현재 어떤 종목을 얼마나 들고 있는지, 목표가·시장구분·평단·최근가·미실현 손익을 바로 확인합니다.
           </p>
           <HoldingsTreemap holdings={currentRows} hrefBySymbol={reportHrefBySymbol} />
@@ -100,7 +100,7 @@ export function PortfolioTables({ holdings, persona, personaLabels, capitalByPer
               setPage(0);
             }}
           />
-          <div className="table-wrap inset overflow-x-auto rounded-box border border-base-300 bg-base-100 shadow-sm">
+          <div className="table-wrap inset overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
             <table className="table table-sm table-zebra">
               <thead>
                 <tr>
@@ -155,7 +155,7 @@ export function PortfolioTables({ holdings, persona, personaLabels, capitalByPer
                         <strong>
                           <Link href={`/reports/${encodeURIComponent(row.symbol)}`}>{row.company || row.symbol}</Link>
                         </strong>
-                        <div className="text-xs text-base-content/55">{row.symbol}</div>
+                        <div className="text-xs text-slate-950/55">{row.symbol}</div>
                       </td>
                       <td>
                         {target ? (
@@ -167,7 +167,7 @@ export function PortfolioTables({ holdings, persona, personaLabels, capitalByPer
                         ) : (
                           '—'
                         )}
-                        <div className="text-xs text-base-content/55">{target?.publicationDate ?? '—'}</div>
+                        <div className="text-xs text-slate-950/55">{target?.publicationDate ?? '—'}</div>
                       </td>
                       <td className="tabular-nums">{row.qty?.toLocaleString('ko-KR') ?? '—'}</td>
                       <td>
@@ -182,19 +182,19 @@ export function PortfolioTables({ holdings, persona, personaLabels, capitalByPer
                       </td>
                       <td>
                         <Money native={nativeValue} krw={row.marketValueKrw} currency={row.currency} />
-                        <div className="text-xs text-base-content/55">손익 {formatKrw(row.unrealizedPnlKrw)}</div>
+                        <div className="text-xs text-slate-950/55">손익 {formatKrw(row.unrealizedPnlKrw)}</div>
                       </td>
                       <td
-                        className={`tabular-nums ${(row.unrealizedReturn ?? 0) >= 0 ? 'text-success' : 'text-error'}`}
+                        className={`tabular-nums ${(row.unrealizedReturn ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}
                       >
                         {formatPercent(row.unrealizedReturn)}
                       </td>
-                      <td className={`tabular-nums ${(contribution ?? 0) >= 0 ? 'text-success' : 'text-error'}`}>
+                      <td className={`tabular-nums ${(contribution ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                         {formatPercent(contribution)}
                       </td>
                       <td>
                         <span className="tabular-nums">{row.firstBuyDate}</span>
-                        <div className="text-xs text-base-content/55">{formatDays(row.holdingDays)}</div>
+                        <div className="text-xs text-slate-950/55">{formatDays(row.holdingDays)}</div>
                       </td>
                     </tr>
                   );

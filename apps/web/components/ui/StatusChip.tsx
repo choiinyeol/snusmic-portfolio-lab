@@ -3,10 +3,10 @@ import type { ReactNode } from 'react';
 type Tone = 'info' | 'success' | 'warning' | 'neutral';
 
 const toneClasses: Record<Tone, string> = {
-  info: 'border-primary/15 bg-primary/10 text-primary',
-  success: 'border-success/15 bg-success/10 text-success',
-  warning: 'border-warning/20 bg-warning/10 text-warning',
-  neutral: 'border-base-300 bg-base-100 text-base-content/65',
+  info: 'border-blue-100 bg-blue-50 text-blue-600',
+  success: 'border-emerald-100 bg-emerald-50 text-emerald-600',
+  warning: 'border-amber-200 bg-amber-50 text-amber-600',
+  neutral: 'border-slate-200 bg-white text-slate-500',
 };
 
 export function StatusChip({
