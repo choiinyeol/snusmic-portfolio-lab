@@ -25402,6 +25402,19 @@
       "open": 27.56999969482422,
       "source_currency": "USD",
       "volume": 1048700.0
+    },
+    {
+      "close": 26.68000030517578,
+      "close_krw": 39748.9307,
+      "currency": "USD",
+      "date": "2026-05-14",
+      "display_currency": "USD",
+      "high": 26.85000038146973,
+      "krw_per_unit": 1489.8399658203125,
+      "low": 26.350000381469727,
+      "open": 26.739999771118164,
+      "source_currency": "USD",
+      "volume": 733200.0
     }
   ],
   "symbol": "SBLK"

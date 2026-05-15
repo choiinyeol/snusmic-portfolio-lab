@@ -17394,6 +17394,19 @@
       "open": 14.0,
       "source_currency": "USD",
       "volume": 2241600.0
+    },
+    {
+      "close": 13.850000381469727,
+      "close_krw": 20634.2841,
+      "currency": "USD",
+      "date": "2026-05-14",
+      "display_currency": "USD",
+      "high": 14.614999771118164,
+      "krw_per_unit": 1489.8399658203125,
+      "low": 13.829999923706056,
+      "open": 14.5600004196167,
+      "source_currency": "USD",
+      "volume": 1407900.0
     }
   ],
   "symbol": "GRND"

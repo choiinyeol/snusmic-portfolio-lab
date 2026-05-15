@@ -25402,6 +25402,19 @@
       "open": 398.2699890136719,
       "source_currency": "USD",
       "volume": 13094000.0
+    },
+    {
+      "close": 417.7200012207031,
+      "close_krw": 622335.9523,
+      "currency": "USD",
+      "date": "2026-05-14",
+      "display_currency": "USD",
+      "high": 421.9700012207031,
+      "krw_per_unit": 1489.8399658203125,
+      "low": 402.1000061035156,
+      "open": 403.2099914550781,
+      "source_currency": "USD",
+      "volume": 18544400.0
     }
   ],
   "symbol": "TSM"

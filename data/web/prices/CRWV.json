@@ -3679,6 +3679,19 @@
       "open": 112.94999694824219,
       "source_currency": "USD",
       "volume": 23470800.0
+    },
+    {
+      "close": 114.21499633789062,
+      "close_krw": 170162.0662,
+      "currency": "USD",
+      "date": "2026-05-14",
+      "display_currency": "USD",
+      "high": 118.20999908447266,
+      "krw_per_unit": 1489.8399658203125,
+      "low": 110.05999755859375,
+      "open": 111.52999877929688,
+      "source_currency": "USD",
+      "volume": 27634000.0
     }
   ],
   "symbol": "CRWV"

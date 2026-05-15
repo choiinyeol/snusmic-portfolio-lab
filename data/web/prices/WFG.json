@@ -25402,6 +25402,19 @@
       "open": 60.88999938964844,
       "source_currency": "USD",
       "volume": 164200.0
+    },
+    {
+      "close": 60.99000167846679,
+      "close_krw": 90865.342,
+      "currency": "USD",
+      "date": "2026-05-14",
+      "display_currency": "USD",
+      "high": 61.91999816894531,
+      "krw_per_unit": 1489.8399658203125,
+      "low": 60.63999938964844,
+      "open": 61.38000106811524,
+      "source_currency": "USD",
+      "volume": 161100.0
     }
   ],
   "symbol": "WFG"

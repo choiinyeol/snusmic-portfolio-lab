@@ -6227,6 +6227,19 @@
       "open": 46.45000076293945,
       "source_currency": "USD",
       "volume": 5866800.0
+    },
+    {
+      "close": 45.47999954223633,
+      "close_krw": 67757.921,
+      "currency": "USD",
+      "date": "2026-05-14",
+      "display_currency": "USD",
+      "high": 47.77000045776367,
+      "krw_per_unit": 1489.8399658203125,
+      "low": 45.12099838256836,
+      "open": 45.900001525878906,
+      "source_currency": "USD",
+      "volume": 6234900.0
     }
   ],
   "symbol": "TEM"

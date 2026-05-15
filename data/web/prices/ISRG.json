@@ -25402,6 +25402,19 @@
       "open": 430.9599914550781,
       "source_currency": "USD",
       "volume": 1996000.0
+    },
+    {
+      "close": 428.05999755859375,
+      "close_krw": 637740.8921,
+      "currency": "USD",
+      "date": "2026-05-14",
+      "display_currency": "USD",
+      "high": 434.9100036621094,
+      "krw_per_unit": 1489.8399658203125,
+      "low": 426.5299987792969,
+      "open": 432.0,
+      "source_currency": "USD",
+      "volume": 2170600.0
     }
   ],
   "symbol": "ISRG"
