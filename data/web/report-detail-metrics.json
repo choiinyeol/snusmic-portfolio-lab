@@ -32,7 +32,7 @@
       {
         "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 363100.7947,
+        "price_krw": 364481.6243,
         "type": "latest"
       }
     ],
@@ -258,9 +258,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 187496.3574,
+        "price_krw": 185204.0175,
         "type": "latest"
       }
     ],
@@ -780,9 +780,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 58000.0,
+        "price_krw": 52900.0,
         "type": "latest"
       }
     ],
@@ -858,9 +858,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 39748.9307,
+        "price_krw": 39528.7079,
         "type": "latest"
       }
     ],
@@ -1008,9 +1008,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 6560.0,
+        "price_krw": 5870.0,
         "type": "latest"
       }
     ],
@@ -1316,7 +1316,7 @@
       {
         "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 452219.1787,
+        "price_krw": 455689.0524,
         "type": "latest"
       }
     ],
@@ -1441,7 +1441,7 @@
   },
   "1986a142e4bb3a97": {
     "company": "Fluence Energy Inc.",
-    "current_return": -0.0189,
+    "current_return": -0.0245,
     "days_to_target": 614.0,
     "entry_price_krw": 31797.1649,
     "markers": [
@@ -1470,9 +1470,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 31197.2497,
+        "price_krw": 31016.6718,
         "type": "latest"
       }
     ],
@@ -1512,7 +1512,7 @@
       "symbol": "FLNC"
     },
     "symbol": "FLNC",
-    "target_gap_pct": -0.3064,
+    "target_gap_pct": -0.3104,
     "target_hit": true,
     "target_price_krw": 44981.0216,
     "trough_return": -0.8394
@@ -1550,7 +1550,7 @@
       {
         "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 895070.9851,
+        "price_krw": 893850.2398,
         "type": "latest"
       }
     ],
@@ -1597,7 +1597,7 @@
   },
   "21420bf57c7d6bf5": {
     "company": "나노",
-    "current_return": -0.0786,
+    "current_return": -0.0723,
     "days_to_target": null,
     "entry_price_krw": 6360.0,
     "markers": [
@@ -1620,9 +1620,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 5860.0,
+        "price_krw": 5900.0,
         "type": "latest"
       }
     ],
@@ -1662,7 +1662,7 @@
       "symbol": "187790.KS"
     },
     "symbol": "187790.KS",
-    "target_gap_pct": -0.6407,
+    "target_gap_pct": -0.6383,
     "target_hit": false,
     "target_price_krw": 16310.0,
     "trough_return": -0.0786
@@ -1694,7 +1694,7 @@
       {
         "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 3940.1466,
+        "price_krw": 3928.0448,
         "type": "latest"
       }
     ],
@@ -1741,7 +1741,7 @@
   },
   "23d6d08a6edd02cd": {
     "company": "Camtek",
-    "current_return": -0.0412,
+    "current_return": -0.0558,
     "days_to_target": null,
     "entry_price_krw": 266259.4756,
     "markers": [
@@ -1758,15 +1758,15 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-13",
+        "date": "2026-05-15",
         "label": "발간 후 저점",
-        "price_krw": 252136.1568,
+        "price_krw": 251403.7924,
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 255298.9775,
+        "price_krw": 251403.7924,
         "type": "latest"
       }
     ],
@@ -1779,9 +1779,9 @@
         "type": "peak"
       },
       "trough": {
-        "date": "2026-05-13",
+        "date": "2026-05-15",
         "label": "발간 후 저점",
-        "price_krw": 252136.1568,
+        "price_krw": 251403.7924,
         "type": "trough"
       }
     },
@@ -1806,10 +1806,10 @@
       "symbol": "CAMT"
     },
     "symbol": "CAMT",
-    "target_gap_pct": -0.2743,
+    "target_gap_pct": -0.2854,
     "target_hit": false,
     "target_price_krw": 351813.9142,
-    "trough_return": -0.053
+    "trough_return": -0.0558
   },
   "23d9adf40ef1d062": {
     "company": "한국전력",
@@ -2136,9 +2136,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 465000.0,
+        "price_krw": 440000.0,
         "type": "latest"
       }
     ],
@@ -2208,9 +2208,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 35550.0,
+        "price_krw": 33700.0,
         "type": "latest"
       }
     ],
@@ -2257,7 +2257,7 @@
   },
   "25e4f4697656dffa": {
     "company": "JAC recruitment Co. Ltd",
-    "current_return": -0.2297,
+    "current_return": -0.2321,
     "days_to_target": null,
     "entry_price_krw": 10198.6416,
     "markers": [
@@ -2282,7 +2282,7 @@
       {
         "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 7855.7443,
+        "price_krw": 7831.6161,
         "type": "latest"
       }
     ],
@@ -2322,7 +2322,7 @@
       "symbol": "2124.T"
     },
     "symbol": "2124.T",
-    "target_gap_pct": -0.5043,
+    "target_gap_pct": -0.5058,
     "target_hit": false,
     "target_price_krw": 15847.843,
     "trough_return": -0.2388
@@ -2574,9 +2574,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 1499821.9118,
+        "price_krw": 1500687.1729,
         "type": "latest"
       }
     ],
@@ -2648,7 +2648,7 @@
       {
         "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 9368.4874,
+        "price_krw": 9351.2749,
         "type": "latest"
       }
     ],
@@ -2796,9 +2796,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 74268.52,
+        "price_krw": 74323.5308,
         "type": "latest"
       }
     ],
@@ -3018,9 +3018,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 89852.2504,
+        "price_krw": 91496.9404,
         "type": "latest"
       }
     ],
@@ -3092,7 +3092,7 @@
       {
         "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 12430.3935,
+        "price_krw": 12392.2146,
         "type": "latest"
       }
     ],
@@ -3289,7 +3289,7 @@
   },
   "3871aacd23309b30": {
     "company": "Cover Corp",
-    "current_return": -0.4314,
+    "current_return": -0.4332,
     "days_to_target": null,
     "entry_price_krw": 24344.5486,
     "markers": [
@@ -3314,7 +3314,7 @@
       {
         "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 13841.9726,
+        "price_krw": 13799.4582,
         "type": "latest"
       }
     ],
@@ -3354,7 +3354,7 @@
       "symbol": "5253.T"
     },
     "symbol": "5253.T",
-    "target_gap_pct": -0.7738,
+    "target_gap_pct": -0.7745,
     "target_hit": false,
     "target_price_krw": 61198.8651,
     "trough_return": -0.4876
@@ -3433,7 +3433,7 @@
   },
   "3b0f47d453265251": {
     "company": "Sensient Technologies Corp",
-    "current_return": 0.246,
+    "current_return": 0.2136,
     "days_to_target": null,
     "entry_price_krw": 140186.5548,
     "markers": [
@@ -3456,9 +3456,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 174668.8344,
+        "price_krw": 170136.2228,
         "type": "latest"
       }
     ],
@@ -3498,7 +3498,7 @@
       "symbol": "SXT"
     },
     "symbol": "SXT",
-    "target_gap_pct": -0.4993,
+    "target_gap_pct": -0.5122,
     "target_hit": false,
     "target_price_krw": 348817.5588,
     "trough_return": -0.1183
@@ -3661,7 +3661,7 @@
   },
   "3d77b9f898008ae2": {
     "company": "Funko Inc.",
-    "current_return": -0.4727,
+    "current_return": -0.4766,
     "days_to_target": null,
     "entry_price_krw": 14437.4144,
     "markers": [
@@ -3684,9 +3684,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 7613.0824,
+        "price_krw": 7556.3001,
         "type": "latest"
       }
     ],
@@ -3726,7 +3726,7 @@
       "symbol": "FNKO"
     },
     "symbol": "FNKO",
-    "target_gap_pct": -0.6617,
+    "target_gap_pct": -0.6642,
     "target_hit": false,
     "target_price_krw": 22501.6819,
     "trough_return": -0.764
@@ -3811,7 +3811,7 @@
   },
   "41254a03f7b64f67": {
     "company": "샘씨엔에스",
-    "current_return": -0.0941,
+    "current_return": -0.1706,
     "days_to_target": null,
     "entry_price_krw": 14130.0,
     "markers": [
@@ -3828,15 +3828,15 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-12",
+        "date": "2026-05-15",
         "label": "발간 후 저점",
-        "price_krw": 12210.0,
+        "price_krw": 11720.0,
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 12800.0,
+        "price_krw": 11720.0,
         "type": "latest"
       }
     ],
@@ -3849,9 +3849,9 @@
         "type": "peak"
       },
       "trough": {
-        "date": "2026-05-12",
+        "date": "2026-05-15",
         "label": "발간 후 저점",
-        "price_krw": 12210.0,
+        "price_krw": 11720.0,
         "type": "trough"
       }
     },
@@ -3876,14 +3876,14 @@
       "symbol": "252990.KS"
     },
     "symbol": "252990.KS",
-    "target_gap_pct": -0.4245,
+    "target_gap_pct": -0.473,
     "target_hit": false,
     "target_price_krw": 22240.0,
-    "trough_return": -0.1359
+    "trough_return": -0.1706
   },
   "42bfead83e507f2d": {
     "company": "Grindr Inc.",
-    "current_return": -0.0111,
+    "current_return": -0.041,
     "days_to_target": 168.0,
     "entry_price_krw": 20866.467,
     "markers": [
@@ -3912,9 +3912,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 20634.2841,
+        "price_krw": 20010.755,
         "type": "latest"
       }
     ],
@@ -3954,7 +3954,7 @@
       "symbol": "GRND"
     },
     "symbol": "GRND",
-    "target_gap_pct": -0.3934,
+    "target_gap_pct": -0.4118,
     "target_hit": true,
     "target_price_krw": 34018.0707,
     "trough_return": -0.3183
@@ -4284,9 +4284,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 78231.4941,
+        "price_krw": 78997.6865,
         "type": "latest"
       }
     ],
@@ -4555,7 +4555,7 @@
   },
   "554d2e862320e96a": {
     "company": "IMAX Corp",
-    "current_return": -0.0605,
+    "current_return": -0.071,
     "days_to_target": null,
     "entry_price_krw": 53993.4408,
     "markers": [
@@ -4578,9 +4578,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 50729.0497,
+        "price_krw": 50161.2897,
         "type": "latest"
       }
     ],
@@ -4620,7 +4620,7 @@
       "symbol": "IMAX"
     },
     "symbol": "IMAX",
-    "target_gap_pct": -0.3661,
+    "target_gap_pct": -0.3732,
     "target_hit": false,
     "target_price_krw": 80022.8517,
     "trough_return": -0.0931
@@ -4806,9 +4806,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 30273.5477,
+        "price_krw": 28477.9927,
         "type": "latest"
       }
     ],
@@ -4878,9 +4878,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 18510.0,
+        "price_krw": 18380.0,
         "type": "latest"
       }
     ],
@@ -5100,9 +5100,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 560522.5067,
+        "price_krw": 553939.5306,
         "type": "latest"
       }
     ],
@@ -5328,9 +5328,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 123239.5638,
+        "price_krw": 122633.0821,
         "type": "latest"
       }
     ],
@@ -5400,9 +5400,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 90865.342,
+        "price_krw": 88435.5946,
         "type": "latest"
       }
     ],
@@ -5671,7 +5671,7 @@
   },
   "69575019ea6dce78": {
     "company": "Establishment Labs Holdings",
-    "current_return": 0.0467,
+    "current_return": -0.0116,
     "days_to_target": null,
     "entry_price_krw": 99354.3808,
     "markers": [
@@ -5694,9 +5694,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 103990.8342,
+        "price_krw": 98202.0393,
         "type": "latest"
       }
     ],
@@ -5736,7 +5736,7 @@
       "symbol": "ESTA"
     },
     "symbol": "ESTA",
-    "target_gap_pct": -0.4025,
+    "target_gap_pct": -0.4358,
     "target_hit": false,
     "target_price_krw": 174057.0306,
     "trough_return": -0.1705
@@ -5893,7 +5893,7 @@
   },
   "6c514ea82bbdec4a": {
     "company": "Palantir Technologies Inc.",
-    "current_return": 5.9339,
+    "current_return": 5.9637,
     "days_to_target": 138.0,
     "entry_price_krw": 28733.6964,
     "markers": [
@@ -5922,9 +5922,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 199236.2923,
+        "price_krw": 200092.6302,
         "type": "latest"
       }
     ],
@@ -5964,7 +5964,7 @@
       "symbol": "PLTR"
     },
     "symbol": "PLTR",
-    "target_gap_pct": 2.5628,
+    "target_gap_pct": 2.5781,
     "target_hit": true,
     "target_price_krw": 55921.9816,
     "trough_return": -0.0069
@@ -6793,7 +6793,7 @@
   },
   "7ff80555314e6b82": {
     "company": "덕산네오룩스",
-    "current_return": -0.0095,
+    "current_return": -0.1048,
     "days_to_target": null,
     "entry_price_krw": 52500.0,
     "markers": [
@@ -6810,15 +6810,15 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-12",
+        "date": "2026-05-15",
         "label": "발간 후 저점",
-        "price_krw": 49400.0,
+        "price_krw": 47000.0,
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 52000.0,
+        "price_krw": 47000.0,
         "type": "latest"
       }
     ],
@@ -6831,9 +6831,9 @@
         "type": "peak"
       },
       "trough": {
-        "date": "2026-05-12",
+        "date": "2026-05-15",
         "label": "발간 후 저점",
-        "price_krw": 49400.0,
+        "price_krw": 47000.0,
         "type": "trough"
       }
     },
@@ -6858,14 +6858,14 @@
       "symbol": "213420.KS"
     },
     "symbol": "213420.KS",
-    "target_gap_pct": -0.4298,
+    "target_gap_pct": -0.4846,
     "target_hit": false,
     "target_price_krw": 91200.0,
-    "trough_return": -0.059
+    "trough_return": -0.1048
   },
   "807e330510c4104c": {
     "company": "쿠쿠홀딩스",
-    "current_return": 0.2877,
+    "current_return": 0.274,
     "days_to_target": 347.0,
     "entry_price_krw": 21900.0,
     "markers": [
@@ -6894,9 +6894,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 28200.0,
+        "price_krw": 27900.0,
         "type": "latest"
       }
     ],
@@ -6936,7 +6936,7 @@
       "symbol": "192400.KQ"
     },
     "symbol": "192400.KQ",
-    "target_gap_pct": -0.0242,
+    "target_gap_pct": -0.0346,
     "target_hit": true,
     "target_price_krw": 28900.0,
     "trough_return": -0.0799
@@ -7776,9 +7776,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 35850.0,
+        "price_krw": 34750.0,
         "type": "latest"
       }
     ],
@@ -7825,7 +7825,7 @@
   },
   "918efca8ecaf4fcc": {
     "company": "Advantest Corporation",
-    "current_return": 1.9158,
+    "current_return": 1.9069,
     "days_to_target": 287.0,
     "entry_price_krw": 85358.2433,
     "markers": [
@@ -7856,7 +7856,7 @@
       {
         "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 248891.1303,
+        "price_krw": 248126.6828,
         "type": "latest"
       }
     ],
@@ -7896,14 +7896,14 @@
       "symbol": "6857.T"
     },
     "symbol": "6857.T",
-    "target_gap_pct": 0.8368,
+    "target_gap_pct": 0.8312,
     "target_hit": true,
     "target_price_krw": 135499.5361,
     "trough_return": -0.4085
   },
   "91d1a46a03353151": {
     "company": "Tempus AI Inc",
-    "current_return": -0.2481,
+    "current_return": -0.272,
     "days_to_target": null,
     "entry_price_krw": 90116.7491,
     "markers": [
@@ -7926,9 +7926,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 67757.921,
+        "price_krw": 65602.4252,
         "type": "latest"
       }
     ],
@@ -7968,7 +7968,7 @@
       "symbol": "TEM"
     },
     "symbol": "TEM",
-    "target_gap_pct": -0.7853,
+    "target_gap_pct": -0.7922,
     "target_hit": false,
     "target_price_krw": 315636.1822,
     "trough_return": -0.298
@@ -8287,7 +8287,7 @@
   },
   "98b34d5d521966a4": {
     "company": "브이티",
-    "current_return": -0.5282,
+    "current_return": -0.5509,
     "days_to_target": null,
     "entry_price_krw": 33000.0,
     "markers": [
@@ -8310,9 +8310,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 15570.0,
+        "price_krw": 14820.0,
         "type": "latest"
       }
     ],
@@ -8352,7 +8352,7 @@
       "symbol": "018290.KS"
     },
     "symbol": "018290.KS",
-    "target_gap_pct": -0.7205,
+    "target_gap_pct": -0.7339,
     "target_hit": false,
     "target_price_krw": 55700.0,
     "trough_return": -0.5664
@@ -8460,9 +8460,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 220213.2417,
+        "price_krw": 212009.4768,
         "type": "latest"
       }
     ],
@@ -8682,9 +8682,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 49250.0,
+        "price_krw": 46100.0,
         "type": "latest"
       }
     ],
@@ -8731,7 +8731,7 @@
   },
   "9c5dd10f00cf4a7c": {
     "company": "코스텍시스",
-    "current_return": 0.0861,
+    "current_return": -0.0245,
     "days_to_target": null,
     "entry_price_krw": 51100.0,
     "markers": [
@@ -8742,21 +8742,21 @@
         "type": "publication"
       },
       {
-        "date": "2026-05-07",
-        "label": "발간 후 저점",
-        "price_krw": 50800.0,
-        "type": "trough"
-      },
-      {
         "date": "2026-05-11",
         "label": "발간 후 고점",
         "price_krw": 58900.0,
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
+        "label": "발간 후 저점",
+        "price_krw": 49850.0,
+        "type": "trough"
+      },
+      {
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 55500.0,
+        "price_krw": 49850.0,
         "type": "latest"
       }
     ],
@@ -8769,9 +8769,9 @@
         "type": "peak"
       },
       "trough": {
-        "date": "2026-05-07",
+        "date": "2026-05-15",
         "label": "발간 후 저점",
-        "price_krw": 50800.0,
+        "price_krw": 49850.0,
         "type": "trough"
       }
     },
@@ -8796,10 +8796,10 @@
       "symbol": "355150.KS"
     },
     "symbol": "355150.KS",
-    "target_gap_pct": -0.5062,
+    "target_gap_pct": -0.5565,
     "target_hit": false,
     "target_price_krw": 112400.0,
-    "trough_return": -0.0059
+    "trough_return": -0.0245
   },
   "9d989772df4a7b0f": {
     "company": "지엔씨에너지",
@@ -9103,7 +9103,7 @@
   },
   "a3c8fafb9892885e": {
     "company": "Cellebrite DI",
-    "current_return": -0.1674,
+    "current_return": -0.1743,
     "days_to_target": null,
     "entry_price_krw": 23476.5954,
     "markers": [
@@ -9126,9 +9126,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 19546.7002,
+        "price_krw": 19383.5521,
         "type": "latest"
       }
     ],
@@ -9168,14 +9168,14 @@
       "symbol": "CLBT"
     },
     "symbol": "CLBT",
-    "target_gap_pct": -0.5236,
+    "target_gap_pct": -0.5275,
     "target_hit": false,
     "target_price_krw": 41025.797,
     "trough_return": -0.3078
   },
   "a45f9d90222e517c": {
     "company": "Corning",
-    "current_return": 1.5272,
+    "current_return": 1.3328,
     "days_to_target": 123.0,
     "entry_price_krw": 122785.5329,
     "markers": [
@@ -9204,9 +9204,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 310303.8663,
+        "price_krw": 286437.5352,
         "type": "latest"
       }
     ],
@@ -9246,7 +9246,7 @@
       "symbol": "GLW"
     },
     "symbol": "GLW",
-    "target_gap_pct": 0.5065,
+    "target_gap_pct": 0.3906,
     "target_hit": true,
     "target_price_krw": 205977.6035,
     "trough_return": -0.0683
@@ -9403,7 +9403,7 @@
   },
   "a5af3dc5e4745791": {
     "company": "크래프톤",
-    "current_return": -0.1226,
+    "current_return": -0.1659,
     "days_to_target": null,
     "entry_price_krw": 334500.0,
     "markers": [
@@ -9426,9 +9426,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 293500.0,
+        "price_krw": 279000.0,
         "type": "latest"
       }
     ],
@@ -9468,7 +9468,7 @@
       "symbol": "259960.KQ"
     },
     "symbol": "259960.KQ",
-    "target_gap_pct": -0.5112,
+    "target_gap_pct": -0.5354,
     "target_hit": false,
     "target_price_krw": 600500.0,
     "trough_return": -0.3692
@@ -9654,9 +9654,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 26550.0,
+        "price_krw": 26500.0,
         "type": "latest"
       }
     ],
@@ -9726,9 +9726,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 6659.5843,
+        "price_krw": 6540.8292,
         "type": "latest"
       }
     ],
@@ -9954,9 +9954,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 131597.5669,
+        "price_krw": 131757.3902,
         "type": "latest"
       }
     ],
@@ -10026,9 +10026,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 13944.9016,
+        "price_krw": 13410.1922,
         "type": "latest"
       }
     ],
@@ -10075,7 +10075,7 @@
   },
   "afafe74c5dc92db9": {
     "company": "Doximity",
-    "current_return": -0.6236,
+    "current_return": -0.6026,
     "days_to_target": null,
     "entry_price_krw": 71278.0066,
     "markers": [
@@ -10098,9 +10098,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 26832.0181,
+        "price_krw": 28328.6581,
         "type": "latest"
       }
     ],
@@ -10140,7 +10140,7 @@
       "symbol": "DOCS"
     },
     "symbol": "DOCS",
-    "target_gap_pct": -0.8119,
+    "target_gap_pct": -0.8014,
     "target_hit": false,
     "target_price_krw": 142664.7917,
     "trough_return": -0.6236
@@ -10303,7 +10303,7 @@
   },
   "b28f6fdfc2ee056e": {
     "company": "Life360 Inc",
-    "current_return": -0.3037,
+    "current_return": -0.3287,
     "days_to_target": 106.0,
     "entry_price_krw": 85711.4656,
     "markers": [
@@ -10332,9 +10332,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 59682.9911,
+        "price_krw": 57538.3871,
         "type": "latest"
       }
     ],
@@ -10374,14 +10374,14 @@
       "symbol": "LIF"
     },
     "symbol": "LIF",
-    "target_gap_pct": -0.5821,
+    "target_gap_pct": -0.5972,
     "target_hit": true,
     "target_price_krw": 142830.5525,
     "trough_return": -0.3451
   },
   "b3f38ee317977754": {
     "company": "Round One Corp",
-    "current_return": -0.139,
+    "current_return": -0.1417,
     "days_to_target": 25.0,
     "entry_price_krw": 9062.8319,
     "markers": [
@@ -10412,7 +10412,7 @@
       {
         "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 7802.8694,
+        "price_krw": 7778.9035,
         "type": "latest"
       }
     ],
@@ -10452,7 +10452,7 @@
       "symbol": "4680.T"
     },
     "symbol": "4680.T",
-    "target_gap_pct": -0.3807,
+    "target_gap_pct": -0.3826,
     "target_hit": true,
     "target_price_krw": 12599.7663,
     "trough_return": -0.1676
@@ -10531,7 +10531,7 @@
   },
   "b724efa4bec6fd8e": {
     "company": "Lumentum Holdings Inc",
-    "current_return": 2.0277,
+    "current_return": 1.9405,
     "days_to_target": 52.0,
     "entry_price_krw": 492968.2629,
     "markers": [
@@ -10560,9 +10560,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 1492536.5725,
+        "price_krw": 1449585.1231,
         "type": "latest"
       }
     ],
@@ -10602,7 +10602,7 @@
       "symbol": "LITE"
     },
     "symbol": "LITE",
-    "target_gap_pct": 1.0322,
+    "target_gap_pct": 0.9737,
     "target_hit": true,
     "target_price_krw": 734437.1303,
     "trough_return": -0.0589
@@ -10687,7 +10687,7 @@
   },
   "b8e4eb25010494a7": {
     "company": "Coreweave",
-    "current_return": -0.0355,
+    "current_return": -0.0918,
     "days_to_target": null,
     "entry_price_krw": 176425.5338,
     "markers": [
@@ -10710,9 +10710,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 170162.0662,
+        "price_krw": 160235.3829,
         "type": "latest"
       }
     ],
@@ -10752,7 +10752,7 @@
       "symbol": "CRWV"
     },
     "symbol": "CRWV",
-    "target_gap_pct": -0.5064,
+    "target_gap_pct": -0.5352,
     "target_hit": false,
     "target_price_krw": 344726.4059,
     "trough_return": -0.4615
@@ -10782,9 +10782,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 9700.0,
+        "price_krw": 9740.0,
         "type": "latest"
       }
     ],
@@ -10903,7 +10903,7 @@
   },
   "bafddc2de3fbd482": {
     "company": "OSAKA Titanium Technologies Co.,Ltd.",
-    "current_return": 0.1713,
+    "current_return": 0.1677,
     "days_to_target": null,
     "entry_price_krw": 20169.7148,
     "markers": [
@@ -10928,7 +10928,7 @@
       {
         "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 23623.885,
+        "price_krw": 23551.3263,
         "type": "latest"
       }
     ],
@@ -10968,14 +10968,14 @@
       "symbol": "5726.T"
     },
     "symbol": "5726.T",
-    "target_gap_pct": -0.3694,
+    "target_gap_pct": -0.3714,
     "target_hit": false,
     "target_price_krw": 37464.2651,
     "trough_return": -0.355
   },
   "bb8b54c6c0db0df2": {
     "company": "Sportradar",
-    "current_return": -0.4196,
+    "current_return": -0.4279,
     "days_to_target": null,
     "entry_price_krw": 32601.8223,
     "markers": [
@@ -10998,9 +10998,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 18920.9673,
+        "price_krw": 18651.8158,
         "type": "latest"
       }
     ],
@@ -11040,7 +11040,7 @@
       "symbol": "SRAD"
     },
     "symbol": "SRAD",
-    "target_gap_pct": -0.6388,
+    "target_gap_pct": -0.6439,
     "target_hit": false,
     "target_price_krw": 52380.4115,
     "trough_return": -0.4621
@@ -11516,7 +11516,7 @@
       {
         "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 1864.8801,
+        "price_krw": 1861.4538,
         "type": "latest"
       }
     ],
@@ -11876,7 +11876,7 @@
       {
         "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 1934.5392,
+        "price_krw": 1929.952,
         "type": "latest"
       }
     ],
@@ -12096,9 +12096,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 622335.9523,
+        "price_krw": 603832.0243,
         "type": "latest"
       }
     ],
@@ -12168,9 +12168,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 1564.3319,
+        "price_krw": 1523.2067,
         "type": "latest"
       }
     ],
@@ -12289,7 +12289,7 @@
   },
   "cfa62286ec8e7734": {
     "company": "Iradimed Corporation",
-    "current_return": -0.0432,
+    "current_return": -0.0459,
     "days_to_target": null,
     "entry_price_krw": 135291.3782,
     "markers": [
@@ -12312,9 +12312,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 129452.1937,
+        "price_krw": 129084.3103,
         "type": "latest"
       }
     ],
@@ -12354,14 +12354,14 @@
       "symbol": "IRMD"
     },
     "symbol": "IRMD",
-    "target_gap_pct": -0.395,
+    "target_gap_pct": -0.3967,
     "target_hit": false,
     "target_price_krw": 213980.5193,
     "trough_return": -0.0892
   },
   "cfc5e7b11b6755e1": {
     "company": "Golar LNG",
-    "current_return": 0.0854,
+    "current_return": 0.0844,
     "days_to_target": null,
     "entry_price_krw": 78552.6619,
     "markers": [
@@ -12384,9 +12384,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 85263.5406,
+        "price_krw": 85180.113,
         "type": "latest"
       }
     ],
@@ -12426,7 +12426,7 @@
       "symbol": "GLNG"
     },
     "symbol": "GLNG",
-    "target_gap_pct": -0.4086,
+    "target_gap_pct": -0.4091,
     "target_hit": false,
     "target_price_krw": 144163.0737,
     "trough_return": -0.0247
@@ -12583,7 +12583,7 @@
   },
   "d06874cf9f0f98b8": {
     "company": "Levi Strauss & Co",
-    "current_return": 0.4291,
+    "current_return": 0.4037,
     "days_to_target": null,
     "entry_price_krw": 22319.9917,
     "markers": [
@@ -12606,9 +12606,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 31897.4734,
+        "price_krw": 31330.2718,
         "type": "latest"
       }
     ],
@@ -12648,7 +12648,7 @@
       "symbol": "LEVI"
     },
     "symbol": "LEVI",
-    "target_gap_pct": -0.1332,
+    "target_gap_pct": -0.1486,
     "target_hit": false,
     "target_price_krw": 36799.3345,
     "trough_return": -0.182
@@ -12828,9 +12828,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 32900.0,
+        "price_krw": 31950.0,
         "type": "latest"
       }
     ],
@@ -13056,9 +13056,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 310303.8663,
+        "price_krw": 286437.5352,
         "type": "latest"
       }
     ],
@@ -13578,9 +13578,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 465000.0,
+        "price_krw": 440000.0,
         "type": "latest"
       }
     ],
@@ -13728,9 +13728,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 104229.2026,
+        "price_krw": 92781.2137,
         "type": "latest"
       }
     ],
@@ -13878,9 +13878,9 @@
         "type": "trough"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 20932.2518,
+        "price_krw": 20757.425,
         "type": "latest"
       }
     ],
@@ -14071,7 +14071,7 @@
   },
   "edabc743b3fa8967": {
     "company": "Intuitive Surgical",
-    "current_return": 0.1518,
+    "current_return": 0.1358,
     "days_to_target": 147.0,
     "entry_price_krw": 553680.9634,
     "markers": [
@@ -14100,9 +14100,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 637740.8921,
+        "price_krw": 628875.3191,
         "type": "latest"
       }
     ],
@@ -14142,7 +14142,7 @@
       "symbol": "ISRG"
     },
     "symbol": "ISRG",
-    "target_gap_pct": -0.1097,
+    "target_gap_pct": -0.1221,
     "target_hit": true,
     "target_price_krw": 716359.3534,
     "trough_return": -0.0194
@@ -14544,9 +14544,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 121500.0,
+        "price_krw": 121400.0,
         "type": "latest"
       }
     ],
@@ -14690,7 +14690,7 @@
       {
         "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 18437.3818,
+        "price_krw": 18393.6631,
         "type": "latest"
       }
     ],
@@ -14893,7 +14893,7 @@
   },
   "fee8fb34906543bb": {
     "company": "비츠로셀",
-    "current_return": 0.0673,
+    "current_return": -0.0619,
     "days_to_target": null,
     "entry_price_krw": 56500.0,
     "markers": [
@@ -14916,9 +14916,9 @@
         "type": "peak"
       },
       {
-        "date": "2026-05-14",
+        "date": "2026-05-15",
         "label": "최근 종가",
-        "price_krw": 60300.0,
+        "price_krw": 53000.0,
         "type": "latest"
       }
     ],
@@ -14958,7 +14958,7 @@
       "symbol": "082920.KS"
     },
     "symbol": "082920.KS",
-    "target_gap_pct": -0.2314,
+    "target_gap_pct": -0.3244,
     "target_hit": false,
     "target_price_krw": 78450.0,
     "trough_return": -0.0779

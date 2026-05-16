@@ -24690,14 +24690,14 @@
     },
     {
       "close": 1316.5,
-      "close_krw": 12430.3935,
+      "close_krw": 12392.2146,
       "currency": "JPY",
       "date": "2026-05-15",
       "display_currency": "JPY",
       "high": 1345.0000000000002,
-      "krw_per_unit": 9.44200038909912,
-      "low": 1276.5000000000002,
-      "open": 1310.5000000000002,
+      "krw_per_unit": 9.413000106811523,
+      "low": 1276.5,
+      "open": 1310.4999999999998,
       "source_currency": "JPY",
       "volume": 6210300.0
     }

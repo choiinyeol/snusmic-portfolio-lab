@@ -2824,40 +2824,40 @@
     "persona": "all_weather",
     "qty": 517,
     "symbol": "069500.KS",
-    "weight_in_portfolio": 0.2694
+    "weight_in_portfolio": 0.2722
   },
   {
     "company": "",
     "currency": "USD",
-    "last_close_native": 714.6668237034373,
-    "market_value_krw": 58980453.1944,
+    "last_close_native": 708.929992675422,
+    "market_value_krw": 58227042.0067,
     "month_end": "2026-05-15",
     "persona": "all_weather",
     "qty": 55,
     "symbol": "QQQ",
-    "weight_in_portfolio": 0.2622
+    "weight_in_portfolio": 0.2616
   },
   {
     "company": "",
     "currency": "USD",
-    "last_close_native": 742.8448319631274,
-    "market_value_krw": 55732677.0883,
+    "last_close_native": 739.1699829098524,
+    "market_value_krw": 55191603.8507,
     "month_end": "2026-05-15",
     "persona": "all_weather",
     "qty": 50,
     "symbol": "SPY",
-    "weight_in_portfolio": 0.2478
+    "weight_in_portfolio": 0.2479
   },
   {
     "company": "",
     "currency": "USD",
-    "last_close_native": 424.16929516660366,
-    "market_value_krw": 49645012.4873,
+    "last_close_native": 417.2900085447909,
+    "market_value_krw": 48606156.0736,
     "month_end": "2026-05-15",
     "persona": "all_weather",
     "qty": 78,
     "symbol": "GLD",
-    "weight_in_portfolio": 0.2207
+    "weight_in_portfolio": 0.2183
   },
   {
     "company": "",
@@ -3566,8 +3566,8 @@
   {
     "company": "",
     "currency": "USD",
-    "last_close_native": 424.1692951664133,
-    "market_value_krw": 234222623.0169,
+    "last_close_native": 417.2900085448702,
+    "market_value_krw": 229321351.7319,
     "month_end": "2026-05-15",
     "persona": "benchmark_gld",
     "qty": 368,
@@ -4996,8 +4996,8 @@
   {
     "company": "",
     "currency": "USD",
-    "last_close_native": 714.6668237037217,
-    "market_value_krw": 210184887.7474,
+    "last_close_native": 708.9299926759064,
+    "market_value_krw": 207500004.2422,
     "month_end": "2026-05-15",
     "persona": "benchmark_qqq",
     "qty": 196,
@@ -5711,8 +5711,8 @@
   {
     "company": "",
     "currency": "USD",
-    "last_close_native": 742.844831963708,
-    "market_value_krw": 181688527.308,
+    "last_close_native": 739.1699829103372,
+    "market_value_krw": 179924628.5534,
     "month_end": "2026-05-15",
     "persona": "benchmark_spy",
     "qty": 163,
@@ -31748,35 +31748,35 @@
   {
     "company": "JAC recruitment Co. Ltd",
     "currency": "JPY",
-    "last_close_native": 832.0000000000001,
-    "market_value_krw": 7541514.5508,
+    "last_close_native": 832.0,
+    "market_value_krw": 7518351.4453,
     "month_end": "2026-05-15",
     "persona": "smic_follower",
     "qty": 960,
     "symbol": "2124.T",
-    "weight_in_portfolio": 0.047
-  },
-  {
-    "company": "Coreweave",
-    "currency": "USD",
-    "last_close_native": 114.21499633789062,
-    "market_value_krw": 6636320.5834,
-    "month_end": "2026-05-15",
-    "persona": "smic_follower",
-    "qty": 39,
-    "symbol": "CRWV",
-    "weight_in_portfolio": 0.0413
+    "weight_in_portfolio": 0.0476
   },
   {
     "company": "Funko Inc.",
     "currency": "USD",
-    "last_close_native": 5.110000133514404,
-    "market_value_krw": 6547250.8849,
+    "last_close_native": 5.059999942779541,
+    "market_value_krw": 6498418.1218,
     "month_end": "2026-05-15",
     "persona": "smic_follower",
     "qty": 860,
     "symbol": "FNKO",
-    "weight_in_portfolio": 0.0408
+    "weight_in_portfolio": 0.0412
+  },
+  {
+    "company": "Coreweave",
+    "currency": "USD",
+    "last_close_native": 107.30000305175781,
+    "market_value_krw": 6249179.9327,
+    "month_end": "2026-05-15",
+    "persona": "smic_follower",
+    "qty": 39,
+    "symbol": "CRWV",
+    "weight_in_portfolio": 0.0396
   },
   {
     "company": "KG스틸",
@@ -31787,7 +31787,7 @@
     "persona": "smic_follower",
     "qty": 790,
     "symbol": "016380.KS",
-    "weight_in_portfolio": 0.0369
+    "weight_in_portfolio": 0.0375
   },
   {
     "company": "마이크로컨텍솔",
@@ -31798,7 +31798,7 @@
     "persona": "smic_follower",
     "qty": 184,
     "symbol": "098120.KQ",
-    "weight_in_portfolio": 0.0346
+    "weight_in_portfolio": 0.0351
   },
   {
     "company": "예스티",
@@ -31809,18 +31809,7 @@
     "persona": "smic_follower",
     "qty": 211,
     "symbol": "122640.KQ",
-    "weight_in_portfolio": 0.0338
-  },
-  {
-    "company": "크래프톤",
-    "currency": "KRW",
-    "last_close_native": 293500.0,
-    "market_value_krw": 5283000.0,
-    "month_end": "2026-05-15",
-    "persona": "smic_follower",
-    "qty": 18,
-    "symbol": "259960.KQ",
-    "weight_in_portfolio": 0.0329
+    "weight_in_portfolio": 0.0343
   },
   {
     "company": "한화비전",
@@ -31831,18 +31820,18 @@
     "persona": "smic_follower",
     "qty": 72,
     "symbol": "489790.KS",
-    "weight_in_portfolio": 0.0317
+    "weight_in_portfolio": 0.0322
   },
   {
-    "company": "Establishment Labs Holdings",
-    "currency": "USD",
-    "last_close_native": 69.8000030517578,
-    "market_value_krw": 4887569.2056,
+    "company": "크래프톤",
+    "currency": "KRW",
+    "last_close_native": 279000.0,
+    "market_value_krw": 5022000.0,
     "month_end": "2026-05-15",
     "persona": "smic_follower",
-    "qty": 47,
-    "symbol": "ESTA",
-    "weight_in_portfolio": 0.0304
+    "qty": 18,
+    "symbol": "259960.KQ",
+    "weight_in_portfolio": 0.0318
   },
   {
     "company": "씨에스윈드",
@@ -31853,7 +31842,18 @@
     "persona": "smic_follower",
     "qty": 92,
     "symbol": "112610.KS",
-    "weight_in_portfolio": 0.0303
+    "weight_in_portfolio": 0.0308
+  },
+  {
+    "company": "Establishment Labs Holdings",
+    "currency": "USD",
+    "last_close_native": 65.76000213623047,
+    "market_value_krw": 4615495.8491,
+    "month_end": "2026-05-15",
+    "persona": "smic_follower",
+    "qty": 47,
+    "symbol": "ESTA",
+    "weight_in_portfolio": 0.0292
   },
   {
     "company": "HDC현대산업개발",
@@ -31864,46 +31864,35 @@
     "persona": "smic_follower",
     "qty": 201,
     "symbol": "294870.KS",
-    "weight_in_portfolio": 0.0287
-  },
-  {
-    "company": "브이티",
-    "currency": "KRW",
-    "last_close_native": 15570.0,
-    "market_value_krw": 4546440.0,
-    "month_end": "2026-05-15",
-    "persona": "smic_follower",
-    "qty": 292,
-    "symbol": "018290.KS",
-    "weight_in_portfolio": 0.0283
-  },
-  {
-    "company": "Cellebrite DI",
-    "currency": "USD",
-    "last_close_native": 13.119999885559082,
-    "market_value_krw": 4534834.442,
-    "month_end": "2026-05-15",
-    "persona": "smic_follower",
-    "qty": 232,
-    "symbol": "CLBT",
-    "weight_in_portfolio": 0.0282
+    "weight_in_portfolio": 0.0291
   },
   {
     "company": "Cover Corp",
     "currency": "JPY",
-    "last_close_native": 1466.0000000000002,
-    "market_value_krw": 4526325.0305,
+    "last_close_native": 1465.9999999999998,
+    "market_value_krw": 4512422.8172,
     "month_end": "2026-05-15",
     "persona": "smic_follower",
     "qty": 327,
     "symbol": "5253.T",
-    "weight_in_portfolio": 0.0282
+    "weight_in_portfolio": 0.0286
+  },
+  {
+    "company": "Cellebrite DI",
+    "currency": "USD",
+    "last_close_native": 12.979999542236328,
+    "market_value_krw": 4496984.0809,
+    "month_end": "2026-05-15",
+    "persona": "smic_follower",
+    "qty": 232,
+    "symbol": "CLBT",
+    "weight_in_portfolio": 0.0285
   },
   {
     "company": "Levi Strauss & Co",
     "currency": "USD",
-    "last_close_native": 21.409999847412113,
-    "market_value_krw": 4497543.7552,
+    "last_close_native": 20.979999542236328,
+    "market_value_krw": 4417568.3237,
     "month_end": "2026-05-15",
     "persona": "smic_follower",
     "qty": 141,
@@ -31911,26 +31900,26 @@
     "weight_in_portfolio": 0.028
   },
   {
-    "company": "비츠로셀",
+    "company": "브이티",
     "currency": "KRW",
-    "last_close_native": 60300.0,
-    "market_value_krw": 4401900.0,
+    "last_close_native": 14820.0,
+    "market_value_krw": 4327440.0,
     "month_end": "2026-05-15",
     "persona": "smic_follower",
-    "qty": 73,
-    "symbol": "082920.KS",
+    "qty": 292,
+    "symbol": "018290.KS",
     "weight_in_portfolio": 0.0274
   },
   {
     "company": "에스트래픽",
     "currency": "KRW",
     "last_close_native": 3375.0,
-    "market_value_krw": 4323375.0,
+    "market_value_krw": 4320000.0,
     "month_end": "2026-05-15",
     "persona": "smic_follower",
-    "qty": 1281,
+    "qty": 1280,
     "symbol": "234300.KQ",
-    "weight_in_portfolio": 0.0269
+    "weight_in_portfolio": 0.0274
   },
   {
     "company": "JYP Ent.",
@@ -31941,7 +31930,7 @@
     "persona": "smic_follower",
     "qty": 68,
     "symbol": "035900.KQ",
-    "weight_in_portfolio": 0.0269
+    "weight_in_portfolio": 0.0273
   },
   {
     "company": "파마리서치",
@@ -31952,7 +31941,7 @@
     "persona": "smic_follower",
     "qty": 13,
     "symbol": "214450.KQ",
-    "weight_in_portfolio": 0.0266
+    "weight_in_portfolio": 0.027
   },
   {
     "company": "한국카본",
@@ -31963,18 +31952,7 @@
     "persona": "smic_follower",
     "qty": 110,
     "symbol": "017960.KS",
-    "weight_in_portfolio": 0.0265
-  },
-  {
-    "company": "Sensient Technologies Corp",
-    "currency": "USD",
-    "last_close_native": 117.23999786376953,
-    "market_value_krw": 4192052.0258,
-    "month_end": "2026-05-15",
-    "persona": "smic_follower",
-    "qty": 24,
-    "symbol": "SXT",
-    "weight_in_portfolio": 0.0261
+    "weight_in_portfolio": 0.027
   },
   {
     "company": "고려신용정보",
@@ -31985,7 +31963,7 @@
     "persona": "smic_follower",
     "qty": 420,
     "symbol": "049720.KQ",
-    "weight_in_portfolio": 0.0258
+    "weight_in_portfolio": 0.0262
   },
   {
     "company": "폰드그룹",
@@ -31996,18 +31974,18 @@
     "persona": "smic_follower",
     "qty": 827,
     "symbol": "472850.KQ",
-    "weight_in_portfolio": 0.0256
+    "weight_in_portfolio": 0.0261
   },
   {
-    "company": "덕산네오룩스",
-    "currency": "KRW",
-    "last_close_native": 52000.0,
-    "market_value_krw": 4108000.0,
+    "company": "Sensient Technologies Corp",
+    "currency": "USD",
+    "last_close_native": 113.93000030517578,
+    "market_value_krw": 4083269.3463,
     "month_end": "2026-05-15",
     "persona": "smic_follower",
-    "qty": 79,
-    "symbol": "213420.KS",
-    "weight_in_portfolio": 0.0256
+    "qty": 24,
+    "symbol": "SXT",
+    "weight_in_portfolio": 0.0259
   },
   {
     "company": "애니플러스",
@@ -32018,7 +31996,7 @@
     "persona": "smic_follower",
     "qty": 1591,
     "symbol": "310200.KQ",
-    "weight_in_portfolio": 0.0253
+    "weight_in_portfolio": 0.0257
   },
   {
     "company": "아프리카TV",
@@ -32029,40 +32007,40 @@
     "persona": "smic_follower",
     "qty": 77,
     "symbol": "067160.KQ",
-    "weight_in_portfolio": 0.0252
+    "weight_in_portfolio": 0.0256
   },
   {
     "company": "OSAKA Titanium Technologies Co.,Ltd.",
     "currency": "JPY",
-    "last_close_native": 2502.0000000000005,
-    "market_value_krw": 3992436.5605,
+    "last_close_native": 2502.0,
+    "market_value_krw": 3980174.1392,
     "month_end": "2026-05-15",
     "persona": "smic_follower",
     "qty": 169,
     "symbol": "5726.T",
-    "weight_in_portfolio": 0.0249
+    "weight_in_portfolio": 0.0252
   },
   {
-    "company": "샘씨엔에스",
+    "company": "비츠로셀",
     "currency": "KRW",
-    "last_close_native": 12800.0,
-    "market_value_krw": 3891200.0,
+    "last_close_native": 53000.0,
+    "market_value_krw": 3869000.0,
     "month_end": "2026-05-15",
     "persona": "smic_follower",
-    "qty": 304,
-    "symbol": "252990.KS",
-    "weight_in_portfolio": 0.0242
+    "qty": 73,
+    "symbol": "082920.KS",
+    "weight_in_portfolio": 0.0245
   },
   {
     "company": "나노",
     "currency": "KRW",
-    "last_close_native": 5860.0,
-    "market_value_krw": 3744540.0,
+    "last_close_native": 5900.0,
+    "market_value_krw": 3770100.0,
     "month_end": "2026-05-15",
     "persona": "smic_follower",
     "qty": 639,
     "symbol": "187790.KS",
-    "weight_in_portfolio": 0.0233
+    "weight_in_portfolio": 0.0239
   },
   {
     "company": "지투지바이오",
@@ -32073,7 +32051,18 @@
     "persona": "smic_follower",
     "qty": 56,
     "symbol": "456160.KQ",
-    "weight_in_portfolio": 0.0232
+    "weight_in_portfolio": 0.0235
+  },
+  {
+    "company": "덕산네오룩스",
+    "currency": "KRW",
+    "last_close_native": 47000.0,
+    "market_value_krw": 3713000.0,
+    "month_end": "2026-05-15",
+    "persona": "smic_follower",
+    "qty": 79,
+    "symbol": "213420.KS",
+    "weight_in_portfolio": 0.0235
   },
   {
     "company": "SK오션플랜트",
@@ -32084,51 +32073,62 @@
     "persona": "smic_follower",
     "qty": 189,
     "symbol": "100090.KS",
-    "weight_in_portfolio": 0.0227
+    "weight_in_portfolio": 0.0231
   },
   {
     "company": "Iradimed Corporation",
     "currency": "USD",
-    "last_close_native": 86.88999938964844,
-    "market_value_krw": 3624661.4242,
+    "last_close_native": 86.44000244140625,
+    "market_value_krw": 3614360.6882,
     "month_end": "2026-05-15",
     "persona": "smic_follower",
     "qty": 28,
     "symbol": "IRMD",
+    "weight_in_portfolio": 0.0229
+  },
+  {
+    "company": "샘씨엔에스",
+    "currency": "KRW",
+    "last_close_native": 11720.0,
+    "market_value_krw": 3562880.0,
+    "month_end": "2026-05-15",
+    "persona": "smic_follower",
+    "qty": 304,
+    "symbol": "252990.KS",
     "weight_in_portfolio": 0.0226
   },
   {
     "company": "IMAX Corp",
     "currency": "USD",
-    "last_close_native": 34.04999923706055,
-    "market_value_krw": 3601762.5287,
+    "last_close_native": 33.59000015258789,
+    "market_value_krw": 3561451.5673,
     "month_end": "2026-05-15",
     "persona": "smic_follower",
     "qty": 71,
     "symbol": "IMAX",
-    "weight_in_portfolio": 0.0224
+    "weight_in_portfolio": 0.0226
+  },
+  {
+    "company": "Doximity",
+    "currency": "USD",
+    "last_close_native": 18.969999313354492,
+    "market_value_krw": 3314453.0008,
+    "month_end": "2026-05-15",
+    "persona": "smic_follower",
+    "qty": 117,
+    "symbol": "DOCS",
+    "weight_in_portfolio": 0.021
   },
   {
     "company": "Sportradar",
     "currency": "USD",
-    "last_close_native": 12.699999809265137,
-    "market_value_krw": 3178722.5033,
+    "last_close_native": 12.489999771118164,
+    "market_value_krw": 3133505.0597,
     "month_end": "2026-05-15",
     "persona": "smic_follower",
     "qty": 168,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0198
-  },
-  {
-    "company": "Doximity",
-    "currency": "USD",
-    "last_close_native": 18.010000228881832,
-    "market_value_krw": 3139346.1207,
-    "month_end": "2026-05-15",
-    "persona": "smic_follower",
-    "qty": 117,
-    "symbol": "DOCS",
-    "weight_in_portfolio": 0.0196
   },
   {
     "company": "세아제강",
@@ -32139,13 +32139,13 @@
     "persona": "smic_follower",
     "qty": 6,
     "symbol": "306200.KS",
-    "weight_in_portfolio": 0.006
+    "weight_in_portfolio": 0.0061
   },
   {
     "company": "Tempus AI Inc",
     "currency": "USD",
-    "last_close_native": 45.47999954223633,
-    "market_value_krw": 271031.6839,
+    "last_close_native": 43.93000030517578,
+    "market_value_krw": 262409.7006,
     "month_end": "2026-05-15",
     "persona": "smic_follower",
     "qty": 4,
@@ -32155,13 +32155,13 @@
   {
     "company": "코스텍시스",
     "currency": "KRW",
-    "last_close_native": 55500.0,
-    "market_value_krw": 111000.0,
+    "last_close_native": 49850.0,
+    "market_value_krw": 99700.0,
     "month_end": "2026-05-15",
     "persona": "smic_follower",
     "qty": 2,
     "symbol": "355150.KS",
-    "weight_in_portfolio": 0.0007
+    "weight_in_portfolio": 0.0006
   },
   {
     "company": "SEA ltd.",
@@ -44464,13 +44464,13 @@
   {
     "company": "Sensient Technologies Corp",
     "currency": "USD",
-    "last_close_native": 117.23999786376953,
-    "market_value_krw": 26025656.3271,
+    "last_close_native": 113.93000030517578,
+    "market_value_krw": 25350297.1915,
     "month_end": "2026-05-15",
     "persona": "smic_follower_v2",
     "qty": 149,
     "symbol": "SXT",
-    "weight_in_portfolio": 0.1556
+    "weight_in_portfolio": 0.1538
   },
   {
     "company": "예스티",
@@ -44481,18 +44481,18 @@
     "persona": "smic_follower_v2",
     "qty": 966,
     "symbol": "122640.KQ",
-    "weight_in_portfolio": 0.1485
+    "weight_in_portfolio": 0.1506
   },
   {
     "company": "Establishment Labs Holdings",
     "currency": "USD",
-    "last_close_native": 69.8000030517578,
-    "market_value_krw": 22773992.6812,
+    "last_close_native": 65.76000213623047,
+    "market_value_krw": 21506246.616,
     "month_end": "2026-05-15",
     "persona": "smic_follower_v2",
     "qty": 219,
     "symbol": "ESTA",
-    "weight_in_portfolio": 0.1362
+    "weight_in_portfolio": 0.1305
   },
   {
     "company": "고려신용정보",
@@ -44503,18 +44503,18 @@
     "persona": "smic_follower_v2",
     "qty": 1941,
     "symbol": "049720.KQ",
-    "weight_in_portfolio": 0.1144
+    "weight_in_portfolio": 0.1161
   },
   {
     "company": "Cellebrite DI",
     "currency": "USD",
-    "last_close_native": 13.119999885559082,
-    "market_value_krw": 19077579.3767,
+    "last_close_native": 12.979999542236328,
+    "market_value_krw": 18918346.823,
     "month_end": "2026-05-15",
     "persona": "smic_follower_v2",
     "qty": 976,
     "symbol": "CLBT",
-    "weight_in_portfolio": 0.1141
+    "weight_in_portfolio": 0.1148
   },
   {
     "company": "한국카본",
@@ -44525,35 +44525,35 @@
     "persona": "smic_follower_v2",
     "qty": 483,
     "symbol": "017960.KS",
-    "weight_in_portfolio": 0.1119
+    "weight_in_portfolio": 0.1135
   },
   {
     "company": "IMAX Corp",
     "currency": "USD",
-    "last_close_native": 34.04999923706055,
-    "market_value_krw": 17653709.2954,
+    "last_close_native": 33.59000015258789,
+    "market_value_krw": 17456128.8086,
     "month_end": "2026-05-15",
     "persona": "smic_follower_v2",
     "qty": 348,
     "symbol": "IMAX",
-    "weight_in_portfolio": 0.1056
+    "weight_in_portfolio": 0.1059
   },
   {
     "company": "Iradimed Corporation",
     "currency": "USD",
-    "last_close_native": 86.88999938964844,
-    "market_value_krw": 17217141.7649,
+    "last_close_native": 86.44000244140625,
+    "market_value_krw": 17168213.2688,
     "month_end": "2026-05-15",
     "persona": "smic_follower_v2",
     "qty": 133,
     "symbol": "IRMD",
-    "weight_in_portfolio": 0.103
+    "weight_in_portfolio": 0.1041
   },
   {
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 171.36000061035156,
-    "market_value_krw": 1787092.8422,
+    "last_close_native": 168.35000610351565,
+    "market_value_krw": 1759826.5465,
     "month_end": "2026-05-15",
     "persona": "smic_follower_v2",
     "qty": 7,
@@ -44563,8 +44563,8 @@
   {
     "company": "나노",
     "currency": "KRW",
-    "last_close_native": 5860.0,
-    "market_value_krw": 11720.0,
+    "last_close_native": 5900.0,
+    "market_value_krw": 11800.0,
     "month_end": "2026-05-15",
     "persona": "smic_follower_v2",
     "qty": 2,
@@ -45608,30 +45608,30 @@
   {
     "company": "IMAX Corp",
     "currency": "USD",
-    "last_close_native": 34.04999923706055,
-    "market_value_krw": 224374586.821,
+    "last_close_native": 33.59000015258789,
+    "market_value_krw": 221863384.2536,
     "month_end": "2026-05-15",
     "persona": "smic_mtt_strategy_top1",
     "qty": 4423,
     "symbol": "IMAX",
-    "weight_in_portfolio": 0.6303
+    "weight_in_portfolio": 0.6283
   },
   {
     "company": "Iradimed Corporation",
     "currency": "USD",
-    "last_close_native": 86.88999938964844,
-    "market_value_krw": 129452193.7208,
+    "last_close_native": 86.44000244140625,
+    "market_value_krw": 129084310.2914,
     "month_end": "2026-05-15",
     "persona": "smic_mtt_strategy_top1",
     "qty": 1000,
     "symbol": "IRMD",
-    "weight_in_portfolio": 0.3636
+    "weight_in_portfolio": 0.3656
   },
   {
     "company": "Golar LNG",
     "currency": "USD",
-    "last_close_native": 57.22999954223633,
-    "market_value_krw": 2131588.514,
+    "last_close_native": 57.040000915527344,
+    "market_value_krw": 2129502.8254,
     "month_end": "2026-05-15",
     "persona": "smic_mtt_strategy_top1",
     "qty": 25,
@@ -45641,8 +45641,8 @@
   {
     "company": "JAC recruitment Co. Ltd",
     "currency": "JPY",
-    "last_close_native": 832.0000000000001,
-    "market_value_krw": 31422.9773,
+    "last_close_native": 832.0,
+    "market_value_krw": 31326.4644,
     "month_end": "2026-05-15",
     "persona": "smic_mtt_strategy_top1",
     "qty": 4,
@@ -46686,41 +46686,41 @@
   {
     "company": "IMAX Corp",
     "currency": "USD",
-    "last_close_native": 34.04999923706055,
-    "market_value_krw": 213417112.0859,
+    "last_close_native": 33.59000015258789,
+    "market_value_krw": 211028545.6828,
     "month_end": "2026-05-15",
     "persona": "smic_mtt_strategy_top2",
     "qty": 4207,
     "symbol": "IMAX",
-    "weight_in_portfolio": 0.6303
+    "weight_in_portfolio": 0.6283
   },
   {
     "company": "Iradimed Corporation",
     "currency": "USD",
-    "last_close_native": 86.88999938964844,
-    "market_value_krw": 123109036.2285,
+    "last_close_native": 86.44000244140625,
+    "market_value_krw": 122759179.0871,
     "month_end": "2026-05-15",
     "persona": "smic_mtt_strategy_top2",
     "qty": 951,
     "symbol": "IRMD",
-    "weight_in_portfolio": 0.3636
+    "weight_in_portfolio": 0.3655
   },
   {
     "company": "Golar LNG",
     "currency": "USD",
-    "last_close_native": 57.22999954223633,
-    "market_value_krw": 2046324.9735,
+    "last_close_native": 57.040000915527344,
+    "market_value_krw": 2044322.7124,
     "month_end": "2026-05-15",
     "persona": "smic_mtt_strategy_top2",
     "qty": 24,
     "symbol": "GLNG",
-    "weight_in_portfolio": 0.006
+    "weight_in_portfolio": 0.0061
   },
   {
     "company": "JAC recruitment Co. Ltd",
     "currency": "JPY",
-    "last_close_native": 832.0000000000001,
-    "market_value_krw": 31422.9773,
+    "last_close_native": 832.0,
+    "market_value_krw": 31326.4644,
     "month_end": "2026-05-15",
     "persona": "smic_mtt_strategy_top2",
     "qty": 4,
@@ -47940,8 +47940,8 @@
   {
     "company": "Golar LNG",
     "currency": "USD",
-    "last_close_native": 57.22999954223633,
-    "market_value_krw": 158163867.7423,
+    "last_close_native": 57.040000915527344,
+    "market_value_krw": 158009109.6476,
     "month_end": "2026-05-15",
     "persona": "smic_mtt_strategy_top3",
     "qty": 1855,
@@ -66429,48 +66429,37 @@
     "weight_in_portfolio": 0.0019
   },
   {
-    "company": "Tenaris S.A.",
+    "company": "Noble Corporation PLC",
     "currency": "USD",
-    "last_close_native": 58.18000030517578,
-    "market_value_krw": 461682996.6642,
+    "last_close_native": 49.06999969482422,
+    "market_value_krw": 621731541.1144,
     "month_end": "2026-03-31",
     "persona": "weak_oracle",
-    "qty": 5234,
-    "symbol": "TS",
-    "weight_in_portfolio": 0.1168
-  },
-  {
-    "company": "Scorpio Tankers Inc.",
-    "currency": "USD",
-    "last_close_native": 74.66000366210938,
-    "market_value_krw": 405348687.0178,
-    "month_end": "2026-03-31",
-    "persona": "weak_oracle",
-    "qty": 3581,
-    "symbol": "STNG",
-    "weight_in_portfolio": 0.1026
+    "qty": 8357,
+    "symbol": "NE",
+    "weight_in_portfolio": 0.1572
   },
   {
     "company": "BE Semiconductor Industries N.V.",
     "currency": "EUR",
     "last_close_native": 178.9499969482422,
-    "market_value_krw": 398011469.7381,
+    "market_value_krw": 450520399.0009,
     "month_end": "2026-03-31",
     "persona": "weak_oracle",
-    "qty": 1281,
+    "qty": 1450,
     "symbol": "BESI.AS",
-    "weight_in_portfolio": 0.1007
+    "weight_in_portfolio": 0.1139
   },
   {
-    "company": "Noble Corporation PLC",
-    "currency": "USD",
-    "last_close_native": 49.06999969482422,
-    "market_value_krw": 376967059.8093,
+    "company": "Gaztransport&technigaz",
+    "currency": "EUR",
+    "last_close_native": 203.1999969482422,
+    "market_value_krw": 421958402.3081,
     "month_end": "2026-03-31",
     "persona": "weak_oracle",
-    "qty": 5067,
-    "symbol": "NE",
-    "weight_in_portfolio": 0.0954
+    "qty": 1196,
+    "symbol": "GTT.PA",
+    "weight_in_portfolio": 0.1067
   },
   {
     "company": "현대에너지솔루션",
@@ -66481,7 +66470,7 @@
     "persona": "weak_oracle",
     "qty": 2617,
     "symbol": "322000.KS",
-    "weight_in_portfolio": 0.0921
+    "weight_in_portfolio": 0.092
   },
   {
     "company": "에이피알",
@@ -66492,18 +66481,18 @@
     "persona": "weak_oracle",
     "qty": 1034,
     "symbol": "278470.KS",
-    "weight_in_portfolio": 0.0882
+    "weight_in_portfolio": 0.0881
   },
   {
-    "company": "Gaztransport&technigaz",
-    "currency": "EUR",
-    "last_close_native": 203.1999969482422,
-    "market_value_krw": 204628656.6377,
+    "company": "Scorpio Tankers Inc.",
+    "currency": "USD",
+    "last_close_native": 74.66000366210938,
+    "market_value_krw": 295776631.996,
     "month_end": "2026-03-31",
     "persona": "weak_oracle",
-    "qty": 580,
-    "symbol": "GTT.PA",
-    "weight_in_portfolio": 0.0518
+    "qty": 2613,
+    "symbol": "STNG",
+    "weight_in_portfolio": 0.0748
   },
   {
     "company": "세아제강지주",
@@ -66514,18 +66503,18 @@
     "persona": "weak_oracle",
     "qty": 926,
     "symbol": "003030.KS",
-    "weight_in_portfolio": 0.0447
+    "weight_in_portfolio": 0.0446
   },
   {
-    "company": "Coreweave",
+    "company": "Tenaris S.A.",
     "currency": "USD",
-    "last_close_native": 77.47000122070312,
-    "market_value_krw": 172775706.787,
+    "last_close_native": 58.18000030517578,
+    "market_value_krw": 167684252.323,
     "month_end": "2026-03-31",
     "persona": "weak_oracle",
-    "qty": 1471,
-    "symbol": "CRWV",
-    "weight_in_portfolio": 0.0437
+    "qty": 1901,
+    "symbol": "TS",
+    "weight_in_portfolio": 0.0424
   },
   {
     "company": "DL",
@@ -66553,12 +66542,12 @@
     "company": "Chegg",
     "currency": "USD",
     "last_close_native": 0.7400000095367432,
-    "market_value_krw": 116131617.9327,
+    "market_value_krw": 127153519.339,
     "month_end": "2026-03-31",
     "persona": "weak_oracle",
-    "qty": 103510,
+    "qty": 113334,
     "symbol": "CHGG",
-    "weight_in_portfolio": 0.0294
+    "weight_in_portfolio": 0.0321
   },
   {
     "company": "현대그린푸드",
@@ -66570,6 +66559,17 @@
     "qty": 6551,
     "symbol": "453340.KQ",
     "weight_in_portfolio": 0.0262
+  },
+  {
+    "company": "Fluence Energy Inc.",
+    "currency": "USD",
+    "last_close_native": 13.760000228881836,
+    "market_value_krw": 98009437.4083,
+    "month_end": "2026-03-31",
+    "persona": "weak_oracle",
+    "qty": 4698,
+    "symbol": "FLNC",
+    "weight_in_portfolio": 0.0248
   },
   {
     "company": "삼성엔지니어링",
@@ -66594,25 +66594,14 @@
     "weight_in_portfolio": 0.0243
   },
   {
-    "company": "Fluence Energy Inc.",
+    "company": "Eli Lilly & Co.",
     "currency": "USD",
-    "last_close_native": 13.760000228881836,
-    "market_value_krw": 86410193.6452,
+    "last_close_native": 919.77001953125,
+    "market_value_krw": 69724546.2101,
     "month_end": "2026-03-31",
     "persona": "weak_oracle",
-    "qty": 4142,
-    "symbol": "FLNC",
-    "weight_in_portfolio": 0.0219
-  },
-  {
-    "company": "Funko Inc.",
-    "currency": "USD",
-    "last_close_native": 3.1500000953674316,
-    "market_value_krw": 69454599.8849,
-    "month_end": "2026-03-31",
-    "persona": "weak_oracle",
-    "qty": 14543,
-    "symbol": "FNKO",
+    "qty": 50,
+    "symbol": "LLY",
     "weight_in_portfolio": 0.0176
   },
   {
@@ -66627,6 +66616,17 @@
     "weight_in_portfolio": 0.0112
   },
   {
+    "company": "Funko Inc.",
+    "currency": "USD",
+    "last_close_native": 3.1500000953674316,
+    "market_value_krw": 41774007.0958,
+    "month_end": "2026-03-31",
+    "persona": "weak_oracle",
+    "qty": 8747,
+    "symbol": "FNKO",
+    "weight_in_portfolio": 0.0106
+  },
+  {
     "company": "레이",
     "currency": "KRW",
     "last_close_native": 5020.0,
@@ -66635,7 +66635,7 @@
     "persona": "weak_oracle",
     "qty": 8310,
     "symbol": "228670.KQ",
-    "weight_in_portfolio": 0.0106
+    "weight_in_portfolio": 0.0105
   },
   {
     "company": "코오롱티슈진",
@@ -66685,10 +66685,10 @@
     "company": "코세스",
     "currency": "KRW",
     "last_close_native": 47400.0,
-    "market_value_krw": 44319000.0,
+    "market_value_krw": 44413800.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 935,
+    "qty": 937,
     "symbol": "089890.KQ",
     "weight_in_portfolio": 0.0098
   },
@@ -66707,10 +66707,10 @@
     "company": "주성엔지니어링",
     "currency": "KRW",
     "last_close_native": 126000.0,
-    "market_value_krw": 40194000.0,
+    "market_value_krw": 40320000.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 319,
+    "qty": 320,
     "symbol": "036930.KQ",
     "weight_in_portfolio": 0.0089
   },
@@ -66718,23 +66718,12 @@
     "company": "아스플로",
     "currency": "KRW",
     "last_close_native": 10590.0,
-    "market_value_krw": 39617190.0,
+    "market_value_krw": 39670140.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 3741,
+    "qty": 3746,
     "symbol": "159010.KQ",
     "weight_in_portfolio": 0.0088
-  },
-  {
-    "company": "Wolfspeed",
-    "currency": "USD",
-    "last_close_native": 29.530000686645508,
-    "market_value_krw": 35928468.0386,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 818,
-    "symbol": "WOLF",
-    "weight_in_portfolio": 0.008
   },
   {
     "company": "현대에너지솔루션",
@@ -66748,13 +66737,24 @@
     "weight_in_portfolio": 0.0078
   },
   {
+    "company": "Wolfspeed",
+    "currency": "USD",
+    "last_close_native": 29.530000686645508,
+    "market_value_krw": 35137866.0524,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 800,
+    "symbol": "WOLF",
+    "weight_in_portfolio": 0.0078
+  },
+  {
     "company": "레이",
     "currency": "KRW",
     "last_close_native": 8810.0,
-    "market_value_krw": 34737830.0,
+    "market_value_krw": 34790690.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 3943,
+    "qty": 3949,
     "symbol": "228670.KQ",
     "weight_in_portfolio": 0.0077
   },
@@ -66773,10 +66773,10 @@
     "company": "비에이치",
     "currency": "KRW",
     "last_close_native": 34500.0,
-    "market_value_krw": 32499000.0,
+    "market_value_krw": 32533500.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 942,
+    "qty": 943,
     "symbol": "090460.KS",
     "weight_in_portfolio": 0.0072
   },
@@ -66784,10 +66784,10 @@
     "company": "Chegg",
     "currency": "USD",
     "last_close_native": 1.0900000333786013,
-    "market_value_krw": 31066282.4137,
+    "market_value_krw": 31108434.7643,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 19162,
+    "qty": 19188,
     "symbol": "CHGG",
     "weight_in_portfolio": 0.0069
   },
@@ -66811,7 +66811,7 @@
     "persona": "weak_oracle",
     "qty": 23,
     "symbol": "000660.KS",
-    "weight_in_portfolio": 0.0066
+    "weight_in_portfolio": 0.0065
   },
   {
     "company": "Coreweave",
@@ -66839,10 +66839,10 @@
     "company": "DI동일",
     "currency": "KRW",
     "last_close_native": 30050.0,
-    "market_value_krw": 28968200.0,
+    "market_value_krw": 28998250.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 964,
+    "qty": 965,
     "symbol": "001530.KS",
     "weight_in_portfolio": 0.0064
   },
@@ -66872,22 +66872,33 @@
     "company": "이수페타시스",
     "currency": "KRW",
     "last_close_native": 150300.0,
-    "market_value_krw": 28557000.0,
+    "market_value_krw": 28707300.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 190,
+    "qty": 191,
     "symbol": "007660.KS",
-    "weight_in_portfolio": 0.0063
+    "weight_in_portfolio": 0.0064
   },
   {
     "company": "Funko Inc.",
     "currency": "USD",
     "last_close_native": 4.409999847412109,
-    "market_value_krw": 28283898.2038,
+    "market_value_krw": 28323254.2774,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 4312,
+    "qty": 4318,
     "symbol": "FNKO",
+    "weight_in_portfolio": 0.0063
+  },
+  {
+    "company": "DL이앤씨",
+    "currency": "KRW",
+    "last_close_native": 99000.0,
+    "market_value_krw": 28314000.0,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 286,
+    "symbol": "375500.KS",
     "weight_in_portfolio": 0.0063
   },
   {
@@ -66902,36 +66913,25 @@
     "weight_in_portfolio": 0.0063
   },
   {
-    "company": "DL이앤씨",
-    "currency": "KRW",
-    "last_close_native": 99000.0,
-    "market_value_krw": 28215000.0,
+    "company": "MP Materials",
+    "currency": "USD",
+    "last_close_native": 66.04000091552734,
+    "market_value_krw": 27994574.412,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
     "qty": 285,
-    "symbol": "375500.KS",
+    "symbol": "MP",
     "weight_in_portfolio": 0.0062
   },
   {
     "company": "한화솔루션",
     "currency": "KRW",
     "last_close_native": 50700.0,
-    "market_value_krw": 27935700.0,
+    "market_value_krw": 27986400.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 551,
+    "qty": 552,
     "symbol": "009830.KS",
-    "weight_in_portfolio": 0.0062
-  },
-  {
-    "company": "MP Materials",
-    "currency": "USD",
-    "last_close_native": 66.04000091552734,
-    "market_value_krw": 27896347.8351,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 284,
-    "symbol": "MP",
     "weight_in_portfolio": 0.0062
   },
   {
@@ -66949,10 +66949,10 @@
     "company": "예스티",
     "currency": "KRW",
     "last_close_native": 27200.0,
-    "market_value_krw": 27635200.0,
+    "market_value_krw": 27662400.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 1016,
+    "qty": 1017,
     "symbol": "122640.KQ",
     "weight_in_portfolio": 0.0061
   },
@@ -66982,10 +66982,10 @@
     "company": "아이씨에이치",
     "currency": "KRW",
     "last_close_native": 1168.0,
-    "market_value_krw": 27139648.0,
+    "market_value_krw": 27175856.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 23236,
+    "qty": 23267,
     "symbol": "368600.KQ",
     "weight_in_portfolio": 0.006
   },
@@ -66993,10 +66993,10 @@
     "company": "KG스틸",
     "currency": "KRW",
     "last_close_native": 7030.0,
-    "market_value_krw": 26735090.0,
+    "market_value_krw": 26770240.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 3803,
+    "qty": 3808,
     "symbol": "016380.KS",
     "weight_in_portfolio": 0.0059
   },
@@ -67004,10 +67004,10 @@
     "company": "태광",
     "currency": "KRW",
     "last_close_native": 46050.0,
-    "market_value_krw": 26709000.0,
+    "market_value_krw": 26755050.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 580,
+    "qty": 581,
     "symbol": "023160.KS",
     "weight_in_portfolio": 0.0059
   },
@@ -67015,12 +67015,23 @@
     "company": "공구우먼",
     "currency": "KRW",
     "last_close_native": 6750.0,
-    "market_value_krw": 26493750.0,
+    "market_value_krw": 26527500.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 3925,
+    "qty": 3930,
     "symbol": "366030.KQ",
     "weight_in_portfolio": 0.0059
+  },
+  {
+    "company": "마이크로컨텍솔",
+    "currency": "KRW",
+    "last_close_native": 37400.0,
+    "market_value_krw": 26441800.0,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 707,
+    "symbol": "098120.KQ",
+    "weight_in_portfolio": 0.0058
   },
   {
     "company": "효성티앤씨",
@@ -67031,17 +67042,6 @@
     "persona": "weak_oracle",
     "qty": 51,
     "symbol": "298020.KQ",
-    "weight_in_portfolio": 0.0059
-  },
-  {
-    "company": "마이크로컨텍솔",
-    "currency": "KRW",
-    "last_close_native": 37400.0,
-    "market_value_krw": 26404400.0,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 706,
-    "symbol": "098120.KQ",
     "weight_in_portfolio": 0.0058
   },
   {
@@ -67081,10 +67081,10 @@
     "company": "GrafTech International Ltd.",
     "currency": "USD",
     "last_close_native": 8.5,
-    "market_value_krw": 25854382.9349,
+    "market_value_krw": 25892311.125,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 2045,
+    "qty": 2048,
     "symbol": "EAF",
     "weight_in_portfolio": 0.0057
   },
@@ -67100,6 +67100,17 @@
     "weight_in_portfolio": 0.0057
   },
   {
+    "company": "에스앤에스텍",
+    "currency": "KRW",
+    "last_close_native": 100700.0,
+    "market_value_krw": 25477100.0,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 253,
+    "symbol": "101490.KQ",
+    "weight_in_portfolio": 0.0056
+  },
+  {
     "company": "Advantest Corporation",
     "currency": "JPY",
     "last_close_native": 28260.0,
@@ -67108,17 +67119,6 @@
     "persona": "weak_oracle",
     "qty": 97,
     "symbol": "6857.T",
-    "weight_in_portfolio": 0.0056
-  },
-  {
-    "company": "에스앤에스텍",
-    "currency": "KRW",
-    "last_close_native": 100700.0,
-    "market_value_krw": 25376400.0,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 252,
-    "symbol": "101490.KQ",
     "weight_in_portfolio": 0.0056
   },
   {
@@ -67136,10 +67136,10 @@
     "company": "시그넷이브이",
     "currency": "KRW",
     "last_close_native": 20550.0,
-    "market_value_krw": 25235400.0,
+    "market_value_krw": 25276500.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 1228,
+    "qty": 1230,
     "symbol": "075580.KS",
     "weight_in_portfolio": 0.0056
   },
@@ -67147,10 +67147,10 @@
     "company": "이랜텍",
     "currency": "KRW",
     "last_close_native": 12750.0,
-    "market_value_krw": 25206750.0,
+    "market_value_krw": 25245000.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 1977,
+    "qty": 1980,
     "symbol": "054210.KQ",
     "weight_in_portfolio": 0.0056
   },
@@ -67158,10 +67158,10 @@
     "company": "파이오링크",
     "currency": "KRW",
     "last_close_native": 11380.0,
-    "market_value_krw": 25172560.0,
+    "market_value_krw": 25206700.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 2212,
+    "qty": 2215,
     "symbol": "170790.KQ",
     "weight_in_portfolio": 0.0056
   },
@@ -67188,36 +67188,58 @@
     "weight_in_portfolio": 0.0056
   },
   {
-    "company": "아이원스",
-    "currency": "KRW",
-    "last_close_native": 16940.0,
-    "market_value_krw": 25003440.0,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 1476,
-    "symbol": "114810.KQ",
-    "weight_in_portfolio": 0.0055
-  },
-  {
     "company": "글로벌텍스프리",
     "currency": "KRW",
     "last_close_native": 5960.0,
-    "market_value_krw": 25002200.0,
+    "market_value_krw": 25037960.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 4195,
+    "qty": 4201,
     "symbol": "204620.KQ",
+    "weight_in_portfolio": 0.0055
+  },
+  {
+    "company": "아이원스",
+    "currency": "KRW",
+    "last_close_native": 16940.0,
+    "market_value_krw": 25037320.0,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 1478,
+    "symbol": "114810.KQ",
     "weight_in_portfolio": 0.0055
   },
   {
     "company": "한국카본",
     "currency": "KRW",
     "last_close_native": 49550.0,
-    "market_value_krw": 24923650.0,
+    "market_value_krw": 24973200.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 503,
+    "qty": 504,
     "symbol": "017960.KS",
+    "weight_in_portfolio": 0.0055
+  },
+  {
+    "company": "기가비스",
+    "currency": "KRW",
+    "last_close_native": 103900.0,
+    "market_value_krw": 24832100.0,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 239,
+    "symbol": "420770.KQ",
+    "weight_in_portfolio": 0.0055
+  },
+  {
+    "company": "벽산",
+    "currency": "KRW",
+    "last_close_native": 2200.0,
+    "market_value_krw": 24813800.0,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 11279,
+    "symbol": "007210.KS",
     "weight_in_portfolio": 0.0055
   },
   {
@@ -67232,28 +67254,6 @@
     "weight_in_portfolio": 0.0055
   },
   {
-    "company": "벽산",
-    "currency": "KRW",
-    "last_close_native": 2200.0,
-    "market_value_krw": 24780800.0,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 11264,
-    "symbol": "007210.KS",
-    "weight_in_portfolio": 0.0055
-  },
-  {
-    "company": "기가비스",
-    "currency": "KRW",
-    "last_close_native": 103900.0,
-    "market_value_krw": 24728200.0,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 238,
-    "symbol": "420770.KQ",
-    "weight_in_portfolio": 0.0055
-  },
-  {
     "company": "S-OIL",
     "currency": "KRW",
     "last_close_native": 134500.0,
@@ -67262,16 +67262,16 @@
     "persona": "weak_oracle",
     "qty": 183,
     "symbol": "010950.KS",
-    "weight_in_portfolio": 0.0055
+    "weight_in_portfolio": 0.0054
   },
   {
     "company": "HPSP",
     "currency": "KRW",
     "last_close_native": 52600.0,
-    "market_value_krw": 24459000.0,
+    "market_value_krw": 24511600.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 465,
+    "qty": 466,
     "symbol": "403870.KQ",
     "weight_in_portfolio": 0.0054
   },
@@ -67279,10 +67279,10 @@
     "company": "원티드랩",
     "currency": "KRW",
     "last_close_native": 4000.0,
-    "market_value_krw": 24384000.0,
+    "market_value_krw": 24416000.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 6096,
+    "qty": 6104,
     "symbol": "376980.KQ",
     "weight_in_portfolio": 0.0054
   },
@@ -67312,10 +67312,10 @@
     "company": "동진쎄미켐",
     "currency": "KRW",
     "last_close_native": 56600.0,
-    "market_value_krw": 24224800.0,
+    "market_value_krw": 24281400.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 428,
+    "qty": 429,
     "symbol": "005290.KS",
     "weight_in_portfolio": 0.0054
   },
@@ -67323,10 +67323,10 @@
     "company": "솔루엠",
     "currency": "KRW",
     "last_close_native": 19400.0,
-    "market_value_krw": 24211200.0,
+    "market_value_krw": 24250000.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 1248,
+    "qty": 1250,
     "symbol": "248070.KS",
     "weight_in_portfolio": 0.0054
   },
@@ -67339,7 +67339,18 @@
     "persona": "weak_oracle",
     "qty": 293,
     "symbol": "TEM",
-    "weight_in_portfolio": 0.0054
+    "weight_in_portfolio": 0.0053
+  },
+  {
+    "company": "Opendoor",
+    "currency": "USD",
+    "last_close_native": 5.380000114440918,
+    "market_value_krw": 24166355.8814,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 3020,
+    "symbol": "OPEN",
+    "weight_in_portfolio": 0.0053
   },
   {
     "company": "국도화학",
@@ -67350,7 +67361,7 @@
     "persona": "weak_oracle",
     "qty": 578,
     "symbol": "007690.KS",
-    "weight_in_portfolio": 0.0054
+    "weight_in_portfolio": 0.0053
   },
   {
     "company": "하나머티리얼즈",
@@ -67361,7 +67372,7 @@
     "persona": "weak_oracle",
     "qty": 320,
     "symbol": "166090.KQ",
-    "weight_in_portfolio": 0.0054
+    "weight_in_portfolio": 0.0053
   },
   {
     "company": "Lumentum Holdings Inc",
@@ -67372,27 +67383,16 @@
     "persona": "weak_oracle",
     "qty": 18,
     "symbol": "LITE",
-    "weight_in_portfolio": 0.0054
-  },
-  {
-    "company": "Opendoor",
-    "currency": "USD",
-    "last_close_native": 5.380000114440918,
-    "market_value_krw": 24134347.463,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 3016,
-    "symbol": "OPEN",
     "weight_in_portfolio": 0.0053
   },
   {
     "company": "동성화인텍",
     "currency": "KRW",
     "last_close_native": 29000.0,
-    "market_value_krw": 24041000.0,
+    "market_value_krw": 24070000.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 829,
+    "qty": 830,
     "symbol": "033500.KQ",
     "weight_in_portfolio": 0.0053
   },
@@ -67400,10 +67400,10 @@
     "company": "Levi Strauss & Co",
     "currency": "USD",
     "last_close_native": 22.280000686645508,
-    "market_value_krw": 24025649.9593,
+    "market_value_krw": 24058788.7868,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 725,
+    "qty": 726,
     "symbol": "LEVI",
     "weight_in_portfolio": 0.0053
   },
@@ -67411,10 +67411,10 @@
     "company": "케이씨씨글라스",
     "currency": "KRW",
     "last_close_native": 29300.0,
-    "market_value_krw": 23996700.0,
+    "market_value_krw": 24026000.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 819,
+    "qty": 820,
     "symbol": "344820.KQ",
     "weight_in_portfolio": 0.0053
   },
@@ -67422,10 +67422,10 @@
     "company": "Establishment Labs Holdings",
     "currency": "USD",
     "last_close_native": 68.62999725341798,
-    "market_value_krw": 23886459.2421,
+    "market_value_krw": 23988538.1277,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 234,
+    "qty": 235,
     "symbol": "ESTA",
     "weight_in_portfolio": 0.0053
   },
@@ -67433,11 +67433,22 @@
     "company": "에스트래픽",
     "currency": "KRW",
     "last_close_native": 3845.0,
-    "market_value_krw": 23681355.0,
+    "market_value_krw": 23712115.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 6159,
+    "qty": 6167,
     "symbol": "234300.KQ",
+    "weight_in_portfolio": 0.0052
+  },
+  {
+    "company": "롯데관광개발",
+    "currency": "KRW",
+    "last_close_native": 20700.0,
+    "market_value_krw": 23701500.0,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 1145,
+    "symbol": "032350.KS",
     "weight_in_portfolio": 0.0052
   },
   {
@@ -67452,24 +67463,13 @@
     "weight_in_portfolio": 0.0052
   },
   {
-    "company": "롯데관광개발",
-    "currency": "KRW",
-    "last_close_native": 20700.0,
-    "market_value_krw": 23660100.0,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 1143,
-    "symbol": "032350.KS",
-    "weight_in_portfolio": 0.0052
-  },
-  {
     "company": "메쎄이상",
     "currency": "KRW",
     "last_close_native": 3625.0,
-    "market_value_krw": 23624125.0,
+    "market_value_krw": 23656750.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 6517,
+    "qty": 6526,
     "symbol": "408920.KQ",
     "weight_in_portfolio": 0.0052
   },
@@ -67485,6 +67485,28 @@
     "weight_in_portfolio": 0.0052
   },
   {
+    "company": "SNT에너지",
+    "currency": "KRW",
+    "last_close_native": 56200.0,
+    "market_value_krw": 23604000.0,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 420,
+    "symbol": "100840.KQ",
+    "weight_in_portfolio": 0.0052
+  },
+  {
+    "company": "아이스크림미디어",
+    "currency": "KRW",
+    "last_close_native": 18600.0,
+    "market_value_krw": 23584800.0,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 1268,
+    "symbol": "461300.KQ",
+    "weight_in_portfolio": 0.0052
+  },
+  {
     "company": "TSMC",
     "currency": "USD",
     "last_close_native": 396.05999755859375,
@@ -67493,28 +67515,6 @@
     "persona": "weak_oracle",
     "qty": 40,
     "symbol": "TSM",
-    "weight_in_portfolio": 0.0052
-  },
-  {
-    "company": "SNT에너지",
-    "currency": "KRW",
-    "last_close_native": 56200.0,
-    "market_value_krw": 23547800.0,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 419,
-    "symbol": "100840.KQ",
-    "weight_in_portfolio": 0.0052
-  },
-  {
-    "company": "아이스크림미디어",
-    "currency": "KRW",
-    "last_close_native": 18600.0,
-    "market_value_krw": 23547600.0,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 1266,
-    "symbol": "461300.KQ",
     "weight_in_portfolio": 0.0052
   },
   {
@@ -67532,10 +67532,10 @@
     "company": "GEM Co., Ltd.",
     "currency": "CNY",
     "last_close_native": 9.14000034332275,
-    "market_value_krw": 23466988.1296,
+    "market_value_krw": 23500130.8394,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 12037,
+    "qty": 12054,
     "symbol": "002340.SZ",
     "weight_in_portfolio": 0.0052
   },
@@ -67565,10 +67565,10 @@
     "company": "엔켐",
     "currency": "KRW",
     "last_close_native": 44300.0,
-    "market_value_krw": 23301800.0,
+    "market_value_krw": 23346100.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 526,
+    "qty": 527,
     "symbol": "348370.KQ",
     "weight_in_portfolio": 0.0052
   },
@@ -67592,16 +67592,16 @@
     "persona": "weak_oracle",
     "qty": 325,
     "symbol": "112610.KS",
-    "weight_in_portfolio": 0.0052
+    "weight_in_portfolio": 0.0051
   },
   {
     "company": "인선이엔티",
     "currency": "KRW",
     "last_close_native": 4640.0,
-    "market_value_krw": 23200000.0,
+    "market_value_krw": 23232480.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 5000,
+    "qty": 5007,
     "symbol": "060150.KQ",
     "weight_in_portfolio": 0.0051
   },
@@ -67620,10 +67620,10 @@
     "company": "지엔씨에너지",
     "currency": "KRW",
     "last_close_native": 36650.0,
-    "market_value_krw": 23052850.0,
+    "market_value_krw": 23089500.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 629,
+    "qty": 630,
     "symbol": "119850.KQ",
     "weight_in_portfolio": 0.0051
   },
@@ -67631,10 +67631,10 @@
     "company": "인터로조",
     "currency": "KRW",
     "last_close_native": 21500.0,
-    "market_value_krw": 23048000.0,
+    "market_value_krw": 23069500.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 1072,
+    "qty": 1073,
     "symbol": "119610.KQ",
     "weight_in_portfolio": 0.0051
   },
@@ -67642,11 +67642,22 @@
     "company": "폰드그룹",
     "currency": "KRW",
     "last_close_native": 5850.0,
-    "market_value_krw": 23002200.0,
+    "market_value_krw": 23037300.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 3932,
+    "qty": 3938,
     "symbol": "472850.KQ",
+    "weight_in_portfolio": 0.0051
+  },
+  {
+    "company": "Grindr Inc.",
+    "currency": "USD",
+    "last_close_native": 13.369999885559082,
+    "market_value_krw": 22968642.4218,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 1155,
+    "symbol": "GRND",
     "weight_in_portfolio": 0.0051
   },
   {
@@ -67661,24 +67672,13 @@
     "weight_in_portfolio": 0.0051
   },
   {
-    "company": "Grindr Inc.",
-    "currency": "USD",
-    "last_close_native": 13.369999885559082,
-    "market_value_krw": 22928869.8808,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 1153,
-    "symbol": "GRND",
-    "weight_in_portfolio": 0.0051
-  },
-  {
     "company": "바이오플러스",
     "currency": "KRW",
     "last_close_native": 5780.0,
-    "market_value_krw": 22813660.0,
+    "market_value_krw": 22848340.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 3947,
+    "qty": 3953,
     "symbol": "099430.KQ",
     "weight_in_portfolio": 0.0051
   },
@@ -67686,12 +67686,23 @@
     "company": "대림제지",
     "currency": "KRW",
     "last_close_native": 9520.0,
-    "market_value_krw": 22809920.0,
+    "market_value_krw": 22838480.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 2396,
+    "qty": 2399,
     "symbol": "017650.KS",
     "weight_in_portfolio": 0.0051
+  },
+  {
+    "company": "넥센",
+    "currency": "KRW",
+    "last_close_native": 7200.0,
+    "market_value_krw": 22809600.0,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 3168,
+    "symbol": "005720.KS",
+    "weight_in_portfolio": 0.005
   },
   {
     "company": "세아제강지주",
@@ -67702,17 +67713,6 @@
     "persona": "weak_oracle",
     "qty": 95,
     "symbol": "003030.KS",
-    "weight_in_portfolio": 0.0051
-  },
-  {
-    "company": "넥센",
-    "currency": "KRW",
-    "last_close_native": 7200.0,
-    "market_value_krw": 22780800.0,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 3164,
-    "symbol": "005720.KS",
     "weight_in_portfolio": 0.005
   },
   {
@@ -67741,10 +67741,10 @@
     "company": "브이티",
     "currency": "KRW",
     "last_close_native": 16960.0,
-    "market_value_krw": 22556800.0,
+    "market_value_krw": 22590720.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 1330,
+    "qty": 1332,
     "symbol": "018290.KS",
     "weight_in_portfolio": 0.005
   },
@@ -67763,10 +67763,10 @@
     "company": "이지바이오",
     "currency": "KRW",
     "last_close_native": 7740.0,
-    "market_value_krw": 22484700.0,
+    "market_value_krw": 22515660.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 2905,
+    "qty": 2909,
     "symbol": "353810.KQ",
     "weight_in_portfolio": 0.005
   },
@@ -67774,10 +67774,10 @@
     "company": "롯데렌탈",
     "currency": "KRW",
     "last_close_native": 33650.0,
-    "market_value_krw": 22478200.0,
+    "market_value_krw": 22511850.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 668,
+    "qty": 669,
     "symbol": "089860.KQ",
     "weight_in_portfolio": 0.005
   },
@@ -67796,44 +67796,55 @@
     "company": "세경하이테크",
     "currency": "KRW",
     "last_close_native": 4790.0,
-    "market_value_krw": 22259130.0,
+    "market_value_krw": 22287870.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 4647,
+    "qty": 4653,
     "symbol": "148150.KQ",
-    "weight_in_portfolio": 0.0049
-  },
-  {
-    "company": "HDC현대산업개발",
-    "currency": "KRW",
-    "last_close_native": 22950.0,
-    "market_value_krw": 22215600.0,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 968,
-    "symbol": "294870.KS",
     "weight_in_portfolio": 0.0049
   },
   {
     "company": "Bank of America Corp.",
     "currency": "USD",
     "last_close_native": 53.459999084472656,
-    "market_value_krw": 22184778.1021,
+    "market_value_krw": 22264293.4358,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 279,
+    "qty": 280,
     "symbol": "BAC",
+    "weight_in_portfolio": 0.0049
+  },
+  {
+    "company": "HDC현대산업개발",
+    "currency": "KRW",
+    "last_close_native": 22950.0,
+    "market_value_krw": 22238550.0,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 969,
+    "symbol": "294870.KS",
     "weight_in_portfolio": 0.0049
   },
   {
     "company": "노바텍",
     "currency": "KRW",
     "last_close_native": 23400.0,
-    "market_value_krw": 22183200.0,
+    "market_value_krw": 22206600.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 948,
+    "qty": 949,
     "symbol": "285490.KQ",
+    "weight_in_portfolio": 0.0049
+  },
+  {
+    "company": "월덱스",
+    "currency": "KRW",
+    "last_close_native": 32750.0,
+    "market_value_krw": 22171750.0,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 677,
+    "symbol": "101160.KQ",
     "weight_in_portfolio": 0.0049
   },
   {
@@ -67848,6 +67859,17 @@
     "weight_in_portfolio": 0.0049
   },
   {
+    "company": "화승인더",
+    "currency": "KRW",
+    "last_close_native": 3490.0,
+    "market_value_krw": 22147540.0,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 6346,
+    "symbol": "006060.KS",
+    "weight_in_portfolio": 0.0049
+  },
+  {
     "company": "에스엘",
     "currency": "KRW",
     "last_close_native": 62900.0,
@@ -67859,36 +67881,36 @@
     "weight_in_portfolio": 0.0049
   },
   {
-    "company": "월덱스",
+    "company": "롯데웰푸드",
     "currency": "KRW",
-    "last_close_native": 32750.0,
-    "market_value_krw": 22139000.0,
+    "last_close_native": 121100.0,
+    "market_value_krw": 22040200.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 676,
-    "symbol": "101160.KQ",
-    "weight_in_portfolio": 0.0049
-  },
-  {
-    "company": "화승인더",
-    "currency": "KRW",
-    "last_close_native": 3490.0,
-    "market_value_krw": 22119620.0,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 6338,
-    "symbol": "006060.KS",
+    "qty": 182,
+    "symbol": "280360.KQ",
     "weight_in_portfolio": 0.0049
   },
   {
     "company": "나스미디어",
     "currency": "KRW",
     "last_close_native": 12190.0,
-    "market_value_krw": 21942000.0,
+    "market_value_krw": 21978570.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 1800,
+    "qty": 1803,
     "symbol": "089600.KQ",
+    "weight_in_portfolio": 0.0049
+  },
+  {
+    "company": "키이스트",
+    "currency": "KRW",
+    "last_close_native": 2750.0,
+    "market_value_krw": 21950500.0,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 7982,
+    "symbol": "054780.KQ",
     "weight_in_portfolio": 0.0049
   },
   {
@@ -67900,38 +67922,16 @@
     "persona": "weak_oracle",
     "qty": 221,
     "symbol": "103140.KS",
-    "weight_in_portfolio": 0.0049
-  },
-  {
-    "company": "키이스트",
-    "currency": "KRW",
-    "last_close_native": 2750.0,
-    "market_value_krw": 21920250.0,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 7971,
-    "symbol": "054780.KQ",
-    "weight_in_portfolio": 0.0049
-  },
-  {
-    "company": "롯데웰푸드",
-    "currency": "KRW",
-    "last_close_native": 121100.0,
-    "market_value_krw": 21919100.0,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 181,
-    "symbol": "280360.KQ",
-    "weight_in_portfolio": 0.0049
+    "weight_in_portfolio": 0.0048
   },
   {
     "company": "쿠콘",
     "currency": "KRW",
     "last_close_native": 29850.0,
-    "market_value_krw": 21880050.0,
+    "market_value_krw": 21909900.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 733,
+    "qty": 734,
     "symbol": "294570.KQ",
     "weight_in_portfolio": 0.0048
   },
@@ -67939,10 +67939,10 @@
     "company": "Doximity",
     "currency": "USD",
     "last_close_native": 24.440000534057617,
-    "market_value_krw": 21847292.4363,
+    "market_value_krw": 21883644.0044,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 601,
+    "qty": 602,
     "symbol": "DOCS",
     "weight_in_portfolio": 0.0048
   },
@@ -67950,10 +67950,10 @@
     "company": "Star Bulk Carriers",
     "currency": "USD",
     "last_close_native": 25.1299991607666,
-    "market_value_krw": 21753913.5157,
+    "market_value_krw": 21791291.374,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 582,
+    "qty": 583,
     "symbol": "SBLK",
     "weight_in_portfolio": 0.0048
   },
@@ -67961,10 +67961,10 @@
     "company": "쿠쿠홀딩스",
     "currency": "KRW",
     "last_close_native": 29450.0,
-    "market_value_krw": 21734100.0,
+    "market_value_krw": 21763550.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 738,
+    "qty": 739,
     "symbol": "192400.KQ",
     "weight_in_portfolio": 0.0048
   },
@@ -67972,11 +67972,33 @@
     "company": "애니플러스",
     "currency": "KRW",
     "last_close_native": 2840.0,
-    "market_value_krw": 21720320.0,
+    "market_value_krw": 21748720.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 7648,
+    "qty": 7658,
     "symbol": "310200.KQ",
+    "weight_in_portfolio": 0.0048
+  },
+  {
+    "company": "티와이홀딩스",
+    "currency": "KRW",
+    "last_close_native": 2840.0,
+    "market_value_krw": 21708960.0,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 7644,
+    "symbol": "363280.KS",
+    "weight_in_portfolio": 0.0048
+  },
+  {
+    "company": "Muyuan foods co ltd",
+    "currency": "CNY",
+    "last_close_native": 44.70000076293945,
+    "market_value_krw": 21700646.346,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 2276,
+    "symbol": "002714.SZ",
     "weight_in_portfolio": 0.0048
   },
   {
@@ -67991,17 +68013,6 @@
     "weight_in_portfolio": 0.0048
   },
   {
-    "company": "티와이홀딩스",
-    "currency": "KRW",
-    "last_close_native": 2840.0,
-    "market_value_krw": 21680560.0,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 7634,
-    "symbol": "363280.KS",
-    "weight_in_portfolio": 0.0048
-  },
-  {
     "company": "LX인터내셔널",
     "currency": "KRW",
     "last_close_native": 53400.0,
@@ -68013,24 +68024,13 @@
     "weight_in_portfolio": 0.0048
   },
   {
-    "company": "Muyuan foods co ltd",
-    "currency": "CNY",
-    "last_close_native": 44.70000076293945,
-    "market_value_krw": 21672042.6821,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 2273,
-    "symbol": "002714.SZ",
-    "weight_in_portfolio": 0.0048
-  },
-  {
     "company": "Inmode",
     "currency": "USD",
     "last_close_native": 14.470000267028809,
-    "market_value_krw": 21651523.4022,
+    "market_value_krw": 21673045.7913,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 1006,
+    "qty": 1007,
     "symbol": "INMD",
     "weight_in_portfolio": 0.0048
   },
@@ -68060,10 +68060,10 @@
     "company": "율촌화학",
     "currency": "KRW",
     "last_close_native": 25750.0,
-    "market_value_krw": 21501250.0,
+    "market_value_krw": 21527000.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 835,
+    "qty": 836,
     "symbol": "008730.KS",
     "weight_in_portfolio": 0.0048
   },
@@ -68079,36 +68079,47 @@
     "weight_in_portfolio": 0.0048
   },
   {
-    "company": "국순당",
-    "currency": "KRW",
-    "last_close_native": 4280.0,
-    "market_value_krw": 21425680.0,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 5006,
-    "symbol": "043650.KQ",
-    "weight_in_portfolio": 0.0047
-  },
-  {
     "company": "Life360 Inc",
     "currency": "USD",
     "last_close_native": 43.09000015258789,
-    "market_value_krw": 21406462.3489,
+    "market_value_krw": 21470553.5535,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 334,
+    "qty": 335,
     "symbol": "LIF",
+    "weight_in_portfolio": 0.0047
+  },
+  {
+    "company": "국순당",
+    "currency": "KRW",
+    "last_close_native": 4280.0,
+    "market_value_krw": 21455640.0,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 5013,
+    "symbol": "043650.KQ",
     "weight_in_portfolio": 0.0047
   },
   {
     "company": "쿠쿠홈시스",
     "currency": "KRW",
     "last_close_native": 24400.0,
-    "market_value_krw": 21374400.0,
+    "market_value_krw": 21398800.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 876,
+    "qty": 877,
     "symbol": "284740.KS",
+    "weight_in_portfolio": 0.0047
+  },
+  {
+    "company": "동아쏘시오홀딩스",
+    "currency": "KRW",
+    "last_close_native": 97900.0,
+    "market_value_krw": 21342200.0,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 218,
+    "symbol": "000640.KS",
     "weight_in_portfolio": 0.0047
   },
   {
@@ -68126,10 +68137,10 @@
     "company": "현대그린푸드",
     "currency": "KRW",
     "last_close_native": 16540.0,
-    "market_value_krw": 21286980.0,
+    "market_value_krw": 21320060.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 1287,
+    "qty": 1289,
     "symbol": "453340.KQ",
     "weight_in_portfolio": 0.0047
   },
@@ -68156,46 +68167,35 @@
     "weight_in_portfolio": 0.0047
   },
   {
-    "company": "동아쏘시오홀딩스",
-    "currency": "KRW",
-    "last_close_native": 97900.0,
-    "market_value_krw": 21244300.0,
+    "company": "SEA ltd.",
+    "currency": "USD",
+    "last_close_native": 84.87999725341795,
+    "market_value_krw": 21209800.2025,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 217,
-    "symbol": "000640.KS",
+    "qty": 168,
+    "symbol": "SE",
     "weight_in_portfolio": 0.0047
   },
   {
     "company": "Z-holdings",
     "currency": "JPY",
     "last_close_native": 412.29998779296875,
-    "market_value_krw": 21162214.6964,
+    "market_value_krw": 21189012.0016,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 5528,
+    "qty": 5535,
     "symbol": "4689.T",
-    "weight_in_portfolio": 0.0047
-  },
-  {
-    "company": "SEA ltd.",
-    "currency": "USD",
-    "last_close_native": 84.87999725341795,
-    "market_value_krw": 21083551.3918,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 167,
-    "symbol": "SE",
     "weight_in_portfolio": 0.0047
   },
   {
     "company": "제이콘텐트리",
     "currency": "KRW",
     "last_close_native": 6050.0,
-    "market_value_krw": 21072150.0,
+    "market_value_krw": 21102400.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 3483,
+    "qty": 3488,
     "symbol": "036420.KS",
     "weight_in_portfolio": 0.0047
   },
@@ -68214,10 +68214,10 @@
     "company": "우리금융지주",
     "currency": "KRW",
     "last_close_native": 33350.0,
-    "market_value_krw": 21010500.0,
+    "market_value_krw": 21043850.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 630,
+    "qty": 631,
     "symbol": "316140.KS",
     "weight_in_portfolio": 0.0047
   },
@@ -68230,17 +68230,28 @@
     "persona": "weak_oracle",
     "qty": 57,
     "symbol": "196170.KQ",
-    "weight_in_portfolio": 0.0047
+    "weight_in_portfolio": 0.0046
   },
   {
     "company": "큐브엔터",
     "currency": "KRW",
     "last_close_native": 10460.0,
-    "market_value_krw": 20940920.0,
+    "market_value_krw": 20972300.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 2002,
+    "qty": 2005,
     "symbol": "182360.KQ",
+    "weight_in_portfolio": 0.0046
+  },
+  {
+    "company": "에이디테크놀로지",
+    "currency": "KRW",
+    "last_close_native": 52300.0,
+    "market_value_krw": 20972300.0,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 401,
+    "symbol": "200710.KQ",
     "weight_in_portfolio": 0.0046
   },
   {
@@ -68255,25 +68266,25 @@
     "weight_in_portfolio": 0.0046
   },
   {
-    "company": "에이디테크놀로지",
-    "currency": "KRW",
-    "last_close_native": 52300.0,
-    "market_value_krw": 20920000.0,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 400,
-    "symbol": "200710.KQ",
-    "weight_in_portfolio": 0.0046
-  },
-  {
     "company": "LG유플러스",
     "currency": "KRW",
     "last_close_native": 15840.0,
-    "market_value_krw": 20861280.0,
+    "market_value_krw": 20892960.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 1317,
+    "qty": 1319,
     "symbol": "032640.KS",
+    "weight_in_portfolio": 0.0046
+  },
+  {
+    "company": "Eli Lilly & Co.",
+    "currency": "USD",
+    "last_close_native": 934.5999755859375,
+    "market_value_krw": 20851579.7438,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 15,
+    "symbol": "LLY",
     "weight_in_portfolio": 0.0046
   },
   {
@@ -68291,10 +68302,10 @@
     "company": "인바디",
     "currency": "KRW",
     "last_close_native": 29500.0,
-    "market_value_krw": 20709000.0,
+    "market_value_krw": 20738500.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 702,
+    "qty": 703,
     "symbol": "041830.KQ",
     "weight_in_portfolio": 0.0046
   },
@@ -68302,10 +68313,10 @@
     "company": "한양디지텍",
     "currency": "KRW",
     "last_close_native": 30950.0,
-    "market_value_krw": 20705550.0,
+    "market_value_krw": 20736500.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 669,
+    "qty": 670,
     "symbol": "078350.KS",
     "weight_in_portfolio": 0.0046
   },
@@ -68324,10 +68335,10 @@
     "company": "JW중외제약",
     "currency": "KRW",
     "last_close_native": 31200.0,
-    "market_value_krw": 20654400.0,
+    "market_value_krw": 20685600.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 662,
+    "qty": 663,
     "symbol": "001060.KS",
     "weight_in_portfolio": 0.0046
   },
@@ -68343,6 +68354,28 @@
     "weight_in_portfolio": 0.0046
   },
   {
+    "company": "Round One Corp",
+    "currency": "JPY",
+    "last_close_native": 855.0,
+    "market_value_krw": 20640452.8999,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 2600,
+    "symbol": "4680.T",
+    "weight_in_portfolio": 0.0046
+  },
+  {
+    "company": "아난티",
+    "currency": "KRW",
+    "last_close_native": 7060.0,
+    "market_value_krw": 20636380.0,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 2923,
+    "symbol": "025980.KS",
+    "weight_in_portfolio": 0.0046
+  },
+  {
     "company": "JYP Ent.",
     "currency": "KRW",
     "last_close_native": 62900.0,
@@ -68351,28 +68384,6 @@
     "persona": "weak_oracle",
     "qty": 328,
     "symbol": "035900.KQ",
-    "weight_in_portfolio": 0.0046
-  },
-  {
-    "company": "Round One Corp",
-    "currency": "JPY",
-    "last_close_native": 855.0,
-    "market_value_krw": 20608698.357,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 2596,
-    "symbol": "4680.T",
-    "weight_in_portfolio": 0.0046
-  },
-  {
-    "company": "아난티",
-    "currency": "KRW",
-    "last_close_native": 7060.0,
-    "market_value_krw": 20608140.0,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 2919,
-    "symbol": "025980.KS",
     "weight_in_portfolio": 0.0046
   },
   {
@@ -68390,10 +68401,10 @@
     "company": "고려신용정보",
     "currency": "KRW",
     "last_close_native": 10060.0,
-    "market_value_krw": 20341320.0,
+    "market_value_krw": 20361440.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 2022,
+    "qty": 2024,
     "symbol": "049720.KQ",
     "weight_in_portfolio": 0.0045
   },
@@ -68401,10 +68412,10 @@
     "company": "JAC recruitment Co. Ltd",
     "currency": "JPY",
     "last_close_native": 862.0,
-    "market_value_krw": 20321217.6091,
+    "market_value_krw": 20345228.5003,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 2539,
+    "qty": 2542,
     "symbol": "2124.T",
     "weight_in_portfolio": 0.0045
   },
@@ -68412,10 +68423,10 @@
     "company": "NPC",
     "currency": "KRW",
     "last_close_native": 3925.0,
-    "market_value_krw": 20311875.0,
+    "market_value_krw": 20339350.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 5175,
+    "qty": 5182,
     "symbol": "004250.KS",
     "weight_in_portfolio": 0.0045
   },
@@ -68423,10 +68434,10 @@
     "company": "SK디앤디",
     "currency": "KRW",
     "last_close_native": 12820.0,
-    "market_value_krw": 20242780.0,
+    "market_value_krw": 20268420.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 1579,
+    "qty": 1581,
     "symbol": "210980.KS",
     "weight_in_portfolio": 0.0045
   },
@@ -68434,10 +68445,10 @@
     "company": "IMAX Corp",
     "currency": "USD",
     "last_close_native": 38.020000457763665,
-    "market_value_krw": 20131867.0941,
+    "market_value_krw": 20188417.2825,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 356,
+    "qty": 357,
     "symbol": "IMAX",
     "weight_in_portfolio": 0.0045
   },
@@ -68445,11 +68456,22 @@
     "company": "BYD",
     "currency": "HKD",
     "last_close_native": 102.49999999999999,
-    "market_value_krw": 20076056.5091,
+    "market_value_krw": 20095510.0522,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 1032,
+    "qty": 1033,
     "symbol": "1211.HK",
+    "weight_in_portfolio": 0.0044
+  },
+  {
+    "company": "Cover Corp",
+    "currency": "JPY",
+    "last_close_native": 1372.0,
+    "market_value_krw": 20063857.2521,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 1575,
+    "symbol": "5253.T",
     "weight_in_portfolio": 0.0044
   },
   {
@@ -68475,24 +68497,13 @@
     "weight_in_portfolio": 0.0044
   },
   {
-    "company": "Cover Corp",
-    "currency": "JPY",
-    "last_close_native": 1372.0,
-    "market_value_krw": 20025640.3812,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 1572,
-    "symbol": "5253.T",
-    "weight_in_portfolio": 0.0044
-  },
-  {
     "company": "카카오게임즈",
     "currency": "KRW",
     "last_close_native": 12020.0,
-    "market_value_krw": 19989260.0,
+    "market_value_krw": 20013300.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 1663,
+    "qty": 1665,
     "symbol": "293490.KQ",
     "weight_in_portfolio": 0.0044
   },
@@ -68500,10 +68511,10 @@
     "company": "아프리카TV",
     "currency": "KRW",
     "last_close_native": 58400.0,
-    "market_value_krw": 19856000.0,
+    "market_value_krw": 19914400.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 340,
+    "qty": 341,
     "symbol": "067160.KQ",
     "weight_in_portfolio": 0.0044
   },
@@ -68511,11 +68522,22 @@
     "company": "West Fraser Timber. Co. Ltd",
     "currency": "USD",
     "last_close_native": 63.310001373291016,
-    "market_value_krw": 19774866.3319,
+    "market_value_krw": 19869032.362,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 210,
+    "qty": 211,
     "symbol": "WFG",
+    "weight_in_portfolio": 0.0044
+  },
+  {
+    "company": "Bili bili",
+    "currency": "USD",
+    "last_close_native": 22.03000068664551,
+    "market_value_krw": 19758490.4649,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 603,
+    "symbol": "BILI",
     "weight_in_portfolio": 0.0044
   },
   {
@@ -68530,25 +68552,25 @@
     "weight_in_portfolio": 0.0044
   },
   {
-    "company": "Bili bili",
-    "currency": "USD",
-    "last_close_native": 22.03000068664551,
-    "market_value_krw": 19725723.4824,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 602,
-    "symbol": "BILI",
-    "weight_in_portfolio": 0.0044
-  },
-  {
     "company": "노머스",
     "currency": "KRW",
     "last_close_native": 17650.0,
-    "market_value_krw": 19609150.0,
+    "market_value_krw": 19626800.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 1111,
+    "qty": 1112,
     "symbol": "473980.KQ",
+    "weight_in_portfolio": 0.0043
+  },
+  {
+    "company": "Chewy",
+    "currency": "USD",
+    "last_close_native": 25.420000076293945,
+    "market_value_krw": 19585165.5159,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 518,
+    "symbol": "CHWY",
     "weight_in_portfolio": 0.0043
   },
   {
@@ -68563,25 +68585,25 @@
     "weight_in_portfolio": 0.0043
   },
   {
-    "company": "Chewy",
-    "currency": "USD",
-    "last_close_native": 25.420000076293945,
-    "market_value_krw": 19547356.316,
+    "company": "OSAKA Titanium Technologies Co.,Ltd.",
+    "currency": "JPY",
+    "last_close_native": 2517.0,
+    "market_value_krw": 19467401.0876,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 517,
-    "symbol": "CHWY",
+    "qty": 833,
+    "symbol": "5726.T",
     "weight_in_portfolio": 0.0043
   },
   {
-    "company": "Eli Lilly & Co.",
-    "currency": "USD",
-    "last_close_native": 934.5999755859375,
-    "market_value_krw": 19461474.4275,
+    "company": "바이넥스",
+    "currency": "KRW",
+    "last_close_native": 11020.0,
+    "market_value_krw": 19461320.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 14,
-    "symbol": "LLY",
+    "qty": 1766,
+    "symbol": "053030.KQ",
     "weight_in_portfolio": 0.0043
   },
   {
@@ -68596,35 +68618,13 @@
     "weight_in_portfolio": 0.0043
   },
   {
-    "company": "바이넥스",
-    "currency": "KRW",
-    "last_close_native": 11020.0,
-    "market_value_krw": 19428260.0,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 1763,
-    "symbol": "053030.KQ",
-    "weight_in_portfolio": 0.0043
-  },
-  {
-    "company": "OSAKA Titanium Technologies Co.,Ltd.",
-    "currency": "JPY",
-    "last_close_native": 2517.0,
-    "market_value_krw": 19420660.6288,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 831,
-    "symbol": "5726.T",
-    "weight_in_portfolio": 0.0043
-  },
-  {
     "company": "Fluence Energy Inc.",
     "currency": "USD",
     "last_close_native": 12.180000305175781,
-    "market_value_krw": 19203266.2482,
+    "market_value_krw": 19239498.826,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 1060,
+    "qty": 1062,
     "symbol": "FLNC",
     "weight_in_portfolio": 0.0043
   },
@@ -68632,10 +68632,10 @@
     "company": "Cellebrite DI",
     "currency": "USD",
     "last_close_native": 12.999999999999998,
-    "market_value_krw": 19200588.483,
+    "market_value_krw": 19219924.4231,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 993,
+    "qty": 994,
     "symbol": "CLBT",
     "weight_in_portfolio": 0.0043
   },
@@ -68676,10 +68676,10 @@
     "company": "Cyber Agent",
     "currency": "JPY",
     "last_close_native": 1248.4999999999998,
-    "market_value_krw": 18628770.1084,
+    "market_value_krw": 18651954.6387,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 1607,
+    "qty": 1609,
     "symbol": "4751.T",
     "weight_in_portfolio": 0.0041
   },
@@ -68698,10 +68698,10 @@
     "company": "인카금융서비스",
     "currency": "KRW",
     "last_close_native": 10820.0,
-    "market_value_krw": 18513020.0,
+    "market_value_krw": 18534660.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 1711,
+    "qty": 1713,
     "symbol": "211050.KQ",
     "weight_in_portfolio": 0.0041
   },
@@ -68709,10 +68709,10 @@
     "company": "Ping An Healthcare & Technology",
     "currency": "HKD",
     "last_close_native": 10.749999999999998,
-    "market_value_krw": 18072531.3575,
+    "market_value_krw": 18097014.3532,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 8858,
+    "qty": 8870,
     "symbol": "1833.HK",
     "weight_in_portfolio": 0.004
   },
@@ -68720,10 +68720,10 @@
     "company": "Iradimed Corporation",
     "currency": "USD",
     "last_close_native": 83.44000244140625,
-    "market_value_krw": 17623192.7559,
+    "market_value_krw": 17747299.7471,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 142,
+    "qty": 143,
     "symbol": "IRMD",
     "weight_in_portfolio": 0.0039
   },
@@ -68731,11 +68731,22 @@
     "company": "데브시스터즈",
     "currency": "KRW",
     "last_close_native": 22650.0,
-    "market_value_krw": 17304600.0,
+    "market_value_krw": 17327250.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 764,
+    "qty": 765,
     "symbol": "194480.KQ",
+    "weight_in_portfolio": 0.0038
+  },
+  {
+    "company": "JTC",
+    "currency": "KRW",
+    "last_close_native": 4105.0,
+    "market_value_krw": 17035750.0,
+    "month_end": "2026-04-30",
+    "persona": "weak_oracle",
+    "qty": 4150,
+    "symbol": "950170.KQ",
     "weight_in_portfolio": 0.0038
   },
   {
@@ -68750,24 +68761,13 @@
     "weight_in_portfolio": 0.0038
   },
   {
-    "company": "JTC",
-    "currency": "KRW",
-    "last_close_native": 4105.0,
-    "market_value_krw": 17015225.0,
-    "month_end": "2026-04-30",
-    "persona": "weak_oracle",
-    "qty": 4145,
-    "symbol": "950170.KQ",
-    "weight_in_portfolio": 0.0038
-  },
-  {
     "company": "진시스템",
     "currency": "KRW",
     "last_close_native": 5510.0,
-    "market_value_krw": 16359190.0,
+    "market_value_krw": 16381230.0,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 2969,
+    "qty": 2973,
     "symbol": "363250.KQ",
     "weight_in_portfolio": 0.0036
   },
@@ -68775,10 +68775,10 @@
     "company": "Sportradar",
     "currency": "USD",
     "last_close_native": 13.050000190734863,
-    "market_value_krw": 16091146.449,
+    "market_value_krw": 16110556.7584,
     "month_end": "2026-04-30",
     "persona": "weak_oracle",
-    "qty": 829,
+    "qty": 830,
     "symbol": "SRAD",
     "weight_in_portfolio": 0.0036
   },
