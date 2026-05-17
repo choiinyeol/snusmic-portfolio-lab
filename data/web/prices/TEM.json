@@ -6249,10 +6249,10 @@
       "display_currency": "USD",
       "high": 45.20000076293945,
       "krw_per_unit": 1493.3399658203125,
-      "low": 43.69200134277344,
-      "open": 44.90999984741211,
+      "low": 43.69160079956055,
+      "open": 45.0,
       "source_currency": "USD",
-      "volume": 5679700.0
+      "volume": 5666996.0
     }
   ],
   "symbol": "TEM"

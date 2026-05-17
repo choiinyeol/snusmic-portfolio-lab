@@ -3699,12 +3699,12 @@
       "currency": "USD",
       "date": "2026-05-15",
       "display_currency": "USD",
-      "high": 110.36000061035156,
+      "high": 110.32499694824219,
       "krw_per_unit": 1493.3399658203125,
       "low": 106.44000244140625,
-      "open": 109.41500091552734,
+      "open": 109.22850036621094,
       "source_currency": "USD",
-      "volume": 21977700.0
+      "volume": 21953198.0
     }
   ],
   "symbol": "CRWV"

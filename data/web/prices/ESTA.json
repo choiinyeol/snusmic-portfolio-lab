@@ -25422,12 +25422,12 @@
       "currency": "USD",
       "date": "2026-05-15",
       "display_currency": "USD",
-      "high": 68.87000274658203,
+      "high": 68.86499786376953,
       "krw_per_unit": 1493.3399658203125,
       "low": 64.23999786376953,
       "open": 68.62000274658203,
       "source_currency": "USD",
-      "volume": 532900.0
+      "volume": 532318.0
     }
   ],
   "symbol": "ESTA"

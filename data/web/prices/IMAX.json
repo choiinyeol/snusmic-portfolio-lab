@@ -25422,12 +25422,12 @@
       "currency": "USD",
       "date": "2026-05-15",
       "display_currency": "USD",
-      "high": 34.619998931884766,
+      "high": 34.615001678466804,
       "krw_per_unit": 1493.3399658203125,
-      "low": 33.22999954223633,
+      "low": 33.2333984375,
       "open": 34.06999969482422,
       "source_currency": "USD",
-      "volume": 991200.0
+      "volume": 991171.0
     }
   ],
   "symbol": "IMAX"

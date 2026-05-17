@@ -19273,12 +19273,12 @@
       "currency": "USD",
       "date": "2026-05-15",
       "display_currency": "USD",
-      "high": 62.279998779296875,
+      "high": 62.27000045776367,
       "krw_per_unit": 1493.3399658203125,
       "low": 59.68000030517578,
       "open": 60.39500045776367,
       "source_currency": "USD",
-      "volume": 5205800.0
+      "volume": 5197396.0
     }
   ],
   "symbol": "MP"

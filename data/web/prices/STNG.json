@@ -25422,12 +25422,12 @@
       "currency": "USD",
       "date": "2026-05-15",
       "display_currency": "USD",
-      "high": 83.0,
+      "high": 82.97000122070311,
       "krw_per_unit": 1493.3399658203125,
       "low": 80.80000305175781,
       "open": 81.51000213623047,
       "source_currency": "USD",
-      "volume": 558200.0
+      "volume": 558084.0
     }
   ],
   "symbol": "STNG"

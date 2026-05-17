@@ -18012,12 +18012,12 @@
       "currency": "USD",
       "date": "2026-05-15",
       "display_currency": "USD",
-      "high": 13.175000190734863,
+      "high": 13.170000076293947,
       "krw_per_unit": 1493.3399658203125,
-      "low": 12.529999732971191,
+      "low": 12.539999961853027,
       "open": 12.899999618530273,
       "source_currency": "USD",
-      "volume": 3484500.0
+      "volume": 3483992.0
     }
   ],
   "symbol": "CLBT"
