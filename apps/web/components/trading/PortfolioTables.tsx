@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
 import type { HoldingRow, ReportTargetDigest } from '@/lib/artifacts';
 import { Money } from '@/components/ui/Money';
 import { formatDateKo, formatDays, formatKrw, formatPercent } from '@/lib/format';
@@ -58,10 +57,6 @@ export function PortfolioTables({ holdings, persona, personaLabels, capitalByPer
     [capitalByPersona, holdings, persona, personaLabels, sort, targetsBySymbol],
   );
   const visibleRows = useMemo(() => pageRows(currentRows, page, pageSize), [currentRows, page, pageSize]);
-  const reportHrefBySymbol = useMemo(
-    () => Object.fromEntries(Object.values(targetsBySymbol).map((target) => [target.symbol, reportTargetHref(target)])),
-    [targetsBySymbol],
-  );
   const updateSort = (key: HoldingSortKey) => {
     setSort((current) => ({ key, direction: current.key === key && current.direction === 'desc' ? 'asc' : 'desc' }));
     setPage(0);
@@ -81,11 +76,6 @@ export function PortfolioTables({ holdings, persona, personaLabels, capitalByPer
 
       <section className="rounded-2xl min-w-0 border border-slate-200 bg-white shadow-sm">
         <div className="flex flex-col min-w-0 gap-2 p-5">
-          <h2 className="text-base font-semibold text-slate-950">현재 보유 포트폴리오</h2>
-          <p className="text-slate-500">
-            현재 어떤 종목을 얼마나 들고 있는지, 목표가·시장구분·평단·최근가·미실현 손익을 바로 확인합니다.
-          </p>
-          <HoldingsTreemap holdings={currentRows} hrefBySymbol={reportHrefBySymbol} />
           <PaginationControls
             page={page}
             pageCount={Math.ceil(currentRows.length / pageSize)}

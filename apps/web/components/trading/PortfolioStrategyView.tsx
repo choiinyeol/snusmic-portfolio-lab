@@ -3,7 +3,6 @@
 import { useMemo } from 'react';
 import { DailyEquityHistory } from '@/components/trading/DailyEquityHistory';
 import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
-import { PositionDecisionPanel } from '@/components/trading/PositionDecisionPanel';
 import { PortfolioAnalyticsPanel } from '@/components/trading/PortfolioAnalyticsPanel';
 import { PortfolioTables } from '@/components/trading/PortfolioTables';
 import { StrategySelector, type StrategySelectorOption } from '@/components/trading/StrategySelector';
@@ -171,15 +170,6 @@ export function PortfolioStrategyView({
       </article>
 
       <StrategyMethodPanel method={methodsByPersona[persona]} personaLabel={personaLabels[persona] ?? persona} />
-
-      <PositionDecisionPanel
-        holdings={holdings}
-        trades={trades}
-        persona={persona}
-        targetsBySymbol={targetsBySymbol}
-        targetsByReportId={targetsByReportId}
-        reportSymbolsById={reportSymbolsById}
-      />
 
       <Tabs
         tabs={[
