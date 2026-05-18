@@ -18,6 +18,22 @@ All notable user-facing changes are tracked here. This project uses git tags as 
 - Add a collapsible desktop sidebar so wide data tables can use more horizontal space.
 - Add a styled native select wrapper and use it in `/screener` filters to avoid clipped Korean option text.
 
+## v0.21.2-command-palette.1 - 2026-05-18
+
+### Added
+- Add a global command palette to `AppShell`. Pressing `⌘K` / `Ctrl+K` opens a filtered list of in-app destinations (메인, 포트폴리오, 리포트, 후보 탐색, 리포트 통계, 전략, 가이드); the palette supports arrow-key navigation, Enter to open, and Esc to dismiss. Built on raw DOM elements with `role="listbox"` and `role="option"` so the static-export bundle stays free of any extra command-palette runtime.
+
+### Changed
+- Sort the `currentReturns` array once in `ReportStatisticsStory` and call a new `quantileFromSorted` helper for all seven percentile lookups, reducing 7×O(n log n) sorts per render to 1.
+- Drop the unused `quantile()` helper now that all call sites flow through `quantileFromSorted`.
+- Soften the `PageHero` h1 from `text-3xl/md:text-4xl tracking-[-0.045em]` to `text-2xl/md:text-3xl tracking-[-0.02em]` so Hangul glyph fitting stays clean and the heading no longer competes with the page's own data density.
+- Restructure the `(app)/loading.tsx` skeleton so the KPI strip placeholder matches the actual page layout (`border-y` + `divide-x` columns) instead of rendering as bordered cards.
+
+### Verified
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web build` (413 static pages generated)
+
 ## v0.21.1-mobile-and-polish.1 - 2026-05-18
 
 ### Added

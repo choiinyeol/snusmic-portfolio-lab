@@ -25,7 +25,7 @@ export function PageHero({ eyebrow, title, subtitle, badges, actions, kpis }: Pr
               {eyebrow}
             </div>
           ) : null}
-          <h1 className="text-3xl font-semibold tracking-[-0.045em] text-slate-950 md:text-4xl">{title}</h1>
+          <h1 className="text-2xl font-semibold tracking-[-0.02em] text-slate-950 md:text-3xl">{title}</h1>
           {subtitle ? <p className="max-w-3xl text-sm leading-6 text-slate-600">{subtitle}</p> : null}
           {badges?.length ? (
             <dl className="flex min-w-0 flex-wrap gap-1.5">

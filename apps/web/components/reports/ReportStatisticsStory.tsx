@@ -22,18 +22,19 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
       (b.rewardReliabilityScore ?? Number.NEGATIVE_INFINITY) - (a.rewardReliabilityScore ?? Number.NEGATIVE_INFINITY),
   )[0];
   const currentReturns = summary.riskScatter.map((row) => row.currentReturn).filter(isNumber);
+  const sortedReturns = [...currentReturns].sort((a, b) => a - b);
   const meanReturn = mean(currentReturns);
-  const medianReturn = quantile(currentReturns, 0.5);
+  const medianReturn = quantileFromSorted(sortedReturns, 0.5);
   const deepLosers = currentReturns.filter((value) => value <= -0.2).length;
   const bigWinners = currentReturns.filter((value) => value >= 0.2).length;
   const returnQuantiles = {
-    min: quantile(currentReturns, 0),
-    p10: quantile(currentReturns, 0.1),
-    p25: quantile(currentReturns, 0.25),
+    min: quantileFromSorted(sortedReturns, 0),
+    p10: quantileFromSorted(sortedReturns, 0.1),
+    p25: quantileFromSorted(sortedReturns, 0.25),
     median: medianReturn,
-    p75: quantile(currentReturns, 0.75),
-    p90: quantile(currentReturns, 0.9),
-    max: quantile(currentReturns, 1),
+    p75: quantileFromSorted(sortedReturns, 0.75),
+    p90: quantileFromSorted(sortedReturns, 0.9),
+    max: quantileFromSorted(sortedReturns, 1),
   };
   const eligiblePathCount = currentReturns.length;
   const pathBuckets = buildPathBuckets(summary.riskScatter);
@@ -1052,8 +1053,7 @@ function mean(values: number[]): number | null {
   return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
 
-function quantile(values: number[], q: number): number | null {
-  const sorted = values.filter(isNumber).sort((a, b) => a - b);
+function quantileFromSorted(sorted: number[], q: number): number | null {
   if (!sorted.length) return null;
   const pos = (sorted.length - 1) * q;
   const base = Math.floor(pos);

@@ -8,6 +8,7 @@ import { APP_NAV, GITHUB_NAV_ITEM } from '@/components/ui/app-shell-nav';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { CommandPalette } from '@/components/ui/CommandPalette';
 import { Separator } from '@/components/ui/separator';
 import { SidebarNav } from '@/components/ui/SidebarNav';
 import { cn } from '@/lib/utils';
@@ -64,6 +65,7 @@ export function AppShell({
 
   return (
     <div className="ui-shell min-h-dvh bg-slate-50 text-slate-950">
+      <CommandPalette />
       {mobileNavOpen ? (
         <button
           type="button"
