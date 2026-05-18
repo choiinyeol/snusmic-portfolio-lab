@@ -42,6 +42,16 @@ class DailyPrice(BaseModel):
     low: float | None = None
     close: float | None = None
     volume: float | None = None
+    stock_split: float | None = None
+    split_event_type: str | None = None
+    split_ratio_text: str | None = None
+    split_factor: float | None = None
+    cum_split_factor_to_latest: float | None = None
+    split_adjusted_open: float | None = None
+    split_adjusted_high: float | None = None
+    split_adjusted_low: float | None = None
+    split_adjusted_close: float | None = None
+    split_adjusted_volume: float | None = None
     source_currency: str | None = None
     display_currency: str | None = None
     krw_per_unit: float | None = None

@@ -374,6 +374,6 @@ export function compactStrategyLabel(id: string, label: string): string {
   if (id === 'benchmark_gld') return 'GLD';
   if (id === 'weak_oracle') return 'Weak Prophet';
   const match = id.match(/^smic_mtt_strategy_top([0-9]+)$/);
-  if (match) return `MTT #${match[1]}`;
-  return label.replace('SMIC MTT Strategy #', 'MTT #');
+  if (match) return `Report Trend #${match[1]}`;
+  return label;
 }

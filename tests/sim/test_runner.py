@@ -21,6 +21,7 @@ from snusmic_pipeline.sim.contracts import (
 )
 from snusmic_pipeline.sim.runner import run_simulation
 from snusmic_pipeline.sim.warehouse import (
+    add_split_adjustment_columns,
     apply_daily_price_krw_conversion,
     fill_report_publication_prices,
     refresh_price_history,
@@ -229,6 +230,52 @@ def test_split_scaled_report_target_is_aligned_to_market_price_units(tmp_path: P
     assert perf.target_hit is True
     assert perf.target_hit_date == date(2024, 1, 3)
     assert any(trade.reason == "target_hit" for trade in result.trades)
+
+
+def test_split_adjustment_columns_track_split_and_reverse_split_events():
+    prices = pd.DataFrame(
+        [
+            {
+                "date": "2024-01-02",
+                "symbol": "SPLT",
+                "open": 400.0,
+                "high": 420.0,
+                "low": 390.0,
+                "close": 400.0,
+                "volume": 10.0,
+                "stock_split": 0.0,
+            },
+            {
+                "date": "2024-01-03",
+                "symbol": "SPLT",
+                "open": 100.0,
+                "high": 105.0,
+                "low": 95.0,
+                "close": 100.0,
+                "volume": 40.0,
+                "stock_split": 4.0,
+            },
+            {
+                "date": "2024-01-04",
+                "symbol": "SPLT",
+                "open": 90.0,
+                "high": 100.0,
+                "low": 80.0,
+                "close": 90.0,
+                "volume": 50.0,
+                "stock_split": 0.1,
+            },
+        ]
+    )
+
+    adjusted = add_split_adjustment_columns(prices)
+
+    assert adjusted["split_factor"].tolist() == [1.0, 4.0, 0.1]
+    assert adjusted["split_event_type"].tolist() == ["none", "split", "reverse_split"]
+    assert adjusted["split_ratio_text"].tolist() == ["none", "4-for-1", "1-for-10"]
+    assert adjusted["cum_split_factor_to_latest"].tolist() == pytest.approx([0.4, 0.4, 0.1])
+    assert adjusted["split_adjusted_close"].tolist() == pytest.approx([1000.0, 250.0, 900.0])
+    assert adjusted["split_adjusted_volume"].tolist() == pytest.approx([4.0, 16.0, 5.0])
 
 
 def test_current_price_scale_mismatch_does_not_expand_plausible_target(tmp_path: Path):

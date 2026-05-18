@@ -202,7 +202,7 @@ class SmicMttStrategyConfig(_PersonaBase):
     """
 
     persona_name: Annotated[str, Field(pattern=r"^smic_mtt_strategy(_top[0-9]+)?$")] = "smic_mtt_strategy"
-    label: str = "SMIC MTT Strategy"
+    label: str = "Report Trend Strategy"
 
     # Report valuation gate, evaluated at publication using market prices.
     min_target_upside_at_pub: Annotated[float, Field(ge=0.0, le=10.0)] = 0.30

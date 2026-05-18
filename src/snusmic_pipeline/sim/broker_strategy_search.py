@@ -184,7 +184,7 @@ def find_top_broker_strategy_configs(
             config.model_copy(
                 update={
                     "persona_name": f"smic_mtt_strategy_top{rank}",
-                    "label": f"SMIC MTT Strategy #{rank}",
+                    "label": _strategy_display_label(config, rank),
                     "source_trial_number": trial.number,
                     "selection_rank": train_rank,
                     "train_money_weighted_return": trial.user_attrs["train_money_weighted_return"],
@@ -195,6 +195,26 @@ def find_top_broker_strategy_configs(
             break
 
     return BrokerStrategySearchResult(configs=tuple(selected), trial_rows=pd.DataFrame(rows))
+
+
+def _strategy_display_label(config: SmicMttStrategyConfig, rank: int) -> str:
+    """Name promoted strategies by product behavior, not implementation family.
+
+    MTT is a rule template inside this strategy family. The user-facing label
+    should say what the strategy actually does: which universe it trades, whether
+    it requires the trend template, and how concentrated the book is.
+    """
+
+    universe = {
+        "all": "Global",
+        "domestic": "Korea",
+        "overseas": "Overseas",
+    }.get(config.universe, "Global")
+    signal = "Trend" if config.require_mtt else "Momentum"
+    concentration = (
+        "Focused" if config.max_positions <= 10 else "Balanced" if config.max_positions <= 25 else "Broad"
+    )
+    return f"{universe} Report {signal} {concentration} #{rank}"
 
 
 def _admission_status(*, beats_benchmark: bool, duplicate_behavior: bool) -> str:

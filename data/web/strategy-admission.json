@@ -1,0 +1,19 @@
+{
+  "accepted_count": 3,
+  "accepted_strategy_ids": [
+    "smic_mtt_strategy_top3",
+    "smic_mtt_strategy_top1",
+    "smic_mtt_strategy_top2"
+  ],
+  "accepted_trials": [],
+  "has_trial_rows": false,
+  "notes": [
+    "broker_strategy_trials.csv가 없어서 현재 catalog 기준 채택 전략 수만 표시합니다.",
+    "다음 run-sim 실행부터 후보별 below_benchmark/duplicate_behavior/accepted 기록이 저장됩니다."
+  ],
+  "rejected_count": null,
+  "schema_version": "1.0.0",
+  "status_counts": {},
+  "top_rejected_trials": [],
+  "trial_count": 0
+}

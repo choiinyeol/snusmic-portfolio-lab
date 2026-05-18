@@ -238,6 +238,7 @@ def refresh_price_history(
     if not prices.empty:
         prices["date"] = pd.to_datetime(prices["date"]).dt.date.astype(str)
         prices = apply_daily_price_krw_conversion(prices, reports, fx_rates)
+        prices = add_split_adjustment_columns(prices)
         columns = [
             "date",
             "symbol",
@@ -246,6 +247,16 @@ def refresh_price_history(
             "low",
             "close",
             "volume",
+            "stock_split",
+            "split_event_type",
+            "split_ratio_text",
+            "split_factor",
+            "cum_split_factor_to_latest",
+            "split_adjusted_open",
+            "split_adjusted_high",
+            "split_adjusted_low",
+            "split_adjusted_close",
+            "split_adjusted_volume",
             "source_currency",
             "display_currency",
             "krw_per_unit",
@@ -261,6 +272,73 @@ def refresh_price_history(
     write_table(warehouse_dir, "reports", reports)
     sync_duckdb(warehouse_dir)
     return prices
+
+
+def add_split_adjustment_columns(prices: pd.DataFrame) -> pd.DataFrame:
+    """Add Yahoo split diagnostics and split-adjusted display OHLCV columns.
+
+    ``stock_split`` preserves Yahoo/yfinance's event value:
+    - 4-for-1 split => ``4.0``
+    - 1-for-10 reverse split => ``0.1``
+    - no event => ``0.0``
+
+    ``split_factor`` converts the sparse event column to a multiplicative daily
+    factor, and ``cum_split_factor_to_latest`` is the reverse cumulative product
+    used to restate earlier prices/share counts on the latest share basis.
+    The canonical ``open/high/low/close`` columns remain unchanged so existing
+    simulation semantics do not silently shift.
+    """
+
+    if prices.empty:
+        return prices
+
+    out = prices.copy()
+    out["date"] = pd.to_datetime(out["date"]).dt.date.astype(str)
+    out["symbol"] = out["symbol"].astype(str)
+    stock_split_source = (
+        out["stock_split"] if "stock_split" in out else pd.Series(0.0, index=out.index, dtype=float)
+    )
+    stock_split = pd.to_numeric(stock_split_source, errors="coerce").fillna(0.0)
+    out["stock_split"] = stock_split
+    out["split_event_type"] = stock_split.map(split_event_type)
+    out["split_ratio_text"] = stock_split.map(split_ratio_text)
+    out["split_factor"] = stock_split.where(stock_split.ne(0), 1.0)
+    out.sort_values(["symbol", "date"], inplace=True)
+
+    frames: list[pd.DataFrame] = []
+    for _, group in out.groupby("symbol", sort=False):
+        group = group.copy()
+        group["cum_split_factor_to_latest"] = (
+            pd.to_numeric(group["split_factor"], errors="coerce").fillna(1.0).iloc[::-1].cumprod().iloc[::-1]
+        )
+        factor = pd.to_numeric(group["cum_split_factor_to_latest"], errors="coerce")
+        valid_factor = factor.where(factor.gt(0))
+        for column in ("open", "high", "low", "close"):
+            if column in group:
+                group[f"split_adjusted_{column}"] = (
+                    pd.to_numeric(group[column], errors="coerce") / valid_factor
+                )
+        if "volume" in group:
+            group["split_adjusted_volume"] = pd.to_numeric(group["volume"], errors="coerce") * valid_factor
+        frames.append(group)
+
+    return pd.concat(frames, ignore_index=True) if frames else out
+
+
+def split_event_type(value: float) -> str:
+    if value > 1:
+        return "split"
+    if 0 < value < 1:
+        return "reverse_split"
+    return "none"
+
+
+def split_ratio_text(value: float) -> str:
+    if value > 1:
+        return f"{value:g}-for-1"
+    if 0 < value < 1:
+        return f"1-for-{1 / value:g}"
+    return "none"
 
 
 def apply_daily_price_krw_conversion(
@@ -481,6 +559,7 @@ def download_history(symbol: str, start: datetime, end: datetime) -> pd.DataFram
             # the correct trade-off for this product because the brokerage
             # ledger already accounts for cash separately.
             auto_adjust=False,
+            actions=True,
             threads=False,
             timeout=10,
         )
@@ -498,6 +577,7 @@ def download_history(symbol: str, start: datetime, end: datetime) -> pd.DataFram
             "low": pd.to_numeric(data.get("Low", data["Close"]), errors="coerce"),
             "close": pd.to_numeric(data["Close"], errors="coerce"),
             "volume": pd.to_numeric(data.get("Volume", 0), errors="coerce").fillna(0),
+            "stock_split": pd.to_numeric(data.get("Stock Splits", 0), errors="coerce").fillna(0),
         }
     ).dropna(subset=["close"])
 

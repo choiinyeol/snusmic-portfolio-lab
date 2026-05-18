@@ -170,6 +170,7 @@ def main() -> int:
             top_n=args.broker_strategy_top,
             seed=args.broker_strategy_seed,
         )
+        _to_csv_rounded(search.trial_rows, out / "broker_strategy_trials.csv")
         if len(search.configs) < args.broker_strategy_top:
             print(
                 "Promoted "

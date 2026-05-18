@@ -14,7 +14,9 @@ const required = [
   'portfolio/equity-daily.json',
   'reports/table.json',
   'reports/rankings.json',
+  'report-statistics-lab.json',
   'strategies/catalog.json',
+  'strategies/admission.json',
   'strategies/curves.json',
   'screener/candidates.json',
 ];

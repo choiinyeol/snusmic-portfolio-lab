@@ -147,6 +147,17 @@ export type PricePoint = {
   closeKrw?: number | null;
   currency?: string;
   volume?: number | null;
+  stockSplit?: number | null;
+  splitEventType?: string | null;
+  splitRatioText?: string | null;
+  splitFactor?: number | null;
+  cumSplitFactorToLatest?: number | null;
+  splitAdjustedOpen?: number | null;
+  splitAdjustedHigh?: number | null;
+  splitAdjustedLow?: number | null;
+  splitAdjustedClose?: number | null;
+  splitAdjustedCloseKrw?: number | null;
+  splitAdjustedVolume?: number | null;
 };
 
 export type ReportTargetDigest = {
@@ -757,6 +768,17 @@ function getFullPriceSeries(symbol: string): PricePoint[] {
         closeKrw,
         currency,
         volume: num(point.volume),
+        stockSplit: num(point.stock_split),
+        splitEventType: typeof point.split_event_type === 'string' ? point.split_event_type : null,
+        splitRatioText: typeof point.split_ratio_text === 'string' ? point.split_ratio_text : null,
+        splitFactor: num(point.split_factor),
+        cumSplitFactorToLatest: num(point.cum_split_factor_to_latest),
+        splitAdjustedOpen: positivePrice(point.split_adjusted_open),
+        splitAdjustedHigh: positivePrice(point.split_adjusted_high),
+        splitAdjustedLow: positivePrice(point.split_adjusted_low),
+        splitAdjustedClose: positivePrice(point.split_adjusted_close),
+        splitAdjustedCloseKrw: num(point.split_adjusted_close_krw),
+        splitAdjustedVolume: num(point.split_adjusted_volume),
       };
     })
     .filter((point) => point.value > 0);

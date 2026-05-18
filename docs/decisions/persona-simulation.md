@@ -85,13 +85,16 @@ Adds three sell gates to the follower baseline:
 | averaged-down loss | `averaged_down_stop_pct = 0.20` | `stop_loss_average_down` |
 | report too old | `report_age_stop_days = 730` | `stop_loss_report_age` |
 
-### `smic_mtt_strategy(_topN)` — broker-ledger strategy
+### `smic_mtt_strategy(_topN)` — promoted report-trend strategy family
 
 This is the practical strategy family promoted by the Optuna search in
-`scripts/run_persona_sim.py`. It trades integer shares, keeps cash, pays costs,
-uses report-day signals and local trend filters, limits positions, supports
-universe/top-up cadence controls, and exits on target, stop-loss, report age, or
-simulation end.
+`scripts/run_persona_sim.py`. The internal id keeps `smic_mtt_strategy_topN`
+for compatibility, but user-facing names should describe the actual behavior
+(`Global/Overseas/Korea Report Trend …`) rather than treating MTT as the
+strategy name. MTT is one trend-template filter inside the family. The family
+trades integer shares, keeps cash, pays costs, uses report-day signals and local
+trend filters, limits positions, supports universe/top-up cadence controls, and
+exits on target, stop-loss, report age, or simulation end.
 
 Broker search arguments:
 
@@ -105,6 +108,11 @@ Broker search arguments:
 Admission compares candidate money-weighted return against the best tradable
 benchmark; `weak_oracle` is excluded from that benchmark choice because it uses
 future information.
+
+The search now writes `data/sim/broker_strategy_trials.csv` when it runs. The
+web exporter turns that file into `strategy-admission.json` so the product can
+explain accepted, below-benchmark, and duplicate-behavior candidates without
+pinning stale labels such as a historical top-22 run.
 
 ## Realistic profit calculation
 

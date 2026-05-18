@@ -110,7 +110,7 @@ export default function StrategiesPage() {
       <Section
         eyebrow="운용 규칙"
         title="고유 전략 매수·매도 규칙"
-        caption="MTT 전략은 수익률 숫자만 보는 대상이 아니라, 어떤 조건에서 현금을 보유하고 어떤 조건에서 매수·매도하는지 함께 읽어야 합니다."
+        caption="리포트 추세 전략은 수익률 숫자만 보는 대상이 아니라, 어떤 조건에서 현금을 보유하고 어떤 조건에서 매수·매도하는지 함께 읽어야 합니다."
       >
         <div className="grid gap-3 lg:grid-cols-2">
           {selectableRows.slice(0, 6).map((row) => (

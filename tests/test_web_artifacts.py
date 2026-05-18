@@ -6,7 +6,12 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from snusmic_pipeline.web_artifacts import ExportInputs, check_web_artifacts, export_web_artifacts
+from snusmic_pipeline.web_artifacts import (
+    ExportInputs,
+    _write_price_artifacts,
+    check_web_artifacts,
+    export_web_artifacts,
+)
 
 
 def test_export_web_artifacts_matches_baseline_counts(tmp_path: Path) -> None:
@@ -70,6 +75,50 @@ def test_check_web_artifacts_requires_deterministic_json(tmp_path: Path) -> None
     assert (out / "overview.json").exists()
     assert (out / "prices" / "090460.KS.json").exists()
     assert result["artifact_count"] > 8
+
+
+def test_price_artifacts_preserve_split_diagnostics(tmp_path: Path) -> None:
+    prices_out = tmp_path / "prices"
+    prices_out.mkdir()
+    prices = pd.DataFrame(
+        [
+            {
+                "date": "2024-01-02",
+                "symbol": "SPLT",
+                "open": 400.0,
+                "high": 420.0,
+                "low": 390.0,
+                "close": 400.0,
+                "volume": 10.0,
+                "stock_split": 4.0,
+                "split_event_type": "split",
+                "split_ratio_text": "4-for-1",
+                "split_factor": 4.0,
+                "cum_split_factor_to_latest": 4.0,
+                "split_adjusted_open": 100.0,
+                "split_adjusted_high": 105.0,
+                "split_adjusted_low": 97.5,
+                "split_adjusted_close": 100.0,
+                "split_adjusted_volume": 40.0,
+                "source_currency": "KRW",
+                "display_currency": "KRW",
+                "krw_per_unit": 1.0,
+            }
+        ]
+    )
+
+    _write_price_artifacts(prices, {"SPLT"}, prices_out)
+
+    artifact = json.loads((prices_out / "SPLT.json").read_text(encoding="utf-8"))
+    point = artifact["prices"][0]
+    assert point["stock_split"] == 4.0
+    assert point["split_event_type"] == "split"
+    assert point["split_ratio_text"] == "4-for-1"
+    assert point["split_factor"] == 4.0
+    assert point["cum_split_factor_to_latest"] == 4.0
+    assert point["split_adjusted_close"] == 100.0
+    assert point["split_adjusted_close_krw"] == 100.0
+    assert point["split_adjusted_volume"] == 40.0
 
 
 def test_extended_web_artifacts_support_insights_and_downloads(tmp_path: Path) -> None:
@@ -149,8 +198,9 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(tmp_path: Path) 
         "end": warehouse_prices["date"].astype(str).max(),
     }
     assert manifest["row_counts"]["reports"] == 202
-    assert manifest["row_counts"]["personas"] == 39
-    assert manifest["row_counts"]["strategy_catalog"] == 39
+    expected_personas = len(pd.read_csv(Path("data/sim") / "summary.csv"))
+    assert manifest["row_counts"]["personas"] == expected_personas
+    assert manifest["row_counts"]["strategy_catalog"] == expected_personas
     assert manifest["row_counts"]["screener_candidates"] > 0
     assert manifest["data_quality"]["reports_with_prices"] == 202
     assert manifest["data_quality"]["missing_price_symbols"] == 5
@@ -158,11 +208,60 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(tmp_path: Path) 
     assert "portfolio/holdings.json" in manifest["artifacts"]
     assert "reports/table.json" in manifest["artifacts"]
     assert "strategies/catalog.json" in manifest["artifacts"]
+    assert "strategies/admission.json" in manifest["artifacts"]
     assert "screener/candidates.json" in manifest["artifacts"]
     assert "reports.json" in manifest["artifacts"]
     assert "prices/QQQ.json" not in manifest["checksums"]
     assert len(manifest["checksums"]["reports/table.json"]) == 64
     assert len(manifest["checksums"]["reports.json"]) == 64
+
+
+def test_strategy_catalog_uses_behavior_labels_and_admission_audit(tmp_path: Path) -> None:
+    out = tmp_path / "web"
+    export_web_artifacts(
+        ExportInputs(
+            warehouse=Path("data/warehouse"),
+            sim=Path("data/sim"),
+            out=out,
+            extraction_quality=Path("data/extraction_quality.json"),
+        )
+    )
+
+    catalog = json.loads((out / "strategies" / "catalog.json").read_text(encoding="utf-8"))
+    promoted = [row for row in catalog if str(row.get("strategy_id", "")).startswith("smic_mtt_strategy")]
+    assert promoted
+    for row in promoted:
+        assert not str(row["label"]).startswith("SMIC MTT Strategy")
+        assert not str(row["short_label"]).startswith("MTT #")
+        assert "Report" in row["label"]
+        assert "MTT는 전략명 자체가 아니라" in row["methodology_summary"]
+
+    admission = json.loads((out / "strategies" / "admission.json").read_text(encoding="utf-8"))
+    assert admission["schema_version"] == "1.0.0"
+    assert admission["accepted_count"] == len(promoted)
+    assert set(admission["accepted_strategy_ids"]) == {row["strategy_id"] for row in promoted}
+
+    csv_text = (out / "table-download-strategies.csv").read_text(encoding="utf-8")
+    assert "SMIC MTT Strategy" not in csv_text
+
+
+def test_optional_monthly_holdings_drop_retired_strategy_personas(tmp_path: Path) -> None:
+    out = tmp_path / "web"
+    export_web_artifacts(
+        ExportInputs(
+            warehouse=Path("data/warehouse"),
+            sim=Path("data/sim"),
+            out=out,
+            extraction_quality=Path("data/extraction_quality.json"),
+        )
+    )
+
+    valid_personas = set(pd.read_csv(Path("data/sim") / "summary.csv")["persona"].astype(str))
+    monthly = json.loads((out / "portfolio" / "monthly-holdings.json").read_text(encoding="utf-8"))
+    columns = monthly["columns"]
+    persona_index = columns.index("persona")
+    exported_personas = {str(row[persona_index]) for row in monthly["rows"]}
+    assert exported_personas <= valid_personas
 
 
 def test_holdings_artifact_exposes_native_currency_for_foreign_positions(tmp_path: Path) -> None:
@@ -204,13 +303,23 @@ def test_holdings_are_rebuilt_from_open_position_episodes_for_all_personas(tmp_p
     )
 
     holdings = json.loads((out / "current-holdings.json").read_text(encoding="utf-8"))
-    mtt22 = [row for row in holdings if row["persona"] == "smic_mtt_strategy_top22"]
-    assert len(mtt22) == 1
-    assert mtt22[0]["symbol"] == "187790.KS"
-    assert mtt22[0]["market_value_krw"] == pytest.approx(157_109_820.0)
+    episodes = json.loads((out / "position-episodes.json").read_text(encoding="utf-8"))
+    open_episode_personas = {
+        row["persona"]
+        for row in episodes
+        if row.get("status") == "open" and str(row.get("persona", "")).startswith("smic_mtt_strategy")
+    }
+    holding_personas = {
+        row["persona"]
+        for row in holdings
+        if str(row.get("persona", "")).startswith("smic_mtt_strategy")
+        and (row.get("market_value_krw") or 0) > 0
+    }
+    assert open_episode_personas
+    assert open_episode_personas <= holding_personas
 
 
-def test_accounting_reconciliation_explains_mtt22_cash_vs_realized_pnl(tmp_path: Path) -> None:
+def test_accounting_reconciliation_explains_strategy_cash_vs_realized_pnl(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
         ExportInputs(
@@ -222,12 +331,18 @@ def test_accounting_reconciliation_explains_mtt22_cash_vs_realized_pnl(tmp_path:
     )
 
     rows = json.loads((out / "portfolio" / "accounting-reconciliation.json").read_text(encoding="utf-8"))
-    mtt22 = next(row for row in rows if row["persona"] == "smic_mtt_strategy_top22")
-    assert mtt22["status"] == "ok"
-    assert mtt22["realized_pnl_krw"] > mtt22["final_cash_krw"]
-    assert mtt22["open_cost_basis_krw"] > 150_000_000
-    assert abs(mtt22["cash_gap_krw"]) < 5_000
-    assert "매입 원가" in mtt22["explanation_ko"]
+    explained = [
+        row
+        for row in rows
+        if str(row.get("persona", "")).startswith("smic_mtt_strategy")
+        and row["realized_pnl_krw"] > row["final_cash_krw"]
+        and row["open_cost_basis_krw"] > 0
+    ]
+    assert explained
+    for row in explained:
+        assert row["status"] == "ok"
+        assert abs(row["cash_gap_krw"]) < 5_000
+        assert "매입 원가" in row["explanation_ko"]
 
 
 def test_price_artifacts_keep_asset_prices_native_and_krw_for_valuation_only(tmp_path: Path) -> None:

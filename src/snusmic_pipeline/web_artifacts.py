@@ -4,6 +4,7 @@ import json
 import math
 import shutil
 import statistics
+import subprocess
 from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
@@ -31,7 +32,9 @@ REQUIRED_ARTIFACTS = [
     "reports/detail-metrics.json",
     "reports/return-windows.json",
     "reports/target-hit-distribution.json",
+    "report-statistics-lab.json",
     "strategies/catalog.json",
+    "strategies/admission.json",
     "strategies/leaderboard.json",
     "strategies/curves.json",
     "screener/candidates.json",
@@ -47,6 +50,7 @@ REQUIRED_ARTIFACTS = [
     "monthly-holdings.json",
     "missing-symbols.json",
     "data-quality.json",
+    "strategy-admission.json",
     "trades.json",
     "position-episodes.json",
     "equity-daily.json",
@@ -248,6 +252,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     trades = _read_csv(inputs.sim / "trades.csv")
     position_episodes = _read_csv(inputs.sim / "position_episodes.csv")
     equity_daily = _read_csv(inputs.sim / "equity_daily.csv")
+    broker_strategy_trials = _read_optional_csv(inputs.sim / "broker_strategy_trials.csv")
     extraction_quality = _read_json(inputs.extraction_quality) if inputs.extraction_quality.exists() else {}
 
     _assert_no_stale_strategy_personas(
@@ -260,6 +265,14 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
             "equity_daily": equity_daily,
         }
     )
+    valid_personas = _summary_personas(summary)
+    current_holdings = _guard_persona_frame(current_holdings, valid_personas, "current_holdings")
+    monthly_holdings = _guard_persona_frame(
+        monthly_holdings, valid_personas, "monthly_holdings", allow_filter=True
+    )
+    trades = _guard_persona_frame(trades, valid_personas, "trades")
+    position_episodes = _guard_persona_frame(position_episodes, valid_personas, "position_episodes")
+    equity_daily = _guard_persona_frame(equity_daily, valid_personas, "equity_daily")
 
     out = inputs.out
     prices_out = out / "prices"
@@ -284,6 +297,9 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
         reports, prices, summary, report_stats, missing_symbols, report_rows, report_exclusions
     )
     strategy_catalog = _build_strategy_catalog(summary, inputs.sim / "persona-configs.json")
+    strategy_admission = _build_strategy_admission(broker_strategy_trials, strategy_catalog)
+    strategy_labels = {str(row["strategy_id"]): str(row["label"]) for row in strategy_catalog}
+    _apply_strategy_labels(overview.get("baseline_personas", []), strategy_labels)
     return_windows = _build_return_windows(report_rows, prices)
     detail_metrics = _build_detail_metrics(report_rows, prices, return_windows)
     target_distribution = _build_target_hit_distribution(report_rows)
@@ -295,6 +311,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
 
     current_holdings = _current_holdings_from_open_episodes(position_episodes, current_holdings)
     persona_rows = _records(summary)
+    _apply_strategy_labels(persona_rows, strategy_labels)
     enriched_current_holdings = _records(_enrich_holdings_with_native(current_holdings, prices, fx_rates))
     enriched_monthly_holdings = _records(
         _enrich_holdings_with_native(monthly_holdings, prices, fx_rates, close_column="month_close_krw")
@@ -323,6 +340,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
         return_windows=return_windows,
         target_distribution=target_distribution,
         strategy_catalog=strategy_catalog,
+        strategy_admission=strategy_admission,
         screener_candidates=screener_candidates,
     )
 
@@ -344,12 +362,14 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     )
     _write_json(out / "missing-symbols.json", [{"symbol": symbol} for symbol in missing_symbols])
     _write_json(out / "data-quality.json", data_quality)
+    _write_json(out / "strategy-admission.json", strategy_admission)
     _write_json(out / "trades.json", trade_rows)
     _write_json(out / "position-episodes.json", episode_rows)
     _write_json(out / "equity-daily.json", equity_rows)
     _write_json(out / "accounting-reconciliation.json", accounting_rows)
-    _write_download_csvs(out, report_rows, data_quality)
+    _write_download_csvs(out, report_rows, data_quality, strategy_catalog)
     _write_price_artifacts(prices, artifact_symbols, prices_out)
+    _write_report_statistics_lab(out)
     write_web_manifest(out)
 
     written = sorted(
@@ -401,6 +421,46 @@ def _assert_no_stale_strategy_personas(frames: dict[str, pd.DataFrame]) -> None:
                     f"{name}.{column} contains stale strategy persona labels; "
                     "rerun `uv run python -m snusmic_pipeline run-sim` before export-web."
                 )
+
+
+def _summary_personas(summary: pd.DataFrame) -> set[str]:
+    if summary.empty or "persona" not in summary.columns:
+        raise RuntimeError("Simulation summary must contain a persona column.")
+    personas = {str(value) for value in summary["persona"].dropna().astype(str) if str(value)}
+    if not personas:
+        raise RuntimeError("Simulation summary does not contain any personas.")
+    return personas
+
+
+def _guard_persona_frame(
+    frame: pd.DataFrame,
+    valid_personas: set[str],
+    name: str,
+    *,
+    allow_filter: bool = False,
+) -> pd.DataFrame:
+    """Prevent stale optional sim artifacts from reintroducing retired personas.
+
+    The summary file is the current simulation contract. Ignored/generated
+    companion CSVs can survive from older runs, so every persona-bearing frame is
+    checked against summary before export. Required ledgers fail loudly; the
+    optional monthly holding history is filtered because an absent/fresh file is
+    acceptable and stale rows should not contaminate the product UI.
+    """
+
+    if frame.empty or "persona" not in frame.columns:
+        return frame
+    personas = {str(value) for value in frame["persona"].dropna().astype(str) if str(value)}
+    unknown = sorted(personas - valid_personas)
+    if not unknown:
+        return frame
+    if not allow_filter:
+        preview = ", ".join(unknown[:5])
+        raise RuntimeError(
+            f"{name} contains personas not present in summary.csv: {preview}. "
+            "Regenerate simulation artifacts before export-web."
+        )
+    return frame[frame["persona"].astype(str).isin(valid_personas)].copy()
 
 
 def _read_csv(path: Path) -> pd.DataFrame:
@@ -524,6 +584,14 @@ def _build_accounting_reconciliation(
     return rows
 
 
+def _apply_strategy_labels(rows: list[dict[str, Any]], labels_by_id: dict[str, str]) -> None:
+    for row in rows:
+        persona = str(row.get("persona") or "")
+        label = labels_by_id.get(persona)
+        if label:
+            row["label"] = label
+
+
 def _write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
@@ -566,6 +634,7 @@ def _write_page_bundles(
     return_windows: list[dict[str, Any]],
     target_distribution: dict[str, Any],
     strategy_catalog: list[dict[str, Any]],
+    strategy_admission: dict[str, Any],
     screener_candidates: list[dict[str, Any]],
 ) -> None:
     """Write page-owned product bundles.
@@ -596,6 +665,7 @@ def _write_page_bundles(
     _write_product_json(out / "reports" / "target-hit-distribution.json", target_distribution)
 
     _write_product_json(out / "strategies" / "catalog.json", strategy_catalog)
+    _write_product_json(out / "strategies" / "admission.json", strategy_admission)
     _write_product_json(out / "strategies" / "leaderboard.json", personas)
     _write_product_json(out / "strategies" / "curves.json", _compact_equity_curves(equity_daily))
 
@@ -734,6 +804,15 @@ def write_web_manifest(out: Path) -> Path:
     return out / "manifest.json"
 
 
+def _write_report_statistics_lab(out: Path) -> None:
+    script = (
+        Path(__file__).resolve().parents[2] / "apps" / "web" / "scripts" / "build-report-statistics-lab.mjs"
+    )
+    if not script.exists():
+        raise RuntimeError(f"Missing report statistics generator: {script}")
+    subprocess.run(["node", str(script), "--web-root", str(out)], check=True)
+
+
 def _build_manifest(out: Path, overview: dict[str, Any]) -> dict[str, Any]:
     simulation_window = overview.get("simulation_window", {}) if isinstance(overview, dict) else {}
     price_end = simulation_window.get("price_end") if isinstance(simulation_window, dict) else None
@@ -865,6 +944,26 @@ def _price_frame_with_native(prices: pd.DataFrame) -> pd.DataFrame:
     )
     out["_krw_per_unit_num"] = pd.to_numeric(out.get("krw_per_unit", 1.0), errors="coerce")
     for column in ("open", "high", "low", "close"):
+        values = pd.to_numeric(out.get(column), errors="coerce")
+        out[f"{column}_native"] = _native_from_display_prices(
+            values,
+            out["_source_currency_norm"],
+            out["_display_currency_norm"],
+            out["_krw_per_unit_num"],
+        )
+        out[f"{column}_krw"] = _krw_from_display_prices(
+            values,
+            out["_display_currency_norm"],
+            out["_krw_per_unit_num"],
+        )
+    for column in (
+        "split_adjusted_open",
+        "split_adjusted_high",
+        "split_adjusted_low",
+        "split_adjusted_close",
+    ):
+        if column not in out:
+            continue
         values = pd.to_numeric(out.get(column), errors="coerce")
         out[f"{column}_native"] = _native_from_display_prices(
             values,
@@ -1263,7 +1362,8 @@ def _build_strategy_catalog(summary: pd.DataFrame, sim_config_path: Path) -> lis
             and mdd_slack is not None
             and mdd_slack >= 0
         )
-        label = str(row.get("label") or config.get("label") or strategy_id)
+        raw_label = str(row.get("label") or config.get("label") or strategy_id)
+        label = _strategy_display_label(strategy_id, config, raw_label)
         rows.append(
             {
                 "strategy_id": strategy_id,
@@ -1295,6 +1395,110 @@ def _build_strategy_catalog(summary: pd.DataFrame, sim_config_path: Path) -> lis
         )
 
     return sorted(rows, key=_strategy_catalog_sort_key)
+
+
+def _build_strategy_admission(
+    trials: pd.DataFrame,
+    strategy_catalog: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Explain why only the promoted report-trend strategies survived.
+
+    The optimizer can evaluate hundreds of parameterizations but promotes only
+    distinct candidates that beat the best tradable benchmark. This artifact is
+    the audit trail that makes "why are there only N strategies?" answerable in
+    the UI without hardcoding stale top-N expectations.
+    """
+
+    accepted_strategy_ids = [
+        str(row.get("strategy_id"))
+        for row in strategy_catalog
+        if row.get("kind") == "strategy" and str(row.get("strategy_id") or "")
+    ]
+    if trials.empty:
+        return {
+            "schema_version": "1.0.0",
+            "has_trial_rows": False,
+            "trial_count": 0,
+            "accepted_count": len(accepted_strategy_ids),
+            "rejected_count": None,
+            "status_counts": {},
+            "accepted_strategy_ids": accepted_strategy_ids,
+            "accepted_trials": [],
+            "top_rejected_trials": [],
+            "notes": [
+                "broker_strategy_trials.csv가 없어서 현재 catalog 기준 채택 전략 수만 표시합니다.",
+                "다음 run-sim 실행부터 후보별 below_benchmark/duplicate_behavior/accepted 기록이 저장됩니다.",
+            ],
+        }
+
+    records = _records(trials)
+    status_counts: dict[str, int] = {}
+    if "admission_status" in trials.columns:
+        for status, count in trials["admission_status"].astype(str).value_counts().to_dict().items():
+            status_counts[str(status)] = int(count)
+
+    accepted = [row for row in records if _boolish(row.get("accepted"))]
+    rejected = [row for row in records if not _boolish(row.get("accepted"))]
+    accepted_trials = [_admission_trial_row(row) for row in accepted[: len(accepted_strategy_ids) or 10]]
+    top_rejected_trials = [
+        _admission_trial_row(row)
+        for row in sorted(
+            rejected,
+            key=lambda row: _number(row.get("full_money_weighted_return")) or float("-inf"),
+            reverse=True,
+        )[:12]
+    ]
+    return {
+        "schema_version": "1.0.0",
+        "has_trial_rows": True,
+        "trial_count": len(records),
+        "accepted_count": len(accepted),
+        "rejected_count": len(rejected),
+        "status_counts": status_counts,
+        "accepted_strategy_ids": accepted_strategy_ids,
+        "accepted_trials": accepted_trials,
+        "top_rejected_trials": top_rejected_trials,
+        "notes": [
+            "채택 조건은 최고 투자 가능 벤치마크 초과 수익률과 중복 행동 제거입니다.",
+            "MTT는 일부 후보가 쓰는 추세 필터이며, 사용자-facing 전략명은 유니버스·신호·집중도 기준으로 표시합니다.",
+        ],
+    }
+
+
+def _admission_trial_row(row: dict[str, Any]) -> dict[str, Any]:
+    keys = [
+        "trial_number",
+        "train_rank",
+        "admission_status",
+        "excess_return_vs_best_benchmark",
+        "train_money_weighted_return",
+        "full_money_weighted_return",
+        "full_net_profit_krw",
+        "full_max_drawdown",
+        "full_trade_count",
+        "full_open_positions",
+        "min_target_upside_at_pub",
+        "max_target_upside_at_pub",
+        "target_hit_multiplier",
+        "require_mtt",
+        "max_positions",
+        "universe",
+        "top_up_cadence",
+        "stop_loss_pct",
+        "take_profit_pct",
+        "report_age_stop_days",
+    ]
+    return {key: row.get(key) for key in keys if key in row}
+
+
+def _boolish(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        return value != 0
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "t", "yes", "y"}
+    return False
 
 
 def _persona_config_by_id(path: Path) -> dict[str, dict[str, Any]]:
@@ -1347,10 +1551,23 @@ def _strategy_short_label(strategy_id: str, label: str) -> str:
     }
     if strategy_id in labels:
         return labels[strategy_id]
-    prefix = "smic_mtt_strategy_top"
-    if strategy_id.startswith(prefix):
-        return f"MTT #{strategy_id.removeprefix(prefix)}"
-    return label.replace("SMIC MTT Strategy #", "MTT #")
+    if strategy_id.startswith("smic_mtt_strategy"):
+        return label.replace(" Report ", " ").replace(" Strategy ", " ")
+    return label
+
+
+def _strategy_display_label(strategy_id: str, config: dict[str, Any], fallback: str) -> str:
+    if not strategy_id.startswith("smic_mtt_strategy"):
+        return fallback
+    rank = strategy_id.removeprefix("smic_mtt_strategy_top") if "_top" in strategy_id else ""
+    universe = {"all": "Global", "domestic": "Korea", "overseas": "Overseas"}.get(
+        str(config.get("universe") or "all"), "Global"
+    )
+    signal = "Trend" if config.get("require_mtt", True) else "Momentum"
+    max_positions = int(config.get("max_positions") or 0)
+    concentration = "Focused" if max_positions <= 10 else "Balanced" if max_positions <= 25 else "Broad"
+    suffix = f" #{rank}" if rank else ""
+    return f"{universe} Report {signal} {concentration}{suffix}"
 
 
 def _methodology_summary(strategy_id: str, config: dict[str, Any]) -> str:
@@ -1369,7 +1586,7 @@ def _methodology_summary(strategy_id: str, config: dict[str, Any]) -> str:
             "미래 가격 정보를 일부 사용하는 강한 상한선 기준입니다. 투자 가능한 전략으로 해석하지 않습니다."
         )
     if strategy_id.startswith("smic_mtt_strategy"):
-        return "리포트 업사이드와 가격 추세 조건을 통과한 종목만 실제 주식 수량 단위로 매수·보유·매도하는 포트폴리오 전략입니다."
+        return "리포트 업사이드와 가격 추세 조건을 통과한 종목만 실제 주식 수량 단위로 매수·보유·매도하는 포트폴리오 전략입니다. MTT는 전략명 자체가 아니라 내부 추세 필터 중 하나입니다."
     return "시뮬레이션에 포함된 전략입니다."
 
 
@@ -1929,7 +2146,12 @@ def _build_data_quality(
     }
 
 
-def _write_download_csvs(out: Path, report_rows: list[dict[str, Any]], data_quality: dict[str, Any]) -> None:
+def _write_download_csvs(
+    out: Path,
+    report_rows: list[dict[str, Any]],
+    data_quality: dict[str, Any],
+    strategy_catalog: list[dict[str, Any]],
+) -> None:
     report_columns = [
         "report_id",
         "date",
@@ -1967,7 +2189,7 @@ def _write_download_csvs(out: Path, report_rows: list[dict[str, Any]], data_qual
         report_download_rows.append(csv_row)
     _write_csv(out / "table-download-reports.csv", report_download_rows, report_columns)
 
-    strategy_rows = _strategy_download_rows()
+    strategy_rows = _strategy_download_rows(strategy_catalog)
     strategy_columns = (
         sorted({key for row in strategy_rows for key in row}) if strategy_rows else ["strategy_id"]
     )
@@ -2001,42 +2223,22 @@ def _write_download_csvs(out: Path, report_rows: list[dict[str, Any]], data_qual
     _write_csv(out / "data-quality-download.csv", quality_rows, ["section", "metric", "value"])
 
 
-def _strategy_download_rows() -> list[dict[str, Any]]:
-    summary_path = Path("data/sim/summary.csv")
-    if not summary_path.exists():
-        return []
-    rows = _records(pd.read_csv(summary_path, keep_default_na=False))
-    benchmark_ids = {
-        "all_weather",
-        "smic_follower",
-        "smic_follower_v2",
-        "benchmark_kodex200",
-        "benchmark_qqq",
-        "benchmark_spy",
-        "benchmark_gld",
-        "weak_oracle",
-    }
+def _strategy_download_rows(strategy_catalog: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [
         {
-            "strategy_id": row.get("persona"),
+            "strategy_id": row.get("strategy_id"),
             "label": row.get("label"),
-            "kind": (
-                "oracle"
-                if row.get("persona") == "weak_oracle"
-                else "benchmark"
-                if row.get("persona") in benchmark_ids
-                else "strategy"
-            ),
-            "final_equity_krw": row.get("final_equity_krw"),
-            "final_cash_krw": row.get("final_cash_krw"),
-            "final_holdings_value_krw": row.get("final_holdings_value_krw"),
-            "money_weighted_return": row.get("money_weighted_return"),
-            "cagr": row.get("cagr"),
-            "max_drawdown": row.get("max_drawdown"),
-            "trade_count": row.get("trade_count"),
-            "open_positions": row.get("open_positions"),
+            "kind": row.get("kind"),
+            "final_equity_krw": (row.get("metrics") or {}).get("final_equity_krw"),
+            "final_cash_krw": (row.get("metrics") or {}).get("final_cash_krw"),
+            "final_holdings_value_krw": (row.get("metrics") or {}).get("final_holdings_value_krw"),
+            "money_weighted_return": (row.get("metrics") or {}).get("money_weighted_return"),
+            "cagr": (row.get("metrics") or {}).get("cagr"),
+            "max_drawdown": (row.get("metrics") or {}).get("max_drawdown"),
+            "trade_count": (row.get("metrics") or {}).get("trade_count"),
+            "open_positions": (row.get("metrics") or {}).get("open_positions"),
         }
-        for row in rows
+        for row in strategy_catalog
     ]
 
 
@@ -2067,23 +2269,47 @@ def _write_price_artifacts(prices: pd.DataFrame, symbols: set[str], prices_out: 
     written: set[str] = set()
     for symbol, group in filtered.groupby("symbol", sort=True):
         written.add(str(symbol))
+        split_series = (
+            pd.to_numeric(group["stock_split"], errors="coerce").fillna(0)
+            if "stock_split" in group
+            else pd.Series(0, index=group.index)
+        )
+        has_split_history = split_series.ne(0).any()
         rows = []
         for row in group.to_dict(orient="records"):
-            rows.append(
-                {
-                    "date": row.get("date"),
-                    "open": _number(row.get("open_native")),
-                    "high": _number(row.get("high_native")),
-                    "low": _number(row.get("low_native")),
-                    "close": _number(row.get("close_native")),
-                    "close_krw": _round_number(row.get("close_krw")),
-                    "volume": _number(row.get("volume")),
-                    "currency": row.get("currency"),
-                    "source_currency": row.get("currency"),
-                    "display_currency": row.get("currency"),
-                    "krw_per_unit": _number(row.get("krw_per_unit")),
+            price_row = {
+                "date": row.get("date"),
+                "open": _number(row.get("open_native")),
+                "high": _number(row.get("high_native")),
+                "low": _number(row.get("low_native")),
+                "close": _number(row.get("close_native")),
+                "close_krw": _round_number(row.get("close_krw")),
+                "volume": _number(row.get("volume")),
+                "currency": row.get("currency"),
+                "source_currency": row.get("currency"),
+                "display_currency": row.get("currency"),
+                "krw_per_unit": _number(row.get("krw_per_unit")),
+            }
+            if has_split_history:
+                optional_fields = {
+                    "stock_split": _number(row.get("stock_split")),
+                    "split_event_type": row.get("split_event_type")
+                    if row.get("split_event_type") != "none"
+                    else None,
+                    "split_ratio_text": row.get("split_ratio_text")
+                    if row.get("split_ratio_text") != "none"
+                    else None,
+                    "split_factor": _number(row.get("split_factor")),
+                    "cum_split_factor_to_latest": _number(row.get("cum_split_factor_to_latest")),
+                    "split_adjusted_open": _number(row.get("split_adjusted_open_native")),
+                    "split_adjusted_high": _number(row.get("split_adjusted_high_native")),
+                    "split_adjusted_low": _number(row.get("split_adjusted_low_native")),
+                    "split_adjusted_close": _number(row.get("split_adjusted_close_native")),
+                    "split_adjusted_close_krw": _round_number(row.get("split_adjusted_close_krw")),
+                    "split_adjusted_volume": _number(row.get("split_adjusted_volume")),
                 }
-            )
+                price_row.update({key: value for key, value in optional_fields.items() if value is not None})
+            rows.append(price_row)
         currency = str(group.iloc[-1].get("currency") or "KRW")
         _write_json(prices_out / f"{symbol}.json", {"symbol": symbol, "currency": currency, "prices": rows})
     for symbol in sorted(str(symbol) for symbol in {str(symbol) for symbol in symbols} - written):

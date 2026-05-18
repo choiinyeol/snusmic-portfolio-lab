@@ -164,9 +164,9 @@ export function PortfolioStrategyView({
         </div>
         <HoldingsTreemap holdings={treemapHoldings} height={360} compact hrefBySymbol={reportHrefBySymbol} />
         <p className="mt-3 text-xs leading-5 text-slate-950/55">
-          매도 후 즉시 다른 종목을 사지 않는 경우는 전략의 리밸런싱/입금 주기, 최대 보유 종목 수, MTT·업사이드·가격
-          조건을 동시에 만족하는 후보 부족 때문입니다. 그 구간의 미투자 금액은 현금으로 보존되어 평가액과 트리맵에
-          포함됩니다.
+          매도 후 즉시 다른 종목을 사지 않는 경우는 전략의 리밸런싱/입금 주기, 최대 보유 종목 수, 추세
+          필터·업사이드·가격 조건을 동시에 만족하는 후보 부족 때문입니다. 그 구간의 미투자 금액은 현금으로 보존되어
+          평가액과 트리맵에 포함됩니다.
         </p>
       </article>
 
@@ -272,9 +272,9 @@ function AccountingExplanationPanel({ row }: { row: AccountingReconciliationRow 
           </p>
           {realizedOverCash ? (
             <p className="mt-2 text-sm leading-6 text-slate-500">
-              따라서 MTT #22처럼 확정 손익이 약 {formatKrw(row.realizedPnlKrw)}인데 현금이 {formatKrw(row.finalCashKrw)}
-              로 보이는 상황은, 약 {formatKrw(row.openCostBasisKrw)}가 현재 보유 종목의 원가로 묶여 있으면 회계적으로
-              자연스럽습니다.
+              따라서 일부 리포트 추세 전략처럼 확정 손익이 약 {formatKrw(row.realizedPnlKrw)}인데 현금이{' '}
+              {formatKrw(row.finalCashKrw)}로 보이는 상황은, 약 {formatKrw(row.openCostBasisKrw)}가 현재 보유 종목의
+              원가로 묶여 있으면 회계적으로 자연스럽습니다.
             </p>
           ) : null}
         </div>

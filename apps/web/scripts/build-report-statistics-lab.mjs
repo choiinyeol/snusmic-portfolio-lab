@@ -2,9 +2,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const repoRoot = path.resolve(process.cwd(), '../..');
-const reportsPath = path.join(repoRoot, 'data/web/reports/table.json');
-const pricesRoot = path.join(repoRoot, 'data/web/prices');
-const outputPath = path.join(repoRoot, 'data/web/report-statistics-lab.json');
+const webRoot = resolveWebRoot();
+const reportsPath = path.join(webRoot, 'reports/table.json');
+const pricesRoot = path.join(webRoot, 'prices');
+const outputPath = path.join(webRoot, 'report-statistics-lab.json');
 
 const THRESHOLDS = [0.6, 0.8, 1.0];
 const HORIZONS = [30, 60, 120, 250];
@@ -18,6 +19,7 @@ const reports = JSON.parse(fs.readFileSync(reportsPath, 'utf8'));
 const outcomes = [];
 const simulations = [];
 const exclusions = { missing_price: 0, non_upside_target: 0, missing_entry_or_target: 0, short_history: 0 };
+const observedPriceEndDates = [];
 
 for (const report of reports) {
   const targetDirection = report.target_direction ?? report.targetDirection;
@@ -87,7 +89,7 @@ for (const report of reports) {
 }
 
 const summary = {
-  generatedAt: new Date().toISOString(),
+  generatedAt: `${max(observedPriceEndDates) ?? max(outcomes.map((row) => row.publicationDate))}T00:00:00+09:00`,
   sample: {
     reportCount: reports.length,
     eligibleReportCount: outcomes.length,
@@ -137,7 +139,7 @@ function readPrices(symbol, startDate) {
   const file = path.join(pricesRoot, `${symbol}.json`);
   if (!fs.existsSync(file)) return [];
   const artifact = JSON.parse(fs.readFileSync(file, 'utf8'));
-  return (artifact.prices ?? [])
+  const rows = (artifact.prices ?? [])
     .filter((point) => String(point.date) >= String(startDate))
     .map((point) => ({
       date: String(point.date),
@@ -147,6 +149,15 @@ function readPrices(symbol, startDate) {
     }))
     .filter((point) => point.close && point.high && point.low && point.close > 0 && point.high > 0 && point.low > 0)
     .sort((a, b) => a.date.localeCompare(b.date));
+  if (rows.length) observedPriceEndDates.push(rows.at(-1).date);
+  return rows;
+}
+
+function resolveWebRoot() {
+  const flagIndex = process.argv.indexOf('--web-root');
+  if (flagIndex >= 0 && process.argv[flagIndex + 1]) return path.resolve(process.argv[flagIndex + 1]);
+  if (process.env.SMIC_WEB_ARTIFACT_ROOT) return path.resolve(process.env.SMIC_WEB_ARTIFACT_ROOT);
+  return path.join(repoRoot, 'data/web');
 }
 
 function pathStatsFromPrices(prices, entry) {
