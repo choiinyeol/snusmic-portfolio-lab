@@ -9,7 +9,13 @@ venv/
 .omx/
 .agents/
 *.tmp
+*.bak
+*.swp
+*~
 .DS_Store
+example_*.png
+example_*.jpg
+example_*.jpeg
 data/opendataloader/
 data/warehouse/*.duckdb
 data/warehouse/*.duckdb.wal
