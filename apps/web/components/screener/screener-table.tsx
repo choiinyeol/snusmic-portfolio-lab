@@ -12,7 +12,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import Link from 'next/link';
-import { Fragment, useCallback, useMemo, useState } from 'react';
+import { Fragment, useCallback, useDeferredValue, useMemo, useState } from 'react';
 import { BlockPagination } from '@/components/trading/TableControls';
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import { useSearchShortcut } from '@/components/ui/use-search-shortcut';
@@ -250,6 +250,7 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
   const [activePreset, setActivePreset] = useState<PresetId>('all');
   const [columnMode, setColumnMode] = useState<ColumnMode>('price');
   const [globalFilter, setGlobalFilter] = useState('');
+  const deferredGlobalFilter = useDeferredValue(globalFilter);
   const clearGlobalFilter = useCallback(() => setGlobalFilter(''), []);
   const searchInputRef = useSearchShortcut(clearGlobalFilter);
   const [bucketFilter, setBucketFilter] = useState('all');
@@ -285,7 +286,7 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
   const table = useReactTable({
     data: rows,
     columns,
-    state: { sorting, globalFilter, columnVisibility },
+    state: { sorting, globalFilter: deferredGlobalFilter, columnVisibility },
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
     globalFilterFn: globalTextFilter,
@@ -294,61 +295,82 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
     getSortedRowModel: getSortedRowModel(),
   });
 
-  const filteredRows = table.getSortedRowModel().rows.filter(
-    (row) =>
-      rowPassesFilters(row.original, {
-        bucketFilter,
-        returnFilter,
-        targetHitFilter,
-        expiredFilter,
-        caveatFilter,
-        maFilter,
-        nearHighOnly,
-      }) && rowPassesColumnFilters(row.original, columnFilters),
+  const sortedRows = table.getSortedRowModel().rows;
+  const filteredRows = useMemo(
+    () =>
+      sortedRows.filter(
+        (row) =>
+          rowPassesFilters(row.original, {
+            bucketFilter,
+            returnFilter,
+            targetHitFilter,
+            expiredFilter,
+            caveatFilter,
+            maFilter,
+            nearHighOnly,
+          }) && rowPassesColumnFilters(row.original, columnFilters),
+      ),
+    [
+      sortedRows,
+      bucketFilter,
+      returnFilter,
+      targetHitFilter,
+      expiredFilter,
+      caveatFilter,
+      maFilter,
+      nearHighOnly,
+      columnFilters,
+    ],
   );
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages - 1);
   const visibleRows = filteredRows.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
 
-  const resetPage = () => setPage(0);
-  const applyPreset = (presetId: PresetId) => {
-    const preset = PRESETS.find((item) => item.id === presetId);
-    if (!preset) throw new Error(`Unknown screener preset: ${presetId}`);
-    setActivePreset(preset.id);
-    setSorting(preset.sort);
-    setReturnFilter(preset.returnFilter ?? 'all');
-    setTargetHitFilter(preset.targetHit ?? 'all');
-    setExpiredFilter(preset.expired ?? 'no');
-    setCaveatFilter(preset.caveat ?? 'all');
-    setNearHighOnly(Boolean(preset.nearHigh));
-    setMaFilter(preset.maStack ? 'above' : 'all');
-    resetPage();
-  };
-  const updateColumnFilter = (columnId: string, value: string) => {
-    setColumnFilters((current) => {
-      const next = { ...current };
-      if (value.trim()) next[columnId] = value;
-      else delete next[columnId];
-      return next;
-    });
-    resetPage();
-  };
-  const clearColumnFilters = () => {
+  const resetPage = useCallback(() => setPage(0), []);
+  const applyPreset = useCallback(
+    (presetId: PresetId) => {
+      const preset = PRESETS.find((item) => item.id === presetId);
+      if (!preset) throw new Error(`Unknown screener preset: ${presetId}`);
+      setActivePreset(preset.id);
+      setSorting(preset.sort);
+      setReturnFilter(preset.returnFilter ?? 'all');
+      setTargetHitFilter(preset.targetHit ?? 'all');
+      setExpiredFilter(preset.expired ?? 'no');
+      setCaveatFilter(preset.caveat ?? 'all');
+      setNearHighOnly(Boolean(preset.nearHigh));
+      setMaFilter(preset.maStack ? 'above' : 'all');
+      resetPage();
+    },
+    [resetPage],
+  );
+  const updateColumnFilter = useCallback(
+    (columnId: string, value: string) => {
+      setColumnFilters((current) => {
+        const next = { ...current };
+        if (value.trim()) next[columnId] = value;
+        else delete next[columnId];
+        return next;
+      });
+      resetPage();
+    },
+    [resetPage],
+  );
+  const clearColumnFilters = useCallback(() => {
     setColumnFilters({});
     resetPage();
-  };
+  }, [resetPage]);
 
   return (
     <section className="grid gap-3">
       <div className="grid gap-3 md:grid-cols-4">
-        <BoardMetric label="종목" value={`${rows.length.toLocaleString('ko-KR')}개`} caption="symbol universe" />
+        <BoardMetric label="종목" value={`${rows.length.toLocaleString('ko-KR')}개`} caption="유니버스" />
         <BoardMetric
           label="현재 플러스"
           value={`${boardStats.positiveCount}개`}
           caption={formatPercent(boardStats.positiveShare, 1)}
         />
-        <BoardMetric label="52주 고점 -10% 이내" value={`${boardStats.nearHighCount}개`} caption="price series" />
-        <BoardMetric label="20/50/200MA 위" value={`${boardStats.aboveAllMaCount}개`} caption="trend stack" />
+        <BoardMetric label="52주 고점 -10% 이내" value={`${boardStats.nearHighCount}개`} caption="가격 시계열" />
+        <BoardMetric label="20/50/200MA 위" value={`${boardStats.aboveAllMaCount}개`} caption="추세 정렬" />
       </div>
 
       <div className="w-full min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white">
@@ -356,10 +378,10 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
           <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
             <div className="min-w-0">
               <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                The research board
+                리서치 보드
               </div>
               <h3 className="mt-1 text-lg font-semibold tracking-tight text-slate-950">
-                Report universe × Price series
+                리포트 유니버스 × 가격 시계열
               </h3>
               <p className="mt-1 text-sm text-slate-600">
                 {activePresetConfig.caption} 기본값은 발간 후 2년 경과 리포트 제외입니다. Market cap, P/E, sector는 현재
@@ -413,7 +435,7 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
               />
             </label>
             <Select
-              label="Bucket"
+              label="후보 유형"
               value={bucketFilter}
               onChange={(value) => {
                 setBucketFilter(value);
@@ -422,7 +444,7 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
               options={buckets}
             />
             <Select
-              label="Return"
+              label="수익률 방향"
               value={returnFilter}
               onChange={(value) => {
                 setReturnFilter(value as SignFilter);
@@ -449,7 +471,7 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
               options={['no', 'all', 'yes']}
             />
             <Select
-              label="MA"
+              label="이동평균"
               value={maFilter}
               onChange={(value) => {
                 setMaFilter(value as MaFilter);
@@ -551,13 +573,21 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
               ))}
             </thead>
             <tbody>
-              {visibleRows.map((row) => (
-                <tr key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
-                  ))}
+              {visibleRows.length === 0 ? (
+                <tr>
+                  <td className="p-6 text-center text-sm text-slate-500" colSpan={table.getVisibleLeafColumns().length}>
+                    조건에 맞는 종목이 없습니다. 프리셋·필터·검색어를 다시 확인해 주세요.
+                  </td>
                 </tr>
-              ))}
+              ) : (
+                visibleRows.map((row) => (
+                  <tr key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                    ))}
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -570,7 +600,7 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
           <div className="flex justify-center">
             <BlockPagination page={safePage} pageCount={totalPages} onPageChange={setPage} />
           </div>
-          <span className="hidden text-right text-xs text-slate-400 sm:block">read-only screener</span>
+          <span className="hidden text-right text-xs text-slate-400 sm:block">읽기 전용 스크리너</span>
         </div>
       </div>
     </section>
@@ -582,7 +612,7 @@ function buildColumns(): ColumnDef<ScreenerBoardRow>[] {
     {
       id: 'symbol',
       accessorKey: 'symbol',
-      header: 'Ticker',
+      header: '종목',
       cell: ({ row }) => (
         <div className="grid min-w-[130px] grid-cols-[22px_minmax(0,1fr)] items-center gap-2">
           <span className="grid size-5 place-items-center rounded-sm bg-slate-950 font-mono text-[10px] font-bold text-white">
@@ -605,7 +635,7 @@ function buildColumns(): ColumnDef<ScreenerBoardRow>[] {
     {
       id: 'company',
       accessorKey: 'company',
-      header: 'Company',
+      header: '회사',
       cell: ({ getValue }) => (
         <span className="block max-w-[150px] truncate" title={getValue<string>()}>
           {getValue<string>()}
@@ -615,19 +645,19 @@ function buildColumns(): ColumnDef<ScreenerBoardRow>[] {
     {
       id: 'currency',
       accessorKey: 'currency',
-      header: 'Ccy',
+      header: '통화',
       cell: ({ getValue }) => <span className="font-mono text-slate-500">{getValue<string>() || '—'}</span>,
     },
     {
       id: 'latestReportDate',
       accessorKey: 'latestReportDate',
-      header: 'Report',
+      header: '리포트',
       cell: ({ getValue }) => <span className="font-mono tabular-nums">{formatDateKo(getValue<string>())}</span>,
     },
     {
       id: 'lastCloseNative',
       accessorKey: 'lastCloseNative',
-      header: 'Price',
+      header: '현재가',
       cell: ({ row }) => (
         <span className="font-mono tabular-nums">
           {formatNative(row.original.lastCloseNative, row.original.currency)}
@@ -637,13 +667,13 @@ function buildColumns(): ColumnDef<ScreenerBoardRow>[] {
     {
       id: 'volumeLatest',
       accessorKey: 'volumeLatest',
-      header: 'Vol',
+      header: '거래량',
       cell: ({ getValue }) => <span className={numCellClass}>{formatCompact(getValue<number | null>())}</span>,
     },
     {
       id: 'entryPriceNative',
       accessorKey: 'entryPriceNative',
-      header: 'Entry',
+      header: '진입가',
       cell: ({ row }) => (
         <span className="font-mono tabular-nums">
           {formatNative(row.original.entryPriceNative, row.original.currency)}
@@ -653,7 +683,7 @@ function buildColumns(): ColumnDef<ScreenerBoardRow>[] {
     {
       id: 'targetPriceNative',
       accessorKey: 'targetPriceNative',
-      header: 'Target',
+      header: '목표가',
       cell: ({ row }) => (
         <span className="font-mono tabular-nums">
           {formatNative(row.original.targetPriceNative, row.original.currency)}
@@ -663,81 +693,86 @@ function buildColumns(): ColumnDef<ScreenerBoardRow>[] {
     {
       id: 'targetUpsideAtPub',
       accessorKey: 'targetUpsideAtPub',
-      header: 'Target Up',
+      header: '상승여력',
       cell: ({ getValue }) => <PercentCell value={getValue<number | null>()} />,
     },
     {
       id: 'targetGapPct',
       accessorKey: 'targetGapPct',
-      header: 'Gap',
+      header: '목표 갭',
       cell: ({ getValue }) => <HighGapCell value={getValue<number | null>()} positiveIsGood />,
     },
     {
       id: 'targetRemainingPct',
       accessorKey: 'targetRemainingPct',
-      header: 'Remain',
+      header: '목표 잔여',
       cell: ({ getValue }) => <PercentCell value={getValue<number | null>()} />,
     },
     {
       id: 'targetProgressPct',
       accessorKey: 'targetProgressPct',
-      header: 'Progress',
+      header: '달성률',
       cell: ({ getValue }) => <ProgressCell value={getValue<number | null>()} />,
     },
-    { id: 'targetHit', accessorKey: 'targetHit', header: 'Hit', cell: ({ row }) => <HitCell row={row.original} /> },
+    {
+      id: 'targetHit',
+      accessorKey: 'targetHit',
+      header: '목표달성',
+      cell: ({ row }) => <HitCell row={row.original} />,
+    },
     {
       id: 'daysToTarget',
       accessorKey: 'daysToTarget',
-      header: 'Days',
+      header: '도달일수',
       cell: ({ getValue }) => <span className={numCellClass}>{formatDaysShort(getValue<number | null>())}</span>,
     },
     {
       id: 'expired',
       accessorKey: 'expired',
-      header: 'Exp',
+      header: '만료',
       cell: ({ getValue }) => <BooleanMark value={getValue<boolean>()} />,
     },
     {
       id: 'currentReturn',
       accessorKey: 'currentReturn',
-      header: 'Current',
+      header: '현재 수익률',
       cell: ({ getValue }) => <PercentCell value={getValue<number | null>()} />,
     },
     {
       id: 'peakReturn',
       accessorKey: 'peakReturn',
-      header: 'Peak',
+      header: '고점',
       cell: ({ getValue }) => <PercentCell value={getValue<number | null>()} />,
     },
     {
       id: 'troughReturn',
       accessorKey: 'troughReturn',
-      header: 'Trough',
+      header: '저점',
       cell: ({ getValue }) => <PercentCell value={getValue<number | null>()} />,
     },
     {
       id: 'ytdReturn',
       accessorKey: 'ytdReturn',
-      header: '% YTD',
+      header: 'YTD',
       cell: ({ getValue }) => <PercentCell value={getValue<number | null>()} heat />,
     },
     {
       id: 'sparkline',
       accessorKey: 'sparkline',
-      header: 'Chart 1Y',
+      header: '1년 차트',
       enableSorting: false,
       cell: ({ row }) => <Sparkline values={row.original.sparkline} />,
     },
     {
       id: 'return1y',
       accessorKey: 'return1y',
-      header: '% 1Y',
+      header: '1년',
       cell: ({ getValue }) => <PercentCell value={getValue<number | null>()} heat />,
     },
     {
       id: 'distanceFrom52wHigh',
       accessorKey: 'distanceFrom52wHigh',
-      header: 'Δ Highs',
+      header: '52주 고점',
       cell: ({ getValue }) => <HighGapCell value={getValue<number | null>()} />,
     },
     {
@@ -761,7 +796,7 @@ function buildColumns(): ColumnDef<ScreenerBoardRow>[] {
     {
       id: 'candidateBucket',
       accessorKey: 'candidateBucket',
-      header: 'Bucket',
+      header: '후보 유형',
       cell: ({ getValue }) => (
         <span className="badge badge-ghost badge-sm font-mono">{getValue<string | null>() ?? '—'}</span>
       ),
@@ -769,13 +804,13 @@ function buildColumns(): ColumnDef<ScreenerBoardRow>[] {
     {
       id: 'candidateScore',
       accessorKey: 'candidateScore',
-      header: 'Score',
+      header: '점수',
       cell: ({ getValue }) => <span className={numCellClass}>{formatScore(getValue<number | null>())}</span>,
     },
     {
       id: 'rankBasis',
       accessorKey: 'rankBasis',
-      header: 'Basis',
+      header: '근거',
       cell: ({ getValue }) => (
         <span className="block max-w-[160px] truncate text-slate-600" title={getValue<string | null>() ?? ''}>
           {getValue<string | null>() ?? '—'}
@@ -785,12 +820,12 @@ function buildColumns(): ColumnDef<ScreenerBoardRow>[] {
     {
       id: 'caveatFlags',
       accessorKey: 'caveatFlags',
-      header: 'Caveat',
+      header: '경고',
       cell: ({ getValue }) => <CaveatCell flags={getValue<string[]>()} />,
     },
     {
       id: 'detail',
-      header: 'Open',
+      header: '상세',
       enableSorting: false,
       cell: ({ row }) => (
         <Link
@@ -1138,14 +1173,20 @@ function ProgressCell({ value }: { value: number | null }) {
   );
 }
 
+/** Sparkline that normalises values to "% return from first point" so rows
+ * in the same table render on a shared visual scale (±30% by default — values
+ * outside the band still draw but get clipped at the band edge, preserving
+ * cross-row rank-order legibility while flagging extreme movers via color). */
 function Sparkline({ values }: { values: number[] }) {
-  const points = sparklinePoints(values, 72, 22);
+  const SCALE = 0.3; // ±30% shared band across all rows
+  const points = sparklinePoints(values, 72, 22, SCALE);
   if (!points) return <span className="text-slate-400">—</span>;
   const first = values[0];
   const last = values.at(-1);
   const positive = first !== undefined && last !== undefined && last >= first;
   return (
     <svg className="h-6 w-[72px] overflow-visible" viewBox="0 0 72 22" role="img" aria-label="1년 가격 경로">
+      <line x1={0} x2={72} y1={11} y2={11} stroke="#e2e8f0" strokeWidth={0.6} strokeDasharray="2 2" />
       <path
         d={points.line}
         fill="none"
@@ -1184,17 +1225,22 @@ function CaveatCell({ flags }: { flags: string[] }) {
   );
 }
 
-function sparklinePoints(values: number[], width: number, height: number): { line: string } | null {
+function sparklinePoints(values: number[], width: number, height: number, scale: number): { line: string } | null {
   const clean = values.filter((value) => Number.isFinite(value));
   if (clean.length < 2) return null;
-  const min = Math.min(...clean);
-  const max = Math.max(...clean);
-  const span = max - min || 1;
+  const first = clean[0];
+  if (!first || first === 0) return null;
+  // Normalise to "% return from first point" so every row shares one band [-scale, +scale]
+  const padding = 2;
+  const usableHeight = height - padding * 2;
+  const midY = height / 2;
   return {
     line: clean
       .map((value, index) => {
+        const r = value / first - 1;
+        const clamped = Math.max(-scale, Math.min(scale, r));
         const x = (index / Math.max(1, clean.length - 1)) * width;
-        const y = height - 2 - ((value - min) / span) * (height - 4);
+        const y = midY - (clamped / scale) * (usableHeight / 2);
         return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
       })
       .join(' '),

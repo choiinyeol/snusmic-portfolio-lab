@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
 import type { HoldingRow, ReportTargetDigest } from '@/lib/artifacts';
 import { Money } from '@/components/ui/Money';
-import { formatDays, formatKrw, formatPercent } from '@/lib/format';
+import { formatDateKo, formatDays, formatKrw, formatPercent } from '@/lib/format';
 import { PaginationControls, SortHeader, pageRows, sortRows, type SortState } from './TableControls';
 
 type Props = {
@@ -164,7 +164,7 @@ export function PortfolioTables({ holdings, persona, personaLabels, capitalByPer
                         ) : (
                           '—'
                         )}
-                        <div className="text-xs text-slate-950/55">{target?.publicationDate ?? '—'}</div>
+                        <div className="text-xs text-slate-950/55">{formatDateKo(target?.publicationDate)}</div>
                       </td>
                       <td className="tabular-nums">{row.qty?.toLocaleString('ko-KR') ?? '—'}</td>
                       <td>

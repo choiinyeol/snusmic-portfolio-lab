@@ -133,6 +133,38 @@ ul, ol { color: var(--muted); line-height: 1.7; }
   font-size: .72rem;
 }
 
+/* ─────────────────────  Badges (used by 30+ TSX call sites)  ─────────────────────
+   Compact status pill. The variant classes are DaisyUI-style names because the
+   call sites predate the Tailwind `<Badge>` component; do not delete without a
+   migration sweep. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  padding: .2rem .55rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: .76rem;
+  font-weight: 600;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.badge-sm { padding: .16rem .48rem; font-size: .72rem; }
+.badge-xs { padding: .1rem .4rem; font-size: .66rem; }
+.badge-outline { background: var(--surface); }
+.badge-ghost { border-color: transparent; background: var(--surface-sunken); color: var(--muted); }
+.badge-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.badge-success { background: var(--good); border-color: var(--good); color: #fff; }
+.badge-error { background: var(--bad); border-color: var(--bad); color: #fff; }
+.badge-warning { background: var(--warn); border-color: var(--warn); color: #fff; }
+/* Soft variant tints the same hue at low opacity for status-on-data contexts. */
+.badge-soft.badge-primary { background: var(--accent-soft); border-color: transparent; color: var(--accent-strong); }
+.badge-soft.badge-success { background: var(--good-soft); border-color: transparent; color: var(--good); }
+.badge-soft.badge-error { background: var(--bad-soft); border-color: transparent; color: var(--bad); }
+.badge-soft.badge-warning { background: var(--warn-soft); border-color: transparent; color: #a55a0a; }
+
 /* ─────────────────────  Lab panels (legacy primitive)  ───────────────────── */
 .lab-panel {
   min-width: 0;

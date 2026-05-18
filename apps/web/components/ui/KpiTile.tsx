@@ -26,7 +26,7 @@ export function KpiTile({
   meta,
   compact = false,
   valueClassName,
-  showToneBadge = tone !== 'neutral',
+  showToneBadge = false,
 }: {
   label: string;
   value: ReactNode;

@@ -30,9 +30,9 @@ export function CumulativeReturnChart({ series, showLegend = true }: { series: R
       layout: {
         background: { type: ColorType.Solid, color: '#ffffff' },
         textColor: '#4e5968',
-        attributionLogo: true,
+        attributionLogo: false,
       },
-      grid: { vertLines: { color: '#f1f3f6' }, horzLines: { color: '#f1f3f6' } },
+      grid: { vertLines: { visible: false }, horzLines: { color: '#f4f6f9' } },
       crosshair: { mode: CrosshairMode.Normal },
       rightPriceScale: { borderColor: '#eaedf2', scaleMargins: { top: 0.12, bottom: 0.12 } },
       timeScale: { borderColor: '#eaedf2', timeVisible: true, secondsVisible: false },

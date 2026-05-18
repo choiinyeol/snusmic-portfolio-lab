@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { BlockPagination } from '@/components/trading/TableControls';
 import {
   flexRender,
@@ -12,10 +13,10 @@ import {
   type SortingState,
   useReactTable,
 } from '@tanstack/react-table';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchShortcut } from '@/components/ui/use-search-shortcut';
 import type { ReportRow } from '@/lib/artifacts';
-import { formatDays, formatNative, formatPercent } from '@/lib/format';
+import { formatDateKo, formatDays, formatNative, formatPercent } from '@/lib/format';
 
 type HitFilter = 'all' | 'hit' | 'open' | 'expired';
 type ReturnFilter = 'all' | 'positive' | 'negative';
@@ -80,7 +81,11 @@ export function ReportsTable({ reports }: ReportsTableProps) {
           </span>
         ),
       },
-      { accessorKey: 'publicationDate', header: '게시일' },
+      {
+        accessorKey: 'publicationDate',
+        header: '게시일',
+        cell: ({ getValue }) => formatDateKo(getValue<string | null>()),
+      },
       {
         accessorKey: 'entryPriceNative',
         header: '진입가',
@@ -203,6 +208,7 @@ export function ReportsTable({ reports }: ReportsTableProps) {
       {
         accessorKey: 'lastCloseDate',
         header: () => <span title="만료 행은 만료일 = 최근 가격일">최근 가격일</span>,
+        cell: ({ getValue }) => formatDateKo(getValue<string | null>()),
       },
     ],
     [],
@@ -236,6 +242,46 @@ export function ReportsTable({ reports }: ReportsTableProps) {
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages - 1);
   const visibleRows = filteredRows.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
+
+  const router = useRouter();
+  const [activeRowIdx, setActiveRowIdx] = useState(0);
+  const tbodyRef = useRef<HTMLTableSectionElement | null>(null);
+
+  useEffect(() => {
+    setActiveRowIdx(0);
+  }, []);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      const target = event.target;
+      if (target instanceof HTMLElement) {
+        const tag = target.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable) return;
+      }
+      if (visibleRows.length === 0) return;
+      if (event.key === 'j') {
+        event.preventDefault();
+        setActiveRowIdx((idx) => Math.min(visibleRows.length - 1, idx + 1));
+      } else if (event.key === 'k') {
+        event.preventDefault();
+        setActiveRowIdx((idx) => Math.max(0, idx - 1));
+      } else if (event.key === 'Enter') {
+        const row = visibleRows[Math.min(activeRowIdx, visibleRows.length - 1)];
+        if (row) {
+          event.preventDefault();
+          router.push(reportDetailHref(row.original));
+        }
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [activeRowIdx, router, visibleRows]);
+
+  useEffect(() => {
+    const row = tbodyRef.current?.querySelectorAll<HTMLTableRowElement>('tr')[activeRowIdx];
+    row?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }, [activeRowIdx]);
 
   const resetPage = () => setPage(0);
 
@@ -363,7 +409,12 @@ export function ReportsTable({ reports }: ReportsTableProps) {
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs text-slate-500">
-        <span>열 제목을 누르면 오름차순·내림차순으로 정렬됩니다.</span>
+        <span>
+          열 제목으로 정렬 · <kbd className="rounded border border-slate-300 bg-white px-1 font-mono">/</kbd> 검색,{' '}
+          <kbd className="rounded border border-slate-300 bg-white px-1 font-mono">j</kbd>/
+          <kbd className="rounded border border-slate-300 bg-white px-1 font-mono">k</kbd> 행 이동,{' '}
+          <kbd className="rounded border border-slate-300 bg-white px-1 font-mono">Enter</kbd> 상세
+        </span>
         <span>페이지당 {PAGE_SIZE}개</span>
       </div>
 
@@ -390,14 +441,22 @@ export function ReportsTable({ reports }: ReportsTableProps) {
               </tr>
             ))}
           </thead>
-          <tbody>
-            {visibleRows.map((row) => (
-              <tr key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
-                ))}
+          <tbody ref={tbodyRef}>
+            {visibleRows.length === 0 ? (
+              <tr>
+                <td className="p-6 text-center text-sm text-slate-500" colSpan={columns.length}>
+                  조건에 맞는 리포트가 없습니다. 검색어 또는 프리셋을 다시 확인해 주세요.
+                </td>
               </tr>
-            ))}
+            ) : (
+              visibleRows.map((row, index) => (
+                <tr key={row.id} data-active={index === activeRowIdx ? 'true' : undefined}>
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                  ))}
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -428,7 +487,7 @@ function globalTextFilter(row: Row<ReportRow>, _columnId: string, filterValue: s
 function sortIndicator(direction: false | 'asc' | 'desc'): string {
   if (direction === 'asc') return ' ↑';
   if (direction === 'desc') return ' ↓';
-  return ' ↕';
+  return '';
 }
 
 function ariaSort(direction: false | 'asc' | 'desc'): 'ascending' | 'descending' | 'none' {

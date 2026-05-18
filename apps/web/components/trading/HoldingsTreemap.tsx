@@ -1,6 +1,6 @@
 'use client';
 
-import * as d3 from 'd3';
+import { hierarchy, treemap, type HierarchyRectangularNode } from 'd3';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, type PointerEvent } from 'react';
 import type { HoldingRow } from '@/lib/artifacts';
@@ -17,8 +17,18 @@ type Props = {
 };
 
 type LeafDatum = HoldingRow & { weight: number };
-type LeafNode = d3.HierarchyRectangularNode<LeafDatum>;
+type RootDatum = { kind: 'root'; children: LeafDatum[] };
+type TreemapDatum = RootDatum | LeafDatum;
+type LeafNode = HierarchyRectangularNode<TreemapDatum> & { data: LeafDatum };
 type Tooltip = { x: number; y: number; row: LeafDatum } | null;
+
+function isLeaf(value: TreemapDatum): value is LeafDatum {
+  return !('kind' in value);
+}
+
+function isLeafNode(node: HierarchyRectangularNode<TreemapDatum>): node is LeafNode {
+  return isLeaf(node.data);
+}
 
 /** Proportional capital-weight treemap rendered with d3 squarify on Canvas.
  * Cell area = market value, cell color = unrealized return. Canvas keeps the
@@ -50,22 +60,20 @@ export function HoldingsTreemap({
     [holdings],
   );
 
-  const root = useMemo<d3.HierarchyRectangularNode<{ children: LeafDatum[] }> | null>(() => {
+  const root = useMemo<HierarchyRectangularNode<TreemapDatum> | null>(() => {
     if (!holdings.length || totalValue <= 0 || size.width <= 0) return null;
     const leaves: LeafDatum[] = holdings
       .filter((row) => (row.marketValueKrw ?? 0) > 0)
       .map((row) => ({ ...row, weight: (row.marketValueKrw ?? 0) / totalValue }));
     if (!leaves.length) return null;
-    const hierarchy = d3
-      .hierarchy<{ children: LeafDatum[] } | LeafDatum>({ children: leaves })
-      .sum((d) => ('marketValueKrw' in d ? Math.max(0, d.marketValueKrw ?? 0) : 0))
+    const tree = hierarchy<TreemapDatum>({ kind: 'root', children: leaves })
+      .sum((d) => (isLeaf(d) ? Math.max(0, d.marketValueKrw ?? 0) : 0))
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
-    d3
-      .treemap<{ children: LeafDatum[] } | LeafDatum>()
+    treemap<TreemapDatum>()
       .size([size.width, size.height])
       .paddingInner(compact ? 1 : 2)
-      .round(true)(hierarchy);
-    return hierarchy as d3.HierarchyRectangularNode<{ children: LeafDatum[] }>;
+      .round(true)(tree);
+    return tree as HierarchyRectangularNode<TreemapDatum>;
   }, [compact, holdings, totalValue, size.width, size.height]);
 
   useEffect(() => {
@@ -120,7 +128,8 @@ export function HoldingsTreemap({
   };
 
   const handleClick = () => {
-    const target = hoveredRef.current ?? (root?.leaves() as unknown as LeafNode[] | undefined)?.[0] ?? null;
+    const fallback = root?.leaves().filter(isLeafNode)[0] ?? null;
+    const target = hoveredRef.current ?? fallback;
     if (!target) return;
     const href = holdingHref(target.data, hrefBySymbol);
     if (!href) return;
@@ -145,12 +154,6 @@ export function HoldingsTreemap({
           <div className="min-w-0">
             <p className="heatmap-caption">{caption}</p>
             <p className="mt-1 font-mono text-xs text-slate-950/55">합계 {formatKrw(totalValue)}</p>
-          </div>
-          <div className="flex shrink-0 flex-wrap justify-end gap-1.5" aria-label="트리맵 모드">
-            <span className="snapshot-pill">전체</span>
-            <span className="snapshot-pill">평가액</span>
-            <span className="snapshot-pill">미실현</span>
-            <span className="snapshot-pill">목표 진행</span>
           </div>
         </div>
       ) : null}
@@ -280,13 +283,13 @@ function setupHiDpi(canvas: HTMLCanvasElement, cssWidth: number, cssHeight: numb
 
 function drawHeatmap(
   ctx: CanvasRenderingContext2D,
-  root: d3.HierarchyRectangularNode<{ children: LeafDatum[] }>,
+  root: HierarchyRectangularNode<TreemapDatum>,
   width: number,
   height: number,
   compact: boolean,
 ): void {
   ctx.clearRect(0, 0, width, height);
-  const leaves = root.leaves() as unknown as LeafNode[];
+  const leaves = root.leaves().filter(isLeafNode);
   for (const leaf of leaves) {
     const x = leaf.x0;
     const y = leaf.y0;
@@ -343,12 +346,8 @@ function drawHoverOverlay(ctx: CanvasRenderingContext2D, target: LeafNode | null
   ctx.stroke();
 }
 
-function findLeafAt(
-  root: d3.HierarchyRectangularNode<{ children: LeafDatum[] }>,
-  x: number,
-  y: number,
-): LeafNode | null {
-  for (const leaf of root.leaves() as unknown as LeafNode[]) {
+function findLeafAt(root: HierarchyRectangularNode<TreemapDatum>, x: number, y: number): LeafNode | null {
+  for (const leaf of root.leaves().filter(isLeafNode)) {
     if (x >= leaf.x0 && x <= leaf.x1 && y >= leaf.y0 && y <= leaf.y1) return leaf;
   }
   return null;

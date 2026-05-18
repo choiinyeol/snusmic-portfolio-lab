@@ -62,7 +62,7 @@
         "noArrayIndexKey": "off"
       },
       "correctness": {
-        "useExhaustiveDependencies": "off"
+        "useExhaustiveDependencies": "warn"
       },
       "a11y": {
         "useKeyWithClickEvents": "off",

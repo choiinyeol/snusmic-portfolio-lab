@@ -18,6 +18,37 @@ All notable user-facing changes are tracked here. This project uses git tags as 
 - Add a collapsible desktop sidebar so wide data tables can use more horizontal space.
 - Add a styled native select wrapper and use it in `/screener` filters to avoid clipped Korean option text.
 
+## v0.21.0-product-density-i18n.1 - 2026-05-18
+
+### Added
+- Add `app/(app)/error.tsx` so the app shell renders a recoverable error state instead of a blank screen when a route's data parsing throws at runtime.
+- Define a CSS fallback for the DaisyUI-style `badge`, `badge-ghost`, `badge-soft`, `badge-success`, `badge-error`, `badge-warning`, `badge-primary`, `badge-outline`, `badge-sm`, and `badge-xs` classes referenced by 30+ status pills across reports, screener, portfolio, strategies, and trades; status colour was previously rendering as unstyled text.
+- Add `j` / `k` row navigation and `Enter` to open detail to the reports table so analysts can drive the queue from the keyboard end-to-end (`/` and `Esc` were already wired in the previous release).
+- Add an explicit "no results" empty state row to both `/reports` and `/screener` when the active filter combination returns 0 rows.
+
+### Changed
+- Reformat KRW values via `formatKrw` so amounts ≥ 1억 render as `123억 4,568만원` and amounts ≥ 1만 render as `3,457만원`, matching Toss/Kakao Pay convention for at-a-glance reading. `formatKrw(value, { exact: true })` keeps the raw ledger form for places that need every digit.
+- Translate the screener column headers (`Price → 현재가`, `Target Up → 상승여력`, `Gap → 목표 갭`, `Remain → 목표 잔여`, `Progress → 달성률`, `Current → 현재 수익률`, `Peak → 고점`, `Trough → 저점`, `Hit → 목표달성`, `Days → 도달일수`, `Exp → 만료`, `Vol → 거래량`, etc.), filter labels (`Return → 수익률 방향`, `Bucket → 후보 유형`, `MA → 이동평균`), section title, footnote, and metric captions to Korean.
+- Apply `formatDateKo` on the reports table and portfolio holdings publication-date cells so dates stop leaking as raw ISO strings.
+- Normalise every screener `Sparkline` to a shared "% return from first point" band (±30%) with a zero-return baseline so rows are visually rank-comparable instead of each rendering on its own auto-scaled axis.
+- Memoise the screener `filteredRows` and route the search input through `useDeferredValue` so filter keystrokes stop re-sorting and re-filtering the full row set inside render, eliminating noticeable keystroke INP jank.
+- Switch `AppShell`'s sidebar collapse state to a lazy `useState` initialiser so the desktop sidebar no longer flashes expanded-then-collapsed on every hard reload.
+- Type the `HoldingsTreemap` d3 hierarchy with a `TreemapDatum` discriminated union and an `isLeafNode` type guard, eliminating three `as unknown as LeafNode[]` casts and restoring leaf-level type safety.
+- Configure `next.config.ts` with `poweredByHeader: false`, `images: { unoptimized: true }` (consistent with `output: 'export'`), and `experimental.optimizePackageImports: ['lucide-react', 'd3']` so the lucide and d3 barrel imports tree-shake at build time.
+- Drop the lightweight-charts attribution logo on the cumulative-return and price-evidence charts, hide vertical gridlines, and lighten horizontal gridlines (`#f1f3f6 → #f4f6f9`) so the data lines carry visual primacy.
+- Set `KpiTile`'s `showToneBadge` default to `false` so the value's colour, not a redundant pill, communicates tone.
+- Re-enable biome's `useExhaustiveDependencies` rule at `warn` level so future stale-closure exposure surfaces in lint output.
+- Soften the `메인화면` h1 letter-spacing from `-0.045em` to `-0.02em` to respect CJK glyph fitting.
+
+### Removed
+- Delete the four non-functional `snapshot-pill` mode buttons ("전체 / 평가액 / 미실현 / 목표 진행") from the holdings treemap toolbar, since they were decorative affordances that did not switch the colour encoding.
+- Stop rendering the `↕` unsorted indicator on every reports-table header glyph; the active `↑` / `↓` direction is still shown.
+
+### Verified
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web build` (413 static pages generated)
+
 ## v0.20.4-ui-density-a11y.1 - 2026-05-18
 
 ### Added

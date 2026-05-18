@@ -23,7 +23,7 @@ export default function OverviewPage() {
               <Badge variant="secondary">{selectedStrategy?.shortLabel || overview.portfolio.label}</Badge>
               <Badge variant="success">읽기 전용</Badge>
             </div>
-            <h1 className="text-3xl font-semibold tracking-[-0.045em] text-slate-950 md:text-5xl">메인화면</h1>
+            <h1 className="text-3xl font-semibold tracking-[-0.02em] text-slate-950 md:text-5xl">메인화면</h1>
             <p className="mt-3 max-w-4xl text-sm leading-7 text-slate-600">
               오늘 판단에 필요한 것만 먼저 봅니다. 보유 포지션의 재검토 사유, 현금과 손익의 관계, 리포트 통계로 넘어갈
               근거를 한 화면에 모으고 세부 차트는 전용 페이지에서 확인합니다.

@@ -2,7 +2,7 @@
 
 import { ExternalLink, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { APP_NAV, GITHUB_NAV_ITEM } from '@/components/ui/app-shell-nav';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -36,10 +36,9 @@ export function AppShell({
   priceRange,
   primaryBookLabel,
 }: AppShellProps) {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  useEffect(() => {
-    setSidebarCollapsed(window.localStorage.getItem('snusmic.sidebar-collapsed') === '1');
-  }, []);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(
+    () => typeof window !== 'undefined' && window.localStorage.getItem('snusmic.sidebar-collapsed') === '1',
+  );
   const toggleSidebar = () => {
     setSidebarCollapsed((value) => {
       const next = !value;

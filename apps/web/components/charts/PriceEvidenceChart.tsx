@@ -165,14 +165,14 @@ export function PriceEvidenceChart({
       layout: {
         background: { type: ColorType.Solid, color: '#ffffff' },
         textColor: '#4e5968',
-        attributionLogo: true,
+        attributionLogo: false,
         panes: {
           separatorColor: '#edf1f5',
           separatorHoverColor: '#dbe4ef',
           enableResize: false,
         },
       },
-      grid: { vertLines: { color: '#f1f3f6' }, horzLines: { color: '#f1f3f6' } },
+      grid: { vertLines: { visible: false }, horzLines: { color: '#f4f6f9' } },
       crosshair: { mode: CrosshairMode.Normal },
       rightPriceScale: {
         borderColor: '#eaedf2',
