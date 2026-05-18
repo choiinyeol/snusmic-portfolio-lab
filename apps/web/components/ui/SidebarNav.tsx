@@ -54,9 +54,11 @@ export function SidebarNav({
             key={`${item.href}-${item.label}`}
             href={item.href}
             className={cn(
-              'group flex min-h-9 items-center gap-2 rounded-md px-2.5 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-950',
+              'group flex min-h-9 items-center gap-2 rounded-md px-2.5 py-2 text-sm font-medium transition-colors',
+              isCurrent
+                ? 'bg-slate-950 text-white hover:bg-slate-900'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950',
               compact && 'justify-center px-2',
-              isCurrent && 'bg-slate-950 text-white hover:bg-slate-900 hover:text-white',
             )}
             aria-current={isCurrent ? 'page' : undefined}
             target={isInternal ? undefined : '_blank'}
