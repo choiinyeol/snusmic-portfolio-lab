@@ -24697,9 +24697,22 @@
       "high": 2531.0000000000005,
       "krw_per_unit": 9.413000106811523,
       "low": 2356.0,
-      "open": 2358.0,
+      "open": 2357.9999999999995,
       "source_currency": "JPY",
       "volume": 2003600.0
+    },
+    {
+      "close": 2439.0,
+      "close_krw": 22907.0885,
+      "currency": "JPY",
+      "date": "2026-05-18",
+      "display_currency": "JPY",
+      "high": 2471.0,
+      "krw_per_unit": 9.392000198364258,
+      "low": 2404.0000000000005,
+      "open": 2424.0,
+      "source_currency": "JPY",
+      "volume": 789500.0
     }
   ],
   "symbol": "5726.T"

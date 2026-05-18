@@ -2438,8 +2438,8 @@
     "close_date": "",
     "company": "OSAKA Titanium Technologies Co.,Ltd.",
     "exit_reasons": "()",
-    "holding_days": 709,
-    "last_close_krw": "23551.3263",
+    "holding_days": 712,
+    "last_close_krw": "22907.0885",
     "open_date": "2024-06-05",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -2448,7 +2448,7 @@
     "symbol": "5726.T",
     "total_qty_bought": 169,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "625484.1208"
+    "unrealized_pnl_krw": "516607.9354"
   },
   {
     "avg_entry_price_krw": 4597.2454,
@@ -2476,8 +2476,8 @@
     "close_date": "",
     "company": "KG스틸",
     "exit_reasons": "()",
-    "holding_days": 707,
-    "last_close_krw": "7490.0",
+    "holding_days": 710,
+    "last_close_krw": "6950.0",
     "open_date": "2024-06-07",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -2486,7 +2486,7 @@
     "symbol": "016380.KS",
     "total_qty_bought": 790,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "1228198.8428"
+    "unrealized_pnl_krw": "801598.8428"
   },
   {
     "avg_entry_price_krw": 20131.547,
@@ -2552,8 +2552,8 @@
     "close_date": "",
     "company": "아프리카TV",
     "exit_reasons": "()",
-    "holding_days": 560,
-    "last_close_krw": "52600.0",
+    "holding_days": 563,
+    "last_close_krw": "51000.0",
     "open_date": "2024-11-01",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -2562,7 +2562,7 @@
     "symbol": "067160.KQ",
     "total_qty_bought": 77,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-1754971.3451"
+    "unrealized_pnl_krw": "-1878171.3451"
   },
   {
     "avg_entry_price_krw": 42854.471,
@@ -2571,8 +2571,8 @@
     "close_date": "",
     "company": "씨에스윈드",
     "exit_reasons": "()",
-    "holding_days": 560,
-    "last_close_krw": "52800.0",
+    "holding_days": 563,
+    "last_close_krw": "52700.0",
     "open_date": "2024-11-01",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -2581,7 +2581,7 @@
     "symbol": "112610.KS",
     "total_qty_bought": 92,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "914988.672"
+    "unrealized_pnl_krw": "905788.672"
   },
   {
     "avg_entry_price_krw": 270475.7153,
@@ -2628,7 +2628,7 @@
     "close_date": "",
     "company": "브이티",
     "exit_reasons": "()",
-    "holding_days": 549,
+    "holding_days": 552,
     "last_close_krw": "14820.0",
     "open_date": "2024-11-12",
     "persona": "smic_follower",
@@ -2660,23 +2660,23 @@
     "unrealized_pnl_krw": ""
   },
   {
-    "avg_entry_price_krw": 3840.7061,
+    "avg_entry_price_krw": 3840.3325,
     "avg_exit_price_krw": "",
-    "buy_fills": 42,
+    "buy_fills": 43,
     "close_date": "",
     "company": "에스트래픽",
     "exit_reasons": "()",
-    "holding_days": 549,
-    "last_close_krw": "3375.0",
+    "holding_days": 552,
+    "last_close_krw": "3360.0",
     "open_date": "2024-11-12",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
     "status": "open",
     "symbol": "234300.KQ",
-    "total_qty_bought": 1280,
+    "total_qty_bought": 1281,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-596103.76"
+    "unrealized_pnl_krw": "-615305.9442"
   },
   {
     "avg_entry_price_krw": 291022.3968,
@@ -2685,7 +2685,7 @@
     "close_date": "",
     "company": "크래프톤",
     "exit_reasons": "()",
-    "holding_days": 536,
+    "holding_days": 539,
     "last_close_krw": "279000.0",
     "open_date": "2024-11-25",
     "persona": "smic_follower",
@@ -2704,8 +2704,8 @@
     "close_date": "",
     "company": "HDC현대산업개발",
     "exit_reasons": "()",
-    "holding_days": 536,
-    "last_close_krw": "22900.0",
+    "holding_days": 539,
+    "last_close_krw": "22050.0",
     "open_date": "2024-11-25",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -2714,7 +2714,7 @@
     "symbol": "294870.KS",
     "total_qty_bought": 201,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "484784.6553"
+    "unrealized_pnl_krw": "313934.6553"
   },
   {
     "avg_entry_price_krw": 13221.3821,
@@ -2761,8 +2761,8 @@
     "close_date": "",
     "company": "Cover Corp",
     "exit_reasons": "()",
-    "holding_days": 536,
-    "last_close_krw": "13799.4582",
+    "holding_days": 539,
+    "last_close_krw": "14764.2243",
     "open_date": "2024-11-25",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -2771,7 +2771,7 @@
     "symbol": "5253.T",
     "total_qty_bought": 327,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-1591119.9217"
+    "unrealized_pnl_krw": "-1275641.389"
   },
   {
     "avg_entry_price_krw": 10127.825,
@@ -2818,8 +2818,8 @@
     "close_date": "",
     "company": "JYP Ent.",
     "exit_reasons": "()",
-    "holding_days": 522,
-    "last_close_krw": "63500.0",
+    "holding_days": 525,
+    "last_close_krw": "61000.0",
     "open_date": "2024-12-09",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -2828,7 +2828,7 @@
     "symbol": "035900.KQ",
     "total_qty_bought": 68,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-382453.6623"
+    "unrealized_pnl_krw": "-552453.6623"
   },
   {
     "avg_entry_price_krw": 14219.2376,
@@ -2894,8 +2894,8 @@
     "close_date": "",
     "company": "Funko Inc.",
     "exit_reasons": "()",
-    "holding_days": 515,
-    "last_close_krw": "7556.3001",
+    "holding_days": 518,
+    "last_close_krw": "7521.8222",
     "open_date": "2024-12-16",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -2904,7 +2904,7 @@
     "symbol": "FNKO",
     "total_qty_bought": 860,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "1076497.5685"
+    "unrealized_pnl_krw": "1046846.5106"
   },
   {
     "avg_entry_price_krw": 25791.9235,
@@ -2951,8 +2951,8 @@
     "close_date": "",
     "company": "Levi Strauss & Co",
     "exit_reasons": "()",
-    "holding_days": 465,
-    "last_close_krw": "31330.2718",
+    "holding_days": 468,
+    "last_close_krw": "32033.2315",
     "open_date": "2025-02-04",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -2961,7 +2961,7 @@
     "symbol": "LEVI",
     "total_qty_bought": 141,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "728652.6522"
+    "unrealized_pnl_krw": "827769.9747"
   },
   {
     "avg_entry_price_krw": 125506.5357,
@@ -3103,8 +3103,8 @@
     "close_date": "",
     "company": "한화비전",
     "exit_reasons": "()",
-    "holding_days": 368,
-    "last_close_krw": "70600.0",
+    "holding_days": 371,
+    "last_close_krw": "71300.0",
     "open_date": "2025-05-12",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -3113,7 +3113,7 @@
     "symbol": "489790.KS",
     "total_qty_bought": 72,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "1086603.6005"
+    "unrealized_pnl_krw": "1137003.6005"
   },
   {
     "avg_entry_price_krw": 21621.9675,
@@ -3122,8 +3122,8 @@
     "close_date": "",
     "company": "Cellebrite DI",
     "exit_reasons": "()",
-    "holding_days": 347,
-    "last_close_krw": "19383.5521",
+    "holding_days": 350,
+    "last_close_krw": "19788.7541",
     "open_date": "2025-06-02",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -3132,7 +3132,7 @@
     "symbol": "CLBT",
     "total_qty_bought": 232,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-519312.3799"
+    "unrealized_pnl_krw": "-425305.5179"
   },
   {
     "avg_entry_price_krw": 55947.3074,
@@ -3141,8 +3141,8 @@
     "close_date": "",
     "company": "Doximity",
     "exit_reasons": "()",
-    "holding_days": 345,
-    "last_close_krw": "28328.6581",
+    "holding_days": 348,
+    "last_close_krw": "29159.2218",
     "open_date": "2025-06-04",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -3151,7 +3151,7 @@
     "symbol": "DOCS",
     "total_qty_bought": 117,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-3231381.9667"
+    "unrealized_pnl_krw": "-3134206.0157"
   },
   {
     "avg_entry_price_krw": 87833.5502,
@@ -3198,8 +3198,8 @@
     "close_date": "",
     "company": "고려신용정보",
     "exit_reasons": "()",
-    "holding_days": 339,
-    "last_close_krw": "9860.0",
+    "holding_days": 342,
+    "last_close_krw": "9910.0",
     "open_date": "2025-06-10",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -3208,7 +3208,7 @@
     "symbol": "049720.KQ",
     "total_qty_bought": 420,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-241136.997"
+    "unrealized_pnl_krw": "-220136.997"
   },
   {
     "avg_entry_price_krw": 21620.2957,
@@ -3236,8 +3236,8 @@
     "close_date": "",
     "company": "애니플러스",
     "exit_reasons": "()",
-    "holding_days": 324,
-    "last_close_krw": "2555.0",
+    "holding_days": 327,
+    "last_close_krw": "2465.0",
     "open_date": "2025-06-25",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -3246,7 +3246,7 @@
     "symbol": "310200.KQ",
     "total_qty_bought": 1591,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-2307489.9084"
+    "unrealized_pnl_krw": "-2450679.9084"
   },
   {
     "avg_entry_price_krw": 20497.7696,
@@ -3274,8 +3274,8 @@
     "close_date": "",
     "company": "폰드그룹",
     "exit_reasons": "()",
-    "holding_days": 303,
-    "last_close_krw": "4975.0",
+    "holding_days": 306,
+    "last_close_krw": "4845.0",
     "open_date": "2025-07-16",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -3284,7 +3284,7 @@
     "symbol": "472850.KQ",
     "total_qty_bought": 827,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-558117.668"
+    "unrealized_pnl_krw": "-665627.668"
   },
   {
     "avg_entry_price_krw": 27484.794,
@@ -3293,8 +3293,8 @@
     "close_date": "",
     "company": "Sportradar",
     "exit_reasons": "()",
-    "holding_days": 225,
-    "last_close_krw": "18651.8158",
+    "holding_days": 228,
+    "last_close_krw": "19160.0643",
     "open_date": "2025-10-02",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -3303,7 +3303,7 @@
     "symbol": "SRAD",
     "total_qty_bought": 168,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-1483940.3279"
+    "unrealized_pnl_krw": "-1398554.5771"
   },
   {
     "avg_entry_price_krw": 22311.8319,
@@ -3312,8 +3312,8 @@
     "close_date": "",
     "company": "마이크로컨텍솔",
     "exit_reasons": "()",
-    "holding_days": 193,
-    "last_close_krw": "30150.0",
+    "holding_days": 196,
+    "last_close_krw": "31700.0",
     "open_date": "2025-11-03",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -3322,7 +3322,7 @@
     "symbol": "098120.KQ",
     "total_qty_bought": 184,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "1442222.9308"
+    "unrealized_pnl_krw": "1727422.9308"
   },
   {
     "avg_entry_price_krw": 929353.7572,
@@ -3350,8 +3350,8 @@
     "close_date": "",
     "company": "한국카본",
     "exit_reasons": "()",
-    "holding_days": 185,
-    "last_close_krw": "38750.0",
+    "holding_days": 188,
+    "last_close_krw": "36650.0",
     "open_date": "2025-11-11",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -3360,7 +3360,7 @@
     "symbol": "017960.KS",
     "total_qty_bought": 110,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "777285.8213"
+    "unrealized_pnl_krw": "546285.8213"
   },
   {
     "avg_entry_price_krw": 102009.1276,
@@ -3426,8 +3426,8 @@
     "close_date": "",
     "company": "지투지바이오",
     "exit_reasons": "()",
-    "holding_days": 185,
-    "last_close_krw": "66400.0",
+    "holding_days": 188,
+    "last_close_krw": "62800.0",
     "open_date": "2025-11-11",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -3436,7 +3436,7 @@
     "symbol": "456160.KQ",
     "total_qty_bought": 56,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-945129.6745"
+    "unrealized_pnl_krw": "-1146729.6745"
   },
   {
     "avg_entry_price_krw": 82364.3778,
@@ -3464,8 +3464,8 @@
     "close_date": "",
     "company": "JAC recruitment Co. Ltd",
     "exit_reasons": "()",
-    "holding_days": 165,
-    "last_close_krw": "7831.6161",
+    "holding_days": 168,
+    "last_close_krw": "7926.8482",
     "open_date": "2025-12-01",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -3474,7 +3474,7 @@
     "symbol": "2124.T",
     "total_qty_bought": 960,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-977908.9101"
+    "unrealized_pnl_krw": "-886486.1147"
   },
   {
     "avg_entry_price_krw": 121587.4591,
@@ -3483,8 +3483,8 @@
     "close_date": "",
     "company": "Coreweave",
     "exit_reasons": "()",
-    "holding_days": 161,
-    "last_close_krw": "160235.3829",
+    "holding_days": 164,
+    "last_close_krw": "149628.1239",
     "open_date": "2025-12-05",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -3493,7 +3493,7 @@
     "symbol": "CRWV",
     "total_qty_bought": 39,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "1507269.0285"
+    "unrealized_pnl_krw": "1093585.9286"
   },
   {
     "avg_entry_price_krw": 101311.8364,
@@ -3502,8 +3502,8 @@
     "close_date": "",
     "company": "Establishment Labs Holdings",
     "exit_reasons": "()",
-    "holding_days": 161,
-    "last_close_krw": "98202.0393",
+    "holding_days": 164,
+    "last_close_krw": "100934.6192",
     "open_date": "2025-12-05",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -3512,7 +3512,7 @@
     "symbol": "ESTA",
     "total_qty_bought": 47,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-146160.4612"
+    "unrealized_pnl_krw": "-17729.2085"
   },
   {
     "avg_entry_price_krw": 126662.7976,
@@ -3540,8 +3540,8 @@
     "close_date": "",
     "company": "IMAX Corp",
     "exit_reasons": "()",
-    "holding_days": 161,
-    "last_close_krw": "50161.2897",
+    "holding_days": 164,
+    "last_close_krw": "51881.8607",
     "open_date": "2025-12-05",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -3550,7 +3550,7 @@
     "symbol": "IMAX",
     "total_qty_bought": 71,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-132366.7025"
+    "unrealized_pnl_krw": "-10206.1572"
   },
   {
     "avg_entry_price_krw": 85732.6195,
@@ -3578,8 +3578,8 @@
     "close_date": "",
     "company": "예스티",
     "exit_reasons": "()",
-    "holding_days": 129,
-    "last_close_krw": "25700.0",
+    "holding_days": 132,
+    "last_close_krw": "27400.0",
     "open_date": "2026-01-06",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -3588,7 +3588,7 @@
     "symbol": "122640.KQ",
     "total_qty_bought": 211,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "1345881.4839"
+    "unrealized_pnl_krw": "1704581.4839"
   },
   {
     "avg_entry_price_krw": 413537.8868,
@@ -3597,8 +3597,8 @@
     "close_date": "",
     "company": "파마리서치",
     "exit_reasons": "()",
-    "holding_days": 129,
-    "last_close_krw": "328000.0",
+    "holding_days": 132,
+    "last_close_krw": "311500.0",
     "open_date": "2026-01-06",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -3607,7 +3607,7 @@
     "symbol": "214450.KQ",
     "total_qty_bought": 13,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-1111992.5279"
+    "unrealized_pnl_krw": "-1326492.5279"
   },
   {
     "avg_entry_price_krw": 194026.0495,
@@ -3635,8 +3635,8 @@
     "close_date": "",
     "company": "Iradimed Corporation",
     "exit_reasons": "()",
-    "holding_days": 126,
-    "last_close_krw": "129084.3103",
+    "holding_days": 129,
+    "last_close_krw": "130258.493",
     "open_date": "2026-01-09",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -3645,7 +3645,7 @@
     "symbol": "IRMD",
     "total_qty_bought": 28,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-405382.2799"
+    "unrealized_pnl_krw": "-372505.1641"
   },
   {
     "avg_entry_price_krw": 553263.9437,
@@ -3673,8 +3673,8 @@
     "close_date": "",
     "company": "Sensient Technologies Corp",
     "exit_reasons": "()",
-    "holding_days": 107,
-    "last_close_krw": "170136.2228",
+    "holding_days": 110,
+    "last_close_krw": "172530.3926",
     "open_date": "2026-01-28",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -3683,7 +3683,7 @@
     "symbol": "SXT",
     "total_qty_bought": 24,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "818529.1273"
+    "unrealized_pnl_krw": "875989.2025"
   },
   {
     "avg_entry_price_krw": 86554.4847,
@@ -3692,8 +3692,8 @@
     "close_date": "",
     "company": "Tempus AI Inc",
     "exit_reasons": "()",
-    "holding_days": 107,
-    "last_close_krw": "65602.4252",
+    "holding_days": 110,
+    "last_close_krw": "66715.9414",
     "open_date": "2026-01-28",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -3702,7 +3702,7 @@
     "symbol": "TEM",
     "total_qty_bought": 4,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-83808.2381"
+    "unrealized_pnl_krw": "-79354.1733"
   },
   {
     "avg_entry_price_krw": 25027.8829,
@@ -3730,7 +3730,7 @@
     "close_date": "",
     "company": "비츠로셀",
     "exit_reasons": "()",
-    "holding_days": 28,
+    "holding_days": 31,
     "last_close_krw": "53000.0",
     "open_date": "2026-04-17",
     "persona": "smic_follower",
@@ -3749,8 +3749,8 @@
     "close_date": "",
     "company": "SK오션플랜트",
     "exit_reasons": "()",
-    "holding_days": 28,
-    "last_close_krw": "19310.0",
+    "holding_days": 31,
+    "last_close_krw": "19130.0",
     "open_date": "2026-04-17",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -3759,7 +3759,7 @@
     "symbol": "100090.KS",
     "total_qty_bought": 189,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-702037.0462"
+    "unrealized_pnl_krw": "-736057.0462"
   },
   {
     "avg_entry_price_krw": 6524.2385,
@@ -3768,7 +3768,7 @@
     "close_date": "",
     "company": "나노",
     "exit_reasons": "()",
-    "holding_days": 9,
+    "holding_days": 12,
     "last_close_krw": "5900.0",
     "open_date": "2026-05-06",
     "persona": "smic_follower",
@@ -3787,7 +3787,7 @@
     "close_date": "",
     "company": "덕산네오룩스",
     "exit_reasons": "()",
-    "holding_days": 9,
+    "holding_days": 12,
     "last_close_krw": "47000.0",
     "open_date": "2026-05-06",
     "persona": "smic_follower",
@@ -3806,7 +3806,7 @@
     "close_date": "",
     "company": "샘씨엔에스",
     "exit_reasons": "()",
-    "holding_days": 9,
+    "holding_days": 12,
     "last_close_krw": "11720.0",
     "open_date": "2026-05-06",
     "persona": "smic_follower",
@@ -3825,8 +3825,8 @@
     "close_date": "",
     "company": "세아제강",
     "exit_reasons": "()",
-    "holding_days": 4,
-    "last_close_krw": "159400.0",
+    "holding_days": 7,
+    "last_close_krw": "153800.0",
     "open_date": "2026-05-11",
     "persona": "smic_follower",
     "realized_pnl_krw": 0.0,
@@ -3835,7 +3835,7 @@
     "symbol": "306200.KS",
     "total_qty_bought": 6,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-22836.1634"
+    "unrealized_pnl_krw": "-56436.1634"
   },
   {
     "avg_entry_price_krw": 58938.2894,
@@ -3844,7 +3844,7 @@
     "close_date": "",
     "company": "코스텍시스",
     "exit_reasons": "()",
-    "holding_days": 4,
+    "holding_days": 7,
     "last_close_krw": "49850.0",
     "open_date": "2026-05-11",
     "persona": "smic_follower",
@@ -7036,8 +7036,8 @@
     "close_date": "",
     "company": "고려신용정보",
     "exit_reasons": "()",
-    "holding_days": 324,
-    "last_close_krw": "9860.0",
+    "holding_days": 327,
+    "last_close_krw": "9910.0",
     "open_date": "2025-06-25",
     "persona": "smic_follower_v2",
     "realized_pnl_krw": 0.0,
@@ -7046,7 +7046,7 @@
     "symbol": "049720.KQ",
     "total_qty_bought": 1941,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-1186273.8878"
+    "unrealized_pnl_krw": "-1089223.8878"
   },
   {
     "avg_entry_price_krw": 21521.1241,
@@ -7131,8 +7131,8 @@
     "close_date": "",
     "company": "Cellebrite DI",
     "exit_reasons": "()",
-    "holding_days": 303,
-    "last_close_krw": "19383.5521",
+    "holding_days": 306,
+    "last_close_krw": "19788.7541",
     "open_date": "2025-07-16",
     "persona": "smic_follower_v2",
     "realized_pnl_krw": 0.0,
@@ -7141,7 +7141,7 @@
     "symbol": "CLBT",
     "total_qty_bought": 976,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-125411.1818"
+    "unrealized_pnl_krw": "270065.962"
   },
   {
     "avg_entry_price_krw": 89317.414,
@@ -7340,8 +7340,8 @@
     "close_date": "",
     "company": "한국카본",
     "exit_reasons": "()",
-    "holding_days": 183,
-    "last_close_krw": "38750.0",
+    "holding_days": 186,
+    "last_close_krw": "36650.0",
     "open_date": "2025-11-13",
     "persona": "smic_follower_v2",
     "realized_pnl_krw": 0.0,
@@ -7350,7 +7350,7 @@
     "symbol": "017960.KS",
     "total_qty_bought": 483,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "2488557.6362"
+    "unrealized_pnl_krw": "1474257.6362"
   },
   {
     "avg_entry_price_krw": 102126.0867,
@@ -7454,8 +7454,8 @@
     "close_date": "",
     "company": "Establishment Labs Holdings",
     "exit_reasons": "()",
-    "holding_days": 162,
-    "last_close_krw": "98202.0393",
+    "holding_days": 165,
+    "last_close_krw": "100934.6192",
     "open_date": "2025-12-04",
     "persona": "smic_follower_v2",
     "realized_pnl_krw": 0.0,
@@ -7464,7 +7464,7 @@
     "symbol": "ESTA",
     "total_qty_bought": 219,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-426690.1691"
+    "unrealized_pnl_krw": "171744.8167"
   },
   {
     "avg_entry_price_krw": 90513.6897,
@@ -7492,8 +7492,8 @@
     "close_date": "",
     "company": "예스티",
     "exit_reasons": "()",
-    "holding_days": 147,
-    "last_close_krw": "25700.0",
+    "holding_days": 150,
+    "last_close_krw": "27400.0",
     "open_date": "2025-12-19",
     "persona": "smic_follower_v2",
     "realized_pnl_krw": 0.0,
@@ -7502,7 +7502,7 @@
     "symbol": "122640.KQ",
     "total_qty_bought": 966,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "5486005.5909"
+    "unrealized_pnl_krw": "7128205.5909"
   },
   {
     "avg_entry_price_krw": 442549.4082,
@@ -7549,8 +7549,8 @@
     "close_date": "",
     "company": "IMAX Corp",
     "exit_reasons": "()",
-    "holding_days": 129,
-    "last_close_krw": "50161.2897",
+    "holding_days": 132,
+    "last_close_krw": "51881.8607",
     "open_date": "2026-01-06",
     "persona": "smic_follower_v2",
     "realized_pnl_krw": 0.0,
@@ -7559,7 +7559,7 @@
     "symbol": "IMAX",
     "total_qty_bought": 348,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-636613.9882"
+    "unrealized_pnl_krw": "-37855.259"
   },
   {
     "avg_entry_price_krw": 143976.2959,
@@ -7568,8 +7568,8 @@
     "close_date": "",
     "company": "Iradimed Corporation",
     "exit_reasons": "()",
-    "holding_days": 126,
-    "last_close_krw": "129084.3103",
+    "holding_days": 129,
+    "last_close_krw": "130258.493",
     "open_date": "2026-01-09",
     "persona": "smic_follower_v2",
     "realized_pnl_krw": 0.0,
@@ -7578,7 +7578,7 @@
     "symbol": "IRMD",
     "total_qty_bought": 133,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-1980634.0804"
+    "unrealized_pnl_krw": "-1824467.7802"
   },
   {
     "avg_entry_price_krw": 506425.28,
@@ -7606,8 +7606,8 @@
     "close_date": "",
     "company": "Sensient Technologies Corp",
     "exit_reasons": "()",
-    "holding_days": 126,
-    "last_close_krw": "170136.2228",
+    "holding_days": 129,
+    "last_close_krw": "172530.3926",
     "open_date": "2026-01-09",
     "persona": "smic_follower_v2",
     "realized_pnl_krw": 0.0,
@@ -7616,7 +7616,7 @@
     "symbol": "SXT",
     "total_qty_bought": 149,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "4976728.4571"
+    "unrealized_pnl_krw": "5333459.7571"
   },
   {
     "avg_entry_price_krw": 275258.5633,
@@ -7625,8 +7625,8 @@
     "close_date": "",
     "company": "Camtek",
     "exit_reasons": "()",
-    "holding_days": 14,
-    "last_close_krw": "251403.7924",
+    "holding_days": 17,
+    "last_close_krw": "238318.2756",
     "open_date": "2026-05-01",
     "persona": "smic_follower_v2",
     "realized_pnl_krw": 0.0,
@@ -7635,7 +7635,7 @@
     "symbol": "CAMT",
     "total_qty_bought": 7,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-166983.3965"
+    "unrealized_pnl_krw": "-258582.0136"
   },
   {
     "avg_entry_price_krw": 6364.1345,
@@ -7644,7 +7644,7 @@
     "close_date": "",
     "company": "나노",
     "exit_reasons": "()",
-    "holding_days": 11,
+    "holding_days": 14,
     "last_close_krw": "5900.0",
     "open_date": "2026-05-04",
     "persona": "smic_follower_v2",
@@ -7910,8 +7910,8 @@
     "close_date": "",
     "company": "JAC recruitment Co. Ltd",
     "exit_reasons": "()",
-    "holding_days": 165,
-    "last_close_krw": "7831.6161",
+    "holding_days": 168,
+    "last_close_krw": "7926.8482",
     "open_date": "2025-12-01",
     "persona": "smic_mtt_strategy_top1",
     "realized_pnl_krw": 0.0,
@@ -7920,7 +7920,7 @@
     "symbol": "2124.T",
     "total_qty_bought": 4,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-9494.6214"
+    "unrealized_pnl_krw": "-9113.6931"
   },
   {
     "avg_entry_price_krw": 109378.7359,
@@ -7948,8 +7948,8 @@
     "close_date": "",
     "company": "IMAX Corp",
     "exit_reasons": "()",
-    "holding_days": 133,
-    "last_close_krw": "50161.2897",
+    "holding_days": 136,
+    "last_close_krw": "51881.8607",
     "open_date": "2026-01-02",
     "persona": "smic_mtt_strategy_top1",
     "realized_pnl_krw": 0.0,
@@ -7958,7 +7958,7 @@
     "symbol": "IMAX",
     "total_qty_bought": 4423,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-41044835.0879"
+    "unrealized_pnl_krw": "-33434749.2849"
   },
   {
     "avg_entry_price_krw": 149167.8211,
@@ -7967,8 +7967,8 @@
     "close_date": "",
     "company": "Iradimed Corporation",
     "exit_reasons": "()",
-    "holding_days": 133,
-    "last_close_krw": "129084.3103",
+    "holding_days": 136,
+    "last_close_krw": "130258.493",
     "open_date": "2026-01-02",
     "persona": "smic_mtt_strategy_top1",
     "realized_pnl_krw": 0.0,
@@ -7977,7 +7977,7 @@
     "symbol": "IRMD",
     "total_qty_bought": 1000,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-20083510.7926"
+    "unrealized_pnl_krw": "-18909328.084"
   },
   {
     "avg_entry_price_krw": 613849.7252,
@@ -8005,8 +8005,8 @@
     "close_date": "",
     "company": "Golar LNG",
     "exit_reasons": "()",
-    "holding_days": 14,
-    "last_close_krw": "85180.113",
+    "holding_days": 17,
+    "last_close_krw": "85194.9268",
     "open_date": "2026-05-01",
     "persona": "smic_mtt_strategy_top1",
     "realized_pnl_krw": 0.0,
@@ -8015,7 +8015,7 @@
     "symbol": "GLNG",
     "total_qty_bought": 25,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "75609.5415"
+    "unrealized_pnl_krw": "75979.8872"
   },
   {
     "avg_entry_price_krw": 232207.4173,
@@ -8271,8 +8271,8 @@
     "close_date": "",
     "company": "JAC recruitment Co. Ltd",
     "exit_reasons": "()",
-    "holding_days": 165,
-    "last_close_krw": "7831.6161",
+    "holding_days": 168,
+    "last_close_krw": "7926.8482",
     "open_date": "2025-12-01",
     "persona": "smic_mtt_strategy_top2",
     "realized_pnl_krw": 0.0,
@@ -8281,7 +8281,7 @@
     "symbol": "2124.T",
     "total_qty_bought": 4,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-9494.6214"
+    "unrealized_pnl_krw": "-9113.6931"
   },
   {
     "avg_entry_price_krw": 109370.3466,
@@ -8309,8 +8309,8 @@
     "close_date": "",
     "company": "IMAX Corp",
     "exit_reasons": "()",
-    "holding_days": 133,
-    "last_close_krw": "50161.2897",
+    "holding_days": 136,
+    "last_close_krw": "51881.8607",
     "open_date": "2026-01-02",
     "persona": "smic_mtt_strategy_top2",
     "realized_pnl_krw": 0.0,
@@ -8319,7 +8319,7 @@
     "symbol": "IMAX",
     "total_qty_bought": 4207,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-39036611.2616"
+    "unrealized_pnl_krw": "-31798168.8077"
   },
   {
     "avg_entry_price_krw": 149159.6196,
@@ -8328,8 +8328,8 @@
     "close_date": "",
     "company": "Iradimed Corporation",
     "exit_reasons": "()",
-    "holding_days": 133,
-    "last_close_krw": "129084.3103",
+    "holding_days": 136,
+    "last_close_krw": "130258.493",
     "open_date": "2026-01-02",
     "persona": "smic_mtt_strategy_top2",
     "realized_pnl_krw": 0.0,
@@ -8338,7 +8338,7 @@
     "symbol": "IRMD",
     "total_qty_bought": 951,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-19091619.1139"
+    "unrealized_pnl_krw": "-17974971.358"
   },
   {
     "avg_entry_price_krw": 613849.7252,
@@ -8366,8 +8366,8 @@
     "close_date": "",
     "company": "Golar LNG",
     "exit_reasons": "()",
-    "holding_days": 14,
-    "last_close_krw": "85180.113",
+    "holding_days": 17,
+    "last_close_krw": "85194.9268",
     "open_date": "2026-05-01",
     "persona": "smic_mtt_strategy_top2",
     "realized_pnl_krw": 0.0,
@@ -8376,7 +8376,7 @@
     "symbol": "GLNG",
     "total_qty_bought": 24,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "72585.1598"
+    "unrealized_pnl_krw": "72940.6917"
   },
   {
     "avg_entry_price_krw": 217121.5523,
@@ -9411,8 +9411,8 @@
     "close_date": "",
     "company": "Golar LNG",
     "exit_reasons": "()",
-    "holding_days": 29,
-    "last_close_krw": "85180.113",
+    "holding_days": 32,
+    "last_close_krw": "85194.9268",
     "open_date": "2026-04-16",
     "persona": "smic_mtt_strategy_top3",
     "realized_pnl_krw": 0.0,
@@ -9421,7 +9421,7 @@
     "symbol": "GLNG",
     "total_qty_bought": 1855,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "9457048.7041"
+    "unrealized_pnl_krw": "9484528.3601"
   },
   {
     "avg_entry_price_krw": 275258.5633,
@@ -19932,7 +19932,7 @@
   },
   {
     "avg_entry_price_krw": 33568.3525,
-    "avg_exit_price_krw": "37494.1699",
+    "avg_exit_price_krw": "37492.8419",
     "buy_fills": 4,
     "close_date": "2026-05-01",
     "company": "펄어비스",
@@ -19941,7 +19941,7 @@
     "last_close_krw": "",
     "open_date": "2025-08-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 38630043.5648,
+    "realized_pnl_krw": 38616975.6471,
     "sell_fills": 4,
     "status": "closed",
     "symbol": "263750.KQ",
@@ -21204,8 +21204,8 @@
     "unrealized_pnl_krw": ""
   },
   {
-    "avg_entry_price_krw": 99974.7327,
-    "avg_exit_price_krw": "108054.2513",
+    "avg_entry_price_krw": 99987.1486,
+    "avg_exit_price_krw": "108068.0745",
     "buy_fills": 3,
     "close_date": "2026-05-01",
     "company": "오리온",
@@ -21214,12 +21214,12 @@
     "last_close_krw": "",
     "open_date": "2025-11-03",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 20562374.6111,
+    "realized_pnl_krw": 20574037.4462,
     "sell_fills": 2,
     "status": "closed",
     "symbol": "271560.KS",
-    "total_qty_bought": 2545,
-    "total_qty_sold": 2545,
+    "total_qty_bought": 2546,
+    "total_qty_sold": 2546,
     "unrealized_pnl_krw": ""
   },
   {
@@ -21337,8 +21337,8 @@
     "unrealized_pnl_krw": ""
   },
   {
-    "avg_entry_price_krw": 55693.1557,
-    "avg_exit_price_krw": "69803.9633",
+    "avg_entry_price_krw": 56551.2624,
+    "avg_exit_price_krw": "70043.6677",
     "buy_fills": 3,
     "close_date": "2026-05-01",
     "company": "Noble Corporation PLC",
@@ -21347,12 +21347,12 @@
     "last_close_krw": "",
     "open_date": "2025-11-03",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 132599258.3621,
+    "realized_pnl_krw": 138081276.083,
     "sell_fills": 3,
     "status": "closed",
     "symbol": "NE",
-    "total_qty_bought": 9397,
-    "total_qty_sold": 9397,
+    "total_qty_bought": 10234,
+    "total_qty_sold": 10234,
     "unrealized_pnl_krw": ""
   },
   {
@@ -21414,7 +21414,7 @@
   },
   {
     "avg_entry_price_krw": 40040.0611,
-    "avg_exit_price_krw": "63681.0166",
+    "avg_exit_price_krw": "63684.143",
     "buy_fills": 3,
     "close_date": "2026-05-01",
     "company": "DL",
@@ -21423,7 +21423,7 @@
     "last_close_krw": "",
     "open_date": "2025-12-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 65627292.4763,
+    "realized_pnl_krw": 65635971.1697,
     "sell_fills": 2,
     "status": "closed",
     "symbol": "000210.KS",
@@ -22041,7 +22041,7 @@
   },
   {
     "avg_entry_price_krw": 29423.1649,
-    "avg_exit_price_krw": "40866.5342",
+    "avg_exit_price_krw": "40877.6997",
     "buy_fills": 3,
     "close_date": "2026-05-01",
     "company": "삼성엔지니어링",
@@ -22050,7 +22050,7 @@
     "last_close_krw": "",
     "open_date": "2025-12-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 31080190.8847,
+    "realized_pnl_krw": 31110516.4344,
     "sell_fills": 2,
     "status": "closed",
     "symbol": "028050.KS",
@@ -23124,7 +23124,7 @@
   },
   {
     "avg_entry_price_krw": 5474.9997,
-    "avg_exit_price_krw": "6922.2295",
+    "avg_exit_price_krw": "6926.2656",
     "buy_fills": 2,
     "close_date": "2026-05-01",
     "company": "레이",
@@ -23133,7 +23133,7 @@
     "last_close_krw": "",
     "open_date": "2025-12-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 12697993.9386,
+    "realized_pnl_krw": 12733406.9983,
     "sell_fills": 3,
     "status": "closed",
     "symbol": "228670.KQ",
@@ -23447,7 +23447,7 @@
   },
   {
     "avg_entry_price_krw": 7009.8734,
-    "avg_exit_price_krw": "7202.0138",
+    "avg_exit_price_krw": "7202.2324",
     "buy_fills": 2,
     "close_date": "2026-05-01",
     "company": "이지바이오",
@@ -23456,7 +23456,7 @@
     "last_close_krw": "",
     "open_date": "2025-12-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 4208066.9608,
+    "realized_pnl_krw": 4212855.2055,
     "sell_fills": 2,
     "status": "closed",
     "symbol": "353810.KQ",
@@ -23655,8 +23655,8 @@
     "unrealized_pnl_krw": ""
   },
   {
-    "avg_entry_price_krw": 35662.6611,
-    "avg_exit_price_krw": "48025.152",
+    "avg_entry_price_krw": 35683.6162,
+    "avg_exit_price_krw": "48061.3201",
     "buy_fills": 2,
     "close_date": "2026-05-01",
     "company": "파두",
@@ -23665,17 +23665,17 @@
     "last_close_krw": "",
     "open_date": "2025-12-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 10236142.4752,
+    "realized_pnl_krw": 10261116.5074,
     "sell_fills": 2,
     "status": "closed",
     "symbol": "440110.KQ",
-    "total_qty_bought": 828,
-    "total_qty_sold": 828,
+    "total_qty_bought": 829,
+    "total_qty_sold": 829,
     "unrealized_pnl_krw": ""
   },
   {
     "avg_entry_price_krw": 15000.5068,
-    "avg_exit_price_krw": "16162.9601",
+    "avg_exit_price_krw": "16163.152",
     "buy_fills": 2,
     "close_date": "2026-05-01",
     "company": "현대그린푸드",
@@ -23684,7 +23684,7 @@
     "last_close_krw": "",
     "open_date": "2025-12-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 7615231.6376,
+    "realized_pnl_krw": 7616488.5518,
     "sell_fills": 2,
     "status": "closed",
     "symbol": "453340.KQ",
@@ -23959,9 +23959,9 @@
     "unrealized_pnl_krw": ""
   },
   {
-    "avg_entry_price_krw": 281472.2859,
-    "avg_exit_price_krw": "329281.9534",
-    "buy_fills": 2,
+    "avg_entry_price_krw": 283644.1133,
+    "avg_exit_price_krw": "329197.11",
+    "buy_fills": 3,
     "close_date": "2026-05-01",
     "company": "BE Semiconductor Industries N.V.",
     "exit_reasons": "('rebalance_sell',)",
@@ -23969,12 +23969,12 @@
     "last_close_krw": "",
     "open_date": "2025-12-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 71284214.3636,
-    "sell_fills": 4,
+    "realized_pnl_krw": 71973734.8132,
+    "sell_fills": 3,
     "status": "closed",
     "symbol": "BESI.AS",
-    "total_qty_bought": 1491,
-    "total_qty_sold": 1491,
+    "total_qty_bought": 1580,
+    "total_qty_sold": 1580,
     "unrealized_pnl_krw": ""
   },
   {
@@ -24130,9 +24130,9 @@
     "unrealized_pnl_krw": ""
   },
   {
-    "avg_entry_price_krw": 319637.2995,
-    "avg_exit_price_krw": "351063.6474",
-    "buy_fills": 3,
+    "avg_entry_price_krw": 309447.8304,
+    "avg_exit_price_krw": "343065.6978",
+    "buy_fills": 2,
     "close_date": "2026-05-01",
     "company": "Gaztransport&technigaz",
     "exit_reasons": "('rebalance_sell',)",
@@ -24140,12 +24140,12 @@
     "last_close_krw": "",
     "open_date": "2025-12-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 37585912.1508,
-    "sell_fills": 2,
+    "realized_pnl_krw": 25784904.267,
+    "sell_fills": 3,
     "status": "closed",
     "symbol": "GTT.PA",
-    "total_qty_bought": 1196,
-    "total_qty_sold": 1196,
+    "total_qty_bought": 767,
+    "total_qty_sold": 767,
     "unrealized_pnl_krw": ""
   },
   {
@@ -24397,7 +24397,7 @@
   },
   {
     "avg_entry_price_krw": 91817.7559,
-    "avg_exit_price_krw": "112019.3906",
+    "avg_exit_price_krw": "112017.033",
     "buy_fills": 2,
     "close_date": "2026-05-01",
     "company": "Scorpio Tankers Inc.",
@@ -24406,7 +24406,7 @@
     "last_close_krw": "",
     "open_date": "2025-12-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 72342053.8014,
+    "realized_pnl_krw": 72333611.3125,
     "sell_fills": 3,
     "status": "closed",
     "symbol": "STNG",
@@ -24454,7 +24454,7 @@
   },
   {
     "avg_entry_price_krw": 64563.1227,
-    "avg_exit_price_krw": "80972.3282",
+    "avg_exit_price_krw": "82232.6811",
     "buy_fills": 2,
     "close_date": "2026-05-01",
     "company": "Tenaris S.A.",
@@ -24463,7 +24463,7 @@
     "last_close_krw": "",
     "open_date": "2025-12-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 110959047.0671,
+    "realized_pnl_krw": 119481553.4945,
     "sell_fills": 3,
     "status": "closed",
     "symbol": "TS",
@@ -24530,7 +24530,7 @@
   },
   {
     "avg_entry_price_krw": 921.2385,
-    "avg_exit_price_krw": "1175.7598",
+    "avg_exit_price_krw": "1212.9324",
     "buy_fills": 1,
     "close_date": "2026-05-01",
     "company": "Chegg",
@@ -24539,17 +24539,17 @@
     "last_close_krw": "",
     "open_date": "2026-03-02",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 28845923.5906,
+    "realized_pnl_krw": 23894105.4975,
     "sell_fills": 2,
     "status": "closed",
     "symbol": "CHGG",
-    "total_qty_bought": 113334,
-    "total_qty_sold": 113334,
+    "total_qty_bought": 81915,
+    "total_qty_sold": 81915,
     "unrealized_pnl_krw": ""
   },
   {
     "avg_entry_price_krw": 21764.259,
-    "avg_exit_price_krw": "19163.454",
+    "avg_exit_price_krw": "19143.7625",
     "buy_fills": 1,
     "close_date": "2026-05-01",
     "company": "Fluence Energy Inc.",
@@ -24558,36 +24558,17 @@
     "last_close_krw": "",
     "open_date": "2026-03-02",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -12218582.1173,
+    "realized_pnl_krw": -11697896.5211,
     "sell_fills": 2,
     "status": "closed",
     "symbol": "FLNC",
-    "total_qty_bought": 4698,
-    "total_qty_sold": 4698,
-    "unrealized_pnl_krw": ""
-  },
-  {
-    "avg_entry_price_krw": 6750.9509,
-    "avg_exit_price_krw": "5652.7506",
-    "buy_fills": 1,
-    "close_date": "2026-05-01",
-    "company": "Funko Inc.",
-    "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 60,
-    "last_close_krw": "",
-    "open_date": "2026-03-02",
-    "persona": "weak_oracle",
-    "realized_pnl_krw": -9605958.0317,
-    "sell_fills": 2,
-    "status": "closed",
-    "symbol": "FNKO",
-    "total_qty_bought": 8747,
-    "total_qty_sold": 8747,
+    "total_qty_bought": 4464,
+    "total_qty_sold": 4464,
     "unrealized_pnl_krw": ""
   },
   {
     "avg_entry_price_krw": 1465301.7401,
-    "avg_exit_price_krw": "1426955.1753",
+    "avg_exit_price_krw": "1430310.6749",
     "buy_fills": 1,
     "close_date": "2026-05-01",
     "company": "Eli Lilly & Co.",
@@ -24596,12 +24577,12 @@
     "last_close_krw": "",
     "open_date": "2026-03-02",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -1917328.2383,
+    "realized_pnl_krw": -6928230.8939,
     "sell_fills": 2,
     "status": "closed",
     "symbol": "LLY",
-    "total_qty_bought": 50,
-    "total_qty_sold": 50,
+    "total_qty_bought": 198,
+    "total_qty_sold": 198,
     "unrealized_pnl_krw": ""
   },
   {
@@ -24691,12 +24672,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -130449.8429,
+    "realized_pnl_krw": -130646.5999,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "001060.KS",
-    "total_qty_bought": 663,
-    "total_qty_sold": 663,
+    "total_qty_bought": 664,
+    "total_qty_sold": 664,
     "unrealized_pnl_krw": ""
   },
   {
@@ -24710,12 +24691,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 907843.7054,
+    "realized_pnl_krw": 912315.8419,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "001120.KS",
-    "total_qty_bought": 406,
-    "total_qty_sold": 406,
+    "total_qty_bought": 408,
+    "total_qty_sold": 408,
     "unrealized_pnl_krw": ""
   },
   {
@@ -24729,12 +24710,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 8166245.1297,
+    "realized_pnl_krw": 8183169.9901,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "001530.KS",
-    "total_qty_bought": 965,
-    "total_qty_sold": 965,
+    "total_qty_bought": 967,
+    "total_qty_sold": 967,
     "unrealized_pnl_krw": ""
   },
   {
@@ -24748,12 +24729,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 2674618.8728,
+    "realized_pnl_krw": 2681497.3517,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "002340.SZ",
-    "total_qty_bought": 12054,
-    "total_qty_sold": 12054,
+    "total_qty_bought": 12085,
+    "total_qty_sold": 12085,
     "unrealized_pnl_krw": ""
   },
   {
@@ -24767,12 +24748,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 884551.3632,
+    "realized_pnl_krw": 886883.2209,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "002714.SZ",
-    "total_qty_bought": 2276,
-    "total_qty_sold": 2276,
+    "total_qty_bought": 2282,
+    "total_qty_sold": 2282,
     "unrealized_pnl_krw": ""
   },
   {
@@ -24786,12 +24767,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 4006774.6671,
+    "realized_pnl_krw": 4020520.0347,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "004020.KS",
-    "total_qty_bought": 583,
-    "total_qty_sold": 583,
+    "total_qty_bought": 585,
+    "total_qty_sold": 585,
     "unrealized_pnl_krw": ""
   },
   {
@@ -24805,12 +24786,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -477863.1747,
+    "realized_pnl_krw": -479061.9823,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "004250.KS",
-    "total_qty_bought": 5182,
-    "total_qty_sold": 5182,
+    "total_qty_bought": 5195,
+    "total_qty_sold": 5195,
     "unrealized_pnl_krw": ""
   },
   {
@@ -24824,12 +24805,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 3466300.2912,
+    "realized_pnl_krw": 3474380.2453,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "005290.KS",
-    "total_qty_bought": 429,
-    "total_qty_sold": 429,
+    "total_qty_bought": 430,
+    "total_qty_sold": 430,
     "unrealized_pnl_krw": ""
   },
   {
@@ -24862,12 +24843,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 6734454.6683,
+    "realized_pnl_krw": 6848597.9677,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "005490.KS",
-    "total_qty_bought": 59,
-    "total_qty_sold": 59,
+    "total_qty_bought": 60,
+    "total_qty_sold": 60,
     "unrealized_pnl_krw": ""
   },
   {
@@ -24881,12 +24862,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 1989849.4031,
+    "realized_pnl_krw": 1994874.2753,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "005720.KS",
-    "total_qty_bought": 3168,
-    "total_qty_sold": 3168,
+    "total_qty_bought": 3176,
+    "total_qty_sold": 3176,
     "unrealized_pnl_krw": ""
   },
   {
@@ -24900,12 +24881,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 1375521.635,
+    "realized_pnl_krw": 1379429.3669,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "005850.KS",
-    "total_qty_bought": 352,
-    "total_qty_sold": 352,
+    "total_qty_bought": 353,
+    "total_qty_sold": 353,
     "unrealized_pnl_krw": ""
   },
   {
@@ -24919,12 +24900,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 1328390.1415,
+    "realized_pnl_krw": 1331948.7032,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "006060.KS",
-    "total_qty_bought": 6346,
-    "total_qty_sold": 6346,
+    "total_qty_bought": 6363,
+    "total_qty_sold": 6363,
     "unrealized_pnl_krw": ""
   },
   {
@@ -24957,12 +24938,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 7171683.2145,
+    "realized_pnl_krw": 7218252.586,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "006650.KS",
-    "total_qty_bought": 154,
-    "total_qty_sold": 154,
+    "total_qty_bought": 155,
+    "total_qty_sold": 155,
     "unrealized_pnl_krw": ""
   },
   {
@@ -24976,12 +24957,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 3986179.143,
+    "realized_pnl_krw": 3996781.6232,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "007210.KS",
-    "total_qty_bought": 11279,
-    "total_qty_sold": 11279,
+    "total_qty_bought": 11309,
+    "total_qty_sold": 11309,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25014,12 +24995,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 3366460.1773,
+    "realized_pnl_krw": 3378108.8284,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "007690.KS",
-    "total_qty_bought": 578,
-    "total_qty_sold": 578,
+    "total_qty_bought": 580,
+    "total_qty_sold": 580,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25033,12 +25014,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 728001.9639,
+    "realized_pnl_krw": 730614.4111,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "008730.KS",
-    "total_qty_bought": 836,
-    "total_qty_sold": 836,
+    "total_qty_bought": 839,
+    "total_qty_sold": 839,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25052,12 +25033,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 7162977.1411,
+    "realized_pnl_krw": 7175953.549,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "009830.KS",
-    "total_qty_bought": 552,
-    "total_qty_sold": 552,
+    "total_qty_bought": 553,
+    "total_qty_sold": 553,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25090,12 +25071,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 3879089.9186,
+    "realized_pnl_krw": 3900287.1313,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "010950.KS",
-    "total_qty_bought": 183,
-    "total_qty_sold": 183,
+    "total_qty_bought": 184,
+    "total_qty_sold": 184,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25109,12 +25090,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 809712.9406,
+    "realized_pnl_krw": 825907.1994,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "012330.KS",
-    "total_qty_bought": 50,
-    "total_qty_sold": 50,
+    "total_qty_bought": 51,
+    "total_qty_sold": 51,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25147,12 +25128,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -135120.0119,
+    "realized_pnl_krw": -135690.1385,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "015760.KS",
-    "total_qty_bought": 474,
-    "total_qty_sold": 474,
+    "total_qty_bought": 476,
+    "total_qty_sold": 476,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25166,12 +25147,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 5937587.6165,
+    "realized_pnl_krw": 5953180.0209,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "016380.KS",
-    "total_qty_bought": 3808,
-    "total_qty_sold": 3808,
+    "total_qty_bought": 3818,
+    "total_qty_sold": 3818,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25185,12 +25166,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 2017708.0577,
+    "realized_pnl_krw": 2022754.4305,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "017650.KS",
-    "total_qty_bought": 2399,
-    "total_qty_sold": 2399,
+    "total_qty_bought": 2405,
+    "total_qty_sold": 2405,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25204,12 +25185,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 4158957.7134,
+    "realized_pnl_krw": 4167209.6136,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "017960.KS",
-    "total_qty_bought": 504,
-    "total_qty_sold": 504,
+    "total_qty_bought": 505,
+    "total_qty_sold": 505,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25223,12 +25204,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 1769344.0415,
+    "realized_pnl_krw": 1773329.0506,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "018290.KS",
-    "total_qty_bought": 1332,
-    "total_qty_sold": 1332,
+    "total_qty_bought": 1335,
+    "total_qty_sold": 1335,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25242,12 +25223,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 5934342.553,
+    "realized_pnl_krw": 5944556.5678,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "023160.KS",
-    "total_qty_bought": 581,
-    "total_qty_sold": 581,
+    "total_qty_bought": 582,
+    "total_qty_sold": 582,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25261,12 +25242,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -180950.212,
+    "realized_pnl_krw": -181383.5516,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "025980.KS",
-    "total_qty_bought": 2923,
-    "total_qty_sold": 2923,
+    "total_qty_bought": 2930,
+    "total_qty_sold": 2930,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25280,12 +25261,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 5038247.4887,
+    "realized_pnl_krw": 5053514.9054,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "029460.KS",
-    "total_qty_bought": 660,
-    "total_qty_sold": 660,
+    "total_qty_bought": 662,
+    "total_qty_sold": 662,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25299,12 +25280,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 2882567.0679,
+    "realized_pnl_krw": 2890119.6454,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "032350.KS",
-    "total_qty_bought": 1145,
-    "total_qty_sold": 1145,
+    "total_qty_bought": 1148,
+    "total_qty_sold": 1148,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25318,12 +25299,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 80434.947,
+    "realized_pnl_krw": 80617.8923,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "032640.KS",
-    "total_qty_bought": 1319,
-    "total_qty_sold": 1319,
+    "total_qty_bought": 1322,
+    "total_qty_sold": 1322,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25337,12 +25318,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 3247562.912,
+    "realized_pnl_krw": 3255388.3648,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "033500.KQ",
-    "total_qty_bought": 830,
-    "total_qty_sold": 830,
+    "total_qty_bought": 832,
+    "total_qty_sold": 832,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25356,12 +25337,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -129580.7968,
+    "realized_pnl_krw": -129975.8602,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "035900.KQ",
-    "total_qty_bought": 328,
-    "total_qty_sold": 328,
+    "total_qty_bought": 329,
+    "total_qty_sold": 329,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25375,12 +25356,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 283628.2983,
+    "realized_pnl_krw": 284360.1374,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "036420.KS",
-    "total_qty_bought": 3488,
-    "total_qty_sold": 3488,
+    "total_qty_bought": 3497,
+    "total_qty_sold": 3497,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25413,12 +25394,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -64270.6854,
+    "realized_pnl_krw": -64453.5322,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "041830.KQ",
-    "total_qty_bought": 703,
-    "total_qty_sold": 703,
+    "total_qty_bought": 705,
+    "total_qty_sold": 705,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25432,12 +25413,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 765261.2024,
+    "realized_pnl_krw": 769956.0564,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "042660.KS",
-    "total_qty_bought": 163,
-    "total_qty_sold": 163,
+    "total_qty_bought": 164,
+    "total_qty_sold": 164,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25451,12 +25432,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 635783.0617,
+    "realized_pnl_krw": 637431.8109,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "043650.KQ",
-    "total_qty_bought": 5013,
-    "total_qty_sold": 5013,
+    "total_qty_bought": 5026,
+    "total_qty_sold": 5026,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25470,12 +25451,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 1374380.0118,
+    "realized_pnl_krw": 1377668.0022,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "044490.KQ",
-    "total_qty_bought": 418,
-    "total_qty_sold": 418,
+    "total_qty_bought": 419,
+    "total_qty_sold": 419,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25508,12 +25489,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -447912.1315,
+    "realized_pnl_krw": -449239.9343,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "049720.KQ",
-    "total_qty_bought": 2024,
-    "total_qty_sold": 2024,
+    "total_qty_bought": 2030,
+    "total_qty_sold": 2030,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25546,12 +25527,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -1350330.6405,
+    "realized_pnl_krw": -1353389.147,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "053030.KQ",
-    "total_qty_bought": 1766,
-    "total_qty_sold": 1766,
+    "total_qty_bought": 1770,
+    "total_qty_sold": 1770,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25565,12 +25546,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 4419285.0476,
+    "realized_pnl_krw": 4430444.8583,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "054210.KQ",
-    "total_qty_bought": 1980,
-    "total_qty_sold": 1980,
+    "total_qty_bought": 1985,
+    "total_qty_sold": 1985,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25584,12 +25565,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 1130051.5402,
+    "realized_pnl_krw": 1133024.615,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "054780.KQ",
-    "total_qty_bought": 7982,
-    "total_qty_sold": 7982,
+    "total_qty_bought": 8003,
+    "total_qty_sold": 8003,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25603,12 +25584,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 2408076.4094,
+    "realized_pnl_krw": 2414328.6549,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "060150.KQ",
-    "total_qty_bought": 5007,
-    "total_qty_sold": 5007,
+    "total_qty_bought": 5020,
+    "total_qty_sold": 5020,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25622,16 +25603,16 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -880648.7384,
+    "realized_pnl_krw": -883231.286,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "067160.KQ",
-    "total_qty_bought": 341,
-    "total_qty_sold": 341,
+    "total_qty_bought": 342,
+    "total_qty_sold": 342,
     "unrealized_pnl_krw": ""
   },
   {
-    "avg_entry_price_krw": 206133.9155,
+    "avg_entry_price_krw": 206133.9154,
     "avg_exit_price_krw": "200008.9705",
     "buy_fills": 1,
     "close_date": "2026-05-01",
@@ -25641,12 +25622,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -612494.4962,
+    "realized_pnl_krw": -618619.4412,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "068270.KS",
-    "total_qty_bought": 100,
-    "total_qty_sold": 100,
+    "total_qty_bought": 101,
+    "total_qty_sold": 101,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25660,12 +25641,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 4451008.0983,
+    "realized_pnl_krw": 4461864.2156,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "075580.KS",
-    "total_qty_bought": 1230,
-    "total_qty_sold": 1230,
+    "total_qty_bought": 1233,
+    "total_qty_sold": 1233,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25679,12 +25660,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -64264.4871,
+    "realized_pnl_krw": -64456.3214,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "078350.KS",
-    "total_qty_bought": 670,
-    "total_qty_sold": 670,
+    "total_qty_bought": 672,
+    "total_qty_sold": 672,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25698,12 +25679,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 19911497.859,
+    "realized_pnl_krw": 19997508.6488,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "082740.KS",
-    "total_qty_bought": 463,
-    "total_qty_sold": 463,
+    "total_qty_bought": 465,
+    "total_qty_sold": 465,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25717,12 +25698,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 1158723.2317,
+    "realized_pnl_krw": 1161293.8878,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "089600.KQ",
-    "total_qty_bought": 1803,
-    "total_qty_sold": 1803,
+    "total_qty_bought": 1807,
+    "total_qty_sold": 1807,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25736,12 +25717,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 1704236.0111,
+    "realized_pnl_krw": 1709330.8871,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "089860.KQ",
-    "total_qty_bought": 669,
-    "total_qty_sold": 669,
+    "total_qty_bought": 671,
+    "total_qty_sold": 671,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25755,12 +25736,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 23536987.4794,
+    "realized_pnl_krw": 23587226.5135,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "089890.KQ",
-    "total_qty_bought": 937,
-    "total_qty_sold": 937,
+    "total_qty_bought": 939,
+    "total_qty_sold": 939,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25774,12 +25755,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 11694338.1892,
+    "realized_pnl_krw": 11719140.6032,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "090460.KS",
-    "total_qty_bought": 943,
-    "total_qty_sold": 943,
+    "total_qty_bought": 945,
+    "total_qty_sold": 945,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25793,12 +25774,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 5613104.022,
+    "realized_pnl_krw": 5621043.3487,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "098120.KQ",
-    "total_qty_bought": 707,
-    "total_qty_sold": 707,
+    "total_qty_bought": 708,
+    "total_qty_sold": 708,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25812,12 +25793,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 2025642.6751,
+    "realized_pnl_krw": 2030766.9926,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "099430.KQ",
-    "total_qty_bought": 3953,
-    "total_qty_sold": 3953,
+    "total_qty_bought": 3963,
+    "total_qty_sold": 3963,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25831,12 +25812,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 2784705.4578,
+    "realized_pnl_krw": 2791335.7089,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "100840.KQ",
-    "total_qty_bought": 420,
-    "total_qty_sold": 420,
+    "total_qty_bought": 421,
+    "total_qty_sold": 421,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25850,12 +25831,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 1353911.7412,
+    "realized_pnl_krw": 1355911.6108,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "101160.KQ",
-    "total_qty_bought": 677,
-    "total_qty_sold": 677,
+    "total_qty_bought": 678,
+    "total_qty_sold": 678,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25888,12 +25869,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 1192576.7104,
+    "realized_pnl_krw": 1197972.9851,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "103140.KS",
-    "total_qty_bought": 221,
-    "total_qty_sold": 221,
+    "total_qty_bought": 222,
+    "total_qty_sold": 222,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25926,12 +25907,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 2497053.0106,
+    "realized_pnl_krw": 2504736.2506,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "112610.KS",
-    "total_qty_bought": 325,
-    "total_qty_sold": 325,
+    "total_qty_bought": 326,
+    "total_qty_sold": 326,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25945,12 +25926,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 4211393.1931,
+    "realized_pnl_krw": 4222790.7389,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "114810.KQ",
-    "total_qty_bought": 1478,
-    "total_qty_sold": 1478,
+    "total_qty_bought": 1482,
+    "total_qty_sold": 1482,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25964,12 +25945,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 2258428.9537,
+    "realized_pnl_krw": 2264743.2937,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "119610.KQ",
-    "total_qty_bought": 1073,
-    "total_qty_sold": 1073,
+    "total_qty_bought": 1076,
+    "total_qty_sold": 1076,
     "unrealized_pnl_krw": ""
   },
   {
@@ -25983,12 +25964,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 2292479.1327,
+    "realized_pnl_krw": 2299756.8443,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "119850.KQ",
-    "total_qty_bought": 630,
-    "total_qty_sold": 630,
+    "total_qty_bought": 632,
+    "total_qty_sold": 632,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26002,12 +25983,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -710287.2285,
+    "realized_pnl_krw": -712350.0181,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "1211.HK",
-    "total_qty_bought": 1033,
-    "total_qty_sold": 1033,
+    "total_qty_bought": 1036,
+    "total_qty_sold": 1036,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26021,12 +26002,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 6834367.1148,
+    "realized_pnl_krw": 6854527.4898,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "122640.KQ",
-    "total_qty_bought": 1017,
-    "total_qty_sold": 1017,
+    "total_qty_bought": 1020,
+    "total_qty_sold": 1020,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26040,12 +26021,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 5510016.9627,
+    "realized_pnl_krw": 5537429.9824,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "131970.KQ",
-    "total_qty_bought": 201,
-    "total_qty_sold": 201,
+    "total_qty_bought": 202,
+    "total_qty_sold": 202,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26059,12 +26040,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 1467415.8457,
+    "realized_pnl_krw": 1471200.2838,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "148150.KQ",
-    "total_qty_bought": 4653,
-    "total_qty_sold": 4653,
+    "total_qty_bought": 4665,
+    "total_qty_sold": 4665,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26078,12 +26059,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 18806655.9329,
+    "realized_pnl_krw": 18856860.567,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "159010.KQ",
-    "total_qty_bought": 3746,
-    "total_qty_sold": 3746,
+    "total_qty_bought": 3756,
+    "total_qty_sold": 3756,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26097,12 +26078,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 3383372.4032,
+    "realized_pnl_krw": 3393945.442,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "166090.KQ",
-    "total_qty_bought": 320,
-    "total_qty_sold": 320,
+    "total_qty_bought": 321,
+    "total_qty_sold": 321,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26116,12 +26097,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 4376926.1474,
+    "realized_pnl_krw": 4386806.3419,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "170790.KQ",
-    "total_qty_bought": 2215,
-    "total_qty_sold": 2215,
+    "total_qty_bought": 2220,
+    "total_qty_sold": 2220,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26135,12 +26116,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 155698.1191,
+    "realized_pnl_krw": 156086.3937,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "182360.KQ",
-    "total_qty_bought": 2005,
-    "total_qty_sold": 2005,
+    "total_qty_bought": 2010,
+    "total_qty_sold": 2010,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26154,12 +26135,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -2715192.634,
+    "realized_pnl_krw": -2722233.156,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "1833.HK",
-    "total_qty_bought": 8870,
-    "total_qty_sold": 8870,
+    "total_qty_bought": 8893,
+    "total_qty_sold": 8893,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26173,12 +26154,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 2213938.1627,
+    "realized_pnl_krw": 2226735.4931,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "189300.KQ",
-    "total_qty_bought": 173,
-    "total_qty_sold": 173,
+    "total_qty_bought": 174,
+    "total_qty_sold": 174,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26192,12 +26173,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 967825.1498,
+    "realized_pnl_krw": 970444.433,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "192400.KQ",
-    "total_qty_bought": 739,
-    "total_qty_sold": 739,
+    "total_qty_bought": 741,
+    "total_qty_sold": 741,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26211,12 +26192,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 1035623.311,
+    "realized_pnl_krw": 1045677.9063,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "192820.KS",
-    "total_qty_bought": 103,
-    "total_qty_sold": 103,
+    "total_qty_bought": 104,
+    "total_qty_sold": 104,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26230,12 +26211,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -3460161.8983,
+    "realized_pnl_krw": -3469208.0732,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "194480.KQ",
-    "total_qty_bought": 765,
-    "total_qty_sold": 765,
+    "total_qty_bought": 767,
+    "total_qty_sold": 767,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26268,12 +26249,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 175761.1531,
+    "realized_pnl_krw": 176199.4602,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "200710.KQ",
-    "total_qty_bought": 401,
-    "total_qty_sold": 401,
+    "total_qty_bought": 402,
+    "total_qty_sold": 402,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26287,12 +26268,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 4210210.4425,
+    "realized_pnl_krw": 4221234.5594,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "204620.KQ",
-    "total_qty_bought": 4201,
-    "total_qty_sold": 4201,
+    "total_qty_bought": 4212,
+    "total_qty_sold": 4212,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26306,12 +26287,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -537422.191,
+    "realized_pnl_krw": -539121.8184,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "210980.KS",
-    "total_qty_bought": 1581,
-    "total_qty_sold": 1581,
+    "total_qty_bought": 1586,
+    "total_qty_sold": 1586,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26325,12 +26306,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -2268647.281,
+    "realized_pnl_krw": -2275269.1353,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "211050.KQ",
-    "total_qty_bought": 1713,
-    "total_qty_sold": 1713,
+    "total_qty_bought": 1718,
+    "total_qty_sold": 1718,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26344,12 +26325,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -500457.2381,
+    "realized_pnl_krw": -501835.3658,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "2124.T",
-    "total_qty_bought": 2542,
-    "total_qty_sold": 2542,
+    "total_qty_bought": 2549,
+    "total_qty_sold": 2549,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26382,12 +26363,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 558268.3735,
+    "realized_pnl_krw": 559610.3648,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "215000.KQ",
-    "total_qty_bought": 416,
-    "total_qty_sold": 416,
+    "total_qty_bought": 417,
+    "total_qty_sold": 417,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26420,12 +26401,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 2888598.1104,
+    "realized_pnl_krw": 2896092.4464,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "234300.KQ",
-    "total_qty_bought": 6167,
-    "total_qty_sold": 6167,
+    "total_qty_bought": 6183,
+    "total_qty_sold": 6183,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26439,12 +26420,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -104329.0493,
+    "realized_pnl_krw": -105101.8571,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "237690.KQ",
-    "total_qty_bought": 135,
-    "total_qty_sold": 135,
+    "total_qty_bought": 136,
+    "total_qty_sold": 136,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26458,12 +26439,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 3427122.0875,
+    "realized_pnl_krw": 3435347.1805,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "248070.KS",
-    "total_qty_bought": 1250,
-    "total_qty_sold": 1250,
+    "total_qty_bought": 1253,
+    "total_qty_sold": 1253,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26534,12 +26515,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 591860.5658,
+    "realized_pnl_krw": 593210.3048,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "284740.KS",
-    "total_qty_bought": 877,
-    "total_qty_sold": 877,
+    "total_qty_bought": 879,
+    "total_qty_sold": 879,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26553,12 +26534,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 1403085.7538,
+    "realized_pnl_krw": 1407521.2198,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "285490.KQ",
-    "total_qty_bought": 949,
-    "total_qty_sold": 949,
+    "total_qty_bought": 952,
+    "total_qty_sold": 952,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26572,12 +26553,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -795099.463,
+    "realized_pnl_krw": -797487.149,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "293490.KQ",
-    "total_qty_bought": 1665,
-    "total_qty_sold": 1665,
+    "total_qty_bought": 1670,
+    "total_qty_sold": 1670,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26591,12 +26572,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 1107262.477,
+    "realized_pnl_krw": 1110279.541,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "294570.KQ",
-    "total_qty_bought": 734,
-    "total_qty_sold": 734,
+    "total_qty_bought": 736,
+    "total_qty_sold": 736,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26610,12 +26591,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 1434006.8898,
+    "realized_pnl_krw": 1438446.5397,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "294870.KS",
-    "total_qty_bought": 969,
-    "total_qty_sold": 969,
+    "total_qty_bought": 972,
+    "total_qty_sold": 972,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26629,12 +26610,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 5940040.1276,
+    "realized_pnl_krw": 6056511.5026,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "298020.KQ",
-    "total_qty_bought": 51,
-    "total_qty_sold": 51,
+    "total_qty_bought": 52,
+    "total_qty_sold": 52,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26648,12 +26629,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 928785.7175,
+    "realized_pnl_krw": 931211.3788,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "310200.KQ",
-    "total_qty_bought": 7658,
-    "total_qty_sold": 7658,
+    "total_qty_bought": 7678,
+    "total_qty_sold": 7678,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26667,12 +26648,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 250488.1031,
+    "realized_pnl_krw": 251282.0432,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "316140.KS",
-    "total_qty_bought": 631,
-    "total_qty_sold": 631,
+    "total_qty_bought": 633,
+    "total_qty_sold": 633,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26686,12 +26667,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -8598789.0664,
+    "realized_pnl_krw": -8628086.4738,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "328130.KQ",
-    "total_qty_bought": 587,
-    "total_qty_sold": 587,
+    "total_qty_bought": 589,
+    "total_qty_sold": 589,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26705,12 +26686,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 3207673.2694,
+    "realized_pnl_krw": 3215496.8627,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "344820.KQ",
-    "total_qty_bought": 820,
-    "total_qty_sold": 820,
+    "total_qty_bought": 822,
+    "total_qty_sold": 822,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26724,12 +26705,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 267181.7594,
+    "realized_pnl_krw": 268066.4672,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "348210.KQ",
-    "total_qty_bought": 302,
-    "total_qty_sold": 302,
+    "total_qty_bought": 303,
+    "total_qty_sold": 303,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26743,12 +26724,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 2537993.9196,
+    "realized_pnl_krw": 2542809.8474,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "348370.KQ",
-    "total_qty_bought": 527,
-    "total_qty_sold": 527,
+    "total_qty_bought": 528,
+    "total_qty_sold": 528,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26781,12 +26762,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 4344847.0527,
+    "realized_pnl_krw": 4359985.8926,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "356860.KQ",
-    "total_qty_bought": 287,
-    "total_qty_sold": 287,
+    "total_qty_bought": 288,
+    "total_qty_sold": 288,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26800,12 +26781,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -4423918.0992,
+    "realized_pnl_krw": -4435822.3524,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "363250.KQ",
-    "total_qty_bought": 2973,
-    "total_qty_sold": 2973,
+    "total_qty_bought": 2981,
+    "total_qty_sold": 2981,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26819,12 +26800,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 888842.9087,
+    "realized_pnl_krw": 891168.505,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "363280.KS",
-    "total_qty_bought": 7644,
-    "total_qty_sold": 7644,
+    "total_qty_bought": 7664,
+    "total_qty_sold": 7664,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26838,12 +26819,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 5698644.173,
+    "realized_pnl_krw": 5714594.5766,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "366030.KQ",
-    "total_qty_bought": 3930,
-    "total_qty_sold": 3930,
+    "total_qty_bought": 3941,
+    "total_qty_sold": 3941,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26857,12 +26838,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 6341645.8861,
+    "realized_pnl_krw": 6358272.0261,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "368600.KQ",
-    "total_qty_bought": 23267,
-    "total_qty_sold": 23267,
+    "total_qty_bought": 23328,
+    "total_qty_sold": 23328,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26876,12 +26857,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 7496179.001,
+    "realized_pnl_krw": 7522389.4171,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "375500.KS",
-    "total_qty_bought": 286,
-    "total_qty_sold": 286,
+    "total_qty_bought": 287,
+    "total_qty_sold": 287,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26895,12 +26876,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 3589113.2091,
+    "realized_pnl_krw": 3598521.1074,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "376980.KQ",
-    "total_qty_bought": 6104,
-    "total_qty_sold": 6104,
+    "total_qty_bought": 6120,
+    "total_qty_sold": 6120,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26914,12 +26895,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 3701089.8735,
+    "realized_pnl_krw": 3709032.1265,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "403870.KQ",
-    "total_qty_bought": 466,
-    "total_qty_sold": 466,
+    "total_qty_bought": 467,
+    "total_qty_sold": 467,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26933,12 +26914,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 2832643.2294,
+    "realized_pnl_krw": 2840022.1652,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "408920.KQ",
-    "total_qty_bought": 6526,
-    "total_qty_sold": 6526,
+    "total_qty_bought": 6543,
+    "total_qty_sold": 6543,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26971,12 +26952,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 2486305.1466,
+    "realized_pnl_krw": 2495445.9744,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "456160.KQ",
-    "total_qty_bought": 272,
-    "total_qty_sold": 272,
+    "total_qty_bought": 273,
+    "total_qty_sold": 273,
     "unrealized_pnl_krw": ""
   },
   {
@@ -26990,12 +26971,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 2769074.7673,
+    "realized_pnl_krw": 2775626.2061,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "461300.KQ",
-    "total_qty_bought": 1268,
-    "total_qty_sold": 1268,
+    "total_qty_bought": 1271,
+    "total_qty_sold": 1271,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27009,12 +26990,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -9134.0667,
+    "realized_pnl_krw": -9158.6584,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "4680.T",
-    "total_qty_bought": 2600,
-    "total_qty_sold": 2600,
+    "total_qty_bought": 2607,
+    "total_qty_sold": 2607,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27028,12 +27009,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 992174.8638,
+    "realized_pnl_krw": 994863.6846,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "4689.T",
-    "total_qty_bought": 5535,
-    "total_qty_sold": 5535,
+    "total_qty_bought": 5550,
+    "total_qty_sold": 5550,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27047,12 +27028,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 2214129.9009,
+    "realized_pnl_krw": 2219752.374,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "472850.KQ",
-    "total_qty_bought": 3938,
-    "total_qty_sold": 3938,
+    "total_qty_bought": 3948,
+    "total_qty_sold": 3948,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27066,12 +27047,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -1173548.2993,
+    "realized_pnl_krw": -1176714.3469,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "473980.KQ",
-    "total_qty_bought": 1112,
-    "total_qty_sold": 1112,
+    "total_qty_bought": 1115,
+    "total_qty_sold": 1115,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27085,12 +27066,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -2025649.8468,
+    "realized_pnl_krw": -2030685.6451,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "4751.T",
-    "total_qty_bought": 1609,
-    "total_qty_sold": 1609,
+    "total_qty_bought": 1613,
+    "total_qty_sold": 1613,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27104,12 +27085,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -744625.2072,
+    "realized_pnl_krw": -746699.3721,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "475960.KQ",
-    "total_qty_bought": 359,
-    "total_qty_sold": 359,
+    "total_qty_bought": 360,
+    "total_qty_sold": 360,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27123,12 +27104,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -4786139.3071,
+    "realized_pnl_krw": -4839318.6328,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "476830.KQ",
-    "total_qty_bought": 90,
-    "total_qty_sold": 90,
+    "total_qty_bought": 91,
+    "total_qty_sold": 91,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27142,12 +27123,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 2833091.0547,
+    "realized_pnl_krw": 2843430.8031,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "489790.KS",
-    "total_qty_bought": 274,
-    "total_qty_sold": 274,
+    "total_qty_bought": 275,
+    "total_qty_sold": 275,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27161,12 +27142,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 401402.5166,
+    "realized_pnl_krw": 402421.9516,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "5253.T",
-    "total_qty_bought": 1575,
-    "total_qty_sold": 1575,
+    "total_qty_bought": 1579,
+    "total_qty_sold": 1579,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27180,12 +27161,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -870988.229,
+    "realized_pnl_krw": -873079.4373,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "5726.T",
-    "total_qty_bought": 833,
-    "total_qty_sold": 833,
+    "total_qty_bought": 835,
+    "total_qty_sold": 835,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27218,12 +27199,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -3769460.0339,
+    "realized_pnl_krw": -3779451.3737,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "950170.KQ",
-    "total_qty_bought": 4150,
-    "total_qty_sold": 4150,
+    "total_qty_bought": 4161,
+    "total_qty_sold": 4161,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27275,12 +27256,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -1301459.6293,
+    "realized_pnl_krw": -1303617.9372,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "BILI",
-    "total_qty_bought": 603,
-    "total_qty_sold": 603,
+    "total_qty_bought": 604,
+    "total_qty_sold": 604,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27294,12 +27275,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -1290151.1781,
+    "realized_pnl_krw": -1292641.8174,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "CHWY",
-    "total_qty_bought": 518,
-    "total_qty_sold": 518,
+    "total_qty_bought": 519,
+    "total_qty_sold": 519,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27313,12 +27294,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -1242442.7208,
+    "realized_pnl_krw": -1246192.5479,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "CLBT",
-    "total_qty_bought": 994,
-    "total_qty_sold": 994,
+    "total_qty_bought": 997,
+    "total_qty_sold": 997,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27351,12 +27332,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 1346571.098,
+    "realized_pnl_krw": 1348807.927,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "DOCS",
-    "total_qty_bought": 602,
-    "total_qty_sold": 602,
+    "total_qty_bought": 603,
+    "total_qty_sold": 603,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27370,12 +27351,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 4952446.1184,
+    "realized_pnl_krw": 4964537.0513,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "EAF",
-    "total_qty_bought": 2048,
-    "total_qty_sold": 2048,
+    "total_qty_bought": 2053,
+    "total_qty_sold": 2053,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27398,6 +27379,25 @@
     "unrealized_pnl_krw": ""
   },
   {
+    "avg_entry_price_krw": 4813.7832,
+    "avg_exit_price_krw": "6528.5766",
+    "buy_fills": 1,
+    "close_date": "2026-05-01",
+    "company": "Funko Inc.",
+    "exit_reasons": "('rebalance_sell',)",
+    "holding_days": 30,
+    "last_close_krw": "",
+    "open_date": "2026-04-01",
+    "persona": "weak_oracle",
+    "realized_pnl_krw": 7416481.4956,
+    "sell_fills": 1,
+    "status": "closed",
+    "symbol": "FNKO",
+    "total_qty_bought": 4325,
+    "total_qty_sold": 4325,
+    "unrealized_pnl_krw": ""
+  },
+  {
     "avg_entry_price_krw": 214183.2712,
     "avg_exit_price_krw": "232705.5153",
     "buy_fills": 1,
@@ -27408,12 +27408,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 1778135.4312,
+    "realized_pnl_krw": 1796657.6753,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "GLW",
-    "total_qty_bought": 96,
-    "total_qty_sold": 96,
+    "total_qty_bought": 97,
+    "total_qty_sold": 97,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27427,12 +27427,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 2639916.6755,
+    "realized_pnl_krw": 2646773.602,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "GRND",
-    "total_qty_bought": 1155,
-    "total_qty_sold": 1155,
+    "total_qty_bought": 1158,
+    "total_qty_sold": 1158,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27446,12 +27446,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -1585838.4732,
+    "realized_pnl_krw": -1590280.5978,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "IMAX",
-    "total_qty_bought": 357,
-    "total_qty_sold": 357,
+    "total_qty_bought": 358,
+    "total_qty_sold": 358,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27465,12 +27465,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 583512.9276,
+    "realized_pnl_krw": 585251.2978,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "INMD",
-    "total_qty_bought": 1007,
-    "total_qty_sold": 1007,
+    "total_qty_bought": 1010,
+    "total_qty_sold": 1010,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27541,12 +27541,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 3033720.4491,
+    "realized_pnl_krw": 3042077.8057,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "LEVI",
-    "total_qty_bought": 726,
-    "total_qty_sold": 726,
+    "total_qty_bought": 728,
+    "total_qty_sold": 728,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27636,12 +27636,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 3395363.1558,
+    "realized_pnl_krw": 3404357.4953,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "OPEN",
-    "total_qty_bought": 3020,
-    "total_qty_sold": 3020,
+    "total_qty_bought": 3028,
+    "total_qty_sold": 3028,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27674,12 +27674,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 929797.9061,
+    "realized_pnl_krw": 932987.6073,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "SBLK",
-    "total_qty_bought": 583,
-    "total_qty_sold": 583,
+    "total_qty_bought": 585,
+    "total_qty_sold": 585,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27712,12 +27712,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": -4580871.3159,
+    "realized_pnl_krw": -4591909.56,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "SRAD",
-    "total_qty_bought": 830,
-    "total_qty_sold": 830,
+    "total_qty_bought": 832,
+    "total_qty_sold": 832,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27731,12 +27731,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 4249943.1712,
+    "realized_pnl_krw": 4278276.1256,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "SXT",
-    "total_qty_bought": 150,
-    "total_qty_sold": 150,
+    "total_qty_bought": 151,
+    "total_qty_sold": 151,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27750,12 +27750,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 2966460.7405,
+    "realized_pnl_krw": 2976585.1799,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "TEM",
-    "total_qty_bought": 293,
-    "total_qty_sold": 293,
+    "total_qty_bought": 294,
+    "total_qty_sold": 294,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27826,12 +27826,12 @@
     "last_close_krw": "",
     "open_date": "2026-04-01",
     "persona": "weak_oracle",
-    "realized_pnl_krw": 23444840.7171,
+    "realized_pnl_krw": 23679289.1243,
     "sell_fills": 1,
     "status": "closed",
     "symbol": "WOLF",
-    "total_qty_bought": 800,
-    "total_qty_sold": 800,
+    "total_qty_bought": 808,
+    "total_qty_sold": 808,
     "unrealized_pnl_krw": ""
   },
   {
@@ -27841,8 +27841,8 @@
     "close_date": "",
     "company": "KODEX 200",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 1957,
-    "last_close_krw": "117200.0",
+    "holding_days": 1960,
+    "last_close_krw": "117840.0",
     "open_date": "2021-01-04",
     "persona": "all_weather",
     "realized_pnl_krw": 13966769.8192,
@@ -27851,7 +27851,7 @@
     "symbol": "069500.KS",
     "total_qty_bought": 977,
     "total_qty_sold": 460,
-    "unrealized_pnl_krw": "40430811.0343"
+    "unrealized_pnl_krw": "40761691.0343"
   },
   {
     "avg_entry_price_krw": 295179.0443,
@@ -27860,8 +27860,8 @@
     "close_date": "",
     "company": "Gold",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 1957,
-    "last_close_krw": "623155.8471",
+    "holding_days": 1960,
+    "last_close_krw": "624540.0661",
     "open_date": "2021-01-04",
     "persona": "all_weather",
     "realized_pnl_krw": 2977955.8274,
@@ -27870,7 +27870,7 @@
     "symbol": "GLD",
     "total_qty_bought": 97,
     "total_qty_sold": 19,
-    "unrealized_pnl_krw": "25582190.6171"
+    "unrealized_pnl_krw": "25690159.7012"
   },
   {
     "avg_entry_price_krw": 593913.1421,
@@ -27879,8 +27879,8 @@
     "close_date": "",
     "company": "NASDAQ-100",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 1957,
-    "last_close_krw": "1058673.491",
+    "holding_days": 1960,
+    "last_close_krw": "1052855.9708",
     "open_date": "2021-01-04",
     "persona": "all_weather",
     "realized_pnl_krw": 679703.4674,
@@ -27889,7 +27889,7 @@
     "symbol": "QQQ",
     "total_qty_bought": 57,
     "total_qty_sold": 2,
-    "unrealized_pnl_krw": "25561819.1931"
+    "unrealized_pnl_krw": "25241855.5819"
   },
   {
     "avg_entry_price_krw": 707918.4065,
@@ -27898,8 +27898,8 @@
     "close_date": "",
     "company": "S&P 500",
     "exit_reasons": "()",
-    "holding_days": 1957,
-    "last_close_krw": "1103832.077",
+    "holding_days": 1960,
+    "last_close_krw": "1102840.1543",
     "open_date": "2021-01-04",
     "persona": "all_weather",
     "realized_pnl_krw": 0.0,
@@ -27908,7 +27908,7 @@
     "symbol": "SPY",
     "total_qty_bought": 50,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "19795683.5273"
+    "unrealized_pnl_krw": "19746087.3917"
   },
   {
     "avg_entry_price_krw": 276627.3791,
@@ -27917,8 +27917,8 @@
     "close_date": "",
     "company": "Gold",
     "exit_reasons": "()",
-    "holding_days": 1957,
-    "last_close_krw": "623155.8471",
+    "holding_days": 1960,
+    "last_close_krw": "624540.0661",
     "open_date": "2021-01-04",
     "persona": "benchmark_gld",
     "realized_pnl_krw": 0.0,
@@ -27927,7 +27927,7 @@
     "symbol": "GLD",
     "total_qty_bought": 368,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "127522476.2349"
+    "unrealized_pnl_krw": "128031868.8371"
   },
   {
     "avg_entry_price_krw": 38867.0553,
@@ -27936,8 +27936,8 @@
     "close_date": "",
     "company": "KODEX 200",
     "exit_reasons": "()",
-    "holding_days": 1957,
-    "last_close_krw": "117200.0",
+    "holding_days": 1960,
+    "last_close_krw": "117840.0",
     "open_date": "2021-01-04",
     "persona": "benchmark_kodex200",
     "realized_pnl_krw": 0.0,
@@ -27946,7 +27946,7 @@
     "symbol": "069500.KS",
     "total_qty_bought": 2623,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "205467314.0231"
+    "unrealized_pnl_krw": "207146034.0231"
   },
   {
     "avg_entry_price_krw": 517265.6851,
@@ -27955,8 +27955,8 @@
     "close_date": "",
     "company": "NASDAQ-100",
     "exit_reasons": "()",
-    "holding_days": 1957,
-    "last_close_krw": "1058673.491",
+    "holding_days": 1960,
+    "last_close_krw": "1052855.9708",
     "open_date": "2021-01-04",
     "persona": "benchmark_qqq",
     "realized_pnl_krw": 0.0,
@@ -27965,7 +27965,7 @@
     "symbol": "QQQ",
     "total_qty_bought": 196,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "106115929.9715"
+    "unrealized_pnl_krw": "104975696.0115"
   },
   {
     "avg_entry_price_krw": 624108.8545,
@@ -27974,8 +27974,8 @@
     "close_date": "",
     "company": "S&P 500",
     "exit_reasons": "()",
-    "holding_days": 1957,
-    "last_close_krw": "1103832.077",
+    "holding_days": 1960,
+    "last_close_krw": "1102840.1543",
     "open_date": "2021-01-04",
     "persona": "benchmark_spy",
     "realized_pnl_krw": 0.0,
@@ -27984,6 +27984,6 @@
     "symbol": "SPY",
     "total_qty_bought": 163,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "78194885.2746"
+    "unrealized_pnl_krw": "78033201.8728"
   }
 ]

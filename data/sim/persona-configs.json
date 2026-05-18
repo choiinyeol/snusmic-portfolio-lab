@@ -100,7 +100,7 @@
       "risk_free_rate": 0.0
     },
     {
-      "label": "SMIC MTT Strategy #1",
+      "label": "Overseas Report Trend Broad #1",
       "max_pct_below_52w_high": 0.7,
       "max_positions": 30,
       "max_target_upside_at_pub": 2.0,
@@ -120,7 +120,7 @@
       "universe": "overseas"
     },
     {
-      "label": "SMIC MTT Strategy #2",
+      "label": "Overseas Report Trend Balanced #2",
       "max_pct_below_52w_high": 0.75,
       "max_positions": 25,
       "max_target_upside_at_pub": 1.75,
@@ -140,7 +140,7 @@
       "universe": "overseas"
     },
     {
-      "label": "SMIC MTT Strategy #3",
+      "label": "Global Report Trend Focused #3",
       "max_pct_below_52w_high": 0.55,
       "max_positions": 5,
       "max_target_upside_at_pub": 2.0,

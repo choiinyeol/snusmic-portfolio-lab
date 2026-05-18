@@ -16120,6 +16120,19 @@
       "open": 52.0,
       "source_currency": "USD",
       "volume": 896922.0
+    },
+    {
+      "close": 53.5099983215332,
+      "close_krw": 80098.0465,
+      "currency": "USD",
+      "date": "2026-05-18",
+      "display_currency": "USD",
+      "high": 53.720001220703125,
+      "krw_per_unit": 1496.8800048828125,
+      "low": 52.244998931884766,
+      "open": 52.650001525878906,
+      "source_currency": "USD",
+      "volume": 129294.0
     }
   ],
   "symbol": "NE"

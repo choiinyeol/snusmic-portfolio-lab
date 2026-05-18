@@ -14822,7 +14822,7 @@
       "volume": 11678400.0
     },
     {
-      "close": 20.770000457763672,
+      "close": 20.770000457763675,
       "close_krw": 31016.6718,
       "currency": "USD",
       "date": "2026-05-15",
@@ -14833,6 +14833,19 @@
       "open": 19.770000457763672,
       "source_currency": "USD",
       "volume": 14960161.0
+    },
+    {
+      "close": 19.94499969482422,
+      "close_krw": 29855.2712,
+      "currency": "USD",
+      "date": "2026-05-18",
+      "display_currency": "USD",
+      "high": 21.8700008392334,
+      "krw_per_unit": 1496.8800048828125,
+      "low": 19.930000305175778,
+      "open": 20.851999282836914,
+      "source_currency": "USD",
+      "volume": 4349366.0
     }
   ],
   "symbol": "FLNC"

@@ -25883,6 +25883,19 @@
       "open": 260.2999877929688,
       "source_currency": "EUR",
       "volume": 419041.0
+    },
+    {
+      "close": 259.1000061035156,
+      "close_krw": 451093.1106,
+      "currency": "EUR",
+      "date": "2026-05-18",
+      "display_currency": "EUR",
+      "high": 266.70001220703125,
+      "krw_per_unit": 1741.0,
+      "low": 255.30000305175784,
+      "open": 258.29998779296875,
+      "source_currency": "EUR",
+      "volume": 225827.0
     }
   ],
   "symbol": "BESI.AS"

@@ -24700,6 +24700,19 @@
       "open": 407.29998779296875,
       "source_currency": "JPY",
       "volume": 19292100.0
+    },
+    {
+      "close": 407.3999938964843,
+      "close_krw": 3826.3008,
+      "currency": "JPY",
+      "date": "2026-05-18",
+      "display_currency": "JPY",
+      "high": 421.00000000000006,
+      "krw_per_unit": 9.392000198364258,
+      "low": 403.2999877929687,
+      "open": 417.29998779296875,
+      "source_currency": "JPY",
+      "volume": 13788300.0
     }
   ],
   "symbol": "4689.T"

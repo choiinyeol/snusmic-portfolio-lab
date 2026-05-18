@@ -22120,12 +22120,25 @@
       "currency": "USD",
       "date": "2026-05-15",
       "display_currency": "USD",
-      "high": 14.149999618530273,
+      "high": 14.149999618530279,
       "krw_per_unit": 1493.3399658203125,
-      "low": 13.88000011444092,
+      "low": 13.880000114440916,
       "open": 14.050000190734863,
       "source_currency": "USD",
       "volume": 773126.0
+    },
+    {
+      "close": 14.020000457763672,
+      "close_krw": 20986.2584,
+      "currency": "USD",
+      "date": "2026-05-18",
+      "display_currency": "USD",
+      "high": 14.145000457763672,
+      "krw_per_unit": 1496.8800048828125,
+      "low": 13.920000076293945,
+      "open": 13.920000076293945,
+      "source_currency": "USD",
+      "volume": 190776.0
     }
   ],
   "symbol": "INMD"

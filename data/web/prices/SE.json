@@ -25428,6 +25428,19 @@
       "open": 88.19999694824219,
       "source_currency": "USD",
       "volume": 4224495.0
+    },
+    {
+      "close": 88.2699966430664,
+      "close_krw": 132129.593,
+      "currency": "USD",
+      "date": "2026-05-18",
+      "display_currency": "USD",
+      "high": 89.9739990234375,
+      "krw_per_unit": 1496.8800048828125,
+      "low": 86.37999725341797,
+      "open": 87.18000030517578,
+      "source_currency": "USD",
+      "volume": 910990.0
     }
   ],
   "symbol": "SE"
