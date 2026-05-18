@@ -18,6 +18,30 @@ All notable user-facing changes are tracked here. This project uses git tags as 
 - Add a collapsible desktop sidebar so wide data tables can use more horizontal space.
 - Add a styled native select wrapper and use it in `/screener` filters to avoid clipped Korean option text.
 
+## v0.21.1-mobile-and-polish.1 - 2026-05-18
+
+### Added
+- Add a mobile drawer to `AppShell`: the sidebar is now a sliding overlay on `<lg` viewports with a hamburger toggle in the top header, a scrim that closes the drawer on tap, and an auto-close on route change. The mobile chrome also surfaces the brand mark + product name on the top bar so phone users always know which app they're in.
+- Add a polished empty state to the `/reports` and `/screener` table bodies — when the active filter combination returns 0 rows, the table now shows a `SearchX` icon, an explanation of which filters can have over-narrowed the result, and a one-click "필터 초기화" button that resets the table back to its default preset.
+
+### Changed
+- Revert `formatKrw` back to raw comma-separated 원 (`12,345원`) per user direction. The earlier 억/만 chunking convention is removed; ledger pages, KPI tiles, and tooltips all display every digit again.
+- Strengthen the `SidebarNav` active state from `bg-slate-100 ring-1 ring-slate-200` (≈1.15:1 contrast vs. hover) to `bg-slate-950 text-white` so the current page is always the highest-contrast item in the navigation column.
+- Switch the `ReportsTable` `activeRowIdx` initial state from `0` to `null` so the first row no longer renders as "selected" before the user has touched `j`/`k`. The visual highlight only appears after the first navigation keystroke.
+- Make the screener `Select` component generic (`Select<T extends string>`) and pass `as const` option arrays so the `SignFilter`, `BooleanFilter`, and `MaFilter` `onChange` casts at four call sites are eliminated and the option literals statically constrain the value type.
+- Translate the screener column-pill labels in the active-filter chip row (`Ticker → 종목`, `Target Up → 상승여력`, `Gap → 목표 갭`, `Hit → 목표달성`, `Peak → 고점`, `Trough → 저점`, etc.) so the active-filter UI matches the Korean column headers.
+- Hide the "컬럼 필터 0개" noise from the screener helper bar when the count is zero and add a `/` shortcut hint inline.
+- Replace the screener "52W high" toggle's `<label>+<button>` dual-click area with a plain `<div>+<button>` (with `aria-pressed`) so the label text no longer pretends to be a clickable affordance.
+- Switch the `AppShell` sidebar collapse animation from a width-only transition to `transition-[transform,width,padding]` so the desktop collapse and the mobile drawer slide share a single transition pass.
+
+### Removed
+- Remove the unused `useEffect`-based initial state hydration for `sidebarCollapsed` in favour of a lazy `useState` initialiser — the layout no longer flashes expanded-then-collapsed on hard reload.
+
+### Verified
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web build` (413 static pages generated)
+
 ## v0.21.0-product-density-i18n.1 - 2026-05-18
 
 ### Added

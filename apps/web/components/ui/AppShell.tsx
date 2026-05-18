@@ -1,8 +1,9 @@
 'use client';
 
-import { ExternalLink, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { ExternalLink, Menu, PanelLeftClose, PanelLeftOpen, X } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { APP_NAV, GITHUB_NAV_ITEM } from '@/components/ui/app-shell-nav';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -39,6 +40,14 @@ export function AppShell({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
     () => typeof window !== 'undefined' && window.localStorage.getItem('snusmic.sidebar-collapsed') === '1',
   );
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const pathname = usePathname();
+  // Close the mobile drawer whenever the route changes — the drawer is overlay
+  // navigation, so each landing on a new page is a successful close gesture.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: pathname is the change trigger
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [pathname]);
   const toggleSidebar = () => {
     setSidebarCollapsed((value) => {
       const next = !value;
@@ -55,10 +64,22 @@ export function AppShell({
 
   return (
     <div className="ui-shell min-h-dvh bg-slate-50 text-slate-950">
+      {mobileNavOpen ? (
+        <button
+          type="button"
+          className="fixed inset-0 z-30 bg-slate-950/40 lg:hidden"
+          aria-label="메뉴 닫기"
+          onClick={() => setMobileNavOpen(false)}
+        />
+      ) : null}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-40 hidden border-r border-slate-200 bg-white/95 py-4 transition-[width,padding] duration-200 lg:flex lg:flex-col',
-          sidebarCollapsed ? 'w-16 px-2' : 'w-64 px-3',
+          'fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-slate-200 bg-white py-4 transition-[transform,width,padding] duration-200',
+          // Mobile drawer: slide off-canvas unless toggled
+          mobileNavOpen ? 'translate-x-0 px-3' : '-translate-x-full px-3',
+          // Desktop: always on-canvas, width toggled via collapsed state
+          'lg:translate-x-0',
+          sidebarCollapsed ? 'lg:w-16 lg:px-2' : 'lg:w-64 lg:px-3',
         )}
       >
         <Link
@@ -123,15 +144,38 @@ export function AppShell({
       </aside>
 
       <div className={cn('min-w-0 transition-[padding] duration-200', sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-64')}>
-        <header className="sticky top-0 z-30 border-b border-slate-200 bg-white">
-          <div className="flex min-h-12 items-center justify-end gap-2 px-4 sm:px-6 lg:px-8">
-            <Badge className="hidden font-mono sm:inline-flex" variant="outline">
-              {snapshotDate || '—'}
-            </Badge>
-            <Badge variant="success">읽기 전용</Badge>
-            <Button asChild size="sm" variant="outline">
-              <Link href="/guide">읽는 법</Link>
-            </Button>
+        <header className="sticky top-0 z-20 border-b border-slate-200 bg-white">
+          <div className="flex min-h-12 items-center justify-between gap-2 px-3 sm:px-6 lg:px-8">
+            <div className="flex min-w-0 items-center gap-2 lg:hidden">
+              <button
+                type="button"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-950"
+                aria-label={mobileNavOpen ? '메뉴 닫기' : '메뉴 열기'}
+                aria-expanded={mobileNavOpen}
+                onClick={() => setMobileNavOpen((value) => !value)}
+              >
+                {mobileNavOpen ? <X className="size-4" /> : <Menu className="size-4" />}
+              </button>
+              <Link
+                href="/main"
+                className="flex items-center gap-2 truncate text-sm font-semibold tracking-tight text-slate-950"
+                aria-label="SNUSMIC Portfolio Lab 메인"
+              >
+                <span className="grid size-7 place-items-center rounded-md bg-slate-950 text-[10px] font-semibold text-white">
+                  SM
+                </span>
+                <span className="truncate">SNUSMIC</span>
+              </Link>
+            </div>
+            <div className="flex flex-1 items-center justify-end gap-2">
+              <Badge className="hidden font-mono sm:inline-flex" variant="outline">
+                {snapshotDate || '—'}
+              </Badge>
+              <Badge variant="success">읽기 전용</Badge>
+              <Button asChild size="sm" variant="outline">
+                <Link href="/guide">읽는 법</Link>
+              </Button>
+            </div>
           </div>
         </header>
         <main className="mx-auto w-full max-w-[1800px] px-3 py-5 sm:px-4 lg:px-5" id="main-content">

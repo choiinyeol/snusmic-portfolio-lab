@@ -1,5 +1,6 @@
 'use client';
 
+import { SearchX } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { BlockPagination } from '@/components/trading/TableControls';
@@ -244,12 +245,8 @@ export function ReportsTable({ reports }: ReportsTableProps) {
   const visibleRows = filteredRows.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
 
   const router = useRouter();
-  const [activeRowIdx, setActiveRowIdx] = useState(0);
+  const [activeRowIdx, setActiveRowIdx] = useState<number | null>(null);
   const tbodyRef = useRef<HTMLTableSectionElement | null>(null);
-
-  useEffect(() => {
-    setActiveRowIdx(0);
-  }, []);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -262,11 +259,12 @@ export function ReportsTable({ reports }: ReportsTableProps) {
       if (visibleRows.length === 0) return;
       if (event.key === 'j') {
         event.preventDefault();
-        setActiveRowIdx((idx) => Math.min(visibleRows.length - 1, idx + 1));
+        setActiveRowIdx((idx) => (idx === null ? 0 : Math.min(visibleRows.length - 1, idx + 1)));
       } else if (event.key === 'k') {
         event.preventDefault();
-        setActiveRowIdx((idx) => Math.max(0, idx - 1));
+        setActiveRowIdx((idx) => (idx === null ? 0 : Math.max(0, idx - 1)));
       } else if (event.key === 'Enter') {
+        if (activeRowIdx === null) return;
         const row = visibleRows[Math.min(activeRowIdx, visibleRows.length - 1)];
         if (row) {
           event.preventDefault();
@@ -279,6 +277,7 @@ export function ReportsTable({ reports }: ReportsTableProps) {
   }, [activeRowIdx, router, visibleRows]);
 
   useEffect(() => {
+    if (activeRowIdx === null) return;
     const row = tbodyRef.current?.querySelectorAll<HTMLTableRowElement>('tr')[activeRowIdx];
     row?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }, [activeRowIdx]);
@@ -444,13 +443,34 @@ export function ReportsTable({ reports }: ReportsTableProps) {
           <tbody ref={tbodyRef}>
             {visibleRows.length === 0 ? (
               <tr>
-                <td className="p-6 text-center text-sm text-slate-500" colSpan={columns.length}>
-                  조건에 맞는 리포트가 없습니다. 검색어 또는 프리셋을 다시 확인해 주세요.
+                <td className="p-8" colSpan={columns.length}>
+                  <div className="mx-auto grid max-w-md gap-3 text-center">
+                    <SearchX aria-hidden="true" className="mx-auto size-6 text-slate-400" />
+                    <div className="text-sm font-semibold text-slate-950">조건에 맞는 리포트가 없습니다</div>
+                    <p className="text-xs leading-5 text-slate-500">
+                      검색어, 거래소, 목표 달성, 현재 수익률 필터 중 일부가 결합되어 모두 제외했을 수 있습니다.
+                    </p>
+                    <div>
+                      <button
+                        type="button"
+                        className="inline-flex h-8 items-center rounded-md border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-950"
+                        onClick={() => {
+                          setGlobalFilter('');
+                          setExchangeFilter('all');
+                          setHitFilter('all');
+                          setReturnFilter('all');
+                          applyPreset('recent');
+                        }}
+                      >
+                        필터 초기화
+                      </button>
+                    </div>
+                  </div>
                 </td>
               </tr>
             ) : (
               visibleRows.map((row, index) => (
-                <tr key={row.id} data-active={index === activeRowIdx ? 'true' : undefined}>
+                <tr key={row.id} data-active={activeRowIdx !== null && index === activeRowIdx ? 'true' : undefined}>
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
                   ))}

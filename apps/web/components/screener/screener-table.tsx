@@ -11,6 +11,7 @@ import {
   type VisibilityState,
   useReactTable,
 } from '@tanstack/react-table';
+import { SearchX } from 'lucide-react';
 import Link from 'next/link';
 import { Fragment, useCallback, useDeferredValue, useMemo, useState } from 'react';
 import { BlockPagination } from '@/components/trading/TableControls';
@@ -443,46 +444,47 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
               }}
               options={buckets}
             />
-            <Select
+            <Select<SignFilter>
               label="수익률 방향"
               value={returnFilter}
               onChange={(value) => {
-                setReturnFilter(value as SignFilter);
+                setReturnFilter(value);
                 resetPage();
               }}
-              options={['all', 'positive', 'negative']}
+              options={['all', 'positive', 'negative'] as const}
             />
-            <Select
+            <Select<BooleanFilter>
               label="목표 도달"
               value={targetHitFilter}
               onChange={(value) => {
-                setTargetHitFilter(value as BooleanFilter);
+                setTargetHitFilter(value);
                 resetPage();
               }}
-              options={['all', 'yes', 'no']}
+              options={['all', 'yes', 'no'] as const}
             />
-            <Select
+            <Select<BooleanFilter>
               label="만료"
               value={expiredFilter}
               onChange={(value) => {
-                setExpiredFilter(value as BooleanFilter);
+                setExpiredFilter(value);
                 resetPage();
               }}
-              options={['no', 'all', 'yes']}
+              options={['no', 'all', 'yes'] as const}
             />
-            <Select
+            <Select<MaFilter>
               label="이동평균"
               value={maFilter}
               onChange={(value) => {
-                setMaFilter(value as MaFilter);
+                setMaFilter(value);
                 resetPage();
               }}
-              options={['all', 'above', 'below']}
+              options={['all', 'above', 'below'] as const}
             />
-            <label className="grid gap-1 text-xs font-medium text-slate-500">
-              <span>52W high</span>
+            <div className="grid gap-1 text-xs font-medium text-slate-500">
+              <span>52주 고점</span>
               <button
                 type="button"
+                aria-pressed={nearHighOnly}
                 className={toggleClass(nearHighOnly)}
                 onClick={() => {
                   setNearHighOnly((value) => !value);
@@ -491,13 +493,15 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
               >
                 -10% 이내
               </button>
-            </label>
+            </div>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
           <span>
-            열 제목 정렬 · 컬럼 필터 {activeColumnFilterCount}개 · 가격 지표는 getPriceSeries(symbol)에서 계산
+            열 제목으로 정렬 · <kbd className="rounded border border-slate-300 bg-white px-1 font-mono">/</kbd> 검색 ·{' '}
+            {activeColumnFilterCount > 0 ? `컬럼 필터 ${activeColumnFilterCount}개 적용 중 · ` : ''}
+            가격 지표는 getPriceSeries(symbol)
           </span>
           <span>
             {filteredRows.length.toLocaleString('ko-KR')} / {rows.length.toLocaleString('ko-KR')}개 · 페이지당{' '}
@@ -575,8 +579,28 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
             <tbody>
               {visibleRows.length === 0 ? (
                 <tr>
-                  <td className="p-6 text-center text-sm text-slate-500" colSpan={table.getVisibleLeafColumns().length}>
-                    조건에 맞는 종목이 없습니다. 프리셋·필터·검색어를 다시 확인해 주세요.
+                  <td className="p-8" colSpan={table.getVisibleLeafColumns().length}>
+                    <div className="mx-auto grid max-w-md gap-3 text-center">
+                      <SearchX aria-hidden="true" className="mx-auto size-6 text-slate-400" />
+                      <div className="text-sm font-semibold text-slate-950">조건에 맞는 종목이 없습니다</div>
+                      <p className="text-xs leading-5 text-slate-500">
+                        프리셋·필터·컬럼 필터·검색어가 동시에 적용되면 종목이 모두 제외될 수 있습니다.
+                      </p>
+                      <div>
+                        <button
+                          type="button"
+                          className="inline-flex h-8 items-center rounded-md border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-950"
+                          onClick={() => {
+                            setGlobalFilter('');
+                            setBucketFilter('all');
+                            clearColumnFilters();
+                            applyPreset('all');
+                          }}
+                        >
+                          필터 초기화
+                        </button>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               ) : (
@@ -1045,21 +1069,21 @@ function BoardMetric({ label, value, caption }: { label: string; value: string; 
   );
 }
 
-function Select({
+function Select<T extends string>({
   label,
   value,
   options,
   onChange,
 }: {
   label: string;
-  value: string;
-  options: string[];
-  onChange: (value: string) => void;
+  value: T;
+  options: readonly T[];
+  onChange: (value: T) => void;
 }) {
   return (
     <div className="grid gap-1 text-xs font-medium text-slate-500">
       <span>{label}</span>
-      <NativeSelect aria-label={label} value={value} onChange={(event) => onChange(event.target.value)}>
+      <NativeSelect aria-label={label} value={value} onChange={(event) => onChange(event.target.value as T)}>
         {options.map((option) => (
           <NativeSelectOption key={option} value={option}>
             {filterOptionLabel(option)}
@@ -1295,34 +1319,34 @@ function modeLabel(mode: ColumnMode): string {
 function columnLabel(columnId: string): string {
   return (
     {
-      symbol: 'Ticker',
-      company: 'Company',
-      currency: 'Ccy',
-      latestReportDate: 'Report',
-      lastCloseNative: 'Price',
-      volumeLatest: 'Vol',
-      entryPriceNative: 'Entry',
-      targetPriceNative: 'Target',
-      targetUpsideAtPub: 'Target Up',
-      targetGapPct: 'Gap',
-      targetRemainingPct: 'Remain',
-      targetProgressPct: 'Progress',
-      targetHit: 'Hit',
-      daysToTarget: 'Days',
-      expired: 'Exp',
-      currentReturn: 'Current',
-      peakReturn: 'Peak',
-      troughReturn: 'Trough',
+      symbol: '종목',
+      company: '회사',
+      currency: '통화',
+      latestReportDate: '리포트',
+      lastCloseNative: '현재가',
+      volumeLatest: '거래량',
+      entryPriceNative: '진입가',
+      targetPriceNative: '목표가',
+      targetUpsideAtPub: '상승여력',
+      targetGapPct: '목표 갭',
+      targetRemainingPct: '목표 잔여',
+      targetProgressPct: '달성률',
+      targetHit: '목표달성',
+      daysToTarget: '도달일수',
+      expired: '만료',
+      currentReturn: '현재 수익률',
+      peakReturn: '고점',
+      troughReturn: '저점',
       ytdReturn: 'YTD',
-      return1y: '1Y',
-      distanceFrom52wHigh: '52W High',
+      return1y: '1년',
+      distanceFrom52wHigh: '52주 고점',
       above20ma: '20SMA',
       above50ma: '50SMA',
       above200ma: '200SMA',
-      candidateBucket: 'Bucket',
-      candidateScore: 'Score',
-      rankBasis: 'Basis',
-      caveatFlags: 'Caveat',
+      candidateBucket: '후보 유형',
+      candidateScore: '점수',
+      rankBasis: '근거',
+      caveatFlags: '경고',
     }[columnId] ?? columnId
   );
 }
@@ -1330,5 +1354,5 @@ function columnLabel(columnId: string): string {
 function sortIndicator(direction: false | 'asc' | 'desc'): string {
   if (direction === 'asc') return ' ↑';
   if (direction === 'desc') return ' ↓';
-  return ' ↕';
+  return '';
 }
