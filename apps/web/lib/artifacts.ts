@@ -655,7 +655,13 @@ function withOhlcTargetTouch(report: ReportRow): ReportRow {
 /** Always recompute the report's latest price, current return, and peak/trough
  * return off the full price series so expired reports do not freeze at the
  * artifact's cap date. The artifact still owns target-hit semantics within the
- * validation window; this only refreshes the "as of today" view. */
+ * validation window; this only refreshes the "as of today" view.
+ *
+ * Also corrects PDF-extracted entry/target prices that diverge ≥5× from the
+ * publication-day close (a strong split / data-extraction signal). When that
+ * happens, the entry snaps to the publication-day close and the target is
+ * rescaled by the same ratio so 코세스-style "진입가 10원" artifacts stop
+ * leaking through to the screener and report table. */
 function withLatestNativeClose(report: ReportRow): ReportRow {
   if (!report.symbol) return report;
   const fullPrices = getPriceSeries(report.symbol);
@@ -665,7 +671,42 @@ function withLatestNativeClose(report: ReportRow): ReportRow {
   if (lastCloseNative === null || lastCloseNative === undefined || !Number.isFinite(lastCloseNative)) {
     return report;
   }
-  const entry = report.entryPriceNative;
+
+  // Detect split / extraction errors before recomputing returns.
+  let entry: number | null = report.entryPriceNative;
+  let targetPriceNative = report.targetPriceNative;
+  let targetPriceKrw = report.targetPriceKrw;
+  let entryPriceKrw = report.entryPriceKrw;
+  const pubPoint = report.publicationDate ? fullPrices.find((point) => point.time >= report.publicationDate) : null;
+  const pubClose = pubPoint?.close ?? pubPoint?.value ?? null;
+  if (
+    pubClose !== null &&
+    pubClose !== undefined &&
+    Number.isFinite(pubClose) &&
+    pubClose > 0 &&
+    entry !== null &&
+    entry !== undefined &&
+    Number.isFinite(entry) &&
+    entry > 0
+  ) {
+    const ratio = entry / pubClose;
+    if (ratio > 5 || ratio < 0.2) {
+      // Treat as suspected split / extraction defect; rescale target by the same
+      // ratio so the relative upside stays intact while absolute prices align
+      // with the post-split series the chart already shows.
+      if (targetPriceNative !== null && Number.isFinite(targetPriceNative)) {
+        targetPriceNative = targetPriceNative / ratio;
+      }
+      if (targetPriceKrw !== null && Number.isFinite(targetPriceKrw)) {
+        targetPriceKrw = targetPriceKrw / ratio;
+      }
+      if (entryPriceKrw !== null && Number.isFinite(entryPriceKrw)) {
+        entryPriceKrw = entryPriceKrw / ratio;
+      }
+      entry = pubClose;
+    }
+  }
+
   const currentReturn =
     entry !== null && entry !== undefined && Number.isFinite(entry) && entry !== 0
       ? lastCloseNative / entry - 1
@@ -689,6 +730,10 @@ function withLatestNativeClose(report: ReportRow): ReportRow {
   return {
     ...report,
     currency: latest.currency ?? report.currency,
+    entryPriceNative: entry,
+    entryPriceKrw,
+    targetPriceNative,
+    targetPriceKrw,
     lastCloseNative,
     lastCloseDate: latest.time ?? report.lastCloseDate,
     currentReturn,

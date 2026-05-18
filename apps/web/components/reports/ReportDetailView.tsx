@@ -3,7 +3,7 @@ import { PriceEvidenceChart } from '@/components/charts/PriceEvidenceChart';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getPriceSeries, getReportStatisticsLabSummary, type ReportRow } from '@/lib/artifacts';
-import { formatDateKo, formatDays, formatPercent } from '@/lib/format';
+import { formatDateKo, formatDays, formatKrw, formatPercent } from '@/lib/format';
 import {
   buildPathEvidence,
   buildScenarioRows,
@@ -84,13 +84,21 @@ export function ReportDetailView({ report }: { report: ReportRow }) {
           { label: '발간일', value: formatDateKo(report.publicationDate) },
           { label: '만료일', value: formatDateKo(report.expiryDate) },
           { label: '최근 가격일', value: formatDateKo(liveCloseDate) },
-          { label: '발간가', value: formatAssetPrice(entryPrice, report) },
+          {
+            label: '발간가',
+            value: formatAssetPrice(entryPrice, report),
+            caption: krwCaption(report.entryPriceKrw, report.currency),
+          },
           {
             label: '목표가',
             value: formatAssetPrice(report.targetPriceNative, report),
-            caption: targetMoveLabel(report),
+            caption: combineCaption(targetMoveLabel(report), krwCaption(report.targetPriceKrw, report.currency)),
           },
-          { label: '현재가', value: formatAssetPrice(liveCloseNative, report) },
+          {
+            label: '현재가',
+            value: formatAssetPrice(liveCloseNative, report),
+            caption: krwCaption(report.lastCloseKrw, report.currency),
+          },
           { label: '제시 상승여력', value: formatPercent(targetReturn) },
           { label: '현재 수익률', value: formatPercent(liveCurrentReturn), tone: signedTone(liveCurrentReturn) },
           { label: '최고 수익률', value: formatPercent(livePeakReturn), tone: 'good' },
@@ -168,7 +176,9 @@ function FactsTable({ rows }: { rows: FactRow[] }) {
 }
 
 function ScenarioTable({ rows, report }: { rows: ScenarioRow[]; report: ReportRow }) {
-  if (rows.length === 0) return null;
+  // 현재가 행은 FactsTable에 같은 값이 이미 있어서 제거 (중복 제거).
+  const filteredRows = rows.filter((row) => row.label !== '현재가');
+  if (filteredRows.length === 0) return null;
   return (
     <section className="grid gap-2" aria-labelledby="scenario-heading">
       <h2
@@ -189,7 +199,7 @@ function ScenarioTable({ rows, report }: { rows: ScenarioRow[]; report: ReportRo
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {rows.map((row) => (
+            {filteredRows.map((row) => (
               <tr key={row.label}>
                 <td className="px-3 py-2 font-medium text-slate-950">{row.label}</td>
                 <td className="px-3 py-2 text-xs text-slate-500">{row.point?.time ?? '—'}</td>
@@ -228,6 +238,18 @@ function badgeVariant(
   if (tone === 'bad') return 'destructive';
   if (tone === 'warn') return 'warning';
   return 'default';
+}
+
+function krwCaption(krw: number | null | undefined, currency: string | null | undefined): string | undefined {
+  if (!krw || !Number.isFinite(krw)) return undefined;
+  if ((currency ?? 'KRW').toUpperCase() === 'KRW') return undefined;
+  return `≈ ${formatKrw(krw)}`;
+}
+
+function combineCaption(a: string | undefined | null, b: string | undefined | null): string | undefined {
+  const parts = [a, b].filter((value): value is string => Boolean(value));
+  if (parts.length === 0) return undefined;
+  return parts.join(' · ');
 }
 
 function returnFromEntry(entry: number | null | undefined, current: number | null | undefined): number | null {

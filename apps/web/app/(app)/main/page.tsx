@@ -23,11 +23,7 @@ export default function OverviewPage() {
               <Badge variant="secondary">{selectedStrategy?.shortLabel || overview.portfolio.label}</Badge>
               <Badge variant="success">읽기 전용</Badge>
             </div>
-            <h1 className="text-3xl font-semibold tracking-[-0.02em] text-slate-950 md:text-5xl">메인화면</h1>
-            <p className="mt-3 max-w-4xl text-sm leading-7 text-slate-600">
-              오늘 판단에 필요한 것만 먼저 봅니다. 보유 포지션의 재검토 사유, 현금과 손익의 관계, 리포트 통계로 넘어갈
-              근거를 한 화면에 모으고 세부 차트는 전용 페이지에서 확인합니다.
-            </p>
+            <h1 className="text-2xl font-semibold tracking-[-0.02em] text-slate-950 md:text-4xl">메인화면</h1>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button asChild size="sm" variant="outline">
@@ -117,10 +113,6 @@ export default function OverviewPage() {
                 </strong>
               </div>
               <Progress className="mt-2" value={(overview.portfolio.cashWeight ?? 0) * 100} />
-              <p className="mt-2 text-xs leading-5 text-slate-500">
-                현금은 확정손익 누계가 아니라 보유 포지션 원가를 차감한 대기 자금입니다. 숫자가 어긋나 보이면 포트폴리오
-                화면의 조정표를 먼저 확인합니다.
-              </p>
             </div>
           </section>
 
@@ -141,10 +133,6 @@ export default function OverviewPage() {
               <Stat label="현재 플러스" value={formatPercent(reportStats.positiveReturnRate)} />
               <Stat label="중앙값" value={formatPercent(reportStats.medianCurrentReturn)} />
             </div>
-            <p className="mt-4 text-xs leading-5 text-slate-500">
-              평균보다 분포와 경로를 먼저 봅니다. 0.8x 목표, 발간 후 지연 진입, 목표 도달 후 보유 성과는 통계 페이지에서
-              인터랙티브하게 확인합니다.
-            </p>
           </section>
         </aside>
       </section>
@@ -193,17 +181,19 @@ export default function OverviewPage() {
         </article>
       </section>
 
-      <section className="grid gap-2 border-t border-slate-200 pt-4 sm:grid-cols-4">
-        <Drilldown
-          href="/portfolio"
-          icon={<ShieldCheck />}
-          title="포트폴리오"
-          caption="보유·현금·매매내역"
-          variant="primary"
-        />
-        <Drilldown href="/reports" icon={<FileText />} title="리포트" caption="목표가 검증 표" />
-        <Drilldown href="/reports/statistics" icon={<BarChart3 />} title="통계" caption="분포·경로·익절선" />
-        <Drilldown href="/strategies" icon={<DatabaseZap />} title="전략" caption="벤치마크·위험 성과" />
+      <section className="overflow-hidden rounded-md border border-slate-200 bg-white" aria-label="페이지 바로가기">
+        <ul className="divide-y divide-slate-100">
+          <DrilldownRow
+            href="/portfolio"
+            icon={<ShieldCheck />}
+            title="포트폴리오"
+            caption="보유·현금·매매내역"
+            primary
+          />
+          <DrilldownRow href="/reports" icon={<FileText />} title="리포트" caption="목표가 검증 표" />
+          <DrilldownRow href="/reports/statistics" icon={<BarChart3 />} title="통계" caption="분포·경로·익절선" />
+          <DrilldownRow href="/strategies" icon={<DatabaseZap />} title="전략" caption="벤치마크·위험 성과" />
+        </ul>
       </section>
     </div>
   );
@@ -227,45 +217,40 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function Drilldown({
+function DrilldownRow({
   href,
   icon,
   title,
   caption,
-  variant = 'default',
+  primary = false,
 }: {
   href: string;
   icon: React.ReactNode;
   title: string;
   caption: string;
-  variant?: 'default' | 'primary';
+  primary?: boolean;
 }) {
-  const isPrimary = variant === 'primary';
   return (
-    <Link
-      className={
-        isPrimary
-          ? 'grid grid-cols-[2rem_minmax(0,1fr)] items-center gap-3 border border-slate-950 bg-slate-950 p-3 text-white transition-colors hover:bg-slate-900'
-          : 'grid grid-cols-[2rem_minmax(0,1fr)] items-center gap-3 border border-slate-200 bg-white p-3 transition-colors hover:border-slate-300 hover:bg-slate-50'
-      }
-      href={href}
-    >
-      <span
-        className={
-          isPrimary
-            ? 'grid size-8 place-items-center text-white [&_svg]:size-4'
-            : 'grid size-8 place-items-center text-slate-500 [&_svg]:size-4'
-        }
-      >
-        {icon}
-      </span>
-      <span className="grid min-w-0 gap-0.5">
-        <span className={isPrimary ? 'font-semibold text-white' : 'font-medium text-slate-950'}>{title}</span>
-        <span className={isPrimary ? 'truncate text-xs text-white/70' : 'truncate text-xs text-slate-500'}>
-          {caption}
+    <li>
+      <Link className="group flex items-center gap-3 px-3 py-2.5 transition-colors hover:bg-slate-50" href={href}>
+        <span
+          className={`grid size-7 shrink-0 place-items-center rounded-md [&_svg]:size-4 ${
+            primary ? 'bg-slate-950 text-white' : 'bg-slate-100 text-slate-600'
+          }`}
+        >
+          {icon}
         </span>
-      </span>
-    </Link>
+        <span className="grid min-w-0 flex-1 grid-cols-[minmax(0,8rem)_minmax(0,1fr)] gap-3 sm:grid-cols-[minmax(0,7rem)_minmax(0,1fr)]">
+          <span
+            className={`truncate text-sm ${primary ? 'font-semibold text-slate-950' : 'font-medium text-slate-950'}`}
+          >
+            {title}
+          </span>
+          <span className="truncate text-xs text-slate-500">{caption}</span>
+        </span>
+        <ArrowUpRight aria-hidden="true" className="size-4 shrink-0 text-slate-400 group-hover:text-slate-700" />
+      </Link>
+    </li>
   );
 }
 
