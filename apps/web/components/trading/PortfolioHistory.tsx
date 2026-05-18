@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import type { MonthlyHoldingRow, ReportTargetDigest } from '@/lib/artifacts';
 import { Money } from '@/components/ui/Money';
-import { formatKrw, formatPercent } from '@/lib/format';
+import { formatDateKo, formatKrw, formatPercent } from '@/lib/format';
 import { PaginationControls, SortHeader, pageRows, sortRows, type SortState } from './TableControls';
 
 type Props = {
@@ -244,7 +244,7 @@ export function PortfolioHistory({ monthly, persona, personaLabels, targetsBySym
                         ) : (
                           '—'
                         )}
-                        <div className="text-xs text-slate-950/55">{target?.publicationDate ?? '—'}</div>
+                        <div className="text-xs text-slate-950/55">{formatDateKo(target?.publicationDate)}</div>
                       </td>
                       <td className="tabular-nums">{row.qty?.toLocaleString('ko-KR') ?? '—'}</td>
                       <td>

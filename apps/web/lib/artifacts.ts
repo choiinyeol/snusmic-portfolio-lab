@@ -652,15 +652,48 @@ function withOhlcTargetTouch(report: ReportRow): ReportRow {
   };
 }
 
+/** Always recompute the report's latest price, current return, and peak/trough
+ * return off the full price series so expired reports do not freeze at the
+ * artifact's cap date. The artifact still owns target-hit semantics within the
+ * validation window; this only refreshes the "as of today" view. */
 function withLatestNativeClose(report: ReportRow): ReportRow {
-  if (report.lastCloseNative !== null) return report;
-  const prices = getPriceSeries(report.symbol, undefined, report.lastCloseDate);
-  const latest = prices.at(-1);
+  if (!report.symbol) return report;
+  const fullPrices = getPriceSeries(report.symbol);
+  const latest = fullPrices.at(-1);
   if (!latest) return report;
+  const lastCloseNative = latest.close ?? latest.value;
+  if (lastCloseNative === null || lastCloseNative === undefined || !Number.isFinite(lastCloseNative)) {
+    return report;
+  }
+  const entry = report.entryPriceNative;
+  const currentReturn =
+    entry !== null && entry !== undefined && Number.isFinite(entry) && entry !== 0
+      ? lastCloseNative / entry - 1
+      : report.currentReturn;
+  // Peak/trough span the entire post-publication path so the table reflects the
+  // full lifetime, not just the validation window.
+  const pricesSincePublication = report.publicationDate
+    ? fullPrices.filter((point) => point.time >= report.publicationDate)
+    : fullPrices;
+  const closes = pricesSincePublication
+    .map((point) => point.close ?? point.value)
+    .filter((value): value is number => value !== null && value !== undefined && Number.isFinite(value));
+  const peakReturn =
+    entry && Number.isFinite(entry) && entry !== 0 && closes.length
+      ? Math.max(...closes) / entry - 1
+      : report.peakReturn;
+  const troughReturn =
+    entry && Number.isFinite(entry) && entry !== 0 && closes.length
+      ? Math.min(...closes) / entry - 1
+      : report.troughReturn;
   return {
     ...report,
     currency: latest.currency ?? report.currency,
-    lastCloseNative: latest.close ?? latest.value,
+    lastCloseNative,
+    lastCloseDate: latest.time ?? report.lastCloseDate,
+    currentReturn,
+    peakReturn,
+    troughReturn,
   };
 }
 

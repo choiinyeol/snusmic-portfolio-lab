@@ -129,8 +129,6 @@ export function PortfolioPageContent({ selectedPersona }: { selectedPersona?: st
           { label: '벤치마크', value: `${benchmarkPersonas.length}개` },
           { label: '매매내역', value: allTrades.length.toLocaleString('ko-KR') },
           { label: '최근 평가', value: latestEquity || '—' },
-          { label: '데이터', value: '저장 기준' },
-          { label: '거래', value: '실시간 매매 아님' },
         ]}
       />
 
