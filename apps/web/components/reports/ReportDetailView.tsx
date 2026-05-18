@@ -15,8 +15,9 @@ import {
 } from '@/lib/report-view-model';
 
 export function ReportDetailView({ report }: { report: ReportRow }) {
-  // End-cap at lastCloseDate so expired reports stop at expiry, not today.
-  const prices = getPriceSeries(report.symbol, undefined, report.lastCloseDate);
+  // Read the full price series — not end-capped at the report's lastCloseDate —
+  // so expired reports still show the live chart and the live current price.
+  const prices = getPriceSeries(report.symbol);
   const pathEvidence = buildPathEvidence(prices, report);
   const scenarioRows = buildScenarioRows(prices, report);
   const status = targetStatus(report);
@@ -26,11 +27,30 @@ export function ReportDetailView({ report }: { report: ReportRow }) {
   const pdfHref = pdfHrefFor(report);
 
   const entryPrice = reportEntryPrice(report);
+
+  // Live overrides recomputed off the full price series so the displayed
+  // current price / return / peak / trough reflect today's market, not the
+  // artifact's expiry-day snapshot for expired reports.
+  const latestPoint = prices.at(-1) ?? null;
+  const liveCloseNative = latestPoint?.close ?? latestPoint?.value ?? report.lastCloseNative;
+  const liveCloseDate = latestPoint?.time ?? report.lastCloseDate;
+  const liveCurrentReturn = returnFromEntry(entryPrice, liveCloseNative) ?? report.currentReturn;
+  const livePeakReturn = pathEvidence.peak
+    ? (returnFromEntry(entryPrice, pathEvidence.peak.value) ?? report.peakReturn)
+    : report.peakReturn;
+  const liveTroughReturn = pathEvidence.trough
+    ? (returnFromEntry(entryPrice, pathEvidence.trough.value) ?? report.troughReturn)
+    : report.troughReturn;
+
   const targetReturn = reportOutcome?.targetReturn ?? report.targetUpsideAtPub;
-  const currentReturn = reportOutcome?.currentReturn ?? report.currentReturn;
-  const peakReturn = reportOutcome?.maxFavorableExcursion ?? report.peakReturn;
-  const troughReturn = reportOutcome?.maxAdverseExcursion ?? report.troughReturn;
-  const captureRatio = reportOutcome?.upsideCaptureRatio ?? captureFromReport(report);
+  const captureRatio =
+    livePeakReturn !== null &&
+    targetReturn !== null &&
+    targetReturn !== 0 &&
+    Number.isFinite(livePeakReturn) &&
+    Number.isFinite(targetReturn)
+      ? livePeakReturn / targetReturn
+      : (reportOutcome?.upsideCaptureRatio ?? captureFromReport(report));
   const stage = stageLabel(reportOutcome, report);
 
   return (
@@ -63,18 +83,18 @@ export function ReportDetailView({ report }: { report: ReportRow }) {
         rows={[
           { label: '발간일', value: formatDateKo(report.publicationDate) },
           { label: '만료일', value: formatDateKo(report.expiryDate) },
-          { label: '최근 가격일', value: formatDateKo(report.lastCloseDate) },
+          { label: '최근 가격일', value: formatDateKo(liveCloseDate) },
           { label: '발간가', value: formatAssetPrice(entryPrice, report) },
           {
             label: '목표가',
             value: formatAssetPrice(report.targetPriceNative, report),
             caption: targetMoveLabel(report),
           },
-          { label: '현재가', value: formatAssetPrice(report.lastCloseNative, report) },
+          { label: '현재가', value: formatAssetPrice(liveCloseNative, report) },
           { label: '제시 상승여력', value: formatPercent(targetReturn) },
-          { label: '현재 수익률', value: formatPercent(currentReturn), tone: signedTone(currentReturn) },
-          { label: '최고 수익률', value: formatPercent(peakReturn), tone: 'good' },
-          { label: '최저 수익률', value: formatPercent(troughReturn), tone: 'bad' },
+          { label: '현재 수익률', value: formatPercent(liveCurrentReturn), tone: signedTone(liveCurrentReturn) },
+          { label: '최고 수익률', value: formatPercent(livePeakReturn), tone: 'good' },
+          { label: '최저 수익률', value: formatPercent(liveTroughReturn), tone: 'bad' },
           { label: '목표 도달 단계', value: stage },
           {
             label: '도달 정보',
@@ -208,6 +228,21 @@ function badgeVariant(
   if (tone === 'bad') return 'destructive';
   if (tone === 'warn') return 'warning';
   return 'default';
+}
+
+function returnFromEntry(entry: number | null | undefined, current: number | null | undefined): number | null {
+  if (
+    entry === null ||
+    entry === undefined ||
+    current === null ||
+    current === undefined ||
+    !Number.isFinite(entry) ||
+    !Number.isFinite(current) ||
+    entry === 0
+  ) {
+    return null;
+  }
+  return current / entry - 1;
 }
 
 function captureFromReport(report: ReportRow): number | null {
