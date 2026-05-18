@@ -1,105 +1,109 @@
-# Data Surface Architecture
+# 데이터 표면 아키텍처
 
-Last updated: 2026-05-13
+Last updated: 2026-05-19
 
-## Problem
+## 문제
 
-The app has been improving visually, but several pages still reconstruct the same meaning independently:
+앱이 시각적으로는 계속 개선되었지만 여러 페이지가 같은 의미를 각자 재구성하던 시기가 있었습니다.
 
-- Overview hardcodes a primary persona.
-- Portfolio defaults to a different local selector rule.
-- Strategies owns benchmark separation through frontend constants.
-- Report ranking views can show different columns for the same rows.
-- Strategy IDs encode meaning that should be data.
+- 메인이 1차 페르소나를 하드코딩.
+- 포트폴리오는 별도의 로컬 셀렉터 규칙으로 기본 전략을 골랐음.
+- 전략 페이지가 벤치마크 분리를 프론트엔드 상수로 소유했음.
+- 동일 행을 다루는 리포트 랭킹 뷰가 컬럼 구성을 다르게 보였음.
+- 페르소나 ID에 비즈니스 의미가 인코딩되어 있었음.
 
-This creates a negative feedback loop: each UI improvement adds another local interpretation, then later work has to patch the duplicates.
+이런 구조는 부정적 피드백 루프를 만들었습니다 — UI 개선마다 새 지역 해석이 추가되고, 이후 작업이 중복을 패치해야 했습니다.
 
-## Target boundary
+## 목표 경계
 
-The Python exporter should produce product-shaped data bundles. The frontend renders those bundles and only performs light formatting/filtering.
+Python 익스포터는 **제품 형태의 데이터 번들**을 만들고, 프론트엔드는 그 번들을 렌더링하면서 가벼운 포맷팅/필터링만 수행합니다.
 
 ```text
-Pipeline → domain artifacts → page bundles → frontend readers → shared components
+Pipeline → 도메인 아티팩트 → 페이지 번들 → 프론트엔드 리더 → 공유 컴포넌트
 ```
 
-A page should be able to answer: “which artifact owns my data?” without importing every raw artifact.
+각 페이지는 "내 데이터를 어떤 아티팩트가 소유하는가?"를 모든 raw 아티팩트를 import하지 않고도 답할 수 있어야 합니다.
 
-## Strategy catalog contract
+## 전략 카탈로그 계약
 
-`data/web/strategies/catalog.json` is the first required step. It defines benchmark/strategy/oracle taxonomy and strategy methodology.
+`data/web/strategies/catalog.json`이 첫 필수 단계입니다. 벤치마크/전략/오라클 분류와 전략 방법론을 정의합니다.
 
-Required semantics:
+필요한 의미:
 
-- Benchmarks are comparison baselines.
-- Weak Prophet is an oracle/future-information benchmark.
-- Selectable strategies are user-reviewable broker-ledger strategies.
-- Default overview strategy is chosen from the catalog, not hardcoded.
-- MTT strategy buy/sell rules are rendered from catalog methodology.
+- 벤치마크는 비교 기준선입니다.
+- Weak Prophet은 오라클/미래정보 벤치마크입니다.
+- 선택 가능 전략은 사용자가 검토할 수 있는 broker-ledger 전략입니다.
+- 메인의 기본 전략은 카탈로그에서 선택되며 하드코딩되지 않습니다.
+- MTT 전략의 매수/매도 규칙은 카탈로그 방법론에서 렌더됩니다.
 
-## Page bundle plan
+## 페이지 번들 계획
 
-### Overview
+### 메인 (Overview)
 
-Consumes:
+소비:
 
-- selected/default strategy snapshot,
-- objective gate result,
-- concise strategy/benchmark comparison,
-- current holdings including cash,
-- latest research pulse.
+- 선택/기본 전략 스냅샷
+- 목표 게이트 결과
+- 간결한 전략/벤치마크 비교
+- 현금을 포함한 현재 보유
+- 최신 리서치 펄스
 
-Does not own full tables.
+전체 표는 소유하지 않습니다.
 
-### Portfolio
+### 포트폴리오
 
-Consumes:
+소비:
 
-- strategy catalog selector options,
-- holdings by selected strategy,
-- cash by selected strategy,
-- trade ledger,
-- position episodes,
-- equity path.
+- 전략 카탈로그 셀렉터 옵션
+- 선택 전략의 보유
+- 선택 전략의 현금
+- 매매 원장
+- 포지션 에피소드
+- equity 경로
 
-Owns “why did it buy/sell?” explanations.
+"왜 사고/팔았는가?" 설명을 소유합니다.
 
-### Reports / Research
+### 리포트 / 리서치
 
-Consumes one unified report table and presets. Ranking modes must change sort/filter defaults, not columns.
+하나의 통합 리포트 표와 프리셋을 소비합니다. 랭킹 모드는 컬럼이 아니라 정렬/필터 기본값을 바꿉니다.
 
-### Strategies
+### 스크리너
 
-Consumes:
+가격 매칭 메트릭(YTD/1Y/52W/SMA)이 결합된 후보 보드를 소비합니다. 스프레드시트형 컬럼 필터·연산자 표현식을 소유합니다. 리포트 표와 표면을 공유하지 않습니다.
 
-- strategy catalog,
-- leaderboard metrics,
-- benchmark lines,
-- selectable strategy lines,
-- objective gate,
-- methodology cards.
+### 전략 (Strategies)
 
-Owns “what are the rules and why did it pass/fail?”
+소비:
 
-### Guide
+- 전략 카탈로그
+- 리더보드 지표
+- 벤치마크 라인
+- 선택 가능 전략 라인
+- 목표 게이트
+- 방법론 카드
 
-Consumes curated examples or small derived samples, not raw full artifacts. It explains the product flow and metric definitions interactively.
+"규칙이 무엇이고 왜 통과/실패했는가?"를 소유합니다.
 
-## Deletion targets
+### 가이드
 
-- Frontend hardcoded `PRIMARY_PERSONA` as business truth.
-- Frontend-only benchmark taxonomy as the only source of truth.
-- Multiple report ranking UIs with different columns over the same row type.
-- Long chart legends without series visibility controls.
-- Developer-facing copy in primary SaaS surfaces.
+큐레이트된 예제 또는 작은 파생 샘플을 소비합니다. raw 전체 아티팩트를 가져가지 않습니다. 제품 흐름과 지표 정의를 인터랙티브하게 설명합니다.
 
-## Implemented slices
+## 제거 대상
 
-1. `strategies/catalog.json` export defines benchmark / strategy / oracle taxonomy.
-2. Zod readers validate the strategy catalog and required app artifacts.
-3. Overview default strategy is selected from the catalog rather than a hardcoded persona.
-4. MTT strategy method summaries are rendered from exported rules and params.
-5. Performance charts use visible series controls.
-6. Page-owned bundles now exist under:
+- 비즈니스 진실로 쓰이던 프론트엔드 하드코딩 `PRIMARY_PERSONA`.
+- 진실의 원천이던 프론트엔드 전용 벤치마크 분류.
+- 같은 행을 다루면서 컬럼이 다른 다중 리포트 랭킹 UI.
+- 시리즈 가시성 컨트롤 없는 긴 차트 legend.
+- 1차 SaaS 표면에 등장하는 개발자 향 카피.
+
+## 구현된 슬라이스
+
+1. `strategies/catalog.json` export가 벤치마크/전략/오라클 분류를 정의합니다.
+2. Zod 리더가 전략 카탈로그와 필수 앱 아티팩트를 검증합니다.
+3. 메인의 기본 전략은 하드코딩된 페르소나가 아니라 카탈로그에서 선택됩니다.
+4. MTT 전략 메소드 요약은 export된 규칙과 파라미터에서 렌더됩니다.
+5. 성능 차트는 가시성 컨트롤이 있는 시리즈 토글을 사용합니다.
+6. 페이지가 소유하는 번들이 다음 디렉토리에 존재합니다:
 
 ```text
 data/web/overview/
@@ -109,8 +113,8 @@ data/web/strategies/
 data/web/screener/
 ```
 
-7. The frontend readers now consume those page bundles for overview, portfolio, reports, strategies, and screener data.
-8. Reports ranking modes are implemented as presets over one sortable/filterable/paginated table. The presets share columns and only change default sort/filter state.
-9. Strategy selection now uses the exported strategy catalog ordering and short labels instead of current-holdings-only local tab lists.
+7. 프론트엔드 리더는 overview·portfolio·reports·strategies·screener 데이터에 대해 위 페이지 번들을 소비합니다.
+8. 리포트 랭킹 모드는 하나의 정렬/필터/페이지네이션 가능한 표 위의 프리셋으로 구현되어, 컬럼을 공유하면서 기본 정렬/필터 상태만 바꿉니다.
+9. 전략 선택은 current-holdings 전용 로컬 탭 목록 대신 export된 전략 카탈로그 순서와 short label을 사용합니다.
 
-Top-level artifacts are still exported as raw/download surfaces during the cutover, but route-level product code should read the page-owned bundles first.
+최상위 raw 아티팩트는 마이그레이션 기간 동안 다운로드 표면으로 계속 export되지만, 라우트 단위 제품 코드는 페이지 소유 번들을 먼저 읽어야 합니다.

@@ -1,17 +1,8 @@
 import Link from 'next/link';
 import { PriceEvidenceChart } from '@/components/charts/PriceEvidenceChart';
-import { SymbolPersonaTrades } from '@/components/reports/SymbolPersonaTrades';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  getPositionEpisodes,
-  getPriceSeries,
-  getReportStatisticsLabSummary,
-  getReportsBySymbol,
-  getSummaryRows,
-  getTrades,
-  type ReportRow,
-} from '@/lib/artifacts';
+import { getPriceSeries, getReportStatisticsLabSummary, type ReportRow } from '@/lib/artifacts';
 import { formatDateKo, formatDays, formatPercent } from '@/lib/format';
 import {
   buildPathEvidence,
@@ -24,14 +15,10 @@ import {
 } from '@/lib/report-view-model';
 
 export function ReportDetailView({ report }: { report: ReportRow }) {
-  const siblingReports = getReportsBySymbol(report.symbol);
   // End-cap at lastCloseDate so expired reports stop at expiry, not today.
   const prices = getPriceSeries(report.symbol, undefined, report.lastCloseDate);
   const pathEvidence = buildPathEvidence(prices, report);
   const scenarioRows = buildScenarioRows(prices, report);
-  const personaLabels = Object.fromEntries(getSummaryRows().map((row) => [row.persona, row.label ?? row.persona]));
-  const symbolEpisodes = getPositionEpisodes().filter((row) => row.symbol === report.symbol);
-  const symbolTrades = getTrades().filter((row) => row.symbol === report.symbol);
   const status = targetStatus(report);
   const reportStatistics = getReportStatisticsLabSummary();
   const reportOutcome = reportStatistics.riskScatter.find((row) => row.reportId === report.reportId) ?? null;
@@ -131,23 +118,6 @@ export function ReportDetailView({ report }: { report: ReportRow }) {
       </section>
 
       <ScenarioTable rows={scenarioRows} report={report} />
-
-      <section className="grid gap-2" aria-labelledby="trades-heading">
-        <h2
-          className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500"
-          id="trades-heading"
-        >
-          전략별 매매
-        </h2>
-        <SymbolPersonaTrades
-          symbol={report.symbol}
-          episodes={symbolEpisodes}
-          trades={symbolTrades}
-          personaLabels={personaLabels}
-        />
-      </section>
-
-      <SiblingReportsTable currentId={report.reportId} reports={siblingReports} />
     </div>
   );
 }
@@ -215,50 +185,6 @@ function ScenarioTable({ rows, report }: { rows: ScenarioRow[]; report: ReportRo
                 </td>
                 <td className={`px-3 py-2 text-right font-mono tabular-nums ${signedTextClass(row.targetReturn)}`}>
                   {formatPercent(row.targetReturn)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </section>
-  );
-}
-
-function SiblingReportsTable({ currentId, reports }: { currentId: string; reports: ReportRow[] }) {
-  const others = reports.filter((row) => row.reportId !== currentId);
-  if (others.length === 0) return null;
-  return (
-    <section className="grid gap-2" aria-labelledby="siblings-heading">
-      <h2
-        className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500"
-        id="siblings-heading"
-      >
-        동일 티커의 다른 리포트
-      </h2>
-      <div className="overflow-hidden rounded-md border border-slate-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="bg-slate-50">
-            <tr>
-              <th className="px-3 py-2 text-left text-xs font-medium text-slate-500">발간일</th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-slate-500">제목</th>
-              <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">현재 수익률</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {others.map((row) => (
-              <tr key={row.reportId} className="hover:bg-slate-50">
-                <td className="px-3 py-2 font-mono text-xs text-slate-500">{formatDateKo(row.publicationDate)}</td>
-                <td className="px-3 py-2">
-                  <Link
-                    className="font-medium text-slate-950 underline-offset-2 hover:underline"
-                    href={`/reports/${encodeURIComponent(row.symbol)}/${encodeURIComponent(row.reportId)}`}
-                  >
-                    {row.title || `${row.company} 리포트`}
-                  </Link>
-                </td>
-                <td className={`px-3 py-2 text-right font-mono tabular-nums ${signedTextClass(row.currentReturn)}`}>
-                  {formatPercent(row.currentReturn)}
                 </td>
               </tr>
             ))}

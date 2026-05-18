@@ -1,24 +1,26 @@
-# V4 Minimal Insight Redesign
+# V4 미니멀 인사이트 리디자인
 
-## User direction consolidated
-- Move away from card walls and generic AI-dashboard scaffolding.
-- Use a formal, minimal, button/list/table-led financial SaaS rhythm closer to YASUN.GG information density.
-- Keep only investor-useful insight: target hit counts, near-target counts, wait-period hypotheses, momentum persistence, loser persistence, post-target holding questions, and portfolio risk/return context.
-- Do not claim statistical significance until the corresponding artifact exists.
-- Fix the portfolio default so the heatmap/ledger shows real holdings, not a cash-only or empty default.
-- Use TradingView lightweight-charts for serious financial charting and add a risk/return frontier view.
-- Delete obsolete guide interactivity and move type-only packages out of production dependencies.
+Last updated: 2026-05-19
 
-## Product decisions
-1. `/` is now a landing page; the app workspace starts at `/main`. `/snapshot` was deleted rather than kept as a hidden alias.
-2. The app overview is a decision brief: status strip, review queue, data-quality rows, and drilldown buttons.
-3. The guide is no longer onboarding fluff. It is an evidence board with verified facts and explicit next statistical tests.
-4. Candidate discovery lives inside `/reports` as sortable/filterable table state. `/screener` was deleted rather than kept as a parallel surface.
-5. The portfolio default prefers `smic_follower_v2` when open holdings exist, avoiding cash-only/empty heatmap behavior.
-6. The portfolio page now adds a lightweight-charts cumulative return comparison and a risk/return frontier scatter.
-7. Weak Prophet/oracle results are pushed out of default portfolio selector priority and labeled as non-investable upper-bound context.
+## 사용자 방향 통합
+- 카드 벽과 generic AI 대시보드 골격에서 벗어납니다.
+- 격식 있는, 미니멀한 버튼/리스트/표 중심의 금융 SaaS 리듬을 채택합니다 (YASUN.GG에 가까운 정보 밀도).
+- 투자자에게 실제로 도움이 되는 인사이트만 유지합니다 — 목표 도달 카운트, 목표 근접 카운트, 대기 기간 가설, 모멘텀 지속성, 패자 지속성, 목표 후 보유 질문, 포트폴리오 risk/return 컨텍스트.
+- 대응하는 아티팩트가 존재하기 전에는 통계적 유의성을 주장하지 않습니다.
+- 포트폴리오 기본값이 cash-only나 빈 히트맵으로 떨어지지 않도록 실제 보유가 보이는 전략을 디폴트로 둡니다.
+- 진지한 금융 차트는 TradingView lightweight-charts를 사용하고 risk/return frontier 뷰를 추가합니다.
+- 가이드의 낡은 인터랙티브 요소를 제거하고, 타입 전용 패키지는 production 의존성에서 분리합니다.
 
-## Remaining intentional constraints
-- DaisyUI has been removed because the app no longer uses its component classes; new UI should stay on Tailwind, Radix, and local primitives.
-- Efficient frontier is currently a strategy risk/return frontier from available summaries, not a full asset-level optimizer. A real optimizer needs return/covariance/constraint artifacts.
-- Waiting-period, post-hit drift, and momentum persistence should not be shown as conclusions until new artifacts and significance tests are generated.
+## 제품 결정
+1. `/`는 랜딩 페이지이고, 앱 워크스페이스는 `/main`에서 시작합니다. `/snapshot`은 숨은 별칭이 아니라 완전히 삭제했습니다.
+2. 앱 메인은 decision brief입니다 — 상태 스트립, 검토 대기열, 데이터 품질 행, 드릴다운 버튼.
+3. 가이드는 더 이상 온보딩 fluff가 아닙니다. 검증된 사실과 명시적인 다음 통계 검정 후보가 적힌 evidence board입니다.
+4. 후보 탐색은 두 곳에서 다룹니다 — `/reports` 통합 표(정렬/필터/프리셋)와 `/screener`(가격 매칭 메트릭 기반 스프레드시트형 표). 스크리너는 v0.20.0에서 다시 도입되어 가격 인지형 시각을 분리해 소유합니다.
+5. 포트폴리오 기본값은 열려 있는 보유가 있을 때 `smic_follower_v2`를 우선해 cash-only/빈 히트맵 동작을 피합니다.
+6. 포트폴리오 페이지는 lightweight-charts 누적 수익률 비교와 risk/return frontier 산점도를 추가했습니다.
+7. Weak Prophet/오라클 결과는 기본 포트폴리오 셀렉터 우선순위에서 밀어내고 투자 불가능한 상한선 컨텍스트로 라벨링합니다.
+
+## 의식적으로 남긴 제약
+- DaisyUI 자체는 의존성에서 제거되었지만, badge·card·table 유틸리티 클래스 이름은 30곳 이상에서 참조되고 있어 globals.css에서 자체 CSS fallback을 정의해 유지합니다(`v0.21.0` 변경 참조). 새 UI는 가능한 한 Tailwind 유틸리티, Radix primitives, 로컬 컴포넌트만 사용합니다.
+- Efficient frontier는 현재 사용 가능한 요약으로 만든 전략 risk/return frontier일 뿐 자산 수준 옵티마이저가 아닙니다. 실제 옵티마이저는 수익률/공분산/제약 아티팩트가 필요합니다.
+- 대기 기간, 목표 후 드리프트, 모멘텀 지속성은 새 아티팩트와 유의성 검정이 생성되기 전까지 결론처럼 표시하지 않습니다.
