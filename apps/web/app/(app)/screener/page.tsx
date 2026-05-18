@@ -22,7 +22,7 @@ export default function ScreenerPage() {
   const reports = getReportRows();
   const candidates = getScreenerCandidates();
   const manifest = getArtifactManifest();
-  const rows = buildScreenerRows(reports, candidates);
+  const rows = buildScreenerRows(reports, candidates, manifest.price_range.end ?? null);
   const latestPublicationDate = rows
     .map((row) => row.latestReportDate)
     .filter(Boolean)
@@ -54,7 +54,7 @@ export default function ScreenerPage() {
         <Section
           eyebrow="Report universe × Price series × Candidate overlay"
           title="종목 보드"
-          caption="getReportRows()를 symbol 기준으로 묶고, getPriceSeries()로 가격 지표를 계산한 뒤 screener candidate score를 overlay합니다."
+          caption="리포트 발간 후 2년이 지난 행은 기본적으로 숨기고, 각 컬럼 필터를 중복 적용해 후보를 좁힙니다."
         >
           <ScreenerTable rows={rows} />
         </Section>
@@ -63,7 +63,11 @@ export default function ScreenerPage() {
   );
 }
 
-function buildScreenerRows(reports: ReportRow[], candidates: ScreenerCandidateRow[]): ScreenerBoardRow[] {
+function buildScreenerRows(
+  reports: ReportRow[],
+  candidates: ScreenerCandidateRow[],
+  priceEndDate: string | null,
+): ScreenerBoardRow[] {
   const reportsBySymbol = new Map<string, ReportRow[]>();
   for (const report of reports) {
     const list = reportsBySymbol.get(report.symbol) ?? [];
@@ -85,6 +89,11 @@ function buildScreenerRows(reports: ReportRow[], candidates: ScreenerCandidateRo
     const candidate = candidateByReportId.get(latest.reportId) ?? candidateBySymbol.get(symbol) ?? null;
     const prices = hasPriceArtifact(symbol) ? getPriceSeries(symbol) : [];
     const technicals = buildTechnicals(prices);
+    const ageDays = daysBetween(
+      latest.publicationDate,
+      priceEndDate ?? latest.lastCloseDate ?? technicals.lastCloseDate,
+    );
+    const expiredByAge = ageDays !== null && ageDays > 730;
     return {
       symbol,
       company: latest.company,
@@ -92,6 +101,7 @@ function buildScreenerRows(reports: ReportRow[], candidates: ScreenerCandidateRo
       currency: latest.currency,
       latestReportId: latest.reportId,
       latestReportDate: latest.publicationDate,
+      reportAgeDays: ageDays,
       reportCount: sortedReports.length,
       lastCloseNative: latest.lastCloseNative ?? technicals.lastPrice,
       lastCloseKrw: latest.lastCloseKrw,
@@ -111,7 +121,8 @@ function buildScreenerRows(reports: ReportRow[], candidates: ScreenerCandidateRo
       targetHit: latest.targetHit,
       targetHitDate: latest.targetHitDate,
       daysToTarget: latest.daysToTarget,
-      expired: latest.expired,
+      expired: latest.expired || expiredByAge,
+      expiredByAge,
       caveatFlags: latest.caveatFlags,
       candidateBucket: candidate?.bucket ?? null,
       candidateScore: candidate?.score ?? null,
@@ -142,6 +153,14 @@ function buildScreenerRows(reports: ReportRow[], candidates: ScreenerCandidateRo
         (b.ytdReturn ?? -Infinity) - (a.ytdReturn ?? -Infinity) ||
         b.latestReportDate.localeCompare(a.latestReportDate),
     );
+}
+
+function daysBetween(startDate: string, endDate: string | null): number | null {
+  if (!startDate || !endDate) return null;
+  const start = Date.parse(`${startDate}T00:00:00.000Z`);
+  const end = Date.parse(`${endDate}T00:00:00.000Z`);
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end < start) return null;
+  return Math.floor((end - start) / 86_400_000);
 }
 
 function buildTechnicals(prices: PricePoint[]) {
