@@ -127,8 +127,19 @@ export function HoldingsTreemap({
     router.push(href);
   };
 
+  const sortedHoldings = useMemo(
+    () =>
+      [...holdings]
+        .filter((row) => (row.marketValueKrw ?? 0) > 0)
+        .sort((a, b) => (b.marketValueKrw ?? 0) - (a.marketValueKrw ?? 0)),
+    [holdings],
+  );
+
   return (
-    <div className="grid gap-2" aria-label="포트폴리오 보유 종목 트리맵">
+    <section className="grid gap-2" aria-labelledby="treemap-heading">
+      <h3 className="sr-only" id="treemap-heading">
+        포트폴리오 보유 종목 비중 트리맵
+      </h3>
       {showToolbar ? (
         <div className="heatmap-toolbar">
           <div className="min-w-0">
@@ -145,9 +156,11 @@ export function HoldingsTreemap({
       ) : null}
       <div
         ref={containerRef}
-        className="relative w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100/30"
+        className="relative w-full overflow-hidden rounded-md border border-slate-200 bg-slate-100/30"
         style={{ height: size.height }}
       >
+        {/* The canvases are visual surrogates for the sr-only list below them, which
+            carries the accessible name and links for screen-reader and keyboard users. */}
         <canvas
           ref={baseCanvasRef}
           className="absolute left-0 top-0"
@@ -160,19 +173,21 @@ export function HoldingsTreemap({
           onPointerMove={handlePointerMove}
           onPointerLeave={handlePointerLeave}
           onClick={handleClick}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' || event.key === ' ') handleClick();
-          }}
-          tabIndex={0}
-          role="button"
-          aria-label="포트폴리오 보유 종목 트리맵. 연결된 리포트가 있는 종목은 선택하면 상세 분석으로 이동합니다."
         />
         {tooltip ? (
           <TreemapTooltip tooltip={tooltip} width={size.width} height={size.height} hrefBySymbol={hrefBySymbol} />
         ) : null}
       </div>
+      {/* Accessible parallel DOM for keyboard / AT users — same data, navigable as a list. */}
+      <ul className="sr-only" aria-label={`보유 종목 ${sortedHoldings.length}개`}>
+        {sortedHoldings.map((row) => {
+          const href = holdingHref(row, hrefBySymbol);
+          const label = `${row.company || row.symbol} (${row.symbol}): 평가액 ${formatKrw(row.marketValueKrw)}, 비중 ${formatPercent((row.marketValueKrw ?? 0) / totalValue)}, 미실현 ${formatPercent(row.unrealizedReturn)}`;
+          return <li key={row.symbol}>{href ? <a href={href}>{label}</a> : <span>{label}</span>}</li>;
+        })}
+      </ul>
       {showLegend ? <TreemapLegend /> : null}
-    </div>
+    </section>
   );
 }
 

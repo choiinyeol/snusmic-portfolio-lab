@@ -57,7 +57,7 @@ export default function OverviewPage() {
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1.28fr)_minmax(360px,.72fr)]">
-        <article className="min-w-0 border-t border-slate-950 bg-white">
+        <article className="min-w-0 border-t border-slate-200 bg-white">
           <div className="grid gap-2 border-b border-slate-200 px-1 py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
             <div>
               <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
@@ -92,7 +92,7 @@ export default function OverviewPage() {
         </article>
 
         <aside className="grid gap-4">
-          <section className="border-t border-slate-950 bg-white px-1 py-3">
+          <section className="border-t border-slate-200 bg-white px-1 py-3">
             <div className="flex items-center justify-between gap-3 border-b border-slate-200 pb-3">
               <div>
                 <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
@@ -124,7 +124,7 @@ export default function OverviewPage() {
             </div>
           </section>
 
-          <section className="border-t border-slate-950 bg-white px-1 py-3">
+          <section className="border-t border-slate-200 bg-white px-1 py-3">
             <div className="flex items-center justify-between gap-3 border-b border-slate-200 pb-3">
               <div>
                 <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">

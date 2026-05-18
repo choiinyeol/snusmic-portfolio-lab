@@ -12,9 +12,10 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import Link from 'next/link';
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useCallback, useMemo, useState } from 'react';
 import { BlockPagination } from '@/components/trading/TableControls';
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
+import { useSearchShortcut } from '@/components/ui/use-search-shortcut';
 import { formatDateKo, formatNative, formatPercent, numCellClass, signedTextClass } from '@/lib/format';
 
 export type ScreenerBoardRow = {
@@ -249,6 +250,8 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
   const [activePreset, setActivePreset] = useState<PresetId>('all');
   const [columnMode, setColumnMode] = useState<ColumnMode>('price');
   const [globalFilter, setGlobalFilter] = useState('');
+  const clearGlobalFilter = useCallback(() => setGlobalFilter(''), []);
+  const searchInputRef = useSearchShortcut(clearGlobalFilter);
   const [bucketFilter, setBucketFilter] = useState('all');
   const [returnFilter, setReturnFilter] = useState<SignFilter>('all');
   const [targetHitFilter, setTargetHitFilter] = useState<BooleanFilter>('all');
@@ -393,9 +396,13 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
           </div>
 
           <div className="grid gap-2 lg:grid-cols-[minmax(220px,1.4fr)_repeat(6,minmax(0,.75fr))]">
-            <label className="grid gap-1 text-xs font-medium text-slate-500">
-              <span>검색</span>
+            <label className="grid gap-1 text-xs font-medium text-slate-500" htmlFor="screener-search">
+              <span>
+                검색 <span className="font-mono text-[10px] text-slate-400">(/ 단축키)</span>
+              </span>
               <input
+                ref={searchInputRef}
+                id="screener-search"
                 className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-950 outline-none focus:border-slate-400"
                 value={globalFilter}
                 placeholder="symbol, company, caveat, rank basis"

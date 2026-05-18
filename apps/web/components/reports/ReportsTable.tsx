@@ -12,7 +12,8 @@ import {
   type SortingState,
   useReactTable,
 } from '@tanstack/react-table';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { useSearchShortcut } from '@/components/ui/use-search-shortcut';
 import type { ReportRow } from '@/lib/artifacts';
 import { formatDays, formatNative, formatPercent } from '@/lib/format';
 
@@ -38,6 +39,8 @@ export function ReportsTable({ reports }: ReportsTableProps) {
   const [sorting, setSorting] = useState<SortingState>([{ id: 'publicationDate', desc: true }]);
   const [activePreset, setActivePreset] = useState<SortPresetId>('recent');
   const [globalFilter, setGlobalFilter] = useState('');
+  const clearGlobalFilter = useCallback(() => setGlobalFilter(''), []);
+  const searchInputRef = useSearchShortcut(clearGlobalFilter);
   const [exchangeFilter, setExchangeFilter] = useState('all');
   const [hitFilter, setHitFilter] = useState<HitFilter>('all');
   const [returnFilter, setReturnFilter] = useState<ReturnFilter>('all');
@@ -279,7 +282,11 @@ export function ReportsTable({ reports }: ReportsTableProps) {
               {activePresetConfig.caption}. 후보 탐색, 전체 리포트, 목표가 검증은 같은 표에서 정렬 조건만 바꿔 봅니다.
             </p>
           </div>
-          <div className="shrink-0 rounded-md bg-slate-50 px-3 py-2 text-xs text-slate-600">
+          <div
+            className="shrink-0 rounded-md bg-slate-50 px-3 py-2 text-xs text-slate-600"
+            aria-live="polite"
+            aria-atomic="true"
+          >
             <span className="font-mono font-semibold tabular-nums text-slate-950">
               {filteredRows.length.toLocaleString('ko-KR')}
             </span>
@@ -288,9 +295,13 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         </div>
 
         <div className="grid gap-2 md:grid-cols-[minmax(240px,1.4fr)_repeat(3,minmax(0,.7fr))]">
-          <label className="grid gap-1 text-xs font-medium text-slate-500">
-            <span>검색</span>
+          <label className="grid gap-1 text-xs font-medium text-slate-500" htmlFor="reports-search">
+            <span>
+              검색 <span className="font-mono text-[10px] text-slate-400">(/ 단축키)</span>
+            </span>
             <input
+              ref={searchInputRef}
+              id="reports-search"
               className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-950 outline-none transition-colors placeholder:text-slate-400 focus:border-slate-400"
               value={globalFilter ?? ''}
               onChange={(event) => {
@@ -362,7 +373,7 @@ export function ReportsTable({ reports }: ReportsTableProps) {
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <th key={header.id}>
+                  <th key={header.id} aria-sort={ariaSort(header.column.getIsSorted())}>
                     {header.isPlaceholder ? null : (
                       <button
                         type="button"
@@ -418,6 +429,12 @@ function sortIndicator(direction: false | 'asc' | 'desc'): string {
   if (direction === 'asc') return ' ↑';
   if (direction === 'desc') return ' ↓';
   return ' ↕';
+}
+
+function ariaSort(direction: false | 'asc' | 'desc'): 'ascending' | 'descending' | 'none' {
+  if (direction === 'asc') return 'ascending';
+  if (direction === 'desc') return 'descending';
+  return 'none';
 }
 
 function reportDetailHref(report: ReportRow): string {

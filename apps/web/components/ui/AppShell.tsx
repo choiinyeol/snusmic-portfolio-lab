@@ -2,7 +2,7 @@
 
 import { ExternalLink, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { APP_NAV, GITHUB_NAV_ITEM } from '@/components/ui/app-shell-nav';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -37,6 +37,16 @@ export function AppShell({
   primaryBookLabel,
 }: AppShellProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  useEffect(() => {
+    setSidebarCollapsed(window.localStorage.getItem('snusmic.sidebar-collapsed') === '1');
+  }, []);
+  const toggleSidebar = () => {
+    setSidebarCollapsed((value) => {
+      const next = !value;
+      window.localStorage.setItem('snusmic.sidebar-collapsed', next ? '1' : '0');
+      return next;
+    });
+  };
   const sidebarMetrics: ShellMetric[] = [
     { label: '기준일', value: snapshotDate || '—' },
     { label: '리포트', value: reportCount.toLocaleString('ko-KR'), caption: reportRangeLabel(reportRange) },
@@ -73,7 +83,7 @@ export function AppShell({
           className="mt-1 inline-flex h-9 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-950"
           aria-label={sidebarCollapsed ? '사이드바 펼치기' : '사이드바 접기'}
           title={sidebarCollapsed ? '사이드바 펼치기' : '사이드바 접기'}
-          onClick={() => setSidebarCollapsed((value) => !value)}
+          onClick={toggleSidebar}
         >
           {sidebarCollapsed ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
         </button>
@@ -114,24 +124,20 @@ export function AppShell({
       </aside>
 
       <div className={cn('min-w-0 transition-[padding] duration-200', sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-64')}>
-        <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/80 backdrop-blur-xl">
-          <div className="flex min-h-14 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
-            <div className="min-w-0">
-              <div className="truncate text-sm font-medium text-slate-950">SNUSMIC Portfolio Lab</div>
-              <div className="hidden truncate text-xs text-slate-500 sm:block">리포트·포트폴리오 분석</div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge className="hidden font-mono sm:inline-flex" variant="outline">
-                {snapshotDate || '—'}
-              </Badge>
-              <Badge variant="success">읽기 전용</Badge>
-              <Button asChild size="sm" variant="outline">
-                <Link href="/guide">읽는 법</Link>
-              </Button>
-            </div>
+        <header className="sticky top-0 z-30 border-b border-slate-200 bg-white">
+          <div className="flex min-h-12 items-center justify-end gap-2 px-4 sm:px-6 lg:px-8">
+            <Badge className="hidden font-mono sm:inline-flex" variant="outline">
+              {snapshotDate || '—'}
+            </Badge>
+            <Badge variant="success">읽기 전용</Badge>
+            <Button asChild size="sm" variant="outline">
+              <Link href="/guide">읽는 법</Link>
+            </Button>
           </div>
         </header>
-        <main className="mx-auto w-full max-w-[1800px] px-3 py-5 sm:px-4 lg:px-5">{children}</main>
+        <main className="mx-auto w-full max-w-[1800px] px-3 py-5 sm:px-4 lg:px-5" id="main-content">
+          {children}
+        </main>
       </div>
     </div>
   );
