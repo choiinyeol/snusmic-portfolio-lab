@@ -132,21 +132,17 @@ type FactRow = {
 function FactsTable({ rows }: { rows: FactRow[] }) {
   return (
     <section className="overflow-hidden rounded-md border border-slate-200 bg-white" aria-label="리포트 핵심 지표">
-      <table className="w-full text-sm">
-        <tbody className="divide-y divide-slate-100">
-          {rows.map((row) => (
-            <tr key={row.label}>
-              <th className="w-40 bg-slate-50 px-3 py-2 text-left text-xs font-medium text-slate-500" scope="row">
-                {row.label}
-              </th>
-              <td className="px-3 py-2">
-                <div className={`font-mono font-semibold tabular-nums ${toneClass(row.tone)}`}>{row.value}</div>
-                {row.caption ? <div className="mt-0.5 text-xs text-slate-500">{row.caption}</div> : null}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <dl className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 [&>div]:border-b [&>div]:border-r [&>div]:border-slate-100">
+        {rows.map((row) => (
+          <div className="grid min-w-0 gap-0.5 p-3" key={row.label}>
+            <dt className="text-xs font-medium text-slate-500">{row.label}</dt>
+            <dd className={`truncate font-mono text-sm font-semibold tabular-nums ${toneClass(row.tone)}`}>
+              {row.value}
+            </dd>
+            {row.caption ? <dd className="truncate text-xs text-slate-500">{row.caption}</dd> : null}
+          </div>
+        ))}
+      </dl>
     </section>
   );
 }
