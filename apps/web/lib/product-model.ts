@@ -80,7 +80,7 @@ export type StrategyLeaderboardRow = {
 };
 
 export function portfolioStrategyHref(strategyId: string): string {
-  return `/portfolio?strategy=${encodeURIComponent(strategyId)}`;
+  return `/portfolio/${encodeURIComponent(strategyId)}`;
 }
 
 export type ResearchCandidate = {

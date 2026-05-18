@@ -63,7 +63,7 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
         </div>
         <Link
           className="inline-flex h-8 items-center rounded-md px-3 text-xs font-medium text-slate-700 hover:bg-slate-100"
-          href={`/portfolio?strategy=${persona}`}
+          href={`/portfolio/${encodeURIComponent(persona)}`}
         >
           포트폴리오 보기 →
         </Link>
@@ -290,8 +290,12 @@ export function SymbolPersonaTrades({ symbol, episodes, trades, personaLabels }:
                         currency={episode.currency}
                       />
                     </td>
-                    <td className={`num ${(stockReturn ?? 0) >= 0 ? 'good' : 'bad'}`}>{formatPercent(stockReturn)}</td>
-                    <td className={`num ${(pnl ?? 0) >= 0 ? 'good' : 'bad'}`}>{formatKrw(pnl)}</td>
+                    <td className={`num ${(stockReturn ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                      {formatPercent(stockReturn)}
+                    </td>
+                    <td className={`num ${(pnl ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                      {formatKrw(pnl)}
+                    </td>
                     <td>{humanReason(episode.exitReasons)}</td>
                   </tr>
                 );

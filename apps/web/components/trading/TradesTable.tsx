@@ -277,7 +277,7 @@ export function TradesTable({
                         <strong>
                           <Link
                             className="link hover:underline"
-                            href={`/reports/${encodeURIComponent(episode.symbol)}`}
+                            href={target ? reportTargetHref(target) : `/reports/${encodeURIComponent(episode.symbol)}`}
                           >
                             {episode.company || episode.symbol}
                           </Link>
@@ -415,7 +415,10 @@ export function TradesTable({
                         </span>
                       </td>
                       <td>
-                        <Link className="link hover:underline" href={`/reports/${encodeURIComponent(trade.symbol)}`}>
+                        <Link
+                          className="link hover:underline"
+                          href={target ? reportTargetHref(target) : `/reports/${encodeURIComponent(trade.symbol)}`}
+                        >
                           {trade.symbol}
                         </Link>
                       </td>
@@ -444,7 +447,7 @@ export function TradesTable({
                         {trade.reportId && reportSymbolsById[trade.reportId] ? (
                           <Link
                             className="link hover:underline"
-                            href={`/reports/${encodeURIComponent(reportSymbolsById[trade.reportId])}`}
+                            href={`/reports/${encodeURIComponent(reportSymbolsById[trade.reportId])}/${encodeURIComponent(trade.reportId)}`}
                           >
                             리포트
                           </Link>
@@ -546,4 +549,8 @@ function initialUrlQuery(): string {
   if (typeof window === 'undefined') return '';
   const params = new URLSearchParams(window.location.search);
   return params.get('q') ?? params.get('symbol') ?? '';
+}
+
+function reportTargetHref(target: ReportTargetDigest): string {
+  return `/reports/${encodeURIComponent(target.symbol)}/${encodeURIComponent(target.reportId)}`;
 }

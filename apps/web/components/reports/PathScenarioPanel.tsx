@@ -42,10 +42,10 @@ export function PathScenarioPanel({ report, scenarioRows, trend }: Props) {
                   <td>{row.basis}</td>
                   <td>{row.point?.time ?? '—'}</td>
                   <td className="num">{formatAssetPrice(row.point?.value, report)}</td>
-                  <td className={`num ${(row.currentReturn ?? 0) >= 0 ? 'good' : 'bad'}`}>
+                  <td className={`num ${(row.currentReturn ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                     {formatPercent(row.currentReturn)}
                   </td>
-                  <td className={`num ${(row.targetReturn ?? 0) >= 0 ? 'good' : 'bad'}`}>
+                  <td className={`num ${(row.targetReturn ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                     {formatPercent(row.targetReturn)}
                   </td>
                 </tr>

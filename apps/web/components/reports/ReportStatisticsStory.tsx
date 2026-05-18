@@ -740,6 +740,11 @@ function TargetMultipleCurve({ rows }: { rows: ReportStatisticsLabSummary['optim
   const minScore = Math.min(-0.05, ...scores);
   const maxScore = Math.max(0.05, ...scores);
   const selected = rows.find((row) => row.targetMultiple === selectedMultiple) ?? rows[0] ?? null;
+  const best =
+    [...rows].sort(
+      (a, b) =>
+        (b.rewardReliabilityScore ?? Number.NEGATIVE_INFINITY) - (a.rewardReliabilityScore ?? Number.NEGATIVE_INFINITY),
+    )[0] ?? null;
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5">
@@ -786,7 +791,10 @@ function TargetMultipleCurve({ rows }: { rows: ReportStatisticsLabSummary['optim
         </div>
       </div>
       <div className="mt-3 grid gap-3 border-t border-slate-100 pt-3 text-xs text-slate-500 md:grid-cols-[minmax(0,1fr)_18rem] md:items-start">
-        <p>점수 = 중앙 수익률 × 도달률 / (하위 25% 손실 + 5% 완충). 점을 누르면 비교 기준이 고정됩니다.</p>
+        <p>
+          점수 = 중앙 수익률 × 도달률 / (하위 25% 손실 + 5% 완충). 점을 누르면 비교 기준이 고정됩니다.{' '}
+          {best ? `현재 최고 후보는 ${best.targetMultiple.toFixed(1)}x입니다.` : ''}
+        </p>
         {selected ? (
           <div className="rounded-xl bg-slate-50 p-3">
             <div className="font-semibold text-slate-950">{selected.targetMultiple.toFixed(1)}x 선택</div>
@@ -794,6 +802,12 @@ function TargetMultipleCurve({ rows }: { rows: ReportStatisticsLabSummary['optim
               <span>도달률 {formatPercent(selected.hitRate)}</span>
               <span>중앙 {formatPercent(selected.medianReturn)}</span>
               <span>하위 25% {formatPercent(selected.p25Return)}</span>
+              {best ? (
+                <span>
+                  최고 후보 대비 점수{' '}
+                  {formatNumber((selected.rewardReliabilityScore ?? 0) - (best.rewardReliabilityScore ?? 0))}
+                </span>
+              ) : null}
             </div>
           </div>
         ) : null}
@@ -894,10 +908,18 @@ function RiskScatter({ rows }: { rows: ReportStatisticsLabSummary['riskScatter']
               {formatPercent(selected.currentReturn)}
             </p>
           </div>
-          <div className="grid grid-cols-3 gap-3 font-mono text-xs tabular-nums text-slate-700">
-            <span>최대상승 {formatPercent(selected.maxFavorableExcursion)}</span>
-            <span>최대하락 {formatPercent(selected.maxAdverseExcursion)}</span>
-            <span>포착률 {formatNumber(selected.upsideCaptureRatio)}x</span>
+          <div className="grid gap-2 text-xs md:justify-items-end">
+            <div className="grid grid-cols-3 gap-3 font-mono tabular-nums text-slate-700">
+              <span>최대상승 {formatPercent(selected.maxFavorableExcursion)}</span>
+              <span>최대하락 {formatPercent(selected.maxAdverseExcursion)}</span>
+              <span>포착률 {formatNumber(selected.upsideCaptureRatio)}x</span>
+            </div>
+            <Link
+              className="inline-flex h-8 items-center rounded-md border border-slate-200 bg-white px-3 font-medium text-slate-700 hover:bg-slate-50"
+              href={`/reports/${encodeURIComponent(selected.symbol)}/${encodeURIComponent(selected.reportId)}`}
+            >
+              리포트 상세 보기
+            </Link>
           </div>
         </div>
       ) : null}

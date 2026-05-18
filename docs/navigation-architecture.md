@@ -1,6 +1,6 @@
 # Navigation Architecture
 
-Last updated: 2026-05-15
+Last updated: 2026-05-18
 
 ## Canonical route map
 
@@ -32,7 +32,8 @@ flowchart LR
   ReportStats --> ExactReport
   ReportValidation --> Reports
   ExactReport --> Reports
-  ExactReport --> PortfolioStrategy["/portfolio?strategy=:id"]
+  ExactReport --> PortfolioStrategy["/portfolio/:strategy
+전략별 포트폴리오"]
   SymbolReport --> ExactReport
 
   Portfolio --> PortfolioStrategy
@@ -50,13 +51,14 @@ flowchart LR
 | --- | --- | --- |
 | `/` | 앱 소개와 주요 진입 | 공개 랜딩. 앱 내부 분석은 하지 않음. |
 | `/main` | 오늘 볼 요약과 검토 대기열 | 메인화면의 유일한 앱 요약 라우트. |
-| `/portfolio` | 전략별 보유·매매·성과 확인 | 쿼리 `strategy`가 선택 상태를 결정. |
+| `/portfolio` | 기본 전략 보유·매매·성과 확인 | 기본 고유 전략을 보여준다. 전략 선택은 정적 `/portfolio/:strategy` 링크를 쓴다. |
+| `/portfolio/:strategy` | 특정 전략 보유·매매·성과 확인 | 선택 전략 데이터만 페이지 payload에 싣는다. 없는 전략은 404, legacy query는 안내만 한다. |
 | `/reports` | 전체 리포트 표본 검색·정렬·후보 탐색 | 후보 탐색은 별도 라우트가 아니라 이 통합 테이블의 필터/정렬 역할. |
 | `/reports/statistics` | fat-tail 리포트 통계, 전체 표본, 경로 고통, 파라미터 실험 | 사이드바에 직접 노출되는 분석 페이지. |
 | `/reports/validation` | 계산식·제외 규칙 설명 | 통계 페이지와 표의 보조 문서. |
 | `/reports/:symbol/:reportId` | 개별 리포트 근거 분석 | 표·포트폴리오·통계의 기본 드릴다운 목적지. |
 | `/reports/:symbol` | 심볼 최신 리포트 편의 경로 | 직접 입력/공유 편의를 위한 보조 경로. 새 목록 링크는 `reportId`가 있으면 exact route를 쓴다. |
-| `/strategies` | 전략 성과와 기준선 비교 | 상세 원장 이동은 `/portfolio?strategy=:id`. |
+| `/strategies` | 전략 성과와 기준선 비교 | 상세 포트폴리오 이동은 `/portfolio/:strategy`. |
 | `/guide` | 읽는 법과 주의사항 | 분석 페이지가 아니라 온보딩 문서. |
 
 ## Deleted routes
@@ -72,9 +74,9 @@ flowchart LR
 2. **Longest active route wins.** `/reports/statistics` must highlight “리포트 통계”, not the broader “리포트”. `SidebarNav` resolves this by longest matching active path.
 3. **Reports table and candidate discovery are one surface.** `/reports` owns the searchable, sortable table; presets and filters belong there.
 4. **Statistics is not a header KPI dump.** It owns long-form sample interpretation: full distribution, quantiles, tail counts, path pain, delayed entry, post-target drift, target-multiple experiments.
-5. **Rows choose the most specific destination.** Report rows go to `/reports/:symbol/:reportId` when `reportId` exists; strategy rows go to `/portfolio?strategy=:id`.
+5. **Rows choose the most specific destination.** Report rows go to `/reports/:symbol/:reportId` when `reportId` exists; strategy rows go to `/portfolio/:strategy`.
 6. **External PDFs and markdown stay inside detail source panels.** Do not put raw artifact links into primary navigation.
-7. **No hidden fallback routes.** If a route was deleted, do not keep redirects or compatibility pages unless a future migration plan explicitly reintroduces them.
+7. **No hidden fallback routes.** If a route was deleted, do not keep redirects or compatibility pages unless a future migration plan explicitly reintroduces them. Legacy `/portfolio?strategy=...` is only a visible client-side migration notice/redirect for valid IDs, not a data fallback.
 
 ## Maintenance checklist for page changes
 

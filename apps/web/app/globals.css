@@ -370,9 +370,6 @@ main { width: min(100% - clamp(1rem, 3vw, 2rem), 1500px); margin: 0 auto; paddin
 .layout-section__head,
 .layout-section__title,
 .layout-section__body,
-.tabs__panel,
-.card,
-.flex flex-col,
 .table-wrap,
 .kpi-tile { min-width: 0; }
 .layout-section__actions { flex-shrink: 0; }
@@ -411,9 +408,6 @@ ul, ol { color: var(--muted); line-height: 1.7; }
 }
 
 /* ─────────────────────  Tone utilities  ───────────────────── */
-.good { color: var(--good); }
-.bad { color: var(--bad); }
-.warn { color: var(--warn); }
 
 /* ─────────────────────  Buttons / links  ───────────────────── */
 .download-actions button,
@@ -858,34 +852,6 @@ select:focus-visible {
 .legend-neutral { background: var(--surface-sunken) !important; color: var(--muted); border-color: transparent !important; }
 .legend-good { background: var(--good-soft) !important; color: var(--good); border-color: transparent !important; }
 
-/* ─────────────────────  Strategy verdict / score row  ───────────────────── */
-.strategy-verdict {
-  display: inline-flex;
-  margin: .25rem 0 .75rem;
-  padding: .5rem .85rem;
-  border-radius: var(--radius-pill);
-  border: 1px solid transparent;
-  font-weight: 700;
-  font-size: .85rem;
-}
-.strategy-verdict.good { color: var(--good); background: var(--good-soft); }
-.strategy-verdict.warn { color: var(--warn); background: var(--warn-soft); }
-.strategy-verdict.bad { color: var(--bad); background: var(--bad-soft); }
-.strategy-score-list { display: grid; gap: .55rem; margin: .9rem 0; }
-.strategy-score-row {
-  display: grid;
-  grid-template-columns: minmax(150px, 1fr) repeat(3, max-content);
-  gap: .65rem;
-  align-items: center;
-  padding: .72rem .85rem;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--surface);
-  font-size: .82rem;
-  font-variant-numeric: tabular-nums;
-  box-shadow: var(--shadow-sm);
-}
-
 /* ─────────────────────  Distribution & histogram  ───────────────────── */
 .distribution-grid {
   display: grid;
@@ -1063,7 +1029,6 @@ select:focus-visible {
   .dashboard-hero-grid,
   .dashboard-stats-grid { grid-template-columns: 1fr; }
   .table-toolbar { grid-template-columns: 1fr 1fr; }
-  .strategy-score-row { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 700px) {
   .bento-metrics { grid-template-columns: 1fr; }

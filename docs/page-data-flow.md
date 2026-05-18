@@ -1,6 +1,6 @@
 # SNUSMIC Portfolio Lab page and artifact map
 
-Updated: 2026-05-15
+Updated: 2026-05-18
 
 This document is the current routing/data contract after the reports/statistics/portfolio cleanup. Code is the source of truth; this map exists to prevent hidden legacy routes and duplicate UI surfaces from drifting apart.
 
@@ -31,7 +31,8 @@ flowchart TD
 | --- | --- | --- | --- |
 | `/` | `apps/web/app/page.tsx` | Public landing page and app entry | Keep |
 | `/main` | `apps/web/app/(app)/main/page.tsx` | Main product dashboard | Keep |
-| `/portfolio` | `apps/web/app/(app)/portfolio/page.tsx` | Portfolio, trades, accounting, strategy selection | Keep |
+| `/portfolio` | `apps/web/app/(app)/portfolio/page.tsx` | Default portfolio entry; displays the current top unique strategy | Keep |
+| `/portfolio/:strategy` | `apps/web/app/(app)/portfolio/[strategy]/page.tsx` | Exact strategy portfolio route with selected-strategy payload | Primary strategy route |
 | `/reports` | `apps/web/app/(app)/reports/page.tsx` | Single report and candidate table surface | Keep |
 | `/reports/statistics` | `apps/web/app/(app)/reports/statistics/page.tsx` | Research-style statistics story | Keep |
 | `/reports/validation` | `apps/web/app/(app)/reports/validation/page.tsx` | Methodology explanation | Keep |
@@ -50,7 +51,7 @@ flowchart LR
   ArtifactReaders --> ReportVM["apps/web/lib/report-view-model.ts"]
   DashboardVM --> MainPage["/main"]
   ProductModel --> Landing["/"]
-  ProductModel --> Portfolio["/portfolio"]
+  ProductModel --> Portfolio["/portfolio + /portfolio/:strategy"]
   ProductModel --> Reports["/reports"]
   ReportVM --> ReportDetail["/reports/:symbol/:reportId"]
   ArtifactReaders --> Statistics["/reports/statistics"]
@@ -61,7 +62,7 @@ flowchart LR
 
 | User question | Artifact | Primary UI |
 | --- | --- | --- |
-| 지금 포트폴리오가 왜 이 금액인가 | `personas.json`, `current-holdings.json`, `accounting-reconciliation.json`, `equity-daily.json`, `trades.json` | `/portfolio` |
+| 지금 포트폴리오가 왜 이 금액인가 | `personas.json`, `current-holdings.json`, `accounting-reconciliation.json`, `equity-daily.json`, `trades.json` | `/portfolio/:strategy` |
 | 리포트는 얼마나 맞았나 | `reports.json`, `report-statistics-lab.json`, `target-hit-distribution.json` | `/reports/statistics` |
 | 개별 리포트가 어떤 경로를 거쳤나 | `reports.json`, `prices/*`, `report-detail-metrics.json` | `/reports/:symbol/:reportId` |
 | 어떤 리포트를 다시 봐야 하나 | `reports.json`, `report-rankings.json`, `screener/*` | `/reports` |
@@ -73,3 +74,4 @@ flowchart LR
 2. Do not add silent fallback data for missing report IDs, prices, or strategy accounting. Throw during render/build so artifact bugs are visible.
 3. Do not reintroduce generic snapshot/terminal language in product copy. Prefer plain Korean labels: 메인화면, 포트폴리오, 리포트, 매매내역.
 4. Delete unused legacy CSS/components once grep and build prove no references remain.
+5. Keep portfolio page payload bounded: server filters holdings/accounting/trades/episodes/targets to the selected strategy, with only comparison benchmark equity curves allowed through.

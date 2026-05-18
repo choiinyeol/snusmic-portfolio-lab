@@ -59,10 +59,7 @@ export function PortfolioTables({ holdings, persona, personaLabels, capitalByPer
   );
   const visibleRows = useMemo(() => pageRows(currentRows, page, pageSize), [currentRows, page, pageSize]);
   const reportHrefBySymbol = useMemo(
-    () =>
-      Object.fromEntries(
-        Object.keys(targetsBySymbol).map((symbol) => [symbol, `/reports/${encodeURIComponent(symbol)}`]),
-      ),
+    () => Object.fromEntries(Object.values(targetsBySymbol).map((target) => [target.symbol, reportTargetHref(target)])),
     [targetsBySymbol],
   );
   const updateSort = (key: HoldingSortKey) => {
@@ -153,7 +150,7 @@ export function PortfolioTables({ holdings, persona, personaLabels, capitalByPer
                       </td>
                       <td>
                         <strong>
-                          <Link href={`/reports/${encodeURIComponent(row.symbol)}`}>{row.company || row.symbol}</Link>
+                          <Link href={targetHrefFor(row.symbol, targetsBySymbol)}>{row.company || row.symbol}</Link>
                         </strong>
                         <div className="text-xs text-slate-950/55">{row.symbol}</div>
                       </td>
@@ -279,4 +276,13 @@ function marketLabel(region: 'domestic' | 'overseas' | undefined): string {
 function nativeFromKrw(krw: number | null, nativeReference: number | null, krwReference: number | null): number | null {
   if (krw === null || nativeReference === null || krwReference === null || krwReference <= 0) return krw;
   return (krw * nativeReference) / krwReference;
+}
+
+function reportTargetHref(target: ReportTargetDigest): string {
+  return `/reports/${encodeURIComponent(target.symbol)}/${encodeURIComponent(target.reportId)}`;
+}
+
+function targetHrefFor(symbol: string, targetsBySymbol: Record<string, ReportTargetDigest>): string {
+  const target = targetsBySymbol[symbol];
+  return target ? reportTargetHref(target) : `/reports/${encodeURIComponent(symbol)}`;
 }

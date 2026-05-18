@@ -458,7 +458,7 @@ function artifactCacheValid(): boolean {
 
 function currentArtifactStamp(): number {
   try {
-    return fs.statSync(fullPath('data/web/artifact-manifest.json')).mtimeMs;
+    return fs.statSync(fullPath('data/web/manifest.json')).mtimeMs;
   } catch {
     return Date.now();
   }
@@ -474,6 +474,8 @@ function clearArtifactCaches() {
   positionEpisodesCache = undefined;
   equityDailyCache = undefined;
   strategyCurvesCache = undefined;
+  priceSeriesCache.clear();
+  nativePricePointCache.clear();
 }
 
 function readText(relativePath: string): string {
@@ -723,13 +725,23 @@ export function marketRegionForSymbol(symbol: string, exchange?: string): 'domes
   return 'overseas';
 }
 
+const priceSeriesCache = new Map<string, PricePoint[]>();
+
 export function getPriceSeries(symbol: string, startDate?: string, endDate?: string | null): PricePoint[] {
+  artifactCacheValid();
+  const base = getFullPriceSeries(symbol);
+  if (!startDate && !endDate) return base;
+  const stop = endDate ?? '9999-99-99';
+  return base.filter((point) => (!startDate || point.time >= startDate) && point.time <= stop);
+}
+
+function getFullPriceSeries(symbol: string): PricePoint[] {
+  const cached = priceSeriesCache.get(symbol);
+  if (cached) return cached;
   const artifact = readRequiredJson<{ currency?: string; prices: Array<Record<string, unknown>> }>(
     `data/web/prices/${symbol}.json`,
   );
-  const stop = endDate ?? '9999-99-99';
-  return artifact.prices
-    .filter((point) => (!startDate || String(point.date) >= startDate) && String(point.date) <= stop)
+  const series = artifact.prices
     .map((point) => {
       const close = num(point.close);
       const closeKrw = num(point.close_krw);
@@ -748,6 +760,8 @@ export function getPriceSeries(symbol: string, startDate?: string, endDate?: str
       };
     })
     .filter((point) => point.value > 0);
+  priceSeriesCache.set(symbol, series);
+  return series;
 }
 
 const nativePricePointCache = new Map<string, PricePoint | undefined>();

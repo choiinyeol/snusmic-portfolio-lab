@@ -34,14 +34,14 @@ export function StrategySelector({
           const active = option.id === value;
           const badge = kindBadge(option.kind, option.isDefault);
           const className = [
-            'inline-flex min-w-0 max-w-[13rem] items-center gap-1.5 rounded-md px-3 py-2 text-xs font-semibold transition-colors',
+            'inline-flex max-w-[13rem] items-center gap-1.5 rounded-md px-3 py-2 text-xs font-semibold transition-colors',
             active
               ? 'bg-slate-950 text-white [&_[data-slot=badge]]:border-white/20 [&_[data-slot=badge]]:bg-white/10 [&_[data-slot=badge]]:text-white'
               : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950',
           ].join(' ');
           const content = (
             <>
-              <span className="truncate" title={option.label}>
+              <span className={`max-w-[9rem] truncate ${active ? 'text-white' : ''}`} title={option.label}>
                 {option.shortLabel}
               </span>
               <Badge className="shrink-0" variant={badge.variant}>
@@ -68,7 +68,7 @@ export function StrategySelector({
             <Link
               aria-current={active ? 'page' : undefined}
               className={className}
-              href={option.href ?? `/portfolio?strategy=${encodeURIComponent(option.id)}`}
+              href={option.href ?? `/portfolio/${encodeURIComponent(option.id)}`}
               key={option.id}
               title={option.label}
             >

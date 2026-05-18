@@ -15,6 +15,7 @@ const links = [
   { href: '/main', label: '메인화면', caption: '오늘 확인할 검토 대기열', icon: ShieldCheck },
   { href: '/portfolio', label: '포트폴리오', caption: '보유·현금·매매내역', icon: BarChart3 },
   { href: '/reports', label: '리포트', caption: '목표가 검증과 제외 사유', icon: FileText },
+  { href: '/reports/statistics', label: '리포트 통계', caption: '분포·경로·익절선 실험', icon: BarChart3 },
   { href: '/strategies', label: '전략', caption: '벤치마크 대비 성과와 위험', icon: Database },
 ];
 
@@ -58,21 +59,21 @@ export default function LandingPage() {
           <p className="mb-5 inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">
             투자 리서치 · 포트폴리오 분석 · 전략 비교
           </p>
-          <h1 className="text-5xl font-semibold tracking-[-0.055em] text-slate-950 sm:text-6xl lg:text-7xl">
+          <h1 className="text-4xl font-semibold tracking-[-0.045em] text-slate-950 sm:text-5xl lg:text-6xl">
             SNUSMIC Portfolio Lab
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-            SNUSMIC Portfolio Lab은 리서치 리포트, 목표가, 매매내역, 전략 성과를 저장된 데이터 기준으로 묶어 오늘 봐야
-            할 검토 항목과 아직 믿으면 안 되는 데이터를 먼저 보여줍니다.
+            리포트가 실제로 맞았는지, 전략이 벤치마크보다 나았는지, 현재 포트폴리오가 어떤 근거로 구성됐는지를 저장된
+            데이터 기준으로 확인합니다.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg" variant="secondary">
               <Link href="/main">
-                메인화면 보기 <ArrowRight />
+                메인화면 <ArrowRight />
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link href="/guide">읽는 법</Link>
+              <Link href="/reports/statistics">리포트 통계</Link>
             </Button>
           </div>
           <ul className="mt-10 grid gap-3 text-sm text-slate-600">

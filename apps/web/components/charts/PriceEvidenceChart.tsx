@@ -522,7 +522,11 @@ export function PriceEvidenceChart({
           </div>
           <div>거래량 {formatVolume(tooltip.volume)}</div>
           <div>목표가 {formatChartPrice(tooltip.targetPrice, currency)}</div>
-          <div className={tooltip.targetGapPct !== null && tooltip.targetGapPct <= 0 ? 'good' : 'warn'}>
+          <div
+            className={
+              tooltip.targetGapPct !== null && tooltip.targetGapPct <= 0 ? 'text-emerald-600' : 'text-amber-600'
+            }
+          >
             목표까지 {formatPercent(tooltip.targetGapPct)}
           </div>
         </div>

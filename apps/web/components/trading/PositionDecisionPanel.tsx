@@ -57,7 +57,10 @@ export function PositionDecisionPanel({
             row.holding.lastCloseNative !== null && row.holding.qty !== null
               ? row.holding.lastCloseNative * row.holding.qty
               : null;
-          const linkedSymbol = row.lastBuy?.reportId ? reportSymbolsById[row.lastBuy.reportId] : row.target?.symbol;
+          const linkedTarget = row.lastBuy?.reportId ? targetsByReportId[row.lastBuy.reportId] : row.target;
+          const linkedSymbol =
+            linkedTarget?.symbol ??
+            (row.lastBuy?.reportId ? reportSymbolsById[row.lastBuy.reportId] : row.target?.symbol);
           return (
             <article
               key={`${row.holding.persona}-${row.holding.symbol}`}
@@ -67,7 +70,9 @@ export function PositionDecisionPanel({
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <Link
-                      href={`/reports/${encodeURIComponent(row.holding.symbol)}`}
+                      href={
+                        row.target ? reportTargetHref(row.target) : `/reports/${encodeURIComponent(row.holding.symbol)}`
+                      }
                       className="min-w-0 truncate text-base font-black hover:underline"
                     >
                       {row.holding.company || row.holding.symbol}
@@ -133,7 +138,9 @@ export function PositionDecisionPanel({
                     {linkedSymbol ? (
                       <Link
                         className="font-bold text-blue-600 hover:underline"
-                        href={`/reports/${encodeURIComponent(linkedSymbol)}`}
+                        href={
+                          linkedTarget ? reportTargetHref(linkedTarget) : `/reports/${encodeURIComponent(linkedSymbol)}`
+                        }
                       >
                         {row.targetSource === 'trade_report' ? '리포트 근거 보기 →' : '최신 리포트 보기 →'}
                       </Link>
@@ -242,4 +249,8 @@ function sourceLabel(source: DecisionRow['targetSource']): string {
   if (source === 'trade_report') return '리포트 근거';
   if (source === 'latest_symbol_report') return '최신 리포트 목표가 참고';
   return '매매 기록';
+}
+
+function reportTargetHref(target: ReportTargetDigest): string {
+  return `/reports/${encodeURIComponent(target.symbol)}/${encodeURIComponent(target.reportId)}`;
 }

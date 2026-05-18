@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { DailyEquityHistory } from '@/components/trading/DailyEquityHistory';
 import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
 import { PositionDecisionPanel } from '@/components/trading/PositionDecisionPanel';
@@ -32,6 +32,8 @@ type Props = {
   strategyOptions: StrategySelectorOption[];
   strategyRows: StrategyLeaderboardRow[];
   defaultPersona: string;
+  selectedPersona: string;
+  invalidStrategyId: string | null;
   methodsByPersona: Record<
     string,
     { summary: string; buyRules: string[]; sellRules: string[]; riskControls: string[] }
@@ -42,8 +44,6 @@ type Props = {
   targetsBySymbol: Record<string, ReportTargetDigest>;
   targetsByReportId: Record<string, ReportTargetDigest>;
 };
-
-const URL_STRATEGY_PARAM = 'strategy';
 
 export function PortfolioStrategyView({
   holdings,
@@ -56,6 +56,8 @@ export function PortfolioStrategyView({
   strategyOptions,
   strategyRows,
   defaultPersona,
+  selectedPersona,
+  invalidStrategyId,
   methodsByPersona,
   capitalByPersona,
   cashByPersona,
@@ -63,35 +65,11 @@ export function PortfolioStrategyView({
   targetsBySymbol,
   targetsByReportId,
 }: Props) {
-  const resolvedDefaultPersona = personas.includes(defaultPersona) ? defaultPersona : (personas[0] ?? '');
-  const [persona, setPersona] = useState<string>(resolvedDefaultPersona);
-  const [urlStateReady, setUrlStateReady] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const syncPersonaFromUrl = () => {
-      const params = new URLSearchParams(window.location.search);
-      const fromUrl = params.get(URL_STRATEGY_PARAM);
-      setPersona(fromUrl && personas.includes(fromUrl) ? fromUrl : resolvedDefaultPersona);
-      setUrlStateReady(true);
-    };
-
-    syncPersonaFromUrl();
-    window.addEventListener('popstate', syncPersonaFromUrl);
-    return () => window.removeEventListener('popstate', syncPersonaFromUrl);
-  }, [personas, resolvedDefaultPersona]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || !urlStateReady) return;
-    const params = new URLSearchParams(window.location.search);
-    const current = params.get(URL_STRATEGY_PARAM);
-    if (current === persona) return;
-    if (persona) params.set(URL_STRATEGY_PARAM, persona);
-    else params.delete(URL_STRATEGY_PARAM);
-    const url = `${window.location.pathname}${params.toString() ? `?${params}` : ''}`;
-    window.history.replaceState(null, '', url);
-  }, [persona, urlStateReady]);
+  const persona = personas.includes(selectedPersona)
+    ? selectedPersona
+    : personas.includes(defaultPersona)
+      ? defaultPersona
+      : (personas[0] ?? '');
 
   const personaHoldings = useMemo(() => holdings.filter((row) => row.persona === persona), [holdings, persona]);
   const cashKrw = cashByPersona[persona] ?? 0;
@@ -103,10 +81,7 @@ export function PortfolioStrategyView({
   const personaTrades = useMemo(() => trades.filter((row) => row.persona === persona), [trades, persona]);
   const personaAccounting = useMemo(() => accounting.find((row) => row.persona === persona), [accounting, persona]);
   const reportHrefBySymbol = useMemo(
-    () =>
-      Object.fromEntries(
-        Object.keys(targetsBySymbol).map((symbol) => [symbol, `/reports/${encodeURIComponent(symbol)}`]),
-      ),
+    () => Object.fromEntries(Object.values(targetsBySymbol).map((target) => [target.symbol, reportTargetHref(target)])),
     [targetsBySymbol],
   );
 
@@ -130,13 +105,13 @@ export function PortfolioStrategyView({
               {strategyOptions.filter((item) => item.kind !== 'strategy').length}
             </span>
           </div>
-          <StrategySelector
-            ariaLabel="포트폴리오 전략 선택"
-            onChange={setPersona}
-            options={strategyOptions}
-            value={persona}
-          />
+          <StrategySelector ariaLabel="포트폴리오 전략 선택" options={strategyOptions} value={persona} />
         </div>
+        {invalidStrategyId ? (
+          <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">
+            요청한 전략 <code>{invalidStrategyId}</code>는 현재 산출물에 없습니다. 현재 기본 전략 기준으로 표시합니다.
+          </div>
+        ) : null}
         <p className="m-0 mt-2 text-xs text-slate-950/55">
           <strong className="text-slate-950">{personaLabels[persona] ?? persona}</strong>의 보유·현금·체결·매수/매도
           규칙을 함께 봅니다. 기준선과 상한선은 비교용이고, 고유 전략만 선택해 검토할 수 있는 포트폴리오 전략입니다.
@@ -251,6 +226,10 @@ export function PortfolioStrategyView({
       />
     </div>
   );
+}
+
+function reportTargetHref(target: ReportTargetDigest): string {
+  return `/reports/${encodeURIComponent(target.symbol)}/${encodeURIComponent(target.reportId)}`;
 }
 
 function StrategyMethodPanel({
