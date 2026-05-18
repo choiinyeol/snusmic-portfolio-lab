@@ -1,12 +1,9 @@
-import { PathScenarioPanel } from '@/components/reports/PathScenarioPanel';
-import { PriceEvidencePanel } from '@/components/reports/PriceEvidencePanel';
-import { ReportHero } from '@/components/reports/ReportHero';
-import { ReportOutcomePanel } from '@/components/reports/ReportOutcomePanel';
-import { ReportSourcesPanel } from '@/components/reports/ReportSourcesPanel';
+import Link from 'next/link';
+import { PriceEvidenceChart } from '@/components/charts/PriceEvidenceChart';
 import { SymbolPersonaTrades } from '@/components/reports/SymbolPersonaTrades';
-import { Section } from '@/components/ui/Section';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
-  getMarkdownSnippet,
   getPositionEpisodes,
   getPriceSeries,
   getReportStatisticsLabSummary,
@@ -15,71 +12,260 @@ import {
   getTrades,
   type ReportRow,
 } from '@/lib/artifacts';
-import { formatDays, formatPercent } from '@/lib/format';
+import { formatDateKo, formatDays, formatPercent } from '@/lib/format';
 import {
-  buildKoreanInvestmentMemo,
   buildPathEvidence,
   buildScenarioRows,
-  buildTrendSnapshot,
+  formatAssetPrice,
+  reportEntryPrice,
+  targetMoveLabel,
   targetStatus,
+  type ScenarioRow,
 } from '@/lib/report-view-model';
 
 export function ReportDetailView({ report }: { report: ReportRow }) {
   const siblingReports = getReportsBySymbol(report.symbol);
   // End-cap at lastCloseDate so expired reports stop at expiry, not today.
   const prices = getPriceSeries(report.symbol, undefined, report.lastCloseDate);
-  const snippet = getMarkdownSnippet(report);
   const pathEvidence = buildPathEvidence(prices, report);
   const scenarioRows = buildScenarioRows(prices, report);
-  const trendSnapshot = buildTrendSnapshot(prices, report);
-  const memo = buildKoreanInvestmentMemo(report);
   const personaLabels = Object.fromEntries(getSummaryRows().map((row) => [row.persona, row.label ?? row.persona]));
   const symbolEpisodes = getPositionEpisodes().filter((row) => row.symbol === report.symbol);
   const symbolTrades = getTrades().filter((row) => row.symbol === report.symbol);
   const status = targetStatus(report);
   const reportStatistics = getReportStatisticsLabSummary();
   const reportOutcome = reportStatistics.riskScatter.find((row) => row.reportId === report.reportId) ?? null;
+  const markdownHref = githubBlobUrl(`data/markdown/${report.markdownFilename}`);
+  const pdfHref = pdfHrefFor(report);
+
+  const entryPrice = reportEntryPrice(report);
+  const targetReturn = reportOutcome?.targetReturn ?? report.targetUpsideAtPub;
+  const currentReturn = reportOutcome?.currentReturn ?? report.currentReturn;
+  const peakReturn = reportOutcome?.maxFavorableExcursion ?? report.peakReturn;
+  const troughReturn = reportOutcome?.maxAdverseExcursion ?? report.troughReturn;
+  const captureRatio = reportOutcome?.upsideCaptureRatio ?? captureFromReport(report);
+  const stage = stageLabel(reportOutcome, report);
 
   return (
-    <>
-      <ReportHero
-        report={report}
-        status={status}
-        markdownHref={githubBlobUrl(`data/markdown/${report.markdownFilename}`)}
-        pdfHref={pdfHrefFor(report)}
+    <div className="grid gap-5">
+      <header className="border-b border-slate-200 pb-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="outline">{report.symbol}</Badge>
+          <Badge variant={badgeVariant(status.tone)}>{status.label}</Badge>
+          {report.exchange ? <Badge variant="secondary">{report.exchange}</Badge> : null}
+          <Badge variant="secondary">{report.currency}</Badge>
+          <span className="font-mono text-xs text-slate-500">{formatDateKo(report.publicationDate)} 발간</span>
+        </div>
+        <h1 className="mt-2 text-2xl font-semibold tracking-[-0.02em] text-slate-950 md:text-3xl">{report.company}</h1>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <Button asChild size="sm" variant="outline">
+            <Link href="/reports">목록</Link>
+          </Button>
+          {pdfHref ? (
+            <Button asChild size="sm" variant="outline">
+              <a href={pdfHref}>PDF</a>
+            </Button>
+          ) : null}
+          <Button asChild size="sm" variant="outline">
+            <a href={markdownHref}>Markdown</a>
+          </Button>
+        </div>
+      </header>
+
+      <FactsTable
+        rows={[
+          { label: '발간일', value: formatDateKo(report.publicationDate) },
+          { label: '만료일', value: formatDateKo(report.expiryDate) },
+          { label: '최근 가격일', value: formatDateKo(report.lastCloseDate) },
+          { label: '발간가', value: formatAssetPrice(entryPrice, report) },
+          {
+            label: '목표가',
+            value: formatAssetPrice(report.targetPriceNative, report),
+            caption: targetMoveLabel(report),
+          },
+          { label: '현재가', value: formatAssetPrice(report.lastCloseNative, report) },
+          { label: '제시 상승여력', value: formatPercent(targetReturn) },
+          { label: '현재 수익률', value: formatPercent(currentReturn), tone: signedTone(currentReturn) },
+          { label: '최고 수익률', value: formatPercent(peakReturn), tone: 'good' },
+          { label: '최저 수익률', value: formatPercent(troughReturn), tone: 'bad' },
+          { label: '목표 도달 단계', value: stage },
+          {
+            label: '도달 정보',
+            value: report.targetHit
+              ? `${formatDateKo(report.targetHitDate)} · ${formatDays(report.daysToTarget)}`
+              : '미달성',
+          },
+          { label: '목표 포착률', value: formatCapture(captureRatio), caption: '최고 ÷ 목표' },
+          {
+            label: '발간 후 고점',
+            value: pathEvidence.peak ? formatAssetPrice(pathEvidence.peak.value, report) : '—',
+            caption: pathEvidence.peak ? formatDateKo(pathEvidence.peak.time) : undefined,
+          },
+          {
+            label: '발간 후 저점',
+            value: pathEvidence.trough ? formatAssetPrice(pathEvidence.trough.value, report) : '—',
+            caption: pathEvidence.trough ? formatDateKo(pathEvidence.trough.time) : undefined,
+          },
+        ]}
       />
 
-      <ReportEvidenceStrip report={report} outcome={reportOutcome} sample={reportStatistics.riskScatter} />
+      <section className="grid gap-2" aria-labelledby="price-chart-heading">
+        <h2
+          className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500"
+          id="price-chart-heading"
+        >
+          가격 경로
+        </h2>
+        <div className="rounded-md border border-slate-200 bg-white p-3">
+          <PriceEvidenceChart
+            priceSeries={prices}
+            targetPrice={report.targetPriceNative}
+            entryPrice={entryPrice}
+            currency={report.currency}
+            publicationDate={report.publicationDate}
+            targetHitDate={report.targetHitDate}
+            expiryDate={report.expiryDate}
+            evidenceMarkers={pathEvidence.markers}
+          />
+        </div>
+      </section>
 
-      <ReportOutcomePanel report={report} outcome={reportOutcome} />
+      <ScenarioTable rows={scenarioRows} report={report} />
 
-      <Section eyebrow="가격 근거" title="가격 경로와 목표가">
-        <PriceEvidencePanel report={report} prices={prices} pathEvidence={pathEvidence} status={status} />
-      </Section>
-
-      <Section eyebrow="진입 비교" title="가격대별 결과 비교">
-        <PathScenarioPanel report={report} scenarioRows={scenarioRows} trend={trendSnapshot} />
-      </Section>
-
-      <Section eyebrow="매매내역" title="전략별 매매">
+      <section className="grid gap-2" aria-labelledby="trades-heading">
+        <h2
+          className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500"
+          id="trades-heading"
+        >
+          전략별 매매
+        </h2>
         <SymbolPersonaTrades
           symbol={report.symbol}
           episodes={symbolEpisodes}
           trades={symbolTrades}
           personaLabels={personaLabels}
         />
-      </Section>
+      </section>
 
-      <Section eyebrow="원본" title="자료와 발간 이력">
-        <ReportSourcesPanel
-          siblingReports={siblingReports}
-          memo={memo}
-          snippet={snippet}
-          markdownHref={githubBlobUrl(`data/markdown/${report.markdownFilename}`)}
-          pdfHref={pdfHrefFor(report)}
-        />
-      </Section>
-    </>
+      <SiblingReportsTable currentId={report.reportId} reports={siblingReports} />
+    </div>
+  );
+}
+
+type FactRow = {
+  label: string;
+  value: string;
+  caption?: string;
+  tone?: 'good' | 'bad';
+};
+
+function FactsTable({ rows }: { rows: FactRow[] }) {
+  return (
+    <section className="overflow-hidden rounded-md border border-slate-200 bg-white" aria-label="리포트 핵심 지표">
+      <table className="w-full text-sm">
+        <tbody className="divide-y divide-slate-100">
+          {rows.map((row) => (
+            <tr key={row.label}>
+              <th className="w-40 bg-slate-50 px-3 py-2 text-left text-xs font-medium text-slate-500" scope="row">
+                {row.label}
+              </th>
+              <td className="px-3 py-2">
+                <div className={`font-mono font-semibold tabular-nums ${toneClass(row.tone)}`}>{row.value}</div>
+                {row.caption ? <div className="mt-0.5 text-xs text-slate-500">{row.caption}</div> : null}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  );
+}
+
+function ScenarioTable({ rows, report }: { rows: ScenarioRow[]; report: ReportRow }) {
+  if (rows.length === 0) return null;
+  return (
+    <section className="grid gap-2" aria-labelledby="scenario-heading">
+      <h2
+        className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500"
+        id="scenario-heading"
+      >
+        가격대별 사후 수익률
+      </h2>
+      <div className="overflow-hidden rounded-md border border-slate-200 bg-white">
+        <table className="w-full text-sm">
+          <thead className="bg-slate-50">
+            <tr>
+              <th className="px-3 py-2 text-left text-xs font-medium text-slate-500">시나리오</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-slate-500">일자</th>
+              <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">매수가</th>
+              <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">현재까지</th>
+              <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">목표까지</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {rows.map((row) => (
+              <tr key={row.label}>
+                <td className="px-3 py-2 font-medium text-slate-950">{row.label}</td>
+                <td className="px-3 py-2 text-xs text-slate-500">{row.point?.time ?? '—'}</td>
+                <td className="px-3 py-2 text-right font-mono tabular-nums">
+                  {formatAssetPrice(row.point?.value, report)}
+                </td>
+                <td className={`px-3 py-2 text-right font-mono tabular-nums ${signedTextClass(row.currentReturn)}`}>
+                  {formatPercent(row.currentReturn)}
+                </td>
+                <td className={`px-3 py-2 text-right font-mono tabular-nums ${signedTextClass(row.targetReturn)}`}>
+                  {formatPercent(row.targetReturn)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function SiblingReportsTable({ currentId, reports }: { currentId: string; reports: ReportRow[] }) {
+  const others = reports.filter((row) => row.reportId !== currentId);
+  if (others.length === 0) return null;
+  return (
+    <section className="grid gap-2" aria-labelledby="siblings-heading">
+      <h2
+        className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500"
+        id="siblings-heading"
+      >
+        동일 티커의 다른 리포트
+      </h2>
+      <div className="overflow-hidden rounded-md border border-slate-200 bg-white">
+        <table className="w-full text-sm">
+          <thead className="bg-slate-50">
+            <tr>
+              <th className="px-3 py-2 text-left text-xs font-medium text-slate-500">발간일</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-slate-500">제목</th>
+              <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">현재 수익률</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {others.map((row) => (
+              <tr key={row.reportId} className="hover:bg-slate-50">
+                <td className="px-3 py-2 font-mono text-xs text-slate-500">{formatDateKo(row.publicationDate)}</td>
+                <td className="px-3 py-2">
+                  <Link
+                    className="font-medium text-slate-950 underline-offset-2 hover:underline"
+                    href={`/reports/${encodeURIComponent(row.symbol)}/${encodeURIComponent(row.reportId)}`}
+                  >
+                    {row.title || `${row.company} 리포트`}
+                  </Link>
+                </td>
+                <td className={`px-3 py-2 text-right font-mono tabular-nums ${signedTextClass(row.currentReturn)}`}>
+                  {formatPercent(row.currentReturn)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 }
 
@@ -93,110 +279,49 @@ function pdfHrefFor(report: { pdfFilename: string; pdfUrl: string }): string | n
   return null;
 }
 
-type ReportOutcomeRow = ReturnType<typeof getReportStatisticsLabSummary>['riskScatter'][number];
-
-function ReportEvidenceStrip({
-  report,
-  outcome,
-  sample,
-}: {
-  report: ReportRow;
-  outcome: ReportOutcomeRow | null;
-  sample: ReportOutcomeRow[];
-}) {
-  const currentReturn = outcome?.currentReturn ?? report.currentReturn;
-  const rank = currentReturnRank(currentReturn, sample);
-  const stage =
-    outcome?.hit10 || report.targetHit
-      ? '1.0x 도달'
-      : outcome?.hit08
-        ? '0.8x 도달'
-        : outcome?.hit06
-          ? '0.6x 도달'
-          : '미도달';
-  const capture = outcome?.upsideCaptureRatio ?? null;
-  return (
-    <section className="grid gap-5 border-b border-slate-200 pb-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start">
-      <div className="min-w-0">
-        <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">한 장 요약</div>
-        <h2 className="mt-2 text-2xl font-semibold tracking-[-0.035em] text-slate-950">
-          이 리포트는 전체 표본 안에서 어디에 있나
-        </h2>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-          개별 리포트 화면은 원문 요약보다 검증 결과를 먼저 봅니다. 발간가에서 목표가까지의 약속, 실제 가격 경로, 중간
-          낙폭, 현재 수익률 순위를 한 줄로 묶어 전체 통계 페이지와 같은 기준으로 읽게 했습니다.
-        </p>
-      </div>
-      <dl className="grid min-w-0 divide-y divide-slate-200 border-y border-slate-200 bg-white/60 sm:grid-cols-2 sm:divide-x sm:divide-y-0 xl:grid-cols-4">
-        <EvidenceMetric
-          label="목표 단계"
-          value={stage}
-          caption={
-            report.targetHit
-              ? `${report.targetHitDate} · ${formatDays(report.daysToTarget)}`
-              : '원 목표가 일부 도달 포함'
-          }
-        />
-        <EvidenceMetric
-          label="현재 수익률"
-          value={formatPercent(currentReturn)}
-          caption={rank ? `전체 ${rank.total}건 중 상위 ${rank.percentileLabel}` : '가격 매칭 없음'}
-          tone={(currentReturn ?? 0) >= 0 ? 'good' : 'bad'}
-        />
-        <EvidenceMetric
-          label="중간 최대 손실"
-          value={formatPercent(outcome?.maxAdverseExcursion ?? report.troughReturn)}
-          caption="발간 이후 저점 기준"
-          tone="bad"
-        />
-        <EvidenceMetric
-          label="목표 포착률"
-          value={
-            capture === null || capture === undefined
-              ? '—'
-              : `${capture.toLocaleString('ko-KR', { maximumFractionDigits: 1 })}x`
-          }
-          caption="최대상승폭 ÷ 목표수익률"
-        />
-      </dl>
-    </section>
-  );
+function badgeVariant(
+  tone: ReturnType<typeof targetStatus>['tone'],
+): 'success' | 'warning' | 'destructive' | 'default' {
+  if (tone === 'good') return 'success';
+  if (tone === 'bad') return 'destructive';
+  if (tone === 'warn') return 'warning';
+  return 'default';
 }
 
-function EvidenceMetric({
-  label,
-  value,
-  caption,
-  tone,
-}: {
-  label: string;
-  value: string;
-  caption: string;
-  tone?: 'good' | 'bad';
-}) {
-  return (
-    <div className="min-w-0 p-4">
-      <dt className="text-xs font-medium text-slate-500">{label}</dt>
-      <dd
-        className={`mt-2 truncate font-mono text-xl font-semibold tabular-nums ${tone === 'good' ? 'text-blue-600' : tone === 'bad' ? 'text-rose-600' : 'text-slate-950'}`}
-      >
-        {value}
-      </dd>
-      <dd className="mt-1 truncate text-xs text-slate-500">{caption}</dd>
-    </div>
-  );
+function captureFromReport(report: ReportRow): number | null {
+  const peak = report.peakReturn;
+  const target = report.targetUpsideAtPub;
+  if (peak === null || target === null || !Number.isFinite(peak) || !Number.isFinite(target) || target === 0)
+    return null;
+  return peak / target;
 }
 
-function currentReturnRank(
-  value: number | null | undefined,
-  sample: ReportOutcomeRow[],
-): { total: number; percentileLabel: string } | null {
-  if (value === null || value === undefined || !Number.isFinite(value)) return null;
-  const values = sample
-    .map((row) => row.currentReturn)
-    .filter((item): item is number => item !== null && item !== undefined && Number.isFinite(item));
-  if (!values.length) return null;
-  const betterOrEqual = values.filter((item) => item >= value).length;
-  const percentile = Math.max(1, Math.round((betterOrEqual / values.length) * 100));
-  return { total: values.length, percentileLabel: `${percentile}%` };
+function formatCapture(value: number | null | undefined): string {
+  if (value === null || value === undefined || !Number.isFinite(value)) return '—';
+  return `${value.toLocaleString('ko-KR', { maximumFractionDigits: 1 })}x`;
+}
+
+type OutcomeRow = NonNullable<ReturnType<typeof getReportStatisticsLabSummary>['riskScatter'][number] | null>;
+
+function stageLabel(outcome: OutcomeRow | null, report: ReportRow): string {
+  if (outcome?.hit10 || report.targetHit) return '1.0x 도달';
+  if (outcome?.hit08) return '0.8x 도달';
+  if (outcome?.hit06) return '0.6x 도달';
+  return '미도달';
+}
+
+function signedTone(value: number | null | undefined): 'good' | 'bad' | undefined {
+  if (value === null || value === undefined || !Number.isFinite(value)) return undefined;
+  return value >= 0 ? 'good' : 'bad';
+}
+
+function signedTextClass(value: number | null | undefined): string {
+  if (value === null || value === undefined || !Number.isFinite(value)) return 'text-slate-950';
+  return value >= 0 ? 'text-emerald-600' : 'text-rose-600';
+}
+
+function toneClass(tone?: 'good' | 'bad'): string {
+  if (tone === 'good') return 'text-emerald-600';
+  if (tone === 'bad') return 'text-rose-600';
+  return 'text-slate-950';
 }
