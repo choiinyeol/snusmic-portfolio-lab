@@ -1245,13 +1245,12 @@ function ProgressCell({ value }: { value: number | null }) {
   );
 }
 
-/** Sparkline that normalises values to "% return from first point" so rows
- * in the same table render on a shared visual scale (±30% by default — values
- * outside the band still draw but get clipped at the band edge, preserving
- * cross-row rank-order legibility while flagging extreme movers via color). */
+/** Sparkline that plots each row's price path as "% return from first point",
+ * auto-scaled per row so the line never flattens at a clamp edge. The dashed
+ * horizontal baseline marks the start price (zero return) so direction stays
+ * visible across rows. */
 function Sparkline({ values }: { values: number[] }) {
-  const SCALE = 0.3; // ±30% shared band across all rows
-  const points = sparklinePoints(values, 72, 22, SCALE);
+  const points = sparklinePoints(values, 72, 22);
   if (!points) return <span className="text-slate-400">—</span>;
   const first = values[0];
   const last = values.at(-1);
@@ -1297,22 +1296,24 @@ function CaveatCell({ flags }: { flags: string[] }) {
   );
 }
 
-function sparklinePoints(values: number[], width: number, height: number, scale: number): { line: string } | null {
+function sparklinePoints(values: number[], width: number, height: number): { line: string } | null {
   const clean = values.filter((value) => Number.isFinite(value));
   if (clean.length < 2) return null;
   const first = clean[0];
   if (!first || first === 0) return null;
-  // Normalise to "% return from first point" so every row shares one band [-scale, +scale]
   const padding = 2;
   const usableHeight = height - padding * 2;
   const midY = height / 2;
+  // Per-row auto-scale anchored at zero so the start price sits on the baseline
+  // and the path uses the cell's full vertical range without clamping flat.
+  const returns = clean.map((value) => value / first - 1);
+  const peak = Math.max(...returns.map(Math.abs));
+  const scale = peak > 0 ? peak : 1;
   return {
-    line: clean
-      .map((value, index) => {
-        const r = value / first - 1;
-        const clamped = Math.max(-scale, Math.min(scale, r));
-        const x = (index / Math.max(1, clean.length - 1)) * width;
-        const y = midY - (clamped / scale) * (usableHeight / 2);
+    line: returns
+      .map((r, index) => {
+        const x = (index / Math.max(1, returns.length - 1)) * width;
+        const y = midY - (r / scale) * (usableHeight / 2);
         return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
       })
       .join(' '),
