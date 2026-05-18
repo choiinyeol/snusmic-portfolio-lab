@@ -54,11 +54,14 @@ export function SidebarNav({
             key={`${item.href}-${item.label}`}
             href={item.href}
             className={cn(
-              'group flex min-h-9 items-center gap-2 rounded-md px-2.5 py-2 text-sm font-medium transition-colors',
+              'group flex min-h-9 items-center gap-2 rounded-md py-2 text-sm font-medium transition-colors',
+              // Active uses a soft slate bg + a 2px accent rail on the left so it
+              // reads as "selected" without being a full dark fill (which the user
+              // found too aggressive). Inactive keeps the plain hover tint.
               isCurrent
-                ? 'bg-slate-950 text-white hover:bg-slate-900'
-                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950',
-              compact && 'justify-center px-2',
+                ? 'border-l-2 border-l-slate-950 bg-slate-100 pl-[calc(0.625rem-2px)] pr-2.5 text-slate-950 hover:bg-slate-200'
+                : 'border-l-2 border-l-transparent pl-[calc(0.625rem-2px)] pr-2.5 text-slate-600 hover:bg-slate-100 hover:text-slate-950',
+              compact && 'justify-center !px-2',
             )}
             aria-current={isCurrent ? 'page' : undefined}
             target={isInternal ? undefined : '_blank'}
