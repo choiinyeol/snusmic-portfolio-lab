@@ -25,7 +25,15 @@ const ICONS: Record<NavIconKey, LucideIcon> = {
   github: GitBranch,
 };
 
-export function SidebarNav({ items, className = '' }: { items: SidebarNavItem[]; className?: string }) {
+export function SidebarNav({
+  items,
+  className = '',
+  compact = false,
+}: {
+  items: SidebarNavItem[];
+  className?: string;
+  compact?: boolean;
+}) {
   const pathname = usePathname();
   const bestActivePath = items
     .map((item) => (item.href.startsWith('/') ? (item.activePath === undefined ? item.href : item.activePath) : null))
@@ -47,14 +55,16 @@ export function SidebarNav({ items, className = '' }: { items: SidebarNavItem[];
             href={item.href}
             className={cn(
               'group flex min-h-9 items-center gap-2 rounded-md px-2.5 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-950',
+              compact && 'justify-center px-2',
               isCurrent && 'bg-slate-100 text-slate-950 ring-1 ring-slate-200 hover:bg-slate-100 hover:text-slate-950',
             )}
             aria-current={isCurrent ? 'page' : undefined}
             target={isInternal ? undefined : '_blank'}
             rel={isInternal ? undefined : 'noreferrer'}
+            title={compact ? item.label : undefined}
           >
             <Icon className="size-4 shrink-0" aria-hidden="true" />
-            <span className="min-w-0 truncate">{item.label}</span>
+            <span className={cn('min-w-0 truncate', compact && 'sr-only')}>{item.label}</span>
           </Link>
         );
       })}

@@ -14,6 +14,7 @@ import {
 import Link from 'next/link';
 import { Fragment, useMemo, useState } from 'react';
 import { BlockPagination } from '@/components/trading/TableControls';
+import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import { formatDateKo, formatNative, formatPercent, numCellClass, signedTextClass } from '@/lib/format';
 
 export type ScreenerBoardRow = {
@@ -1014,20 +1015,16 @@ function Select({
   onChange: (value: string) => void;
 }) {
   return (
-    <label className="grid gap-1 text-xs font-medium text-slate-500">
+    <div className="grid gap-1 text-xs font-medium text-slate-500">
       <span>{label}</span>
-      <select
-        className="h-9 rounded-md border border-slate-200 bg-white px-2 text-xs text-slate-950 outline-none focus:border-slate-400"
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-      >
+      <NativeSelect aria-label={label} value={value} onChange={(event) => onChange(event.target.value)}>
         {options.map((option) => (
-          <option key={option} value={option}>
+          <NativeSelectOption key={option} value={option}>
             {filterOptionLabel(option)}
-          </option>
+          </NativeSelectOption>
         ))}
-      </select>
-    </label>
+      </NativeSelect>
+    </div>
   );
 }
 
@@ -1059,32 +1056,32 @@ function ColumnFilterControl({
   if (columnId === 'sparkline' || columnId === 'detail') return null;
   if (columnId === 'candidateBucket') {
     return (
-      <select
+      <NativeSelect
         aria-label={`${columnLabel(columnId)} 컬럼 필터`}
-        className="h-7 w-full rounded border border-slate-200 bg-white px-1 text-[11px] font-normal normal-case tracking-normal text-slate-700 outline-none focus:border-slate-400"
+        className="h-8 w-full px-1.5 text-[11px] font-normal normal-case tracking-normal text-slate-700"
         value={value}
         onChange={(event) => onChange(event.target.value)}
       >
         {buckets.map((bucket) => (
-          <option key={bucket} value={bucket === 'all' ? '' : bucket}>
+          <NativeSelectOption key={bucket} value={bucket === 'all' ? '' : bucket}>
             {bucket === 'all' ? '전체' : bucket}
-          </option>
+          </NativeSelectOption>
         ))}
-      </select>
+      </NativeSelect>
     );
   }
   if (BOOLEAN_FILTER_IDS.has(columnId)) {
     return (
-      <select
+      <NativeSelect
         aria-label={`${columnLabel(columnId)} 컬럼 필터`}
-        className="h-7 w-full rounded border border-slate-200 bg-white px-1 text-[11px] font-normal normal-case tracking-normal text-slate-700 outline-none focus:border-slate-400"
+        className="h-8 w-full px-1.5 text-[11px] font-normal normal-case tracking-normal text-slate-700"
         value={value}
         onChange={(event) => onChange(event.target.value)}
       >
-        <option value="">전체</option>
-        <option value="yes">Y</option>
-        <option value="no">N</option>
-      </select>
+        <NativeSelectOption value="">전체</NativeSelectOption>
+        <NativeSelectOption value="yes">Y</NativeSelectOption>
+        <NativeSelectOption value="no">N</NativeSelectOption>
+      </NativeSelect>
     );
   }
   return (

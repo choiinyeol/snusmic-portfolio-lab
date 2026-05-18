@@ -1,11 +1,15 @@
-import { ExternalLink } from 'lucide-react';
+'use client';
+
+import { ExternalLink, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
 import { APP_NAV, GITHUB_NAV_ITEM } from '@/components/ui/app-shell-nav';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { SidebarNav } from '@/components/ui/SidebarNav';
+import { cn } from '@/lib/utils';
 
 type ShellMetric = {
   label: string;
@@ -32,6 +36,7 @@ export function AppShell({
   priceRange,
   primaryBookLabel,
 }: AppShellProps) {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const sidebarMetrics: ShellMetric[] = [
     { label: '기준일', value: snapshotDate || '—' },
     { label: '리포트', value: reportCount.toLocaleString('ko-KR'), caption: reportRangeLabel(reportRange) },
@@ -41,16 +46,21 @@ export function AppShell({
 
   return (
     <div className="ui-shell min-h-dvh bg-slate-50 text-slate-950">
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 border-r border-slate-200 bg-white/95 px-3 py-4 lg:flex lg:flex-col">
+      <aside
+        className={cn(
+          'fixed inset-y-0 left-0 z-40 hidden border-r border-slate-200 bg-white/95 py-4 transition-[width,padding] duration-200 lg:flex lg:flex-col',
+          sidebarCollapsed ? 'w-16 px-2' : 'w-64 px-3',
+        )}
+      >
         <Link
-          className="flex items-center gap-3 rounded-lg px-2 py-2"
+          className={cn('flex items-center rounded-lg px-2 py-2', sidebarCollapsed ? 'justify-center gap-0' : 'gap-3')}
           href="/main"
           aria-label="SNUSMIC Portfolio Lab 메인"
         >
           <span className="grid size-8 place-items-center rounded-md bg-slate-950 text-xs font-semibold text-white">
             SM
           </span>
-          <span className="grid min-w-0 gap-0.5">
+          <span className={cn('min-w-0 gap-0.5', sidebarCollapsed ? 'hidden' : 'grid')}>
             <span className="truncate text-sm font-semibold tracking-tight">SNUSMIC</span>
             <span className="truncate font-mono text-[11px] uppercase tracking-[0.12em] text-slate-500">
               Portfolio Lab
@@ -58,11 +68,21 @@ export function AppShell({
           </span>
         </Link>
 
+        <button
+          type="button"
+          className="mt-1 inline-flex h-9 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-950"
+          aria-label={sidebarCollapsed ? '사이드바 펼치기' : '사이드바 접기'}
+          title={sidebarCollapsed ? '사이드바 펼치기' : '사이드바 접기'}
+          onClick={() => setSidebarCollapsed((value) => !value)}
+        >
+          {sidebarCollapsed ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
+        </button>
+
         <Separator className="my-3" />
-        <SidebarNav items={APP_NAV} />
+        <SidebarNav items={APP_NAV} compact={sidebarCollapsed} />
 
         <div className="mt-auto grid gap-3">
-          <Card className="rounded-lg shadow-none">
+          <Card className={cn('rounded-lg shadow-none', sidebarCollapsed && 'hidden')}>
             <CardContent className="grid gap-3 p-3">
               {sidebarMetrics.map((metric) => (
                 <div className="grid gap-1" key={metric.label}>
@@ -79,15 +99,21 @@ export function AppShell({
               ))}
             </CardContent>
           </Card>
-          <Button asChild className="justify-start" size="sm" variant="outline">
+          <Button
+            asChild
+            className={cn('justify-start', sidebarCollapsed && 'justify-center px-0')}
+            size="sm"
+            variant="outline"
+          >
             <Link href={GITHUB_NAV_ITEM.href} target="_blank" rel="noreferrer">
-              GitHub <ExternalLink className="ml-auto size-3.5" />
+              <span className={cn(sidebarCollapsed && 'sr-only')}>GitHub</span>
+              <ExternalLink className={cn('size-3.5', !sidebarCollapsed && 'ml-auto')} />
             </Link>
           </Button>
         </div>
       </aside>
 
-      <div className="min-w-0 lg:pl-64">
+      <div className={cn('min-w-0 transition-[padding] duration-200', sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-64')}>
         <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/80 backdrop-blur-xl">
           <div className="flex min-h-14 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
             <div className="min-w-0">
@@ -105,7 +131,7 @@ export function AppShell({
             </div>
           </div>
         </header>
-        <main className="mx-auto w-full max-w-[1500px] px-4 py-5 sm:px-6 lg:px-8">{children}</main>
+        <main className="mx-auto w-full max-w-[1800px] px-3 py-5 sm:px-4 lg:px-5">{children}</main>
       </div>
     </div>
   );

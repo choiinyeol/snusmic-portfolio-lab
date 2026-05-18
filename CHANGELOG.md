@@ -15,6 +15,8 @@ All notable user-facing changes are tracked here. This project uses git tags as 
 - Filter stale optional monthly holding rows that refer to retired personas while failing fast on stale required ledger artifacts.
 - Make `report-statistics-lab.json` a deterministic exporter-owned artifact so report detail/statistics pages build after artifact refresh.
 - Add spreadsheet-style per-column filters to `/screener` and hide reports older than two years by default while keeping an explicit expired filter.
+- Add a collapsible desktop sidebar so wide data tables can use more horizontal space.
+- Add a styled native select wrapper and use it in `/screener` filters to avoid clipped Korean option text.
 
 ## v0.20.0-screener-board.1 - 2026-05-18
 
