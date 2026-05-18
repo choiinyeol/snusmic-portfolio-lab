@@ -18,6 +18,42 @@ All notable user-facing changes are tracked here. This project uses git tags as 
 - Add a collapsible desktop sidebar so wide data tables can use more horizontal space.
 - Add a styled native select wrapper and use it in `/screener` filters to avoid clipped Korean option text.
 
+## v0.21.3-ultragoal-polish.1 - 2026-05-18
+
+### Added
+- Add a mobile sidebar focus trap (`useFocusTrap` hook) so keyboard users opening the drawer have `Tab` / `Shift+Tab` cycle inside the drawer and `Escape` restores focus to the trigger.
+- Extend the command palette index — supplied by the `(app)` server layout — with every selectable strategy and every unique report symbol; each result now carries a `kind` chip (페이지·전략·종목) and `keywords` so power users can `⌘K` straight to a ticker or persona instead of going through the screener.
+- Add a generic `Select<T extends string>` discriminator and route the four screener filter dropdowns through it so the previous `as SignFilter` / `as BooleanFilter` / `as MaFilter` casts are eliminated.
+- Add a `mask-image` right-edge fade to `StrategyRiskTable` on `<sm` viewports so analysts can tell the table scrolls horizontally.
+- Add a primary-variant Drilldown CTA on `/main` so 포트폴리오 stands out from the three sibling reports/통계/전략 links.
+
+### Changed
+- Consolidate the nine manual screener filter `useState` calls (activePreset, bucket, return, targetHit, expired, caveat, ma, nearHighOnly, columnFilters, page) into a single `useReducer` with a discriminated `FilterAction` so preset application is atomic and the stale-closure exposure on `applyPreset`'s `useCallback` deps is eliminated.
+- Replace the four parallel filter-id Sets (`PERCENT_FILTER_IDS`, `NUMBER_FILTER_IDS`, `BOOLEAN_FILTER_IDS`, `TEXT_FILTER_IDS`) and the `COLUMN_FILTER_LABELS` map with a single `COLUMN_META` record keyed by column id; adding a new column now requires editing one row.
+- Swap the `HoldingsTreemap` colour scale from six discrete buckets to a continuous RGB interpolation between bad/neutral/good at ±25% clamp so a +8% holding and a +24% holding render as visibly different greens. Replace the three-pill heatmap legend with a gradient bar that mirrors the actual encoding.
+- Widen the `ReportsTable` target-progress bar from `h-1.5 w-14` (6×56) to `h-2.5 w-20` (10×80) with a 2px-wide centred slate-400 zero tick so the analog reading is no longer below the resolution threshold.
+- Tint the active `SeriesToggleChart` legend pill with the series' own colour (rgba .14 background, .4 border, full text) so the toggle and the chart line share one visual encoding instead of two parallel ones.
+- Migrate the three remaining bare `<select>` controls in `/reports` to `NativeSelect` with explicit `htmlFor`/`id` pairing.
+- Replace the screener column-mode `핵심 / 가격 / 전체 컬럼` pill trio with a labelled segmented control so the three column-set buttons are visually distinct from the ten filter-preset pills below.
+- Soften the `PageHero` h1 from `text-3xl md:text-4xl tracking-[-0.045em]` to `text-2xl md:text-3xl tracking-[-0.02em]` so Hangul glyph fitting stays clean and the heading no longer competes with the page's own data density.
+- Restructure the `(app)/loading.tsx` skeleton so the KPI strip placeholder mirrors the actual `border-y` + `divide-x` columns layout instead of bordered cards.
+- Replace the screener `52W high` `<label>+<button>` dual-click area with a `<div>+<button aria-pressed>` so the label text no longer pretends to be a clickable affordance.
+
+### Fixed
+- Fix three `matchesDateFilter` / `matchesNumberFilter` / `parseMetricNumber` regex literals where source-level `\\s` and `\\d` produced a literal-backslash class instead of a whitespace/digit class, silently disabling every operator-prefixed screener column filter (`>=100`, `<=120`, `>-10`, …). Single backslashes inside the regex literals now restore the documented operator semantics surfaced by `COLUMN_META` placeholders.
+
+### Removed
+- Remove the unreachable `colorWithAlpha` length-check fallback in `SeriesToggleChart` (only documented hex inputs).
+- Remove the unreachable `applyPreset` runtime throw — the `PresetId` union already constrains callers.
+- Remove the `DEFAULT_NAV_TARGETS` fallback in `CommandPalette` — the prop is now required and the call site always supplies the full index.
+
+### Verified
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web build` (413 static pages generated)
+- AI slop sweep (oh-my-claudecode:code-reviewer) — PASS, 5 LOW nits addressed
+- Final code review (oh-my-claudecode:code-reviewer) — P0 regex bug fixed, P1 focus-trap ESC routed via `onEscape`, P2 previouslyFocused `document.contains` guard added, container fallback focus via `tabIndex={-1}`
+
 ## v0.21.2-command-palette.1 - 2026-05-18
 
 ### Added

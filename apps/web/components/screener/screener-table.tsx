@@ -13,7 +13,7 @@ import {
 } from '@tanstack/react-table';
 import { SearchX } from 'lucide-react';
 import Link from 'next/link';
-import { Fragment, useCallback, useDeferredValue, useMemo, useState } from 'react';
+import { Fragment, useCallback, useDeferredValue, useMemo, useReducer, useState } from 'react';
 import { BlockPagination } from '@/components/trading/TableControls';
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import { useSearchShortcut } from '@/components/ui/use-search-shortcut';
@@ -123,58 +123,128 @@ const PRICE_COLUMN_IDS = new Set([
   'latestReportDate',
   'rankBasis',
 ]);
-const COLUMN_FILTER_LABELS: Record<string, string> = {
-  symbol: 'ticker/company',
-  company: 'company',
-  currency: 'ccy',
-  latestReportDate: 'YYYY-MM-DD',
-  lastCloseNative: '>=100',
-  volumeLatest: '>=1M',
-  entryPriceNative: '>=100',
-  targetPriceNative: '>=100',
-  targetUpsideAtPub: '>=30',
-  targetGapPct: '>-10',
-  targetRemainingPct: '>=0',
-  targetProgressPct: '>=70',
-  targetHit: '전체',
-  daysToTarget: '<=120',
-  expired: '전체',
-  currentReturn: '>=0',
-  peakReturn: '>=50',
-  troughReturn: '<=-20',
-  ytdReturn: '>=0',
-  return1y: '>=0',
-  distanceFrom52wHigh: '>=-10',
-  above20ma: '전체',
-  above50ma: '전체',
-  above200ma: '전체',
-  candidateBucket: '전체',
-  candidateScore: '>=0.5',
-  rankBasis: 'contains',
-  caveatFlags: 'contains',
+/** Per-column filter metadata: kind drives `rowPassesColumnFilters` matching and
+ * the ColumnFilterControl input variant, placeholder is the input hint. Adding
+ * a new column means adding one row here — no more five-Set scatter. */
+type ColumnFilterKind = 'percent' | 'number' | 'boolean' | 'text';
+
+const COLUMN_META: Record<string, { kind: ColumnFilterKind; placeholder: string }> = {
+  symbol: { kind: 'text', placeholder: 'ticker/company' },
+  company: { kind: 'text', placeholder: 'company' },
+  currency: { kind: 'text', placeholder: 'ccy' },
+  rankBasis: { kind: 'text', placeholder: 'contains' },
+  caveatFlags: { kind: 'text', placeholder: 'contains' },
+  latestReportDate: { kind: 'text', placeholder: 'YYYY-MM-DD' },
+  lastCloseNative: { kind: 'number', placeholder: '>=100' },
+  volumeLatest: { kind: 'number', placeholder: '>=1M' },
+  entryPriceNative: { kind: 'number', placeholder: '>=100' },
+  targetPriceNative: { kind: 'number', placeholder: '>=100' },
+  daysToTarget: { kind: 'number', placeholder: '<=120' },
+  candidateScore: { kind: 'number', placeholder: '>=0.5' },
+  targetUpsideAtPub: { kind: 'percent', placeholder: '>=30' },
+  targetGapPct: { kind: 'percent', placeholder: '>-10' },
+  targetRemainingPct: { kind: 'percent', placeholder: '>=0' },
+  targetProgressPct: { kind: 'percent', placeholder: '>=70' },
+  currentReturn: { kind: 'percent', placeholder: '>=0' },
+  peakReturn: { kind: 'percent', placeholder: '>=50' },
+  troughReturn: { kind: 'percent', placeholder: '<=-20' },
+  ytdReturn: { kind: 'percent', placeholder: '>=0' },
+  return1y: { kind: 'percent', placeholder: '>=0' },
+  distanceFrom52wHigh: { kind: 'percent', placeholder: '>=-10' },
+  targetHit: { kind: 'boolean', placeholder: '전체' },
+  expired: { kind: 'boolean', placeholder: '전체' },
+  above20ma: { kind: 'boolean', placeholder: '전체' },
+  above50ma: { kind: 'boolean', placeholder: '전체' },
+  above200ma: { kind: 'boolean', placeholder: '전체' },
+  // candidateBucket has its own rendering and matching branch — intentionally absent here.
 };
-const PERCENT_FILTER_IDS = new Set([
-  'targetUpsideAtPub',
-  'targetGapPct',
-  'targetRemainingPct',
-  'targetProgressPct',
-  'currentReturn',
-  'peakReturn',
-  'troughReturn',
-  'ytdReturn',
-  'return1y',
-  'distanceFrom52wHigh',
-]);
-const NUMBER_FILTER_IDS = new Set([
-  'lastCloseNative',
-  'volumeLatest',
-  'entryPriceNative',
-  'targetPriceNative',
-  'daysToTarget',
-  'candidateScore',
-]);
-const BOOLEAN_FILTER_IDS = new Set(['targetHit', 'expired', 'above20ma', 'above50ma', 'above200ma']);
-const TEXT_FILTER_IDS = new Set(['symbol', 'company', 'currency', 'rankBasis', 'caveatFlags']);
+
+function columnFilterKind(columnId: string): ColumnFilterKind | undefined {
+  return COLUMN_META[columnId]?.kind;
+}
+
+function columnFilterPlaceholder(columnId: string): string {
+  return COLUMN_META[columnId]?.placeholder ?? 'filter';
+}
+
+type FilterState = {
+  activePreset: PresetId;
+  bucketFilter: string;
+  returnFilter: SignFilter;
+  targetHitFilter: BooleanFilter;
+  expiredFilter: BooleanFilter;
+  caveatFilter: BooleanFilter;
+  maFilter: MaFilter;
+  nearHighOnly: boolean;
+  columnFilters: ColumnFilterValues;
+  page: number;
+};
+
+type FilterAction =
+  | { type: 'APPLY_PRESET'; preset: Preset }
+  | { type: 'SET_BUCKET'; value: string }
+  | { type: 'SET_RETURN'; value: SignFilter }
+  | { type: 'SET_TARGET_HIT'; value: BooleanFilter }
+  | { type: 'SET_EXPIRED'; value: BooleanFilter }
+  | { type: 'SET_MA'; value: MaFilter }
+  | { type: 'TOGGLE_NEAR_HIGH' }
+  | { type: 'SET_COLUMN_FILTER'; columnId: string; value: string }
+  | { type: 'CLEAR_COLUMN_FILTERS' }
+  | { type: 'SET_PAGE'; page: number };
+
+const INITIAL_FILTER_STATE: FilterState = {
+  activePreset: 'all',
+  bucketFilter: 'all',
+  returnFilter: 'all',
+  targetHitFilter: 'all',
+  expiredFilter: 'no',
+  caveatFilter: 'all',
+  maFilter: 'all',
+  nearHighOnly: false,
+  columnFilters: {},
+  page: 0,
+};
+
+function filterReducer(state: FilterState, action: FilterAction): FilterState {
+  switch (action.type) {
+    case 'APPLY_PRESET': {
+      const preset = action.preset;
+      return {
+        ...state,
+        activePreset: preset.id,
+        returnFilter: preset.returnFilter ?? 'all',
+        targetHitFilter: preset.targetHit ?? 'all',
+        expiredFilter: preset.expired ?? 'no',
+        caveatFilter: preset.caveat ?? 'all',
+        maFilter: preset.maStack ? 'above' : 'all',
+        nearHighOnly: Boolean(preset.nearHigh),
+        page: 0,
+      };
+    }
+    case 'SET_BUCKET':
+      return { ...state, bucketFilter: action.value, page: 0 };
+    case 'SET_RETURN':
+      return { ...state, returnFilter: action.value, page: 0 };
+    case 'SET_TARGET_HIT':
+      return { ...state, targetHitFilter: action.value, page: 0 };
+    case 'SET_EXPIRED':
+      return { ...state, expiredFilter: action.value, page: 0 };
+    case 'SET_MA':
+      return { ...state, maFilter: action.value, page: 0 };
+    case 'TOGGLE_NEAR_HIGH':
+      return { ...state, nearHighOnly: !state.nearHighOnly, page: 0 };
+    case 'SET_COLUMN_FILTER': {
+      const next = { ...state.columnFilters };
+      if (action.value.trim()) next[action.columnId] = action.value;
+      else delete next[action.columnId];
+      return { ...state, columnFilters: next, page: 0 };
+    }
+    case 'CLEAR_COLUMN_FILTERS':
+      return { ...state, columnFilters: {}, page: 0 };
+    case 'SET_PAGE':
+      return { ...state, page: action.page };
+  }
+}
 
 const PRESETS: Preset[] = [
   {
@@ -248,21 +318,25 @@ const PRESETS: Preset[] = [
 
 export function ScreenerTable({ rows }: ScreenerTableProps) {
   const [sorting, setSorting] = useState<SortingState>([{ id: 'candidateScore', desc: true }]);
-  const [activePreset, setActivePreset] = useState<PresetId>('all');
   const [columnMode, setColumnMode] = useState<ColumnMode>('price');
   const [globalFilter, setGlobalFilter] = useState('');
   const deferredGlobalFilter = useDeferredValue(globalFilter);
   const clearGlobalFilter = useCallback(() => setGlobalFilter(''), []);
   const searchInputRef = useSearchShortcut(clearGlobalFilter);
-  const [bucketFilter, setBucketFilter] = useState('all');
-  const [returnFilter, setReturnFilter] = useState<SignFilter>('all');
-  const [targetHitFilter, setTargetHitFilter] = useState<BooleanFilter>('all');
-  const [expiredFilter, setExpiredFilter] = useState<BooleanFilter>('no');
-  const [caveatFilter, setCaveatFilter] = useState<BooleanFilter>('all');
-  const [maFilter, setMaFilter] = useState<MaFilter>('all');
-  const [nearHighOnly, setNearHighOnly] = useState(false);
-  const [columnFilters, setColumnFilters] = useState<ColumnFilterValues>({});
-  const [page, setPage] = useState(0);
+  const [filters, dispatchFilters] = useReducer(filterReducer, INITIAL_FILTER_STATE);
+  const {
+    activePreset,
+    bucketFilter,
+    returnFilter,
+    targetHitFilter,
+    expiredFilter,
+    caveatFilter,
+    maFilter,
+    nearHighOnly,
+    columnFilters,
+    page,
+  } = filters;
+  const setPage = useCallback((next: number) => dispatchFilters({ type: 'SET_PAGE', page: next }), []);
 
   const columns = useMemo<ColumnDef<ScreenerBoardRow>[]>(() => buildColumns(), []);
   const columnVisibility = useMemo<VisibilityState>(() => buildColumnVisibility(columnMode), [columnMode]);
@@ -327,39 +401,17 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
   const safePage = Math.min(page, totalPages - 1);
   const visibleRows = filteredRows.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
 
-  const resetPage = useCallback(() => setPage(0), []);
-  const applyPreset = useCallback(
-    (presetId: PresetId) => {
-      const preset = PRESETS.find((item) => item.id === presetId);
-      if (!preset) throw new Error(`Unknown screener preset: ${presetId}`);
-      setActivePreset(preset.id);
-      setSorting(preset.sort);
-      setReturnFilter(preset.returnFilter ?? 'all');
-      setTargetHitFilter(preset.targetHit ?? 'all');
-      setExpiredFilter(preset.expired ?? 'no');
-      setCaveatFilter(preset.caveat ?? 'all');
-      setNearHighOnly(Boolean(preset.nearHigh));
-      setMaFilter(preset.maStack ? 'above' : 'all');
-      resetPage();
-    },
-    [resetPage],
-  );
-  const updateColumnFilter = useCallback(
-    (columnId: string, value: string) => {
-      setColumnFilters((current) => {
-        const next = { ...current };
-        if (value.trim()) next[columnId] = value;
-        else delete next[columnId];
-        return next;
-      });
-      resetPage();
-    },
-    [resetPage],
-  );
-  const clearColumnFilters = useCallback(() => {
-    setColumnFilters({});
-    resetPage();
-  }, [resetPage]);
+  const resetPage = useCallback(() => dispatchFilters({ type: 'SET_PAGE', page: 0 }), []);
+  const applyPreset = useCallback((presetId: PresetId) => {
+    const preset = PRESETS.find((item) => item.id === presetId);
+    if (!preset) return;
+    setSorting(preset.sort);
+    dispatchFilters({ type: 'APPLY_PRESET', preset });
+  }, []);
+  const updateColumnFilter = useCallback((columnId: string, value: string) => {
+    dispatchFilters({ type: 'SET_COLUMN_FILTER', columnId, value });
+  }, []);
+  const clearColumnFilters = useCallback(() => dispatchFilters({ type: 'CLEAR_COLUMN_FILTERS' }), []);
 
   return (
     <section className="grid gap-3">
@@ -389,17 +441,32 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
                 artifact에 없어 숨깁니다.
               </p>
             </div>
-            <div className="flex flex-wrap gap-1.5" aria-label="컬럼 보기">
-              {(['core', 'price', 'all'] as const).map((mode) => (
-                <button
-                  key={mode}
-                  type="button"
-                  className={toggleClass(columnMode === mode)}
-                  onClick={() => setColumnMode(mode)}
-                >
-                  {modeLabel(mode)}
-                </button>
-              ))}
+            <div className="flex shrink-0 items-center gap-2" aria-label="컬럼 보기">
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                컬럼
+              </span>
+              <div className="inline-flex overflow-hidden rounded-md border border-slate-200 bg-white">
+                {(['core', 'price', 'all'] as const).map((mode, index) => {
+                  const isActive = columnMode === mode;
+                  return (
+                    <button
+                      key={mode}
+                      type="button"
+                      aria-pressed={isActive}
+                      className={[
+                        'inline-flex h-8 items-center px-3 text-xs font-semibold transition-colors',
+                        index > 0 ? 'border-l border-slate-200' : '',
+                        isActive
+                          ? 'bg-slate-950 text-white'
+                          : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-950',
+                      ].join(' ')}
+                      onClick={() => setColumnMode(mode)}
+                    >
+                      {modeLabel(mode)}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
@@ -438,46 +505,31 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
             <Select
               label="후보 유형"
               value={bucketFilter}
-              onChange={(value) => {
-                setBucketFilter(value);
-                resetPage();
-              }}
+              onChange={(value) => dispatchFilters({ type: 'SET_BUCKET', value })}
               options={buckets}
             />
             <Select<SignFilter>
               label="수익률 방향"
               value={returnFilter}
-              onChange={(value) => {
-                setReturnFilter(value);
-                resetPage();
-              }}
+              onChange={(value) => dispatchFilters({ type: 'SET_RETURN', value })}
               options={['all', 'positive', 'negative'] as const}
             />
             <Select<BooleanFilter>
               label="목표 도달"
               value={targetHitFilter}
-              onChange={(value) => {
-                setTargetHitFilter(value);
-                resetPage();
-              }}
+              onChange={(value) => dispatchFilters({ type: 'SET_TARGET_HIT', value })}
               options={['all', 'yes', 'no'] as const}
             />
             <Select<BooleanFilter>
               label="만료"
               value={expiredFilter}
-              onChange={(value) => {
-                setExpiredFilter(value);
-                resetPage();
-              }}
+              onChange={(value) => dispatchFilters({ type: 'SET_EXPIRED', value })}
               options={['no', 'all', 'yes'] as const}
             />
             <Select<MaFilter>
               label="이동평균"
               value={maFilter}
-              onChange={(value) => {
-                setMaFilter(value);
-                resetPage();
-              }}
+              onChange={(value) => dispatchFilters({ type: 'SET_MA', value })}
               options={['all', 'above', 'below'] as const}
             />
             <div className="grid gap-1 text-xs font-medium text-slate-500">
@@ -486,10 +538,7 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
                 type="button"
                 aria-pressed={nearHighOnly}
                 className={toggleClass(nearHighOnly)}
-                onClick={() => {
-                  setNearHighOnly((value) => !value);
-                  resetPage();
-                }}
+                onClick={() => dispatchFilters({ type: 'TOGGLE_NEAR_HIGH' })}
               >
                 -10% 이내
               </button>
@@ -592,7 +641,7 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
                           className="inline-flex h-8 items-center rounded-md border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-950"
                           onClick={() => {
                             setGlobalFilter('');
-                            setBucketFilter('all');
+                            dispatchFilters({ type: 'SET_BUCKET', value: 'all' });
                             clearColumnFilters();
                             applyPreset('all');
                           }}
@@ -905,12 +954,11 @@ function matchesColumnFilter(row: ScreenerBoardRow, columnId: string, filterValu
     return textIncludes(`${row.symbol} ${row.company}`, filterValue);
   }
   if (columnId === 'candidateBucket') return row.candidateBucket === filterValue;
-  if (BOOLEAN_FILTER_IDS.has(columnId)) return matchesBoolean(columnValue(row, columnId), filterValue);
-  if (PERCENT_FILTER_IDS.has(columnId))
-    return matchesNumberFilter(asNumber(columnValue(row, columnId), 100), filterValue);
-  if (NUMBER_FILTER_IDS.has(columnId)) return matchesNumberFilter(asNumber(columnValue(row, columnId)), filterValue);
   if (columnId === 'latestReportDate') return matchesDateFilter(row.latestReportDate, filterValue);
-  if (TEXT_FILTER_IDS.has(columnId)) return textIncludes(String(columnValue(row, columnId) ?? ''), filterValue);
+  const kind = columnFilterKind(columnId);
+  if (kind === 'boolean') return matchesBoolean(columnValue(row, columnId), filterValue);
+  if (kind === 'percent') return matchesNumberFilter(asNumber(columnValue(row, columnId), 100), filterValue);
+  if (kind === 'number') return matchesNumberFilter(asNumber(columnValue(row, columnId)), filterValue);
   return textIncludes(String(columnValue(row, columnId) ?? ''), filterValue);
 }
 
@@ -932,7 +980,7 @@ function matchesDateFilter(value: string | null, filterValue: string): boolean {
     const [min, max] = range;
     return (!min || value >= min) && (!max || value <= max);
   }
-  const operator = filterValue.match(/^(<=|>=|<|>|=)\\s*(\\d{4}-\\d{2}-\\d{2})$/);
+  const operator = filterValue.match(/^(<=|>=|<|>|=)\s*(\d{4}-\d{2}-\d{2})$/);
   if (operator) {
     const [, op, date] = operator;
     if (op === '<=') return value <= date;
@@ -953,7 +1001,7 @@ function matchesNumberFilter(value: number | null, filterValue: string): boolean
     const max = parseMetricNumber(range[1]);
     return (min === null || value >= min) && (max === null || value <= max);
   }
-  const operator = normalized.match(/^(<=|>=|<|>|=)?\\s*(-?\\d+(?:\\.\\d+)?)([kKmMbB])?$/);
+  const operator = normalized.match(/^(<=|>=|<|>|=)?\s*(-?\d+(?:\.\d+)?)([kKmMbB])?$/);
   if (!operator) return textIncludes(String(value), filterValue);
   const [, op = '=', rawNumber, suffix] = operator;
   const target = scaleMetricNumber(Number(rawNumber), suffix);
@@ -966,7 +1014,7 @@ function matchesNumberFilter(value: number | null, filterValue: string): boolean
 
 function parseMetricNumber(value: string): number | null {
   if (!value) return null;
-  const match = value.match(/^(-?\\d+(?:\\.\\d+)?)([kKmMbB])?$/);
+  const match = value.match(/^(-?\d+(?:\.\d+)?)([kKmMbB])?$/);
   if (!match) return null;
   return scaleMetricNumber(Number(match[1]), match[2]);
 }
@@ -1136,7 +1184,7 @@ function ColumnFilterControl({
       </NativeSelect>
     );
   }
-  if (BOOLEAN_FILTER_IDS.has(columnId)) {
+  if (columnFilterKind(columnId) === 'boolean') {
     return (
       <NativeSelect
         aria-label={`${columnLabel(columnId)} 컬럼 필터`}
@@ -1155,7 +1203,7 @@ function ColumnFilterControl({
       aria-label={`${columnLabel(columnId)} 컬럼 필터`}
       className="h-7 w-full min-w-[72px] rounded border border-slate-200 bg-white px-1.5 font-mono text-[11px] font-normal normal-case tracking-normal text-slate-700 outline-none placeholder:text-slate-300 focus:border-slate-400"
       value={value}
-      placeholder={COLUMN_FILTER_LABELS[columnId] ?? 'filter'}
+      placeholder={columnFilterPlaceholder(columnId)}
       onChange={(event) => onChange(event.target.value)}
     />
   );

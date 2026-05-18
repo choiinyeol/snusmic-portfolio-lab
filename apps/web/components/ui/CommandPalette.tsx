@@ -3,13 +3,26 @@
 import { ArrowRight, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import { APP_NAV } from '@/components/ui/app-shell-nav';
-import type { SidebarNavItem } from '@/components/ui/SidebarNav';
 
-/** Lightweight global command palette wired to ⌘K / Ctrl+K. Filters APP_NAV
- * client-side and dispatches Next.js router navigation on Enter. Built on raw
- * elements so the static export bundle stays free of cmdk / Radix Dialog. */
-export function CommandPalette() {
+export type CommandTarget = {
+  kind: 'nav' | 'symbol' | 'strategy';
+  label: string;
+  description?: string;
+  href: string;
+  /** Extra haystack keywords joined into the search needle (e.g., a stock symbol). */
+  keywords?: string;
+};
+
+const KIND_LABEL: Record<CommandTarget['kind'], string> = {
+  nav: '페이지',
+  symbol: '종목',
+  strategy: '전략',
+};
+
+/** Lightweight global command palette wired to ⌘K / Ctrl+K. Filters the supplied
+ * `targets` client-side and dispatches Next.js router navigation on Enter. Built
+ * on raw elements so the static export bundle stays free of cmdk / Radix Dialog. */
+export function CommandPalette({ targets }: { targets: CommandTarget[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -43,11 +56,11 @@ export function CommandPalette() {
 
   const items = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    if (!needle) return APP_NAV;
-    return APP_NAV.filter((item) =>
-      [item.label, item.description, item.href].filter(Boolean).join(' ').toLowerCase().includes(needle),
+    if (!needle) return targets;
+    return targets.filter((item) =>
+      [item.label, item.description, item.href, item.keywords].filter(Boolean).join(' ').toLowerCase().includes(needle),
     );
-  }, [query]);
+  }, [query, targets]);
 
   // Reset activeIdx when the filtered list shrinks past the current index.
   useEffect(() => {
@@ -70,7 +83,7 @@ export function CommandPalette() {
     }
   };
 
-  const navigate = (item: SidebarNavItem) => {
+  const navigate = (item: CommandTarget) => {
     setOpen(false);
     if (item.href.startsWith('/')) {
       router.push(item.href);
@@ -138,7 +151,9 @@ export function CommandPalette() {
                   ) : null}
                 </span>
                 <span className="flex shrink-0 items-center gap-2 text-xs text-slate-400">
-                  <span className="hidden font-mono sm:inline">{item.href}</span>
+                  <span className="rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-slate-500">
+                    {KIND_LABEL[item.kind]}
+                  </span>
                   <ArrowRight aria-hidden="true" className="size-3.5" />
                 </span>
               </button>

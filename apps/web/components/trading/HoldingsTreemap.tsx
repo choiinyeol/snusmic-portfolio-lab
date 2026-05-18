@@ -260,11 +260,17 @@ function TooltipLine({ label, value }: { label: string; value: string }) {
 }
 
 function TreemapLegend() {
+  // Render the same continuous interpolation the cells use so the legend matches
+  // the actual encoding instead of three discrete pills that lie about the scale.
+  const gradient = `linear-gradient(to right, ${rgbToHex(COLOR_NEGATIVE)}, ${rgbToHex(COLOR_NEUTRAL)}, ${rgbToHex(COLOR_POSITIVE)})`;
   return (
-    <div className="heatmap-legend" aria-label="트리맵 색상 범례">
-      <span className="legend-bad">손실 · -25%</span>
-      <span className="legend-neutral">보합 · 0%</span>
-      <span className="legend-good">수익 · +25%</span>
+    <div className="grid gap-1.5" aria-label="트리맵 색상 범례">
+      <div className="h-2 rounded-full" style={{ backgroundImage: gradient }} />
+      <div className="flex justify-between font-mono text-[10px] text-slate-500">
+        <span>-25%</span>
+        <span>0%</span>
+        <span>+25%</span>
+      </div>
     </div>
   );
 }
@@ -368,17 +374,31 @@ function drawRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, w:
   ctx.closePath();
 }
 
+/** Continuous diverging colour scale: a +8% holding and a +24% holding render
+ * as visibly different greens, preserving rank order under colour alone. */
+const COLOR_NEGATIVE: Rgb = { r: 0xef, g: 0x44, b: 0x52 }; // var(--bad)
+const COLOR_NEUTRAL: Rgb = { r: 0xe2, g: 0xe8, b: 0xf0 }; // slate-200
+const COLOR_POSITIVE: Rgb = { r: 0x16, g: 0xa3, b: 0x68 }; // var(--good)
+
 function colorForReturn(ret: number, symbol?: string): string {
   if (symbol === 'CASH') return '#94a3b8';
-  const mag = Math.min(1, Math.abs(ret) / 0.25);
-  if (ret >= 0) {
-    if (mag > 0.66) return '#17a56a';
-    if (mag > 0.33) return '#43b87b';
-    return '#77c59b';
-  }
-  if (mag > 0.66) return '#ef4d5a';
-  if (mag > 0.33) return '#e97780';
-  return '#e3a0a6';
+  const t = Math.max(-1, Math.min(1, ret / 0.25));
+  const stop = t >= 0 ? mixRgb(COLOR_NEUTRAL, COLOR_POSITIVE, t) : mixRgb(COLOR_NEUTRAL, COLOR_NEGATIVE, -t);
+  return rgbToHex(stop);
+}
+
+type Rgb = { r: number; g: number; b: number };
+
+function mixRgb(a: Rgb, b: Rgb, t: number): Rgb {
+  return {
+    r: Math.round(a.r + (b.r - a.r) * t),
+    g: Math.round(a.g + (b.g - a.g) * t),
+    b: Math.round(a.b + (b.b - a.b) * t),
+  };
+}
+
+function rgbToHex({ r, g, b }: Rgb): string {
+  return `#${[r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('')}`;
 }
 
 function formatQuantity(value: number | null | undefined): string {

@@ -4,6 +4,7 @@ import { SearchX } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { BlockPagination } from '@/components/trading/TableControls';
+import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import {
   flexRender,
   getCoreRowModel,
@@ -145,8 +146,8 @@ export function ReportsTable({ reports }: ReportsTableProps) {
           return (
             <div className="flex items-center justify-end gap-2">
               <span className="tabular-nums">{formatPercent(value)}</span>
-              <div className="relative h-1.5 w-14 rounded-full bg-slate-100">
-                <div className="absolute left-1/2 top-0 h-full w-px bg-slate-300" />
+              <div className="relative h-2.5 w-20 rounded-full bg-slate-100">
+                <div className="absolute left-1/2 top-0 h-full w-[2px] -translate-x-1/2 bg-slate-400" />
                 <div className={`absolute top-0 h-full rounded-full ${tone}`} style={progressBarStyle(value)} />
               </div>
             </div>
@@ -356,10 +357,11 @@ export function ReportsTable({ reports }: ReportsTableProps) {
               placeholder="기업명, 심볼, 제목"
             />
           </label>
-          <label className="grid gap-1 text-xs font-medium text-slate-500">
+          <label className="grid gap-1 text-xs font-medium text-slate-500" htmlFor="reports-exchange">
             <span>거래소</span>
-            <select
-              className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-950 outline-none transition-colors focus:border-slate-400"
+            <NativeSelect
+              id="reports-exchange"
+              className="h-10 text-sm"
               value={exchangeFilter}
               onChange={(event) => {
                 setExchangeFilter(event.target.value);
@@ -367,42 +369,44 @@ export function ReportsTable({ reports }: ReportsTableProps) {
               }}
             >
               {exchanges.map((exchange) => (
-                <option key={exchange} value={exchange}>
+                <NativeSelectOption key={exchange} value={exchange}>
                   {exchange === 'all' ? '전체' : exchange}
-                </option>
+                </NativeSelectOption>
               ))}
-            </select>
+            </NativeSelect>
           </label>
-          <label className="grid gap-1 text-xs font-medium text-slate-500">
+          <label className="grid gap-1 text-xs font-medium text-slate-500" htmlFor="reports-hit">
             <span>목표 달성</span>
-            <select
-              className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-950 outline-none transition-colors focus:border-slate-400"
+            <NativeSelect
+              id="reports-hit"
+              className="h-10 text-sm"
               value={hitFilter}
               onChange={(event) => {
                 setHitFilter(event.target.value as HitFilter);
                 resetPage();
               }}
             >
-              <option value="all">전체</option>
-              <option value="hit">달성</option>
-              <option value="open">진행 중</option>
-              <option value="expired">만료</option>
-            </select>
+              <NativeSelectOption value="all">전체</NativeSelectOption>
+              <NativeSelectOption value="hit">달성</NativeSelectOption>
+              <NativeSelectOption value="open">진행 중</NativeSelectOption>
+              <NativeSelectOption value="expired">만료</NativeSelectOption>
+            </NativeSelect>
           </label>
-          <label className="grid gap-1 text-xs font-medium text-slate-500">
+          <label className="grid gap-1 text-xs font-medium text-slate-500" htmlFor="reports-return">
             <span>현재 수익률</span>
-            <select
-              className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-950 outline-none transition-colors focus:border-slate-400"
+            <NativeSelect
+              id="reports-return"
+              className="h-10 text-sm"
               value={returnFilter}
               onChange={(event) => {
                 setReturnFilter(event.target.value as ReturnFilter);
                 resetPage();
               }}
             >
-              <option value="all">전체</option>
-              <option value="positive">0% 이상</option>
-              <option value="negative">0% 미만</option>
-            </select>
+              <NativeSelectOption value="all">전체</NativeSelectOption>
+              <NativeSelectOption value="positive">0% 이상</NativeSelectOption>
+              <NativeSelectOption value="negative">0% 미만</NativeSelectOption>
+            </NativeSelect>
           </label>
         </div>
       </div>

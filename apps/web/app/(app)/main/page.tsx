@@ -194,7 +194,13 @@ export default function OverviewPage() {
       </section>
 
       <section className="grid gap-2 border-t border-slate-200 pt-4 sm:grid-cols-4">
-        <Drilldown href="/portfolio" icon={<ShieldCheck />} title="포트폴리오" caption="보유·현금·매매내역" />
+        <Drilldown
+          href="/portfolio"
+          icon={<ShieldCheck />}
+          title="포트폴리오"
+          caption="보유·현금·매매내역"
+          variant="primary"
+        />
         <Drilldown href="/reports" icon={<FileText />} title="리포트" caption="목표가 검증 표" />
         <Drilldown href="/reports/statistics" icon={<BarChart3 />} title="통계" caption="분포·경로·익절선" />
         <Drilldown href="/strategies" icon={<DatabaseZap />} title="전략" caption="벤치마크·위험 성과" />
@@ -226,21 +232,38 @@ function Drilldown({
   icon,
   title,
   caption,
+  variant = 'default',
 }: {
   href: string;
   icon: React.ReactNode;
   title: string;
   caption: string;
+  variant?: 'default' | 'primary';
 }) {
+  const isPrimary = variant === 'primary';
   return (
     <Link
-      className="grid grid-cols-[2rem_minmax(0,1fr)] items-center gap-3 border border-slate-200 bg-white p-3 transition-colors hover:border-slate-300 hover:bg-slate-50"
+      className={
+        isPrimary
+          ? 'grid grid-cols-[2rem_minmax(0,1fr)] items-center gap-3 border border-slate-950 bg-slate-950 p-3 text-white transition-colors hover:bg-slate-900'
+          : 'grid grid-cols-[2rem_minmax(0,1fr)] items-center gap-3 border border-slate-200 bg-white p-3 transition-colors hover:border-slate-300 hover:bg-slate-50'
+      }
       href={href}
     >
-      <span className="grid size-8 place-items-center text-slate-500 [&_svg]:size-4">{icon}</span>
+      <span
+        className={
+          isPrimary
+            ? 'grid size-8 place-items-center text-white [&_svg]:size-4'
+            : 'grid size-8 place-items-center text-slate-500 [&_svg]:size-4'
+        }
+      >
+        {icon}
+      </span>
       <span className="grid min-w-0 gap-0.5">
-        <span className="font-medium text-slate-950">{title}</span>
-        <span className="truncate text-xs text-slate-500">{caption}</span>
+        <span className={isPrimary ? 'font-semibold text-white' : 'font-medium text-slate-950'}>{title}</span>
+        <span className={isPrimary ? 'truncate text-xs text-white/70' : 'truncate text-xs text-slate-500'}>
+          {caption}
+        </span>
       </span>
     </Link>
   );

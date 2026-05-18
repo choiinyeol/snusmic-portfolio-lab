@@ -4,7 +4,7 @@ import type { StrategyLeaderboardRow } from '@/lib/product-model';
 
 export function StrategyRiskTable({ rows }: { rows: StrategyLeaderboardRow[] }) {
   return (
-    <article className="board-table-wrap">
+    <article className="board-table-wrap [mask-image:linear-gradient(to_right,black_calc(100%-1.5rem),transparent)] sm:[mask-image:none]">
       <table className="board-table table table-sm table-density-compact w-full">
         <thead>
           <tr>

@@ -8,9 +8,10 @@ import { APP_NAV, GITHUB_NAV_ITEM } from '@/components/ui/app-shell-nav';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { CommandPalette } from '@/components/ui/CommandPalette';
+import { CommandPalette, type CommandTarget } from '@/components/ui/CommandPalette';
 import { Separator } from '@/components/ui/separator';
 import { SidebarNav } from '@/components/ui/SidebarNav';
+import { useFocusTrap } from '@/components/ui/use-focus-trap';
 import { cn } from '@/lib/utils';
 
 type ShellMetric = {
@@ -27,6 +28,7 @@ type AppShellProps = {
   reportRange: DateRange;
   priceRange: DateRange;
   primaryBookLabel: string;
+  commandTargets?: CommandTarget[];
 };
 
 export function AppShell({
@@ -37,11 +39,22 @@ export function AppShell({
   reportRange,
   priceRange,
   primaryBookLabel,
+  commandTargets,
 }: AppShellProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
     () => typeof window !== 'undefined' && window.localStorage.getItem('snusmic.sidebar-collapsed') === '1',
   );
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [desktopMode, setDesktopMode] = useState(true);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const apply = () => setDesktopMode(mq.matches);
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  }, []);
+  const closeMobileNav = () => setMobileNavOpen(false);
+  const drawerRef = useFocusTrap<HTMLElement>(mobileNavOpen, closeMobileNav);
   const pathname = usePathname();
   // Close the mobile drawer whenever the route changes — the drawer is overlay
   // navigation, so each landing on a new page is a successful close gesture.
@@ -65,7 +78,7 @@ export function AppShell({
 
   return (
     <div className="ui-shell min-h-dvh bg-slate-50 text-slate-950">
-      <CommandPalette />
+      <CommandPalette targets={commandTargets ?? []} />
       {mobileNavOpen ? (
         <button
           type="button"
@@ -75,6 +88,13 @@ export function AppShell({
         />
       ) : null}
       <aside
+        ref={drawerRef}
+        aria-label="주요 탐색"
+        tabIndex={-1}
+        // `inert` removes the off-canvas drawer from the tab order + AT tree while
+        // closed on mobile; on desktop the aside is permanently on-canvas via
+        // lg:translate-x-0, and desktopMode flips inert off there.
+        inert={!mobileNavOpen && !desktopMode}
         className={cn(
           'fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-slate-200 bg-white py-4 transition-[transform,width,padding] duration-200',
           // Mobile drawer: slide off-canvas unless toggled

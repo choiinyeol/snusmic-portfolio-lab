@@ -1,7 +1,18 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type CSSProperties } from 'react';
 import { CumulativeReturnChart, type ReturnSeries } from '@/components/charts/CumulativeReturnChart';
+
+/** Convert a hex colour (#rgb / #rrggbb) into rgba(...) so the active toggle pill
+ * can share one visual encoding with the chart line at a lower opacity. */
+function colorWithAlpha(color: string, alpha: number): string {
+  const hex = color.replace('#', '');
+  const full = hex.length === 3 ? hex.replace(/(.)/g, '$1$1') : hex;
+  const r = Number.parseInt(full.slice(0, 2), 16);
+  const g = Number.parseInt(full.slice(2, 4), 16);
+  const b = Number.parseInt(full.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
 
 export function SeriesToggleChart({ series }: { series: ReturnSeries[] }) {
   const available = useMemo(() => series.filter((item) => item.points.length), [series]);
@@ -49,11 +60,21 @@ export function SeriesToggleChart({ series }: { series: ReturnSeries[] }) {
         <div className="flex min-w-0 gap-1.5 overflow-x-auto pb-1" aria-label="차트 표시 항목">
           {available.map((item) => {
             const active = activeIds.has(item.id);
+            // Tint the active pill with the series's own colour so the toggle and
+            // the chart line share one visual encoding instead of two parallel ones.
+            const activeStyle: CSSProperties | undefined = active
+              ? {
+                  backgroundColor: colorWithAlpha(item.color, 0.14),
+                  borderColor: colorWithAlpha(item.color, 0.4),
+                  color: item.color,
+                }
+              : undefined;
             return (
               <button
-                className={`snapshot-pill max-w-[9.5rem] shrink-0 border transition ${active ? 'border-blue-200 bg-blue-50 text-blue-600' : 'opacity-55'}`}
+                className={`snapshot-pill max-w-[9.5rem] shrink-0 border transition ${active ? '' : 'opacity-55'}`}
                 key={item.id}
                 onClick={() => toggle(item.id)}
+                style={activeStyle}
                 title={item.label}
                 type="button"
               >
