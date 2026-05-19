@@ -20,6 +20,16 @@
 
 ---
 
+## v0.23.2-portfolio-tab-contrast.1 — 2026-05-19
+
+### 변경
+- `/portfolio/[strategy]` 상세 탭의 active 상태에서 라벨과 count/meta 텍스트를 흰색으로 강제해 어두운 배경 위에서 보이도록 수정했습니다.
+
+### 검증
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web build`
+
 ## v0.23.1-hide-cash-check.1 — 2026-05-19
 
 ### 변경

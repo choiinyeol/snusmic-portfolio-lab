@@ -56,13 +56,15 @@ export function PortfolioStrategyFrame({ children, model }: { children: ReactNod
                 aria-current={active ? 'page' : undefined}
                 className={[
                   'inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-xs font-semibold transition-colors',
-                  active ? 'bg-slate-950 text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950',
+                  active
+                    ? 'bg-slate-950 !text-white [&>span]:!text-white'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950',
                 ].join(' ')}
                 href={href}
                 key={link.view}
               >
-                <span>{link.label}</span>
-                {meta ? <span className={active ? 'text-white/65' : 'text-slate-400'}>{meta}</span> : null}
+                <span className={active ? '!text-white' : undefined}>{link.label}</span>
+                {meta ? <span className={active ? '!text-white/65' : 'text-slate-400'}>{meta}</span> : null}
               </Link>
             );
           })}
