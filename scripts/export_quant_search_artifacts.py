@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import csv
 import json
 from datetime import UTC, datetime
 from pathlib import Path
@@ -12,7 +11,6 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / ".omx" / "quant" / "leader-meta-search-fixed.json"
 JSON_OUT = ROOT / "data" / "web" / "strategies" / "quant-search-top.json"
-CSV_OUT = ROOT / "apps" / "web" / "public" / "downloads" / "snusmic-quant-strategy-search.csv"
 
 
 def finite_float(value: Any) -> float | None:
@@ -139,37 +137,7 @@ def main() -> None:
     JSON_OUT.parent.mkdir(parents=True, exist_ok=True)
     JSON_OUT.write_text(json.dumps(artifact, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    CSV_OUT.parent.mkdir(parents=True, exist_ok=True)
-    headers = [
-        "rank",
-        "strategy_id",
-        "family",
-        "hit_basis",
-        "goal_hit",
-        "robust_goal_hit",
-        "annualized_sharpe",
-        "annualized_sortino_lpm0",
-        "annualized_sortino_downside_std",
-        "cagr",
-        "total_return",
-        "max_drawdown",
-        "ann_vol",
-        "days",
-        "split_2021_2023_sharpe",
-        "split_2021_2023_sortino_lpm0",
-        "split_2021_2023_sortino_downside_std",
-        "split_2024_2026_sharpe",
-        "split_2024_2026_sortino_lpm0",
-        "split_2024_2026_sortino_downside_std",
-        "params_summary",
-    ]
-    with CSV_OUT.open("w", encoding="utf-8-sig", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=headers, extrasaction="ignore", lineterminator="\n")
-        writer.writeheader()
-        writer.writerows(rows)
-
     print(f"wrote {JSON_OUT.relative_to(ROOT)} ({len(rows)} rows)")
-    print(f"wrote {CSV_OUT.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":

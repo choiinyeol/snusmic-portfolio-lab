@@ -71,13 +71,14 @@ export function QuantStrategySearchTable({ rows }: { rows: QuantStrategySearchRo
       }
       actions={
         <div className="flex flex-wrap items-center gap-2">
-          <a
-            className="inline-flex min-h-9 items-center rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium leading-normal text-slate-700 transition-colors hover:bg-slate-50"
-            href="/downloads/snusmic-quant-strategy-search.csv"
-          >
-            전체 CSV
-          </a>
-          <CsvDownloadButton label="표시 CSV" onClick={() => downloadQuantRows(sorted)} />
+          <CsvDownloadButton
+            label="전체 CSV"
+            onClick={() => downloadQuantRows(rows, 'snusmic-quant-strategy-search.csv')}
+          />
+          <CsvDownloadButton
+            label="표시 CSV"
+            onClick={() => downloadQuantRows(sorted, 'snusmic-quant-strategy-search-top.csv')}
+          />
         </div>
       }
     >
@@ -180,9 +181,9 @@ function formatRatio(value: number | null): string {
   return value.toLocaleString('ko-KR', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
 }
 
-function downloadQuantRows(rows: QuantStrategySearchRow[]) {
+function downloadQuantRows(rows: QuantStrategySearchRow[], filename: string) {
   downloadCsv(
-    'snusmic-quant-strategy-search-top.csv',
+    filename,
     [
       'rank',
       'strategy_id',
