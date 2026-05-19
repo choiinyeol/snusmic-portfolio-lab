@@ -216,12 +216,14 @@ export function PortfolioHistory({ monthly, persona, personaLabels, targetsBySym
                   <td className="font-mono text-xs">{row.monthEnd}</td>
                   <td>{personaLabels[row.persona] ?? row.persona}</td>
                   <td>
-                    <span className="badge badge-ghost badge-sm">{marketLabel(target?.marketRegion)}</span>
+                    <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-600">
+                      {marketLabel(target?.marketRegion)}
+                    </span>
                   </td>
                   <td>
                     {row.company || row.symbol}
                     <div className="text-xs text-slate-950/55">
-                      <a className="link hover:underline" href={`/reports/${encodeURIComponent(row.symbol)}`}>
+                      <a className="text-slate-700 hover:underline" href={`/reports/${encodeURIComponent(row.symbol)}`}>
                         {row.symbol}
                       </a>
                     </div>

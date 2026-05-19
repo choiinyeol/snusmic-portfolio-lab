@@ -80,7 +80,7 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         header: '시장',
         accessorFn: (report) => marketLabel(marketRegionForSymbol(report.symbol, report.exchange)),
         cell: ({ row }) => (
-          <span className="badge badge-ghost badge-sm">
+          <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-600">
             {marketLabel(marketRegionForSymbol(row.original.symbol, row.original.exchange))}
           </span>
         ),
@@ -172,29 +172,39 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         cell: ({ row }) => {
           if (row.original.targetDirection === 'downside') {
             return row.original.targetHit ? (
-              <span className="badge badge-success badge-soft badge-sm">
+              <span className="rounded-md bg-emerald-50 px-1.5 py-0.5 text-[11px] font-medium text-emerald-700">
                 매도 적중 · {formatDays(row.original.daysToTarget)}
               </span>
             ) : row.original.expired ? (
-              <span className="badge badge-error badge-soft badge-sm">매도 의견 · 만료</span>
+              <span className="rounded-md bg-rose-50 px-1.5 py-0.5 text-[11px] font-medium text-rose-700">
+                매도 의견 · 만료
+              </span>
             ) : (
-              <span className="badge badge-warning badge-soft badge-sm">매도 의견 · 미달성</span>
+              <span className="rounded-md bg-amber-50 px-1.5 py-0.5 text-[11px] font-medium text-amber-700">
+                매도 의견 · 미달성
+              </span>
             );
           }
           if ((row.original.targetUpsideAtPub ?? 0) <= 0) {
-            return <span className="badge badge-warning badge-soft badge-sm">이미 초과/비실행</span>;
+            return (
+              <span className="rounded-md bg-amber-50 px-1.5 py-0.5 text-[11px] font-medium text-amber-700">
+                이미 초과/비실행
+              </span>
+            );
           }
           if (row.original.targetHit) {
             return (
-              <span className="badge badge-success badge-soft badge-sm">
+              <span className="rounded-md bg-emerald-50 px-1.5 py-0.5 text-[11px] font-medium text-emerald-700">
                 달성 · {formatDays(row.original.daysToTarget)}
               </span>
             );
           }
           if (row.original.expired) {
-            return <span className="badge badge-error badge-soft badge-sm">만료</span>;
+            return (
+              <span className="rounded-md bg-rose-50 px-1.5 py-0.5 text-[11px] font-medium text-rose-700">만료</span>
+            );
           }
-          return <span className="badge badge-ghost badge-sm">미달성</span>;
+          return <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-600">미달성</span>;
         },
       },
       {

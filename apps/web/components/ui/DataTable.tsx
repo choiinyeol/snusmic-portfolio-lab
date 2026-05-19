@@ -5,7 +5,9 @@ export function TableCard({ title, meta, children }: { title: string; meta?: Rea
     <div className="ledger-table-card rounded-2xl min-w-0 bg-white border border-slate-200 shadow-sm">
       <div className="ledger-table-card__head flex flex-col min-w-0 gap-1 border-b border-slate-200 p-4 md:p-5">
         <h3 className="text-base font-semibold text-slate-950 text-base md:text-lg">{title}</h3>
-        {meta ? <span className="badge badge-ghost badge-sm w-fit">{meta}</span> : null}
+        {meta ? (
+          <span className="w-fit rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-600">{meta}</span>
+        ) : null}
       </div>
       <div className="p-0">{children}</div>
     </div>
@@ -36,7 +38,7 @@ export function DataTable({
     .join(' ');
   return (
     <div className={classes}>
-      <table className={`table ${compact ? 'table-sm' : ''}`}>{children}</table>
+      <table className={`w-full text-sm ${compact ? '[&_td]:py-2 [&_th]:py-2' : ''}`}>{children}</table>
     </div>
   );
 }

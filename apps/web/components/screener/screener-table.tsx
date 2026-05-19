@@ -945,7 +945,9 @@ function buildColumns(): ColumnDef<ScreenerBoardRow>[] {
       accessorKey: 'candidateBucket',
       header: '후보 유형',
       cell: ({ getValue }) => (
-        <span className="badge badge-ghost badge-sm font-mono">{getValue<string | null>() ?? '—'}</span>
+        <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-600 font-mono">
+          {getValue<string | null>() ?? '—'}
+        </span>
       ),
     },
     {
@@ -1356,15 +1358,22 @@ function BooleanMark({ value }: { value: boolean }) {
 }
 
 function HitCell({ row }: { row: ScreenerBoardRow }) {
-  if (row.targetHit) return <span className="badge badge-success badge-soft badge-sm">도달</span>;
-  if (row.expired) return <span className="badge badge-warning badge-soft badge-sm">만료</span>;
-  return <span className="badge badge-ghost badge-sm">진행</span>;
+  if (row.targetHit)
+    return (
+      <span className="rounded-md bg-emerald-50 px-1.5 py-0.5 text-[11px] font-medium text-emerald-700">도달</span>
+    );
+  if (row.expired)
+    return <span className="rounded-md bg-amber-50 px-1.5 py-0.5 text-[11px] font-medium text-amber-700">만료</span>;
+  return <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-600">진행</span>;
 }
 
 function CaveatCell({ flags }: { flags: string[] }) {
   if (!flags.length) return <span className="text-slate-400">—</span>;
   return (
-    <span className="badge badge-warning badge-soft badge-sm" title={flags.join(', ')}>
+    <span
+      className="rounded-md bg-amber-50 px-1.5 py-0.5 text-[11px] font-medium text-amber-700"
+      title={flags.join(', ')}
+    >
       {flags.length}개
     </span>
   );

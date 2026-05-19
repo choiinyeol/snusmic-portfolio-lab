@@ -118,7 +118,7 @@ export function DailyEquityHistory({ equity, trades, persona, personaLabels }: P
             <label className="flex items-center gap-2 text-xs text-slate-950/55">
               <span>일수</span>
               <select
-                className="select select-xs select-bordered"
+                className="h-7 rounded-md border border-slate-200 bg-white px-2 text-xs text-slate-700"
                 value={windowSize}
                 onChange={(event) => setWindowSize(Number(event.target.value) as (typeof PAGE_SIZE_OPTIONS)[number])}
               >
@@ -131,7 +131,7 @@ export function DailyEquityHistory({ equity, trades, persona, personaLabels }: P
             </label>
           </div>
           <div className="overflow-x-auto">
-            <table className="table table-sm table-zebra">
+            <table className="w-full text-sm">
               <thead>
                 <tr>
                   <th>날짜</th>
