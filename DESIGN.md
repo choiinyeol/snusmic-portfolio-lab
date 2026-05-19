@@ -1,334 +1,395 @@
-# SNUSMIC Portfolio Lab Design Contract
+# SNUSMIC Portfolio Lab — Design Contract
 
-Last updated: 2026-05-14
+Last updated: 2026-05-19
+Status: replaces all prior versions; vision sections from earlier drafts are removed (see Appendix B for rationale).
 
-This document is the source of truth for product, IA, data ownership, UI/UX, and content decisions in this repository. It supersedes ad-hoc page-level interpretations when they conflict.
+---
 
-## 1. Source of truth
+## 0. How to read this document
 
-SNUSMIC Portfolio Lab is a static, artifact-backed research and portfolio validation product. The Python pipeline owns data refresh, price matching, simulation, strategy search, and artifact export. The Next.js app reads prepared artifacts and renders product views.
+Each section is tagged:
 
-Do not let pages infer business taxonomy from string names. Strategy/benchmark/report/portfolio semantics must come from exported artifacts or shared domain functions.
+- **[FIXED]** — a contract. Changes require a Decision log entry (Appendix A) and PR review.
+- **[GUIDELINE]** — a principle. Pages may diverge with explicit rationale in code or PR description.
 
-## 2. Brand and product frame
+Per-section revision markers (`<!-- rev: YYYY-MM-DD -->`) record the last substantive change to that section.
 
-Product name: **SNUSMIC Portfolio Lab**.
+---
 
-The product is a portfolio research lab for:
+## 1. Product frame [FIXED]
 
-- research-report validation,
-- share-based portfolio ledger review,
-- benchmark comparison,
-- selectable strategy review,
-- research-derived candidate screening.
+<!-- rev: 2026-05-19 -->
 
-The product is not a live trading terminal, broker app, order-entry UI, black-box recommender, or market-data streaming app.
+SNUSMIC Portfolio Lab is the public, static, artifact-backed research archive of the Seoul National University 학부 투자 동아리 SMIC. It records, for already-published reports, how the price actually behaved within a fixed validity window.
 
-User-facing language should sound like a finance product, not an implementation note. Prefer:
+It is **not**: a trading terminal, broker app, order-entry UI, black-box recommender, market-data feed, or signal product.
 
-- 기준 데이터
-- 읽기 전용
-- 리포트 검증
-- 포트폴리오 원장
-- 전략 비교
-- 벤치마크
-- 가격 확인
-- 목표가 진행
-- 낙폭 점검
+The tone is **academic appendix, not pitch**. We log what happened. We do not sell, recommend, or motivate.
 
-Avoid exposing implementation terms as product copy unless shown in a technical/data-quality panel:
+One-line product sentence:
 
-- Static Artifacts
-- canonical artifact
-- schema
-- data/web
-- commit 기준
-- generated artifact
-- simulation artifact
+> 발간된 분석 리포트가 시장에서 어떻게 끝났는지를 기록하는, 학부 동아리의 정적 검증 원장.
 
-The dashboard may mention that it is read-only and not a live trading product, but this should be concise and product-safe rather than developer-flavored.
+---
 
-## 3. User jobs and page ownership
+## 2. Reader and retail questions [GUIDELINE]
 
-Navigation and page jobs are fixed:
+<!-- rev: 2026-05-19 -->
 
-| Page | Primary user question | Owns | Must not duplicate |
+Default reader: a Korean retail investor (개인 투자자) who is not the author of any report. Secondary readers: club members, financial-industry visitors, prospective members. Page copy must answer the retail reader's questions, not the maintainer's.
+
+Retail questions per page (this drives section §3):
+
+| 페이지 | Retail이 던지는 질문 |
+| --- | --- |
+| `/` (Overview) | 이 사이트 누구? 학부생인데 봐도 돼? 지금 뭐가 잘 됐고 뭐가 망했나? |
+| `/portfolio` | 이 전략 따라 했으면 잠 잘 수 있었나? 얼마나 손실 견뎠어야? |
+| `/reports` | 이 종목 지금 사도 돼? 늦었나? 얼마나 갔다 왔어? |
+| `/reports/[symbol]/[id]` | 이거 발간일에 샀으면 지금 얼마? 최악은 언제? 그때 팔았어야? |
+| `/statistics` | 망한 케이스 공통점은? 사면 안 됐던 패턴? 어떤 신호가 미리 보였나? |
+| `/screener` | 비슷한 케이스 중 망한 건 뭐? 지금 후보 어떻게 거를까? |
+| `/strategies` | 어떤 룰이 작동했나? MDD 얼마나 견뎠어야? |
+| `/guide` | 이 수치 못 믿을 이유는? 어디서 왜곡될 수 있나? |
+
+Reader assumption: 매도 타이밍을 모델이 알려줄 수 없다. 우리는 "비슷한 케이스가 어떻게 끝났는지"만 보여준다.
+
+---
+
+## 3. Pages and ownership [FIXED]
+
+<!-- rev: 2026-05-19 -->
+
+| Page | Type | Primary retail question | Owned data |
 | --- | --- | --- | --- |
-| Overview | “30초 안에 현재 상태와 최고 전략이 어떤가?” | selected/best strategy snapshot, portfolio state, objective gate, concise research pulse | full report table, full strategy table, full trade ledger |
-| Portfolio | “이 전략은 무엇을 어떻게 사고팔았나?” | persona/strategy selector, holdings, cash, trades, position lifecycle, buy/sell reason | benchmark taxonomy invention, report ranking UI |
-| Research | “리포트가 실제로 맞았나?” | target-price validation, price-matched report table, ranking presets over one table | separate inconsistent ranking cards/tables |
-| Strategies | “어떤 전략이 기준선을 이겼고 규칙은 무엇인가?” | benchmark set, selectable strategies, strategy methodology/params, objective gate, series comparison | trade-ledger details already owned by Portfolio |
-| Screener | “지금 다시 검토할 후보는 무엇인가?” | explainable report-derived candidates and filters | black-box buy recommendations |
-| Guide | “무엇을 어떻게 읽어야 하나?” | interactive onboarding, metric definitions, example workflow, terminology | live trading or investment advice |
+| `/` | Dashboard | 지금 상태와 어디가 잘/안 됐나 | snapshot · selected strategy · objective gate · recent reports · recent trades |
+| `/portfolio` | Dashboard | 이 전략 따라가면 어떤 보유·매매·MDD | holdings · cash · trades · episodes · equity curve |
+| `/reports` | Index | 어떤 리포트들? | report table with target/result columns |
+| `/reports/[symbol]/[id]` | Detail | 이 리포트는 어떻게 됐나 | report detail · price path · facts · scenario table |
+| `/statistics` | Analytics | 전체 리포트가 어떻게 끝났고 어떤 패턴? | derived stats only — feeds off artifacts, doesn't own state |
+| `/screener` | Index | 지금 검토할 후보는? | research-derived candidates · filters |
+| `/strategies` | Index | 어떤 전략이 어떻게? | strategy catalog · leaderboard · curves |
+| `/guide` | Detail | 어떻게 읽어야? | onboarding · definitions |
 
-Menu labels and route labels must match. If the route is `/reports`, the sidebar should say Reports or Research consistently with the page title/link copy. Do not mix “리서치 메뉴” with “리포트 링크” in a way that creates mismatched mental models.
+Page types defined in §7. Menu labels and route labels must match.
 
-## 4. Data ownership and physical separation
+---
 
-The frontend should not assemble page products by pulling every artifact into one giant model. Export page-oriented bundles that preserve domain boundaries.
+## 4. Data ownership and runtime contracts [FIXED]
 
-Current physical data surface:
+<!-- rev: 2026-05-19 -->
+
+### 4.1 Pipeline vs frontend split
+
+Python pipeline owns: data refresh, price matching, simulation, strategy search, artifact export. Next.js app reads artifacts, computes server-side derived stats where needed, and renders.
+
+Pages do not infer business taxonomy from string names. Strategy/benchmark/report meaning must come from exported artifacts or shared domain modules.
+
+### 4.2 Physical artifacts
 
 ```text
 data/web/
   manifest.json
-  overview/
-    snapshot.json
-    research-pulse.json
-    data-quality.json
-  portfolio/
-    personas.json
-    holdings.json
-    monthly-holdings.json
-    trades.json
-    episodes.json
-    equity-daily.json
-  reports/
-    table.json
-    rankings.json
-    detail-metrics.json
-    return-windows.json
-    target-hit-distribution.json
-  strategies/
-    catalog.json
-    leaderboard.json
-    curves.json
-  screener/
-    candidates.json
+  overview/        snapshot.json · research-pulse.json · data-quality.json
+  portfolio/       personas.json · holdings.json · monthly-holdings.json · trades.json · episodes.json · equity-daily.json
+  reports/         table.json · rankings.json · detail-metrics.json · return-windows.json · target-hit-distribution.json
+  strategies/      catalog.json · leaderboard.json · curves.json
+  screener/        candidates.json
+  prices/          {SYMBOL}.json   (full daily OHLCV)
+  report-statistics-lab.json
 ```
 
-Top-level artifacts may remain as raw/download surfaces during the cutover, but route-level product code should use page-owned readers. Do not introduce legacy/fallback/deprecated wrappers. If the new artifact is required, validate it and fail clearly when missing.
+Routes use page-owned readers. Required artifacts fail loudly when missing; do not add fallback/legacy/deprecated wrappers.
 
-The most important new contract is the **strategy catalog**:
+### 4.3 Strategy catalog contract
 
 ```text
-strategy_id
-label
-short_label
+strategy_id · label · short_label
 kind: benchmark | strategy | oracle
 benchmark_group: allocation | follower | market | oracle | null
-is_selectable
-is_default_candidate
-objective_passed
-objective_return_excess
-objective_mdd_slack
-methodology_summary
-buy_rules[]
-sell_rules[]
-risk_controls[]
-params
-metrics
+is_selectable · is_default_candidate
+objective_passed · objective_return_excess · objective_mdd_slack
+methodology_summary · buy_rules[] · sell_rules[] · risk_controls[]
+params · metrics
 ```
 
-Pages consume strategy meaning from this catalog. They must not hardcode that `smic_follower_v2` is the primary portfolio or that `smic_mtt_strategy_top1` means a top strategy.
+Pages must not hardcode that `smic_follower_v2` is the primary portfolio or that a specific id is the "best".
 
-## 5. Benchmark/strategy taxonomy
+### 4.4 Return-metric contracts on `/statistics`
 
-Benchmarks are comparison baselines, not user-selectable proprietary strategies:
+These are the runtime semantics enforced by `app/(app)/statistics/page.tsx`. All other pages that surface return numbers must follow the same window/metric definitions.
+
+- **Validity window**: 발간일 + **500 trading days** (≈ 2 calendar years). Everything beyond this point is out of scope.
+- **maxFavorableExcursion (MFE)**: 윈도우 내 일중 고가(`highKrw`)의 최댓값 ÷ 발간일 종가(KRW) − 1. "한 번이라도 도달한 최대 폭".
+- **expiryReturn**: 윈도우 마지막 날 종가 ÷ 발간일 종가 − 1. 윈도우가 아직 끝나지 않은 (진행 중) 리포트는 `null`.
+- **hit10/08/06**: 윈도우 내 일중 고가가 목표가의 1.0x / 0.8x / 0.6x를 한 번이라도 넘었는가.
+- **daysToTarget**: 윈도우 내 첫 도달일 (없으면 `null`).
+- 종가 환산은 항상 `close_krw` 우선. 일중 KRW 환산은 `high * (close_krw / close)`.
+
+### 4.5 Outcome classification [FIXED]
+
+여섯 단계. 도달 여부 우선 → 상승 기회 → 만료 종가 순.
+
+```text
+target       hit10                                                  → blue
+partial      hit08 || hit06                                          → violet
+upside       not hit, MFE >= +20%                                    → teal
+flat         not hit, |expiryReturn| < 10% AND MFE < 20%             → slate
+declining    not hit, -30% < expiryReturn <= -10%                    → amber
+devastating  not hit, expiryReturn <= -30% (and MFE < 20%)           → rose
+```
+
+여기서 `devastating`은 "매수해서 거의 못 오르고 만료까지 깊게 하락한" 케이스. 이 분류는 리테일 핵심 위험 지표라서 별도 카테고리.
+
+### 4.6 Server-side derived stats boundary
+
+| 위치 | 무엇 |
+| --- | --- |
+| Artifact (Python) | 가격 시리즈, 시뮬레이션 산출물, 리포트 메타데이터, 변경 빈도가 낮은 수치 |
+| Server component (`page.tsx`) | derived metric (r5/r10/r20, SMA 정배열, 52w high 비율, Mann-Whitney U, 조기 손절 규칙, MFE/expiry windowing) |
+| Client component | 토글, 선택, hover, 강조 |
+
+원칙: 정렬·필터·집계는 서버에서. 강조·선택은 클라이언트에서.
+
+---
+
+## 5. Strategy and benchmark taxonomy [FIXED]
+
+<!-- rev: 2026-05-19 -->
+
+Benchmarks (selectable=false unless oracle, presented as comparison baselines, not proprietary strategies):
 
 1. All-Weather
 2. SMIC Follower v1
-3. SMIC Follower SL/v2
+3. SMIC Follower SL / v2
 4. KODEX 200 / KOSPI proxy
 5. QQQ / NASDAQ-100 proxy
 6. SPY / S&P 500 proxy
 7. GLD / gold proxy
-8. Weak Prophet / future-information upper-bound baseline
+8. Weak Prophet (oracle / future-information upper-bound baseline; visibly separated)
 
-Everything else is a selectable strategy unless explicitly marked otherwise by the strategy catalog.
+Everything else is a selectable strategy unless the catalog says otherwise.
 
-Weak Prophet should be visibly separated as an oracle/future-information baseline. It is allowed to be intentionally strong because its purpose is an upper-bound reference, not a tradable strategy.
-
-The personal objective gate is:
+Personal objective gate:
 
 ```text
-MDD <= 15% and return > KODEX 200 / KOSPI proxy
+MDD <= 15% AND return > KODEX 200 / KOSPI proxy
 ```
 
-This gate must be shown on strategy comparisons and should drive the default “best strategy” choice only after the taxonomy is clear.
+Must be shown on strategy comparisons. Drives the default "best strategy" only after the taxonomy is established.
 
-## 6. UI/UX principles
+---
 
-1. **One data set, one table.** Ranking modes change sort/filter state on a unified table. They do not create different columns for the same rows.
-   Reports ranking presets are part of the table contract: add a preset, not another card grid or table.
+## 6. Interaction principles and navigation [FIXED]
+
+<!-- rev: 2026-05-19 -->
+
+### 6.1 Principles
+
+1. **One data set, one table.** Ranking modes change sort/filter on a unified table; they don't spawn new column sets.
 2. **Every scalable table has controls.** Search/filter, sortable headers, pagination or row windowing, sticky header, right-aligned numeric cells, internal horizontal scroll.
-3. **No page-level horizontal overflow.** Long strategy names, Korean labels, and company names must truncate or wrap within their container.
-4. **Cards summarize; tables decide.** Cards can preview top-N, but the full decision surface is a unified table.
-5. **Charts are controllable.** Multi-series performance charts need on/off controls because benchmark and strategy labels otherwise crowd the view.
+3. **No page-level horizontal overflow.** Long names truncate or wrap inside their container.
+4. **Cards summarize; tables decide.** Cards preview top-N; the full decision surface is a table.
+5. **Charts are controllable.** Multi-series performance charts need on/off controls.
 6. **Cash is an asset class.** Portfolio value includes cash; treemaps include cash when nonzero.
-7. **Methodology is visible.** Strategy pages and portfolio strategy views must explain buy/sell rules, not just show returns.
-8. **Content is user-facing.** Avoid AI-slop/product-internal phrases. If a phrase exists only because an engineer reasoned it out, rewrite it as a user benefit or remove it.
-9. **No silent exclusions.** If missing-price, sell-opinion, or instant-listing-hit reports are excluded from validation, expose counts in data quality, but keep the user table focused on actionable rows.
-10. **Interactivity teaches.** Guide/onboarding should use interactive examples, not a static wall of documentation.
+7. **Methodology is visible.** Strategy and portfolio strategy views explain buy/sell rules, not just returns.
+8. **No silent exclusions.** Excluded reports surface counts in data quality.
+9. **Status is text + color, never color-only.**
+10. **Empty data is a first-class state.** No active holdings → cash/reserve ledger, not an empty treemap.
 
-## 6.1 Navigation contract
-
-The canonical route/link map lives in `docs/navigation-architecture.md`.
+### 6.2 Navigation contract
 
 ```mermaid
 flowchart LR
-  Overview["Overview /"] --> Portfolio["/portfolio?strategy=:id"]
-  Overview --> ReportDetail["/reports/:symbol"]
+  Overview["/"] --> Portfolio["/portfolio?strategy=:id"]
+  Overview --> ReportDetail["/reports/:symbol/:id"]
   Portfolio --> ReportDetail
-  Reports["Reports /reports"] --> ReportDetail
-  Screener["Screener /screener"] --> ReportDetail
-  Strategies["Strategies /strategies"] --> Portfolio
+  Reports["/reports"] --> ReportDetail
+  Screener["/screener"] --> ReportDetail
+  Strategies["/strategies"] --> Portfolio
+  Statistics["/statistics"] --> ReportDetail
   ReportDetail --> Reports
   ReportDetail --> Portfolio
-  Guide["Guide /guide"] --> Overview
+  Guide["/guide"] --> Overview
 ```
 
-Navigation rules:
+Rules:
 
-- Strategy and benchmark rows open the selected ledger view: `/portfolio?strategy=:id`.
-- Report rows, screener candidates, trade-basis links, and report-backed heatmap tiles open `/reports/:symbol`.
+- Strategy/benchmark rows open `/portfolio?strategy=:id`.
+- Report rows, screener candidates, statistics points/legends, trade-basis links, report-backed heatmap tiles open `/reports/:symbol/:id`.
 - Cash and benchmark-only holdings without a matched report stay non-clickable.
-- Guide links are onboarding shortcuts, not duplicated primary CTAs.
+- Guide links are onboarding shortcuts, never duplicated primary CTAs.
 
-## 7. Visual language
+---
 
-Light fintech SaaS. White panels, soft blue-gray background, restrained blue/purple accents, strong tabular numbers, compact badges, clear section hierarchy. Avoid dark HTS/Bloomberg clone aesthetics.
+## 7. Page composition patterns [GUIDELINE]
 
-Overview should not feel like a developer status page. If the top cards become too small to read, collapse them into a single executive summary panel or remove them.
+<!-- rev: 2026-05-19 -->
 
-### 7.1 Major redesign direction — research command board
+Three composition types. A page picks exactly one.
 
-The next major UI/UX direction is a **Korean fintech research command board**:
+### 7.1 Dashboard
 
-- high-density but calm,
-- light-mode only,
-- left navigation plus persistent snapshot/status context,
-- KPI strip for current state,
-- portfolio treemap and cumulative return chart as the main visual anchors,
-- right-side or secondary rails for recent reports, updates, strategy summaries, and validation feeds,
-- compact tables and feeds for auditability.
+Current-state monitoring. Multi-widget grid. Used by `/`, `/portfolio`.
 
-Reference imagery and YASUN.GG are **guidelines, not pixel targets**. Borrow:
+```
+┌──────────────────────────────────────────────────────┐
+│ minimal header (h1 noun phrase + 1-line meta)        │
+├──────────────────────────────────────────────────────┤
+│ KPI strip (selected strategy · equity · MDD · …)     │
+├──────────────────────────────────────────────────────┤
+│ primary anchor (treemap · curve)  │  rail (feeds)    │
+├──────────────────────────────────────────────────────┤
+│ evidence board (trades · holdings · validation)      │
+└──────────────────────────────────────────────────────┘
+```
 
-- dashboard rhythm,
-- compact status chips,
-- market-like KPI cards,
-- prominent heatmap/treemap,
-- ranking/feed panel density,
-- fast scanability.
+### 7.2 Analytics
 
-Do not copy:
+Single-question vertical narrative. Used by `/statistics`.
 
-- dark terminal aesthetics,
-- live trading urgency,
-- order/quote UI,
-- chat/community affordances,
-- prediction/gambling framing,
-- exact card positions or exact visual proportions.
+```
+header (h1 + meta line)
+[figure component 1 — own h3 caption + 1-line takeaway]
+[figure component 2 — …]
+…
+footer (data note, 1 line)
+```
 
-The guiding product sentence remains:
+Rules:
 
-> SNUSMIC Portfolio Lab is not a trading terminal. It is a static snapshot-based investment research dashboard for tracking research reports, portfolio holdings, strategy performance, backtest results, target price validation, and portfolio risk.
+- 외부 wrapper title 없음. 각 figure 컴포넌트의 내부 `<h3>`가 캡션.
+- Figure 위 헤더에 한 줄 사실 캡션 (현재 선택값·표본 수·윈도우). bold/강조 없음.
+- 인터랙티브 요소(선택·토글)는 figure 헤더 우측 또는 내부에.
 
-### 7.2 Target desktop composition
+### 7.3 Detail
 
-The desktop dashboard should feel like a plausible production SaaS screenshot, not a wireframe and not a clone. Preferred composition:
+Single-object deep view. Header + tabs/scroll. Used by `/reports/[symbol]/[id]`, `/guide`.
 
-1. **App shell**
-   - fixed left sidebar,
-   - product identity,
-   - Korean primary navigation,
-   - bottom source/GitHub/data card,
-   - compact top status area with snapshot date and read-only status.
-2. **KPI command strip**
-   - current equity,
-   - MWR,
-   - unrealized PnL,
-   - MDD,
-   - target hit rate,
-   - report count,
-   - selected/default strategy.
-3. **Primary board**
-   - treemap as the largest first visual anchor,
-   - risk summary and currency exposure next to it,
-   - recent reports feed as a compact scan panel.
-4. **Performance board**
-   - cumulative return chart as second visual anchor,
-   - strategy performance table next to or below it,
-   - recent updates/feed rail.
-5. **Evidence board**
-   - recent simulated trades,
-   - top current holdings,
-   - target validation feed/progress rows.
+### 7.4 Index
 
-This composition may vary by implementation. The hierarchy matters more than exact layout.
+Sortable/filterable single table dominating the page. Used by `/reports`, `/screener`, `/strategies`.
 
-### 7.3 Redesign constraints
+---
 
-- Every visible metric needs a source field, calculation meaning, time window, null behavior, responsive behavior, and non-trading framing.
-- Do not invent unsupported market metrics such as bid/ask, live volume, VaR, beta, analyst consensus, AI signal, realtime alerts, or order flow.
-- Do not rank strategies as if higher return alone is “better”; show MDD and benchmark context.
-- MDD is risk/loss magnitude and must not be visually framed as positive.
-- Target hit rate is report validation, not trading win rate.
-- Benchmarks, selectable strategies, oracle baselines, current holdings, and report target outcomes must remain visually distinct.
-- Dense desktop layouts must collapse into summary-first mobile sections; do not create page-level horizontal scroll.
-- Charts show trends and comparison; tables show auditability; cards show current state. Avoid repeating the same metric everywhere.
+## 8. Visual language and copy [FIXED]
 
-### 7.4 V3 research archive correction
+<!-- rev: 2026-05-19 -->
 
-The V3 correction intentionally rejects the earlier glossy dashboard direction when it feels like AI-generated SaaS decoration. The overview should read as a **research archive / command ledger**, not a hero-led marketing dashboard.
+### 8.1 Single visual vision
 
-Rules for this lane:
+학술지 부록(academic appendix) 톤. 화이트 패널, 헤어라인 디바이더, tabular numbers, compact rows, restrained 모노톤. 데이터가 시각 texture를 만든다. 다크 터미널·HTS·Bloomberg 클론, glossy SaaS dashboard, hero 마케팅 톤은 모두 금지.
 
-- Keep the H1 short and literal. Avoid motivational or editorial headlines such as “오늘 이 스냅샷은…” or “이렇게 읽습니다.”
-- Prefer noun-heavy Korean labels: 원장 요약, 포트폴리오 비중, 노출 점검, 전략 순위, 검증 테이프.
-- Use low-radius panels, hairline dividers, tabular numbers, compact rows, and restrained monochrome accents.
-- Data can create the visual texture: tables, ledgers, progress bars, facts, and grid lines are preferable to shadows, gradients, and decorative cards.
-- `/compare` must not be a product page that explains why one branch is better than another. If comparison returns, it should compare strategies, reports, or artifact versions using product data.
-- Empty data is a first-class state. If the selected book has no active holdings, show a cash/reserve ledger instead of an empty treemap.
-- Reference sites and generated images are guidance, not a target to copy. The product should look deliberate and finance-native even if it diverges from the prompt image.
+이전 문서의 "Light fintech SaaS", "Korean fintech research command board", "Research command board"는 폐기. 단일 라벨은 **"Research archive · static ledger"**.
 
-### 7.4 Implementation sequencing for major redesign
+### 8.2 Copy contract
 
-1. **Shell pass** — extract and redesign app shell/sidebar/topbar/navigation without changing data semantics.
-2. **Primitive pass** — add/strengthen reusable `Panel`, KPI grid, feed row, status chip, and table chrome patterns.
-3. **Overview pass** — rebuild `/` around KPI strip, treemap anchor, risk/feed rail, cumulative chart, strategy table, and evidence board.
-4. **Artifact pass** — add product-owned artifacts where React currently recomputes UI meaning: overview dashboard summary, feeds, strategy diagnostics, validation exclusions, treemap leaves, risk metrics, and snapshot status.
-5. **Route alignment pass** — update Reports, Screener, Strategies, Portfolio, and Guide to use the same visual language and Korean product copy.
-6. **Responsive/visual QA pass** — validate desktop and mobile screenshots, overflow, contrast, keyboard focus, build, typecheck, artifact check, and route smoke.
+```text
+H1:        명사구, 6~14자. 동사·수사·2인칭·motivational 금지.
+           OK:  "리포트 통계"  "포트폴리오 원장"  "AAPL · 발간 후 가격"
+           NG:  "여러분의 투자 인사이트를 발견하세요"
 
-## 8. Component ownership
+메타라인:  H1 바로 아래 한 줄. font-mono text-xs.
+           예: "2026-05-19 기준 · 표본 197건 · 유효기간 500거래일 (≈ 2년)"
+
+H3 캡션:  각 figure 위. 명사구 또는 짧은 질문형. bold 강조 없음.
+
+본문 prose:기본 금지. 정의·방법론·한계 disclosure 한정으로 1~2문장 허용.
+           강조 prose("이게 진짜 그림입니다") 절대 금지.
+
+Eyebrow:   금지 (SaaS 잔재).
+
+CTA:       "지금 시작하기" 류 금지. 명사형만: "리포트 보기", "원본 PDF", "전체 보기".
+
+배지:      outcome 6단계 라벨은 사실 기술어 ("목표 도달", "치명적 손실").
+           bold 강조 없음.
+
+Disclaimer:평서문, 1인칭/감정어 없음.
+           "본 자료는 SMIC 학술 활동 산출물이며 투자 권유가 아닙니다."
+
+p-value:   숫자 + 별표. "0.034 **". "유의/비유의"는 굵게 쓰지 않는다.
+```
+
+### 8.3 Color semantics
+
+색은 브랜드 자산이 아니라 데이터 의미에 종속.
+
+- Outcome 6단계 (§4.5): blue · violet · teal · slate · amber · rose. 한 곳에서만 정의(`OUTCOME_CATEGORIES`), 모든 컴포넌트가 재사용.
+- 가격 차트 (lightweight-charts): up = emerald-500, down = rose-500. 도움 라인(발간/만료)은 slate dotted.
+- 강조 없음. 표·KPI에 컬러 박스를 마구 두지 않는다.
+
+### 8.4 Chart medium
+
+| 도구 | 언제 |
+| --- | --- |
+| `lightweight-charts` v5 | 시간축 × 가격, OHLCV 캔들, 멀티 라인 overlay. 줌·팬이 의미를 만들 때. |
+| Custom SVG | 분포, 순위, 카테고리, 6-class outcome 막대, q-q plot 같은 정적 시각화. 인쇄 가능해야 할 때. |
+
+---
+
+## 9. Component ownership [GUIDELINE]
+
+<!-- rev: 2026-05-19 -->
 
 Preferred shared components:
 
-- `StrategySelector`: one selector used by Overview, Portfolio, and Strategies.
-- `SeriesToggleChart`: one chart shell with visible series controls.
-- `StrategyMethodCard`: rules/params explanation for MTT and other strategies.
-- `UnifiedDataTable`: sortable/filterable/paginated table shell.
-- `TargetProgressBar`: consistent target progress visualization.
-- `ValueDelta`: consistent signed metric rendering.
-- `DataQualityNotice`: concise exclusions/coverage explanation.
+- `StrategySelector` — Overview · Portfolio · Strategies가 같은 selector
+- `SeriesToggleChart` — multi-series 차트 컨트롤 단일 셸
+- `StrategyMethodCard` — rule/param 설명
+- `UnifiedDataTable` — sortable/filterable/paginated 표 셸
+- `TargetProgressBar` — 목표가 진행 시각화
+- `ValueDelta` — signed metric 렌더링
+- `DataQualityNotice` — 제외/커버리지 노트
+- `OUTCOME_CATEGORIES` (`lib/outcome.ts`) — 6-class outcome 분류 derivation + color + label
 
-Do not create page-specific duplicates when one shared domain component would keep interpretation aligned.
+Page-specific duplicates를 만들지 말고 공유 컴포넌트로 정렬.
 
-## 9. Accessibility and responsiveness
+---
 
-- Status is text + color, never color-only.
-- Tables remain semantic tables.
-- Chart and treemap panels have captions or aria-labels.
-- Controls have visible focus states.
-- Mobile stacks sections; tables scroll inside their wrappers.
-- Desktop is dense but not cramped.
+## 10. Accessibility and platform constraints [FIXED]
 
-## 10. Implementation constraints
+<!-- rev: 2026-05-19 -->
 
-- No new dependencies unless explicitly approved.
-- No live market API fetches in the web runtime.
-- No external runtime scraping inside page rendering.
-- Scraping/reference capture, if added for UI inspiration, belongs in scripts/docs and must not become app runtime behavior.
-- Fast-fail required artifacts. Do not add fallback/legacy/deprecated branches.
-- Prefer deletion and consolidation over wrapper layers.
+- Status는 text + color (color-only 금지).
+- Tables는 시맨틱 `<table>`.
+- Chart·treemap 패널은 caption 또는 aria-label.
+- 컨트롤에 visible focus.
+- 모바일은 섹션을 stack, 표는 wrapper 내부 스크롤.
+- No new runtime dependencies without explicit approval.
+- No live market API in web runtime.
+- No external runtime scraping.
+- Required artifacts fast-fail. No fallback/legacy/deprecated branches.
 
-## 11. Open direction
+---
 
-The current codebase can evolve through staged cuts rather than a one-shot rewrite:
+## 11. Open questions
 
-1. Replace duplicated strategy selectors/tables with shared components.
-2. Collapse remaining top-level raw artifacts into download-only surfaces.
-3. Keep the interactive Guide page aligned with the navigation contract.
-4. Continue removing primary-page developer copy in favor of user-facing finance language.
+<!-- rev: 2026-05-19 -->
+
+Decision pending. If empty, this section is deleted.
+
+- [ ] 코세스 사례의 PDF 추출 버그 (`entry_price_native = 9.6` from "9,600원" 콤마 파싱). 우선순위와 fix owner.
+- [ ] `/statistics` `OutcomeBreakdownPanel`의 임계값 조정 (-30% 치명적 vs -20% 등). 표본 누적 후 재검토.
+- [ ] `/main` Dashboard의 KPI strip 콘텐츠 — 현재는 명세만 있고 구현·검증 미완.
+
+---
+
+## Appendix A. Decision log
+
+| Date | Decision | Sections affected |
+| --- | --- | --- |
+| 2026-05-19 | 백지 재작성. "Light fintech SaaS" 비전 폐기, "academic appendix" 톤 단일화. v0.21.x decisions(MFE 500D, expiry close, 6-class outcome, p-value, lightweight-charts OHLCV)를 §4-5에 본문 승격. | All |
+| 2026-05-19 | `/statistics` 페이지를 §3 추가. Analytics 페이지 타입 신설 (§7.2). | §3, §7 |
+| 2026-05-19 | Outcome 6단계 분류 fixed contract로. | §4.5 |
+| 2026-05-19 | 모든 return metric의 윈도우를 500 trading days로 통일. | §4.4 |
+
+## Appendix B. What was removed from the prior version
+
+- `§7 "Light fintech SaaS"` — 마케팅 SaaS 톤. 사용자 명시적 거부.
+- `§7.1 "Major redesign direction — research command board"` — 미실현 비전. 본문 contract로 부적합.
+- `§7.2 "Target desktop composition"` — Dashboard 페이지 한정 가정. Analytics 페이지에 맞지 않음. §7.1로 축소 흡수.
+- `§7.3 "Redesign constraints"` — 절반은 §10으로, 절반은 폐기.
+- `§7.4 "V3 research archive correction"` — 핵심 원칙은 §8.1로 흡수. 모순되는 §7과 같이 죽임.
+- 중복 `§7.4 "Implementation sequencing"` — 미래 비전. 본 contract에서 제외.
+- `§11 "Open direction"` placeholder — 의미 있는 항목으로 재정의 (§11).
+
+미래 비전은 별도 `VISION.md` 또는 `docs/adr/` 폴더로 분리할 때 살릴 수 있음. 본 contract는 현재 상태만 기술.
