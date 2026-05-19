@@ -12,7 +12,7 @@
 [![Vercel](https://img.shields.io/badge/Vercel-static_export-000000)](https://vercel.com/)
 [![pages](https://img.shields.io/badge/static_pages-413-16a368)](#)
 
-[**라이브 →**](https://smic-portfolio-lab.vercel.app) · [**변경 이력 →**](./CHANGELOG.md) · [**디자인 시스템 →**](./DESIGN.md)
+[**라이브 →**](https://smic-portfolio.vercel.app) · [**변경 이력 →**](./CHANGELOG.md) · [**디자인 시스템 →**](./DESIGN.md)
 
 </div>
 
