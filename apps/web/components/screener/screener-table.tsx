@@ -14,6 +14,7 @@ import {
 import { SearchX } from 'lucide-react';
 import Link from 'next/link';
 import { Fragment, useCallback, useDeferredValue, useMemo, useReducer, useState } from 'react';
+import { CsvDownloadButton, downloadCsv } from '@/components/ui/data-panel';
 import { BlockPagination } from '@/components/trading/TableControls';
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import { useSearchShortcut } from '@/components/ui/use-search-shortcut';
@@ -158,6 +159,74 @@ const COLUMN_META: Record<string, { kind: ColumnFilterKind; placeholder: string 
   above200ma: { kind: 'boolean', placeholder: '전체' },
   // candidateBucket has its own rendering and matching branch — intentionally absent here.
 };
+
+function downloadScreenerRows(rows: ScreenerBoardRow[]) {
+  const headers = [
+    'symbol',
+    'company',
+    'exchange',
+    'currency',
+    'latest_report_id',
+    'latest_report_date',
+    'report_age_days',
+    'report_count',
+    'last_close_native',
+    'last_close_krw',
+    'target_price_krw',
+    'target_upside_at_pub',
+    'target_gap_pct',
+    'target_progress_pct',
+    'current_return',
+    'peak_return',
+    'trough_return',
+    'target_hit',
+    'expired',
+    'candidate_bucket',
+    'candidate_score',
+    'return_1m',
+    'return_3m',
+    'ytd_return',
+    'return_1y',
+    'distance_from_52w_high',
+    'rs_rank_1m',
+    'above_20ma',
+    'above_50ma',
+    'above_200ma',
+  ];
+  const data = rows.map((row) => [
+    row.symbol,
+    row.company,
+    row.exchange,
+    row.currency,
+    row.latestReportId,
+    row.latestReportDate,
+    row.reportAgeDays ?? '',
+    row.reportCount,
+    row.lastCloseNative ?? '',
+    row.lastCloseKrw ?? '',
+    row.targetPriceKrw ?? '',
+    row.targetUpsideAtPub ?? '',
+    row.targetGapPct ?? '',
+    row.targetProgressPct ?? '',
+    row.currentReturn ?? '',
+    row.peakReturn ?? '',
+    row.troughReturn ?? '',
+    row.targetHit ? 'true' : 'false',
+    row.expired ? 'true' : 'false',
+    row.candidateBucket ?? '',
+    row.candidateScore ?? '',
+    row.return1m ?? '',
+    row.return3m ?? '',
+    row.ytdReturn ?? '',
+    row.return1y ?? '',
+    row.distanceFrom52wHigh ?? '',
+    row.rsRank1m ?? '',
+    row.above20ma === null ? '' : row.above20ma ? 'true' : 'false',
+    row.above50ma === null ? '' : row.above50ma ? 'true' : 'false',
+    row.above200ma === null ? '' : row.above200ma ? 'true' : 'false',
+  ]);
+  downloadCsv('snusmic-screener-filtered.csv', headers, data);
+}
 
 function columnFilterKind(columnId: string): ColumnFilterKind | undefined {
   return COLUMN_META[columnId]?.kind;
@@ -441,32 +510,38 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
                 artifact에 없어 숨깁니다.
               </p>
             </div>
-            <div className="flex shrink-0 items-center gap-2" aria-label="컬럼 보기">
-              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                컬럼
-              </span>
-              <div className="inline-flex overflow-hidden rounded-md border border-slate-200 bg-white">
-                {(['core', 'price', 'all'] as const).map((mode, index) => {
-                  const isActive = columnMode === mode;
-                  return (
-                    <button
-                      key={mode}
-                      type="button"
-                      aria-pressed={isActive}
-                      className={[
-                        'inline-flex h-8 items-center px-3 text-xs font-semibold transition-colors',
-                        index > 0 ? 'border-l border-slate-200' : '',
-                        isActive
-                          ? 'bg-slate-950 text-white'
-                          : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-950',
-                      ].join(' ')}
-                      onClick={() => setColumnMode(mode)}
-                    >
-                      {modeLabel(mode)}
-                    </button>
-                  );
-                })}
+            <div className="flex shrink-0 items-center gap-3">
+              <div className="flex items-center gap-2" aria-label="컬럼 보기">
+                <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                  컬럼
+                </span>
+                <div className="inline-flex overflow-hidden rounded-md border border-slate-200 bg-white">
+                  {(['core', 'price', 'all'] as const).map((mode, index) => {
+                    const isActive = columnMode === mode;
+                    return (
+                      <button
+                        key={mode}
+                        type="button"
+                        aria-pressed={isActive}
+                        className={[
+                          'inline-flex h-8 items-center px-3 text-xs font-semibold transition-colors',
+                          index > 0 ? 'border-l border-slate-200' : '',
+                          isActive
+                            ? 'bg-slate-950 text-white'
+                            : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-950',
+                        ].join(' ')}
+                        onClick={() => setColumnMode(mode)}
+                      >
+                        {modeLabel(mode)}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
+              <CsvDownloadButton
+                label="CSV"
+                onClick={() => downloadScreenerRows(filteredRows.map((row) => row.original))}
+              />
             </div>
           </div>
 

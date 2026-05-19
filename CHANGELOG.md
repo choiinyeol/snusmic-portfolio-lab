@@ -20,6 +20,28 @@
 
 ---
 
+## v0.22.0-datapanel-unify.1 — 2026-05-19
+
+ultragoal 7개 스토리 모두 완료. 모든 dense 표가 같은 chrome을 공유.
+
+### 추가
+- `components/ui/data-panel.tsx`: 공유 `DataPanel` + `CsvDownloadButton` + `EmptyTableState` + `downloadCsv`. header(title/subtitle/actions/search) + sticky table body + grid 1fr/auto/1fr footer(총 N행 · 페이지네이션 · 페이지당).
+- 모든 dense 표에 CSV 다운로드 추가 (Holdings, Episodes, Trades, MonthlyHoldings, Reports, Strategies, Screener). UTF-8 BOM 통일로 Excel 한글 호환.
+
+### 변경 (Phase B 마이그레이션 — 6개 표)
+- **PortfolioTables**: 이중 box 제거, "포트폴리오 필터" 거짓 wrapper 제거, 검색 입력 추가, CSV 버튼 panel header로, 페이지네이션 footer 중앙.
+- **TradesTable**: episodes + trades 두 표 모두 DataPanel. 공유 검색·side 필터 row 상단에. daisyui badge·select·input·btn 클래스 제거.
+- **PortfolioHistory**: 3 sections → 2 (filter row 흡수). 월말 selector + CSV를 panel header로. daisyui form-control·btn 제거.
+- **ReportsTable**: 기존 chrome 유지 + CSV 버튼 추가 (filtered rows, 19컬럼).
+- **StrategyRiskTable**: 'use client' 변환, DataPanel 마이그레이션, 정렬 8 키 추가, title/csvFilename prop으로 벤치마크/고유 인스턴스 구분.
+- **ScreenerTable**: 기존 chrome 유지 + CSV 버튼 (filtered rows, 30컬럼) 컬럼 모드 토글 옆.
+
+### 검증
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web build` (정적 페이지 413개)
+
+---
+
 ## v0.21.22-pagination-center.1 — 2026-05-19
 
 ### 변경 (페이지네이션 중앙 정렬)

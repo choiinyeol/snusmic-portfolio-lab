@@ -82,11 +82,11 @@ export default function StrategiesPage() {
       />
 
       <Section eyebrow="비교 기준" title="벤치마크 세트">
-        <StrategyRiskTable rows={benchmarkRows} />
+        <StrategyRiskTable rows={benchmarkRows} title="벤치마크" csvFilename="snusmic-benchmarks.csv" />
       </Section>
 
       <Section eyebrow="목표 조건" title="고유 전략 — MDD 15% 이하 + KOSPI 초과" id="strategy-board">
-        <StrategyRiskTable rows={selectableRows} />
+        <StrategyRiskTable rows={selectableRows} title="고유 전략" csvFilename="snusmic-strategies.csv" />
       </Section>
 
       <Section eyebrow="성과 경로" title="벤치마크 세트와 고유 전략의 누적 수익률">

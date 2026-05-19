@@ -16,6 +16,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import { CsvDownloadButton, downloadCsv } from '@/components/ui/data-panel';
 import { useSearchShortcut } from '@/components/ui/use-search-shortcut';
 import type { ReportRow } from '@/lib/artifacts';
 import { formatDateKo, formatDays, formatNative, formatPercent } from '@/lib/format';
@@ -329,15 +330,18 @@ export function ReportsTable({ reports }: ReportsTableProps) {
               {activePresetConfig.caption}. 후보 탐색, 전체 리포트, 목표가 검증은 같은 표에서 정렬 조건만 바꿔 봅니다.
             </p>
           </div>
-          <div
-            className="shrink-0 rounded-md bg-slate-50 px-3 py-2 text-xs text-slate-600"
-            aria-live="polite"
-            aria-atomic="true"
-          >
-            <span className="font-mono font-semibold tabular-nums text-slate-950">
-              {filteredRows.length.toLocaleString('ko-KR')}
-            </span>
-            개 표시 · 전체 {reports.length.toLocaleString('ko-KR')}개
+          <div className="flex shrink-0 items-center gap-2">
+            <div
+              className="rounded-md bg-slate-50 px-3 py-2 text-xs text-slate-600"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              <span className="font-mono font-semibold tabular-nums text-slate-950">
+                {filteredRows.length.toLocaleString('ko-KR')}
+              </span>
+              개 표시 · 전체 {reports.length.toLocaleString('ko-KR')}개
+            </div>
+            <CsvDownloadButton label="CSV" onClick={() => downloadReports(filteredRows.map((row) => row.original))} />
           </div>
         </div>
 
@@ -502,6 +506,52 @@ export function ReportsTable({ reports }: ReportsTableProps) {
       </div>
     </section>
   );
+}
+
+function downloadReports(rows: ReportRow[]) {
+  const headers = [
+    'report_id',
+    'symbol',
+    'company',
+    'exchange',
+    'publication_date',
+    'currency',
+    'entry_price_native',
+    'entry_price_krw',
+    'target_price_native',
+    'target_price_krw',
+    'target_upside_at_pub',
+    'target_hit',
+    'target_hit_date',
+    'days_to_target',
+    'current_return',
+    'peak_return',
+    'trough_return',
+    'expiry_date',
+    'expired',
+  ];
+  const data = rows.map((row) => [
+    row.reportId,
+    row.symbol,
+    row.company,
+    row.exchange,
+    row.publicationDate,
+    row.currency,
+    row.entryPriceNative ?? '',
+    row.entryPriceKrw ?? '',
+    row.targetPriceNative ?? '',
+    row.targetPriceKrw ?? '',
+    row.targetUpsideAtPub ?? '',
+    row.targetHit ? 'true' : 'false',
+    row.targetHitDate ?? '',
+    row.daysToTarget ?? '',
+    row.currentReturn ?? '',
+    row.peakReturn ?? '',
+    row.troughReturn ?? '',
+    row.expiryDate ?? '',
+    row.expired ? 'true' : 'false',
+  ]);
+  downloadCsv('snusmic-reports-filtered.csv', headers, data);
 }
 
 function globalTextFilter(row: Row<ReportRow>, _columnId: string, filterValue: string): boolean {
