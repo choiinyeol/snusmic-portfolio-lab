@@ -20,6 +20,18 @@
 
 ---
 
+## v0.21.21-screener-patterns-batch-2.1 — 2026-05-19
+
+### 적용 (전역 테이블 sticky header)
+- `globals.css`의 `.board-table-wrap` (StrategyRiskTable이 사용)과 `.table-wrap` (PortfolioTables, TradesTable이 사용)에 `max-height: 72vh` + `overflow: auto` 추가. 기존 가로 스크롤만 되던 컨테이너가 세로도 스크롤되며, 기존에 정의된 `th { position: sticky; top: 0 }` 규칙이 실제로 동작하기 시작.
+- `.board-table thead th`에 Screener 헤더 톤(`bg-slate-100`, mono uppercase, tracking-wide, slate-600) 직접 적용해 시각 통일.
+- 영향: `/strategies` 위험표, `/portfolio` 보유·매매 표가 모두 행 스크롤 시 컬럼명을 잡고 있음.
+
+### 검증
+- `pnpm --dir apps/web build` (정적 페이지 413개)
+
+---
+
 ## v0.21.20-screener-patterns-batch-1.1 — 2026-05-19
 
 ### 분석 (Screener 페이지 패턴 catalog)
