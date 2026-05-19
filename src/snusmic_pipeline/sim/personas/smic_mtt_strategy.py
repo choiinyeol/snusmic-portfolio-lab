@@ -223,6 +223,33 @@ def _passes_universe(record: dict[str, Any], universe: str) -> bool:
     raise ValueError(f"unknown SMIC MTT universe: {universe}")
 
 
+def _relative_strength(
+    board: PriceBoard,
+    day: date,
+    symbol: str,
+    config: SmicMttStrategyConfig,
+) -> tuple[float, float]:
+    if board.close.empty or symbol not in board.close.columns:
+        return 0.0, 1.0
+    ts = pd.Timestamp(day)
+    history = board.close.loc[board.close.index <= ts].tail(config.relative_strength_lookback_days + 1)
+    if len(history) < 2 or symbol not in history.columns:
+        return 0.0, 1.0
+
+    start = history.iloc[0]
+    end = history.iloc[-1]
+    returns = (end / start - 1.0).replace([float("inf"), float("-inf")], pd.NA).dropna()
+    returns = returns[returns.map(isfinite)]
+    if symbol not in returns.index:
+        return 0.0, 1.0
+    momentum_return = float(returns[symbol])
+    if returns.empty:
+        return momentum_return, 1.0
+    rank = float((returns <= momentum_return).sum())
+    percentile = rank / float(len(returns))
+    return momentum_return, percentile
+
+
 def _passes_trend_filter(
     board: PriceBoard,
     day: date,

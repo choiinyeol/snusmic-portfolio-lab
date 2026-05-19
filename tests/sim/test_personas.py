@@ -222,6 +222,7 @@ def test_smic_rsi_reversal_buys_oversold_report_and_exits_on_rebound():
         min_pullback_pct=0.05,
         pullback_lookback_days=20,
         signal_valid_days=80,
+        stop_loss_pct=0.20,
         take_profit_pct=10.0,
         top_up_cadence="deposit_only",
     )
