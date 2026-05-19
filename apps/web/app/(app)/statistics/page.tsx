@@ -4,41 +4,151 @@ import {
   ReportStatisticsStory,
 } from '@/components/reports/ReportStatisticsStory';
 import { getPriceSeries, getReportRows, getReportStatisticsLabSummary, hasPriceArtifact } from '@/lib/artifacts';
-import type { PricePoint, ReportStatisticsLabSummary } from '@/lib/artifacts';
+import type { PricePoint, ReportRow, ReportStatisticsLabSummary } from '@/lib/artifacts';
 import { isNumber } from '@/lib/report-statistics';
+
+/** All return/hit metrics on this page are capped to this many trading
+ * days from publication. Two calendar years ≈ 500 trading days; the
+ * user-facing rule is "if peak hit target within 2 years it counts,
+ * what happens after is out of scope." */
+const RETURN_WINDOW_DAYS = 500;
+
+function highKrw(point: PricePoint): number {
+  const high = point.high ?? point.close ?? point.value;
+  const close = point.close ?? point.value ?? 0;
+  const closeKrw = point.closeKrw ?? null;
+  if (closeKrw != null && close > 0) return high * (closeKrw / close);
+  return high;
+}
+
+function lowKrw(point: PricePoint): number {
+  const low = point.low ?? point.close ?? point.value;
+  const close = point.close ?? point.value ?? 0;
+  const closeKrw = point.closeKrw ?? null;
+  if (closeKrw != null && close > 0) return low * (closeKrw / close);
+  return low;
+}
+
+function closeKrwOf(point: PricePoint): number {
+  return point.closeKrw ?? point.close ?? point.value ?? 0;
+}
+
+/** Recompute peak/trough/hit flags within the trading-day window. The
+ * returned row carries the windowed values in the same fields used by
+ * downstream views (maxFavorableExcursion, hit10/08/06), so all stats
+ * downstream automatically honor the 500-day deadline. */
+function clipRowToWindow(
+  row: ReportStatisticsLabSummary['riskScatter'][number],
+  reportMeta: ReportRow | undefined,
+  windowDays: number,
+): ReportStatisticsLabSummary['riskScatter'][number] {
+  if (!hasPriceArtifact(row.symbol)) return row;
+  const series = getPriceSeries(row.symbol, row.publicationDate);
+  if (series.length === 0) return row;
+  const window = series.slice(0, windowDays);
+  const baseKrw = closeKrwOf(window[0]);
+  if (!baseKrw || baseKrw <= 0) return row;
+
+  const target = reportMeta?.targetPriceKrw ?? null;
+  const entry = reportMeta?.entryPriceKrw ?? baseKrw;
+  const threshold10 = target;
+  const threshold08 = target !== null && entry !== null ? entry + (target - entry) * 0.8 : null;
+  const threshold06 = target !== null && entry !== null ? entry + (target - entry) * 0.6 : null;
+
+  let maxKrw = baseKrw;
+  let minKrw = baseKrw;
+  let hit10Day: number | null = null;
+  let hit08Day: number | null = null;
+  let hit06Day: number | null = null;
+
+  for (let i = 0; i < window.length; i += 1) {
+    const h = highKrw(window[i]);
+    const l = lowKrw(window[i]);
+    if (h > maxKrw) maxKrw = h;
+    if (l < minKrw) minKrw = l;
+    if (threshold10 !== null && hit10Day === null && h >= threshold10) hit10Day = i;
+    if (threshold08 !== null && hit08Day === null && h >= threshold08) hit08Day = i;
+    if (threshold06 !== null && hit06Day === null && h >= threshold06) hit06Day = i;
+  }
+
+  return {
+    ...row,
+    maxFavorableExcursion: maxKrw / baseKrw - 1,
+    maxAdverseExcursion: minKrw / baseKrw - 1,
+    hit10: hit10Day !== null,
+    hit08: hit08Day !== null,
+    hit06: hit06Day !== null,
+  };
+}
+
+function clipSummary(
+  summary: ReportStatisticsLabSummary,
+  reportById: Map<string, ReportRow>,
+  windowDays: number,
+): ReportStatisticsLabSummary {
+  return {
+    ...summary,
+    riskScatter: summary.riskScatter.map((row) => clipRowToWindow(row, reportById.get(row.reportId), windowDays)),
+  };
+}
+
+/** Days from publication to first close-or-high crossing the 1.0x target
+ * within the trading-day window, or null if never hit. Re-derived from
+ * price series so we honor the 500-day cap regardless of what the
+ * pre-built artifact recorded. */
+function daysToTargetWithin(
+  row: ReportStatisticsLabSummary['riskScatter'][number],
+  reportMeta: ReportRow | undefined,
+  windowDays: number,
+): number | null {
+  if (!reportMeta?.targetPriceKrw || !hasPriceArtifact(row.symbol)) return null;
+  const series = getPriceSeries(row.symbol, row.publicationDate);
+  const target = reportMeta.targetPriceKrw;
+  const limit = Math.min(series.length, windowDays);
+  for (let i = 0; i < limit; i += 1) {
+    if (highKrw(series[i]) >= target) return i;
+  }
+  return null;
+}
 
 function buildPricePath(
   row: ReportStatisticsLabSummary['riskScatter'][number],
-  samplePoints: number,
+  windowDays: number,
 ): PricePathSeries | null {
-  const prices = getPriceSeries(row.symbol, row.publicationDate);
-  if (prices.length === 0) return null;
-  const basePrice = prices[0].close ?? prices[0].value;
-  if (!basePrice || basePrice <= 0) return null;
-  const step = Math.max(1, Math.floor(prices.length / samplePoints));
-  const points: Array<{ day: number; returnPct: number }> = [];
-  for (let i = 0; i < prices.length; i += step) {
-    const close = prices[i].close ?? prices[i].value;
-    if (close > 0) points.push({ day: i, returnPct: close / basePrice - 1 });
-  }
-  const lastIdx = prices.length - 1;
-  if (points[points.length - 1]?.day !== lastIdx) {
-    const lastClose = prices[lastIdx].close ?? prices[lastIdx].value;
-    if (lastClose > 0) points.push({ day: lastIdx, returnPct: lastClose / basePrice - 1 });
-  }
+  const fullSeries = getPriceSeries(row.symbol, row.publicationDate);
+  if (fullSeries.length === 0) return null;
+  const window = fullSeries.slice(0, windowDays);
+  const basePoint = window[0];
+  const baseKrw = closeKrwOf(basePoint);
+  if (!baseKrw || baseKrw <= 0) return null;
+
+  const bars = window
+    .map((point, day) => ({
+      day,
+      time: point.time,
+      open: point.open ?? point.close ?? point.value,
+      high: point.high ?? point.close ?? point.value,
+      low: point.low ?? point.close ?? point.value,
+      close: point.close ?? point.value,
+      closeKrw: closeKrwOf(point),
+    }))
+    .filter((bar) => bar.close > 0);
+
   return {
     reportId: row.reportId,
     symbol: row.symbol,
     company: row.company,
+    currency: basePoint.currency ?? 'KRW',
     publicationDate: row.publicationDate,
     peakReturn: row.maxFavorableExcursion ?? 0,
-    points,
+    baseKrw,
+    bars,
   };
 }
 
 function buildPricePaths(
   summary: ReportStatisticsLabSummary,
-  options: { winnerCount: number; loserCount: number; samplePoints: number },
+  options: { winnerCount: number; loserCount: number; windowDays: number },
 ): { winners: PricePathSeries[]; losers: PricePathSeries[] } {
   const eligible = summary.riskScatter.filter(
     (row) => isNumber(row.maxFavorableExcursion) && hasPriceArtifact(row.symbol),
@@ -51,10 +161,10 @@ function buildPricePaths(
     .slice(0, options.loserCount);
   return {
     winners: winners
-      .map((row) => buildPricePath(row, options.samplePoints))
+      .map((row) => buildPricePath(row, options.windowDays))
       .filter((path): path is PricePathSeries => path !== null),
     losers: losers
-      .map((row) => buildPricePath(row, options.samplePoints))
+      .map((row) => buildPricePath(row, options.windowDays))
       .filter((path): path is PricePathSeries => path !== null),
   };
 }
@@ -191,8 +301,11 @@ function bucketStats(
   };
 }
 
-function buildFeatureBuckets(summary: ReportStatisticsLabSummary): FeatureBucket[] {
-  const reportById = new Map(getReportRows().map((row) => [row.reportId, row]));
+function buildFeatureBuckets(
+  summary: ReportStatisticsLabSummary,
+  reportById: Map<string, ReportRow>,
+  windowDays: number,
+): FeatureBucket[] {
   const snapshots: Snapshot[] = [];
   for (const row of summary.riskScatter) {
     if (!isNumber(row.maxFavorableExcursion)) continue;
@@ -200,11 +313,10 @@ function buildFeatureBuckets(summary: ReportStatisticsLabSummary): FeatureBucket
     const prices = getPriceSeries(row.symbol);
     const features = computeFeatures(prices, row.publicationDate);
     if (features === null) continue;
-    const meta = reportById.get(row.reportId);
     snapshots.push({
       peakReturn: row.maxFavorableExcursion,
       hit10: row.hit10,
-      daysToTarget: meta?.daysToTarget ?? null,
+      daysToTarget: daysToTargetWithin(row, reportById.get(row.reportId), windowDays),
       features,
     });
   }
@@ -232,8 +344,21 @@ function buildFeatureBuckets(summary: ReportStatisticsLabSummary): FeatureBucket
 }
 
 export default function ReportStatisticsPage() {
-  const summary = getReportStatisticsLabSummary();
-  const pricePaths = buildPricePaths(summary, { winnerCount: 10, loserCount: 5, samplePoints: 60 });
-  const featureBuckets = buildFeatureBuckets(summary);
-  return <ReportStatisticsStory summary={summary} pricePaths={pricePaths} featureBuckets={featureBuckets} />;
+  const rawSummary = getReportStatisticsLabSummary();
+  const reportById = new Map(getReportRows().map((row) => [row.reportId, row]));
+  const summary = clipSummary(rawSummary, reportById, RETURN_WINDOW_DAYS);
+  const pricePaths = buildPricePaths(summary, {
+    winnerCount: 10,
+    loserCount: 5,
+    windowDays: RETURN_WINDOW_DAYS,
+  });
+  const featureBuckets = buildFeatureBuckets(summary, reportById, RETURN_WINDOW_DAYS);
+  return (
+    <ReportStatisticsStory
+      featureBuckets={featureBuckets}
+      pricePaths={pricePaths}
+      summary={summary}
+      windowDays={RETURN_WINDOW_DAYS}
+    />
+  );
 }

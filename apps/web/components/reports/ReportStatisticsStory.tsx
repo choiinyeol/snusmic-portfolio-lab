@@ -1,19 +1,38 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { createChart, LineSeries, type IChartApi, type UTCTimestamp } from 'lightweight-charts';
+import {
+  CandlestickSeries,
+  createChart,
+  LineSeries,
+  type IChartApi,
+  type Time,
+  type UTCTimestamp,
+} from 'lightweight-charts';
 import type { ReportStatisticsLabSummary } from '@/lib/artifacts';
 import { formatPercent } from '@/lib/format';
 import { formatMultiple, isNumber, mean, quantileFromSorted, trimmedMean, wilsonCI } from '@/lib/report-statistics';
+
+export type PricePathBar = {
+  day: number;
+  time: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  closeKrw: number;
+};
 
 export type PricePathSeries = {
   reportId: string;
   symbol: string;
   company: string;
+  currency: string;
   publicationDate: string;
   peakReturn: number;
-  points: Array<{ day: number; returnPct: number }>;
+  baseKrw: number;
+  bars: PricePathBar[];
 };
 
 export type FeatureBucket = {
@@ -32,10 +51,12 @@ export function ReportStatisticsStory({
   summary,
   pricePaths,
   featureBuckets,
+  windowDays,
 }: {
   summary: ReportStatisticsLabSummary;
   pricePaths: { winners: PricePathSeries[]; losers: PricePathSeries[] };
   featureBuckets: FeatureBucket[];
+  windowDays: number;
 }) {
   const peakReturns = summary.riskScatter.map((row) => row.maxFavorableExcursion).filter(isNumber);
   const sortedReturns = [...peakReturns].sort((a, b) => a - b);
@@ -67,7 +88,7 @@ export function ReportStatisticsStory({
         <h1 className="text-xl font-semibold text-slate-950">리포트 통계</h1>
         <p className="mt-1 font-mono text-xs text-slate-500">
           기준일 {summary.sample.endDate} · 표본 {eligiblePathCount.toLocaleString('ko-KR')}건 · 유효 티커{' '}
-          {uniqueSymbolCount.toLocaleString('ko-KR')}개
+          {uniqueSymbolCount.toLocaleString('ko-KR')}개 · 유효기간 {windowDays}거래일 (≈ 2년)
         </p>
       </header>
 
@@ -87,14 +108,14 @@ export function ReportStatisticsStory({
 
       <PricePathOverlay
         title="가장 크게 간 종목 10건의 가격 경로"
-        caption="발간 당일을 0%로 두고 거래일 기준 경과 시간에 따라 누적 수익률을 그렸습니다."
+        caption={`발간 당일을 0%로 두고 ${windowDays}거래일까지의 누적 수익률입니다. 종목을 선택하면 단일 OHLCV 차트로 전환됩니다.`}
         paths={pricePaths.winners}
         tone="good"
       />
 
       <PricePathOverlay
-        title="가장 크게 빠진 종목 5건의 가격 경로"
-        caption="발간 당일을 0%로 두고 거래일 기준 경과 시간에 따라 누적 수익률을 그렸습니다."
+        title="발간 후 거의 못 오른 종목 5건의 가격 경로"
+        caption={`발간 당일을 0%로 두고 ${windowDays}거래일까지의 누적 수익률입니다. 종목을 선택하면 단일 OHLCV 차트로 전환됩니다.`}
         paths={pricePaths.losers}
         tone="bad"
       />
@@ -678,6 +699,83 @@ function PricePathOverlay({
   paths: PricePathSeries[];
   tone: 'good' | 'bad';
 }) {
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = selectedId ? (paths.find((p) => p.reportId === selectedId) ?? null) : null;
+
+  if (paths.length === 0) {
+    return (
+      <section className="rounded-2xl border border-slate-200 bg-white p-5">
+        <h3 className="text-sm font-semibold text-slate-950">{title}</h3>
+        <p className="mt-2 text-xs text-slate-500">표시할 가격 경로가 없습니다.</p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="rounded-2xl border border-slate-200 bg-white p-5">
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h3 className="text-sm font-semibold text-slate-950">{title}</h3>
+          <p className="mt-1 text-xs text-slate-500">{caption}</p>
+        </div>
+        {selected ? (
+          <div className="flex items-center gap-2 text-xs">
+            <button
+              className="rounded-md border border-slate-200 bg-white px-2.5 py-1 font-medium text-slate-600 transition-colors hover:bg-slate-50"
+              onClick={() => setSelectedId(null)}
+              type="button"
+            >
+              ← 전체 보기
+            </button>
+            <Link
+              className="rounded-md border border-slate-200 bg-white px-2.5 py-1 font-medium text-slate-700 transition-colors hover:bg-slate-50"
+              href={`/reports/${encodeURIComponent(selected.symbol)}/${encodeURIComponent(selected.reportId)}`}
+            >
+              리포트 상세 ↗
+            </Link>
+          </div>
+        ) : null}
+      </header>
+      {selected ? (
+        <PricePathCandlestick path={selected} tone={tone} />
+      ) : (
+        <PricePathLineOverlay paths={paths} tone={tone} />
+      )}
+      {selected ? null : (
+        <ul className="mt-3 grid gap-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          {paths.map((path, i) => {
+            const opacity = 0.4 + 0.55 * (1 - i / Math.max(1, paths.length - 1));
+            const swatch =
+              tone === 'good'
+                ? `rgba(16, 185, 129, ${opacity.toFixed(2)})`
+                : `rgba(244, 63, 94, ${opacity.toFixed(2)})`;
+            return (
+              <li key={path.reportId}>
+                <button
+                  className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs transition-colors hover:bg-slate-50"
+                  onClick={() => setSelectedId(path.reportId)}
+                  type="button"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="inline-block size-2.5 rounded-full"
+                    style={{ backgroundColor: swatch }}
+                  />
+                  <span className="truncate font-semibold text-slate-950">{path.company}</span>
+                  <span className="ml-auto font-mono tabular-nums text-slate-700">
+                    {formatPercent(path.peakReturn)}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+function PricePathLineOverlay({ paths, tone }: { paths: PricePathSeries[]; tone: 'good' | 'bad' }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -718,9 +816,9 @@ function PricePathOverlay({
         lastValueVisible: false,
       });
       series.setData(
-        path.points.map((pt) => ({
-          time: (PRICE_PATH_BASE_TIME + pt.day * 86400) as UTCTimestamp,
-          value: pt.returnPct,
+        path.bars.map((bar) => ({
+          time: (PRICE_PATH_BASE_TIME + bar.day * 86400) as UTCTimestamp,
+          value: bar.closeKrw / path.baseKrw - 1,
         })),
       );
     }
@@ -728,46 +826,77 @@ function PricePathOverlay({
     return () => chart.remove();
   }, [paths, tone]);
 
-  if (paths.length === 0) {
-    return (
-      <section className="rounded-2xl border border-slate-200 bg-white p-5">
-        <h3 className="text-sm font-semibold text-slate-950">{title}</h3>
-        <p className="mt-2 text-xs text-slate-500">표시할 가격 경로가 없습니다.</p>
-      </section>
+  return (
+    <div className="mt-4 h-[28rem] w-full overflow-hidden rounded-xl border border-slate-100" ref={containerRef} />
+  );
+}
+
+function PricePathCandlestick({ path, tone }: { path: PricePathSeries; tone: 'good' | 'bad' }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const node = containerRef.current;
+    if (!node) return;
+    const chart: IChartApi = createChart(node, {
+      autoSize: true,
+      layout: { background: { color: 'transparent' }, textColor: '#475569', fontFamily: 'inherit' },
+      grid: { vertLines: { color: '#e2e8f0' }, horzLines: { color: '#e2e8f0' } },
+      rightPriceScale: { borderColor: '#e2e8f0', scaleMargins: { top: 0.05, bottom: 0.08 } },
+      timeScale: { borderColor: '#e2e8f0', timeVisible: false, secondsVisible: false },
+      crosshair: { mode: 1 },
+    });
+    const accent = tone === 'good' ? '#16a34a' : '#e11d48';
+    const series = chart.addSeries(CandlestickSeries, {
+      upColor: '#10b981',
+      downColor: '#ef4444',
+      borderUpColor: '#059669',
+      borderDownColor: '#dc2626',
+      wickUpColor: '#059669',
+      wickDownColor: '#dc2626',
+    });
+    series.setData(
+      path.bars.map((bar) => ({
+        time: bar.time as Time,
+        open: bar.open,
+        high: bar.high,
+        low: bar.low,
+        close: bar.close,
+      })),
     );
-  }
+    const basePrice = path.bars[0]?.close ?? 0;
+    if (basePrice > 0) {
+      series.createPriceLine({
+        price: basePrice,
+        color: accent,
+        lineWidth: 1,
+        lineStyle: 2,
+        axisLabelVisible: true,
+        title: '발간',
+      });
+    }
+    chart.timeScale().fitContent();
+    return () => chart.remove();
+  }, [path, tone]);
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5">
-      <header>
-        <h3 className="text-sm font-semibold text-slate-950">{title}</h3>
-        <p className="mt-1 text-xs text-slate-500">{caption}</p>
-      </header>
-      <div className="mt-4 h-[28rem] w-full overflow-hidden rounded-xl border border-slate-100" ref={containerRef} />
-      <ul className="mt-3 grid gap-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-        {paths.map((path, i) => {
-          const opacity = 0.4 + 0.55 * (1 - i / Math.max(1, paths.length - 1));
-          const swatch =
-            tone === 'good' ? `rgba(16, 185, 129, ${opacity.toFixed(2)})` : `rgba(244, 63, 94, ${opacity.toFixed(2)})`;
-          return (
-            <li key={path.reportId}>
-              <Link
-                className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs transition-colors hover:bg-slate-50"
-                href={`/reports/${encodeURIComponent(path.symbol)}/${encodeURIComponent(path.reportId)}`}
-              >
-                <span
-                  aria-hidden="true"
-                  className="inline-block size-2.5 rounded-full"
-                  style={{ backgroundColor: swatch }}
-                />
-                <span className="truncate font-semibold text-slate-950">{path.company}</span>
-                <span className="ml-auto font-mono tabular-nums text-slate-700">{formatPercent(path.peakReturn)}</span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </section>
+    <div className="mt-4 grid gap-3">
+      <div className="flex flex-wrap items-baseline justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5">
+        <div>
+          <div className="text-sm font-semibold text-slate-950">
+            {path.company} <span className="font-mono text-xs text-slate-500">({path.symbol})</span>
+          </div>
+          <div className="mt-0.5 font-mono text-[11px] text-slate-500">
+            발간 {path.publicationDate} · {path.bars.length}거래일 · {path.currency}
+          </div>
+        </div>
+        <div
+          className={`font-mono text-base font-semibold tabular-nums ${tone === 'good' ? 'text-emerald-600' : 'text-rose-600'}`}
+        >
+          고점 {formatPercent(path.peakReturn)}
+        </div>
+      </div>
+      <div className="h-[28rem] w-full overflow-hidden rounded-xl border border-slate-100" ref={containerRef} />
+    </div>
   );
 }
 

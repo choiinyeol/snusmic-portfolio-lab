@@ -20,6 +20,31 @@
 
 ---
 
+## v0.21.15-500d-window.1 — 2026-05-19
+
+### 변경 (500거래일 데드라인)
+- `/statistics`의 모든 수익률·도달 지표를 발간일부터 500거래일(≈ 2년) 이내로 통일. 매도 타이밍을 모델이 알 수 없으니, 분석가 콜의 유효기간을 500거래일로 고정하고 그 구간 내의 고점이 도달했다면 도달한 것.
+- `page.tsx`에서 server-side로 모든 리포트의 가격 시리즈를 500거래일 윈도우로 잘라 `maxFavorableExcursion`·`maxAdverseExcursion`·`hit10/08/06`을 재계산. `summary.riskScatter`를 통째로 교체해 downstream 모든 컴포넌트가 자동으로 500거래일 기준 데이터를 받음.
+- 페이지 헤더에 "유효기간 500거래일 (≈ 2년)" 표기 추가.
+- `FeatureBucketsTable`의 도달 중앙 일수도 500거래일 윈도우 내 첫 도달일로 재계산.
+
+### 추가 (OHLCV 차트 + 종목 선택)
+- `PricePathOverlay`에 종목 선택 모드 추가. 범례에서 종목을 누르면 멀티 라인 overlay에서 단일 OHLCV(캔들스틱) 차트로 전환.
+- OHLCV 차트는 lightweight-charts v5의 `CandlestickSeries`로 렌더링. 발간일 종가 위치에 가로 점선(`createPriceLine`)으로 "발간" 표시.
+- 헤더에 "← 전체 보기" 버튼과 "리포트 상세 ↗" 링크 추가. 전자는 멀티라인으로 복귀, 후자는 해당 리포트 상세로 이동.
+- `PricePathSeries.points` (수익률 포인트) → `PricePathSeries.bars` (전체 OHLCV) 로 데이터 모델 교체. 500거래일 풀 해상도로 전송, 라인 뷰는 `closeKrw / baseKrw - 1`로 client-side 정규화.
+
+### 검토 (코세스 089890.KQ)
+- 데이터 파일은 정상(1903행, 2018-08 ~ 2026-05-18 완전 커버). 발간일 2023-10-19 기준 500거래일 윈도우 내 최고가는 2025-11-06의 32,400원 → MFE ≈ 251.79% (이전 화면 표시 162.76%는 expiry 캡 + close 기반이라 더 보수적). 500거래일 기준 적용 후 정상 수치로 표시.
+- 별도 이슈: PDF 추출에서 `entry_price_native`가 9.6원으로 잘못 파싱됨(원본 "9,600원"의 콤마 처리 버그). 단 KRW 경로(`entry_price_krw = 9210`)는 가격 파일에서 직접 가져오므로 통계에는 영향 없음. Python 아티팩트 파이프라인 후속 작업 필요.
+
+### 검증
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web build` (정적 페이지 413개)
+
+---
+
 ## v0.21.14-peak-metric.1 — 2026-05-19
 
 ### 변경 (지표 기준)
