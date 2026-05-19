@@ -228,6 +228,12 @@ class SmicMttStrategyConfig(_PersonaBase):
     min_relative_strength_percentile: Annotated[float, Field(ge=0.0, le=1.0)] = 0.0
     min_momentum_return: Annotated[float, Field(ge=-1.0, le=10.0)] = -1.0
 
+    # Relative-strength overlay: rank candidates by trailing performance within
+    # the available report universe. Defaults keep legacy behavior permissive.
+    relative_strength_lookback_days: Annotated[int, Field(ge=20, le=504)] = 126
+    min_relative_strength_percentile: Annotated[float, Field(ge=0.0, le=1.0)] = 0.0
+    min_momentum_return: Annotated[float, Field(ge=-1.0, le=10.0)] = -1.0
+
     # Real account controls.
     max_positions: Annotated[int, Field(ge=1, le=200)] = 10
     universe: Literal["all", "domestic", "overseas"] = "overseas"
