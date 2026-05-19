@@ -20,6 +20,21 @@
 
 ---
 
+## v0.21.22-pagination-center.1 — 2026-05-19
+
+### 변경 (페이지네이션 중앙 정렬)
+- `.pagination-bar`를 flex+`justify-content: flex-end`에서 `grid-template-columns: 1fr auto 1fr`로 교체. 좌·중·우 3슬롯 grid로 페이지네이션을 항상 중앙에 고정.
+- `PaginationControls` JSX 순서를 행수 표시 → BlockPagination → 페이지당 selector로 재정렬해 grid 중앙 슬롯이 페이지네이션과 일치하도록.
+- 영향 받은 페이지: `/portfolio`의 PortfolioTables · TradesTable · PortfolioHistory.
+
+### 문서
+- `docs/portfolio-restructure-plan.md` 추가. portfolio를 페이지 내 탭에서 `/portfolio/[strategy]/{holdings,equity,trades,methodology}` 하위 라우트 객체로 재구성하는 제안 (실행 대기).
+
+### 검증
+- `pnpm --dir apps/web build` (정적 페이지 413개)
+
+---
+
 ## v0.21.21-screener-patterns-batch-2.1 — 2026-05-19
 
 ### 적용 (전역 테이블 sticky header)

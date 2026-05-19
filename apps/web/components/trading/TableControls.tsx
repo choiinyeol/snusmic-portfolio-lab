@@ -58,10 +58,11 @@ export function PaginationControls({
   const safePage = Math.min(Math.max(0, page), lastPage);
   return (
     <nav className="pagination-bar" aria-label="페이지 이동">
-      <span>
+      <span className="justify-self-start text-xs">
         총 {totalRows.toLocaleString('ko-KR')}행 · {pageCount ? safePage + 1 : 0}/{Math.max(1, pageCount)}쪽
       </span>
-      <label className="page-size-label">
+      <BlockPagination page={safePage} pageCount={Math.max(1, pageCount)} onPageChange={onPageChange} />
+      <label className="page-size-label justify-self-end">
         <span>페이지당</span>
         <select value={pageSize} onChange={(event) => onPageSizeChange(Number(event.target.value))}>
           {pageSizeOptions.map((size) => (
@@ -71,7 +72,6 @@ export function PaginationControls({
           ))}
         </select>
       </label>
-      <BlockPagination page={safePage} pageCount={Math.max(1, pageCount)} onPageChange={onPageChange} />
     </nav>
   );
 }
