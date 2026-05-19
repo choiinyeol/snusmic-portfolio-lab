@@ -26,13 +26,15 @@ export default function ReportsPage() {
       <PageHero
         eyebrow="리포트 검증"
         title="리포트 검증"
-        subtitle="발간 이후 가격 경로, 목표가 진행률, 제외 사유를 같은 기준으로 검증합니다."
         badges={[
           { label: '리포트', value: `${stats.total}건` },
           { label: '최신 발간', value: formatDateKo(stats.latestPublicationDate) },
           { label: '활성 후보', value: `${candidates.length}개` },
           { label: '중앙 도달일', value: formatDays(stats.medianDaysToTarget) },
-          { label: '제외', value: `${excludedReports}건` },
+          {
+            label: '제외',
+            value: `${excludedReports}건${excludedShare === null ? '' : ` (${formatPercent(excludedShare)})`}`,
+          },
         ]}
         actions={
           <>
@@ -46,11 +48,7 @@ export default function ReportsPage() {
         }
       />
 
-      <Section
-        eyebrow="검증 표"
-        title="리포트 통합 테이블"
-        caption={`전체 ${extractedReports.toLocaleString('ko-KR')}건 중 ${visibleReports.toLocaleString('ko-KR')}건을 같은 기준으로 비교합니다. 제외 표본 ${excludedReports.toLocaleString('ko-KR')}건${excludedShare === null ? '' : `(${formatPercent(excludedShare)})`}의 세부 사유와 목표가 검증 공식은 별도 페이지에서 설명합니다.`}
-      >
+      <Section eyebrow="검증 표" title="리포트 통합 테이블">
         <ReportsTable reports={reports} />
       </Section>
     </>

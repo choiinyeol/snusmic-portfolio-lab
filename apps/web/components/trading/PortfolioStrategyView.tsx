@@ -111,10 +111,6 @@ export function PortfolioStrategyView({
             요청한 전략 <code>{invalidStrategyId}</code>는 현재 산출물에 없습니다. 현재 기본 전략 기준으로 표시합니다.
           </div>
         ) : null}
-        <p className="m-0 mt-2 text-xs text-slate-950/55">
-          <strong className="text-slate-950">{personaLabels[persona] ?? persona}</strong>의 보유·현금·체결·매수/매도
-          규칙을 함께 봅니다. 기준선과 상한선은 비교용이고, 고유 전략만 선택해 검토할 수 있는 포트폴리오 전략입니다.
-        </p>
       </div>
 
       <div className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-6">
@@ -162,11 +158,6 @@ export function PortfolioStrategyView({
           <span className="snapshot-pill">면적=평가액</span>
         </div>
         <HoldingsTreemap holdings={treemapHoldings} height={360} compact hrefBySymbol={reportHrefBySymbol} />
-        <p className="mt-3 text-xs leading-5 text-slate-950/55">
-          매도 후 즉시 다른 종목을 사지 않는 경우는 전략의 리밸런싱/입금 주기, 최대 보유 종목 수, 추세
-          필터·업사이드·가격 조건을 동시에 만족하는 후보 부족 때문입니다. 그 구간의 미투자 금액은 현금으로 보존되어
-          평가액과 트리맵에 포함됩니다.
-        </p>
       </article>
 
       <StrategyMethodPanel method={methodsByPersona[persona]} personaLabel={personaLabels[persona] ?? persona} />
@@ -248,25 +239,16 @@ function StrategyMethodPanel({
 
 function AccountingExplanationPanel({ row }: { row: AccountingReconciliationRow | undefined }) {
   if (!row) return null;
-  const realizedOverCash = (row.realizedPnlKrw ?? 0) > (row.finalCashKrw ?? 0);
   return (
     <article className="lab-panel p-4">
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_28rem] xl:items-start">
         <div>
           <div className="lab-panel__eyebrow">현금 검산</div>
-          <h2 className="lab-panel__title">확정 손익과 현금은 같은 숫자가 아닙니다</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-500">
-            {row.explanationKo} 이 검산은 저장된 매매내역과 현재 보유 포지션을 이용해 만든 파생 데이터입니다. 현금은
-            “입금액 + 실현손익 − 아직 들고 있는 주식의 매입 원가”로 다시 계산하며, 평가액은 현금과 보유 주식의 현재
-            가치가 합쳐진 값입니다.
+          <h2 className="lab-panel__title">확정 손익과 현금</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-500">{row.explanationKo}</p>
+          <p className="mt-2 font-mono text-xs leading-5 text-slate-500">
+            계산 현금 = 입금 누계 + 확정 손익 − 보유 원가
           </p>
-          {realizedOverCash ? (
-            <p className="mt-2 text-sm leading-6 text-slate-500">
-              따라서 일부 리포트 추세 전략처럼 확정 손익이 약 {formatKrw(row.realizedPnlKrw)}인데 현금이{' '}
-              {formatKrw(row.finalCashKrw)}로 보이는 상황은, 약 {formatKrw(row.openCostBasisKrw)}가 현재 보유 종목의
-              원가로 묶여 있으면 회계적으로 자연스럽습니다.
-            </p>
-          ) : null}
         </div>
         <dl className="grid gap-2 rounded-xl border border-slate-200 bg-white p-3 text-sm">
           <AccountingLine label="입금 누계" value={row.totalContributedKrw} />

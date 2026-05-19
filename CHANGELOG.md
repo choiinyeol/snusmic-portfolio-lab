@@ -20,6 +20,21 @@
 
 ---
 
+## v0.21.6-prose-trim.1 — 2026-05-19
+
+### 변경
+- `PortfolioStrategyView`에서 전략 셀렉터 아래의 boilerplate caption("…보유·현금·체결·매수/매도 규칙을 함께 봅니다") 한 줄과, 트리맵 아래에 있던 6줄짜리 "매도 후 즉시 다른 종목을 사지 않는 경우…" caveat 단락을 제거. 같은 패널의 `AccountingExplanationPanel` 산문도 단일 산문 + 짧은 공식 한 줄(`계산 현금 = 입금 누계 + 확정 손익 − 보유 원가`)로 압축하고, 자동 생성되던 보조 단락("따라서 일부 리포트 추세 전략처럼…")을 삭제.
+- `/strategies`의 4개 Section caption 산문을 제거(eyebrow + title + 표만 남김).
+- `/reports`의 `PageHero` subtitle과 Section caption을 제거하고 제외 표본 정보는 그대로 배지에 합쳤다(`제외 N건 (X%)`).
+
+### 변경 (구조)
+- `lib/report-statistics.ts`를 새로 만들고 `isNumber`·`mean`·`quantileFromSorted`·`formatMultiple`를 `ReportStatisticsStory.tsx`(1063줄)에서 분리. 동일 코드를 클라이언트 컴포넌트 안에 묶어두지 않고 server·non-client 호출자도 재사용 가능하도록 모듈화. 향후 `/reports/statistics`의 데이터 prep을 본격적으로 server-side로 옮길 때 시작점이 된다.
+
+### 검증
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web build` (정적 페이지 413개)
+
 ## v0.21.5-polish-batch.1 — 2026-05-19
 
 ### 수정

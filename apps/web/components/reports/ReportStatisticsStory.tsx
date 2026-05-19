@@ -5,6 +5,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import type { ReportStatisticsLabSummary } from '@/lib/artifacts';
 import { formatDays, formatPercent } from '@/lib/format';
+import { formatMultiple, isNumber, mean, quantileFromSorted } from '@/lib/report-statistics';
 
 const HORIZONS = [30, 60, 120, 250] as const;
 const THRESHOLDS = [0.6, 0.8, 1.0] as const;
@@ -491,11 +492,6 @@ function formatHitDays(days: number | null | undefined): string {
   if (days === null || days === undefined) return '';
   if (days === 0) return ' · 발간일 고가 기준';
   return ` · ${days.toLocaleString('ko-KR')}거래일`;
-}
-
-function formatMultiple(value: number | null | undefined): string {
-  if (value === null || value === undefined || !Number.isFinite(value)) return '—';
-  return `${value.toLocaleString('ko-KR', { maximumFractionDigits: 1 })}x`;
 }
 
 function buildPathBuckets(rows: RiskScatterRow[]): PathBucket[] {
@@ -1039,25 +1035,7 @@ function xScale(value: number, min: number, max: number): number {
   return Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
 }
 
-function isNumber(value: unknown): value is number {
-  return typeof value === 'number' && Number.isFinite(value);
-}
-
 function formatNumber(value: number | null | undefined): string {
   if (value === null || value === undefined || !Number.isFinite(value)) return '—';
   return value.toLocaleString('ko-KR', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
-}
-
-function mean(values: number[]): number | null {
-  if (!values.length) return null;
-  return values.reduce((sum, value) => sum + value, 0) / values.length;
-}
-
-function quantileFromSorted(sorted: number[], q: number): number | null {
-  if (!sorted.length) return null;
-  const pos = (sorted.length - 1) * q;
-  const base = Math.floor(pos);
-  const rest = pos - base;
-  const next = sorted[base + 1];
-  return next === undefined ? sorted[base] : sorted[base] + rest * (next - sorted[base]);
 }
