@@ -10,6 +10,7 @@ price stop, and stale-report stop.
 
 from __future__ import annotations
 
+from bisect import bisect_right
 from dataclasses import dataclass
 from datetime import date
 from math import isfinite
@@ -184,11 +185,6 @@ def _candidate_from_report(
         return None
     if relative_strength_percentile < config.min_relative_strength_percentile:
         return None
-    momentum_return, relative_strength_percentile = _relative_strength(board, day, symbol, config)
-    if momentum_return < config.min_momentum_return:
-        return None
-    if relative_strength_percentile < config.min_relative_strength_percentile:
-        return None
     return ActiveCandidate(
         report_id=str(record["report_id"]),
         symbol=symbol,
@@ -239,6 +235,8 @@ def _passes_trend_filter(
         return _passes_supertrend(board, day, symbol, config)
     if config.trend_filter == "atr_breakout":
         return _passes_atr_breakout(board, day, symbol, config)
+    if config.trend_filter == "ma_crossover":
+        return _passes_ma_crossover(board, day, symbol, config)
     raise ValueError(f"unknown SMIC MTT trend filter: {config.trend_filter}")
 
 
@@ -303,16 +301,20 @@ def _passes_supertrend(
             continue
         previous_upper = final_upper.iloc[idx - 1]
         previous_lower = final_lower.iloc[idx - 1]
-        if pd.isna(previous_upper):
-            final_upper.iloc[idx] = basic_upper.iloc[idx]
-        elif basic_upper.iloc[idx] < previous_upper or close.iloc[idx - 1] > previous_upper:
+        if (
+            pd.isna(previous_upper)
+            or basic_upper.iloc[idx] < previous_upper
+            or close.iloc[idx - 1] > previous_upper
+        ):
             final_upper.iloc[idx] = basic_upper.iloc[idx]
         else:
             final_upper.iloc[idx] = previous_upper
 
-        if pd.isna(previous_lower):
-            final_lower.iloc[idx] = basic_lower.iloc[idx]
-        elif basic_lower.iloc[idx] > previous_lower or close.iloc[idx - 1] < previous_lower:
+        if (
+            pd.isna(previous_lower)
+            or basic_lower.iloc[idx] > previous_lower
+            or close.iloc[idx - 1] < previous_lower
+        ):
             final_lower.iloc[idx] = basic_lower.iloc[idx]
         else:
             final_lower.iloc[idx] = previous_lower
@@ -348,6 +350,69 @@ def _passes_atr_breakout(
     return float(close.iloc[-1]) >= breakout_level
 
 
+def _relative_strength(
+    board: PriceBoard,
+    day: date,
+    symbol: str,
+    config: SmicMttStrategyConfig,
+) -> tuple[float, float]:
+    close = board.close
+    if close.empty or symbol not in close.columns:
+        return -1.0, 0.0
+    asof = close.index <= pd.Timestamp(day)
+    if not asof.any():
+        return -1.0, 0.0
+    snapshot = close.loc[: pd.Timestamp(day)].dropna(how="all")
+    if snapshot.empty:
+        return -1.0, 0.0
+
+    lookback = config.relative_strength_lookback_days
+    if lookback <= 0:
+        return -1.0, 0.0
+    symbol_returns: dict[str, float] = {}
+    for symbol_candidate in snapshot.columns:
+        series = snapshot[symbol_candidate].dropna()
+        if len(series) < lookback + 1:
+            continue
+        start = series.iloc[-(lookback + 1)]
+        end = series.iloc[-1]
+        if start <= 0 or end <= 0 or not isfinite(start) or not isfinite(end):
+            continue
+        symbol_returns[symbol_candidate] = float(end / start - 1.0)
+
+    target_return = symbol_returns.get(symbol)
+    if target_return is None:
+        return -1.0, 0.0
+    if not symbol_returns:
+        return target_return, 0.0
+    ordered = sorted(symbol_returns.values())
+    if len(ordered) == 1:
+        return target_return, 1.0
+    rank = bisect_right(ordered, target_return)
+    return target_return, (rank - 1) / (len(ordered) - 1)
+
+
+def _passes_ma_crossover(
+    board: PriceBoard,
+    day: date,
+    symbol: str,
+    config: SmicMttStrategyConfig,
+) -> bool:
+    ohlc = _ohlc_history(board, day, symbol, min_rows=max(config.fast_ma_window, config.slow_ma_window) + 1)
+    if ohlc is None:
+        return False
+    _, _, close = ohlc
+    if len(close) < max(config.fast_ma_window, config.slow_ma_window) + 1:
+        return False
+    fast_ma = close.rolling(config.fast_ma_window, min_periods=config.fast_ma_window).mean()
+    slow_ma = close.rolling(config.slow_ma_window, min_periods=config.slow_ma_window).mean()
+    if pd.isna(fast_ma.iloc[-1]) or pd.isna(slow_ma.iloc[-1]):
+        return False
+    if not fast_ma.iloc[-1] > slow_ma.iloc[-1]:
+        return False
+    return not pd.isna(fast_ma.iloc[-2]) and fast_ma.iloc[-2] <= slow_ma.iloc[-2]
+
+
 def _ohlc_history(
     board: PriceBoard,
     day: date,
@@ -364,16 +429,8 @@ def _ohlc_history(
     index = close.index
     high_frame = board.high if board.high is not None else board.close
     low_frame = board.low if board.low is not None else board.close
-    high = (
-        high_frame[symbol].reindex(index).fillna(close)
-        if symbol in high_frame.columns
-        else close.copy()
-    )
-    low = (
-        low_frame[symbol].reindex(index).fillna(close)
-        if symbol in low_frame.columns
-        else close.copy()
-    )
+    high = high_frame[symbol].reindex(index).fillna(close) if symbol in high_frame.columns else close.copy()
+    low = low_frame[symbol].reindex(index).fillna(close) if symbol in low_frame.columns else close.copy()
     return high.astype(float), low.astype(float), close.astype(float)
 
 

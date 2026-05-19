@@ -213,7 +213,9 @@ class SmicMttStrategyConfig(_PersonaBase):
 
     # Minervini-style trend template, implemented only with local OHLC history.
     require_mtt: bool = True
-    trend_filter: Literal["mtt", "supertrend", "atr_breakout"] = "mtt"
+    trend_filter: Literal["mtt", "supertrend", "atr_breakout", "ma_crossover"] = "mtt"
+    fast_ma_window: Annotated[int, Field(ge=5, le=120)] = 50
+    slow_ma_window: Annotated[int, Field(ge=10, le=300)] = 200
     min_price_vs_52w_low: Annotated[float, Field(ge=0.0, le=10.0)] = 0.30
     max_pct_below_52w_high: Annotated[float, Field(ge=0.0, le=1.0)] = 0.25
     min_ma200_1m_return: Annotated[float, Field(ge=-1.0, le=1.0)] = 0.0
@@ -221,12 +223,6 @@ class SmicMttStrategyConfig(_PersonaBase):
     supertrend_multiplier: Annotated[float, Field(gt=0.0, le=10.0)] = 3.0
     breakout_lookback_days: Annotated[int, Field(ge=5, le=252)] = 20
     breakout_atr_multiple: Annotated[float, Field(ge=0.0, le=5.0)] = 0.0
-
-    # Relative-strength overlay: rank candidates by trailing performance within
-    # the available report universe. Defaults keep legacy behavior permissive.
-    relative_strength_lookback_days: Annotated[int, Field(ge=20, le=504)] = 126
-    min_relative_strength_percentile: Annotated[float, Field(ge=0.0, le=1.0)] = 0.0
-    min_momentum_return: Annotated[float, Field(ge=-1.0, le=10.0)] = -1.0
 
     # Relative-strength overlay: rank candidates by trailing performance within
     # the available report universe. Defaults keep legacy behavior permissive.
@@ -251,6 +247,14 @@ class SmicMttStrategyConfig(_PersonaBase):
             raise ValueError(
                 "max_target_upside_at_pub must exceed min_target_upside_at_pub; "
                 f"got {self.max_target_upside_at_pub} <= {self.min_target_upside_at_pub}"
+            )
+        return self
+
+    @model_validator(mode="after")
+    def _check_ma_crossover_windows(self) -> SmicMttStrategyConfig:
+        if self.trend_filter == "ma_crossover" and self.fast_ma_window >= self.slow_ma_window:
+            raise ValueError(
+                "fast_ma_window must be strictly smaller than slow_ma_window for MA crossover trend filter"
             )
         return self
 
@@ -532,6 +536,8 @@ class PersonaSummary(_FrozenModel):
     cagr: float | None
     max_drawdown: float
     realized_pnl_krw: float
+    sharpe: float | None = None
+    sortino: float | None = None
     trade_count: int
     open_positions: int
 

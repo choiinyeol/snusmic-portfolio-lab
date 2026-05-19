@@ -1393,6 +1393,8 @@ def _build_strategy_catalog(summary: pd.DataFrame, sim_config_path: Path) -> lis
                     "final_cash_krw": _number(row.get("final_cash_krw")),
                     "final_holdings_value_krw": _number(row.get("final_holdings_value_krw")),
                     "money_weighted_return": return_pct,
+                    "sharpe": _number(row.get("sharpe")),
+                    "sortino": _number(row.get("sortino")),
                     "cagr": _number(row.get("cagr")),
                     "max_drawdown": max_drawdown,
                     "trade_count": _number(row.get("trade_count")),
@@ -1488,6 +1490,9 @@ def _admission_trial_row(row: dict[str, Any]) -> dict[str, Any]:
         "max_target_upside_at_pub",
         "target_hit_multiplier",
         "require_mtt",
+        "trend_filter",
+        "fast_ma_window",
+        "slow_ma_window",
         "max_positions",
         "universe",
         "top_up_cadence",
@@ -1593,6 +1598,11 @@ def _methodology_summary(strategy_id: str, config: dict[str, Any]) -> str:
             "미래 가격 정보를 일부 사용하는 강한 상한선 기준입니다. 투자 가능한 전략으로 해석하지 않습니다."
         )
     if strategy_id.startswith("smic_mtt_strategy"):
+        if config.get("trend_filter") == "ma_crossover":
+            return (
+                "리포트 업사이드와 단기/장기 이동평균 골든크로스 조건을 통과한 종목만 실제 주식 수량 단위로 "
+                "매수·보유·매도하는 포트폴리오 전략입니다."
+            )
         return "리포트 업사이드와 가격 추세 조건을 통과한 종목만 실제 주식 수량 단위로 매수·보유·매도하는 포트폴리오 전략입니다. MTT는 전략명 자체가 아니라 내부 추세 필터 중 하나입니다."
     return "시뮬레이션에 포함된 전략입니다."
 
@@ -1608,13 +1618,20 @@ def _buy_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
             f"투자 유니버스: {config.get('universe', 'all')}",
         ]
         if config.get("require_mtt"):
-            rules.extend(
-                [
-                    f"52주 저점 대비 {_pct(config.get('min_price_vs_52w_low'))} 이상",
-                    f"52주 고점 대비 {_pct(config.get('max_pct_below_52w_high'))} 이내",
-                    f"200일선 1개월 변화율 {_pct(config.get('min_ma200_1m_return'))} 이상",
-                ]
-            )
+            trend_filter = config.get("trend_filter")
+            if trend_filter == "ma_crossover":
+                rules.append(
+                    f"MA 전환 추세 {int(config.get('fast_ma_window') or 0)}일 > "
+                    f"{int(config.get('slow_ma_window') or 0)}일"
+                )
+            else:
+                rules.extend(
+                    [
+                        f"52주 저점 대비 {_pct(config.get('min_price_vs_52w_low'))} 이상",
+                        f"52주 고점 대비 {_pct(config.get('max_pct_below_52w_high'))} 이내",
+                        f"200일선 1개월 변화율 {_pct(config.get('min_ma200_1m_return'))} 이상",
+                    ]
+                )
         if float(config.get("min_relative_strength_percentile") or 0) > 0:
             rules.append(
                 f"{int(config.get('relative_strength_lookback_days') or 0)}거래일 상대강도 "
@@ -2247,6 +2264,8 @@ def _strategy_download_rows(strategy_catalog: list[dict[str, Any]]) -> list[dict
             "final_cash_krw": (row.get("metrics") or {}).get("final_cash_krw"),
             "final_holdings_value_krw": (row.get("metrics") or {}).get("final_holdings_value_krw"),
             "money_weighted_return": (row.get("metrics") or {}).get("money_weighted_return"),
+            "sharpe": (row.get("metrics") or {}).get("sharpe"),
+            "sortino": (row.get("metrics") or {}).get("sortino"),
             "cagr": (row.get("metrics") or {}).get("cagr"),
             "max_drawdown": (row.get("metrics") or {}).get("max_drawdown"),
             "trade_count": (row.get("metrics") or {}).get("trade_count"),

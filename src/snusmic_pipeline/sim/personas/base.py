@@ -214,6 +214,71 @@ def max_drawdown(equity_points: list[EquityPoint]) -> float:
     return float(abs(drawdowns.min()))
 
 
+def _cumulative_returns(equity_points: list[EquityPoint]) -> list[float]:
+    if len(equity_points) < 2:
+        return []
+    cumulative: list[float] = []
+    for point in equity_points:
+        if point.contributed_capital_krw <= 0:
+            cumulative.append(0.0)
+        else:
+            cumulative.append(point.equity_krw / point.contributed_capital_krw - 1.0)
+    return cumulative
+
+
+def _annualized_risk_adjusted_return(
+    points: list[EquityPoint],
+    use_downside_only: bool,
+) -> float | None:
+    cumulative = _cumulative_returns(points)
+    if len(cumulative) < 3:
+        return None
+
+    returns: list[float] = []
+    for idx in range(1, len(cumulative)):
+        prev = cumulative[idx - 1]
+        nxt = cumulative[idx]
+        if not math.isfinite(prev) or not math.isfinite(nxt):
+            continue
+        if prev <= -1:
+            continue
+        period_return = (1.0 + nxt) / (1.0 + prev) - 1.0
+        if math.isfinite(period_return):
+            returns.append(period_return)
+
+    if len(returns) < 3:
+        return None
+
+    mean = sum(returns) / len(returns)
+    if mean == 0:
+        return 0.0
+    if len(returns) < 2:
+        return None
+
+    if use_downside_only:
+        selected = [value for value in returns if value < 0.0]
+        denom_source = selected
+    else:
+        denom_source = returns
+
+    if len(denom_source) < 2:
+        return None
+    avg = sum(denom_source) / len(denom_source)
+    variance = sum((value - avg) ** 2 for value in denom_source) / (len(denom_source) - 1)
+    sigma = math.sqrt(variance)
+    if sigma <= 0:
+        return None
+    return (mean / sigma) * math.sqrt(252.0)
+
+
+def sharpe_ratio(equity_points: list[EquityPoint]) -> float | None:
+    return _annualized_risk_adjusted_return(equity_points, use_downside_only=False)
+
+
+def sortino_ratio(equity_points: list[EquityPoint]) -> float | None:
+    return _annualized_risk_adjusted_return(equity_points, use_downside_only=True)
+
+
 def build_summary(
     persona: str,
     label: str,
@@ -242,6 +307,8 @@ def build_summary(
         cagr=cagr(equity_points, total_contributed),
         max_drawdown=max_drawdown(equity_points),
         realized_pnl_krw=account.realized_pnl_krw,
+        sharpe=sharpe_ratio(equity_points),
+        sortino=sortino_ratio(equity_points),
         trade_count=len(account.trades),
         open_positions=account.open_position_count(),
     )
@@ -256,6 +323,8 @@ __all__ = [
     "Trade",
     "accrue_cash_yield_since_previous",
     "build_summary",
+    "sharpe_ratio",
+    "sortino_ratio",
     "cumulative_contributions",
     "deposits_indexed_by_date",
     "record_equity_point",

@@ -16,6 +16,7 @@ from snusmic_pipeline.sim.contracts import (
     SavingsPlan,
     SimulationConfig,
     SmicFollowerConfig,
+    SmicMttStrategyConfig,
     Trade,
 )
 
@@ -136,3 +137,12 @@ def test_equity_point_serializes_to_json():
 def test_simulation_config_extras_forbidden():
     with pytest.raises(ValidationError):
         SimulationConfig.model_validate({"start_date": "2021-01-04", "end_date": "2026-04-01", "unknown": 1})
+
+
+def test_smic_mtt_rejects_invalid_ma_window_order():
+    with pytest.raises(ValidationError):
+        SmicMttStrategyConfig(
+            trend_filter="ma_crossover",
+            fast_ma_window=60,
+            slow_ma_window=20,
+        )

@@ -39,6 +39,8 @@ def find_top_broker_strategy_configs(
     top_n: int = 5,
     seed: int = 42,
     min_excess_return: float = 0.0,
+    min_sharpe: float | None = None,
+    min_sortino: float | None = None,
 ) -> BrokerStrategySearchResult:
     """Select Optuna train winners, then admit up to ``top_n`` full-period winners.
 
@@ -114,6 +116,8 @@ def find_top_broker_strategy_configs(
                 "train_score": score,
                 "train_money_weighted_return": summary.money_weighted_return,
                 "train_max_drawdown": summary.max_drawdown,
+                "train_sharpe": summary.sharpe,
+                "train_sortino": summary.sortino,
                 "train_trade_count": summary.trade_count,
                 "train_open_positions": summary.open_positions,
             }
@@ -149,6 +153,12 @@ def find_top_broker_strategy_configs(
         summary = output.summary
         excess = summary.money_weighted_return - benchmark_money_weighted_return
         beats_benchmark = excess > min_excess_return
+        meets_risk_gate = _meets_risk_gate(
+            sharpe=summary.sharpe,
+            sortino=summary.sortino,
+            min_sharpe=min_sharpe,
+            min_sortino=min_sortino,
+        )
         behavior_key = (
             round(summary.money_weighted_return, 6),
             round(summary.net_profit_krw, 2),
@@ -157,13 +167,14 @@ def find_top_broker_strategy_configs(
             summary.open_positions,
         )
         duplicate_behavior = behavior_key in seen_behavior_keys
-        accepted = beats_benchmark and not duplicate_behavior
+        accepted = beats_benchmark and meets_risk_gate and not duplicate_behavior
         row = {
             "trial_number": trial.number,
             "train_rank": train_rank,
             "accepted": accepted,
             "admission_status": _admission_status(
                 beats_benchmark=beats_benchmark,
+                meets_risk_gate=meets_risk_gate,
                 duplicate_behavior=duplicate_behavior,
             ),
             "excess_return_vs_best_benchmark": excess,
@@ -171,6 +182,8 @@ def find_top_broker_strategy_configs(
             "full_money_weighted_return": summary.money_weighted_return,
             "full_net_profit_krw": summary.net_profit_krw,
             "full_final_equity_krw": summary.final_equity_krw,
+            "full_sharpe": summary.sharpe,
+            "full_sortino": summary.sortino,
             "full_max_drawdown": summary.max_drawdown,
             "full_trade_count": summary.trade_count,
             "full_open_positions": summary.open_positions,
@@ -217,12 +230,33 @@ def _strategy_display_label(config: SmicMttStrategyConfig, rank: int) -> str:
     return f"{universe} Report {signal} {concentration} #{rank}"
 
 
-def _admission_status(*, beats_benchmark: bool, duplicate_behavior: bool) -> str:
+def _admission_status(
+    *,
+    beats_benchmark: bool,
+    duplicate_behavior: bool,
+    meets_risk_gate: bool,
+) -> str:
     if not beats_benchmark:
         return "below_benchmark"
+    if not meets_risk_gate:
+        return "below_risk_gate"
     if duplicate_behavior:
         return "duplicate_behavior"
     return "accepted"
+
+
+def _meets_risk_gate(
+    *,
+    sharpe: float | None,
+    sortino: float | None,
+    min_sharpe: float | None,
+    min_sortino: float | None,
+) -> bool:
+    if min_sharpe is None and min_sortino is None:
+        return True
+    has_sharpe = sharpe is not None and sharpe >= min_sharpe if min_sharpe is not None else False
+    has_sortino = sortino is not None and sortino >= min_sortino if min_sortino is not None else False
+    return has_sharpe or has_sortino
 
 
 def _score_summary(
@@ -248,16 +282,29 @@ def _sample_config(trial: optuna.Trial) -> SmicMttStrategyConfig:
     require_mtt = trial.suggest_categorical("require_mtt", [False, True])
     trend_filter = cast(
         Any,
-        trial.suggest_categorical("trend_filter", ["mtt", "supertrend", "atr_breakout"])
+        trial.suggest_categorical("trend_filter", ["mtt", "supertrend", "atr_breakout", "ma_crossover"])
         if require_mtt
         else "mtt",
     )
+    if trend_filter == "ma_crossover":
+        fast_ma_window = trial.suggest_int("fast_ma_window", 8, 30, step=2)
+        slow_ma_window = trial.suggest_int(
+            "slow_ma_window",
+            40,
+            120,
+            step=10,
+        )
+    else:
+        fast_ma_window = 8
+        slow_ma_window = 40
     return SmicMttStrategyConfig(
         min_target_upside_at_pub=min_upside,
         max_target_upside_at_pub=max_upside,
         target_hit_multiplier=trial.suggest_float("target_hit_multiplier", 0.8, 1.1, step=0.05),
         require_mtt=require_mtt,
         trend_filter=trend_filter,
+        fast_ma_window=fast_ma_window,
+        slow_ma_window=slow_ma_window,
         min_price_vs_52w_low=trial.suggest_float("min_price_vs_52w_low", 0.0, 1.0, step=0.10),
         max_pct_below_52w_high=trial.suggest_float("max_pct_below_52w_high", 0.10, 1.0, step=0.05),
         min_ma200_1m_return=trial.suggest_float("min_ma200_1m_return", -0.05, 0.05, step=0.01),
@@ -283,6 +330,8 @@ def _signal_label(config: SmicMttStrategyConfig) -> str:
         return "Supertrend"
     if config.trend_filter == "atr_breakout":
         return "Breakout"
+    if config.trend_filter == "ma_crossover":
+        return f"MA Crossover ({config.fast_ma_window}/{config.slow_ma_window})"
     return "Trend"
 
 
