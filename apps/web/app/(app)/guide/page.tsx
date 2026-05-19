@@ -36,7 +36,7 @@ export default function GuidePage() {
       state: '추가 검정 필요',
       title: '발간 후 지연 진입 효과',
       metric: `도달 중앙 ${formatDays(reportStats.medianDaysToTarget)}`,
-      href: '/reports/statistics',
+      href: '/statistics',
     },
     {
       state: '검토 대기열',

@@ -5,7 +5,16 @@ import { useState } from 'react';
 import Link from 'next/link';
 import type { ReportStatisticsLabSummary } from '@/lib/artifacts';
 import { formatDays, formatPercent } from '@/lib/format';
-import { formatMultiple, isNumber, mean, quantileFromSorted } from '@/lib/report-statistics';
+import {
+  excessKurtosis,
+  formatMultiple,
+  isNumber,
+  mean,
+  quantileFromSorted,
+  sampleSkewness,
+  trimmedMean,
+  wilsonCI,
+} from '@/lib/report-statistics';
 
 const HORIZONS = [30, 60, 120, 250] as const;
 const THRESHOLDS = [0.6, 0.8, 1.0] as const;
@@ -41,6 +50,14 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
   const pathBuckets = buildPathBuckets(summary.riskScatter);
   const exampleMetaById = buildExampleMetaById(summary.topExamples);
 
+  // Quant-grade tail diagnostics surfaced because mean/median divergence alone
+  // is too cheap a signal of fat tails for an analyst-validation page.
+  const trimmedMean10 = trimmedMean(currentReturns, 0.1);
+  const skewness = sampleSkewness(currentReturns);
+  const excessKurt = excessKurtosis(currentReturns);
+  const uniqueSymbolCount = new Set(summary.riskScatter.map((row) => row.symbol).filter(Boolean)).size;
+  const vintageCohorts = buildVintageCohorts(summary.riskScatter);
+
   return (
     <div className="grid gap-14">
       <section className="grid gap-6 border-b border-slate-200 pb-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-end">
@@ -60,10 +77,17 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
         <DistributionSignature
           mean={meanReturn}
           median={medianReturn}
+          trimmed={trimmedMean10}
+          skewness={skewness}
+          kurtosis={excessKurt}
+          sampleSize={eligiblePathCount}
+          uniqueSymbols={uniqueSymbolCount}
           deepLosers={deepLosers}
           bigWinners={bigWinners}
         />
       </section>
+
+      <LimitationsPanel sampleSize={eligiblePathCount} uniqueSymbols={uniqueSymbolCount} />
 
       <StorySection
         kicker="01 · 전체 표본 지도"
@@ -76,6 +100,7 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
           <strong>{formatPercent(returnQuantiles.p90)}</strong> 이상입니다. 이 정도 꼬리에서는 “평균 수익률”보다
           “중앙값·사분위·극단 손실을 통과하는 규칙”을 먼저 봐야 합니다.
         </InsightLine>
+        <VintageCohortTable cohorts={vintageCohorts} />
       </StorySection>
 
       <StorySection
@@ -189,16 +214,27 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
 function DistributionSignature({
   mean,
   median,
+  trimmed,
+  skewness,
+  kurtosis,
+  sampleSize,
+  uniqueSymbols,
   deepLosers,
   bigWinners,
 }: {
   mean: number | null;
   median: number | null;
+  trimmed: number | null;
+  skewness: number | null;
+  kurtosis: number | null;
+  sampleSize: number;
+  uniqueSymbols: number;
   deepLosers: number;
   bigWinners: number;
 }) {
   const medianX = xScale(median ?? 0, -0.8, 1.2);
   const meanX = xScale(mean ?? 0, -0.8, 1.2);
+  const trimmedX = xScale(trimmed ?? 0, -0.8, 1.2);
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5">
       <div className="flex items-center justify-between text-xs text-slate-500">
@@ -207,6 +243,7 @@ function DistributionSignature({
       </div>
       <div className="relative mt-5 h-24 rounded-xl bg-gradient-to-r from-rose-100 via-slate-100 to-blue-100">
         <Marker x={medianX} label="중앙값" value={formatPercent(median)} tone="slate" />
+        <Marker x={trimmedX} label="10% 절단 평균" value={formatPercent(trimmed)} tone="amber" />
         <Marker x={meanX} label="평균" value={formatPercent(mean)} tone="blue" />
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
@@ -219,14 +256,56 @@ function DistributionSignature({
           <div className="text-slate-500">+20% 이상</div>
         </div>
       </div>
+      <dl className="mt-4 grid grid-cols-2 gap-x-3 gap-y-1 border-t border-slate-100 pt-3 text-xs">
+        <div className="flex items-center justify-between">
+          <dt className="text-slate-500">왜도(skew)</dt>
+          <dd className="font-mono font-semibold tabular-nums text-slate-950">{formatStat(skewness)}</dd>
+        </div>
+        <div className="flex items-center justify-between">
+          <dt className="text-slate-500">초과 첨도</dt>
+          <dd className="font-mono font-semibold tabular-nums text-slate-950">{formatStat(kurtosis)}</dd>
+        </div>
+        <div className="flex items-center justify-between">
+          <dt className="text-slate-500">표본</dt>
+          <dd className="font-mono font-semibold tabular-nums text-slate-950">
+            {sampleSize.toLocaleString('ko-KR')}건
+          </dd>
+        </div>
+        <div className="flex items-center justify-between">
+          <dt className="text-slate-500">유효 티커</dt>
+          <dd className="font-mono font-semibold tabular-nums text-slate-950">
+            {uniqueSymbols.toLocaleString('ko-KR')}개
+          </dd>
+        </div>
+      </dl>
+      <p className="mt-3 text-[11px] leading-5 text-slate-500">
+        평균이 중앙값과 크게 다르고 절단 평균이 더 작다면 꼬리 몇 개가 평균을 끌어올리고 있다는 신호입니다. 왜도 &gt;
+        0은 우측 꼬리, 초과 첨도 &gt; 0은 정규분포보다 두꺼운 꼬리를 뜻합니다.
+      </p>
     </div>
   );
 }
 
-function Marker({ x, label, value, tone }: { x: number; label: string; value: string; tone: 'slate' | 'blue' }) {
+function formatStat(value: number | null): string {
+  if (value === null || !Number.isFinite(value)) return '—';
+  return value.toLocaleString('ko-KR', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+}
+
+function Marker({
+  x,
+  label,
+  value,
+  tone,
+}: {
+  x: number;
+  label: string;
+  value: string;
+  tone: 'slate' | 'blue' | 'amber';
+}) {
+  const lineClass = tone === 'blue' ? 'bg-blue-600' : tone === 'amber' ? 'bg-amber-500' : 'bg-slate-950';
   return (
     <div className="absolute top-0 h-full" style={{ left: `${x}%` }}>
-      <div className={`h-full w-px ${tone === 'blue' ? 'bg-blue-600' : 'bg-slate-950'}`} />
+      <div className={`h-full w-px ${lineClass}`} />
       <div className="absolute top-2 w-28 -translate-x-1/2 rounded-md bg-white/90 px-2 py-1 text-center shadow-sm">
         <div className="text-[11px] text-slate-500">{label}</div>
         <div className="font-mono text-xs font-semibold text-slate-950">{value}</div>
@@ -620,27 +699,41 @@ function FractionalHitFigure({ rows }: { rows: ReportStatisticsLabSummary['fract
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5">
       <div className="grid gap-4 md:grid-cols-4">
-        {rows.map((row) => (
-          <div key={row.horizonDays}>
-            <div className="flex items-baseline justify-between gap-2">
-              <span className="text-sm font-semibold text-slate-950">{row.horizonDays}D</span>
-              <span className="font-mono text-sm font-semibold tabular-nums text-slate-950">
-                {formatPercent(row.hitRate)}
-              </span>
-            </div>
-            <div className="mt-2 h-28 rounded-md bg-slate-100 p-2">
-              <div className="mt-auto flex h-full items-end">
+        {rows.map((row) => {
+          const ci = wilsonCI(row.hitCount ?? 0, row.sampleSize ?? 0);
+          const point = (row.hitRate ?? ci.point) * 100;
+          return (
+            <div key={row.horizonDays}>
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-sm font-semibold text-slate-950">{row.horizonDays}D</span>
+                <span className="font-mono text-sm font-semibold tabular-nums text-slate-950">
+                  {formatPercent(row.hitRate)}
+                </span>
+              </div>
+              <div className="relative mt-2 h-28 rounded-md bg-slate-100">
+                {/* Wilson 95% CI whisker rendered as a soft band so the reader sees
+                 *  the bar's binomial uncertainty, not just the point estimate. */}
                 <div
-                  className="w-full rounded-t bg-slate-950"
-                  style={{ height: `${Math.max(2, (row.hitRate ?? 0) * 100)}%` }}
+                  aria-hidden="true"
+                  className="absolute inset-x-2 rounded bg-slate-300/70"
+                  style={{
+                    bottom: `${Math.max(0, ci.lo * 100)}%`,
+                    height: `${Math.max(0, (ci.hi - ci.lo) * 100)}%`,
+                  }}
+                />
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-x-2 h-[2px] bg-slate-950"
+                  style={{ bottom: `${Math.max(2, point)}%` }}
                 />
               </div>
+              <div className="mt-2 text-xs text-slate-500">
+                {row.hitCount}/{row.sampleSize} · 95% CI [{formatPercent(ci.lo)}, {formatPercent(ci.hi)}]
+              </div>
+              <div className="mt-0.5 text-[10px] text-slate-400">중앙 {formatDays(row.medianDaysToHit)}</div>
             </div>
-            <div className="mt-2 text-xs text-slate-500">
-              {row.hitCount}/{row.sampleSize} · 중앙 {formatDays(row.medianDaysToHit)}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -1038,4 +1131,132 @@ function xScale(value: number, min: number, max: number): number {
 function formatNumber(value: number | null | undefined): string {
   if (value === null || value === undefined || !Number.isFinite(value)) return '—';
   return value.toLocaleString('ko-KR', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+}
+
+type VintageCohort = {
+  year: string;
+  reports: number;
+  hits: number;
+  hitRate: number;
+  ciLo: number;
+  ciHi: number;
+  medianReturn: number | null;
+};
+
+function buildVintageCohorts(rows: RiskScatterRow[]): VintageCohort[] {
+  const byYear = new Map<string, { reports: number; hits: number; returns: number[] }>();
+  for (const row of rows) {
+    if (!row.publicationDate) continue;
+    const year = row.publicationDate.slice(0, 4);
+    const bucket = byYear.get(year) ?? { reports: 0, hits: 0, returns: [] };
+    bucket.reports += 1;
+    if (row.hit10) bucket.hits += 1;
+    if (isNumber(row.currentReturn)) bucket.returns.push(row.currentReturn);
+    byYear.set(year, bucket);
+  }
+  return Array.from(byYear.entries())
+    .map(([year, bucket]) => {
+      const ci = wilsonCI(bucket.hits, bucket.reports);
+      const sorted = [...bucket.returns].sort((a, b) => a - b);
+      return {
+        year,
+        reports: bucket.reports,
+        hits: bucket.hits,
+        hitRate: ci.point,
+        ciLo: ci.lo,
+        ciHi: ci.hi,
+        medianReturn: quantileFromSorted(sorted, 0.5),
+      };
+    })
+    .sort((a, b) => a.year.localeCompare(b.year));
+}
+
+/** Top-level limits panel — every quant reviewer (Stanford·MIT·Booth)
+ * agreed the page over-claims by reporting absolute returns without an
+ * index baseline, transaction costs, or survivorship accounting. This
+ * banner names those gaps in plain Korean so readers don't mistake the
+ * descriptive statistics for an alpha attribution. */
+function LimitationsPanel({ sampleSize, uniqueSymbols }: { sampleSize: number; uniqueSymbols: number }) {
+  return (
+    <section
+      aria-label="이 페이지의 측정 범위"
+      className="overflow-hidden rounded-md border border-amber-200 bg-amber-50"
+    >
+      <div className="grid gap-2 px-4 py-3 text-xs leading-5 text-amber-900 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <div>
+          <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-700">
+            이 페이지가 측정하는 것
+          </div>
+          <ul className="mt-1 list-disc pl-4">
+            <li>
+              표본 {sampleSize.toLocaleString('ko-KR')}건 · 유효 티커 {uniqueSymbols.toLocaleString('ko-KR')}개의 raw
+              가격 경로
+            </li>
+            <li>발간가 → 현재가 / 목표가 / 최고·최저 도달 비율 (절대 수익률)</li>
+            <li>경로 분류는 도달 이후 사후(retrospective) tagging — 예측 모델 아님</li>
+          </ul>
+        </div>
+        <div>
+          <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-700">
+            아직 측정하지 않는 것
+          </div>
+          <ul className="mt-1 list-disc pl-4">
+            <li>KOSPI/KOSDAQ 시점 일치 벤치마크 대비 알파</li>
+            <li>거래비용·슬리피지·시장 충격 (모든 수익률은 총수익)</li>
+            <li>상장폐지·거래정지 종목의 종료 가격 (생존편향)</li>
+            <li>발간 시점 implementable lag (당일/익일 시가)</li>
+            <li>섹터·시가총액·모멘텀 같은 팩터 보정</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function VintageCohortTable({ cohorts }: { cohorts: VintageCohort[] }) {
+  if (cohorts.length === 0) return null;
+  return (
+    <section className="overflow-hidden rounded-md border border-slate-200 bg-white" aria-label="발간연도별 코호트">
+      <header className="border-b border-slate-200 px-4 py-2">
+        <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+          발간연도 코호트
+        </div>
+        <h3 className="mt-1 text-sm font-semibold text-slate-950">시장 국면이 다른 해의 표본을 분리해서 봅니다</h3>
+      </header>
+      <table className="w-full text-sm">
+        <thead className="bg-slate-50">
+          <tr>
+            <th className="px-3 py-2 text-left text-xs font-medium text-slate-500">발간연도</th>
+            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">표본</th>
+            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">목표 도달</th>
+            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">도달률</th>
+            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">95% Wilson CI</th>
+            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">중앙 수익률</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-100">
+          {cohorts.map((cohort) => (
+            <tr key={cohort.year}>
+              <td className="px-3 py-2 font-mono text-xs text-slate-950">{cohort.year}</td>
+              <td className="px-3 py-2 text-right font-mono tabular-nums">{cohort.reports}</td>
+              <td className="px-3 py-2 text-right font-mono tabular-nums">{cohort.hits}</td>
+              <td className="px-3 py-2 text-right font-mono font-semibold tabular-nums text-slate-950">
+                {formatPercent(cohort.hitRate)}
+              </td>
+              <td className="px-3 py-2 text-right font-mono text-xs tabular-nums text-slate-500">
+                [{formatPercent(cohort.ciLo)}, {formatPercent(cohort.ciHi)}]
+              </td>
+              <td
+                className={`px-3 py-2 text-right font-mono tabular-nums ${
+                  (cohort.medianReturn ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'
+                }`}
+              >
+                {formatPercent(cohort.medianReturn)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  );
 }

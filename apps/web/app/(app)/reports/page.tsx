@@ -39,7 +39,7 @@ export default function ReportsPage() {
         actions={
           <>
             <Button asChild size="sm" variant="secondary">
-              <Link href="/reports/statistics">통계 보기</Link>
+              <Link href="/statistics">통계 보기</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
               <Link href="/reports/validation">검증 방법</Link>

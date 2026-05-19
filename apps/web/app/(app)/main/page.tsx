@@ -27,7 +27,7 @@ export default function OverviewPage() {
           </div>
           <div className="flex flex-wrap gap-2">
             <Button asChild size="sm" variant="outline">
-              <Link href="/reports/statistics">통계 보기</Link>
+              <Link href="/statistics">통계 보기</Link>
             </Button>
             <Button asChild size="sm" variant="secondary">
               <Link href="/portfolio">
@@ -125,7 +125,7 @@ export default function OverviewPage() {
                 <h2 className="mt-1 text-lg font-semibold tracking-tight text-slate-950">리포트 통계</h2>
               </div>
               <Button asChild size="sm" variant="ghost">
-                <Link href="/reports/statistics">열기</Link>
+                <Link href="/statistics">열기</Link>
               </Button>
             </div>
             <div className="mt-4 grid grid-cols-3 divide-x divide-slate-100 text-center">
@@ -191,7 +191,7 @@ export default function OverviewPage() {
             primary
           />
           <DrilldownRow href="/reports" icon={<FileText />} title="리포트" caption="목표가 검증 표" />
-          <DrilldownRow href="/reports/statistics" icon={<BarChart3 />} title="통계" caption="분포·경로·익절선" />
+          <DrilldownRow href="/statistics" icon={<BarChart3 />} title="통계" caption="분포·경로·익절선" />
           <DrilldownRow href="/strategies" icon={<DatabaseZap />} title="전략" caption="벤치마크·위험 성과" />
         </ul>
       </section>

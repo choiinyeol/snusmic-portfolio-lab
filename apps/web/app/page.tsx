@@ -15,7 +15,7 @@ const links = [
   { href: '/main', label: '메인화면', caption: '오늘 확인할 검토 대기열', icon: ShieldCheck },
   { href: '/portfolio', label: '포트폴리오', caption: '보유·현금·매매내역', icon: BarChart3 },
   { href: '/reports', label: '리포트', caption: '목표가 검증과 제외 사유', icon: FileText },
-  { href: '/reports/statistics', label: '리포트 통계', caption: '분포·경로·익절선 실험', icon: BarChart3 },
+  { href: '/statistics', label: '리포트 통계', caption: '분포·경로·익절선 실험', icon: BarChart3 },
   { href: '/strategies', label: '전략', caption: '벤치마크 대비 성과와 위험', icon: Database },
 ];
 
@@ -73,7 +73,7 @@ export default function LandingPage() {
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link href="/reports/statistics">리포트 통계</Link>
+              <Link href="/statistics">리포트 통계</Link>
             </Button>
           </div>
           <ul className="mt-10 grid gap-3 text-sm text-slate-600">

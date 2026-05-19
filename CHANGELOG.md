@@ -20,6 +20,26 @@
 
 ---
 
+## v0.21.7-statistics-rigor.1 — 2026-05-19
+
+### 변경 (경로)
+- `/reports/statistics` 경로를 `/statistics`로 이전. 사이드바·메인·`/reports`·`/guide`·홈에서 가리키던 모든 링크를 새 경로로 갱신.
+
+### 추가 (통계 엄밀성)
+- 스탠퍼드·MIT·시카고 부스 관점의 6인 quant 합의 리뷰에서 채택한 항목을 우선 반영. **KOSPI 알파/팩터 보정/거래비용은 의도적으로 추후 작업**으로 분리하고, 이번 릴리스에서는 다음과 같이 본 페이지에 한정된 통계적 엄밀성을 우선 보강한다.
+- `lib/report-statistics.ts`에 4개의 순수 헬퍼 추가: `wilsonCI`(95% Wilson 점수 신뢰구간), `trimmedMean`(대칭 10% 트림 평균), `sampleSkewness`(Fisher-Pearson 표본 왜도), `excessKurtosis`(초과 첨도). n<100 에서 정규 근사가 무너지는 점, fat-tail 분포에서 산술 평균이 소수 관측치로 왜곡되는 점을 직접 시각화하는 데 사용.
+- `FractionalHitFigure`(상승·하락 도달률 바)를 Wilson 95% CI 밴드 + 점추정 굵은 선 + `[lo, hi]` 라벨 형태로 재작성. 표본 수가 적은 멀티플(예: 10.0x 도달)에서 시각적으로 신뢰구간이 얼마나 넓은지 즉시 보이도록 했다.
+- `DistributionSignature`에 트림 평균·왜도·초과 첨도·표본 크기·유효 티커 수 마커를 추가. 왜도/첨도가 0이 아닌 fat-tail 표본에서 평균과 중앙값의 괴리를 함께 읽도록 한다.
+- `VintageCohortTable` 신설(발간연도별 표본·도달건수·도달률·95% Wilson CI·중앙 수익률). 시장 국면이 다른 해의 표본을 한 번에 평균내지 않도록 코호트 분해.
+- `LimitationsPanel` 신설: 이 페이지가 측정하지 않는 것을 상단에 명시 — KOSPI/KOSDAQ 동시점 알파 미차감, 거래비용·슬리피지·시장 충격 미반영, 상장폐지/거래정지 종목의 종료 가격 누락(생존편향), 발간 시점 implementable lag, 섹터/시가총액/모멘텀 등 팩터 보정 부재. 절대 수익률을 알파로 오독하지 않도록 한 단락에 못박는다.
+
+### 검증
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web build` (정적 페이지 413개)
+
+---
+
 ## v0.21.6-prose-trim.1 — 2026-05-19
 
 ### 변경
