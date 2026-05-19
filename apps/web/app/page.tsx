@@ -16,7 +16,7 @@ const links = [
   { href: '/portfolio', label: '포트폴리오', caption: '보유·RP·매매내역', icon: BarChart3 },
   { href: '/reports', label: '리포트', caption: '목표가 검증과 제외 사유', icon: FileText },
   { href: '/statistics', label: '리포트 통계', caption: '분포·경로·익절선 실험', icon: BarChart3 },
-  { href: '/strategies', label: '전략', caption: '벤치마크 대비 성과와 위험', icon: Database },
+  { href: '/portfolio#quant-search-board', label: '퀀트 후보', caption: 'Top N 후보와 메타 원장', icon: Database },
 ];
 
 export default function LandingPage() {
@@ -43,8 +43,8 @@ export default function LandingPage() {
           <Link className="hover:text-slate-950" href="/portfolio">
             포트폴리오
           </Link>
-          <Link className="hover:text-slate-950" href="/strategies">
-            전략
+          <Link className="hover:text-slate-950" href="/portfolio#quant-search-board">
+            퀀트 후보
           </Link>
         </nav>
         <Button asChild size="sm" variant="secondary">

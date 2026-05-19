@@ -191,7 +191,12 @@ export default function OverviewPage() {
           />
           <DrilldownRow href="/reports" icon={<FileText />} title="리포트" caption="목표가 검증 표" />
           <DrilldownRow href="/statistics" icon={<BarChart3 />} title="통계" caption="분포·경로·익절선" />
-          <DrilldownRow href="/strategies" icon={<DatabaseZap />} title="전략" caption="벤치마크·위험 성과" />
+          <DrilldownRow
+            href="/portfolio#quant-search-board"
+            icon={<DatabaseZap />}
+            title="퀀트 후보"
+            caption="Top N 후보와 메타 원장"
+          />
         </ul>
       </section>
     </div>

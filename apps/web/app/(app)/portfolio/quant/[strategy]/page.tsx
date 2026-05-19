@@ -41,12 +41,12 @@ export default async function QuantStrategyDetailPage({ params }: { params: Prom
               {detail.strategyId}
             </h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-              이 화면은 Strategies의 숫자와 Portfolio의 원장을 연결한 퀀트 후보 상세입니다. 실제 개별 종목 체결이
-              아니라, 기존 portfolio/benchmark persona를 언제 편입·제외했는지 보여주는 메타 포트폴리오 원장입니다.
+              이 화면은 Portfolio 안에서 보는 퀀트 후보 상세입니다. 실제 개별 종목 체결이 아니라, 기존
+              portfolio/benchmark persona를 언제 편입·제외했는지 보여주는 메타 포트폴리오 원장입니다.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Button asChild size="sm" variant="outline">
-                <Link href="/strategies#quant-search-board">← Top N으로 돌아가기</Link>
+                <Link href="/portfolio#quant-search-board">← Top N으로 돌아가기</Link>
               </Button>
               <Button asChild size="sm" variant="outline">
                 <Link href="/portfolio">포트폴리오 보기</Link>
@@ -213,7 +213,7 @@ function PersonaLink({ persona }: { persona: string }) {
     <Link
       className="truncate text-sm font-semibold text-slate-800 underline-offset-4 hover:text-slate-950 hover:underline"
       href={
-        persona.startsWith('benchmark_') ? '/strategies#benchmark-board' : `/portfolio/${encodeURIComponent(persona)}`
+        persona.startsWith('benchmark_') ? '/portfolio#benchmark-board' : `/portfolio/${encodeURIComponent(persona)}`
       }
       title={`${persona} 원장 보기`}
     >

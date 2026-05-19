@@ -10,6 +10,7 @@ import {
   getLatestReportTargetsBySymbol,
   getPersonaLabel,
   getPositionEpisodes,
+  getQuantStrategySearch,
   getReportSymbolById,
   getReportTargetsById,
   getSummaryRows,
@@ -31,6 +32,7 @@ export function buildPortfolioLandingModel(): PortfolioLandingModel {
   const summaries = getSummaryRows();
   const allTrades = getTrades();
   const leaderboardRows = getStrategyLeaderboard();
+  const quantSearch = getQuantStrategySearch();
   const allWeatherReturn = leaderboardRows.find((row) => row.id === ALL_WEATHER_PERSONA)?.returnPct ?? null;
   const portfolioRows = getPortfolioRows(leaderboardRows);
   const benchmarkRows = leaderboardRows.filter((row) => row.kind === 'benchmark');
@@ -77,6 +79,12 @@ export function buildPortfolioLandingModel(): PortfolioLandingModel {
     latestEquityDate: equity.reduce((latest, row) => (row.date > latest ? row.date : latest), ''),
     strategies,
     frontierRows,
+    quantSearch: {
+      candidateCount: quantSearch.candidateCount,
+      goalHitCount: quantSearch.goalHitCount,
+      excluded: quantSearch.excluded,
+      rows: quantSearch.rows,
+    },
     allWeatherReturn,
     holdings: allHoldings.filter((row) => portfolioIds.has(row.persona)),
     equity,

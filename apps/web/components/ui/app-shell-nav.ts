@@ -6,7 +6,6 @@ export const APP_NAV: SidebarNavItem[] = [
   { href: '/reports', label: '리포트', description: '표본·검증', icon: 'reports' },
   { href: '/screener', label: '후보 탐색', description: '검토 대기열', icon: 'screener' },
   { href: '/statistics', label: '리포트 통계', description: '분포·경로', icon: 'reports' },
-  { href: '/strategies', label: '전략', description: '성과·위험', icon: 'strategies' },
   { href: '/guide', label: '가이드', description: '방법론', icon: 'guide' },
 ];
 

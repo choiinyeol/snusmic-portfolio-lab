@@ -46,14 +46,12 @@ export function PortfolioPageShell({ children, model }: { children: ReactNode; m
             <h1 className="text-2xl font-semibold tracking-[-0.02em] text-slate-950 md:text-4xl">{shortLabel}</h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
               {label}의 실제 보유, RP이자, 체결, 매매 로직을 투자 보고서 형태로 보여줍니다.
-              benchmark·follower·oracle류는 `/strategies` 비교 페이지에 남기고 이 원장에는 섞지 않습니다.
+              benchmark·follower·oracle류는 선택 가능한 실제 보유 원장에는 섞지 않고, 상위 포트폴리오 화면에서 비교
+              기준선으로만 함께 보여줍니다.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Button asChild size="sm" variant="outline">
                 <Link href="/portfolio">포트폴리오 선택</Link>
-              </Button>
-              <Button asChild size="sm" variant="outline">
-                <Link href="/strategies">전략 비교</Link>
               </Button>
             </div>
           </div>

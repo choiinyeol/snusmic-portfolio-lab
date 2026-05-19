@@ -124,14 +124,14 @@ export function QuantStrategySearchTable({ rows }: { rows: QuantStrategySearchRo
               <td className="min-w-[210px] px-3 py-2">
                 <Link
                   className="group block min-w-0"
-                  href={`/strategies/${encodeURIComponent(row.strategyId)}`}
+                  href={`/portfolio/quant/${encodeURIComponent(row.strategyId)}`}
                   title={`${row.strategyId} 리밸런싱 상세 보기`}
                 >
                   <span className="block truncate font-bold text-slate-950 underline-offset-4 group-hover:underline">
                     {row.strategyId}
                   </span>
                   <span className="block text-[11px] font-medium text-slate-500">
-                    {formatDays(row.days)} · 사고판 내역 보기
+                    {formatDays(row.days)} · 포트폴리오 원장 보기
                   </span>
                 </Link>
               </td>

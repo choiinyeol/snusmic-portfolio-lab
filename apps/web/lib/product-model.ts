@@ -294,7 +294,7 @@ function strategyRowFromSummary(
     riskControls: catalog?.riskControls ?? [],
     params: catalog?.params ?? {},
     href:
-      kind === 'strategy' && (catalog?.isSelectable ?? true) ? portfolioStrategyHref(summary.persona) : '/strategies',
+      kind === 'strategy' && (catalog?.isSelectable ?? true) ? portfolioStrategyHref(summary.persona) : '/portfolio',
   };
 }
 
