@@ -1565,10 +1565,14 @@ def _strategy_short_label(strategy_id: str, label: str) -> str:
         return labels[strategy_id]
     if strategy_id.startswith("smic_mtt_strategy"):
         return label.replace(" Report ", " ").replace(" Strategy ", " ")
+    if strategy_id.startswith("smic_rsi_reversal"):
+        return "RSI Reversal"
     return label
 
 
 def _strategy_display_label(strategy_id: str, config: dict[str, Any], fallback: str) -> str:
+    if strategy_id.startswith("smic_rsi_reversal"):
+        return "RSI Reversal Strategy"
     if not strategy_id.startswith("smic_mtt_strategy"):
         return fallback
     rank = strategy_id.removeprefix("smic_mtt_strategy_top") if "_top" in strategy_id else ""
@@ -1604,6 +1608,8 @@ def _methodology_summary(strategy_id: str, config: dict[str, Any]) -> str:
                 "매수·보유·매도하는 포트폴리오 전략입니다."
             )
         return "리포트 업사이드와 가격 추세 조건을 통과한 종목만 실제 주식 수량 단위로 매수·보유·매도하는 포트폴리오 전략입니다. MTT는 전략명 자체가 아니라 내부 추세 필터 중 하나입니다."
+    if strategy_id.startswith("smic_rsi_reversal"):
+        return "유효한 상승 리포트를 가진 종목이 단기 RSI 과매도와 최근 고점 대비 하락 조건을 동시에 만족할 때 실제 주식 수량 단위로 매수하는 단기 반등 전략입니다."
     return "시뮬레이션에 포함된 전략입니다."
 
 
@@ -1640,6 +1646,17 @@ def _buy_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
         if float(config.get("min_momentum_return") or -1) > -1:
             rules.append(f"동일 기간 모멘텀 수익률 {_pct(config.get('min_momentum_return'))} 이상")
         return rules
+    if strategy_id.startswith("smic_rsi_reversal"):
+        if not config:
+            return ["세부 조건 artifact 없음", "성과·보유·매매내역만 검증 가능"]
+        return [
+            f"발간 시 목표 업사이드 {_pct(config.get('min_target_upside_at_pub'))} 이상",
+            f"목표 업사이드 {_pct(config.get('max_target_upside_at_pub'))} 이하",
+            f"{int(config.get('rsi_window') or 0)}일 RSI가 {float(config.get('max_entry_rsi') or 0):.1f} 이하",
+            f"{int(config.get('pullback_lookback_days') or 0)}일 고점 대비 {_pct(config.get('min_pullback_pct'))} 이상 하락",
+            f"신호 유효기간 {int(config.get('signal_valid_days') or 0)}일",
+            f"최대 보유 {int(config.get('max_positions') or 0)}개 슬롯",
+        ]
     if strategy_id == "smic_follower":
         return ["상승 목표가가 있는 가격 매칭 리포트를 1/N으로 편입"]
     if strategy_id == "smic_follower_v2":
@@ -1662,6 +1679,16 @@ def _sell_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
             f"손절 {_pct(config.get('stop_loss_pct'))}",
             f"익절 {_pct(config.get('take_profit_pct'))}",
             f"리포트 발간 후 {int(config.get('report_age_stop_days') or 0)}일 경과",
+            f"목표가 도달 배수 {float(config.get('target_hit_multiplier') or 1):.2f}x",
+        ]
+    if strategy_id.startswith("smic_rsi_reversal"):
+        if not config:
+            return ["세부 조건 artifact 없음", "매도 사유는 매매내역과 포지션 기록에서 확인"]
+        return [
+            f"손절 {_pct(config.get('stop_loss_pct'))}",
+            f"익절 {_pct(config.get('take_profit_pct'))}",
+            f"RSI 반등 {float(config.get('rebound_exit_rsi') or 0):.1f} 이상",
+            f"최대 보유 {int(config.get('max_holding_days') or 0)}일",
             f"목표가 도달 배수 {float(config.get('target_hit_multiplier') or 1):.2f}x",
         ]
     if strategy_id == "smic_follower_v2":
@@ -1688,6 +1715,15 @@ def _risk_controls(strategy_id: str, config: dict[str, Any]) -> list[str]:
             "수수료·세금 반영",
             "미충족 후보가 없으면 RP이자 보유",
         ]
+    if strategy_id.startswith("smic_rsi_reversal"):
+        if not config:
+            return ["정수 주식 수량 기반 체결", "수수료·세금 반영", "누락된 조건은 데이터 품질 항목으로 표시"]
+        return [
+            f"투자 유니버스: {config.get('universe', 'all')}",
+            "정수 주식 수량 기반 체결",
+            "수수료·세금 반영",
+            "단기 반등 신호가 없으면 RP이자 보유",
+        ]
     if strategy_id == "weak_oracle":
         return [
             f"개별 자산 최대 비중 {_pct(config.get('max_weight'))}",
@@ -1707,11 +1743,12 @@ def _strategy_catalog_sort_key(row: dict[str, Any]) -> tuple[int, float, str]:
         "all_weather": 0,
         "smic_follower": 1,
         "smic_follower_v2": 2,
-        "benchmark_kodex200": 3,
-        "benchmark_qqq": 4,
-        "benchmark_spy": 5,
-        "benchmark_gld": 6,
-        "weak_oracle": 7,
+        "smic_rsi_reversal": 3,
+        "benchmark_kodex200": 4,
+        "benchmark_qqq": 5,
+        "benchmark_spy": 6,
+        "benchmark_gld": 7,
+        "weak_oracle": 8,
     }
     if strategy_id in order:
         return (order[strategy_id], 0.0, strategy_id)

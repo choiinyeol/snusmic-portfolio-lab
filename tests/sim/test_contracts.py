@@ -16,7 +16,7 @@ from snusmic_pipeline.sim.contracts import (
     SavingsPlan,
     SimulationConfig,
     SmicFollowerConfig,
-    SmicMttStrategyConfig,
+    SmicRsiReversalConfig,
     Trade,
 )
 
@@ -55,6 +55,7 @@ def test_default_personas_are_benchmarks_plus_promotable_search_targets():
         "benchmark_gld",
         "smic_follower",
         "smic_follower_v2",
+        "smic_rsi_reversal",
         "weak_oracle",
     ]
     assert "oracle" not in names
@@ -73,6 +74,11 @@ def test_simulation_config_rejects_duplicate_persona_names():
             end_date=date(2026, 4, 1),
             personas=(ProphetConfig(), ProphetConfig()),
         )
+
+
+def test_rsi_reversal_config_rejects_non_rebound_exit_band():
+    with pytest.raises(ValidationError):
+        SmicRsiReversalConfig(max_entry_rsi=55.0, rebound_exit_rsi=55.0)
 
 
 def test_all_weather_weights_must_sum_to_one():

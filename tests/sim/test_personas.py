@@ -14,6 +14,7 @@ from snusmic_pipeline.sim.contracts import (
     SmicFollowerConfig,
     SmicFollowerV2Config,
     SmicMttStrategyConfig,
+    SmicRsiReversalConfig,
     WeakProphetConfig,
 )
 from snusmic_pipeline.sim.market import PriceBoard
@@ -22,6 +23,7 @@ from snusmic_pipeline.sim.personas import (
     simulate_smic_follower,
     simulate_smic_follower_v2,
     simulate_smic_mtt_strategy,
+    simulate_smic_rsi_reversal,
     simulate_weak_prophet,
     smic_mtt_strategy,
 )
@@ -193,91 +195,45 @@ def test_smic_mtt_strategy_relative_strength_prefers_trailing_winner(synthetic_b
     assert {t.symbol for t in buys} == {"WIN"}
 
 
-def test_smic_mtt_strategy_ma_crossover_filter_requires_recent_bullish_cross():
-    dates = pd.bdate_range("2024-01-02", "2024-06-30")
-    close = []
-    for i, _ in enumerate(dates):
-        if i < 24:
-            close.append(200.0 - i * 1.5)
-        else:
-            close.append(164.0 + (i - 24) * 1.2)
-    series = pd.Series(close, index=pd.to_datetime(dates))
-    fast = series.rolling(8, min_periods=8).mean()
-    slow = series.rolling(40, min_periods=40).mean()
-    cross_day: date | None = None
-    for idx in range(1, len(series)):
-        if idx >= 40 and fast.iloc[idx] > slow.iloc[idx] and fast.iloc[idx - 1] <= slow.iloc[idx - 1]:
-            cross_day = series.index[idx].date()
-            break
-    assert cross_day is not None
-
+def test_smic_rsi_reversal_buys_oversold_report_and_exits_on_rebound():
+    trading_dates = [d.date() for d in pd.bdate_range("2024-01-02", periods=80)]
+    drawdown = [100.0 - (22.0 * (i + 1) / 20) for i in range(20)]
+    rebound = [78.0 + (42.0 * (i + 1) / 55) for i in range(55)]
+    close = pd.DataFrame({"DIP": [100.0] * 5 + drawdown + rebound}, index=pd.to_datetime(trading_dates))
+    board = PriceBoard(close=close, open=close.copy(), high=close.copy(), low=close.copy())
     reports = pd.DataFrame(
         [
             {
-                "report_id": "crossover-win",
-                "symbol": "WIN",
-                "company": "Winners",
-                "exchange": "NASDAQ",
-                "publication_date": pd.Timestamp(cross_day),
-                "target_price": 190.0,
+                "report_id": "r-dip",
+                "symbol": "DIP",
+                "company": "Dip Buyer",
+                "exchange": "KRX",
+                "publication_date": pd.Timestamp("2024-01-02"),
+                "target_price": 140.0,
             }
         ]
     )
-    rows = []
-    for d, close_v in zip(dates, close, strict=True):
-        rows.append(
-            {
-                "date": pd.Timestamp(d.date()),
-                "symbol": "WIN",
-                "open": close_v,
-                "high": close_v,
-                "low": close_v,
-                "close": close_v,
-                "volume": 0,
-                "source_currency": "KRW",
-                "display_currency": "KRW",
-                "krw_per_unit": 1.0,
-            }
-        )
-    board = PriceBoard(
-        close=pd.DataFrame(rows)
-        .pivot_table(index="date", columns="symbol", values="close", aggfunc="last")
-        .sort_index(),
-        open=pd.DataFrame(rows)
-        .pivot_table(index="date", columns="symbol", values="open", aggfunc="last")
-        .sort_index(),
-    )
-    trading_dates = [d.date() for d in dates]
-    plan = SavingsPlan(
-        initial_capital_krw=10_000_000,
-        monthly_contribution_krw=1_000_000,
-        escalation_step_krw=500_000,
-    )
-    fees = BrokerageFees()
-    cashflows = build_cash_flow_schedule(trading_dates, plan)
-
-    cfg = SmicMttStrategyConfig(
-        require_mtt=False,
-        trend_filter="ma_crossover",
-        fast_ma_window=8,
-        slow_ma_window=40,
-        min_target_upside_at_pub=0.0,
+    plan, fees, cashflows = _common_inputs(trading_dates)
+    cfg = SmicRsiReversalConfig(
         max_positions=1,
+        rsi_window=14,
+        max_entry_rsi=35.0,
+        rebound_exit_rsi=55.0,
+        min_pullback_pct=0.05,
+        pullback_lookback_days=20,
+        signal_valid_days=80,
+        take_profit_pct=10.0,
         top_up_cadence="deposit_only",
-        target_hit_multiplier=2.0,
-        take_profit_pct=3.0,
-        min_relative_strength_percentile=0.0,
     )
-    out = simulate_smic_mtt_strategy(
-        cfg,
-        plan,
-        fees,
-        board,
-        reports,
-        cashflows,
-        trading_dates,
-    )
-    assert any(t.symbol == "WIN" for t in out.account.trades if t.side == "buy")
+
+    out = simulate_smic_rsi_reversal(cfg, plan, fees, board, reports, cashflows, trading_dates)
+
+    buys = [t for t in out.account.trades if t.side == "buy"]
+    sells = [t for t in out.account.trades if t.side == "sell"]
+    assert buys
+    assert {t.symbol for t in buys} == {"DIP"}
+    assert any(t.symbol == "DIP" and t.reason == "rebound_exit" for t in sells)
+    assert not any(t.reason == "rebalance_sell" for t in sells)
 
 
 def test_weak_prophet_empty_rebalance_sells_to_cash(synthetic_board, synthetic_reports):

@@ -259,12 +259,63 @@ class SmicMttStrategyConfig(_PersonaBase):
         return self
 
 
+class SmicRsiReversalConfig(_PersonaBase):
+    """Short-term broker-ledger strategy for oversold report pullbacks.
+
+    The strategy keeps the same realistic account constraints as
+    :class:`SmicMttStrategyConfig`, but its buy signal is deliberately
+    contrarian: a still-valid SMIC report with enough target upside is bought
+    only after a short-term pullback leaves the symbol oversold by RSI.
+    Positions exit quickly on rebound, target/profit, stop-loss, or max hold
+    age so this persona tests a reversal-buy lane rather than another trend
+    follower.
+    """
+
+    persona_name: Annotated[str, Field(pattern=r"^smic_rsi_reversal(_top[0-9]+)?$")] = (
+        "smic_rsi_reversal"
+    )
+    label: str = "RSI Reversal Strategy"
+
+    min_target_upside_at_pub: Annotated[float, Field(ge=0.0, le=10.0)] = 0.10
+    max_target_upside_at_pub: Annotated[float, Field(gt=0.0, le=20.0)] = 5.0
+    target_hit_multiplier: Annotated[float, Field(gt=0.0, le=2.0)] = 1.0
+
+    rsi_window: Annotated[int, Field(ge=5, le=60)] = 14
+    max_entry_rsi: Annotated[float, Field(gt=0.0, lt=100.0)] = 35.0
+    rebound_exit_rsi: Annotated[float, Field(gt=0.0, lt=100.0)] = 55.0
+    pullback_lookback_days: Annotated[int, Field(ge=5, le=252)] = 20
+    min_pullback_pct: Annotated[float, Field(ge=0.0, le=1.0)] = 0.05
+
+    max_positions: Annotated[int, Field(ge=1, le=200)] = 10
+    universe: Literal["all", "domestic", "overseas"] = "all"
+    top_up_cadence: Literal["deposit_only", "monthly", "quarterly"] = "monthly"
+    signal_valid_days: Annotated[int, Field(ge=1, le=3650)] = 90
+    stop_loss_pct: Annotated[float, Field(gt=0.0, lt=1.0)] = 0.12
+    take_profit_pct: Annotated[float, Field(gt=0.0, le=10.0)] = 0.25
+    max_holding_days: Annotated[int, Field(ge=1, le=3650)] = 60
+
+    @model_validator(mode="after")
+    def _check_reversal_bands(self) -> SmicRsiReversalConfig:
+        if self.max_target_upside_at_pub <= self.min_target_upside_at_pub:
+            raise ValueError(
+                "max_target_upside_at_pub must exceed min_target_upside_at_pub; "
+                f"got {self.max_target_upside_at_pub} <= {self.min_target_upside_at_pub}"
+            )
+        if self.rebound_exit_rsi <= self.max_entry_rsi:
+            raise ValueError(
+                "rebound_exit_rsi must exceed max_entry_rsi; "
+                f"got {self.rebound_exit_rsi} <= {self.max_entry_rsi}"
+            )
+        return self
+
+
 PersonaConfig = (
     ProphetConfig
     | WeakProphetConfig
     | SmicFollowerConfig
     | SmicFollowerV2Config
     | SmicMttStrategyConfig
+    | SmicRsiReversalConfig
     | AllWeatherConfig
 )
 
@@ -274,6 +325,7 @@ PersonaName = Literal[
     "smic_follower",
     "smic_follower_v2",
     "smic_mtt_strategy",
+    "smic_rsi_reversal",
     "all_weather",
     "benchmark_qqq",
     "benchmark_spy",
@@ -318,6 +370,7 @@ class SimulationConfig(_FrozenModel):
         ),
         SmicFollowerConfig(),
         SmicFollowerV2Config(label="SMIC Follower (SL)"),
+        SmicRsiReversalConfig(),
         WeakProphetConfig(
             label="Weak Prophet (3M oracle)",
             lookahead_months=3,
@@ -357,6 +410,8 @@ TradeReason = Literal[
     "stop_loss_average_down",
     "stop_loss_report_age",
     "stop_loss_price",
+    "stop_loss_max_hold",
+    "rebound_exit",
     "end_of_sim",
 ]
 
