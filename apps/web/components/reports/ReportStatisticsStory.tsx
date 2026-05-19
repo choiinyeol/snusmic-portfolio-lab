@@ -14,12 +14,23 @@ export type PricePathSeries = {
   points: Array<{ day: number; returnPct: number }>;
 };
 
+export type FeatureBucket = {
+  group: 'alignment' | 'high52w' | 'gap';
+  label: string;
+  count: number;
+  medianReturn: number | null;
+  hitRate10: number;
+  medianDaysToHit10: number | null;
+};
+
 export function ReportStatisticsStory({
   summary,
   pricePaths,
+  featureBuckets,
 }: {
   summary: ReportStatisticsLabSummary;
   pricePaths: { winners: PricePathSeries[]; losers: PricePathSeries[] };
+  featureBuckets: FeatureBucket[];
 }) {
   const currentReturns = summary.riskScatter.map((row) => row.currentReturn).filter(isNumber);
   const sortedReturns = [...currentReturns].sort((a, b) => a - b);
@@ -84,6 +95,8 @@ export function ReportStatisticsStory({
       />
 
       <ConcentrationInsight rows={concentration} />
+
+      <FeatureBucketsTable buckets={featureBuckets} />
 
       <PathBucketPanel buckets={pathBuckets} exampleMetaById={exampleMetaById} total={eligiblePathCount} />
 
@@ -855,6 +868,74 @@ function VintageCohortTable({ cohorts }: { cohorts: VintageCohort[] }) {
               </td>
             </tr>
           ))}
+        </tbody>
+      </table>
+    </section>
+  );
+}
+
+function FeatureBucketsTable({ buckets }: { buckets: FeatureBucket[] }) {
+  if (buckets.length === 0) return null;
+  const groups: Array<{ id: FeatureBucket['group']; label: string }> = [
+    { id: 'alignment', label: '추세 정배열' },
+    { id: 'high52w', label: '52주 고가 근접도' },
+    { id: 'gap', label: '발간일 갭' },
+  ];
+  return (
+    <section
+      className="overflow-hidden rounded-md border border-slate-200 bg-white"
+      aria-label="발간 시점 기술적 특성별"
+    >
+      <header className="border-b border-slate-200 px-4 py-2">
+        <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+          발간 시점 기술적 특성별
+        </div>
+        <h3 className="mt-1 text-sm font-semibold text-slate-950">정배열·신고가 근접·갭이 결과를 가른 폭</h3>
+      </header>
+      <table className="w-full text-sm">
+        <thead className="bg-slate-50">
+          <tr>
+            <th className="px-3 py-2 text-left text-xs font-medium text-slate-500">특성</th>
+            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">표본</th>
+            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">중앙 수익률</th>
+            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">1.0x 도달</th>
+            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">도달 중앙 일수</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-100">
+          {groups.flatMap((group) => {
+            const groupBuckets = buckets.filter((bucket) => bucket.group === group.id);
+            if (groupBuckets.length === 0) return [];
+            return [
+              <tr className="bg-slate-50/60" key={`group-${group.id}`}>
+                <td
+                  className="px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500"
+                  colSpan={5}
+                >
+                  {group.label}
+                </td>
+              </tr>,
+              ...groupBuckets.map((bucket) => (
+                <tr key={`${bucket.group}-${bucket.label}`}>
+                  <td className="px-3 py-2 text-sm text-slate-950">{bucket.label}</td>
+                  <td className="px-3 py-2 text-right font-mono tabular-nums">{bucket.count}</td>
+                  <td
+                    className={`px-3 py-2 text-right font-mono tabular-nums ${
+                      (bucket.medianReturn ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'
+                    }`}
+                  >
+                    {formatPercent(bucket.medianReturn)}
+                  </td>
+                  <td className="px-3 py-2 text-right font-mono tabular-nums text-slate-950">
+                    {formatPercent(bucket.hitRate10)}
+                  </td>
+                  <td className="px-3 py-2 text-right font-mono tabular-nums text-slate-500">
+                    {bucket.medianDaysToHit10 !== null ? `${bucket.medianDaysToHit10.toLocaleString('ko-KR')}일` : '—'}
+                  </td>
+                </tr>
+              )),
+            ];
+          })}
         </tbody>
       </table>
     </section>
