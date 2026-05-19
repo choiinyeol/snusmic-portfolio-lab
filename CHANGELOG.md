@@ -2,6 +2,19 @@
 
 이 프로젝트의 사용자 가시 변경사항을 모두 정리합니다. 릴리스의 진실은 git 태그이며, 본 파일은 태그 단위로 의도를 한국어로 기록합니다.
 
+## v0.25.3-mpt-frontier.1 — 2026-05-20
+
+### 변경
+- `/portfolio` 메인의 전략 원장 표를 제거하고, 큰 현재 비중 히트맵을 먼저 보여준 뒤 compact 선택 버튼으로 전략을 고르게 바꿨습니다.
+- 수익률/낙폭 곡선을 MPT efficient frontier 스타일로 재디자인해 benchmark 기준점, frontier 점선, 최대 위험조정 점수, 최소 낙폭 표시, hover/focus tooltip을 함께 제공합니다.
+- KODEX200, QQQ, SPY, GLD, All-Weather 등 benchmark를 frontier 차트에 모두 추가하되, 실제 포트폴리오 선택 버튼은 All-Weather MWR 이상 전략만 남기도록 필터링했습니다.
+
+### 검증
+- `pnpm --dir apps/web check`
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web build` (정적 페이지 506개)
+- static scan: `/portfolio` build output includes `KODEX200`, `QQQ`, `SPY`, `GLD`, removes `실제 전략 원장` and `<table` from the portfolio landing HTML
+
 ## v0.25.2-portfolio-ux-refine.1 — 2026-05-19
 
 ### 변경

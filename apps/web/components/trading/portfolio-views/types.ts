@@ -42,6 +42,7 @@ export type PortfolioStrategySnapshot = {
   id: string;
   label: string;
   shortLabel: string;
+  kind: 'strategy' | 'benchmark' | 'oracle';
   href: string;
   finalEquityKrw: number | null;
   cashKrw: number | null;
@@ -60,6 +61,8 @@ export type PortfolioLandingModel = {
   defaultPersona: string;
   latestEquityDate: string;
   strategies: PortfolioStrategySnapshot[];
+  frontierRows: PortfolioStrategySnapshot[];
+  allWeatherReturn: number | null;
   holdings: HoldingRow[];
   equity: EquityPoint[];
   trades: TradeRow[];

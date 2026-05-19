@@ -20,22 +20,29 @@ import {
   getSelectableStrategyRows,
   getStrategyLeaderboard,
   portfolioStrategyHref,
+  type StrategyLeaderboardRow,
 } from '@/lib/product-model';
+
+const ALL_WEATHER_PERSONA = 'all_weather';
 
 export function buildPortfolioLandingModel(): PortfolioLandingModel {
   const allHoldings = getCurrentHoldings();
   const allEquity = getEquityDaily();
   const summaries = getSummaryRows();
   const allTrades = getTrades();
-  const portfolioRows = getPortfolioRows();
+  const leaderboardRows = getStrategyLeaderboard();
+  const allWeatherReturn = leaderboardRows.find((row) => row.id === ALL_WEATHER_PERSONA)?.returnPct ?? null;
+  const portfolioRows = getPortfolioRows(leaderboardRows);
+  const benchmarkRows = leaderboardRows.filter((row) => row.kind === 'benchmark');
   const defaultPersona = getDefaultPortfolioPersona();
   const portfolioIds = new Set(portfolioRows.map((row) => row.id));
+  const frontierIds = new Set([...portfolioRows.map((row) => row.id), ...benchmarkRows.map((row) => row.id)]);
   const personaLabels = Object.fromEntries(portfolioRows.map((row) => [row.id, row.label]));
   const summaryById = new Map(summaries.map((row) => [row.persona, row]));
-  const holdingsByPersona = groupByPersona(allHoldings.filter((row) => portfolioIds.has(row.persona)));
+  const holdingsByPersona = groupByPersona(allHoldings.filter((row) => frontierIds.has(row.persona)));
   const trades = allTrades.filter((row) => portfolioIds.has(row.persona));
   const equity = allEquity.filter((row) => portfolioIds.has(row.persona));
-  const strategies = portfolioRows.map<PortfolioStrategySnapshot>((row) => {
+  const snapshotFromRow = (row: StrategyLeaderboardRow): PortfolioStrategySnapshot => {
     const summary = summaryById.get(row.id);
     const holdings = holdingsByPersona.get(row.id) ?? [];
     const holdingsValue =
@@ -47,6 +54,7 @@ export function buildPortfolioLandingModel(): PortfolioLandingModel {
       id: row.id,
       label: row.label,
       shortLabel: row.shortLabel,
+      kind: row.kind,
       href: row.href,
       finalEquityKrw: finalEquity,
       cashKrw,
@@ -61,11 +69,15 @@ export function buildPortfolioLandingModel(): PortfolioLandingModel {
         finalEquity && finalEquity > 0 && topHolding?.marketValueKrw ? topHolding.marketValueKrw / finalEquity : null,
       objectivePassed: row.objectivePassed,
     };
-  });
+  };
+  const strategies = portfolioRows.map(snapshotFromRow);
+  const frontierRows = [...strategies, ...benchmarkRows.map(snapshotFromRow)];
   return {
     defaultPersona,
     latestEquityDate: equity.reduce((latest, row) => (row.date > latest ? row.date : latest), ''),
     strategies,
+    frontierRows,
+    allWeatherReturn,
     holdings: allHoldings.filter((row) => portfolioIds.has(row.persona)),
     equity,
     trades,
@@ -187,15 +199,18 @@ export function buildPortfolioViewModel(selectedPersona?: string): PortfolioView
 export function getPortfolioStaticParams() {
   const summaries = getSummaryRows();
   const summaryIds = new Set(summaries.map((row) => row.persona));
-  return getPortfolioRows()
+  return getPortfolioRows(getStrategyLeaderboard())
     .filter((row) => summaryIds.has(row.id))
     .map((row) => ({ strategy: row.id }));
 }
 
-function getPortfolioRows() {
-  return getSelectableStrategyRows(getStrategyLeaderboard()).filter(
-    (row) => row.kind === 'strategy' && row.isSelectable,
-  );
+function getPortfolioRows(rows: StrategyLeaderboardRow[] = getStrategyLeaderboard()) {
+  const allWeatherReturn = rows.find((row) => row.id === ALL_WEATHER_PERSONA)?.returnPct ?? null;
+  return getSelectableStrategyRows(rows).filter((row) => {
+    if (row.kind !== 'strategy' || !row.isSelectable) return false;
+    if (allWeatherReturn === null || row.returnPct === null) return true;
+    return row.returnPct >= allWeatherReturn;
+  });
 }
 
 function groupByPersona<T extends { persona: string }>(rows: T[]): Map<string, T[]> {
