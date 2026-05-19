@@ -1,4 +1,5 @@
 import {
+  type EarlyExitRule,
   type FeatureBucket,
   type PricePathSeries,
   ReportStatisticsStory,
@@ -347,6 +348,98 @@ function buildFeatureBuckets(
   ];
 }
 
+type OutcomeCategoryId = 'target' | 'partial' | 'upside' | 'flat' | 'declining' | 'devastating';
+
+function classifyOutcomeServer(row: ReportStatisticsLabSummary['riskScatter'][number]): OutcomeCategoryId {
+  if (row.hit10) return 'target';
+  if (row.hit08 || row.hit06) return 'partial';
+  const peak = row.maxFavorableExcursion ?? 0;
+  if (peak >= 0.2) return 'upside';
+  const ref = row.expiryReturn ?? row.currentReturn ?? 0;
+  if (ref <= -0.3) return 'devastating';
+  if (ref <= -0.1) return 'declining';
+  return 'flat';
+}
+
+type RuleSpec = { signalDay: number; threshold: number };
+
+/** For each (signalDay, threshold) rule, aggregate how many devastating
+ * losses the rule would have intercepted vs how many target hits it
+ * would have wrongly exited. Decided to surface multiple rules so the
+ * reader can see the trade-off explicitly. */
+function buildEarlyExitRules(summary: ReportStatisticsLabSummary): EarlyExitRule[] {
+  const snapshots: Array<{
+    category: OutcomeCategoryId;
+    r5: number | null;
+    r10: number | null;
+    r20: number | null;
+  }> = [];
+  for (const row of summary.riskScatter) {
+    if (!isNumber(row.maxFavorableExcursion)) continue;
+    if (!hasPriceArtifact(row.symbol)) continue;
+    const series = getPriceSeries(row.symbol, row.publicationDate);
+    if (series.length === 0) continue;
+    const baseKrw = closeKrwOf(series[0]);
+    if (!baseKrw || baseKrw <= 0) continue;
+    const retAfter = (n: number): number | null => {
+      if (n >= series.length) return null;
+      return closeKrwOf(series[n]) / baseKrw - 1;
+    };
+    snapshots.push({
+      category: classifyOutcomeServer(row),
+      r5: retAfter(5),
+      r10: retAfter(10),
+      r20: retAfter(20),
+    });
+  }
+
+  const totalDevastating = snapshots.filter((s) => s.category === 'devastating').length;
+  const totalTarget = snapshots.filter((s) => s.category === 'target').length;
+
+  const rules: RuleSpec[] = [
+    { signalDay: 5, threshold: -0.03 },
+    { signalDay: 5, threshold: -0.05 },
+    { signalDay: 10, threshold: -0.05 },
+    { signalDay: 10, threshold: -0.1 },
+    { signalDay: 20, threshold: -0.05 },
+    { signalDay: 20, threshold: -0.1 },
+  ];
+
+  return rules.map((rule) => {
+    const triggered = snapshots.filter((s) => {
+      const ret = rule.signalDay === 5 ? s.r5 : rule.signalDay === 10 ? s.r10 : s.r20;
+      return ret !== null && ret <= rule.threshold;
+    });
+    const triggeredDevastating = triggered.filter((s) => s.category === 'devastating').length;
+    const triggeredDeclining = triggered.filter((s) => s.category === 'declining').length;
+    const triggeredTarget = triggered.filter((s) => s.category === 'target').length;
+    const notTriggered = snapshots.length - triggered.length;
+    const avoidedDevastating = triggeredDevastating;
+    const lostTarget = triggeredTarget;
+    return {
+      signalDay: rule.signalDay,
+      threshold: rule.threshold,
+      label: `발간 후 ${rule.signalDay}거래일 ${formatThresholdLabel(rule.threshold)} 이하 손절`,
+      triggered: triggered.length,
+      triggeredDevastating,
+      triggeredDeclining,
+      triggeredTarget,
+      notTriggered,
+      totalDevastating,
+      totalTarget,
+      avoidedDevastating,
+      avoidedDevastatingRate: totalDevastating ? avoidedDevastating / totalDevastating : 0,
+      lostTarget,
+      lostTargetRate: totalTarget ? lostTarget / totalTarget : 0,
+    };
+  });
+}
+
+function formatThresholdLabel(threshold: number): string {
+  const pct = Math.round(threshold * 100);
+  return `${pct}%`;
+}
+
 export default function ReportStatisticsPage() {
   const rawSummary = getReportStatisticsLabSummary();
   const reportById = new Map(getReportRows().map((row) => [row.reportId, row]));
@@ -357,8 +450,10 @@ export default function ReportStatisticsPage() {
     windowDays: RETURN_WINDOW_DAYS,
   });
   const featureBuckets = buildFeatureBuckets(summary, reportById, RETURN_WINDOW_DAYS);
+  const earlyExitRules = buildEarlyExitRules(summary);
   return (
     <ReportStatisticsStory
+      earlyExitRules={earlyExitRules}
       featureBuckets={featureBuckets}
       pricePaths={pricePaths}
       summary={summary}

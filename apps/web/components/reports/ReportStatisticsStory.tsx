@@ -47,15 +47,38 @@ export type FeatureBucket = {
   pValue: number | null;
 };
 
+export type EarlyExitRule = {
+  signalDay: number;
+  threshold: number;
+  label: string;
+  triggered: number;
+  triggeredDevastating: number;
+  triggeredDeclining: number;
+  triggeredTarget: number;
+  notTriggered: number;
+  totalDevastating: number;
+  totalTarget: number;
+  /** Of all devastating outcomes, how many would this rule have caught
+   * early (and therefore prevented the catastrophic drawdown). */
+  avoidedDevastating: number;
+  avoidedDevastatingRate: number;
+  /** Of all target hits, how many would this rule have wrongly exited
+   * before the win materialized. The cost side of the rule. */
+  lostTarget: number;
+  lostTargetRate: number;
+};
+
 export function ReportStatisticsStory({
   summary,
   pricePaths,
   featureBuckets,
+  earlyExitRules,
   windowDays,
 }: {
   summary: ReportStatisticsLabSummary;
   pricePaths: { winners: PricePathSeries[]; losers: PricePathSeries[] };
   featureBuckets: FeatureBucket[];
+  earlyExitRules: EarlyExitRule[];
   windowDays: number;
 }) {
   const peakReturns = summary.riskScatter.map((row) => row.maxFavorableExcursion).filter(isNumber);
@@ -128,6 +151,8 @@ export function ReportStatisticsStory({
       />
 
       <ConcentrationInsight rows={concentration} />
+
+      <EarlyExitRulesTable rules={earlyExitRules} />
 
       <FeatureBucketsTable buckets={featureBuckets} />
 
@@ -1157,6 +1182,76 @@ function VintageCohortTable({ cohorts }: { cohorts: VintageCohort[] }) {
           ))}
         </tbody>
       </table>
+    </section>
+  );
+}
+
+function EarlyExitRulesTable({ rules }: { rules: EarlyExitRule[] }) {
+  if (rules.length === 0) return null;
+  const best = [...rules].sort((a, b) => {
+    const aScore = a.avoidedDevastatingRate - a.lostTargetRate;
+    const bScore = b.avoidedDevastatingRate - b.lostTargetRate;
+    return bScore - aScore;
+  })[0];
+  return (
+    <section className="overflow-hidden rounded-md border border-slate-200 bg-white" aria-label="조기 손절 규칙">
+      <header className="border-b border-slate-200 px-4 py-2">
+        <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+          치명적 손실 회피 규칙
+        </div>
+        <h3 className="mt-1 text-sm font-semibold text-slate-950">발간 후 며칠 안에 얼마나 빠지면 손절할까</h3>
+        <p className="mt-1 text-xs leading-5 text-slate-500">
+          치명적 손실 ({rules[0]?.totalDevastating ?? 0}건)을 사후 데이터로 보면, 대부분 발간 후 20거래일 이내에 이미 큰
+          폭으로 빠지기 시작합니다. 각 손절 규칙이 치명적 손실을 얼마나 거르고, 1.0x 목표를 얼마나 헛 놓치는지를 같이
+          봅니다.
+        </p>
+      </header>
+      <table className="w-full text-sm">
+        <thead className="bg-slate-50">
+          <tr>
+            <th className="px-3 py-2 text-left text-xs font-medium text-slate-500">규칙</th>
+            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">발동</th>
+            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">회피한 치명적</th>
+            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">놓친 목표</th>
+            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">차이</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-100">
+          {rules.map((rule) => {
+            const isBest = rule === best;
+            const delta = rule.avoidedDevastatingRate - rule.lostTargetRate;
+            return (
+              <tr className={isBest ? 'bg-emerald-50/50' : undefined} key={`${rule.signalDay}-${rule.threshold}`}>
+                <td className="px-3 py-2">
+                  <div className="text-sm text-slate-950">{rule.label}</div>
+                  <div className="mt-0.5 font-mono text-[10px] text-slate-500">
+                    {rule.totalDevastating}건 중 {rule.avoidedDevastating}건 회피 · 목표 {rule.totalTarget}건 중{' '}
+                    {rule.lostTarget}건 손절
+                  </div>
+                </td>
+                <td className="px-3 py-2 text-right font-mono tabular-nums">{rule.triggered}</td>
+                <td className="px-3 py-2 text-right font-mono tabular-nums text-emerald-700">
+                  {formatPercent(rule.avoidedDevastatingRate)}
+                </td>
+                <td className="px-3 py-2 text-right font-mono tabular-nums text-rose-600">
+                  {formatPercent(rule.lostTargetRate)}
+                </td>
+                <td
+                  className={`px-3 py-2 text-right font-mono tabular-nums ${
+                    delta >= 0 ? 'text-emerald-700' : 'text-rose-600'
+                  }`}
+                >
+                  {(delta >= 0 ? '+' : '') + formatPercent(delta)}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <footer className="border-t border-slate-200 bg-slate-50 px-4 py-2.5 text-[11px] leading-5 text-slate-600">
+        <span className="font-semibold text-slate-700">차이</span> = 회피한 치명적률 − 놓친 목표율. 값이 양수일수록
+        규칙이 평균적으로 도움이 됩니다 (치명적을 거르는 효과 &gt; 목표 놓치는 손실). 가장 큰 양수가 강조됩니다.
+      </footer>
     </section>
   );
 }
