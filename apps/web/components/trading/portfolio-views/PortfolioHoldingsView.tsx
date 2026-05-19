@@ -39,7 +39,7 @@ export function PortfolioHoldingsView({ model }: { model: PortfolioViewModel }) 
               </div>
               <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">현재 보유 비중</h2>
               <p className="mt-1 text-sm leading-6 text-slate-500">
-                연 2.5% RP 대기자금까지 별도 자산으로 포함한 실제 포트폴리오 비중입니다.
+                연 2.5% RP이자까지 별도 자산으로 포함한 실제 포트폴리오 비중입니다.
               </p>
             </div>
             <span className="font-mono text-xs font-semibold text-slate-500">{formatKrw(totalValue)}</span>
@@ -49,7 +49,7 @@ export function PortfolioHoldingsView({ model }: { model: PortfolioViewModel }) 
             height={420}
             compact
             hrefBySymbol={hrefBySymbol}
-            caption="면적 = 평가액, 색 = 미실현 수익률. RP 대기자금도 포트폴리오 비중으로 포함합니다."
+            caption="면적 = 평가액, 색 = 미실현 수익률. RP이자도 포트폴리오 비중으로 포함합니다."
           />
         </article>
 
@@ -160,7 +160,7 @@ function withCashHolding(holdings: HoldingRow[], cashKrw: number, persona: strin
     {
       persona,
       symbol: 'CASH',
-      company: 'RP 대기자금',
+      company: 'RP이자',
       qty: null,
       avgCostKrw: null,
       lastCloseKrw: 1,

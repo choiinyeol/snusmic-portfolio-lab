@@ -106,7 +106,7 @@ export default function OverviewPage() {
             </div>
             <div className="mt-4 pt-2">
               <div className="flex items-end justify-between gap-3">
-                <span className="text-sm text-slate-500">RP 비중</span>
+                <span className="text-sm text-slate-500">RP이자 비중</span>
                 <strong className="font-mono text-2xl font-semibold tracking-tight tabular-nums text-slate-950">
                   {formatPercent(overview.portfolio.cashWeight)}
                 </strong>

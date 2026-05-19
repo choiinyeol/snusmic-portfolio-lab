@@ -7,7 +7,7 @@ import { getExecutiveOverview } from '@/lib/product-model';
 
 const principles = [
   '저장된 데이터로 리포트 목표가와 실제 매매를 대조',
-  '전략 성과, 낙폭, RP 대기를 같은 기준으로 비교',
+  '전략 성과, 낙폭, RP이자를 같은 기준으로 비교',
   '불완전한 데이터와 제외 사유를 후보보다 먼저 노출',
 ];
 
@@ -99,7 +99,7 @@ export default function LandingPage() {
           </div>
           <div className="grid divide-y divide-slate-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
             <Metric label="평가액" value={formatKrw(portfolio.finalEquityKrw)} />
-            <Metric label="RP 비중" value={formatPercent(portfolio.cashWeight)} />
+            <Metric label="RP이자 비중" value={formatPercent(portfolio.cashWeight)} />
             <Metric label="리포트" value={`${manifest.row_counts.reports.toLocaleString('ko-KR')}건`} />
             <Metric label="전략" value={`${manifest.row_counts.strategy_catalog.toLocaleString('ko-KR')}개`} />
           </div>

@@ -91,8 +91,6 @@ export function PortfolioTradesView({ model }: { model: PortfolioViewModel }) {
       </section>
 
       <TradesTable
-        capitalByPersona={model.capitalByPersona}
-        episodes={model.episodes}
         persona={model.selectedPersona}
         personaLabels={model.personaLabels}
         reportSymbolsById={model.reportSymbolsById}

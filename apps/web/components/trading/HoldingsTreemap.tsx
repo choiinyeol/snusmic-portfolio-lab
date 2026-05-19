@@ -185,7 +185,9 @@ export function HoldingsTreemap({
       <ul className="sr-only" aria-label={`보유 종목 ${sortedHoldings.length}개`}>
         {sortedHoldings.map((row) => {
           const href = holdingHref(row, hrefBySymbol);
-          const label = `${row.company || row.symbol} (${row.symbol}): 평가액 ${formatKrw(row.marketValueKrw)}, 비중 ${formatPercent((row.marketValueKrw ?? 0) / totalValue)}, 미실현 ${formatPercent(row.unrealizedReturn)}`;
+          const label = isCashHolding(row)
+            ? `${row.company || row.symbol}: 평가액 ${formatKrw(row.marketValueKrw)}, 비중 ${formatPercent((row.marketValueKrw ?? 0) / totalValue)}, 현금성 RP이자 잔고`
+            : `${row.company || row.symbol} (${row.symbol}): 평가액 ${formatKrw(row.marketValueKrw)}, 비중 ${formatPercent((row.marketValueKrw ?? 0) / totalValue)}, 미실현 ${formatPercent(row.unrealizedReturn)}`;
           return <li key={row.symbol}>{href ? <a href={href}>{label}</a> : <span>{label}</span>}</li>;
         })}
       </ul>
@@ -237,13 +239,19 @@ function TreemapTooltip({
       </div>
       <dl className="mt-2 grid gap-1.5 text-slate-500">
         <TooltipLine label="평가액" value={`${formatKrw(row.marketValueKrw)} · ${formatPercent(row.weight)}`} />
-        <TooltipLine
-          label="미실현"
-          value={`${formatKrw(row.unrealizedPnlKrw)} · ${formatPercent(row.unrealizedReturn)}`}
-        />
-        <TooltipLine label="수량" value={formatQuantity(row.qty)} />
-        <TooltipLine label="평단(KRW)" value={formatKrw(row.avgCostKrw)} />
-        <TooltipLine label="최근가" value={formatNative(row.lastCloseNative, row.currency)} />
+        {isCashHolding(row) ? (
+          <TooltipLine label="구분" value="연 2.5% RP이자 현금성 잔고" />
+        ) : (
+          <>
+            <TooltipLine
+              label="미실현"
+              value={`${formatKrw(row.unrealizedPnlKrw)} · ${formatPercent(row.unrealizedReturn)}`}
+            />
+            <TooltipLine label="수량" value={formatQuantity(row.qty)} />
+            <TooltipLine label="평단(KRW)" value={formatKrw(row.avgCostKrw)} />
+            <TooltipLine label="최근가" value={formatNative(row.lastCloseNative, row.currency)} />
+          </>
+        )}
         {href ? <TooltipLine label="동선" value="상세 분석으로 이동" /> : null}
       </dl>
     </div>
@@ -328,7 +336,12 @@ function drawLabel(ctx: CanvasRenderingContext2D, leaf: LeafNode, w: number, h: 
   if (w >= 70 && h >= 44) {
     ctx.fillStyle = 'rgba(255,255,255,0.86)';
     ctx.font = `600 ${compact ? 10 : 11}px system-ui, -apple-system, BlinkMacSystemFont, sans-serif`;
-    ctx.fillText(formatPercent(leaf.data.unrealizedReturn), x + pad, y + pad + 17, w - pad * 2);
+    ctx.fillText(
+      isCashHolding(leaf.data) ? '현금성 RP이자' : formatPercent(leaf.data.unrealizedReturn),
+      x + pad,
+      y + pad + 17,
+      w - pad * 2,
+    );
   }
 
   if (w >= 118 && h >= 76) {
@@ -410,4 +423,8 @@ function holdingHref(row: HoldingRow, hrefBySymbol: Record<string, string> | und
   if (hrefBySymbol) return hrefBySymbol[row.symbol] ?? null;
   if (!row.symbol || row.symbol === 'CASH') return null;
   return `/reports/${encodeURIComponent(row.symbol)}`;
+}
+
+function isCashHolding(row: Pick<HoldingRow, 'symbol'>): boolean {
+  return row.symbol === 'CASH';
 }

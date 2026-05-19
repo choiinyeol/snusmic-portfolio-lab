@@ -85,56 +85,90 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
             <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
               choose portfolio
             </div>
-            <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">실제 전략만 선택</h2>
+            <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">실제 전략 원장</h2>
           </div>
-          <span className="text-xs font-medium text-slate-500">비교 기준 8개는 이 selector에서 제거</span>
+          <span className="text-xs font-medium text-slate-500">
+            {model.strategies.length.toLocaleString('ko-KR')}개 · benchmark 제외
+          </span>
         </div>
-        <div className="grid gap-2 md:grid-cols-3">
-          {model.strategies.map((strategy) => (
-            <button
-              aria-pressed={strategy.id === selected.id}
-              className={[
-                'group grid min-h-36 min-w-0 gap-3 rounded-md border bg-white p-3 text-left leading-normal transition-colors',
-                strategy.id === selected.id
-                  ? 'border-slate-950 ring-1 ring-slate-950/10'
-                  : 'border-slate-200 hover:border-slate-400',
-              ].join(' ')}
-              key={strategy.id}
-              type="button"
-              onClick={() => setSelectedId(strategy.id)}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="truncate text-base font-semibold tracking-tight text-slate-950">
-                    {strategy.shortLabel}
-                  </div>
-                  <div className="truncate text-xs text-slate-500">{strategy.label}</div>
-                </div>
-                <span className="rounded-full bg-slate-950 px-2 py-1 text-xs font-semibold leading-normal text-white">
-                  전략
-                </span>
-              </div>
-              <div className="grid grid-cols-3 gap-2 text-xs">
-                <Fact
-                  label="MWR"
-                  value={formatPercent(strategy.moneyWeightedReturn)}
-                  tone={strategy.moneyWeightedReturn}
-                />
-                <Fact label="MDD" value={formatPercent(strategy.maxDrawdown)} danger />
-                <Fact label="보유" value={`${strategy.holdingCount}개`} />
-              </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
-                <div
-                  className="h-full rounded-full bg-slate-950"
-                  style={{ width: percentWidth(strategy.cashWeight) }}
-                />
-              </div>
-              <div className="text-[11px] text-slate-500">
-                RP {formatPercent(strategy.cashWeight)} · 최대 비중 {strategy.topHoldingLabel}{' '}
-                {formatPercent(strategy.topHoldingWeight)}
-              </div>
-            </button>
-          ))}
+        <div className="overflow-hidden rounded-md border border-slate-200 bg-white">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[780px] text-sm">
+              <thead className="bg-slate-50 text-xs font-semibold text-slate-500">
+                <tr>
+                  <th className="px-3 py-2 text-left">전략</th>
+                  <th className="px-3 py-2 text-right">MWR</th>
+                  <th className="px-3 py-2 text-right">MDD</th>
+                  <th className="px-3 py-2 text-right">RP이자 비중</th>
+                  <th className="px-3 py-2 text-left">최대 비중</th>
+                  <th className="px-3 py-2 text-right">보유</th>
+                  <th className="px-3 py-2 text-right">열기</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {model.strategies.map((strategy) => {
+                  const isSelected = strategy.id === selected.id;
+                  return (
+                    <tr
+                      className={isSelected ? 'bg-slate-950/[0.03]' : 'transition-colors hover:bg-slate-50'}
+                      key={strategy.id}
+                    >
+                      <td className="px-3 py-2">
+                        <button
+                          aria-pressed={isSelected}
+                          className="grid min-h-11 min-w-0 cursor-pointer text-left leading-normal"
+                          type="button"
+                          onClick={() => setSelectedId(strategy.id)}
+                        >
+                          <span className="truncate font-semibold text-slate-950">{strategy.shortLabel}</span>
+                          <span className="truncate text-xs text-slate-500">{strategy.label}</span>
+                        </button>
+                      </td>
+                      <td
+                        className={`px-3 py-2 text-right font-mono font-semibold tabular-nums ${
+                          (strategy.moneyWeightedReturn ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'
+                        }`}
+                      >
+                        {formatPercent(strategy.moneyWeightedReturn)}
+                      </td>
+                      <td className="px-3 py-2 text-right font-mono font-semibold tabular-nums text-rose-600">
+                        {formatPercent(strategy.maxDrawdown)}
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="ml-auto grid w-28 gap-1">
+                          <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
+                            <div
+                              className="h-full rounded-full bg-slate-950"
+                              style={{ width: percentWidth(strategy.cashWeight) }}
+                            />
+                          </div>
+                          <span className="text-right font-mono text-xs text-slate-500">
+                            {formatPercent(strategy.cashWeight)}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-3 py-2 text-slate-600">
+                        <span className="line-clamp-1">
+                          {strategy.topHoldingLabel} {formatPercent(strategy.topHoldingWeight)}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2 text-right font-mono tabular-nums text-slate-600">
+                        {strategy.holdingCount.toLocaleString('ko-KR')}개
+                      </td>
+                      <td className="px-3 py-2 text-right">
+                        <Link
+                          className="inline-flex min-h-9 items-center rounded-md border border-slate-200 px-3 py-2 text-xs font-semibold leading-normal text-slate-700 transition-colors hover:border-slate-400 hover:bg-slate-50"
+                          href={strategy.href}
+                        >
+                          상세
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -160,7 +194,7 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
             holdings={selectedHoldings}
             height={460}
             compact
-            caption="면적 = 현재 평가액. RP 대기자금도 하나의 비중으로 포함합니다."
+            caption="면적 = 현재 평가액. RP이자 잔고도 현금성 비중으로 포함합니다."
           />
         </article>
 
@@ -186,7 +220,11 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
               tone={(selected.moneyWeightedReturn ?? 0) >= 0 ? 'good' : 'bad'}
               caption={`MDD ${formatPercent(selected.maxDrawdown)}`}
             />
-            <KpiTile label="RP 비중" value={formatPercent(selected.cashWeight)} caption={formatKrw(selected.cashKrw)} />
+            <KpiTile
+              label="RP이자 비중"
+              value={formatPercent(selected.cashWeight)}
+              caption={formatKrw(selected.cashKrw)}
+            />
             <KpiTile
               label="체결"
               value={selected.tradeCount?.toLocaleString('ko-KR') ?? '—'}
@@ -247,16 +285,26 @@ function PortfolioFrontierChart({
   selectedId: string;
   onSelect: (id: string) => void;
 }) {
-  const maxX = Math.max(0.01, ...rows.map((row) => row.maxDrawdown ?? 0)) * 1.08;
-  const minY = Math.min(0, ...rows.map((row) => row.moneyWeightedReturn ?? 0)) * 1.08;
-  const maxY = Math.max(0.01, ...rows.map((row) => row.moneyWeightedReturn ?? 0)) * 1.08;
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const plottableRows = rows.filter((row) => row.maxDrawdown !== null && row.moneyWeightedReturn !== null);
+  const xValues = plottableRows.map((row) => row.maxDrawdown ?? 0);
+  const yValues = plottableRows.map((row) => row.moneyWeightedReturn ?? 0);
+  const { min: minX, max: maxX } = paddedDomain(xValues, { floor: 0.0, minSpan: 0.01 });
+  const { min: minY, max: maxY } = paddedDomain(yValues, { minSpan: 0.04 });
   const frontier = efficientFrontier(rows);
   const path = frontier
     .map(
       (row, index) =>
-        `${index === 0 ? 'M' : 'L'} ${plotX(row.maxDrawdown ?? 0, maxX)} ${plotY(row.moneyWeightedReturn ?? 0, minY, maxY)}`,
+        `${index === 0 ? 'M' : 'L'} ${plotX(row.maxDrawdown ?? 0, minX, maxX)} ${plotY(row.moneyWeightedReturn ?? 0, minY, maxY)}`,
     )
     .join(' ');
+  const activeRow = rows.find((row) => row.id === (hoveredId ?? selectedId)) ?? rows[0];
+  const activePoint = activeRow
+    ? {
+        x: plotX(activeRow.maxDrawdown ?? 0, minX, maxX),
+        y: plotY(activeRow.moneyWeightedReturn ?? 0, minY, maxY),
+      }
+    : null;
   return (
     <div className="relative h-72 rounded-md border border-slate-100 bg-[linear-gradient(to_right,rgba(226,232,240,.75)_1px,transparent_1px),linear-gradient(to_bottom,rgba(226,232,240,.75)_1px,transparent_1px)] bg-[size:25%_25%]">
       <svg
@@ -268,50 +316,106 @@ function PortfolioFrontierChart({
         {path ? <path d={path} fill="none" stroke="#2563eb" strokeDasharray="4 4" strokeWidth="2" /> : null}
         {rows.map((row) => {
           const selected = row.id === selectedId;
+          const hovered = row.id === hoveredId;
+          const x = plotX(row.maxDrawdown ?? 0, minX, maxX);
+          const y = plotY(row.moneyWeightedReturn ?? 0, minY, maxY);
           return (
             <g key={row.id}>
               <circle
-                cx={plotX(row.maxDrawdown ?? 0, maxX)}
-                cy={plotY(row.moneyWeightedReturn ?? 0, minY, maxY)}
-                fill={selected ? '#111827' : '#2563eb'}
+                cx={x}
+                cy={y}
+                fill={selected ? '#111827' : hovered ? '#f29423' : '#2563eb'}
                 role="button"
                 tabIndex={0}
-                r={selected ? 7 : 5}
+                r={selected || hovered ? 7 : 5}
                 stroke="white"
                 strokeWidth="2"
                 className="cursor-pointer outline-none"
                 onClick={() => onSelect(row.id)}
+                onMouseEnter={() => setHoveredId(row.id)}
+                onMouseLeave={() => setHoveredId(null)}
+                onFocus={() => setHoveredId(row.id)}
+                onBlur={() => setHoveredId(null)}
                 onKeyDown={(event) => {
                   if (event.key === 'Enter' || event.key === ' ') onSelect(row.id);
                 }}
               />
-              <text
-                x={plotX(row.maxDrawdown ?? 0, maxX) + 9}
-                y={plotY(row.moneyWeightedReturn ?? 0, minY, maxY) - 7}
-                className="fill-slate-600 text-[10px] font-semibold"
-              >
-                {row.shortLabel.replace('Overseas Trend ', '').replace('Global Trend ', '')}
-              </text>
+              {selected || hovered ? (
+                <text x={x + 9} y={y - 7} className="fill-slate-950 text-[10px] font-semibold">
+                  {shortChartLabel(row.shortLabel)}
+                </text>
+              ) : null}
             </g>
           );
         })}
       </svg>
+      {activeRow && activePoint ? (
+        <div
+          className="pointer-events-none absolute z-10 w-52 rounded-md border border-slate-200 bg-white p-3 text-xs shadow-lg"
+          style={{
+            left: `${(activePoint.x / 360) * 100}%`,
+            top: `${(activePoint.y / 280) * 100}%`,
+            transform: activePoint.x > 250 ? 'translate(-104%, -50%)' : 'translate(12px, -50%)',
+          }}
+        >
+          <div className="line-clamp-1 font-semibold text-slate-950">{activeRow.shortLabel}</div>
+          <dl className="mt-2 grid grid-cols-2 gap-2 font-mono tabular-nums">
+            <div>
+              <dt className="text-[10px] text-slate-500">MWR</dt>
+              <dd className="font-semibold text-slate-950">{formatPercent(activeRow.moneyWeightedReturn)}</dd>
+            </div>
+            <div>
+              <dt className="text-[10px] text-slate-500">MDD</dt>
+              <dd className="font-semibold text-rose-600">{formatPercent(activeRow.maxDrawdown)}</dd>
+            </div>
+            <div>
+              <dt className="text-[10px] text-slate-500">RP이자</dt>
+              <dd className="font-semibold text-slate-950">{formatPercent(activeRow.cashWeight)}</dd>
+            </div>
+            <div>
+              <dt className="text-[10px] text-slate-500">보유</dt>
+              <dd className="font-semibold text-slate-950">{activeRow.holdingCount.toLocaleString('ko-KR')}개</dd>
+            </div>
+          </dl>
+        </div>
+      ) : null}
       <div className="absolute bottom-2 left-3 right-3 flex justify-between font-mono text-[10px] text-slate-400">
-        <span>낮은 MDD</span>
-        <span>높은 MDD</span>
+        <span>{formatPercent(minX)}</span>
+        <span>{formatPercent(maxX)}</span>
       </div>
-      <div className="absolute left-3 top-2 font-mono text-[10px] text-slate-400">높은 MWR</div>
+      <div className="absolute left-3 top-2 font-mono text-[10px] text-slate-400">{formatPercent(maxY)}</div>
+      <div className="absolute left-3 bottom-6 font-mono text-[10px] text-slate-400">{formatPercent(minY)}</div>
     </div>
   );
 }
 
-function plotX(value: number, maxX: number): number {
-  return 34 + (Math.max(0, value) / maxX) * 300;
+function plotX(value: number, minX: number, maxX: number): number {
+  const span = maxX - minX || 1;
+  return 34 + ((value - minX) / span) * 300;
 }
 
 function plotY(value: number, minY: number, maxY: number): number {
   const span = maxY - minY || 1;
   return 248 - ((value - minY) / span) * 210;
+}
+
+function paddedDomain(values: number[], options: { floor?: number; minSpan: number }): { min: number; max: number } {
+  if (!values.length) return { min: options.floor ?? 0, max: (options.floor ?? 0) + options.minSpan };
+  const rawMin = Math.min(...values);
+  const rawMax = Math.max(...values);
+  const center = (rawMin + rawMax) / 2;
+  const span = Math.max(rawMax - rawMin, options.minSpan);
+  let min = center - span * 0.62;
+  let max = center + span * 0.62;
+  if (options.floor !== undefined && min < options.floor) {
+    max += options.floor - min;
+    min = options.floor;
+  }
+  return { min, max };
+}
+
+function shortChartLabel(label: string): string {
+  return label.replace('Overseas Trend ', 'Overseas ').replace('Global Trend ', 'Global ');
 }
 
 function efficientFrontier(rows: PortfolioStrategySnapshot[]): PortfolioStrategySnapshot[] {
@@ -339,7 +443,7 @@ function withCashHolding(holdings: HoldingRow[], selected: PortfolioStrategySnap
     {
       persona: selected.id,
       symbol: 'CASH',
-      company: 'RP 대기자금',
+      company: 'RP이자',
       qty: null,
       avgCostKrw: null,
       lastCloseKrw: 1,

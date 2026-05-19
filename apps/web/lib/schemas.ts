@@ -142,6 +142,7 @@ export const AccountingReconciliationRowSchema = z
     open_cost_basis_krw: NullableNumber,
     open_market_value_krw: NullableNumber,
     unrealized_pnl_krw: NullableNumber,
+    cash_yield_krw: NullableNumber.optional(),
     final_equity_krw: NullableNumber,
     net_profit_krw: NullableNumber,
     expected_cash_krw: NullableNumber,

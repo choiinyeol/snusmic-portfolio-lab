@@ -203,6 +203,7 @@ export type AccountingReconciliationRow = {
   openCostBasisKrw: number | null;
   openMarketValueKrw: number | null;
   unrealizedPnlKrw: number | null;
+  cashYieldKrw?: number | null;
   finalEquityKrw: number | null;
   netProfitKrw: number | null;
   expectedCashKrw: number | null;
@@ -941,6 +942,7 @@ export function getAccountingReconciliations(): AccountingReconciliationRow[] {
     openCostBasisKrw: row.open_cost_basis_krw,
     openMarketValueKrw: row.open_market_value_krw,
     unrealizedPnlKrw: row.unrealized_pnl_krw,
+    cashYieldKrw: row.cash_yield_krw,
     finalEquityKrw: row.final_equity_krw,
     netProfitKrw: row.net_profit_krw,
     expectedCashKrw: row.expected_cash_krw,

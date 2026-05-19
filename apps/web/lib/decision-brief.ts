@@ -40,7 +40,7 @@ export function buildDecisionBrief(view: DashboardViewModel): DecisionBrief {
         caption: `${overview.portfolio.label} · ${overview.snapshotDate || '기준일 없음'}`,
       },
       {
-        label: 'RP 비중',
+        label: 'RP이자 비중',
         value: formatPercent(overview.portfolio.cashWeight),
         caption: holdings.length ? `${holdings.length}개 보유` : '현재 보유 종목 없음',
         tone: (overview.portfolio.cashWeight ?? 0) > 0.5 ? 'watch' : 'ok',

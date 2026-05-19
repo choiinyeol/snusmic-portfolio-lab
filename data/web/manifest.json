@@ -44,7 +44,7 @@
     "trades.json"
   ],
   "checksums": {
-    "accounting-reconciliation.json": "b89821279494a3ef75e0f6b439bc4d782f0483979ca16efb42927b810d513423",
+    "accounting-reconciliation.json": "75c481566f6104559aa6b124f52a714ef42141043d1a8a7fd9898024cfd30aea",
     "current-holdings.json": "f8479e2293169c963dc94772499dfdf8114b688dc93bed090f6a5c252de17d5e",
     "data-quality-download.csv": "ca7f934a6b3fa8912033689acfee50812f02bb02851d03eed268a1cb9d5ba524",
     "data-quality.json": "fcd4b63301f1c79cf9f89f512ded3ee059491e57c3f7ddf6547edf1d9eaa385b",
@@ -57,7 +57,7 @@
     "overview/research-pulse.json": "a42526ea0d6af856a910865cf44377c82ed23b0ae3b55d8097db5c3cddd247c4",
     "overview/snapshot.json": "3196ea13481e5bedc25375f1b3f265f144886034c2f648b24d9a2d4af839972c",
     "personas.json": "df3730ac97e3da58d02d373e4b5bf5fde19ad7852e3bc46cfb938df920a5f370",
-    "portfolio/accounting-reconciliation.json": "5040d882fa53d0fe6fdb3bf981dcc7a5636c7e34eb8d5d940ee93f3a46eaa499",
+    "portfolio/accounting-reconciliation.json": "e6f765242b4b3a686defcd12e8a2f7402efe02af9ee965e82fd6bbf0a502803b",
     "portfolio/episodes.json": "279cbb13d0a331a35199dd887cf59d17335eefa34a71f6a8d838b5adb117c55d",
     "portfolio/equity-daily.json": "f0e03f6f020057166f8ea2537434fe40cc650f5ccb157a21ff04e0717fee025b",
     "portfolio/holdings.json": "0ab7c5700f079aae0908326b38e0353a2fbca4df48e0bd12f3611b03164ffbb4",
@@ -77,7 +77,7 @@
     "return-windows.json": "3ebe1cb4c1e15961f618074cd590a570a3d15a57564257803e3b86e55858fdee",
     "screener/candidates.json": "f1ff3d60377a1a204545515d4868b57e2d10007920b9238a56ee024421bf0e4d",
     "strategies/admission.json": "7e029de600581b207d570254558ccfcc4b8805dd966a13ef17c57e2494a24a40",
-    "strategies/catalog.json": "5d99b02ed5c5572f516a964261c577d45f1516559e73d32880970a1c98a7c87e",
+    "strategies/catalog.json": "a30cd9ddc0ce7090f4c7e5e620104fa791712ccbf3e72f6d0edbec8abd3b5d26",
     "strategies/curves.json": "f0e03f6f020057166f8ea2537434fe40cc650f5ccb157a21ff04e0717fee025b",
     "strategies/leaderboard.json": "d8bb3a5c5bef082ac5506ca66f07c96253ecab9b14a8908feb06712a5a342e54",
     "strategy-admission.json": "bbd1ff949dada964d1cd71dbf092e32bedd8be5242225a8a43524dfb297481dc",

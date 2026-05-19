@@ -2,6 +2,22 @@
 
 이 프로젝트의 사용자 가시 변경사항을 모두 정리합니다. 릴리스의 진실은 git 태그이며, 본 파일은 태그 단위로 의도를 한국어로 기록합니다.
 
+## v0.25.2-portfolio-ux-refine.1 — 2026-05-19
+
+### 변경
+- `/portfolio`의 큰 카드형 선택기를 조밀한 실제 전략 원장 테이블로 바꿔 전략 수가 늘어나도 한 화면에서 비교·선택할 수 있게 했습니다.
+- portfolio frontier 차트가 실제 MDD/MWR 최소·최대값 기반 도메인과 패딩을 계산해 점들이 한쪽에 뭉치지 않도록 하고, hover/focus tooltip에 MWR·MDD·RP이자·보유 수를 표시합니다.
+- `/portfolio/[strategy]` 상세 상단의 중복 전략 selector를 제거하고, `포트폴리오 선택`/`전략 비교` 복귀 버튼과 간결한 보고서 섹션 내비게이션으로 대체했습니다.
+- `/portfolio/[strategy]/trades`의 `포지션 단위 매수·매도` 표를 제거하고 `매매내역` 단일 원장으로 통합했습니다.
+- 사용자 노출 명칭을 `RP 대기자금`/`RP 비중`에서 `RP이자`/`RP이자 비중`으로 정리하고, 트리맵의 RP 항목은 0.00% 미실현 수익률 대신 현금성 RP이자 잔고로 설명합니다.
+
+### 검증
+- `pnpm --dir apps/web check:fix`
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web build` (정적 페이지 506개)
+- `uv run python -m pytest tests/test_web_artifacts.py::test_accounting_reconciliation_explains_strategy_cash_vs_realized_pnl -q`
+- static scan: portfolio build output has no `포지션 단위 매수`, `실제 운용 원장`, `RP 대기자금`, `RP 비중` strings
+
 ## v0.25.1-rp-cash-allocation.1 — 2026-05-19
 
 ### Changed

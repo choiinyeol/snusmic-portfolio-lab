@@ -87,7 +87,7 @@ export function PortfolioOverviewView({ model }: { model: PortfolioViewModel }) 
             height={460}
             compact
             hrefBySymbol={reportHrefBySymbol}
-            caption="면적 = 평가액, 색 = 미실현 수익률. RP 대기자금도 포트폴리오 비중으로 포함합니다."
+            caption="면적 = 평가액, 색 = 미실현 수익률. RP이자도 포트폴리오 비중으로 포함합니다."
           />
         </article>
       </section>
@@ -264,7 +264,7 @@ function withCashHolding(holdings: HoldingRow[], cashKrw: number, persona: strin
     {
       persona,
       symbol: 'CASH',
-      company: 'RP 대기자금',
+      company: 'RP이자',
       qty: null,
       avgCostKrw: null,
       lastCloseKrw: 1,

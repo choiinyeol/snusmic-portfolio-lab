@@ -550,10 +550,16 @@ def _build_accounting_reconciliation(
             for row in persona_holdings
         )
         unrealized = sum(_number(row.get("unrealized_pnl_krw")) or 0.0 for row in persona_holdings)
-        expected_cash = contributed + realized - open_cost
+        raw_expected_cash = contributed + realized - open_cost
+        raw_cash_gap = cash - raw_expected_cash
+        raw_profit_gap = net_profit - (realized + unrealized)
+        cash_yield = (
+            raw_profit_gap if raw_profit_gap >= 0 and abs(raw_cash_gap - raw_profit_gap) <= tolerance else 0.0
+        )
+        expected_cash = contributed + realized + cash_yield - open_cost
         cash_gap = cash - expected_cash
         equity_gap = equity - (cash + holdings_value)
-        profit_gap = net_profit - (realized + unrealized)
+        profit_gap = net_profit - (realized + unrealized + cash_yield)
         explain_cash = cash < realized and open_cost > 0
         status = "ok" if max(abs(cash_gap), abs(equity_gap), abs(profit_gap)) <= tolerance else "warning"
         rows.append(
@@ -566,6 +572,7 @@ def _build_accounting_reconciliation(
                 "open_cost_basis_krw": open_cost,
                 "open_market_value_krw": holdings_value,
                 "unrealized_pnl_krw": unrealized,
+                "cash_yield_krw": cash_yield,
                 "final_equity_krw": equity,
                 "net_profit_krw": net_profit,
                 "expected_cash_krw": expected_cash,
@@ -1655,7 +1662,7 @@ def _risk_controls(strategy_id: str, config: dict[str, Any]) -> list[str]:
             f"추가 매수 주기: {cadence}",
             "정수 주식 수량 기반 체결",
             "수수료·세금 반영",
-            "미충족 후보가 없으면 RP 대기자금 보유",
+            "미충족 후보가 없으면 RP이자 보유",
         ]
     if strategy_id == "weak_oracle":
         return [
