@@ -20,6 +20,32 @@
 
 ---
 
+## v0.21.20-screener-patterns-batch-1.1 — 2026-05-19
+
+### 분석 (Screener 페이지 패턴 catalog)
+- 사용자 평가: "/screener 진짜 잘 만든듯". 197개 종목을 dense table로 정렬·필터·페이징·기술적 지표·sparkline까지 보여주는 표준이 됨. 다른 페이지에 일괄 적용하기 위해 14가지 패턴을 정리.
+- 핵심 affordance: 컬럼별 inline filter row (sticky `top-[31px]`), column visibility modes (core/price/all), preset 정렬+필터 조합 + presetCounts, useReducer for filters, useDeferredValue for global filter, sticky 2-row header, active filter count + clear-all, kind-driven column matching (`percent/number/boolean/text`), 빈 상태 UX, sparkline mini-chart.
+
+### 적용 (ReportsTable batch 1)
+- `useDeferredValue`로 global filter 적용. 타이핑 중 table re-render 부드러워짐.
+- 헤더에 `sticky top-0 z-10` 추가. 행 스크롤 시 컬럼명 항상 보임.
+- 표 컨테이너에 `max-h-[72vh] overflow-auto`로 수직 스크롤 활성화. 헤더 sticky가 동작.
+- 헤더 background를 `bg-slate-100`으로 변경 (Screener와 동일 톤). 폰트도 mono uppercase로 통일.
+
+### 후속 (대기)
+- ReportsTable에 per-column filter row 적용 (sticky `top-[31px]`).
+- ReportsTable column visibility modes (core/extended).
+- `/strategies` leaderboard 표 동일 패턴 적용.
+- `/portfolio` 다중 표 (StrategyRiskTable, PortfolioTables, TradesTable) 동일 패턴.
+- 공유 `<UnifiedDataTable>` 컴포넌트 추출 (DESIGN.md §9 명시).
+
+### 검증
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web build` (정적 페이지 413개)
+
+---
+
 ## v0.21.19-confirmation-signals.1 — 2026-05-19
 
 ### 변경 (분류 기준)

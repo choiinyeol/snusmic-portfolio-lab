@@ -15,7 +15,7 @@ import {
   type SortingState,
   useReactTable,
 } from '@tanstack/react-table';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchShortcut } from '@/components/ui/use-search-shortcut';
 import type { ReportRow } from '@/lib/artifacts';
 import { formatDateKo, formatDays, formatNative, formatPercent } from '@/lib/format';
@@ -42,6 +42,7 @@ export function ReportsTable({ reports }: ReportsTableProps) {
   const [sorting, setSorting] = useState<SortingState>([{ id: 'publicationDate', desc: true }]);
   const [activePreset, setActivePreset] = useState<SortPresetId>('recent');
   const [globalFilter, setGlobalFilter] = useState('');
+  const deferredGlobalFilter = useDeferredValue(globalFilter);
   const clearGlobalFilter = useCallback(() => setGlobalFilter(''), []);
   const searchInputRef = useSearchShortcut(clearGlobalFilter);
   const [exchangeFilter, setExchangeFilter] = useState('all');
@@ -221,7 +222,7 @@ export function ReportsTable({ reports }: ReportsTableProps) {
   const table = useReactTable({
     data: reports,
     columns,
-    state: { sorting, globalFilter },
+    state: { sorting, globalFilter: deferredGlobalFilter },
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
     globalFilterFn: globalTextFilter,
@@ -421,13 +422,17 @@ export function ReportsTable({ reports }: ReportsTableProps) {
         <span>페이지당 {PAGE_SIZE}개</span>
       </div>
 
-      <div className="w-full min-w-0 overflow-x-auto">
-        <table className="w-full min-w-[1120px] text-sm [&_td]:border-b [&_td]:border-slate-100 [&_td]:px-3 [&_td]:py-3 [&_th]:border-b [&_th]:border-slate-200 [&_th]:bg-white [&_th]:px-3 [&_th]:py-2 [&_tr:hover_td]:bg-slate-50">
+      <div className="w-full min-w-0 max-h-[72vh] overflow-auto">
+        <table className="w-full min-w-[1120px] text-sm [&_td]:border-b [&_td]:border-slate-100 [&_td]:px-3 [&_td]:py-3 [&_th]:border-b [&_th]:border-slate-200 [&_th]:px-3 [&_th]:py-2 [&_tr:hover_td]:bg-slate-50">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <th key={header.id} aria-sort={ariaSort(header.column.getIsSorted())}>
+                  <th
+                    key={header.id}
+                    aria-sort={ariaSort(header.column.getIsSorted())}
+                    className="sticky top-0 z-10 whitespace-nowrap bg-slate-100 text-left font-mono text-[11px] uppercase tracking-[0.04em] text-slate-600"
+                  >
                     {header.isPlaceholder ? null : (
                       <button
                         type="button"
