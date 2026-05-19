@@ -210,7 +210,7 @@ def _strategy_display_label(config: SmicMttStrategyConfig, rank: int) -> str:
         "domestic": "Korea",
         "overseas": "Overseas",
     }.get(config.universe, "Global")
-    signal = "Trend" if config.require_mtt else "Momentum"
+    signal = _signal_label(config)
     concentration = (
         "Focused" if config.max_positions <= 10 else "Balanced" if config.max_positions <= 25 else "Broad"
     )
@@ -246,21 +246,25 @@ def _sample_config(trial: optuna.Trial) -> SmicMttStrategyConfig:
         step=0.25,
     )
     require_mtt = trial.suggest_categorical("require_mtt", [False, True])
+    trend_filter = cast(
+        Any,
+        trial.suggest_categorical("trend_filter", ["mtt", "supertrend", "atr_breakout"])
+        if require_mtt
+        else "mtt",
+    )
     return SmicMttStrategyConfig(
         min_target_upside_at_pub=min_upside,
         max_target_upside_at_pub=max_upside,
         target_hit_multiplier=trial.suggest_float("target_hit_multiplier", 0.8, 1.1, step=0.05),
         require_mtt=require_mtt,
+        trend_filter=trend_filter,
         min_price_vs_52w_low=trial.suggest_float("min_price_vs_52w_low", 0.0, 1.0, step=0.10),
         max_pct_below_52w_high=trial.suggest_float("max_pct_below_52w_high", 0.10, 1.0, step=0.05),
         min_ma200_1m_return=trial.suggest_float("min_ma200_1m_return", -0.05, 0.05, step=0.01),
-        relative_strength_lookback_days=trial.suggest_categorical(
-            "relative_strength_lookback_days", [63, 126, 252]
-        ),
-        min_relative_strength_percentile=trial.suggest_float(
-            "min_relative_strength_percentile", 0.0, 0.80, step=0.10
-        ),
-        min_momentum_return=trial.suggest_float("min_momentum_return", -0.20, 0.40, step=0.05),
+        atr_period_days=trial.suggest_categorical("atr_period_days", [10, 14, 20]),
+        supertrend_multiplier=trial.suggest_float("supertrend_multiplier", 2.0, 4.0, step=0.5),
+        breakout_lookback_days=trial.suggest_categorical("breakout_lookback_days", [20, 55, 100]),
+        breakout_atr_multiple=trial.suggest_float("breakout_atr_multiple", 0.0, 1.0, step=0.25),
         max_positions=trial.suggest_int("max_positions", 5, 40, step=5),
         universe=cast(Any, trial.suggest_categorical("universe", ["all", "domestic", "overseas"])),
         top_up_cadence=cast(
@@ -270,6 +274,16 @@ def _sample_config(trial: optuna.Trial) -> SmicMttStrategyConfig:
         take_profit_pct=trial.suggest_float("take_profit_pct", 0.50, 3.00, step=0.25),
         report_age_stop_days=trial.suggest_categorical("report_age_stop_days", [180, 365, 730, 1095]),
     )
+
+
+def _signal_label(config: SmicMttStrategyConfig) -> str:
+    if not config.require_mtt:
+        return "Momentum"
+    if config.trend_filter == "supertrend":
+        return "Supertrend"
+    if config.trend_filter == "atr_breakout":
+        return "Breakout"
+    return "Trend"
 
 
 def _config_from_attrs(attrs: dict[str, Any]) -> SmicMttStrategyConfig:
