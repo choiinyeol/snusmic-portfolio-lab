@@ -1,6 +1,5 @@
 'use client';
 
-import type { ReactNode } from 'react';
 import { useState } from 'react';
 import Link from 'next/link';
 import type { ReportStatisticsLabSummary } from '@/lib/artifacts';
@@ -40,91 +39,49 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
   const vintageCohorts = buildVintageCohorts(summary.riskScatter);
   const concentration = buildConcentration(summary.riskScatter);
 
+  const day0Median = delayRows.find((row) => row.delayDays === 0)?.medianReturn ?? null;
+  const day20Median = delayRows.find((row) => row.delayDays === 20)?.medianReturn ?? null;
+
   return (
-    <div className="grid gap-14">
-      <section className="grid gap-6 border-b border-slate-200 pb-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-end">
-        <div className="max-w-3xl">
-          <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-            리포트 성과
-          </div>
-          <h1 className="mt-3 text-4xl font-semibold tracking-[-0.055em] text-slate-950 md:text-6xl">
-            큰 수익은 누가 만들었을까요
-          </h1>
-          <p className="mt-5 text-base leading-8 text-slate-600">
-            SMIC가 발간한 리포트 {summary.sample.eligibleReportCount.toLocaleString('ko-KR')}건을 끝까지 추적했습니다.
-            평균 한 줄로는 보이지 않습니다 — 누가 크게 갔고, 누가 빠졌고, 전체 수익이 얼마나 소수에 집중됐는지가 진짜
-            그림입니다.
+    <div className="grid gap-10">
+      <header className="border-b border-slate-200 pb-5">
+        <h1 className="text-xl font-semibold text-slate-950">리포트 통계</h1>
+        <p className="mt-1 font-mono text-xs text-slate-500">
+          기준일 {summary.sample.endDate} · 표본 {eligiblePathCount.toLocaleString('ko-KR')}건 · 유효 티커{' '}
+          {uniqueSymbolCount.toLocaleString('ko-KR')}개
+        </p>
+      </header>
+
+      <DistributionSignature
+        mean={meanReturn}
+        median={medianReturn}
+        trimmed={trimmedMean10}
+        sampleSize={eligiblePathCount}
+        uniqueSymbols={uniqueSymbolCount}
+        deepLosers={deepLosers}
+        bigWinners={bigWinners}
+      />
+
+      <WholeSampleMap rows={summary.riskScatter} quantiles={returnQuantiles} />
+
+      <WinnersLosersBoard rows={summary.riskScatter} />
+
+      <ConcentrationInsight rows={concentration} />
+
+      <PathBucketPanel buckets={pathBuckets} exampleMetaById={exampleMetaById} total={eligiblePathCount} />
+
+      <VintageCohortTable cohorts={vintageCohorts} />
+
+      <RiskScatter rows={summary.riskScatter} />
+
+      <section className="grid gap-3">
+        <header>
+          <h2 className="text-sm font-semibold text-slate-950">목표가 도달률</h2>
+          <p className="mt-1 text-xs text-slate-500">
+            목표 기준 {threshold.toFixed(1)}x · 보유 기간 {horizon}거래일에서 도달률{' '}
+            {formatPercent(selectedHit?.hitRate)} · 도달 중앙 시간 {formatDays(selectedHit?.medianDaysToHit)}.
           </p>
-        </div>
-        <DistributionSignature
-          mean={meanReturn}
-          median={medianReturn}
-          trimmed={trimmedMean10}
-          sampleSize={eligiblePathCount}
-          uniqueSymbols={uniqueSymbolCount}
-          deepLosers={deepLosers}
-          bigWinners={bigWinners}
-        />
-      </section>
-
-      <StorySection
-        kicker="전체 분포"
-        title="리포트 한 건은 점 하나"
-        body="왼쪽부터 수익률이 낮은 순서. 위로 길게 뻗은 몇 개의 점이 전체 그림을 바꿉니다 — 가장 큰 수익을 만든 종목 셋의 이름이 그래프 위에 표시됩니다."
-      >
-        <WholeSampleMap rows={summary.riskScatter} quantiles={returnQuantiles} />
-        <InsightLine>
-          전체 표본의 하위 10%는 <strong>{formatPercent(returnQuantiles.p10)}</strong> 이하, 상위 10%는{' '}
-          <strong>{formatPercent(returnQuantiles.p90)}</strong> 이상. 평균과 중앙값 사이의 간격이 바로 몇 건의 큰 수익이
-          평균을 끌어올린 폭입니다.
-        </InsightLine>
-      </StorySection>
-
-      <StorySection
-        kicker="크게 간 종목 · 크게 빠진 종목"
-        title="평균 뒤에 숨어 있던 이름들"
-        body="평균 한 숫자만 보면 사라지는 정보입니다. 실제로 누가 크게 갔고 누가 빠졌는지 이름을 봅니다."
-      >
-        <WinnersLosersBoard rows={summary.riskScatter} />
-      </StorySection>
-
-      <StorySection
-        kicker="수익 집중도"
-        title="수익은 상위 몇 건이 만들었나"
-        body="전체 표본의 누적 (+) 수익률을 상위 N건이 얼마나 차지하는지 봅니다. 수익이 몇 종목에 몰릴수록, 평균은 그 종목들의 그림자일 뿐입니다."
-      >
-        <ConcentrationInsight rows={concentration} />
-      </StorySection>
-
-      <StorySection
-        kicker="경로 유형"
-        title="같은 결과여도 다른 길로 도착했습니다"
-        body="목표가에 빠르게 닿은 리포트, 큰 손실을 거쳤다가 회복한 리포트, 끝내 손실로 끝난 리포트를 나눠봅니다."
-      >
-        <PathBucketPanel buckets={pathBuckets} exampleMetaById={exampleMetaById} total={eligiblePathCount} />
-      </StorySection>
-
-      <StorySection
-        kicker="발간 시기별"
-        title="시장 국면이 다른 해의 표본"
-        body="2024년 모멘텀과 2022년 약세장은 같은 표본이 아닙니다. 발간 연도별로 도달률과 중앙 수익률을 나눠 봅니다."
-      >
-        <VintageCohortTable cohorts={vintageCohorts} />
-      </StorySection>
-
-      <StorySection
-        kicker="중간 손실"
-        title="끝까지 들고 가려면 얼마까지 빠질 각오?"
-        body="발간 이후 최대 상승폭과 최대 하락폭을 같은 그림에 놓습니다. 결과적으로 맞춘 리포트도 도착까지 굴곡이 있었습니다."
-      >
-        <RiskScatter rows={summary.riskScatter} />
-      </StorySection>
-
-      <StorySection
-        kicker="참고 지표"
-        title="가정을 바꿔보면"
-        body="이상은 모두 발간 당일 종가에 1주씩 산 가정입니다. 도달 기준과 진입 시점을 바꾸면 결과가 어떻게 달라지는지 따로 토글해 봅니다."
-      >
+        </header>
         <ControlStrip
           label="목표 기준"
           options={THRESHOLDS.map((value) => ({ value, label: `${value.toFixed(1)}x` }))}
@@ -132,11 +89,16 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
           onChange={setThreshold}
         />
         <FractionalHitFigure rows={thresholdRows} />
-        <InsightLine>
-          {horizon}거래일 안에 {threshold.toFixed(1)}x 목표에 닿은 비율은{' '}
-          <strong>{formatPercent(selectedHit?.hitRate)}</strong>, 평균적으로 도달까지 걸린 시간은{' '}
-          <strong>{formatDays(selectedHit?.medianDaysToHit)}</strong>입니다.
-        </InsightLine>
+      </section>
+
+      <section className="grid gap-3">
+        <header>
+          <h2 className="text-sm font-semibold text-slate-950">진입 시점별 결과</h2>
+          <p className="mt-1 text-xs text-slate-500">
+            보유 기간 {horizon}거래일 · 당일 진입 중앙 수익률 {formatPercent(day0Median)} · 20일 지연{' '}
+            {formatPercent(day20Median)}.
+          </p>
+        </header>
         <ControlStrip
           label="보유 기간"
           options={HORIZONS.map((value) => ({ value, label: `${value}D` }))}
@@ -144,12 +106,7 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
           onChange={setHorizon}
         />
         <DelayHeatmap rows={delayRows} />
-        <InsightLine>
-          {horizon}거래일 보유 기준으로 당일 진입의 중앙 수익률은{' '}
-          <strong>{formatPercent(delayRows.find((row) => row.delayDays === 0)?.medianReturn)}</strong>, 20일 기다린 뒤
-          진입은 <strong>{formatPercent(delayRows.find((row) => row.delayDays === 20)?.medianReturn)}</strong>입니다.
-        </InsightLine>
-      </StorySection>
+      </section>
 
       <DataNoteFooter
         sampleSize={eligiblePathCount}
@@ -215,9 +172,6 @@ function DistributionSignature({
           </dd>
         </div>
       </dl>
-      <p className="mt-3 text-[11px] leading-5 text-slate-500">
-        평균이 중앙값보다 크고 절단 평균이 더 작다면, 양극단의 큰 수익 몇 건이 평균을 끌어올리고 있다는 뜻입니다.
-      </p>
     </div>
   );
 }
@@ -618,29 +572,6 @@ function bucketToneClass(tone: PathBucket['tone']): string {
   return 'text-slate-700';
 }
 
-function StorySection({
-  kicker,
-  title,
-  body,
-  children,
-}: {
-  kicker: string;
-  title: string;
-  body: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="grid gap-5 lg:grid-cols-[20rem_minmax(0,1fr)] lg:gap-10">
-      <div className="lg:sticky lg:top-8 lg:self-start">
-        <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{kicker}</div>
-        <h2 className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-slate-950 md:text-3xl">{title}</h2>
-        <p className="mt-4 text-sm leading-7 text-slate-600">{body}</p>
-      </div>
-      <div className="grid gap-4">{children}</div>
-    </section>
-  );
-}
-
 function ControlStrip<T extends number>({
   label,
   options,
@@ -929,10 +860,6 @@ function targetHitLabel(row: ReportStatisticsLabSummary['riskScatter'][number]):
   return '미도달';
 }
 
-function InsightLine({ children }: { children: ReactNode }) {
-  return <p className="rounded-xl bg-slate-50 px-4 py-3 text-sm leading-7 text-slate-700">{children}</p>;
-}
-
 function xScale(value: number, min: number, max: number): number {
   if (max <= min) return 50;
   return Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
@@ -991,20 +918,12 @@ function DataNoteFooter({
   snapshotDate: string;
 }) {
   return (
-    <section aria-label="데이터 노트" className="border-t border-slate-200 pt-6">
-      <div className="grid gap-4 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:items-start">
-        <div>
-          <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-            데이터 노트
-          </div>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            기준일 {snapshotDate} · 표본 {sampleSize.toLocaleString('ko-KR')}건 · 유효 티커{' '}
-            {uniqueSymbols.toLocaleString('ko-KR')}개. 가격은 종가 기준이며 거래비용은 반영되지 않았습니다. 이 페이지는
-            학습 자료로 제공되며 투자 권유가 아닙니다.
-          </p>
-        </div>
-      </div>
-    </section>
+    <footer aria-label="데이터 노트" className="border-t border-slate-200 pt-5">
+      <p className="font-mono text-[11px] text-slate-500">
+        기준일 {snapshotDate} · 표본 {sampleSize.toLocaleString('ko-KR')}건 · 유효 티커{' '}
+        {uniqueSymbols.toLocaleString('ko-KR')}개 · 종가 기준 · 거래비용 미반영
+      </p>
+    </footer>
   );
 }
 
@@ -1083,8 +1002,6 @@ function buildConcentration(rows: RiskScatterRow[]): ConcentrationRow[] {
 
 function ConcentrationInsight({ rows }: { rows: ConcentrationRow[] }) {
   if (rows.length === 0) return null;
-  const top5 = rows.find((row) => row.topN === 5);
-  const top10 = rows.find((row) => row.topN === 10);
   return (
     <div className="grid gap-4">
       <div className="rounded-2xl border border-slate-200 bg-white p-5">
@@ -1109,22 +1026,6 @@ function ConcentrationInsight({ rows }: { rows: ConcentrationRow[] }) {
           ))}
         </div>
       </div>
-      {top5 || top10 ? (
-        <InsightLine>
-          {top5 ? (
-            <>
-              상위 5건이 전체 (+) 수익의 <strong>{formatPercent(top5.share)}</strong>를 만들었습니다.
-            </>
-          ) : null}
-          {top5 && top10 ? ' ' : ''}
-          {top10 ? (
-            <>
-              상위 10건이면 <strong>{formatPercent(top10.share)}</strong>. 평균 한 숫자가 표본 전체의 대표값이라고 보기
-              어려운 이유입니다.
-            </>
-          ) : null}
-        </InsightLine>
-      ) : null}
     </div>
   );
 }

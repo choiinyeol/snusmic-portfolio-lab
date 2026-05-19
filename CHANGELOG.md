@@ -20,6 +20,29 @@
 
 ---
 
+## v0.21.11-formal-report-tone.1 — 2026-05-19
+
+### 변경 (페이지 톤)
+- `/statistics` 페이지에서 SaaS 랜딩 페이지 스타일 히어로(eyebrow + 큰 트래킹 타이트 헤드라인 + 본문 prose paragraph)를 완전히 제거. 대신 minimal 페이지 헤더(`<h1>리포트 통계</h1>` + 1줄 메타 "기준일 · 표본 · 티커")로 교체.
+- 각 섹션의 `StorySection` 래퍼(kicker + 큰 h2 + body prose) 패턴을 제거. 각 figure는 자체 `<h3>` 캡션을 갖고 있어서 외부 wrapper title이 중복이었음. 그냥 `<section>`으로 감싸기만.
+- 차트 아래 marketing 문장형 `InsightLine` (강조 prose with bold) 블록을 모두 제거. 도달률·진입 시점 같은 interactive 섹션에서는 figure 위 `<header>`에 한 줄 사실 캡션으로 핵심 숫자 노출 (bold 없음, plain text).
+- `DataNoteFooter`의 두 줄 prose("거래비용 미반영, 학습 자료") → 한 줄 메타 라인으로.
+- `DistributionSignature` 하단 instructional 캡션("평균이 중앙값보다 크고 절단 평균이 더 작다면...") 제거.
+
+### 제거 (구조)
+- `StorySection`·`InsightLine` 컴포넌트 삭제 (호출자 모두 사라짐).
+- 미사용 import `ReactNode` 제거.
+
+### 동기
+- 사용자 피드백: "히어로 카피 제발 다 빼세요. 그냥 제목-내용-figure 이런식으로 노멀하고 포멀하게 갑시다." 이 페이지는 SaaS 제품이 아니라 학부 동아리의 데이터 산출물이고, 마케팅 hero·subhead·body prose는 false flair.
+
+### 검증
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web build` (정적 페이지 413개)
+
+---
+
 ## v0.21.10-statistics-deep-change.1 — 2026-05-19
 
 ### 동기
