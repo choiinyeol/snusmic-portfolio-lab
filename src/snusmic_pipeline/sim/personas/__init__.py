@@ -12,6 +12,7 @@ from .prophet import simulate_prophet
 from .smic_follower import simulate_smic_follower
 from .smic_follower_v2 import simulate_smic_follower_v2
 from .smic_mtt_strategy import simulate_smic_mtt_strategy
+from .smic_rsi_reversal import simulate_smic_rsi_reversal
 from .weak_prophet import simulate_weak_prophet
 
 __all__ = [
@@ -23,5 +24,6 @@ __all__ = [
     "simulate_smic_follower",
     "simulate_smic_follower_v2",
     "simulate_smic_mtt_strategy",
+    "simulate_smic_rsi_reversal",
     "simulate_weak_prophet",
 ]
