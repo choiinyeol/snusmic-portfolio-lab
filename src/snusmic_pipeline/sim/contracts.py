@@ -213,9 +213,14 @@ class SmicMttStrategyConfig(_PersonaBase):
 
     # Minervini-style trend template, implemented only with local OHLC history.
     require_mtt: bool = True
+    trend_filter: Literal["mtt", "supertrend", "atr_breakout"] = "mtt"
     min_price_vs_52w_low: Annotated[float, Field(ge=0.0, le=10.0)] = 0.30
     max_pct_below_52w_high: Annotated[float, Field(ge=0.0, le=1.0)] = 0.25
     min_ma200_1m_return: Annotated[float, Field(ge=-1.0, le=1.0)] = 0.0
+    atr_period_days: Annotated[int, Field(ge=5, le=60)] = 14
+    supertrend_multiplier: Annotated[float, Field(gt=0.0, le=10.0)] = 3.0
+    breakout_lookback_days: Annotated[int, Field(ge=5, le=252)] = 20
+    breakout_atr_multiple: Annotated[float, Field(ge=0.0, le=5.0)] = 0.0
 
     # Real account controls.
     max_positions: Annotated[int, Field(ge=1, le=200)] = 10
