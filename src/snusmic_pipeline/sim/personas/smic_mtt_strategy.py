@@ -37,6 +37,8 @@ class ActiveCandidate:
     publication_date: date
     target_price_krw: float
     target_upside_at_pub: float
+    momentum_return: float
+    relative_strength_percentile: float
 
 
 class MttStrategyState:
@@ -177,12 +179,19 @@ def _candidate_from_report(
         return None
     if config.require_mtt and not _passes_mtt(board, day, symbol, config):
         return None
+    momentum_return, relative_strength_percentile = _relative_strength(board, day, symbol, config)
+    if momentum_return < config.min_momentum_return:
+        return None
+    if relative_strength_percentile < config.min_relative_strength_percentile:
+        return None
     return ActiveCandidate(
         report_id=str(record["report_id"]),
         symbol=symbol,
         publication_date=record["_pub"],
         target_price_krw=target,
         target_upside_at_pub=target_upside,
+        momentum_return=momentum_return,
+        relative_strength_percentile=relative_strength_percentile,
     )
 
 
@@ -247,6 +256,41 @@ def _passes_mtt(
         return False
     pct_below_high = high_52w / current - 1.0
     return pct_below_high <= config.max_pct_below_52w_high
+
+
+def _relative_strength(
+    board: PriceBoard,
+    day: date,
+    symbol: str,
+    config: SmicMttStrategyConfig,
+) -> tuple[float, float]:
+    """Return trailing momentum and cross-sectional relative-strength percentile.
+
+    The overlay uses only closes known on or before ``day``. When the requested
+    lookback history is unavailable, permissive defaults preserve legacy report
+    gating unless callers raise ``min_momentum_return`` or
+    ``min_relative_strength_percentile`` above their disabled defaults.
+    """
+
+    if board.close.empty or symbol not in board.close.columns:
+        return 0.0, 0.0
+
+    history = board.close.loc[board.close.index <= pd.Timestamp(day)]
+    if len(history) <= config.relative_strength_lookback_days:
+        return 0.0, 0.0
+
+    window = history.tail(config.relative_strength_lookback_days + 1)
+    first = window.iloc[0]
+    last = window.iloc[-1]
+    returns = (last / first - 1.0).replace([float("inf"), float("-inf")], pd.NA).dropna()
+    returns = returns[(first > 0) & (last > 0)]
+    if symbol not in returns or returns.empty:
+        return 0.0, 0.0
+
+    momentum_return = float(returns[symbol])
+    rank = returns.rank(method="average", pct=True)
+    relative_strength_percentile = float(rank[symbol])
+    return momentum_return, relative_strength_percentile
 
 
 def _top_up_days(trading_dates: list[date], cadence: str) -> set[date]:
@@ -321,7 +365,15 @@ def _buy_or_top_up_slots(
         and c.symbol not in state.stopped_out
         and (not config.require_mtt or _passes_mtt(board, day, c.symbol, config))
     ]
-    candidates.sort(key=lambda c: (-c.target_upside_at_pub, c.publication_date, c.symbol))
+    candidates.sort(
+        key=lambda c: (
+            -c.relative_strength_percentile,
+            -c.momentum_return,
+            -c.target_upside_at_pub,
+            c.publication_date,
+            c.symbol,
+        )
+    )
     candidates = candidates[: config.max_positions]
     if not candidates:
         return

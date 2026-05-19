@@ -1615,6 +1615,13 @@ def _buy_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
                     f"200일선 1개월 변화율 {_pct(config.get('min_ma200_1m_return'))} 이상",
                 ]
             )
+        if float(config.get("min_relative_strength_percentile") or 0) > 0:
+            rules.append(
+                f"{int(config.get('relative_strength_lookback_days') or 0)}거래일 상대강도 "
+                f"상위 {_pct(config.get('min_relative_strength_percentile'))} 이상"
+            )
+        if float(config.get("min_momentum_return") or -1) > -1:
+            rules.append(f"동일 기간 모멘텀 수익률 {_pct(config.get('min_momentum_return'))} 이상")
         return rules
     if strategy_id == "smic_follower":
         return ["상승 목표가가 있는 가격 매칭 리포트를 1/N으로 편입"]

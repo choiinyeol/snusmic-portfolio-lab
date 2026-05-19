@@ -254,6 +254,13 @@ def _sample_config(trial: optuna.Trial) -> SmicMttStrategyConfig:
         min_price_vs_52w_low=trial.suggest_float("min_price_vs_52w_low", 0.0, 1.0, step=0.10),
         max_pct_below_52w_high=trial.suggest_float("max_pct_below_52w_high", 0.10, 1.0, step=0.05),
         min_ma200_1m_return=trial.suggest_float("min_ma200_1m_return", -0.05, 0.05, step=0.01),
+        relative_strength_lookback_days=trial.suggest_categorical(
+            "relative_strength_lookback_days", [63, 126, 252]
+        ),
+        min_relative_strength_percentile=trial.suggest_float(
+            "min_relative_strength_percentile", 0.0, 0.80, step=0.10
+        ),
+        min_momentum_return=trial.suggest_float("min_momentum_return", -0.20, 0.40, step=0.05),
         max_positions=trial.suggest_int("max_positions", 5, 40, step=5),
         universe=cast(Any, trial.suggest_categorical("universe", ["all", "domestic", "overseas"])),
         top_up_cadence=cast(

@@ -146,6 +146,49 @@ def test_smic_mtt_strategy_filters_non_mtt_reports(synthetic_board, synthetic_da
     assert not any(t.symbol == "LOSS" for t in buys)
 
 
+def test_smic_mtt_strategy_relative_strength_prefers_trailing_winner(synthetic_board, synthetic_dates):
+    plan, fees, cashflows = _common_inputs(synthetic_dates)
+    reports = pd.DataFrame(
+        [
+            {
+                "report_id": "rs-win",
+                "symbol": "WIN",
+                "company": "Winners Co",
+                "exchange": "NASDAQ",
+                "publication_date": pd.Timestamp("2025-03-03"),
+                "target_price": 220.0,
+            },
+            {
+                "report_id": "rs-loss",
+                "symbol": "LOSS",
+                "company": "Losers Co",
+                "exchange": "NASDAQ",
+                "publication_date": pd.Timestamp("2025-03-03"),
+                "target_price": 200.0,
+            },
+        ]
+    )
+    cfg = SmicMttStrategyConfig(
+        require_mtt=False,
+        universe="all",
+        min_target_upside_at_pub=0.05,
+        max_target_upside_at_pub=5.0,
+        max_positions=1,
+        top_up_cadence="deposit_only",
+        target_hit_multiplier=2.0,
+        take_profit_pct=3.0,
+        relative_strength_lookback_days=126,
+        min_relative_strength_percentile=0.60,
+        min_momentum_return=0.0,
+    )
+
+    out = simulate_smic_mtt_strategy(cfg, plan, fees, synthetic_board, reports, cashflows, synthetic_dates)
+
+    buys = [t for t in out.account.trades if t.side == "buy"]
+    assert buys
+    assert {t.symbol for t in buys} == {"WIN"}
+
+
 def test_weak_prophet_empty_rebalance_sells_to_cash(synthetic_board, synthetic_reports):
     trading_dates = [date(2024, 1, 2), date(2024, 2, 1)]
     plan, fees, cashflows = _common_inputs(trading_dates)
