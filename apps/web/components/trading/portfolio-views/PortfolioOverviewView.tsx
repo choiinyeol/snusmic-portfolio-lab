@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useMemo } from 'react';
 import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
 import { Button } from '@/components/ui/button';
-import type { AccountingReconciliationRow, HoldingRow, ReportTargetDigest, TradeRow } from '@/lib/artifacts';
+import type { HoldingRow, ReportTargetDigest, TradeRow } from '@/lib/artifacts';
 import { formatKrw } from '@/lib/format';
 import { PortfolioEquityTradeChart } from './PortfolioEquityTradeChart';
 import type { PortfolioViewModel } from './types';
@@ -34,10 +34,6 @@ export function PortfolioOverviewView({ model }: { model: PortfolioViewModel }) 
         .sort((a, b) => b.date.localeCompare(a.date))
         .slice(0, 8),
     [model.trades, persona],
-  );
-  const personaAccounting = useMemo(
-    () => model.accounting.find((row) => row.persona === persona),
-    [model.accounting, persona],
   );
   const method = model.methodsByPersona[persona];
   const personaLabel = model.personaLabels[persona] ?? persona;
@@ -133,8 +129,6 @@ export function PortfolioOverviewView({ model }: { model: PortfolioViewModel }) 
           )}
         </article>
       </section>
-
-      <AccountingExplanationPanel row={personaAccounting} />
     </div>
   );
 }
@@ -182,60 +176,6 @@ function RulePreview({ title, items }: { title: string; items: string[] }) {
 
 function reportTargetHref(target: ReportTargetDigest): string {
   return `/reports/${encodeURIComponent(target.symbol)}/${encodeURIComponent(target.reportId)}`;
-}
-
-function AccountingExplanationPanel({ row }: { row: AccountingReconciliationRow | undefined }) {
-  if (!row) return null;
-  return (
-    <article className="rounded-md border border-slate-200 bg-white p-4">
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_28rem] xl:items-start">
-        <div>
-          <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-            cash check
-          </div>
-          <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">확정 손익과 현금 검산</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-500">{row.explanationKo}</p>
-          <p className="mt-2 font-mono text-xs leading-5 text-slate-500">
-            계산 현금 = 입금 누계 + 확정 손익 − 보유 원가
-          </p>
-        </div>
-        <dl className="grid gap-2 rounded-md border border-slate-200 bg-white p-3 text-sm">
-          <AccountingLine label="입금 누계" value={row.totalContributedKrw} />
-          <AccountingLine label="+ 확정 손익" value={row.realizedPnlKrw} />
-          <AccountingLine label="- 보유 원가" value={row.openCostBasisKrw === null ? null : -row.openCostBasisKrw} />
-          <AccountingLine label="= 계산 현금" value={row.expectedCashKrw} strong />
-          <AccountingLine label="표시 현금" value={row.finalCashKrw} />
-          <AccountingLine
-            label="검산 차이"
-            value={row.cashGapKrw}
-            tone={Math.abs(row.cashGapKrw ?? 0) > 5000 ? 'bad' : 'good'}
-          />
-        </dl>
-      </div>
-    </article>
-  );
-}
-
-function AccountingLine({
-  label,
-  value,
-  strong,
-  tone,
-}: {
-  label: string;
-  value: number | null;
-  strong?: boolean;
-  tone?: 'good' | 'bad';
-}) {
-  const color = tone === 'bad' ? 'text-rose-600' : tone === 'good' ? 'text-emerald-600' : 'text-slate-950';
-  return (
-    <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-2 last:border-b-0 last:pb-0">
-      <dt className="text-slate-950/55">{label}</dt>
-      <dd className={`font-mono tabular-nums ${strong ? 'font-black' : 'font-semibold'} ${color}`}>
-        {formatKrw(value)}
-      </dd>
-    </div>
-  );
 }
 
 function withCashHolding(holdings: HoldingRow[], cashKrw: number, persona: string): HoldingRow[] {

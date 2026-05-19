@@ -72,9 +72,8 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
         </div>
         <div className="grid gap-2 rounded-md border border-slate-200 bg-white p-3">
           <div className="text-xs font-medium text-slate-500">포트폴리오 범위</div>
-          <dl className="grid grid-cols-3 gap-2 text-sm">
+          <dl className="grid grid-cols-2 gap-2 text-sm">
             <Fact label="실제 전략" value={`${model.strategies.length}개`} />
-            <Fact label="합산 평가" value={formatKrw(model.totalEquityKrw)} />
             <Fact label="최근 평가" value={model.latestEquityDate || '—'} />
           </dl>
         </div>

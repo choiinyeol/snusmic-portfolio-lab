@@ -20,6 +20,21 @@
 
 ---
 
+## v0.23.1-hide-cash-check.1 — 2026-05-19
+
+### 변경
+- `/portfolio/[strategy]` overview에서 `cash check` / 확정 손익과 현금 검산 패널을 제거했습니다.
+- `/portfolio` landing의 `합산 평가` 지표를 제거했습니다. 세 실제 전략을 단순 합산한 금액은 포트폴리오 선택 UX에 유의미하지 않아 노출하지 않습니다.
+- 회계 검산은 `accounting-reconciliation.json`과 테스트/내부 데이터 계약으로만 유지하고, 사용자 화면은 보유·현금 비중·손익 경로·매매 시점·운용 로직에 집중합니다.
+
+### 문서
+- `docs/decisions/2026-05-14-plain-language-accounting.md`에 cash check는 내부 검산이라는 최신 UX 결정을 반영했습니다.
+
+### 검증
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web build`
+
 ## v0.23.0-portfolio-ledger-redesign.1 — 2026-05-19
 
 ### 변경
