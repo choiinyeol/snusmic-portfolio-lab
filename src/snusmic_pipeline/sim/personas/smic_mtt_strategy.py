@@ -184,6 +184,11 @@ def _candidate_from_report(
         return None
     if relative_strength_percentile < config.min_relative_strength_percentile:
         return None
+    momentum_return, relative_strength_percentile = _relative_strength(board, day, symbol, config)
+    if momentum_return < config.min_momentum_return:
+        return None
+    if relative_strength_percentile < config.min_relative_strength_percentile:
+        return None
     return ActiveCandidate(
         report_id=str(record["report_id"]),
         symbol=symbol,
