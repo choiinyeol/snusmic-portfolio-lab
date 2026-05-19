@@ -31,14 +31,13 @@ export function PortfolioPageShell({ children, model }: { children: ReactNode; m
   const cashKrw = model.cashByPersona[persona] ?? 0;
   const totalValue = holdingsValue + cashKrw;
   const totalPnl = model.holdings.reduce((sum, row) => sum + (row.unrealizedPnlKrw ?? 0), 0);
-  const tradeCount = model.trades.length;
   const latestEquity = [...model.equity].sort((a, b) => b.date.localeCompare(a.date))[0];
 
   return (
     <div className="grid gap-5">
       <header className="grid gap-4 border-b border-slate-200 pb-5">
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="outline">포트폴리오 원장</Badge>
+          <Badge variant="outline">운용 보고서</Badge>
           <Badge variant="secondary">benchmark 제외</Badge>
           <span className="font-mono text-xs text-slate-500">{model.latestEquityDate || '—'} 평가</span>
         </div>
@@ -46,8 +45,8 @@ export function PortfolioPageShell({ children, model }: { children: ReactNode; m
           <div className="min-w-0">
             <h1 className="text-2xl font-semibold tracking-[-0.02em] text-slate-950 md:text-4xl">{shortLabel}</h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-              {label}의 실제 보유, 현금, 체결, 매매 로직만 보여줍니다. benchmark·follower·oracle류는 `/strategies` 비교
-              페이지에 남기고 이 원장에는 섞지 않습니다.
+              {label}의 실제 보유, 현금, 체결, 매매 로직을 투자 보고서 형태로 보여줍니다. benchmark·follower·oracle류는
+              `/strategies` 비교 페이지에 남기고 이 원장에는 섞지 않습니다.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Button asChild size="sm" variant="outline">
@@ -60,20 +59,18 @@ export function PortfolioPageShell({ children, model }: { children: ReactNode; m
           </div>
           <FactsTable
             rows={[
-              { label: '평가액', value: formatKrw(totalValue), tone: 'neutral' },
+              { label: '현재 평가액', value: formatKrw(totalValue), tone: 'neutral' },
               {
-                label: '현금',
-                value: formatKrw(cashKrw),
-                caption: formatPercent(totalValue > 0 ? cashKrw / totalValue : null),
+                label: '현금 비중',
+                value: formatPercent(totalValue > 0 ? cashKrw / totalValue : null),
+                caption: formatKrw(cashKrw),
               },
-              { label: '미실현', value: formatKrw(totalPnl), tone: totalPnl >= 0 ? 'good' : 'bad' },
+              { label: '미실현 손익', value: formatKrw(totalPnl), tone: totalPnl >= 0 ? 'good' : 'bad' },
               {
                 label: '누적 수익률',
                 value: formatPercent(latestEquity?.cumulativeReturn ?? null),
                 tone: (latestEquity?.cumulativeReturn ?? 0) >= 0 ? 'good' : 'bad',
               },
-              { label: '보유', value: `${model.holdings.length}개` },
-              { label: '체결', value: tradeCount.toLocaleString('ko-KR') },
             ]}
           />
         </div>
@@ -127,7 +124,7 @@ type FactRow = {
 function FactsTable({ rows }: { rows: FactRow[] }) {
   return (
     <section className="overflow-hidden rounded-md border border-slate-200 bg-white" aria-label="포트폴리오 핵심 지표">
-      <dl className="grid grid-cols-2 sm:grid-cols-3 [&>div]:border-b [&>div]:border-r [&>div]:border-slate-100">
+      <dl className="grid grid-cols-2 lg:grid-cols-4 [&>div]:border-b [&>div]:border-r [&>div]:border-slate-100">
         {rows.map((row) => (
           <div className="grid min-w-0 gap-0.5 p-3" key={row.label}>
             <dt className="text-xs font-medium text-slate-500">{row.label}</dt>

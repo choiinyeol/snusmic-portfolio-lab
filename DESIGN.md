@@ -62,7 +62,7 @@ Reader assumption: 매도 타이밍을 모델이 알려줄 수 없다. 우리는
 | Page | Type | Primary retail question | Owned data |
 | --- | --- | --- | --- |
 | `/` | Dashboard | 지금 상태와 어디가 잘/안 됐나 | snapshot · selected strategy · objective gate · recent reports · recent trades |
-| `/portfolio` | Dashboard | 실제 전략 포트폴리오 선택, 현재 비중, 손익 경로 | selectable strategy portfolios · allocation treemap · optimization frontier · equity/trade markers; benchmark/follower/oracle excluded |
+| `/portfolio` | Dashboard + dossier | 실제 전략 포트폴리오 선택, 현재 비중, 손익 경로 | selectable strategy portfolios · allocation treemap · optimization frontier · equity/trade markers; benchmark/follower/oracle excluded |
 | `/reports` | Index | 어떤 리포트들? | report table with target/result columns |
 | `/reports/[symbol]/[id]` | Detail | 이 리포트는 어떻게 됐나 | report detail · price path · facts · scenario table |
 | `/statistics` | Analytics | 전체 리포트가 어떻게 끝났고 어떤 패턴? | derived stats only — feeds off artifacts, doesn't own state |
@@ -374,7 +374,7 @@ Decision pending. If empty, this section is deleted.
 
 - [x] ReportsTable per-column filter row — `DataPanel` chrome, sticky 2-row header, kind-driven column filters, global/dropdown/column reset.
 - [x] `/portfolio/[strategy]` 객체 sub-route 분리 — overview/holdings/equity/trades/methodology URL surface, shared shell, benchmark/follower/oracle 원장 제외.
-- [x] `/portfolio` UI 재정의 — 메인은 실제 전략 선택 + 현재 비중 treemap + strategy-only frontier, 상세는 report-detail식 facts/header + PnL chart with trade markers.
+- [x] `/portfolio` UI 재정의 — 메인은 실제 전략 선택 + 현재 비중 treemap + strategy-only frontier, 상세는 report-detail식 4-KPI header + PnL chart with trade markers, holdings evidence links, Entry/Rebalance/Exit-Risk/Exceptions methodology dossier.
 - [x] `/main` Dashboard의 KPI strip — `buildDecisionBrief(view).state`로 5-tile(평가액·현금비중·낙폭·기준선 대비·데이터 제외) 이미 구현돼 있음.
 
 ---
@@ -389,6 +389,7 @@ Decision pending. If empty, this section is deleted.
 | 2026-05-19 | 모든 return metric의 윈도우를 500 trading days로 통일. | §4.4 |
 | 2026-05-19 | 코드가 단일 truth라는 운영 원칙을 명시. ReportsTable filter row 구현 상태와 `/portfolio/:strategy` 현재 navigation을 문서에 반영. | §0, §6, §9, §11 |
 | 2026-05-19 | `/strategies`는 strategy/benchmark/follower/oracle 비교 카탈로그, `/portfolio`는 실제 selectable strategy 원장으로 역할 분리. Portfolio sub-route, landing/detail UI 재설계, benchmark/follower/oracle 원장 제외를 반영. | §2, §3, §6, §11 |
+| 2026-05-19 | Portfolio detail phase 2: header KPI 축소, trade marker tooltip 설명 강화, holdings evidence links, Entry/Rebalance/Exit-Risk/Exceptions methodology dossier 구조 반영. | §3, §6, §11 |
 
 ## Appendix B. What was removed from the prior version
 

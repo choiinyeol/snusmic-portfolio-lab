@@ -157,7 +157,7 @@ devastating  not hit, expiryReturn <= -30%                           → rose
 - `apps/web/app/(app)/portfolio/[strategy]/page.tsx` — overview만 렌더.
 - `apps/web/app/(app)/portfolio/[strategy]/{holdings,equity,trades,methodology}/page.tsx` — 각 객체 view만 렌더.
 - `apps/web/app/(app)/portfolio/portfolio-view-model.ts` — landing/detail 모델 분리, persona 검증, strategy-only selector/static params 구성.
-- `apps/web/components/trading/portfolio-views/*.tsx` — landing, detail overview, holdings/equity/trades/methodology, PnL trade-marker chart 분리.
+- `apps/web/components/trading/portfolio-views/*.tsx` — landing, detail overview, holdings/equity/trades/methodology, PnL trade-marker chart 분리. Phase 2 기준: detail header는 4-KPI, holdings는 treemap+근거 카드+표, methodology는 진입 후보/편입/청산·교체/위험·예외 구조.
 - `apps/web/lib/product-model.ts`의 `portfolioStrategyHref(strategyId)`는 `/portfolio/${strategyId}`를 반환한다. 단, `/portfolio` static params/selector는 selectable strategy만 포함한다; benchmark/follower/oracle 원장은 `/strategies`의 비교 기준이다.
 
 구현된 라우트:
@@ -165,10 +165,10 @@ devastating  not hit, expiryReturn <= -30%                           → rose
 ```text
 /portfolio                              → strategy-only landing (선택 + 현재 비중 + frontier + PnL path)
 /portfolio/[strategy]                   → overview
-/portfolio/[strategy]/holdings          → Holdings 표
+/portfolio/[strategy]/holdings          → Holdings treemap + 상위 보유 근거 카드 + Holdings 표
 /portfolio/[strategy]/equity            → 일별 평가액
 /portfolio/[strategy]/trades            → 매매 ledger
-/portfolio/[strategy]/methodology       → buy/sell rules + params
+/portfolio/[strategy]/methodology       → Entry · 진입 / Rebalance · 편입·조정 / Exit-Risk · 청산 / Exceptions · 예외 방법론
 ```
 
 결정:

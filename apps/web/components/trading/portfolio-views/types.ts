@@ -34,7 +34,6 @@ export type PortfolioViewModel = {
   targetsBySymbol: Record<string, ReportTargetDigest>;
   targetsByReportId: Record<string, ReportTargetDigest>;
   portfolioStrategyCount: number;
-  totalTradeCount: number;
   latestEquityDate: string;
 };
 
@@ -64,6 +63,4 @@ export type PortfolioLandingModel = {
   equity: EquityPoint[];
   trades: TradeRow[];
   personaLabels: Record<string, string>;
-  totalEquityKrw: number;
-  totalTradeCount: number;
 };

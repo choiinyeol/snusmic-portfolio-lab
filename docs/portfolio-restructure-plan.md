@@ -65,7 +65,7 @@ apps/web/components/trading/portfolio-views/*.tsx
 - 데이터 조립은 `buildPortfolioViewModel(selectedPersona?: string)`로 이동했다.
 - overview, holdings, equity, trades, methodology는 `components/trading/portfolio-views/` 아래 view component로 나뉘었다.
 - 내부 `<Tabs>`는 제거했고 URL sub-route link nav를 사용한다.
-- `/portfolio`는 default detail이 아니라 strategy-only landing이다. 사용자가 실제 포트폴리오를 선택하고 현재 비중 treemap, strategy-only frontier, 손익 경로를 먼저 본다.
+- `/portfolio`는 default detail이 아니라 strategy-only landing이다. 사용자가 실제 포트폴리오를 선택하고 현재 비중 treemap, strategy-only frontier, 손익 경로를 먼저 본다. 상세 페이지는 4-KPI header, PnL+trade marker explanation, holdings evidence links, Entry/Rebalance/Exit-Risk/Exceptions methodology dossier를 소유한다.
 
 ---
 
@@ -74,10 +74,10 @@ apps/web/components/trading/portfolio-views/*.tsx
 ```text
 /portfolio                              → strategy-only landing (선택 + 현재 비중 + frontier + PnL path)
 /portfolio/[strategy]                   → overview (KPI + analytics + treemap summary)
-/portfolio/[strategy]/holdings          → Holdings table
+/portfolio/[strategy]/holdings          → Holdings treemap + evidence cards + table
 /portfolio/[strategy]/equity            → Daily equity view
 /portfolio/[strategy]/trades            → Trade ledger
-/portfolio/[strategy]/methodology       → buy/sell/risk rules + params
+/portfolio/[strategy]/methodology       → Entry / Rebalance / Exit-Risk / Exceptions methodology
 ```
 
 원칙:

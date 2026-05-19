@@ -70,8 +70,6 @@ export function buildPortfolioLandingModel(): PortfolioLandingModel {
     equity,
     trades,
     personaLabels,
-    totalEquityKrw: strategies.reduce((sum, row) => sum + (row.finalEquityKrw ?? 0), 0),
-    totalTradeCount: trades.length,
   };
 }
 
@@ -162,8 +160,6 @@ export function buildPortfolioViewModel(selectedPersona?: string): PortfolioView
   const latestEquityDate = allEquity
     .filter((row) => personas.includes(row.persona))
     .reduce((latest, row) => (row.date > latest ? row.date : latest), '');
-  const portfolioPersonaSet = new Set(personas);
-
   return {
     holdings,
     accounting,
@@ -183,7 +179,6 @@ export function buildPortfolioViewModel(selectedPersona?: string): PortfolioView
     targetsBySymbol,
     targetsByReportId,
     portfolioStrategyCount: personas.length,
-    totalTradeCount: allTrades.filter((row) => portfolioPersonaSet.has(row.persona)).length,
     latestEquityDate,
   };
 }

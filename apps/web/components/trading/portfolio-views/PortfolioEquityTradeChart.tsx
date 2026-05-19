@@ -88,7 +88,7 @@ export function PortfolioEquityTradeChart({ equity, trades, persona, label, heig
       }
       setTooltip({
         x: Math.min(params.point.x + 16, Math.max(16, container.clientWidth - 260)),
-        y: Math.max(12, params.point.y - 88),
+        y: Math.max(12, params.point.y - 132),
         date,
         equityKrw: point.equityKrw,
         returnPct: point.cumulativeReturn,
@@ -135,17 +135,35 @@ export function PortfolioEquityTradeChart({ equity, trades, persona, label, heig
           <div>평가액 {formatKrw(tooltip.equityKrw)}</div>
           <div>누적 {formatPercent(tooltip.returnPct)}</div>
           {tooltip.trades.length ? (
-            <div className="mt-1 border-t border-slate-100 pt-1">
+            <div className="mt-1 grid gap-1 border-t border-slate-100 pt-1">
               {tooltip.trades.slice(0, 3).map((trade) => (
-                <div key={`${trade.date}-${trade.symbol}-${trade.side}-${trade.qty}`}>
-                  {trade.side === 'sell' ? '매도' : '매수'} {trade.symbol} · {formatKrw(trade.grossKrw)}
-                </div>
+                <TradeTooltipLine key={`${trade.date}-${trade.symbol}-${trade.side}-${trade.qty}`} trade={trade} />
               ))}
-              {tooltip.trades.length > 3 ? <div>외 {tooltip.trades.length - 3}건</div> : null}
+              {tooltip.trades.length > 3 ? (
+                <div className="text-slate-400">외 {tooltip.trades.length - 3}건</div>
+              ) : null}
             </div>
           ) : null}
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function TradeTooltipLine({ trade }: { trade: TradeRow }) {
+  const sideLabel = trade.side === 'sell' ? '매도' : '매수';
+  const sideClass = trade.side === 'sell' ? 'text-rose-600' : 'text-emerald-600';
+  return (
+    <div className="grid gap-0.5">
+      <div className="flex items-center justify-between gap-3">
+        <span className={`font-semibold ${sideClass}`}>
+          {sideLabel} {trade.symbol}
+        </span>
+        <span className="font-mono tabular-nums text-slate-950">{formatKrw(trade.grossKrw)}</span>
+      </div>
+      <div className="truncate text-[11px] text-slate-500">
+        {trade.qty?.toLocaleString('ko-KR') ?? '—'}주 · {trade.reason || '기록된 사유 없음'}
+      </div>
     </div>
   );
 }
@@ -161,12 +179,13 @@ function groupTradesByDate(trades: TradeRow[]): Map<string, TradeRow[]> {
 }
 
 function buildTradeMarkers(trades: TradeRow[]): SeriesMarker<Time>[] {
-  const byDateSide = new Map<string, { date: string; side: 'buy' | 'sell'; count: number }>();
+  const byDateSide = new Map<string, { date: string; side: 'buy' | 'sell'; count: number; grossKrw: number }>();
   for (const trade of trades) {
     if (trade.side !== 'buy' && trade.side !== 'sell') continue;
     const key = `${trade.date}-${trade.side}`;
-    const current = byDateSide.get(key) ?? { date: trade.date, side: trade.side, count: 0 };
+    const current = byDateSide.get(key) ?? { date: trade.date, side: trade.side, count: 0, grossKrw: 0 };
     current.count += 1;
+    current.grossKrw += Math.abs(trade.grossKrw ?? 0);
     byDateSide.set(key, current);
   }
   return [...byDateSide.values()]
@@ -175,7 +194,14 @@ function buildTradeMarkers(trades: TradeRow[]): SeriesMarker<Time>[] {
       position: row.side === 'buy' ? ('belowBar' as const) : ('aboveBar' as const),
       color: row.side === 'buy' ? '#16a368' : '#ef4452',
       shape: row.side === 'buy' ? ('arrowUp' as const) : ('arrowDown' as const),
-      text: `${row.side === 'buy' ? '매수' : '매도'}${row.count > 1 ? ` ${row.count}` : ''}`,
+      text: `${row.side === 'buy' ? '매수' : '매도'}${row.count > 1 ? ` ${row.count}` : ''} · ${formatCompactKrw(row.grossKrw)}`,
     }))
     .sort((a, b) => String(a.time).localeCompare(String(b.time)));
+}
+
+function formatCompactKrw(value: number): string {
+  if (!Number.isFinite(value) || value <= 0) return '—';
+  if (value >= 100_000_000) return `${(value / 100_000_000).toFixed(1)}억`;
+  if (value >= 10_000) return `${Math.round(value / 10_000).toLocaleString('ko-KR')}만`;
+  return value.toLocaleString('ko-KR');
 }

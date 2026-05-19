@@ -20,6 +20,24 @@
 
 ---
 
+## v0.24.0-portfolio-dossier-phase2.1 — 2026-05-19
+
+### 변경
+- `/portfolio/[strategy]` 상세 헤더 KPI를 4개 핵심 지표(현재 평가액, 현금 비중, 미실현 손익, 누적 수익률)로 줄여 정보 위계를 정리했습니다.
+- PnL/일별 평가 차트 tooltip의 매매 마커 설명에 종목, 매수/매도, 체결 금액, 수량, 체결 사유를 함께 표시하고, 차트 marker label에는 같은 날 같은 side의 합산 체결액을 압축 표기합니다.
+- `/portfolio/[strategy]/holdings`에 treemap과 상위 보유 근거 카드 섹션을 추가해 큰 비중 종목에서 최신 리포트 근거로 바로 이동할 수 있게 했습니다.
+- `/portfolio/[strategy]/methodology`를 Entry · 진입 → Rebalance · 편입/조정 → Exit / Risk · 청산 → Exceptions · 예외의 dossier형 운용 방법론으로 재구성했습니다.
+- 상세 헤더의 `포트폴리오 원장` 라벨을 `운용 보고서`로 바꾸고, `/portfolio` landing에서 사용하지 않는 합산 평가/총 거래수 모델 필드를 제거했습니다. 실제 strategy ledger만 다루는 계약도 문서에 다시 고정했습니다.
+
+### 문서
+- `DESIGN.md`, `docs/handoff-codex.md`, `docs/portfolio-restructure-plan.md`에 portfolio detail phase 2의 KPI 축소, holdings 근거 연결, methodology 구조를 반영했습니다.
+
+### 검증
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web build`
+- static/live scan: removed internal labels and excluded benchmark/follower/oracle labels/ids
+
 ## v0.23.2-portfolio-tab-contrast.1 — 2026-05-19
 
 ### 변경
