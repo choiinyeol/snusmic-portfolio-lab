@@ -50,15 +50,14 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
       <section className="grid gap-6 border-b border-slate-200 pb-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-end">
         <div className="max-w-3xl">
           <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-            리포트 통계 실험실
+            리포트 성과
           </div>
           <h1 className="mt-3 text-4xl font-semibold tracking-[-0.055em] text-slate-950 md:text-6xl">
-            평균보다 먼저 볼 것은 분포입니다
+            발간된 리포트는 실제로 어디까지 갔을까요
           </h1>
           <p className="mt-5 text-base leading-8 text-slate-600">
-            {summary.sample.eligibleReportCount.toLocaleString('ko-KR')}건의 가격 경로를 다시 계산했습니다. 주식
-            수익률은 꼬리가 두꺼워 평균과 표준편차만으로 보기 어렵습니다. 그래서 이 페이지는 정규분포를 가정하지 않고
-            전체 표본의 순위, 분위수, 꼬리, 경로를 먼저 보여줍니다.
+            발간된 분석 리포트 {summary.sample.eligibleReportCount.toLocaleString('ko-KR')}건이 이후 어떤 가격 경로를
+            지나갔는지 한 페이지에 모았습니다. 목표가 도달률, 중간 손실, 도달 후 흐름까지 한 번에 보고 비교해 보세요.
           </p>
         </div>
         <DistributionSignature
@@ -72,38 +71,36 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
         />
       </section>
 
-      <LimitationsPanel sampleSize={eligiblePathCount} uniqueSymbols={uniqueSymbolCount} />
-
       <StorySection
-        kicker="01 · 전체 표본 지도"
-        title="정규분포 대신 모든 리포트를 한 줄로 펼쳐 봅니다"
-        body="표본이 fat-tail이면 평균은 대표값이 아니라 꼬리의 흔적일 수 있습니다. 먼저 가격 경로가 연결된 리포트를 현재 수익률 순서대로 놓고, 분위수와 극단값이 어디에 있는지 봅니다."
+        kicker="전체 분포"
+        title="모든 리포트를 한 줄에 늘어놓으면"
+        body="발간된 리포트 한 건이 점 하나입니다. 현재 수익률 순으로 늘어놓으면 어디가 평균이고 어디가 양극단인지 한눈에 보입니다."
       >
         <WholeSampleMap rows={summary.riskScatter} quantiles={returnQuantiles} />
         <InsightLine>
-          하위 10%는 <strong>{formatPercent(returnQuantiles.p10)}</strong> 이하, 상위 10%는{' '}
-          <strong>{formatPercent(returnQuantiles.p90)}</strong> 이상입니다. 이 정도 꼬리에서는 “평균 수익률”보다
-          “중앙값·사분위·극단 손실을 통과하는 규칙”을 먼저 봐야 합니다.
+          전체 표본의 하위 10%는 <strong>{formatPercent(returnQuantiles.p10)}</strong> 이하, 상위 10%는{' '}
+          <strong>{formatPercent(returnQuantiles.p90)}</strong> 이상입니다. 평균만 보면 한쪽 끝의 큰 수익·큰 손실이
+          가려질 수 있어, 중앙값과 사분위를 함께 봅니다.
         </InsightLine>
         <VintageCohortTable cohorts={vintageCohorts} />
       </StorySection>
 
       <StorySection
-        kicker="02 · 경로별 표본 분해"
-        title="같은 수익률도 전혀 다른 길로 도착했습니다"
-        body="전체 지도가 분포의 모양을 보여준다면, 이 섹션은 개인투자자가 실제로 겪었을 경로를 보여줍니다. 빠른 적중, 큰 초과상승, 큰 손실 후 적중, 손실 꼬리를 나눠 보면 ‘맞았다/틀렸다’보다 중요한 것은 중간 손실과 기다린 시간입니다."
+        kicker="경로 유형"
+        title="같은 수익률에도 다른 길이 있었습니다"
+        body="목표가에 빠르게 닿은 리포트, 큰 손실을 거쳤다가 회복한 리포트, 끝내 손실로 끝난 리포트를 나눠봅니다. 같은 결과여도 도착한 방식이 달랐습니다."
       >
         <PathBucketPanel buckets={pathBuckets} exampleMetaById={exampleMetaById} total={eligiblePathCount} />
         <InsightLine>
-          이 표는 예측 라벨이 아니라 <strong>검정 대기열</strong>입니다. “큰 손실 후 적중”는 손절 규칙을 너무 촘촘하게
-          만들면 놓칠 표본이고, “반납한 표본”은 목표가 이후 보유 규칙을 따로 검정해야 하는 이유입니다.
+          “큰 손실 후 적중” 그룹은 손절선을 너무 촘촘하게 잡으면 놓치는 표본입니다. “반납한 표본”은 목표가에 한 번
+          닿았지만 이후 다시 빠졌던 케이스로, 익절 규칙을 따로 볼 필요가 있습니다.
         </InsightLine>
       </StorySection>
 
       <StorySection
-        kicker="03 · 목표가를 더 현실적으로 보기"
-        title="목표가 100%가 아니라 80%에 닿았는지도 봅니다"
-        body="분석가 목표가는 단일 정답이 아니라 파라미터입니다. 원래 목표가의 60%, 80%, 100%에 해당하는 가격을 각각 계산하면 ‘완전 적중’보다 더 실용적인 성과 경로가 보입니다."
+        kicker="목표가 도달률"
+        title="목표가의 60·80·100%까지 가본 비율"
+        body="목표가에 완전히 닿지 않더라도 80%까지는 갔다면 의미 있는 결과입니다. 도달 기준을 바꾸어가며 도달률과 도달까지 걸린 시간을 봅니다."
       >
         <ControlStrip
           label="목표 기준"
@@ -114,15 +111,15 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
         <FractionalHitFigure rows={thresholdRows} />
         <InsightLine>
           {horizon}거래일 안에 {threshold.toFixed(1)}x 목표에 닿은 비율은{' '}
-          <strong>{formatPercent(selectedHit?.hitRate)}</strong>입니다. 중앙 도달 시간은{' '}
+          <strong>{formatPercent(selectedHit?.hitRate)}</strong>, 평균적으로 도달까지 걸린 시간은{' '}
           <strong>{formatDays(selectedHit?.medianDaysToHit)}</strong>입니다.
         </InsightLine>
       </StorySection>
 
       <StorySection
-        kicker="04 · 읽고 바로 사야 했나"
-        title="발간 후 며칠 기다리면 결과가 달라졌나"
-        body="리포트를 당일에 읽지 못한 개인투자자가 더 현실적입니다. 1·3·5·10·20거래일 뒤 진입했을 때의 중앙 수익률과 0.8x 목표 도달률을 같은 방식으로 다시 계산했습니다."
+        kicker="진입 시점"
+        title="발간 당일 vs 며칠 뒤"
+        body="당일 매수가 어려운 개인투자자에게 1·3·5·10·20거래일 뒤 진입의 결과를 따로 계산했습니다."
       >
         <ControlStrip
           label="보유 기간"
@@ -132,66 +129,64 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
         />
         <DelayHeatmap rows={delayRows} />
         <InsightLine>
-          이 표본에서는 기다린다고 자동으로 유리해지지 않았습니다. {horizon}거래일 기준 당일 진입의 중앙 수익률은{' '}
-          <strong>{formatPercent(delayRows.find((row) => row.delayDays === 0)?.medianReturn)}</strong>, 20일 지연 진입은{' '}
-          <strong>{formatPercent(delayRows.find((row) => row.delayDays === 20)?.medianReturn)}</strong>입니다.
+          {horizon}거래일 보유 기준으로 당일 진입의 중앙 수익률은{' '}
+          <strong>{formatPercent(delayRows.find((row) => row.delayDays === 0)?.medianReturn)}</strong>, 20일 기다린 뒤
+          진입은 <strong>{formatPercent(delayRows.find((row) => row.delayDays === 20)?.medianReturn)}</strong>입니다.
+          기다린다고 자동으로 유리해지진 않았습니다.
         </InsightLine>
       </StorySection>
 
       <StorySection
-        kicker="05 · 눌림목인가 확인 매수인가"
-        title="하락을 기다릴수록 참여율은 낮아지고, 돌파를 기다릴수록 가짜 돌파가 생깁니다"
-        body="발간 후 20거래일 안에 -3/-5/-10% 눌림목이 오면 매수하는 규칙과 +3/+5/+10% 상승 확인 후 매수하는 규칙을 비교했습니다."
+        kicker="진입 규칙"
+        title="눌림목에서 살까, 돌파를 보고 살까"
+        body="발간 후 20거래일 안에 일정 폭의 하락이 오면 매수하는 규칙과, 상승을 먼저 확인한 뒤 매수하는 규칙을 같은 표본에서 비교했습니다."
       >
         <TriggerFrontier rows={triggerRows} />
       </StorySection>
 
       <StorySection
-        kicker="06 · 목표가에 닿은 뒤"
-        title="목표가는 끝이 아니라 분기점이었습니다"
-        body="목표가에 처음 닿은 날을 0일로 놓고, 이후 5·20·60·120거래일을 더 보유했을 때의 중앙값과 사분위 범위를 계산했습니다."
+        kicker="도달 후 흐름"
+        title="목표가에 닿은 뒤 계속 들고 가면"
+        body="목표가에 처음 닿은 날부터 5·20·60·120거래일을 더 보유했을 때의 분포입니다."
       >
         <PostTargetDrift rows={summary.postTargetDrift} />
         <InsightLine>
-          목표 도달 후 60거래일 중앙 수익률은{' '}
+          도달 후 60거래일 중앙 수익률은{' '}
           <strong>
             {formatPercent(summary.postTargetDrift.find((row) => row.daysAfterTarget === 60)?.medianReturn)}
           </strong>
-          이지만, 하위 25%는{' '}
+          , 하위 25%는{' '}
           <strong>{formatPercent(summary.postTargetDrift.find((row) => row.daysAfterTarget === 60)?.p25Return)}</strong>
-          입니다. 계속 보유는 가능성을 키우는 동시에 분산도 키웠습니다.
+          입니다. 더 들고 가면 더 벌 가능성도 있지만 폭이 커집니다.
         </InsightLine>
       </StorySection>
 
       <StorySection
-        kicker="07 · 역사적 익절선"
-        title="이 표본에서 안정적이었던 익절선은 낮은 목표 배수 쪽이었습니다"
-        body="목표가의 일부에 도달하면 익절하고, 아니면 250거래일 후 청산한다고 가정했습니다. 최고 평균이 아니라 중앙 수익률·도달률·하방 위험을 함께 본 보상/신뢰 점수를 봅니다."
+        kicker="익절선"
+        title="이 표본에서 안정적이었던 익절 배수"
+        body="목표가의 일정 비율에 닿으면 익절하고, 그렇지 않으면 250거래일 후 청산한다고 했을 때의 결과입니다."
       >
         <TargetMultipleCurve rows={multipleRows} />
         <InsightLine>
-          250거래일 기준 보상/신뢰 점수가 가장 높은 구간은{' '}
-          <strong>{bestMultiple ? `${bestMultiple.targetMultiple.toFixed(1)}x` : '—'}</strong>입니다. 이는 “정답”이
-          아니라 현재 표본에서 실용적 익절선 후보로 볼 파라미터입니다.
+          250거래일 기준 가장 안정적이었던 익절선은{' '}
+          <strong>{bestMultiple ? `${bestMultiple.targetMultiple.toFixed(1)}x` : '—'}</strong> 부근입니다. 평균 수익이
+          가장 높은 구간이 아니라, 도달률과 하방 위험까지 같이 본 결과입니다.
         </InsightLine>
       </StorySection>
 
       <StorySection
-        kicker="08 · 경로의 고통"
-        title="맞은 리포트도 중간 손실을 견뎌야 했습니다"
-        body="각 리포트의 발간 이후 최대 상승폭과 최대 하락폭을 전체 표본으로 동시에 놓으면, 성공 표본이 얼마나 불편한 경로를 거쳤는지 보입니다."
+        kicker="경로의 굴곡"
+        title="맞춘 리포트도 도착까지 굴곡이 있었습니다"
+        body="발간 이후 최대 상승폭과 최대 하락폭을 같은 그림에 놓으면, 결과적으로 맞춘 리포트가 얼마나 굴곡을 거쳤는지 보입니다."
       >
         <RiskScatter rows={summary.riskScatter} />
       </StorySection>
 
-      <section className="rounded-2xl border border-slate-200 bg-slate-950 p-6 text-white">
-        <div className="text-sm font-semibold">해석 원칙</div>
-        <p className="mt-3 max-w-4xl text-sm leading-7 text-slate-300">
-          이 페이지는 예측 모델이 아니라 과거 표본의 규칙 실험입니다. 같은 종목의 중복 리포트, 유동성, 장중 발간 시점,
-          상장폐지·거래정지 누락, 시장 국면 차이는 결과를 바꿀 수 있습니다. 따라서 결론은 “이대로 사라”가 아니라 “이
-          파라미터를 전략 후보로 검정하라”입니다.
-        </p>
-      </section>
+      <DataNoteFooter
+        sampleSize={eligiblePathCount}
+        uniqueSymbols={uniqueSymbolCount}
+        snapshotDate={summary.sample.endDate}
+      />
     </div>
   );
 }
@@ -252,7 +247,7 @@ function DistributionSignature({
         </div>
       </dl>
       <p className="mt-3 text-[11px] leading-5 text-slate-500">
-        평균이 중앙값과 크게 다르고 10% 절단 평균이 더 작다면, 꼬리 몇 개가 평균을 끌어올리고 있다는 신호입니다.
+        평균이 중앙값보다 크고 절단 평균이 더 작다면, 양극단의 큰 수익 몇 건이 평균을 끌어올리고 있다는 뜻입니다.
       </p>
     </div>
   );
@@ -678,8 +673,6 @@ function FractionalHitFigure({ rows }: { rows: ReportStatisticsLabSummary['fract
                 </span>
               </div>
               <div className="relative mt-2 h-28 rounded-md bg-slate-100">
-                {/* Wilson 95% CI whisker rendered as a soft band so the reader sees
-                 *  the bar's binomial uncertainty, not just the point estimate. */}
                 <div
                   aria-hidden="true"
                   className="absolute inset-x-2 rounded bg-slate-300/70"
@@ -695,7 +688,7 @@ function FractionalHitFigure({ rows }: { rows: ReportStatisticsLabSummary['fract
                 />
               </div>
               <div className="mt-2 text-xs text-slate-500">
-                {row.hitCount}/{row.sampleSize} · 95% CI [{formatPercent(ci.lo)}, {formatPercent(ci.hi)}]
+                {row.hitCount}/{row.sampleSize} · 추정 범위 {formatPercent(ci.lo)}–{formatPercent(ci.hi)}
               </div>
               <div className="mt-0.5 text-[10px] text-slate-400">중앙 {formatDays(row.medianDaysToHit)}</div>
             </div>
@@ -1138,42 +1131,27 @@ function buildVintageCohorts(rows: RiskScatterRow[]): VintageCohort[] {
     .sort((a, b) => a.year.localeCompare(b.year));
 }
 
-/** Top-level limits panel — every quant reviewer (Stanford·MIT·Booth)
- * agreed the page over-claims by reporting absolute returns without an
- * index baseline, transaction costs, or survivorship accounting. This
- * banner names those gaps in plain Korean so readers don't mistake the
- * descriptive statistics for an alpha attribution. */
-function LimitationsPanel({ sampleSize, uniqueSymbols }: { sampleSize: number; uniqueSymbols: number }) {
+function DataNoteFooter({
+  sampleSize,
+  uniqueSymbols,
+  snapshotDate,
+}: {
+  sampleSize: number;
+  uniqueSymbols: number;
+  snapshotDate: string;
+}) {
   return (
-    <section
-      aria-label="이 페이지의 측정 범위"
-      className="overflow-hidden rounded-md border border-amber-200 bg-amber-50"
-    >
-      <div className="grid gap-2 px-4 py-3 text-xs leading-5 text-amber-900 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+    <section aria-label="데이터 노트" className="border-t border-slate-200 pt-6">
+      <div className="grid gap-4 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:items-start">
         <div>
-          <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-700">
-            이 페이지가 측정하는 것
+          <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+            데이터 노트
           </div>
-          <ul className="mt-1 list-disc pl-4">
-            <li>
-              표본 {sampleSize.toLocaleString('ko-KR')}건 · 유효 티커 {uniqueSymbols.toLocaleString('ko-KR')}개의 raw
-              가격 경로
-            </li>
-            <li>발간가 → 현재가 / 목표가 / 최고·최저 도달 비율 (절대 수익률)</li>
-            <li>경로 분류는 도달 이후 사후(retrospective) tagging — 예측 모델 아님</li>
-          </ul>
-        </div>
-        <div>
-          <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-700">
-            아직 측정하지 않는 것
-          </div>
-          <ul className="mt-1 list-disc pl-4">
-            <li>KOSPI/KOSDAQ 시점 일치 벤치마크 대비 알파</li>
-            <li>거래비용·슬리피지·시장 충격 (모든 수익률은 총수익)</li>
-            <li>상장폐지·거래정지 종목의 종료 가격 (생존편향)</li>
-            <li>발간 시점 implementable lag (당일/익일 시가)</li>
-            <li>섹터·시가총액·모멘텀 같은 팩터 보정</li>
-          </ul>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            기준일 {snapshotDate} · 표본 {sampleSize.toLocaleString('ko-KR')}건 · 유효 티커{' '}
+            {uniqueSymbols.toLocaleString('ko-KR')}개. 가격은 종가 기준이며 거래비용은 반영되지 않았습니다. 이 페이지는
+            학습 자료로 제공되며 투자 권유가 아닙니다.
+          </p>
         </div>
       </div>
     </section>
@@ -1183,10 +1161,10 @@ function LimitationsPanel({ sampleSize, uniqueSymbols }: { sampleSize: number; u
 function VintageCohortTable({ cohorts }: { cohorts: VintageCohort[] }) {
   if (cohorts.length === 0) return null;
   return (
-    <section className="overflow-hidden rounded-md border border-slate-200 bg-white" aria-label="발간연도별 코호트">
+    <section className="overflow-hidden rounded-md border border-slate-200 bg-white" aria-label="발간 연도별">
       <header className="border-b border-slate-200 px-4 py-2">
         <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-          발간연도 코호트
+          발간 연도별
         </div>
         <h3 className="mt-1 text-sm font-semibold text-slate-950">시장 국면이 다른 해의 표본을 분리해서 봅니다</h3>
       </header>
@@ -1197,7 +1175,7 @@ function VintageCohortTable({ cohorts }: { cohorts: VintageCohort[] }) {
             <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">표본</th>
             <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">목표 도달</th>
             <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">도달률</th>
-            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">95% Wilson CI</th>
+            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">추정 범위</th>
             <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">중앙 수익률</th>
           </tr>
         </thead>
@@ -1211,7 +1189,7 @@ function VintageCohortTable({ cohorts }: { cohorts: VintageCohort[] }) {
                 {formatPercent(cohort.hitRate)}
               </td>
               <td className="px-3 py-2 text-right font-mono text-xs tabular-nums text-slate-500">
-                [{formatPercent(cohort.ciLo)}, {formatPercent(cohort.ciHi)}]
+                {formatPercent(cohort.ciLo)}–{formatPercent(cohort.ciHi)}
               </td>
               <td
                 className={`px-3 py-2 text-right font-mono tabular-nums ${
