@@ -367,9 +367,14 @@ Page-specific duplicates를 만들지 말고 공유 컴포넌트로 정렬.
 
 Decision pending. If empty, this section is deleted.
 
-- [ ] 코세스 사례의 PDF 추출 버그 (`entry_price_native = 9.6` from "9,600원" 콤마 파싱). 우선순위와 fix owner.
+- [ ] 코세스 사례의 PDF 추출 버그 (`entry_price_native = 9.6` from "9,600원" 콤마 파싱). Python 파이프라인 작업, 별도 트랙.
 - [ ] `/statistics` `OutcomeBreakdownPanel`의 임계값 조정 (-30% 치명적 vs -20% 등). 표본 누적 후 재검토.
-- [ ] `/main` Dashboard의 KPI strip 콘텐츠 — 현재는 명세만 있고 구현·검증 미완.
+- [ ] ReportsTable에 per-column filter row 추가 — 현재는 단일 글로벌 검색 + 3 드롭다운. /screener의 `ColumnFilterControl`+`rowPassesColumnFilters` 패턴 차용 가능.
+- [ ] `/portfolio/[strategy]` 객체 sub-route 분리 (`/holdings`, `/equity`, `/trades`, `/methodology`). `docs/portfolio-restructure-plan.md` §3에 단계 명시. 다음 sprint 후보.
+
+### 해결됨 (2026-05-19)
+
+- [x] `/main` Dashboard의 KPI strip — `buildDecisionBrief(view).state`로 5-tile(평가액·현금비중·낙폭·기준선 대비·데이터 제외) 이미 구현돼 있음.
 
 ---
 
