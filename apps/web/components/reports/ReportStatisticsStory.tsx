@@ -62,6 +62,10 @@ export function ReportStatisticsStory({
   const sortedReturns = [...peakReturns].sort((a, b) => a - b);
   const meanReturn = mean(peakReturns);
   const medianReturn = quantileFromSorted(sortedReturns, 0.5);
+  const expiryReturns = summary.riskScatter.map((row) => row.expiryReturn ?? null).filter(isNumber);
+  const sortedExpiry = [...expiryReturns].sort((a, b) => a - b);
+  const expiryMedian = quantileFromSorted(sortedExpiry, 0.5);
+  const expiryMean = mean(expiryReturns);
   const hitTargetCount = summary.riskScatter.filter((row) => row.hit10).length;
   const flatCount = peakReturns.filter((value) => value < 0.05).length;
   const returnQuantiles = {
@@ -100,6 +104,9 @@ export function ReportStatisticsStory({
         uniqueSymbols={uniqueSymbolCount}
         hitTargetCount={hitTargetCount}
         flatCount={flatCount}
+        expiryMedian={expiryMedian}
+        expiryMean={expiryMean}
+        expirySample={expiryReturns.length}
       />
 
       <WholeSampleMap rows={summary.riskScatter} quantiles={returnQuantiles} />
@@ -145,6 +152,9 @@ function DistributionSignature({
   uniqueSymbols,
   hitTargetCount,
   flatCount,
+  expiryMedian,
+  expiryMean,
+  expirySample,
 }: {
   mean: number | null;
   median: number | null;
@@ -153,6 +163,9 @@ function DistributionSignature({
   uniqueSymbols: number;
   hitTargetCount: number;
   flatCount: number;
+  expiryMedian: number | null;
+  expiryMean: number | null;
+  expirySample: number;
 }) {
   const compressDomain = Math.max(0.5, compressReturn(Math.max(1.5, mean ?? 0, median ?? 0, trimmed ?? 0)));
   const xLin = (value: number) => xScale(compressReturn(Math.max(0, value)), 0, compressDomain);
@@ -191,6 +204,12 @@ function DistributionSignature({
           </dd>
         </div>
       </dl>
+      <div className="mt-3 rounded-md bg-slate-50 px-3 py-2 text-[11px] leading-5 text-slate-600">
+        <span className="font-semibold text-slate-700">만료 종가 기준</span> (500거래일 경과 표본 {expirySample}건):
+        중앙 <span className="font-mono font-semibold tabular-nums text-slate-950">{formatPercent(expiryMedian)}</span>{' '}
+        · 평균 <span className="font-mono font-semibold tabular-nums text-slate-950">{formatPercent(expiryMean)}</span>.
+        고점은 보유 중 한 번이라도 도달한 폭, 만료는 끝까지 들고 갔을 때의 종가 수익률입니다.
+      </div>
     </div>
   );
 }
@@ -335,8 +354,8 @@ function WholeSampleMap({
                 href={`/reports/${encodeURIComponent(row.symbol)}/${encodeURIComponent(row.reportId)}`}
                 rows={[
                   ['발간 후 고점', formatPercent(row.maxFavorableExcursion)],
+                  ['만료 종가', formatPercent(row.expiryReturn ?? null)],
                   ['최대 하락폭', formatPercent(row.maxAdverseExcursion)],
-                  ['현재 수익률', formatPercent(row.currentReturn)],
                   ['목표 도달', targetHitLabel(row)],
                 ]}
                 annotation={isTopWinner ? `${row.company} ${formatPercent(row.maxFavorableExcursion)}` : undefined}
@@ -874,6 +893,17 @@ function PricePathCandlestick({ path, tone }: { path: PricePathSeries; tone: 'go
         title: '발간',
       });
     }
+    const expiryBar = path.bars[path.bars.length - 1];
+    if (expiryBar && expiryBar.close > 0) {
+      series.createPriceLine({
+        price: expiryBar.close,
+        color: '#64748b',
+        lineWidth: 1,
+        lineStyle: 2,
+        axisLabelVisible: true,
+        title: '만료',
+      });
+    }
     chart.timeScale().fitContent();
     return () => chart.remove();
   }, [path, tone]);
@@ -1150,6 +1180,7 @@ function CaseList({ title, tone, rows }: { title: string; tone: 'good' | 'bad'; 
     <section className="overflow-hidden rounded-md border border-slate-200 bg-white">
       <header className="border-b border-slate-200 px-4 py-2">
         <div className={`font-mono text-[10px] font-semibold uppercase tracking-[0.16em] ${accent}`}>{title}</div>
+        <p className="mt-0.5 font-mono text-[10px] text-slate-400">고점 / 만료 종가 (500거래일)</p>
       </header>
       <ol className="divide-y divide-slate-100">
         {rows.map((row, index) => (
@@ -1165,9 +1196,14 @@ function CaseList({ title, tone, rows }: { title: string; tone: 'good' | 'bad'; 
                   {row.symbol} · 발간 {row.publicationDate} · {targetHitLabel(row)}
                 </div>
               </div>
-              <span className={`text-right font-mono text-base font-semibold tabular-nums ${valueColor}`}>
-                {formatPercent(row.maxFavorableExcursion)}
-              </span>
+              <div className="text-right">
+                <div className={`font-mono text-base font-semibold tabular-nums ${valueColor}`}>
+                  {formatPercent(row.maxFavorableExcursion)}
+                </div>
+                <div className="mt-0.5 font-mono text-[11px] tabular-nums text-slate-500">
+                  만료 {formatPercent(row.expiryReturn ?? null)}
+                </div>
+              </div>
             </Link>
           </li>
         ))}

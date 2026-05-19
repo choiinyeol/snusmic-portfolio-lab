@@ -71,10 +71,14 @@ function clipRowToWindow(
     if (threshold06 !== null && hit06Day === null && h >= threshold06) hit06Day = i;
   }
 
+  const windowComplete = window.length >= windowDays;
+  const expiryReturn = windowComplete ? closeKrwOf(window[windowDays - 1]) / baseKrw - 1 : null;
+
   return {
     ...row,
     maxFavorableExcursion: maxKrw / baseKrw - 1,
     maxAdverseExcursion: minKrw / baseKrw - 1,
+    expiryReturn,
     hit10: hit10Day !== null,
     hit08: hit08Day !== null,
     hit06: hit06Day !== null,

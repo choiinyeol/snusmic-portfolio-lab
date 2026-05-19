@@ -443,6 +443,11 @@ export type ReportStatisticsLabSummary = {
     upsideCaptureRatio: number | null;
     targetReturn: number | null;
     currentReturn: number | null;
+    /** Close-price return at the end of the analysis window (publication
+     * + N trading days). Populated at runtime when the row has been
+     * clipped to a window; `null` if the window has not fully elapsed
+     * yet (active reports inside their first N days). */
+    expiryReturn?: number | null;
     hit06: boolean;
     hit08: boolean;
     hit10: boolean;

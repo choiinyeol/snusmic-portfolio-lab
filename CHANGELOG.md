@@ -20,6 +20,24 @@
 
 ---
 
+## v0.21.16-expiry-close.1 — 2026-05-19
+
+### 추가 (만료 종가)
+- 발간일 + 500거래일 시점의 종가 수익률을 별도 데이터 `expiryReturn`으로 산출. 고점(MFE)이 "윈도우 안에서 한 번이라도 도달한 최대 폭"이라면, 만료 종가는 "매도 신호 없이 끝까지 들고 갔을 때 끝 값". 두 지표가 같이 보이면 분석가 콜의 상한선과 baseline 보유 결과를 한 화면에서 비교할 수 있음.
+- `ReportStatisticsLabSummary['riskScatter']` 타입에 옵셔널 `expiryReturn` 필드 추가. `clipRowToWindow`가 윈도우 길이가 500거래일을 채운 경우에만 값 채우고, 진행 중 리포트는 `null`.
+- 노출 영역:
+  - **WholeSampleMap DataPoint hover**: "만료 종가" 행 추가. 호버에서 고점·만료·최대 하락폭·목표 도달을 한 번에 비교.
+  - **WinnersLosersBoard CaseList**: 각 종목 행 우측에 "고점 +X%" 메인 라벨과 "만료 +Y%" 보조 라벨 동시 표시. 헤더에 "고점 / 만료 종가 (500거래일)" 설명.
+  - **DistributionSignature 하단**: "만료 종가 기준 (500거래일 경과 표본 N건): 중앙 X% · 평균 Y%" 한 줄. 고점과 만료의 의미 차이도 같이 명시.
+  - **PricePathCandlestick**: 발간일 점선에 더해 마지막 바(만료 시점)의 종가 위치에도 가로 점선("만료") 추가. 차트 안에서 baseline·만료 두 reference price가 동시에 보임.
+
+### 검증
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web build` (정적 페이지 413개)
+
+---
+
 ## v0.21.15-500d-window.1 — 2026-05-19
 
 ### 변경 (500거래일 데드라인)
