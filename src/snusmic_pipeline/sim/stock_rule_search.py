@@ -236,24 +236,23 @@ def default_stock_rule_configs() -> tuple[StockRuleConfig, ...]:
     """Return a deterministic, bounded stock-rule family grid."""
 
     configs: list[StockRuleConfig] = []
+    ma_pairs = ((5, 20), (10, 30), (20, 60))
+    age_windows = ((0, 60), (7, 120), (30, 365))
+    pool_shapes = ((3, (1, 2)), (5, (3,)), (10, (5,)))
     for family in ("target_upside_momentum", "fresh_report_momentum", "target_gap_reversal"):
-        for fast, slow in ((5, 20), (10, 30), (20, 60), (50, 200)):
-            if fast >= slow:
-                continue
-            for min_age, max_age in ((0, 60), (3, 90), (7, 120), (14, 180), (30, 365)):
+        for fast, slow in ma_pairs:
+            for min_age, max_age in age_windows:
                 for rebalance in ("D", "W", "M"):
-                    for top_pool, hold_choices in ((3, (1, 2, 3)), (5, (1, 3)), (10, (3, 5))):
+                    for top_pool, hold_choices in pool_shapes:
                         for hold_top in hold_choices:
-                            if hold_top > top_pool:
-                                continue
-                            for weight_mode in ("equal", "winner_compress", "rank_linear"):
+                            for weight_mode in ("equal", "winner_compress"):
                                 score_modes: tuple[ScoreMode, ...]
                                 if family == "target_gap_reversal":
-                                    score_modes = ("reversal_gap", "blend")
+                                    score_modes = ("reversal_gap",)
                                 elif family == "fresh_report_momentum":
-                                    score_modes = ("momentum_blend", "blend")
+                                    score_modes = ("momentum_blend",)
                                 else:
-                                    score_modes = ("dynamic_upside", "blend", "momentum_blend")
+                                    score_modes = ("dynamic_upside", "blend")
                                 for score_mode in score_modes:
                                     min_pullback = 0.03 if family == "target_gap_reversal" else 0.0
                                     min_momentum = 0.0 if family == "fresh_report_momentum" else -1.0

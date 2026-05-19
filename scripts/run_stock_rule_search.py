@@ -21,7 +21,11 @@ sys.path.insert(0, str(ROOT / "src"))
 
 import pandas as pd  # noqa: E402
 
-from snusmic_pipeline.sim.stock_rule_search import admit_oos, search_is  # noqa: E402
+from snusmic_pipeline.sim.stock_rule_search import (  # noqa: E402
+    admit_oos,
+    default_stock_rule_configs,
+    search_is,
+)
 
 
 def _json_safe(value: Any) -> Any:
@@ -54,6 +58,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--oos-end", type=str, default=date.today().isoformat())
     parser.add_argument("--out", type=Path, default=ROOT / ".omx" / "quant-insights" / "stock-rule-search")
     parser.add_argument("--is-top", type=int, default=75)
+    parser.add_argument(
+        "--max-configs",
+        type=int,
+        default=0,
+        help="Limit the deterministic rule grid before IS search; 0 searches the full bounded grid.",
+    )
     parser.add_argument("--admit-top", type=int, default=0, help="0 means evaluate all IS finalists")
     parser.add_argument("--benchmark-total-return", type=float, default=0.0)
     parser.add_argument("--min-oos-excess-return", type=float, default=0.0)
@@ -72,10 +82,14 @@ def main() -> int:
     out: Path = args.out
     out.mkdir(parents=True, exist_ok=True)
 
+    configs = default_stock_rule_configs()
+    if args.max_configs > 0:
+        configs = configs[: args.max_configs]
     is_result = search_is(
         warehouse_dir=args.warehouse,
         start_date=is_start,
         end_date=is_end,
+        configs=configs,
         top_n=args.is_top,
     )
     admitted = admit_oos(
