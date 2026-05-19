@@ -7,6 +7,7 @@ import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import { CsvDownloadButton, DataPanel, EmptyTableState, downloadCsv } from '@/components/ui/data-panel';
 import type { PositionEpisodeRow, ReportTargetDigest, TradeRow } from '@/lib/artifacts';
 import { formatDays, formatKrw, formatPercent } from '@/lib/format';
+import { capitalContribution, marketLabel, reportTargetHref } from './helpers';
 import { SortHeader, pageRows, sortRows, type SortState } from './TableControls';
 
 type Props = {
@@ -604,21 +605,8 @@ function positionReturn(episode: PositionEpisodeRow): number | null {
   return exitOrLast / episode.avgEntryPriceKrw - 1;
 }
 
-function capitalContribution(pnl: number | null, capital: number | undefined): number | null {
-  if (pnl === null || pnl === undefined || !capital || capital <= 0) return null;
-  return pnl / capital;
-}
-
-function marketLabel(region: 'domestic' | 'overseas' | undefined): string {
-  return region === 'domestic' ? '국내' : '해외';
-}
-
 function initialUrlQuery(): string {
   if (typeof window === 'undefined') return '';
   const params = new URLSearchParams(window.location.search);
   return params.get('q') ?? params.get('symbol') ?? '';
-}
-
-function reportTargetHref(target: ReportTargetDigest): string {
-  return `/reports/${encodeURIComponent(target.symbol)}/${encodeURIComponent(target.reportId)}`;
 }

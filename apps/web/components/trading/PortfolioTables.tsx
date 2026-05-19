@@ -6,6 +6,7 @@ import { Money } from '@/components/ui/Money';
 import { CsvDownloadButton, DataPanel, EmptyTableState, downloadCsv } from '@/components/ui/data-panel';
 import type { HoldingRow, ReportTargetDigest } from '@/lib/artifacts';
 import { formatDateKo, formatDays, formatKrw, formatPercent } from '@/lib/format';
+import { capitalContribution, marketLabel, nativeFromKrw, reportTargetHref } from './helpers';
 import { SortHeader, pageRows, sortRows, type SortState } from './TableControls';
 
 type Props = {
@@ -282,24 +283,6 @@ function downloadHoldings(
   });
   const slug = personaName.replace(/[^a-zA-Z0-9가-힣]+/g, '-').slice(0, 40);
   downloadCsv(`snusmic-holdings-${slug}.csv`, headers, data);
-}
-
-function capitalContribution(pnl: number | null, capital: number | undefined): number | null {
-  if (pnl === null || pnl === undefined || !capital || capital <= 0) return null;
-  return pnl / capital;
-}
-
-function marketLabel(region: 'domestic' | 'overseas' | undefined): string {
-  return region === 'domestic' ? '국내' : '해외';
-}
-
-function nativeFromKrw(krw: number | null, nativeReference: number | null, krwReference: number | null): number | null {
-  if (krw === null || nativeReference === null || krwReference === null || krwReference <= 0) return krw;
-  return (krw * nativeReference) / krwReference;
-}
-
-function reportTargetHref(target: ReportTargetDigest): string {
-  return `/reports/${encodeURIComponent(target.symbol)}/${encodeURIComponent(target.reportId)}`;
 }
 
 function targetHrefFor(symbol: string, targetsBySymbol: Record<string, ReportTargetDigest>): string {

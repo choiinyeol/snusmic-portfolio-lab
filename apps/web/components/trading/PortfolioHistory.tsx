@@ -6,6 +6,7 @@ import { Money } from '@/components/ui/Money';
 import { formatDateKo, formatKrw, formatPercent } from '@/lib/format';
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import { CsvDownloadButton, DataPanel, downloadCsv } from '@/components/ui/data-panel';
+import { marketLabel, nativeFromKrw } from './helpers';
 import { SortHeader, pageRows, sortRows, type SortState } from './TableControls';
 
 type Props = {
@@ -341,15 +342,6 @@ function downloadMonthly(rows: MonthlyHoldingRow[], targetsBySymbol: Record<stri
     ];
   });
   downloadCsv('snusmic-monthly-portfolio.csv', headers, data);
-}
-
-function marketLabel(region: 'domestic' | 'overseas' | undefined): string {
-  return region === 'domestic' ? '국내' : '해외';
-}
-
-function nativeFromKrw(krw: number | null, nativeReference: number | null, krwReference: number | null): number | null {
-  if (krw === null || nativeReference === null || krwReference === null || krwReference <= 0) return krw;
-  return (krw * nativeReference) / krwReference;
 }
 
 function targetGap(row: MonthlyHoldingRow, target: ReportTargetDigest | undefined): number | null {
