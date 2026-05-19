@@ -215,6 +215,8 @@ def admit_oos(
             "admission_status": status,
             "admission_reasons": list(reasons),
             "reason_metadata": metadata,
+            "is_reason_metadata": is_eval.reason_metadata,
+            "oos_reason_metadata": oos_eval.reason_metadata,
             "current_holdings": oos_eval.current_holdings,
         }
         rows.append(row)
@@ -656,7 +658,10 @@ def _empty_evaluation(config: StockRuleConfig, status: str, reason: str) -> _Eva
         current_holdings={},
         status=status,
         reasons=(reason,),
-        reason_metadata={},
+        reason_metadata={
+            "failure_reason": reason,
+            "decision_lag": "rebalance close signal shifted one trading day before returns are earned",
+        },
     )
 
 
