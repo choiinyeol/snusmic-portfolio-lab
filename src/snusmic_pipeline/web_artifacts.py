@@ -1588,9 +1588,7 @@ def _stock_admission_summary(artifact: dict[str, Any] | None) -> dict[str, Any] 
 def _stock_admission_decision_row(decision: dict[str, Any]) -> dict[str, Any]:
     candidate = decision.get("candidate") if isinstance(decision.get("candidate"), dict) else {}
     in_sample = (
-        candidate.get("in_sample_metrics")
-        if isinstance(candidate.get("in_sample_metrics"), dict)
-        else {}
+        candidate.get("in_sample_metrics") if isinstance(candidate.get("in_sample_metrics"), dict) else {}
     )
     out_of_sample = (
         decision.get("out_of_sample_metrics")
