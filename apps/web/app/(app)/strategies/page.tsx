@@ -29,6 +29,10 @@ export default function StrategiesPage() {
   const targetBenchmark = benchmarkRows.find((row) => row.id === TARGET_BENCHMARK_ID);
   const bestSelectable = selectableRows[0];
   const chartSeries = buildStrategySeries([...benchmarkRows, ...selectableRows.slice(0, 8)]);
+  const comparisonLabelSummary = benchmarkRows
+    .slice(0, 5)
+    .map((row) => row.shortLabel)
+    .join(', ');
 
   return (
     <>
@@ -45,10 +49,10 @@ export default function StrategiesPage() {
         actions={
           <>
             <Button asChild size="sm" variant="secondary">
-              <Link href="/portfolio">포트폴리오로 이동</Link>
+              <Link href="/portfolio">실제 포트폴리오 선택</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <a href="#strategy-board">전략 리더보드</a>
+              <a href="#strategy-board">비교표 보기</a>
             </Button>
           </>
         }
@@ -76,12 +80,40 @@ export default function StrategiesPage() {
               }
               tone={bestSelectable?.objectivePassed ? 'good' : 'neutral'}
             />
-            <KpiTile label="벤치마크 정의" value="8개" delta="비교 기준선과 고유 전략을 분리" tone="neutral" />
+            <KpiTile
+              label="벤치마크 정의"
+              value={`${benchmarkRows.length}개`}
+              delta="비교 기준선과 고유 전략을 분리"
+              tone="neutral"
+            />
           </div>
         }
       />
 
-      <Section eyebrow="비교 기준" title="벤치마크 세트">
+      <Section eyebrow="역할 구분" title="Strategies는 비교, Portfolio는 실제 원장">
+        <div className="grid gap-3 lg:grid-cols-3">
+          <RoleCard
+            title="Portfolio"
+            body="현재 보유, PnL, 체결, 운용 규칙을 실제 투자 가능한 strategy ledger만으로 보여줍니다."
+            cta="포트폴리오 선택"
+            href="/portfolio"
+          />
+          <RoleCard
+            title="Strategies"
+            body="벤치마크·오라클·후보 전략을 한 화면에서 비교합니다. 기준선은 살펴보는 대상이지 보유 포트폴리오가 아닙니다."
+            cta="고유 전략 표"
+            href="#strategy-board"
+          />
+          <RoleCard
+            title="Benchmark"
+            body={`${comparisonLabelSummary} 등 ${benchmarkRows.length}개 기준선은 비교 기준으로만 남깁니다.`}
+            cta="벤치마크 표"
+            href="#benchmark-board"
+          />
+        </div>
+      </Section>
+
+      <Section eyebrow="비교 기준" title="벤치마크 세트" id="benchmark-board">
         <StrategyRiskTable rows={benchmarkRows} title="벤치마크" csvFilename="snusmic-benchmarks.csv" />
       </Section>
 
@@ -105,6 +137,18 @@ export default function StrategiesPage() {
         </div>
       </Section>
     </>
+  );
+}
+
+function RoleCard({ title, body, cta, href }: { title: string; body: string; cta: string; href: string }) {
+  return (
+    <article className="rounded-md border border-slate-200 bg-white p-4">
+      <h3 className="text-lg font-semibold tracking-tight text-slate-950">{title}</h3>
+      <p className="mt-2 text-sm leading-6 text-slate-500">{body}</p>
+      <Button asChild className="mt-4" size="sm" variant={title === 'Portfolio' ? 'default' : 'outline'}>
+        <Link href={href}>{cta}</Link>
+      </Button>
+    </article>
   );
 }
 

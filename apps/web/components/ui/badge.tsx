@@ -3,7 +3,7 @@ import type * as React from 'react';
 import { cn } from '@/lib/utils';
 
 const badgeVariants = cva(
-  'inline-flex w-fit shrink-0 items-center gap-1 rounded-md border px-2 py-0.5 text-xs font-medium tabular-nums transition-colors',
+  'inline-flex min-h-6 w-fit shrink-0 items-center gap-1 rounded-md border px-2 py-1 text-xs font-medium leading-normal tabular-nums transition-colors',
   {
     variants: {
       variant: {

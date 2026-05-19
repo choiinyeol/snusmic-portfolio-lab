@@ -22,7 +22,7 @@ export function StatusChip({
 }) {
   return (
     <span
-      className={`inline-flex min-h-7 max-w-full items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold leading-none ${toneClasses[tone]} ${className}`}
+      className={`inline-flex min-h-7 max-w-full items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold leading-normal ${toneClasses[tone]} ${className}`}
     >
       {dot ? (
         <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-current shadow-[0_0_0_3px_color-mix(in_srgb,currentColor_16%,transparent)]" />

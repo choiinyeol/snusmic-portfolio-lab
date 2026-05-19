@@ -127,6 +127,7 @@ export function buildPortfolioViewModel(selectedPersona?: string): PortfolioView
         buyRules: row.buyRules,
         sellRules: row.sellRules,
         riskControls: row.riskControls,
+        params: row.params,
       },
     ]),
   );

@@ -13,6 +13,7 @@ export type StrategyMethod = {
   buyRules: string[];
   sellRules: string[];
   riskControls: string[];
+  params: Record<string, unknown>;
 };
 
 export type PortfolioViewModel = {

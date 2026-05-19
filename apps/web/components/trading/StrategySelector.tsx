@@ -25,7 +25,7 @@ export function StrategySelector({
 }) {
   return (
     <div
-      className="min-w-0 overflow-x-auto border-y border-slate-200 bg-white py-1"
+      className="min-w-0 overflow-x-auto border-y border-slate-200 bg-white py-1.5"
       role="tablist"
       aria-label={ariaLabel}
     >
@@ -34,14 +34,17 @@ export function StrategySelector({
           const active = option.id === value;
           const badge = kindBadge(option.kind, option.isDefault);
           const className = [
-            'inline-flex max-w-[13rem] items-center gap-1.5 rounded-md px-3 py-2 text-xs font-semibold transition-colors',
+            'inline-flex min-h-10 max-w-[13rem] items-center gap-1.5 rounded-md px-3 py-2.5 text-sm font-semibold leading-normal transition-colors',
             active
               ? 'bg-slate-950 text-white [&_[data-slot=badge]]:border-white/20 [&_[data-slot=badge]]:bg-white/10 [&_[data-slot=badge]]:text-white'
               : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950',
           ].join(' ');
           const content = (
             <>
-              <span className={`max-w-[9rem] truncate ${active ? 'text-white' : ''}`} title={option.label}>
+              <span
+                className={`max-w-[9rem] truncate leading-normal ${active ? 'text-white' : ''}`}
+                title={option.label}
+              >
                 {option.shortLabel}
               </span>
               <Badge className="shrink-0" variant={badge.variant}>

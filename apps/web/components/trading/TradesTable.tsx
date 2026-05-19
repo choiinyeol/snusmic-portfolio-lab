@@ -182,13 +182,13 @@ export function TradesTable({
           onChange={(event) => handleQueryChange(event.target.value)}
           placeholder="심볼·사유·리포트 ID"
           aria-label="검색"
-          className="h-8 w-64 rounded-md border border-slate-200 bg-white px-3 text-xs text-slate-700 outline-none focus:border-slate-500"
+          className="min-h-9 w-64 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm leading-normal text-slate-700 outline-none focus:border-slate-500"
         />
         <NativeSelect
           value={side}
           onChange={(event) => handleSideChange(event.target.value)}
           aria-label="매수/매도 필터"
-          className="h-8 w-28 rounded-md border border-slate-200 bg-white px-2 text-xs"
+          className="min-h-9 w-28 rounded-md border border-slate-200 bg-white px-2 py-2 text-sm leading-normal"
         >
           <NativeSelectOption value="all">전체</NativeSelectOption>
           <NativeSelectOption value="buy">매수</NativeSelectOption>

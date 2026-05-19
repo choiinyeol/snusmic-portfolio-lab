@@ -134,7 +134,7 @@ export function PortfolioHistory({ monthly, persona, personaLabels, targetsBySym
                 setPage(0);
               }}
               aria-label="월말 기준일"
-              className="h-8 w-32 rounded-md border border-slate-200 bg-white px-2 text-xs"
+              className="min-h-9 w-32 rounded-md border border-slate-200 bg-white px-2 py-2 text-sm leading-normal"
             >
               {months.map((item) => (
                 <NativeSelectOption key={item} value={item}>

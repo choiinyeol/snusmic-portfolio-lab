@@ -157,7 +157,7 @@ devastating  not hit, expiryReturn <= -30%                           → rose
 - `apps/web/app/(app)/portfolio/[strategy]/page.tsx` — overview만 렌더.
 - `apps/web/app/(app)/portfolio/[strategy]/{holdings,equity,trades,methodology}/page.tsx` — 각 객체 view만 렌더.
 - `apps/web/app/(app)/portfolio/portfolio-view-model.ts` — landing/detail 모델 분리, persona 검증, strategy-only selector/static params 구성.
-- `apps/web/components/trading/portfolio-views/*.tsx` — landing, detail overview, holdings/equity/trades/methodology, PnL trade-marker chart 분리. Phase 2 기준: detail header는 4-KPI, holdings는 treemap+근거 카드+표, methodology는 진입 후보/편입/청산·교체/위험·예외 구조.
+- `apps/web/components/trading/portfolio-views/*.tsx` — landing, detail overview, holdings/equity/trades/methodology, PnL trade-marker chart 분리. Phase 3 기준: detail header는 4-KPI, overview는 `거래 이벤트 타임라인`, holdings는 treemap+`리스크 집중` 카드+표, trades는 `거래 요약`/큰 체결/`사유별 체결`+원장 표, methodology는 진입 후보/편입/청산·교체/위험·예외+`실제 파라미터` 구조.
 - `apps/web/lib/product-model.ts`의 `portfolioStrategyHref(strategyId)`는 `/portfolio/${strategyId}`를 반환한다. 단, `/portfolio` static params/selector는 selectable strategy만 포함한다; benchmark/follower/oracle 원장은 `/strategies`의 비교 기준이다.
 
 구현된 라우트:
@@ -176,6 +176,7 @@ devastating  not hit, expiryReturn <= -30%                           → rose
 1. `/strategies`는 strategy/benchmark 비교 카탈로그다.
 2. `/portfolio`는 실제 selectable strategy 원장이다. benchmark/follower/oracle은 selector/static params/sub-route/serialized model에서 제외한다.
 3. `/portfolio?strategy=:id` backward compat는 기존 notice/redirect component를 유지하되 primary href는 `/portfolio/:id`다. benchmark/follower/oracle id는 invalid로 취급된다.
+4. 버튼/탭/selector/pagination은 한글 라벨이 세로로 잘리지 않도록 고정 `h-*`보다 `min-height + py + leading-normal`을 우선한다. `목록` 버튼이 잘리면 공용 `Button`과 raw toolbar class를 먼저 본다.
 
 ### A. 코세스 PDF 파싱 버그 (Python 트랙)
 
@@ -199,6 +200,7 @@ devastating  not hit, expiryReturn <= -30%                           → rose
 - **사이드바**: active state는 `bg-slate-100 + border-l-2 border-l-slate-950` 계열. 다크 풀바 금지.
 - **카피 톤**: SaaS marketing copy(hero/eyebrow/CTA) 금지. academic appendix / static ledger 톤 유지.
 - **컴포넌트 재사용**: 새 dense table은 우선 `<DataPanel>` 사용. CSV는 `downloadCsv` helper 사용.
+- **hover-only 금지**: 포트폴리오 매매 설명은 tooltip만으로 끝내지 않는다. overview timeline 또는 trades narrative처럼 상시 visible한 텍스트 경로가 있어야 한다.
 - **검증**: 의미 있는 코드 변경은 typecheck + lint + build로 확인한다.
 - **버전 태깅**: 의미 있는 릴리스 단위 변경 시 `v0.X.Y-{slug}.1` 형태 tag와 CHANGELOG 한국어 entry를 준비한다.
 

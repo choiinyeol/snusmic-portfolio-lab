@@ -63,6 +63,11 @@ export function PortfolioOverviewView({ model }: { model: PortfolioViewModel }) 
             label={personaLabel}
             height={460}
           />
+          <TradeEventTimeline
+            trades={recentTrades.slice(0, 6)}
+            targetsByReportId={model.targetsByReportId}
+            targetsBySymbol={model.targetsBySymbol}
+          />
         </article>
 
         <article className="rounded-md border border-slate-200 bg-white p-3">
@@ -129,6 +134,80 @@ export function PortfolioOverviewView({ model }: { model: PortfolioViewModel }) 
           )}
         </article>
       </section>
+    </div>
+  );
+}
+
+function TradeEventTimeline({
+  trades,
+  targetsByReportId,
+  targetsBySymbol,
+}: {
+  trades: TradeRow[];
+  targetsByReportId: Record<string, ReportTargetDigest>;
+  targetsBySymbol: Record<string, ReportTargetDigest>;
+}) {
+  if (!trades.length) {
+    return (
+      <div className="mt-4 rounded-md border border-dashed border-slate-200 bg-slate-50 px-4 py-5 text-sm text-slate-500">
+        거래 이벤트 타임라인에 표시할 최근 체결이 없습니다.
+      </div>
+    );
+  }
+  return (
+    <div className="mt-4 rounded-md border border-slate-100 bg-slate-50/70 p-3">
+      <div className="flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <h3 className="text-sm font-semibold text-slate-950">거래 이벤트 타임라인</h3>
+          <p className="mt-1 text-xs leading-5 text-slate-500">
+            차트 마커를 hover하지 않아도 최근 체결 사유와 리포트 근거를 바로 읽을 수 있습니다.
+          </p>
+        </div>
+        <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+          latest {trades.length}
+        </span>
+      </div>
+      <ol className="mt-3 grid gap-2">
+        {trades.map((trade) => {
+          const target = (trade.reportId && targetsByReportId[trade.reportId]) || targetsBySymbol[trade.symbol];
+          const href = target
+            ? reportTargetHref(target)
+            : trade.reportId
+              ? `/reports/${encodeURIComponent(trade.symbol)}/${encodeURIComponent(trade.reportId)}`
+              : `/reports/${encodeURIComponent(trade.symbol)}`;
+          const sideLabel = trade.side === 'sell' ? '매도' : '매수';
+          return (
+            <li
+              className="grid gap-2 rounded-md border border-slate-200 bg-white p-3 sm:grid-cols-[8rem_minmax(0,1fr)_auto]"
+              key={`${trade.date}-${trade.symbol}-${trade.side}-${trade.qty}-${trade.grossKrw}`}
+            >
+              <div className="font-mono text-xs font-semibold text-slate-500">{trade.date}</div>
+              <div className="min-w-0">
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                  <span
+                    className={`rounded px-2 py-1 text-xs font-bold leading-normal ${
+                      trade.side === 'sell' ? 'bg-rose-50 text-rose-700' : 'bg-emerald-50 text-emerald-700'
+                    }`}
+                  >
+                    {sideLabel}
+                  </span>
+                  <strong className="truncate text-sm text-slate-950">{trade.symbol}</strong>
+                  <span className="font-mono text-xs text-slate-500">{formatKrw(Math.abs(trade.grossKrw ?? 0))}</span>
+                </div>
+                <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">
+                  {trade.reason || '기록된 체결 사유 없음'}
+                </p>
+              </div>
+              <Link
+                className="self-center text-sm font-semibold text-slate-700 underline-offset-4 hover:text-slate-950 hover:underline"
+                href={href}
+              >
+                근거 보기
+              </Link>
+            </li>
+          );
+        })}
+      </ol>
     </div>
   );
 }

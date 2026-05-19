@@ -44,7 +44,7 @@ export function PortfolioStrategyFrame({ children, model }: { children: ReactNod
 
       <nav
         aria-label="포트폴리오 상세 보기"
-        className="min-w-0 overflow-x-auto border-y border-slate-200 bg-white py-1"
+        className="min-w-0 overflow-x-auto border-y border-slate-200 bg-white py-1.5"
       >
         <div className="flex min-w-max gap-1 px-1">
           {ROUTE_LINKS.map((link) => {
@@ -55,7 +55,7 @@ export function PortfolioStrategyFrame({ children, model }: { children: ReactNod
               <Link
                 aria-current={active ? 'page' : undefined}
                 className={[
-                  'inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-xs font-semibold transition-colors',
+                  'inline-flex min-h-10 items-center gap-1.5 rounded-md px-3 py-2.5 text-sm font-semibold leading-normal transition-colors',
                   active
                     ? 'bg-slate-950 !text-white [&>span]:!text-white'
                     : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950',

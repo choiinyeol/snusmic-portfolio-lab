@@ -25,12 +25,12 @@ export default function AppError({ error, reset }: { error: Error & { digest?: s
         <button
           type="button"
           onClick={reset}
-          className="inline-flex h-9 items-center rounded-md bg-slate-950 px-4 text-sm font-semibold text-white transition-colors hover:bg-slate-800"
+          className="inline-flex min-h-10 items-center rounded-md bg-slate-950 px-4 py-2.5 text-sm font-semibold leading-normal text-white transition-colors hover:bg-slate-800"
         >
           다시 시도
         </button>
         <Link
-          className="inline-flex h-9 items-center rounded-md border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-900 transition-colors hover:bg-slate-50"
+          className="inline-flex min-h-10 items-center rounded-md border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold leading-normal text-slate-900 transition-colors hover:bg-slate-50"
           href="/main"
         >
           메인으로 이동

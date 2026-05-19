@@ -67,7 +67,7 @@ Reader assumption: 매도 타이밍을 모델이 알려줄 수 없다. 우리는
 | `/reports/[symbol]/[id]` | Detail | 이 리포트는 어떻게 됐나 | report detail · price path · facts · scenario table |
 | `/statistics` | Analytics | 전체 리포트가 어떻게 끝났고 어떤 패턴? | derived stats only — feeds off artifacts, doesn't own state |
 | `/screener` | Index | 지금 검토할 후보는? | research-derived candidates · filters |
-| `/strategies` | Index | 전략과 benchmark가 어떻게 다르나? | strategy/benchmark catalog · leaderboard · curves |
+| `/strategies` | Index | 전략과 benchmark가 어떻게 다르나? | strategy/benchmark catalog · leaderboard · curves · comparison-only role cards |
 | `/guide` | Detail | 어떻게 읽어야? | onboarding · definitions |
 
 Page types defined in §7. Menu labels and route labels must match.
@@ -195,6 +195,8 @@ Must be shown on strategy comparisons. Drives the default "best strategy" only a
 8. **No silent exclusions.** Excluded reports surface counts in data quality.
 9. **Status is text + color, never color-only.**
 10. **Empty data is a first-class state.** No active holdings → cash/reserve ledger, not an empty treemap.
+11. **Korean labels must not be cropped.** Buttons, list controls, tabs, selectors, chips, and pagination use `min-height` + vertical padding + normal line-height rather than fixed tight heights.
+12. **Trade explanations are not hover-only.** PnL markers may have tooltips, but portfolio overview must also expose a visible trade-event timeline.
 
 ### 6.2 Navigation contract
 
@@ -215,6 +217,7 @@ flowchart LR
 Rules:
 
 - Only selectable strategy rows open `/portfolio/:strategy` via `portfolioStrategyHref(strategyId)`. Benchmark/follower/oracle rows are comparison objects in `/strategies`, not portfolio ledgers or portfolio links. Legacy `?strategy=:id` support is compatibility only, not primary navigation.
+- `/strategies` owns comparison and benchmark context; `/portfolio` owns actual strategy ledgers. If the same entity appears in both contexts, the UI must state whether it is comparison-only or investable portfolio state.
 - Report rows, screener candidates, statistics points/legends, trade-basis links, report-backed heatmap tiles open `/reports/:symbol/:id`.
 - Cash and benchmark-only holdings without a matched report stay non-clickable.
 - Guide links are onboarding shortcuts, never duplicated primary CTAs.

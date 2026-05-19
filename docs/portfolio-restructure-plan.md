@@ -1,6 +1,6 @@
 # Portfolio Restructure Plan — code-traced next phase
 
-Status: **Phase C route decomposition + deep UI redesign implemented; docs are audit notes**
+Status: **Phase C route decomposition + phase 3 narrative UX implemented; docs are audit notes**
 Last updated: 2026-05-19
 
 이 문서는 과거 table-chrome proposal에서 출발했지만, 현재는 코드 상태를 기준으로 `/portfolio/[strategy]` route split 구현 상태를 기록하는 계획서다. 최종 truth는 코드다.
@@ -65,7 +65,7 @@ apps/web/components/trading/portfolio-views/*.tsx
 - 데이터 조립은 `buildPortfolioViewModel(selectedPersona?: string)`로 이동했다.
 - overview, holdings, equity, trades, methodology는 `components/trading/portfolio-views/` 아래 view component로 나뉘었다.
 - 내부 `<Tabs>`는 제거했고 URL sub-route link nav를 사용한다.
-- `/portfolio`는 default detail이 아니라 strategy-only landing이다. 사용자가 실제 포트폴리오를 선택하고 현재 비중 treemap, strategy-only frontier, 손익 경로를 먼저 본다. 상세 페이지는 4-KPI header, PnL+trade marker explanation, holdings evidence links, Entry/Rebalance/Exit-Risk/Exceptions methodology dossier를 소유한다.
+- `/portfolio`는 default detail이 아니라 strategy-only landing이다. 사용자가 실제 포트폴리오를 선택하고 현재 비중 treemap, strategy-only frontier, 손익 경로를 먼저 본다. 상세 페이지는 4-KPI header, PnL+trade marker explanation, visible 거래 이벤트 타임라인, holdings 리스크 집중 카드, trades narrative, Entry/Rebalance/Exit-Risk/Exceptions + 실제 파라미터 methodology dossier를 소유한다.
 
 ---
 
@@ -73,11 +73,11 @@ apps/web/components/trading/portfolio-views/*.tsx
 
 ```text
 /portfolio                              → strategy-only landing (선택 + 현재 비중 + frontier + PnL path)
-/portfolio/[strategy]                   → overview (KPI + analytics + treemap summary)
-/portfolio/[strategy]/holdings          → Holdings treemap + evidence cards + table
+/portfolio/[strategy]                   → overview (KPI + analytics + treemap summary + 거래 이벤트 타임라인)
+/portfolio/[strategy]/holdings          → Holdings treemap + 리스크 집중 cards + table
 /portfolio/[strategy]/equity            → Daily equity view
-/portfolio/[strategy]/trades            → Trade ledger
-/portfolio/[strategy]/methodology       → Entry / Rebalance / Exit-Risk / Exceptions methodology
+/portfolio/[strategy]/trades            → 거래 요약 + 큰 체결 + 사유별 체결 + Trade ledger
+/portfolio/[strategy]/methodology       → Entry / Rebalance / Exit-Risk / Exceptions methodology + 실제 파라미터
 ```
 
 원칙:
@@ -170,3 +170,12 @@ apps/web/components/trading/portfolio-views/PortfolioMethodologyView.tsx
 - `[strategy]` 상세는 report-detail식 header/facts/nav shell을 사용한다.
 - `PortfolioEquityTradeChart`가 누적 손익 곡선 위에 매수·매도 marker를 표시한다.
 - `StrategyRiskTable`은 selectable strategy만 portfolio link를 제공한다. benchmark/follower/oracle row는 `/portfolio`로 보내지 않는다.
+
+## 7. Phase 3 narrative UX follow-up (2026-05-19)
+
+- 공용 `Button`, selector, route nav, DataPanel controls, pagination CSS는 고정 `h-*` 중심에서 `min-height + padding + normal line-height` 중심으로 바꿨다. 한글 `목록`, `보유 표`, route tab meta가 잘려 보이면 이 계열부터 확인한다.
+- `/portfolio/[strategy]` overview는 `거래 이벤트 타임라인`을 차트 아래에 노출한다. 차트 tooltip은 보조 설명이고, 체결 사유/금액/근거 링크는 timeline에서 hover 없이 읽힌다.
+- `/portfolio/[strategy]/trades`는 raw ledger 앞에 `거래 요약`, 최근 30일 매수·매도, 큰 체결, `사유별 체결`을 둔다. 표와 CSV는 기존 `TradesTable`을 그대로 사용한다.
+- `/portfolio/[strategy]/holdings`의 상위 보유 카드는 `리스크 집중` 섹션이다. 비중, 평가액, 미실현 수익률, 보유일, 목표가, 발간시 상승여력을 같이 보여준다.
+- `/portfolio/[strategy]/methodology`는 `methodsByPersona[persona].params`를 받아 `실제 파라미터`를 렌더한다. 파라미터는 strategy catalog가 source of truth다.
+- `/strategies`에는 role-card를 두어 benchmark/oracle/follower는 비교 기준, `/portfolio`는 실제 원장이라는 분리를 화면에서도 반복한다.

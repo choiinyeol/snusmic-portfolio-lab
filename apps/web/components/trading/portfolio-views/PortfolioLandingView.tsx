@@ -94,7 +94,7 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
             <button
               aria-pressed={strategy.id === selected.id}
               className={[
-                'group grid min-w-0 gap-3 rounded-md border bg-white p-3 text-left transition-colors',
+                'group grid min-h-36 min-w-0 gap-3 rounded-md border bg-white p-3 text-left leading-normal transition-colors',
                 strategy.id === selected.id
                   ? 'border-slate-950 ring-1 ring-slate-950/10'
                   : 'border-slate-200 hover:border-slate-400',
@@ -110,7 +110,9 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
                   </div>
                   <div className="truncate text-xs text-slate-500">{strategy.label}</div>
                 </div>
-                <span className="rounded-full bg-slate-950 px-2 py-1 text-[10px] font-semibold text-white">전략</span>
+                <span className="rounded-full bg-slate-950 px-2 py-1 text-xs font-semibold leading-normal text-white">
+                  전략
+                </span>
               </div>
               <div className="grid grid-cols-3 gap-2 text-xs">
                 <Fact

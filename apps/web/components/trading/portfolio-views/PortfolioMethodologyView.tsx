@@ -43,6 +43,17 @@ export function PortfolioMethodologyView({
 
       <section className="rounded-md border border-slate-200 bg-white p-4">
         <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+          actual params
+        </div>
+        <h3 className="mt-1 text-lg font-semibold tracking-tight text-slate-950">실제 파라미터</h3>
+        <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-500">
+          아래 값은 전략 카탈로그에 저장된 실제 threshold/limit입니다. 서술형 운용 규칙과 같은 원천에서 읽습니다.
+        </p>
+        <ParamGrid params={method.params} />
+      </section>
+
+      <section className="rounded-md border border-slate-200 bg-white p-4">
+        <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
           operating contract
         </div>
         <h3 className="mt-1 text-lg font-semibold tracking-tight text-slate-950">이 페이지가 보장하는 것</h3>
@@ -62,6 +73,25 @@ export function PortfolioMethodologyView({
         </div>
       </section>
     </article>
+  );
+}
+
+function ParamGrid({ params }: { params: Record<string, unknown> }) {
+  const entries = Object.entries(params).filter(([, value]) => value !== null && value !== undefined);
+  if (!entries.length) return <p className="mt-3 text-sm text-slate-500">기록된 실제 파라미터가 없습니다.</p>;
+  return (
+    <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      {entries.map(([key, value]) => (
+        <div className="rounded-md border border-slate-100 bg-slate-50 p-3" key={key}>
+          <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+            {formatParamKey(key)}
+          </div>
+          <div className="mt-1 break-words font-mono text-sm font-semibold tabular-nums text-slate-950">
+            {formatParamValue(value)}
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -106,4 +136,19 @@ function ContractCard({ title, body }: { title: string; body: string }) {
       <p className="mt-1 text-sm leading-5 text-slate-600">{body}</p>
     </div>
   );
+}
+
+function formatParamKey(key: string): string {
+  return key.replaceAll('_', ' ');
+}
+
+function formatParamValue(value: unknown): string {
+  if (typeof value === 'number') {
+    if (Number.isInteger(value)) return value.toLocaleString('ko-KR');
+    return value.toLocaleString('ko-KR', { maximumFractionDigits: 4 });
+  }
+  if (typeof value === 'boolean') return value ? 'true' : 'false';
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value)) return value.map(formatParamValue).join(', ');
+  return JSON.stringify(value);
 }

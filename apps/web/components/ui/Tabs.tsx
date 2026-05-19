@@ -25,7 +25,7 @@ export function Tabs({ tabs, defaultTabId }: { tabs: Tab[]; defaultTabId?: strin
               type="button"
               aria-selected={tab.id === active}
               aria-controls={panelId}
-              className={`inline-flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition ${tab.id === active ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:bg-white/70 hover:text-slate-900'}`}
+              className={`inline-flex min-h-10 shrink-0 items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium leading-normal transition ${tab.id === active ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:bg-white/70 hover:text-slate-900'}`}
               onClick={() => setActive(tab.id)}
             >
               {tab.label}

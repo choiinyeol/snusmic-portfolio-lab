@@ -4,7 +4,7 @@ import type * as React from 'react';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-slate-950/15 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+  'inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium leading-normal outline-none transition-colors focus-visible:ring-2 focus-visible:ring-slate-950/15 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -12,13 +12,13 @@ const buttonVariants = cva(
         secondary: 'bg-slate-100 text-slate-950 hover:bg-slate-200',
         outline: 'border border-slate-200 bg-white text-slate-950 hover:bg-slate-50',
         ghost: 'text-slate-700 hover:bg-slate-100 hover:text-slate-950',
-        link: 'h-auto p-0 text-slate-950 underline-offset-4 hover:underline',
+        link: 'min-h-0 p-0 text-slate-950 underline-offset-4 hover:underline',
       },
       size: {
-        default: 'h-9 px-4 py-2',
-        sm: 'h-8 rounded-md px-3 text-xs',
-        lg: 'h-10 rounded-md px-5',
-        icon: 'size-9',
+        default: 'min-h-10 px-4 py-2.5',
+        sm: 'min-h-9 rounded-md px-3 py-2 text-sm',
+        lg: 'min-h-11 rounded-md px-5 py-3 text-base',
+        icon: 'min-h-10 min-w-10 p-2',
       },
     },
     defaultVariants: {

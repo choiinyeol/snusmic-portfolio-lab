@@ -50,7 +50,7 @@ export function DataPanel({ title, subtitle, actions, search, toolbar, paginatio
               onChange={(event) => search.onChange(event.target.value)}
               placeholder={search.placeholder ?? '검색'}
               aria-label={search.ariaLabel ?? '검색'}
-              className="h-8 w-44 rounded-md border border-slate-200 bg-white px-3 text-xs text-slate-700 outline-none transition-colors focus:border-slate-500"
+              className="min-h-9 w-44 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm leading-normal text-slate-700 outline-none transition-colors focus:border-slate-500"
             />
           ) : null}
           {actions}
@@ -60,7 +60,7 @@ export function DataPanel({ title, subtitle, actions, search, toolbar, paginatio
       <div className="max-h-[72vh] overflow-auto">{children}</div>
       {pagination ? (
         <footer className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 border-t border-slate-200 bg-slate-50 px-4 py-2.5 font-mono text-[11px] text-slate-500">
-          <span className="justify-self-start">
+          <span className="justify-self-start leading-normal">
             총 {pagination.totalRows.toLocaleString('ko-KR')}행 ·{' '}
             {pagination.pageCount ? Math.min(pagination.page, pagination.pageCount - 1) + 1 : 0}/
             {Math.max(1, pagination.pageCount)}쪽
@@ -76,7 +76,7 @@ export function DataPanel({ title, subtitle, actions, search, toolbar, paginatio
               <select
                 value={pagination.pageSize}
                 onChange={(event) => pagination.onPageSizeChange?.(Number(event.target.value))}
-                className="h-7 rounded-md border border-slate-200 bg-white px-2 text-xs"
+                className="min-h-8 rounded-md border border-slate-200 bg-white px-2 py-1 text-xs leading-normal"
               >
                 {(pagination.pageSizeOptions ?? [10, 25, 50, 100]).map((size) => (
                   <option key={size} value={size}>
@@ -108,7 +108,7 @@ export function CsvDownloadButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="inline-flex h-8 items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+      className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium leading-normal text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
     >
       <Download aria-hidden="true" className="size-3.5" />
       {label}
@@ -136,7 +136,7 @@ export function EmptyTableState({
           <button
             type="button"
             onClick={onAction}
-            className="inline-flex h-8 items-center rounded-md border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-950"
+            className="inline-flex min-h-9 items-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold leading-normal text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-950"
           >
             {actionLabel}
           </button>

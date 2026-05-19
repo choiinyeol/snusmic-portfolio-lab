@@ -109,7 +109,7 @@ export function DailyEquityHistory({ equity, trades, persona, personaLabels }: P
             <label className="flex items-center gap-2 text-xs text-slate-950/55">
               <span>일수</span>
               <select
-                className="h-7 rounded-md border border-slate-200 bg-white px-2 text-xs text-slate-700"
+                className="min-h-8 rounded-md border border-slate-200 bg-white px-2 py-1 text-xs leading-normal text-slate-700"
                 value={windowSize}
                 onChange={(event) => setWindowSize(Number(event.target.value) as (typeof PAGE_SIZE_OPTIONS)[number])}
               >

@@ -54,11 +54,12 @@ export function PortfolioHoldingsView({ model }: { model: PortfolioViewModel }) 
         <article className="rounded-md border border-slate-200 bg-white p-4">
           <div className="mb-3">
             <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-              evidence links
+              risk focus
             </div>
-            <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">큰 비중부터 근거 확인</h2>
+            <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">리스크 집중</h2>
             <p className="mt-1 text-sm leading-6 text-slate-500">
-              {personaLabel}의 현재 위험은 보유 비중 상위 종목이 결정합니다. 각 행은 최신 리포트 근거와 연결됩니다.
+              {personaLabel}의 현재 위험은 보유 비중 상위 종목이 결정합니다. 비중·미실현 수익률·보유일·목표가 근거를 한
+              번에 확인합니다.
             </p>
           </div>
           <div className="grid gap-2">
@@ -131,7 +132,21 @@ function HoldingEvidenceCard({
         >
           미실현 {formatPercent(holding.unrealizedReturn)}
         </span>
+        <span className="rounded bg-slate-100 px-1.5 py-0.5 text-slate-600">
+          보유 {formatHoldingDays(holding.holdingDays)}
+        </span>
+        <span className="rounded bg-slate-100 px-1.5 py-0.5 text-slate-600">
+          목표가 {formatKrw(target?.targetPriceKrw)}
+        </span>
+        <span className="rounded bg-slate-100 px-1.5 py-0.5 text-slate-600">
+          발간시 상승여력 {formatPercent(target?.targetUpsideAtPub)}
+        </span>
       </div>
     </Link>
   );
+}
+
+function formatHoldingDays(value: number | null | undefined): string {
+  if (value === null || value === undefined || !Number.isFinite(value)) return '—';
+  return `${Math.round(value).toLocaleString('ko-KR')}일`;
 }

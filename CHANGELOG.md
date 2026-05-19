@@ -20,6 +20,26 @@
 
 ---
 
+## v0.25.0-portfolio-trade-narrative.1 — 2026-05-19
+
+### 변경
+- 포트폴리오/전략 화면의 버튼·탭·selector·pagination 계열 높이와 line-height를 키워 한글 라벨이 세로로 잘려 보이는 문제를 줄였습니다.
+- `/portfolio` 선택 카드는 실제 전략만 고르는 화면이라는 역할을 더 명확히 하고, `/strategies`에는 비교 화면/실제 원장 역할 구분 카드를 추가했습니다.
+- `/portfolio/[strategy]` overview에 `거래 이벤트 타임라인`을 추가해 PnL 차트 마커의 체결 사유와 리포트 근거를 hover 없이 읽을 수 있게 했습니다.
+- `/portfolio/[strategy]/trades`를 원장 표 앞의 `거래 요약`, 큰 체결, `사유별 체결` 내러티브로 확장했습니다.
+- `/portfolio/[strategy]/holdings` 상위 보유 섹션을 `리스크 집중`으로 바꾸고 비중, 미실현 수익률, 보유일, 목표가/리포트 근거를 함께 노출했습니다.
+- `/portfolio/[strategy]/methodology`가 strategy catalog의 실제 `params`를 읽어 `실제 파라미터`로 표시합니다.
+
+### 문서
+- `DESIGN.md`, `docs/handoff-codex.md`, `docs/portfolio-restructure-plan.md`에 portfolio narrative phase 3와 `/strategies`/`/portfolio` 역할 분리를 반영했습니다.
+
+### 검증
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web check`
+- `pnpm --dir apps/web build`
+- static/live scan: portfolio-only selector, timeline/trade narrative/risk/params copy, clipped-height class smoke
+
 ## v0.24.0-portfolio-dossier-phase2.1 — 2026-05-19
 
 ### 변경
