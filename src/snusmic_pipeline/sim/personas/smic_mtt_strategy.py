@@ -481,6 +481,41 @@ def _average_true_range(
     return true_range.rolling(period, min_periods=period).mean()
 
 
+def _relative_strength(
+    board: PriceBoard,
+    day: date,
+    symbol: str,
+    config: SmicMttStrategyConfig,
+) -> tuple[float, float]:
+    """Trailing momentum and cross-sectional relative-strength percentile.
+
+    Uses closes available on or before ``day`` only. Missing lookback history
+    returns disabled-gate defaults, preserving legacy behavior unless callers
+    require positive momentum or a non-zero relative-strength percentile.
+    """
+
+    if board.close.empty or symbol not in board.close.columns:
+        return 0.0, 0.0
+
+    history = board.close.loc[board.close.index <= pd.Timestamp(day)]
+    lookback = config.relative_strength_lookback_days
+    if len(history) <= lookback:
+        return 0.0, 0.0
+
+    window = history.tail(lookback + 1)
+    first = window.iloc[0]
+    last = window.iloc[-1]
+    valid = first.gt(0) & last.gt(0)
+    returns = (last[valid] / first[valid] - 1.0).replace([float("inf"), float("-inf")], pd.NA)
+    returns = returns.dropna()
+    if symbol not in returns or returns.empty:
+        return 0.0, 0.0
+
+    momentum_return = float(returns[symbol])
+    relative_strength_percentile = float(returns.rank(method="average", pct=True)[symbol])
+    return momentum_return, relative_strength_percentile
+
+
 def _top_up_days(trading_dates: list[date], cadence: str) -> set[date]:
     if cadence == "deposit_only":
         return set()
