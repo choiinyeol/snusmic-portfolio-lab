@@ -253,6 +253,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     position_episodes = _read_csv(inputs.sim / "position_episodes.csv")
     equity_daily = _read_csv(inputs.sim / "equity_daily.csv")
     broker_strategy_trials = _read_optional_csv(inputs.sim / "broker_strategy_trials.csv")
+    stock_admission = _read_stock_admission_artifact(inputs.sim)
     extraction_quality = _read_json(inputs.extraction_quality) if inputs.extraction_quality.exists() else {}
 
     _assert_no_stale_strategy_personas(
@@ -297,7 +298,11 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
         reports, prices, summary, report_stats, missing_symbols, report_rows, report_exclusions
     )
     strategy_catalog = _build_strategy_catalog(summary, inputs.sim / "persona-configs.json")
-    strategy_admission = _build_strategy_admission(broker_strategy_trials, strategy_catalog)
+    strategy_admission = _build_strategy_admission(
+        broker_strategy_trials,
+        strategy_catalog,
+        stock_admission=stock_admission,
+    )
     strategy_labels = {str(row["strategy_id"]): str(row["label"]) for row in strategy_catalog}
     _apply_strategy_labels(overview.get("baseline_personas", []), strategy_labels)
     return_windows = _build_return_windows(report_rows, prices)
@@ -310,7 +315,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     insights = _build_insights(overview, rankings, target_distribution, return_windows, data_quality)
 
     current_holdings = _current_holdings_from_open_episodes(position_episodes, current_holdings)
-    persona_rows = _records(summary)
+    persona_rows = _enrich_persona_rows_with_catalog(_records(summary), strategy_catalog)
     _apply_strategy_labels(persona_rows, strategy_labels)
     enriched_current_holdings = _records(_enrich_holdings_with_native(current_holdings, prices, fx_rates))
     enriched_monthly_holdings = _records(
@@ -480,6 +485,25 @@ def _read_json(path: Path) -> Any:
         return json.load(handle)
 
 
+def _read_stock_admission_artifact(sim_dir: Path) -> dict[str, Any] | None:
+    """Read the optional stock-level admission audit artifact.
+
+    The stock-rule search/admission lane owns producing this file. The web
+    exporter treats it as optional so existing simulation fixtures keep working,
+    but when present the artifact is copied into the strategy-admission product
+    contract instead of reviving the retired meta-quant candidate surface.
+    """
+
+    for name in ("stock-admission.json", "stock_admission.json"):
+        path = sim_dir / name
+        if path.exists():
+            data = _read_json(path)
+            if not isinstance(data, dict):
+                raise RuntimeError(f"{path} must contain a JSON object.")
+            return data
+    return None
+
+
 def _current_holdings_from_open_episodes(
     position_episodes: pd.DataFrame, existing_holdings: pd.DataFrame
 ) -> pd.DataFrame:
@@ -597,6 +621,43 @@ def _apply_strategy_labels(rows: list[dict[str, Any]], labels_by_id: dict[str, s
         label = labels_by_id.get(persona)
         if label:
             row["label"] = label
+
+
+def _enrich_persona_rows_with_catalog(
+    personas: list[dict[str, Any]],
+    strategy_catalog: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Attach product methodology fields to portfolio/persona bundles.
+
+    ``portfolio/personas.json`` is the portfolio route's compact persona list.
+    It should not need to re-join the strategy catalog to explain why a
+    stock-level strategy exists after the meta-quant route is removed.
+    """
+
+    catalog_by_id = {str(row.get("strategy_id") or ""): row for row in strategy_catalog}
+    enriched: list[dict[str, Any]] = []
+    for persona in personas:
+        row = dict(persona)
+        catalog = catalog_by_id.get(str(row.get("persona") or ""))
+        if catalog:
+            for key in (
+                "short_label",
+                "kind",
+                "benchmark_group",
+                "is_selectable",
+                "is_default_candidate",
+                "objective_passed",
+                "objective_return_excess",
+                "objective_mdd_slack",
+                "methodology_summary",
+                "buy_rules",
+                "sell_rules",
+                "risk_controls",
+                "params",
+            ):
+                row[key] = catalog.get(key)
+        enriched.append(row)
+    return enriched
 
 
 def _write_json(path: Path, data: Any) -> None:
@@ -1409,6 +1470,8 @@ def _build_strategy_catalog(summary: pd.DataFrame, sim_config_path: Path) -> lis
 def _build_strategy_admission(
     trials: pd.DataFrame,
     strategy_catalog: list[dict[str, Any]],
+    *,
+    stock_admission: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Explain why only the promoted report-trend strategies survived.
 
@@ -1423,17 +1486,20 @@ def _build_strategy_admission(
         for row in strategy_catalog
         if row.get("kind") == "strategy" and str(row.get("strategy_id") or "")
     ]
+    stock_summary = _stock_admission_summary(stock_admission)
     if trials.empty:
         return {
             "schema_version": "1.0.0",
             "has_trial_rows": False,
             "trial_count": 0,
             "accepted_count": len(accepted_strategy_ids),
+            "stock_accepted_count": stock_summary["accepted_count"] if stock_summary else 0,
             "rejected_count": None,
             "status_counts": {},
             "accepted_strategy_ids": accepted_strategy_ids,
             "accepted_trials": [],
             "top_rejected_trials": [],
+            "stock_admission": stock_summary,
             "notes": [
                 "broker_strategy_trials.csv가 없어서 현재 catalog 기준 채택 전략 수만 표시합니다.",
                 "다음 run-sim 실행부터 후보별 below_benchmark/duplicate_behavior/accepted 기록이 저장됩니다.",
@@ -1462,16 +1528,109 @@ def _build_strategy_admission(
         "has_trial_rows": True,
         "trial_count": len(records),
         "accepted_count": len(accepted),
+        "stock_accepted_count": stock_summary["accepted_count"] if stock_summary else 0,
         "rejected_count": len(rejected),
         "status_counts": status_counts,
         "accepted_strategy_ids": accepted_strategy_ids,
         "accepted_trials": accepted_trials,
         "top_rejected_trials": top_rejected_trials,
+        "stock_admission": stock_summary,
         "notes": [
             "채택 조건은 최고 투자 가능 벤치마크 초과 수익률과 중복 행동 제거입니다.",
             "MTT는 일부 후보가 쓰는 추세 필터이며, 사용자-facing 전략명은 유니버스·신호·집중도 기준으로 표시합니다.",
         ],
     }
+
+
+def _stock_admission_summary(artifact: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not artifact:
+        return None
+    decisions = artifact.get("decisions")
+    if not isinstance(decisions, list):
+        raise RuntimeError("stock admission artifact must contain a decisions list.")
+
+    status_counts: dict[str, int] = {}
+    accepted: list[dict[str, Any]] = []
+    rejected: list[dict[str, Any]] = []
+    for decision in decisions:
+        if not isinstance(decision, dict):
+            continue
+        status = str(decision.get("status") or "unknown")
+        status_counts[status] = status_counts.get(status, 0) + 1
+        row = _stock_admission_decision_row(decision)
+        if status == "accepted":
+            accepted.append(row)
+        else:
+            rejected.append(row)
+
+    return {
+        "schema_version": str(artifact.get("schema_version") or "1.0.0"),
+        "window": artifact.get("window"),
+        "benchmark_persona": artifact.get("benchmark_persona"),
+        "methodology": artifact.get("methodology") or [],
+        "decision_count": len(decisions),
+        "accepted_count": len(accepted),
+        "rejected_count": len(rejected),
+        "status_counts": status_counts,
+        "accepted_rules": accepted,
+        "top_rejected_rules": sorted(
+            rejected,
+            key=lambda row: _number(row.get("oos_money_weighted_return")) or float("-inf"),
+            reverse=True,
+        )[:12],
+        "notes": [
+            "stock admission은 search_is 구간에서 발견한 개별 종목 규칙만 admit_oos 구간으로 검증합니다.",
+            "이 블록은 meta-quant 조합 후보가 아니라 실제 종목 단위 OOS 입장 근거입니다.",
+        ],
+    }
+
+
+def _stock_admission_decision_row(decision: dict[str, Any]) -> dict[str, Any]:
+    candidate = decision.get("candidate") if isinstance(decision.get("candidate"), dict) else {}
+    in_sample = (
+        candidate.get("in_sample_metrics")
+        if isinstance(candidate.get("in_sample_metrics"), dict)
+        else {}
+    )
+    out_of_sample = (
+        decision.get("out_of_sample_metrics")
+        if isinstance(decision.get("out_of_sample_metrics"), dict)
+        else {}
+    )
+    rule_id = str(candidate.get("rule_id") or "")
+    return {
+        "rule_id": rule_id,
+        "persona": _stock_rule_persona_id(rule_id) if rule_id else None,
+        "family": candidate.get("family"),
+        "symbol": candidate.get("symbol"),
+        "company": candidate.get("company"),
+        "status": decision.get("status"),
+        "reason_codes": decision.get("reason_codes") or [],
+        "params": _stock_rule_params(candidate.get("params")),
+        "is_money_weighted_return": _number(in_sample.get("money_weighted_return")),
+        "oos_money_weighted_return": _number(out_of_sample.get("money_weighted_return")),
+        "oos_net_profit_krw": _number(out_of_sample.get("net_profit_krw")),
+        "oos_final_equity_krw": _number(out_of_sample.get("final_equity_krw")),
+        "oos_max_drawdown": _number(out_of_sample.get("max_drawdown")),
+        "oos_trade_count": _number(out_of_sample.get("trade_count")),
+        "benchmark_oos_money_weighted_return": _number(decision.get("benchmark_oos_money_weighted_return")),
+        "excess_return_vs_benchmark": _number(decision.get("excess_return_vs_benchmark")),
+    }
+
+
+def _stock_rule_params(params: Any) -> dict[str, Any]:
+    if not isinstance(params, list):
+        return {}
+    out: dict[str, Any] = {}
+    for param in params:
+        if isinstance(param, dict) and param.get("name"):
+            out[str(param["name"])] = param.get("value")
+    return out
+
+
+def _stock_rule_persona_id(rule_id: str) -> str:
+    safe = "".join(ch if ch.isalnum() else "_" for ch in rule_id.lower()).strip("_")
+    return f"stock_rule_{safe}"
 
 
 def _admission_trial_row(row: dict[str, Any]) -> dict[str, Any]:
@@ -1568,6 +1727,8 @@ def _strategy_short_label(strategy_id: str, label: str) -> str:
     }
     if strategy_id in labels:
         return labels[strategy_id]
+    if strategy_id.startswith("stock_rule_"):
+        return label.replace("Stock Rule: ", "")
     if strategy_id.startswith("smic_mtt_strategy"):
         return label.replace(" Report ", " ").replace(" Strategy ", " ")
     if strategy_id.startswith("smic_rsi_reversal"):
@@ -1576,6 +1737,12 @@ def _strategy_short_label(strategy_id: str, label: str) -> str:
 
 
 def _strategy_display_label(strategy_id: str, config: dict[str, Any], fallback: str) -> str:
+    if strategy_id.startswith("stock_rule_"):
+        symbol = config.get("symbol")
+        family = _stock_family_label(config.get("family") or config.get("rule_family"))
+        if symbol:
+            return f"Stock Rule: {symbol} {family}"
+        return fallback if fallback != strategy_id else f"Stock Rule: {family}"
     if strategy_id.startswith("smic_rsi_reversal"):
         return "RSI Reversal Strategy"
     if not strategy_id.startswith("smic_mtt_strategy"):
@@ -1608,6 +1775,8 @@ def _methodology_summary(strategy_id: str, config: dict[str, Any]) -> str:
         )
     if strategy_id.startswith("smic_mtt_strategy"):
         return "리포트 업사이드와 가격 추세 조건(MTT·Supertrend·ATR breakout)을 통과한 종목만 실제 주식 수량 단위로 매수·보유·매도하는 포트폴리오 전략입니다. MTT는 전략명 자체가 아니라 내부 추세 필터 중 하나입니다."
+    if strategy_id.startswith("stock_rule_"):
+        return "개별 종목 규칙은 in-sample(search_is)에서만 발견하고 out-of-sample(admit_oos) 성과로만 채택한 주식 단위 입장 계약입니다."
     return "시뮬레이션에 포함된 전략입니다."
 
 
@@ -1623,6 +1792,18 @@ def _strategy_signal_label(config: dict[str, Any]) -> str:
 
 
 def _buy_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
+    if strategy_id.startswith("stock_rule_"):
+        rules = [
+            "search_is 구간에서 발견된 개별 종목 조건만 사용",
+            "admit_oos 구간에서 벤치마크 초과 수익률을 확인한 경우만 표시",
+        ]
+        symbol = config.get("symbol")
+        family = config.get("family") or config.get("rule_family")
+        if symbol:
+            rules.append(f"대상 종목: {symbol}")
+        if family:
+            rules.append(f"규칙 계열: {family}")
+        return rules
     if strategy_id.startswith("smic_mtt_strategy"):
         if not config:
             return ["세부 조건 artifact 없음", "성과·보유·매매내역만 검증 가능"]
@@ -1683,6 +1864,8 @@ def _buy_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
 
 
 def _sell_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
+    if strategy_id.startswith("stock_rule_"):
+        return ["규칙별 exit 조건과 admit_oos 거래 원장에 기록된 청산 사유를 따릅니다."]
     if strategy_id.startswith("smic_mtt_strategy"):
         if not config:
             return ["세부 조건 artifact 없음", "매도 사유는 매매내역과 포지션 기록에서 확인"]
@@ -1716,6 +1899,12 @@ def _sell_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
 
 
 def _risk_controls(strategy_id: str, config: dict[str, Any]) -> list[str]:
+    if strategy_id.startswith("stock_rule_"):
+        return [
+            "IS/OOS 날짜 분리로 lookahead 방지",
+            "OOS 벤치마크 초과 수익률 게이트",
+            "최소 거래 수·위험 지표 게이트",
+        ]
     if strategy_id.startswith("smic_mtt_strategy"):
         if not config:
             return ["정수 주식 수량 기반 체결", "수수료·세금 반영", "누락된 조건은 데이터 품질 항목으로 표시"]
@@ -1746,6 +1935,19 @@ def _risk_controls(strategy_id: str, config: dict[str, Any]) -> list[str]:
 def _strategy_params(config: dict[str, Any]) -> dict[str, Any]:
     excluded = {"persona_name", "label", "assets"}
     return {key: value for key, value in config.items() if key not in excluded}
+
+
+def _stock_family_label(value: Any) -> str:
+    labels = {
+        "report_upside": "Report Upside",
+        "mtt": "MTT",
+        "rsi_reversal": "RSI Reversal",
+        "ma_crossover": "MA Crossover",
+        "atr_breakout": "ATR Breakout",
+        "relative_strength": "Relative Strength",
+    }
+    family = str(value or "rule")
+    return labels.get(family, family.replace("_", " ").title())
 
 
 def _strategy_catalog_sort_key(row: dict[str, Any]) -> tuple[int, float, str]:
