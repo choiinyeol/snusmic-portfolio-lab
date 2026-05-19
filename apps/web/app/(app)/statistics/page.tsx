@@ -353,7 +353,7 @@ export default function ReportStatisticsPage() {
   const summary = clipSummary(rawSummary, reportById, RETURN_WINDOW_DAYS);
   const pricePaths = buildPricePaths(summary, {
     winnerCount: 10,
-    loserCount: 5,
+    loserCount: 10,
     windowDays: RETURN_WINDOW_DAYS,
   });
   const featureBuckets = buildFeatureBuckets(summary, reportById, RETURN_WINDOW_DAYS);

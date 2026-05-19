@@ -121,7 +121,7 @@ export function ReportStatisticsStory({
       />
 
       <PricePathOverlay
-        title="발간 후 거의 못 오른 종목 5건의 가격 경로"
+        title="발간 후 거의 못 오른 종목 10건의 가격 경로"
         caption={`발간 당일을 0%로 두고 ${windowDays}거래일까지의 누적 수익률입니다. 종목을 선택하면 단일 OHLCV 차트로 전환됩니다.`}
         paths={pricePaths.losers}
         tone="bad"
@@ -341,7 +341,8 @@ function WholeSampleMap({
             const x = sortedRows.length <= 1 ? 50 : (index / (sortedRows.length - 1)) * 100;
             const compressed = compressReturn(value);
             const y = 100 - ((compressed - yLo) / (yHi - yLo)) * 100;
-            const tone = row.hit10 ? 'good' : row.hit08 ? 'accent' : row.hit06 ? 'teal' : 'neutral';
+            const category = classifyOutcome(row);
+            const tone = OUTCOME_CATEGORIES.find((meta) => meta.id === category)?.tone ?? 'neutral';
             const isTopWinner = topThreeIds.has(row.reportId);
             return (
               <DataPoint
@@ -364,6 +365,8 @@ function WholeSampleMap({
           })}
         </div>
       </div>
+
+      <OutcomeBreakdownPanel rows={sortedRows} />
 
       <div className="rounded-2xl border border-slate-200 bg-white p-5">
         <h3 className="text-sm font-semibold text-slate-950">분위수로 본 표본</h3>
@@ -394,6 +397,127 @@ function WholeSampleMap({
 }
 
 type RiskScatterRow = ReportStatisticsLabSummary['riskScatter'][number];
+
+function OutcomeBreakdownPanel({ rows }: { rows: RiskScatterRow[] }) {
+  const counts = new Map<OutcomeCategory, number>();
+  for (const row of rows) {
+    const id = classifyOutcome(row);
+    counts.set(id, (counts.get(id) ?? 0) + 1);
+  }
+  const total = rows.length;
+  const devastating = counts.get('devastating') ?? 0;
+  const declining = counts.get('declining') ?? 0;
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h3 className="text-sm font-semibold text-slate-950">결과 분류</h3>
+        <p className="font-mono text-[11px] text-slate-500">
+          치명적+손실 {devastating + declining}건 ({total ? formatPercent((devastating + declining) / total) : '—'})
+        </p>
+      </div>
+      <p className="mt-1 text-xs text-slate-500">
+        매수해서 조금 오르거나 목표가에 못 닿은 건 큰 문제 아니지만, 발간 후 거의 못 오르고 만료까지 깊게 하락한 표본은
+        별도로 봅니다.
+      </p>
+      <div className="mt-4 grid gap-2">
+        {OUTCOME_CATEGORIES.map((category) => {
+          const count = counts.get(category.id) ?? 0;
+          const share = total ? count / total : 0;
+          return (
+            <div
+              className="grid grid-cols-[1rem_minmax(0,16rem)_minmax(0,1fr)_5rem_3rem] items-center gap-3"
+              key={category.id}
+            >
+              <span aria-hidden="true" className={`inline-block size-2.5 rounded-full ${category.swatchClass}`} />
+              <div>
+                <div className="text-sm font-semibold text-slate-950">{category.label}</div>
+                <div className="mt-0.5 text-[11px] leading-4 text-slate-500">{category.description}</div>
+              </div>
+              <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                <div className={`h-full rounded-full ${category.swatchClass}`} style={{ width: `${share * 100}%` }} />
+              </div>
+              <span className="text-right font-mono text-sm font-semibold tabular-nums text-slate-950">
+                {count.toLocaleString('ko-KR')}건
+              </span>
+              <span className="text-right font-mono text-xs tabular-nums text-slate-500">{formatPercent(share)}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+type OutcomeCategory = 'target' | 'partial' | 'upside' | 'flat' | 'declining' | 'devastating';
+
+type OutcomeMeta = {
+  id: OutcomeCategory;
+  label: string;
+  description: string;
+  tone: 'good' | 'accent' | 'teal' | 'neutral' | 'warning' | 'bad';
+  swatchClass: string;
+};
+
+const OUTCOME_CATEGORIES: OutcomeMeta[] = [
+  {
+    id: 'target',
+    label: '1.0x 목표 도달',
+    description: '발간 후 500거래일 안에 목표가에 한 번이라도 도달',
+    tone: 'good',
+    swatchClass: 'bg-blue-600',
+  },
+  {
+    id: 'partial',
+    label: '부분 도달 (0.6–0.8x)',
+    description: '목표가의 60–80% 구간까지 도달',
+    tone: 'accent',
+    swatchClass: 'bg-violet-600',
+  },
+  {
+    id: 'upside',
+    label: '상승 기회 있었음',
+    description: '목표 미도달이지만 발간 후 한 번이라도 +20% 이상 올랐던 표본',
+    tone: 'teal',
+    swatchClass: 'bg-teal-600',
+  },
+  {
+    id: 'flat',
+    label: '횡보',
+    description: '발간 후 큰 등락 없이 ±10% 안쪽으로 끝난 표본',
+    tone: 'neutral',
+    swatchClass: 'bg-slate-400',
+  },
+  {
+    id: 'declining',
+    label: '손실 (-10% ~ -30%)',
+    description: '만료 시점 종가가 -10% ~ -30% 사이',
+    tone: 'warning',
+    swatchClass: 'bg-amber-500',
+  },
+  {
+    id: 'devastating',
+    label: '계속 하락 · 치명적 손실',
+    description: '발간 후 거의 못 오르고 만료 종가가 -30% 이하 — "사면 안 됐던" 표본',
+    tone: 'bad',
+    swatchClass: 'bg-rose-600',
+  },
+];
+
+/** Classify a row into one of six buckets ordered from best to worst.
+ * The split below the hit-target line is intentionally asymmetric:
+ * upside misses with positive MFE are "OK", but unilateral losses get
+ * two buckets (-10–30% and -30%+) because catastrophic losses are the
+ * dominant risk on this page. */
+function classifyOutcome(row: RiskScatterRow): OutcomeCategory {
+  if (row.hit10) return 'target';
+  if (row.hit08 || row.hit06) return 'partial';
+  const peak = row.maxFavorableExcursion ?? 0;
+  if (peak >= 0.2) return 'upside';
+  const ref = row.expiryReturn ?? row.currentReturn ?? 0;
+  if (ref <= -0.3) return 'devastating';
+  if (ref <= -0.1) return 'declining';
+  return 'flat';
+}
 
 type PathBucket = {
   id: string;
@@ -624,7 +748,7 @@ function DataPoint({
   y: number;
   label: string;
   meta: string;
-  tone: 'good' | 'bad' | 'neutral' | 'accent' | 'teal';
+  tone: 'good' | 'bad' | 'neutral' | 'accent' | 'teal' | 'warning';
   rows: Array<[string, string]>;
   href?: string;
   annotation?: string;
@@ -634,11 +758,13 @@ function DataPoint({
       ? 'bg-blue-600 ring-blue-100'
       : tone === 'bad'
         ? 'bg-rose-600 ring-rose-100'
-        : tone === 'accent'
-          ? 'bg-violet-600 ring-violet-100'
-          : tone === 'teal'
-            ? 'bg-teal-600 ring-teal-100'
-            : 'bg-slate-400 ring-slate-100';
+        : tone === 'warning'
+          ? 'bg-amber-500 ring-amber-100'
+          : tone === 'accent'
+            ? 'bg-violet-600 ring-violet-100'
+            : tone === 'teal'
+              ? 'bg-teal-600 ring-teal-100'
+              : 'bg-slate-400 ring-slate-100';
 
   const positionStyle = {
     left: `calc(1.25rem + ${x} * (100% - 2.5rem) / 100)`,
@@ -1164,11 +1290,11 @@ function WinnersLosersBoard({ rows }: { rows: RiskScatterRow[] }) {
     .slice(0, 10);
   const losers = [...eligible]
     .sort((a, b) => (a.maxFavorableExcursion ?? 0) - (b.maxFavorableExcursion ?? 0))
-    .slice(0, 5);
+    .slice(0, 10);
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <CaseList title="고점 기준 가장 크게 간 종목 10" tone="good" rows={winners} />
-      <CaseList title="발간 후 거의 못 오른 종목 5" tone="bad" rows={losers} />
+      <CaseList title="발간 후 거의 못 오른 종목 10" tone="bad" rows={losers} />
     </div>
   );
 }
