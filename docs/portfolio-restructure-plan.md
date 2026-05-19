@@ -179,3 +179,9 @@ apps/web/components/trading/portfolio-views/PortfolioMethodologyView.tsx
 - `/portfolio/[strategy]/holdings`의 상위 보유 카드는 `리스크 집중` 섹션이다. 비중, 평가액, 미실현 수익률, 보유일, 목표가, 발간시 상승여력을 같이 보여준다.
 - `/portfolio/[strategy]/methodology`는 `methodsByPersona[persona].params`를 받아 `실제 파라미터`를 렌더한다. 파라미터는 strategy catalog가 source of truth다.
 - `/strategies`에는 role-card를 두어 benchmark/oracle/follower는 비교 기준, `/portfolio`는 실제 원장이라는 분리를 화면에서도 반복한다.
+
+
+## RP cash allocation update — 2026-05-19
+
+- Idle cash is now modeled as RP 대기자금 with 2.5% annual daily accrual in the simulation ledger.
+- Portfolio allocation treemaps include RP cash so current weights reconcile to total equity rather than holdings-only value.

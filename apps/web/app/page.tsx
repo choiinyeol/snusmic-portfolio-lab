@@ -7,13 +7,13 @@ import { getExecutiveOverview } from '@/lib/product-model';
 
 const principles = [
   '저장된 데이터로 리포트 목표가와 실제 매매를 대조',
-  '전략 성과, 낙폭, 현금 대기를 같은 기준으로 비교',
+  '전략 성과, 낙폭, RP 대기를 같은 기준으로 비교',
   '불완전한 데이터와 제외 사유를 후보보다 먼저 노출',
 ];
 
 const links = [
   { href: '/main', label: '메인화면', caption: '오늘 확인할 검토 대기열', icon: ShieldCheck },
-  { href: '/portfolio', label: '포트폴리오', caption: '보유·현금·매매내역', icon: BarChart3 },
+  { href: '/portfolio', label: '포트폴리오', caption: '보유·RP·매매내역', icon: BarChart3 },
   { href: '/reports', label: '리포트', caption: '목표가 검증과 제외 사유', icon: FileText },
   { href: '/statistics', label: '리포트 통계', caption: '분포·경로·익절선 실험', icon: BarChart3 },
   { href: '/strategies', label: '전략', caption: '벤치마크 대비 성과와 위험', icon: Database },
@@ -99,7 +99,7 @@ export default function LandingPage() {
           </div>
           <div className="grid divide-y divide-slate-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
             <Metric label="평가액" value={formatKrw(portfolio.finalEquityKrw)} />
-            <Metric label="현금 비중" value={formatPercent(portfolio.cashWeight)} />
+            <Metric label="RP 비중" value={formatPercent(portfolio.cashWeight)} />
             <Metric label="리포트" value={`${manifest.row_counts.reports.toLocaleString('ko-KR')}건`} />
             <Metric label="전략" value={`${manifest.row_counts.strategy_catalog.toLocaleString('ko-KR')}개`} />
           </div>

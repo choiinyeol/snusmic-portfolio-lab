@@ -43,13 +43,15 @@ class SavingsPlan(_FrozenModel):
     ``monthly_contribution_krw`` on the first trading day of every later
     month. The contribution steps up by ``escalation_step_krw`` every
     ``escalation_period_years`` years (so ``2y → +500k`` makes month-25's
-    deposit 1.5M, month-49's deposit 2.0M, etc.)."""
+    deposit 1.5M, month-49's deposit 2.0M, etc.). Idle cash is modeled
+    as RP 대기자금 accruing ``cash_yield_annual_rate`` daily."""
 
     initial_capital_krw: Annotated[float, Field(ge=0)] = 10_000_000.0
     monthly_contribution_krw: Annotated[float, Field(ge=0)] = 1_000_000.0
     escalation_step_krw: Annotated[float, Field(ge=0)] = 500_000.0
     escalation_period_years: Annotated[int, Field(ge=1, le=10)] = 2
     max_escalations: Annotated[int, Field(ge=0, le=20)] = 10
+    cash_yield_annual_rate: Annotated[float, Field(ge=0.0, le=0.20)] = 0.025
 
 
 class BrokerageFees(_FrozenModel):

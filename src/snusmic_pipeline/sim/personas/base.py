@@ -15,7 +15,7 @@ from datetime import date
 import numpy as np
 
 from ..brokerage import Account
-from ..contracts import EquityPoint, PersonaSummary, Trade
+from ..contracts import EquityPoint, PersonaSummary, SavingsPlan, Trade
 from ..market import PriceBoard
 from ..savings import CashFlowEvent
 
@@ -35,6 +35,18 @@ def deposits_indexed_by_date(events: list[CashFlowEvent]) -> dict[date, float]:
     for event in events:
         out[event.date] = out.get(event.date, 0.0) + event.amount_krw
     return out
+
+
+def accrue_cash_yield_since_previous(
+    account: Account,
+    day: date,
+    previous_day: date | None,
+    plan: SavingsPlan,
+) -> None:
+    """Accrue RP-style yield on idle cash between trading snapshots."""
+    if previous_day is None:
+        return
+    account.accrue_cash_yield(day, plan.cash_yield_annual_rate, (day - previous_day).days)
 
 
 def record_equity_point(
@@ -242,6 +254,7 @@ def build_summary(
 __all__ = [
     "PersonaRunOutput",
     "Trade",
+    "accrue_cash_yield_since_previous",
     "build_summary",
     "cumulative_contributions",
     "deposits_indexed_by_date",

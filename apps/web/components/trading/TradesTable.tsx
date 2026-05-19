@@ -408,7 +408,7 @@ export function TradesTable({
                 <SortHeader label="체결금액" sortKey="gross" sort={tradeSort} onSort={updateTradeSort} />
               </th>
               <th className="px-3 py-2 text-right">
-                <SortHeader label="현금잔고" sortKey="cash" sort={tradeSort} onSort={updateTradeSort} />
+                <SortHeader label="RP잔고" sortKey="cash" sort={tradeSort} onSort={updateTradeSort} />
               </th>
               <th className="px-3 py-2 text-left">
                 <SortHeader label="사유" sortKey="reason" sort={tradeSort} onSort={updateTradeSort} />

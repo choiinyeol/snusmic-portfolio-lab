@@ -101,12 +101,12 @@ export default function OverviewPage() {
             </div>
             <div className="mt-4 grid gap-3 text-sm">
               <MetricLine label="평가액" value={formatKrw(overview.portfolio.finalEquityKrw)} />
-              <MetricLine label="현금" value={formatKrw(overview.portfolio.cashKrw)} />
+              <MetricLine label="RP" value={formatKrw(overview.portfolio.cashKrw)} />
               <MetricLine label="현재 보유" value={`${overview.portfolio.holdingCount.toLocaleString('ko-KR')}개`} />
             </div>
             <div className="mt-4 pt-2">
               <div className="flex items-end justify-between gap-3">
-                <span className="text-sm text-slate-500">현금 비중</span>
+                <span className="text-sm text-slate-500">RP 비중</span>
                 <strong className="font-mono text-2xl font-semibold tracking-tight tabular-nums text-slate-950">
                   {formatPercent(overview.portfolio.cashWeight)}
                 </strong>
@@ -186,7 +186,7 @@ export default function OverviewPage() {
             href="/portfolio"
             icon={<ShieldCheck />}
             title="포트폴리오"
-            caption="보유·현금·매매내역"
+            caption="보유·RP·매매내역"
             primary
           />
           <DrilldownRow href="/reports" icon={<FileText />} title="리포트" caption="목표가 검증 표" />

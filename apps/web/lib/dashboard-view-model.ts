@@ -94,7 +94,7 @@ export function withCashHolding(
     {
       persona,
       symbol: 'CASH',
-      company: '현금',
+      company: 'RP 대기자금',
       qty: null,
       avgCostKrw: null,
       lastCloseKrw: 1,

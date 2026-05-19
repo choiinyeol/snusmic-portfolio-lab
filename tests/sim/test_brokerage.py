@@ -103,3 +103,15 @@ def test_open_position_count_excludes_closed_lots():
     acc.sell_all(date(2024, 6, 1), "A", 200_000, "target_hit")
     assert acc.open_position_count() == 0
     assert isinstance(acc.holdings["A"], Lot)
+
+
+def test_cash_yield_accrues_like_rp_without_changing_contributions_or_realized_pnl():
+    acc = _zero_fee_account()
+    acc.deposit(date(2024, 1, 1), 1_000_000)
+    earned = acc.accrue_cash_yield(date(2024, 1, 2), annual_rate=0.025, days=1)
+    expected = 1_000_000 * 0.025 / 365.25
+    assert abs(earned - expected) < 1e-6
+    assert abs(acc.cash_krw - (1_000_000 + expected)) < 1e-6
+    assert abs(acc.cash_yield_krw - expected) < 1e-6
+    assert acc.contributed_krw == 1_000_000
+    assert acc.realized_pnl_krw == 0

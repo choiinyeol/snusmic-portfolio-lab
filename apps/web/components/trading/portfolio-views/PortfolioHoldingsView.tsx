@@ -13,7 +13,9 @@ export function PortfolioHoldingsView({ model }: { model: PortfolioViewModel }) 
   const persona = model.selectedPersona;
   const personaLabel = model.personaLabels[persona] ?? persona;
   const holdings = useMemo(() => model.holdings.filter((row) => row.persona === persona), [model.holdings, persona]);
-  const totalValue = holdings.reduce((sum, row) => sum + (row.marketValueKrw ?? 0), 0);
+  const cashKrw = model.cashByPersona[persona] ?? 0;
+  const allocationHoldings = useMemo(() => withCashHolding(holdings, cashKrw, persona), [cashKrw, holdings, persona]);
+  const totalValue = allocationHoldings.reduce((sum, row) => sum + (row.marketValueKrw ?? 0), 0);
   const topHoldings = useMemo(
     () => [...holdings].sort((a, b) => (b.marketValueKrw ?? 0) - (a.marketValueKrw ?? 0)).slice(0, 4),
     [holdings],
@@ -37,17 +39,17 @@ export function PortfolioHoldingsView({ model }: { model: PortfolioViewModel }) 
               </div>
               <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">현재 보유 비중</h2>
               <p className="mt-1 text-sm leading-6 text-slate-500">
-                아래 표와 같은 원장입니다. 면적이 큰 종목부터 리포트 근거로 바로 이동할 수 있습니다.
+                연 2.5% RP 대기자금까지 별도 자산으로 포함한 실제 포트폴리오 비중입니다.
               </p>
             </div>
             <span className="font-mono text-xs font-semibold text-slate-500">{formatKrw(totalValue)}</span>
           </div>
           <HoldingsTreemap
-            holdings={holdings}
+            holdings={allocationHoldings}
             height={420}
             compact
             hrefBySymbol={hrefBySymbol}
-            caption="면적 = 보유 평가액, 색 = 미실현 수익률. 종목을 누르면 연결된 최신 리포트 근거로 이동합니다."
+            caption="면적 = 평가액, 색 = 미실현 수익률. RP 대기자금도 포트폴리오 비중으로 포함합니다."
           />
         </article>
 
@@ -149,4 +151,26 @@ function HoldingEvidenceCard({
 function formatHoldingDays(value: number | null | undefined): string {
   if (value === null || value === undefined || !Number.isFinite(value)) return '—';
   return `${Math.round(value).toLocaleString('ko-KR')}일`;
+}
+
+function withCashHolding(holdings: HoldingRow[], cashKrw: number, persona: string): HoldingRow[] {
+  if (cashKrw <= 0) return holdings;
+  return [
+    ...holdings,
+    {
+      persona,
+      symbol: 'CASH',
+      company: 'RP 대기자금',
+      qty: null,
+      avgCostKrw: null,
+      lastCloseKrw: 1,
+      lastCloseNative: 1,
+      currency: 'KRW',
+      marketValueKrw: cashKrw,
+      unrealizedPnlKrw: 0,
+      unrealizedReturn: 0,
+      holdingDays: null,
+      firstBuyDate: null,
+    },
+  ];
 }

@@ -225,3 +225,9 @@ devastating  not hit, expiryReturn <= -30%                           → rose
 - `reference_screener_playbook.md` — `/screener`가 dense table 표준, 14가지 affordance pattern 목록
 
 `memory/MEMORY.md`가 인덱스다.
+
+
+### v0.25.1 RP cash allocation note
+
+- Simulation cash now accrues as RP 대기자금 at 2.5% annual daily yield.
+- Current allocation UI includes RP cash in treemap weights; holdings tables remain security-only ledgers.

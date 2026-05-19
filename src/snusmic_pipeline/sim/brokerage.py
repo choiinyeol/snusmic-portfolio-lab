@@ -49,6 +49,7 @@ class Account:
     cash_krw: float = 0.0
     contributed_krw: float = 0.0
     realized_pnl_krw: float = 0.0
+    cash_yield_krw: float = 0.0
     holdings: dict[str, Lot] = field(default_factory=dict)
     trades: list[Trade] = field(default_factory=list)
 
@@ -61,6 +62,21 @@ class Account:
             raise ValueError(f"deposit amount must be ≥ 0; got {amount_krw}")
         self.cash_krw += amount_krw
         self.contributed_krw += amount_krw
+
+    def accrue_cash_yield(self, when: date, annual_rate: float, days: int) -> float:
+        """Accrue RP-style daily yield on idle KRW cash.
+
+        The yield is not a user contribution and is not trade realised PnL; it
+        simply increases cash/equity like a brokerage RP sweep balance.
+        """
+        if annual_rate <= 0 or days <= 0 or self.cash_krw <= 0:
+            return 0.0
+        interest = self.cash_krw * annual_rate * (days / 365.25)
+        if interest <= 0 or not math.isfinite(interest):
+            return 0.0
+        self.cash_krw += interest
+        self.cash_yield_krw += interest
+        return interest
 
     # ------------------------------------------------------------------
     # Helpers for fill mechanics.

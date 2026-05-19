@@ -21,6 +21,7 @@ from ..market import PriceBoard
 from ..savings import CashFlowEvent
 from .base import (
     PersonaRunOutput,
+    accrue_cash_yield_since_previous,
     build_summary,
     cumulative_contributions,
     record_equity_point,
@@ -104,8 +105,10 @@ def _simulate_follower(
 
     state = FollowerState()
     equity_points: list = []
+    previous_day: date | None = None
 
     for day in trading_dates:
+        accrue_cash_yield_since_previous(account, day, previous_day, plan)
         state.absorb_reports(reports, day, board)
         deposit_today = cashflow_by_date.get(day, 0.0)
         if deposit_today > 0:
@@ -127,6 +130,7 @@ def _simulate_follower(
         equity_points.append(
             record_equity_point(account, persona, day, daily_closes[day], contributions[day], board=board)
         )
+        previous_day = day
     summary = build_summary(persona, label, account, equity_points, cashflows, plan.initial_capital_krw)
     return PersonaRunOutput(account=account, equity_points=equity_points, summary=summary)
 

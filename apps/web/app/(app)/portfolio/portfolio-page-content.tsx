@@ -45,8 +45,8 @@ export function PortfolioPageShell({ children, model }: { children: ReactNode; m
           <div className="min-w-0">
             <h1 className="text-2xl font-semibold tracking-[-0.02em] text-slate-950 md:text-4xl">{shortLabel}</h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-              {label}의 실제 보유, 현금, 체결, 매매 로직을 투자 보고서 형태로 보여줍니다. benchmark·follower·oracle류는
-              `/strategies` 비교 페이지에 남기고 이 원장에는 섞지 않습니다.
+              {label}의 실제 보유, RP 대기자금, 체결, 매매 로직을 투자 보고서 형태로 보여줍니다.
+              benchmark·follower·oracle류는 `/strategies` 비교 페이지에 남기고 이 원장에는 섞지 않습니다.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Button asChild size="sm" variant="outline">
@@ -61,7 +61,7 @@ export function PortfolioPageShell({ children, model }: { children: ReactNode; m
             rows={[
               { label: '현재 평가액', value: formatKrw(totalValue), tone: 'neutral' },
               {
-                label: '현금 비중',
+                label: 'RP 비중',
                 value: formatPercent(totalValue > 0 ? cashKrw / totalValue : null),
                 caption: formatKrw(cashKrw),
               },

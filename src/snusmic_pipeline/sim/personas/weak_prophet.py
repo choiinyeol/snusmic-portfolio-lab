@@ -22,6 +22,7 @@ from ..market import PriceBoard
 from ..savings import CashFlowEvent
 from .base import (
     PersonaRunOutput,
+    accrue_cash_yield_since_previous,
     build_summary,
     cumulative_contributions,
     record_equity_point,
@@ -51,8 +52,10 @@ def simulate_weak_prophet(
     pub_dates = pd.to_datetime(reports["publication_date"]).dt.date
     reports = reports.assign(_pub=pub_dates)
     equity_points: list = []
+    previous_day: date | None = None
 
     for day in trading_dates:
+        accrue_cash_yield_since_previous(account, day, previous_day, plan)
         deposit = cashflow_by_date.get(day, 0.0)
         if deposit > 0:
             account.deposit(day, deposit)
@@ -74,6 +77,7 @@ def simulate_weak_prophet(
         equity_points.append(
             record_equity_point(account, persona, day, daily_closes[day], contributions[day], board=board)
         )
+        previous_day = day
     summary = build_summary(
         persona, config.label, account, equity_points, cashflows, plan.initial_capital_krw
     )

@@ -40,7 +40,7 @@ export function buildDecisionBrief(view: DashboardViewModel): DecisionBrief {
         caption: `${overview.portfolio.label} · ${overview.snapshotDate || '기준일 없음'}`,
       },
       {
-        label: '현금 비중',
+        label: 'RP 비중',
         value: formatPercent(overview.portfolio.cashWeight),
         caption: holdings.length ? `${holdings.length}개 보유` : '현재 보유 종목 없음',
         tone: (overview.portfolio.cashWeight ?? 0) > 0.5 ? 'watch' : 'ok',
@@ -109,7 +109,7 @@ function buildDecisionItems({
       id: 'cash-reserve',
       title: '현재 보유 종목 없음',
       label: '대기',
-      reason: `현금 ${formatPercent(view.overview.portfolio.cashWeight)} 상태입니다. 후보는 리포트 검증 화면에서 근거를 먼저 확인합니다.`,
+      reason: `RP ${formatPercent(view.overview.portfolio.cashWeight)} 상태입니다. 후보는 리포트 검증 화면에서 근거를 먼저 확인합니다.`,
       metric: formatKrw(view.overview.portfolio.cashKrw),
       href: '/portfolio',
       tone: 'watch',

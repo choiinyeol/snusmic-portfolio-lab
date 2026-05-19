@@ -2,6 +2,17 @@
 
 이 프로젝트의 사용자 가시 변경사항을 모두 정리합니다. 릴리스의 진실은 git 태그이며, 본 파일은 태그 단위로 의도를 한국어로 기록합니다.
 
+## v0.25.1-rp-cash-allocation.1 — 2026-05-19
+
+### Changed
+- Modeled idle portfolio cash as RP 대기자금 accruing 2.5% annual daily yield in the simulation ledger.
+- Included RP cash in current allocation treemaps on portfolio overview, landing, and holdings views.
+- Renamed portfolio cash-weight UI copy to RP 비중 / RP 대기자금 to make idle capital less confusing.
+
+### Verification
+- `uv run --with scipy python -m pytest tests/sim/test_brokerage.py tests/sim/test_personas.py tests/sim/test_runner.py tests/sim/test_all_weather.py -q`
+- Regenerated `data/sim` and `data/web` artifacts through 2026-05-18 with existing promoted strategy configs.
+
 ## Unreleased
 
 ### 추가

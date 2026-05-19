@@ -1655,7 +1655,7 @@ def _risk_controls(strategy_id: str, config: dict[str, Any]) -> list[str]:
             f"추가 매수 주기: {cadence}",
             "정수 주식 수량 기반 체결",
             "수수료·세금 반영",
-            "미충족 후보가 없으면 현금 보유",
+            "미충족 후보가 없으면 RP 대기자금 보유",
         ]
     if strategy_id == "weak_oracle":
         return [

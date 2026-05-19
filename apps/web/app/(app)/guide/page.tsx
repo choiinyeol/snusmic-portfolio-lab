@@ -22,7 +22,7 @@ export default function GuidePage() {
     ['목표가 도달', `${reportStats.hitCount}/${reportStats.total}`, `도달률 ${formatPercent(reportStats.hitRate)}`],
     ['목표 근접', `${reportStats.nearTargetCount}/${reportStats.activeCount}`, '미도달 활성 80%+ 진행'],
     ['손실 군집', `${reportStats.deepLoserCount}건`, '현재 수익률 -20% 이하'],
-    ['기본 포트폴리오', portfolio.label, `${portfolio.holdingCount}종목 · 현금 ${formatPercent(portfolio.cashWeight)}`],
+    ['기본 포트폴리오', portfolio.label, `${portfolio.holdingCount}종목 · RP ${formatPercent(portfolio.cashWeight)}`],
   ];
 
   const evidenceRows: EvidenceRow[] = [

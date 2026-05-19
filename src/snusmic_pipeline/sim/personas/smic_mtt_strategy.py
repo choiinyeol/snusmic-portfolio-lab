@@ -23,6 +23,7 @@ from ..market import PriceBoard
 from ..savings import CashFlowEvent
 from .base import (
     PersonaRunOutput,
+    accrue_cash_yield_since_previous,
     build_summary,
     cumulative_contributions,
     record_equity_point,
@@ -105,9 +106,11 @@ def simulate_smic_mtt_strategy(
     top_up_days = _top_up_days(trading_dates, config.top_up_cadence)
     state = MttStrategyState()
     equity_points: list = []
+    previous_day: date | None = None
     cursor = 0
 
     for day in trading_dates:
+        accrue_cash_yield_since_previous(account, day, previous_day, plan)
         cursor, has_new_signal = state.absorb_reports(report_rows, cursor, day, board, config)
 
         deposit_today = cashflow_by_date.get(day, 0.0)
@@ -130,6 +133,7 @@ def simulate_smic_mtt_strategy(
                 board=board,
             )
         )
+        previous_day = day
 
     summary = build_summary(
         persona, config.label, account, equity_points, cashflows, plan.initial_capital_krw

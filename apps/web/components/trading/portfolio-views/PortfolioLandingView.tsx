@@ -130,7 +130,7 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
                 />
               </div>
               <div className="text-[11px] text-slate-500">
-                현금 {formatPercent(strategy.cashWeight)} · 최대 비중 {strategy.topHoldingLabel}{' '}
+                RP {formatPercent(strategy.cashWeight)} · 최대 비중 {strategy.topHoldingLabel}{' '}
                 {formatPercent(strategy.topHoldingWeight)}
               </div>
             </button>
@@ -160,7 +160,7 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
             holdings={selectedHoldings}
             height={460}
             compact
-            caption="면적 = 현재 평가액. 현금도 하나의 비중으로 포함합니다."
+            caption="면적 = 현재 평가액. RP 대기자금도 하나의 비중으로 포함합니다."
           />
         </article>
 
@@ -186,11 +186,7 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
               tone={(selected.moneyWeightedReturn ?? 0) >= 0 ? 'good' : 'bad'}
               caption={`MDD ${formatPercent(selected.maxDrawdown)}`}
             />
-            <KpiTile
-              label="현금 비중"
-              value={formatPercent(selected.cashWeight)}
-              caption={formatKrw(selected.cashKrw)}
-            />
+            <KpiTile label="RP 비중" value={formatPercent(selected.cashWeight)} caption={formatKrw(selected.cashKrw)} />
             <KpiTile
               label="체결"
               value={selected.tradeCount?.toLocaleString('ko-KR') ?? '—'}
@@ -343,7 +339,7 @@ function withCashHolding(holdings: HoldingRow[], selected: PortfolioStrategySnap
     {
       persona: selected.id,
       symbol: 'CASH',
-      company: '현금',
+      company: 'RP 대기자금',
       qty: null,
       avgCostKrw: null,
       lastCloseKrw: 1,
