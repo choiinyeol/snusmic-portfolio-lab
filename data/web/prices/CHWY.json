@@ -22633,6 +22633,19 @@
       "open": 21.22999954223633,
       "source_currency": "USD",
       "volume": 985093.0
+    },
+    {
+      "close": 21.219999313354492,
+      "close_krw": 32018.4327,
+      "currency": "USD",
+      "date": "2026-05-19",
+      "display_currency": "USD",
+      "high": 21.68000030517578,
+      "krw_per_unit": 1508.8800048828125,
+      "low": 20.881000518798825,
+      "open": 21.610000610351562,
+      "source_currency": "USD",
+      "volume": 666989.0
     }
   ],
   "symbol": "CHWY"

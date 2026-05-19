@@ -18031,6 +18031,19 @@
       "open": 12.880000114440918,
       "source_currency": "USD",
       "volume": 844158.0
+    },
+    {
+      "close": 13.819999694824219,
+      "close_krw": 20852.7212,
+      "currency": "USD",
+      "date": "2026-05-19",
+      "display_currency": "USD",
+      "high": 14.050000190734863,
+      "krw_per_unit": 1508.8800048828125,
+      "low": 13.449999809265137,
+      "open": 13.890000343322754,
+      "source_currency": "USD",
+      "volume": 183245.0
     }
   ],
   "symbol": "CLBT"

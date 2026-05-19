@@ -25441,6 +25441,19 @@
       "open": 67.0999984741211,
       "source_currency": "USD",
       "volume": 58457.0
+    },
+    {
+      "close": 65.63999938964844,
+      "close_krw": 99042.8826,
+      "currency": "USD",
+      "date": "2026-05-19",
+      "display_currency": "USD",
+      "high": 66.36000061035156,
+      "krw_per_unit": 1508.8800048828125,
+      "low": 64.6500015258789,
+      "open": 65.08000183105469,
+      "source_currency": "USD",
+      "volume": 24061.0
     }
   ],
   "symbol": "ESTA"
