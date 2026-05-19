@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { CumulativeReturnChart, type ReturnSeries } from '@/components/charts/CumulativeReturnChart';
 import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
-import { QuantStrategySearchTable } from '@/components/trading/QuantStrategySearchTable';
 import { Button } from '@/components/ui/button';
 import { KpiTile } from '@/components/ui/KpiTile';
 import type { HoldingRow } from '@/lib/artifacts';
@@ -60,15 +59,12 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
           </div>
           <h1 className="text-3xl font-semibold tracking-[-0.04em] text-slate-950 md:text-5xl">포트폴리오</h1>
           <p className="max-w-3xl text-sm leading-6 text-slate-600 md:text-base">
-            실제 보유 포트폴리오와 퀀트 후보를 한 화면에서 봅니다. 보유 포트폴리오는 선택·원장으로 열고, 퀀트 후보는
-            portfolio persona를 어떻게 갈아탔는지 상세 원장으로 확인합니다.
+            실제 주식 수량 단위로 매수·보유·매도한 포트폴리오 persona를 한 화면에서 봅니다. 통과 전략은 선택·원장으로
+            열고, benchmark 점은 수익률과 낙폭의 위치 비교용으로만 사용합니다.
           </p>
           <div className="flex flex-wrap gap-2">
             <Button asChild size="sm" variant="secondary">
               <Link href={selected.href}>선택 포트폴리오 열기</Link>
-            </Button>
-            <Button asChild size="sm" variant="outline">
-              <a href="#quant-search-board">퀀트 후보 Top N</a>
             </Button>
           </div>
         </div>
@@ -153,10 +149,10 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
             <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
               choose portfolio
             </div>
-            <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">All-Weather 이상 전략만 선택</h2>
+            <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">승인된 주식 전략 선택</h2>
           </div>
           <span className="text-xs font-medium text-slate-500">
-            표는 제거 · {model.strategies.length.toLocaleString('ko-KR')}개 버튼
+            stock-level persona · {model.strategies.length.toLocaleString('ko-KR')}개 버튼
           </span>
         </div>
         <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
@@ -169,32 +165,6 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
             />
           ))}
         </div>
-      </section>
-
-      <section
-        id="quant-search-board"
-        className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
-        aria-label="퀀트 후보 Top N"
-      >
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-              quant portfolio candidates
-            </div>
-            <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">
-              Sharpe 2 또는 Sortino 2 이상 후보 Top N
-            </h2>
-            <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-500">
-              {model.quantSearch.candidateCount.toLocaleString('ko-KR')}개 조합 중{' '}
-              {model.quantSearch.goalHitCount.toLocaleString('ko-KR')}개가 목표를 통과했습니다. 후보를 열면 실제 종목
-              체결이 아니라 portfolio/benchmark persona를 언제 편입·제외했는지 볼 수 있습니다.
-            </p>
-          </div>
-          <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-900">
-            OOS 검증 필요 · 제외 {model.quantSearch.excluded.join(', ') || '없음'}
-          </span>
-        </div>
-        <QuantStrategySearchTable rows={model.quantSearch.rows} />
       </section>
 
       <section className="rounded-md border border-slate-200 bg-white p-4" aria-label="전략 누적 수익률 비교">

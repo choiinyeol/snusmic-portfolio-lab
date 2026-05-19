@@ -4,7 +4,6 @@ import type {
   EquityPoint,
   HoldingRow,
   PositionEpisodeRow,
-  QuantStrategySearchRow,
   ReportTargetDigest,
   TradeRow,
 } from '@/lib/artifacts';
@@ -63,12 +62,6 @@ export type PortfolioLandingModel = {
   latestEquityDate: string;
   strategies: PortfolioStrategySnapshot[];
   frontierRows: PortfolioStrategySnapshot[];
-  quantSearch: {
-    candidateCount: number;
-    goalHitCount: number;
-    excluded: string[];
-    rows: QuantStrategySearchRow[];
-  };
   allWeatherReturn: number | null;
   holdings: HoldingRow[];
   equity: EquityPoint[];

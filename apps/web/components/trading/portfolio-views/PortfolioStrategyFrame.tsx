@@ -39,12 +39,6 @@ export function PortfolioStrategyFrame({ children, model }: { children: ReactNod
           >
             ← 포트폴리오 선택
           </Link>
-          <Link
-            className="inline-flex min-h-10 items-center rounded-md border border-slate-200 px-3 py-2 text-sm font-semibold leading-normal text-slate-700 transition-colors hover:border-slate-400 hover:bg-slate-50"
-            href="/portfolio#quant-search-board"
-          >
-            퀀트 후보
-          </Link>
         </div>
         {model.invalidStrategyId ? (
           <div className="mt-3 basis-full rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">

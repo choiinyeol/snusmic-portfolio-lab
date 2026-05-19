@@ -251,73 +251,6 @@ export type StrategyCatalogRow = {
   };
 };
 
-export type QuantStrategySearchRow = {
-  rank: number;
-  strategyId: string;
-  family: string;
-  params: Record<string, unknown>;
-  paramsSummary: string;
-  days: number | null;
-  annualizedSharpe: number | null;
-  annualizedSortinoLpm0: number | null;
-  annualizedSortinoDownsideStd: number | null;
-  cagr: number | null;
-  totalReturn: number | null;
-  maxDrawdown: number | null;
-  annVol: number | null;
-  score: number | null;
-  goalHit: boolean;
-  robustGoalHit: boolean;
-  hitBasis: string;
-  split2021_2023Sharpe: number | null;
-  split2021_2023SortinoLpm0: number | null;
-  split2021_2023SortinoDownsideStd: number | null;
-  split2024_2026Sharpe: number | null;
-  split2024_2026SortinoLpm0: number | null;
-  split2024_2026SortinoDownsideStd: number | null;
-};
-
-export type QuantAllocationLeg = {
-  persona: string;
-  weight?: number | null;
-  weightDelta?: number | null;
-  weightAfter?: number | null;
-};
-
-export type QuantAllocationEvent = {
-  date: string;
-  equityKrw: number | null;
-  buys: QuantAllocationLeg[];
-  sells: QuantAllocationLeg[];
-};
-
-export type QuantStrategySearchDetail = QuantStrategySearchRow & {
-  methodologySummary: string;
-  buyRules: string[];
-  sellRules: string[];
-  riskControls: string[];
-  currentAllocations: QuantAllocationLeg[];
-  allocationEvents: QuantAllocationEvent[];
-  latestEquityKrw: number | null;
-  latestCumulativeReturn: number | null;
-  latestDrawdown: number | null;
-};
-
-export type QuantStrategySearchArtifact = {
-  schemaVersion: string;
-  generatedAt: string;
-  sourceArtifact: string;
-  rerunCommand: string | null;
-  candidateCount: number;
-  goalHitCount: number;
-  displayCount: number;
-  goal: string;
-  excluded: string[];
-  caveats: string[];
-  rows: QuantStrategySearchRow[];
-  details: QuantStrategySearchDetail[];
-};
-
 export type ScreenerCandidateRow = {
   reportId: string;
   symbol: string;
@@ -564,7 +497,6 @@ function clearArtifactCaches() {
   positionEpisodesCache = undefined;
   equityDailyCache = undefined;
   strategyCurvesCache = undefined;
-  quantStrategySearchCache = undefined;
   priceSeriesCache.clear();
   nativePricePointCache.clear();
 }
@@ -590,10 +522,6 @@ function bool(value: unknown): boolean {
 function strOrNull(value: unknown): string | null {
   if (value === undefined || value === null || value === '') return null;
   return String(value);
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
 function targetDirection(value: unknown): 'upside' | 'downside' | null {
@@ -1093,110 +1021,6 @@ export function getStrategyCatalog(): StrategyCatalogRow[] {
     },
   }));
   return strategyCatalogCache;
-}
-
-let quantStrategySearchCache: QuantStrategySearchArtifact | undefined;
-export function getQuantStrategySearch(): QuantStrategySearchArtifact {
-  if (artifactCacheValid() && quantStrategySearchCache) return quantStrategySearchCache;
-  const raw = readRequiredJson<{
-    schema_version: string;
-    generated_at: string;
-    source_artifact: string;
-    rerun_command?: string | null;
-    candidate_count?: number | null;
-    goal_hit_count?: number | null;
-    display_count?: number | null;
-    goal?: string;
-    excluded?: string[];
-    caveats?: string[];
-    rows?: Array<Record<string, unknown>>;
-    details?: Array<Record<string, unknown>>;
-  }>('data/web/strategies/quant-search-top.json');
-  const rows = (raw.rows ?? []).map(quantSearchRow);
-  quantStrategySearchCache = {
-    schemaVersion: raw.schema_version,
-    generatedAt: raw.generated_at,
-    sourceArtifact: raw.source_artifact,
-    rerunCommand: raw.rerun_command ?? null,
-    candidateCount: Number(raw.candidate_count ?? 0),
-    goalHitCount: Number(raw.goal_hit_count ?? 0),
-    displayCount: Number(raw.display_count ?? raw.rows?.length ?? 0),
-    goal: raw.goal ?? 'annualized Sharpe >= 2 or annualized Sortino >= 2',
-    excluded: raw.excluded ?? [],
-    caveats: raw.caveats ?? [],
-    rows,
-    details: (raw.details ?? []).map(quantSearchDetail),
-  };
-  return quantStrategySearchCache;
-}
-
-export function getQuantStrategySearchDetail(strategyId: string): QuantStrategySearchDetail | undefined {
-  return getQuantStrategySearch().details.find((row) => row.strategyId === strategyId);
-}
-
-function quantSearchRow(row: Record<string, unknown>): QuantStrategySearchRow {
-  return {
-    rank: Number(row.rank ?? 0),
-    strategyId: String(row.strategy_id ?? ''),
-    family: String(row.family ?? ''),
-    params: isRecord(row.params) ? row.params : {},
-    paramsSummary: String(row.params_summary ?? ''),
-    days: num(row.days),
-    annualizedSharpe: num(row.annualized_sharpe),
-    annualizedSortinoLpm0: num(row.annualized_sortino_lpm0),
-    annualizedSortinoDownsideStd: num(row.annualized_sortino_downside_std),
-    cagr: num(row.cagr),
-    totalReturn: num(row.total_return),
-    maxDrawdown: num(row.max_drawdown),
-    annVol: num(row.ann_vol),
-    score: num(row.score),
-    goalHit: bool(row.goal_hit),
-    robustGoalHit: bool(row.robust_goal_hit),
-    hitBasis: String(row.hit_basis ?? ''),
-    split2021_2023Sharpe: num(row.split_2021_2023_sharpe),
-    split2021_2023SortinoLpm0: num(row.split_2021_2023_sortino_lpm0),
-    split2021_2023SortinoDownsideStd: num(row.split_2021_2023_sortino_downside_std),
-    split2024_2026Sharpe: num(row.split_2024_2026_sharpe),
-    split2024_2026SortinoLpm0: num(row.split_2024_2026_sortino_lpm0),
-    split2024_2026SortinoDownsideStd: num(row.split_2024_2026_sortino_downside_std),
-  };
-}
-
-function quantSearchDetail(row: Record<string, unknown>): QuantStrategySearchDetail {
-  return {
-    ...quantSearchRow(row),
-    methodologySummary: String(row.methodology_summary ?? ''),
-    buyRules: stringArray(row.buy_rules),
-    sellRules: stringArray(row.sell_rules),
-    riskControls: stringArray(row.risk_controls),
-    currentAllocations: recordArray(row.current_allocations).map(allocationLeg),
-    allocationEvents: recordArray(row.allocation_events).map((event) => ({
-      date: String(event.date ?? ''),
-      equityKrw: num(event.equity_krw),
-      buys: recordArray(event.buys).map(allocationLeg),
-      sells: recordArray(event.sells).map(allocationLeg),
-    })),
-    latestEquityKrw: num(row.latest_equity_krw),
-    latestCumulativeReturn: num(row.latest_cumulative_return),
-    latestDrawdown: num(row.latest_drawdown),
-  };
-}
-
-function allocationLeg(row: Record<string, unknown>): QuantAllocationLeg {
-  return {
-    persona: String(row.persona ?? ''),
-    weight: num(row.weight),
-    weightDelta: num(row.weight_delta),
-    weightAfter: num(row.weight_after),
-  };
-}
-
-function recordArray(value: unknown): Array<Record<string, unknown>> {
-  return Array.isArray(value) ? value.filter(isRecord) : [];
-}
-
-function stringArray(value: unknown): string[] {
-  return Array.isArray(value) ? value.map(String) : [];
 }
 
 export function getArtifactManifest(): ArtifactManifest {

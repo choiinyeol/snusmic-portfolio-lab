@@ -1,4 +1,4 @@
-import { ArrowUpRight, BarChart3, DatabaseZap, FileText, ShieldCheck } from 'lucide-react';
+import { ArrowUpRight, BarChart3, FileText, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -160,7 +160,7 @@ export default function OverviewPage() {
         <article className="border-t border-slate-200 bg-white">
           <div className="border-b border-slate-200 px-1 py-3">
             <h2 className="text-base font-semibold text-slate-950">최근 변경</h2>
-            <p className="mt-1 text-xs text-slate-500">새로 반영된 리포트, 후보, 매매 이벤트입니다.</p>
+            <p className="mt-1 text-xs text-slate-500">새로 반영된 리포트와 매매 이벤트입니다.</p>
           </div>
           <div className="divide-y divide-slate-100">
             {brief.changes.map((item) => (
@@ -191,12 +191,6 @@ export default function OverviewPage() {
           />
           <DrilldownRow href="/reports" icon={<FileText />} title="리포트" caption="목표가 검증 표" />
           <DrilldownRow href="/statistics" icon={<BarChart3 />} title="통계" caption="분포·경로·익절선" />
-          <DrilldownRow
-            href="/portfolio#quant-search-board"
-            icon={<DatabaseZap />}
-            title="퀀트 후보"
-            caption="Top N 후보와 메타 원장"
-          />
         </ul>
       </section>
     </div>
