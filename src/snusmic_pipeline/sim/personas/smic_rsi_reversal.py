@@ -20,7 +20,7 @@ from .base import (
     cumulative_contributions,
     record_equity_point,
 )
-from .smic_mtt_strategy import _passes_universe, _target_price, _top_up_days
+from .smic_mtt_strategy import _passes_universe, _target_price
 
 
 @dataclass(frozen=True)
@@ -101,7 +101,6 @@ def simulate_smic_rsi_reversal(
     report_rows = cast(list[dict[str, Any]], reports.to_dict("records"))
     daily_closes = {d: board.close_on(d) for d in trading_dates}
     contributions = cumulative_contributions(cashflows, trading_dates)
-    top_up_days = _top_up_days(trading_dates, config.top_up_cadence)
     state = RsiReversalState()
     equity_points: list = []
     previous_day: date | None = None
@@ -117,8 +116,9 @@ def simulate_smic_rsi_reversal(
 
         _apply_sell_rules(account, day, board, state, config)
 
-        if deposit_today > 0 or has_new_signal or day in top_up_days:
-            _buy_short_term_reversals(account, day, board, state, config, deposit_today > 0)
+        _buy_short_term_reversals(
+            account, day, board, state, config, deposit_today > 0 or has_new_signal
+        )
 
         equity_points.append(
             record_equity_point(
@@ -241,7 +241,7 @@ def _buy_short_term_reversals(
     signals = [
         signal
         for candidate in state.valid_candidates(day, config)
-        if candidate.symbol in prices and account.holdings.get(candidate.symbol, None) is None
+        if candidate.symbol in prices and not _has_open_position(account, candidate.symbol)
         for signal in [_reversal_signal(board, day, candidate, config)]
         if signal is not None
     ]
@@ -323,3 +323,8 @@ def _price_view(account: Account, day: date, board: PriceBoard) -> dict[str, flo
         if mid is not None and mid > 0:
             prices[symbol] = mid
     return prices
+
+
+def _has_open_position(account: Account, symbol: str) -> bool:
+    lot = account.holdings.get(symbol)
+    return lot is not None and lot.qty > 0

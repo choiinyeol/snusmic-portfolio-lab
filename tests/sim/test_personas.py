@@ -13,13 +13,16 @@ from snusmic_pipeline.sim.contracts import (
     SmicFollowerConfig,
     SmicFollowerV2Config,
     SmicMttStrategyConfig,
+    SmicRsiReversalConfig,
     WeakProphetConfig,
 )
+from snusmic_pipeline.sim.market import PriceBoard
 from snusmic_pipeline.sim.personas import (
     simulate_prophet,
     simulate_smic_follower,
     simulate_smic_follower_v2,
     simulate_smic_mtt_strategy,
+    simulate_smic_rsi_reversal,
     simulate_weak_prophet,
 )
 from snusmic_pipeline.sim.savings import build_cash_flow_schedule
@@ -187,6 +190,47 @@ def test_smic_mtt_strategy_relative_strength_prefers_trailing_winner(synthetic_b
     buys = [t for t in out.account.trades if t.side == "buy"]
     assert buys
     assert {t.symbol for t in buys} == {"WIN"}
+
+
+def test_smic_rsi_reversal_buys_oversold_report_and_exits_on_rebound():
+    trading_dates = [d.date() for d in pd.bdate_range("2024-01-02", periods=80)]
+    drawdown = [100.0 - (22.0 * (i + 1) / 20) for i in range(20)]
+    rebound = [78.0 + (42.0 * (i + 1) / 55) for i in range(55)]
+    close = pd.DataFrame({"DIP": [100.0] * 5 + drawdown + rebound}, index=pd.to_datetime(trading_dates))
+    board = PriceBoard(close=close, open=close.copy(), high=close.copy(), low=close.copy())
+    reports = pd.DataFrame(
+        [
+            {
+                "report_id": "r-dip",
+                "symbol": "DIP",
+                "company": "Dip Buyer",
+                "exchange": "KRX",
+                "publication_date": pd.Timestamp("2024-01-02"),
+                "target_price": 140.0,
+            }
+        ]
+    )
+    plan, fees, cashflows = _common_inputs(trading_dates)
+    cfg = SmicRsiReversalConfig(
+        max_positions=1,
+        rsi_window=14,
+        max_entry_rsi=35.0,
+        rebound_exit_rsi=55.0,
+        min_pullback_pct=0.05,
+        pullback_lookback_days=20,
+        signal_valid_days=80,
+        take_profit_pct=10.0,
+        top_up_cadence="deposit_only",
+    )
+
+    out = simulate_smic_rsi_reversal(cfg, plan, fees, board, reports, cashflows, trading_dates)
+
+    buys = [t for t in out.account.trades if t.side == "buy"]
+    sells = [t for t in out.account.trades if t.side == "sell"]
+    assert buys
+    assert {t.symbol for t in buys} == {"DIP"}
+    assert any(t.symbol == "DIP" and t.reason == "rebound_exit" for t in sells)
+    assert not any(t.reason == "rebalance_sell" for t in sells)
 
 
 def test_weak_prophet_empty_rebalance_sells_to_cash(synthetic_board, synthetic_reports):
