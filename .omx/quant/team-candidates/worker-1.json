@@ -1,0 +1,946 @@
+{
+  "best_metrics": {
+    "active_days": 791,
+    "annualized_return": 0.39860328107499865,
+    "annualized_sharpe": 1.1781322436694246,
+    "annualized_sortino": 1.3345727670482126,
+    "annualized_volatility": 0.3383349222609375,
+    "avg_positions": 0.6896891958559448,
+    "avg_turnover_per_rebalance": 0.32082922013820336,
+    "daily_mean": 0.0015508857728910358,
+    "daily_std": 0.021313096765495514,
+    "max_drawdown": -0.3380428844171054,
+    "noncash_fraction": 0.39023186975826346,
+    "observations": 2026,
+    "total_return": 13.836718999669046
+  },
+  "candidate_count": 1680,
+  "data_sources": [
+    "data/warehouse/daily_prices.csv",
+    "data/warehouse/reports.csv"
+  ],
+  "generated_at": "2026-05-19T15:51:41.957568+00:00",
+  "goal_hit_count": 0,
+  "methodology": "Long-only report-upside ranking gated by fast>slow moving-average crossover; top-pool compression selects/weights top candidates and shifts weights one trading day before returns.",
+  "metric_definitions": {
+    "annualized_return": "geometric CAGR from daily portfolio returns with 252 trading-day annualization",
+    "annualized_sharpe": "annualized_return / annualized_volatility; zero-return cash days included",
+    "annualized_sortino": "annualized_return / annualized downside standard deviation; zero-return cash days included",
+    "max_drawdown": "minimum cumulative-equity drawdown, negative number"
+  },
+  "schema_version": 1,
+  "searched_grid_size": 1680,
+  "success_threshold": "annualized_sharpe >= 2.0 OR annualized_sortino >= 2.0",
+  "task_id": "1",
+  "top_candidates": [
+    {
+      "candidate_id": "w1_ma5_20_D_age0-60_pool3_hold2_equal_dynamic_upside",
+      "current_holdings": {
+        "355150.KS": 0.5,
+        "GLNG": 0.5
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 791,
+        "annualized_return": 0.39860328107499865,
+        "annualized_sharpe": 1.1781322436694246,
+        "annualized_sortino": 1.3345727670482126,
+        "annualized_volatility": 0.3383349222609375,
+        "avg_positions": 0.6896891958559448,
+        "avg_turnover_per_rebalance": 0.32082922013820336,
+        "daily_mean": 0.0015508857728910358,
+        "daily_std": 0.021313096765495514,
+        "max_drawdown": -0.3380428844171054,
+        "noncash_fraction": 0.39023186975826346,
+        "observations": 2026,
+        "total_return": 13.836718999669046
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 5,
+        "hold_top": 2,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "D",
+        "score_mode": "dynamic_upside",
+        "slow_ma_days": 20,
+        "top_pool": 3,
+        "weight_mode": "equal"
+      }
+    },
+    {
+      "candidate_id": "w1_ma5_20_D_age0-60_pool3_hold2_winner_compress_dynamic_upside",
+      "current_holdings": {
+        "355150.KS": 0.55,
+        "GLNG": 0.44999999999999996
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 791,
+        "annualized_return": 0.38716338900009184,
+        "annualized_sharpe": 1.1352633175331577,
+        "annualized_sortino": 1.2896853982716938,
+        "annualized_volatility": 0.3410339989152199,
+        "avg_positions": 0.6896891958559448,
+        "avg_turnover_per_rebalance": 0.3223593287265548,
+        "daily_mean": 0.0015216590649818524,
+        "daily_std": 0.021483122613036743,
+        "max_drawdown": -0.34754455772016046,
+        "noncash_fraction": 0.39023186975826346,
+        "observations": 2026,
+        "total_return": 12.88867864779935
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 5,
+        "hold_top": 2,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "D",
+        "score_mode": "dynamic_upside",
+        "slow_ma_days": 20,
+        "top_pool": 3,
+        "weight_mode": "winner_compress"
+      }
+    },
+    {
+      "candidate_id": "w1_ma10_30_D_age0-60_pool3_hold2_equal_dynamic_upside",
+      "current_holdings": {
+        "187790.KS": 0.5,
+        "355150.KS": 0.5
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 802,
+        "annualized_return": 0.34448676068171147,
+        "annualized_sharpe": 0.9877736436463984,
+        "annualized_sortino": 1.1566654934978713,
+        "annualized_volatility": 0.3487507111548628,
+        "avg_positions": 0.7113961519486927,
+        "avg_turnover_per_rebalance": 0.255182625863771,
+        "daily_mean": 0.0014052313889776884,
+        "daily_std": 0.02196922979220682,
+        "max_drawdown": -0.293301961910875,
+        "noncash_fraction": 0.3956586087814504,
+        "observations": 2026,
+        "total_return": 9.80323168085667
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 10,
+        "hold_top": 2,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "D",
+        "score_mode": "dynamic_upside",
+        "slow_ma_days": 30,
+        "top_pool": 3,
+        "weight_mode": "equal"
+      }
+    },
+    {
+      "candidate_id": "w1_ma5_20_D_age0-60_pool3_hold2_equal_blend",
+      "current_holdings": {
+        "355150.KS": 0.5,
+        "GLNG": 0.5
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 793,
+        "annualized_return": 0.35893583049451605,
+        "annualized_sharpe": 1.0699895253618177,
+        "annualized_sortino": 1.1486687255672487,
+        "annualized_volatility": 0.3354573311109206,
+        "avg_positions": 0.6980759743463246,
+        "avg_turnover_per_rebalance": 0.31046396841066143,
+        "daily_mean": 0.0014342478987624412,
+        "daily_std": 0.021131825561736824,
+        "max_drawdown": -0.4062423941859241,
+        "noncash_fraction": 0.3912185495806611,
+        "observations": 2026,
+        "total_return": 10.772732330367736
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 5,
+        "hold_top": 2,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "D",
+        "score_mode": "blend",
+        "slow_ma_days": 20,
+        "top_pool": 3,
+        "weight_mode": "equal"
+      }
+    },
+    {
+      "candidate_id": "w1_ma5_20_D_age0-60_pool3_hold2_winner_compress_blend",
+      "current_holdings": {
+        "355150.KS": 0.55,
+        "GLNG": 0.44999999999999996
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 793,
+        "annualized_return": 0.3544981531752378,
+        "annualized_sharpe": 1.0472635940773674,
+        "annualized_sortino": 1.1386360243886244,
+        "annualized_volatility": 0.33849945245881335,
+        "avg_positions": 0.6980759743463246,
+        "avg_turnover_per_rebalance": 0.31154985192497536,
+        "daily_mean": 0.0014249236301804296,
+        "daily_std": 0.021323461193751225,
+        "max_drawdown": -0.4030733773380709,
+        "noncash_fraction": 0.3912185495806611,
+        "observations": 2026,
+        "total_return": 10.467180273529538
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 5,
+        "hold_top": 2,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "D",
+        "score_mode": "blend",
+        "slow_ma_days": 20,
+        "top_pool": 3,
+        "weight_mode": "winner_compress"
+      }
+    },
+    {
+      "candidate_id": "w1_ma10_30_D_age0-60_pool3_hold2_winner_compress_dynamic_upside",
+      "current_holdings": {
+        "187790.KS": 0.55,
+        "355150.KS": 0.44999999999999996
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 802,
+        "annualized_return": 0.3144689362352855,
+        "annualized_sharpe": 0.9077065456456866,
+        "annualized_sortino": 1.0534303745589602,
+        "annualized_volatility": 0.34644339378602984,
+        "avg_positions": 0.7113961519486927,
+        "avg_turnover_per_rebalance": 0.25567620927936824,
+        "daily_mean": 0.001312840785587933,
+        "daily_std": 0.021823882459977493,
+        "max_drawdown": -0.30661384653717993,
+        "noncash_fraction": 0.3956586087814504,
+        "observations": 2026,
+        "total_return": 8.009795475106488
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 10,
+        "hold_top": 2,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "D",
+        "score_mode": "dynamic_upside",
+        "slow_ma_days": 30,
+        "top_pool": 3,
+        "weight_mode": "winner_compress"
+      }
+    },
+    {
+      "candidate_id": "w1_ma5_20_D_age0-60_pool3_hold3_equal_dynamic_upside",
+      "current_holdings": {
+        "355150.KS": 0.5,
+        "GLNG": 0.5
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 791,
+        "annualized_return": 0.2933802895091653,
+        "annualized_sharpe": 0.9431085739893691,
+        "annualized_sortino": 1.0386526948155455,
+        "annualized_volatility": 0.3110779581487214,
+        "avg_positions": 0.9037987173162308,
+        "avg_turnover_per_rebalance": 0.31605791378743003,
+        "daily_mean": 0.001206547697733184,
+        "daily_std": 0.019596069419411322,
+        "max_drawdown": -0.30991290316789344,
+        "noncash_fraction": 0.39023186975826346,
+        "observations": 2026,
+        "total_return": 6.911220452929543
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 5,
+        "hold_top": 3,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "D",
+        "score_mode": "dynamic_upside",
+        "slow_ma_days": 20,
+        "top_pool": 3,
+        "weight_mode": "equal"
+      }
+    },
+    {
+      "candidate_id": "w1_ma5_20_D_age0-60_pool5_hold3_equal_dynamic_upside",
+      "current_holdings": {
+        "355150.KS": 0.5,
+        "GLNG": 0.5
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 791,
+        "annualized_return": 0.2933802895091653,
+        "annualized_sharpe": 0.9431085739893691,
+        "annualized_sortino": 1.0386526948155455,
+        "annualized_volatility": 0.3110779581487214,
+        "avg_positions": 0.9037987173162308,
+        "avg_turnover_per_rebalance": 0.31605791378743003,
+        "daily_mean": 0.001206547697733184,
+        "daily_std": 0.019596069419411322,
+        "max_drawdown": -0.30991290316789344,
+        "noncash_fraction": 0.39023186975826346,
+        "observations": 2026,
+        "total_return": 6.911220452929543
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 5,
+        "hold_top": 3,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "D",
+        "score_mode": "dynamic_upside",
+        "slow_ma_days": 20,
+        "top_pool": 5,
+        "weight_mode": "equal"
+      }
+    },
+    {
+      "candidate_id": "w1_ma5_20_D_age0-60_pool10_hold3_equal_dynamic_upside",
+      "current_holdings": {
+        "355150.KS": 0.5,
+        "GLNG": 0.5
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 791,
+        "annualized_return": 0.2933802895091653,
+        "annualized_sharpe": 0.9431085739893691,
+        "annualized_sortino": 1.0386526948155455,
+        "annualized_volatility": 0.3110779581487214,
+        "avg_positions": 0.9037987173162308,
+        "avg_turnover_per_rebalance": 0.31605791378743003,
+        "daily_mean": 0.001206547697733184,
+        "daily_std": 0.019596069419411322,
+        "max_drawdown": -0.30991290316789344,
+        "noncash_fraction": 0.39023186975826346,
+        "observations": 2026,
+        "total_return": 6.911220452929543
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 5,
+        "hold_top": 3,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "D",
+        "score_mode": "dynamic_upside",
+        "slow_ma_days": 20,
+        "top_pool": 10,
+        "weight_mode": "equal"
+      }
+    },
+    {
+      "candidate_id": "w1_ma10_30_D_age0-60_pool3_hold3_equal_dynamic_upside",
+      "current_holdings": {
+        "187790.KS": 0.3333333333333333,
+        "355150.KS": 0.3333333333333333,
+        "GLNG": 0.3333333333333333
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 802,
+        "annualized_return": 0.27015678924245967,
+        "annualized_sharpe": 0.8482246655333451,
+        "annualized_sortino": 0.9962556438697374,
+        "annualized_volatility": 0.31849673821096797,
+        "avg_positions": 0.9452392698569314,
+        "avg_turnover_per_rebalance": 0.24991773609740048,
+        "daily_mean": 0.0011409827923319741,
+        "daily_std": 0.02006340863551105,
+        "max_drawdown": -0.3022914807739904,
+        "noncash_fraction": 0.3956586087814504,
+        "observations": 2026,
+        "total_return": 5.83880143830065
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 10,
+        "hold_top": 3,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "D",
+        "score_mode": "dynamic_upside",
+        "slow_ma_days": 30,
+        "top_pool": 3,
+        "weight_mode": "equal"
+      }
+    },
+    {
+      "candidate_id": "w1_ma10_30_D_age0-60_pool5_hold3_equal_dynamic_upside",
+      "current_holdings": {
+        "187790.KS": 0.3333333333333333,
+        "355150.KS": 0.3333333333333333,
+        "GLNG": 0.3333333333333333
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 802,
+        "annualized_return": 0.27015678924245967,
+        "annualized_sharpe": 0.8482246655333451,
+        "annualized_sortino": 0.9962556438697374,
+        "annualized_volatility": 0.31849673821096797,
+        "avg_positions": 0.9452392698569314,
+        "avg_turnover_per_rebalance": 0.24991773609740048,
+        "daily_mean": 0.0011409827923319741,
+        "daily_std": 0.02006340863551105,
+        "max_drawdown": -0.3022914807739904,
+        "noncash_fraction": 0.3956586087814504,
+        "observations": 2026,
+        "total_return": 5.83880143830065
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 10,
+        "hold_top": 3,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "D",
+        "score_mode": "dynamic_upside",
+        "slow_ma_days": 30,
+        "top_pool": 5,
+        "weight_mode": "equal"
+      }
+    },
+    {
+      "candidate_id": "w1_ma10_30_D_age0-60_pool10_hold3_equal_dynamic_upside",
+      "current_holdings": {
+        "187790.KS": 0.3333333333333333,
+        "355150.KS": 0.3333333333333333,
+        "GLNG": 0.3333333333333333
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 802,
+        "annualized_return": 0.27015678924245967,
+        "annualized_sharpe": 0.8482246655333451,
+        "annualized_sortino": 0.9962556438697374,
+        "annualized_volatility": 0.31849673821096797,
+        "avg_positions": 0.9452392698569314,
+        "avg_turnover_per_rebalance": 0.24991773609740048,
+        "daily_mean": 0.0011409827923319741,
+        "daily_std": 0.02006340863551105,
+        "max_drawdown": -0.3022914807739904,
+        "noncash_fraction": 0.3956586087814504,
+        "observations": 2026,
+        "total_return": 5.83880143830065
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 10,
+        "hold_top": 3,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "D",
+        "score_mode": "dynamic_upside",
+        "slow_ma_days": 30,
+        "top_pool": 10,
+        "weight_mode": "equal"
+      }
+    },
+    {
+      "candidate_id": "w1_ma5_20_D_age0-60_pool3_hold3_winner_compress_dynamic_upside",
+      "current_holdings": {
+        "355150.KS": 0.55,
+        "GLNG": 0.44999999999999996
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 791,
+        "annualized_return": 0.2866991175754108,
+        "annualized_sharpe": 0.8757989691041752,
+        "annualized_sortino": 0.9738317793658274,
+        "annualized_volatility": 0.3273572220216992,
+        "avg_positions": 0.9037987173162308,
+        "avg_turnover_per_rebalance": 0.32169299111549854,
+        "daily_mean": 0.0012056223720321993,
+        "daily_std": 0.020621566651199356,
+        "max_drawdown": -0.35373072598171906,
+        "noncash_fraction": 0.39023186975826346,
+        "observations": 2026,
+        "total_return": 6.588577091945611
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 5,
+        "hold_top": 3,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "D",
+        "score_mode": "dynamic_upside",
+        "slow_ma_days": 20,
+        "top_pool": 3,
+        "weight_mode": "winner_compress"
+      }
+    },
+    {
+      "candidate_id": "w1_ma5_20_D_age0-60_pool5_hold3_winner_compress_dynamic_upside",
+      "current_holdings": {
+        "355150.KS": 0.55,
+        "GLNG": 0.44999999999999996
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 791,
+        "annualized_return": 0.2866991175754108,
+        "annualized_sharpe": 0.8757989691041752,
+        "annualized_sortino": 0.9738317793658274,
+        "annualized_volatility": 0.3273572220216992,
+        "avg_positions": 0.9037987173162308,
+        "avg_turnover_per_rebalance": 0.32169299111549854,
+        "daily_mean": 0.0012056223720321993,
+        "daily_std": 0.020621566651199356,
+        "max_drawdown": -0.35373072598171906,
+        "noncash_fraction": 0.39023186975826346,
+        "observations": 2026,
+        "total_return": 6.588577091945611
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 5,
+        "hold_top": 3,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "D",
+        "score_mode": "dynamic_upside",
+        "slow_ma_days": 20,
+        "top_pool": 5,
+        "weight_mode": "winner_compress"
+      }
+    },
+    {
+      "candidate_id": "w1_ma5_20_D_age0-60_pool10_hold3_winner_compress_dynamic_upside",
+      "current_holdings": {
+        "355150.KS": 0.55,
+        "GLNG": 0.44999999999999996
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 791,
+        "annualized_return": 0.2866991175754108,
+        "annualized_sharpe": 0.8757989691041752,
+        "annualized_sortino": 0.9738317793658274,
+        "annualized_volatility": 0.3273572220216992,
+        "avg_positions": 0.9037987173162308,
+        "avg_turnover_per_rebalance": 0.32169299111549854,
+        "daily_mean": 0.0012056223720321993,
+        "daily_std": 0.020621566651199356,
+        "max_drawdown": -0.35373072598171906,
+        "noncash_fraction": 0.39023186975826346,
+        "observations": 2026,
+        "total_return": 6.588577091945611
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 5,
+        "hold_top": 3,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "D",
+        "score_mode": "dynamic_upside",
+        "slow_ma_days": 20,
+        "top_pool": 10,
+        "weight_mode": "winner_compress"
+      }
+    },
+    {
+      "candidate_id": "w1_ma10_30_M_age0-60_pool10_hold5_equal_blend",
+      "current_holdings": {
+        "187790.KS": 0.3333333333333333,
+        "355150.KS": 0.3333333333333333,
+        "GLNG": 0.3333333333333333
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 789,
+        "annualized_return": 0.2445628607941892,
+        "annualized_sharpe": 0.8018451032362544,
+        "annualized_sortino": 0.9505850570258001,
+        "annualized_volatility": 0.30500013008389176,
+        "avg_positions": 1.0843611248149976,
+        "avg_turnover_per_rebalance": 0.7691756272401432,
+        "daily_mean": 0.0010462927389373498,
+        "daily_std": 0.01921320223915065,
+        "max_drawdown": -0.3411057359724098,
+        "noncash_fraction": 0.3892451899358658,
+        "observations": 2006,
+        "total_return": 4.706425956965499
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 10,
+        "hold_top": 5,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "M",
+        "score_mode": "blend",
+        "slow_ma_days": 30,
+        "top_pool": 10,
+        "weight_mode": "equal"
+      }
+    },
+    {
+      "candidate_id": "w1_ma5_20_D_age0-60_pool10_hold5_equal_dynamic_upside",
+      "current_holdings": {
+        "355150.KS": 0.5,
+        "GLNG": 0.5
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 791,
+        "annualized_return": 0.26365325713811405,
+        "annualized_sharpe": 0.8706407396702339,
+        "annualized_sortino": 0.9481357725109191,
+        "annualized_volatility": 0.30282669432397114,
+        "avg_positions": 1.1435619141588556,
+        "avg_turnover_per_rebalance": 0.3070582428430405,
+        "daily_mean": 0.0011045321035580917,
+        "daily_std": 0.019076288655547682,
+        "max_drawdown": -0.31558629222106027,
+        "noncash_fraction": 0.39023186975826346,
+        "observations": 2026,
+        "total_return": 5.562302151950611
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 5,
+        "hold_top": 5,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "D",
+        "score_mode": "dynamic_upside",
+        "slow_ma_days": 20,
+        "top_pool": 10,
+        "weight_mode": "equal"
+      }
+    },
+    {
+      "candidate_id": "w1_ma5_20_D_age0-60_pool10_hold5_winner_compress_dynamic_upside",
+      "current_holdings": {
+        "355150.KS": 0.55,
+        "GLNG": 0.44999999999999996
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 791,
+        "annualized_return": 0.272847492797635,
+        "annualized_sharpe": 0.8412297132462848,
+        "annualized_sortino": 0.9362183381441068,
+        "annualized_volatility": 0.3243436227956371,
+        "avg_positions": 1.1435619141588556,
+        "avg_turnover_per_rebalance": 0.3174358341559724,
+        "daily_mean": 0.0011588938708039262,
+        "daily_std": 0.020431727743976093,
+        "max_drawdown": -0.34421590747880126,
+        "noncash_fraction": 0.39023186975826346,
+        "observations": 2026,
+        "total_return": 5.956147207490499
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 5,
+        "hold_top": 5,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "D",
+        "score_mode": "dynamic_upside",
+        "slow_ma_days": 20,
+        "top_pool": 10,
+        "weight_mode": "winner_compress"
+      }
+    },
+    {
+      "candidate_id": "w1_ma10_30_M_age0-60_pool10_hold5_equal_dynamic_upside",
+      "current_holdings": {
+        "187790.KS": 0.3333333333333333,
+        "355150.KS": 0.3333333333333333,
+        "GLNG": 0.3333333333333333
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 789,
+        "annualized_return": 0.23921278553260628,
+        "annualized_sharpe": 0.7860334977975203,
+        "annualized_sortino": 0.936138197506714,
+        "annualized_volatility": 0.3043289964141283,
+        "avg_positions": 1.0641341884558462,
+        "avg_turnover_per_rebalance": 0.768100358422939,
+        "daily_mean": 0.0010283451642855578,
+        "daily_std": 0.019170924791848832,
+        "max_drawdown": -0.3411057359724098,
+        "noncash_fraction": 0.3892451899358658,
+        "observations": 2006,
+        "total_return": 4.514051518168209
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 10,
+        "hold_top": 5,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "M",
+        "score_mode": "dynamic_upside",
+        "slow_ma_days": 30,
+        "top_pool": 10,
+        "weight_mode": "equal"
+      }
+    },
+    {
+      "candidate_id": "w1_ma5_20_D_age0-60_pool10_hold5_equal_blend",
+      "current_holdings": {
+        "355150.KS": 0.5,
+        "GLNG": 0.5
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 793,
+        "annualized_return": 0.2554377496247511,
+        "annualized_sharpe": 0.8742524441974979,
+        "annualized_sortino": 0.9175773390811967,
+        "annualized_volatility": 0.2921784792483193,
+        "avg_positions": 1.171188949185989,
+        "avg_turnover_per_rebalance": 0.30177690029615006,
+        "daily_mean": 0.0010675857586567423,
+        "daily_std": 0.018405514155621406,
+        "max_drawdown": -0.3215470092215341,
+        "noncash_fraction": 0.3912185495806611,
+        "observations": 2026,
+        "total_return": 5.227043648285602
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 5,
+        "hold_top": 5,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "D",
+        "score_mode": "blend",
+        "slow_ma_days": 20,
+        "top_pool": 10,
+        "weight_mode": "equal"
+      }
+    },
+    {
+      "candidate_id": "w1_ma5_20_D_age0-60_pool10_hold5_winner_compress_blend",
+      "current_holdings": {
+        "355150.KS": 0.55,
+        "GLNG": 0.44999999999999996
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 793,
+        "annualized_return": 0.26910282555520104,
+        "annualized_sharpe": 0.8425426736513644,
+        "annualized_sortino": 0.9169581855862138,
+        "annualized_volatility": 0.3193937042844112,
+        "avg_positions": 1.171188949185989,
+        "avg_turnover_per_rebalance": 0.30892152023692004,
+        "daily_mean": 0.0011420762259453945,
+        "daily_std": 0.02011991218705374,
+        "max_drawdown": -0.35020684239123845,
+        "noncash_fraction": 0.3912185495806611,
+        "observations": 2026,
+        "total_return": 5.793311115465183
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 5,
+        "hold_top": 5,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "D",
+        "score_mode": "blend",
+        "slow_ma_days": 20,
+        "top_pool": 10,
+        "weight_mode": "winner_compress"
+      }
+    },
+    {
+      "candidate_id": "w1_ma10_30_D_age0-60_pool3_hold2_equal_blend",
+      "current_holdings": {
+        "187790.KS": 0.5,
+        "355150.KS": 0.5
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 805,
+        "annualized_return": 0.27675744347549935,
+        "annualized_sharpe": 0.7816398777184989,
+        "annualized_sortino": 0.8881639775192182,
+        "annualized_volatility": 0.3540728299115405,
+        "avg_positions": 0.7197829304390725,
+        "avg_turnover_per_rebalance": 0.2458045409674235,
+        "daily_mean": 0.0012076925216534845,
+        "daily_std": 0.022304491760733524,
+        "max_drawdown": -0.38195031797210577,
+        "noncash_fraction": 0.3971386285150469,
+        "observations": 2026,
+        "total_return": 6.129808059816957
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 10,
+        "hold_top": 2,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "D",
+        "score_mode": "blend",
+        "slow_ma_days": 30,
+        "top_pool": 3,
+        "weight_mode": "equal"
+      }
+    },
+    {
+      "candidate_id": "w1_ma10_30_M_age7-120_pool10_hold5_equal_dynamic_upside",
+      "current_holdings": {
+        "187790.KS": 0.3333333333333333,
+        "355150.KS": 0.3333333333333333,
+        "GLNG": 0.3333333333333333
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 1268,
+        "annualized_return": 0.25217552320819014,
+        "annualized_sharpe": 0.6124098357386096,
+        "annualized_sortino": 0.8874938381558457,
+        "annualized_volatility": 0.411775756187927,
+        "avg_positions": 1.951652688702516,
+        "avg_turnover_per_rebalance": 1.1767025089605734,
+        "daily_mean": 0.0012085961795819825,
+        "daily_std": 0.025939434447590975,
+        "max_drawdown": -0.46090228614280004,
+        "noncash_fraction": 0.6255550074000986,
+        "observations": 2006,
+        "total_return": 4.990265588731119
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 10,
+        "hold_top": 5,
+        "max_report_age_days": 120,
+        "min_report_age_days": 7,
+        "rebalance": "M",
+        "score_mode": "dynamic_upside",
+        "slow_ma_days": 30,
+        "top_pool": 10,
+        "weight_mode": "equal"
+      }
+    },
+    {
+      "candidate_id": "w1_ma10_30_M_age7-120_pool10_hold5_equal_blend",
+      "current_holdings": {
+        "187790.KS": 0.3333333333333333,
+        "355150.KS": 0.3333333333333333,
+        "GLNG": 0.3333333333333333
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 1268,
+        "annualized_return": 0.24930721852872129,
+        "annualized_sharpe": 0.6029308118248445,
+        "annualized_sortino": 0.8758939999935014,
+        "annualized_volatility": 0.4134922509170865,
+        "avg_positions": 2.0360138135175134,
+        "avg_turnover_per_rebalance": 1.168100358422939,
+        "daily_mean": 0.0012023129981346482,
+        "daily_std": 0.026047563451879294,
+        "max_drawdown": -0.4628419788924414,
+        "noncash_fraction": 0.6255550074000986,
+        "observations": 2006,
+        "total_return": 4.881903748791241
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 10,
+        "hold_top": 5,
+        "max_report_age_days": 120,
+        "min_report_age_days": 7,
+        "rebalance": "M",
+        "score_mode": "blend",
+        "slow_ma_days": 30,
+        "top_pool": 10,
+        "weight_mode": "equal"
+      }
+    },
+    {
+      "candidate_id": "w1_ma10_30_D_age0-60_pool10_hold5_equal_dynamic_upside",
+      "current_holdings": {
+        "187790.KS": 0.3333333333333333,
+        "355150.KS": 0.3333333333333333,
+        "GLNG": 0.3333333333333333
+      },
+      "family": "moving_average_crossover_top_pool_compression",
+      "highlight": false,
+      "metrics": {
+        "active_days": 802,
+        "annualized_return": 0.23229467723742592,
+        "annualized_sharpe": 0.7528166156620687,
+        "annualized_sortino": 0.8583890386999459,
+        "annualized_volatility": 0.30856741523051145,
+        "avg_positions": 1.2106561420818944,
+        "avg_turnover_per_rebalance": 0.23479763079960517,
+        "daily_mean": 0.0010090182033045372,
+        "daily_std": 0.019437920080903275,
+        "max_drawdown": -0.3454255756157497,
+        "noncash_fraction": 0.3956586087814504,
+        "observations": 2026,
+        "total_return": 4.361871052142307
+      },
+      "params": {
+        "decision_lag": "one trading day; rebalance close signal earns next trading-day return",
+        "fast_ma_days": 10,
+        "hold_top": 5,
+        "max_report_age_days": 60,
+        "min_report_age_days": 0,
+        "rebalance": "D",
+        "score_mode": "dynamic_upside",
+        "slow_ma_days": 30,
+        "top_pool": 10,
+        "weight_mode": "equal"
+      }
+    }
+  ],
+  "worker": "worker-1"
+}
