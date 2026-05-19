@@ -20,6 +20,20 @@
 
 ---
 
+## v0.21.8-skew-kurt-trim.1 — 2026-05-19
+
+### 변경
+- `/statistics` DistributionSignature에서 표본 왜도(skewness)와 초과 첨도(excess kurtosis) 마커를 제거. 학부 SMIC 동아리 표본에서 4차 모멘트 raw 숫자는 일반 독자에게 직관이 잘 잡히지 않고, 데이터 자체가 거래정지·상장폐지·트랜잭션비용을 포함하지 않는 상황에서 academic 정밀도를 더하는 것이 false precision으로 이어진다는 판단. 대신 평균-중앙값-10% 절단 평균의 시각적 정렬과 -20%/+20% 꼬리 카운트로 fat-tail 직관을 유지.
+- Wilson 95% CI 밴드, 트림 평균 마커, VintageCohortTable, LimitationsPanel은 유지(이쪽은 데이터 한계를 명시하는 방향이라 false precision 위험이 없음).
+- `lib/report-statistics.ts`에서 더 이상 호출되지 않는 `sampleSkewness`·`excessKurtosis` export 삭제.
+
+### 검증
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web build` (정적 페이지 413개)
+
+---
+
 ## v0.21.7-statistics-rigor.1 — 2026-05-19
 
 ### 변경 (경로)

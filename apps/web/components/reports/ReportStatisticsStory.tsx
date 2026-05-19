@@ -5,16 +5,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import type { ReportStatisticsLabSummary } from '@/lib/artifacts';
 import { formatDays, formatPercent } from '@/lib/format';
-import {
-  excessKurtosis,
-  formatMultiple,
-  isNumber,
-  mean,
-  quantileFromSorted,
-  sampleSkewness,
-  trimmedMean,
-  wilsonCI,
-} from '@/lib/report-statistics';
+import { formatMultiple, isNumber, mean, quantileFromSorted, trimmedMean, wilsonCI } from '@/lib/report-statistics';
 
 const HORIZONS = [30, 60, 120, 250] as const;
 const THRESHOLDS = [0.6, 0.8, 1.0] as const;
@@ -50,11 +41,7 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
   const pathBuckets = buildPathBuckets(summary.riskScatter);
   const exampleMetaById = buildExampleMetaById(summary.topExamples);
 
-  // Quant-grade tail diagnostics surfaced because mean/median divergence alone
-  // is too cheap a signal of fat tails for an analyst-validation page.
   const trimmedMean10 = trimmedMean(currentReturns, 0.1);
-  const skewness = sampleSkewness(currentReturns);
-  const excessKurt = excessKurtosis(currentReturns);
   const uniqueSymbolCount = new Set(summary.riskScatter.map((row) => row.symbol).filter(Boolean)).size;
   const vintageCohorts = buildVintageCohorts(summary.riskScatter);
 
@@ -78,8 +65,6 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
           mean={meanReturn}
           median={medianReturn}
           trimmed={trimmedMean10}
-          skewness={skewness}
-          kurtosis={excessKurt}
           sampleSize={eligiblePathCount}
           uniqueSymbols={uniqueSymbolCount}
           deepLosers={deepLosers}
@@ -215,8 +200,6 @@ function DistributionSignature({
   mean,
   median,
   trimmed,
-  skewness,
-  kurtosis,
   sampleSize,
   uniqueSymbols,
   deepLosers,
@@ -225,8 +208,6 @@ function DistributionSignature({
   mean: number | null;
   median: number | null;
   trimmed: number | null;
-  skewness: number | null;
-  kurtosis: number | null;
   sampleSize: number;
   uniqueSymbols: number;
   deepLosers: number;
@@ -258,14 +239,6 @@ function DistributionSignature({
       </div>
       <dl className="mt-4 grid grid-cols-2 gap-x-3 gap-y-1 border-t border-slate-100 pt-3 text-xs">
         <div className="flex items-center justify-between">
-          <dt className="text-slate-500">왜도(skew)</dt>
-          <dd className="font-mono font-semibold tabular-nums text-slate-950">{formatStat(skewness)}</dd>
-        </div>
-        <div className="flex items-center justify-between">
-          <dt className="text-slate-500">초과 첨도</dt>
-          <dd className="font-mono font-semibold tabular-nums text-slate-950">{formatStat(kurtosis)}</dd>
-        </div>
-        <div className="flex items-center justify-between">
           <dt className="text-slate-500">표본</dt>
           <dd className="font-mono font-semibold tabular-nums text-slate-950">
             {sampleSize.toLocaleString('ko-KR')}건
@@ -279,16 +252,10 @@ function DistributionSignature({
         </div>
       </dl>
       <p className="mt-3 text-[11px] leading-5 text-slate-500">
-        평균이 중앙값과 크게 다르고 절단 평균이 더 작다면 꼬리 몇 개가 평균을 끌어올리고 있다는 신호입니다. 왜도 &gt;
-        0은 우측 꼬리, 초과 첨도 &gt; 0은 정규분포보다 두꺼운 꼬리를 뜻합니다.
+        평균이 중앙값과 크게 다르고 10% 절단 평균이 더 작다면, 꼬리 몇 개가 평균을 끌어올리고 있다는 신호입니다.
       </p>
     </div>
   );
-}
-
-function formatStat(value: number | null): string {
-  if (value === null || !Number.isFinite(value)) return '—';
-  return value.toLocaleString('ko-KR', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
 }
 
 function Marker({
