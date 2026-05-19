@@ -184,11 +184,6 @@ def _candidate_from_report(
         return None
     if relative_strength_percentile < config.min_relative_strength_percentile:
         return None
-    momentum_return, relative_strength_percentile = _relative_strength(board, day, symbol, config)
-    if momentum_return < config.min_momentum_return:
-        return None
-    if relative_strength_percentile < config.min_relative_strength_percentile:
-        return None
     return ActiveCandidate(
         report_id=str(record["report_id"]),
         symbol=symbol,
@@ -303,16 +298,20 @@ def _passes_supertrend(
             continue
         previous_upper = final_upper.iloc[idx - 1]
         previous_lower = final_lower.iloc[idx - 1]
-        if pd.isna(previous_upper):
-            final_upper.iloc[idx] = basic_upper.iloc[idx]
-        elif basic_upper.iloc[idx] < previous_upper or close.iloc[idx - 1] > previous_upper:
+        if (
+            pd.isna(previous_upper)
+            or basic_upper.iloc[idx] < previous_upper
+            or close.iloc[idx - 1] > previous_upper
+        ):
             final_upper.iloc[idx] = basic_upper.iloc[idx]
         else:
             final_upper.iloc[idx] = previous_upper
 
-        if pd.isna(previous_lower):
-            final_lower.iloc[idx] = basic_lower.iloc[idx]
-        elif basic_lower.iloc[idx] > previous_lower or close.iloc[idx - 1] < previous_lower:
+        if (
+            pd.isna(previous_lower)
+            or basic_lower.iloc[idx] > previous_lower
+            or close.iloc[idx - 1] < previous_lower
+        ):
             final_lower.iloc[idx] = basic_lower.iloc[idx]
         else:
             final_lower.iloc[idx] = previous_lower
@@ -364,16 +363,8 @@ def _ohlc_history(
     index = close.index
     high_frame = board.high if board.high is not None else board.close
     low_frame = board.low if board.low is not None else board.close
-    high = (
-        high_frame[symbol].reindex(index).fillna(close)
-        if symbol in high_frame.columns
-        else close.copy()
-    )
-    low = (
-        low_frame[symbol].reindex(index).fillna(close)
-        if symbol in low_frame.columns
-        else close.copy()
-    )
+    high = high_frame[symbol].reindex(index).fillna(close) if symbol in high_frame.columns else close.copy()
+    low = low_frame[symbol].reindex(index).fillna(close) if symbol in low_frame.columns else close.copy()
     return high.astype(float), low.astype(float), close.astype(float)
 
 
@@ -395,6 +386,41 @@ def _average_true_range(
         axis=1,
     ).max(axis=1)
     return true_range.rolling(period, min_periods=period).mean()
+
+
+def _relative_strength(
+    board: PriceBoard,
+    day: date,
+    symbol: str,
+    config: SmicMttStrategyConfig,
+) -> tuple[float, float]:
+    """Trailing momentum and cross-sectional relative-strength percentile.
+
+    Uses closes available on or before ``day`` only. Missing lookback history
+    returns disabled-gate defaults, preserving legacy behavior unless callers
+    require positive momentum or a non-zero relative-strength percentile.
+    """
+
+    if board.close.empty or symbol not in board.close.columns:
+        return 0.0, 0.0
+
+    history = board.close.loc[board.close.index <= pd.Timestamp(day)]
+    lookback = config.relative_strength_lookback_days
+    if len(history) <= lookback:
+        return 0.0, 0.0
+
+    window = history.tail(lookback + 1)
+    first = window.iloc[0]
+    last = window.iloc[-1]
+    valid = first.gt(0) & last.gt(0)
+    returns = (last[valid] / first[valid] - 1.0).replace([float("inf"), float("-inf")], pd.NA)
+    returns = returns.dropna()
+    if symbol not in returns or returns.empty:
+        return 0.0, 0.0
+
+    momentum_return = float(returns[symbol])
+    relative_strength_percentile = float(returns.rank(method="average", pct=True)[symbol])
+    return momentum_return, relative_strength_percentile
 
 
 def _top_up_days(trading_dates: list[date], cadence: str) -> set[date]:

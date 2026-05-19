@@ -265,6 +265,13 @@ def _sample_config(trial: optuna.Trial) -> SmicMttStrategyConfig:
         supertrend_multiplier=trial.suggest_float("supertrend_multiplier", 2.0, 4.0, step=0.5),
         breakout_lookback_days=trial.suggest_categorical("breakout_lookback_days", [20, 55, 100]),
         breakout_atr_multiple=trial.suggest_float("breakout_atr_multiple", 0.0, 1.0, step=0.25),
+        relative_strength_lookback_days=trial.suggest_categorical(
+            "relative_strength_lookback_days", [63, 126, 252]
+        ),
+        min_relative_strength_percentile=trial.suggest_float(
+            "min_relative_strength_percentile", 0.0, 0.80, step=0.10
+        ),
+        min_momentum_return=trial.suggest_float("min_momentum_return", -0.20, 0.40, step=0.05),
         max_positions=trial.suggest_int("max_positions", 5, 40, step=5),
         universe=cast(Any, trial.suggest_categorical("universe", ["all", "domestic", "overseas"])),
         top_up_cadence=cast(
