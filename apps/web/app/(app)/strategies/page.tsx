@@ -1,13 +1,14 @@
 import Link from 'next/link';
 import type { ReturnSeries } from '@/components/charts/CumulativeReturnChart';
 import { PerformanceChartPanel } from '@/components/charts/PerformanceChartPanel';
+import { QuantStrategySearchTable } from '@/components/trading/QuantStrategySearchTable';
 import { StrategyRiskTable } from '@/components/trading/StrategyRiskTable';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { KpiTile } from '@/components/ui/KpiTile';
 import { PageHero } from '@/components/ui/PageHero';
 import { Section } from '@/components/ui/Section';
-import { getStrategyCurves } from '@/lib/artifacts';
+import { getQuantStrategySearch, getStrategyCurves } from '@/lib/artifacts';
 import { formatPercent } from '@/lib/format';
 import {
   BENCHMARK_IDS,
@@ -26,8 +27,10 @@ export default function StrategiesPage() {
   const benchmarkRows = getBenchmarkRows(leaderboard);
   const selectableRows = getSelectableStrategyRows(leaderboard);
   const objectiveRows = getObjectivePassingRows(leaderboard);
+  const quantSearch = getQuantStrategySearch();
   const targetBenchmark = benchmarkRows.find((row) => row.id === TARGET_BENCHMARK_ID);
   const bestSelectable = selectableRows[0];
+  const bestQuantCandidate = quantSearch.rows[0];
   const chartSeries = buildStrategySeries([...benchmarkRows, ...selectableRows.slice(0, 8)]);
   const comparisonLabelSummary = benchmarkRows
     .slice(0, 5)
@@ -43,6 +46,7 @@ export default function StrategiesPage() {
         badges={[
           { label: '벤치마크', value: benchmarkRows.length },
           { label: '고유 전략', value: selectableRows.length },
+          { label: '퀀트 탐색', value: `${quantSearch.candidateCount.toLocaleString('ko-KR')}개 후보` },
           { label: '목표', value: `MDD ≤ ${formatPercent(OBJECTIVE_MAX_DRAWDOWN)}` },
           { label: '수익 기준', value: 'KOSPI 초과' },
         ]}
@@ -53,6 +57,9 @@ export default function StrategiesPage() {
             </Button>
             <Button asChild size="sm" variant="outline">
               <a href="#strategy-board">비교표 보기</a>
+            </Button>
+            <Button asChild size="sm" variant="outline">
+              <a href="#quant-search-board">퀀트 Top N</a>
             </Button>
           </>
         }
@@ -79,6 +86,18 @@ export default function StrategiesPage() {
                   : '선택 가능 전략 없음'
               }
               tone={bestSelectable?.objectivePassed ? 'good' : 'neutral'}
+            />
+            <KpiTile
+              label="퀀트 탐색 목표"
+              value={`${quantSearch.goalHitCount.toLocaleString('ko-KR')}개 통과`}
+              delta={
+                bestQuantCandidate
+                  ? `Top1 Sortino ${bestQuantCandidate.annualizedSortinoLpm0?.toFixed(2) ?? '—'} · Sharpe ${
+                      bestQuantCandidate.annualizedSharpe?.toFixed(2) ?? '—'
+                    }`
+                  : '탐색 후보 없음'
+              }
+              tone={quantSearch.goalHitCount ? 'good' : 'warn'}
             />
             <KpiTile
               label="벤치마크 정의"
@@ -119,6 +138,16 @@ export default function StrategiesPage() {
 
       <Section eyebrow="목표 조건" title="고유 전략 — MDD 15% 이하 + KOSPI 초과" id="strategy-board">
         <StrategyRiskTable rows={selectableRows} title="고유 전략" csvFilename="snusmic-strategies.csv" />
+      </Section>
+
+      <Section eyebrow="팀 퀀트 탐색" title="Sharpe 2 또는 Sortino 2 이상 후보 Top N" id="quant-search-board">
+        <div className="mb-3 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
+          <strong>리서치 후보:</strong> {quantSearch.candidateCount.toLocaleString('ko-KR')}개 조합 중{' '}
+          {quantSearch.goalHitCount.toLocaleString('ko-KR')}개가 Sharpe/Sortino 목표를 통과했습니다. 동일 후보군 반복
+          탐색에 따른 과최적화 위험이 있어 실제 운용 전에는 별도 OOS 검증이 필요합니다. 제외:{' '}
+          {quantSearch.excluded.join(', ') || '없음'}.
+        </div>
+        <QuantStrategySearchTable rows={quantSearch.rows} />
       </Section>
 
       <Section eyebrow="성과 경로" title="벤치마크 세트와 고유 전략의 누적 수익률">
