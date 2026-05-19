@@ -20,6 +20,39 @@
 
 ---
 
+## v0.21.14-peak-metric.1 — 2026-05-19
+
+### 변경 (지표 기준)
+- `/statistics`의 모든 수익률 통계 기준을 `currentReturn`(현재 수익률)에서 `maxFavorableExcursion`(발간 후 고점 수익률, MFE)으로 전환. 매도 타이밍은 모델이 알려줄 수 없으니, 분석가 콜이 만든 "고점 기회"를 측정 기준으로 삼는다는 사용자 의도 반영.
+- 영향 받은 영역:
+  - **DistributionSignature**: 평균/중앙/10% 절단 평균이 모두 MFE 기준. 마커 양극단 라벨 "손실/상승 꼬리" → "발간 시점/발간 후 고점"으로 교체. 카운트 "-20% 이하 / +20% 이상" → "1.0x 목표 도달 / 고점 +5% 미만"으로 교체.
+  - **WholeSampleMap**: y축이 발간 후 고점. y축 음수 구간 제거(MFE ≥ 0). 점 색상은 hit10/hit08/hit06 도달 여부로 톤 결정. 헤딩 "전체 리포트 수익률 지도" → "전체 리포트 발간 후 고점 지도".
+  - **WinnersLosersBoard**: MFE 기준으로 winners 정렬(고점이 가장 컸던 10건), losers 정렬(고점이 가장 작았던 5건 = 발간 후 거의 못 오른 종목).
+  - **ConcentrationInsight**: (+) 수익 누적이 MFE 기준.
+  - **VintageCohortTable**: 중앙 수익률이 MFE 기준.
+  - **FeatureBucketsTable**: 중앙 수익률 + Mann-Whitney U 모두 MFE 기준.
+- 발간일 갭 버킷 제거 (사용자 평가: "별로 의미 없는 거 같음").
+
+### 추가 (Mann-Whitney U p-value)
+- `FeatureBucketsTable`에 양측 Mann-Whitney U 검정 p-value 칼럼 추가. 각 버킷의 MFE 분포를 같은 차원의 나머지 표본과 비교.
+- 표기: `0.034 **` 형태. 유의 수준 `*` p<0.1 / `**` p<0.05 / `***` p<0.01. 헤더에 미니 범례 1줄.
+- 정규 근사 + tie-rank 보정 적용. 표본 크기 양측 5 미만이면 p-value 미산출(`—`).
+
+### 추가 (네비게이션)
+- `WholeSampleMap`의 모든 점, `WinnersLosersBoard`의 모든 행, `PricePathOverlay`의 모든 범례 항목이 클릭 시 해당 리포트 상세(`/reports/{symbol}/{reportId}`)로 이동.
+
+### 변경 (가격 경로 차트)
+- `PricePathOverlay`의 SVG 직접 렌더링을 `lightweight-charts` v5 기반 인터랙티브 차트로 교체. 줌·팬·crosshair·정확한 hover 값 제공.
+- 거래일을 가짜 unix timestamp(2000-01-01 + 86400 × day)로 변환해 시간축에 매핑, `tickMarkFormatter`로 `{N}D`로 재라벨.
+- 범례를 차트 아래로 분리 (회사명 색 swatch + 고점 수익률 + 클릭 가능 링크).
+
+### 검증
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web build` (정적 페이지 413개)
+
+---
+
 ## v0.21.13-technical-features.1 — 2026-05-19
 
 ### 추가 (발간 시점 기술적 특성 → 결과)

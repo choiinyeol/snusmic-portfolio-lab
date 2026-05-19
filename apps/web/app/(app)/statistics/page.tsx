@@ -31,7 +31,7 @@ function buildPricePath(
     symbol: row.symbol,
     company: row.company,
     publicationDate: row.publicationDate,
-    finalReturn: row.currentReturn ?? 0,
+    peakReturn: row.maxFavorableExcursion ?? 0,
     points,
   };
 }
@@ -40,12 +40,14 @@ function buildPricePaths(
   summary: ReportStatisticsLabSummary,
   options: { winnerCount: number; loserCount: number; samplePoints: number },
 ): { winners: PricePathSeries[]; losers: PricePathSeries[] } {
-  const eligible = summary.riskScatter.filter((row) => isNumber(row.currentReturn) && hasPriceArtifact(row.symbol));
+  const eligible = summary.riskScatter.filter(
+    (row) => isNumber(row.maxFavorableExcursion) && hasPriceArtifact(row.symbol),
+  );
   const winners = [...eligible]
-    .sort((a, b) => (b.currentReturn ?? 0) - (a.currentReturn ?? 0))
+    .sort((a, b) => (b.maxFavorableExcursion ?? 0) - (a.maxFavorableExcursion ?? 0))
     .slice(0, options.winnerCount);
   const losers = [...eligible]
-    .sort((a, b) => (a.currentReturn ?? 0) - (b.currentReturn ?? 0))
+    .sort((a, b) => (a.maxFavorableExcursion ?? 0) - (b.maxFavorableExcursion ?? 0))
     .slice(0, options.loserCount);
   return {
     winners: winners
@@ -60,14 +62,13 @@ function buildPricePaths(
 type PublicationFeatures = {
   aligned: boolean | null;
   high52wProximity: number | null;
-  gapPct: number | null;
 };
 
 /** Compute price-action features at publication day from the symbol's
- * full daily history: trend alignment (price > SMA20 > SMA50 > SMA200),
- * 52-week high proximity (close at pub / max close over past ~252 trading days),
- * and the opening gap (pub-day open vs prior-day close). Returns nulls
- * for features that need more history than is available. */
+ * full daily history: trend alignment (price > SMA20 > SMA50 > SMA200)
+ * and 52-week high proximity (close at pub / max close over past ~252
+ * trading days). Returns nulls for features that need more history
+ * than is available. */
 function computeFeatures(prices: PricePoint[], publicationDate: string): PublicationFeatures | null {
   const pubIdx = prices.findIndex((point) => point.time >= publicationDate);
   if (pubIdx < 0) return null;
@@ -95,16 +96,58 @@ function computeFeatures(prices: PricePoint[], publicationDate: string): Publica
   const high52w = Math.max(...lookback);
   const high52wProximity = high52w > 0 ? last / high52w : null;
 
-  let gapPct: number | null = null;
-  if (pubIdx > 0) {
-    const prevClose = prices[pubIdx - 1].close ?? prices[pubIdx - 1].value;
-    const openPub = prices[pubIdx].open ?? null;
-    if (openPub && prevClose > 0) {
-      gapPct = openPub / prevClose - 1;
-    }
-  }
+  return { aligned, high52wProximity };
+}
 
-  return { aligned, high52wProximity, gapPct };
+/** Standard normal CDF via Abramowitz & Stegun 26.2.17 — accurate to ~7.5
+ * decimal places, plenty for converting Mann-Whitney z-scores to p-values. */
+function normalCdf(z: number): number {
+  if (z < 0) return 1 - normalCdf(-z);
+  const t = 1 / (1 + 0.2316419 * z);
+  const density = 0.3989422804014327 * Math.exp((-z * z) / 2);
+  const poly = t * (0.31938153 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))));
+  return 1 - density * poly;
+}
+
+/** Two-sided Mann-Whitney U test with mid-rank tie correction. Returns
+ * the two-tailed p-value via normal approximation (n1, n2 ≳ 10).
+ * Preferred over the two-sample t-test for stock returns because it makes
+ * no normality assumption and is robust to fat tails. */
+function mannWhitneyU(a: number[], b: number[]): { pValue: number; effectSign: number } {
+  const n1 = a.length;
+  const n2 = b.length;
+  if (n1 === 0 || n2 === 0) return { pValue: 1, effectSign: 0 };
+  const combined = [
+    ...a.map((value) => ({ value, group: 'a' as const })),
+    ...b.map((value) => ({ value, group: 'b' as const })),
+  ].sort((x, y) => x.value - y.value);
+  const ranks = new Array<number>(combined.length).fill(0);
+  let tieCorrection = 0;
+  let i = 0;
+  while (i < combined.length) {
+    let j = i;
+    while (j + 1 < combined.length && combined[j + 1].value === combined[i].value) j += 1;
+    const tied = j - i + 1;
+    const avgRank = (i + j) / 2 + 1;
+    for (let k = i; k <= j; k += 1) ranks[k] = avgRank;
+    if (tied > 1) tieCorrection += tied ** 3 - tied;
+    i = j + 1;
+  }
+  let rankSumA = 0;
+  for (let k = 0; k < combined.length; k += 1) {
+    if (combined[k].group === 'a') rankSumA += ranks[k];
+  }
+  const u1 = rankSumA - (n1 * (n1 + 1)) / 2;
+  const u2 = n1 * n2 - u1;
+  const u = Math.min(u1, u2);
+  const meanU = (n1 * n2) / 2;
+  const n = n1 + n2;
+  const variance = ((n1 * n2) / 12) * (n + 1 - tieCorrection / (n * (n - 1)));
+  if (variance <= 0) return { pValue: 1, effectSign: 0 };
+  const z = (u - meanU) / Math.sqrt(variance);
+  const pValue = Math.max(0, Math.min(1, 2 * (1 - normalCdf(Math.abs(z)))));
+  const effectSign = u1 > u2 ? 1 : u1 < u2 ? -1 : 0;
+  return { pValue, effectSign };
 }
 
 function median(values: number[]): number | null {
@@ -115,23 +158,36 @@ function median(values: number[]): number | null {
 }
 
 type Snapshot = {
-  currentReturn: number;
+  peakReturn: number;
   hit10: boolean;
   daysToTarget: number | null;
   features: PublicationFeatures;
 };
 
-function bucketStats(group: FeatureBucket['group'], label: string, items: Snapshot[]): FeatureBucket {
-  const returns = items.map((s) => s.currentReturn);
-  const hits = items.filter((s) => s.hit10);
+function bucketStats(
+  group: FeatureBucket['group'],
+  label: string,
+  bucket: Snapshot[],
+  rest: Snapshot[],
+): FeatureBucket {
+  const returns = bucket.map((s) => s.peakReturn);
+  const hits = bucket.filter((s) => s.hit10);
   const hitDays = hits.map((s) => s.daysToTarget).filter((value): value is number => value !== null);
+  const { pValue } =
+    bucket.length >= 5 && rest.length >= 5
+      ? mannWhitneyU(
+          returns,
+          rest.map((s) => s.peakReturn),
+        )
+      : { pValue: null };
   return {
     group,
     label,
-    count: items.length,
+    count: bucket.length,
     medianReturn: median(returns),
-    hitRate10: items.length === 0 ? 0 : hits.length / items.length,
+    hitRate10: bucket.length === 0 ? 0 : hits.length / bucket.length,
     medianDaysToHit10: median(hitDays),
+    pValue,
   };
 }
 
@@ -139,14 +195,14 @@ function buildFeatureBuckets(summary: ReportStatisticsLabSummary): FeatureBucket
   const reportById = new Map(getReportRows().map((row) => [row.reportId, row]));
   const snapshots: Snapshot[] = [];
   for (const row of summary.riskScatter) {
-    if (!isNumber(row.currentReturn)) continue;
+    if (!isNumber(row.maxFavorableExcursion)) continue;
     if (!hasPriceArtifact(row.symbol)) continue;
     const prices = getPriceSeries(row.symbol);
     const features = computeFeatures(prices, row.publicationDate);
     if (features === null) continue;
     const meta = reportById.get(row.reportId);
     snapshots.push({
-      currentReturn: row.currentReturn,
+      peakReturn: row.maxFavorableExcursion,
       hit10: row.hit10,
       daysToTarget: meta?.daysToTarget ?? null,
       features,
@@ -155,26 +211,23 @@ function buildFeatureBuckets(summary: ReportStatisticsLabSummary): FeatureBucket
 
   const alignedYes = snapshots.filter((s) => s.features.aligned === true);
   const alignedNo = snapshots.filter((s) => s.features.aligned === false);
-  const high95 = snapshots.filter((s) => (s.features.high52wProximity ?? 0) >= 0.95);
-  const high80 = snapshots.filter(
+  const high52wUniverse = snapshots.filter((s) => s.features.high52wProximity !== null);
+  const high95 = high52wUniverse.filter((s) => (s.features.high52wProximity ?? 0) >= 0.95);
+  const high80 = high52wUniverse.filter(
     (s) => (s.features.high52wProximity ?? 0) >= 0.8 && (s.features.high52wProximity ?? 0) < 0.95,
   );
-  const highLow = snapshots.filter(
-    (s) => s.features.high52wProximity !== null && (s.features.high52wProximity ?? 0) < 0.8,
-  );
-  const gapUp = snapshots.filter((s) => (s.features.gapPct ?? 0) >= 0.02);
-  const gapFlat = snapshots.filter((s) => s.features.gapPct !== null && Math.abs(s.features.gapPct ?? 0) < 0.02);
-  const gapDown = snapshots.filter((s) => (s.features.gapPct ?? 0) <= -0.02);
+  const highLow = high52wUniverse.filter((s) => (s.features.high52wProximity ?? 0) < 0.8);
+  const without = (universe: Snapshot[], group: Snapshot[]) => {
+    const ids = new Set(group);
+    return universe.filter((s) => !ids.has(s));
+  };
 
   return [
-    bucketStats('alignment', '정배열 (가격 > SMA20 > SMA50 > SMA200)', alignedYes),
-    bucketStats('alignment', '비정배열', alignedNo),
-    bucketStats('high52w', '52주 고가의 95%+ 근접', high95),
-    bucketStats('high52w', '80–95%', high80),
-    bucketStats('high52w', '80% 미만', highLow),
-    bucketStats('gap', '발간일 갭 +2% 이상', gapUp),
-    bucketStats('gap', '갭 ±2% 이내', gapFlat),
-    bucketStats('gap', '발간일 갭 -2% 이하', gapDown),
+    bucketStats('alignment', '정배열 (가격 > SMA20 > SMA50 > SMA200)', alignedYes, alignedNo),
+    bucketStats('alignment', '비정배열', alignedNo, alignedYes),
+    bucketStats('high52w', '52주 고가의 95%+ 근접', high95, without(high52wUniverse, high95)),
+    bucketStats('high52w', '80–95%', high80, without(high52wUniverse, high80)),
+    bucketStats('high52w', '80% 미만', highLow, without(high52wUniverse, highLow)),
   ];
 }
 

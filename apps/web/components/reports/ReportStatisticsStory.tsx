@@ -1,6 +1,8 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { createChart, LineSeries, type IChartApi, type UTCTimestamp } from 'lightweight-charts';
 import type { ReportStatisticsLabSummary } from '@/lib/artifacts';
 import { formatPercent } from '@/lib/format';
 import { formatMultiple, isNumber, mean, quantileFromSorted, trimmedMean, wilsonCI } from '@/lib/report-statistics';
@@ -10,17 +12,20 @@ export type PricePathSeries = {
   symbol: string;
   company: string;
   publicationDate: string;
-  finalReturn: number;
+  peakReturn: number;
   points: Array<{ day: number; returnPct: number }>;
 };
 
 export type FeatureBucket = {
-  group: 'alignment' | 'high52w' | 'gap';
+  group: 'alignment' | 'high52w';
   label: string;
   count: number;
   medianReturn: number | null;
   hitRate10: number;
   medianDaysToHit10: number | null;
+  /** Two-sided Mann-Whitney U p-value vs the rest of the dimension's
+   * qualifying universe. `null` when either side has too few samples. */
+  pValue: number | null;
 };
 
 export function ReportStatisticsStory({
@@ -32,12 +37,12 @@ export function ReportStatisticsStory({
   pricePaths: { winners: PricePathSeries[]; losers: PricePathSeries[] };
   featureBuckets: FeatureBucket[];
 }) {
-  const currentReturns = summary.riskScatter.map((row) => row.currentReturn).filter(isNumber);
-  const sortedReturns = [...currentReturns].sort((a, b) => a - b);
-  const meanReturn = mean(currentReturns);
+  const peakReturns = summary.riskScatter.map((row) => row.maxFavorableExcursion).filter(isNumber);
+  const sortedReturns = [...peakReturns].sort((a, b) => a - b);
+  const meanReturn = mean(peakReturns);
   const medianReturn = quantileFromSorted(sortedReturns, 0.5);
-  const deepLosers = currentReturns.filter((value) => value <= -0.2).length;
-  const bigWinners = currentReturns.filter((value) => value >= 0.2).length;
+  const hitTargetCount = summary.riskScatter.filter((row) => row.hit10).length;
+  const flatCount = peakReturns.filter((value) => value < 0.05).length;
   const returnQuantiles = {
     min: quantileFromSorted(sortedReturns, 0),
     p10: quantileFromSorted(sortedReturns, 0.1),
@@ -47,11 +52,11 @@ export function ReportStatisticsStory({
     p90: quantileFromSorted(sortedReturns, 0.9),
     max: quantileFromSorted(sortedReturns, 1),
   };
-  const eligiblePathCount = currentReturns.length;
+  const eligiblePathCount = peakReturns.length;
   const pathBuckets = buildPathBuckets(summary.riskScatter);
   const exampleMetaById = buildExampleMetaById(summary.topExamples);
 
-  const trimmedMean10 = trimmedMean(currentReturns, 0.1);
+  const trimmedMean10 = trimmedMean(peakReturns, 0.1);
   const uniqueSymbolCount = new Set(summary.riskScatter.map((row) => row.symbol).filter(Boolean)).size;
   const vintageCohorts = buildVintageCohorts(summary.riskScatter);
   const concentration = buildConcentration(summary.riskScatter);
@@ -72,8 +77,8 @@ export function ReportStatisticsStory({
         trimmed={trimmedMean10}
         sampleSize={eligiblePathCount}
         uniqueSymbols={uniqueSymbolCount}
-        deepLosers={deepLosers}
-        bigWinners={bigWinners}
+        hitTargetCount={hitTargetCount}
+        flatCount={flatCount}
       />
 
       <WholeSampleMap rows={summary.riskScatter} quantiles={returnQuantiles} />
@@ -117,39 +122,38 @@ function DistributionSignature({
   trimmed,
   sampleSize,
   uniqueSymbols,
-  deepLosers,
-  bigWinners,
+  hitTargetCount,
+  flatCount,
 }: {
   mean: number | null;
   median: number | null;
   trimmed: number | null;
   sampleSize: number;
   uniqueSymbols: number;
-  deepLosers: number;
-  bigWinners: number;
+  hitTargetCount: number;
+  flatCount: number;
 }) {
-  const medianX = xScale(median ?? 0, -0.8, 1.2);
-  const meanX = xScale(mean ?? 0, -0.8, 1.2);
-  const trimmedX = xScale(trimmed ?? 0, -0.8, 1.2);
+  const compressDomain = Math.max(0.5, compressReturn(Math.max(1.5, mean ?? 0, median ?? 0, trimmed ?? 0)));
+  const xLin = (value: number) => xScale(compressReturn(Math.max(0, value)), 0, compressDomain);
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5">
       <div className="flex items-center justify-between text-xs text-slate-500">
-        <span>손실 꼬리</span>
-        <span>상승 꼬리</span>
+        <span>발간 시점</span>
+        <span>발간 후 고점</span>
       </div>
-      <div className="relative mt-5 h-24 rounded-xl bg-gradient-to-r from-rose-100 via-slate-100 to-blue-100">
-        <Marker x={medianX} label="중앙값" value={formatPercent(median)} tone="slate" />
-        <Marker x={trimmedX} label="10% 절단 평균" value={formatPercent(trimmed)} tone="amber" />
-        <Marker x={meanX} label="평균" value={formatPercent(mean)} tone="blue" />
+      <div className="relative mt-5 h-24 rounded-xl bg-gradient-to-r from-slate-100 via-emerald-50 to-emerald-200">
+        <Marker x={xLin(median ?? 0)} label="중앙 고점" value={formatPercent(median)} tone="slate" />
+        <Marker x={xLin(trimmed ?? 0)} label="10% 절단 평균" value={formatPercent(trimmed)} tone="amber" />
+        <Marker x={xLin(mean ?? 0)} label="평균 고점" value={formatPercent(mean)} tone="blue" />
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
         <div>
-          <div className="font-mono text-2xl font-semibold text-rose-600">{deepLosers}</div>
-          <div className="text-slate-500">-20% 이하</div>
+          <div className="font-mono text-2xl font-semibold text-emerald-600">{hitTargetCount}</div>
+          <div className="text-slate-500">1.0x 목표 도달</div>
         </div>
         <div className="text-right">
-          <div className="font-mono text-2xl font-semibold text-blue-600">{bigWinners}</div>
-          <div className="text-slate-500">+20% 이상</div>
+          <div className="font-mono text-2xl font-semibold text-slate-500">{flatCount}</div>
+          <div className="text-slate-500">고점 +5% 미만</div>
         </div>
       </div>
       <dl className="mt-4 grid grid-cols-2 gap-x-3 gap-y-1 border-t border-slate-100 pt-3 text-xs">
@@ -240,13 +244,12 @@ function WholeSampleMap({
   quantiles: ReturnQuantiles;
 }) {
   const sortedRows = rows
-    .filter((row) => isNumber(row.currentReturn))
-    .sort((a, b) => (a.currentReturn ?? 0) - (b.currentReturn ?? 0));
-  const maxReturn = sortedRows.length === 0 ? 1 : (sortedRows[sortedRows.length - 1].currentReturn ?? 1);
-  const minReturn = -0.8;
-  const yLo = compressReturn(minReturn);
+    .filter((row) => isNumber(row.maxFavorableExcursion))
+    .sort((a, b) => (a.maxFavorableExcursion ?? 0) - (b.maxFavorableExcursion ?? 0));
+  const maxReturn = sortedRows.length === 0 ? 1 : (sortedRows[sortedRows.length - 1].maxFavorableExcursion ?? 1);
+  const yLo = 0;
   const yHi = compressReturn(Math.max(maxReturn, 1));
-  const yTicks = pickYTicks(maxReturn);
+  const yTicks = pickYTicks(maxReturn).filter((tick) => tick.value >= 0);
   const topThreeIds = new Set(
     [...sortedRows]
       .slice(-3)
@@ -259,10 +262,10 @@ function WholeSampleMap({
       <div className="rounded-2xl border border-slate-200 bg-white p-5">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h3 className="text-sm font-semibold text-slate-950">전체 리포트 수익률 지도</h3>
+            <h3 className="text-sm font-semibold text-slate-950">전체 리포트 발간 후 고점 지도</h3>
             <p className="mt-1 text-xs text-slate-500">
-              점 하나가 리포트 한 건입니다. 왼쪽부터 현재 수익률이 낮은 순서. y축은 큰 폭을 같이 보기 위해 ±50% 안쪽은
-              일정 간격, 바깥은 점점 압축됩니다.
+              점 하나가 리포트 한 건. 왼쪽부터 발간 후 고점이 낮은 순서. y축은 ±50% 안쪽 선형, 바깥 log 압축으로
+              극단까지 같이 보입니다. 점을 누르면 리포트 상세로 이동합니다.
             </p>
           </div>
           <span className="rounded-md bg-slate-100 px-2 py-1 font-mono text-[11px] text-slate-500">
@@ -294,11 +297,11 @@ function WholeSampleMap({
             );
           })}
           {sortedRows.map((row, index) => {
-            const value = row.currentReturn ?? 0;
+            const value = row.maxFavorableExcursion ?? 0;
             const x = sortedRows.length <= 1 ? 50 : (index / (sortedRows.length - 1)) * 100;
             const compressed = compressReturn(value);
             const y = 100 - ((compressed - yLo) / (yHi - yLo)) * 100;
-            const tone = value <= -0.2 ? 'bad' : value >= 0.2 ? 'good' : 'neutral';
+            const tone = row.hit10 ? 'good' : row.hit08 ? 'accent' : row.hit06 ? 'teal' : 'neutral';
             const isTopWinner = topThreeIds.has(row.reportId);
             return (
               <DataPoint
@@ -308,13 +311,14 @@ function WholeSampleMap({
                 tone={tone}
                 x={x}
                 y={y}
+                href={`/reports/${encodeURIComponent(row.symbol)}/${encodeURIComponent(row.reportId)}`}
                 rows={[
-                  ['현재 수익률', formatPercent(row.currentReturn)],
-                  ['최대 상승폭', formatPercent(row.maxFavorableExcursion)],
+                  ['발간 후 고점', formatPercent(row.maxFavorableExcursion)],
                   ['최대 하락폭', formatPercent(row.maxAdverseExcursion)],
+                  ['현재 수익률', formatPercent(row.currentReturn)],
                   ['목표 도달', targetHitLabel(row)],
                 ]}
-                annotation={isTopWinner ? `${row.company} ${formatPercent(row.currentReturn)}` : undefined}
+                annotation={isTopWinner ? `${row.company} ${formatPercent(row.maxFavorableExcursion)}` : undefined}
               />
             );
           })}
@@ -573,8 +577,7 @@ function DataPoint({
   meta,
   tone,
   rows,
-  selected = false,
-  onSelect,
+  href,
   annotation,
 }: {
   x: number;
@@ -583,8 +586,7 @@ function DataPoint({
   meta: string;
   tone: 'good' | 'bad' | 'neutral' | 'accent' | 'teal';
   rows: Array<[string, string]>;
-  selected?: boolean;
-  onSelect?: () => void;
+  href?: string;
   annotation?: string;
 }) {
   const colorClass =
@@ -598,24 +600,14 @@ function DataPoint({
             ? 'bg-teal-600 ring-teal-100'
             : 'bg-slate-400 ring-slate-100';
 
-  return (
-    <button
-      aria-label={`${label} ${rows.map(([key, value]) => `${key} ${value}`).join(', ')}`}
-      className="group absolute z-10 grid size-6 -translate-x-1/2 -translate-y-1/2 place-items-center outline-none"
-      style={{
-        left: `calc(1.25rem + ${x} * (100% - 2.5rem) / 100)`,
-        top: `calc(1.25rem + ${y} * (100% - 2.5rem) / 100)`,
-      }}
-      type="button"
-      onClick={onSelect}
-    >
-      <span
-        className={[
-          'size-2.5 rounded-full ring-4 transition-transform group-hover:scale-150 group-focus-visible:scale-150',
-          selected ? 'scale-150 ring-slate-950/20' : '',
-          colorClass,
-        ].join(' ')}
-      />
+  const positionStyle = {
+    left: `calc(1.25rem + ${x} * (100% - 2.5rem) / 100)`,
+    top: `calc(1.25rem + ${y} * (100% - 2.5rem) / 100)`,
+  };
+  const ariaLabel = `${label} ${rows.map(([key, value]) => `${key} ${value}`).join(', ')}`;
+  const dotClass = `size-2.5 rounded-full ring-4 transition-transform group-hover:scale-150 group-focus-visible:scale-150 ${colorClass}`;
+  const tooltip = (
+    <>
       {annotation ? (
         <span
           aria-hidden="true"
@@ -636,7 +628,24 @@ function DataPoint({
           ))}
         </span>
       </span>
-    </button>
+    </>
+  );
+  const wrapperClass =
+    'group absolute z-10 grid size-6 -translate-x-1/2 -translate-y-1/2 place-items-center outline-none';
+
+  if (href) {
+    return (
+      <Link aria-label={ariaLabel} className={wrapperClass} href={href} style={positionStyle}>
+        <span className={dotClass} />
+        {tooltip}
+      </Link>
+    );
+  }
+  return (
+    <span aria-label={ariaLabel} className={wrapperClass} style={positionStyle}>
+      <span className={dotClass} />
+      {tooltip}
+    </span>
   );
 }
 
@@ -652,6 +661,12 @@ function xScale(value: number, min: number, max: number): number {
   return Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
 }
 
+/** Trading-day index 0 maps to this UTC timestamp; subsequent days are
+ * added in 86400-second increments. lightweight-charts requires actual
+ * unix timestamps for its time axis, so we synthesize a "day → date"
+ * mapping and relabel ticks back to `{N}D` in the formatter. */
+const PRICE_PATH_BASE_TIME = 946684800; // 2000-01-01 UTC
+
 function PricePathOverlay({
   title,
   caption,
@@ -663,6 +678,56 @@ function PricePathOverlay({
   paths: PricePathSeries[];
   tone: 'good' | 'bad';
 }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const node = containerRef.current;
+    if (!node || paths.length === 0) return;
+    const chart: IChartApi = createChart(node, {
+      autoSize: true,
+      layout: { background: { color: 'transparent' }, textColor: '#475569', fontFamily: 'inherit' },
+      grid: { vertLines: { color: '#e2e8f0' }, horzLines: { color: '#e2e8f0' } },
+      rightPriceScale: { borderColor: '#e2e8f0', scaleMargins: { top: 0.05, bottom: 0.08 } },
+      timeScale: {
+        borderColor: '#e2e8f0',
+        timeVisible: false,
+        secondsVisible: false,
+        tickMarkFormatter: (time: number) => {
+          const day = Math.round((time - PRICE_PATH_BASE_TIME) / 86400);
+          return `${day}D`;
+        },
+      },
+      localization: {
+        priceFormatter: (price: number) => `${(price * 100).toFixed(0)}%`,
+        timeFormatter: (time: number) => {
+          const day = Math.round((Number(time) - PRICE_PATH_BASE_TIME) / 86400);
+          return `${day}거래일`;
+        },
+      },
+      crosshair: { mode: 1 },
+    });
+    for (let i = 0; i < paths.length; i += 1) {
+      const path = paths[i];
+      const opacity = 0.4 + 0.55 * (1 - i / Math.max(1, paths.length - 1));
+      const color =
+        tone === 'good' ? `rgba(16, 185, 129, ${opacity.toFixed(2)})` : `rgba(244, 63, 94, ${opacity.toFixed(2)})`;
+      const series = chart.addSeries(LineSeries, {
+        color,
+        lineWidth: 2,
+        priceLineVisible: false,
+        lastValueVisible: false,
+      });
+      series.setData(
+        path.points.map((pt) => ({
+          time: (PRICE_PATH_BASE_TIME + pt.day * 86400) as UTCTimestamp,
+          value: pt.returnPct,
+        })),
+      );
+    }
+    chart.timeScale().fitContent();
+    return () => chart.remove();
+  }, [paths, tone]);
+
   if (paths.length === 0) {
     return (
       <section className="rounded-2xl border border-slate-200 bg-white p-5">
@@ -671,22 +736,6 @@ function PricePathOverlay({
       </section>
     );
   }
-  const maxDay = Math.max(...paths.map((p) => p.points.at(-1)?.day ?? 0));
-  const returns = paths.flatMap((p) => p.points.map((pt) => pt.returnPct));
-  const observedMax = Math.max(0.1, ...returns);
-  const observedMin = Math.min(-0.05, ...returns);
-  const yLo = compressReturn(observedMin);
-  const yHi = compressReturn(observedMax);
-  const yTicks = pickYTicks(observedMax).filter((tick) => tick.value >= observedMin - 0.01);
-  const dayTicks: number[] = [];
-  for (const d of [0, 30, 60, 120, 250, 500, 1000, 1500, 2000]) {
-    if (d <= maxDay) dayTicks.push(d);
-  }
-  if (dayTicks[dayTicks.length - 1] !== maxDay) dayTicks.push(maxDay);
-
-  const lineColor = tone === 'good' ? '16, 185, 129' : '244, 63, 94';
-  const yPos = (value: number) => 100 - ((compressReturn(value) - yLo) / (yHi - yLo)) * 100;
-  const xPos = (day: number) => (maxDay <= 0 ? 0 : (day / maxDay) * 100);
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-5">
@@ -694,77 +743,30 @@ function PricePathOverlay({
         <h3 className="text-sm font-semibold text-slate-950">{title}</h3>
         <p className="mt-1 text-xs text-slate-500">{caption}</p>
       </header>
-      <div className="relative mt-4 h-[28rem] rounded-xl border border-slate-100 bg-white px-12 py-4">
-        {yTicks.map((tick) => {
-          const y = yPos(tick.value);
-          const isZero = tick.value === 0;
+      <div className="mt-4 h-[28rem] w-full overflow-hidden rounded-xl border border-slate-100" ref={containerRef} />
+      <ul className="mt-3 grid gap-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        {paths.map((path, i) => {
+          const opacity = 0.4 + 0.55 * (1 - i / Math.max(1, paths.length - 1));
+          const swatch =
+            tone === 'good' ? `rgba(16, 185, 129, ${opacity.toFixed(2)})` : `rgba(244, 63, 94, ${opacity.toFixed(2)})`;
           return (
-            <div className="pointer-events-none" key={`y-${tick.value}`}>
-              <div
-                className={
-                  isZero
-                    ? 'absolute left-12 right-2 h-px bg-slate-950/30'
-                    : 'absolute left-12 right-2 h-px bg-slate-200/70'
-                }
-                style={{ top: `${y}%` }}
-              />
-              <span
-                className="absolute -translate-y-1/2 font-mono text-[10px] text-slate-500"
-                style={{ top: `${y}%`, left: '0.5rem' }}
+            <li key={path.reportId}>
+              <Link
+                className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs transition-colors hover:bg-slate-50"
+                href={`/reports/${encodeURIComponent(path.symbol)}/${encodeURIComponent(path.reportId)}`}
               >
-                {tick.label}
-              </span>
-            </div>
+                <span
+                  aria-hidden="true"
+                  className="inline-block size-2.5 rounded-full"
+                  style={{ backgroundColor: swatch }}
+                />
+                <span className="truncate font-semibold text-slate-950">{path.company}</span>
+                <span className="ml-auto font-mono tabular-nums text-slate-700">{formatPercent(path.peakReturn)}</span>
+              </Link>
+            </li>
           );
         })}
-        <svg
-          aria-hidden="true"
-          className="absolute inset-0 h-full w-full"
-          preserveAspectRatio="none"
-          viewBox="0 0 100 100"
-        >
-          {paths.map((path, index) => {
-            if (path.points.length < 2) return null;
-            const d = path.points
-              .map((pt, j) => `${j === 0 ? 'M' : 'L'} ${xPos(pt.day).toFixed(2)} ${yPos(pt.returnPct).toFixed(2)}`)
-              .join(' ');
-            const opacity = 0.35 + 0.55 * (1 - index / Math.max(1, paths.length - 1));
-            return (
-              <path
-                d={d}
-                fill="none"
-                key={path.reportId}
-                stroke={`rgba(${lineColor}, ${opacity.toFixed(2)})`}
-                strokeWidth="0.4"
-                vectorEffect="non-scaling-stroke"
-              />
-            );
-          })}
-        </svg>
-        {paths.map((path) => {
-          const last = path.points.at(-1);
-          if (!last) return null;
-          const top = yPos(last.returnPct);
-          return (
-            <span
-              className={`pointer-events-none absolute -translate-y-1/2 whitespace-nowrap rounded-sm bg-white/90 px-1 font-mono text-[10px] tabular-nums shadow-sm ${
-                tone === 'good' ? 'text-emerald-700' : 'text-rose-700'
-              }`}
-              key={`${path.reportId}-label`}
-              style={{ top: `${top}%`, right: '0.25rem' }}
-            >
-              {path.company} {formatPercent(path.finalReturn)}
-            </span>
-          );
-        })}
-        <div className="absolute inset-x-12 bottom-1 flex justify-between font-mono text-[10px] text-slate-400">
-          {dayTicks.map((day) => (
-            <span key={`d-${day}`} style={{ position: 'absolute', left: `${xPos(day)}%` }}>
-              {day}D
-            </span>
-          ))}
-        </div>
-      </div>
+      </ul>
     </section>
   );
 }
@@ -787,7 +789,7 @@ function buildVintageCohorts(rows: RiskScatterRow[]): VintageCohort[] {
     const bucket = byYear.get(year) ?? { reports: 0, hits: 0, returns: [] };
     bucket.reports += 1;
     if (row.hit10) bucket.hits += 1;
-    if (isNumber(row.currentReturn)) bucket.returns.push(row.currentReturn);
+    if (isNumber(row.maxFavorableExcursion)) bucket.returns.push(row.maxFavorableExcursion);
     byYear.set(year, bucket);
   }
   return Array.from(byYear.entries())
@@ -879,7 +881,6 @@ function FeatureBucketsTable({ buckets }: { buckets: FeatureBucket[] }) {
   const groups: Array<{ id: FeatureBucket['group']; label: string }> = [
     { id: 'alignment', label: '추세 정배열' },
     { id: 'high52w', label: '52주 고가 근접도' },
-    { id: 'gap', label: '발간일 갭' },
   ];
   return (
     <section
@@ -954,7 +955,7 @@ type ConcentrationRow = {
  * carry most of the upside. */
 function buildConcentration(rows: RiskScatterRow[]): ConcentrationRow[] {
   const positive = rows
-    .map((row) => row.currentReturn)
+    .map((row) => row.maxFavorableExcursion)
     .filter(isNumber)
     .filter((value): value is number => value > 0)
     .sort((a, b) => b - a);
@@ -972,9 +973,9 @@ function ConcentrationInsight({ rows }: { rows: ConcentrationRow[] }) {
   return (
     <div className="grid gap-4">
       <div className="rounded-2xl border border-slate-200 bg-white p-5">
-        <h3 className="text-sm font-semibold text-slate-950">상위 N건이 누적 (+) 수익의 몇 %를 만들었나</h3>
+        <h3 className="text-sm font-semibold text-slate-950">상위 N건이 누적 고점 수익의 몇 %를 만들었나</h3>
         <p className="mt-1 text-xs text-slate-500">
-          전체 표본의 (+) 수익률을 모두 더한 값을 100%로 두고, 상위 몇 건이 그중 얼마를 차지하는지 봅니다.
+          모든 리포트의 발간 후 고점 수익률을 더한 값을 100%로 두고, 상위 몇 건이 그중 얼마를 차지하는지 봅니다.
         </p>
         <div className="mt-5 grid gap-4">
           {rows.map((row) => (
@@ -998,14 +999,17 @@ function ConcentrationInsight({ rows }: { rows: ConcentrationRow[] }) {
 }
 
 function WinnersLosersBoard({ rows }: { rows: RiskScatterRow[] }) {
-  const eligible = rows.filter((row) => isNumber(row.currentReturn));
-  const sorted = [...eligible].sort((a, b) => (b.currentReturn ?? 0) - (a.currentReturn ?? 0));
-  const winners = sorted.slice(0, 10);
-  const losers = [...eligible].sort((a, b) => (a.currentReturn ?? 0) - (b.currentReturn ?? 0)).slice(0, 5);
+  const eligible = rows.filter((row) => isNumber(row.maxFavorableExcursion));
+  const winners = [...eligible]
+    .sort((a, b) => (b.maxFavorableExcursion ?? 0) - (a.maxFavorableExcursion ?? 0))
+    .slice(0, 10);
+  const losers = [...eligible]
+    .sort((a, b) => (a.maxFavorableExcursion ?? 0) - (b.maxFavorableExcursion ?? 0))
+    .slice(0, 5);
   return (
     <div className="grid gap-4 lg:grid-cols-2">
-      <CaseList title="가장 크게 간 종목 10" tone="good" rows={winners} />
-      <CaseList title="가장 크게 빠진 종목 5" tone="bad" rows={losers} />
+      <CaseList title="고점 기준 가장 크게 간 종목 10" tone="good" rows={winners} />
+      <CaseList title="발간 후 거의 못 오른 종목 5" tone="bad" rows={losers} />
     </div>
   );
 }
@@ -1020,17 +1024,22 @@ function CaseList({ title, tone, rows }: { title: string; tone: 'good' | 'bad'; 
       </header>
       <ol className="divide-y divide-slate-100">
         {rows.map((row, index) => (
-          <li className="grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3" key={row.reportId}>
-            <span className="font-mono text-xs text-slate-400">{String(index + 1).padStart(2, '0')}</span>
-            <div className="min-w-0">
-              <div className="truncate text-sm font-semibold text-slate-950">{row.company}</div>
-              <div className="mt-0.5 truncate font-mono text-[11px] text-slate-500">
-                {row.symbol} · 발간 {row.publicationDate} · {targetHitLabel(row)}
+          <li key={row.reportId}>
+            <Link
+              className="grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 transition-colors hover:bg-slate-50"
+              href={`/reports/${encodeURIComponent(row.symbol)}/${encodeURIComponent(row.reportId)}`}
+            >
+              <span className="font-mono text-xs text-slate-400">{String(index + 1).padStart(2, '0')}</span>
+              <div className="min-w-0">
+                <div className="truncate text-sm font-semibold text-slate-950">{row.company}</div>
+                <div className="mt-0.5 truncate font-mono text-[11px] text-slate-500">
+                  {row.symbol} · 발간 {row.publicationDate} · {targetHitLabel(row)}
+                </div>
               </div>
-            </div>
-            <span className={`text-right font-mono text-base font-semibold tabular-nums ${valueColor}`}>
-              {formatPercent(row.currentReturn)}
-            </span>
+              <span className={`text-right font-mono text-base font-semibold tabular-nums ${valueColor}`}>
+                {formatPercent(row.maxFavorableExcursion)}
+              </span>
+            </Link>
           </li>
         ))}
       </ol>
