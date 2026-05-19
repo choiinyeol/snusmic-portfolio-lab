@@ -20,6 +20,40 @@
 
 ---
 
+## v0.21.12-price-path-overlay.1 — 2026-05-19
+
+### 제거 (집계만 보여주던 섹션)
+- `/statistics`에서 200개 표본의 cross-section 평균에 가까운 집계 섹션을 모두 제거. holding effect에 압도되어 정보 가치가 낮다는 사용자 피드백 반영.
+  - `RiskScatter` (전체 표본의 최대 상승폭·최대 하락폭) — y축 1.5x 클리핑이 있어 1800% 같은 outlier도 잘렸음.
+  - `FractionalHitFigure` (목표가 도달률 + Wilson CI) 및 그 상위 컨트롤 섹션 전체.
+  - `DelayHeatmap` (진입 시점별 결과) 및 그 컨트롤 섹션 전체.
+  - `ControlStrip` 컴포넌트 (호출자 사라짐).
+- `useState` import도 같이 제거 (남은 페이지가 전부 서버 상태로만 동작).
+
+### 추가 (개별 종목 가격 경로)
+- `PricePathOverlay` 컴포넌트 신설: 발간 당일을 0%로 두고 거래일 경과에 따라 누적 수익률을 SVG line으로 그림.
+  - 상위 10건 (가장 크게 간 종목들) — 에메랄드 톤
+  - 하위 5건 (가장 크게 빠진 종목들) — 로즈 톤
+  - y축은 ±50% 안쪽 선형 + 바깥 log10 압축 signed-log (HD현대일렉트릭 +1800% 끝까지 보임)
+  - x축은 거래일 단위, 0/30/60/120/250/500/1000D tick
+  - 각 라인 끝에 회사명 + 최종 수익률 라벨
+  - 라인 색 진하기는 순위에 따라 변화 (1등이 가장 진함)
+- `apps/web/app/(app)/statistics/page.tsx`에서 server-side로 winners/losers 가격 경로 계산. `getPriceSeries(symbol, publicationDate)`로 발간일부터 종가 시리즈를 가져와 60 포인트로 리샘플 후 클라이언트로 전달.
+- `ReportStatisticsStory`가 새 prop `pricePaths: { winners, losers }`를 받음.
+
+### 동기
+- 사용자 피드백: "전체 통계라서 왜곡 가능. 차라리 개별 누적수익률 또는 가격 경로 그래프를 두는 건 어때? 성공하는 주식/실패하는 주식의 가격 추이." 종목 단위 raw 경로가 200개 집계보다 retail 인사이트가 큼.
+
+### 후속 (다음 이터레이션)
+- "정배열인 주식이 얼마만에 잘 되더라" — 발간 시점 기술적 특성(SMA20/50/200 정배열, 52주 신고가 근접, 갭) → 결과 outcome 분석 테이블. 현재는 인프라(getPriceSeries 활용 패턴)까지 정리됨.
+
+### 검증
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web build` (정적 페이지 413개)
+
+---
+
 ## v0.21.11-formal-report-tone.1 — 2026-05-19
 
 ### 변경 (페이지 톤)

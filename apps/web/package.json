@@ -1,6 +1,6 @@
 {
   "name": "snusmic-portfolio-lab-web",
-  "version": "0.21.11",
+  "version": "0.21.12",
   "private": true,
   "scripts": {
     "dev": "next dev",

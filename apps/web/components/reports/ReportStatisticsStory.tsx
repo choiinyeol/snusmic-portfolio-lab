@@ -1,20 +1,26 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import type { ReportStatisticsLabSummary } from '@/lib/artifacts';
-import { formatDays, formatPercent } from '@/lib/format';
+import { formatPercent } from '@/lib/format';
 import { formatMultiple, isNumber, mean, quantileFromSorted, trimmedMean, wilsonCI } from '@/lib/report-statistics';
 
-const HORIZONS = [30, 60, 120, 250] as const;
-const THRESHOLDS = [0.6, 0.8, 1.0] as const;
+export type PricePathSeries = {
+  reportId: string;
+  symbol: string;
+  company: string;
+  publicationDate: string;
+  finalReturn: number;
+  points: Array<{ day: number; returnPct: number }>;
+};
 
-export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLabSummary }) {
-  const [threshold, setThreshold] = useState(0.8);
-  const [horizon, setHorizon] = useState(120);
-  const thresholdRows = summary.fractionalHitRates.filter((row) => row.threshold === threshold);
-  const selectedHit = thresholdRows.find((row) => row.horizonDays === horizon) ?? thresholdRows.at(-1);
-  const delayRows = summary.delayedEntry.filter((row) => row.horizonDays === horizon);
+export function ReportStatisticsStory({
+  summary,
+  pricePaths,
+}: {
+  summary: ReportStatisticsLabSummary;
+  pricePaths: { winners: PricePathSeries[]; losers: PricePathSeries[] };
+}) {
   const currentReturns = summary.riskScatter.map((row) => row.currentReturn).filter(isNumber);
   const sortedReturns = [...currentReturns].sort((a, b) => a - b);
   const meanReturn = mean(currentReturns);
@@ -38,9 +44,6 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
   const uniqueSymbolCount = new Set(summary.riskScatter.map((row) => row.symbol).filter(Boolean)).size;
   const vintageCohorts = buildVintageCohorts(summary.riskScatter);
   const concentration = buildConcentration(summary.riskScatter);
-
-  const day0Median = delayRows.find((row) => row.delayDays === 0)?.medianReturn ?? null;
-  const day20Median = delayRows.find((row) => row.delayDays === 20)?.medianReturn ?? null;
 
   return (
     <div className="grid gap-10">
@@ -66,47 +69,25 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
 
       <WinnersLosersBoard rows={summary.riskScatter} />
 
+      <PricePathOverlay
+        title="가장 크게 간 종목 10건의 가격 경로"
+        caption="발간 당일을 0%로 두고 거래일 기준 경과 시간에 따라 누적 수익률을 그렸습니다."
+        paths={pricePaths.winners}
+        tone="good"
+      />
+
+      <PricePathOverlay
+        title="가장 크게 빠진 종목 5건의 가격 경로"
+        caption="발간 당일을 0%로 두고 거래일 기준 경과 시간에 따라 누적 수익률을 그렸습니다."
+        paths={pricePaths.losers}
+        tone="bad"
+      />
+
       <ConcentrationInsight rows={concentration} />
 
       <PathBucketPanel buckets={pathBuckets} exampleMetaById={exampleMetaById} total={eligiblePathCount} />
 
       <VintageCohortTable cohorts={vintageCohorts} />
-
-      <RiskScatter rows={summary.riskScatter} />
-
-      <section className="grid gap-3">
-        <header>
-          <h2 className="text-sm font-semibold text-slate-950">목표가 도달률</h2>
-          <p className="mt-1 text-xs text-slate-500">
-            목표 기준 {threshold.toFixed(1)}x · 보유 기간 {horizon}거래일에서 도달률{' '}
-            {formatPercent(selectedHit?.hitRate)} · 도달 중앙 시간 {formatDays(selectedHit?.medianDaysToHit)}.
-          </p>
-        </header>
-        <ControlStrip
-          label="목표 기준"
-          options={THRESHOLDS.map((value) => ({ value, label: `${value.toFixed(1)}x` }))}
-          value={threshold}
-          onChange={setThreshold}
-        />
-        <FractionalHitFigure rows={thresholdRows} />
-      </section>
-
-      <section className="grid gap-3">
-        <header>
-          <h2 className="text-sm font-semibold text-slate-950">진입 시점별 결과</h2>
-          <p className="mt-1 text-xs text-slate-500">
-            보유 기간 {horizon}거래일 · 당일 진입 중앙 수익률 {formatPercent(day0Median)} · 20일 지연{' '}
-            {formatPercent(day20Median)}.
-          </p>
-        </header>
-        <ControlStrip
-          label="보유 기간"
-          options={HORIZONS.map((value) => ({ value, label: `${value}D` }))}
-          value={horizon}
-          onChange={setHorizon}
-        />
-        <DelayHeatmap rows={delayRows} />
-      </section>
 
       <DataNoteFooter
         sampleSize={eligiblePathCount}
@@ -572,213 +553,6 @@ function bucketToneClass(tone: PathBucket['tone']): string {
   return 'text-slate-700';
 }
 
-function ControlStrip<T extends number>({
-  label,
-  options,
-  value,
-  onChange,
-}: {
-  label: string;
-  options: Array<{ value: T; label: string }>;
-  value: T;
-  onChange: (value: T) => void;
-}) {
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="text-xs font-medium text-slate-500">{label}</span>
-      {options.map((option) => (
-        <button
-          className={`rounded-md border px-3 py-1.5 text-xs font-semibold ${option.value === value ? 'border-slate-950 bg-slate-950 text-white' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'}`}
-          key={option.value}
-          type="button"
-          onClick={() => onChange(option.value)}
-        >
-          {option.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function FractionalHitFigure({ rows }: { rows: ReportStatisticsLabSummary['fractionalHitRates'] }) {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5">
-      <div className="grid gap-4 md:grid-cols-4">
-        {rows.map((row) => {
-          const ci = wilsonCI(row.hitCount ?? 0, row.sampleSize ?? 0);
-          const point = (row.hitRate ?? ci.point) * 100;
-          return (
-            <div key={row.horizonDays}>
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="text-sm font-semibold text-slate-950">{row.horizonDays}D</span>
-                <span className="font-mono text-sm font-semibold tabular-nums text-slate-950">
-                  {formatPercent(row.hitRate)}
-                </span>
-              </div>
-              <div className="relative mt-2 h-28 rounded-md bg-slate-100">
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-x-2 rounded bg-slate-300/70"
-                  style={{
-                    bottom: `${Math.max(0, ci.lo * 100)}%`,
-                    height: `${Math.max(0, (ci.hi - ci.lo) * 100)}%`,
-                  }}
-                />
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-x-2 h-[2px] bg-slate-950"
-                  style={{ bottom: `${Math.max(2, point)}%` }}
-                />
-              </div>
-              <div className="mt-2 text-xs text-slate-500">
-                {row.hitCount}/{row.sampleSize} · 추정 범위 {formatPercent(ci.lo)}–{formatPercent(ci.hi)}
-              </div>
-              <div className="mt-0.5 text-[10px] text-slate-400">중앙 {formatDays(row.medianDaysToHit)}</div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function DelayHeatmap({ rows }: { rows: ReportStatisticsLabSummary['delayedEntry'] }) {
-  const maxAbs = Math.max(0.05, ...rows.map((row) => Math.abs(row.medianReturn ?? 0)));
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5">
-      <div className="grid gap-2 md:grid-cols-6">
-        {rows.map((row) => {
-          const value = row.medianReturn ?? 0;
-          const intensity = Math.min(1, Math.abs(value) / maxAbs);
-          return (
-            <div className="rounded-xl border border-slate-100 p-3" key={row.delayDays}>
-              <div className="text-xs text-slate-500">{row.delayDays}일 뒤</div>
-              <div
-                className={`mt-3 rounded-lg p-3 ${value >= 0 ? 'bg-blue-50 text-blue-700' : 'bg-rose-50 text-rose-700'}`}
-                style={{ opacity: 0.45 + intensity * 0.55 }}
-              >
-                <div className="font-mono text-lg font-semibold tabular-nums">{formatPercent(value)}</div>
-                <div className="mt-1 text-[11px]">0.8x {formatPercent(row.hitRate08)}</div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function RiskScatter({ rows }: { rows: ReportStatisticsLabSummary['riskScatter'] }) {
-  const [view, setView] = useState<'all' | 'hit10' | 'partial' | 'lossTail'>('all');
-  const [selectedId, setSelectedId] = useState<string | null>(rows[0]?.reportId ?? null);
-  const visibleRows = rows.filter((row) => {
-    if (view === 'hit10') return row.hit10;
-    if (view === 'partial') return row.hit08 && !row.hit10;
-    if (view === 'lossTail') return (row.maxAdverseExcursion ?? 0) <= -0.5 || (row.currentReturn ?? 0) <= -0.3;
-    return true;
-  });
-  const selected = rows.find((row) => row.reportId === selectedId) ?? visibleRows[0] ?? null;
-
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5">
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h3 className="text-sm font-semibold text-slate-950">전체 표본의 최대 상승폭·최대 하락폭</h3>
-          <p className="mt-1 text-xs text-slate-500">
-            오른쪽으로 갈수록 중간 손실이 작고, 위로 갈수록 발간 이후 상승 여지가 컸습니다.
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-1.5">
-          {[
-            ['all', '전체'],
-            ['hit10', '1.0x'],
-            ['partial', '0.8x만'],
-            ['lossTail', '손실 꼬리'],
-          ].map(([id, label]) => (
-            <button
-              className={[
-                'h-7 rounded-md border px-2 text-[11px] font-semibold transition-colors',
-                view === id
-                  ? 'border-slate-950 bg-slate-950 text-white'
-                  : 'border-slate-200 bg-white text-slate-500 hover:bg-slate-50',
-              ].join(' ')}
-              key={id}
-              type="button"
-              onClick={() => setView(id as typeof view)}
-            >
-              {label}
-            </button>
-          ))}
-          <span className="rounded-md bg-slate-100 px-2 py-1 font-mono text-[11px] text-slate-500">
-            n={visibleRows.length.toLocaleString('ko-KR')}
-          </span>
-        </div>
-      </div>
-      <div className="relative h-80 rounded-xl border border-slate-100 bg-[linear-gradient(to_right,rgba(226,232,240,.7)_1px,transparent_1px),linear-gradient(to_bottom,rgba(226,232,240,.7)_1px,transparent_1px)] bg-[size:12.5%_25%] px-5 py-5">
-        <div className="absolute bottom-8 left-5 text-[11px] text-slate-500">최대 하락폭</div>
-        <div className="absolute left-5 top-3 text-[11px] text-slate-500">최대 상승폭</div>
-        {visibleRows.map((row) => {
-          const adverse = Math.max(-0.8, Math.min(0, row.maxAdverseExcursion ?? 0));
-          const favorable = Math.max(0, Math.min(1.5, row.maxFavorableExcursion ?? 0));
-          const x = xScale(adverse, -0.8, 0);
-          const y = 100 - xScale(favorable, 0, 1.5);
-          const tone = row.hit10 ? 'good' : row.hit08 ? 'accent' : row.hit06 ? 'teal' : 'neutral';
-          return (
-            <DataPoint
-              key={row.reportId}
-              label={`${row.company} (${row.symbol})`}
-              meta={row.publicationDate}
-              tone={tone}
-              x={x}
-              y={y}
-              selected={row.reportId === selected?.reportId}
-              onSelect={() => setSelectedId(row.reportId)}
-              rows={[
-                ['최대 상승폭', formatPercent(row.maxFavorableExcursion)],
-                ['최대 하락폭', formatPercent(row.maxAdverseExcursion)],
-                ['현재 수익률', formatPercent(row.currentReturn)],
-                ['목표 도달', targetHitLabel(row)],
-              ]}
-            />
-          );
-        })}
-      </div>
-      <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-500">
-        <span>파랑: 1.0x 도달</span>
-        <span>보라: 0.8x 도달</span>
-        <span>청록: 0.6x 도달</span>
-        <span>회색: 미도달</span>
-      </div>
-      {selected ? (
-        <div className="mt-4 grid gap-3 rounded-xl border border-slate-100 bg-slate-50 p-4 text-sm md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
-          <div className="min-w-0">
-            <div className="font-semibold text-slate-950">
-              {selected.company} ({selected.symbol})
-            </div>
-            <p className="mt-1 text-xs leading-5 text-slate-500">
-              {selected.publicationDate} 발간 · 목표 {targetHitLabel(selected)} · 현재{' '}
-              {formatPercent(selected.currentReturn)}
-            </p>
-          </div>
-          <div className="grid gap-2 text-xs md:justify-items-end">
-            <div className="grid grid-cols-3 gap-3 font-mono tabular-nums text-slate-700">
-              <span>최대상승 {formatPercent(selected.maxFavorableExcursion)}</span>
-              <span>최대하락 {formatPercent(selected.maxAdverseExcursion)}</span>
-              <span>포착률 {formatNumber(selected.upsideCaptureRatio)}x</span>
-            </div>
-            <Link
-              className="inline-flex h-8 items-center rounded-md border border-slate-200 bg-white px-3 font-medium text-slate-700 hover:bg-slate-50"
-              href={`/reports/${encodeURIComponent(selected.symbol)}/${encodeURIComponent(selected.reportId)}`}
-            >
-              리포트 상세 보기
-            </Link>
-          </div>
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
 function DataPoint({
   x,
   y,
@@ -865,9 +639,121 @@ function xScale(value: number, min: number, max: number): number {
   return Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
 }
 
-function formatNumber(value: number | null | undefined): string {
-  if (value === null || value === undefined || !Number.isFinite(value)) return '—';
-  return value.toLocaleString('ko-KR', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+function PricePathOverlay({
+  title,
+  caption,
+  paths,
+  tone,
+}: {
+  title: string;
+  caption: string;
+  paths: PricePathSeries[];
+  tone: 'good' | 'bad';
+}) {
+  if (paths.length === 0) {
+    return (
+      <section className="rounded-2xl border border-slate-200 bg-white p-5">
+        <h3 className="text-sm font-semibold text-slate-950">{title}</h3>
+        <p className="mt-2 text-xs text-slate-500">표시할 가격 경로가 없습니다.</p>
+      </section>
+    );
+  }
+  const maxDay = Math.max(...paths.map((p) => p.points.at(-1)?.day ?? 0));
+  const returns = paths.flatMap((p) => p.points.map((pt) => pt.returnPct));
+  const observedMax = Math.max(0.1, ...returns);
+  const observedMin = Math.min(-0.05, ...returns);
+  const yLo = compressReturn(observedMin);
+  const yHi = compressReturn(observedMax);
+  const yTicks = pickYTicks(observedMax).filter((tick) => tick.value >= observedMin - 0.01);
+  const dayTicks: number[] = [];
+  for (const d of [0, 30, 60, 120, 250, 500, 1000, 1500, 2000]) {
+    if (d <= maxDay) dayTicks.push(d);
+  }
+  if (dayTicks[dayTicks.length - 1] !== maxDay) dayTicks.push(maxDay);
+
+  const lineColor = tone === 'good' ? '16, 185, 129' : '244, 63, 94';
+  const yPos = (value: number) => 100 - ((compressReturn(value) - yLo) / (yHi - yLo)) * 100;
+  const xPos = (day: number) => (maxDay <= 0 ? 0 : (day / maxDay) * 100);
+
+  return (
+    <section className="rounded-2xl border border-slate-200 bg-white p-5">
+      <header>
+        <h3 className="text-sm font-semibold text-slate-950">{title}</h3>
+        <p className="mt-1 text-xs text-slate-500">{caption}</p>
+      </header>
+      <div className="relative mt-4 h-[28rem] rounded-xl border border-slate-100 bg-white px-12 py-4">
+        {yTicks.map((tick) => {
+          const y = yPos(tick.value);
+          const isZero = tick.value === 0;
+          return (
+            <div className="pointer-events-none" key={`y-${tick.value}`}>
+              <div
+                className={
+                  isZero
+                    ? 'absolute left-12 right-2 h-px bg-slate-950/30'
+                    : 'absolute left-12 right-2 h-px bg-slate-200/70'
+                }
+                style={{ top: `${y}%` }}
+              />
+              <span
+                className="absolute -translate-y-1/2 font-mono text-[10px] text-slate-500"
+                style={{ top: `${y}%`, left: '0.5rem' }}
+              >
+                {tick.label}
+              </span>
+            </div>
+          );
+        })}
+        <svg
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full"
+          preserveAspectRatio="none"
+          viewBox="0 0 100 100"
+        >
+          {paths.map((path, index) => {
+            if (path.points.length < 2) return null;
+            const d = path.points
+              .map((pt, j) => `${j === 0 ? 'M' : 'L'} ${xPos(pt.day).toFixed(2)} ${yPos(pt.returnPct).toFixed(2)}`)
+              .join(' ');
+            const opacity = 0.35 + 0.55 * (1 - index / Math.max(1, paths.length - 1));
+            return (
+              <path
+                d={d}
+                fill="none"
+                key={path.reportId}
+                stroke={`rgba(${lineColor}, ${opacity.toFixed(2)})`}
+                strokeWidth="0.4"
+                vectorEffect="non-scaling-stroke"
+              />
+            );
+          })}
+        </svg>
+        {paths.map((path) => {
+          const last = path.points.at(-1);
+          if (!last) return null;
+          const top = yPos(last.returnPct);
+          return (
+            <span
+              className={`pointer-events-none absolute -translate-y-1/2 whitespace-nowrap rounded-sm bg-white/90 px-1 font-mono text-[10px] tabular-nums shadow-sm ${
+                tone === 'good' ? 'text-emerald-700' : 'text-rose-700'
+              }`}
+              key={`${path.reportId}-label`}
+              style={{ top: `${top}%`, right: '0.25rem' }}
+            >
+              {path.company} {formatPercent(path.finalReturn)}
+            </span>
+          );
+        })}
+        <div className="absolute inset-x-12 bottom-1 flex justify-between font-mono text-[10px] text-slate-400">
+          {dayTicks.map((day) => (
+            <span key={`d-${day}`} style={{ position: 'absolute', left: `${xPos(day)}%` }}>
+              {day}D
+            </span>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
 
 type VintageCohort = {
