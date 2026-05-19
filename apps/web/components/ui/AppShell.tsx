@@ -193,7 +193,6 @@ export function AppShell({
               <Badge className="hidden font-mono sm:inline-flex" variant="outline">
                 {snapshotDate || '—'}
               </Badge>
-              <Badge variant="success">읽기 전용</Badge>
               <Button asChild size="sm" variant="outline">
                 <Link href="/guide">읽는 법</Link>
               </Button>

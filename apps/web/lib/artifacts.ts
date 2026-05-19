@@ -448,6 +448,12 @@ export type ReportStatisticsLabSummary = {
      * clipped to a window; `null` if the window has not fully elapsed
      * yet (active reports inside their first N days). */
     expiryReturn?: number | null;
+    /** Absolute KRW close at the window's expiry day. Null when the
+     * window is still in progress. */
+    expiryCloseKrw?: number | null;
+    /** ISO date string for the expiry day's bar. Useful when surfacing
+     * "만료 시점" rows on per-report views. */
+    expiryDate?: string | null;
     hit06: boolean;
     hit08: boolean;
     hit10: boolean;

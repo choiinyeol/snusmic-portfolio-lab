@@ -47,38 +47,38 @@ export type FeatureBucket = {
   pValue: number | null;
 };
 
-export type EarlyExitRule = {
-  signalDay: number;
-  threshold: number;
+export type ConfirmationSignal = {
+  id:
+    | 'risk_no_5pct_60d'
+    | 'risk_deep_drop_20d'
+    | 'risk_first_5_negative'
+    | 'pass_first_5pct_5d'
+    | 'pass_first_5pct_21_60'
+    | 'pass_dip_recover';
+  kind: 'risk' | 'pass';
   label: string;
-  triggered: number;
-  triggeredDevastating: number;
-  triggeredDeclining: number;
-  triggeredTarget: number;
-  notTriggered: number;
-  totalDevastating: number;
-  totalTarget: number;
-  /** Of all devastating outcomes, how many would this rule have caught
-   * early (and therefore prevented the catastrophic drawdown). */
-  avoidedDevastating: number;
-  avoidedDevastatingRate: number;
-  /** Of all target hits, how many would this rule have wrongly exited
-   * before the win materialized. The cost side of the rule. */
-  lostTarget: number;
-  lostTargetRate: number;
+  description: string;
+  cohortSize: number;
+  cohortShare: number;
+  successRate: number;
+  devastatingRate: number;
+  targetRate: number;
+  baselineSuccess: number;
+  baselineDevastating: number;
+  baselineTarget: number;
 };
 
 export function ReportStatisticsStory({
   summary,
   pricePaths,
   featureBuckets,
-  earlyExitRules,
+  confirmationSignals,
   windowDays,
 }: {
   summary: ReportStatisticsLabSummary;
   pricePaths: { winners: PricePathSeries[]; losers: PricePathSeries[] };
   featureBuckets: FeatureBucket[];
-  earlyExitRules: EarlyExitRule[];
+  confirmationSignals: ConfirmationSignal[];
   windowDays: number;
 }) {
   const peakReturns = summary.riskScatter.map((row) => row.maxFavorableExcursion).filter(isNumber);
@@ -152,7 +152,7 @@ export function ReportStatisticsStory({
 
       <ConcentrationInsight rows={concentration} />
 
-      <EarlyExitRulesTable rules={earlyExitRules} />
+      <ConfirmationSignalsTable signals={confirmationSignals} />
 
       <FeatureBucketsTable buckets={featureBuckets} />
 
@@ -430,19 +430,23 @@ function OutcomeBreakdownPanel({ rows }: { rows: RiskScatterRow[] }) {
     counts.set(id, (counts.get(id) ?? 0) + 1);
   }
   const total = rows.length;
-  const devastating = counts.get('devastating') ?? 0;
-  const declining = counts.get('declining') ?? 0;
+  const successCount = OUTCOME_CATEGORIES.filter((c) => c.kind === 'success').reduce(
+    (sum, c) => sum + (counts.get(c.id) ?? 0),
+    0,
+  );
+  const failureCount = total - successCount;
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="text-sm font-semibold text-slate-950">결과 분류</h3>
+        <h3 className="text-sm font-semibold text-slate-950">결과 분류 (기회비용 기준)</h3>
         <p className="font-mono text-[11px] text-slate-500">
-          치명적+손실 {devastating + declining}건 ({total ? formatPercent((devastating + declining) / total) : '—'})
+          성공 {successCount}건 ({total ? formatPercent(successCount / total) : '—'}) · 실패 {failureCount}건 (
+          {total ? formatPercent(failureCount / total) : '—'})
         </p>
       </div>
       <p className="mt-1 text-xs text-slate-500">
-        매수해서 조금 오르거나 목표가에 못 닿은 건 큰 문제 아니지만, 발간 후 거의 못 오르고 만료까지 깊게 하락한 표본은
-        별도로 봅니다.
+        목표 도달, 부분 도달, +30% 이상 상승 기회는 성공으로 봅니다. 횡보·손실·치명적 손실은 실패 — 매수 대신 다른
+        종목을 골랐다면 더 나았을 기회비용까지 포함해서 본 분류입니다.
       </p>
       <div className="mt-4 grid gap-2">
         {OUTCOME_CATEGORIES.map((category) => {
@@ -481,6 +485,8 @@ type OutcomeMeta = {
   description: string;
   tone: 'good' | 'accent' | 'teal' | 'neutral' | 'warning' | 'bad';
   swatchClass: string;
+  /** 기회비용 관점에서 횡보/손실/치명적은 모두 실패로 본다. */
+  kind: 'success' | 'failure';
 };
 
 const OUTCOME_CATEGORIES: OutcomeMeta[] = [
@@ -490,6 +496,7 @@ const OUTCOME_CATEGORIES: OutcomeMeta[] = [
     description: '발간 후 500거래일 안에 목표가에 한 번이라도 도달',
     tone: 'good',
     swatchClass: 'bg-blue-600',
+    kind: 'success',
   },
   {
     id: 'partial',
@@ -497,20 +504,23 @@ const OUTCOME_CATEGORIES: OutcomeMeta[] = [
     description: '목표가의 60–80% 구간까지 도달',
     tone: 'accent',
     swatchClass: 'bg-violet-600',
+    kind: 'success',
   },
   {
     id: 'upside',
     label: '상승 기회 있었음',
-    description: '목표 미도달이지만 발간 후 한 번이라도 +20% 이상 올랐던 표본',
+    description: '목표 미도달이지만 발간 후 한 번이라도 +30% 이상 올랐던 표본',
     tone: 'teal',
     swatchClass: 'bg-teal-600',
+    kind: 'success',
   },
   {
     id: 'flat',
     label: '횡보',
-    description: '발간 후 큰 등락 없이 ±10% 안쪽으로 끝난 표본',
+    description: '발간 후 큰 등락 없이 ±10% 안쪽으로 끝남 — 기회비용 기준 실패',
     tone: 'neutral',
     swatchClass: 'bg-slate-400',
+    kind: 'failure',
   },
   {
     id: 'declining',
@@ -518,6 +528,7 @@ const OUTCOME_CATEGORIES: OutcomeMeta[] = [
     description: '만료 시점 종가가 -10% ~ -30% 사이',
     tone: 'warning',
     swatchClass: 'bg-amber-500',
+    kind: 'failure',
   },
   {
     id: 'devastating',
@@ -525,6 +536,7 @@ const OUTCOME_CATEGORIES: OutcomeMeta[] = [
     description: '발간 후 거의 못 오르고 만료 종가가 -30% 이하 — "사면 안 됐던" 표본',
     tone: 'bad',
     swatchClass: 'bg-rose-600',
+    kind: 'failure',
   },
 ];
 
@@ -537,7 +549,7 @@ function classifyOutcome(row: RiskScatterRow): OutcomeCategory {
   if (row.hit10) return 'target';
   if (row.hit08 || row.hit06) return 'partial';
   const peak = row.maxFavorableExcursion ?? 0;
-  if (peak >= 0.2) return 'upside';
+  if (peak >= 0.3) return 'upside';
   const ref = row.expiryReturn ?? row.currentReturn ?? 0;
   if (ref <= -0.3) return 'devastating';
   if (ref <= -0.1) return 'declining';
@@ -1186,72 +1198,100 @@ function VintageCohortTable({ cohorts }: { cohorts: VintageCohort[] }) {
   );
 }
 
-function EarlyExitRulesTable({ rules }: { rules: EarlyExitRule[] }) {
-  if (rules.length === 0) return null;
-  const best = [...rules].sort((a, b) => {
-    const aScore = a.avoidedDevastatingRate - a.lostTargetRate;
-    const bScore = b.avoidedDevastatingRate - b.lostTargetRate;
-    return bScore - aScore;
-  })[0];
+function ConfirmationSignalsTable({ signals }: { signals: ConfirmationSignal[] }) {
+  if (signals.length === 0) return null;
+  const baselineSuccess = signals[0].baselineSuccess;
+  const baselineDevastating = signals[0].baselineDevastating;
+  const baselineTarget = signals[0].baselineTarget;
+  const groups: Array<{ kind: ConfirmationSignal['kind']; label: string; tone: 'risk' | 'pass' }> = [
+    { kind: 'risk', label: '위험 신호 (이 코호트에 들면 결과가 평균보다 나쁘다)', tone: 'risk' },
+    { kind: 'pass', label: '확인 신호 (이 코호트에 들면 결과가 평균보다 좋다)', tone: 'pass' },
+  ];
   return (
-    <section className="overflow-hidden rounded-md border border-slate-200 bg-white" aria-label="조기 손절 규칙">
+    <section
+      aria-label="발간 후 가격 동작 코호트별 결과"
+      className="overflow-hidden rounded-md border border-slate-200 bg-white"
+    >
       <header className="border-b border-slate-200 px-4 py-2">
         <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-          치명적 손실 회피 규칙
+          발간 후 가격 동작 신호
         </div>
-        <h3 className="mt-1 text-sm font-semibold text-slate-950">발간 후 며칠 안에 얼마나 빠지면 손절할까</h3>
+        <h3 className="mt-1 text-sm font-semibold text-slate-950">어떤 신호가 어떤 결과로 이어졌나</h3>
         <p className="mt-1 text-xs leading-5 text-slate-500">
-          치명적 손실 ({rules[0]?.totalDevastating ?? 0}건)을 사후 데이터로 보면, 대부분 발간 후 20거래일 이내에 이미 큰
-          폭으로 빠지기 시작합니다. 각 손절 규칙이 치명적 손실을 얼마나 거르고, 1.0x 목표를 얼마나 헛 놓치는지를 같이
-          봅니다.
+          손절 규칙은 누구나 만들 수 있고 그것만으론 무책임합니다. 대신 발간 직후 며칠간의 가격 동작이 이후 결과에
+          어떻게 연결되는지를 코호트로 봅니다. 각 신호는 베이스라인(전체 평균 성공{' '}
+          <span className="font-mono">{formatPercent(baselineSuccess)}</span> · 치명적{' '}
+          <span className="font-mono">{formatPercent(baselineDevastating)}</span> · 목표{' '}
+          <span className="font-mono">{formatPercent(baselineTarget)}</span>) 대비 어떻게 다른지를 표시합니다.
         </p>
       </header>
       <table className="w-full text-sm">
         <thead className="bg-slate-50">
           <tr>
-            <th className="px-3 py-2 text-left text-xs font-medium text-slate-500">규칙</th>
-            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">발동</th>
-            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">회피한 치명적</th>
-            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">놓친 목표</th>
-            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">차이</th>
+            <th className="px-3 py-2 text-left text-xs font-medium text-slate-500">신호</th>
+            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">코호트</th>
+            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">성공률</th>
+            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">치명적률</th>
+            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">목표 도달</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
-          {rules.map((rule) => {
-            const isBest = rule === best;
-            const delta = rule.avoidedDevastatingRate - rule.lostTargetRate;
-            return (
-              <tr className={isBest ? 'bg-emerald-50/50' : undefined} key={`${rule.signalDay}-${rule.threshold}`}>
-                <td className="px-3 py-2">
-                  <div className="text-sm text-slate-950">{rule.label}</div>
-                  <div className="mt-0.5 font-mono text-[10px] text-slate-500">
-                    {rule.totalDevastating}건 중 {rule.avoidedDevastating}건 회피 · 목표 {rule.totalTarget}건 중{' '}
-                    {rule.lostTarget}건 손절
-                  </div>
-                </td>
-                <td className="px-3 py-2 text-right font-mono tabular-nums">{rule.triggered}</td>
-                <td className="px-3 py-2 text-right font-mono tabular-nums text-emerald-700">
-                  {formatPercent(rule.avoidedDevastatingRate)}
-                </td>
-                <td className="px-3 py-2 text-right font-mono tabular-nums text-rose-600">
-                  {formatPercent(rule.lostTargetRate)}
-                </td>
+          {groups.flatMap((group) => {
+            const groupSignals = signals.filter((signal) => signal.kind === group.kind);
+            if (groupSignals.length === 0) return [];
+            return [
+              <tr className="bg-slate-50/60" key={`group-${group.kind}`}>
                 <td
-                  className={`px-3 py-2 text-right font-mono tabular-nums ${
-                    delta >= 0 ? 'text-emerald-700' : 'text-rose-600'
+                  className={`px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] ${
+                    group.tone === 'risk' ? 'text-rose-700' : 'text-emerald-700'
                   }`}
+                  colSpan={5}
                 >
-                  {(delta >= 0 ? '+' : '') + formatPercent(delta)}
+                  {group.label}
                 </td>
-              </tr>
-            );
+              </tr>,
+              ...groupSignals.map((signal) => {
+                const successDelta = signal.successRate - signal.baselineSuccess;
+                const devDelta = signal.devastatingRate - signal.baselineDevastating;
+                const targetDelta = signal.targetRate - signal.baselineTarget;
+                return (
+                  <tr key={signal.id}>
+                    <td className="px-3 py-2">
+                      <div className="text-sm text-slate-950">{signal.label}</div>
+                      <div className="mt-0.5 text-[11px] leading-4 text-slate-500">{signal.description}</div>
+                    </td>
+                    <td className="px-3 py-2 text-right font-mono tabular-nums">
+                      {signal.cohortSize}건
+                      <span className="ml-1 text-[10px] text-slate-400">({formatPercent(signal.cohortShare)})</span>
+                    </td>
+                    <td className="px-3 py-2 text-right font-mono tabular-nums">
+                      {formatPercent(signal.successRate)}
+                      <span className={`ml-1 text-[10px] ${successDelta >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        ({successDelta >= 0 ? '+' : ''}
+                        {formatPercent(successDelta)})
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 text-right font-mono tabular-nums">
+                      {formatPercent(signal.devastatingRate)}
+                      <span className={`ml-1 text-[10px] ${devDelta <= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        ({devDelta >= 0 ? '+' : ''}
+                        {formatPercent(devDelta)})
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 text-right font-mono tabular-nums">
+                      {formatPercent(signal.targetRate)}
+                      <span className={`ml-1 text-[10px] ${targetDelta >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        ({targetDelta >= 0 ? '+' : ''}
+                        {formatPercent(targetDelta)})
+                      </span>
+                    </td>
+                  </tr>
+                );
+              }),
+            ];
           })}
         </tbody>
       </table>
-      <footer className="border-t border-slate-200 bg-slate-50 px-4 py-2.5 text-[11px] leading-5 text-slate-600">
-        <span className="font-semibold text-slate-700">차이</span> = 회피한 치명적률 − 놓친 목표율. 값이 양수일수록
-        규칙이 평균적으로 도움이 됩니다 (치명적을 거르는 효과 &gt; 목표 놓치는 손실). 가장 큰 양수가 강조됩니다.
-      </footer>
     </section>
   );
 }

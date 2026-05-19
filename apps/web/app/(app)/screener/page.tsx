@@ -36,7 +36,7 @@ export default function ScreenerPage() {
       <PageHero
         eyebrow="Screener"
         title="후보 탐색"
-        subtitle="리포트 universe에 가격 시계열과 후보 점수를 겹쳐 보는 읽기 전용 종목 보드입니다."
+        subtitle="발간된 리포트 universe에 가격 시계열과 후보 점수를 겹쳐 보는 검토 보드입니다."
         badges={[
           { label: '종목', value: `${rows.length.toLocaleString('ko-KR')}개` },
           { label: '리포트', value: `${reports.length.toLocaleString('ko-KR')}건` },

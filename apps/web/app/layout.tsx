@@ -5,7 +5,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'SNUSMIC Portfolio Lab',
-  description: '리서치 추천, 포트폴리오, 전략 검증을 한 곳에서 추적하는 읽기 전용 투자 리서치 대시보드.',
+  description: '발간된 분석 리포트가 시장에서 어떻게 끝났는지를 추적하는 SNUSMIC 투자 리서치 원장.',
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

@@ -1,5 +1,5 @@
 import {
-  type EarlyExitRule,
+  type ConfirmationSignal,
   type FeatureBucket,
   type PricePathSeries,
   ReportStatisticsStory,
@@ -73,13 +73,18 @@ function clipRowToWindow(
   }
 
   const windowComplete = window.length >= windowDays;
-  const expiryReturn = windowComplete ? closeKrwOf(window[windowDays - 1]) / baseKrw - 1 : null;
+  const expiryBar = windowComplete ? window[windowDays - 1] : null;
+  const expiryCloseKrw = expiryBar ? closeKrwOf(expiryBar) : null;
+  const expiryReturn = expiryCloseKrw !== null ? expiryCloseKrw / baseKrw - 1 : null;
+  const expiryDate = expiryBar?.time ?? null;
 
   return {
     ...row,
     maxFavorableExcursion: maxKrw / baseKrw - 1,
     maxAdverseExcursion: minKrw / baseKrw - 1,
     expiryReturn,
+    expiryCloseKrw,
+    expiryDate,
     hit10: hit10Day !== null,
     hit08: hit08Day !== null,
     hit06: hit06Day !== null,
@@ -354,26 +359,26 @@ function classifyOutcomeServer(row: ReportStatisticsLabSummary['riskScatter'][nu
   if (row.hit10) return 'target';
   if (row.hit08 || row.hit06) return 'partial';
   const peak = row.maxFavorableExcursion ?? 0;
-  if (peak >= 0.2) return 'upside';
+  if (peak >= 0.3) return 'upside';
   const ref = row.expiryReturn ?? row.currentReturn ?? 0;
   if (ref <= -0.3) return 'devastating';
   if (ref <= -0.1) return 'declining';
   return 'flat';
 }
 
-type RuleSpec = { signalDay: number; threshold: number };
+/** Per-report price-action snapshot used to derive confirmation signals.
+ * Computed once per row, then bucketed many ways downstream. */
+type SignalSnapshot = {
+  category: OutcomeCategoryId;
+  r5: number | null;
+  r10: number | null;
+  mae20: number | null;
+  firstFivePctUp: number | null;
+  firstFivePctDown: number | null;
+};
 
-/** For each (signalDay, threshold) rule, aggregate how many devastating
- * losses the rule would have intercepted vs how many target hits it
- * would have wrongly exited. Decided to surface multiple rules so the
- * reader can see the trade-off explicitly. */
-function buildEarlyExitRules(summary: ReportStatisticsLabSummary): EarlyExitRule[] {
-  const snapshots: Array<{
-    category: OutcomeCategoryId;
-    r5: number | null;
-    r10: number | null;
-    r20: number | null;
-  }> = [];
+function buildSignalSnapshots(summary: ReportStatisticsLabSummary): SignalSnapshot[] {
+  const snapshots: SignalSnapshot[] = [];
   for (const row of summary.riskScatter) {
     if (!isNumber(row.maxFavorableExcursion)) continue;
     if (!hasPriceArtifact(row.symbol)) continue;
@@ -381,63 +386,121 @@ function buildEarlyExitRules(summary: ReportStatisticsLabSummary): EarlyExitRule
     if (series.length === 0) continue;
     const baseKrw = closeKrwOf(series[0]);
     if (!baseKrw || baseKrw <= 0) continue;
-    const retAfter = (n: number): number | null => {
+    const retAt = (n: number): number | null => {
       if (n >= series.length) return null;
       return closeKrwOf(series[n]) / baseKrw - 1;
     };
+    let minRet20 = 0;
+    for (let i = 0; i < Math.min(20, series.length); i += 1) {
+      const r = closeKrwOf(series[i]) / baseKrw - 1;
+      if (r < minRet20) minRet20 = r;
+    }
+    let firstUp: number | null = null;
+    let firstDown: number | null = null;
+    for (let i = 0; i < Math.min(60, series.length); i += 1) {
+      const r = closeKrwOf(series[i]) / baseKrw - 1;
+      if (firstUp === null && r >= 0.05) firstUp = i;
+      if (firstDown === null && r <= -0.05) firstDown = i;
+      if (firstUp !== null && firstDown !== null) break;
+    }
     snapshots.push({
       category: classifyOutcomeServer(row),
-      r5: retAfter(5),
-      r10: retAfter(10),
-      r20: retAfter(20),
+      r5: retAt(5),
+      r10: retAt(10),
+      mae20: minRet20,
+      firstFivePctUp: firstUp,
+      firstFivePctDown: firstDown,
     });
   }
+  return snapshots;
+}
 
+/** Bucket the sample by qualitative price-action signals at publication
+ * and aggregate outcome rates. Unlike a stop-loss rule, these cohorts
+ * tell the reader what to *expect* given a signal, not when to exit. */
+function buildConfirmationSignals(summary: ReportStatisticsLabSummary): ConfirmationSignal[] {
+  const snapshots = buildSignalSnapshots(summary);
+  const total = snapshots.length;
+  if (total === 0) return [];
+  const totalSuccess = snapshots.filter((s) => ['target', 'partial', 'upside'].includes(s.category)).length;
   const totalDevastating = snapshots.filter((s) => s.category === 'devastating').length;
   const totalTarget = snapshots.filter((s) => s.category === 'target').length;
 
-  const rules: RuleSpec[] = [
-    { signalDay: 5, threshold: -0.03 },
-    { signalDay: 5, threshold: -0.05 },
-    { signalDay: 10, threshold: -0.05 },
-    { signalDay: 10, threshold: -0.1 },
-    { signalDay: 20, threshold: -0.05 },
-    { signalDay: 20, threshold: -0.1 },
-  ];
-
-  return rules.map((rule) => {
-    const triggered = snapshots.filter((s) => {
-      const ret = rule.signalDay === 5 ? s.r5 : rule.signalDay === 10 ? s.r10 : s.r20;
-      return ret !== null && ret <= rule.threshold;
-    });
-    const triggeredDevastating = triggered.filter((s) => s.category === 'devastating').length;
-    const triggeredDeclining = triggered.filter((s) => s.category === 'declining').length;
-    const triggeredTarget = triggered.filter((s) => s.category === 'target').length;
-    const notTriggered = snapshots.length - triggered.length;
-    const avoidedDevastating = triggeredDevastating;
-    const lostTarget = triggeredTarget;
+  const aggregate = (
+    id: ConfirmationSignal['id'],
+    kind: ConfirmationSignal['kind'],
+    label: string,
+    description: string,
+    predicate: (s: SignalSnapshot) => boolean,
+  ): ConfirmationSignal => {
+    const cohort = snapshots.filter(predicate);
+    const success = cohort.filter((s) => ['target', 'partial', 'upside'].includes(s.category)).length;
+    const dev = cohort.filter((s) => s.category === 'devastating').length;
+    const tgt = cohort.filter((s) => s.category === 'target').length;
     return {
-      signalDay: rule.signalDay,
-      threshold: rule.threshold,
-      label: `발간 후 ${rule.signalDay}거래일 ${formatThresholdLabel(rule.threshold)} 이하 손절`,
-      triggered: triggered.length,
-      triggeredDevastating,
-      triggeredDeclining,
-      triggeredTarget,
-      notTriggered,
-      totalDevastating,
-      totalTarget,
-      avoidedDevastating,
-      avoidedDevastatingRate: totalDevastating ? avoidedDevastating / totalDevastating : 0,
-      lostTarget,
-      lostTargetRate: totalTarget ? lostTarget / totalTarget : 0,
+      id,
+      kind,
+      label,
+      description,
+      cohortSize: cohort.length,
+      cohortShare: cohort.length / total,
+      successRate: cohort.length ? success / cohort.length : 0,
+      devastatingRate: cohort.length ? dev / cohort.length : 0,
+      targetRate: cohort.length ? tgt / cohort.length : 0,
+      baselineSuccess: totalSuccess / total,
+      baselineDevastating: totalDevastating / total,
+      baselineTarget: totalTarget / total,
     };
-  });
-}
+  };
 
-function formatThresholdLabel(threshold: number): string {
-  const pct = Math.round(threshold * 100);
-  return `${pct}%`;
+  return [
+    aggregate(
+      'risk_no_5pct_60d',
+      'risk',
+      '발간 후 60거래일 안에 +5% 한 번도 못 감',
+      '발간 직후부터 두 달 가까이 한 번도 +5%를 보이지 못한 종목. 위험 신호 중 가장 강함.',
+      (s) => s.firstFivePctUp === null || s.firstFivePctUp > 60,
+    ),
+    aggregate(
+      'risk_deep_drop_20d',
+      'risk',
+      '발간 후 20거래일 내 -15% 이상 drop',
+      '초기 20거래일 안에 종가가 발간가 대비 -15% 이하로 내려감. 치명적 손실의 약 절반이 여기.',
+      (s) => s.mae20 !== null && s.mae20 <= -0.15,
+    ),
+    aggregate(
+      'risk_first_5_negative',
+      'risk',
+      '발간 후 5거래일 종가가 마이너스',
+      '발간 직후 첫 주가 마이너스로 마감. 약한 신호지만 전체 표본 절반에서 발생.',
+      (s) => s.r5 !== null && s.r5 <= 0,
+    ),
+    aggregate(
+      'pass_first_5pct_5d',
+      'pass',
+      '발간 후 5거래일 안에 +5% 돌파',
+      '빠르게 첫 +5% 갱신. 추세가 살아 있다는 확인 신호.',
+      (s) => s.firstFivePctUp !== null && s.firstFivePctUp <= 5,
+    ),
+    aggregate(
+      'pass_first_5pct_21_60',
+      'pass',
+      '첫 +5%가 21–60거래일 사이',
+      '늦게라도 +5%에 도달. 이 코호트는 치명적 손실 비율이 매우 낮은 편.',
+      (s) => s.firstFivePctUp !== null && s.firstFivePctUp > 20 && s.firstFivePctUp <= 60,
+    ),
+    aggregate(
+      'pass_dip_recover',
+      'pass',
+      '-5% 눌림 후 다시 발간가 회복',
+      '발간 후 첫 -5% 눌림을 거쳤다가 다시 발간가 위로 올라온 종목. 매수 기회 패턴.',
+      (s) =>
+        s.firstFivePctDown !== null &&
+        s.firstFivePctDown <= 20 &&
+        s.firstFivePctUp !== null &&
+        s.firstFivePctUp > s.firstFivePctDown,
+    ),
+  ];
 }
 
 export default function ReportStatisticsPage() {
@@ -450,10 +513,10 @@ export default function ReportStatisticsPage() {
     windowDays: RETURN_WINDOW_DAYS,
   });
   const featureBuckets = buildFeatureBuckets(summary, reportById, RETURN_WINDOW_DAYS);
-  const earlyExitRules = buildEarlyExitRules(summary);
+  const confirmationSignals = buildConfirmationSignals(summary);
   return (
     <ReportStatisticsStory
-      earlyExitRules={earlyExitRules}
+      confirmationSignals={confirmationSignals}
       featureBuckets={featureBuckets}
       pricePaths={pricePaths}
       summary={summary}

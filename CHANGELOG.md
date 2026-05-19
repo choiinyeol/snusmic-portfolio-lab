@@ -20,6 +20,49 @@
 
 ---
 
+## v0.21.19-confirmation-signals.1 — 2026-05-19
+
+### 변경 (분류 기준)
+- Outcome 분류의 `upside` 임계값을 +20% → **+30%**로 상향. 약한 반등은 "상승 기회"로 보지 않음.
+- 횡보·손실·치명적은 모두 **실패**로 그룹화 (기회비용 관점). `OUTCOME_CATEGORIES`에 `kind: 'success' | 'failure'` 필드 추가. `OutcomeBreakdownPanel` 헤더가 "성공 N건 · 실패 M건"으로 한 줄 요약.
+- 새 분류 결과: 성공 (target+partial+upside) = 149건 / 실패 (flat+declining+devastating) = 48건. 치명적 손실은 +30% 상향 적용 시 18 → 24건.
+
+### 추가 (고유 데이터: 만료 종가)
+- `riskScatter` 타입에 `expiryCloseKrw` (KRW 절댓값), `expiryDate` (ISO 날짜) 필드 추가. `clipRowToWindow`가 윈도우 완료 시점에 채움.
+- 리포트 상세 (`/reports/[symbol]/[id]`)에 "유효기간 종가 (500거래일)" fact row 추가. 종가 절댓값 + 날짜 + 수익률을 한 셀에. 윈도우 미경과 시 "진행 중" 표시.
+
+### 변경 (회피 분석 — 손절 규칙 → 확인 신호 코호트)
+- 사용자 피드백: "손절만하면 무책임. 더 다양한 걸 시도해라." 단순 stop-loss는 누구나 만들 수 있고, 또 진입 시점의 의사결정 정보는 아님.
+- `EarlyExitRulesTable` 폐기. 대신 `ConfirmationSignalsTable` 신설.
+- **위험 신호 코호트 3개** (해당하면 결과가 평균보다 나쁨):
+  - 발간 후 60거래일 안에 +5% 한 번도 못 감 → n=46, 성공률 48% (baseline 76%), 치명적률 28%
+  - 발간 후 20거래일 내 -15% 이상 drop → n=26, 성공률 38%, 치명적률 42%
+  - 발간 후 5거래일 종가 음봉 → n=97, 성공률 66%, 치명적률 20%
+- **확인 신호 코호트 3개** (해당하면 결과가 평균보다 좋음):
+  - 발간 후 5거래일 안에 +5% 돌파 → n=65, 성공률 85%
+  - 첫 +5%가 21–60거래일 사이 → n=25, **치명적률 0%**, target 72%
+  - -5% 눌림 후 발간가 회복 → n=33, 치명적률 6%
+- 각 셀에 baseline 대비 delta `(+/− X%)` 표기 — 신호 강도가 한눈에.
+- `page.tsx`의 `buildConfirmationSignals`가 모든 리포트의 가격 시리즈에서 r5/r10/mae20/first_5pct_up/first_5pct_down server-side 계산.
+
+### 변경 (페이지 카피)
+- 사용자 피드백: "읽기 전용 같은 개발용 문구 다 빼라. SaaS라고 생각하고 만들어라."
+- 다음 위치에서 "읽기 전용" 배지 / 카피 제거:
+  - `app/layout.tsx` meta description (재작성)
+  - `app/page.tsx` 홈 헤더 우측 emerald 배지
+  - `components/ui/AppShell.tsx` 사이드바 상단 success 배지
+  - `app/(app)/main/page.tsx` 메인 페이지 헤더 배지
+  - `components/screener/screener-table.tsx` 푸터 라벨
+  - `app/(app)/screener/page.tsx` 페이지 subtitle
+- "정적 산출물 소스" 같은 개발자 카피도 GitHub nav link description에서 제거.
+
+### 검증
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web build` (정적 페이지 413개)
+
+---
+
 ## v0.21.18-early-exit-rules.1 — 2026-05-19
 
 ### 분석 (데이터에서 패턴 발견)

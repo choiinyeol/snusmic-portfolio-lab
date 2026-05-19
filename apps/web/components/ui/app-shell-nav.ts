@@ -13,7 +13,7 @@ export const APP_NAV: SidebarNavItem[] = [
 export const GITHUB_NAV_ITEM: SidebarNavItem = {
   href: 'https://github.com/ChoiInYeol/snusmic-portfolio-lab',
   label: 'GitHub',
-  description: '정적 산출물 소스',
+  description: '원본 데이터 저장소',
   icon: 'github',
   activePath: null,
 };

@@ -95,9 +95,6 @@ export default function LandingPage() {
                   {overview.snapshotDate || manifest.price_range.end}
                 </div>
               </div>
-              <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
-                읽기 전용
-              </span>
             </div>
           </div>
           <div className="grid divide-y divide-slate-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0">

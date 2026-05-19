@@ -21,7 +21,6 @@ export default function OverviewPage() {
             <div className="mb-3 flex flex-wrap items-center gap-2">
               <Badge variant="outline">{overview.snapshotDate || '기준일 없음'}</Badge>
               <Badge variant="secondary">{selectedStrategy?.shortLabel || overview.portfolio.label}</Badge>
-              <Badge variant="success">읽기 전용</Badge>
             </div>
             <h1 className="text-2xl font-semibold tracking-[-0.02em] text-slate-950 md:text-4xl">메인화면</h1>
           </div>

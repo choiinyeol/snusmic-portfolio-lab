@@ -14,6 +14,8 @@ import {
   type ScenarioRow,
 } from '@/lib/report-view-model';
 
+const RETURN_WINDOW_DAYS = 500;
+
 export function ReportDetailView({ report }: { report: ReportRow }) {
   // Read the full price series — not end-capped at the report's lastCloseDate —
   // so expired reports still show the live chart and the live current price.
@@ -27,6 +29,16 @@ export function ReportDetailView({ report }: { report: ReportRow }) {
   const pdfHref = pdfHrefFor(report);
 
   const entryPrice = reportEntryPrice(report);
+
+  // Window-expiry close: same 500-trading-day deadline used by /statistics.
+  // Surfaces "if you had held to the window's end, what would you have"
+  // alongside the live current price, so the reader sees both data points.
+  const pubIdx = prices.findIndex((point) => point.time >= report.publicationDate);
+  const windowExpiryBar =
+    pubIdx >= 0 && prices.length >= pubIdx + RETURN_WINDOW_DAYS ? prices[pubIdx + RETURN_WINDOW_DAYS - 1] : null;
+  const windowExpiryClose = windowExpiryBar ? (windowExpiryBar.close ?? windowExpiryBar.value ?? null) : null;
+  const windowExpiryReturn =
+    windowExpiryClose !== null && entryPrice !== null && entryPrice > 0 ? windowExpiryClose / entryPrice - 1 : null;
 
   // Live overrides recomputed off the full price series so the displayed
   // current price / return / peak / trough reflect today's market, not the
@@ -120,6 +132,15 @@ export function ReportDetailView({ report }: { report: ReportRow }) {
             label: '발간 후 저점',
             value: pathEvidence.trough ? formatAssetPrice(pathEvidence.trough.value, report) : '—',
             caption: pathEvidence.trough ? formatDateKo(pathEvidence.trough.time) : undefined,
+          },
+          {
+            label: '유효기간 종가 (500거래일)',
+            value: windowExpiryClose !== null ? formatAssetPrice(windowExpiryClose, report) : '진행 중',
+            caption:
+              windowExpiryBar !== null
+                ? `${formatDateKo(windowExpiryBar.time)} · ${formatPercent(windowExpiryReturn)}`
+                : '발간 후 500거래일 미경과',
+            tone: windowExpiryReturn === null ? undefined : signedTone(windowExpiryReturn),
           },
         ]}
       />

@@ -673,7 +673,6 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
           <div className="flex justify-center">
             <BlockPagination page={safePage} pageCount={totalPages} onPageChange={setPage} />
           </div>
-          <span className="hidden text-right text-xs text-slate-400 sm:block">읽기 전용 스크리너</span>
         </div>
       </div>
     </section>
