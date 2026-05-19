@@ -177,7 +177,7 @@ def _candidate_from_report(
     target_upside = target / entry - 1.0
     if target_upside < config.min_target_upside_at_pub or target_upside > config.max_target_upside_at_pub:
         return None
-    if config.require_mtt and not _passes_mtt(board, day, symbol, config):
+    if config.require_mtt and not _passes_trend_filter(board, day, symbol, config):
         return None
     momentum_return, relative_strength_percentile = _relative_strength(board, day, symbol, config)
     if momentum_return < config.min_momentum_return:
@@ -222,6 +222,21 @@ def _passes_universe(record: dict[str, Any], universe: str) -> bool:
     raise ValueError(f"unknown SMIC MTT universe: {universe}")
 
 
+def _passes_trend_filter(
+    board: PriceBoard,
+    day: date,
+    symbol: str,
+    config: SmicMttStrategyConfig,
+) -> bool:
+    if config.trend_filter == "mtt":
+        return _passes_mtt(board, day, symbol, config)
+    if config.trend_filter == "supertrend":
+        return _passes_supertrend(board, day, symbol, config)
+    if config.trend_filter == "atr_breakout":
+        return _passes_atr_breakout(board, day, symbol, config)
+    raise ValueError(f"unknown SMIC MTT trend filter: {config.trend_filter}")
+
+
 def _passes_mtt(
     board: PriceBoard,
     day: date,
@@ -258,39 +273,123 @@ def _passes_mtt(
     return pct_below_high <= config.max_pct_below_52w_high
 
 
-def _relative_strength(
+def _passes_supertrend(
     board: PriceBoard,
     day: date,
     symbol: str,
     config: SmicMttStrategyConfig,
-) -> tuple[float, float]:
-    """Return trailing momentum and cross-sectional relative-strength percentile.
+) -> bool:
+    ohlc = _ohlc_history(board, day, symbol, min_rows=config.atr_period_days + 2)
+    if ohlc is None:
+        return False
+    high, low, close = ohlc
+    atr = _average_true_range(high, low, close, config.atr_period_days)
+    if atr is None or atr.empty:
+        return False
 
-    The overlay uses only closes known on or before ``day``. When the requested
-    lookback history is unavailable, permissive defaults preserve legacy report
-    gating unless callers raise ``min_momentum_return`` or
-    ``min_relative_strength_percentile`` above their disabled defaults.
-    """
+    basic_upper = (high + low) / 2.0 + config.supertrend_multiplier * atr
+    basic_lower = (high + low) / 2.0 - config.supertrend_multiplier * atr
+    final_upper = basic_upper.copy()
+    final_lower = basic_lower.copy()
+    trend_up = True
 
+    for idx in range(1, len(close)):
+        if pd.isna(atr.iloc[idx]):
+            continue
+        previous_upper = final_upper.iloc[idx - 1]
+        previous_lower = final_lower.iloc[idx - 1]
+        if pd.isna(previous_upper):
+            final_upper.iloc[idx] = basic_upper.iloc[idx]
+        elif basic_upper.iloc[idx] < previous_upper or close.iloc[idx - 1] > previous_upper:
+            final_upper.iloc[idx] = basic_upper.iloc[idx]
+        else:
+            final_upper.iloc[idx] = previous_upper
+
+        if pd.isna(previous_lower):
+            final_lower.iloc[idx] = basic_lower.iloc[idx]
+        elif basic_lower.iloc[idx] > previous_lower or close.iloc[idx - 1] < previous_lower:
+            final_lower.iloc[idx] = basic_lower.iloc[idx]
+        else:
+            final_lower.iloc[idx] = previous_lower
+
+        if trend_up and close.iloc[idx] < final_lower.iloc[idx]:
+            trend_up = False
+        elif not trend_up and close.iloc[idx] > final_upper.iloc[idx]:
+            trend_up = True
+
+    latest_close = float(close.iloc[-1])
+    latest_lower = float(final_lower.iloc[-1])
+    return trend_up and latest_close > latest_lower
+
+
+def _passes_atr_breakout(
+    board: PriceBoard,
+    day: date,
+    symbol: str,
+    config: SmicMttStrategyConfig,
+) -> bool:
+    min_rows = max(config.breakout_lookback_days + 1, config.atr_period_days + 1)
+    ohlc = _ohlc_history(board, day, symbol, min_rows=min_rows)
+    if ohlc is None:
+        return False
+    high, low, close = ohlc
+    atr = _average_true_range(high, low, close, config.atr_period_days)
+    if atr is None or pd.isna(atr.iloc[-1]):
+        return False
+    prior_highs = high.iloc[-(config.breakout_lookback_days + 1) : -1].dropna()
+    if prior_highs.empty:
+        return False
+    breakout_level = float(prior_highs.max()) + float(atr.iloc[-1]) * config.breakout_atr_multiple
+    return float(close.iloc[-1]) >= breakout_level
+
+
+def _ohlc_history(
+    board: PriceBoard,
+    day: date,
+    symbol: str,
+    *,
+    min_rows: int,
+) -> tuple[pd.Series, pd.Series, pd.Series] | None:
     if board.close.empty or symbol not in board.close.columns:
-        return 0.0, 0.0
+        return None
+    ts = pd.Timestamp(day)
+    close = board.close[symbol].loc[board.close.index <= ts].dropna()
+    if len(close) < min_rows:
+        return None
+    index = close.index
+    high_frame = board.high if board.high is not None else board.close
+    low_frame = board.low if board.low is not None else board.close
+    high = (
+        high_frame[symbol].reindex(index).fillna(close)
+        if symbol in high_frame.columns
+        else close.copy()
+    )
+    low = (
+        low_frame[symbol].reindex(index).fillna(close)
+        if symbol in low_frame.columns
+        else close.copy()
+    )
+    return high.astype(float), low.astype(float), close.astype(float)
 
-    history = board.close.loc[board.close.index <= pd.Timestamp(day)]
-    if len(history) <= config.relative_strength_lookback_days:
-        return 0.0, 0.0
 
-    window = history.tail(config.relative_strength_lookback_days + 1)
-    first = window.iloc[0]
-    last = window.iloc[-1]
-    returns = (last / first - 1.0).replace([float("inf"), float("-inf")], pd.NA).dropna()
-    returns = returns[(first > 0) & (last > 0)]
-    if symbol not in returns or returns.empty:
-        return 0.0, 0.0
-
-    momentum_return = float(returns[symbol])
-    rank = returns.rank(method="average", pct=True)
-    relative_strength_percentile = float(rank[symbol])
-    return momentum_return, relative_strength_percentile
+def _average_true_range(
+    high: pd.Series,
+    low: pd.Series,
+    close: pd.Series,
+    period: int,
+) -> pd.Series | None:
+    if len(close) < period + 1:
+        return None
+    previous_close = close.shift(1)
+    true_range = pd.concat(
+        [
+            high - low,
+            (high - previous_close).abs(),
+            (low - previous_close).abs(),
+        ],
+        axis=1,
+    ).max(axis=1)
+    return true_range.rolling(period, min_periods=period).mean()
 
 
 def _top_up_days(trading_dates: list[date], cadence: str) -> set[date]:
@@ -363,7 +462,7 @@ def _buy_or_top_up_slots(
         for c in state.active.values()
         if c.symbol in prices
         and c.symbol not in state.stopped_out
-        and (not config.require_mtt or _passes_mtt(board, day, c.symbol, config))
+        and (not config.require_mtt or _passes_trend_filter(board, day, c.symbol, config))
     ]
     candidates.sort(
         key=lambda c: (
