@@ -70,6 +70,7 @@ export type StrategyLeaderboardRow = {
   objectivePassed: boolean;
   objectiveMddSlack: number | null;
   objectiveReturnExcess: number | null;
+  isSelectable: boolean;
   sourceLabel: string;
   methodologySummary: string;
   buyRules: string[];
@@ -236,7 +237,7 @@ export function getBenchmarkRows(rows = getStrategyLeaderboard()): StrategyLeade
 }
 
 export function getSelectableStrategyRows(rows = getStrategyLeaderboard()): StrategyLeaderboardRow[] {
-  return rows.filter((row) => row.kind === 'strategy');
+  return rows.filter((row) => row.kind === 'strategy' && row.isSelectable);
 }
 
 export function getObjectivePassingRows(rows = getStrategyLeaderboard()): StrategyLeaderboardRow[] {
@@ -285,13 +286,15 @@ function strategyRowFromSummary(
     objectivePassed: catalog?.objectivePassed ?? objective.passed,
     objectiveMddSlack: catalog?.objectiveMddSlack ?? objective.mddSlack,
     objectiveReturnExcess: catalog?.objectiveReturnExcess ?? objective.returnExcess,
+    isSelectable: catalog?.isSelectable ?? kind === 'strategy',
     sourceLabel: kind === 'strategy' ? '고유 전략' : kind === 'oracle' ? '오라클 기준선' : '벤치마크',
     methodologySummary: catalog?.methodologySummary ?? '',
     buyRules: catalog?.buyRules ?? [],
     sellRules: catalog?.sellRules ?? [],
     riskControls: catalog?.riskControls ?? [],
     params: catalog?.params ?? {},
-    href: portfolioStrategyHref(summary.persona),
+    href:
+      kind === 'strategy' && (catalog?.isSelectable ?? true) ? portfolioStrategyHref(summary.persona) : '/strategies',
   };
 }
 

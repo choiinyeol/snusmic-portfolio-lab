@@ -1,9 +1,7 @@
 'use client';
 
-import { SearchX } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { BlockPagination } from '@/components/trading/TableControls';
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import {
   flexRender,
@@ -15,8 +13,8 @@ import {
   type SortingState,
   useReactTable,
 } from '@tanstack/react-table';
-import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
-import { CsvDownloadButton, downloadCsv } from '@/components/ui/data-panel';
+import { Fragment, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import { CsvDownloadButton, DataPanel, EmptyTableState, downloadCsv } from '@/components/ui/data-panel';
 import { useSearchShortcut } from '@/components/ui/use-search-shortcut';
 import type { ReportRow } from '@/lib/artifacts';
 import { formatDateKo, formatDays, formatNative, formatPercent } from '@/lib/format';
@@ -34,6 +32,25 @@ type SortPreset = {
   returnFilter: ReturnFilter;
   count: (report: ReportRow) => boolean;
 };
+type ColumnFilterKind = 'percent' | 'number' | 'boolean' | 'date' | 'text';
+type ColumnFilterValues = Record<string, string>;
+
+const COLUMN_META: Record<string, { kind: ColumnFilterKind; placeholder: string }> = {
+  company: { kind: 'text', placeholder: '회사/티커' },
+  marketRegion: { kind: 'text', placeholder: '한국/미국' },
+  publicationDate: { kind: 'date', placeholder: 'YYYY-MM-DD' },
+  entryPriceNative: { kind: 'number', placeholder: '>=100' },
+  targetPriceNative: { kind: 'number', placeholder: '>=100' },
+  targetUpsideAtPub: { kind: 'percent', placeholder: '>=30' },
+  currentReturn: { kind: 'percent', placeholder: '>=0' },
+  targetRemainingPct: { kind: 'percent', placeholder: '<=10' },
+  targetProgressPct: { kind: 'percent', placeholder: '>=70' },
+  peakReturn: { kind: 'percent', placeholder: '>=50' },
+  troughReturn: { kind: 'percent', placeholder: '<=-20' },
+  targetHit: { kind: 'boolean', placeholder: '전체' },
+  daysToTarget: { kind: 'number', placeholder: '<=120' },
+  lastCloseDate: { kind: 'date', placeholder: 'YYYY-MM-DD' },
+};
 
 type ReportsTableProps = {
   reports: ReportRow[];
@@ -49,6 +66,7 @@ export function ReportsTable({ reports }: ReportsTableProps) {
   const [exchangeFilter, setExchangeFilter] = useState('all');
   const [hitFilter, setHitFilter] = useState<HitFilter>('all');
   const [returnFilter, setReturnFilter] = useState<ReturnFilter>('all');
+  const [columnFilters, setColumnFilters] = useState<ColumnFilterValues>({});
   const [page, setPage] = useState(0);
 
   const exchanges = useMemo(
@@ -250,8 +268,10 @@ export function ReportsTable({ reports }: ReportsTableProps) {
     if (hitFilter === 'expired' && !report.expired) return false;
     if (returnFilter === 'positive' && (report.currentReturn ?? -Infinity) < 0) return false;
     if (returnFilter === 'negative' && (report.currentReturn ?? Infinity) >= 0) return false;
+    if (!rowPassesColumnFilters(report, columnFilters)) return false;
     return true;
   });
+  const activeColumnFilterCount = Object.values(columnFilters).filter((value) => value.trim()).length;
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages - 1);
@@ -309,143 +329,187 @@ export function ReportsTable({ reports }: ReportsTableProps) {
     setPage(0);
   };
 
+  const updateColumnFilter = (columnId: string, value: string) => {
+    setColumnFilters((current) => {
+      const next = { ...current };
+      if (value.trim()) next[columnId] = value;
+      else delete next[columnId];
+      return next;
+    });
+    setPage(0);
+  };
+
+  const clearColumnFilters = () => {
+    setColumnFilters({});
+    setPage(0);
+  };
+
+  const clearAllFilters = () => {
+    setGlobalFilter('');
+    setExchangeFilter('all');
+    setHitFilter('all');
+    setReturnFilter('all');
+    setColumnFilters({});
+    applyPreset('recent');
+  };
+
   return (
-    <section className="w-full min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white">
-      <div className="grid gap-4 border-b border-slate-200 bg-white p-4" aria-label="리포트 표 필터">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-          <div className="min-w-0">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">보기 방식</div>
-            <div className="mt-2 flex flex-wrap gap-1.5" aria-label="관심별 정렬 프리셋">
-              {SORT_PRESETS.map((preset) => (
-                <button
-                  key={preset.id}
-                  className={[
-                    'inline-flex h-8 items-center gap-1.5 rounded-md border px-2.5 text-xs font-semibold transition-colors',
-                    activePreset === preset.id
-                      ? 'border-slate-950 bg-slate-950 text-white'
-                      : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-950',
-                  ].join(' ')}
-                  type="button"
-                  title={preset.caption}
-                  onClick={() => applyPreset(preset.id)}
-                >
-                  {preset.label}
-                  <span className="font-mono text-[11px] opacity-70 tabular-nums">
-                    {presetCounts[preset.id]?.toLocaleString('ko-KR') ?? 0}
-                  </span>
-                </button>
-              ))}
+    <DataPanel
+      title="리포트 원장"
+      subtitle={`${filteredRows.length.toLocaleString('ko-KR')}개 표시 · 전체 ${reports.length.toLocaleString('ko-KR')}개`}
+      search={{
+        value: globalFilter ?? '',
+        onChange: (value) => {
+          setGlobalFilter(value);
+          resetPage();
+        },
+        placeholder: '기업명, 심볼, 제목',
+        ariaLabel: '리포트 검색',
+        inputRef: searchInputRef,
+      }}
+      actions={
+        <CsvDownloadButton label="CSV" onClick={() => downloadReports(filteredRows.map((row) => row.original))} />
+      }
+      toolbar={
+        <div className="grid gap-3" aria-label="리포트 표 필터">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+            <div className="min-w-0">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">보기 방식</div>
+              <div className="mt-2 flex flex-wrap gap-1.5" aria-label="관심별 정렬 프리셋">
+                {SORT_PRESETS.map((preset) => (
+                  <button
+                    key={preset.id}
+                    className={[
+                      'inline-flex h-8 items-center gap-1.5 rounded-md border px-2.5 text-xs font-semibold transition-colors',
+                      activePreset === preset.id
+                        ? 'border-slate-950 bg-slate-950 text-white'
+                        : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-950',
+                    ].join(' ')}
+                    type="button"
+                    title={preset.caption}
+                    onClick={() => applyPreset(preset.id)}
+                  >
+                    {preset.label}
+                    <span className="font-mono text-[11px] opacity-70 tabular-nums">
+                      {presetCounts[preset.id]?.toLocaleString('ko-KR') ?? 0}
+                    </span>
+                  </button>
+                ))}
+              </div>
+              <p className="mt-2 max-w-3xl text-xs leading-5 text-slate-500">
+                {activePresetConfig.caption}. 후보 탐색, 전체 리포트, 목표가 검증은 같은 표에서 정렬 조건만 바꿔 봅니다.
+              </p>
             </div>
-            <p className="mt-2 max-w-3xl text-xs leading-5 text-slate-500">
-              {activePresetConfig.caption}. 후보 탐색, 전체 리포트, 목표가 검증은 같은 표에서 정렬 조건만 바꿔 봅니다.
-            </p>
           </div>
-          <div className="flex shrink-0 items-center gap-2">
-            <div
-              className="rounded-md bg-slate-50 px-3 py-2 text-xs text-slate-600"
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              <span className="font-mono font-semibold tabular-nums text-slate-950">
-                {filteredRows.length.toLocaleString('ko-KR')}
-              </span>
-              개 표시 · 전체 {reports.length.toLocaleString('ko-KR')}개
-            </div>
-            <CsvDownloadButton label="CSV" onClick={() => downloadReports(filteredRows.map((row) => row.original))} />
-          </div>
-        </div>
 
-        <div className="grid gap-2 md:grid-cols-[minmax(240px,1.4fr)_repeat(3,minmax(0,.7fr))]">
-          <label className="grid gap-1 text-xs font-medium text-slate-500" htmlFor="reports-search">
+          <div className="grid gap-2 md:grid-cols-3">
+            <label className="grid gap-1 text-xs font-medium text-slate-500" htmlFor="reports-exchange">
+              <span>거래소</span>
+              <NativeSelect
+                id="reports-exchange"
+                className="h-10 text-sm"
+                value={exchangeFilter}
+                onChange={(event) => {
+                  setExchangeFilter(event.target.value);
+                  resetPage();
+                }}
+              >
+                {exchanges.map((exchange) => (
+                  <NativeSelectOption key={exchange} value={exchange}>
+                    {exchange === 'all' ? '전체' : exchange}
+                  </NativeSelectOption>
+                ))}
+              </NativeSelect>
+            </label>
+            <label className="grid gap-1 text-xs font-medium text-slate-500" htmlFor="reports-hit">
+              <span>목표 달성</span>
+              <NativeSelect
+                id="reports-hit"
+                className="h-10 text-sm"
+                value={hitFilter}
+                onChange={(event) => {
+                  setHitFilter(event.target.value as HitFilter);
+                  resetPage();
+                }}
+              >
+                <NativeSelectOption value="all">전체</NativeSelectOption>
+                <NativeSelectOption value="hit">달성</NativeSelectOption>
+                <NativeSelectOption value="open">진행 중</NativeSelectOption>
+                <NativeSelectOption value="expired">만료</NativeSelectOption>
+              </NativeSelect>
+            </label>
+            <label className="grid gap-1 text-xs font-medium text-slate-500" htmlFor="reports-return">
+              <span>현재 수익률</span>
+              <NativeSelect
+                id="reports-return"
+                className="h-10 text-sm"
+                value={returnFilter}
+                onChange={(event) => {
+                  setReturnFilter(event.target.value as ReturnFilter);
+                  resetPage();
+                }}
+              >
+                <NativeSelectOption value="all">전체</NativeSelectOption>
+                <NativeSelectOption value="positive">0% 이상</NativeSelectOption>
+                <NativeSelectOption value="negative">0% 미만</NativeSelectOption>
+              </NativeSelect>
+            </label>
+          </div>
+
+          {activeColumnFilterCount > 0 ? (
+            <div className="flex flex-wrap items-center gap-1.5 text-xs text-slate-500">
+              <span>컬럼 필터 {activeColumnFilterCount}개</span>
+              {Object.entries(columnFilters)
+                .filter(([, value]) => value.trim())
+                .map(([columnId, value]) => (
+                  <button
+                    key={columnId}
+                    type="button"
+                    className="rounded-full border border-slate-200 bg-white px-2 py-1 font-mono text-[11px] text-slate-700 hover:bg-slate-50"
+                    title="클릭하면 이 컬럼 필터를 제거합니다."
+                    onClick={() => updateColumnFilter(columnId, '')}
+                  >
+                    {columnLabel(columnId)}: {value} ×
+                  </button>
+                ))}
+              <button
+                type="button"
+                className="rounded-full border border-slate-300 bg-slate-950 px-2 py-1 text-[11px] font-semibold text-white"
+                onClick={clearColumnFilters}
+              >
+                모두 지우기
+              </button>
+            </div>
+          ) : null}
+
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-md bg-slate-50 px-3 py-2 text-xs text-slate-500">
             <span>
-              검색 <span className="font-mono text-[10px] text-slate-400">(/ 단축키)</span>
+              열 제목으로 정렬 · <kbd className="rounded border border-slate-300 bg-white px-1 font-mono">/</kbd> 검색 ·{' '}
+              <kbd className="rounded border border-slate-300 bg-white px-1 font-mono">j</kbd>/
+              <kbd className="rounded border border-slate-300 bg-white px-1 font-mono">k</kbd> 행 이동 ·{' '}
+              <kbd className="rounded border border-slate-300 bg-white px-1 font-mono">Enter</kbd> 상세
             </span>
-            <input
-              ref={searchInputRef}
-              id="reports-search"
-              className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-950 outline-none transition-colors placeholder:text-slate-400 focus:border-slate-400"
-              value={globalFilter ?? ''}
-              onChange={(event) => {
-                setGlobalFilter(event.target.value);
-                resetPage();
-              }}
-              placeholder="기업명, 심볼, 제목"
-            />
-          </label>
-          <label className="grid gap-1 text-xs font-medium text-slate-500" htmlFor="reports-exchange">
-            <span>거래소</span>
-            <NativeSelect
-              id="reports-exchange"
-              className="h-10 text-sm"
-              value={exchangeFilter}
-              onChange={(event) => {
-                setExchangeFilter(event.target.value);
-                resetPage();
-              }}
-            >
-              {exchanges.map((exchange) => (
-                <NativeSelectOption key={exchange} value={exchange}>
-                  {exchange === 'all' ? '전체' : exchange}
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
-          </label>
-          <label className="grid gap-1 text-xs font-medium text-slate-500" htmlFor="reports-hit">
-            <span>목표 달성</span>
-            <NativeSelect
-              id="reports-hit"
-              className="h-10 text-sm"
-              value={hitFilter}
-              onChange={(event) => {
-                setHitFilter(event.target.value as HitFilter);
-                resetPage();
-              }}
-            >
-              <NativeSelectOption value="all">전체</NativeSelectOption>
-              <NativeSelectOption value="hit">달성</NativeSelectOption>
-              <NativeSelectOption value="open">진행 중</NativeSelectOption>
-              <NativeSelectOption value="expired">만료</NativeSelectOption>
-            </NativeSelect>
-          </label>
-          <label className="grid gap-1 text-xs font-medium text-slate-500" htmlFor="reports-return">
-            <span>현재 수익률</span>
-            <NativeSelect
-              id="reports-return"
-              className="h-10 text-sm"
-              value={returnFilter}
-              onChange={(event) => {
-                setReturnFilter(event.target.value as ReturnFilter);
-                resetPage();
-              }}
-            >
-              <NativeSelectOption value="all">전체</NativeSelectOption>
-              <NativeSelectOption value="positive">0% 이상</NativeSelectOption>
-              <NativeSelectOption value="negative">0% 미만</NativeSelectOption>
-            </NativeSelect>
-          </label>
+            <span>페이지당 {PAGE_SIZE}개</span>
+          </div>
         </div>
-      </div>
-
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs text-slate-500">
-        <span>
-          열 제목으로 정렬 · <kbd className="rounded border border-slate-300 bg-white px-1 font-mono">/</kbd> 검색,{' '}
-          <kbd className="rounded border border-slate-300 bg-white px-1 font-mono">j</kbd>/
-          <kbd className="rounded border border-slate-300 bg-white px-1 font-mono">k</kbd> 행 이동,{' '}
-          <kbd className="rounded border border-slate-300 bg-white px-1 font-mono">Enter</kbd> 상세
-        </span>
-        <span>페이지당 {PAGE_SIZE}개</span>
-      </div>
-
-      <div className="w-full min-w-0 max-h-[72vh] overflow-auto">
-        <table className="w-full min-w-[1120px] text-sm [&_td]:border-b [&_td]:border-slate-100 [&_td]:px-3 [&_td]:py-3 [&_th]:border-b [&_th]:border-slate-200 [&_th]:px-3 [&_th]:py-2 [&_tr:hover_td]:bg-slate-50">
-          <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
+      }
+      pagination={{
+        page: safePage,
+        pageCount: totalPages,
+        totalRows: filteredRows.length,
+        onPageChange: setPage,
+      }}
+    >
+      <table className="w-full min-w-[1120px] text-sm [&_td]:border-b [&_td]:border-slate-100 [&_td]:px-3 [&_td]:py-3 [&_th]:border-b [&_th]:border-slate-200 [&_th]:px-3 [&_th]:py-2 [&_tr:hover_td]:bg-slate-50">
+        <thead>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <Fragment key={headerGroup.id}>
+              <tr>
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
                     aria-sort={ariaSort(header.column.getIsSorted())}
-                    className="sticky top-0 z-10 whitespace-nowrap bg-slate-100 text-left font-mono text-[11px] uppercase tracking-[0.04em] text-slate-600"
+                    className="sticky top-0 z-20 whitespace-nowrap bg-slate-100 text-left font-mono text-[11px] uppercase tracking-[0.04em] text-slate-600"
                   >
                     {header.isPlaceholder ? null : (
                       <button
@@ -461,60 +525,45 @@ export function ReportsTable({ reports }: ReportsTableProps) {
                   </th>
                 ))}
               </tr>
-            ))}
-          </thead>
-          <tbody ref={tbodyRef}>
-            {visibleRows.length === 0 ? (
               <tr>
-                <td className="p-8" colSpan={columns.length}>
-                  <div className="mx-auto grid max-w-md gap-3 text-center">
-                    <SearchX aria-hidden="true" className="mx-auto size-6 text-slate-400" />
-                    <div className="text-sm font-semibold text-slate-950">조건에 맞는 리포트가 없습니다</div>
-                    <p className="text-xs leading-5 text-slate-500">
-                      검색어, 거래소, 목표 달성, 현재 수익률 필터 중 일부가 결합되어 모두 제외했을 수 있습니다.
-                    </p>
-                    <div>
-                      <button
-                        type="button"
-                        className="inline-flex h-8 items-center rounded-md border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-950"
-                        onClick={() => {
-                          setGlobalFilter('');
-                          setExchangeFilter('all');
-                          setHitFilter('all');
-                          setReturnFilter('all');
-                          applyPreset('recent');
-                        }}
-                      >
-                        필터 초기화
-                      </button>
-                    </div>
-                  </div>
-                </td>
+                {headerGroup.headers.map((header) => (
+                  <th key={`${header.id}-filter`} className="sticky top-[31px] z-10 bg-white align-top">
+                    {header.isPlaceholder ? null : (
+                      <ColumnFilterControl
+                        columnId={header.column.id}
+                        value={columnFilters[header.column.id] ?? ''}
+                        onChange={(value) => updateColumnFilter(header.column.id, value)}
+                      />
+                    )}
+                  </th>
+                ))}
               </tr>
-            ) : (
-              visibleRows.map((row, index) => (
-                <tr key={row.id} data-active={activeRowIdx !== null && index === activeRowIdx ? 'true' : undefined}>
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
-                  ))}
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="grid gap-2 border-t border-slate-200 px-4 py-3 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
-        <span className="text-center text-xs text-slate-500 sm:text-left">
-          {filteredRows.length ? safePage * PAGE_SIZE + 1 : 0}–
-          {Math.min(filteredRows.length, (safePage + 1) * PAGE_SIZE)} / {filteredRows.length.toLocaleString('ko-KR')}
-        </span>
-        <div className="flex justify-center">
-          <BlockPagination page={safePage} pageCount={totalPages} onPageChange={setPage} />
-        </div>
-        <span aria-hidden="true" />
-      </div>
-    </section>
+            </Fragment>
+          ))}
+        </thead>
+        <tbody ref={tbodyRef}>
+          {visibleRows.length === 0 ? (
+            <tr>
+              <td className="p-0" colSpan={columns.length}>
+                <EmptyTableState
+                  message="조건에 맞는 리포트가 없습니다"
+                  actionLabel="필터 초기화"
+                  onAction={clearAllFilters}
+                />
+              </td>
+            </tr>
+          ) : (
+            visibleRows.map((row, index) => (
+              <tr key={row.id} data-active={activeRowIdx !== null && index === activeRowIdx ? 'true' : undefined}>
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                ))}
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </DataPanel>
   );
 }
 
@@ -564,6 +613,114 @@ function downloadReports(rows: ReportRow[]) {
   downloadCsv('snusmic-reports-filtered.csv', headers, data);
 }
 
+function columnFilterKind(columnId: string): ColumnFilterKind | undefined {
+  return COLUMN_META[columnId]?.kind;
+}
+
+function columnFilterPlaceholder(columnId: string): string {
+  return COLUMN_META[columnId]?.placeholder ?? 'filter';
+}
+
+function rowPassesColumnFilters(row: ReportRow, filters: ColumnFilterValues): boolean {
+  for (const [columnId, rawValue] of Object.entries(filters)) {
+    const filterValue = rawValue.trim();
+    if (!filterValue) continue;
+    if (!matchesColumnFilter(row, columnId, filterValue)) return false;
+  }
+  return true;
+}
+
+function matchesColumnFilter(row: ReportRow, columnId: string, filterValue: string): boolean {
+  if (columnId === 'company') return textIncludes(`${row.company} ${row.symbol} ${row.title ?? ''}`, filterValue);
+  if (columnId === 'marketRegion') {
+    return textIncludes(marketLabel(marketRegionForSymbol(row.symbol, row.exchange)), filterValue);
+  }
+  const kind = columnFilterKind(columnId);
+  if (kind === 'boolean') return matchesBoolean(columnValue(row, columnId), filterValue);
+  if (kind === 'date') return matchesDateFilter(asString(columnValue(row, columnId)), filterValue);
+  if (kind === 'percent') return matchesNumberFilter(asNumber(columnValue(row, columnId), 100), filterValue);
+  if (kind === 'number') return matchesNumberFilter(asNumber(columnValue(row, columnId)), filterValue);
+  return textIncludes(String(columnValue(row, columnId) ?? ''), filterValue);
+}
+
+function columnValue(row: ReportRow, columnId: string): unknown {
+  if (columnId === 'marketRegion') return marketLabel(marketRegionForSymbol(row.symbol, row.exchange));
+  return row[columnId as keyof ReportRow];
+}
+
+function matchesBoolean(value: unknown, filterValue: string): boolean {
+  if (filterValue === 'yes') return value === true;
+  if (filterValue === 'no') return value === false;
+  return true;
+}
+
+function matchesDateFilter(value: string | null, filterValue: string): boolean {
+  if (!value) return false;
+  const range = filterValue.split('..').map((item) => item.trim());
+  if (range.length === 2) {
+    const [min, max] = range;
+    return (!min || value >= min) && (!max || value <= max);
+  }
+  const operator = filterValue.match(/^(<=|>=|<|>|=)\s*(\d{4}-\d{2}-\d{2})$/);
+  if (operator) {
+    const [, op, date] = operator;
+    if (op === '<=') return value <= date;
+    if (op === '>=') return value >= date;
+    if (op === '<') return value < date;
+    if (op === '>') return value > date;
+    return value === date;
+  }
+  return textIncludes(value, filterValue);
+}
+
+function matchesNumberFilter(value: number | null, filterValue: string): boolean {
+  if (value === null || !Number.isFinite(value)) return false;
+  const normalized = filterValue.replaceAll(',', '').replaceAll('%', '').trim();
+  const range = normalized.split('..').map((item) => item.trim());
+  if (range.length === 2) {
+    const min = parseMetricNumber(range[0]);
+    const max = parseMetricNumber(range[1]);
+    return (min === null || value >= min) && (max === null || value <= max);
+  }
+  const operator = normalized.match(/^(<=|>=|<|>|=)?\s*(-?\d+(?:\.\d+)?)([kKmMbB])?$/);
+  if (!operator) return textIncludes(String(value), filterValue);
+  const [, op = '=', rawNumber, suffix] = operator;
+  const target = scaleMetricNumber(Number(rawNumber), suffix);
+  if (op === '<=') return value <= target;
+  if (op === '>=') return value >= target;
+  if (op === '<') return value < target;
+  if (op === '>') return value > target;
+  return Math.abs(value - target) < 0.000001;
+}
+
+function parseMetricNumber(value: string): number | null {
+  if (!value) return null;
+  const match = value.match(/^(-?\d+(?:\.\d+)?)([kKmMbB])?$/);
+  if (!match) return null;
+  return scaleMetricNumber(Number(match[1]), match[2]);
+}
+
+function scaleMetricNumber(value: number, suffix?: string): number {
+  const unit = suffix?.toLowerCase();
+  if (unit === 'k') return value * 1_000;
+  if (unit === 'm') return value * 1_000_000;
+  if (unit === 'b') return value * 1_000_000_000;
+  return value;
+}
+
+function asNumber(value: unknown, multiplier = 1): number | null {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return null;
+  return value * multiplier;
+}
+
+function asString(value: unknown): string | null {
+  return typeof value === 'string' && value ? value : null;
+}
+
+function textIncludes(value: string, filterValue: string): boolean {
+  return value.toLocaleLowerCase('ko-KR').includes(filterValue.toLocaleLowerCase('ko-KR'));
+}
+
 function globalTextFilter(row: Row<ReportRow>, _columnId: string, filterValue: string): boolean {
   const needle = filterValue.trim().toLocaleLowerCase('ko-KR');
   if (!needle) return true;
@@ -571,6 +728,61 @@ function globalTextFilter(row: Row<ReportRow>, _columnId: string, filterValue: s
   return [report.company, report.symbol, report.exchange, report.title, report.publicationDate]
     .filter(Boolean)
     .some((value) => value.toLocaleLowerCase('ko-KR').includes(needle));
+}
+
+function ColumnFilterControl({
+  columnId,
+  value,
+  onChange,
+}: {
+  columnId: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  if (columnFilterKind(columnId) === 'boolean') {
+    return (
+      <NativeSelect
+        aria-label={`${columnLabel(columnId)} 컬럼 필터`}
+        className="h-8 w-full px-1.5 text-[11px] font-normal normal-case tracking-normal text-slate-700"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+      >
+        <NativeSelectOption value="">전체</NativeSelectOption>
+        <NativeSelectOption value="yes">Y</NativeSelectOption>
+        <NativeSelectOption value="no">N</NativeSelectOption>
+      </NativeSelect>
+    );
+  }
+  return (
+    <input
+      aria-label={`${columnLabel(columnId)} 컬럼 필터`}
+      className="h-7 w-full min-w-[72px] rounded border border-slate-200 bg-white px-1.5 font-mono text-[11px] font-normal normal-case tracking-normal text-slate-700 outline-none placeholder:text-slate-300 focus:border-slate-400"
+      value={value}
+      placeholder={columnFilterPlaceholder(columnId)}
+      onChange={(event) => onChange(event.target.value)}
+    />
+  );
+}
+
+function columnLabel(columnId: string): string {
+  return (
+    {
+      company: '리포트',
+      marketRegion: '시장',
+      publicationDate: '게시일',
+      entryPriceNative: '진입가',
+      targetPriceNative: '목표가',
+      targetUpsideAtPub: '제시 상승여력',
+      currentReturn: '현재 수익률',
+      targetRemainingPct: '목표 잔여',
+      targetProgressPct: '달성률',
+      peakReturn: '최고',
+      troughReturn: '최저',
+      targetHit: '목표 달성',
+      daysToTarget: '도달 소요일',
+      lastCloseDate: '최근 가격일',
+    }[columnId] ?? columnId
+  );
 }
 
 function sortIndicator(direction: false | 'asc' | 'desc'): string {

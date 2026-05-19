@@ -20,6 +20,27 @@
 
 ---
 
+## v0.23.0-portfolio-ledger-redesign.1 — 2026-05-19
+
+### 변경
+- `/portfolio`를 실제 투자 포트폴리오 3개만 고르는 랜딩으로 재구성했습니다. 현재 비중 treemap, 전략 전용 최적화 곡선, 포트폴리오 PnL 경로를 전면에 배치했습니다.
+- `/portfolio/[strategy]`를 리포트 상세페이지형 dossier로 재구성하고 overview / holdings / equity / trades / methodology 하위 경로를 추가했습니다.
+- KODEX200, All-Weather, GLD, QQQ, SPY, Follower SL, Follower v1, Weak Prophet은 portfolio 선택지·정적 경로·직렬화 모델·portfolio 링크에서 제거했습니다. 이들은 비교 기준/실험군이지 포트폴리오 원장이 아닙니다.
+- 상세 포트폴리오 PnL 차트에 실제 매수/매도 마커를 얹어 손익 곡선과 거래 시점을 함께 보도록 했습니다.
+- `/strategies` 위험표는 실제 선택 가능한 전략만 portfolio 링크로 보내고, benchmark/follower/oracle 행은 비교 표 안의 텍스트로만 남깁니다.
+- `ReportsTable`을 `DataPanel` 기반으로 정리하고 컬럼별 sticky filter row, active filter chip, reset 흐름을 추가했습니다.
+- `DataPanel` toolbar가 외부 검색 input ref를 받을 수 있게 해 dense table chrome 재사용성을 높였습니다.
+
+### 문서
+- `DESIGN.md`, `docs/handoff-codex.md`, `docs/portfolio-restructure-plan.md`에 portfolio는 실제 strategy ledger만 다룬다는 계약과 새 route/view-model 구조를 반영했습니다.
+
+### 검증
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web check`
+- `pnpm --dir apps/web build`
+- `apps/web/out/portfolio`에서 제외 대상 persona 라벨/id exact-string scan
+
 ## v0.22.0-datapanel-unify.1 — 2026-05-19
 
 ultragoal 7개 스토리 모두 완료. 모든 dense 표가 같은 chrome을 공유.

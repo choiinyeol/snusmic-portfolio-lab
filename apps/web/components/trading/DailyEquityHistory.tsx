@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { CumulativeReturnChart, type ReturnSeries } from '@/components/charts/CumulativeReturnChart';
+import { PortfolioEquityTradeChart } from '@/components/trading/portfolio-views/PortfolioEquityTradeChart';
 import { KpiTile } from '@/components/ui/KpiTile';
 import type { EquityPoint, TradeRow } from '@/lib/artifacts';
 import { formatKrw, formatPercent } from '@/lib/format';
@@ -43,20 +43,6 @@ export function DailyEquityHistory({ equity, trades, persona, personaLabels }: P
     const drawdown = peakEquity > 0 && last.equityKrw !== null ? last.equityKrw / peakEquity - 1 : null;
     return { first, last, peak, trough, drawdown };
   }, [personaEquity]);
-
-  const chartSeries = useMemo<ReturnSeries[]>(
-    () => [
-      {
-        id: persona,
-        label: personaLabels[persona] ?? persona,
-        color: '#1b64da',
-        points: personaEquity
-          .filter((row) => row.cumulativeReturn !== null)
-          .map((row) => ({ time: row.date, value: row.cumulativeReturn ?? 0 })),
-      },
-    ],
-    [persona, personaEquity, personaLabels],
-  );
 
   const recentDays = useMemo(() => personaEquity.slice(-windowSize).reverse(), [personaEquity, windowSize]);
   const tradeCountByDate = useMemo(() => {
@@ -107,7 +93,12 @@ export function DailyEquityHistory({ equity, trades, persona, personaLabels }: P
             <h3 className="text-sm font-semibold text-slate-600">누적 수익률 (일별)</h3>
             <span className="text-xs text-slate-950/55">{personaEquity.length.toLocaleString('ko-KR')}거래일</span>
           </div>
-          <CumulativeReturnChart series={chartSeries} />
+          <PortfolioEquityTradeChart
+            equity={equity}
+            trades={trades}
+            persona={persona}
+            label={personaLabels[persona] ?? persona}
+          />
         </div>
       </section>
 

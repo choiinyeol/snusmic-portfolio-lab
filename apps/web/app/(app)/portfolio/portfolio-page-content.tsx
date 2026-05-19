@@ -1,168 +1,149 @@
-import { PortfolioStrategyView } from '@/components/trading/PortfolioStrategyView';
-import { PageHero } from '@/components/ui/PageHero';
+import Link from 'next/link';
+import type { ReactNode } from 'react';
+import { PortfolioEquityView } from '@/components/trading/portfolio-views/PortfolioEquityView';
+import { PortfolioHoldingsView } from '@/components/trading/portfolio-views/PortfolioHoldingsView';
+import { PortfolioLandingView } from '@/components/trading/portfolio-views/PortfolioLandingView';
+import { PortfolioMethodologyView } from '@/components/trading/portfolio-views/PortfolioMethodologyView';
+import { PortfolioOverviewView } from '@/components/trading/portfolio-views/PortfolioOverviewView';
+import { PortfolioStrategyFrame } from '@/components/trading/portfolio-views/PortfolioStrategyFrame';
+import { PortfolioTradesView } from '@/components/trading/portfolio-views/PortfolioTradesView';
+import type { PortfolioViewModel } from '@/components/trading/portfolio-views/types';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { formatKrw, formatPercent } from '@/lib/format';
 import {
-  getCurrentHoldings,
-  getAccountingReconciliations,
-  getEquityDaily,
-  getLatestReportTargetsBySymbol,
-  getPersonaLabel,
-  getPositionEpisodes,
-  getReportSymbolById,
-  getReportTargetsById,
-  getSummaryRows,
-  getTrades,
-} from '@/lib/artifacts';
-import {
-  getDefaultPortfolioPersona,
-  getStrategyLeaderboard,
-  isBenchmarkPersona,
-  portfolioStrategyHref,
-  type StrategyKind,
-} from '@/lib/product-model';
+  buildPortfolioLandingModel,
+  buildPortfolioViewModel,
+  getPortfolioStaticParams as getStaticParams,
+} from './portfolio-view-model';
 
-const BENCHMARK_COMPARE_IDS = ['benchmark_kodex200', 'benchmark_qqq', 'benchmark_spy'];
+export type PortfolioRouteView = 'overview' | 'holdings' | 'equity' | 'trades' | 'methodology';
 
-export function PortfolioPageContent({ selectedPersona }: { selectedPersona?: string }) {
-  const allHoldings = getCurrentHoldings();
-  const allAccounting = getAccountingReconciliations();
-  const allEquity = getEquityDaily();
-  const summaries = getSummaryRows();
-  const allTrades = getTrades();
-  const allEpisodes = getPositionEpisodes();
-  const allTargetsBySymbol = getLatestReportTargetsBySymbol();
-  const allTargetsByReportId = getReportTargetsById();
-  const strategyRows = getStrategyLeaderboard();
-  const defaultPersona = getDefaultPortfolioPersona();
+export function PortfolioPageContent() {
+  return <PortfolioLandingView model={buildPortfolioLandingModel()} />;
+}
 
-  const strategyById = new Map(strategyRows.map((row) => [row.id, row]));
-  const allPersonas = Array.from(
-    new Set([
-      ...summaries.map((row) => row.persona),
-      ...allHoldings.map((row) => row.persona),
-      ...allTrades.map((row) => row.persona),
-      ...allEquity.map((row) => row.persona),
-    ]),
-  );
-  const orderedStrategyIds = [
-    defaultPersona,
-    ...strategyRows.filter((row) => row.kind === 'strategy' && row.id !== defaultPersona).map((row) => row.id),
-    ...strategyRows.filter((row) => row.kind === 'benchmark').map((row) => row.id),
-    ...strategyRows.filter((row) => row.kind === 'oracle').map((row) => row.id),
-  ];
-  const personas = [
-    ...Array.from(new Set(orderedStrategyIds)).filter((persona) => allPersonas.includes(persona)),
-    ...allPersonas.filter((persona) => !strategyById.has(persona)).sort(),
-  ];
-  const activePersona = selectedPersona && personas.includes(selectedPersona) ? selectedPersona : defaultPersona;
-  const invalidStrategyId = selectedPersona && !personas.includes(selectedPersona) ? selectedPersona : null;
-  const strategyPersonas = personas.filter((persona) => (strategyById.get(persona)?.kind ?? 'strategy') === 'strategy');
-  const benchmarkPersonas = personas.filter(
-    (persona) => (strategyById.get(persona)?.kind ?? inferPersonaKind(persona)) !== 'strategy',
-  );
-  const personaLabels = Object.fromEntries(
-    personas.map((persona) => [persona, strategyById.get(persona)?.label ?? getPersonaLabel(persona)]),
-  );
-  const strategyOptions = personas.map((persona) => {
-    const row = strategyById.get(persona);
-    return {
-      id: persona,
-      label: row?.label ?? getPersonaLabel(persona),
-      shortLabel: row?.shortLabel ?? getPersonaLabel(persona),
-      kind: row?.kind ?? inferPersonaKind(persona),
-      href: portfolioStrategyHref(persona),
-      isDefault: persona === defaultPersona,
-    };
-  });
-  const capitalByPersona = Object.fromEntries(
-    summaries.map((row) => [row.persona, row.totalContributedKrw ?? row.finalEquityKrw ?? 0]),
-  );
-  const cashByPersona = Object.fromEntries(summaries.map((row) => [row.persona, row.finalCashKrw ?? 0]));
-  const methodsByPersona = Object.fromEntries(
-    strategyRows.map((row) => [
-      row.id,
-      {
-        summary: row.methodologySummary,
-        buyRules: row.buyRules,
-        sellRules: row.sellRules,
-        riskControls: row.riskControls,
-      },
-    ]),
-  );
-
-  const relevantEquityIds = new Set([activePersona, ...BENCHMARK_COMPARE_IDS]);
-  const holdings = allHoldings.filter((row) => row.persona === activePersona);
-  const accounting = allAccounting.filter((row) => row.persona === activePersona);
-  const equity = allEquity.filter((row) => relevantEquityIds.has(row.persona));
-  const trades = allTrades.filter((row) => row.persona === activePersona);
-  const episodes = allEpisodes.filter((row) => row.persona === activePersona);
-  const relevantSymbols = new Set([
-    ...holdings.map((row) => row.symbol),
-    ...trades.map((row) => row.symbol),
-    ...episodes.map((row) => row.symbol),
-  ]);
-  const relevantReportIds = new Set(
-    trades.map((trade) => trade.reportId).filter((value): value is string => Boolean(value)),
-  );
-  const targetsBySymbol = Object.fromEntries(
-    Object.entries(allTargetsBySymbol).filter(([symbol]) => relevantSymbols.has(symbol)),
-  );
-  const targetsByReportId = Object.fromEntries(
-    Object.entries(allTargetsByReportId).filter(
-      ([reportId, target]) => relevantReportIds.has(reportId) || relevantSymbols.has(target.symbol),
-    ),
-  );
-  const reportSymbolsById = Object.fromEntries(
-    Array.from(relevantReportIds)
-      .map((reportId) => [reportId, getReportSymbolById(reportId)])
-      .filter((entry): entry is [string, string] => Boolean(entry[1])),
-  );
-  const latestEquity = allEquity.reduce((latest, row) => (row.date > latest ? row.date : latest), '');
+export function PortfolioPageShell({ children, model }: { children: ReactNode; model: PortfolioViewModel }) {
+  const persona = model.selectedPersona;
+  const label = model.personaLabels[persona] ?? persona;
+  const shortLabel = model.strategyOptions.find((row) => row.id === persona)?.shortLabel ?? label;
+  const holdingsValue = model.holdings.reduce((sum, row) => sum + (row.marketValueKrw ?? 0), 0);
+  const cashKrw = model.cashByPersona[persona] ?? 0;
+  const totalValue = holdingsValue + cashKrw;
+  const totalPnl = model.holdings.reduce((sum, row) => sum + (row.unrealizedPnlKrw ?? 0), 0);
+  const tradeCount = model.trades.length;
+  const latestEquity = [...model.equity].sort((a, b) => b.date.localeCompare(a.date))[0];
 
   return (
-    <>
-      <PageHero
-        eyebrow="보유 현황"
-        title="포트폴리오"
-        subtitle="보유 종목, 매매내역, 현금 흐름, 연결 리포트 근거를 저장된 데이터 기준으로 확인합니다."
-        badges={[
-          { label: '선택 전략', value: `${strategyPersonas.length}개` },
-          { label: '벤치마크', value: `${benchmarkPersonas.length}개` },
-          { label: '매매내역', value: allTrades.length.toLocaleString('ko-KR') },
-          { label: '최근 평가', value: latestEquity || '—' },
-        ]}
-      />
-
-      <PortfolioStrategyView
-        holdings={holdings}
-        accounting={accounting}
-        equity={equity}
-        trades={trades}
-        episodes={episodes}
-        personas={personas}
-        personaLabels={personaLabels}
-        strategyOptions={strategyOptions}
-        strategyRows={strategyRows}
-        defaultPersona={defaultPersona}
-        selectedPersona={activePersona}
-        invalidStrategyId={invalidStrategyId}
-        methodsByPersona={methodsByPersona}
-        capitalByPersona={capitalByPersona}
-        cashByPersona={cashByPersona}
-        reportSymbolsById={reportSymbolsById}
-        targetsBySymbol={targetsBySymbol}
-        targetsByReportId={targetsByReportId}
-      />
-    </>
+    <div className="grid gap-5">
+      <header className="grid gap-4 border-b border-slate-200 pb-5">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="outline">포트폴리오 원장</Badge>
+          <Badge variant="secondary">benchmark 제외</Badge>
+          <span className="font-mono text-xs text-slate-500">{model.latestEquityDate || '—'} 평가</span>
+        </div>
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(420px,.75fr)] xl:items-end">
+          <div className="min-w-0">
+            <h1 className="text-2xl font-semibold tracking-[-0.02em] text-slate-950 md:text-4xl">{shortLabel}</h1>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+              {label}의 실제 보유, 현금, 체결, 매매 로직만 보여줍니다. benchmark·follower·oracle류는 `/strategies` 비교
+              페이지에 남기고 이 원장에는 섞지 않습니다.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button asChild size="sm" variant="outline">
+                <Link href="/portfolio">포트폴리오 선택</Link>
+              </Button>
+              <Button asChild size="sm" variant="outline">
+                <Link href="/strategies">전략 비교</Link>
+              </Button>
+            </div>
+          </div>
+          <FactsTable
+            rows={[
+              { label: '평가액', value: formatKrw(totalValue), tone: 'neutral' },
+              {
+                label: '현금',
+                value: formatKrw(cashKrw),
+                caption: formatPercent(totalValue > 0 ? cashKrw / totalValue : null),
+              },
+              { label: '미실현', value: formatKrw(totalPnl), tone: totalPnl >= 0 ? 'good' : 'bad' },
+              {
+                label: '누적 수익률',
+                value: formatPercent(latestEquity?.cumulativeReturn ?? null),
+                tone: (latestEquity?.cumulativeReturn ?? 0) >= 0 ? 'good' : 'bad',
+              },
+              { label: '보유', value: `${model.holdings.length}개` },
+              { label: '체결', value: tradeCount.toLocaleString('ko-KR') },
+            ]}
+          />
+        </div>
+      </header>
+      <PortfolioStrategyFrame model={model}>{children}</PortfolioStrategyFrame>
+    </div>
   );
 }
 
-export function getPortfolioStaticParams() {
-  const strategyRows = getStrategyLeaderboard();
-  const summaries = getSummaryRows();
-  const summaryIds = new Set(summaries.map((row) => row.persona));
-  return strategyRows.filter((row) => summaryIds.has(row.id)).map((row) => ({ strategy: row.id }));
+export function PortfolioRouteContent({
+  selectedPersona,
+  view,
+}: {
+  selectedPersona: string;
+  view: PortfolioRouteView;
+}) {
+  const model = buildPortfolioViewModel(selectedPersona);
+  return <PortfolioRouteContentFromModel model={model} view={view} />;
 }
 
-function inferPersonaKind(persona: string): StrategyKind {
-  return isBenchmarkPersona(persona) ? 'benchmark' : 'strategy';
+export function PortfolioRouteContentFromModel({
+  model,
+  view,
+}: {
+  model: PortfolioViewModel;
+  view: PortfolioRouteView;
+}) {
+  if (view === 'holdings') return <PortfolioHoldingsView model={model} />;
+  if (view === 'equity') return <PortfolioEquityView model={model} />;
+  if (view === 'trades') return <PortfolioTradesView model={model} />;
+  if (view === 'methodology') {
+    return (
+      <PortfolioMethodologyView
+        method={model.methodsByPersona[model.selectedPersona]}
+        personaLabel={model.personaLabels[model.selectedPersona] ?? model.selectedPersona}
+      />
+    );
+  }
+  return <PortfolioOverviewView model={model} />;
+}
+
+export const getPortfolioStaticParams = getStaticParams;
+
+type FactRow = {
+  label: string;
+  value: string;
+  caption?: string;
+  tone?: 'neutral' | 'good' | 'bad';
+};
+
+function FactsTable({ rows }: { rows: FactRow[] }) {
+  return (
+    <section className="overflow-hidden rounded-md border border-slate-200 bg-white" aria-label="포트폴리오 핵심 지표">
+      <dl className="grid grid-cols-2 sm:grid-cols-3 [&>div]:border-b [&>div]:border-r [&>div]:border-slate-100">
+        {rows.map((row) => (
+          <div className="grid min-w-0 gap-0.5 p-3" key={row.label}>
+            <dt className="text-xs font-medium text-slate-500">{row.label}</dt>
+            <dd className={`truncate font-mono text-sm font-semibold tabular-nums ${toneClass(row.tone)}`}>
+              {row.value}
+            </dd>
+            {row.caption ? <dd className="truncate text-xs text-slate-500">{row.caption}</dd> : null}
+          </div>
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function toneClass(tone: FactRow['tone']): string {
+  if (tone === 'good') return 'text-emerald-600';
+  if (tone === 'bad') return 'text-rose-600';
+  return 'text-slate-950';
 }

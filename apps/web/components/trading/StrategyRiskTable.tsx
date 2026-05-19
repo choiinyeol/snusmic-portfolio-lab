@@ -93,10 +93,15 @@ export function StrategyRiskTable({
                 </span>
               </td>
               <td className="min-w-[130px] max-w-[230px] px-3 py-2">
-                <Link className="block min-w-0" href={row.href} title={row.label}>
-                  <span className="block truncate font-bold text-slate-950">{row.shortLabel || row.label}</span>
-                  <span className="block truncate text-[11px] font-medium text-slate-500">{row.label}</span>
-                </Link>
+                {row.kind === 'strategy' && row.isSelectable ? (
+                  <Link className="block min-w-0" href={row.href} title={row.label}>
+                    <StrategyName row={row} />
+                  </Link>
+                ) : (
+                  <div className="block min-w-0" title={`${row.label} — 비교 기준이며 포트폴리오 원장이 아닙니다.`}>
+                    <StrategyName row={row} />
+                  </div>
+                )}
               </td>
               <td
                 className={`px-3 py-2 text-right font-mono font-black tabular-nums ${signedTextClass(row.returnPct)}`}
@@ -127,6 +132,15 @@ export function StrategyRiskTable({
         </tbody>
       </table>
     </DataPanel>
+  );
+}
+
+function StrategyName({ row }: { row: StrategyLeaderboardRow }) {
+  return (
+    <>
+      <span className="block truncate font-bold text-slate-950">{row.shortLabel || row.label}</span>
+      <span className="block truncate text-[11px] font-medium text-slate-500">{row.label}</span>
+    </>
   );
 }
 

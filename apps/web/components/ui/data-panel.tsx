@@ -1,7 +1,7 @@
 'use client';
 
 import { Download, SearchX } from 'lucide-react';
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 import { BlockPagination } from '@/components/trading/TableControls';
 
 /** Shared dense-table chrome: header (title + actions + optional search),
@@ -18,7 +18,9 @@ export type DataPanelProps = {
     onChange: (value: string) => void;
     placeholder?: string;
     ariaLabel?: string;
+    inputRef?: Ref<HTMLInputElement>;
   };
+  toolbar?: ReactNode;
   pagination?: {
     page: number;
     pageCount: number;
@@ -31,7 +33,7 @@ export type DataPanelProps = {
   children: ReactNode;
 };
 
-export function DataPanel({ title, subtitle, actions, search, pagination, children }: DataPanelProps) {
+export function DataPanel({ title, subtitle, actions, search, toolbar, pagination, children }: DataPanelProps) {
   return (
     <section className="overflow-hidden rounded-md border border-slate-200 bg-white">
       <header className="grid gap-2 border-b border-slate-200 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
@@ -42,6 +44,7 @@ export function DataPanel({ title, subtitle, actions, search, pagination, childr
         <div className="flex flex-wrap items-center justify-end gap-2">
           {search ? (
             <input
+              ref={search.inputRef}
               type="search"
               value={search.value}
               onChange={(event) => search.onChange(event.target.value)}
@@ -53,6 +56,7 @@ export function DataPanel({ title, subtitle, actions, search, pagination, childr
           {actions}
         </div>
       </header>
+      {toolbar ? <div className="border-b border-slate-200 bg-white px-4 py-3">{toolbar}</div> : null}
       <div className="max-h-[72vh] overflow-auto">{children}</div>
       {pagination ? (
         <footer className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 border-t border-slate-200 bg-slate-50 px-4 py-2.5 font-mono text-[11px] text-slate-500">
