@@ -271,9 +271,7 @@ class SmicRsiReversalConfig(_PersonaBase):
     follower.
     """
 
-    persona_name: Annotated[str, Field(pattern=r"^smic_rsi_reversal(_top[0-9]+)?$")] = (
-        "smic_rsi_reversal"
-    )
+    persona_name: Annotated[str, Field(pattern=r"^smic_rsi_reversal(_top[0-9]+)?$")] = "smic_rsi_reversal"
     label: str = "RSI Reversal Strategy"
 
     min_target_upside_at_pub: Annotated[float, Field(ge=0.0, le=10.0)] = 0.10
@@ -309,6 +307,50 @@ class SmicRsiReversalConfig(_PersonaBase):
         return self
 
 
+class StockRulePersonaConfig(_PersonaBase):
+    """OOS-admitted stock-level ranking rule promoted into the portfolio engine.
+
+    These personas are created by the stock-rule search lane.  They trade real
+    shares in the same account ledger as the hand-written personas, but the
+    signal itself is a frozen, audited rule discovered in an in-sample window
+    and admitted only after out-of-sample replay.
+    """
+
+    persona_name: Annotated[str, Field(pattern=r"^stock_rule_[a-z0-9_]+$")]
+    label: str
+    rule_id: Annotated[str, Field(min_length=1)]
+    family: Literal["target_upside_momentum", "fresh_report_momentum", "target_gap_reversal"]
+    fast_ma_days: Annotated[int, Field(ge=1, le=300)]
+    slow_ma_days: Annotated[int, Field(ge=1, le=500)]
+    min_report_age_days: Annotated[int, Field(ge=0, le=3650)]
+    max_report_age_days: Annotated[int, Field(ge=0, le=3650)]
+    rebalance: Literal["D", "W", "M"]
+    top_pool: Annotated[int, Field(ge=1, le=200)]
+    hold_top: Annotated[int, Field(ge=1, le=200)]
+    weight_mode: Literal["equal", "rank_linear", "winner_compress", "score_proportional"]
+    score_mode: Literal["dynamic_upside", "blend", "momentum_blend", "reversal_gap"]
+    min_dynamic_upside: float = 0.0
+    min_momentum_return: float = -1.0
+    min_pullback_pct: float = 0.0
+    source_search_start: date | None = None
+    source_search_end: date | None = None
+    source_oos_start: date | None = None
+    source_oos_end: date | None = None
+    source_oos_total_return: float | None = None
+    source_oos_sharpe: float | None = None
+    source_oos_sortino: float | None = None
+
+    @model_validator(mode="after")
+    def _check_stock_rule_bounds(self) -> StockRulePersonaConfig:
+        if self.slow_ma_days < self.fast_ma_days:
+            raise ValueError("slow_ma_days must be >= fast_ma_days")
+        if self.max_report_age_days < self.min_report_age_days:
+            raise ValueError("max_report_age_days must be >= min_report_age_days")
+        if self.hold_top > self.top_pool:
+            raise ValueError("hold_top must be <= top_pool")
+        return self
+
+
 PersonaConfig = (
     ProphetConfig
     | WeakProphetConfig
@@ -316,6 +358,7 @@ PersonaConfig = (
     | SmicFollowerV2Config
     | SmicMttStrategyConfig
     | SmicRsiReversalConfig
+    | StockRulePersonaConfig
     | AllWeatherConfig
 )
 

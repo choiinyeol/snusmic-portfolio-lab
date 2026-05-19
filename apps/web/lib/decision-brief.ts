@@ -218,7 +218,7 @@ function exactReportHref(report: ReportRow): string {
 
 function exactTradeReportHref(trade: TradeRow): string {
   if (!trade.reportId) {
-    throw new Error(`Trade report link requires reportId for ${trade.symbol} on ${trade.date}`);
+    return `/portfolio/${encodeURIComponent(trade.persona)}`;
   }
   return `/reports/${encodeURIComponent(trade.symbol)}/${encodeURIComponent(trade.reportId)}`;
 }

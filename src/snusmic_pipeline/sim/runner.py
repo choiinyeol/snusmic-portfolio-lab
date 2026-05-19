@@ -23,6 +23,7 @@ from .contracts import (
     SmicFollowerV2Config,
     SmicMttStrategyConfig,
     SmicRsiReversalConfig,
+    StockRulePersonaConfig,
     WeakProphetConfig,
 )
 from .holdings import (
@@ -40,6 +41,7 @@ from .personas import (
     simulate_smic_follower_v2,
     simulate_smic_mtt_strategy,
     simulate_smic_rsi_reversal,
+    simulate_stock_rule_persona,
     simulate_weak_prophet,
 )
 from .report_stats import aggregate_report_stats, compute_report_performance
@@ -233,6 +235,16 @@ def _dispatch(
         )
     if isinstance(persona, SmicRsiReversalConfig):
         return simulate_smic_rsi_reversal(
+            persona,
+            config.savings_plan,
+            config.fees,
+            board,
+            reports,
+            cashflows,
+            trading_dates,
+        )
+    if isinstance(persona, StockRulePersonaConfig):
+        return simulate_stock_rule_persona(
             persona,
             config.savings_plan,
             config.fees,

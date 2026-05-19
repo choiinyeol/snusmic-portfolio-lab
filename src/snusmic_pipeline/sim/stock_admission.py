@@ -100,7 +100,7 @@ class StockRuleMetrics(_FrozenStockModel):
 class StockRuleCandidate(_FrozenStockModel):
     """A stock-level rule discovered only from the in-sample window."""
 
-    rule_id: Annotated[str, Field(pattern=r"^[a-z0-9][a-z0-9_.-]*$")]
+    rule_id: Annotated[str, Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")]
     family: StockRuleFamily
     symbol: Annotated[str, Field(min_length=1)]
     company: str | None = None
@@ -156,7 +156,8 @@ class StockAdmissionDecision(_FrozenStockModel):
                     f"got {self.out_of_sample_metrics.trade_count} < {self.min_trades}"
                 )
             if self.min_sharpe is not None and (
-                self.out_of_sample_metrics.sharpe is None or self.out_of_sample_metrics.sharpe < self.min_sharpe
+                self.out_of_sample_metrics.sharpe is None
+                or self.out_of_sample_metrics.sharpe < self.min_sharpe
             ):
                 raise ValueError("accepted stock-rule candidates must satisfy the OOS Sharpe gate")
             if self.min_sortino is not None and (

@@ -29,7 +29,7 @@ import json  # noqa: E402
 import pandas as pd  # noqa: E402
 
 from snusmic_pipeline.sim.broker_strategy_search import find_top_broker_strategy_configs  # noqa: E402
-from snusmic_pipeline.sim.contracts import SimulationConfig  # noqa: E402
+from snusmic_pipeline.sim.contracts import SimulationConfig, StockRulePersonaConfig  # noqa: E402
 from snusmic_pipeline.sim.runner import run_simulation  # noqa: E402
 from snusmic_pipeline.sim.visualize import (  # noqa: E402
     plot_drawdowns,
@@ -126,6 +126,12 @@ def parse_args() -> argparse.Namespace:
         type=str,
         default=os.environ.get("SMIC_BROKER_STRATEGY_TRAIN_END", "2023-12-31"),
     )
+    parser.add_argument(
+        "--stock-rule-personas",
+        type=Path,
+        default=None,
+        help="Optional JSON list of OOS-admitted StockRulePersonaConfig rows to include.",
+    )
     return parser.parse_args()
 
 
@@ -178,6 +184,14 @@ def main() -> int:
                 "non-qualifying candidate rows are intentionally not exported."
             )
         config = config.model_copy(update={"personas": (*config.personas, *search.configs)})
+    else:
+        (out / "broker_strategy_trials.csv").unlink(missing_ok=True)
+
+    stock_rule_path = args.stock_rule_personas or (out / "stock-rule-personas.json")
+    if stock_rule_path.exists():
+        stock_rule_configs = _load_stock_rule_personas(stock_rule_path)
+        if stock_rule_configs:
+            config = config.model_copy(update={"personas": (*config.personas, *stock_rule_configs)})
 
     print(f"Running simulation {config.start_date} → {config.end_date}")
     print(f"  warehouse: {args.warehouse}")
@@ -297,6 +311,13 @@ def main() -> int:
 
     print(f"\nArtifacts written to {out}")
     return 0
+
+
+def _load_stock_rule_personas(path: Path) -> tuple[StockRulePersonaConfig, ...]:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, list):
+        raise ValueError(f"{path} must be a JSON list of stock-rule persona configs")
+    return tuple(StockRulePersonaConfig.model_validate(row) for row in data)
 
 
 if __name__ == "__main__":

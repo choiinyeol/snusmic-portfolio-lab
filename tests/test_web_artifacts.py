@@ -228,18 +228,21 @@ def test_strategy_catalog_uses_behavior_labels_and_admission_audit(tmp_path: Pat
     )
 
     catalog = json.loads((out / "strategies" / "catalog.json").read_text(encoding="utf-8"))
-    promoted = [row for row in catalog if str(row.get("strategy_id", "")).startswith("smic_mtt_strategy")]
+    promoted = [row for row in catalog if str(row.get("strategy_id", "")).startswith("stock_rule_")]
     assert promoted
+    assert len(promoted) >= 10
     for row in promoted:
-        assert not str(row["label"]).startswith("SMIC MTT Strategy")
-        assert not str(row["short_label"]).startswith("MTT #")
-        assert "Report" in row["label"]
-        assert "MTT는 전략명 자체가 아니라" in row["methodology_summary"]
+        assert str(row["label"]).startswith("Stock Rule")
+        assert "in-sample(search_is)" in row["methodology_summary"]
+        assert row["is_selectable"] is True
 
     admission = json.loads((out / "strategies" / "admission.json").read_text(encoding="utf-8"))
     assert admission["schema_version"] == "1.0.0"
-    assert admission["accepted_count"] == len(promoted)
-    assert set(admission["accepted_strategy_ids"]) == {row["strategy_id"] for row in promoted}
+    assert admission["stock_accepted_count"] == len(promoted)
+    assert admission["stock_admission"]["accepted_count"] == len(promoted)
+    assert {row["persona"] for row in admission["stock_admission"]["accepted_rules"]} == {
+        row["strategy_id"] for row in promoted
+    }
 
     csv_text = (out / "table-download-strategies.csv").read_text(encoding="utf-8")
     assert "SMIC MTT Strategy" not in csv_text

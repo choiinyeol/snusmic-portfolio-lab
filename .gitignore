@@ -33,3 +33,10 @@ apps/web/tsconfig.tsbuildinfo
 data/optuna/
 /public/
 .vercel/
+
+# Stock-rule search scratch outputs (stock-admission/personas are committed product inputs)
+data/sim/is-search.csv
+data/sim/is-search.json
+data/sim/oos-admission.csv
+data/sim/oos-admission.json
+data/sim/summary.json
