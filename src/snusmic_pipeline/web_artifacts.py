@@ -1495,6 +1495,11 @@ def _admission_trial_row(row: dict[str, Any]) -> dict[str, Any]:
         "slow_ma_window",
         "max_positions",
         "universe",
+        "trend_filter",
+        "atr_period_days",
+        "supertrend_multiplier",
+        "breakout_lookback_days",
+        "breakout_atr_multiple",
         "top_up_cadence",
         "stop_loss_pct",
         "take_profit_pct",
@@ -1579,7 +1584,7 @@ def _strategy_display_label(strategy_id: str, config: dict[str, Any], fallback: 
     universe = {"all": "Global", "domestic": "Korea", "overseas": "Overseas"}.get(
         str(config.get("universe") or "all"), "Global"
     )
-    signal = "Trend" if config.get("require_mtt", True) else "Momentum"
+    signal = _strategy_signal_label(config)
     max_positions = int(config.get("max_positions") or 0)
     concentration = "Focused" if max_positions <= 10 else "Balanced" if max_positions <= 25 else "Broad"
     suffix = f" #{rank}" if rank else ""
@@ -1602,15 +1607,19 @@ def _methodology_summary(strategy_id: str, config: dict[str, Any]) -> str:
             "미래 가격 정보를 일부 사용하는 강한 상한선 기준입니다. 투자 가능한 전략으로 해석하지 않습니다."
         )
     if strategy_id.startswith("smic_mtt_strategy"):
-        if config.get("trend_filter") == "ma_crossover":
-            return (
-                "리포트 업사이드와 단기/장기 이동평균 골든크로스 조건을 통과한 종목만 실제 주식 수량 단위로 "
-                "매수·보유·매도하는 포트폴리오 전략입니다."
-            )
-        return "리포트 업사이드와 가격 추세 조건을 통과한 종목만 실제 주식 수량 단위로 매수·보유·매도하는 포트폴리오 전략입니다. MTT는 전략명 자체가 아니라 내부 추세 필터 중 하나입니다."
-    if strategy_id.startswith("smic_rsi_reversal"):
-        return "유효한 상승 리포트를 가진 종목이 단기 RSI 과매도와 최근 고점 대비 하락 조건을 동시에 만족할 때 실제 주식 수량 단위로 매수하는 단기 반등 전략입니다."
+        return "리포트 업사이드와 가격 추세 조건(MTT·Supertrend·ATR breakout)을 통과한 종목만 실제 주식 수량 단위로 매수·보유·매도하는 포트폴리오 전략입니다. MTT는 전략명 자체가 아니라 내부 추세 필터 중 하나입니다."
     return "시뮬레이션에 포함된 전략입니다."
+
+
+def _strategy_signal_label(config: dict[str, Any]) -> str:
+    if not config.get("require_mtt", True):
+        return "Momentum"
+    trend_filter = str(config.get("trend_filter") or "mtt")
+    if trend_filter == "supertrend":
+        return "Supertrend"
+    if trend_filter == "atr_breakout":
+        return "Breakout"
+    return "Trend"
 
 
 def _buy_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
@@ -1624,11 +1633,20 @@ def _buy_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
             f"투자 유니버스: {config.get('universe', 'all')}",
         ]
         if config.get("require_mtt"):
-            trend_filter = config.get("trend_filter")
-            if trend_filter == "ma_crossover":
-                rules.append(
-                    f"MA 전환 추세 {int(config.get('fast_ma_window') or 0)}일 > "
-                    f"{int(config.get('slow_ma_window') or 0)}일"
+            trend_filter = str(config.get("trend_filter") or "mtt")
+            if trend_filter == "supertrend":
+                rules.extend(
+                    [
+                        f"Supertrend 근사: ATR {int(config.get('atr_period_days') or 0)}일",
+                        f"Supertrend 배수 {float(config.get('supertrend_multiplier') or 0):.1f}x",
+                    ]
+                )
+            elif trend_filter == "atr_breakout":
+                rules.extend(
+                    [
+                        f"ATR breakout 근사: 직전 {int(config.get('breakout_lookback_days') or 0)}거래일 고가 돌파",
+                        f"돌파 여유 ATR {float(config.get('breakout_atr_multiple') or 0):.2f}x",
+                    ]
                 )
             else:
                 rules.extend(
@@ -1638,13 +1656,6 @@ def _buy_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
                         f"200일선 1개월 변화율 {_pct(config.get('min_ma200_1m_return'))} 이상",
                     ]
                 )
-        if float(config.get("min_relative_strength_percentile") or 0) > 0:
-            rules.append(
-                f"{int(config.get('relative_strength_lookback_days') or 0)}거래일 상대강도 "
-                f"상위 {_pct(config.get('min_relative_strength_percentile'))} 이상"
-            )
-        if float(config.get("min_momentum_return") or -1) > -1:
-            rules.append(f"동일 기간 모멘텀 수익률 {_pct(config.get('min_momentum_return'))} 이상")
         return rules
     if strategy_id.startswith("smic_rsi_reversal"):
         if not config:
