@@ -20,6 +20,37 @@
 
 ---
 
+## v0.21.10-statistics-deep-change.1 — 2026-05-19
+
+### 동기
+- 사용자 피드백: "200개 주식 전체 통계는 의미 없다. q-q plot 하나만 맘에 드는데 상단이 막혀 있어서 별로다. HD현대일렉트릭은 1800% 갔는데." 평균·도달률 같은 cross-section aggregate는 holding effect에 압도되어 retail 독자에게 인사이트를 못 준다는 것. 페이지의 구조와 콘텐츠를 종목 단위 인사이트 중심으로 다시 짬.
+
+### 변경 (Q-Q plot)
+- `WholeSampleMap` y축 클리핑(`Math.min(1.5, value)`) 제거. ±50% 안쪽은 선형, 바깥은 log10 압축한 signed-log 스케일로 교체. HD현대일렉트릭 +1800% 같은 outlier가 잘리지 않고 끝까지 보임.
+- y축에 의미 있는 tick label 추가(-80%/-50%/-20%/0%/+20%/+50%/+100%/+200%/+500%/+1000%/+2000%, 관측 최댓값에 맞춰 동적). 0% 라인 강조.
+- 상위 3개 종목의 회사명을 점 옆에 인라인 라벨로 표시. `DataPoint`에 `annotation` prop 추가.
+- 차트 높이 320px → 448px로 키워서 dominant visual로 만들고, "꼬리 개수" 사이드 패널은 제거(분위수 테이블만 유지).
+
+### 추가 (종목 단위 인사이트)
+- `WinnersLosersBoard`: 가장 크게 간 종목 10건 + 가장 크게 빠진 종목 5건. 회사명·티커·발간일·목표 도달 여부·현재 수익률을 표 형태로. 평균 뒤에 숨어 있던 이름들을 직접 보여줌.
+- `ConcentrationInsight`: 전체 (+) 수익률 합을 100%로 두고 상위 1/3/5/10/25건이 차지하는 비중을 가로 바로 표시. "수익은 몇 종목이 만들었나"라는 retail 핵심 질문에 직접 답.
+
+### 제거 (aggregate-만-보여주는 섹션)
+- `TriggerFrontier` (눌림목 vs 돌파 진입 규칙) 제거 — academic, retail 의사결정에 직결되지 않음.
+- `PostTargetDrift` (목표가 도달 후 +5/+20/+60/+120D 분포) 제거 — 표본 전체 aggregate.
+- `TargetMultipleCurve` (목표 배수별 보상/신뢰 점수) 제거 — 합성 점수가 retail 직관에 안 잡힘.
+- `RangeBar` 헬퍼 동시에 제거 (호출자 사라짐).
+
+### 변경 (히어로 카피)
+- "발간된 리포트는 실제로 어디까지 갔을까요" → "큰 수익은 누가 만들었을까요". 본문도 "누가 크게 갔고, 누가 빠졌고, 전체 수익이 얼마나 소수에 집중됐는지"로 재정렬.
+
+### 검증
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web build` (정적 페이지 413개)
+
+---
+
 ## v0.21.9-statistics-saas-rewrite.1 — 2026-05-19
 
 ### 변경 (톤 · 카피)

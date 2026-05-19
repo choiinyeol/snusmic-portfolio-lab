@@ -16,12 +16,6 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
   const thresholdRows = summary.fractionalHitRates.filter((row) => row.threshold === threshold);
   const selectedHit = thresholdRows.find((row) => row.horizonDays === horizon) ?? thresholdRows.at(-1);
   const delayRows = summary.delayedEntry.filter((row) => row.horizonDays === horizon);
-  const triggerRows = summary.entryTriggers.filter((row) => row.horizonDays === horizon);
-  const multipleRows = summary.optimalTargetMultiples.filter((row) => row.horizonDays === 250);
-  const bestMultiple = [...multipleRows].sort(
-    (a, b) =>
-      (b.rewardReliabilityScore ?? Number.NEGATIVE_INFINITY) - (a.rewardReliabilityScore ?? Number.NEGATIVE_INFINITY),
-  )[0];
   const currentReturns = summary.riskScatter.map((row) => row.currentReturn).filter(isNumber);
   const sortedReturns = [...currentReturns].sort((a, b) => a - b);
   const meanReturn = mean(currentReturns);
@@ -44,6 +38,7 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
   const trimmedMean10 = trimmedMean(currentReturns, 0.1);
   const uniqueSymbolCount = new Set(summary.riskScatter.map((row) => row.symbol).filter(Boolean)).size;
   const vintageCohorts = buildVintageCohorts(summary.riskScatter);
+  const concentration = buildConcentration(summary.riskScatter);
 
   return (
     <div className="grid gap-14">
@@ -53,11 +48,12 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
             리포트 성과
           </div>
           <h1 className="mt-3 text-4xl font-semibold tracking-[-0.055em] text-slate-950 md:text-6xl">
-            발간된 리포트는 실제로 어디까지 갔을까요
+            큰 수익은 누가 만들었을까요
           </h1>
           <p className="mt-5 text-base leading-8 text-slate-600">
-            발간된 분석 리포트 {summary.sample.eligibleReportCount.toLocaleString('ko-KR')}건이 이후 어떤 가격 경로를
-            지나갔는지 한 페이지에 모았습니다. 목표가 도달률, 중간 손실, 도달 후 흐름까지 한 번에 보고 비교해 보세요.
+            SMIC가 발간한 리포트 {summary.sample.eligibleReportCount.toLocaleString('ko-KR')}건을 끝까지 추적했습니다.
+            평균 한 줄로는 보이지 않습니다 — 누가 크게 갔고, 누가 빠졌고, 전체 수익이 얼마나 소수에 집중됐는지가 진짜
+            그림입니다.
           </p>
         </div>
         <DistributionSignature
@@ -73,34 +69,61 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
 
       <StorySection
         kicker="전체 분포"
-        title="모든 리포트를 한 줄에 늘어놓으면"
-        body="발간된 리포트 한 건이 점 하나입니다. 현재 수익률 순으로 늘어놓으면 어디가 평균이고 어디가 양극단인지 한눈에 보입니다."
+        title="리포트 한 건은 점 하나"
+        body="왼쪽부터 수익률이 낮은 순서. 위로 길게 뻗은 몇 개의 점이 전체 그림을 바꿉니다 — 가장 큰 수익을 만든 종목 셋의 이름이 그래프 위에 표시됩니다."
       >
         <WholeSampleMap rows={summary.riskScatter} quantiles={returnQuantiles} />
         <InsightLine>
           전체 표본의 하위 10%는 <strong>{formatPercent(returnQuantiles.p10)}</strong> 이하, 상위 10%는{' '}
-          <strong>{formatPercent(returnQuantiles.p90)}</strong> 이상입니다. 평균만 보면 한쪽 끝의 큰 수익·큰 손실이
-          가려질 수 있어, 중앙값과 사분위를 함께 봅니다.
+          <strong>{formatPercent(returnQuantiles.p90)}</strong> 이상. 평균과 중앙값 사이의 간격이 바로 몇 건의 큰 수익이
+          평균을 끌어올린 폭입니다.
         </InsightLine>
-        <VintageCohortTable cohorts={vintageCohorts} />
+      </StorySection>
+
+      <StorySection
+        kicker="크게 간 종목 · 크게 빠진 종목"
+        title="평균 뒤에 숨어 있던 이름들"
+        body="평균 한 숫자만 보면 사라지는 정보입니다. 실제로 누가 크게 갔고 누가 빠졌는지 이름을 봅니다."
+      >
+        <WinnersLosersBoard rows={summary.riskScatter} />
+      </StorySection>
+
+      <StorySection
+        kicker="수익 집중도"
+        title="수익은 상위 몇 건이 만들었나"
+        body="전체 표본의 누적 (+) 수익률을 상위 N건이 얼마나 차지하는지 봅니다. 수익이 몇 종목에 몰릴수록, 평균은 그 종목들의 그림자일 뿐입니다."
+      >
+        <ConcentrationInsight rows={concentration} />
       </StorySection>
 
       <StorySection
         kicker="경로 유형"
-        title="같은 수익률에도 다른 길이 있었습니다"
-        body="목표가에 빠르게 닿은 리포트, 큰 손실을 거쳤다가 회복한 리포트, 끝내 손실로 끝난 리포트를 나눠봅니다. 같은 결과여도 도착한 방식이 달랐습니다."
+        title="같은 결과여도 다른 길로 도착했습니다"
+        body="목표가에 빠르게 닿은 리포트, 큰 손실을 거쳤다가 회복한 리포트, 끝내 손실로 끝난 리포트를 나눠봅니다."
       >
         <PathBucketPanel buckets={pathBuckets} exampleMetaById={exampleMetaById} total={eligiblePathCount} />
-        <InsightLine>
-          “큰 손실 후 적중” 그룹은 손절선을 너무 촘촘하게 잡으면 놓치는 표본입니다. “반납한 표본”은 목표가에 한 번
-          닿았지만 이후 다시 빠졌던 케이스로, 익절 규칙을 따로 볼 필요가 있습니다.
-        </InsightLine>
       </StorySection>
 
       <StorySection
-        kicker="목표가 도달률"
-        title="목표가의 60·80·100%까지 가본 비율"
-        body="목표가에 완전히 닿지 않더라도 80%까지는 갔다면 의미 있는 결과입니다. 도달 기준을 바꾸어가며 도달률과 도달까지 걸린 시간을 봅니다."
+        kicker="발간 시기별"
+        title="시장 국면이 다른 해의 표본"
+        body="2024년 모멘텀과 2022년 약세장은 같은 표본이 아닙니다. 발간 연도별로 도달률과 중앙 수익률을 나눠 봅니다."
+      >
+        <VintageCohortTable cohorts={vintageCohorts} />
+      </StorySection>
+
+      <StorySection
+        kicker="중간 손실"
+        title="끝까지 들고 가려면 얼마까지 빠질 각오?"
+        body="발간 이후 최대 상승폭과 최대 하락폭을 같은 그림에 놓습니다. 결과적으로 맞춘 리포트도 도착까지 굴곡이 있었습니다."
+      >
+        <RiskScatter rows={summary.riskScatter} />
+      </StorySection>
+
+      <StorySection
+        kicker="참고 지표"
+        title="가정을 바꿔보면"
+        body="이상은 모두 발간 당일 종가에 1주씩 산 가정입니다. 도달 기준과 진입 시점을 바꾸면 결과가 어떻게 달라지는지 따로 토글해 봅니다."
       >
         <ControlStrip
           label="목표 기준"
@@ -114,13 +137,6 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
           <strong>{formatPercent(selectedHit?.hitRate)}</strong>, 평균적으로 도달까지 걸린 시간은{' '}
           <strong>{formatDays(selectedHit?.medianDaysToHit)}</strong>입니다.
         </InsightLine>
-      </StorySection>
-
-      <StorySection
-        kicker="진입 시점"
-        title="발간 당일 vs 며칠 뒤"
-        body="당일 매수가 어려운 개인투자자에게 1·3·5·10·20거래일 뒤 진입의 결과를 따로 계산했습니다."
-      >
         <ControlStrip
           label="보유 기간"
           options={HORIZONS.map((value) => ({ value, label: `${value}D` }))}
@@ -132,54 +148,7 @@ export function ReportStatisticsStory({ summary }: { summary: ReportStatisticsLa
           {horizon}거래일 보유 기준으로 당일 진입의 중앙 수익률은{' '}
           <strong>{formatPercent(delayRows.find((row) => row.delayDays === 0)?.medianReturn)}</strong>, 20일 기다린 뒤
           진입은 <strong>{formatPercent(delayRows.find((row) => row.delayDays === 20)?.medianReturn)}</strong>입니다.
-          기다린다고 자동으로 유리해지진 않았습니다.
         </InsightLine>
-      </StorySection>
-
-      <StorySection
-        kicker="진입 규칙"
-        title="눌림목에서 살까, 돌파를 보고 살까"
-        body="발간 후 20거래일 안에 일정 폭의 하락이 오면 매수하는 규칙과, 상승을 먼저 확인한 뒤 매수하는 규칙을 같은 표본에서 비교했습니다."
-      >
-        <TriggerFrontier rows={triggerRows} />
-      </StorySection>
-
-      <StorySection
-        kicker="도달 후 흐름"
-        title="목표가에 닿은 뒤 계속 들고 가면"
-        body="목표가에 처음 닿은 날부터 5·20·60·120거래일을 더 보유했을 때의 분포입니다."
-      >
-        <PostTargetDrift rows={summary.postTargetDrift} />
-        <InsightLine>
-          도달 후 60거래일 중앙 수익률은{' '}
-          <strong>
-            {formatPercent(summary.postTargetDrift.find((row) => row.daysAfterTarget === 60)?.medianReturn)}
-          </strong>
-          , 하위 25%는{' '}
-          <strong>{formatPercent(summary.postTargetDrift.find((row) => row.daysAfterTarget === 60)?.p25Return)}</strong>
-          입니다. 더 들고 가면 더 벌 가능성도 있지만 폭이 커집니다.
-        </InsightLine>
-      </StorySection>
-
-      <StorySection
-        kicker="익절선"
-        title="이 표본에서 안정적이었던 익절 배수"
-        body="목표가의 일정 비율에 닿으면 익절하고, 그렇지 않으면 250거래일 후 청산한다고 했을 때의 결과입니다."
-      >
-        <TargetMultipleCurve rows={multipleRows} />
-        <InsightLine>
-          250거래일 기준 가장 안정적이었던 익절선은{' '}
-          <strong>{bestMultiple ? `${bestMultiple.targetMultiple.toFixed(1)}x` : '—'}</strong> 부근입니다. 평균 수익이
-          가장 높은 구간이 아니라, 도달률과 하방 위험까지 같이 본 결과입니다.
-        </InsightLine>
-      </StorySection>
-
-      <StorySection
-        kicker="경로의 굴곡"
-        title="맞춘 리포트도 도착까지 굴곡이 있었습니다"
-        body="발간 이후 최대 상승폭과 최대 하락폭을 같은 그림에 놓으면, 결과적으로 맞춘 리포트가 얼마나 굴곡을 거쳤는지 보입니다."
-      >
-        <RiskScatter rows={summary.riskScatter} />
       </StorySection>
 
       <DataNoteFooter
@@ -286,6 +255,35 @@ type ReturnQuantiles = {
   max: number | null;
 };
 
+/** Signed-log compression for the y-axis. Linear within ±50%, log10 beyond.
+ * Lets one +1800% winner (HD현대일렉트릭) and many ±20% middle reports
+ * share a single readable chart without the top getting clipped. */
+function compressReturn(v: number, lin: number = 0.5): number {
+  const sign = Math.sign(v);
+  const abs = Math.abs(v);
+  if (abs <= lin) return v;
+  return sign * (lin + Math.log10(1 + (abs - lin)) * 2);
+}
+
+/** Pleasant tick set covering the observed range. Asymmetric because
+ * downside is bounded near -100% while upside is unbounded. */
+function pickYTicks(maxObserved: number): Array<{ value: number; label: string }> {
+  const ticks: Array<{ value: number; label: string }> = [
+    { value: -0.8, label: '-80%' },
+    { value: -0.5, label: '-50%' },
+    { value: -0.2, label: '-20%' },
+    { value: 0, label: '0%' },
+    { value: 0.2, label: '+20%' },
+    { value: 0.5, label: '+50%' },
+  ];
+  if (maxObserved >= 1) ticks.push({ value: 1, label: '+100%' });
+  if (maxObserved >= 2) ticks.push({ value: 2, label: '+200%' });
+  if (maxObserved >= 5) ticks.push({ value: 5, label: '+500%' });
+  if (maxObserved >= 10) ticks.push({ value: 10, label: '+1000%' });
+  if (maxObserved >= 20) ticks.push({ value: 20, label: '+2000%' });
+  return ticks;
+}
+
 function WholeSampleMap({
   rows,
   quantiles,
@@ -296,37 +294,64 @@ function WholeSampleMap({
   const sortedRows = rows
     .filter((row) => isNumber(row.currentReturn))
     .sort((a, b) => (a.currentReturn ?? 0) - (b.currentReturn ?? 0));
-  const tails = [
-    { label: '-50% 이하', count: sortedRows.filter((row) => (row.currentReturn ?? 0) <= -0.5).length, tone: 'bad' },
-    { label: '-20% 이하', count: sortedRows.filter((row) => (row.currentReturn ?? 0) <= -0.2).length, tone: 'bad' },
-    { label: '+20% 이상', count: sortedRows.filter((row) => (row.currentReturn ?? 0) >= 0.2).length, tone: 'good' },
-    { label: '+100% 이상', count: sortedRows.filter((row) => (row.currentReturn ?? 0) >= 1).length, tone: 'good' },
-  ] as const;
+  const maxReturn = sortedRows.length === 0 ? 1 : (sortedRows[sortedRows.length - 1].currentReturn ?? 1);
+  const minReturn = -0.8;
+  const yLo = compressReturn(minReturn);
+  const yHi = compressReturn(Math.max(maxReturn, 1));
+  const yTicks = pickYTicks(maxReturn);
+  const topThreeIds = new Set(
+    [...sortedRows]
+      .slice(-3)
+      .reverse()
+      .map((row) => row.reportId),
+  );
 
   return (
     <div className="grid gap-4">
       <div className="rounded-2xl border border-slate-200 bg-white p-5">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h3 className="text-sm font-semibold text-slate-950">전체 현재 수익률 지도</h3>
+            <h3 className="text-sm font-semibold text-slate-950">전체 리포트 수익률 지도</h3>
             <p className="mt-1 text-xs text-slate-500">
-              각 점은 리포트 1건입니다. 왼쪽부터 현재 수익률이 낮은 순서입니다.
+              점 하나가 리포트 한 건입니다. 왼쪽부터 현재 수익률이 낮은 순서. y축은 큰 폭을 같이 보기 위해 ±50% 안쪽은
+              일정 간격, 바깥은 점점 압축됩니다.
             </p>
           </div>
           <span className="rounded-md bg-slate-100 px-2 py-1 font-mono text-[11px] text-slate-500">
             n={sortedRows.length.toLocaleString('ko-KR')}
           </span>
         </div>
-        <div className="relative h-80 rounded-xl border border-slate-100 bg-[linear-gradient(to_right,rgba(226,232,240,.7)_1px,transparent_1px),linear-gradient(to_bottom,rgba(226,232,240,.7)_1px,transparent_1px)] bg-[size:12.5%_25%] px-4 py-5">
-          <div className="absolute left-4 right-4 top-[53.33%] h-px bg-slate-950/25" />
-          <div className="absolute left-4 top-[51%] rounded bg-white/90 px-1.5 py-0.5 font-mono text-[10px] text-slate-500">
-            0%
-          </div>
+        <div className="relative h-[28rem] rounded-xl border border-slate-100 bg-white px-12 py-4">
+          {yTicks.map((tick) => {
+            const compressed = compressReturn(tick.value);
+            const y = 100 - ((compressed - yLo) / (yHi - yLo)) * 100;
+            const isZero = tick.value === 0;
+            return (
+              <div className="pointer-events-none" key={tick.value}>
+                <div
+                  className={
+                    isZero
+                      ? 'absolute left-12 right-12 h-px bg-slate-950/30'
+                      : 'absolute left-12 right-12 h-px bg-slate-200/70'
+                  }
+                  style={{ top: `${y}%` }}
+                />
+                <span
+                  className="absolute -translate-y-1/2 font-mono text-[10px] text-slate-500"
+                  style={{ top: `${y}%`, left: '0.5rem' }}
+                >
+                  {tick.label}
+                </span>
+              </div>
+            );
+          })}
           {sortedRows.map((row, index) => {
             const value = row.currentReturn ?? 0;
             const x = sortedRows.length <= 1 ? 50 : (index / (sortedRows.length - 1)) * 100;
-            const y = 100 - xScale(Math.max(-0.8, Math.min(1.5, value)), -0.8, 1.5);
+            const compressed = compressReturn(value);
+            const y = 100 - ((compressed - yLo) / (yHi - yLo)) * 100;
             const tone = value <= -0.2 ? 'bad' : value >= 0.2 ? 'good' : 'neutral';
+            const isTopWinner = topThreeIds.has(row.reportId);
             return (
               <DataPoint
                 key={row.reportId}
@@ -341,48 +366,35 @@ function WholeSampleMap({
                   ['최대 하락폭', formatPercent(row.maxAdverseExcursion)],
                   ['목표 도달', targetHitLabel(row)],
                 ]}
+                annotation={isTopWinner ? `${row.company} ${formatPercent(row.currentReturn)}` : undefined}
               />
             );
           })}
         </div>
       </div>
 
-      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_18rem]">
-        <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <h3 className="text-sm font-semibold text-slate-950">분위수로 본 표본</h3>
-          <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-7">
-            {[
-              ['최저', quantiles.min],
-              ['P10', quantiles.p10],
-              ['P25', quantiles.p25],
-              ['중앙', quantiles.median],
-              ['P75', quantiles.p75],
-              ['P90', quantiles.p90],
-              ['최고', quantiles.max],
-            ].map(([label, value]) => (
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-3" key={label as string}>
-                <div className="font-mono text-[11px] uppercase text-slate-500">{label}</div>
-                <div className="mt-2 font-mono text-sm font-semibold tabular-nums text-slate-950">
-                  {formatPercent(value as number | null)}
-                </div>
+      <div className="rounded-2xl border border-slate-200 bg-white p-5">
+        <h3 className="text-sm font-semibold text-slate-950">분위수로 본 표본</h3>
+        <p className="mt-1 text-xs text-slate-500">
+          평균은 위쪽 꼬리 몇 건이 크게 끌어올리지만, 중앙값은 표본 절반을 나누는 실제 위치입니다.
+        </p>
+        <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-7">
+          {[
+            ['최저', quantiles.min],
+            ['P10', quantiles.p10],
+            ['P25', quantiles.p25],
+            ['중앙', quantiles.median],
+            ['P75', quantiles.p75],
+            ['P90', quantiles.p90],
+            ['최고', quantiles.max],
+          ].map(([label, value]) => (
+            <div className="rounded-xl border border-slate-100 bg-slate-50 p-3" key={label as string}>
+              <div className="font-mono text-[11px] uppercase text-slate-500">{label}</div>
+              <div className="mt-2 font-mono text-sm font-semibold tabular-nums text-slate-950">
+                {formatPercent(value as number | null)}
               </div>
-            ))}
-          </div>
-        </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <h3 className="text-sm font-semibold text-slate-950">꼬리 개수</h3>
-          <div className="mt-4 grid gap-2">
-            {tails.map((tail) => (
-              <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2" key={tail.label}>
-                <span className="text-xs text-slate-500">{tail.label}</span>
-                <span
-                  className={`font-mono text-sm font-semibold ${tail.tone === 'good' ? 'text-blue-600' : 'text-rose-600'}`}
-                >
-                  {tail.count.toLocaleString('ko-KR')}건
-                </span>
-              </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -725,147 +737,6 @@ function DelayHeatmap({ rows }: { rows: ReportStatisticsLabSummary['delayedEntry
   );
 }
 
-function TriggerFrontier({ rows }: { rows: ReportStatisticsLabSummary['entryTriggers'] }) {
-  return (
-    <div className="grid gap-4 md:grid-cols-2">
-      {(['dip', 'rally'] as const).map((type) => (
-        <div className="rounded-2xl border border-slate-200 bg-white p-5" key={type}>
-          <h3 className="text-sm font-semibold text-slate-950">{type === 'dip' ? '눌림목 진입' : '상승 확인 진입'}</h3>
-          <div className="mt-4 grid gap-3">
-            {rows
-              .filter((row) => row.type === type)
-              .map((row) => (
-                <div key={row.triggerPct}>
-                  <div className="flex items-center justify-between text-xs">
-                    <span>{formatPercent(row.triggerPct, 0)} 조건</span>
-                    <span className="font-mono text-slate-950">중앙 {formatPercent(row.medianReturn)}</span>
-                  </div>
-                  <div className="mt-1 grid grid-cols-[1fr_4rem] items-center gap-3">
-                    <div className="h-2 rounded-full bg-slate-100">
-                      <div
-                        className="h-full rounded-full bg-slate-950"
-                        style={{ width: `${(row.entryRate ?? 0) * 100}%` }}
-                      />
-                    </div>
-                    <span className="text-right font-mono text-xs text-slate-500">
-                      참여 {formatPercent(row.entryRate, 0)}
-                    </span>
-                  </div>
-                  <div className="mt-1 text-[11px] text-slate-500">
-                    0.8x {formatPercent(row.hitRate08)} · 최대하락 중앙 {formatPercent(row.medianDrawdown)}
-                    {type === 'rally' ? ` · 가짜 돌파 ${formatPercent(row.falseBreakoutRate)}` : ''}
-                  </div>
-                </div>
-              ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function PostTargetDrift({ rows }: { rows: ReportStatisticsLabSummary['postTargetDrift'] }) {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5">
-      <div className="grid gap-4 md:grid-cols-4">
-        {rows.map((row) => (
-          <div key={row.daysAfterTarget}>
-            <div className="text-sm font-semibold text-slate-950">+{row.daysAfterTarget}D</div>
-            <div className="relative mt-4 h-28 rounded-lg bg-slate-50">
-              <RangeBar low={row.p25Return} high={row.p75Return} median={row.medianReturn} min={-0.3} max={0.3} />
-            </div>
-            <div className="mt-2 text-xs text-slate-500">
-              양수 {formatPercent(row.sharePositive)} · n={row.sampleSize}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function TargetMultipleCurve({ rows }: { rows: ReportStatisticsLabSummary['optimalTargetMultiples'] }) {
-  const [selectedMultiple, setSelectedMultiple] = useState<number | null>(rows[0]?.targetMultiple ?? null);
-  const scores = rows.map((row) => row.rewardReliabilityScore ?? 0);
-  const minScore = Math.min(-0.05, ...scores);
-  const maxScore = Math.max(0.05, ...scores);
-  const selected = rows.find((row) => row.targetMultiple === selectedMultiple) ?? rows[0] ?? null;
-  const best =
-    [...rows].sort(
-      (a, b) =>
-        (b.rewardReliabilityScore ?? Number.NEGATIVE_INFINITY) - (a.rewardReliabilityScore ?? Number.NEGATIVE_INFINITY),
-    )[0] ?? null;
-
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5">
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h3 className="text-sm font-semibold text-slate-950">목표 배수별 보상/신뢰 지도</h3>
-          <p className="mt-1 text-xs text-slate-500">
-            점에 마우스를 올리면 도달률, 중앙 수익률, 하위 25% 손실을 같이 봅니다.
-          </p>
-        </div>
-        <span className="rounded-md bg-slate-100 px-2 py-1 text-[11px] text-slate-500">250거래일 청산 가정</span>
-      </div>
-      <div className="relative h-72 rounded-xl border border-slate-100 bg-[linear-gradient(to_right,rgba(226,232,240,.7)_1px,transparent_1px),linear-gradient(to_bottom,rgba(226,232,240,.7)_1px,transparent_1px)] bg-[size:12.5%_25%] px-5 py-5">
-        <div className="absolute bottom-10 left-5 right-5 h-px bg-slate-950/20" />
-        {rows.map((row) => {
-          const x = xScale(row.targetMultiple, 0.35, 1.25);
-          const y = 100 - xScale(row.rewardReliabilityScore ?? 0, minScore, maxScore);
-          const positive = (row.rewardReliabilityScore ?? 0) >= 0;
-          return (
-            <DataPoint
-              key={row.targetMultiple}
-              label={`${row.targetMultiple.toFixed(1)}x 목표`}
-              meta={`표본 ${row.sampleSize.toLocaleString('ko-KR')}건`}
-              tone={positive ? 'good' : 'bad'}
-              x={x}
-              y={y}
-              selected={row.targetMultiple === selected?.targetMultiple}
-              onSelect={() => setSelectedMultiple(row.targetMultiple)}
-              rows={[
-                ['보상/신뢰 점수', formatNumber(row.rewardReliabilityScore)],
-                ['도달률', formatPercent(row.hitRate)],
-                ['중앙 수익률', formatPercent(row.medianReturn)],
-                ['하위 25%', formatPercent(row.p25Return)],
-              ]}
-            />
-          );
-        })}
-        <div className="absolute bottom-3 left-5 right-5 flex justify-between font-mono text-[10px] text-slate-400">
-          <span>0.4x</span>
-          <span>0.6x</span>
-          <span>0.8x</span>
-          <span>1.0x</span>
-          <span>1.2x</span>
-        </div>
-      </div>
-      <div className="mt-3 grid gap-3 border-t border-slate-100 pt-3 text-xs text-slate-500 md:grid-cols-[minmax(0,1fr)_18rem] md:items-start">
-        <p>
-          점수 = 중앙 수익률 × 도달률 / (하위 25% 손실 + 5% 완충). 점을 누르면 비교 기준이 고정됩니다.{' '}
-          {best ? `현재 최고 후보는 ${best.targetMultiple.toFixed(1)}x입니다.` : ''}
-        </p>
-        {selected ? (
-          <div className="rounded-xl bg-slate-50 p-3">
-            <div className="font-semibold text-slate-950">{selected.targetMultiple.toFixed(1)}x 선택</div>
-            <div className="mt-2 grid gap-1 font-mono tabular-nums">
-              <span>도달률 {formatPercent(selected.hitRate)}</span>
-              <span>중앙 {formatPercent(selected.medianReturn)}</span>
-              <span>하위 25% {formatPercent(selected.p25Return)}</span>
-              {best ? (
-                <span>
-                  최고 후보 대비 점수{' '}
-                  {formatNumber((selected.rewardReliabilityScore ?? 0) - (best.rewardReliabilityScore ?? 0))}
-                </span>
-              ) : null}
-            </div>
-          </div>
-        ) : null}
-      </div>
-    </div>
-  );
-}
-
 function RiskScatter({ rows }: { rows: ReportStatisticsLabSummary['riskScatter'] }) {
   const [view, setView] = useState<'all' | 'hit10' | 'partial' | 'lossTail'>('all');
   const [selectedId, setSelectedId] = useState<string | null>(rows[0]?.reportId ?? null);
@@ -986,6 +857,7 @@ function DataPoint({
   rows,
   selected = false,
   onSelect,
+  annotation,
 }: {
   x: number;
   y: number;
@@ -995,6 +867,7 @@ function DataPoint({
   rows: Array<[string, string]>;
   selected?: boolean;
   onSelect?: () => void;
+  annotation?: string;
 }) {
   const colorClass =
     tone === 'good'
@@ -1025,6 +898,14 @@ function DataPoint({
           colorClass,
         ].join(' ')}
       />
+      {annotation ? (
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-1 top-1/2 z-20 -translate-y-1/2 translate-x-full whitespace-nowrap rounded-sm bg-white/95 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-slate-700 shadow-sm"
+        >
+          {annotation}
+        </span>
+      ) : null}
       <span className="pointer-events-none absolute bottom-6 left-1/2 z-30 hidden w-64 -translate-x-1/2 rounded-xl border border-slate-200 bg-white p-3 text-left text-xs shadow-xl group-hover:block group-focus-visible:block">
         <span className="block font-semibold text-slate-950">{label}</span>
         <span className="mt-0.5 block font-mono text-[11px] text-slate-500">{meta}</span>
@@ -1046,37 +927,6 @@ function targetHitLabel(row: ReportStatisticsLabSummary['riskScatter'][number]):
   if (row.hit08) return '0.8x';
   if (row.hit06) return '0.6x';
   return '미도달';
-}
-
-function RangeBar({
-  low,
-  high,
-  median,
-  min,
-  max,
-}: {
-  low: number | null;
-  high: number | null;
-  median: number | null;
-  min: number;
-  max: number;
-}) {
-  const left = xScale(low ?? 0, min, max);
-  const right = xScale(high ?? 0, min, max);
-  const mid = xScale(median ?? 0, min, max);
-  return (
-    <>
-      <div className="absolute top-1/2 h-px w-full bg-slate-200" />
-      <div
-        className="absolute top-1/2 h-6 -translate-y-1/2 rounded-full bg-blue-100"
-        style={{ left: `${left}%`, width: `${Math.max(2, right - left)}%` }}
-      />
-      <div className="absolute top-1/2 h-10 w-0.5 -translate-y-1/2 bg-slate-950" style={{ left: `${mid}%` }} />
-      <div className="absolute bottom-2 left-0 w-full text-center font-mono text-xs font-semibold text-slate-950">
-        {formatPercent(median)}
-      </div>
-    </>
-  );
 }
 
 function InsightLine({ children }: { children: ReactNode }) {
@@ -1202,6 +1052,120 @@ function VintageCohortTable({ cohorts }: { cohorts: VintageCohort[] }) {
           ))}
         </tbody>
       </table>
+    </section>
+  );
+}
+
+type ConcentrationRow = {
+  topN: number;
+  share: number;
+  totalGain: number;
+};
+
+/** Concentration of positive returns. Sum up every report's positive
+ * current return, then show what share of that sum the top-N reports
+ * contribute. Tells the retail-investor truth that a handful of names
+ * carry most of the upside. */
+function buildConcentration(rows: RiskScatterRow[]): ConcentrationRow[] {
+  const positive = rows
+    .map((row) => row.currentReturn)
+    .filter(isNumber)
+    .filter((value): value is number => value > 0)
+    .sort((a, b) => b - a);
+  const totalGain = positive.reduce((sum, value) => sum + value, 0);
+  const topShare = (n: number) => positive.slice(0, n).reduce((sum, value) => sum + value, 0);
+  return [1, 3, 5, 10, 25].map((topN) => ({
+    topN,
+    share: totalGain > 0 ? topShare(topN) / totalGain : 0,
+    totalGain,
+  }));
+}
+
+function ConcentrationInsight({ rows }: { rows: ConcentrationRow[] }) {
+  if (rows.length === 0) return null;
+  const top5 = rows.find((row) => row.topN === 5);
+  const top10 = rows.find((row) => row.topN === 10);
+  return (
+    <div className="grid gap-4">
+      <div className="rounded-2xl border border-slate-200 bg-white p-5">
+        <h3 className="text-sm font-semibold text-slate-950">상위 N건이 누적 (+) 수익의 몇 %를 만들었나</h3>
+        <p className="mt-1 text-xs text-slate-500">
+          전체 표본의 (+) 수익률을 모두 더한 값을 100%로 두고, 상위 몇 건이 그중 얼마를 차지하는지 봅니다.
+        </p>
+        <div className="mt-5 grid gap-4">
+          {rows.map((row) => (
+            <div className="grid grid-cols-[3rem_minmax(0,1fr)_5rem] items-center gap-3" key={row.topN}>
+              <span className="font-mono text-xs font-semibold text-slate-500">상위 {row.topN}</span>
+              <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className="h-full rounded-full bg-slate-950"
+                  style={{ width: `${Math.max(2, row.share * 100)}%` }}
+                />
+              </div>
+              <span className="text-right font-mono text-sm font-semibold tabular-nums text-slate-950">
+                {formatPercent(row.share)}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+      {top5 || top10 ? (
+        <InsightLine>
+          {top5 ? (
+            <>
+              상위 5건이 전체 (+) 수익의 <strong>{formatPercent(top5.share)}</strong>를 만들었습니다.
+            </>
+          ) : null}
+          {top5 && top10 ? ' ' : ''}
+          {top10 ? (
+            <>
+              상위 10건이면 <strong>{formatPercent(top10.share)}</strong>. 평균 한 숫자가 표본 전체의 대표값이라고 보기
+              어려운 이유입니다.
+            </>
+          ) : null}
+        </InsightLine>
+      ) : null}
+    </div>
+  );
+}
+
+function WinnersLosersBoard({ rows }: { rows: RiskScatterRow[] }) {
+  const eligible = rows.filter((row) => isNumber(row.currentReturn));
+  const sorted = [...eligible].sort((a, b) => (b.currentReturn ?? 0) - (a.currentReturn ?? 0));
+  const winners = sorted.slice(0, 10);
+  const losers = [...eligible].sort((a, b) => (a.currentReturn ?? 0) - (b.currentReturn ?? 0)).slice(0, 5);
+  return (
+    <div className="grid gap-4 lg:grid-cols-2">
+      <CaseList title="가장 크게 간 종목 10" tone="good" rows={winners} />
+      <CaseList title="가장 크게 빠진 종목 5" tone="bad" rows={losers} />
+    </div>
+  );
+}
+
+function CaseList({ title, tone, rows }: { title: string; tone: 'good' | 'bad'; rows: RiskScatterRow[] }) {
+  const accent = tone === 'good' ? 'text-emerald-700' : 'text-rose-700';
+  const valueColor = tone === 'good' ? 'text-emerald-600' : 'text-rose-600';
+  return (
+    <section className="overflow-hidden rounded-md border border-slate-200 bg-white">
+      <header className="border-b border-slate-200 px-4 py-2">
+        <div className={`font-mono text-[10px] font-semibold uppercase tracking-[0.16em] ${accent}`}>{title}</div>
+      </header>
+      <ol className="divide-y divide-slate-100">
+        {rows.map((row, index) => (
+          <li className="grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3" key={row.reportId}>
+            <span className="font-mono text-xs text-slate-400">{String(index + 1).padStart(2, '0')}</span>
+            <div className="min-w-0">
+              <div className="truncate text-sm font-semibold text-slate-950">{row.company}</div>
+              <div className="mt-0.5 truncate font-mono text-[11px] text-slate-500">
+                {row.symbol} · 발간 {row.publicationDate} · {targetHitLabel(row)}
+              </div>
+            </div>
+            <span className={`text-right font-mono text-base font-semibold tabular-nums ${valueColor}`}>
+              {formatPercent(row.currentReturn)}
+            </span>
+          </li>
+        ))}
+      </ol>
     </section>
   );
 }
