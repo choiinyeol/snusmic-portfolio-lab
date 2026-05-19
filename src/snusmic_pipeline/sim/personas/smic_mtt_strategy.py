@@ -10,7 +10,6 @@ price stop, and stale-report stop.
 
 from __future__ import annotations
 
-from bisect import bisect_right
 from dataclasses import dataclass
 from datetime import date
 from math import isfinite
@@ -223,33 +222,6 @@ def _passes_universe(record: dict[str, Any], universe: str) -> bool:
     raise ValueError(f"unknown SMIC MTT universe: {universe}")
 
 
-def _relative_strength(
-    board: PriceBoard,
-    day: date,
-    symbol: str,
-    config: SmicMttStrategyConfig,
-) -> tuple[float, float]:
-    if board.close.empty or symbol not in board.close.columns:
-        return 0.0, 1.0
-    ts = pd.Timestamp(day)
-    history = board.close.loc[board.close.index <= ts].tail(config.relative_strength_lookback_days + 1)
-    if len(history) < 2 or symbol not in history.columns:
-        return 0.0, 1.0
-
-    start = history.iloc[0]
-    end = history.iloc[-1]
-    returns = (end / start - 1.0).replace([float("inf"), float("-inf")], pd.NA).dropna()
-    returns = returns[returns.map(isfinite)]
-    if symbol not in returns.index:
-        return 0.0, 1.0
-    momentum_return = float(returns[symbol])
-    if returns.empty:
-        return momentum_return, 1.0
-    rank = float((returns <= momentum_return).sum())
-    percentile = rank / float(len(returns))
-    return momentum_return, percentile
-
-
 def _passes_trend_filter(
     board: PriceBoard,
     day: date,
@@ -375,48 +347,6 @@ def _passes_atr_breakout(
         return False
     breakout_level = float(prior_highs.max()) + float(atr.iloc[-1]) * config.breakout_atr_multiple
     return float(close.iloc[-1]) >= breakout_level
-
-
-def _relative_strength(
-    board: PriceBoard,
-    day: date,
-    symbol: str,
-    config: SmicMttStrategyConfig,
-) -> tuple[float, float]:
-    close = board.close
-    if close.empty or symbol not in close.columns:
-        return -1.0, 0.0
-    asof = close.index <= pd.Timestamp(day)
-    if not asof.any():
-        return -1.0, 0.0
-    snapshot = close.loc[: pd.Timestamp(day)].dropna(how="all")
-    if snapshot.empty:
-        return -1.0, 0.0
-
-    lookback = config.relative_strength_lookback_days
-    if lookback <= 0:
-        return -1.0, 0.0
-    symbol_returns: dict[str, float] = {}
-    for symbol_candidate in snapshot.columns:
-        series = snapshot[symbol_candidate].dropna()
-        if len(series) < lookback + 1:
-            continue
-        start = series.iloc[-(lookback + 1)]
-        end = series.iloc[-1]
-        if start <= 0 or end <= 0 or not isfinite(start) or not isfinite(end):
-            continue
-        symbol_returns[symbol_candidate] = float(end / start - 1.0)
-
-    target_return = symbol_returns.get(symbol)
-    if target_return is None:
-        return -1.0, 0.0
-    if not symbol_returns:
-        return target_return, 0.0
-    ordered = sorted(symbol_returns.values())
-    if len(ordered) == 1:
-        return target_return, 1.0
-    rank = bisect_right(ordered, target_return)
-    return target_return, (rank - 1) / (len(ordered) - 1)
 
 
 def _passes_ma_crossover(

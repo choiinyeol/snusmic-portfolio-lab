@@ -16,6 +16,7 @@ from snusmic_pipeline.sim.contracts import (
     SavingsPlan,
     SimulationConfig,
     SmicFollowerConfig,
+    SmicMttStrategyConfig,
     SmicRsiReversalConfig,
     Trade,
 )
