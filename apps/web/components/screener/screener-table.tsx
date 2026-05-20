@@ -487,7 +487,7 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
   }, []);
   const clearColumnFilters = useCallback(() => dispatchFilters({ type: 'CLEAR_COLUMN_FILTERS' }), []);
   const tableMinWidthClass =
-    columnMode === 'all' ? 'min-w-[1900px]' : columnMode === 'price' ? 'min-w-[1480px]' : 'min-w-[1220px]';
+    columnMode === 'all' ? 'min-w-[2820px]' : columnMode === 'price' ? 'min-w-[1840px]' : 'min-w-[1480px]';
 
   return (
     <section className="grid gap-3">
@@ -630,6 +630,32 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
               </button>
             </div>
           </div>
+
+          <details className="rounded-lg border border-slate-200 bg-slate-50/70 p-2">
+            <summary className="cursor-pointer select-none px-1 text-xs font-semibold text-slate-700">
+              컬럼별 세부 필터
+              <span className="ml-2 font-normal text-slate-500">
+                직접 입력·Y/N 선택은 표 밖에서 넓게 조정합니다
+                {activeColumnFilterCount > 0 ? ` · ${activeColumnFilterCount}개 적용 중` : ''}
+              </span>
+            </summary>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+              {table
+                .getVisibleLeafColumns()
+                .filter((column) => isColumnFilterable(column.id))
+                .map((column) => (
+                  <div key={column.id} className="grid gap-1 text-xs font-medium text-slate-500">
+                    <span>{columnLabel(column.id)}</span>
+                    <ColumnFilterControl
+                      columnId={column.id}
+                      value={columnFilters[column.id] ?? ''}
+                      buckets={buckets}
+                      onChange={(value) => updateColumnFilter(column.id, value)}
+                    />
+                  </div>
+                ))}
+            </div>
+          </details>
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
@@ -680,7 +706,7 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
                     {headerGroup.headers.map((header) => (
                       <th
                         key={header.id}
-                        className="sticky top-0 z-20 whitespace-nowrap bg-slate-100 text-left font-mono text-[11px] uppercase tracking-[0.04em] text-slate-600"
+                        className={`${columnWidthClass(header.column.id)} sticky top-0 z-20 whitespace-nowrap bg-slate-100 text-left font-mono text-[11px] uppercase tracking-[0.04em] text-slate-600`}
                       >
                         {header.isPlaceholder ? null : (
                           <button
@@ -692,20 +718,6 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
                             {flexRender(header.column.columnDef.header, header.getContext())}
                             <span aria-hidden="true">{sortIndicator(header.column.getIsSorted())}</span>
                           </button>
-                        )}
-                      </th>
-                    ))}
-                  </tr>
-                  <tr>
-                    {headerGroup.headers.map((header) => (
-                      <th key={`${header.id}-filter`} className="sticky top-[31px] z-10 bg-white align-top">
-                        {header.isPlaceholder ? null : (
-                          <ColumnFilterControl
-                            columnId={header.column.id}
-                            value={columnFilters[header.column.id] ?? ''}
-                            buckets={buckets}
-                            onChange={(value) => updateColumnFilter(header.column.id, value)}
-                          />
                         )}
                       </th>
                     ))}
@@ -744,7 +756,9 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
                 visibleRows.map((row) => (
                   <tr key={row.id}>
                     {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                      <td key={cell.id} className={columnWidthClass(cell.column.id)}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
                     ))}
                   </tr>
                 ))
@@ -1268,7 +1282,7 @@ function ColumnFilterControl({
     return (
       <NativeSelect
         aria-label={`${columnLabel(columnId)} 컬럼 필터`}
-        className="h-8 w-full px-1.5 text-[11px] font-normal normal-case tracking-normal text-slate-700"
+        className="h-9 w-full px-2 text-xs font-normal normal-case tracking-normal text-slate-700"
         value={value}
         onChange={(event) => onChange(event.target.value)}
       >
@@ -1284,7 +1298,7 @@ function ColumnFilterControl({
     return (
       <NativeSelect
         aria-label={`${columnLabel(columnId)} 컬럼 필터`}
-        className="h-8 w-full px-1.5 text-[11px] font-normal normal-case tracking-normal text-slate-700"
+        className="h-9 w-full px-2 text-xs font-normal normal-case tracking-normal text-slate-700"
         value={value}
         onChange={(event) => onChange(event.target.value)}
       >
@@ -1297,12 +1311,41 @@ function ColumnFilterControl({
   return (
     <input
       aria-label={`${columnLabel(columnId)} 컬럼 필터`}
-      className="h-7 w-full min-w-[72px] rounded border border-slate-200 bg-white px-1.5 font-mono text-[11px] font-normal normal-case tracking-normal text-slate-700 outline-none placeholder:text-slate-300 focus:border-slate-400"
+      className="h-9 w-full rounded border border-slate-200 bg-white px-2 font-mono text-xs font-normal normal-case tracking-normal text-slate-700 outline-none placeholder:text-slate-300 focus:border-slate-400"
       value={value}
       placeholder={columnFilterPlaceholder(columnId)}
       onChange={(event) => onChange(event.target.value)}
     />
   );
+}
+
+function isColumnFilterable(columnId: string): boolean {
+  return columnId !== 'sparkline' && columnId !== 'detail';
+}
+
+function columnWidthClass(columnId: string): string {
+  if (columnId === 'symbol') return 'min-w-[150px]';
+  if (columnId === 'company') return 'min-w-[140px]';
+  if (columnId === 'latestReportDate') return 'min-w-[112px]';
+  if (columnId === 'currency' || columnId === 'detail') return 'min-w-[72px]';
+  if (columnId === 'sparkline') return 'min-w-[96px]';
+  if (columnId === 'candidateBucket') return 'min-w-[132px]';
+  if (columnId === 'rankBasis') return 'min-w-[150px]';
+  if (columnId === 'caveatFlags') return 'min-w-[86px]';
+  if (columnId === 'targetHit' || columnId === 'expired') return 'min-w-[82px]';
+  if (columnId === 'above20ma' || columnId === 'above50ma' || columnId === 'above200ma' || columnId === 'maStack') {
+    return 'min-w-[78px]';
+  }
+  if (
+    columnId === 'lastCloseNative' ||
+    columnId === 'volumeLatest' ||
+    columnId === 'entryPriceNative' ||
+    columnId === 'targetPriceNative'
+  ) {
+    return 'min-w-[96px]';
+  }
+  if (columnId === 'daysToTarget' || columnId === 'candidateScore') return 'min-w-[86px]';
+  return 'min-w-[92px]';
 }
 
 function PercentCell({ value, heat = false }: { value: number | null; heat?: boolean }) {
