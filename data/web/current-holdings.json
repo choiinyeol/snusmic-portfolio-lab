@@ -840,36 +840,6 @@
     "unrealized_return": -0.013220100863675976
   },
   {
-    "avg_cost_krw": 56953.6668,
-    "company": "비츠로셀",
-    "currency": "KRW",
-    "first_buy_date": "2026-04-16",
-    "holding_days": 33,
-    "last_close_krw": 53200.0,
-    "last_close_native": 53200.0,
-    "market_value_krw": 2234400.0,
-    "persona": "smic_mtt_strategy_top2",
-    "qty": 42,
-    "symbol": "082920.KS",
-    "unrealized_pnl_krw": -157654.0043,
-    "unrealized_return": -0.06590737718752115
-  },
-  {
-    "avg_cost_krw": 6364.1345,
-    "company": "나노",
-    "currency": "KRW",
-    "first_buy_date": "2026-05-04",
-    "holding_days": 15,
-    "last_close_krw": 6280.0,
-    "last_close_native": 6280.0,
-    "market_value_krw": 37680.0,
-    "persona": "smic_mtt_strategy_top2",
-    "qty": 6,
-    "symbol": "187790.KS",
-    "unrealized_pnl_krw": -504.8069,
-    "unrealized_return": -0.013220100863675976
-  },
-  {
     "avg_cost_krw": 11727.6189,
     "company": "샘씨엔에스",
     "currency": "KRW",

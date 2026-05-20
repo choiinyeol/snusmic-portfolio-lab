@@ -422,6 +422,7 @@ def run_generate_strategies(args: argparse.Namespace) -> int:
             is_top=args.is_top,
             admit_top=args.admit_top,
             stock_persona_top=args.stock_persona_top,
+            pit_strategy_top=args.pit_strategy_top,
             max_correlation=args.max_correlation,
             broker_strategy_trials=args.broker_strategy_trials,
             broker_strategy_top=args.broker_strategy_top,
@@ -607,6 +608,7 @@ def build_parser() -> argparse.ArgumentParser:
     generate.add_argument("--is-top", type=int, default=75)
     generate.add_argument("--admit-top", type=int, default=0)
     generate.add_argument("--stock-persona-top", type=int, default=10)
+    generate.add_argument("--pit-strategy-top", type=int, default=5)
     generate.add_argument("--max-correlation", type=float, default=0.90)
     generate.add_argument(
         "--broker-strategy-trials",

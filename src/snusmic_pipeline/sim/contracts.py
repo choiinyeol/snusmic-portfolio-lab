@@ -366,6 +366,28 @@ class StockRulePersonaConfig(_PersonaBase):
         return self
 
 
+class PitResearchBoardConfig(_PersonaBase):
+    """Point-in-time research-board score rotation.
+
+    The strategy rebuilds the product screener board for each decision date
+    using only reports/prices known as of that date, then trades the top-N
+    rows in the real share ledger on the next trading day.
+    """
+
+    persona_name: Annotated[str, Field(pattern=r"^pit_research_board_[a-z0-9_]+$")]
+    label: str
+    top_n: Annotated[int, Field(ge=1, le=50)] = 10
+    rebalance: Literal["D", "W", "M"] = "M"
+    score_mode: Literal["candidate_score", "board_score"] = "board_score"
+    weight_mode: Literal["equal", "score_proportional", "winner_compress"] = "equal"
+    universe: Literal["all", "domestic", "overseas"] = "all"
+    max_report_age_days: Annotated[int, Field(ge=30, le=3650)] = 730
+    min_score: Annotated[float, Field(ge=0.0, le=100.0)] = 0.0
+    bucket_filter: Literal["all", "fresh", "large-upside", "near-target", "active"] = "all"
+    require_ma_stack: bool = False
+    require_near_52w_high: bool = False
+
+
 PersonaConfig = (
     ProphetConfig
     | WeakProphetConfig
@@ -374,6 +396,7 @@ PersonaConfig = (
     | SmicMttStrategyConfig
     | SmicRsiReversalConfig
     | StockRulePersonaConfig
+    | PitResearchBoardConfig
     | AllWeatherConfig
 )
 
@@ -389,6 +412,11 @@ PersonaName = Literal[
     "benchmark_spy",
     "benchmark_kodex200",
     "benchmark_gld",
+    "pit_research_board_score_top5",
+    "pit_research_board_score_top10",
+    "pit_research_board_large_upside_top10",
+    "pit_research_board_trend_top10",
+    "pit_research_board_near_high_top10",
 ]
 
 

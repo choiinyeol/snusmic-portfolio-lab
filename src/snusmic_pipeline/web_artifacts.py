@@ -51,6 +51,8 @@ REQUIRED_ARTIFACTS = [
     "missing-symbols.json",
     "data-quality.json",
     "strategy-admission.json",
+    "pit-research-board-admission.json",
+    "pit-research-board-snapshots.json",
     "trades.json",
     "position-episodes.json",
     "equity-daily.json",
@@ -253,6 +255,8 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     position_episodes = _read_csv(inputs.sim / "position_episodes.csv")
     equity_daily = _read_csv(inputs.sim / "equity_daily.csv")
     broker_strategy_trials = _read_optional_csv(inputs.sim / "broker_strategy_trials.csv")
+    pit_research_board_admission = _read_optional_csv(inputs.sim / "pit-research-board-admission.csv")
+    pit_research_board_snapshots = _read_optional_csv(inputs.sim / "pit-research-board-snapshots.csv")
     stock_admission = _read_stock_admission_artifact(inputs.sim)
     extraction_quality = _read_json(inputs.extraction_quality) if inputs.extraction_quality.exists() else {}
 
@@ -302,7 +306,9 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
         broker_strategy_trials,
         strategy_catalog,
         stock_admission=stock_admission,
+        pit_research_board_admission=pit_research_board_admission,
     )
+    pit_research_board_admission_rows = _pit_research_board_admission_rows(pit_research_board_admission)
     strategy_labels = {str(row["strategy_id"]): str(row["label"]) for row in strategy_catalog}
     _apply_strategy_labels(overview.get("baseline_personas", []), strategy_labels)
     return_windows = _build_return_windows(report_rows, prices)
@@ -346,6 +352,8 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
         target_distribution=target_distribution,
         strategy_catalog=strategy_catalog,
         strategy_admission=strategy_admission,
+        pit_research_board_admission=pit_research_board_admission_rows,
+        pit_research_board_snapshots=_records(pit_research_board_snapshots),
         screener_candidates=screener_candidates,
     )
 
@@ -368,6 +376,8 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     _write_json(out / "missing-symbols.json", [{"symbol": symbol} for symbol in missing_symbols])
     _write_json(out / "data-quality.json", data_quality)
     _write_json(out / "strategy-admission.json", strategy_admission)
+    _write_json(out / "pit-research-board-admission.json", pit_research_board_admission_rows)
+    _write_json(out / "pit-research-board-snapshots.json", _records(pit_research_board_snapshots))
     _write_json(out / "trades.json", trade_rows)
     _write_json(out / "position-episodes.json", episode_rows)
     _write_json(out / "equity-daily.json", equity_rows)
@@ -477,7 +487,10 @@ def _read_csv(path: Path) -> pd.DataFrame:
 def _read_optional_csv(path: Path) -> pd.DataFrame:
     if not path.exists():
         return pd.DataFrame()
-    return pd.read_csv(path, keep_default_na=False)
+    try:
+        return pd.read_csv(path, keep_default_na=False)
+    except pd.errors.EmptyDataError:
+        return pd.DataFrame()
 
 
 def _read_json(path: Path) -> Any:
@@ -703,6 +716,8 @@ def _write_page_bundles(
     target_distribution: dict[str, Any],
     strategy_catalog: list[dict[str, Any]],
     strategy_admission: dict[str, Any],
+    pit_research_board_admission: list[dict[str, Any]],
+    pit_research_board_snapshots: list[dict[str, Any]],
     screener_candidates: list[dict[str, Any]],
 ) -> None:
     """Write page-owned product bundles.
@@ -734,8 +749,14 @@ def _write_page_bundles(
 
     _write_product_json(out / "strategies" / "catalog.json", strategy_catalog)
     _write_product_json(out / "strategies" / "admission.json", strategy_admission)
+    _write_product_json(
+        out / "strategies" / "pit-research-board-admission.json", pit_research_board_admission
+    )
     _write_product_json(out / "strategies" / "leaderboard.json", personas)
     _write_product_json(out / "strategies" / "curves.json", _compact_equity_curves(equity_daily))
+    _write_product_json(
+        out / "strategies" / "pit-research-board-snapshots.json", pit_research_board_snapshots
+    )
 
     _write_product_json(out / "screener" / "candidates.json", screener_candidates)
 
@@ -900,6 +921,12 @@ def _build_manifest(out: Path, overview: dict[str, Any]) -> dict[str, Any]:
         "equity_daily": _json_row_count(out / "portfolio" / "equity-daily.json"),
         "personas": _json_row_count(out / "portfolio" / "personas.json"),
         "strategy_catalog": _json_row_count(out / "strategies" / "catalog.json"),
+        "pit_research_board_admission": _json_row_count(
+            out / "strategies" / "pit-research-board-admission.json"
+        ),
+        "pit_research_board_snapshots": _json_row_count(
+            out / "strategies" / "pit-research-board-snapshots.json"
+        ),
         "screener_candidates": _json_row_count(out / "screener" / "candidates.json"),
     }
     report_counts = overview.get("report_counts", {}) if isinstance(overview, dict) else {}
@@ -1472,6 +1499,7 @@ def _build_strategy_admission(
     strategy_catalog: list[dict[str, Any]],
     *,
     stock_admission: dict[str, Any] | None = None,
+    pit_research_board_admission: pd.DataFrame | None = None,
 ) -> dict[str, Any]:
     """Explain why only the promoted report-trend strategies survived.
 
@@ -1487,6 +1515,7 @@ def _build_strategy_admission(
         if row.get("kind") == "strategy" and str(row.get("strategy_id") or "")
     ]
     stock_summary = _stock_admission_summary(stock_admission)
+    pit_summary = _pit_research_board_admission_summary(pit_research_board_admission)
     if trials.empty:
         return {
             "schema_version": "1.0.0",
@@ -1500,6 +1529,7 @@ def _build_strategy_admission(
             "accepted_trials": [],
             "top_rejected_trials": [],
             "stock_admission": stock_summary,
+            "pit_research_board_admission": pit_summary,
             "notes": [
                 "broker_strategy_trials.csv가 없어서 현재 catalog 기준 채택 전략 수만 표시합니다.",
                 "다음 run-sim 실행부터 후보별 below_benchmark/duplicate_behavior/accepted 기록이 저장됩니다.",
@@ -1535,11 +1565,83 @@ def _build_strategy_admission(
         "accepted_trials": accepted_trials,
         "top_rejected_trials": top_rejected_trials,
         "stock_admission": stock_summary,
+        "pit_research_board_admission": pit_summary,
         "notes": [
             "채택 조건은 최고 투자 가능 벤치마크 초과 수익률과 중복 행동 제거입니다.",
             "MTT는 일부 후보가 쓰는 추세 필터이며, 사용자-facing 전략명은 유니버스·신호·집중도 기준으로 표시합니다.",
         ],
     }
+
+
+def _pit_research_board_admission_summary(frame: pd.DataFrame | None) -> dict[str, Any] | None:
+    rows = _pit_research_board_admission_rows(frame)
+    if not rows:
+        return None
+    status_counts: dict[str, int] = {}
+    for row in rows:
+        status = str(row.get("admission_status") or "unknown")
+        status_counts[status] = status_counts.get(status, 0) + 1
+    accepted = [row for row in rows if _boolish(row.get("accepted"))]
+    rejected = [row for row in rows if not _boolish(row.get("accepted"))]
+    return {
+        "schema_version": "1.0.0",
+        "candidate_count": len(rows),
+        "accepted_count": len(accepted),
+        "rejected_count": len(rejected),
+        "status_counts": status_counts,
+        "accepted_strategies": accepted,
+        "top_rejected_strategies": sorted(
+            rejected,
+            key=lambda row: _number(row.get("portfolio_money_weighted_return")) or float("-inf"),
+            reverse=True,
+        )[:12],
+        "notes": [
+            "PIT research-board 후보는 현재 리서치보드 최신값을 재사용하지 않고 판단일별 보드를 재구성합니다.",
+            "벤치마크보다 낮은 후보는 포트폴리오 catalog에 노출하지 않습니다.",
+        ],
+    }
+
+
+def _pit_research_board_admission_rows(frame: pd.DataFrame | None) -> list[dict[str, Any]]:
+    if frame is None or frame.empty:
+        return []
+    rows: list[dict[str, Any]] = []
+    config_keys = {
+        "top_n",
+        "rebalance",
+        "score_mode",
+        "weight_mode",
+        "universe",
+        "max_report_age_days",
+        "min_score",
+        "bucket_filter",
+        "require_ma_stack",
+        "require_near_52w_high",
+    }
+    for raw in _records(frame):
+        config = {
+            key.removeprefix("config_"): raw.get(key)
+            for key in raw
+            if key.startswith("config_") and key.removeprefix("config_") in config_keys
+        }
+        rows.append(
+            {
+                "persona_name": raw.get("persona_name"),
+                "label": raw.get("label"),
+                "accepted": _boolish(raw.get("accepted")),
+                "admission_status": raw.get("admission_status"),
+                "benchmark_money_weighted_return": _number(raw.get("benchmark_money_weighted_return")),
+                "portfolio_money_weighted_return": _number(raw.get("portfolio_money_weighted_return")),
+                "portfolio_excess_vs_benchmark": _number(raw.get("portfolio_excess_vs_benchmark")),
+                "portfolio_sharpe": _number(raw.get("portfolio_sharpe")),
+                "portfolio_sortino": _number(raw.get("portfolio_sortino")),
+                "portfolio_max_drawdown": _number(raw.get("portfolio_max_drawdown")),
+                "portfolio_trade_count": _number(raw.get("portfolio_trade_count")),
+                "portfolio_correlated_with_rule_id": raw.get("portfolio_correlated_with_rule_id"),
+                "config": config,
+            }
+        )
+    return rows
 
 
 def _stock_admission_summary(artifact: dict[str, Any] | None) -> dict[str, Any] | None:
@@ -1728,6 +1830,8 @@ def _strategy_short_label(strategy_id: str, label: str) -> str:
         return labels[strategy_id]
     if strategy_id.startswith("stock_rule_"):
         return label.replace("Stock Rule: ", "")
+    if strategy_id.startswith("pit_research_board_"):
+        return label.replace("PIT Research Board ", "PIT Board ").replace("PIT ", "")
     if strategy_id.startswith("smic_mtt_strategy"):
         return label.replace(" Report ", " ").replace(" Strategy ", " ")
     if strategy_id.startswith("smic_rsi_reversal"):
@@ -1742,6 +1846,18 @@ def _strategy_display_label(strategy_id: str, config: dict[str, Any], fallback: 
         if symbol:
             return f"Stock Rule: {symbol} {family}"
         return fallback if fallback != strategy_id else f"Stock Rule: {family}"
+    if strategy_id.startswith("pit_research_board_"):
+        top_n = int(config.get("top_n") or 0)
+        mode = "종합점수" if config.get("score_mode") == "board_score" else "업사이드 후보점수"
+        suffix = f" Top {top_n}" if top_n else ""
+        if config.get("require_ma_stack"):
+            return f"PIT 리서치보드 정배열{suffix}"
+        if config.get("require_near_52w_high"):
+            return f"PIT 리서치보드 52주고점근접{suffix}"
+        bucket = str(config.get("bucket_filter") or "all")
+        if bucket != "all":
+            return f"PIT 리서치보드 {bucket}{suffix}"
+        return f"PIT 리서치보드 {mode}{suffix}"
     if strategy_id.startswith("smic_rsi_reversal"):
         return "RSI Reversal Strategy"
     if not strategy_id.startswith("smic_mtt_strategy"):
@@ -1776,6 +1892,16 @@ def _methodology_summary(strategy_id: str, config: dict[str, Any]) -> str:
         return "리포트 업사이드와 가격 추세 조건(MTT·Supertrend·ATR breakout)을 통과한 종목만 실제 주식 수량 단위로 매수·보유·매도하는 포트폴리오 전략입니다. MTT는 전략명 자체가 아니라 내부 추세 필터 중 하나입니다."
     if strategy_id.startswith("stock_rule_"):
         return _stock_rule_plain_summary(config)
+    if strategy_id.startswith("pit_research_board_"):
+        top_n = int(config.get("top_n") or 0)
+        cadence = _pit_research_board_cadence(config)
+        score = (
+            "리서치보드 종합점수" if config.get("score_mode") == "board_score" else "목표가 업사이드 후보점수"
+        )
+        return (
+            f"{cadence}마다 그 날짜에 이미 발간된 리포트와 그 날짜까지의 가격만으로 리서치보드를 다시 만듭니다. "
+            f"목표가 미도달·미만료 종목을 {score}로 정렬해 상위 {top_n}개를 다음 거래일 실제 주식 수량으로 편입합니다."
+        )
     return "시뮬레이션에 포함된 전략입니다."
 
 
@@ -1909,9 +2035,48 @@ def _stock_rule_weighting(config: dict[str, Any]) -> str:
     return mode or "기록된 비중 규칙"
 
 
+def _pit_research_board_cadence(config: dict[str, Any]) -> str:
+    return {"D": "매일", "W": "매주 첫 거래일", "M": "매월 첫 거래일"}.get(
+        str(config.get("rebalance") or ""), "정기적으로"
+    )
+
+
+def _pit_research_board_weighting(config: dict[str, Any]) -> str:
+    mode = str(config.get("weight_mode") or "")
+    if mode == "winner_compress":
+        return "1위 55%, 나머지 후보 45% 분산"
+    if mode == "score_proportional":
+        return "선정 점수 비례 비중"
+    if mode == "equal":
+        return "동일비중"
+    return mode or "기록된 비중 규칙"
+
+
+def _pit_research_board_buy_rules(config: dict[str, Any]) -> list[str]:
+    top_n = int(config.get("top_n") or 0)
+    score = "리서치보드 종합점수" if config.get("score_mode") == "board_score" else "목표가 업사이드 후보점수"
+    rules = [
+        "판단일 기준 이미 발간된 리포트만 투자 가능 universe에 넣습니다.",
+        "판단일 기준 이미 관측된 종가·이동평균·52주 고점 정보만 계산에 사용합니다.",
+        "목표가를 이미 달성했거나 리포트 유효기간이 지난 종목은 제외합니다.",
+        f"{score}가 높은 상위 {top_n}개를 다음 거래일에 실제 주식 수량으로 편입합니다.",
+        f"비중은 {_pit_research_board_weighting(config)}으로 배분합니다.",
+    ]
+    bucket = str(config.get("bucket_filter") or "all")
+    if bucket != "all":
+        rules.append(f"후보 유형은 {bucket} 버킷으로 제한합니다.")
+    if config.get("require_ma_stack"):
+        rules.append("현재가 ≥ 20일선 ≥ 50일선 ≥ 200일선 정배열인 종목만 통과합니다.")
+    if config.get("require_near_52w_high"):
+        rules.append("판단일 기준 52주 고점 대비 -10% 이내 종목만 통과합니다.")
+    return rules
+
+
 def _buy_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
     if strategy_id.startswith("stock_rule_"):
         return _stock_rule_buy_rules(config)
+    if strategy_id.startswith("pit_research_board_"):
+        return _pit_research_board_buy_rules(config)
     if strategy_id.startswith("smic_mtt_strategy"):
         if not config:
             return ["세부 조건 artifact 없음", "성과·보유·매매내역만 검증 가능"]
@@ -1979,6 +2144,14 @@ def _sell_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
             "새 후보가 기존 보유보다 점수가 높으면 낮은 점수 포지션을 교체합니다.",
             "매도 사유는 거래 원장의 rebalance_sell/교체 체결로 확인합니다.",
         ]
+    if strategy_id.startswith("pit_research_board_"):
+        cadence = _pit_research_board_cadence(config)
+        return [
+            f"{cadence} 재평가 때 상위 후보에서 밀리면 축소 또는 전량 매도합니다.",
+            "목표가를 터치하면 target_hit 사유로 청산합니다.",
+            f"리포트 발간 후 {int(config.get('max_report_age_days') or 0)}일을 넘기면 만료 청산합니다.",
+            "모든 매도는 포트폴리오 거래 원장의 날짜·수량·사유로 확인합니다.",
+        ]
     if strategy_id.startswith("smic_mtt_strategy"):
         if not config:
             return ["세부 조건 artifact 없음", "매도 사유는 매매내역과 포지션 기록에서 확인"]
@@ -2017,6 +2190,13 @@ def _risk_controls(strategy_id: str, config: dict[str, Any]) -> list[str]:
             "성과 검증·후보 압축 기준은 내부 품질관리 영역으로 숨기고, 사용자 화면에는 실제 운용 규칙만 노출합니다.",
             "리포트 발간 전 가격 데이터는 과거 차트 계산에는 존재하더라도 실제 편입 후보로는 쓰지 않습니다.",
             "같은 수익률 경로를 반복하는 유사 전략은 하나의 대표 전략만 남깁니다.",
+            "체결은 정수 주식 수량, 수수료·세금, RP이자 현금 잔고를 반영합니다.",
+        ]
+    if strategy_id.startswith("pit_research_board_"):
+        return [
+            "현재 웹 리서치보드 화면의 최신값을 역사용으로 재사용하지 않고, 각 판단일마다 PIT 보드를 재구성합니다.",
+            "판단일 보드에서 고른 종목은 다음 거래일 체결하므로 리포트 발간일보다 빠른 매수는 구조적으로 불가능합니다.",
+            "벤치마크 수익률을 못 이기거나 수익률 경로 상관이 높은 후보는 최종 포트폴리오 catalog에 올리지 않습니다.",
             "체결은 정수 주식 수량, 수수료·세금, RP이자 현금 잔고를 반영합니다.",
         ]
     if strategy_id.startswith("smic_mtt_strategy"):
@@ -2058,6 +2238,20 @@ def _strategy_params(strategy_id: str, config: dict[str, Any]) -> dict[str, Any]
             "hold_top",
             "weight_mode",
             "score_mode",
+        }
+        return {key: value for key, value in config.items() if key in public_keys}
+    if strategy_id.startswith("pit_research_board_"):
+        public_keys = {
+            "top_n",
+            "rebalance",
+            "score_mode",
+            "weight_mode",
+            "universe",
+            "max_report_age_days",
+            "min_score",
+            "bucket_filter",
+            "require_ma_stack",
+            "require_near_52w_high",
         }
         return {key: value for key, value in config.items() if key in public_keys}
     return {key: value for key, value in config.items() if key not in excluded}

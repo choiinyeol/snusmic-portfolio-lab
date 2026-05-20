@@ -16,6 +16,7 @@ from .contracts import (
     AllWeatherConfig,
     MonthlyHolding,
     PersonaConfig,
+    PitResearchBoardConfig,
     ProphetConfig,
     SimulationConfig,
     SimulationResult,
@@ -44,6 +45,7 @@ from .personas import (
     simulate_stock_rule_persona,
     simulate_weak_prophet,
 )
+from .pit_research_board import simulate_pit_research_board
 from .report_stats import aggregate_report_stats, compute_report_performance
 from .savings import build_cash_flow_schedule
 from .target_adjustment import align_report_targets_to_market_scale
@@ -245,6 +247,16 @@ def _dispatch(
         )
     if isinstance(persona, StockRulePersonaConfig):
         return simulate_stock_rule_persona(
+            persona,
+            config.savings_plan,
+            config.fees,
+            board,
+            reports,
+            cashflows,
+            trading_dates,
+        )
+    if isinstance(persona, PitResearchBoardConfig):
+        return simulate_pit_research_board(
             persona,
             config.savings_plan,
             config.fees,
