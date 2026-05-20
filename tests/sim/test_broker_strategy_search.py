@@ -65,7 +65,7 @@ def broker_search_warehouse(tmp_path: Path) -> Path:
     return warehouse
 
 
-def test_broker_strategy_search_returns_fewer_than_requested_when_benchmark_gate_is_too_high(
+def test_broker_strategy_search_records_benchmark_lag_without_hard_rejection(
     broker_search_warehouse: Path,
 ) -> None:
     result = find_top_broker_strategy_configs(
@@ -82,6 +82,7 @@ def test_broker_strategy_search_returns_fewer_than_requested_when_benchmark_gate
         seed=7,
     )
 
-    assert result.configs == ()
+    assert result.configs
     assert not result.trial_rows.empty
-    assert set(result.trial_rows["admission_status"]) == {"below_benchmark"}
+    assert "below_benchmark" not in set(result.trial_rows["admission_status"])
+    assert (result.trial_rows["excess_return_vs_best_benchmark"] < 0).any()

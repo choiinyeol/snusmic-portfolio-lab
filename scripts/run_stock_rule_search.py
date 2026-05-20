@@ -96,7 +96,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--max-correlation",
         type=float,
-        default=0.997,
+        default=0.95,
         help="Greedy diversity gate: keep only the best rule when validation return correlation is >= this value; 0 disables.",
     )
     parser.add_argument("--goal-min-sharpe", type=float, default=1.5)
@@ -474,7 +474,7 @@ def _stock_admission_artifact(
         )
         reasons = cast(
             list[StockAdmissionReason],
-            ["beats_oos_benchmark"] if status == "accepted" else _artifact_reasons(row),
+            ["passes_validation_goal"] if status == "accepted" else _artifact_reasons(row),
         )
         candidate = StockRuleCandidate(
             rule_id=rule_id,
@@ -528,7 +528,7 @@ def _stock_admission_artifact(
                 else "admit_oos replays frozen IS finalists on the later OOS window"
             ),
             "portfolio personas are materialized only when validation Sharpe >= 1.5, Sortino >= 1.5, or return >= 500%",
-            "highly correlated validation return paths keep only the best-scoring strategy",
+            "highly correlated validation return paths keep only the best-scoring strategy; default correlation threshold is 0.95",
         ),
     )
 
@@ -553,8 +553,6 @@ def _artifact_status(row: dict[str, Any], *, passes_goal: bool) -> StockAdmissio
             return "duplicate_behavior"
         if "activity" in status:
             return "insufficient_trades"
-        if "benchmark" in status:
-            return "below_benchmark"
         if "correlation" in status or "duplicate" in status:
             return "duplicate_behavior"
     return "below_risk_gate" if not passes_goal else "duplicate_behavior"
@@ -566,8 +564,6 @@ def _artifact_reasons(row: dict[str, Any]) -> list[StockAdmissionReason]:
     status = str(row.get("admission_status") or "")
     if "duplicate" in status:
         return ["duplicate_behavior"]
-    if "benchmark" in status:
-        return ["below_oos_benchmark"]
     if "correlation" in status:
         return ["duplicate_behavior"]
     if "activity" in status:

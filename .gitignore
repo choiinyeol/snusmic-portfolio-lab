@@ -25,6 +25,7 @@ data/sim/trades.csv
 data/sim/personas.json
 data/sim/monthly_holdings.csv
 data/sim/broker_strategy_trials.csv
+data/sim/.cache/
 .omc/
 apps/web/.next/
 apps/web/node_modules/

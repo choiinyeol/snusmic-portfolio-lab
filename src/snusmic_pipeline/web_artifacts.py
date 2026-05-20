@@ -1504,9 +1504,11 @@ def _build_strategy_admission(
     """Explain why only the promoted report-trend strategies survived.
 
     The optimizer can evaluate hundreds of parameterizations but promotes only
-    distinct candidates that beat the best tradable benchmark. This artifact is
-    the audit trail that makes "why are there only N strategies?" answerable in
-    the UI without hardcoding stale top-N expectations.
+    distinct candidates that pass the configured validation goals and
+    high-correlation compression gate. Benchmark-relative return is retained as
+    comparative evidence, not as a hard rejection gate. This artifact is the
+    audit trail that makes "why are there only N strategies?" answerable in the
+    UI without hardcoding stale top-N expectations.
     """
 
     accepted_strategy_ids = [

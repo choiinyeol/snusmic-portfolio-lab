@@ -1,8 +1,8 @@
 [
   {
-    "accepted": false,
-    "admission_status": "below_portfolio_benchmark",
-    "benchmark_money_weighted_return": 0.4172694423468782,
+    "accepted": true,
+    "admission_status": "accepted",
+    "benchmark_money_weighted_return": 0.4173,
     "config": {
       "bucket_filter": "all",
       "max_report_age_days": 730,
@@ -18,7 +18,7 @@
     "label": "PIT Research Board Score Top 5",
     "persona_name": "pit_research_board_score_top5",
     "portfolio_correlated_with_rule_id": "",
-    "portfolio_excess_vs_benchmark": -0.2137499279687471,
+    "portfolio_excess_vs_benchmark": -0.2137804856218689,
     "portfolio_max_drawdown": 0.2763180505994886,
     "portfolio_money_weighted_return": 0.203519514378131,
     "portfolio_sharpe": 0.4688633456075768,
@@ -26,9 +26,9 @@
     "portfolio_trade_count": 276.0
   },
   {
-    "accepted": false,
-    "admission_status": "below_portfolio_benchmark",
-    "benchmark_money_weighted_return": 0.4172694423468782,
+    "accepted": true,
+    "admission_status": "accepted",
+    "benchmark_money_weighted_return": 0.4173,
     "config": {
       "bucket_filter": "all",
       "max_report_age_days": 730,
@@ -44,7 +44,7 @@
     "label": "PIT Research Board Score Top 10",
     "persona_name": "pit_research_board_score_top10",
     "portfolio_correlated_with_rule_id": "",
-    "portfolio_excess_vs_benchmark": -0.0787066417021559,
+    "portfolio_excess_vs_benchmark": -0.0787371993552777,
     "portfolio_max_drawdown": 0.2903585846211501,
     "portfolio_money_weighted_return": 0.3385628006447223,
     "portfolio_sharpe": 0.6157028385349578,
@@ -52,9 +52,9 @@
     "portfolio_trade_count": 555.0
   },
   {
-    "accepted": false,
-    "admission_status": "below_portfolio_benchmark",
-    "benchmark_money_weighted_return": 0.4172694423468782,
+    "accepted": true,
+    "admission_status": "accepted",
+    "benchmark_money_weighted_return": 0.4173,
     "config": {
       "bucket_filter": "large-upside",
       "max_report_age_days": 730,
@@ -70,7 +70,7 @@
     "label": "PIT Large Upside Top 10",
     "persona_name": "pit_research_board_large_upside_top10",
     "portfolio_correlated_with_rule_id": "",
-    "portfolio_excess_vs_benchmark": -0.376895648761565,
+    "portfolio_excess_vs_benchmark": -0.3769262064146867,
     "portfolio_max_drawdown": 0.2013589772417792,
     "portfolio_money_weighted_return": 0.0403737935853132,
     "portfolio_sharpe": 0.1998907829170177,
@@ -78,9 +78,9 @@
     "portfolio_trade_count": 448.0
   },
   {
-    "accepted": false,
-    "admission_status": "below_portfolio_benchmark",
-    "benchmark_money_weighted_return": 0.4172694423468782,
+    "accepted": true,
+    "admission_status": "accepted",
+    "benchmark_money_weighted_return": 0.4173,
     "config": {
       "bucket_filter": "all",
       "max_report_age_days": 730,
@@ -96,7 +96,7 @@
     "label": "PIT Trend-Confirmed Top 10",
     "persona_name": "pit_research_board_trend_top10",
     "portfolio_correlated_with_rule_id": "",
-    "portfolio_excess_vs_benchmark": -0.2155892928085813,
+    "portfolio_excess_vs_benchmark": -0.215619850461703,
     "portfolio_max_drawdown": 0.2423232964765193,
     "portfolio_money_weighted_return": 0.2016801495382969,
     "portfolio_sharpe": 0.4514847580773637,
@@ -104,9 +104,9 @@
     "portfolio_trade_count": 616.0
   },
   {
-    "accepted": false,
-    "admission_status": "below_portfolio_benchmark",
-    "benchmark_money_weighted_return": 0.4172694423468782,
+    "accepted": true,
+    "admission_status": "accepted",
+    "benchmark_money_weighted_return": 0.4173,
     "config": {
       "bucket_filter": "all",
       "max_report_age_days": 730,
@@ -122,7 +122,7 @@
     "label": "PIT Near-High Top 10",
     "persona_name": "pit_research_board_near_high_top10",
     "portfolio_correlated_with_rule_id": "",
-    "portfolio_excess_vs_benchmark": -0.3020405949684208,
+    "portfolio_excess_vs_benchmark": -0.3020711526215426,
     "portfolio_max_drawdown": 0.1881265443979495,
     "portfolio_money_weighted_return": 0.1152288473784574,
     "portfolio_sharpe": 0.3376575204289203,

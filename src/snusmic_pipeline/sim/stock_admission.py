@@ -40,6 +40,7 @@ StockAdmissionStatus: TypeAlias = Literal[
 StockAdmissionReason: TypeAlias = Literal[
     "beats_oos_benchmark",
     "below_oos_benchmark",
+    "passes_validation_goal",
     "below_sharpe_gate",
     "below_sortino_gate",
     "duplicate_behavior",
@@ -148,11 +149,6 @@ class StockAdmissionDecision(_FrozenStockModel):
                 f"got {self.excess_return_vs_benchmark} vs expected {expected_excess}"
             )
         if self.status == "accepted":
-            if expected_excess <= self.min_excess_return:
-                raise ValueError(
-                    "accepted stock-rule candidates must beat the OOS benchmark by min_excess_return; "
-                    f"got excess={expected_excess}, min_excess_return={self.min_excess_return}"
-                )
             if self.out_of_sample_metrics.trade_count < self.min_trades:
                 raise ValueError(
                     "accepted stock-rule candidates must satisfy the OOS min_trades gate; "
@@ -168,8 +164,8 @@ class StockAdmissionDecision(_FrozenStockModel):
                 or self.out_of_sample_metrics.sortino < self.min_sortino
             ):
                 raise ValueError("accepted stock-rule candidates must satisfy the OOS Sortino gate")
-            if "beats_oos_benchmark" not in self.reason_codes:
-                raise ValueError("accepted stock-rule candidates must include beats_oos_benchmark reason")
+            if not ({"passes_validation_goal", "beats_oos_benchmark"} & set(self.reason_codes)):
+                raise ValueError("accepted stock-rule candidates must include a validation-pass reason")
         return self
 
 
@@ -182,7 +178,7 @@ class StockAdmissionArtifact(_FrozenStockModel):
     decisions: tuple[StockAdmissionDecision, ...]
     methodology: tuple[str, ...] = (
         "search_is discovers candidates using only the in-sample ranking window",
-        "validation replay promotes only rules that beat the configured benchmark gate",
+        "validation replay promotes rules by configured activity/risk/return gates; benchmark return is comparative metadata, not a hard rejection gate",
     )
 
     @property

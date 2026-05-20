@@ -13,13 +13,14 @@ The goal is a set of universal, recognizable rule families rather than a strict 
 - IS ranking: 2021-01-04 → 2022-12-31.
 - Full Sample validation: 2021-01-04 → 2026-05-19.
 - Promotion: validation Sharpe ≥ 1.5, Sortino ≥ 1.5, or total return ≥ 500%.
+- Benchmark: benchmark return is comparative evidence only; lagging the benchmark in a validation window is not a hard rejection reason.
 - Universe/no-lookahead: every stock rule, including price-only MA/RSI/momentum rules, can rank a symbol only after that symbol's first report publication date. Historical prices may feed moving-average math after eligibility, but a future report cannot introduce an earlier buy.
-- Diversity: greedy return-path correlation gate, default `max_correlation=0.997`; if a candidate is too correlated with a previously selected higher-scoring rule, only the higher-scoring rule is kept.
-- Stop condition: at least 10 stock-rule personas, all integrated into `/portfolio` with holdings/trades/equity/methodology routes.
+- Diversity: greedy return-path correlation gate, default `max_correlation=0.95`; if a candidate is too correlated with a previously selected higher-scoring rule, only the higher-scoring rule is kept.
+- Current export: 4 stock-rule personas survive the validation-goal plus correlation gates and are integrated into `/portfolio` with holdings/trades/equity/methodology routes. The broader product target remains to discover at least 10 stock-level personas, but this run should not fake-fill that count by relaxing the validation-goal gate.
 
 ## Useful result from this run
 
-After the report-publication eligibility fix, the selected set is a mix of MA crossover plus report-upside/fresh-report/reversal rules. The earlier MA-heavy result was invalid because report-discovered symbols could enter price-only rules before the first report publication.
+After the report-publication eligibility fix, the selected set is a mix of MA crossover plus report-upside/fresh-report/reversal rules. The earlier MA-heavy result was invalid because report-discovered symbols could enter price-only rules before the first report publication. Benchmark underperformance is now shown as comparative metadata only; it no longer creates `below_oos_benchmark` rejection rows.
 
 This is a product-facing strategy discovery mode, not a claim of OOS robustness. Future sessions should either:
 

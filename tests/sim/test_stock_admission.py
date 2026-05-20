@@ -52,7 +52,7 @@ def _accepted_decision(rule_id: str = "report_upside.win") -> StockAdmissionDeci
     return StockAdmissionDecision(
         candidate=_candidate(rule_id),
         status="accepted",
-        reason_codes=("beats_oos_benchmark",),
+        reason_codes=("passes_validation_goal",),
         out_of_sample_metrics=_metrics(mwr=0.22),
         benchmark_oos_money_weighted_return=0.10,
         excess_return_vs_benchmark=0.12,
@@ -94,16 +94,17 @@ def test_stock_admission_decision_recomputes_oos_excess() -> None:
         )
 
 
-def test_accepted_stock_decision_must_pass_oos_gate_not_is_score() -> None:
-    with pytest.raises(ValidationError, match="must beat the OOS benchmark"):
-        StockAdmissionDecision(
-            candidate=_candidate(),
-            status="accepted",
-            reason_codes=("beats_oos_benchmark",),
-            out_of_sample_metrics=_metrics(mwr=0.09),
-            benchmark_oos_money_weighted_return=0.10,
-            excess_return_vs_benchmark=-0.01,
-        )
+def test_accepted_stock_decision_may_lag_oos_benchmark() -> None:
+    decision = StockAdmissionDecision(
+        candidate=_candidate(),
+        status="accepted",
+        reason_codes=("passes_validation_goal",),
+        out_of_sample_metrics=_metrics(mwr=0.09),
+        benchmark_oos_money_weighted_return=0.10,
+        excess_return_vs_benchmark=-0.01,
+    )
+
+    assert decision.accepted is True
 
 
 def test_accepted_stock_decision_requires_oos_trade_count_gate() -> None:
@@ -111,7 +112,7 @@ def test_accepted_stock_decision_requires_oos_trade_count_gate() -> None:
         StockAdmissionDecision(
             candidate=_candidate(),
             status="accepted",
-            reason_codes=("beats_oos_benchmark",),
+            reason_codes=("passes_validation_goal",),
             out_of_sample_metrics=_metrics(mwr=0.22, trades=0),
             benchmark_oos_money_weighted_return=0.10,
             excess_return_vs_benchmark=0.12,

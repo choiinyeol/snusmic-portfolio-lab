@@ -69,26 +69,38 @@ def test_equity_return_series_uses_portfolio_equity_path() -> None:
     assert series.tolist() == pytest.approx([0.1, 0.1])
 
 
-def test_annotate_stock_trial_gate_removes_benchmark_losers_from_acceptance() -> None:
+def test_annotate_stock_trial_gate_uses_correlation_not_benchmark_lag_for_rejection() -> None:
     from snusmic_pipeline.sim.strategy_generation import PortfolioGateResult
 
     frame = pd.DataFrame(
         [
             {"rule_id": "win", "accepted": True, "admission_status": "accepted"},
-            {"rule_id": "lose", "accepted": True, "admission_status": "accepted"},
+            {"rule_id": "lagged", "accepted": True, "admission_status": "accepted"},
+            {"rule_id": "duplicate", "accepted": True, "admission_status": "accepted"},
         ]
     )
     updated = annotate_stock_trial_gate(
         frame,
         PortfolioGateResult(
-            accepted_rule_ids=frozenset({"win"}),
-            rejected_by_benchmark=frozenset({"lose"}),
-            rejected_by_correlation=frozenset(),
-            correlation_peer={},
-            metrics_by_rule_id={"lose": {"portfolio_money_weighted_return": 0.1}},
+            accepted_rule_ids=frozenset({"win", "lagged"}),
+            rejected_by_benchmark=frozenset(),
+            rejected_by_correlation=frozenset({"duplicate"}),
+            correlation_peer={"duplicate": "win"},
+            metrics_by_rule_id={
+                "lagged": {
+                    "portfolio_money_weighted_return": 0.1,
+                    "portfolio_excess_vs_benchmark": -0.05,
+                },
+                "duplicate": {"portfolio_max_correlation": 0.96},
+            },
         ),
     )
 
     assert updated.loc[updated["rule_id"] == "win", "accepted"].item() is True
-    assert updated.loc[updated["rule_id"] == "lose", "accepted"].item() is False
-    assert updated.loc[updated["rule_id"] == "lose", "admission_status"].item() == "below_portfolio_benchmark"
+    assert updated.loc[updated["rule_id"] == "lagged", "accepted"].item() is True
+    assert updated.loc[updated["rule_id"] == "lagged", "portfolio_excess_vs_benchmark"].item() == -0.05
+    assert updated.loc[updated["rule_id"] == "duplicate", "accepted"].item() is False
+    assert (
+        updated.loc[updated["rule_id"] == "duplicate", "admission_status"].item()
+        == "portfolio_correlation_rejected"
+    )

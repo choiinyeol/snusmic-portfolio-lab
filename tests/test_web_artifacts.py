@@ -229,19 +229,12 @@ def test_strategy_catalog_uses_behavior_labels_and_admission_audit(tmp_path: Pat
 
     catalog = json.loads((out / "strategies" / "catalog.json").read_text(encoding="utf-8"))
     promoted = [row for row in catalog if str(row.get("strategy_id", "")).startswith("stock_rule_")]
-    benchmark_return = max(
-        row["metrics"]["money_weighted_return"]
-        for row in catalog
-        if row.get("strategy_id")
-        in {"all_weather", "benchmark_qqq", "benchmark_spy", "benchmark_kodex200", "benchmark_gld"}
-    )
     for row in promoted:
         assert str(row["label"]).startswith("Stock Rule")
         assert "리포트" in row["methodology_summary"]
         assert "Full Sample validation" not in row["methodology_summary"]
         assert "search_is" not in row["methodology_summary"]
         assert row["is_selectable"] is True
-        assert row["metrics"]["money_weighted_return"] > benchmark_return
 
     admission = json.loads((out / "strategies" / "admission.json").read_text(encoding="utf-8"))
     assert admission["schema_version"] == "1.0.0"

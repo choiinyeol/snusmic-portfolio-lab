@@ -7,6 +7,15 @@ benchmark_qqq,QQQ (NASDAQ-100),benchmark,207683020.6495,734285.9379,206948734.71
 benchmark_spy,SPY (S&P 500),benchmark,180842470.6765,446211.7579,180396258.9187,0.2204,0.1126,0.1487,65.0,1.0,0.6284,0.8839
 benchmark_gld,GLD (Gold ETF),benchmark,229798395.7307,265807.9913,229532587.7394,0.313,0.1633,0.1483,65.0,1.0,0.8365,1.1718
 weak_oracle,Weak Prophet (3M oracle),oracle,4747242218.4382,4747242218.4382,0.0,1.7109,1.0448,0.2163,2018.0,0.0,3.2917,4.107
-smic_mtt_strategy_top1,Global Report Supertrend Broad #1,strategy,398967236.4781,398967236.4781,0.0,0.5311,0.2892,0.3747,46.0,0.0,0.765,0.7469
-smic_mtt_strategy_top3,Global Report Supertrend Broad #3,strategy,370371181.7354,370371181.7354,0.0,0.5012,0.2715,0.3738,57.0,0.0,0.7263,0.7837
-smic_mtt_strategy_top2,Global Report Supertrend Broad #2,strategy,340303793.3744,340303793.3744,0.0,0.4673,0.2516,0.3738,60.0,0.0,0.6936,0.7492
+smic_mtt_strategy_top1,Global Report Supertrend Broad #1,strategy,277647959.5756,277647959.5756,0.0,0.3869,0.205,0.2445,42.0,0.0,0.6641,0.6271
+smic_mtt_strategy_top2,Global Report Supertrend Broad #2,strategy,277266914.3177,277266914.3177,0.0,0.3863,0.2047,0.2441,44.0,0.0,0.6639,0.6268
+pit_research_board_score_top10,PIT 리서치보드 종합점수 Top 10,strategy,245404229.143,26833972.5513,218570256.5916,0.3386,0.1777,0.2904,555.0,0.0,0.6157,1.0755
+stock_rule_ma_crossover_ma5_20_m_age0_3650_pool5_hold3_equal_ma_cross,Stock Rule 01: Ma Crossover,strategy,227120615.4735,2007215.4735,225113400.0,0.3084,0.1608,0.4298,284.0,3.0,0.5297,0.8728
+smic_mtt_strategy_top3,Global Report Supertrend Broad #3,strategy,209712358.0496,119158.0496,209593200.0,0.2775,0.1437,0.2573,43.0,1.0,0.5166,0.511
+stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool3_hold2_equal_blend,Stock Rule 03: Target Upside Momentum,strategy,204690984.7433,19384.7433,204671600.0,0.2682,0.1385,0.4723,1162.0,2.0,0.506,0.7903
+stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool3_hold2_equal_dynamic_upside,Stock Rule 04: Target Upside Momentum,strategy,198529788.0094,19588.0094,198510200.0,0.2564,0.1321,0.4385,1343.0,2.0,0.4964,0.7991
+stock_rule_target_gap_reversal_ma10_30_m_age7_120_pool3_hold2_winner_compress_reversal_gap,Stock Rule 02: Target Gap Reversal,strategy,189974303.0397,2040453.0397,187933850.0,0.2394,0.1228,0.4338,132.0,2.0,0.4863,0.6668
+pit_research_board_score_top5,PIT 리서치보드 종합점수 Top 5,strategy,173086826.6305,41108191.9514,131978634.6791,0.2035,0.1035,0.2763,276.0,0.0,0.4689,0.7082
+pit_research_board_trend_top10,PIT 리서치보드 정배열 Top 10,strategy,172261146.8325,26107435.7507,146153711.0818,0.2017,0.1025,0.2423,616.0,0.0,0.4515,0.6223
+pit_research_board_near_high_top10,PIT 리서치보드 52주고점근접 Top 10,strategy,137551720.2852,16164419.8662,121387300.419,0.1152,0.0573,0.1881,620.0,0.0,0.3377,0.4574
+pit_research_board_large_upside_top10,PIT 리서치보드 large-upside Top 10,strategy,113233139.6023,3185.5846,113229954.0178,0.0404,0.0196,0.2014,448.0,0.0,0.1999,0.281

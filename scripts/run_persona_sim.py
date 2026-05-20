@@ -109,7 +109,7 @@ def parse_args() -> argparse.Namespace:
         "--broker-strategy-top",
         type=int,
         default=int(os.environ.get("SMIC_BROKER_STRATEGY_TOP", "0")),
-        help="Maximum number of benchmark-beating broker-ledger strategies to promote. Use 0 for every qualifying strategy.",
+        help="Maximum number of broker-ledger strategies to promote after risk/diversity gates. Use 0 for every qualifying strategy.",
     )
     parser.add_argument(
         "--broker-strategy-seed",

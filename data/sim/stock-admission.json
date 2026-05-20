@@ -13,7 +13,7 @@
       "candidate": {
         "rule_id": "ma_crossover_ma5_20_M_age0-3650_pool5_hold3_equal_ma_cross",
         "family": "ma_crossover",
-        "symbol": "089890.KQ",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -77,8 +77,8 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.30864789294846395,
-          "net_profit_krw": 0.30864789294846395,
+          "money_weighted_return": 0.3086478929484639,
+          "net_profit_krw": 0.3086478929484639,
           "final_equity_krw": 1.308647892948464,
           "max_drawdown": 0.4908712824432263,
           "trade_count": 500,
@@ -86,9 +86,9 @@
           "sortino": 0.5131306168280528
         }
       },
-      "status": "below_benchmark",
+      "status": "accepted",
       "reason_codes": [
-        "below_oos_benchmark"
+        "passes_validation_goal"
       ],
       "out_of_sample_metrics": {
         "money_weighted_return": 12.325062196970183,
@@ -97,10 +97,10 @@
         "max_drawdown": 0.4908712824432263,
         "trade_count": 1379,
         "sharpe": 1.1583168106852546,
-        "sortino": 1.9604614416539858
+        "sortino": 1.9604614416539856
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 11.907792754623305,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 11.907762196970182,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -110,7 +110,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma10_30_D_age7-120_pool3_hold2_equal_blend",
         "family": "relative_strength",
-        "symbol": "355150.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -174,18 +174,18 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.21557882813406337,
-          "net_profit_krw": 0.21557882813406337,
+          "money_weighted_return": 0.2155788281340633,
+          "net_profit_krw": 0.2155788281340633,
           "final_equity_krw": 1.2155788281340634,
           "max_drawdown": 0.5613163731743405,
           "trade_count": 430,
           "sharpe": 0.2711919111043751,
-          "sortino": 0.40798494247317435
+          "sortino": 0.4079849424731743
         }
       },
-      "status": "below_benchmark",
+      "status": "accepted",
       "reason_codes": [
-        "below_oos_benchmark"
+        "passes_validation_goal"
       ],
       "out_of_sample_metrics": {
         "money_weighted_return": 6.339536078597126,
@@ -196,8 +196,8 @@
         "sharpe": 1.049030105620941,
         "sortino": 1.659789644589996
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 5.922266636250248,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 5.922236078597126,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -207,7 +207,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma10_30_D_age7-120_pool3_hold2_winner_compress_blend",
         "family": "relative_strength",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -276,7 +276,7 @@
           "final_equity_krw": 1.2080830741367763,
           "max_drawdown": 0.573902919722803,
           "trade_count": 430,
-          "sharpe": 0.25818438493084545,
+          "sharpe": 0.2581843849308454,
           "sortino": 0.3838610970279734
         }
       },
@@ -293,8 +293,8 @@
         "sharpe": 1.012432464225496,
         "sortino": 1.58134314685552
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 5.670640406895724,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 5.670609849242602,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -304,7 +304,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma10_30_D_age7-120_pool3_hold2_equal_dynamic_upside",
         "family": "relative_strength",
-        "symbol": "355150.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -377,9 +377,9 @@
           "sortino": 0.6522726173583622
         }
       },
-      "status": "duplicate_behavior",
+      "status": "accepted",
       "reason_codes": [
-        "duplicate_behavior"
+        "passes_validation_goal"
       ],
       "out_of_sample_metrics": {
         "money_weighted_return": 5.579982184414047,
@@ -388,10 +388,10 @@
         "max_drawdown": 0.5290409269537015,
         "trade_count": 1190,
         "sharpe": 1.017136701258773,
-        "sortino": 1.5972691548289855
+        "sortino": 1.5972691548289857
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 5.162712742067169,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 5.162682184414047,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -465,8 +465,8 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.35425844157206154,
-          "net_profit_krw": 0.35425844157206154,
+          "money_weighted_return": 0.3542584415720615,
+          "net_profit_krw": 0.3542584415720615,
           "final_equity_krw": 1.3542584415720615,
           "max_drawdown": 0.3488117756632264,
           "trade_count": 413,
@@ -474,21 +474,21 @@
           "sortino": 0.6958446452955314
         }
       },
-      "status": "below_benchmark",
+      "status": "duplicate_behavior",
       "reason_codes": [
-        "below_oos_benchmark"
+        "duplicate_behavior"
       ],
       "out_of_sample_metrics": {
         "money_weighted_return": 5.357795690950993,
         "net_profit_krw": 5.357795690950993,
         "final_equity_krw": 6.357795690950993,
-        "max_drawdown": 0.46919856135857263,
+        "max_drawdown": 0.4691985613585726,
         "trade_count": 1019,
-        "sharpe": 1.1353786235733723,
-        "sortino": 1.6459290293473219
+        "sharpe": 1.1353786235733725,
+        "sortino": 1.645929029347322
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 4.940526248604114,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 4.940495690950993,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -565,15 +565,15 @@
           "money_weighted_return": 0.3189360303046638,
           "net_profit_krw": 0.3189360303046638,
           "final_equity_krw": 1.3189360303046638,
-          "max_drawdown": 0.35251131513936906,
+          "max_drawdown": 0.352511315139369,
           "trade_count": 413,
           "sharpe": 0.4040273644254878,
           "sortino": 0.6135515043820026
         }
       },
-      "status": "duplicate_behavior",
+      "status": "accepted",
       "reason_codes": [
-        "duplicate_behavior"
+        "passes_validation_goal"
       ],
       "out_of_sample_metrics": {
         "money_weighted_return": 5.258261559484461,
@@ -584,8 +584,8 @@
         "sharpe": 1.109001384628435,
         "sortino": 1.615107032658403
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 4.840992117137582,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 4.840961559484461,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -595,7 +595,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma10_30_D_age7-120_pool3_hold2_winner_compress_dynamic_upside",
         "family": "relative_strength",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -678,11 +678,11 @@
         "final_equity_krw": 6.255440360569112,
         "max_drawdown": 0.5382328098527084,
         "trade_count": 1190,
-        "sharpe": 0.9766060463957595,
+        "sharpe": 0.9766060463957597,
         "sortino": 1.522155149299969
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 4.838170918222233,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 4.838140360569112,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -692,7 +692,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma10_30_W_age7-120_pool10_hold5_winner_compress_blend",
         "family": "relative_strength",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -759,10 +759,10 @@
           "money_weighted_return": 0.2454036105896067,
           "net_profit_krw": 0.2454036105896067,
           "final_equity_krw": 1.2454036105896067,
-          "max_drawdown": 0.44296152601602923,
+          "max_drawdown": 0.4429615260160292,
           "trade_count": 430,
           "sharpe": 0.3197722557458198,
-          "sortino": 0.48131006879437205
+          "sortino": 0.481310068794372
         }
       },
       "status": "below_risk_gate",
@@ -779,8 +779,8 @@
         "sharpe": 0.8539980840169363,
         "sortino": 1.304733997081546
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 3.508978445383657,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 3.5089478877305353,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -790,7 +790,7 @@
       "candidate": {
         "rule_id": "fresh_report_momentum_ma10_30_W_age7-120_pool10_hold5_winner_compress_momentum_blend",
         "family": "mtt",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -859,7 +859,7 @@
           "final_equity_krw": 1.2608758038544514,
           "max_drawdown": 0.439629136967843,
           "trade_count": 430,
-          "sharpe": 0.34067153857148835,
+          "sharpe": 0.3406715385714883,
           "sortino": 0.5113349829639442
         }
       },
@@ -877,8 +877,8 @@
         "sharpe": 0.7636216542243349,
         "sortino": 1.1610648771236125
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 2.9253017325200092,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 2.9252711748668876,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -888,7 +888,7 @@
       "candidate": {
         "rule_id": "target_gap_reversal_ma10_30_W_age0-60_pool3_hold1_equal_reversal_gap",
         "family": "rsi_reversal",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -975,8 +975,8 @@
         "sharpe": 0.7276753444355811,
         "sortino": 0.909018343846734
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 2.910431152082884,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 2.9104005944297624,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -986,7 +986,7 @@
       "candidate": {
         "rule_id": "target_gap_reversal_ma10_30_D_age0-60_pool3_hold1_equal_reversal_gap",
         "family": "rsi_reversal",
-        "symbol": "100090.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -1050,13 +1050,13 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.27115070933533736,
-          "net_profit_krw": 0.27115070933533736,
+          "money_weighted_return": 0.2711507093353373,
+          "net_profit_krw": 0.2711507093353373,
           "final_equity_krw": 1.2711507093353374,
-          "max_drawdown": 0.33533104410769077,
+          "max_drawdown": 0.3353310441076907,
           "trade_count": 269,
-          "sharpe": 0.30492449267411115,
-          "sortino": 0.39183855955034785
+          "sharpe": 0.3049244926741111,
+          "sortino": 0.3918385595503478
         }
       },
       "status": "below_risk_gate",
@@ -1068,13 +1068,13 @@
         "money_weighted_return": 3.297959255917066,
         "net_profit_krw": 3.297959255917066,
         "final_equity_krw": 4.297959255917066,
-        "max_drawdown": 0.38377855966380525,
+        "max_drawdown": 0.3837785596638052,
         "trade_count": 672,
         "sharpe": 0.7414591255248846,
         "sortino": 0.7451217817539435
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 2.8806898135701875,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 2.880659255917066,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -1151,7 +1151,7 @@
           "money_weighted_return": 0.4843044280414215,
           "net_profit_krw": 0.4843044280414215,
           "final_equity_krw": 1.4843044280414215,
-          "max_drawdown": 0.31526595094617094,
+          "max_drawdown": 0.3152659509461709,
           "trade_count": 325,
           "sharpe": 0.648533264894213,
           "sortino": 0.8615338219681926
@@ -1171,8 +1171,8 @@
         "sharpe": 0.7156814707029452,
         "sortino": 0.7726203394552625
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 2.577021558420895,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 2.5769910007677734,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -1249,7 +1249,7 @@
           "money_weighted_return": 0.4744938439394668,
           "net_profit_krw": 0.4744938439394668,
           "final_equity_krw": 1.4744938439394668,
-          "max_drawdown": 0.30907995208343475,
+          "max_drawdown": 0.3090799520834347,
           "trade_count": 325,
           "sharpe": 0.6229163962941459,
           "sortino": 0.8528099803478174
@@ -1269,8 +1269,8 @@
         "sharpe": 0.6890861879484645,
         "sortino": 0.7549329626075323
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 2.4569800568564615,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 2.45694949920334,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -1280,7 +1280,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma10_30_W_age7-120_pool3_hold1_equal_blend",
         "family": "relative_strength",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -1359,16 +1359,16 @@
         "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
-        "money_weighted_return": 2.7841866334786918,
-        "net_profit_krw": 2.7841866334786918,
-        "final_equity_krw": 3.7841866334786918,
+        "money_weighted_return": 2.784186633478692,
+        "net_profit_krw": 2.784186633478692,
+        "final_equity_krw": 3.784186633478692,
         "max_drawdown": 0.7853838141063281,
         "trade_count": 1204,
         "sharpe": 0.4600256146956807,
         "sortino": 0.6591323764833762
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 2.3669171911318134,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 2.366886633478692,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -1445,7 +1445,7 @@
           "money_weighted_return": 0.4785488310481609,
           "net_profit_krw": 0.4785488310481609,
           "final_equity_krw": 1.478548831048161,
-          "max_drawdown": 0.30907995208343464,
+          "max_drawdown": 0.3090799520834346,
           "trade_count": 325,
           "sharpe": 0.6368965937221036,
           "sortino": 0.8463126071236169
@@ -1465,8 +1465,8 @@
         "sharpe": 0.6691170982777315,
         "sortino": 0.7186894160519416
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 2.30133364397012,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 2.3013030863169983,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -1543,7 +1543,7 @@
           "money_weighted_return": 0.484125513139418,
           "net_profit_krw": 0.484125513139418,
           "final_equity_krw": 1.484125513139418,
-          "max_drawdown": 0.31526595094617105,
+          "max_drawdown": 0.315265950946171,
           "trade_count": 325,
           "sharpe": 0.6665592178522087,
           "sortino": 0.8452530479098044
@@ -1563,8 +1563,8 @@
         "sharpe": 0.6759294017492887,
         "sortino": 0.7064557785696887
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 2.266413183644702,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 2.2663826259915805,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -1574,7 +1574,7 @@
       "candidate": {
         "rule_id": "target_gap_reversal_ma20_60_D_age0-60_pool3_hold1_equal_reversal_gap",
         "family": "rsi_reversal",
-        "symbol": "100090.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -1638,13 +1638,13 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.28019632753622736,
-          "net_profit_krw": 0.28019632753622736,
+          "money_weighted_return": 0.2801963275362273,
+          "net_profit_krw": 0.2801963275362273,
           "final_equity_krw": 1.2801963275362274,
-          "max_drawdown": 0.32434675865390505,
+          "max_drawdown": 0.324346758653905,
           "trade_count": 281,
           "sharpe": 0.2942815442480334,
-          "sortino": 0.41309065518813837
+          "sortino": 0.4130906551881383
         }
       },
       "status": "below_risk_gate",
@@ -1653,16 +1653,16 @@
         "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
-        "money_weighted_return": 2.6743609105298534,
-        "net_profit_krw": 2.6743609105298534,
-        "final_equity_krw": 3.6743609105298534,
+        "money_weighted_return": 2.674360910529854,
+        "net_profit_krw": 2.674360910529854,
+        "final_equity_krw": 3.674360910529854,
         "max_drawdown": 0.3712852676581456,
         "trade_count": 717,
         "sharpe": 0.6104284502079288,
         "sortino": 0.6531071802831135
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 2.257091468182975,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 2.257060910529854,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -1736,10 +1736,10 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.48666783528689583,
-          "net_profit_krw": 0.48666783528689583,
+          "money_weighted_return": 0.4866678352868958,
+          "net_profit_krw": 0.4866678352868958,
           "final_equity_krw": 1.4866678352868958,
-          "max_drawdown": 0.31526595094617094,
+          "max_drawdown": 0.3152659509461709,
           "trade_count": 325,
           "sharpe": 0.6468117142432575,
           "sortino": 0.8577688649782169
@@ -1759,8 +1759,8 @@
         "sharpe": 0.6382007008618767,
         "sortino": 0.7049338397431312
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 2.184889358529982,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 2.18485880087686,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -1834,8 +1834,8 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.47694459328587424,
-          "net_profit_krw": 0.47694459328587424,
+          "money_weighted_return": 0.4769445932858742,
+          "net_profit_krw": 0.4769445932858742,
           "final_equity_krw": 1.4769445932858742,
           "max_drawdown": 0.3090799520834352,
           "trade_count": 325,
@@ -1857,8 +1857,8 @@
         "sharpe": 0.6359831921549589,
         "sortino": 0.7051715450287687
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 2.182498381406783,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 2.182467823753661,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -1868,7 +1868,7 @@
       "candidate": {
         "rule_id": "fresh_report_momentum_ma10_30_W_age7-120_pool3_hold1_equal_momentum_blend",
         "family": "mtt",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -1947,16 +1947,16 @@
         "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
-        "money_weighted_return": 2.5193886016015234,
-        "net_profit_krw": 2.5193886016015234,
-        "final_equity_krw": 3.5193886016015234,
+        "money_weighted_return": 2.519388601601523,
+        "net_profit_krw": 2.519388601601523,
+        "final_equity_krw": 3.519388601601523,
         "max_drawdown": 0.7266559727433508,
         "trade_count": 1204,
-        "sharpe": 0.42696535961139936,
+        "sharpe": 0.4269653596113993,
         "sortino": 0.6194321139999054
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 2.102119159254645,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 2.102088601601523,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -1966,7 +1966,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma10_30_W_age7-120_pool10_hold5_winner_compress_dynamic_upside",
         "family": "relative_strength",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -2036,7 +2036,7 @@
           "max_drawdown": 0.4639500830460104,
           "trade_count": 430,
           "sharpe": 0.2933608669855749,
-          "sortino": 0.44329182296758807
+          "sortino": 0.443291822967588
         }
       },
       "status": "below_risk_gate",
@@ -2053,8 +2053,8 @@
         "sharpe": 0.6822227834041268,
         "sortino": 1.037311402451259
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 2.0373483372555397,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 2.037317779602418,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -2064,7 +2064,7 @@
       "candidate": {
         "rule_id": "target_gap_reversal_ma10_30_D_age7-120_pool3_hold1_equal_reversal_gap",
         "family": "rsi_reversal",
-        "symbol": "100090.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -2131,7 +2131,7 @@
           "money_weighted_return": 0.7019649696141677,
           "net_profit_krw": 0.7019649696141677,
           "final_equity_krw": 1.7019649696141677,
-          "max_drawdown": 0.31623296095136666,
+          "max_drawdown": 0.3162329609513666,
           "trade_count": 396,
           "sharpe": 0.5820683965485139,
           "sortino": 0.8443833988532828
@@ -2148,11 +2148,11 @@
         "final_equity_krw": 3.216129056575948,
         "max_drawdown": 0.7368294088199501,
         "trade_count": 1041,
-        "sharpe": 0.45623281844730607,
+        "sharpe": 0.456232818447306,
         "sortino": 0.6077805604763612
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 1.7988596142290696,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 1.798829056575948,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -2162,7 +2162,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma5_20_D_age7-120_pool5_hold3_equal_dynamic_upside",
         "family": "relative_strength",
-        "symbol": "355150.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -2241,16 +2241,16 @@
         "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
-        "money_weighted_return": 2.1103766563176642,
-        "net_profit_krw": 2.1103766563176642,
-        "final_equity_krw": 3.1103766563176642,
+        "money_weighted_return": 2.110376656317664,
+        "net_profit_krw": 2.110376656317664,
+        "final_equity_krw": 3.110376656317664,
         "max_drawdown": 0.4493534553816221,
         "trade_count": 1203,
         "sharpe": 0.6405063970900828,
         "sortino": 0.9513723186774504
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 1.693107213970786,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 1.6930766563176638,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -2327,9 +2327,9 @@
           "money_weighted_return": 0.3239419530540093,
           "net_profit_krw": 0.3239419530540093,
           "final_equity_krw": 1.3239419530540093,
-          "max_drawdown": 0.34277151762167357,
+          "max_drawdown": 0.3427715176216735,
           "trade_count": 325,
-          "sharpe": 0.32067520702252195,
+          "sharpe": 0.3206752070225219,
           "sortino": 0.4424657381609954
         }
       },
@@ -2347,8 +2347,8 @@
         "sharpe": 0.472432425162117,
         "sortino": 0.5596397323646238
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 1.684283323524923,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 1.6842527658718014,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -2358,7 +2358,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma5_20_D_age7-120_pool5_hold3_winner_compress_dynamic_upside",
         "family": "relative_strength",
-        "symbol": "355150.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -2425,7 +2425,7 @@
           "money_weighted_return": 0.2887284755926276,
           "net_profit_krw": 0.2887284755926276,
           "final_equity_krw": 1.2887284755926276,
-          "max_drawdown": 0.43389340702309076,
+          "max_drawdown": 0.4338934070230907,
           "trade_count": 430,
           "sharpe": 0.3845128296651272,
           "sortino": 0.5578937770818131
@@ -2440,13 +2440,13 @@
         "money_weighted_return": 1.9295591148600644,
         "net_profit_krw": 1.9295591148600644,
         "final_equity_krw": 2.9295591148600644,
-        "max_drawdown": 0.47811101068925155,
+        "max_drawdown": 0.4781110106892515,
         "trade_count": 1203,
         "sharpe": 0.5748950072031808,
         "sortino": 0.8364820119380402
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 1.512289672513186,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 1.5122591148600644,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -2520,13 +2520,13 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.24305430621769664,
-          "net_profit_krw": 0.24305430621769664,
+          "money_weighted_return": 0.2430543062176966,
+          "net_profit_krw": 0.2430543062176966,
           "final_equity_krw": 1.2430543062176966,
-          "max_drawdown": 0.26563818147781904,
+          "max_drawdown": 0.265638181477819,
           "trade_count": 261,
-          "sharpe": 0.40989322035358844,
-          "sortino": 0.48475189203411123
+          "sharpe": 0.4098932203535884,
+          "sortino": 0.4847518920341112
         }
       },
       "status": "below_risk_gate",
@@ -2535,16 +2535,16 @@
         "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
-        "money_weighted_return": 1.7846102201340255,
-        "net_profit_krw": 1.7846102201340255,
+        "money_weighted_return": 1.7846102201340257,
+        "net_profit_krw": 1.7846102201340257,
         "final_equity_krw": 2.7846102201340255,
         "max_drawdown": 0.3163829631585089,
         "trade_count": 627,
         "sharpe": 0.794700408390289,
         "sortino": 0.87647897851476
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 1.3673407777871471,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 1.3673102201340257,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -2618,8 +2618,8 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.26431471216102853,
-          "net_profit_krw": 0.26431471216102853,
+          "money_weighted_return": 0.2643147121610285,
+          "net_profit_krw": 0.2643147121610285,
           "final_equity_krw": 1.2643147121610285,
           "max_drawdown": 0.2734313209750745,
           "trade_count": 261,
@@ -2636,13 +2636,13 @@
         "money_weighted_return": 1.7305432168555637,
         "net_profit_krw": 1.7305432168555637,
         "final_equity_krw": 2.7305432168555637,
-        "max_drawdown": 0.33068760784826345,
+        "max_drawdown": 0.3306876078482634,
         "trade_count": 627,
         "sharpe": 0.7721143609198131,
         "sortino": 0.8501278441095965
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 1.3132737745086853,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 1.3132432168555637,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -2652,7 +2652,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma5_20_D_age7-120_pool5_hold3_equal_blend",
         "family": "relative_strength",
-        "symbol": "355150.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -2719,9 +2719,9 @@
           "money_weighted_return": 0.2017800858200367,
           "net_profit_krw": 0.2017800858200367,
           "final_equity_krw": 1.2017800858200367,
-          "max_drawdown": 0.43452352501267755,
+          "max_drawdown": 0.4345235250126775,
           "trade_count": 430,
-          "sharpe": 0.29133264145430304,
+          "sharpe": 0.291332641454303,
           "sortino": 0.4489517631781779
         }
       },
@@ -2739,8 +2739,8 @@
         "sharpe": 0.525004210197084,
         "sortino": 0.7846678222527929
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 1.2013144591034464,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 1.2012839014503247,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -2750,7 +2750,7 @@
       "candidate": {
         "rule_id": "ma_crossover_ma3_10_M_age0-3650_pool20_hold10_equal_ma_cross",
         "family": "ma_crossover",
-        "symbol": "204620.KQ",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -2814,12 +2814,12 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.27404630229945504,
-          "net_profit_krw": 0.27404630229945504,
+          "money_weighted_return": 0.274046302299455,
+          "net_profit_krw": 0.274046302299455,
           "final_equity_krw": 1.274046302299455,
           "max_drawdown": 0.2875795143550892,
           "trade_count": 500,
-          "sharpe": 0.39920417964820654,
+          "sharpe": 0.3992041796482065,
           "sortino": 0.7282519748718935
         }
       },
@@ -2837,8 +2837,8 @@
         "sharpe": 0.4982976916793893,
         "sortino": 0.7243704067301068
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 0.8645892001152325,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 0.8645586424621108,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -2912,8 +2912,8 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.22445643965299422,
-          "net_profit_krw": 0.22445643965299422,
+          "money_weighted_return": 0.2244564396529942,
+          "net_profit_krw": 0.2244564396529942,
           "final_equity_krw": 1.2244564396529942,
           "max_drawdown": 0.2734313209750746,
           "trade_count": 261,
@@ -2930,13 +2930,13 @@
         "money_weighted_return": 1.276326975492882,
         "net_profit_krw": 1.276326975492882,
         "final_equity_krw": 2.276326975492882,
-        "max_drawdown": 0.31710704292123926,
+        "max_drawdown": 0.3171070429212392,
         "trade_count": 627,
         "sharpe": 0.6675104868028199,
         "sortino": 0.7193545907611844
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 0.8590575331460039,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 0.8590269754928821,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -3010,8 +3010,8 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.18454764995966078,
-          "net_profit_krw": 0.18454764995966078,
+          "money_weighted_return": 0.1845476499596607,
+          "net_profit_krw": 0.1845476499596607,
           "final_equity_krw": 1.1845476499596608,
           "max_drawdown": 0.2734313209750747,
           "trade_count": 261,
@@ -3033,8 +3033,8 @@
         "sharpe": 0.6384997939869707,
         "sortino": 0.6814380022258841
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 0.826429709809272,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 0.8263991521561502,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -3044,7 +3044,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma10_30_D_age0-60_pool3_hold1_equal_blend",
         "family": "relative_strength",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -3131,8 +3131,8 @@
         "sharpe": 0.3076175461410621,
         "sortino": 0.3891109230876956
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 0.7344157237445118,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 0.73438516609139,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -3142,7 +3142,7 @@
       "candidate": {
         "rule_id": "fresh_report_momentum_ma5_20_M_age0-60_pool3_hold1_equal_momentum_blend",
         "family": "mtt",
-        "symbol": "306200.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -3206,8 +3206,8 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.37602563905489084,
-          "net_profit_krw": 0.37602563905489084,
+          "money_weighted_return": 0.3760256390548908,
+          "net_profit_krw": 0.3760256390548908,
           "final_equity_krw": 1.3760256390548908,
           "max_drawdown": 0.4980499740532218,
           "trade_count": 306,
@@ -3226,11 +3226,11 @@
         "final_equity_krw": 2.118402331255964,
         "max_drawdown": 0.5268455458917205,
         "trade_count": 835,
-        "sharpe": 0.30625531787006066,
-        "sortino": 0.35207769212887485
+        "sharpe": 0.3062553178700606,
+        "sortino": 0.3520776921288748
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 0.7011328889090859,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 0.7011023312559641,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -3304,13 +3304,13 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.13887762902947287,
-          "net_profit_krw": 0.13887762902947287,
+          "money_weighted_return": 0.1388776290294728,
+          "net_profit_krw": 0.1388776290294728,
           "final_equity_krw": 1.1388776290294729,
           "max_drawdown": 0.2656381814778185,
           "trade_count": 261,
           "sharpe": 0.2696063456014538,
-          "sortino": 0.32450437120747894
+          "sortino": 0.3245043712074789
         }
       },
       "status": "below_risk_gate",
@@ -3322,13 +3322,13 @@
         "money_weighted_return": 1.076010866309526,
         "net_profit_krw": 1.076010866309526,
         "final_equity_krw": 2.076010866309526,
-        "max_drawdown": 0.29458360934075534,
+        "max_drawdown": 0.2945836093407553,
         "trade_count": 627,
         "sharpe": 0.6174463648469649,
         "sortino": 0.6373666241738919
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 0.6587414239626478,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 0.658710866309526,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -3402,12 +3402,12 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.41999836484884767,
-          "net_profit_krw": 0.41999836484884767,
+          "money_weighted_return": 0.4199983648488476,
+          "net_profit_krw": 0.4199983648488476,
           "final_equity_krw": 1.4199983648488477,
-          "max_drawdown": 0.34277151762167324,
+          "max_drawdown": 0.3427715176216732,
           "trade_count": 261,
-          "sharpe": 0.49398670874792366,
+          "sharpe": 0.4939867087479236,
           "sortino": 0.7291018492418533
         }
       },
@@ -3422,11 +3422,11 @@
         "final_equity_krw": 2.0464010235728782,
         "max_drawdown": 0.4986820986449304,
         "trade_count": 627,
-        "sharpe": 0.40237034172226266,
+        "sharpe": 0.4023703417222626,
         "sortino": 0.434036674684688
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 0.629131581226,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 0.6291010235728782,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -3436,7 +3436,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma10_30_W_age7-120_pool3_hold1_equal_dynamic_upside",
         "family": "relative_strength",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -3503,9 +3503,9 @@
           "money_weighted_return": 0.5394462875277826,
           "net_profit_krw": 0.5394462875277826,
           "final_equity_krw": 1.5394462875277826,
-          "max_drawdown": 0.41300277576251165,
+          "max_drawdown": 0.4130027757625116,
           "trade_count": 430,
-          "sharpe": 0.47445727270850696,
+          "sharpe": 0.4744572727085069,
           "sortino": 0.6732987639217805
         }
       },
@@ -3523,8 +3523,8 @@
         "sharpe": 0.253792624781648,
         "sortino": 0.3525003334005126
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 0.6121432145303644,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 0.6121126568772426,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -3534,7 +3534,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma10_30_M_age0-60_pool3_hold1_equal_dynamic_upside",
         "family": "relative_strength",
-        "symbol": "306200.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -3598,8 +3598,8 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.44188844704822183,
-          "net_profit_krw": 0.44188844704822183,
+          "money_weighted_return": 0.4418884470482218,
+          "net_profit_krw": 0.4418884470482218,
           "final_equity_krw": 1.4418884470482218,
           "max_drawdown": 0.2645906432612747,
           "trade_count": 306,
@@ -3618,11 +3618,11 @@
         "final_equity_krw": 1.7330606916372842,
         "max_drawdown": 0.6179768496601288,
         "trade_count": 859,
-        "sharpe": 0.21436606463376667,
-        "sortino": 0.25141183821173313
+        "sharpe": 0.2143660646337666,
+        "sortino": 0.2514118382117331
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 0.3157912492904059,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 0.31576069163728415,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -3632,7 +3632,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma5_20_D_age0-60_pool3_hold1_equal_dynamic_upside",
         "family": "relative_strength",
-        "symbol": "355150.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -3696,13 +3696,13 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.20788085882231755,
-          "net_profit_krw": 0.20788085882231755,
+          "money_weighted_return": 0.2078808588223175,
+          "net_profit_krw": 0.2078808588223175,
           "final_equity_krw": 1.2078808588223175,
-          "max_drawdown": 0.27941531262958874,
+          "max_drawdown": 0.2794153126295887,
           "trade_count": 306,
-          "sharpe": 0.27785561421138366,
-          "sortino": 0.33308633308368185
+          "sharpe": 0.2778556142113836,
+          "sortino": 0.3330863330836818
         }
       },
       "status": "below_risk_gate",
@@ -3716,11 +3716,11 @@
         "final_equity_krw": 1.6511307932182584,
         "max_drawdown": 0.5406543518819344,
         "trade_count": 817,
-        "sharpe": 0.20828880666339736,
-        "sortino": 0.25525646704635113
+        "sharpe": 0.2082888066633973,
+        "sortino": 0.2552564670463511
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 0.23386135087138016,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 0.2338307932182584,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -3730,7 +3730,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma5_20_M_age0-60_pool3_hold1_equal_blend",
         "family": "relative_strength",
-        "symbol": "306200.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -3794,8 +3794,8 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.37602563905489084,
-          "net_profit_krw": 0.37602563905489084,
+          "money_weighted_return": 0.3760256390548908,
+          "net_profit_krw": 0.3760256390548908,
           "final_equity_krw": 1.3760256390548908,
           "max_drawdown": 0.4980499740532218,
           "trade_count": 306,
@@ -3815,10 +3815,10 @@
         "max_drawdown": 0.5563053819601624,
         "trade_count": 835,
         "sharpe": 0.1883472552428844,
-        "sortino": 0.21716326911485873
+        "sortino": 0.2171632691148587
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 0.18340196393122887,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 0.1833714062781071,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -3828,7 +3828,7 @@
       "candidate": {
         "rule_id": "fresh_report_momentum_ma10_30_M_age0-60_pool3_hold1_equal_momentum_blend",
         "family": "mtt",
-        "symbol": "306200.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -3892,10 +3892,10 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.27429644352999616,
-          "net_profit_krw": 0.27429644352999616,
+          "money_weighted_return": 0.2742964435299961,
+          "net_profit_krw": 0.2742964435299961,
           "final_equity_krw": 1.2742964435299962,
-          "max_drawdown": 0.38626625142622817,
+          "max_drawdown": 0.3862662514262281,
           "trade_count": 306,
           "sharpe": 0.3137418279408611,
           "sortino": 0.4724380297757304
@@ -3912,11 +3912,11 @@
         "final_equity_krw": 1.5231018070232296,
         "max_drawdown": 0.5936625847806911,
         "trade_count": 859,
-        "sharpe": 0.16508517508049106,
-        "sortino": 0.19850707095344355
+        "sharpe": 0.165085175080491,
+        "sortino": 0.1985070709534435
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 0.10583236467635138,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 0.10580180702322961,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -3926,7 +3926,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma5_20_M_age0-60_pool3_hold1_equal_dynamic_upside",
         "family": "relative_strength",
-        "symbol": "306200.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -3990,12 +3990,12 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.33042341715027534,
-          "net_profit_krw": 0.33042341715027534,
+          "money_weighted_return": 0.3304234171502753,
+          "net_profit_krw": 0.3304234171502753,
           "final_equity_krw": 1.3304234171502753,
           "max_drawdown": 0.4980499740532218,
           "trade_count": 306,
-          "sharpe": 0.34877112093595125,
+          "sharpe": 0.3487711209359512,
           "sortino": 0.4747799964549715
         }
       },
@@ -4010,11 +4010,11 @@
         "final_equity_krw": 1.4517622740220848,
         "max_drawdown": 0.5563053819601627,
         "trade_count": 835,
-        "sharpe": 0.15260030400170085,
+        "sharpe": 0.1526003040017008,
         "sortino": 0.1720695871208152
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 0.03449283167520656,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 0.03446227402208479,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -4024,7 +4024,7 @@
       "candidate": {
         "rule_id": "target_gap_reversal_ma10_30_W_age0-60_pool3_hold1_winner_compress_reversal_gap",
         "family": "rsi_reversal",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -4110,8 +4110,8 @@
         "sharpe": 0.7276753444355811,
         "sortino": 0.909018343846734
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 2.910431152082884,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 2.9104005944297624,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -4121,7 +4121,7 @@
       "candidate": {
         "rule_id": "target_gap_reversal_ma10_30_D_age0-60_pool3_hold1_winner_compress_reversal_gap",
         "family": "rsi_reversal",
-        "symbol": "100090.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -4185,13 +4185,13 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.27115070933533736,
-          "net_profit_krw": 0.27115070933533736,
+          "money_weighted_return": 0.2711507093353373,
+          "net_profit_krw": 0.2711507093353373,
           "final_equity_krw": 1.2711507093353374,
-          "max_drawdown": 0.33533104410769077,
+          "max_drawdown": 0.3353310441076907,
           "trade_count": 269,
-          "sharpe": 0.30492449267411115,
-          "sortino": 0.39183855955034785
+          "sharpe": 0.3049244926741111,
+          "sortino": 0.3918385595503478
         }
       },
       "status": "duplicate_behavior",
@@ -4202,13 +4202,13 @@
         "money_weighted_return": 3.297959255917066,
         "net_profit_krw": 3.297959255917066,
         "final_equity_krw": 4.297959255917066,
-        "max_drawdown": 0.38377855966380525,
+        "max_drawdown": 0.3837785596638052,
         "trade_count": 672,
         "sharpe": 0.7414591255248846,
         "sortino": 0.7451217817539435
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 2.8806898135701875,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 2.880659255917066,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -4218,7 +4218,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma10_30_W_age7-120_pool3_hold1_winner_compress_blend",
         "family": "relative_strength",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -4296,16 +4296,16 @@
         "duplicate_behavior"
       ],
       "out_of_sample_metrics": {
-        "money_weighted_return": 2.7841866334786918,
-        "net_profit_krw": 2.7841866334786918,
-        "final_equity_krw": 3.7841866334786918,
+        "money_weighted_return": 2.784186633478692,
+        "net_profit_krw": 2.784186633478692,
+        "final_equity_krw": 3.784186633478692,
         "max_drawdown": 0.7853838141063281,
         "trade_count": 1204,
         "sharpe": 0.4600256146956807,
         "sortino": 0.6591323764833762
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 2.3669171911318134,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 2.366886633478692,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -4315,7 +4315,7 @@
       "candidate": {
         "rule_id": "target_gap_reversal_ma20_60_D_age0-60_pool3_hold1_winner_compress_reversal_gap",
         "family": "rsi_reversal",
-        "symbol": "100090.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -4379,13 +4379,13 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.28019632753622736,
-          "net_profit_krw": 0.28019632753622736,
+          "money_weighted_return": 0.2801963275362273,
+          "net_profit_krw": 0.2801963275362273,
           "final_equity_krw": 1.2801963275362274,
-          "max_drawdown": 0.32434675865390505,
+          "max_drawdown": 0.324346758653905,
           "trade_count": 281,
           "sharpe": 0.2942815442480334,
-          "sortino": 0.41309065518813837
+          "sortino": 0.4130906551881383
         }
       },
       "status": "duplicate_behavior",
@@ -4393,16 +4393,16 @@
         "duplicate_behavior"
       ],
       "out_of_sample_metrics": {
-        "money_weighted_return": 2.6743609105298534,
-        "net_profit_krw": 2.6743609105298534,
-        "final_equity_krw": 3.6743609105298534,
+        "money_weighted_return": 2.674360910529854,
+        "net_profit_krw": 2.674360910529854,
+        "final_equity_krw": 3.674360910529854,
         "max_drawdown": 0.3712852676581456,
         "trade_count": 717,
         "sharpe": 0.6104284502079288,
         "sortino": 0.6531071802831135
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 2.257091468182975,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 2.257060910529854,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -4412,7 +4412,7 @@
       "candidate": {
         "rule_id": "fresh_report_momentum_ma10_30_W_age7-120_pool3_hold1_winner_compress_momentum_blend",
         "family": "mtt",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -4490,16 +4490,16 @@
         "duplicate_behavior"
       ],
       "out_of_sample_metrics": {
-        "money_weighted_return": 2.5193886016015234,
-        "net_profit_krw": 2.5193886016015234,
-        "final_equity_krw": 3.5193886016015234,
+        "money_weighted_return": 2.519388601601523,
+        "net_profit_krw": 2.519388601601523,
+        "final_equity_krw": 3.519388601601523,
         "max_drawdown": 0.7266559727433508,
         "trade_count": 1204,
-        "sharpe": 0.42696535961139936,
+        "sharpe": 0.4269653596113993,
         "sortino": 0.6194321139999054
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 2.102119159254645,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 2.102088601601523,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -4509,7 +4509,7 @@
       "candidate": {
         "rule_id": "target_gap_reversal_ma10_30_D_age7-120_pool3_hold1_winner_compress_reversal_gap",
         "family": "rsi_reversal",
-        "symbol": "100090.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -4576,7 +4576,7 @@
           "money_weighted_return": 0.7019649696141677,
           "net_profit_krw": 0.7019649696141677,
           "final_equity_krw": 1.7019649696141677,
-          "max_drawdown": 0.31623296095136666,
+          "max_drawdown": 0.3162329609513666,
           "trade_count": 396,
           "sharpe": 0.5820683965485139,
           "sortino": 0.8443833988532828
@@ -4592,11 +4592,11 @@
         "final_equity_krw": 3.216129056575948,
         "max_drawdown": 0.7368294088199501,
         "trade_count": 1041,
-        "sharpe": 0.45623281844730607,
+        "sharpe": 0.456232818447306,
         "sortino": 0.6077805604763612
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 1.7988596142290696,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 1.798829056575948,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -4673,9 +4673,9 @@
           "money_weighted_return": 0.3239419530540093,
           "net_profit_krw": 0.3239419530540093,
           "final_equity_krw": 1.3239419530540093,
-          "max_drawdown": 0.34277151762167357,
+          "max_drawdown": 0.3427715176216735,
           "trade_count": 325,
-          "sharpe": 0.32067520702252195,
+          "sharpe": 0.3206752070225219,
           "sortino": 0.4424657381609954
         }
       },
@@ -4692,8 +4692,8 @@
         "sharpe": 0.472432425162117,
         "sortino": 0.5596397323646238
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 1.684283323524923,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 1.6842527658718014,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -4703,7 +4703,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma10_30_D_age0-60_pool3_hold1_winner_compress_blend",
         "family": "relative_strength",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -4789,8 +4789,8 @@
         "sharpe": 0.3076175461410621,
         "sortino": 0.3891109230876956
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 0.7344157237445118,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 0.73438516609139,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -4800,7 +4800,7 @@
       "candidate": {
         "rule_id": "fresh_report_momentum_ma5_20_M_age0-60_pool3_hold1_winner_compress_momentum_blend",
         "family": "mtt",
-        "symbol": "306200.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -4864,8 +4864,8 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.37602563905489084,
-          "net_profit_krw": 0.37602563905489084,
+          "money_weighted_return": 0.3760256390548908,
+          "net_profit_krw": 0.3760256390548908,
           "final_equity_krw": 1.3760256390548908,
           "max_drawdown": 0.4980499740532218,
           "trade_count": 306,
@@ -4883,11 +4883,11 @@
         "final_equity_krw": 2.118402331255964,
         "max_drawdown": 0.5268455458917205,
         "trade_count": 835,
-        "sharpe": 0.30625531787006066,
-        "sortino": 0.35207769212887485
+        "sharpe": 0.3062553178700606,
+        "sortino": 0.3520776921288748
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 0.7011328889090859,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 0.7011023312559641,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -4961,12 +4961,12 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.41999836484884767,
-          "net_profit_krw": 0.41999836484884767,
+          "money_weighted_return": 0.4199983648488476,
+          "net_profit_krw": 0.4199983648488476,
           "final_equity_krw": 1.4199983648488477,
-          "max_drawdown": 0.34277151762167324,
+          "max_drawdown": 0.3427715176216732,
           "trade_count": 261,
-          "sharpe": 0.49398670874792366,
+          "sharpe": 0.4939867087479236,
           "sortino": 0.7291018492418533
         }
       },
@@ -4980,11 +4980,11 @@
         "final_equity_krw": 2.0464010235728782,
         "max_drawdown": 0.4986820986449304,
         "trade_count": 627,
-        "sharpe": 0.40237034172226266,
+        "sharpe": 0.4023703417222626,
         "sortino": 0.434036674684688
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 0.629131581226,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 0.6291010235728782,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -4994,7 +4994,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma10_30_W_age7-120_pool3_hold1_winner_compress_dynamic_upside",
         "family": "relative_strength",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -5061,9 +5061,9 @@
           "money_weighted_return": 0.5394462875277826,
           "net_profit_krw": 0.5394462875277826,
           "final_equity_krw": 1.5394462875277826,
-          "max_drawdown": 0.41300277576251165,
+          "max_drawdown": 0.4130027757625116,
           "trade_count": 430,
-          "sharpe": 0.47445727270850696,
+          "sharpe": 0.4744572727085069,
           "sortino": 0.6732987639217805
         }
       },
@@ -5080,8 +5080,8 @@
         "sharpe": 0.253792624781648,
         "sortino": 0.3525003334005126
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 0.6121432145303644,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 0.6121126568772426,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -5091,7 +5091,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma10_30_M_age0-60_pool3_hold1_winner_compress_dynamic_upside",
         "family": "relative_strength",
-        "symbol": "306200.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -5155,8 +5155,8 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.44188844704822183,
-          "net_profit_krw": 0.44188844704822183,
+          "money_weighted_return": 0.4418884470482218,
+          "net_profit_krw": 0.4418884470482218,
           "final_equity_krw": 1.4418884470482218,
           "max_drawdown": 0.2645906432612747,
           "trade_count": 306,
@@ -5174,11 +5174,11 @@
         "final_equity_krw": 1.7330606916372842,
         "max_drawdown": 0.6179768496601288,
         "trade_count": 859,
-        "sharpe": 0.21436606463376667,
-        "sortino": 0.25141183821173313
+        "sharpe": 0.2143660646337666,
+        "sortino": 0.2514118382117331
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 0.3157912492904059,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 0.31576069163728415,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -5188,7 +5188,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma5_20_D_age0-60_pool3_hold1_winner_compress_dynamic_upside",
         "family": "relative_strength",
-        "symbol": "355150.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -5252,13 +5252,13 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.20788085882231755,
-          "net_profit_krw": 0.20788085882231755,
+          "money_weighted_return": 0.2078808588223175,
+          "net_profit_krw": 0.2078808588223175,
           "final_equity_krw": 1.2078808588223175,
-          "max_drawdown": 0.27941531262958874,
+          "max_drawdown": 0.2794153126295887,
           "trade_count": 306,
-          "sharpe": 0.27785561421138366,
-          "sortino": 0.33308633308368185
+          "sharpe": 0.2778556142113836,
+          "sortino": 0.3330863330836818
         }
       },
       "status": "duplicate_behavior",
@@ -5271,11 +5271,11 @@
         "final_equity_krw": 1.6511307932182584,
         "max_drawdown": 0.5406543518819344,
         "trade_count": 817,
-        "sharpe": 0.20828880666339736,
-        "sortino": 0.25525646704635113
+        "sharpe": 0.2082888066633973,
+        "sortino": 0.2552564670463511
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 0.23386135087138016,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 0.2338307932182584,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -5285,7 +5285,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma5_20_M_age0-60_pool3_hold1_winner_compress_blend",
         "family": "relative_strength",
-        "symbol": "306200.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -5349,8 +5349,8 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.37602563905489084,
-          "net_profit_krw": 0.37602563905489084,
+          "money_weighted_return": 0.3760256390548908,
+          "net_profit_krw": 0.3760256390548908,
           "final_equity_krw": 1.3760256390548908,
           "max_drawdown": 0.4980499740532218,
           "trade_count": 306,
@@ -5369,10 +5369,10 @@
         "max_drawdown": 0.5563053819601624,
         "trade_count": 835,
         "sharpe": 0.1883472552428844,
-        "sortino": 0.21716326911485873
+        "sortino": 0.2171632691148587
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 0.18340196393122887,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 0.1833714062781071,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -5382,7 +5382,7 @@
       "candidate": {
         "rule_id": "fresh_report_momentum_ma10_30_M_age0-60_pool3_hold1_winner_compress_momentum_blend",
         "family": "mtt",
-        "symbol": "306200.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -5446,10 +5446,10 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.27429644352999616,
-          "net_profit_krw": 0.27429644352999616,
+          "money_weighted_return": 0.2742964435299961,
+          "net_profit_krw": 0.2742964435299961,
           "final_equity_krw": 1.2742964435299962,
-          "max_drawdown": 0.38626625142622817,
+          "max_drawdown": 0.3862662514262281,
           "trade_count": 306,
           "sharpe": 0.3137418279408611,
           "sortino": 0.4724380297757304
@@ -5465,11 +5465,11 @@
         "final_equity_krw": 1.5231018070232296,
         "max_drawdown": 0.5936625847806911,
         "trade_count": 859,
-        "sharpe": 0.16508517508049106,
-        "sortino": 0.19850707095344355
+        "sharpe": 0.165085175080491,
+        "sortino": 0.1985070709534435
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 0.10583236467635138,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 0.10580180702322961,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -5479,7 +5479,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma5_20_M_age0-60_pool3_hold1_winner_compress_dynamic_upside",
         "family": "relative_strength",
-        "symbol": "306200.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -5543,12 +5543,12 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.33042341715027534,
-          "net_profit_krw": 0.33042341715027534,
+          "money_weighted_return": 0.3304234171502753,
+          "net_profit_krw": 0.3304234171502753,
           "final_equity_krw": 1.3304234171502753,
           "max_drawdown": 0.4980499740532218,
           "trade_count": 306,
-          "sharpe": 0.34877112093595125,
+          "sharpe": 0.3487711209359512,
           "sortino": 0.4747799964549715
         }
       },
@@ -5562,11 +5562,11 @@
         "final_equity_krw": 1.4517622740220848,
         "max_drawdown": 0.5563053819601627,
         "trade_count": 835,
-        "sharpe": 0.15260030400170085,
+        "sharpe": 0.1526003040017008,
         "sortino": 0.1720695871208152
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": 0.03449283167520656,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": 0.03446227402208479,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -5576,7 +5576,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma10_30_D_age0-60_pool3_hold1_equal_dynamic_upside",
         "family": "relative_strength",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -5640,18 +5640,19 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.21986466406589744,
-          "net_profit_krw": 0.21986466406589744,
+          "money_weighted_return": 0.2198646640658974,
+          "net_profit_krw": 0.2198646640658974,
           "final_equity_krw": 1.2198646640658974,
           "max_drawdown": 0.4037667406917498,
           "trade_count": 304,
           "sharpe": 0.2535418150432708,
-          "sortino": 0.35985735754997594
+          "sortino": 0.3598573575499759
         }
       },
-      "status": "below_benchmark",
+      "status": "below_risk_gate",
       "reason_codes": [
-        "below_oos_benchmark"
+        "below_sharpe_gate",
+        "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
         "money_weighted_return": 0.2566161765667401,
@@ -5659,11 +5660,11 @@
         "final_equity_krw": 1.25661617656674,
         "max_drawdown": 0.5622831937571673,
         "trade_count": 811,
-        "sharpe": 0.09179581806531069,
-        "sortino": 0.11703865902642613
+        "sharpe": 0.0917958180653106,
+        "sortino": 0.1170386590264261
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": -0.16065326578013817,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": -0.16068382343325993,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -5673,7 +5674,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma10_30_D_age0-60_pool3_hold1_winner_compress_dynamic_upside",
         "family": "relative_strength",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -5737,18 +5738,19 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.21986466406589744,
-          "net_profit_krw": 0.21986466406589744,
+          "money_weighted_return": 0.2198646640658974,
+          "net_profit_krw": 0.2198646640658974,
           "final_equity_krw": 1.2198646640658974,
           "max_drawdown": 0.4037667406917498,
           "trade_count": 304,
           "sharpe": 0.2535418150432708,
-          "sortino": 0.35985735754997594
+          "sortino": 0.3598573575499759
         }
       },
-      "status": "below_benchmark",
+      "status": "below_risk_gate",
       "reason_codes": [
-        "below_oos_benchmark"
+        "below_sharpe_gate",
+        "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
         "money_weighted_return": 0.2566161765667401,
@@ -5756,11 +5758,11 @@
         "final_equity_krw": 1.25661617656674,
         "max_drawdown": 0.5622831937571673,
         "trade_count": 811,
-        "sharpe": 0.09179581806531069,
-        "sortino": 0.11703865902642613
+        "sharpe": 0.0917958180653106,
+        "sortino": 0.1170386590264261
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": -0.16065326578013817,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": -0.16068382343325993,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -5770,7 +5772,7 @@
       "candidate": {
         "rule_id": "ma_crossover_ma3_10_M_age0-3650_pool10_hold5_equal_ma_cross",
         "family": "ma_crossover",
-        "symbol": "089890.KQ",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -5834,30 +5836,31 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.24262119080643108,
-          "net_profit_krw": 0.24262119080643108,
+          "money_weighted_return": 0.242621190806431,
+          "net_profit_krw": 0.242621190806431,
           "final_equity_krw": 1.242621190806431,
-          "max_drawdown": 0.36421132333127215,
+          "max_drawdown": 0.3642113233312721,
           "trade_count": 500,
-          "sharpe": 0.29878001481110944,
+          "sharpe": 0.2987800148111094,
           "sortino": 0.5328723917454273
         }
       },
-      "status": "below_benchmark",
+      "status": "below_risk_gate",
       "reason_codes": [
-        "below_oos_benchmark"
+        "below_sharpe_gate",
+        "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
-        "money_weighted_return": 0.14923490736163214,
-        "net_profit_krw": 0.14923490736163214,
+        "money_weighted_return": 0.1492349073616321,
+        "net_profit_krw": 0.1492349073616321,
         "final_equity_krw": 1.1492349073616321,
         "max_drawdown": 0.6700513060893238,
         "trade_count": 1379,
         "sharpe": 0.0657150929899708,
-        "sortino": 0.10286924025991158
+        "sortino": 0.1028692402599115
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": -0.2680345349852461,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": -0.26806509263836786,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -5867,7 +5870,7 @@
       "candidate": {
         "rule_id": "ma_crossover_ma3_10_M_age0-3650_pool20_hold5_equal_ma_cross",
         "family": "ma_crossover",
-        "symbol": "089890.KQ",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -5931,30 +5934,31 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.24262119080643108,
-          "net_profit_krw": 0.24262119080643108,
+          "money_weighted_return": 0.242621190806431,
+          "net_profit_krw": 0.242621190806431,
           "final_equity_krw": 1.242621190806431,
-          "max_drawdown": 0.36421132333127215,
+          "max_drawdown": 0.3642113233312721,
           "trade_count": 500,
-          "sharpe": 0.29878001481110944,
+          "sharpe": 0.2987800148111094,
           "sortino": 0.5328723917454273
         }
       },
-      "status": "below_benchmark",
+      "status": "below_risk_gate",
       "reason_codes": [
-        "below_oos_benchmark"
+        "below_sharpe_gate",
+        "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
-        "money_weighted_return": 0.14923490736163214,
-        "net_profit_krw": 0.14923490736163214,
+        "money_weighted_return": 0.1492349073616321,
+        "net_profit_krw": 0.1492349073616321,
         "final_equity_krw": 1.1492349073616321,
         "max_drawdown": 0.6700513060893238,
         "trade_count": 1379,
         "sharpe": 0.0657150929899708,
-        "sortino": 0.10286924025991158
+        "sortino": 0.1028692402599115
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": -0.2680345349852461,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": -0.26806509263836786,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -6028,30 +6032,31 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.22228947463613657,
-          "net_profit_krw": 0.22228947463613657,
+          "money_weighted_return": 0.2222894746361365,
+          "net_profit_krw": 0.2222894746361365,
           "final_equity_krw": 1.2222894746361366,
-          "max_drawdown": 0.34277151762167357,
+          "max_drawdown": 0.3427715176216735,
           "trade_count": 153,
           "sharpe": 0.3141118770345378,
-          "sortino": 0.36635357155450704
+          "sortino": 0.366353571554507
         }
       },
-      "status": "below_benchmark",
+      "status": "below_risk_gate",
       "reason_codes": [
-        "below_oos_benchmark"
+        "below_sharpe_gate",
+        "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
-        "money_weighted_return": 0.06915387393399075,
-        "net_profit_krw": 0.06915387393399075,
+        "money_weighted_return": 0.0691538739339907,
+        "net_profit_krw": 0.0691538739339907,
         "final_equity_krw": 1.0691538739339908,
         "max_drawdown": 0.5732122161520302,
         "trade_count": 474,
-        "sharpe": 0.03174771855501169,
-        "sortino": 0.023848102442247127
+        "sharpe": 0.0317477185550116,
+        "sortino": 0.0238481024422471
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": -0.3481155684128875,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": -0.3481461260660093,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -6125,30 +6130,31 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.22228947463613657,
-          "net_profit_krw": 0.22228947463613657,
+          "money_weighted_return": 0.2222894746361365,
+          "net_profit_krw": 0.2222894746361365,
           "final_equity_krw": 1.2222894746361366,
-          "max_drawdown": 0.34277151762167357,
+          "max_drawdown": 0.3427715176216735,
           "trade_count": 153,
           "sharpe": 0.3141118770345378,
-          "sortino": 0.36635357155450704
+          "sortino": 0.366353571554507
         }
       },
-      "status": "below_benchmark",
+      "status": "below_risk_gate",
       "reason_codes": [
-        "below_oos_benchmark"
+        "below_sharpe_gate",
+        "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
-        "money_weighted_return": 0.06915387393399075,
-        "net_profit_krw": 0.06915387393399075,
+        "money_weighted_return": 0.0691538739339907,
+        "net_profit_krw": 0.0691538739339907,
         "final_equity_krw": 1.0691538739339908,
         "max_drawdown": 0.5732122161520302,
         "trade_count": 474,
-        "sharpe": 0.03174771855501169,
-        "sortino": 0.023848102442247127
+        "sharpe": 0.0317477185550116,
+        "sortino": 0.0238481024422471
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": -0.3481155684128875,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": -0.3481461260660093,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -6222,30 +6228,31 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.14364830281408403,
-          "net_profit_krw": 0.14364830281408403,
+          "money_weighted_return": 0.143648302814084,
+          "net_profit_krw": 0.143648302814084,
           "final_equity_krw": 1.143648302814084,
           "max_drawdown": 0.2734313209750744,
           "trade_count": 153,
           "sharpe": 0.3175914549930873,
-          "sortino": 0.32113078551602287
+          "sortino": 0.3211307855160228
         }
       },
-      "status": "below_benchmark",
+      "status": "below_risk_gate",
       "reason_codes": [
-        "below_oos_benchmark"
+        "below_sharpe_gate",
+        "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
-        "money_weighted_return": 0.027753122737507407,
-        "net_profit_krw": 0.027753122737507407,
+        "money_weighted_return": 0.0277531227375074,
+        "net_profit_krw": 0.0277531227375074,
         "final_equity_krw": 1.0277531227375074,
         "max_drawdown": 0.5622584214257568,
         "trade_count": 474,
-        "sharpe": 0.015116984444624013,
-        "sortino": 0.010127360703568825
+        "sharpe": 0.015116984444624,
+        "sortino": 0.0101273607035688
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": -0.38951631960937083,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": -0.3895468772624926,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -6255,7 +6262,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma10_30_W_age0-60_pool3_hold1_equal_dynamic_upside",
         "family": "relative_strength",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -6322,27 +6329,28 @@
           "money_weighted_return": 0.3035557286528334,
           "net_profit_krw": 0.3035557286528334,
           "final_equity_krw": 1.3035557286528334,
-          "max_drawdown": 0.39625465461701204,
+          "max_drawdown": 0.396254654617012,
           "trade_count": 310,
-          "sharpe": 0.36265076936529633,
+          "sharpe": 0.3626507693652963,
           "sortino": 0.5096068366335506
         }
       },
-      "status": "below_benchmark",
+      "status": "below_risk_gate",
       "reason_codes": [
-        "below_oos_benchmark"
+        "below_sharpe_gate",
+        "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
-        "money_weighted_return": 0.01395957424799299,
-        "net_profit_krw": 0.01395957424799299,
+        "money_weighted_return": 0.0139595742479929,
+        "net_profit_krw": 0.0139595742479929,
         "final_equity_krw": 1.013959574247993,
         "max_drawdown": 0.7765709559439862,
         "trade_count": 834,
-        "sharpe": 0.005871541732244451,
-        "sortino": 0.007488479041846677
+        "sharpe": 0.0058715417322444,
+        "sortino": 0.0074884790418466
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": -0.40330986809888525,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": -0.4033404257520071,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -6352,7 +6360,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma10_30_W_age0-60_pool3_hold1_winner_compress_dynamic_upside",
         "family": "relative_strength",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -6419,27 +6427,28 @@
           "money_weighted_return": 0.3035557286528334,
           "net_profit_krw": 0.3035557286528334,
           "final_equity_krw": 1.3035557286528334,
-          "max_drawdown": 0.39625465461701204,
+          "max_drawdown": 0.396254654617012,
           "trade_count": 310,
-          "sharpe": 0.36265076936529633,
+          "sharpe": 0.3626507693652963,
           "sortino": 0.5096068366335506
         }
       },
-      "status": "below_benchmark",
+      "status": "below_risk_gate",
       "reason_codes": [
-        "below_oos_benchmark"
+        "below_sharpe_gate",
+        "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
-        "money_weighted_return": 0.01395957424799299,
-        "net_profit_krw": 0.01395957424799299,
+        "money_weighted_return": 0.0139595742479929,
+        "net_profit_krw": 0.0139595742479929,
         "final_equity_krw": 1.013959574247993,
         "max_drawdown": 0.7765709559439862,
         "trade_count": 834,
-        "sharpe": 0.005871541732244451,
-        "sortino": 0.007488479041846677
+        "sharpe": 0.0058715417322444,
+        "sortino": 0.0074884790418466
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": -0.40330986809888525,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": -0.4033404257520071,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -6513,30 +6522,31 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.14721285077395074,
-          "net_profit_krw": 0.14721285077395074,
+          "money_weighted_return": 0.1472128507739507,
+          "net_profit_krw": 0.1472128507739507,
           "final_equity_krw": 1.1472128507739507,
           "max_drawdown": 0.2734313209750743,
           "trade_count": 153,
           "sharpe": 0.3153491508472541,
-          "sortino": 0.32691366381851517
+          "sortino": 0.3269136638185151
         }
       },
-      "status": "below_benchmark",
+      "status": "below_risk_gate",
       "reason_codes": [
-        "below_oos_benchmark"
+        "below_sharpe_gate",
+        "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
-        "money_weighted_return": 0.004641577991416845,
-        "net_profit_krw": 0.004641577991416845,
+        "money_weighted_return": 0.0046415779914168,
+        "net_profit_krw": 0.0046415779914168,
         "final_equity_krw": 1.0046415779914168,
         "max_drawdown": 0.574119851208929,
         "trade_count": 474,
-        "sharpe": 0.0025321315024210297,
-        "sortino": 0.001715951872127052
+        "sharpe": 0.002532131502421,
+        "sortino": 0.001715951872127
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": -0.4126278643554614,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": -0.4126584220085832,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -6610,30 +6620,31 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.13558580472245851,
-          "net_profit_krw": 0.13558580472245851,
+          "money_weighted_return": 0.1355858047224585,
+          "net_profit_krw": 0.1355858047224585,
           "final_equity_krw": 1.1355858047224585,
           "max_drawdown": 0.2656381814778189,
           "trade_count": 153,
-          "sharpe": 0.30091372554842766,
+          "sharpe": 0.3009137255484276,
           "sortino": 0.3053955202422187
         }
       },
-      "status": "below_benchmark",
+      "status": "below_risk_gate",
       "reason_codes": [
-        "below_oos_benchmark"
+        "below_sharpe_gate",
+        "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
-        "money_weighted_return": -0.009711107199170232,
-        "net_profit_krw": -0.009711107199170232,
+        "money_weighted_return": -0.0097111071991702,
+        "net_profit_krw": -0.0097111071991702,
         "final_equity_krw": 0.9902888928008298,
         "max_drawdown": 0.5743000214787976,
         "trade_count": 474,
-        "sharpe": -0.005359713765518664,
-        "sortino": -0.003611500096740476
+        "sharpe": -0.0053597137655186,
+        "sortino": -0.0036115000967404
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": -0.42698054954604847,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": -0.4270111071991702,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -6643,7 +6654,7 @@
       "candidate": {
         "rule_id": "fresh_report_momentum_ma10_30_W_age0-60_pool3_hold1_equal_momentum_blend",
         "family": "mtt",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -6710,27 +6721,28 @@
           "money_weighted_return": 0.2852852020665799,
           "net_profit_krw": 0.2852852020665799,
           "final_equity_krw": 1.28528520206658,
-          "max_drawdown": 0.46958108707609136,
+          "max_drawdown": 0.4695810870760913,
           "trade_count": 310,
-          "sharpe": 0.33273706011710114,
+          "sharpe": 0.3327370601171011,
           "sortino": 0.4695660015355265
         }
       },
-      "status": "below_benchmark",
+      "status": "below_risk_gate",
       "reason_codes": [
-        "below_oos_benchmark"
+        "below_sharpe_gate",
+        "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
-        "money_weighted_return": -0.10891243377331006,
-        "net_profit_krw": -0.10891243377331006,
+        "money_weighted_return": -0.10891243377331,
+        "net_profit_krw": -0.10891243377331,
         "final_equity_krw": 0.8910875662266899,
         "max_drawdown": 0.7746619446741174,
         "trade_count": 834,
-        "sharpe": -0.04471527714538673,
-        "sortino": -0.056552471967062236
+        "sharpe": -0.0447152771453867,
+        "sortino": -0.0565524719670622
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": -0.5261818761201883,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": -0.5262124337733101,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -6740,7 +6752,7 @@
       "candidate": {
         "rule_id": "fresh_report_momentum_ma10_30_W_age0-60_pool3_hold1_winner_compress_momentum_blend",
         "family": "mtt",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -6807,27 +6819,28 @@
           "money_weighted_return": 0.2852852020665799,
           "net_profit_krw": 0.2852852020665799,
           "final_equity_krw": 1.28528520206658,
-          "max_drawdown": 0.46958108707609136,
+          "max_drawdown": 0.4695810870760913,
           "trade_count": 310,
-          "sharpe": 0.33273706011710114,
+          "sharpe": 0.3327370601171011,
           "sortino": 0.4695660015355265
         }
       },
-      "status": "below_benchmark",
+      "status": "below_risk_gate",
       "reason_codes": [
-        "below_oos_benchmark"
+        "below_sharpe_gate",
+        "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
-        "money_weighted_return": -0.10891243377331006,
-        "net_profit_krw": -0.10891243377331006,
+        "money_weighted_return": -0.10891243377331,
+        "net_profit_krw": -0.10891243377331,
         "final_equity_krw": 0.8910875662266899,
         "max_drawdown": 0.7746619446741174,
         "trade_count": 834,
-        "sharpe": -0.04471527714538673,
-        "sortino": -0.056552471967062236
+        "sharpe": -0.0447152771453867,
+        "sortino": -0.0565524719670622
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": -0.5261818761201883,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": -0.5262124337733101,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -6837,7 +6850,7 @@
       "candidate": {
         "rule_id": "ma_crossover_ma3_10_M_age0-3650_pool20_hold10_winner_compress_ma_cross",
         "family": "ma_crossover",
-        "symbol": "082740.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -6901,30 +6914,31 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.21003852063643613,
-          "net_profit_krw": 0.21003852063643613,
+          "money_weighted_return": 0.2100385206364361,
+          "net_profit_krw": 0.2100385206364361,
           "final_equity_krw": 1.2100385206364361,
           "max_drawdown": 0.5294833607405889,
           "trade_count": 500,
           "sharpe": 0.2040551426915096,
-          "sortino": 0.31031344707448344
+          "sortino": 0.3103134470744834
         }
       },
-      "status": "below_benchmark",
+      "status": "below_risk_gate",
       "reason_codes": [
-        "below_oos_benchmark"
+        "below_sharpe_gate",
+        "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
-        "money_weighted_return": -0.12386883024425055,
-        "net_profit_krw": -0.12386883024425055,
+        "money_weighted_return": -0.1238688302442505,
+        "net_profit_krw": -0.1238688302442505,
         "final_equity_krw": 0.8761311697557495,
         "max_drawdown": 0.7152583403732435,
         "trade_count": 1379,
-        "sharpe": -0.04859548178796618,
-        "sortino": -0.07213346435185401
+        "sharpe": -0.0485954817879661,
+        "sortino": -0.072133464351854
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": -0.5411382725911288,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": -0.5411688302442506,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -6934,7 +6948,7 @@
       "candidate": {
         "rule_id": "price_momentum_ma3_10_M_age0-3650_pool20_hold10_winner_compress_price_momentum",
         "family": "relative_strength",
-        "symbol": "322000.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -6998,30 +7012,31 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.28650188405532306,
-          "net_profit_krw": 0.28650188405532306,
+          "money_weighted_return": 0.286501884055323,
+          "net_profit_krw": 0.286501884055323,
           "final_equity_krw": 1.286501884055323,
           "max_drawdown": 0.5780807583963592,
           "trade_count": 500,
           "sharpe": 0.2682770457360936,
-          "sortino": 0.40240091908199993
+          "sortino": 0.4024009190819999
         }
       },
-      "status": "below_benchmark",
+      "status": "below_risk_gate",
       "reason_codes": [
-        "below_oos_benchmark"
+        "below_sharpe_gate",
+        "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
-        "money_weighted_return": -0.17916171541041326,
-        "net_profit_krw": -0.17916171541041326,
+        "money_weighted_return": -0.1791617154104132,
+        "net_profit_krw": -0.1791617154104132,
         "final_equity_krw": 0.8208382845895867,
         "max_drawdown": 0.7393622812947139,
         "trade_count": 1379,
         "sharpe": -0.0717565712533142,
-        "sortino": -0.10701226769206168
+        "sortino": -0.1070122676920616
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": -0.5964311577572915,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": -0.5964617154104133,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -7031,7 +7046,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma10_30_W_age0-60_pool3_hold1_equal_blend",
         "family": "relative_strength",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -7098,15 +7113,16 @@
           "money_weighted_return": 0.2757687058337932,
           "net_profit_krw": 0.2757687058337932,
           "final_equity_krw": 1.2757687058337932,
-          "max_drawdown": 0.49030699699754265,
+          "max_drawdown": 0.4903069969975426,
           "trade_count": 310,
           "sharpe": 0.3206100260083236,
           "sortino": 0.4451188872408609
         }
       },
-      "status": "below_benchmark",
+      "status": "below_risk_gate",
       "reason_codes": [
-        "below_oos_benchmark"
+        "below_sharpe_gate",
+        "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
         "money_weighted_return": -0.2240376158275863,
@@ -7114,11 +7130,11 @@
         "final_equity_krw": 0.7759623841724137,
         "max_drawdown": 0.8169595158377848,
         "trade_count": 834,
-        "sharpe": -0.09808426395080176,
-        "sortino": -0.12340956122559583
+        "sharpe": -0.0980842639508017,
+        "sortino": -0.1234095612255958
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": -0.6413070581744645,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": -0.6413376158275863,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -7128,7 +7144,7 @@
       "candidate": {
         "rule_id": "target_upside_momentum_ma10_30_W_age0-60_pool3_hold1_winner_compress_blend",
         "family": "relative_strength",
-        "symbol": "187790.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -7195,15 +7211,16 @@
           "money_weighted_return": 0.2757687058337932,
           "net_profit_krw": 0.2757687058337932,
           "final_equity_krw": 1.2757687058337932,
-          "max_drawdown": 0.49030699699754265,
+          "max_drawdown": 0.4903069969975426,
           "trade_count": 310,
           "sharpe": 0.3206100260083236,
           "sortino": 0.4451188872408609
         }
       },
-      "status": "below_benchmark",
+      "status": "below_risk_gate",
       "reason_codes": [
-        "below_oos_benchmark"
+        "below_sharpe_gate",
+        "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
         "money_weighted_return": -0.2240376158275863,
@@ -7211,11 +7228,11 @@
         "final_equity_krw": 0.7759623841724137,
         "max_drawdown": 0.8169595158377848,
         "trade_count": 834,
-        "sharpe": -0.09808426395080176,
-        "sortino": -0.12340956122559583
+        "sharpe": -0.0980842639508017,
+        "sortino": -0.1234095612255958
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": -0.6413070581744645,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": -0.6413376158275863,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -7225,7 +7242,7 @@
       "candidate": {
         "rule_id": "ma_crossover_ma3_10_M_age0-3650_pool10_hold5_winner_compress_ma_cross",
         "family": "ma_crossover",
-        "symbol": "082740.KS",
+        "symbol": "multi_stock",
         "company": null,
         "window": {
           "search_start": "2021-01-04",
@@ -7289,30 +7306,31 @@
           }
         ],
         "in_sample_metrics": {
-          "money_weighted_return": 0.20304438594808705,
-          "net_profit_krw": 0.20304438594808705,
+          "money_weighted_return": 0.203044385948087,
+          "net_profit_krw": 0.203044385948087,
           "final_equity_krw": 1.203044385948087,
           "max_drawdown": 0.5083536642959194,
           "trade_count": 500,
-          "sharpe": 0.19271443706277958,
+          "sharpe": 0.1927144370627795,
           "sortino": 0.2922798910936528
         }
       },
-      "status": "below_benchmark",
+      "status": "below_risk_gate",
       "reason_codes": [
-        "below_oos_benchmark"
+        "below_sharpe_gate",
+        "below_sortino_gate"
       ],
       "out_of_sample_metrics": {
-        "money_weighted_return": -0.32996826680842206,
-        "net_profit_krw": -0.32996826680842206,
+        "money_weighted_return": -0.329968266808422,
+        "net_profit_krw": -0.329968266808422,
         "final_equity_krw": 0.6700317331915779,
         "max_drawdown": 0.768054401147261,
         "trade_count": 1379,
-        "sharpe": -0.14005540118056056,
-        "sortino": -0.20938576767476116
+        "sharpe": -0.1400554011805605,
+        "sortino": -0.2093857676747611
       },
-      "benchmark_oos_money_weighted_return": 0.41726944234687824,
-      "excess_return_vs_benchmark": -0.7472377091553003,
+      "benchmark_oos_money_weighted_return": 0.4173,
+      "excess_return_vs_benchmark": -0.7472682668084221,
       "min_excess_return": 0.0,
       "min_trades": 1,
       "min_sharpe": null,
@@ -7323,6 +7341,6 @@
     "search_is ranks stock rules using only the in-sample window",
     "validation replay runs frozen IS finalists on the full sample",
     "portfolio personas are materialized only when validation Sharpe >= 1.5, Sortino >= 1.5, or return >= 500%",
-    "highly correlated validation return paths keep only the best-scoring strategy"
+    "highly correlated validation return paths keep only the best-scoring strategy; default correlation threshold is 0.95"
   ]
 }

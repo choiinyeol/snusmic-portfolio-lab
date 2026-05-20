@@ -30,7 +30,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--is-top", type=int, default=75)
     parser.add_argument("--admit-top", type=int, default=0)
     parser.add_argument("--stock-persona-top", type=int, default=10)
-    parser.add_argument("--max-correlation", type=float, default=0.90)
+    parser.add_argument("--max-correlation", type=float, default=0.95)
     parser.add_argument("--broker-strategy-trials", type=int, default=120)
     parser.add_argument("--broker-strategy-top", type=int, default=3)
     parser.add_argument("--broker-strategy-seed", type=int, default=42)

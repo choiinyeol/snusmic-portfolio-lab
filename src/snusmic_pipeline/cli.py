@@ -609,7 +609,7 @@ def build_parser() -> argparse.ArgumentParser:
     generate.add_argument("--admit-top", type=int, default=0)
     generate.add_argument("--stock-persona-top", type=int, default=10)
     generate.add_argument("--pit-strategy-top", type=int, default=5)
-    generate.add_argument("--max-correlation", type=float, default=0.90)
+    generate.add_argument("--max-correlation", type=float, default=0.95)
     generate.add_argument(
         "--broker-strategy-trials",
         type=int,
@@ -653,7 +653,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--broker-strategy-top",
         type=int,
         default=int(os.environ.get("SMIC_BROKER_STRATEGY_TOP", "0")),
-        help="Maximum number of benchmark-beating broker-ledger strategies to promote. Use 0 for every qualifying strategy.",
+        help="Maximum number of broker-ledger strategies to promote after risk/diversity gates. Use 0 for every qualifying strategy.",
     )
     sim.add_argument(
         "--broker-strategy-seed",

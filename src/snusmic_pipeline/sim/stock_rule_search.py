@@ -163,12 +163,14 @@ def admit_oos(
     min_observations: int = DEFAULT_MIN_OBSERVATIONS,
     min_noncash_fraction: float = DEFAULT_MIN_NONCASH_FRACTION,
 ) -> StockRuleSearchResult:
-    """Replay candidate stock rules OOS and admit benchmark-beating rules.
+    """Replay candidate stock rules OOS and admit validation-quality rules.
 
-    ``benchmark_total_return`` is the OOS hurdle.  A rule is accepted only if it
-    passed activity gates in both windows, passed optional IS/OOS metric gates,
-    beat ``benchmark_total_return + min_oos_excess_return``, and was not a near
-    duplicate of an earlier accepted rule.
+    ``benchmark_total_return`` is retained as comparative metadata only.  A rule
+    is accepted when it passes activity gates in both windows, optional IS/OOS
+    metric gates, and is not a near duplicate of an earlier accepted rule.  A
+    validation window can lag the benchmark without being disqualified because
+    benchmark-relative return is a portfolio-selection context, not a hard stock
+    rule contract.
     """
 
     candidate_configs = configs.configs if isinstance(configs, StockRuleSearchResult) else tuple(configs)
@@ -781,18 +783,17 @@ def _admission_decision(
     if min_oos_sharpe is not None and float(oos_eval.metrics["annualized_sharpe"]) < min_oos_sharpe:
         reasons.append("below_oos_sharpe")
 
-    required_oos = benchmark_total_return + min_oos_excess_return
-    if float(oos_eval.metrics["total_return"]) <= required_oos:
-        reasons.append("below_oos_benchmark")
     behavior_key = _behavior_key(oos_eval)
     if behavior_key in seen_behaviors:
         reasons.append("duplicate_oos_behavior")
 
     status = "accepted" if not reasons else _primary_rejection(reasons)
+    required_oos = benchmark_total_return + min_oos_excess_return
     metadata = {
         "benchmark_total_return": benchmark_total_return,
         "min_oos_excess_return": min_oos_excess_return,
         "required_oos_total_return": required_oos,
+        "benchmark_gate_enabled": False,
         "min_is_total_return": min_is_total_return,
         "min_is_sharpe": min_is_sharpe,
         "min_oos_sharpe": min_oos_sharpe,

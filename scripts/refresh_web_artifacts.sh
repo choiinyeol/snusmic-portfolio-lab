@@ -35,7 +35,7 @@ uv run python scripts/run_stock_rule_search.py \
   --is-top "${STOCK_RULE_IS_TOP:-0}" \
   --admit-top 0 \
   --persona-top "${STOCK_RULE_PERSONA_TOP:-10}" \
-  --max-correlation "${STOCK_RULE_MAX_CORRELATION:-0.995}"
+  --max-correlation "${STOCK_RULE_MAX_CORRELATION:-0.95}"
 
 uv run python -m snusmic_pipeline run-sim --start "${SIM_START:-2021-01-04}" --end "$PRICE_END" --disable-broker-strategy-search
 uv run python -m snusmic_pipeline export-web --warehouse data/warehouse --sim data/sim --out data/web

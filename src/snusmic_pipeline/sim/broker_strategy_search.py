@@ -46,8 +46,9 @@ def find_top_broker_strategy_configs(
 
     Selection is intentionally two-stage:
     1. Optuna maximizes actual train-period broker-ledger performance.
-    2. Candidate configs are replayed on the full window and only accepted
-       when they beat the strongest benchmark by ``min_excess_return``.
+    2. Candidate configs are replayed on the full window and accepted by
+       risk/diversity gates. Benchmark-relative return is recorded as
+       comparative evidence, not a hard disqualification.
 
     ``top_n`` is optional. When it is positive, it caps the promoted strategy
     count; when it is zero or negative, every qualifying distinct strategy is
@@ -152,7 +153,6 @@ def find_top_broker_strategy_configs(
         output = simulate_smic_mtt_strategy(config, plan, fees, board, reports, full_cashflows, full_dates)
         summary = output.summary
         excess = summary.money_weighted_return - benchmark_money_weighted_return
-        beats_benchmark = excess > min_excess_return
         meets_risk_gate = _meets_risk_gate(
             sharpe=summary.sharpe,
             sortino=summary.sortino,
@@ -167,13 +167,12 @@ def find_top_broker_strategy_configs(
             summary.open_positions,
         )
         duplicate_behavior = behavior_key in seen_behavior_keys
-        accepted = beats_benchmark and meets_risk_gate and not duplicate_behavior
+        accepted = meets_risk_gate and not duplicate_behavior
         row = {
             "trial_number": trial.number,
             "train_rank": train_rank,
             "accepted": accepted,
             "admission_status": _admission_status(
-                beats_benchmark=beats_benchmark,
                 meets_risk_gate=meets_risk_gate,
                 duplicate_behavior=duplicate_behavior,
             ),
@@ -232,12 +231,9 @@ def _strategy_display_label(config: SmicMttStrategyConfig, rank: int) -> str:
 
 def _admission_status(
     *,
-    beats_benchmark: bool,
     duplicate_behavior: bool,
     meets_risk_gate: bool,
 ) -> str:
-    if not beats_benchmark:
-        return "below_benchmark"
     if not meets_risk_gate:
         return "below_risk_gate"
     if duplicate_behavior:

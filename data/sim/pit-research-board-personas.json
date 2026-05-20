@@ -1,1 +1,72 @@
-[]
+[
+  {
+    "label": "PIT Research Board Score Top 10",
+    "persona_name": "pit_research_board_score_top10",
+    "top_n": 10,
+    "rebalance": "M",
+    "score_mode": "board_score",
+    "weight_mode": "score_proportional",
+    "universe": "all",
+    "max_report_age_days": 730,
+    "min_score": 0.0,
+    "bucket_filter": "all",
+    "require_ma_stack": false,
+    "require_near_52w_high": false
+  },
+  {
+    "label": "PIT Research Board Score Top 5",
+    "persona_name": "pit_research_board_score_top5",
+    "top_n": 5,
+    "rebalance": "M",
+    "score_mode": "board_score",
+    "weight_mode": "equal",
+    "universe": "all",
+    "max_report_age_days": 730,
+    "min_score": 0.0,
+    "bucket_filter": "all",
+    "require_ma_stack": false,
+    "require_near_52w_high": false
+  },
+  {
+    "label": "PIT Trend-Confirmed Top 10",
+    "persona_name": "pit_research_board_trend_top10",
+    "top_n": 10,
+    "rebalance": "M",
+    "score_mode": "board_score",
+    "weight_mode": "score_proportional",
+    "universe": "all",
+    "max_report_age_days": 730,
+    "min_score": 0.0,
+    "bucket_filter": "all",
+    "require_ma_stack": true,
+    "require_near_52w_high": false
+  },
+  {
+    "label": "PIT Near-High Top 10",
+    "persona_name": "pit_research_board_near_high_top10",
+    "top_n": 10,
+    "rebalance": "M",
+    "score_mode": "board_score",
+    "weight_mode": "equal",
+    "universe": "all",
+    "max_report_age_days": 730,
+    "min_score": 0.0,
+    "bucket_filter": "all",
+    "require_ma_stack": false,
+    "require_near_52w_high": true
+  },
+  {
+    "label": "PIT Large Upside Top 10",
+    "persona_name": "pit_research_board_large_upside_top10",
+    "top_n": 10,
+    "rebalance": "M",
+    "score_mode": "candidate_score",
+    "weight_mode": "equal",
+    "universe": "all",
+    "max_report_age_days": 730,
+    "min_score": 0.0,
+    "bucket_filter": "large-upside",
+    "require_ma_stack": false,
+    "require_near_52w_high": false
+  }
+]
