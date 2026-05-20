@@ -319,7 +319,14 @@ class StockRulePersonaConfig(_PersonaBase):
     persona_name: Annotated[str, Field(pattern=r"^stock_rule_[a-z0-9_]+$")]
     label: str
     rule_id: Annotated[str, Field(min_length=1)]
-    family: Literal["target_upside_momentum", "fresh_report_momentum", "target_gap_reversal"]
+    family: Literal[
+        "target_upside_momentum",
+        "fresh_report_momentum",
+        "target_gap_reversal",
+        "price_momentum",
+        "ma_crossover",
+        "rsi_reversal",
+    ]
     fast_ma_days: Annotated[int, Field(ge=1, le=300)]
     slow_ma_days: Annotated[int, Field(ge=1, le=500)]
     min_report_age_days: Annotated[int, Field(ge=0, le=3650)]
@@ -328,7 +335,15 @@ class StockRulePersonaConfig(_PersonaBase):
     top_pool: Annotated[int, Field(ge=1, le=200)]
     hold_top: Annotated[int, Field(ge=1, le=200)]
     weight_mode: Literal["equal", "rank_linear", "winner_compress", "score_proportional"]
-    score_mode: Literal["dynamic_upside", "blend", "momentum_blend", "reversal_gap"]
+    score_mode: Literal[
+        "dynamic_upside",
+        "blend",
+        "momentum_blend",
+        "reversal_gap",
+        "price_momentum",
+        "ma_cross",
+        "rsi_reversal",
+    ]
     min_dynamic_upside: float = 0.0
     min_momentum_return: float = -1.0
     min_pullback_pct: float = 0.0

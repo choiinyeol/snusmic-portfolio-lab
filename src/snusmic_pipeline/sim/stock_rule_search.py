@@ -34,10 +34,15 @@ RuleFamily = Literal[
     "target_upside_momentum",
     "fresh_report_momentum",
     "target_gap_reversal",
+    "price_momentum",
+    "ma_crossover",
+    "rsi_reversal",
 ]
 RebalanceCadence = Literal["D", "W", "M"]
 WeightMode = Literal["equal", "rank_linear", "winner_compress", "score_proportional"]
-ScoreMode = Literal["dynamic_upside", "blend", "momentum_blend", "reversal_gap"]
+ScoreMode = Literal[
+    "dynamic_upside", "blend", "momentum_blend", "reversal_gap", "price_momentum", "ma_cross", "rsi_reversal"
+]
 
 
 @dataclass(frozen=True)
@@ -82,6 +87,7 @@ class _Evaluation:
     config: StockRuleConfig
     metrics: dict[str, float | int]
     current_holdings: dict[str, float]
+    daily_returns: np.ndarray
     status: str
     reasons: tuple[str, ...]
     reason_metadata: dict[str, Any]
@@ -175,6 +181,7 @@ def admit_oos(
     rows: list[dict[str, Any]] = []
     accepted: list[StockRuleConfig] = []
     seen_behaviors: set[tuple[float, float, int, str]] = set()
+    oos_daily_returns: dict[str, list[float]] = {}
 
     for config in candidate_configs:
         is_eval = _evaluate_config(
@@ -193,6 +200,9 @@ def admit_oos(
             min_observations=min_observations,
             min_noncash_fraction=min_noncash_fraction,
         )
+        oos_daily_returns[config.rule_id] = [
+            float(value) for value in oos_eval.daily_returns if isfinite(float(value))
+        ]
         status, reasons, metadata = _admission_decision(
             is_eval=is_eval,
             oos_eval=oos_eval,
@@ -231,6 +241,7 @@ def admit_oos(
             ["accepted", "oos_total_return", "oos_annualized_sharpe", "rule_id"],
             ascending=[False, False, False, True],
         ).reset_index(drop=True)
+        frame.attrs["oos_daily_returns"] = oos_daily_returns
     return StockRuleSearchResult(configs=tuple(accepted), trial_rows=frame)
 
 
@@ -275,6 +286,35 @@ def default_stock_rule_configs() -> tuple[StockRuleConfig, ...]:
                                             min_pullback_pct=min_pullback,
                                         )
                                     )
+
+    price_families: tuple[tuple[RuleFamily, ScoreMode], ...] = (
+        ("price_momentum", "price_momentum"),
+        ("ma_crossover", "ma_cross"),
+        ("rsi_reversal", "rsi_reversal"),
+    )
+    for family, score_mode in price_families:
+        for fast, slow in ma_pairs:
+            for rebalance in ("D", "W", "M"):
+                for top_pool, hold_choices in ((5, (3,)), (10, (5,)), (20, (5, 10))):
+                    for hold_top in hold_choices:
+                        for weight_mode in ("equal", "winner_compress"):
+                            configs.append(
+                                _config(
+                                    family=family,
+                                    fast_ma_days=fast,
+                                    slow_ma_days=slow,
+                                    min_report_age_days=0,
+                                    max_report_age_days=3650,
+                                    rebalance=rebalance,
+                                    top_pool=top_pool,
+                                    hold_top=hold_top,
+                                    weight_mode=weight_mode,
+                                    score_mode=score_mode,
+                                    min_dynamic_upside=0.0,
+                                    min_momentum_return=0.0 if family != "rsi_reversal" else -1.0,
+                                    min_pullback_pct=0.0,
+                                )
+                            )
     return tuple(configs)
 
 
@@ -427,6 +467,7 @@ def _evaluate_config(
         config=config,
         metrics=metrics,
         current_holdings=_current_holdings(columns, weights),
+        daily_returns=portfolio_returns,
         status=status,
         reasons=tuple(reasons),
         reason_metadata={
@@ -491,11 +532,24 @@ def _weights_for_config(
         dynamic_upside = report_state["target"] / close_np - 1.0
         momentum = close_np / slow_ma - 1.0
         pullback = fast_ma / close_np - 1.0
+        ma_spread = fast_ma / slow_ma - 1.0
+
+    returns_frame = close.pct_change(fill_method=None).replace([np.inf, -np.inf], np.nan)
+    losses = (-returns_frame.clip(upper=0)).rolling(14, min_periods=7).mean().to_numpy(float)
+    gains = returns_frame.clip(lower=0).rolling(14, min_periods=7).mean().to_numpy(float)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        rsi = 100.0 - (100.0 / (1.0 + gains / losses))
+    rsi = np.where((losses == 0) & np.isfinite(gains), 100.0, rsi)
 
     age = report_state["report_age"]
     static_upside = report_state["static_upside"]
     trend = close_np > slow_ma
-    if config.family in {"target_upside_momentum", "fresh_report_momentum"}:
+    report_family = config.family in {
+        "target_upside_momentum",
+        "fresh_report_momentum",
+        "target_gap_reversal",
+    }
+    if config.family in {"target_upside_momentum", "fresh_report_momentum", "price_momentum", "ma_crossover"}:
         trend &= fast_ma >= slow_ma
     if config.family == "target_gap_reversal":
         trend = pullback >= config.min_pullback_pct
@@ -506,19 +560,26 @@ def _weights_for_config(
         score = 0.45 * dynamic_upside + 0.20 * static_upside + 0.70 * momentum
     elif config.score_mode == "reversal_gap":
         score = 0.65 * dynamic_upside + 0.50 * pullback + 0.10 * static_upside
+    elif config.score_mode == "price_momentum":
+        score = momentum
+    elif config.score_mode == "ma_cross":
+        score = 0.70 * ma_spread + 0.30 * momentum
+    elif config.score_mode == "rsi_reversal":
+        score = (45.0 - rsi) / 45.0 + 0.20 * momentum
+        trend = (rsi <= 45.0) & (close_np >= slow_ma * 0.90)
     else:
         score = 0.65 * dynamic_upside + 0.25 * static_upside + 0.35 * momentum
 
-    valid = (
-        trend
-        & np.isfinite(score)
-        & np.isfinite(dynamic_upside)
-        & np.isfinite(age)
-        & (dynamic_upside >= config.min_dynamic_upside)
-        & (momentum >= config.min_momentum_return)
-        & (age >= config.min_report_age_days)
-        & (age <= config.max_report_age_days)
-    )
+    valid = trend & np.isfinite(score) & (momentum >= config.min_momentum_return)
+    if report_family:
+        valid = (
+            valid
+            & np.isfinite(dynamic_upside)
+            & np.isfinite(age)
+            & (dynamic_upside >= config.min_dynamic_upside)
+            & (age >= config.min_report_age_days)
+            & (age <= config.max_report_age_days)
+        )
     rebalance_indices = _rebalance_indices(close.index, config.rebalance)
     if len(rebalance_indices) == 0:
         return np.zeros((n_days, n_symbols)), np.zeros((0, n_symbols))
@@ -656,6 +717,7 @@ def _empty_evaluation(config: StockRuleConfig, status: str, reason: str) -> _Eva
             avg_turnover_per_rebalance=0.0,
         ),
         current_holdings={},
+        daily_returns=np.array([], dtype=float),
         status=status,
         reasons=(reason,),
         reason_metadata={

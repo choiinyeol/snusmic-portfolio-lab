@@ -1579,8 +1579,9 @@ def _stock_admission_summary(artifact: dict[str, Any] | None) -> dict[str, Any] 
             reverse=True,
         )[:12],
         "notes": [
-            "stock admission은 search_is 구간에서 발견한 개별 종목 규칙만 admit_oos 구간으로 검증합니다.",
-            "이 블록은 meta-quant 조합 후보가 아니라 실제 종목 단위 OOS 입장 근거입니다.",
+            "stock admission은 search_is 구간에서 발견한 개별 종목 규칙을 설정된 validation 구간으로 검증합니다.",
+            "현재 기본값은 IS 랭킹 후 Full Sample 검증이며, 높은 상관의 전략끼리는 최고 점수 1개만 남깁니다.",
+            "이 블록은 meta-quant 조합 후보가 아니라 실제 종목 단위 입장 근거입니다.",
         ],
     }
 
@@ -1774,7 +1775,7 @@ def _methodology_summary(strategy_id: str, config: dict[str, Any]) -> str:
     if strategy_id.startswith("smic_mtt_strategy"):
         return "리포트 업사이드와 가격 추세 조건(MTT·Supertrend·ATR breakout)을 통과한 종목만 실제 주식 수량 단위로 매수·보유·매도하는 포트폴리오 전략입니다. MTT는 전략명 자체가 아니라 내부 추세 필터 중 하나입니다."
     if strategy_id.startswith("stock_rule_"):
-        return "개별 종목 규칙은 in-sample(search_is)에서만 발견하고 out-of-sample(admit_oos) 성과로만 채택한 주식 단위 입장 계약입니다."
+        return "개별 종목 규칙은 in-sample(search_is)에서 후보를 고정한 뒤 Full Sample validation 성과와 상관 다양성 게이트로 채택한 주식 단위 입장 계약입니다."
     return "시뮬레이션에 포함된 전략입니다."
 
 
@@ -1793,7 +1794,8 @@ def _buy_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
     if strategy_id.startswith("stock_rule_"):
         rules = [
             "search_is 구간에서 발견된 개별 종목 조건만 사용",
-            "admit_oos 구간에서 벤치마크 초과 수익률을 확인한 경우만 표시",
+            "Full Sample validation에서 벤치마크 초과 수익률과 목표 성과를 확인한 경우만 표시",
+            "수익률 경로 상관이 높은 규칙끼리는 최고 점수 규칙 1개만 유지",
         ]
         symbol = config.get("symbol")
         family = config.get("family") or config.get("rule_family")
@@ -1863,7 +1865,7 @@ def _buy_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
 
 def _sell_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
     if strategy_id.startswith("stock_rule_"):
-        return ["규칙별 exit 조건과 admit_oos 거래 원장에 기록된 청산 사유를 따릅니다."]
+        return ["규칙별 exit 조건과 Full Sample validation 거래 원장에 기록된 청산 사유를 따릅니다."]
     if strategy_id.startswith("smic_mtt_strategy"):
         if not config:
             return ["세부 조건 artifact 없음", "매도 사유는 매매내역과 포지션 기록에서 확인"]

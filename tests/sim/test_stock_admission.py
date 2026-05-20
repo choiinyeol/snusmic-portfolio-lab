@@ -70,6 +70,18 @@ def test_stock_admission_window_rejects_is_oos_overlap() -> None:
         )
 
 
+def test_stock_admission_window_allows_full_sample_validation_overlap() -> None:
+    window = StockAdmissionWindow(
+        search_start=date(2021, 1, 4),
+        search_end=date(2022, 12, 30),
+        oos_start=date(2021, 1, 4),
+        oos_end=date(2026, 4, 30),
+        validation_mode="full_sample",
+    )
+
+    assert window.validation_mode == "full_sample"
+
+
 def test_stock_admission_decision_recomputes_oos_excess() -> None:
     with pytest.raises(ValidationError, match="must equal OOS money_weighted_return minus benchmark"):
         StockAdmissionDecision(

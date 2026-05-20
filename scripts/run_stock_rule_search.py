@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Run stock-level IS search and OOS admission.
+"""Run stock-level IS search and full-sample validation admission.
 
 Example:
     uv run python scripts/run_stock_rule_search.py \
-      --warehouse data/warehouse --is-start 2021-01-04 --is-end 2023-12-31 \
-      --oos-start 2024-01-02 --oos-end 2026-05-11 --out .omx/quant-insights/stock-rule-search
+      --warehouse data/warehouse --is-start 2021-01-04 --is-end 2022-12-31 \
+      --full-start 2021-01-04 --full-end 2026-05-11 --out data/sim
 """
 
 from __future__ import annotations
@@ -14,22 +14,28 @@ import json
 import sys
 from datetime import UTC, date, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal, cast
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
 from snusmic_pipeline.sim.contracts import StockRulePersonaConfig  # noqa: E402
 from snusmic_pipeline.sim.stock_admission import (  # noqa: E402
     StockAdmissionArtifact,
     StockAdmissionDecision,
+    StockAdmissionReason,
+    StockAdmissionStatus,
     StockAdmissionWindow,
     StockRuleCandidate,
+    StockRuleFamily,
     StockRuleMetrics,
     StockRuleParam,
 )
+
+ValidationMode = Literal["oos", "full_sample"]
 from snusmic_pipeline.sim.stock_rule_search import (  # noqa: E402
     admit_oos,
     default_stock_rule_configs,
@@ -62,7 +68,14 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--warehouse", type=Path, default=ROOT / "data" / "warehouse")
     parser.add_argument("--is-start", type=str, default="2021-01-04")
-    parser.add_argument("--is-end", type=str, default="2023-12-31")
+    parser.add_argument("--is-end", type=str, default="2022-12-31")
+    parser.add_argument("--validation-mode", choices=("full_sample", "oos"), default="full_sample")
+    parser.add_argument(
+        "--full-start", type=str, default=None, help="Full-sample replay start; defaults to --is-start"
+    )
+    parser.add_argument(
+        "--full-end", type=str, default=None, help="Full-sample replay end; defaults to --oos-end"
+    )
     parser.add_argument("--oos-start", type=str, default="2024-01-02")
     parser.add_argument("--oos-end", type=str, default=date.today().isoformat())
     parser.add_argument("--out", type=Path, default=ROOT / ".omx" / "quant-insights" / "stock-rule-search")
@@ -80,6 +93,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--min-is-sharpe", type=float, default=None)
     parser.add_argument("--min-oos-sharpe", type=float, default=None)
     parser.add_argument("--persona-top", type=int, default=10)
+    parser.add_argument(
+        "--max-correlation",
+        type=float,
+        default=0.995,
+        help="Greedy diversity gate: keep only the best rule when validation return correlation is >= this value; 0 disables.",
+    )
     parser.add_argument("--goal-min-sharpe", type=float, default=1.5)
     parser.add_argument("--goal-min-sortino", type=float, default=1.5)
     parser.add_argument("--goal-min-return", type=float, default=5.0)
@@ -90,8 +109,20 @@ def main() -> int:
     args = parse_args()
     is_start = date.fromisoformat(args.is_start)
     is_end = date.fromisoformat(args.is_end)
-    oos_start = date.fromisoformat(args.oos_start)
-    oos_end = date.fromisoformat(args.oos_end)
+    requested_oos_start = date.fromisoformat(args.oos_start)
+    requested_oos_end = date.fromisoformat(args.oos_end)
+    validation_start = (
+        date.fromisoformat(args.full_start)
+        if args.validation_mode == "full_sample" and args.full_start
+        else is_start
+        if args.validation_mode == "full_sample"
+        else requested_oos_start
+    )
+    validation_end = (
+        date.fromisoformat(args.full_end)
+        if args.validation_mode == "full_sample" and args.full_end
+        else requested_oos_end
+    )
     out: Path = args.out
     out.mkdir(parents=True, exist_ok=True)
 
@@ -110,8 +141,8 @@ def main() -> int:
         configs=is_result,
         is_start=is_start,
         is_end=is_end,
-        oos_start=oos_start,
-        oos_end=oos_end,
+        oos_start=validation_start,
+        oos_end=validation_end,
         benchmark_total_return=args.benchmark_total_return,
         top_n=args.admit_top,
         min_oos_excess_return=args.min_oos_excess_return,
@@ -120,35 +151,36 @@ def main() -> int:
         min_oos_sharpe=args.min_oos_sharpe,
     )
 
-    _write_rows(is_result.trial_rows, out / "is-search.csv", out / "is-search.json")
-    _write_rows(admitted.trial_rows, out / "oos-admission.csv", out / "oos-admission.json")
-
-    accepted = (
-        admitted.trial_rows[admitted.trial_rows["accepted"]]
-        if not admitted.trial_rows.empty
-        else pd.DataFrame()
-    )
-    goal_rows = _goal_rows(
+    trial_rows, goal_rows, diversity_summary = _apply_diversity_gate(
         admitted.trial_rows,
+        returns_by_rule_id=admitted.trial_rows.attrs.get("oos_daily_returns", {}),
         persona_top=args.persona_top,
         min_sharpe=args.goal_min_sharpe,
         min_sortino=args.goal_min_sortino,
         min_return=args.goal_min_return,
+        max_correlation=args.max_correlation,
     )
+
+    _write_rows(is_result.trial_rows, out / "is-search.csv", out / "is-search.json")
+    _write_rows(trial_rows, out / "validation-admission.csv", out / "validation-admission.json")
+    _write_rows(trial_rows, out / "oos-admission.csv", out / "oos-admission.json")
+
+    accepted = trial_rows[trial_rows["accepted"]] if not trial_rows.empty else pd.DataFrame()
     persona_configs = _stock_persona_configs(
         goal_rows,
         search_start=is_start,
         search_end=is_end,
-        oos_start=oos_start,
-        oos_end=oos_end,
+        oos_start=validation_start,
+        oos_end=validation_end,
     )
     artifact = _stock_admission_artifact(
-        admitted.trial_rows,
+        trial_rows,
         selected_rule_ids={config.rule_id for config in persona_configs},
         search_start=is_start,
         search_end=is_end,
-        oos_start=oos_start,
-        oos_end=oos_end,
+        oos_start=validation_start,
+        oos_end=validation_end,
+        validation_mode=args.validation_mode,
         benchmark_total_return=args.benchmark_total_return,
         min_oos_excess_return=args.min_oos_excess_return,
         min_sharpe=args.goal_min_sharpe,
@@ -174,7 +206,11 @@ def main() -> int:
         "data_sources": [str(args.warehouse / "daily_prices.csv"), str(args.warehouse / "reports.csv")],
         "windows": {
             "is": {"start": args.is_start, "end": args.is_end},
-            "oos": {"start": args.oos_start, "end": args.oos_end},
+            "validation": {
+                "mode": args.validation_mode,
+                "start": validation_start.isoformat(),
+                "end": validation_end.isoformat(),
+            },
         },
         "searched_count": int(len(is_result.trial_rows)),
         "is_finalist_count": int(len(is_result.configs)),
@@ -182,9 +218,12 @@ def main() -> int:
         "goal_persona_count": len(persona_configs),
         "accepted_rule_ids": [config.rule_id for config in admitted.configs],
         "goal_persona_ids": [config.persona_name for config in persona_configs],
+        "diversity": diversity_summary,
         "methodology": (
             "Stock-level report rules rank individual symbols from report/price data available at "
-            "rebalance close, shift holdings one trading day, then require separate OOS admission."
+            "rebalance close, shift holdings one trading day, then replay frozen rules on the configured "
+            "validation window. Current default is IS ranking -> Full Sample validation, with correlated "
+            "return paths compressed to the best-scoring persona."
         ),
     }
     (out / "summary.json").write_text(
@@ -192,14 +231,130 @@ def main() -> int:
     )
     print(
         f"stock-rule search: {len(is_result.trial_rows)} IS rows, "
-        f"{len(is_result.configs)} finalists, {len(admitted.configs)} OOS admissions, "
-        f"{len(persona_configs)} goal personas"
+        f"{len(is_result.configs)} finalists, {len(admitted.configs)} validation admissions, "
+        f"{len(persona_configs)} diverse goal personas"
     )
     if not accepted.empty:
         print(
             accepted[["rule_id", "oos_total_return", "oos_annualized_sharpe"]].head(10).to_string(index=False)
         )
     return 0
+
+
+def _apply_diversity_gate(
+    frame: pd.DataFrame,
+    *,
+    returns_by_rule_id: dict[str, list[float]],
+    persona_top: int,
+    min_sharpe: float,
+    min_sortino: float,
+    min_return: float,
+    max_correlation: float,
+) -> tuple[pd.DataFrame, list[dict[str, Any]], dict[str, Any]]:
+    if frame.empty:
+        return frame, [], {"enabled": max_correlation > 0, "selected_count": 0, "rejected_count": 0}
+
+    rows = frame.to_dict("records")
+    eligible = [
+        row
+        for row in rows
+        if bool(row.get("accepted"))
+        and _passes_goal(row, min_sharpe=min_sharpe, min_sortino=min_sortino, min_return=min_return)
+    ]
+    eligible.sort(key=_goal_sort_key, reverse=True)
+
+    selected: list[dict[str, Any]] = []
+    selected_series: list[tuple[str, np.ndarray]] = []
+    selected_meta: dict[str, dict[str, Any]] = {}
+    rejected_meta: dict[str, dict[str, Any]] = {}
+
+    for row in eligible:
+        rule_id = str(row.get("rule_id") or "")
+        series = _return_series(returns_by_rule_id.get(rule_id))
+        peer_id = None
+        peer_corr = 0.0
+        if max_correlation > 0 and series.size:
+            for selected_id, peer_series in selected_series:
+                corr = _path_correlation(series, peer_series)
+                if corr > peer_corr:
+                    peer_corr = corr
+                    peer_id = selected_id
+        if max_correlation > 0 and peer_corr >= max_correlation and peer_id is not None:
+            rejected_meta[rule_id] = {
+                "diversity_status": "correlation_rejected",
+                "diversity_correlated_with_rule_id": peer_id,
+                "diversity_max_correlation": peer_corr,
+            }
+            continue
+
+        selected_meta[rule_id] = {
+            "diversity_status": "selected",
+            "diversity_correlated_with_rule_id": peer_id,
+            "diversity_max_correlation": peer_corr if peer_id is not None else None,
+        }
+        selected.append(row)
+        if series.size:
+            selected_series.append((rule_id, series))
+        if persona_top > 0 and len(selected) >= persona_top:
+            break
+
+    meta_by_rule = {**rejected_meta, **selected_meta}
+    updated = frame.copy()
+    updated["diversity_status"] = [
+        meta_by_rule.get(str(row.get("rule_id") or ""), {}).get("diversity_status", "not_selected")
+        for row in rows
+    ]
+    updated["diversity_correlated_with_rule_id"] = [
+        meta_by_rule.get(str(row.get("rule_id") or ""), {}).get("diversity_correlated_with_rule_id")
+        for row in rows
+    ]
+    updated["diversity_max_correlation"] = [
+        meta_by_rule.get(str(row.get("rule_id") or ""), {}).get("diversity_max_correlation") for row in rows
+    ]
+    updated.attrs.update(frame.attrs)
+    summary = {
+        "enabled": max_correlation > 0,
+        "max_correlation": max_correlation,
+        "eligible_count": len(eligible),
+        "selected_count": len(selected),
+        "correlation_rejected_count": len(rejected_meta),
+        "selected_rule_ids": [str(row.get("rule_id") or "") for row in selected],
+        "correlation_rejected_rule_ids": sorted(rejected_meta),
+    }
+    return updated, selected, summary
+
+
+def _goal_sort_key(row: dict[str, Any]) -> tuple[float, float, float, str]:
+    return (
+        float(row.get("oos_annualized_sharpe") or 0.0),
+        float(row.get("oos_annualized_sortino") or 0.0),
+        float(row.get("oos_total_return") or 0.0),
+        str(row.get("rule_id") or ""),
+    )
+
+
+def _return_series(values: list[float] | None) -> np.ndarray:
+    if not values:
+        return np.array([], dtype=float)
+    series = np.asarray(values, dtype=float)
+    return series[np.isfinite(series)]
+
+
+def _path_correlation(left: np.ndarray, right: np.ndarray) -> float:
+    n = min(left.size, right.size)
+    if n < 3:
+        return 0.0
+    left = left[-n:]
+    right = right[-n:]
+    mask = np.isfinite(left) & np.isfinite(right)
+    if int(mask.sum()) < 3:
+        return 0.0
+    left = left[mask]
+    right = right[mask]
+    if float(np.std(left)) == 0.0 or float(np.std(right)) == 0.0:
+        return 0.0
+    corr = float(np.corrcoef(left, right)[0, 1])
+    return abs(corr) if np.isfinite(corr) else 0.0
 
 
 def _goal_rows(
@@ -296,6 +451,7 @@ def _stock_admission_artifact(
     oos_end: date,
     benchmark_total_return: float,
     min_oos_excess_return: float,
+    validation_mode: ValidationMode,
     min_sharpe: float,
     min_sortino: float,
     min_return: float,
@@ -305,17 +461,24 @@ def _stock_admission_artifact(
         search_end=search_end,
         oos_start=oos_start,
         oos_end=oos_end,
+        validation_mode=validation_mode,
     )
     decisions: list[StockAdmissionDecision] = []
     for row in frame.to_dict("records"):
         rule_id = str(row["rule_id"])
         selected = rule_id in selected_rule_ids
         passes_goal = _passes_goal(row, min_sharpe=min_sharpe, min_sortino=min_sortino, min_return=min_return)
-        status = "accepted" if selected else _artifact_status(row, passes_goal=passes_goal)
-        reasons = ["beats_oos_benchmark"] if status == "accepted" else _artifact_reasons(row)
+        status = cast(
+            StockAdmissionStatus,
+            "accepted" if selected else _artifact_status(row, passes_goal=passes_goal),
+        )
+        reasons = cast(
+            list[StockAdmissionReason],
+            ["beats_oos_benchmark"] if status == "accepted" else _artifact_reasons(row),
+        )
         candidate = StockRuleCandidate(
             rule_id=rule_id,
-            family=_artifact_family(str(row["family"])),
+            family=cast(StockRuleFamily, _artifact_family(str(row["family"]))),
             symbol=_representative_symbol(row),
             company=None,
             window=window,
@@ -359,8 +522,13 @@ def _stock_admission_artifact(
         decisions=tuple(decisions),
         methodology=(
             "search_is ranks stock rules using only the in-sample window",
-            "admit_oos replays frozen IS finalists on the later OOS window",
-            "portfolio personas are materialized only when OOS Sharpe >= 1.5, Sortino >= 1.5, or return >= 500%",
+            (
+                "validation replay runs frozen IS finalists on the full sample"
+                if validation_mode == "full_sample"
+                else "admit_oos replays frozen IS finalists on the later OOS window"
+            ),
+            "portfolio personas are materialized only when validation Sharpe >= 1.5, Sortino >= 1.5, or return >= 500%",
+            "highly correlated validation return paths keep only the best-scoring strategy",
         ),
     )
 
@@ -378,7 +546,7 @@ def _metrics(row: dict[str, Any], prefix: str) -> StockRuleMetrics:
     )
 
 
-def _artifact_status(row: dict[str, Any], *, passes_goal: bool) -> str:
+def _artifact_status(row: dict[str, Any], *, passes_goal: bool) -> StockAdmissionStatus:
     if not bool(row.get("accepted")):
         status = str(row.get("admission_status") or "")
         if "duplicate" in status:
@@ -390,7 +558,9 @@ def _artifact_status(row: dict[str, Any], *, passes_goal: bool) -> str:
     return "below_risk_gate" if not passes_goal else "duplicate_behavior"
 
 
-def _artifact_reasons(row: dict[str, Any]) -> list[str]:
+def _artifact_reasons(row: dict[str, Any]) -> list[StockAdmissionReason]:
+    if str(row.get("diversity_status") or "") == "correlation_rejected":
+        return ["duplicate_behavior"]
     status = str(row.get("admission_status") or "")
     if "duplicate" in status:
         return ["duplicate_behavior"]
@@ -401,12 +571,16 @@ def _artifact_reasons(row: dict[str, Any]) -> list[str]:
     return ["below_sharpe_gate", "below_sortino_gate"]
 
 
-def _artifact_family(family: str) -> str:
-    return {
+def _artifact_family(family: str) -> StockRuleFamily:
+    mapping: dict[str, StockRuleFamily] = {
         "target_upside_momentum": "relative_strength",
         "fresh_report_momentum": "mtt",
         "target_gap_reversal": "rsi_reversal",
-    }.get(family, "relative_strength")
+        "price_momentum": "relative_strength",
+        "ma_crossover": "ma_crossover",
+        "rsi_reversal": "rsi_reversal",
+    }
+    return mapping.get(family, "relative_strength")
 
 
 def _representative_symbol(row: dict[str, Any]) -> str:

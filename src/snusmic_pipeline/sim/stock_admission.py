@@ -1,10 +1,10 @@
 """Stock-level rule-search admission contracts.
 
 These models are the schema boundary between an in-sample stock-rule search
-(`search_is`) and out-of-sample admission (`admit_oos`).  They deliberately do
-not run the search; they lock the dates, metrics, reason codes, and artifact
-shape so implementations cannot accidentally promote a stock rule with OOS
-lookahead baked into the candidate selection.
+(`search_is`) and a later validation replay.  The validation window is normally
+out-of-sample, but can intentionally be a full-sample replay when the product
+goal is to keep universal, famous-rule-style personas instead of harshly
+optimizing an already short history split.
 """
 
 from __future__ import annotations
@@ -52,15 +52,18 @@ JsonParamValue: TypeAlias = str | int | float | bool | None
 class StockAdmissionWindow(_FrozenStockModel):
     """Date split used by stock-rule search and admission.
 
-    ``search_*`` is the in-sample window. ``oos_*`` is the only window whose
-    performance can admit a discovered rule. The strict ``search_end < oos_start``
-    check is the central no-lookahead guard.
+    ``search_*`` is the in-sample ranking window. ``oos_*`` is the legacy field
+    name for the validation replay window.  In strict OOS mode the search window
+    must end before validation starts.  In full-sample mode overlap is deliberate:
+    the search ranks candidates on IS, then replays frozen rules on the whole
+    available sample for product admission.
     """
 
     search_start: date
     search_end: date
     oos_start: date
     oos_end: date
+    validation_mode: Literal["oos", "full_sample"] = "oos"
 
     @model_validator(mode="after")
     def _check_order_and_gap(self) -> StockAdmissionWindow:
@@ -70,7 +73,7 @@ class StockAdmissionWindow(_FrozenStockModel):
             )
         if self.oos_end < self.oos_start:
             raise ValueError(f"oos_end {self.oos_end} must be on or after oos_start {self.oos_start}")
-        if self.search_end >= self.oos_start:
+        if self.validation_mode == "oos" and self.search_end >= self.oos_start:
             raise ValueError(
                 "in-sample search window must end strictly before out-of-sample admission starts; "
                 f"got search_end={self.search_end}, oos_start={self.oos_start}"
@@ -178,8 +181,8 @@ class StockAdmissionArtifact(_FrozenStockModel):
     benchmark_persona: Annotated[str, Field(min_length=1)]
     decisions: tuple[StockAdmissionDecision, ...]
     methodology: tuple[str, ...] = (
-        "search_is discovers candidates using only the in-sample window",
-        "admit_oos promotes only rules that beat the out-of-sample benchmark gate",
+        "search_is discovers candidates using only the in-sample ranking window",
+        "validation replay promotes only rules that beat the configured benchmark gate",
     )
 
     @property

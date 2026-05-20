@@ -28,19 +28,19 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
     () => model.equity.filter((row) => row.persona === selected?.id).sort((a, b) => a.date.localeCompare(b.date)),
     [model.equity, selected],
   );
-  const chartSeries = useMemo<ReturnSeries[]>(
-    () =>
-      model.strategies.map((strategy, index) => ({
-        id: strategy.id,
-        label: strategy.label,
-        shortLabel: strategy.shortLabel,
-        color: SERIES_COLORS[index % SERIES_COLORS.length],
-        points: model.equity
-          .filter((point) => point.persona === strategy.id && point.cumulativeReturn !== null)
-          .map((point) => ({ time: point.date, value: point.cumulativeReturn ?? 0 })),
-      })),
-    [model.equity, model.strategies],
-  );
+  const chartSeries = useMemo<ReturnSeries[]>(() => {
+    const benchmarkRows = model.frontierRows.filter((row) => row.kind === 'benchmark');
+    const rows = [...model.strategies, ...benchmarkRows];
+    return rows.map((strategy, index) => ({
+      id: strategy.id,
+      label: strategy.label,
+      shortLabel: strategy.shortLabel,
+      color: SERIES_COLORS[index % SERIES_COLORS.length],
+      points: model.equity
+        .filter((point) => point.persona === strategy.id && point.cumulativeReturn !== null)
+        .map((point) => ({ time: point.date, value: point.cumulativeReturn ?? 0 })),
+    }));
+  }, [model.equity, model.frontierRows, model.strategies]);
 
   if (!selected) {
     return (
@@ -416,8 +416,16 @@ function PortfolioFrontierChart({
         {maxScoreRow ? (
           <StarMarker
             label="Max score"
+            selectable={maxScoreRow.kind === 'strategy'}
             x={plotX(maxScoreRow.maxDrawdown ?? 0, minX, maxX)}
             y={plotY(maxScoreRow.moneyWeightedReturn ?? 0, minY, maxY)}
+            onBlur={() => setHoveredId(null)}
+            onFocus={() => setHoveredId(maxScoreRow.id)}
+            onMouseEnter={() => setHoveredId(maxScoreRow.id)}
+            onMouseLeave={() => setHoveredId(null)}
+            onSelect={() => {
+              if (maxScoreRow.kind === 'strategy') onSelect(maxScoreRow.id);
+            }}
           />
         ) : null}
         {minRiskRow ? (
@@ -483,9 +491,43 @@ function PortfolioFrontierChart({
   );
 }
 
-function StarMarker({ x, y, label }: { x: number; y: number; label: string }) {
+function StarMarker({
+  x,
+  y,
+  label,
+  selectable,
+  onSelect,
+  onFocus,
+  onBlur,
+  onMouseEnter,
+  onMouseLeave,
+}: {
+  x: number;
+  y: number;
+  label: string;
+  selectable: boolean;
+  onSelect: () => void;
+  onFocus: () => void;
+  onBlur: () => void;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+}) {
   return (
-    <g aria-label={label}>
+    <g
+      aria-label={label}
+      aria-disabled={!selectable}
+      className={selectable ? 'cursor-pointer outline-none' : 'outline-none'}
+      role="button"
+      tabIndex={selectable ? 0 : -1}
+      onBlur={onBlur}
+      onClick={selectable ? onSelect : undefined}
+      onFocus={onFocus}
+      onKeyDown={(event) => {
+        if (selectable && (event.key === 'Enter' || event.key === ' ')) onSelect();
+      }}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
       <path
         d={`M ${x} ${y - 11} L ${x + 3.1} ${y - 3.5} L ${x + 11} ${y - 3.2} L ${x + 4.8} ${y + 1.8} L ${x + 6.8} ${y + 9.5} L ${x} ${y + 5.2} L ${x - 6.8} ${y + 9.5} L ${x - 4.8} ${y + 1.8} L ${x - 11} ${y - 3.2} L ${x - 3.1} ${y - 3.5} Z`}
         fill="#f59e0b"

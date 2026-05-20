@@ -233,7 +233,7 @@ def test_strategy_catalog_uses_behavior_labels_and_admission_audit(tmp_path: Pat
     assert len(promoted) >= 10
     for row in promoted:
         assert str(row["label"]).startswith("Stock Rule")
-        assert "in-sample(search_is)" in row["methodology_summary"]
+        assert "Full Sample validation" in row["methodology_summary"]
         assert row["is_selectable"] is True
 
     admission = json.loads((out / "strategies" / "admission.json").read_text(encoding="utf-8"))
@@ -310,13 +310,12 @@ def test_holdings_are_rebuilt_from_open_position_episodes_for_all_personas(tmp_p
     open_episode_personas = {
         row["persona"]
         for row in episodes
-        if row.get("status") == "open" and str(row.get("persona", "")).startswith("smic_mtt_strategy")
+        if row.get("status") == "open" and str(row.get("persona", "")).startswith("stock_rule_")
     }
     holding_personas = {
         row["persona"]
         for row in holdings
-        if str(row.get("persona", "")).startswith("smic_mtt_strategy")
-        and (row.get("market_value_krw") or 0) > 0
+        if str(row.get("persona", "")).startswith("stock_rule_") and (row.get("market_value_krw") or 0) > 0
     }
     assert open_episode_personas
     assert open_episode_personas <= holding_personas
@@ -337,7 +336,7 @@ def test_accounting_reconciliation_explains_strategy_cash_vs_realized_pnl(tmp_pa
     explained = [
         row
         for row in rows
-        if str(row.get("persona", "")).startswith("smic_mtt_strategy")
+        if str(row.get("persona", "")).startswith("stock_rule_")
         and row["realized_pnl_krw"] > row["final_cash_krw"]
         and row["open_cost_basis_krw"] > 0
     ]
