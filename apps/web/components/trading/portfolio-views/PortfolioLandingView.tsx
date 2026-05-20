@@ -114,8 +114,8 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
               </div>
               <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">수익률 / 낙폭 곡선으로 선택</h2>
               <p className="mt-1 text-sm leading-6 text-slate-500">
-                MPT의 efficient frontier처럼, 같은 수익률이면 더 낮은 낙폭의 점이 우위입니다. 전략 점은 클릭해서
-                포트폴리오를 바꾸고, benchmark 점은 위치 비교용입니다.
+                MPT의 efficient frontier처럼, 더 높은 낙폭에 더 낮은 수익률인 지배 전략은 차트에서 숨깁니다. 전략 점은
+                클릭해서 포트폴리오를 바꾸고, benchmark 점은 위치 비교용입니다.
               </p>
             </div>
             <PortfolioFrontierChart rows={model.frontierRows} selectedId={selected.id} onSelect={setSelectedId} />
@@ -350,219 +350,216 @@ function PortfolioFrontierChart({
 }) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const plottableRows = rows.filter((row) => row.maxDrawdown !== null && row.moneyWeightedReturn !== null);
-  const xValues = plottableRows.map((row) => row.maxDrawdown ?? 0);
-  const yValues = plottableRows.map((row) => row.moneyWeightedReturn ?? 0);
+  const strategyRows = plottableRows.filter((row) => row.kind === 'strategy');
+  const benchmarkRows = plottableRows.filter((row) => row.kind === 'benchmark');
+  const frontier = efficientFrontier(strategyRows);
+  const frontierIds = new Set(frontier.map((row) => row.id));
+  const selectedRow = plottableRows.find((row) => row.id === selectedId) ?? strategyRows[0] ?? benchmarkRows[0];
+  const activeRow = plottableRows.find((row) => row.id === (hoveredId ?? selectedId)) ?? selectedRow;
+  const visibleRows = uniqueRows([
+    ...frontier,
+    ...benchmarkRows,
+    ...(selectedRow && !frontierIds.has(selectedRow.id) ? [selectedRow] : []),
+  ]);
+  const domainRows = visibleRows.length ? visibleRows : plottableRows;
+  const xValues = domainRows.map((row) => row.maxDrawdown ?? 0);
+  const yValues = domainRows.map((row) => row.moneyWeightedReturn ?? 0);
   const { min: minX, max: maxX } = paddedDomain(xValues, { floor: 0.0, minSpan: 0.01 });
   const { min: minY, max: maxY } = paddedDomain(yValues, { minSpan: 0.04 });
-  const frontier = efficientFrontier(plottableRows);
-  const maxScoreRow = bestRiskAdjustedRow(plottableRows.filter((row) => row.kind === 'strategy'));
-  const minRiskRow = minDrawdownRow(plottableRows);
+  const maxScoreRow = bestRiskAdjustedRow(frontier);
+  const minRiskRow = minDrawdownRow(frontier);
+  const hiddenDominatedCount = Math.max(0, strategyRows.length - frontier.length);
   const path = frontier
     .map(
       (row, index) =>
         `${index === 0 ? 'M' : 'L'} ${plotX(row.maxDrawdown ?? 0, minX, maxX)} ${plotY(row.moneyWeightedReturn ?? 0, minY, maxY)}`,
     )
     .join(' ');
-  const activeRow = rows.find((row) => row.id === (hoveredId ?? selectedId)) ?? rows[0];
-  const activePoint = activeRow
-    ? {
-        x: plotX(activeRow.maxDrawdown ?? 0, minX, maxX),
-        y: plotY(activeRow.moneyWeightedReturn ?? 0, minY, maxY),
-      }
-    : null;
+  const activeDominatedBy = activeRow?.kind === 'strategy' ? dominatedBy(activeRow, strategyRows) : null;
+  const selectedIsDominated = selectedRow?.kind === 'strategy' && !frontierIds.has(selectedRow.id);
   return (
-    <div className="relative h-[420px] overflow-hidden rounded-xl border border-slate-100 bg-[radial-gradient(circle_at_18%_18%,rgba(37,99,235,.14),transparent_30%),linear-gradient(135deg,#ffffff_0%,#f8fafc_48%,#eef2ff_100%)]">
-      <div className="absolute left-3 top-3 z-10 flex flex-wrap gap-2 text-[10px] font-semibold">
-        <span className="inline-flex items-center gap-1 rounded-full bg-slate-950 px-2 py-1 text-white">
-          <span className="size-2 rounded-full bg-white" />
-          선택 전략
-        </span>
-        <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white/85 px-2 py-1 text-slate-600">
-          <span className="size-2 rotate-45 bg-slate-400" />
-          benchmark
-        </span>
-      </div>
-      <svg
-        className="h-full w-full"
-        viewBox="0 0 360 280"
-        role="img"
-        aria-label="실제 포트폴리오 전략과 benchmark의 MDD 대비 수익률 곡선"
-      >
-        <defs>
-          <linearGradient id="frontierStroke" x1="0%" x2="100%" y1="0%" y2="0%">
-            <stop offset="0%" stopColor="#0f172a" />
-            <stop offset="55%" stopColor="#2563eb" />
-            <stop offset="100%" stopColor="#22c55e" />
-          </linearGradient>
-        </defs>
-        <g opacity="0.62">
-          {[0.25, 0.5, 0.75].map((ratio) => (
-            <line
-              key={`v-${ratio}`}
-              x1={34 + 300 * ratio}
-              x2={34 + 300 * ratio}
-              y1="38"
-              y2="248"
-              stroke="#cbd5e1"
-              strokeDasharray="3 5"
-            />
-          ))}
-          {[0.25, 0.5, 0.75].map((ratio) => (
-            <line
-              key={`h-${ratio}`}
-              x1="34"
-              x2="334"
-              y1={38 + 210 * ratio}
-              y2={38 + 210 * ratio}
-              stroke="#cbd5e1"
-              strokeDasharray="3 5"
-            />
-          ))}
-        </g>
-        <line x1="34" x2="334" y1="248" y2="248" stroke="#94a3b8" />
-        <line x1="34" x2="34" y1="38" y2="248" stroke="#94a3b8" />
-        {path ? (
-          <path
-            d={path}
-            fill="none"
-            stroke="url(#frontierStroke)"
-            strokeDasharray="6 5"
-            strokeLinecap="round"
-            strokeWidth="2.5"
-          />
-        ) : null}
-        {rows.map((row) => {
-          const selected = row.id === selectedId;
-          const hovered = row.id === hoveredId;
-          const benchmark = row.kind === 'benchmark';
-          const x = plotX(row.maxDrawdown ?? 0, minX, maxX);
-          const y = plotY(row.moneyWeightedReturn ?? 0, minY, maxY);
-          const canSelect = row.kind === 'strategy';
-          return (
-            <g key={row.id}>
-              {benchmark ? (
-                <rect
-                  aria-label={`${row.shortLabel} benchmark`}
-                  className="outline-none"
-                  fill={hovered ? '#64748b' : '#94a3b8'}
-                  height={hovered ? 11 : 9}
-                  role="button"
-                  stroke="white"
-                  strokeWidth="2"
-                  tabIndex={0}
-                  transform={`rotate(45 ${x} ${y})`}
-                  width={hovered ? 11 : 9}
-                  x={x - (hovered ? 5.5 : 4.5)}
-                  y={y - (hovered ? 5.5 : 4.5)}
-                  onBlur={() => setHoveredId(null)}
-                  onFocus={() => setHoveredId(row.id)}
-                  onMouseEnter={() => setHoveredId(row.id)}
-                  onMouseLeave={() => setHoveredId(null)}
-                />
-              ) : (
-                <circle
-                  aria-label={`${row.shortLabel} 선택`}
-                  cx={x}
-                  cy={y}
-                  fill={selected ? '#111827' : hovered ? '#f29423' : '#2563eb'}
-                  role="button"
-                  tabIndex={0}
-                  r={selected || hovered ? 8 : 5.5}
-                  stroke="white"
-                  strokeWidth="2"
-                  className={canSelect ? 'cursor-pointer outline-none' : 'outline-none'}
-                  onClick={() => canSelect && onSelect(row.id)}
-                  onMouseEnter={() => setHoveredId(row.id)}
-                  onMouseLeave={() => setHoveredId(null)}
-                  onFocus={() => setHoveredId(row.id)}
-                  onBlur={() => setHoveredId(null)}
-                  onKeyDown={(event) => {
-                    if (canSelect && (event.key === 'Enter' || event.key === ' ')) onSelect(row.id);
-                  }}
-                />
-              )}
-              {selected || hovered ? (
-                <text x={x + 9} y={y - 7} className="fill-slate-950 text-[10px] font-semibold">
-                  {shortChartLabel(row.shortLabel)}
-                </text>
-              ) : null}
-            </g>
-          );
-        })}
-        {maxScoreRow ? (
-          <StarMarker
-            label="Max score"
-            selectable={maxScoreRow.kind === 'strategy'}
-            x={plotX(maxScoreRow.maxDrawdown ?? 0, minX, maxX)}
-            y={plotY(maxScoreRow.moneyWeightedReturn ?? 0, minY, maxY)}
-            onBlur={() => setHoveredId(null)}
-            onFocus={() => setHoveredId(maxScoreRow.id)}
-            onMouseEnter={() => setHoveredId(maxScoreRow.id)}
-            onMouseLeave={() => setHoveredId(null)}
-            onSelect={() => {
-              if (maxScoreRow.kind === 'strategy') onSelect(maxScoreRow.id);
-            }}
-          />
-        ) : null}
-        {minRiskRow ? (
-          <g>
-            <circle
-              cx={plotX(minRiskRow.maxDrawdown ?? 0, minX, maxX)}
-              cy={plotY(minRiskRow.moneyWeightedReturn ?? 0, minY, maxY)}
-              fill="none"
-              r="12"
-              stroke="#22c55e"
-              strokeDasharray="3 3"
-              strokeWidth="2"
-            />
-          </g>
-        ) : null}
-      </svg>
-      {activeRow && activePoint ? (
-        <div
-          className="pointer-events-none absolute z-10 w-52 rounded-md border border-slate-200 bg-white p-3 text-xs shadow-lg"
-          style={{
-            left: `${(activePoint.x / 360) * 100}%`,
-            top: `${(activePoint.y / 280) * 100}%`,
-            transform: activePoint.x > 250 ? 'translate(-104%, -50%)' : 'translate(12px, -50%)',
-          }}
-        >
-          <div className="line-clamp-1 font-semibold text-slate-950">{activeRow.shortLabel}</div>
-          <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-            {activeRow.kind === 'benchmark' ? 'benchmark reference' : 'selectable strategy'}
-          </div>
-          <dl className="mt-2 grid grid-cols-2 gap-2 font-mono tabular-nums">
-            <div>
-              <dt className="text-[10px] text-slate-500">MWR</dt>
-              <dd className="font-semibold text-slate-950">{formatPercent(activeRow.moneyWeightedReturn)}</dd>
-            </div>
-            <div>
-              <dt className="text-[10px] text-slate-500">MDD</dt>
-              <dd className="font-semibold text-rose-600">{formatPercent(activeRow.maxDrawdown)}</dd>
-            </div>
-            <div>
-              <dt className="text-[10px] text-slate-500">RP이자</dt>
-              <dd className="font-semibold text-slate-950">{formatPercent(activeRow.cashWeight)}</dd>
-            </div>
-            <div>
-              <dt className="text-[10px] text-slate-500">보유</dt>
-              <dd className="font-semibold text-slate-950">{activeRow.holdingCount.toLocaleString('ko-KR')}개</dd>
-            </div>
-          </dl>
+    <div className="grid gap-3">
+      <div className="relative h-[360px] overflow-hidden rounded-xl border border-slate-100 bg-[radial-gradient(circle_at_18%_18%,rgba(37,99,235,.14),transparent_30%),linear-gradient(135deg,#ffffff_0%,#f8fafc_48%,#eef2ff_100%)]">
+        <div className="absolute left-3 top-3 z-10 flex max-w-[calc(100%-1.5rem)] flex-wrap gap-2 text-[10px] font-semibold">
+          <span className="inline-flex items-center gap-1 rounded-full bg-slate-950 px-2 py-1 text-white">
+            <span className="size-2 rounded-full bg-white" />
+            효율 전략
+          </span>
+          <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white/85 px-2 py-1 text-slate-600">
+            <span className="size-2 rotate-45 bg-slate-400" />
+            benchmark
+          </span>
+          {hiddenDominatedCount > 0 ? (
+            <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-1 text-amber-800">
+              지배 전략 {hiddenDominatedCount.toLocaleString('ko-KR')}개 숨김
+            </span>
+          ) : null}
         </div>
-      ) : null}
-      <div className="absolute bottom-2 left-3 right-3 flex justify-between font-mono text-[10px] text-slate-400">
-        <span>{formatPercent(minX)}</span>
-        <span>{formatPercent(maxX)}</span>
+        <svg
+          className="h-full w-full"
+          viewBox="0 0 360 280"
+          role="img"
+          aria-label="실제 포트폴리오 전략과 benchmark의 MDD 대비 수익률 곡선"
+        >
+          <defs>
+            <linearGradient id="frontierStroke" x1="0%" x2="100%" y1="0%" y2="0%">
+              <stop offset="0%" stopColor="#0f172a" />
+              <stop offset="55%" stopColor="#2563eb" />
+              <stop offset="100%" stopColor="#22c55e" />
+            </linearGradient>
+          </defs>
+          <g opacity="0.62">
+            {[0.25, 0.5, 0.75].map((ratio) => (
+              <line
+                key={`v-${ratio}`}
+                x1={34 + 300 * ratio}
+                x2={34 + 300 * ratio}
+                y1="38"
+                y2="248"
+                stroke="#cbd5e1"
+                strokeDasharray="3 5"
+              />
+            ))}
+            {[0.25, 0.5, 0.75].map((ratio) => (
+              <line
+                key={`h-${ratio}`}
+                x1="34"
+                x2="334"
+                y1={38 + 210 * ratio}
+                y2={38 + 210 * ratio}
+                stroke="#cbd5e1"
+                strokeDasharray="3 5"
+              />
+            ))}
+          </g>
+          <line x1="34" x2="334" y1="248" y2="248" stroke="#94a3b8" />
+          <line x1="34" x2="34" y1="38" y2="248" stroke="#94a3b8" />
+          {path ? (
+            <path
+              d={path}
+              fill="none"
+              stroke="url(#frontierStroke)"
+              strokeDasharray="6 5"
+              strokeLinecap="round"
+              strokeWidth="2.5"
+            />
+          ) : null}
+          {visibleRows.map((row) => {
+            const selected = row.id === selectedId;
+            const hovered = row.id === hoveredId;
+            const benchmark = row.kind === 'benchmark';
+            const efficient = row.kind === 'strategy' && frontierIds.has(row.id);
+            const dominatedSelected = selected && row.kind === 'strategy' && !efficient;
+            const x = plotX(row.maxDrawdown ?? 0, minX, maxX);
+            const y = plotY(row.moneyWeightedReturn ?? 0, minY, maxY);
+            const canSelect = row.kind === 'strategy';
+            return (
+              <g key={row.id}>
+                {benchmark ? (
+                  <rect
+                    aria-label={`${row.shortLabel} benchmark 상세 보기`}
+                    className="cursor-default outline-none"
+                    fill={hovered ? '#64748b' : '#94a3b8'}
+                    height={hovered ? 11 : 9}
+                    role="button"
+                    stroke="white"
+                    strokeWidth="2"
+                    tabIndex={0}
+                    transform={`rotate(45 ${x} ${y})`}
+                    width={hovered ? 11 : 9}
+                    x={x - (hovered ? 5.5 : 4.5)}
+                    y={y - (hovered ? 5.5 : 4.5)}
+                    onBlur={() => setHoveredId(null)}
+                    onClick={() => setHoveredId(row.id)}
+                    onFocus={() => setHoveredId(row.id)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') setHoveredId(row.id);
+                    }}
+                    onMouseEnter={() => setHoveredId(row.id)}
+                    onMouseLeave={() => setHoveredId(null)}
+                  />
+                ) : (
+                  <circle
+                    aria-label={`${row.shortLabel} 선택`}
+                    cx={x}
+                    cy={y}
+                    fill={selected ? '#111827' : hovered ? '#f29423' : efficient ? '#2563eb' : '#94a3b8'}
+                    role="button"
+                    tabIndex={0}
+                    r={selected || hovered ? 8 : efficient ? 5.8 : 4.8}
+                    stroke={dominatedSelected ? '#f59e0b' : 'white'}
+                    strokeDasharray={dominatedSelected ? '3 2' : undefined}
+                    strokeWidth={dominatedSelected ? 2.5 : 2}
+                    className={canSelect ? 'cursor-pointer outline-none' : 'outline-none'}
+                    onClick={() => canSelect && onSelect(row.id)}
+                    onMouseEnter={() => setHoveredId(row.id)}
+                    onMouseLeave={() => setHoveredId(null)}
+                    onFocus={() => setHoveredId(row.id)}
+                    onBlur={() => setHoveredId(null)}
+                    onKeyDown={(event) => {
+                      if (canSelect && (event.key === 'Enter' || event.key === ' ')) onSelect(row.id);
+                    }}
+                  />
+                )}
+                {selected || hovered ? (
+                  <text x={x + 9} y={y - 7} className="fill-slate-950 text-[10px] font-semibold">
+                    {shortChartLabel(row.shortLabel)}
+                  </text>
+                ) : null}
+              </g>
+            );
+          })}
+          {maxScoreRow ? (
+            <StarMarker
+              label="최고 위험대비 점수"
+              selectable={maxScoreRow.kind === 'strategy'}
+              x={plotX(maxScoreRow.maxDrawdown ?? 0, minX, maxX)}
+              y={plotY(maxScoreRow.moneyWeightedReturn ?? 0, minY, maxY)}
+              onBlur={() => setHoveredId(null)}
+              onFocus={() => setHoveredId(maxScoreRow.id)}
+              onMouseEnter={() => setHoveredId(maxScoreRow.id)}
+              onMouseLeave={() => setHoveredId(null)}
+              onSelect={() => {
+                if (maxScoreRow.kind === 'strategy') onSelect(maxScoreRow.id);
+              }}
+            />
+          ) : null}
+          {minRiskRow ? (
+            <g>
+              <circle
+                cx={plotX(minRiskRow.maxDrawdown ?? 0, minX, maxX)}
+                cy={plotY(minRiskRow.moneyWeightedReturn ?? 0, minY, maxY)}
+                fill="none"
+                r="12"
+                stroke="#22c55e"
+                strokeDasharray="3 3"
+                strokeWidth="2"
+              />
+            </g>
+          ) : null}
+        </svg>
+        <div className="absolute bottom-2 left-3 right-3 flex justify-between font-mono text-[10px] text-slate-400">
+          <span>{formatPercent(minX)}</span>
+          <span>{formatPercent(maxX)}</span>
+        </div>
+        <div className="absolute bottom-7 left-1/2 -translate-x-1/2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+          MDD
+        </div>
+        <div className="absolute left-1 top-1/2 -translate-y-1/2 -rotate-90 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+          MWR
+        </div>
+        <div className="absolute left-3 top-10 font-mono text-[10px] text-slate-400">{formatPercent(maxY)}</div>
+        <div className="absolute left-3 bottom-6 font-mono text-[10px] text-slate-400">{formatPercent(minY)}</div>
       </div>
-      <div className="absolute bottom-7 left-1/2 -translate-x-1/2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
-        MDD
-      </div>
-      <div className="absolute left-1 top-1/2 -translate-y-1/2 -rotate-90 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
-        MWR
-      </div>
-      <div className="absolute left-3 top-2 font-mono text-[10px] text-slate-400">{formatPercent(maxY)}</div>
-      <div className="absolute left-3 bottom-6 font-mono text-[10px] text-slate-400">{formatPercent(minY)}</div>
+      <FrontierDetailCard
+        activeRow={activeRow}
+        dominatedByRow={activeDominatedBy}
+        frontierCount={frontier.length}
+        hiddenDominatedCount={hiddenDominatedCount}
+        inspecting={hoveredId !== null && hoveredId !== selectedId}
+        selectedIsDominated={selectedIsDominated}
+        onSelect={activeRow?.kind === 'strategy' ? () => onSelect(activeRow.id) : undefined}
+      />
     </div>
   );
 }
@@ -612,6 +609,147 @@ function StarMarker({
         strokeWidth="1.5"
       />
     </g>
+  );
+}
+
+function uniqueRows(rows: PortfolioStrategySnapshot[]): PortfolioStrategySnapshot[] {
+  const seen = new Set<string>();
+  return rows.filter((row) => {
+    if (seen.has(row.id)) return false;
+    seen.add(row.id);
+    return true;
+  });
+}
+
+function dominatedBy(
+  target: PortfolioStrategySnapshot,
+  rows: PortfolioStrategySnapshot[],
+): PortfolioStrategySnapshot | null {
+  if (target.moneyWeightedReturn === null || target.maxDrawdown === null) return null;
+  const dominators = rows.filter((row) => row.id !== target.id && dominates(row, target));
+  return dominators.reduce<PortfolioStrategySnapshot | null>((best, row) => {
+    if (!best) return row;
+    const rowScore = frontierDominanceScore(row);
+    const bestScore = frontierDominanceScore(best);
+    if (rowScore !== bestScore) return rowScore > bestScore ? row : best;
+    return (row.maxDrawdown ?? Number.POSITIVE_INFINITY) < (best.maxDrawdown ?? Number.POSITIVE_INFINITY) ? row : best;
+  }, null);
+}
+
+function dominates(candidate: PortfolioStrategySnapshot, target: PortfolioStrategySnapshot): boolean {
+  if (
+    candidate.moneyWeightedReturn === null ||
+    candidate.maxDrawdown === null ||
+    target.moneyWeightedReturn === null ||
+    target.maxDrawdown === null
+  ) {
+    return false;
+  }
+  const noWorseReturn = candidate.moneyWeightedReturn >= target.moneyWeightedReturn;
+  const noWorseDrawdown = candidate.maxDrawdown <= target.maxDrawdown;
+  const strictlyBetter =
+    candidate.moneyWeightedReturn > target.moneyWeightedReturn || candidate.maxDrawdown < target.maxDrawdown;
+  return noWorseReturn && noWorseDrawdown && strictlyBetter;
+}
+
+function frontierDominanceScore(row: PortfolioStrategySnapshot): number {
+  const returnScore = row.moneyWeightedReturn ?? 0;
+  const drawdownPenalty = row.maxDrawdown ?? 0;
+  return returnScore - drawdownPenalty;
+}
+
+function FrontierDetailCard({
+  activeRow,
+  dominatedByRow,
+  frontierCount,
+  hiddenDominatedCount,
+  inspecting,
+  selectedIsDominated,
+  onSelect,
+}: {
+  activeRow: PortfolioStrategySnapshot | undefined;
+  dominatedByRow: PortfolioStrategySnapshot | null;
+  frontierCount: number;
+  hiddenDominatedCount: number;
+  inspecting: boolean;
+  selectedIsDominated: boolean;
+  onSelect?: () => void;
+}) {
+  if (!activeRow) {
+    return (
+      <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
+        표시할 frontier 점이 없습니다.
+      </div>
+    );
+  }
+  const isBenchmark = activeRow.kind === 'benchmark';
+  const stateLabel = isBenchmark ? 'benchmark 비교점' : dominatedByRow ? 'frontier 밖' : '효율 전략';
+  const stateTone = isBenchmark
+    ? 'border-slate-200 bg-slate-50 text-slate-600'
+    : dominatedByRow
+      ? 'border-amber-200 bg-amber-50 text-amber-800'
+      : 'border-emerald-200 bg-emerald-50 text-emerald-700';
+  return (
+    <div
+      aria-live="polite"
+      className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+      data-testid="portfolio-frontier-detail-card"
+    >
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={`rounded-full border px-2 py-1 text-[11px] font-semibold ${stateTone}`}>{stateLabel}</span>
+            {inspecting ? (
+              <span className="rounded-full border border-blue-100 bg-blue-50 px-2 py-1 text-[11px] font-semibold text-blue-700">
+                탐색 중
+              </span>
+            ) : (
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-semibold text-slate-600">
+                선택 전략
+              </span>
+            )}
+          </div>
+          <h3 className="mt-2 truncate text-base font-semibold text-slate-950">{activeRow.shortLabel}</h3>
+          <p className="mt-1 text-xs leading-5 text-slate-500">
+            차트는 전략 {frontierCount.toLocaleString('ko-KR')}개만 frontier로 그리고, 더 나쁜 수익률·낙폭 조합{' '}
+            {hiddenDominatedCount.toLocaleString('ko-KR')}개는 숨깁니다. benchmark는 선택 대상이 아니라 위치
+            비교용입니다.
+          </p>
+        </div>
+        {onSelect && inspecting ? (
+          <Button size="sm" variant="outline" onClick={onSelect}>
+            이 전략 선택
+          </Button>
+        ) : null}
+      </div>
+      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <MiniStat label="MWR" value={formatPercent(activeRow.moneyWeightedReturn)} />
+        <MiniStat label="MDD" value={formatPercent(activeRow.maxDrawdown)} />
+        <MiniStat label="RP이자" value={formatPercent(activeRow.cashWeight)} />
+        <MiniStat label="보유" value={`${activeRow.holdingCount.toLocaleString('ko-KR')}개`} />
+      </div>
+      {dominatedByRow ? (
+        <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">
+          <span className="font-semibold">숨김 판단:</span> {dominatedByRow.shortLabel}이 더 낮거나 같은 MDD(
+          {formatPercent(dominatedByRow.maxDrawdown)})에서 더 높거나 같은 MWR(
+          {formatPercent(dominatedByRow.moneyWeightedReturn)})을 보여 이 점은 frontier 밖입니다.
+        </div>
+      ) : null}
+      {selectedIsDominated && !inspecting && !dominatedByRow ? (
+        <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">
+          현재 선택 전략은 지배 원리상 frontier 밖일 수 있어 차트에는 보조 점으로만 유지합니다.
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function MiniStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-slate-100 bg-slate-50 px-3 py-2">
+      <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">{label}</div>
+      <div className="mt-1 font-mono text-sm font-semibold text-slate-950">{value}</div>
+    </div>
   );
 }
 
