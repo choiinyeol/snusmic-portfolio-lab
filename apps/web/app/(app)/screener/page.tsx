@@ -29,7 +29,7 @@ export default function ScreenerPage() {
     .sort((a, b) => b.localeCompare(a))[0];
   const positiveCurrentReturnCount = rows.filter((row) => (row.currentReturn ?? -Infinity) >= 0).length;
   const positiveCurrentReturnShare = rows.length ? positiveCurrentReturnCount / rows.length : null;
-  const aboveAllMaCount = rows.filter((row) => row.above20ma && row.above50ma && row.above200ma).length;
+  const aboveAllMaCount = rows.filter((row) => row.maStack).length;
 
   return (
     <>
@@ -45,7 +45,7 @@ export default function ScreenerPage() {
             label: '현재 플러스',
             value: `${positiveCurrentReturnCount}개 · ${formatPercent(positiveCurrentReturnShare, 1)}`,
           },
-          { label: '20/50/200MA 위', value: `${aboveAllMaCount.toLocaleString('ko-KR')}개` },
+          { label: '정배열', value: `${aboveAllMaCount.toLocaleString('ko-KR')}개` },
           { label: '가격 기준일', value: manifest.price_range.end ?? '—' },
         ]}
       />
@@ -136,6 +136,7 @@ function buildScreenerRows(
       above20ma: technicals.above20ma,
       above50ma: technicals.above50ma,
       above200ma: technicals.above200ma,
+      maStack: technicals.maStack,
       sparkline: technicals.sparkline,
     } satisfies ScreenerBoardRow;
   });
@@ -188,6 +189,7 @@ function buildTechnicals(prices: PricePoint[]) {
     above20ma: compareToAverage(lastPrice, sma20),
     above50ma: compareToAverage(lastPrice, sma50),
     above200ma: compareToAverage(lastPrice, sma200),
+    maStack: movingAverageStack(lastPrice, sma20, sma50, sma200),
     sparkline: oneYearPrices.map((point) => point.value),
   };
 }
@@ -231,6 +233,16 @@ function pctChange(current: number | null | undefined, base: number | null | und
 function compareToAverage(current: number | null, average: number | null): boolean | null {
   if (current === null || average === null) return null;
   return current >= average;
+}
+
+function movingAverageStack(
+  current: number | null,
+  sma20: number | null,
+  sma50: number | null,
+  sma200: number | null,
+): boolean | null {
+  if (current === null || sma20 === null || sma50 === null || sma200 === null) return null;
+  return current >= sma20 && sma20 >= sma50 && sma50 >= sma200;
 }
 
 function percentileRank(value: number | null, sortedValues: number[]): number | null {

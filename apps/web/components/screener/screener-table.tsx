@@ -62,6 +62,7 @@ export type ScreenerBoardRow = {
   above20ma: boolean | null;
   above50ma: boolean | null;
   above200ma: boolean | null;
+  maStack: boolean | null;
   sparkline: number[];
 };
 
@@ -112,6 +113,7 @@ const CORE_COLUMN_IDS = new Set([
   'above20ma',
   'above50ma',
   'above200ma',
+  'maStack',
   'candidateScore',
   'candidateBucket',
   'detail',
@@ -157,6 +159,7 @@ const COLUMN_META: Record<string, { kind: ColumnFilterKind; placeholder: string 
   above20ma: { kind: 'boolean', placeholder: '전체' },
   above50ma: { kind: 'boolean', placeholder: '전체' },
   above200ma: { kind: 'boolean', placeholder: '전체' },
+  maStack: { kind: 'boolean', placeholder: '전체' },
   // candidateBucket has its own rendering and matching branch — intentionally absent here.
 };
 
@@ -192,6 +195,7 @@ function downloadScreenerRows(rows: ScreenerBoardRow[]) {
     'above_20ma',
     'above_50ma',
     'above_200ma',
+    'ma_stack',
   ];
   const data = rows.map((row) => [
     row.symbol,
@@ -224,6 +228,7 @@ function downloadScreenerRows(rows: ScreenerBoardRow[]) {
     row.above20ma === null ? '' : row.above20ma ? 'true' : 'false',
     row.above50ma === null ? '' : row.above50ma ? 'true' : 'false',
     row.above200ma === null ? '' : row.above200ma ? 'true' : 'false',
+    row.maStack === null ? '' : row.maStack ? 'true' : 'false',
   ]);
   downloadCsv('snusmic-screener-filtered.csv', headers, data);
 }
@@ -363,8 +368,8 @@ const PRESETS: Preset[] = [
   },
   {
     id: 'maStack',
-    label: '20/50/200MA 위',
-    caption: '세 이동평균을 모두 위에 둔 후보입니다.',
+    label: '정배열',
+    caption: '현재가 ≥ 20SMA ≥ 50SMA ≥ 200SMA를 모두 만족하는 후보입니다.',
     sort: [{ id: 'rsRank1m', desc: true }],
     maStack: true,
   },
@@ -492,7 +497,11 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
           caption={formatPercent(boardStats.positiveShare, 1)}
         />
         <BoardMetric label="52주 고점 -10% 이내" value={`${boardStats.nearHighCount}개`} caption="가격 시계열" />
-        <BoardMetric label="20/50/200MA 위" value={`${boardStats.aboveAllMaCount}개`} caption="추세 정렬" />
+        <BoardMetric
+          label="정배열"
+          value={`${boardStats.aboveAllMaCount}개`}
+          caption="현재가 ≥ 20SMA ≥ 50SMA ≥ 200SMA"
+        />
       </div>
 
       <div className="w-full min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white">
@@ -941,6 +950,12 @@ function buildColumns(): ColumnDef<ScreenerBoardRow>[] {
       cell: ({ getValue }) => <TrendMark value={getValue<boolean | null>()} />,
     },
     {
+      id: 'maStack',
+      accessorKey: 'maStack',
+      header: '정배열',
+      cell: ({ getValue }) => <TrendMark value={getValue<boolean | null>()} />,
+    },
+    {
       id: 'candidateBucket',
       accessorKey: 'candidateBucket',
       header: '후보 유형',
@@ -1009,8 +1024,8 @@ function rowPassesFilters(
   if (filters.expiredFilter === 'no' && row.expired) return false;
   if (filters.caveatFilter === 'yes' && row.caveatFlags.length === 0) return false;
   if (filters.caveatFilter === 'no' && row.caveatFlags.length > 0) return false;
-  if (filters.maFilter === 'above' && !(row.above20ma && row.above50ma && row.above200ma)) return false;
-  if (filters.maFilter === 'below' && row.above20ma && row.above50ma && row.above200ma) return false;
+  if (filters.maFilter === 'above' && !row.maStack) return false;
+  if (filters.maFilter === 'below' && row.maStack) return false;
   if (filters.nearHighOnly && ((row.distanceFrom52wHigh ?? -Infinity) < -0.1 || row.distanceFrom52wHigh === null))
     return false;
   return true;
@@ -1176,6 +1191,7 @@ const ALL_COLUMN_IDS = [
   'above20ma',
   'above50ma',
   'above200ma',
+  'maStack',
   'candidateBucket',
   'candidateScore',
   'rankBasis',
@@ -1409,7 +1425,7 @@ function buildBoardStats(rows: ScreenerBoardRow[]) {
     positiveCount,
     positiveShare: rows.length ? positiveCount / rows.length : null,
     nearHighCount: rows.filter((row) => row.distanceFrom52wHigh !== null && row.distanceFrom52wHigh >= -0.1).length,
-    aboveAllMaCount: rows.filter((row) => row.above20ma && row.above50ma && row.above200ma).length,
+    aboveAllMaCount: rows.filter((row) => row.maStack).length,
   };
 }
 
@@ -1475,6 +1491,7 @@ function columnLabel(columnId: string): string {
       above20ma: '20SMA',
       above50ma: '50SMA',
       above200ma: '200SMA',
+      maStack: '정배열',
       candidateBucket: '후보 유형',
       candidateScore: '점수',
       rankBasis: '근거',

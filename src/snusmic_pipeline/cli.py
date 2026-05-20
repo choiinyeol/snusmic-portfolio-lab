@@ -19,6 +19,7 @@ from .fetch_index import fetch_reports, parse_pages
 from .github_urls import github_pdf_url
 from .markdown_export import export_markdown
 from .models import DownloadedPdf, ExtractedReport, ReportMeta
+from .sim.strategy_generation import StrategyGenerationConfig, run_strategy_generation
 from .sim.warehouse import build_warehouse, refresh_price_history
 from .web_artifacts import ExportInputs, check_web_artifacts, export_web_artifacts
 
@@ -408,6 +409,32 @@ def run_export_web(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_generate_strategies(args: argparse.Namespace) -> int:
+    result = run_strategy_generation(
+        StrategyGenerationConfig(
+            warehouse_dir=Path(args.warehouse),
+            out_dir=Path(args.out),
+            start_date=date.fromisoformat(args.start),
+            end_date=date.fromisoformat(args.end),
+            is_start=date.fromisoformat(args.is_start),
+            is_end=date.fromisoformat(args.is_end),
+            max_stock_configs=args.max_stock_configs,
+            is_top=args.is_top,
+            admit_top=args.admit_top,
+            stock_persona_top=args.stock_persona_top,
+            max_correlation=args.max_correlation,
+            broker_strategy_trials=args.broker_strategy_trials,
+            broker_strategy_top=args.broker_strategy_top,
+            broker_strategy_seed=args.broker_strategy_seed,
+            broker_strategy_train_start=date.fromisoformat(args.broker_strategy_train_start),
+            broker_strategy_train_end=date.fromisoformat(args.broker_strategy_train_end),
+            refresh_benchmark=args.refresh_benchmark,
+        )
+    )
+    print(json.dumps(result.__dict__, ensure_ascii=False, indent=2, sort_keys=True))
+    return 0
+
+
 def run_persona_sim(args: argparse.Namespace) -> int:
     """Thin wrapper around ``scripts/run_persona_sim.py``.
 
@@ -565,6 +592,42 @@ def build_parser() -> argparse.ArgumentParser:
     )
     export_web.add_argument("--check", action="store_true", help="Verify deterministic artifact output.")
     export_web.set_defaults(func=run_export_web)
+
+    generate = subparsers.add_parser(
+        "generate-strategies",
+        help="Generate benchmark-approved strategy personas through the structural pipeline.",
+    )
+    generate.add_argument("--start", default="2021-01-04")
+    generate.add_argument("--end", default=date.today().isoformat())
+    generate.add_argument("--warehouse", default=str(REPO_ROOT / "data" / "warehouse"))
+    generate.add_argument("--out", default=str(REPO_ROOT / "data" / "sim"))
+    generate.add_argument("--is-start", default="2021-01-04")
+    generate.add_argument("--is-end", default="2022-12-31")
+    generate.add_argument("--max-stock-configs", type=int, default=0)
+    generate.add_argument("--is-top", type=int, default=75)
+    generate.add_argument("--admit-top", type=int, default=0)
+    generate.add_argument("--stock-persona-top", type=int, default=10)
+    generate.add_argument("--max-correlation", type=float, default=0.90)
+    generate.add_argument(
+        "--broker-strategy-trials",
+        type=int,
+        default=int(os.environ.get("SMIC_BROKER_STRATEGY_TRIALS", "120")),
+    )
+    generate.add_argument(
+        "--broker-strategy-top", type=int, default=int(os.environ.get("SMIC_BROKER_STRATEGY_TOP", "3"))
+    )
+    generate.add_argument(
+        "--broker-strategy-seed", type=int, default=int(os.environ.get("SMIC_BROKER_STRATEGY_SEED", "42"))
+    )
+    generate.add_argument(
+        "--broker-strategy-train-start",
+        default=os.environ.get("SMIC_BROKER_STRATEGY_TRAIN_START", "2021-01-01"),
+    )
+    generate.add_argument(
+        "--broker-strategy-train-end", default=os.environ.get("SMIC_BROKER_STRATEGY_TRAIN_END", "2023-12-31")
+    )
+    generate.add_argument("--refresh-benchmark", action="store_true")
+    generate.set_defaults(func=run_generate_strategies)
 
     sim = subparsers.add_parser(
         "run-sim", help="Run the persona simulation (delegates to scripts/run_persona_sim.py)."

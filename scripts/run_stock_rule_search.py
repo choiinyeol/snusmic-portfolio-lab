@@ -555,6 +555,8 @@ def _artifact_status(row: dict[str, Any], *, passes_goal: bool) -> StockAdmissio
             return "insufficient_trades"
         if "benchmark" in status:
             return "below_benchmark"
+        if "correlation" in status or "duplicate" in status:
+            return "duplicate_behavior"
     return "below_risk_gate" if not passes_goal else "duplicate_behavior"
 
 
@@ -566,6 +568,8 @@ def _artifact_reasons(row: dict[str, Any]) -> list[StockAdmissionReason]:
         return ["duplicate_behavior"]
     if "benchmark" in status:
         return ["below_oos_benchmark"]
+    if "correlation" in status:
+        return ["duplicate_behavior"]
     if "activity" in status:
         return ["insufficient_trades"]
     return ["below_sharpe_gate", "below_sortino_gate"]

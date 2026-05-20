@@ -8,13 +8,5 @@ benchmark_qqq,QQQ (NASDAQ-100),benchmark,207683020.6495,734285.9379,206948734.71
 benchmark_spy,SPY (S&P 500),benchmark,180842470.6765,446211.7579,180396258.9187,0.2204,0.1126,0.1487,65.0,1.0,0.6284,0.8839
 benchmark_gld,GLD (Gold ETF),benchmark,229798395.7307,265807.9913,229532587.7394,0.313,0.1633,0.1483,65.0,1.0,0.8365,1.1718
 weak_oracle,Weak Prophet (3M oracle),oracle,4747242218.4382,4747242218.4382,0.0,1.7109,1.0448,0.2163,2018.0,0.0,3.2917,4.107
-stock_rule_ma_crossover_ma5_20_m_age0_3650_pool5_hold3_equal_ma_cross,Stock Rule 01: Ma Crossover,strategy,227120615.4735,2007215.4735,225113400.0,0.3084,0.1608,0.4298,284.0,3.0,0.5297,0.8728
-stock_rule_target_gap_reversal_ma10_30_m_age7_120_pool10_hold5_winner_compress_reversal_gap,Stock Rule 04: Target Gap Reversal,strategy,217587400.524,38011450.524,179575950.0,0.2918,0.1516,0.3119,228.0,3.0,0.5625,0.7379
-stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool3_hold2_equal_blend,Stock Rule 06: Target Upside Momentum,strategy,204690984.7433,19384.7433,204671600.0,0.2682,0.1385,0.4723,1162.0,2.0,0.506,0.7903
-stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool3_hold2_equal_dynamic_upside,Stock Rule 07: Target Upside Momentum,strategy,198529788.0094,19588.0094,198510200.0,0.2564,0.1321,0.4385,1343.0,2.0,0.4964,0.7991
-stock_rule_target_gap_reversal_ma10_30_m_age7_120_pool3_hold2_winner_compress_reversal_gap,Stock Rule 03: Target Gap Reversal,strategy,189974303.0397,2040453.0397,187933850.0,0.2394,0.1228,0.4338,132.0,2.0,0.4863,0.6668
-stock_rule_target_gap_reversal_ma10_30_m_age7_120_pool3_hold2_equal_reversal_gap,Stock Rule 02: Target Gap Reversal,strategy,188213451.6372,2287551.6372,185925900.0,0.2358,0.1209,0.4438,131.0,2.0,0.4842,0.6627
-stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool3_hold2_winner_compress_dynamic_upside,Stock Rule 09: Target Upside Momentum,strategy,184039308.3411,29708.3411,184009600.0,0.2271,0.1162,0.4295,1384.0,2.0,0.461,0.7438
-stock_rule_ma_crossover_ma10_30_m_age0_3650_pool20_hold10_equal_ma_cross,Stock Rule 05: Ma Crossover,strategy,183914984.9552,19844.7258,183895140.2294,0.2269,0.1161,0.2374,825.0,11.0,0.4941,0.7499
-stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool3_hold2_winner_compress_blend,Stock Rule 08: Target Upside Momentum,strategy,183170083.282,47243.282,183122840.0,0.2253,0.1152,0.4702,1192.0,2.0,0.4572,0.7125
-stock_rule_fresh_report_momentum_ma10_30_d_age7_120_pool3_hold2_equal_momentum_blend,Stock Rule 10: Fresh Report Momentum,strategy,155401844.2871,2604.2871,155399240.0,0.1621,0.0816,0.4615,1067.0,2.0,0.3879,0.5871
+smic_mtt_strategy_top1,Overseas Report Momentum Broad #1,strategy,396292461.0425,396292461.0425,0.0,0.5284,0.2876,0.3061,53.0,0.0,0.8832,0.8202
+smic_mtt_strategy_top2,Korea Report Momentum Broad #2,strategy,335325251.6938,333053171.6938,2272080.0,0.4615,0.2482,0.3009,150.0,2.0,0.7556,0.9969
