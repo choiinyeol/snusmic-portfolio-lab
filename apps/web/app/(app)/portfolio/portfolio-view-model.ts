@@ -13,7 +13,6 @@ import {
   getReportSymbolById,
   getReportTargetsById,
   getSummaryRows,
-  getStrategyRejectionRows,
   getTrades,
 } from '@/lib/artifacts';
 import {
@@ -35,7 +34,7 @@ export function buildPortfolioLandingModel(): PortfolioLandingModel {
   const allWeatherReturn = leaderboardRows.find((row) => row.id === ALL_WEATHER_PERSONA)?.returnPct ?? null;
   const portfolioRows = getPortfolioRows(leaderboardRows);
   const benchmarkRows = leaderboardRows.filter((row) => row.kind === 'benchmark');
-  const defaultPersona = getDefaultPortfolioPersona();
+  const defaultPersona = defaultPortfolioPersona(portfolioRows);
   const portfolioIds = new Set(portfolioRows.map((row) => row.id));
   const frontierIds = new Set([...portfolioRows.map((row) => row.id), ...benchmarkRows.map((row) => row.id)]);
   const personaLabels = Object.fromEntries(portfolioRows.map((row) => [row.id, row.label]));
@@ -83,7 +82,6 @@ export function buildPortfolioLandingModel(): PortfolioLandingModel {
     equity,
     trades,
     personaLabels,
-    rejectedStrategies: getStrategyRejectionRows(),
   };
 }
 
@@ -98,7 +96,7 @@ export function buildPortfolioViewModel(selectedPersona?: string): PortfolioView
   const allTargetsByReportId = getReportTargetsById();
   const portfolioRows = getPortfolioRows();
   const benchmarkRows = getStrategyLeaderboard().filter((row) => row.kind === 'benchmark');
-  const defaultPersona = getDefaultPortfolioPersona();
+  const defaultPersona = defaultPortfolioPersona(portfolioRows);
 
   const portfolioRowById = new Map(portfolioRows.map((row) => [row.id, row]));
   const dataPersonaIds = new Set([
@@ -212,10 +210,35 @@ export function getPortfolioStaticParams() {
 
 function getPortfolioRows(rows: StrategyLeaderboardRow[] = getStrategyLeaderboard()) {
   const selectable = getSelectableStrategyRows(rows).filter((row) => row.kind === 'strategy' && row.isSelectable);
-  return selectable.sort((a, b) => {
+  const nonDominated = selectable.filter((row) => !selectable.some((candidate) => dominates(candidate, row)));
+  return nonDominated.sort((a, b) => {
     if (a.objectivePassed !== b.objectivePassed) return a.objectivePassed ? -1 : 1;
     return (b.returnPct ?? Number.NEGATIVE_INFINITY) - (a.returnPct ?? Number.NEGATIVE_INFINITY);
   });
+}
+
+function defaultPortfolioPersona(rows: StrategyLeaderboardRow[]): string {
+  const productDefault = getDefaultPortfolioPersona();
+  if (rows.some((row) => row.id === productDefault)) return productDefault;
+  const fallback = rows[0]?.id;
+  if (fallback) return fallback;
+  return productDefault;
+}
+
+function dominates(candidate: StrategyLeaderboardRow, target: StrategyLeaderboardRow): boolean {
+  if (
+    candidate.id === target.id ||
+    candidate.returnPct === null ||
+    candidate.maxDrawdown === null ||
+    target.returnPct === null ||
+    target.maxDrawdown === null
+  ) {
+    return false;
+  }
+  const noWorseReturn = candidate.returnPct >= target.returnPct;
+  const noWorseDrawdown = candidate.maxDrawdown <= target.maxDrawdown;
+  const strictlyBetter = candidate.returnPct > target.returnPct || candidate.maxDrawdown < target.maxDrawdown;
+  return noWorseReturn && noWorseDrawdown && strictlyBetter;
 }
 
 function groupByPersona<T extends { persona: string }>(rows: T[]): Map<string, T[]> {

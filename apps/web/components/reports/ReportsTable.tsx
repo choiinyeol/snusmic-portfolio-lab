@@ -456,6 +456,31 @@ export function ReportsTable({ reports }: ReportsTableProps) {
             </label>
           </div>
 
+          <details className="rounded-lg border border-slate-200 bg-slate-50/70 p-2">
+            <summary className="cursor-pointer select-none px-1 text-xs font-semibold text-slate-700">
+              컬럼별 세부 필터
+              <span className="ml-2 font-normal text-slate-500">
+                직접 입력·Y/N 선택은 표 밖에서 넓게 조정합니다
+                {activeColumnFilterCount > 0 ? ` · ${activeColumnFilterCount}개 적용 중` : ''}
+              </span>
+            </summary>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+              {table
+                .getVisibleLeafColumns()
+                .filter((column) => columnFilterKind(column.id))
+                .map((column) => (
+                  <div key={column.id} className="grid gap-1 text-xs font-medium text-slate-500">
+                    <span>{columnLabel(column.id)}</span>
+                    <ColumnFilterControl
+                      columnId={column.id}
+                      value={columnFilters[column.id] ?? ''}
+                      onChange={(value) => updateColumnFilter(column.id, value)}
+                    />
+                  </div>
+                ))}
+            </div>
+          </details>
+
           {activeColumnFilterCount > 0 ? (
             <div className="flex flex-wrap items-center gap-1.5 text-xs text-slate-500">
               <span>컬럼 필터 {activeColumnFilterCount}개</span>
@@ -521,19 +546,6 @@ export function ReportsTable({ reports }: ReportsTableProps) {
                         {flexRender(header.column.columnDef.header, header.getContext())}
                         <span aria-hidden="true">{sortIndicator(header.column.getIsSorted())}</span>
                       </button>
-                    )}
-                  </th>
-                ))}
-              </tr>
-              <tr>
-                {headerGroup.headers.map((header) => (
-                  <th key={`${header.id}-filter`} className="sticky top-[31px] z-10 bg-white align-top">
-                    {header.isPlaceholder ? null : (
-                      <ColumnFilterControl
-                        columnId={header.column.id}
-                        value={columnFilters[header.column.id] ?? ''}
-                        onChange={(value) => updateColumnFilter(header.column.id, value)}
-                      />
                     )}
                   </th>
                 ))}

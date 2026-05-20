@@ -5,7 +5,6 @@ import type {
   HoldingRow,
   PositionEpisodeRow,
   ReportTargetDigest,
-  StrategyRejectionRow,
   TradeRow,
 } from '@/lib/artifacts';
 
@@ -69,5 +68,4 @@ export type PortfolioLandingModel = {
   equity: EquityPoint[];
   trades: TradeRow[];
   personaLabels: Record<string, string>;
-  rejectedStrategies: StrategyRejectionRow[];
 };
