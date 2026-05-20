@@ -25454,6 +25454,19 @@
       "open": 329.67999267578125,
       "source_currency": "USD",
       "volume": 1130383.0
+    },
+    {
+      "close": 322.1400146484375,
+      "close_krw": 485403.8143,
+      "currency": "USD",
+      "date": "2026-05-20",
+      "display_currency": "USD",
+      "high": 328.2099914550781,
+      "krw_per_unit": 1506.81005859375,
+      "low": 320.2099914550781,
+      "open": 329.67999267578125,
+      "source_currency": "USD",
+      "volume": 656262.0
     }
   ],
   "symbol": "VRT"

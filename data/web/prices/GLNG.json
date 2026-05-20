@@ -25454,6 +25454,19 @@
       "open": 56.619998931884766,
       "source_currency": "USD",
       "volume": 88989.0
+    },
+    {
+      "close": 55.45500183105469,
+      "close_krw": 83560.1546,
+      "currency": "USD",
+      "date": "2026-05-20",
+      "display_currency": "USD",
+      "high": 56.720699310302734,
+      "krw_per_unit": 1506.81005859375,
+      "low": 55.04999923706055,
+      "open": 56.63999938964844,
+      "source_currency": "USD",
+      "volume": 188662.0
     }
   ],
   "symbol": "GLNG"

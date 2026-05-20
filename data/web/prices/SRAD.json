@@ -15264,7 +15264,7 @@
       "volume": 373161.0
     },
     {
-      "close": 13.539999961853027,
+      "close": 13.53999996185303,
       "close_krw": 20430.2352,
       "currency": "USD",
       "date": "2026-05-19",
@@ -15275,6 +15275,19 @@
       "open": 13.140000343322754,
       "source_currency": "USD",
       "volume": 219253.0
+    },
+    {
+      "close": 13.199999809265137,
+      "close_krw": 19889.8925,
+      "currency": "USD",
+      "date": "2026-05-20",
+      "display_currency": "USD",
+      "high": 13.300000190734865,
+      "krw_per_unit": 1506.81005859375,
+      "low": 13.090000152587892,
+      "open": 13.149999618530273,
+      "source_currency": "USD",
+      "volume": 78854.0
     }
   ],
   "symbol": "SRAD"

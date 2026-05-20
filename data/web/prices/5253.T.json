@@ -9984,6 +9984,19 @@
       "open": 1600.0,
       "source_currency": "JPY",
       "volume": 2444700.0
+    },
+    {
+      "close": 1700.0,
+      "close_krw": 16064.9997,
+      "currency": "JPY",
+      "date": "2026-05-20",
+      "display_currency": "JPY",
+      "high": 1700.0,
+      "krw_per_unit": 9.449999809265137,
+      "low": 1642.0,
+      "open": 1671.0,
+      "source_currency": "JPY",
+      "volume": 1624400.0
     }
   ],
   "symbol": "5253.T"

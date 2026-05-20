@@ -25454,6 +25454,19 @@
       "open": 4.730000019073486,
       "source_currency": "USD",
       "volume": 50995.0
+    },
+    {
+      "close": 4.600299835205078,
+      "close_krw": 6931.7781,
+      "currency": "USD",
+      "date": "2026-05-20",
+      "display_currency": "USD",
+      "high": 4.659999847412109,
+      "krw_per_unit": 1506.81005859375,
+      "low": 4.510000228881836,
+      "open": 4.639999866485596,
+      "source_currency": "USD",
+      "volume": 14917.0
     }
   ],
   "symbol": "FNKO"

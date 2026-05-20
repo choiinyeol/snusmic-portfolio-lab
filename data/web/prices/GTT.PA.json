@@ -25922,6 +25922,19 @@
       "open": 202.8000030517578,
       "source_currency": "EUR",
       "volume": 24202.0
+    },
+    {
+      "close": 204.8000030517578,
+      "close_krw": 357560.3303,
+      "currency": "EUR",
+      "date": "2026-05-20",
+      "display_currency": "EUR",
+      "high": 206.99999999999997,
+      "krw_per_unit": 1745.9000244140625,
+      "low": 204.39999389648438,
+      "open": 206.0,
+      "source_currency": "EUR",
+      "volume": 10796.0
     }
   ],
   "symbol": "GTT.PA"

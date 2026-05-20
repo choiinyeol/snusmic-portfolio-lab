@@ -25454,6 +25454,19 @@
       "open": 34.119998931884766,
       "source_currency": "USD",
       "volume": 17002.0
+    },
+    {
+      "close": 33.61000061035156,
+      "close_krw": 50643.887,
+      "currency": "USD",
+      "date": "2026-05-20",
+      "display_currency": "USD",
+      "high": 33.81999969482422,
+      "krw_per_unit": 1506.81005859375,
+      "low": 33.13999938964844,
+      "open": 34.119998931884766,
+      "source_currency": "USD",
+      "volume": 16248.0
     }
   ],
   "symbol": "IMAX"
