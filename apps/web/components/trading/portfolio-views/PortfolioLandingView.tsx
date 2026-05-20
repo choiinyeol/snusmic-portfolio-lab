@@ -6,7 +6,7 @@ import { CumulativeReturnChart, type ReturnSeries } from '@/components/charts/Cu
 import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
 import { Button } from '@/components/ui/button';
 import { KpiTile } from '@/components/ui/KpiTile';
-import type { HoldingRow } from '@/lib/artifacts';
+import type { HoldingRow, StrategyRejectionRow } from '@/lib/artifacts';
 import { formatKrw, formatPercent } from '@/lib/format';
 import type { PortfolioLandingModel, PortfolioStrategySnapshot } from './types';
 
@@ -179,6 +179,8 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
         </div>
         <CumulativeReturnChart series={chartSeries} />
       </section>
+
+      <RejectedStrategyTable rows={model.rejectedStrategies} />
     </div>
   );
 }
@@ -263,6 +265,80 @@ function PortfolioChoiceButton({
   );
 }
 
+function RejectedStrategyTable({ rows }: { rows: StrategyRejectionRow[] }) {
+  if (!rows.length) return null;
+  return (
+    <section className="rounded-md border border-slate-200 bg-white p-4" aria-label="탈락한 전략 실험 성과">
+      <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+            rejected experiments
+          </div>
+          <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">조건 미달 전략 실험 성과</h2>
+          <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-500">
+            벤치마크 미달, 고상관 중복, Sharpe/Sortino 위험 게이트 미달로 포트폴리오에 올리지 않은 후보입니다. 실패도
+            숨기지 않고 성과와 탈락 사유를 같이 남깁니다.
+          </p>
+        </div>
+        <span className="font-mono text-xs font-semibold text-slate-500">top {rows.length}</span>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-left text-xs text-slate-500">
+              <th className="px-3 py-2">후보</th>
+              <th className="px-3 py-2">계열</th>
+              <th className="px-3 py-2">탈락 사유</th>
+              <th className="px-3 py-2 text-right">수익률</th>
+              <th className="px-3 py-2 text-right">초과</th>
+              <th className="px-3 py-2 text-right">Sharpe</th>
+              <th className="px-3 py-2 text-right">Sortino</th>
+              <th className="px-3 py-2 text-right">MDD</th>
+              <th className="px-3 py-2 text-right">거래</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {rows.map((row) => (
+              <tr className="hover:bg-slate-50" key={`${row.source}-${row.id}`}>
+                <td className="max-w-[320px] px-3 py-2">
+                  <div className="line-clamp-1 font-semibold text-slate-950">{row.label}</div>
+                  <div className="mt-0.5 font-mono text-[11px] text-slate-400">{row.source}</div>
+                </td>
+                <td className="px-3 py-2 text-slate-600">{row.family.replaceAll('_', ' ')}</td>
+                <td className="px-3 py-2">
+                  <span className="rounded bg-rose-50 px-2 py-1 text-xs font-semibold text-rose-700">{row.reason}</span>
+                </td>
+                <td className="px-3 py-2 text-right font-mono tabular-nums text-slate-950">
+                  {formatPercent(row.returnPct)}
+                </td>
+                <td
+                  className={`px-3 py-2 text-right font-mono tabular-nums ${
+                    (row.excessReturn ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'
+                  }`}
+                >
+                  {formatPercent(row.excessReturn)}
+                </td>
+                <td className="px-3 py-2 text-right font-mono tabular-nums">{formatNumber(row.sharpe)}</td>
+                <td className="px-3 py-2 text-right font-mono tabular-nums">{formatNumber(row.sortino)}</td>
+                <td className="px-3 py-2 text-right font-mono tabular-nums text-rose-600">
+                  {formatPercent(row.maxDrawdown)}
+                </td>
+                <td className="px-3 py-2 text-right font-mono tabular-nums">
+                  {row.tradeCount?.toLocaleString('ko-KR') ?? '—'}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function formatNumber(value: number | null): string {
+  return value === null || !Number.isFinite(value) ? '—' : value.toFixed(2);
+}
+
 function PortfolioFrontierChart({
   rows,
   selectedId,
@@ -279,7 +355,7 @@ function PortfolioFrontierChart({
   const { min: minX, max: maxX } = paddedDomain(xValues, { floor: 0.0, minSpan: 0.01 });
   const { min: minY, max: maxY } = paddedDomain(yValues, { minSpan: 0.04 });
   const frontier = efficientFrontier(plottableRows);
-  const maxScoreRow = bestRiskAdjustedRow(plottableRows);
+  const maxScoreRow = bestRiskAdjustedRow(plottableRows.filter((row) => row.kind === 'strategy'));
   const minRiskRow = minDrawdownRow(plottableRows);
   const path = frontier
     .map(

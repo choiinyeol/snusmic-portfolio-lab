@@ -6,6 +6,7 @@ import {
   LineSeries,
   createChart,
   createSeriesMarkers,
+  type ISeriesApi,
   type MouseEventParams,
   type SeriesMarker,
   type Time,
@@ -13,6 +14,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { EquityPoint, TradeRow } from '@/lib/artifacts';
 import { formatKrw, formatPercent } from '@/lib/format';
+import { tradeDisplayName } from '../helpers';
 
 type Tooltip = {
   x: number;
@@ -21,6 +23,7 @@ type Tooltip = {
   equityKrw: number | null;
   returnPct: number | null;
   trades: TradeRow[];
+  comparisonRows: Array<{ label: string; value: number; color: string }>;
 };
 
 type Props = {
@@ -28,10 +31,22 @@ type Props = {
   trades: TradeRow[];
   persona: string;
   label: string;
+  benchmarkPersonas?: string[];
+  personaLabels?: Record<string, string>;
   height?: number;
 };
 
-export function PortfolioEquityTradeChart({ equity, trades, persona, label, height = 420 }: Props) {
+const BENCHMARK_COLORS = ['#64748b', '#94a3b8', '#a855f7', '#f59e0b'];
+
+export function PortfolioEquityTradeChart({
+  equity,
+  trades,
+  persona,
+  label,
+  benchmarkPersonas = [],
+  personaLabels = {},
+  height = 420,
+}: Props) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
   const personaEquity = useMemo(
@@ -49,6 +64,21 @@ export function PortfolioEquityTradeChart({ equity, trades, persona, label, heig
         .filter((row) => row.cumulativeReturn !== null)
         .map((row) => ({ time: row.date as Time, value: (row.cumulativeReturn ?? 0) * 100 })),
     [personaEquity],
+  );
+  const benchmarkSeries = useMemo(
+    () =>
+      benchmarkPersonas
+        .map((benchmarkPersona, index) => ({
+          persona: benchmarkPersona,
+          label: personaLabels[benchmarkPersona] ?? benchmarkPersona,
+          color: BENCHMARK_COLORS[index % BENCHMARK_COLORS.length],
+          points: equity
+            .filter((row) => row.persona === benchmarkPersona && row.cumulativeReturn !== null)
+            .sort((a, b) => a.date.localeCompare(b.date))
+            .map((row) => ({ time: row.date as Time, value: (row.cumulativeReturn ?? 0) * 100 })),
+        }))
+        .filter((series) => series.points.length),
+    [benchmarkPersonas, equity, personaLabels],
   );
   const equityByDate = useMemo(() => new Map(personaEquity.map((row) => [row.date, row])), [personaEquity]);
   const markers = useMemo(() => buildTradeMarkers(personaTrades), [personaTrades]);
@@ -74,6 +104,21 @@ export function PortfolioEquityTradeChart({ equity, trades, persona, label, heig
       title: label,
     });
     line.setData(lineData);
+    const apiByLabel = new Map<ISeriesApi<'Line'>, { label: string; color: string }>([
+      [line, { label, color: '#111827' }],
+    ]);
+    for (const benchmark of benchmarkSeries) {
+      const benchmarkLine = chart.addSeries(LineSeries, {
+        color: benchmark.color,
+        lineWidth: 1,
+        priceFormat: { type: 'percent', precision: 2, minMove: 0.01 },
+        priceLineVisible: false,
+        lastValueVisible: false,
+        title: benchmark.label,
+      });
+      benchmarkLine.setData(benchmark.points);
+      apiByLabel.set(benchmarkLine, { label: benchmark.label, color: benchmark.color });
+    }
     createSeriesMarkers(line, markers);
     const handleCrosshairMove = (params: MouseEventParams<Time>) => {
       if (!params.point || !params.time || params.point.x < 0 || params.point.y < 0) {
@@ -86,6 +131,15 @@ export function PortfolioEquityTradeChart({ equity, trades, persona, label, heig
         setTooltip(null);
         return;
       }
+      const comparisonRows = [...apiByLabel.entries()]
+        .map(([api, meta]) => {
+          const datum = params.seriesData.get(api);
+          if (typeof datum !== 'object' || !datum || !('value' in datum)) return null;
+          const value = Number(datum.value);
+          if (!Number.isFinite(value)) return null;
+          return { label: meta.label, value: value / 100, color: meta.color };
+        })
+        .filter((row): row is { label: string; value: number; color: string } => Boolean(row));
       setTooltip({
         x: Math.min(params.point.x + 16, Math.max(16, container.clientWidth - 260)),
         y: Math.max(12, params.point.y - 132),
@@ -93,6 +147,7 @@ export function PortfolioEquityTradeChart({ equity, trades, persona, label, heig
         equityKrw: point.equityKrw,
         returnPct: point.cumulativeReturn,
         trades: tradesByDate.get(date) ?? [],
+        comparisonRows,
       });
     };
     chart.subscribeCrosshairMove(handleCrosshairMove);
@@ -101,7 +156,7 @@ export function PortfolioEquityTradeChart({ equity, trades, persona, label, heig
       chart.unsubscribeCrosshairMove(handleCrosshairMove);
       chart.remove();
     };
-  }, [equityByDate, height, label, lineData, markers, tradesByDate]);
+  }, [benchmarkSeries, equityByDate, height, label, lineData, markers, tradesByDate]);
 
   if (!lineData.length) {
     return <div className="chart-box empty-chart">포트폴리오 손익 경로 데이터가 없습니다.</div>;
@@ -112,8 +167,14 @@ export function PortfolioEquityTradeChart({ equity, trades, persona, label, heig
       <div className="mb-2 flex flex-wrap gap-3 px-1 text-xs text-slate-500">
         <span className="inline-flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-slate-950" />
-          누적 수익률
+          {label}
         </span>
+        {benchmarkSeries.map((series) => (
+          <span className="inline-flex items-center gap-1.5" key={series.persona}>
+            <span className="h-2 w-2 rounded-full" style={{ backgroundColor: series.color }} />
+            {series.label}
+          </span>
+        ))}
         <span className="inline-flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-emerald-600" />
           매수
@@ -134,6 +195,15 @@ export function PortfolioEquityTradeChart({ equity, trades, persona, label, heig
           <div className="tooltip-date">{tooltip.date}</div>
           <div>평가액 {formatKrw(tooltip.equityKrw)}</div>
           <div>누적 {formatPercent(tooltip.returnPct)}</div>
+          {tooltip.comparisonRows?.length ? (
+            <div className="mt-1 grid gap-0.5 border-t border-slate-100 pt-1">
+              {tooltip.comparisonRows.map((row) => (
+                <div key={row.label} style={{ color: row.color }}>
+                  {row.label}: {formatPercent(row.value)}
+                </div>
+              ))}
+            </div>
+          ) : null}
           {tooltip.trades.length ? (
             <div className="mt-1 grid gap-1 border-t border-slate-100 pt-1">
               {tooltip.trades.slice(0, 3).map((trade) => (
@@ -157,7 +227,7 @@ function TradeTooltipLine({ trade }: { trade: TradeRow }) {
     <div className="grid gap-0.5">
       <div className="flex items-center justify-between gap-3">
         <span className={`font-semibold ${sideClass}`}>
-          {sideLabel} {trade.symbol}
+          {sideLabel} {tradeDisplayName(trade.symbol, trade.company)}
         </span>
         <span className="font-mono tabular-nums text-slate-950">{formatKrw(trade.grossKrw)}</span>
       </div>

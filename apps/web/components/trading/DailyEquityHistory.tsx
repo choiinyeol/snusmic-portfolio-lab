@@ -11,11 +11,12 @@ type Props = {
   trades: TradeRow[];
   persona: string;
   personaLabels: Record<string, string>;
+  benchmarkPersonas?: string[];
 };
 
 const PAGE_SIZE_OPTIONS = [30, 90, 180, 365] as const;
 
-export function DailyEquityHistory({ equity, trades, persona, personaLabels }: Props) {
+export function DailyEquityHistory({ equity, trades, persona, personaLabels, benchmarkPersonas = [] }: Props) {
   const [windowSize, setWindowSize] = useState<(typeof PAGE_SIZE_OPTIONS)[number]>(90);
 
   const personaEquity = useMemo(
@@ -95,9 +96,11 @@ export function DailyEquityHistory({ equity, trades, persona, personaLabels }: P
           </div>
           <PortfolioEquityTradeChart
             equity={equity}
+            benchmarkPersonas={benchmarkPersonas}
             trades={trades}
             persona={persona}
             label={personaLabels[persona] ?? persona}
+            personaLabels={personaLabels}
           />
         </div>
       </section>

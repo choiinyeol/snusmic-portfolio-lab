@@ -456,7 +456,6 @@ class SimulationConfig(_FrozenModel):
         ),
         SmicFollowerConfig(),
         SmicFollowerV2Config(label="SMIC Follower (SL)"),
-        SmicRsiReversalConfig(),
         WeakProphetConfig(
             label="Weak Prophet (3M oracle)",
             lookahead_months=3,

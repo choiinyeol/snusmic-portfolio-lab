@@ -3,6 +3,7 @@
 import { TradesTable } from '@/components/trading/TradesTable';
 import type { TradeRow } from '@/lib/artifacts';
 import { formatKrw } from '@/lib/format';
+import { tradeDisplayName } from '../helpers';
 import type { PortfolioViewModel } from './types';
 
 export function PortfolioTradesView({ model }: { model: PortfolioViewModel }) {
@@ -128,7 +129,7 @@ function TradeHighlightCard({ trade, index }: { trade: TradeRow; index: number }
           >
             {sideLabel}
           </span>
-          <strong className="truncate text-sm text-slate-950">{trade.symbol}</strong>
+          <strong className="truncate text-sm text-slate-950">{tradeDisplayName(trade.symbol, trade.company)}</strong>
           <span className="font-mono text-xs text-slate-500">{trade.date}</span>
         </div>
         <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">{trade.reason || '기록된 사유 없음'}</p>

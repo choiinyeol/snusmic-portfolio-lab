@@ -91,25 +91,6 @@
       "time_loss_days": 365
     },
     {
-      "label": "RSI Reversal Strategy",
-      "max_entry_rsi": 35.0,
-      "max_holding_days": 60,
-      "max_positions": 10,
-      "max_target_upside_at_pub": 5.0,
-      "min_pullback_pct": 0.05,
-      "min_target_upside_at_pub": 0.1,
-      "persona_name": "smic_rsi_reversal",
-      "pullback_lookback_days": 20,
-      "rebound_exit_rsi": 55.0,
-      "rsi_window": 14,
-      "signal_valid_days": 90,
-      "stop_loss_pct": 0.12,
-      "take_profit_pct": 0.25,
-      "target_hit_multiplier": 1.0,
-      "top_up_cadence": "monthly",
-      "universe": "all"
-    },
-    {
       "label": "Weak Prophet (3M oracle)",
       "lookahead_months": 3,
       "max_weight": 1.0,

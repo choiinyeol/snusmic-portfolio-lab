@@ -29,3 +29,11 @@ export function nativeFromKrw(
 export function reportTargetHref(target: ReportTargetDigest): string {
   return `/reports/${encodeURIComponent(target.symbol)}/${encodeURIComponent(target.reportId)}`;
 }
+
+/** Display stocks the way a person scans them: US-style alphabetic tickers can
+ * stay as tickers, while numeric domestic/Japan/HK tickers are easier to read
+ * as company names. */
+export function tradeDisplayName(symbol: string, company?: string | null): string {
+  if (/^[A-Z]{1,5}$/.test(symbol)) return symbol;
+  return company || symbol;
+}

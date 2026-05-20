@@ -116,9 +116,7 @@ def simulate_smic_rsi_reversal(
 
         _apply_sell_rules(account, day, board, state, config)
 
-        _buy_short_term_reversals(
-            account, day, board, state, config, deposit_today > 0 or has_new_signal
-        )
+        _buy_short_term_reversals(account, day, board, state, config, deposit_today > 0 or has_new_signal)
 
         equity_points.append(
             record_equity_point(
@@ -245,7 +243,9 @@ def _buy_short_term_reversals(
         for signal in [_reversal_signal(board, day, candidate, config)]
         if signal is not None
     ]
-    signals.sort(key=lambda signal: (signal.rsi, -signal.pullback_pct, -signal.candidate.target_upside_at_pub))
+    signals.sort(
+        key=lambda signal: (signal.rsi, -signal.pullback_pct, -signal.candidate.target_upside_at_pub)
+    )
 
     slots_available = max(0, config.max_positions - account.open_position_count())
     if slots_available <= 0:
@@ -302,9 +302,7 @@ def _rsi(board: PriceBoard, day: date, symbol: str, window: int) -> float | None
 def _pullback_pct(board: PriceBoard, day: date, symbol: str, lookback_days: int) -> float | None:
     if board.close.empty or symbol not in board.close.columns:
         return None
-    series = board.close[symbol].loc[board.close.index <= pd.Timestamp(day)].dropna().tail(
-        lookback_days + 1
-    )
+    series = board.close[symbol].loc[board.close.index <= pd.Timestamp(day)].dropna().tail(lookback_days + 1)
     if len(series) < 2:
         return None
     current = float(series.iloc[-1])

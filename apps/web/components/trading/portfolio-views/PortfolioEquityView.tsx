@@ -7,6 +7,7 @@ export function PortfolioEquityView({ model }: { model: PortfolioViewModel }) {
   return (
     <DailyEquityHistory
       equity={model.equity}
+      benchmarkPersonas={model.benchmarkPersonas}
       persona={model.selectedPersona}
       personaLabels={model.personaLabels}
       trades={model.trades}

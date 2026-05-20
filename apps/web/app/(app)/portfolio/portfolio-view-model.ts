@@ -13,6 +13,7 @@ import {
   getReportSymbolById,
   getReportTargetsById,
   getSummaryRows,
+  getStrategyRejectionRows,
   getTrades,
 } from '@/lib/artifacts';
 import {
@@ -41,7 +42,7 @@ export function buildPortfolioLandingModel(): PortfolioLandingModel {
   const summaryById = new Map(summaries.map((row) => [row.persona, row]));
   const holdingsByPersona = groupByPersona(allHoldings.filter((row) => frontierIds.has(row.persona)));
   const trades = allTrades.filter((row) => portfolioIds.has(row.persona));
-  const equity = allEquity.filter((row) => portfolioIds.has(row.persona));
+  const equity = allEquity.filter((row) => frontierIds.has(row.persona));
   const snapshotFromRow = (row: StrategyLeaderboardRow): PortfolioStrategySnapshot => {
     const summary = summaryById.get(row.id);
     const holdings = holdingsByPersona.get(row.id) ?? [];
@@ -82,6 +83,7 @@ export function buildPortfolioLandingModel(): PortfolioLandingModel {
     equity,
     trades,
     personaLabels,
+    rejectedStrategies: getStrategyRejectionRows(),
   };
 }
 
@@ -95,6 +97,7 @@ export function buildPortfolioViewModel(selectedPersona?: string): PortfolioView
   const allTargetsBySymbol = getLatestReportTargetsBySymbol();
   const allTargetsByReportId = getReportTargetsById();
   const portfolioRows = getPortfolioRows();
+  const benchmarkRows = getStrategyLeaderboard().filter((row) => row.kind === 'benchmark');
   const defaultPersona = getDefaultPortfolioPersona();
 
   const portfolioRowById = new Map(portfolioRows.map((row) => [row.id, row]));
@@ -109,9 +112,10 @@ export function buildPortfolioViewModel(selectedPersona?: string): PortfolioView
   );
   const activePersona = selectedPersona && personas.includes(selectedPersona) ? selectedPersona : defaultPersona;
   const invalidStrategyId = selectedPersona && !personas.includes(selectedPersona) ? selectedPersona : null;
-  const personaLabels = Object.fromEntries(
-    personas.map((persona) => [persona, portfolioRowById.get(persona)?.label ?? getPersonaLabel(persona)]),
-  );
+  const personaLabels = Object.fromEntries([
+    ...personas.map((persona) => [persona, portfolioRowById.get(persona)?.label ?? getPersonaLabel(persona)]),
+    ...benchmarkRows.map((row) => [row.id, row.shortLabel || row.label]),
+  ]);
   const strategyOptions = personas.map((persona) => {
     const row = portfolioRowById.get(persona);
     return {
@@ -146,7 +150,8 @@ export function buildPortfolioViewModel(selectedPersona?: string): PortfolioView
 
   const holdings = allHoldings.filter((row) => row.persona === activePersona);
   const accounting = allAccounting.filter((row) => row.persona === activePersona);
-  const equity = allEquity.filter((row) => row.persona === activePersona);
+  const benchmarkIds = new Set(benchmarkRows.map((row) => row.id));
+  const equity = allEquity.filter((row) => row.persona === activePersona || benchmarkIds.has(row.persona));
   const trades = allTrades.filter((row) => row.persona === activePersona);
   const episodes = allEpisodes.filter((row) => row.persona === activePersona);
   const relevantSymbols = new Set([
@@ -180,6 +185,7 @@ export function buildPortfolioViewModel(selectedPersona?: string): PortfolioView
     trades,
     episodes,
     personas,
+    benchmarkPersonas: benchmarkRows.map((row) => row.id),
     personaLabels,
     strategyOptions,
     defaultPersona,

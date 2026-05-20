@@ -838,35 +838,5 @@
     "symbol": "187790.KS",
     "unrealized_pnl_krw": -168.269,
     "unrealized_return": -0.013220100863675976
-  },
-  {
-    "avg_cost_krw": 11727.6189,
-    "company": "샘씨엔에스",
-    "currency": "KRW",
-    "first_buy_date": "2026-05-15",
-    "holding_days": 4,
-    "last_close_krw": 11730.0,
-    "last_close_native": 11730.0,
-    "market_value_krw": 13290090.0,
-    "persona": "smic_rsi_reversal",
-    "qty": 1133,
-    "symbol": "252990.KS",
-    "unrealized_pnl_krw": 2697.8101,
-    "unrealized_return": 0.0002030335416169926
-  },
-  {
-    "avg_cost_krw": 218141.7164,
-    "company": "HD현대마린솔루션",
-    "currency": "KRW",
-    "first_buy_date": "2026-05-19",
-    "holding_days": 0,
-    "last_close_krw": 218000.0,
-    "last_close_native": 218000.0,
-    "market_value_krw": 13080000.0,
-    "persona": "smic_rsi_reversal",
-    "qty": 60,
-    "symbol": "443060.KS",
-    "unrealized_pnl_krw": -8502.981,
-    "unrealized_return": -0.0006496529060958656
   }
 ]

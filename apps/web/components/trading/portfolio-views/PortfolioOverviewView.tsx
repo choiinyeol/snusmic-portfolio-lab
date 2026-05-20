@@ -6,6 +6,7 @@ import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
 import { Button } from '@/components/ui/button';
 import type { HoldingRow, ReportTargetDigest, TradeRow } from '@/lib/artifacts';
 import { formatKrw } from '@/lib/format';
+import { tradeDisplayName } from '../helpers';
 import { PortfolioEquityTradeChart } from './PortfolioEquityTradeChart';
 import type { PortfolioViewModel } from './types';
 
@@ -58,9 +59,11 @@ export function PortfolioOverviewView({ model }: { model: PortfolioViewModel }) 
           </div>
           <PortfolioEquityTradeChart
             equity={model.equity}
+            benchmarkPersonas={model.benchmarkPersonas}
             trades={model.trades}
             persona={persona}
             label={personaLabel}
+            personaLabels={model.personaLabels}
             height={460}
           />
           <TradeEventTimeline
@@ -191,7 +194,9 @@ function TradeEventTimeline({
                   >
                     {sideLabel}
                   </span>
-                  <strong className="truncate text-sm text-slate-950">{trade.symbol}</strong>
+                  <strong className="truncate text-sm text-slate-950">
+                    {tradeDisplayName(trade.symbol, target?.company ?? trade.company)}
+                  </strong>
                   <span className="font-mono text-xs text-slate-500">{formatKrw(Math.abs(trade.grossKrw ?? 0))}</span>
                 </div>
                 <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">
@@ -224,7 +229,7 @@ function RecentTradeList({ trades }: { trades: TradeRow[] }) {
           <time className="font-mono text-xs text-slate-500">{trade.date}</time>
           <div className="min-w-0">
             <div className="truncate font-semibold text-slate-950">
-              {trade.side === 'sell' ? '매도' : '매수'} {trade.symbol}
+              {trade.side === 'sell' ? '매도' : '매수'} {tradeDisplayName(trade.symbol, trade.company)}
             </div>
             <div className="truncate text-xs text-slate-500">{trade.reason || '기록된 사유 없음'}</div>
           </div>

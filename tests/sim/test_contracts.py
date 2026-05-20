@@ -56,7 +56,6 @@ def test_default_personas_are_benchmarks_plus_promotable_search_targets():
         "benchmark_gld",
         "smic_follower",
         "smic_follower_v2",
-        "smic_rsi_reversal",
         "weak_oracle",
     ]
     assert "oracle" not in names

@@ -4,7 +4,7 @@
     "search_start": "2021-01-04",
     "search_end": "2022-12-31",
     "oos_start": "2021-01-04",
-    "oos_end": "2026-05-19",
+    "oos_end": "2026-05-20",
     "validation_mode": "full_sample"
   },
   "benchmark_persona": "cash_or_selected_benchmark",
@@ -19,7 +19,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -116,7 +116,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -213,7 +213,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -310,7 +310,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -407,7 +407,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -504,7 +504,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -601,7 +601,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -698,7 +698,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -796,7 +796,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -894,7 +894,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -992,7 +992,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -1090,7 +1090,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -1188,7 +1188,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -1286,7 +1286,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -1384,7 +1384,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -1482,7 +1482,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -1580,7 +1580,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -1678,7 +1678,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -1776,7 +1776,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -1874,7 +1874,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -1972,7 +1972,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -2070,7 +2070,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -2168,7 +2168,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -2266,7 +2266,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -2364,7 +2364,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -2462,7 +2462,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -2560,7 +2560,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -2658,7 +2658,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -2756,7 +2756,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -2854,7 +2854,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -2952,7 +2952,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -3050,7 +3050,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -3148,7 +3148,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -3246,7 +3246,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -3344,7 +3344,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -3442,7 +3442,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -3540,7 +3540,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -3638,7 +3638,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -3736,7 +3736,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -3834,7 +3834,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -3932,7 +3932,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -4030,7 +4030,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -4127,7 +4127,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -4224,7 +4224,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -4321,7 +4321,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -4418,7 +4418,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -4515,7 +4515,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -4612,7 +4612,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -4709,7 +4709,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -4806,7 +4806,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -4903,7 +4903,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -5000,7 +5000,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -5097,7 +5097,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -5194,7 +5194,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -5291,7 +5291,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -5388,7 +5388,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -5485,7 +5485,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -5582,7 +5582,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -5679,7 +5679,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -5776,7 +5776,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -5873,7 +5873,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -5970,7 +5970,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -6067,7 +6067,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -6164,7 +6164,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -6261,7 +6261,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -6358,7 +6358,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -6455,7 +6455,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -6552,7 +6552,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -6649,7 +6649,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -6746,7 +6746,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -6843,7 +6843,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -6940,7 +6940,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -7037,7 +7037,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -7134,7 +7134,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [
@@ -7231,7 +7231,7 @@
           "search_start": "2021-01-04",
           "search_end": "2022-12-31",
           "oos_start": "2021-01-04",
-          "oos_end": "2026-05-19",
+          "oos_end": "2026-05-20",
           "validation_mode": "full_sample"
         },
         "params": [

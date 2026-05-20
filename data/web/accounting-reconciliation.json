@@ -133,25 +133,6 @@
     "unrealized_pnl_krw": 8480684.3756
   },
   {
-    "cash_gap_krw": 0.0268000066280365,
-    "cash_yield_krw": 6387451.7368,
-    "equity_gap_krw": 0.0,
-    "expected_cash_krw": 105664982.005,
-    "explanation_ko": "현금, 보유 평가액, 확정·미실현 손익의 관계가 허용 오차 안에서 맞습니다.",
-    "final_cash_krw": 105664982.0318,
-    "final_equity_krw": 132035072.0318,
-    "label": "RSI Reversal Strategy",
-    "net_profit_krw": 30035072.0318,
-    "open_cost_basis_krw": 26375895.1977,
-    "open_market_value_krw": 26370090.0,
-    "persona": "smic_rsi_reversal",
-    "profit_gap_krw": 0.0,
-    "realized_pnl_krw": 23653425.4659,
-    "status": "ok",
-    "total_contributed_krw": 102000000.0,
-    "unrealized_pnl_krw": -5805.170899999999
-  },
-  {
     "cash_gap_krw": 0.0,
     "cash_yield_krw": 5853564.145899773,
     "equity_gap_krw": 0.0,

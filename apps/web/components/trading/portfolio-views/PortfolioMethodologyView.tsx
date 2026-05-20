@@ -29,13 +29,13 @@ export function PortfolioMethodologyView({
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{method.summary}</p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Link
-            className="rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-slate-800"
+            className="rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-slate-800 active:bg-slate-950 active:text-white"
             href={`/portfolio/${strategyId}/holdings`}
           >
             현재 보유 보기
           </Link>
           <Link
-            className="rounded-md border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-400 hover:bg-slate-50"
+            className="rounded-md border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-400 hover:bg-slate-50 active:border-slate-950 active:bg-slate-950 active:text-white"
             href={`/portfolio/${strategyId}/trades`}
           >
             실제 매매 원장 보기

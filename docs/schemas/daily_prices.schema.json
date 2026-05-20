@@ -77,6 +77,136 @@
       "title": "Volume",
       "x-snusmic-nan-policy": "drop"
     },
+    "stock_split": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Stock Split",
+      "x-snusmic-nan-policy": "drop"
+    },
+    "split_event_type": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Split Event Type",
+      "x-snusmic-nan-policy": "drop"
+    },
+    "split_ratio_text": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Split Ratio Text",
+      "x-snusmic-nan-policy": "drop"
+    },
+    "split_factor": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Split Factor",
+      "x-snusmic-nan-policy": "drop"
+    },
+    "cum_split_factor_to_latest": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Cum Split Factor To Latest",
+      "x-snusmic-nan-policy": "drop"
+    },
+    "split_adjusted_open": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Split Adjusted Open",
+      "x-snusmic-nan-policy": "drop"
+    },
+    "split_adjusted_high": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Split Adjusted High",
+      "x-snusmic-nan-policy": "drop"
+    },
+    "split_adjusted_low": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Split Adjusted Low",
+      "x-snusmic-nan-policy": "drop"
+    },
+    "split_adjusted_close": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Split Adjusted Close",
+      "x-snusmic-nan-policy": "drop"
+    },
+    "split_adjusted_volume": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Split Adjusted Volume",
+      "x-snusmic-nan-policy": "drop"
+    },
     "source_currency": {
       "anyOf": [
         {

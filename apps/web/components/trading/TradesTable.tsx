@@ -7,7 +7,7 @@ import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import { CsvDownloadButton, DataPanel, EmptyTableState, downloadCsv } from '@/components/ui/data-panel';
 import type { ReportTargetDigest, TradeRow } from '@/lib/artifacts';
 import { formatKrw } from '@/lib/format';
-import { marketLabel, reportTargetHref } from './helpers';
+import { marketLabel, reportTargetHref, tradeDisplayName } from './helpers';
 import { SortHeader, pageRows, sortRows, type SortState } from './TableControls';
 
 type Props = {
@@ -55,7 +55,7 @@ export function TradesTable({
       trades.filter((trade) => {
         if (trade.persona !== persona) return false;
         if (side !== 'all' && trade.side !== side) return false;
-        const haystack = `${trade.symbol} ${trade.reason} ${trade.reportId ?? ''}`.toLowerCase();
+        const haystack = `${trade.symbol} ${trade.company} ${trade.reason} ${trade.reportId ?? ''}`.toLowerCase();
         return haystack.includes(normalizedQuery);
       }),
     [normalizedQuery, persona, side, trades],
@@ -71,7 +71,7 @@ export function TradesTable({
               targetsBySymbol[row.symbol]?.marketRegion,
           ),
         side: (row) => row.side,
-        symbol: (row) => row.symbol,
+        symbol: (row) => tradeDisplayName(row.symbol, row.company),
         target: (row) =>
           (row.reportId ? targetsByReportId[row.reportId]?.targetPriceNative : undefined) ??
           targetsBySymbol[row.symbol]?.targetPriceNative ??
@@ -229,8 +229,11 @@ export function TradesTable({
                         className="font-semibold text-slate-950 hover:underline"
                         href={target ? reportTargetHref(target) : `/reports/${encodeURIComponent(trade.symbol)}`}
                       >
-                        {trade.symbol}
+                        {tradeDisplayName(trade.symbol, target?.company ?? trade.company)}
                       </Link>
+                      {tradeDisplayName(trade.symbol, target?.company ?? trade.company) !== trade.symbol ? (
+                        <div className="mt-0.5 font-mono text-[11px] text-slate-400">{trade.symbol}</div>
+                      ) : null}
                     </td>
                     <td className="px-3 py-2">
                       {target ? (
@@ -297,6 +300,7 @@ function downloadTrades(rows: TradeRow[]) {
     'persona',
     'side',
     'symbol',
+    'company',
     'currency',
     'qty',
     'fill_price_native',
@@ -312,6 +316,7 @@ function downloadTrades(rows: TradeRow[]) {
     row.persona,
     row.side,
     row.symbol,
+    row.company,
     row.currency,
     row.qty ?? '',
     row.fillPriceNative ?? '',
