@@ -486,6 +486,8 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
     dispatchFilters({ type: 'SET_COLUMN_FILTER', columnId, value });
   }, []);
   const clearColumnFilters = useCallback(() => dispatchFilters({ type: 'CLEAR_COLUMN_FILTERS' }), []);
+  const tableMinWidthClass =
+    columnMode === 'all' ? 'min-w-[1900px]' : columnMode === 'price' ? 'min-w-[1480px]' : 'min-w-[1220px]';
 
   return (
     <section className="grid gap-3">
@@ -519,12 +521,12 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
                 artifact에 없어 숨깁니다.
               </p>
             </div>
-            <div className="flex shrink-0 items-center gap-3">
-              <div className="flex items-center gap-2" aria-label="컬럼 보기">
-                <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+            <div className="flex shrink-0 flex-wrap items-center gap-2 sm:gap-3">
+              <div className="flex min-w-0 flex-wrap items-center gap-2" aria-label="컬럼 보기">
+                <span className="shrink-0 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
                   컬럼
                 </span>
-                <div className="inline-flex overflow-hidden rounded-md border border-slate-200 bg-white">
+                <div className="inline-flex min-w-max overflow-hidden rounded-md border border-slate-200 bg-white">
                   {(['core', 'price', 'all'] as const).map((mode, index) => {
                     const isActive = columnMode === mode;
                     return (
@@ -533,7 +535,7 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
                         type="button"
                         aria-pressed={isActive}
                         className={[
-                          'inline-flex h-8 items-center px-3 text-xs font-semibold transition-colors',
+                          'inline-flex h-8 min-w-12 items-center justify-center whitespace-nowrap px-3 text-xs font-semibold transition-colors',
                           index > 0 ? 'border-l border-slate-200' : '',
                           isActive
                             ? 'bg-slate-950 text-white'
@@ -569,7 +571,7 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
             ))}
           </div>
 
-          <div className="grid gap-2 lg:grid-cols-[minmax(220px,1.4fr)_repeat(6,minmax(0,.75fr))]">
+          <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-[minmax(300px,1.5fr)_repeat(6,minmax(140px,1fr))]">
             <label className="grid gap-1 text-xs font-medium text-slate-500" htmlFor="screener-search">
               <span>
                 검색 <span className="font-mono text-[10px] text-slate-400">(/ 단축키)</span>
@@ -668,7 +670,9 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
         ) : null}
 
         <div className="w-full min-w-0 overflow-x-auto">
-          <table className="w-full min-w-[1080px] border-separate border-spacing-0 text-[11px] leading-4 [&_td]:border-b [&_td]:border-slate-100 [&_td]:px-1.5 [&_td]:py-1.5 [&_th]:border-b [&_th]:border-slate-200 [&_th]:px-1.5 [&_th]:py-1.5 [&_tr:hover_td]:bg-slate-50">
+          <table
+            className={`${tableMinWidthClass} w-full border-separate border-spacing-0 text-[11px] leading-4 [&_td]:border-b [&_td]:border-slate-100 [&_td]:px-2 [&_td]:py-1.5 [&_th]:border-b [&_th]:border-slate-200 [&_th]:px-2 [&_th]:py-1.5 [&_tr:hover_td]:bg-slate-50`}
+          >
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
                 <Fragment key={headerGroup.id}>
@@ -1454,8 +1458,8 @@ function formatDaysShort(value: number | null): string {
 
 function toggleClass(active: boolean): string {
   return active
-    ? 'inline-flex h-8 items-center rounded-md border border-slate-950 bg-slate-950 px-2.5 text-xs font-semibold text-white'
-    : 'inline-flex h-8 items-center rounded-md border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-950';
+    ? 'inline-flex h-8 items-center whitespace-nowrap rounded-md border border-slate-950 bg-slate-950 px-2.5 text-xs font-semibold text-white'
+    : 'inline-flex h-8 items-center whitespace-nowrap rounded-md border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-950';
 }
 
 function modeLabel(mode: ColumnMode): string {
