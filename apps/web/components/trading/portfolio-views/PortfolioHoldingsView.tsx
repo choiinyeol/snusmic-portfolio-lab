@@ -60,8 +60,8 @@ export function PortfolioHoldingsView({ model }: { model: PortfolioViewModel }) 
             </div>
             <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">리스크 집중</h2>
             <p className="mt-1 text-sm leading-6 text-slate-500">
-              {personaLabel}의 현재 위험은 보유 비중 상위 종목이 결정합니다. 비중·미실현 수익률·보유일·목표가 근거를 한
-              번에 확인합니다.
+              {personaLabel}의 현재 위험은 보유 비중 상위 종목이 결정합니다. 비중·미실현 수익률·보유일·최근 리포트
+              맥락을 한 번에 확인합니다.
             </p>
           </div>
           <div className="grid gap-2">
@@ -127,7 +127,7 @@ function HoldingEvidenceCard({
       </div>
       <div className="flex flex-wrap gap-2 text-[11px] font-medium">
         <span className="rounded bg-slate-100 px-1.5 py-0.5 text-slate-600">
-          {target ? '근거 리포트' : '근거 없음'}
+          {target ? '최근 리포트' : '리포트 없음'}
         </span>
         <span
           className={`rounded px-1.5 py-0.5 ${(holding.unrealizedReturn ?? 0) >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}

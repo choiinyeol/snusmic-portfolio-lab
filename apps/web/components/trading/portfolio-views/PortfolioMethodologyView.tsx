@@ -1,13 +1,16 @@
 'use client';
 
+import Link from 'next/link';
 import type { StrategyMethod } from './types';
 
 export function PortfolioMethodologyView({
   method,
   personaLabel,
+  strategyId,
 }: {
   method: StrategyMethod | undefined;
   personaLabel: string;
+  strategyId: string;
 }) {
   if (!method) {
     return (
@@ -20,10 +23,24 @@ export function PortfolioMethodologyView({
     <article className="grid gap-4">
       <section className="rounded-md border border-slate-200 bg-white p-4">
         <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-          methodology
+          strategy playbook
         </div>
         <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">{personaLabel} 운용 방법론</h2>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{method.summary}</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link
+            className="rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-slate-800"
+            href={`/portfolio/${strategyId}/holdings`}
+          >
+            현재 보유 보기
+          </Link>
+          <Link
+            className="rounded-md border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-400 hover:bg-slate-50"
+            href={`/portfolio/${strategyId}/trades`}
+          >
+            실제 매매 원장 보기
+          </Link>
+        </div>
       </section>
 
       <section className="grid gap-3 lg:grid-cols-4">
@@ -33,42 +50,41 @@ export function PortfolioMethodologyView({
           title="Rebalance · 편입/조정"
           tone="emerald"
           items={[
-            '리포트 기반 후보 중 현재 원장 규칙을 통과한 종목만 실제 포지션으로 남깁니다.',
-            '동일 전략 안에서는 현재 보유 원장과 체결 내역이 판단의 단일 source of truth입니다.',
+            '정해진 주기마다 후보 점수를 다시 계산하고 상위 보유 수만 남깁니다.',
+            '순위가 낮아진 보유 종목은 매도하고, 새 상위 후보로 교체합니다.',
+            '보유/거래 탭에서 실제 편입·제외 날짜를 확인합니다.',
           ]}
         />
         <MethodStep index="03" title="Exit / Risk · 청산" tone="rose" items={method.sellRules} />
-        <MethodStep index="04" title="Exceptions · 예외" tone="amber" items={method.riskControls} />
+        <MethodStep index="04" title="Checks · 안전장치" tone="amber" items={method.riskControls} />
       </section>
 
       <section className="rounded-md border border-slate-200 bg-white p-4">
         <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-          actual params
+          operating settings
         </div>
-        <h3 className="mt-1 text-lg font-semibold tracking-tight text-slate-950">실제 파라미터</h3>
+        <h3 className="mt-1 text-lg font-semibold tracking-tight text-slate-950">사용자가 알아야 할 운용 설정</h3>
         <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-500">
-          아래 값은 전략 카탈로그에 저장된 실제 threshold/limit입니다. 서술형 운용 규칙과 같은 원천에서 읽습니다.
+          실제 매수·매도 판단에 직접 쓰이는 공개 설정만 표시합니다. 검증용 날짜, 내부 점수 원장, 후보 압축 실험값은
+          숨깁니다.
         </p>
         <ParamGrid params={method.params} />
       </section>
 
       <section className="rounded-md border border-slate-200 bg-white p-4">
         <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-          operating contract
+          what you can audit
         </div>
-        <h3 className="mt-1 text-lg font-semibold tracking-tight text-slate-950">이 페이지가 보장하는 것</h3>
+        <h3 className="mt-1 text-lg font-semibold tracking-tight text-slate-950">사용자가 직접 확인할 수 있는 것</h3>
         <div className="mt-3 grid gap-3 md:grid-cols-3">
           <ContractCard
-            title="실제 원장만"
-            body="benchmark, follower, oracle은 비교 기준일 뿐 portfolio 원장에 섞지 않습니다."
+            title="매수 가능 시점"
+            body="주식 규칙은 첫 리포트 발간 뒤 투자 가능 종목으로 등록된 날짜부터만 편입 후보가 됩니다."
           />
+          <ContractCard title="거래로 검증" body="수익률 설명은 현재 보유와 실제 체결 원장을 기준으로만 이어집니다." />
           <ContractCard
-            title="거래로 검증"
-            body="수익률 설명은 현재 보유와 실제 체결 ledger를 기준으로만 이어집니다."
-          />
-          <ContractCard
-            title="근거로 이동"
-            body="보유 종목은 최신 리포트 근거와 연결되어 왜 들고 있는지 추적할 수 있어야 합니다."
+            title="리포트의 역할"
+            body="가격 규칙에서 리포트는 매수 트리거가 아니라 투자 가능 universe에 들어온 근거입니다."
           />
         </div>
       </section>

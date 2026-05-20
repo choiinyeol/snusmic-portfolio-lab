@@ -104,6 +104,7 @@ export function PortfolioRouteContentFromModel({
       <PortfolioMethodologyView
         method={model.methodsByPersona[model.selectedPersona]}
         personaLabel={model.personaLabels[model.selectedPersona] ?? model.selectedPersona}
+        strategyId={model.selectedPersona}
       />
     );
   }

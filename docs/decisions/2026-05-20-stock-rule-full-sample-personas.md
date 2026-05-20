@@ -13,12 +13,13 @@ The goal is a set of universal, recognizable rule families rather than a strict 
 - IS ranking: 2021-01-04 → 2022-12-31.
 - Full Sample validation: 2021-01-04 → 2026-05-19.
 - Promotion: validation Sharpe ≥ 1.5, Sortino ≥ 1.5, or total return ≥ 500%.
-- Diversity: greedy return-path correlation gate, default `max_correlation=0.995`; if a candidate is too correlated with a previously selected higher-scoring rule, only the higher-scoring rule is kept.
+- Universe/no-lookahead: every stock rule, including price-only MA/RSI/momentum rules, can rank a symbol only after that symbol's first report publication date. Historical prices may feed moving-average math after eligibility, but a future report cannot introduce an earlier buy.
+- Diversity: greedy return-path correlation gate, default `max_correlation=0.997`; if a candidate is too correlated with a previously selected higher-scoring rule, only the higher-scoring rule is kept.
 - Stop condition: at least 10 stock-rule personas, all integrated into `/portfolio` with holdings/trades/equity/methodology routes.
 
 ## Useful result from this run
 
-Price-only MA crossover and price momentum families dominated the full-sample gate. Report-upside families still run, but did not dominate the final 10 under the current score/correlation ordering.
+After the report-publication eligibility fix, the selected set is a mix of MA crossover plus report-upside/fresh-report/reversal rules. The earlier MA-heavy result was invalid because report-discovered symbols could enter price-only rules before the first report publication.
 
 This is a product-facing strategy discovery mode, not a claim of OOS robustness. Future sessions should either:
 

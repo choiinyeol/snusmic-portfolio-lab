@@ -292,8 +292,9 @@ def default_stock_rule_configs() -> tuple[StockRuleConfig, ...]:
         ("ma_crossover", "ma_cross"),
         ("rsi_reversal", "rsi_reversal"),
     )
+    price_ma_pairs = ((3, 10), (5, 20), (10, 30), (15, 45), (20, 60), (30, 90), (50, 150))
     for family, score_mode in price_families:
-        for fast, slow in ma_pairs:
+        for fast, slow in price_ma_pairs:
             for rebalance in ("D", "W", "M"):
                 for top_pool, hold_choices in ((5, (3,)), (10, (5,)), (20, (5, 10))):
                     for hold_top in hold_choices:
@@ -570,16 +571,20 @@ def _weights_for_config(
     else:
         score = 0.65 * dynamic_upside + 0.25 * static_upside + 0.35 * momentum
 
-    valid = trend & np.isfinite(score) & (momentum >= config.min_momentum_return)
+    # Every stock rule ranks symbols that entered the investable universe via a
+    # published research report.  Even price-only families must therefore wait
+    # until the first publication date; otherwise a later report would leak the
+    # symbol into an earlier rebalance.
+    valid = (
+        trend
+        & np.isfinite(score)
+        & np.isfinite(age)
+        & (momentum >= config.min_momentum_return)
+        & (age >= config.min_report_age_days)
+        & (age <= config.max_report_age_days)
+    )
     if report_family:
-        valid = (
-            valid
-            & np.isfinite(dynamic_upside)
-            & np.isfinite(age)
-            & (dynamic_upside >= config.min_dynamic_upside)
-            & (age >= config.min_report_age_days)
-            & (age <= config.max_report_age_days)
-        )
+        valid = valid & np.isfinite(dynamic_upside) & (dynamic_upside >= config.min_dynamic_upside)
     rebalance_indices = _rebalance_indices(close.index, config.rebalance)
     if len(rebalance_indices) == 0:
         return np.zeros((n_days, n_symbols)), np.zeros((0, n_symbols))

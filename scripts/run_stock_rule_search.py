@@ -96,7 +96,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--max-correlation",
         type=float,
-        default=0.995,
+        default=0.997,
         help="Greedy diversity gate: keep only the best rule when validation return correlation is >= this value; 0 disables.",
     )
     parser.add_argument("--goal-min-sharpe", type=float, default=1.5)

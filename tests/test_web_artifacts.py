@@ -233,7 +233,9 @@ def test_strategy_catalog_uses_behavior_labels_and_admission_audit(tmp_path: Pat
     assert len(promoted) >= 10
     for row in promoted:
         assert str(row["label"]).startswith("Stock Rule")
-        assert "Full Sample validation" in row["methodology_summary"]
+        assert "리포트" in row["methodology_summary"]
+        assert "Full Sample validation" not in row["methodology_summary"]
+        assert "search_is" not in row["methodology_summary"]
         assert row["is_selectable"] is True
 
     admission = json.loads((out / "strategies" / "admission.json").read_text(encoding="utf-8"))
@@ -246,6 +248,37 @@ def test_strategy_catalog_uses_behavior_labels_and_admission_audit(tmp_path: Pat
 
     csv_text = (out / "table-download-strategies.csv").read_text(encoding="utf-8")
     assert "SMIC MTT Strategy" not in csv_text
+
+
+def test_stock_rule_holdings_do_not_precede_first_report_publication(tmp_path: Path) -> None:
+    out = tmp_path / "web"
+    export_web_artifacts(
+        ExportInputs(
+            warehouse=Path("data/warehouse"),
+            sim=Path("data/sim"),
+            out=out,
+            extraction_quality=Path("data/extraction_quality.json"),
+        )
+    )
+
+    reports = pd.read_csv(Path("data/warehouse") / "reports.csv", usecols=["symbol", "publication_date"])
+    reports["publication_date"] = pd.to_datetime(reports["publication_date"]).dt.strftime("%Y-%m-%d")
+    first_report_by_symbol = reports.groupby("symbol")["publication_date"].min().to_dict()
+    holdings = json.loads((out / "current-holdings.json").read_text(encoding="utf-8"))
+    leaks = [
+        (
+            row.get("persona"),
+            row.get("symbol"),
+            row.get("first_buy_date"),
+            first_report_by_symbol.get(str(row.get("symbol"))),
+        )
+        for row in holdings
+        if str(row.get("persona", "")).startswith("stock_rule_")
+        and row.get("first_buy_date")
+        and first_report_by_symbol.get(str(row.get("symbol")))
+        and str(row["first_buy_date"]) < str(first_report_by_symbol[str(row["symbol"])])
+    ]
+    assert leaks == []
 
 
 def test_optional_monthly_holdings_drop_retired_strategy_personas(tmp_path: Path) -> None:

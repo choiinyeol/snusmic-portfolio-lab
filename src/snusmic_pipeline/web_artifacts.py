@@ -1448,7 +1448,7 @@ def _build_strategy_catalog(summary: pd.DataFrame, sim_config_path: Path) -> lis
                 "buy_rules": _buy_rules(strategy_id, config),
                 "sell_rules": _sell_rules(strategy_id, config),
                 "risk_controls": _risk_controls(strategy_id, config),
-                "params": _strategy_params(config),
+                "params": _strategy_params(strategy_id, config),
                 "metrics": {
                     "final_equity_krw": _number(row.get("final_equity_krw")),
                     "final_cash_krw": _number(row.get("final_cash_krw")),
@@ -1775,7 +1775,7 @@ def _methodology_summary(strategy_id: str, config: dict[str, Any]) -> str:
     if strategy_id.startswith("smic_mtt_strategy"):
         return "리포트 업사이드와 가격 추세 조건(MTT·Supertrend·ATR breakout)을 통과한 종목만 실제 주식 수량 단위로 매수·보유·매도하는 포트폴리오 전략입니다. MTT는 전략명 자체가 아니라 내부 추세 필터 중 하나입니다."
     if strategy_id.startswith("stock_rule_"):
-        return "개별 종목 규칙은 in-sample(search_is)에서 후보를 고정한 뒤 Full Sample validation 성과와 상관 다양성 게이트로 채택한 주식 단위 입장 계약입니다."
+        return _stock_rule_plain_summary(config)
     return "시뮬레이션에 포함된 전략입니다."
 
 
@@ -1790,20 +1790,128 @@ def _strategy_signal_label(config: dict[str, Any]) -> str:
     return "Trend"
 
 
+def _stock_rule_plain_summary(config: dict[str, Any]) -> str:
+    family = str(config.get("family") or "")
+    fast = int(config.get("fast_ma_days") or 0)
+    slow = int(config.get("slow_ma_days") or 0)
+    hold_top = int(config.get("hold_top") or 0)
+    top_pool = int(config.get("top_pool") or 0)
+    cadence = _stock_rule_cadence(config)
+    weighting = _stock_rule_weighting(config)
+    if family == "ma_crossover":
+        return (
+            f"리포트가 발간되어 투자 가능 종목으로 등록된 뒤에만 {cadence} 가격 추세를 재평가합니다. "
+            f"{fast}일 이동평균이 {slow}일 이동평균 위에 있는 종목만 후보로 삼습니다. "
+            f"후보를 단기 추세 강도 순으로 정렬해 상위 {top_pool}개를 압축하고, 실제로는 {hold_top}개만 {weighting}으로 보유합니다."
+        )
+    if family == "price_momentum":
+        return (
+            f"리포트 발간 이후 투자 가능 universe에 들어온 종목만 대상으로 {cadence} 최근 가격 모멘텀을 순위화합니다. "
+            f"상위 {top_pool}개 후보 중 {hold_top}개만 {weighting}으로 보유하고, 다음 재평가 때 더 강한 종목으로 교체합니다."
+        )
+    if family == "rsi_reversal":
+        return (
+            f"리포트 발간 이후 투자 가능 종목으로 등록된 뒤에만 {cadence} 과매도 후 반등 가능성이 있는 종목을 찾습니다. "
+            f"RSI가 낮고 장기 추세가 완전히 깨지지 않은 후보 중 {hold_top}개만 보유합니다."
+        )
+    if family == "target_upside_momentum":
+        return (
+            f"리포트 발간 이후 {cadence} 목표가까지 남은 상승여력과 가격 추세를 함께 봅니다. "
+            f"{fast}일선이 {slow}일선 위에 있는 종목 중 상승여력·추세 점수가 높은 상위 {top_pool}개를 압축하고 {hold_top}개만 {weighting}으로 보유합니다."
+        )
+    if family == "fresh_report_momentum":
+        return (
+            f"발간 후 {cadence} 아직 신선한 리포트 종목 중 가격 추세가 살아 있는 후보를 찾습니다. "
+            f"목표가 상승여력과 최근 모멘텀을 섞어 상위 {top_pool}개를 고르고 {hold_top}개만 {weighting}으로 보유합니다."
+        )
+    if family == "target_gap_reversal":
+        return (
+            f"리포트 발간 이후 {cadence} 목표가까지 괴리가 남아 있고 단기 되돌림 여지가 큰 종목을 찾습니다. "
+            f"반등 점수가 높은 후보를 상위 {top_pool}개로 압축하고 {hold_top}개만 {weighting}으로 보유합니다."
+        )
+    return f"리포트 발간으로 투자 가능 종목이 된 뒤 {cadence} 정해진 가격/리포트 신호로 점수화하고 상위 {hold_top}개만 실제 포트폴리오에 편입합니다."
+
+
+def _stock_rule_buy_rules(config: dict[str, Any]) -> list[str]:
+    family = str(config.get("family") or "")
+    fast = int(config.get("fast_ma_days") or 0)
+    slow = int(config.get("slow_ma_days") or 0)
+    top_pool = int(config.get("top_pool") or 0)
+    hold_top = int(config.get("hold_top") or 0)
+    cadence = _stock_rule_cadence(config)
+    weighting = _stock_rule_weighting(config)
+    if family == "ma_crossover":
+        return [
+            "첫 리포트 발간 전에는 아무리 가격 조건이 좋아도 후보에 넣지 않습니다.",
+            f"{cadence} 종가 기준으로 {fast}일선과 {slow}일선을 다시 계산합니다.",
+            f"{fast}일선이 {slow}일선보다 높고, 현재가가 {slow}일선 위인 종목만 후보가 됩니다.",
+            f"후보를 '이동평균 격차 70% + {slow}일 모멘텀 30%' 점수로 정렬합니다.",
+            f"상위 {top_pool}개 후보를 검토하되 실제 보유는 {hold_top}개로 제한합니다.",
+            f"비중은 {weighting}으로 배분합니다.",
+        ]
+    if family == "price_momentum":
+        return [
+            "첫 리포트 발간 전에는 해당 종목을 투자 가능 universe에 넣지 않습니다.",
+            f"{cadence} 최근 {slow}일 가격 모멘텀을 계산합니다.",
+            f"현재가가 {slow}일선 위에 있고 {fast}일선이 {slow}일선보다 높은 종목만 후보가 됩니다.",
+            f"가격 모멘텀 점수가 높은 상위 {top_pool}개 중 {hold_top}개를 보유합니다.",
+            f"비중은 {weighting}으로 배분합니다.",
+        ]
+    if family == "rsi_reversal":
+        return [
+            "첫 리포트 발간 전에는 해당 종목을 후보로 보지 않습니다.",
+            f"{cadence} RSI가 낮아진 과매도 후보를 찾습니다.",
+            f"현재가가 {slow}일선의 90% 이상을 유지하는 종목만 후보가 됩니다.",
+            f"후보 중 반등 점수가 높은 {hold_top}개를 보유합니다.",
+        ]
+    if family == "target_upside_momentum":
+        return [
+            "첫 리포트 발간 전에는 해당 종목을 후보로 보지 않습니다.",
+            f"{cadence} 목표가 대비 현재가의 남은 상승여력을 다시 계산합니다.",
+            f"{fast}일선이 {slow}일선 위에 있고 현재가가 {slow}일선 위인 종목만 후보가 됩니다.",
+            "목표가 상승여력과 가격 모멘텀을 섞은 점수로 후보를 정렬합니다.",
+            f"상위 {top_pool}개 후보 중 {hold_top}개만 보유합니다.",
+        ]
+    if family == "fresh_report_momentum":
+        return [
+            "첫 리포트 발간 전에는 해당 종목을 후보로 보지 않습니다.",
+            f"발간 후 {int(config.get('max_report_age_days') or 0)}일 이내의 리포트만 신선한 후보로 봅니다.",
+            f"{fast}일선이 {slow}일선 위에 있고 최근 모멘텀이 양수인 종목만 후보가 됩니다.",
+            "목표가 상승여력과 최근 가격 모멘텀을 함께 점수화합니다.",
+            f"상위 {top_pool}개 후보 중 {hold_top}개만 보유합니다.",
+        ]
+    if family == "target_gap_reversal":
+        return [
+            "첫 리포트 발간 전에는 해당 종목을 후보로 보지 않습니다.",
+            f"발간 후 {int(config.get('min_report_age_days') or 0)}~{int(config.get('max_report_age_days') or 0)}일 구간의 리포트만 봅니다.",
+            "목표가까지의 괴리와 단기 되돌림 여지를 함께 점수화합니다.",
+            "설정된 pullback 조건을 통과한 종목만 후보가 됩니다.",
+            f"상위 {top_pool}개 후보 중 {hold_top}개만 보유합니다.",
+        ]
+    return [f"{cadence} 정해진 점수식으로 후보를 정렬하고 상위 {hold_top}개를 보유합니다."]
+
+
+def _stock_rule_cadence(config: dict[str, Any]) -> str:
+    return {"D": "매일", "W": "매주", "M": "매월 말"}.get(str(config.get("rebalance") or ""), "정기적으로")
+
+
+def _stock_rule_weighting(config: dict[str, Any]) -> str:
+    mode = str(config.get("weight_mode") or "")
+    hold_top = int(config.get("hold_top") or 0)
+    if mode == "winner_compress" and hold_top > 1:
+        return f"1위 약 55%, 나머지 {hold_top - 1}개가 45%를 나눠 갖는 집중형"
+    if mode == "equal":
+        return "동일비중"
+    if mode == "rank_linear":
+        return "순위가 높을수록 더 크게 담는 선형 비중"
+    if mode == "score_proportional":
+        return "점수 비례 비중"
+    return mode or "기록된 비중 규칙"
+
+
 def _buy_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
     if strategy_id.startswith("stock_rule_"):
-        rules = [
-            "search_is 구간에서 발견된 개별 종목 조건만 사용",
-            "Full Sample validation에서 벤치마크 초과 수익률과 목표 성과를 확인한 경우만 표시",
-            "수익률 경로 상관이 높은 규칙끼리는 최고 점수 규칙 1개만 유지",
-        ]
-        symbol = config.get("symbol")
-        family = config.get("family") or config.get("rule_family")
-        if symbol:
-            rules.append(f"대상 종목: {symbol}")
-        if family:
-            rules.append(f"규칙 계열: {family}")
-        return rules
+        return _stock_rule_buy_rules(config)
     if strategy_id.startswith("smic_mtt_strategy"):
         if not config:
             return ["세부 조건 artifact 없음", "성과·보유·매매내역만 검증 가능"]
@@ -1865,7 +1973,12 @@ def _buy_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
 
 def _sell_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
     if strategy_id.startswith("stock_rule_"):
-        return ["규칙별 exit 조건과 Full Sample validation 거래 원장에 기록된 청산 사유를 따릅니다."]
+        cadence = _stock_rule_cadence(config)
+        return [
+            f"{cadence} 재평가 때 보유 순위 밖으로 밀리면 축소 또는 매도합니다.",
+            "새 후보가 기존 보유보다 점수가 높으면 낮은 점수 포지션을 교체합니다.",
+            "매도 사유는 거래 원장의 rebalance_sell/교체 체결로 확인합니다.",
+        ]
     if strategy_id.startswith("smic_mtt_strategy"):
         if not config:
             return ["세부 조건 artifact 없음", "매도 사유는 매매내역과 포지션 기록에서 확인"]
@@ -1901,9 +2014,10 @@ def _sell_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
 def _risk_controls(strategy_id: str, config: dict[str, Any]) -> list[str]:
     if strategy_id.startswith("stock_rule_"):
         return [
-            "IS/OOS 날짜 분리로 lookahead 방지",
-            "OOS 벤치마크 초과 수익률 게이트",
-            "최소 거래 수·위험 지표 게이트",
+            "성과 검증·후보 압축 기준은 내부 품질관리 영역으로 숨기고, 사용자 화면에는 실제 운용 규칙만 노출합니다.",
+            "리포트 발간 전 가격 데이터는 과거 차트 계산에는 존재하더라도 실제 편입 후보로는 쓰지 않습니다.",
+            "같은 수익률 경로를 반복하는 유사 전략은 하나의 대표 전략만 남깁니다.",
+            "체결은 정수 주식 수량, 수수료·세금, RP이자 현금 잔고를 반영합니다.",
         ]
     if strategy_id.startswith("smic_mtt_strategy"):
         if not config:
@@ -1932,8 +2046,20 @@ def _risk_controls(strategy_id: str, config: dict[str, Any]) -> list[str]:
     return ["벤치마크 비교용 기준선"] if strategy_id in BENCHMARK_PERSONA_IDS else []
 
 
-def _strategy_params(config: dict[str, Any]) -> dict[str, Any]:
+def _strategy_params(strategy_id: str, config: dict[str, Any]) -> dict[str, Any]:
     excluded = {"persona_name", "label", "assets"}
+    if strategy_id.startswith("stock_rule_"):
+        public_keys = {
+            "family",
+            "fast_ma_days",
+            "slow_ma_days",
+            "rebalance",
+            "top_pool",
+            "hold_top",
+            "weight_mode",
+            "score_mode",
+        }
+        return {key: value for key, value in config.items() if key in public_keys}
     return {key: value for key, value in config.items() if key not in excluded}
 
 
