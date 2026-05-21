@@ -25467,6 +25467,19 @@
       "open": 8.36999988555908,
       "source_currency": "USD",
       "volume": 1885.0
+    },
+    {
+      "close": 8.449999809265137,
+      "close_krw": 12747.5003,
+      "currency": "USD",
+      "date": "2026-05-21",
+      "display_currency": "USD",
+      "high": 8.729999542236328,
+      "krw_per_unit": 1508.5799560546875,
+      "low": 8.449999809265137,
+      "open": 8.590000152587892,
+      "source_currency": "USD",
+      "volume": 10076.0
     }
   ],
   "symbol": "EAF"

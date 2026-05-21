@@ -1,15 +1,14 @@
 strategy_id,label,kind,final_equity_krw,final_cash_krw,final_holdings_value_krw,money_weighted_return,cagr,max_drawdown,trade_count,open_positions,sharpe,sortino
-all_weather,All-Weather (25/25/25/25),benchmark,229405289.6478,8418819.5835,220986470.0643,0.312,0.1629,0.0946,186.0,4.0,1.1026,1.61
-smic_follower,SMIC Follower (1/N),benchmark,154406833.9053,918.669,154405915.2363,0.1595,0.0802,0.1917,2005.0,38.0,0.4631,0.5953
-smic_follower_v2,SMIC Follower (SL),benchmark,147833052.2717,4268.3134,147828783.9583,0.1428,0.0715,0.1862,1583.0,10.0,0.4361,0.6015
-benchmark_kodex200,KODEX 200 (069500.KS),benchmark,297395113.1638,104293.1638,297290820.0,0.4135,0.2204,0.199,65.0,1.0,0.9489,1.22
-benchmark_qqq,QQQ (NASDAQ-100),benchmark,209043482.701,734336.1971,208309146.504,0.276,0.1429,0.1856,65.0,1.0,0.6536,0.9299
-benchmark_spy,SPY (S&P 500),benchmark,181195000.8378,446242.2994,180748758.5385,0.2209,0.1129,0.1487,65.0,1.0,0.6297,0.8866
-benchmark_gld,GLD (Gold ETF),benchmark,228510033.8857,265826.1849,228244207.7009,0.3105,0.162,0.1483,65.0,1.0,0.8304,1.1632
-weak_oracle,Weak Prophet (3M oracle),oracle,4516220454.7142,4516220454.7142,0.0,1.6809,1.0251,0.2163,2507.0,0.0,3.2382,4.0701
-stock_rule_ma_crossover_ma5_20_m_age0_3650_pool5_hold3_equal_ma_cross,Stock Rule 01: Ma Crossover,strategy,223818652.8599,2007352.8599,221811300.0,0.3025,0.1575,0.4298,284.0,3.0,0.5243,0.8641
-stock_rule_target_gap_reversal_ma10_30_m_age7_120_pool10_hold5_winner_compress_reversal_gap,Stock Rule 03: Target Gap Reversal,strategy,212279852.266,38014052.266,174265800.0,0.282,0.1462,0.3119,228.0,3.0,0.5496,0.7216
-stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool3_hold2_equal_blend,Stock Rule 05: Target Upside Momentum,strategy,190654486.0701,19386.0701,190635100.0,0.2405,0.1235,0.4723,1162.0,2.0,0.4749,0.7386
-stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool3_hold2_equal_dynamic_upside,Stock Rule 06: Target Upside Momentum,strategy,184915539.3501,19589.3501,184895950.0,0.2288,0.1171,0.4385,1343.0,2.0,0.4639,0.7427
-stock_rule_target_gap_reversal_ma10_30_m_age7_120_pool3_hold2_equal_reversal_gap,Stock Rule 02: Target Gap Reversal,strategy,180511108.2116,2287708.2116,178223400.0,0.2195,0.1121,0.4438,131.0,2.0,0.4632,0.634
-stock_rule_ma_crossover_ma10_30_m_age0_3650_pool20_hold10_equal_ma_cross,Stock Rule 04: Ma Crossover,strategy,179278372.5683,19846.0841,179258526.4842,0.2168,0.1107,0.2374,825.0,11.0,0.4792,0.7278
+all_weather,All-Weather (25/25/25/25),benchmark,235300154.6595,8419395.8203,226880758.8392,0.3216,0.1683,0.0946,186.0,4.0,1.1324,1.6564
+smic_follower,SMIC Follower (1/N),benchmark,157197797.6601,1019.0154,157196778.6447,0.1662,0.0838,0.1917,2005.0,38.0,0.4781,0.6149
+smic_follower_v2,SMIC Follower (SL),benchmark,149625764.6951,4268.6056,149621496.0895,0.1473,0.0739,0.1862,1583.0,10.0,0.4468,0.6162
+benchmark_kodex200,KODEX 200 (069500.KS),benchmark,322890680.3023,104300.3023,322786380.0,0.4456,0.2391,0.199,65.0,1.0,1.0031,1.3048
+benchmark_qqq,QQQ (NASDAQ-100),benchmark,210235828.6633,734386.4596,209501442.2037,0.278,0.144,0.1856,65.0,1.0,0.6572,0.936
+benchmark_spy,SPY (S&P 500),benchmark,182009774.697,446272.843,181563501.854,0.2224,0.1138,0.1487,65.0,1.0,0.6333,0.8924
+benchmark_gld,GLD (Gold ETF),benchmark,229806708.2877,265844.3797,229540863.908,0.3124,0.1632,0.1483,65.0,1.0,0.8344,1.1708
+weak_oracle,Weak Prophet (3M oracle),oracle,4518274351.9859,4518274351.9859,0.0,1.6796,1.0246,0.2163,2505.0,0.0,3.2372,4.0675
+stock_rule_ma_crossover_ma5_20_m_age0_3650_pool5_hold3_equal_ma_cross,Stock Rule 01: Ma Crossover,strategy,236651890.2558,2007490.2558,234644400.0,0.3238,0.1695,0.4298,284.0,3.0,0.5441,0.8974
+stock_rule_target_gap_reversal_ma10_30_m_age7_120_pool10_hold5_winner_compress_reversal_gap,Stock Rule 03: Target Gap Reversal,strategy,212222804.186,38016654.186,174206150.0,0.2816,0.1461,0.3119,228.0,3.0,0.5493,0.7209
+stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool3_hold2_equal_blend,Stock Rule 05: Target Upside Momentum,strategy,187483087.397,19387.397,187463700.0,0.2338,0.1199,0.4723,1162.0,2.0,0.4675,0.7275
+stock_rule_ma_crossover_ma10_30_m_age0_3650_pool20_hold10_equal_ma_cross,Stock Rule 04: Ma Crossover,strategy,185638470.6832,19847.4425,185618623.2407,0.23,0.1179,0.2374,825.0,11.0,0.4987,0.758
+stock_rule_target_gap_reversal_ma10_30_m_age7_120_pool3_hold2_equal_reversal_gap,Stock Rule 02: Target Gap Reversal,strategy,183971864.7967,2287864.7967,181684000.0,0.2266,0.116,0.4438,131.0,2.0,0.4724,0.6465

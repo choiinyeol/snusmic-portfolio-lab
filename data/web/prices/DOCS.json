@@ -16016,6 +16016,19 @@
       "open": 19.799999237060547,
       "source_currency": "USD",
       "volume": 229486.0
+    },
+    {
+      "close": 19.3799991607666,
+      "close_krw": 29236.2783,
+      "currency": "USD",
+      "date": "2026-05-21",
+      "display_currency": "USD",
+      "high": 19.860000610351562,
+      "krw_per_unit": 1508.5799560546875,
+      "low": 19.059999465942383,
+      "open": 19.750000000000004,
+      "source_currency": "USD",
+      "volume": 330828.0
     }
   ],
   "symbol": "DOCS"

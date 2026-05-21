@@ -25467,6 +25467,19 @@
       "open": 139.5800018310547,
       "source_currency": "USD",
       "volume": 757109.0
+    },
+    {
+      "close": 145.6399993896484,
+      "close_krw": 219709.5839,
+      "currency": "USD",
+      "date": "2026-05-21",
+      "display_currency": "USD",
+      "high": 146.88000488281253,
+      "krw_per_unit": 1508.5799560546875,
+      "low": 139.125,
+      "open": 139.3000030517578,
+      "source_currency": "USD",
+      "volume": 3242201.0
     }
   ],
   "symbol": "ANET"

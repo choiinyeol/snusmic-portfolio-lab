@@ -25467,6 +25467,19 @@
       "open": 121.33000183105469,
       "source_currency": "USD",
       "volume": 134871.0
+    },
+    {
+      "close": 124.67500305175781,
+      "close_krw": 188082.2106,
+      "currency": "USD",
+      "date": "2026-05-21",
+      "display_currency": "USD",
+      "high": 124.7699966430664,
+      "krw_per_unit": 1508.5799560546875,
+      "low": 122.27999877929686,
+      "open": 123.46499633789062,
+      "source_currency": "USD",
+      "volume": 125376.0
     }
   ],
   "symbol": "ROKU"

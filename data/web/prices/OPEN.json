@@ -19344,6 +19344,19 @@
       "open": 4.320000171661377,
       "source_currency": "USD",
       "volume": 1743309.0
+    },
+    {
+      "close": 4.394999980926514,
+      "close_krw": 6630.2089,
+      "currency": "USD",
+      "date": "2026-05-21",
+      "display_currency": "USD",
+      "high": 4.407800197601318,
+      "krw_per_unit": 1508.5799560546875,
+      "low": 4.260000228881836,
+      "open": 4.400000095367432,
+      "source_currency": "USD",
+      "volume": 5777460.0
     }
   ],
   "symbol": "OPEN"

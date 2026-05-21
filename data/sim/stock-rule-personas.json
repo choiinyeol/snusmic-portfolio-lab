@@ -19,10 +19,10 @@
     "source_search_start": "2021-01-04",
     "source_search_end": "2022-12-31",
     "source_oos_start": "2021-01-04",
-    "source_oos_end": "2026-05-20",
-    "source_oos_total_return": 12.412241487714038,
-    "source_oos_sharpe": 1.161338048640464,
-    "source_oos_sortino": 1.9648834993536695
+    "source_oos_end": "2026-05-21",
+    "source_oos_total_return": 12.85511153293722,
+    "source_oos_sharpe": 1.1785708760572893,
+    "source_oos_sortino": 1.9939669152456774
   },
   {
     "label": "Stock Rule 02: Target Gap Reversal",
@@ -44,10 +44,10 @@
     "source_search_start": "2021-01-04",
     "source_search_end": "2022-12-31",
     "source_oos_start": "2021-01-04",
-    "source_oos_end": "2026-05-20",
+    "source_oos_end": "2026-05-21",
     "source_oos_total_return": 5.357795690950993,
-    "source_oos_sharpe": 1.1348282674633021,
-    "source_oos_sortino": 1.6445456768307327
+    "source_oos_sharpe": 1.1342786795523372,
+    "source_oos_sortino": 1.643164629476531
   },
   {
     "label": "Stock Rule 03: Target Gap Reversal",
@@ -69,10 +69,10 @@
     "source_search_start": "2021-01-04",
     "source_search_end": "2022-12-31",
     "source_oos_start": "2021-01-04",
-    "source_oos_end": "2026-05-20",
+    "source_oos_end": "2026-05-21",
     "source_oos_total_return": 4.525653406328637,
-    "source_oos_sharpe": 1.089262371766204,
-    "source_oos_sortino": 1.5564686514510477
+    "source_oos_sharpe": 1.0887458429406214,
+    "source_oos_sortino": 1.555177097413181
   },
   {
     "label": "Stock Rule 04: Ma Crossover",
@@ -94,10 +94,10 @@
     "source_search_start": "2021-01-04",
     "source_search_end": "2022-12-31",
     "source_oos_start": "2021-01-04",
-    "source_oos_end": "2026-05-20",
-    "source_oos_total_return": 3.6955807448344746,
-    "source_oos_sharpe": 1.0269220860124788,
-    "source_oos_sortino": 1.5100600334133398
+    "source_oos_end": "2026-05-21",
+    "source_oos_total_return": 3.886583202121786,
+    "source_oos_sharpe": 1.0555493907155602,
+    "source_oos_sortino": 1.5537983190367057
   },
   {
     "label": "Stock Rule 05: Target Upside Momentum",
@@ -119,34 +119,9 @@
     "source_search_start": "2021-01-04",
     "source_search_end": "2022-12-31",
     "source_oos_start": "2021-01-04",
-    "source_oos_end": "2026-05-20",
-    "source_oos_total_return": 5.832483800078066,
-    "source_oos_sharpe": 1.0013166701560157,
-    "source_oos_sortino": 1.5758483677678279
-  },
-  {
-    "label": "Stock Rule 06: Target Upside Momentum",
-    "persona_name": "stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool3_hold2_equal_dynamic_upside",
-    "rule_id": "target_upside_momentum_ma10_30_D_age7-120_pool3_hold2_equal_dynamic_upside",
-    "family": "target_upside_momentum",
-    "fast_ma_days": 10,
-    "slow_ma_days": 30,
-    "min_report_age_days": 7,
-    "max_report_age_days": 120,
-    "rebalance": "D",
-    "top_pool": 3,
-    "hold_top": 2,
-    "weight_mode": "equal",
-    "score_mode": "dynamic_upside",
-    "min_dynamic_upside": 0.0,
-    "min_momentum_return": -1.0,
-    "min_pullback_pct": 0.0,
-    "source_search_start": "2021-01-04",
-    "source_search_end": "2022-12-31",
-    "source_oos_start": "2021-01-04",
-    "source_oos_end": "2026-05-20",
-    "source_oos_total_return": 5.125403731022252,
-    "source_oos_sharpe": 0.968621545211826,
-    "source_oos_sortino": 1.5121062007965895
+    "source_oos_end": "2026-05-21",
+    "source_oos_total_return": 5.677385150364641,
+    "source_oos_sharpe": 0.986401544371956,
+    "source_oos_sortino": 1.5536662253327662
   }
 ]

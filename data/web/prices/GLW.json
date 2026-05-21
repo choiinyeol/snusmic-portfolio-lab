@@ -25467,6 +25467,19 @@
       "open": 173.83000183105472,
       "source_currency": "USD",
       "volume": 1048442.0
+    },
+    {
+      "close": 187.92999267578125,
+      "close_krw": 283507.4201,
+      "currency": "USD",
+      "date": "2026-05-21",
+      "display_currency": "USD",
+      "high": 189.5,
+      "krw_per_unit": 1508.5799560546875,
+      "low": 179.5,
+      "open": 182.0,
+      "source_currency": "USD",
+      "volume": 2621202.0
     }
   ],
   "symbol": "GLW"

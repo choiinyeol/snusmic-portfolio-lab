@@ -25467,6 +25467,19 @@
       "open": 81.87999725341797,
       "source_currency": "USD",
       "volume": 29675.0
+    },
+    {
+      "close": 81.52999877929688,
+      "close_krw": 122994.522,
+      "currency": "USD",
+      "date": "2026-05-21",
+      "display_currency": "USD",
+      "high": 82.30999755859375,
+      "krw_per_unit": 1508.5799560546875,
+      "low": 79.70999908447266,
+      "open": 81.80999755859374,
+      "source_currency": "USD",
+      "volume": 103996.0
     }
   ],
   "symbol": "STNG"

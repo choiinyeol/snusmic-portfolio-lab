@@ -25467,6 +25467,19 @@
       "open": 989.510009765625,
       "source_currency": "USD",
       "volume": 410430.0
+    },
+    {
+      "close": 1029.25,
+      "close_krw": 1552705.9198,
+      "currency": "USD",
+      "date": "2026-05-21",
+      "display_currency": "USD",
+      "high": 1036.5179443359375,
+      "krw_per_unit": 1508.5799560546875,
+      "low": 1022.0,
+      "open": 1024.300048828125,
+      "source_currency": "USD",
+      "volume": 641306.0
     }
   ],
   "symbol": "LLY"

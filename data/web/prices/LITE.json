@@ -25467,6 +25467,19 @@
       "open": 917.0100097656251,
       "source_currency": "USD",
       "volume": 740600.0
+    },
+    {
+      "close": 940.1049804687499,
+      "close_krw": 1418223.5301,
+      "currency": "USD",
+      "date": "2026-05-21",
+      "display_currency": "USD",
+      "high": 951.4000244140625,
+      "krw_per_unit": 1508.5799560546875,
+      "low": 859.0,
+      "open": 872.0499877929688,
+      "source_currency": "USD",
+      "volume": 2305323.0
     }
   ],
   "symbol": "LITE"
