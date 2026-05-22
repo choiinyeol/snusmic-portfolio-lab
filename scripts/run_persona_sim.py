@@ -29,7 +29,12 @@ import json  # noqa: E402
 import pandas as pd  # noqa: E402
 
 from snusmic_pipeline.sim.broker_strategy_search import find_top_broker_strategy_configs  # noqa: E402
-from snusmic_pipeline.sim.contracts import SimulationConfig, StockRulePersonaConfig  # noqa: E402
+from snusmic_pipeline.sim.contracts import (  # noqa: E402
+    PitResearchBoardConfig,
+    SimulationConfig,
+    SmicMttStrategyConfig,
+    StockRulePersonaConfig,
+)
 from snusmic_pipeline.sim.runner import run_simulation  # noqa: E402
 from snusmic_pipeline.sim.visualize import (  # noqa: E402
     plot_drawdowns,
@@ -39,6 +44,7 @@ from snusmic_pipeline.sim.visualize import (  # noqa: E402
 )
 
 ROUND_NDIGITS = 4
+EXPERIMENTAL_PIT_ALPHA_PREFIX = "pit_research_board_alpha_"
 
 
 def _to_csv_rounded(df: pd.DataFrame, path: Path) -> None:
@@ -117,6 +123,16 @@ def parse_args() -> argparse.Namespace:
         default=int(os.environ.get("SMIC_BROKER_STRATEGY_SEED", "42")),
     )
     parser.add_argument(
+        "--broker-strategy-personas",
+        type=Path,
+        default=None,
+        help=(
+            "Optional JSON artifact containing SmicMttStrategyConfig rows to include "
+            "instead of rerunning Optuna broker-ledger search. Accepts a plain list or "
+            "persona-configs.json."
+        ),
+    )
+    parser.add_argument(
         "--broker-strategy-train-start",
         type=str,
         default=os.environ.get("SMIC_BROKER_STRATEGY_TRAIN_START", "2021-01-01"),
@@ -132,6 +148,12 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Optional JSON list of OOS-admitted StockRulePersonaConfig rows to include.",
     )
+    parser.add_argument(
+        "--pit-research-board-personas",
+        type=Path,
+        default=None,
+        help="Optional JSON list of admitted PIT research-board persona configs to include.",
+    )
     return parser.parse_args()
 
 
@@ -143,7 +165,11 @@ def main() -> int:
         start_date=date.fromisoformat(args.start),
         end_date=date.fromisoformat(args.end),
     )
-    if not args.disable_broker_strategy_search:
+    if args.broker_strategy_personas is not None:
+        broker_strategy_configs = _load_broker_strategy_personas(args.broker_strategy_personas)
+        if broker_strategy_configs:
+            config = config.model_copy(update={"personas": (*config.personas, *broker_strategy_configs)})
+    elif not args.disable_broker_strategy_search:
         print(
             "Searching broker-ledger SMIC MTT strategies with Optuna "
             f"({args.broker_strategy_trials} evaluations, promotion limit {args.broker_strategy_top})"
@@ -192,6 +218,12 @@ def main() -> int:
         stock_rule_configs = _load_stock_rule_personas(stock_rule_path)
         if stock_rule_configs:
             config = config.model_copy(update={"personas": (*config.personas, *stock_rule_configs)})
+
+    pit_rule_path = args.pit_research_board_personas or (out / "pit-research-board-personas.json")
+    if pit_rule_path.exists():
+        pit_rule_configs = _load_pit_research_board_personas(pit_rule_path)
+        if pit_rule_configs:
+            config = config.model_copy(update={"personas": (*config.personas, *pit_rule_configs)})
 
     print(f"Running simulation {config.start_date} → {config.end_date}")
     print(f"  warehouse: {args.warehouse}")
@@ -279,7 +311,7 @@ def main() -> int:
         )
         if rs.avg_days_to_target is not None:
             print(f"  days to target: avg={rs.avg_days_to_target:.0f}  median={rs.median_days_to_target:.0f}")
-        if rs.avg_current_return is not None:
+        if rs.avg_current_return is not None and rs.median_current_return is not None:
             print(
                 f"  realised return so far: avg={rs.avg_current_return * 100:+.1f}%  "
                 f"median={rs.median_current_return * 100:+.1f}%"
@@ -318,6 +350,28 @@ def _load_stock_rule_personas(path: Path) -> tuple[StockRulePersonaConfig, ...]:
     if not isinstance(data, list):
         raise ValueError(f"{path} must be a JSON list of stock-rule persona configs")
     return tuple(StockRulePersonaConfig.model_validate(row) for row in data)
+
+
+def _load_broker_strategy_personas(path: Path) -> tuple[SmicMttStrategyConfig, ...]:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    rows = data.get("personas") if isinstance(data, dict) else data
+    if not isinstance(rows, list):
+        raise ValueError(f"{path} must be a JSON list or persona-configs artifact")
+    return tuple(
+        SmicMttStrategyConfig.model_validate(row)
+        for row in rows
+        if isinstance(row, dict) and str(row.get("persona_name", "")).startswith("smic_mtt_strategy")
+    )
+
+
+def _load_pit_research_board_personas(path: Path) -> tuple[PitResearchBoardConfig, ...]:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, list):
+        raise ValueError(f"{path} must be a JSON list of PIT research-board persona configs")
+    configs = tuple(PitResearchBoardConfig.model_validate(row) for row in data)
+    return tuple(
+        config for config in configs if not config.persona_name.startswith(EXPERIMENTAL_PIT_ALPHA_PREFIX)
+    )
 
 
 if __name__ == "__main__":

@@ -347,6 +347,7 @@ class StockRulePersonaConfig(_PersonaBase):
     min_dynamic_upside: float = 0.0
     min_momentum_return: float = -1.0
     min_pullback_pct: float = 0.0
+    coverage_failure_trading_days: Annotated[int, Field(ge=0, le=5000)] = 0
     source_search_start: date | None = None
     source_search_end: date | None = None
     source_oos_start: date | None = None
@@ -378,14 +379,42 @@ class PitResearchBoardConfig(_PersonaBase):
     label: str
     top_n: Annotated[int, Field(ge=1, le=50)] = 10
     rebalance: Literal["D", "W", "M"] = "M"
-    score_mode: Literal["candidate_score", "board_score"] = "board_score"
+    score_mode: Literal["candidate_score", "board_score", "ta_momentum_score"] = "board_score"
     weight_mode: Literal["equal", "score_proportional", "winner_compress"] = "equal"
     universe: Literal["all", "domestic", "overseas"] = "all"
+    min_report_age_days: Annotated[int, Field(ge=0, le=3650)] = 0
     max_report_age_days: Annotated[int, Field(ge=30, le=3650)] = 730
     min_score: Annotated[float, Field(ge=0.0, le=100.0)] = 0.0
     bucket_filter: Literal["all", "fresh", "large-upside", "near-target", "active"] = "all"
     require_ma_stack: bool = False
     require_near_52w_high: bool = False
+    min_target_upside_at_pub: Annotated[float, Field(ge=0.0, le=10.0)] = 0.0
+    max_target_upside_at_pub: Annotated[float, Field(gt=0.0, le=20.0)] = 20.0
+    min_current_return: Annotated[float, Field(ge=-1.0, le=20.0)] = -1.0
+    max_current_return: Annotated[float, Field(ge=-1.0, le=20.0)] = 20.0
+    min_return_1m: Annotated[float, Field(ge=-1.0, le=20.0)] = -1.0
+    min_return_3m: Annotated[float, Field(ge=-1.0, le=20.0)] = -1.0
+    min_return_6m: Annotated[float, Field(ge=-1.0, le=20.0)] = -1.0
+    min_return_1y: Annotated[float, Field(ge=-1.0, le=20.0)] = -1.0
+    min_distance_from_52w_high: Annotated[float, Field(ge=-1.0, le=0.0)] = -1.0
+    require_ema_stack: bool = False
+    require_macd_bullish: bool = False
+    target_hit_multiplier: Annotated[float, Field(gt=0.0, le=2.0)] = 1.0
+    stop_loss_pct: Annotated[float, Field(ge=0.0, lt=1.0)] = 0.0
+    take_profit_pct: Annotated[float, Field(ge=0.0, le=10.0)] = 0.0
+    max_holding_days: Annotated[int, Field(ge=0, le=3650)] = 0
+    hold_target_winners: bool = False
+    target_winner_trailing_stop_pct: Annotated[float, Field(ge=0.0, lt=1.0)] = 0.0
+
+    @model_validator(mode="after")
+    def _check_alpha_rule_bounds(self) -> PitResearchBoardConfig:
+        if self.max_report_age_days < self.min_report_age_days:
+            raise ValueError("max_report_age_days must be >= min_report_age_days")
+        if self.max_target_upside_at_pub <= self.min_target_upside_at_pub:
+            raise ValueError("max_target_upside_at_pub must exceed min_target_upside_at_pub")
+        if self.max_current_return < self.min_current_return:
+            raise ValueError("max_current_return must be >= min_current_return")
+        return self
 
 
 PersonaConfig = (

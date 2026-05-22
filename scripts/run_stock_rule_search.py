@@ -36,6 +36,7 @@ from snusmic_pipeline.sim.stock_admission import (  # noqa: E402
 )
 
 ValidationMode = Literal["oos", "full_sample"]
+_COVERAGE_POOL_REPRESENTATIVE_FAMILIES = ("price_momentum", "ma_crossover")
 from snusmic_pipeline.sim.stock_rule_search import (  # noqa: E402
     admit_oos,
     default_stock_rule_configs,
@@ -60,7 +61,7 @@ def _json_safe(value: Any) -> Any:
 def _write_rows(frame: pd.DataFrame, csv_path: Path, json_path: Path) -> None:
     csv_path.parent.mkdir(parents=True, exist_ok=True)
     frame.to_csv(csv_path, index=False)
-    rows = [_json_safe(row) for row in frame.to_dict("records")]
+    rows = [_json_safe(row) for row in cast(list[dict[str, Any]], frame.to_dict("records"))]
     json_path.write_text(json.dumps(rows, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
@@ -69,14 +70,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--warehouse", type=Path, default=ROOT / "data" / "warehouse")
     parser.add_argument("--is-start", type=str, default="2021-01-04")
     parser.add_argument("--is-end", type=str, default="2022-12-31")
-    parser.add_argument("--validation-mode", choices=("full_sample", "oos"), default="full_sample")
+    parser.add_argument("--validation-mode", choices=("full_sample", "oos"), default="oos")
     parser.add_argument(
         "--full-start", type=str, default=None, help="Full-sample replay start; defaults to --is-start"
     )
     parser.add_argument(
         "--full-end", type=str, default=None, help="Full-sample replay end; defaults to --oos-end"
     )
-    parser.add_argument("--oos-start", type=str, default="2024-01-02")
+    parser.add_argument("--oos-start", type=str, default="2023-01-02")
     parser.add_argument("--oos-end", type=str, default=date.today().isoformat())
     parser.add_argument("--out", type=Path, default=ROOT / ".omx" / "quant-insights" / "stock-rule-search")
     parser.add_argument("--is-top", type=int, default=75)
@@ -99,9 +100,15 @@ def parse_args() -> argparse.Namespace:
         default=0.95,
         help="Greedy diversity gate: keep only the best rule when validation return correlation is >= this value; 0 disables.",
     )
-    parser.add_argument("--goal-min-sharpe", type=float, default=1.5)
-    parser.add_argument("--goal-min-sortino", type=float, default=1.5)
-    parser.add_argument("--goal-min-return", type=float, default=5.0)
+    parser.add_argument("--goal-min-sharpe", type=float, default=0.7)
+    parser.add_argument("--goal-min-sortino", type=float, default=0.7)
+    parser.add_argument("--goal-min-return", type=float, default=2.0)
+    parser.add_argument(
+        "--goal-max-drawdown",
+        type=float,
+        default=0.65,
+        help="Maximum validation drawdown for persona materialization; <=0 disables the deployability gate.",
+    )
     return parser.parse_args()
 
 
@@ -158,6 +165,7 @@ def main() -> int:
         min_sharpe=args.goal_min_sharpe,
         min_sortino=args.goal_min_sortino,
         min_return=args.goal_min_return,
+        max_drawdown=args.goal_max_drawdown,
         max_correlation=args.max_correlation,
     )
 
@@ -186,6 +194,7 @@ def main() -> int:
         min_sharpe=args.goal_min_sharpe,
         min_sortino=args.goal_min_sortino,
         min_return=args.goal_min_return,
+        max_drawdown=args.goal_max_drawdown,
     )
     (out / "stock-rule-personas.json").write_text(
         json.dumps(
@@ -222,8 +231,9 @@ def main() -> int:
         "methodology": (
             "Stock-level report rules rank individual symbols from report/price data available at "
             "rebalance close, shift holdings one trading day, then replay frozen rules on the configured "
-            "validation window. Current default is IS ranking -> Full Sample validation, with correlated "
-            "return paths compressed to the best-scoring persona."
+            "validation window. Current default is IS ranking -> later OOS validation, with correlated "
+            "return paths compressed to the best-scoring persona and high-drawdown candidates filtered "
+            "before persona materialization."
         ),
     }
     (out / "summary.json").write_text(
@@ -249,17 +259,24 @@ def _apply_diversity_gate(
     min_sharpe: float,
     min_sortino: float,
     min_return: float,
+    max_drawdown: float,
     max_correlation: float,
 ) -> tuple[pd.DataFrame, list[dict[str, Any]], dict[str, Any]]:
     if frame.empty:
         return frame, [], {"enabled": max_correlation > 0, "selected_count": 0, "rejected_count": 0}
 
-    rows = frame.to_dict("records")
+    rows = cast(list[dict[str, Any]], frame.to_dict("records"))
     eligible = [
         row
         for row in rows
         if bool(row.get("accepted"))
-        and _passes_goal(row, min_sharpe=min_sharpe, min_sortino=min_sortino, min_return=min_return)
+        and _passes_goal(
+            row,
+            min_sharpe=min_sharpe,
+            min_sortino=min_sortino,
+            min_return=min_return,
+            max_drawdown=max_drawdown,
+        )
     ]
     eligible.sort(key=_goal_sort_key, reverse=True)
 
@@ -298,6 +315,14 @@ def _apply_diversity_gate(
         if persona_top > 0 and len(selected) >= persona_top:
             break
 
+    representative_ids = _append_coverage_pool_representatives(
+        eligible,
+        persona_top=persona_top,
+        selected=selected,
+        selected_meta=selected_meta,
+        rejected_meta=rejected_meta,
+    )
+
     meta_by_rule = {**rejected_meta, **selected_meta}
     updated = frame.copy()
     updated["diversity_status"] = [
@@ -315,13 +340,83 @@ def _apply_diversity_gate(
     summary = {
         "enabled": max_correlation > 0,
         "max_correlation": max_correlation,
+        "max_drawdown": max_drawdown,
         "eligible_count": len(eligible),
         "selected_count": len(selected),
         "correlation_rejected_count": len(rejected_meta),
         "selected_rule_ids": [str(row.get("rule_id") or "") for row in selected],
         "correlation_rejected_rule_ids": sorted(rejected_meta),
+        "coverage_pool_representative_rule_ids": representative_ids,
     }
     return updated, selected, summary
+
+
+def _append_coverage_pool_representatives(
+    eligible: list[dict[str, Any]],
+    *,
+    persona_top: int,
+    selected: list[dict[str, Any]],
+    selected_meta: dict[str, dict[str, Any]],
+    rejected_meta: dict[str, dict[str, Any]],
+) -> list[str]:
+    """Keep one semi-permanent coverage-pool price/MA rule visible as a portfolio.
+
+    The diversity gate can correctly mark price-only coverage-pool rules as
+    behaviorally redundant versus report-upside rules.  For product review we
+    still want one representative of the user's pool -> candidate -> buy idea
+    materialized as an actual ledger persona.
+    """
+
+    selected_ids = {str(row.get("rule_id") or "") for row in selected}
+    selected_families = {str(row.get("family") or "") for row in selected}
+    added: list[str] = []
+    for family in _COVERAGE_POOL_REPRESENTATIVE_FAMILIES:
+        if family in selected_families:
+            continue
+        candidates = [row for row in eligible if str(row.get("family") or "") == family]
+        if not candidates:
+            continue
+        candidates.sort(
+            key=lambda row: (
+                float(row.get("oos_total_return") or 0.0),
+                float(row.get("oos_annualized_sharpe") or 0.0),
+                float(row.get("oos_annualized_sortino") or 0.0),
+                str(row.get("rule_id") or ""),
+            ),
+            reverse=True,
+        )
+        row = candidates[0]
+        rule_id = str(row.get("rule_id") or "")
+        if rule_id in selected_ids:
+            continue
+        if persona_top > 0 and len(selected) >= persona_top:
+            replace_idx = _coverage_replacement_index(selected)
+            if replace_idx is None:
+                break
+            replaced = selected.pop(replace_idx)
+            replaced_id = str(replaced.get("rule_id") or "")
+            selected_ids.discard(replaced_id)
+            selected_families.discard(str(replaced.get("family") or ""))
+            selected_meta.pop(replaced_id, None)
+        selected.append(row)
+        selected_ids.add(rule_id)
+        selected_families.add(family)
+        rejected_meta.pop(rule_id, None)
+        selected_meta[rule_id] = {
+            "diversity_status": "coverage_pool_representative",
+            "diversity_correlated_with_rule_id": None,
+            "diversity_max_correlation": None,
+        }
+        added.append(rule_id)
+    return added
+
+
+def _coverage_replacement_index(selected: list[dict[str, Any]]) -> int | None:
+    for idx in range(len(selected) - 1, -1, -1):
+        family = str(selected[idx].get("family") or "")
+        if family not in _COVERAGE_POOL_REPRESENTATIVE_FAMILIES:
+            return idx
+    return None
 
 
 def _goal_sort_key(row: dict[str, Any]) -> tuple[float, float, float, str]:
@@ -364,14 +459,21 @@ def _goal_rows(
     min_sharpe: float,
     min_sortino: float,
     min_return: float,
+    max_drawdown: float,
 ) -> list[dict[str, Any]]:
     if frame.empty:
         return []
     rows = [
         row
-        for row in frame.to_dict("records")
+        for row in cast(list[dict[str, Any]], frame.to_dict("records"))
         if bool(row.get("accepted"))
-        and _passes_goal(row, min_sharpe=min_sharpe, min_sortino=min_sortino, min_return=min_return)
+        and _passes_goal(
+            row,
+            min_sharpe=min_sharpe,
+            min_sortino=min_sortino,
+            min_return=min_return,
+            max_drawdown=max_drawdown,
+        )
     ]
     rows.sort(
         key=lambda row: (
@@ -391,12 +493,15 @@ def _passes_goal(
     min_sharpe: float,
     min_sortino: float,
     min_return: float,
+    max_drawdown: float,
 ) -> bool:
-    return (
+    risk_ok = max_drawdown <= 0 or abs(float(row.get("oos_max_drawdown") or 0.0)) <= max_drawdown
+    quality_ok = (
         float(row.get("oos_annualized_sharpe") or 0.0) >= min_sharpe
         or float(row.get("oos_annualized_sortino") or 0.0) >= min_sortino
         or float(row.get("oos_total_return") or 0.0) >= min_return
     )
+    return risk_ok and quality_ok
 
 
 def _stock_persona_configs(
@@ -429,6 +534,7 @@ def _stock_persona_configs(
                 min_dynamic_upside=float(row.get("min_dynamic_upside") or 0.0),
                 min_momentum_return=float(row.get("min_momentum_return") or -1.0),
                 min_pullback_pct=float(row.get("min_pullback_pct") or 0.0),
+                coverage_failure_trading_days=int(row.get("coverage_failure_trading_days") or 0),
                 source_search_start=search_start,
                 source_search_end=search_end,
                 source_oos_start=oos_start,
@@ -455,6 +561,7 @@ def _stock_admission_artifact(
     min_sharpe: float,
     min_sortino: float,
     min_return: float,
+    max_drawdown: float,
 ) -> StockAdmissionArtifact:
     window = StockAdmissionWindow(
         search_start=search_start,
@@ -464,10 +571,16 @@ def _stock_admission_artifact(
         validation_mode=validation_mode,
     )
     decisions: list[StockAdmissionDecision] = []
-    for row in frame.to_dict("records"):
+    for row in cast(list[dict[str, Any]], frame.to_dict("records")):
         rule_id = str(row["rule_id"])
         selected = rule_id in selected_rule_ids
-        passes_goal = _passes_goal(row, min_sharpe=min_sharpe, min_sortino=min_sortino, min_return=min_return)
+        passes_goal = _passes_goal(
+            row,
+            min_sharpe=min_sharpe,
+            min_sortino=min_sortino,
+            min_return=min_return,
+            max_drawdown=max_drawdown,
+        )
         status = cast(
             StockAdmissionStatus,
             "accepted" if selected else _artifact_status(row, passes_goal=passes_goal),
@@ -498,6 +611,7 @@ def _stock_admission_artifact(
                     "min_dynamic_upside",
                     "min_momentum_return",
                     "min_pullback_pct",
+                    "coverage_failure_trading_days",
                 )
             ),
             in_sample_metrics=_metrics(row, "is"),
@@ -527,7 +641,14 @@ def _stock_admission_artifact(
                 if validation_mode == "full_sample"
                 else "admit_oos replays frozen IS finalists on the later OOS window"
             ),
-            "portfolio personas are materialized only when validation Sharpe >= 1.5, Sortino >= 1.5, or return >= 500%",
+            (
+                "portfolio personas are materialized only when validation "
+                f"Sharpe >= {min_sharpe:g}, Sortino >= {min_sortino:g}, or return >= {min_return:.0%}"
+            ),
+            (
+                "persona materialization also requires validation max drawdown "
+                f"<= {max_drawdown:.0%} unless that gate is disabled"
+            ),
             "highly correlated validation return paths keep only the best-scoring strategy; default correlation threshold is 0.95",
         ),
     )
@@ -572,15 +693,19 @@ def _artifact_reasons(row: dict[str, Any]) -> list[StockAdmissionReason]:
 
 
 def _artifact_family(family: str) -> StockRuleFamily:
-    mapping: dict[str, StockRuleFamily] = {
-        "target_upside_momentum": "relative_strength",
-        "fresh_report_momentum": "mtt",
-        "target_gap_reversal": "rsi_reversal",
-        "price_momentum": "relative_strength",
-        "ma_crossover": "ma_crossover",
-        "rsi_reversal": "rsi_reversal",
+    known_families: set[StockRuleFamily] = {
+        "report_upside",
+        "mtt",
+        "rsi_reversal",
+        "ma_crossover",
+        "atr_breakout",
+        "relative_strength",
+        "target_upside_momentum",
+        "fresh_report_momentum",
+        "target_gap_reversal",
+        "price_momentum",
     }
-    return mapping.get(family, "relative_strength")
+    return cast(StockRuleFamily, family) if family in known_families else "relative_strength"
 
 
 def _representative_symbol(row: dict[str, Any]) -> str:

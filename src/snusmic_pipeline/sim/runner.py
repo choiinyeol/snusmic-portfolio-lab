@@ -45,7 +45,7 @@ from .personas import (
     simulate_stock_rule_persona,
     simulate_weak_prophet,
 )
-from .pit_research_board import simulate_pit_research_board
+from .pit_research_board import PitResearchBoardCache, simulate_pit_research_board
 from .report_stats import aggregate_report_stats, compute_report_performance
 from .savings import build_cash_flow_schedule
 from .target_adjustment import align_report_targets_to_market_scale
@@ -89,9 +89,26 @@ def run_simulation(
             refresh=refresh_benchmark,
         )
 
+    pit_board_cache = (
+        PitResearchBoardCache(reports, board)
+        if any(isinstance(persona, PitResearchBoardConfig) for persona in config.personas)
+        else None
+    )
+
     outputs: list[PersonaRunOutput] = []
     for persona in config.personas:
-        outputs.append(_dispatch(persona, config, board, benchmark_board, reports, cashflows, trading_dates))
+        outputs.append(
+            _dispatch(
+                persona,
+                config,
+                board,
+                benchmark_board,
+                reports,
+                cashflows,
+                trading_dates,
+                pit_board_cache,
+            )
+        )
 
     summaries = tuple(o.summary for o in outputs)
     equity_points = tuple(p for o in outputs for p in o.equity_points)
@@ -194,6 +211,7 @@ def _dispatch(
     reports: pd.DataFrame,
     cashflows,
     trading_dates: list[date],
+    pit_board_cache: PitResearchBoardCache | None,
 ) -> PersonaRunOutput:
     if isinstance(persona, ProphetConfig):
         return simulate_prophet(
@@ -264,6 +282,7 @@ def _dispatch(
             reports,
             cashflows,
             trading_dates,
+            row_cache=pit_board_cache,
         )
     if isinstance(persona, AllWeatherConfig):
         if benchmark_board is None or benchmark_board.is_empty:

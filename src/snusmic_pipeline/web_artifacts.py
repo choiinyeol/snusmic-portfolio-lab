@@ -1599,7 +1599,7 @@ def _pit_research_board_admission_summary(frame: pd.DataFrame | None) -> dict[st
         )[:12],
         "notes": [
             "PIT research-board 후보는 현재 리서치보드 최신값을 재사용하지 않고 판단일별 보드를 재구성합니다.",
-            "벤치마크보다 낮은 후보는 포트폴리오 catalog에 노출하지 않습니다.",
+            "벤치마크 대비 성과는 감사 지표로 남기되, 현재 승격은 절대 성과와 상관 압축 게이트로 결정합니다.",
         ],
     }
 
@@ -1618,7 +1618,14 @@ def _pit_research_board_admission_rows(frame: pd.DataFrame | None) -> list[dict[
         "min_score",
         "bucket_filter",
         "require_ma_stack",
+        "require_ema_stack",
+        "require_macd_bullish",
         "require_near_52w_high",
+        "min_return_1m",
+        "min_return_3m",
+        "min_return_6m",
+        "min_return_1y",
+        "min_distance_from_52w_high",
     }
     for raw in _records(frame):
         config = {
@@ -1667,9 +1674,17 @@ def _stock_admission_summary(artifact: dict[str, Any] | None) -> dict[str, Any] 
         else:
             rejected.append(row)
 
+    window = artifact.get("window") if isinstance(artifact.get("window"), dict) else {}
+    validation_mode = str(window.get("validation_mode") or "oos")
+    validation_note = (
+        "현재 기본값은 IS 랭킹 후 이후 OOS 검증이며, 높은 상관의 전략끼리는 최고 점수 1개만 남깁니다."
+        if validation_mode == "oos"
+        else "현재 설정은 IS 랭킹 후 지정된 validation 구간으로 검증하며, 높은 상관의 전략끼리는 최고 점수 1개만 남깁니다."
+    )
+
     return {
         "schema_version": str(artifact.get("schema_version") or "1.0.0"),
-        "window": artifact.get("window"),
+        "window": window,
         "benchmark_persona": artifact.get("benchmark_persona"),
         "methodology": artifact.get("methodology") or [],
         "decision_count": len(decisions),
@@ -1684,7 +1699,7 @@ def _stock_admission_summary(artifact: dict[str, Any] | None) -> dict[str, Any] 
         )[:12],
         "notes": [
             "stock admission은 search_is 구간에서 발견한 개별 종목 규칙을 설정된 validation 구간으로 검증합니다.",
-            "현재 기본값은 IS 랭킹 후 Full Sample 검증이며, 높은 상관의 전략끼리는 최고 점수 1개만 남깁니다.",
+            validation_note,
             "이 블록은 meta-quant 조합 후보가 아니라 실제 종목 단위 입장 근거입니다.",
         ],
     }
@@ -1850,8 +1865,10 @@ def _strategy_display_label(strategy_id: str, config: dict[str, Any], fallback: 
         return fallback if fallback != strategy_id else f"Stock Rule: {family}"
     if strategy_id.startswith("pit_research_board_"):
         top_n = int(config.get("top_n") or 0)
-        mode = "종합점수" if config.get("score_mode") == "board_score" else "업사이드 후보점수"
+        mode = _pit_research_board_score_label(config, short=True)
         suffix = f" Top {top_n}" if top_n else ""
+        if config.get("score_mode") == "ta_momentum_score":
+            return f"PIT 리서치보드 TA 모멘텀{suffix}"
         if config.get("require_ma_stack"):
             return f"PIT 리서치보드 정배열{suffix}"
         if config.get("require_near_52w_high"):
@@ -1897,12 +1914,23 @@ def _methodology_summary(strategy_id: str, config: dict[str, Any]) -> str:
     if strategy_id.startswith("pit_research_board_"):
         top_n = int(config.get("top_n") or 0)
         cadence = _pit_research_board_cadence(config)
-        score = (
-            "리서치보드 종합점수" if config.get("score_mode") == "board_score" else "목표가 업사이드 후보점수"
-        )
+        score = _pit_research_board_score_label(config)
+        exits = []
+        if float(config.get("stop_loss_pct") or 0) > 0:
+            exits.append(f"손절 {_pct(config.get('stop_loss_pct'))}")
+        if float(config.get("take_profit_pct") or 0) > 0:
+            exits.append(f"익절 {_pct(config.get('take_profit_pct'))}")
+        if int(config.get("max_holding_days") or 0) > 0:
+            exits.append(f"최대 보유 {int(config.get('max_holding_days') or 0)}일")
+        if config.get("hold_target_winners"):
+            exits.append("목표가 도달 후 winner pool 보유")
+            if float(config.get("target_winner_trailing_stop_pct") or 0) > 0:
+                exits.append(f"winner trailing stop {_pct(config.get('target_winner_trailing_stop_pct'))}")
+        exit_text = f" 매도는 {' · '.join(exits)} 조건을 추가로 적용합니다." if exits else ""
         return (
             f"{cadence}마다 그 날짜에 이미 발간된 리포트와 그 날짜까지의 가격만으로 리서치보드를 다시 만듭니다. "
             f"목표가 미도달·미만료 종목을 {score}로 정렬해 상위 {top_n}개를 다음 거래일 실제 주식 수량으로 편입합니다."
+            f"{exit_text}"
         )
     return "시뮬레이션에 포함된 전략입니다."
 
@@ -1926,20 +1954,24 @@ def _stock_rule_plain_summary(config: dict[str, Any]) -> str:
     top_pool = int(config.get("top_pool") or 0)
     cadence = _stock_rule_cadence(config)
     weighting = _stock_rule_weighting(config)
+    coverage = _stock_rule_coverage_text(config)
     if family == "ma_crossover":
         return (
             f"리포트가 발간되어 투자 가능 종목으로 등록된 뒤에만 {cadence} 가격 추세를 재평가합니다. "
+            f"{coverage} "
             f"{fast}일 이동평균이 {slow}일 이동평균 위에 있는 종목만 후보로 삼습니다. "
             f"후보를 단기 추세 강도 순으로 정렬해 상위 {top_pool}개를 압축하고, 실제로는 {hold_top}개만 {weighting}으로 보유합니다."
         )
     if family == "price_momentum":
         return (
             f"리포트 발간 이후 투자 가능 universe에 들어온 종목만 대상으로 {cadence} 최근 가격 모멘텀을 순위화합니다. "
+            f"{coverage} "
             f"상위 {top_pool}개 후보 중 {hold_top}개만 {weighting}으로 보유하고, 다음 재평가 때 더 강한 종목으로 교체합니다."
         )
     if family == "rsi_reversal":
         return (
             f"리포트 발간 이후 투자 가능 종목으로 등록된 뒤에만 {cadence} 과매도 후 반등 가능성이 있는 종목을 찾습니다. "
+            f"{coverage} "
             f"RSI가 낮고 장기 추세가 완전히 깨지지 않은 후보 중 {hold_top}개만 보유합니다."
         )
     if family == "target_upside_momentum":
@@ -1968,8 +2000,14 @@ def _stock_rule_buy_rules(config: dict[str, Any]) -> list[str]:
     hold_top = int(config.get("hold_top") or 0)
     cadence = _stock_rule_cadence(config)
     weighting = _stock_rule_weighting(config)
+    coverage_failure_days = int(config.get("coverage_failure_trading_days") or 0)
+    coverage_rule = (
+        f"최신 리포트 발간 후 {coverage_failure_days}거래일 안에 목표가를 터치하지 못하면 coverage pool에서 제외합니다."
+        if coverage_failure_days > 0
+        else None
+    )
     if family == "ma_crossover":
-        return [
+        rules = [
             "첫 리포트 발간 전에는 아무리 가격 조건이 좋아도 후보에 넣지 않습니다.",
             f"{cadence} 종가 기준으로 {fast}일선과 {slow}일선을 다시 계산합니다.",
             f"{fast}일선이 {slow}일선보다 높고, 현재가가 {slow}일선 위인 종목만 후보가 됩니다.",
@@ -1977,50 +2015,75 @@ def _stock_rule_buy_rules(config: dict[str, Any]) -> list[str]:
             f"상위 {top_pool}개 후보를 검토하되 실제 보유는 {hold_top}개로 제한합니다.",
             f"비중은 {weighting}으로 배분합니다.",
         ]
+        if coverage_rule:
+            rules.insert(1, coverage_rule)
+        return rules
     if family == "price_momentum":
-        return [
+        rules = [
             "첫 리포트 발간 전에는 해당 종목을 투자 가능 universe에 넣지 않습니다.",
             f"{cadence} 최근 {slow}일 가격 모멘텀을 계산합니다.",
             f"현재가가 {slow}일선 위에 있고 {fast}일선이 {slow}일선보다 높은 종목만 후보가 됩니다.",
             f"가격 모멘텀 점수가 높은 상위 {top_pool}개 중 {hold_top}개를 보유합니다.",
             f"비중은 {weighting}으로 배분합니다.",
         ]
+        if coverage_rule:
+            rules.insert(1, coverage_rule)
+        return rules
     if family == "rsi_reversal":
-        return [
+        rules = [
             "첫 리포트 발간 전에는 해당 종목을 후보로 보지 않습니다.",
             f"{cadence} RSI가 낮아진 과매도 후보를 찾습니다.",
             f"현재가가 {slow}일선의 90% 이상을 유지하는 종목만 후보가 됩니다.",
             f"후보 중 반등 점수가 높은 {hold_top}개를 보유합니다.",
         ]
+        if coverage_rule:
+            rules.insert(1, coverage_rule)
+        return rules
     if family == "target_upside_momentum":
-        return [
+        rules = [
             "첫 리포트 발간 전에는 해당 종목을 후보로 보지 않습니다.",
             f"{cadence} 목표가 대비 현재가의 남은 상승여력을 다시 계산합니다.",
             f"{fast}일선이 {slow}일선 위에 있고 현재가가 {slow}일선 위인 종목만 후보가 됩니다.",
             "목표가 상승여력과 가격 모멘텀을 섞은 점수로 후보를 정렬합니다.",
             f"상위 {top_pool}개 후보 중 {hold_top}개만 보유합니다.",
         ]
+        if coverage_rule:
+            rules.insert(1, coverage_rule)
+        return rules
     if family == "fresh_report_momentum":
-        return [
+        rules = [
             "첫 리포트 발간 전에는 해당 종목을 후보로 보지 않습니다.",
             f"발간 후 {int(config.get('max_report_age_days') or 0)}일 이내의 리포트만 신선한 후보로 봅니다.",
             f"{fast}일선이 {slow}일선 위에 있고 최근 모멘텀이 양수인 종목만 후보가 됩니다.",
             "목표가 상승여력과 최근 가격 모멘텀을 함께 점수화합니다.",
             f"상위 {top_pool}개 후보 중 {hold_top}개만 보유합니다.",
         ]
+        if coverage_rule:
+            rules.insert(1, coverage_rule)
+        return rules
     if family == "target_gap_reversal":
-        return [
+        rules = [
             "첫 리포트 발간 전에는 해당 종목을 후보로 보지 않습니다.",
             f"발간 후 {int(config.get('min_report_age_days') or 0)}~{int(config.get('max_report_age_days') or 0)}일 구간의 리포트만 봅니다.",
             "목표가까지의 괴리와 단기 되돌림 여지를 함께 점수화합니다.",
             "설정된 pullback 조건을 통과한 종목만 후보가 됩니다.",
             f"상위 {top_pool}개 후보 중 {hold_top}개만 보유합니다.",
         ]
+        if coverage_rule:
+            rules.insert(1, coverage_rule)
+        return rules
     return [f"{cadence} 정해진 점수식으로 후보를 정렬하고 상위 {hold_top}개를 보유합니다."]
 
 
 def _stock_rule_cadence(config: dict[str, Any]) -> str:
     return {"D": "매일", "W": "매주", "M": "매월 말"}.get(str(config.get("rebalance") or ""), "정기적으로")
+
+
+def _stock_rule_coverage_text(config: dict[str, Any]) -> str:
+    days = int(config.get("coverage_failure_trading_days") or 0)
+    if days <= 0:
+        return "한 번 커버된 종목은 설정된 리포트 age 범위 안에서 계속 후보 pool에 남습니다."
+    return f"최신 리포트가 {days}거래일 안에 목표가를 한 번도 못 터치하면 research failure로 보고 pool에서 제외합니다."
 
 
 def _stock_rule_weighting(config: dict[str, Any]) -> str:
@@ -2054,9 +2117,18 @@ def _pit_research_board_weighting(config: dict[str, Any]) -> str:
     return mode or "기록된 비중 규칙"
 
 
+def _pit_research_board_score_label(config: dict[str, Any], *, short: bool = False) -> str:
+    mode = str(config.get("score_mode") or "board_score")
+    if mode == "ta_momentum_score":
+        return "TA 모멘텀 점수" if short else "TA 모멘텀 점수"
+    if mode == "candidate_score":
+        return "업사이드 후보점수" if short else "목표가 업사이드 후보점수"
+    return "종합점수" if short else "리서치보드 종합점수"
+
+
 def _pit_research_board_buy_rules(config: dict[str, Any]) -> list[str]:
     top_n = int(config.get("top_n") or 0)
-    score = "리서치보드 종합점수" if config.get("score_mode") == "board_score" else "목표가 업사이드 후보점수"
+    score = _pit_research_board_score_label(config)
     rules = [
         "판단일 기준 이미 발간된 리포트만 투자 가능 universe에 넣습니다.",
         "판단일 기준 이미 관측된 종가·이동평균·52주 고점 정보만 계산에 사용합니다.",
@@ -2069,8 +2141,41 @@ def _pit_research_board_buy_rules(config: dict[str, Any]) -> list[str]:
         rules.append(f"후보 유형은 {bucket} 버킷으로 제한합니다.")
     if config.get("require_ma_stack"):
         rules.append("현재가 ≥ 20일선 ≥ 50일선 ≥ 200일선 정배열인 종목만 통과합니다.")
+    if config.get("require_ema_stack"):
+        rules.append("현재가 ≥ 20일 EMA ≥ 50일 EMA ≥ 200일 EMA 정배열인 종목만 통과합니다.")
+    if config.get("require_macd_bullish"):
+        rules.append("MACD 라인이 시그널 위에 있고 히스토그램이 양수인 종목만 통과합니다.")
     if config.get("require_near_52w_high"):
         rules.append("판단일 기준 52주 고점 대비 -10% 이내 종목만 통과합니다.")
+    if config.get("hold_target_winners"):
+        rules.append("목표가를 터치한 종목은 후보 밖으로 밀려도 winner pool로 승격해 계속 보유합니다.")
+    min_age = int(config.get("min_report_age_days") or 0)
+    if min_age > 0:
+        rules.append(f"발간 후 최소 {min_age}일이 지나 가격 확인 신호가 생긴 종목만 통과합니다.")
+    min_upside = float(config.get("min_target_upside_at_pub") or 0)
+    if min_upside > 0:
+        rules.append(f"발간가 대비 목표 업사이드 {_pct(min_upside)} 이상만 통과합니다.")
+    max_current = float(config.get("max_current_return") or 20)
+    if max_current < 20:
+        rules.append(f"이미 발간가 대비 {_pct(max_current)} 이상 오른 종목은 제외합니다.")
+    min_current = float(config.get("min_current_return") or -1)
+    if min_current > -1:
+        rules.append(f"현재 수익률 {_pct(min_current)} 이상인 종목만 통과합니다.")
+    min_return_1m = float(config.get("min_return_1m") or -1)
+    if min_return_1m > -1:
+        rules.append(f"최근 1개월 수익률 {_pct(min_return_1m)} 이상인 종목만 통과합니다.")
+    min_return_3m = float(config.get("min_return_3m") or -1)
+    if min_return_3m > -1:
+        rules.append(f"최근 3개월 수익률 {_pct(min_return_3m)} 이상인 종목만 통과합니다.")
+    min_return_6m = float(config.get("min_return_6m") or -1)
+    if min_return_6m > -1:
+        rules.append(f"최근 6개월 수익률 {_pct(min_return_6m)} 이상인 종목만 통과합니다.")
+    min_return_1y = float(config.get("min_return_1y") or -1)
+    if min_return_1y > -1:
+        rules.append(f"최근 1년 수익률 {_pct(min_return_1y)} 이상인 종목만 통과합니다.")
+    min_high_gap = float(config.get("min_distance_from_52w_high") or -1)
+    if min_high_gap > -1 and not config.get("require_near_52w_high"):
+        rules.append(f"52주 고점 대비 {_pct(abs(min_high_gap))} 이내 하락 폭만 허용합니다.")
     return rules
 
 
@@ -2141,19 +2246,42 @@ def _buy_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
 def _sell_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
     if strategy_id.startswith("stock_rule_"):
         cadence = _stock_rule_cadence(config)
-        return [
+        rules = [
             f"{cadence} 재평가 때 보유 순위 밖으로 밀리면 축소 또는 매도합니다.",
             "새 후보가 기존 보유보다 점수가 높으면 낮은 점수 포지션을 교체합니다.",
             "매도 사유는 거래 원장의 rebalance_sell/교체 체결로 확인합니다.",
         ]
+        if int(config.get("coverage_failure_trading_days") or 0) > 0:
+            rules.insert(
+                0, "coverage 실패 판정으로 후보 pool에서 빠진 종목은 다음 재평가 때 편출 대상이 됩니다."
+            )
+        return rules
     if strategy_id.startswith("pit_research_board_"):
         cadence = _pit_research_board_cadence(config)
-        return [
+        rules = [
             f"{cadence} 재평가 때 상위 후보에서 밀리면 축소 또는 전량 매도합니다.",
-            "목표가를 터치하면 target_hit 사유로 청산합니다.",
             f"리포트 발간 후 {int(config.get('max_report_age_days') or 0)}일을 넘기면 만료 청산합니다.",
-            "모든 매도는 포트폴리오 거래 원장의 날짜·수량·사유로 확인합니다.",
         ]
+        if config.get("hold_target_winners"):
+            rules.append(
+                f"목표가 {float(config.get('target_hit_multiplier') or 1):.2f}x를 터치하면 청산하지 않고 winner pool로 보유합니다."
+            )
+            if float(config.get("target_winner_trailing_stop_pct") or 0) > 0:
+                rules.append(
+                    f"winner pool 고점 대비 {_pct(config.get('target_winner_trailing_stop_pct'))} 하락 시 청산합니다."
+                )
+        else:
+            rules.append(
+                f"목표가 {float(config.get('target_hit_multiplier') or 1):.2f}x를 터치하면 target_hit 사유로 청산합니다."
+            )
+        if float(config.get("stop_loss_pct") or 0) > 0:
+            rules.append(f"평균단가 대비 손절 {_pct(config.get('stop_loss_pct'))}")
+        if float(config.get("take_profit_pct") or 0) > 0:
+            rules.append(f"평균단가 대비 익절 {_pct(config.get('take_profit_pct'))}")
+        if int(config.get("max_holding_days") or 0) > 0:
+            rules.append(f"최대 보유 {int(config.get('max_holding_days') or 0)}일")
+        rules.append("모든 매도는 포트폴리오 거래 원장의 날짜·수량·사유로 확인합니다.")
+        return rules
     if strategy_id.startswith("smic_mtt_strategy"):
         if not config:
             return ["세부 조건 artifact 없음", "매도 사유는 매매내역과 포지션 기록에서 확인"]
@@ -2198,7 +2326,7 @@ def _risk_controls(strategy_id: str, config: dict[str, Any]) -> list[str]:
         return [
             "현재 웹 리서치보드 화면의 최신값을 역사용으로 재사용하지 않고, 각 판단일마다 PIT 보드를 재구성합니다.",
             "판단일 보드에서 고른 종목은 다음 거래일 체결하므로 리포트 발간일보다 빠른 매수는 구조적으로 불가능합니다.",
-            "벤치마크 수익률을 못 이기거나 수익률 경로 상관이 높은 후보는 최종 포트폴리오 catalog에 올리지 않습니다.",
+            "벤치마크 대비 성과는 감사 지표로 표시하고, 유사한 수익률 경로는 상관 압축으로 대표 전략만 남깁니다.",
             "체결은 정수 주식 수량, 수수료·세금, RP이자 현금 잔고를 반영합니다.",
         ]
     if strategy_id.startswith("smic_mtt_strategy"):
@@ -2240,6 +2368,7 @@ def _strategy_params(strategy_id: str, config: dict[str, Any]) -> dict[str, Any]
             "hold_top",
             "weight_mode",
             "score_mode",
+            "coverage_failure_trading_days",
         }
         return {key: value for key, value in config.items() if key in public_keys}
     if strategy_id.startswith("pit_research_board_"):
@@ -2253,7 +2382,14 @@ def _strategy_params(strategy_id: str, config: dict[str, Any]) -> dict[str, Any]
             "min_score",
             "bucket_filter",
             "require_ma_stack",
+            "require_ema_stack",
+            "require_macd_bullish",
             "require_near_52w_high",
+            "min_return_1m",
+            "min_return_3m",
+            "min_return_6m",
+            "min_return_1y",
+            "min_distance_from_52w_high",
         }
         return {key: value for key, value in config.items() if key in public_keys}
     return {key: value for key, value in config.items() if key not in excluded}
