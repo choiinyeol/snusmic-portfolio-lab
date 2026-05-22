@@ -1,4 +1,4 @@
-import 'server-only';
+﻿import 'server-only';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
@@ -250,22 +250,6 @@ export type StrategyCatalogRow = {
     tradeCount: number | null;
     openPositions: number | null;
   };
-};
-
-export type StrategyRejectionRow = {
-  id: string;
-  label: string;
-  source: 'broker' | 'stock-rule' | 'pit-board';
-  family: string;
-  status: string;
-  reason: string;
-  returnPct: number | null;
-  benchmarkReturnPct: number | null;
-  excessReturn: number | null;
-  sharpe: number | null;
-  sortino: number | null;
-  maxDrawdown: number | null;
-  tradeCount: number | null;
 };
 
 export type ScreenerCandidateRow = {
@@ -1007,12 +991,12 @@ let strategyCatalogCache: StrategyCatalogRow[] | undefined;
 export function getStrategyCatalog(): StrategyCatalogRow[] {
   if (artifactCacheValid() && strategyCatalogCache) return strategyCatalogCache;
   const raw = parseRows(
-    'strategies/catalog.json',
+    'accounts/catalog.json',
     StrategyCatalogRowSchema,
-    readRequiredJson<unknown>('data/web/strategies/catalog.json'),
+    readRequiredJson<unknown>('data/web/accounts/catalog.json'),
   );
   strategyCatalogCache = raw.map((row) => ({
-    strategyId: row.strategy_id,
+    strategyId: row.account_id,
     label: row.label,
     shortLabel: row.short_label,
     kind: row.kind,
@@ -1041,108 +1025,6 @@ export function getStrategyCatalog(): StrategyCatalogRow[] {
   return strategyCatalogCache;
 }
 
-export function getStrategyRejectionRows(limit = 24): StrategyRejectionRow[] {
-  const artifact = readRequiredJson<RawReport>('data/web/strategy-admission.json');
-  const rows: StrategyRejectionRow[] = [
-    ...brokerRejections(arrayValue(artifact.top_rejected_trials)),
-    ...stockRuleRejections(arrayValue(recordValue(artifact.stock_admission).top_rejected_rules)),
-    ...pitBoardRejections(arrayValue(recordValue(artifact.pit_research_board_admission).top_rejected_strategies)),
-  ];
-  return rows
-    .filter((row) => row.status !== 'accepted')
-    .sort((a, b) => (b.returnPct ?? Number.NEGATIVE_INFINITY) - (a.returnPct ?? Number.NEGATIVE_INFINITY))
-    .slice(0, limit);
-}
-
-function brokerRejections(rows: RawReport[]): StrategyRejectionRow[] {
-  return rows.map((row) => ({
-    id: `broker_trial_${String(row.trial_number ?? '')}`,
-    label: brokerTrialLabel(row),
-    source: 'broker',
-    family: String(row.trend_filter ?? 'broker'),
-    status: String(row.admission_status ?? 'rejected'),
-    reason: statusKo(String(row.admission_status ?? 'rejected')),
-    returnPct: num(row.full_money_weighted_return),
-    benchmarkReturnPct: null,
-    excessReturn: num(row.excess_return_vs_best_benchmark),
-    sharpe: null,
-    sortino: null,
-    maxDrawdown: num(row.full_max_drawdown),
-    tradeCount: num(row.full_trade_count),
-  }));
-}
-
-function stockRuleRejections(rows: RawReport[]): StrategyRejectionRow[] {
-  return rows.map((row) => ({
-    id: String(row.rule_id ?? row.persona ?? ''),
-    label: stockRuleLabel(row),
-    source: 'stock-rule',
-    family: String(row.family ?? 'stock_rule'),
-    status: String(row.status ?? 'rejected'),
-    reason: reasonCodesKo(row.reason_codes) || statusKo(String(row.status ?? 'rejected')),
-    returnPct: num(row.oos_money_weighted_return),
-    benchmarkReturnPct: num(row.benchmark_oos_money_weighted_return),
-    excessReturn: num(row.excess_return_vs_benchmark),
-    sharpe: num(row.oos_sharpe),
-    sortino: num(row.oos_sortino),
-    maxDrawdown: num(row.oos_max_drawdown),
-    tradeCount: num(row.oos_trade_count),
-  }));
-}
-
-function pitBoardRejections(rows: RawReport[]): StrategyRejectionRow[] {
-  return rows.map((row) => ({
-    id: String(row.persona_name ?? ''),
-    label: String(row.label ?? row.persona_name ?? 'PIT research-board'),
-    source: 'pit-board',
-    family: 'pit_research_board',
-    status: String(row.admission_status ?? 'rejected'),
-    reason: statusKo(String(row.admission_status ?? 'rejected')),
-    returnPct: num(row.portfolio_money_weighted_return),
-    benchmarkReturnPct: num(row.benchmark_money_weighted_return),
-    excessReturn: num(row.portfolio_excess_vs_benchmark),
-    sharpe: num(row.portfolio_sharpe),
-    sortino: num(row.portfolio_sortino),
-    maxDrawdown: num(row.portfolio_max_drawdown),
-    tradeCount: num(row.portfolio_trade_count),
-  }));
-}
-
-function recordValue(value: unknown): RawReport {
-  return typeof value === 'object' && value !== null && !Array.isArray(value) ? (value as RawReport) : {};
-}
-
-function arrayValue(value: unknown): RawReport[] {
-  return Array.isArray(value) ? value.map(recordValue) : [];
-}
-
-function brokerTrialLabel(row: RawReport): string {
-  const trial = row.trial_number === undefined ? '' : ` #${String(row.trial_number)}`;
-  const filter = String(row.trend_filter ?? 'rule');
-  const positions = row.max_positions === undefined ? '' : ` · ${String(row.max_positions)} slots`;
-  return `Broker ${filter}${trial}${positions}`;
-}
-
-function stockRuleLabel(row: RawReport): string {
-  const family = String(row.family ?? 'stock rule').replaceAll('_', ' ');
-  const rule = String(row.rule_id ?? '').replaceAll('_', ' ');
-  if (!rule) return family;
-  return `${family}: ${rule}`;
-}
-
-function reasonCodesKo(value: unknown): string {
-  const codes = Array.isArray(value) ? value.map((item) => String(item)) : [];
-  return codes.map(statusKo).join(', ');
-}
-
-function statusKo(status: string): string {
-  if (status.includes('below_benchmark') || status.includes('below_portfolio_benchmark')) return '벤치마크 미달';
-  if (status.includes('duplicate') || status.includes('correlation')) return '고상관 중복 제거';
-  if (status.includes('below_risk') || status.includes('sharpe') || status.includes('sortino')) return '위험지표 미달';
-  if (status.includes('not_selected')) return '상위 후보 미선정';
-  return status.replaceAll('_', ' ');
-}
-
 export function getArtifactManifest(): ArtifactManifest {
   return parseArtifact('manifest.json', ArtifactManifestSchema, readRequiredJson<unknown>('data/web/manifest.json'));
 }
@@ -1168,6 +1050,7 @@ export function getInsights(): Insight[] {
 }
 
 let screenerCandidateCache: ScreenerCandidateRow[] | undefined;
+
 export function getScreenerCandidates(): ScreenerCandidateRow[] {
   if (artifactCacheValid() && screenerCandidateCache) return screenerCandidateCache;
   const raw = parseRows(
@@ -1464,7 +1347,7 @@ export function getEquityDaily(): EquityPoint[] {
 let strategyCurvesCache: EquityPoint[] | undefined;
 export function getStrategyCurves(): EquityPoint[] {
   if (artifactCacheValid() && strategyCurvesCache) return strategyCurvesCache;
-  strategyCurvesCache = readCompactEquityCurves('data/web/strategies/curves.json');
+  strategyCurvesCache = readCompactEquityCurves('data/web/accounts/curves.json');
   return strategyCurvesCache;
 }
 

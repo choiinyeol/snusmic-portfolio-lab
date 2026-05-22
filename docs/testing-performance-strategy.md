@@ -1,4 +1,4 @@
-# Testing and Performance Strategy
+﻿# Testing and Performance Strategy
 
 Last updated: 2026-05-23
 Status: canonical verification guidance
@@ -36,7 +36,7 @@ GitHub `ci.yml` uses the same fast lane. Slow replay and full artifact contract 
 Targeted strategy loop:
 
 ```bash
-uv run pytest -q tests/sim/test_strategy_generation.py tests/sim/test_stock_rule_search.py
+uv run pytest -q tests/sim/test_pit_research_board.py
 ```
 
 Frontend loop:

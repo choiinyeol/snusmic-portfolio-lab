@@ -20,7 +20,7 @@ type RiskSortKey =
 export function StrategyRiskTable({
   rows,
   title = '전략 성과',
-  csvFilename = 'snusmic-strategies.csv',
+  csvFilename = 'snusmic-accounts.csv',
 }: {
   rows: StrategyLeaderboardRow[];
   title?: string;

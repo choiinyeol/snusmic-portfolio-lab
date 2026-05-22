@@ -10,7 +10,7 @@ from typing import Any
 
 import pandas as pd
 
-from snusmic_pipeline.sim.contracts import SimulationConfig, SmicMttStrategyConfig
+from snusmic_pipeline.sim.contracts import SimulationConfig
 from snusmic_pipeline.sim.forward_runner import run_daily_forward
 from snusmic_pipeline.web_artifacts import ExportInputs, export_web_artifacts
 
@@ -60,7 +60,7 @@ def _measure_forward_smoke(warehouse: Path) -> dict[str, Any]:
         out = Path(tmpdir) / "sim"
         base = SimulationConfig(start_date=date(2021, 1, 4), end_date=date(2021, 2, 10))
         personas = tuple(persona for persona in base.personas if persona.persona_name != "weak_oracle")
-        config = base.model_copy(update={"personas": (*personas, SmicMttStrategyConfig())})
+        config = base.model_copy(update={"personas": personas})
         started = time.perf_counter()
         result = run_daily_forward(config, warehouse, out)
         duration = time.perf_counter() - started

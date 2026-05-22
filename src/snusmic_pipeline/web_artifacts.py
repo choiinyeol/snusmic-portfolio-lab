@@ -1,8 +1,7 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 import math
-import re
 import shutil
 import statistics
 import subprocess
@@ -16,7 +15,6 @@ from typing import Any, cast
 import pandas as pd
 
 from .currency import currency_for_symbol, normalize_currency
-from .sim.stock_admission import StockAdmissionArtifact
 from .web_contracts import HOLDING_ROWS, REPORT_ROWS, TRADE_ROWS, ArtifactManifest, WebOverview
 
 REQUIRED_ARTIFACTS = [
@@ -38,10 +36,9 @@ REQUIRED_ARTIFACTS = [
     "reports/return-windows.json",
     "reports/target-hit-distribution.json",
     "report-statistics-lab.json",
-    "strategies/catalog.json",
-    "strategies/admission.json",
-    "strategies/leaderboard.json",
-    "strategies/curves.json",
+    "accounts/catalog.json",
+    "accounts/leaderboard.json",
+    "accounts/curves.json",
     "screener/candidates.json",
     "overview.json",
     "personas.json",
@@ -55,16 +52,13 @@ REQUIRED_ARTIFACTS = [
     "monthly-holdings.json",
     "missing-symbols.json",
     "data-quality.json",
-    "strategy-admission.json",
-    "pit-research-board-admission.json",
-    "pit-research-board-snapshots.json",
     "trades.json",
     "daily-decisions.json",
     "position-episodes.json",
     "equity-daily.json",
     "accounting-reconciliation.json",
     "table-download-reports.csv",
-    "table-download-strategies.csv",
+    "table-download-accounts.csv",
     "data-quality-download.csv",
 ]
 
@@ -326,24 +320,9 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     )
     position_episodes = _read_csv(inputs.sim / "position_episodes.csv")
     equity_daily = _read_csv(inputs.sim / "equity_daily.csv")
-    broker_strategy_trials = _read_optional_csv(inputs.sim / "broker_strategy_trials.csv")
-    pit_research_board_admission = _read_optional_csv(inputs.sim / "pit-research-board-admission.csv")
-    pit_research_board_snapshots = _read_optional_csv(inputs.sim / "pit-research-board-snapshots.csv")
-    stock_admission = _read_stock_admission_artifact(inputs.sim)
     extraction_quality = _read_json(inputs.extraction_quality) if inputs.extraction_quality.exists() else {}
     mark("read_inputs")
 
-    _assert_no_stale_strategy_personas(
-        {
-            "summary": summary,
-            "current_holdings": current_holdings,
-            "monthly_holdings": monthly_holdings,
-            "trades": trades,
-            "daily_decisions": daily_decisions,
-            "position_episodes": position_episodes,
-            "equity_daily": equity_daily,
-        }
-    )
     valid_personas = _summary_personas(summary)
     current_holdings = _guard_persona_frame(current_holdings, valid_personas, "current_holdings")
     monthly_holdings = _guard_persona_frame(
@@ -377,16 +356,9 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     overview = _build_overview(
         reports, prices, summary, report_stats, missing_symbols, report_rows, report_exclusions
     )
-    strategy_catalog = _build_strategy_catalog(summary, inputs.sim / "persona-configs.json")
-    strategy_admission = _build_strategy_admission(
-        broker_strategy_trials,
-        strategy_catalog,
-        stock_admission=stock_admission,
-        pit_research_board_admission=pit_research_board_admission,
-    )
-    pit_research_board_admission_rows = _pit_research_board_admission_rows(pit_research_board_admission)
-    strategy_labels = {str(row["strategy_id"]): str(row["label"]) for row in strategy_catalog}
-    _apply_strategy_labels(overview.get("baseline_personas", []), strategy_labels)
+    account_catalog = _build_account_catalog(summary, inputs.sim / "persona-configs.json")
+    account_labels = {str(row["account_id"]): str(row["label"]) for row in account_catalog}
+    _apply_account_labels(overview.get("baseline_personas", []), account_labels)
     priced_prices = _price_frame_with_native(prices)
     mark("build_overview")
 
@@ -404,8 +376,8 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     mark("build_report_metrics")
 
     current_holdings = _current_holdings_from_open_episodes(position_episodes, current_holdings)
-    persona_rows = _enrich_persona_rows_with_catalog(_records(summary), strategy_catalog)
-    _apply_strategy_labels(persona_rows, strategy_labels)
+    persona_rows = _enrich_persona_rows_with_catalog(_records(summary), account_catalog)
+    _apply_account_labels(persona_rows, account_labels)
     enriched_current_holdings = _records(_enrich_holdings_with_native(current_holdings, prices, fx_rates))
     enriched_monthly_holdings = _records(
         _enrich_holdings_with_native(monthly_holdings, prices, fx_rates, close_column="month_close_krw")
@@ -445,10 +417,7 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
         detail_metrics=detail_metrics,
         return_windows=return_windows,
         target_distribution=target_distribution,
-        strategy_catalog=strategy_catalog,
-        strategy_admission=strategy_admission,
-        pit_research_board_admission=pit_research_board_admission_rows,
-        pit_research_board_snapshots=_records(pit_research_board_snapshots),
+        account_catalog=account_catalog,
         screener_candidates=screener_candidates,
     )
     mark("write_page_bundles")
@@ -471,9 +440,6 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     )
     _write_json(out / "missing-symbols.json", [{"symbol": symbol} for symbol in missing_symbols])
     _write_json(out / "data-quality.json", data_quality)
-    _write_json(out / "strategy-admission.json", strategy_admission)
-    _write_json(out / "pit-research-board-admission.json", pit_research_board_admission_rows)
-    _write_json(out / "pit-research-board-snapshots.json", _records(pit_research_board_snapshots))
     _write_json(out / "trades.json", trade_rows)
     _write_machine_json(
         out / "daily-decisions.json",
@@ -482,7 +448,7 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     _write_json(out / "position-episodes.json", episode_rows)
     _write_json(out / "equity-daily.json", equity_rows)
     _write_json(out / "accounting-reconciliation.json", accounting_rows)
-    _write_download_csvs(out, report_rows, data_quality, strategy_catalog)
+    _write_download_csvs(out, report_rows, data_quality, account_catalog)
     mark("write_tables")
 
     _write_price_artifacts(priced_prices, artifact_symbols, prices_out, prices_are_native=True)
@@ -576,22 +542,6 @@ def _replace_directory(staged: Path, destination: Path) -> None:
         shutil.rmtree(backup)
 
 
-def _assert_no_stale_strategy_personas(frames: dict[str, pd.DataFrame]) -> None:
-    stale_markers = ("smic_mtt_strategy_optuna_top", "SMIC MTT Optuna #")
-    for name, frame in frames.items():
-        if frame.empty:
-            continue
-        for column in ("persona", "label"):
-            if column not in frame.columns:
-                continue
-            values = frame[column].astype(str)
-            if values.str.contains("|".join(stale_markers), regex=True).any():
-                raise RuntimeError(
-                    f"{name}.{column} contains stale strategy persona labels; "
-                    "rerun `uv run python -m snusmic_pipeline run-sim` before export-web."
-                )
-
-
 def _summary_personas(summary: pd.DataFrame) -> set[str]:
     if summary.empty or "persona" not in summary.columns:
         raise RuntimeError("Simulation summary must contain a persona column.")
@@ -652,25 +602,6 @@ def _read_json(path: Path) -> Any:
         return json.load(handle)
 
 
-def _read_stock_admission_artifact(sim_dir: Path) -> dict[str, Any] | None:
-    """Read the optional stock-level admission audit artifact.
-
-    The stock-rule search/admission lane owns producing this file. The web
-    exporter treats it as optional so existing simulation fixtures keep working,
-    but when present the artifact is copied into the strategy-admission product
-    contract instead of reviving the retired meta-quant candidate surface.
-    """
-
-    for name in ("stock-admission.json", "stock_admission.json"):
-        path = sim_dir / name
-        if path.exists():
-            data = _read_json(path)
-            if not isinstance(data, dict):
-                raise RuntimeError(f"{path} must contain a JSON object.")
-            return StockAdmissionArtifact.model_validate(data).model_dump(mode="json")
-    return None
-
-
 def _current_holdings_from_open_episodes(
     position_episodes: pd.DataFrame, existing_holdings: pd.DataFrame
 ) -> pd.DataFrame:
@@ -678,10 +609,9 @@ def _current_holdings_from_open_episodes(
 
     ``position_episodes.csv`` is reconstructed from the trade ledger and is
     therefore the safest local source of truth for "what is still held now".
-    ``current_holdings.csv`` can lag when a strategy-search export adds more
-    promoted MTT personas after the first simulation pass. Rebuilding here
-    prevents the web app from showing those personas as 100% cash while their
-    summary row still reports open positions and non-zero holdings value.
+    ``current_holdings.csv`` can lag any time a full simulation artifact set is
+    regenerated in pieces. Rebuilding here keeps the web app aligned with the
+    canonical trade-ledger-derived episodes.
     """
 
     if position_episodes.empty or "status" not in position_episodes.columns:
@@ -782,7 +712,7 @@ def _build_accounting_reconciliation(
     return rows
 
 
-def _apply_strategy_labels(rows: list[dict[str, Any]], labels_by_id: dict[str, str]) -> None:
+def _apply_account_labels(rows: list[dict[str, Any]], labels_by_id: dict[str, str]) -> None:
     for row in rows:
         persona = str(row.get("persona") or "")
         label = labels_by_id.get(persona)
@@ -792,7 +722,7 @@ def _apply_strategy_labels(rows: list[dict[str, Any]], labels_by_id: dict[str, s
 
 def _enrich_persona_rows_with_catalog(
     personas: list[dict[str, Any]],
-    strategy_catalog: list[dict[str, Any]],
+    account_catalog: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     """Attach product methodology fields to portfolio/persona bundles.
 
@@ -801,7 +731,7 @@ def _enrich_persona_rows_with_catalog(
     stock-level strategy exists after the meta-quant route is removed.
     """
 
-    catalog_by_id = {str(row.get("strategy_id") or ""): row for row in strategy_catalog}
+    catalog_by_id = {str(row.get("account_id") or ""): row for row in account_catalog}
     enriched: list[dict[str, Any]] = []
     for persona in personas:
         row = dict(persona)
@@ -898,10 +828,7 @@ def _write_page_bundles(
     detail_metrics: dict[str, Any],
     return_windows: list[dict[str, Any]],
     target_distribution: dict[str, Any],
-    strategy_catalog: list[dict[str, Any]],
-    strategy_admission: dict[str, Any],
-    pit_research_board_admission: list[dict[str, Any]],
-    pit_research_board_snapshots: list[dict[str, Any]],
+    account_catalog: list[dict[str, Any]],
     screener_candidates: list[dict[str, Any]],
 ) -> None:
     """Write page-owned product bundles.
@@ -935,16 +862,9 @@ def _write_page_bundles(
     _write_product_json(out / "reports" / "return-windows.json", return_windows)
     _write_product_json(out / "reports" / "target-hit-distribution.json", target_distribution)
 
-    _write_product_json(out / "strategies" / "catalog.json", strategy_catalog)
-    _write_product_json(out / "strategies" / "admission.json", strategy_admission)
-    _write_product_json(
-        out / "strategies" / "pit-research-board-admission.json", pit_research_board_admission
-    )
-    _write_product_json(out / "strategies" / "leaderboard.json", personas)
-    _write_product_json(out / "strategies" / "curves.json", _compact_equity_curves(equity_daily))
-    _write_product_json(
-        out / "strategies" / "pit-research-board-snapshots.json", pit_research_board_snapshots
-    )
+    _write_product_json(out / "accounts" / "catalog.json", account_catalog)
+    _write_product_json(out / "accounts" / "leaderboard.json", personas)
+    _write_product_json(out / "accounts" / "curves.json", _compact_equity_curves(equity_daily))
 
     _write_product_json(out / "screener" / "candidates.json", screener_candidates)
 
@@ -1146,13 +1066,7 @@ def _build_manifest(out: Path, overview: dict[str, Any]) -> dict[str, Any]:
         "position_episodes": _json_row_count(out / "portfolio" / "episodes.json"),
         "equity_daily": _json_row_count(out / "portfolio" / "equity-daily.json"),
         "personas": _json_row_count(out / "portfolio" / "personas.json"),
-        "strategy_catalog": _json_row_count(out / "strategies" / "catalog.json"),
-        "pit_research_board_admission": _json_row_count(
-            out / "strategies" / "pit-research-board-admission.json"
-        ),
-        "pit_research_board_snapshots": _json_row_count(
-            out / "strategies" / "pit-research-board-snapshots.json"
-        ),
+        "account_catalog": _json_row_count(out / "accounts" / "catalog.json"),
         "screener_candidates": _json_row_count(out / "screener" / "candidates.json"),
     }
     report_counts = overview.get("report_counts", {}) if isinstance(overview, dict) else {}
@@ -1665,27 +1579,34 @@ BENCHMARK_PERSONA_IDS = {
 
 TARGET_BENCHMARK_ID = "benchmark_kodex200"
 OBJECTIVE_MAX_DRAWDOWN = 0.15
-STOCK_RULE_FAMILY_LABELS = {
-    "fresh_report_momentum": "신규 리포트 추세",
-    "ma_crossover": "이동평균 정배열",
-    "price_momentum": "가격 추세",
-    "relative_strength": "상대강도",
-    "report_upside": "리포트 업사이드",
-    "rsi_reversal": "RSI 반등",
-    "target_gap_reversal": "목표가 괴리 되돌림",
-    "target_upside_momentum": "목표가 상승여력 추세",
-}
-PIT_RESEARCH_BOARD_BUCKET_LABELS = {
-    "active": "활성 리포트",
-    "all": "전체",
-    "fresh": "신규 리포트",
-    "large-upside": "목표가 업사이드",
-    "near-target": "목표가 근접",
-}
+
+def _persona_config_by_id(path: Path) -> dict[str, dict[str, Any]]:
+    if not path.exists():
+        raise RuntimeError(f"Required simulation config artifact is missing: {path}")
+    data = _read_json(path)
+    personas = data.get("personas") if isinstance(data, dict) else None
+    if not isinstance(personas, list):
+        raise RuntimeError(f"{path} must contain personas for strategy catalog export.")
+    out: dict[str, dict[str, Any]] = {}
+    for item in personas:
+        if not isinstance(item, dict):
+            continue
+        strategy_id = item.get("persona_name")
+        if strategy_id:
+            out[str(strategy_id)] = _clean(item)
+    return out
 
 
-def _build_strategy_catalog(summary: pd.DataFrame, sim_config_path: Path) -> list[dict[str, Any]]:
-    """Build the frontend strategy taxonomy and methodology contract.
+def _account_kind(strategy_id: str) -> str:
+    if strategy_id == "weak_oracle":
+        return "oracle"
+    if strategy_id in BENCHMARK_PERSONA_IDS:
+        return "benchmark"
+    return "strategy"
+
+
+def _build_account_catalog(summary: pd.DataFrame, sim_config_path: Path) -> list[dict[str, Any]]:
+    """Build the frontend account taxonomy and methodology contract.
 
     The UI must not infer benchmark/strategy meaning from fragile string
     prefixes. This catalog is the product boundary: labels, short labels,
@@ -1704,7 +1625,7 @@ def _build_strategy_catalog(summary: pd.DataFrame, sim_config_path: Path) -> lis
         if not strategy_id:
             continue
         config = config_by_id.get(strategy_id, {})
-        kind = _strategy_kind(strategy_id)
+        kind = _account_kind(strategy_id)
         return_pct = _number(row.get("money_weighted_return"))
         max_drawdown = _number(row.get("max_drawdown"))
         return_excess = (
@@ -1724,7 +1645,7 @@ def _build_strategy_catalog(summary: pd.DataFrame, sim_config_path: Path) -> lis
         label = _strategy_display_label(strategy_id, config, raw_label)
         rows.append(
             {
-                "strategy_id": strategy_id,
+                "account_id": strategy_id,
                 "label": label,
                 "short_label": _strategy_short_label(strategy_id, label),
                 "kind": kind,
@@ -1754,333 +1675,7 @@ def _build_strategy_catalog(summary: pd.DataFrame, sim_config_path: Path) -> lis
             }
         )
 
-    return sorted(rows, key=_strategy_catalog_sort_key)
-
-
-def _build_strategy_admission(
-    trials: pd.DataFrame,
-    strategy_catalog: list[dict[str, Any]],
-    *,
-    stock_admission: dict[str, Any] | None = None,
-    pit_research_board_admission: pd.DataFrame | None = None,
-) -> dict[str, Any]:
-    """Explain why only the promoted report-trend strategies survived.
-
-    The optimizer can evaluate hundreds of parameterizations but promotes only
-    distinct candidates that pass the configured validation goals and
-    high-correlation compression gate. Benchmark-relative return is retained as
-    comparative evidence, not as a hard rejection gate. This artifact is the
-    audit trail that makes "why are there only N strategies?" answerable in the
-    UI without hardcoding stale top-N expectations.
-    """
-
-    accepted_strategy_ids = [
-        str(row.get("strategy_id"))
-        for row in strategy_catalog
-        if row.get("kind") == "strategy" and str(row.get("strategy_id") or "")
-    ]
-    stock_summary = _stock_admission_summary(stock_admission)
-    pit_summary = _pit_research_board_admission_summary(pit_research_board_admission)
-    if trials.empty:
-        return {
-            "schema_version": "1.0.0",
-            "has_trial_rows": False,
-            "trial_count": 0,
-            "accepted_count": len(accepted_strategy_ids),
-            "stock_accepted_count": stock_summary["accepted_count"] if stock_summary else 0,
-            "rejected_count": None,
-            "status_counts": {},
-            "accepted_strategy_ids": accepted_strategy_ids,
-            "accepted_trials": [],
-            "top_rejected_trials": [],
-            "stock_admission": stock_summary,
-            "pit_research_board_admission": pit_summary,
-            "notes": [
-                "broker_strategy_trials.csv가 없어서 현재 catalog 기준 채택 전략 수만 표시합니다.",
-                "다음 run-sim 실행부터 후보별 below_benchmark/duplicate_behavior/accepted 기록이 저장됩니다.",
-            ],
-        }
-
-    records = _records(trials)
-    status_counts: dict[str, int] = {}
-    if "admission_status" in trials.columns:
-        for status, count in trials["admission_status"].astype(str).value_counts().to_dict().items():
-            status_counts[str(status)] = int(count)
-
-    accepted = [row for row in records if _boolish(row.get("accepted"))]
-    rejected = [row for row in records if not _boolish(row.get("accepted"))]
-    accepted_trials = [_admission_trial_row(row) for row in accepted[: len(accepted_strategy_ids) or 10]]
-    top_rejected_trials = [
-        _admission_trial_row(row)
-        for row in sorted(
-            rejected,
-            key=lambda row: _number(row.get("full_money_weighted_return")) or float("-inf"),
-            reverse=True,
-        )[:12]
-    ]
-    return {
-        "schema_version": "1.0.0",
-        "has_trial_rows": True,
-        "trial_count": len(records),
-        "accepted_count": len(accepted),
-        "stock_accepted_count": stock_summary["accepted_count"] if stock_summary else 0,
-        "rejected_count": len(rejected),
-        "status_counts": status_counts,
-        "accepted_strategy_ids": accepted_strategy_ids,
-        "accepted_trials": accepted_trials,
-        "top_rejected_trials": top_rejected_trials,
-        "stock_admission": stock_summary,
-        "pit_research_board_admission": pit_summary,
-        "notes": [
-            "채택 조건은 최고 투자 가능 벤치마크 초과 수익률과 중복 행동 제거입니다.",
-            "MTT는 일부 후보가 쓰는 추세 필터이며, 사용자-facing 전략명은 유니버스·신호·집중도 기준으로 표시합니다.",
-        ],
-    }
-
-
-def _pit_research_board_admission_summary(frame: pd.DataFrame | None) -> dict[str, Any] | None:
-    rows = _pit_research_board_admission_rows(frame)
-    if not rows:
-        return None
-    status_counts: dict[str, int] = {}
-    for row in rows:
-        status = str(row.get("admission_status") or "unknown")
-        status_counts[status] = status_counts.get(status, 0) + 1
-    accepted = [row for row in rows if _boolish(row.get("accepted"))]
-    rejected = [row for row in rows if not _boolish(row.get("accepted"))]
-    return {
-        "schema_version": "1.0.0",
-        "candidate_count": len(rows),
-        "accepted_count": len(accepted),
-        "rejected_count": len(rejected),
-        "status_counts": status_counts,
-        "accepted_strategies": accepted,
-        "top_rejected_strategies": sorted(
-            rejected,
-            key=lambda row: _number(row.get("portfolio_money_weighted_return")) or float("-inf"),
-            reverse=True,
-        )[:12],
-        "notes": [
-            "시점별 리서치보드 후보는 현재 리서치보드 최신값을 재사용하지 않고 판단일별 보드를 재구성합니다.",
-            "벤치마크 대비 성과는 감사 지표로 남기되, 현재 승격은 절대 성과와 상관 압축 게이트로 결정합니다.",
-        ],
-    }
-
-
-def _pit_research_board_admission_rows(frame: pd.DataFrame | None) -> list[dict[str, Any]]:
-    if frame is None or frame.empty:
-        return []
-    rows: list[dict[str, Any]] = []
-    config_keys = {
-        "top_n",
-        "rebalance",
-        "score_mode",
-        "weight_mode",
-        "universe",
-        "max_report_age_days",
-        "min_score",
-        "bucket_filter",
-        "require_ma_stack",
-        "require_ema_stack",
-        "require_macd_bullish",
-        "require_near_52w_high",
-        "min_return_1m",
-        "min_return_3m",
-        "min_return_6m",
-        "min_return_1y",
-        "min_distance_from_52w_high",
-    }
-    for raw in _records(frame):
-        config = {
-            key.removeprefix("config_"): raw.get(key)
-            for key in raw
-            if key.startswith("config_") and key.removeprefix("config_") in config_keys
-        }
-        persona_name = str(raw.get("persona_name") or "")
-        label = _strategy_display_label(persona_name, config, str(raw.get("label") or persona_name))
-        rows.append(
-            {
-                "persona_name": persona_name,
-                "label": label,
-                "accepted": _boolish(raw.get("accepted")),
-                "admission_status": raw.get("admission_status"),
-                "benchmark_money_weighted_return": _number(raw.get("benchmark_money_weighted_return")),
-                "portfolio_money_weighted_return": _number(raw.get("portfolio_money_weighted_return")),
-                "portfolio_excess_vs_benchmark": _number(raw.get("portfolio_excess_vs_benchmark")),
-                "portfolio_sharpe": _number(raw.get("portfolio_sharpe")),
-                "portfolio_sortino": _number(raw.get("portfolio_sortino")),
-                "portfolio_max_drawdown": _number(raw.get("portfolio_max_drawdown")),
-                "portfolio_trade_count": _number(raw.get("portfolio_trade_count")),
-                "portfolio_correlated_with_rule_id": raw.get("portfolio_correlated_with_rule_id"),
-                "config": config,
-            }
-        )
-    return rows
-
-
-def _stock_admission_summary(artifact: dict[str, Any] | None) -> dict[str, Any] | None:
-    if not artifact:
-        return None
-    decisions = artifact.get("decisions")
-    if not isinstance(decisions, list):
-        raise RuntimeError("stock admission artifact must contain a decisions list.")
-
-    status_counts: dict[str, int] = {}
-    accepted: list[dict[str, Any]] = []
-    rejected: list[dict[str, Any]] = []
-    for decision in decisions:
-        if not isinstance(decision, dict):
-            continue
-        status = str(decision.get("status") or "unknown")
-        status_counts[status] = status_counts.get(status, 0) + 1
-        row = _stock_admission_decision_row(decision)
-        if status == "accepted":
-            accepted.append(row)
-        else:
-            rejected.append(row)
-
-    raw_window = artifact.get("window")
-    window = cast(dict[str, Any], raw_window) if isinstance(raw_window, dict) else {}
-    validation_mode = str(window.get("validation_mode") or "oos")
-    validation_note = (
-        "현재 기본값은 IS 랭킹 후 이후 OOS 검증이며, 높은 상관의 전략끼리는 최고 점수 1개만 남깁니다."
-        if validation_mode == "oos"
-        else "현재 설정은 IS 랭킹 후 지정된 validation 구간으로 검증하며, 높은 상관의 전략끼리는 최고 점수 1개만 남깁니다."
-    )
-
-    return {
-        "schema_version": str(artifact.get("schema_version") or "1.0.0"),
-        "window": window,
-        "benchmark_persona": artifact.get("benchmark_persona"),
-        "methodology": artifact.get("methodology") or [],
-        "decision_count": len(decisions),
-        "accepted_count": len(accepted),
-        "rejected_count": len(rejected),
-        "status_counts": status_counts,
-        "accepted_rules": accepted,
-        "top_rejected_rules": sorted(
-            rejected,
-            key=lambda row: _number(row.get("oos_money_weighted_return")) or float("-inf"),
-            reverse=True,
-        )[:12],
-        "notes": [
-            "stock admission은 search_is 구간에서 발견한 개별 종목 규칙을 설정된 validation 구간으로 검증합니다.",
-            validation_note,
-            "이 블록은 meta-quant 조합 후보가 아니라 실제 종목 단위 입장 근거입니다.",
-        ],
-    }
-
-
-def _stock_admission_decision_row(decision: dict[str, Any]) -> dict[str, Any]:
-    raw_candidate = decision.get("candidate")
-    candidate = cast(dict[str, Any], raw_candidate) if isinstance(raw_candidate, dict) else {}
-    raw_in_sample = candidate.get("in_sample_metrics")
-    in_sample = cast(dict[str, Any], raw_in_sample) if isinstance(raw_in_sample, dict) else {}
-    raw_out_of_sample = decision.get("out_of_sample_metrics")
-    out_of_sample = cast(dict[str, Any], raw_out_of_sample) if isinstance(raw_out_of_sample, dict) else {}
-    rule_id = str(candidate.get("rule_id") or "")
-    return {
-        "rule_id": rule_id,
-        "persona": _stock_rule_persona_id(rule_id) if rule_id else None,
-        "family": candidate.get("family"),
-        "symbol": candidate.get("symbol"),
-        "company": candidate.get("company"),
-        "status": decision.get("status"),
-        "reason_codes": decision.get("reason_codes") or [],
-        "params": _stock_rule_params(candidate.get("params")),
-        "is_money_weighted_return": _number(in_sample.get("money_weighted_return")),
-        "oos_money_weighted_return": _number(out_of_sample.get("money_weighted_return")),
-        "oos_net_profit_krw": _number(out_of_sample.get("net_profit_krw")),
-        "oos_final_equity_krw": _number(out_of_sample.get("final_equity_krw")),
-        "oos_max_drawdown": _number(out_of_sample.get("max_drawdown")),
-        "oos_trade_count": _number(out_of_sample.get("trade_count")),
-        "benchmark_oos_money_weighted_return": _number(decision.get("benchmark_oos_money_weighted_return")),
-        "excess_return_vs_benchmark": _number(decision.get("excess_return_vs_benchmark")),
-    }
-
-
-def _stock_rule_params(params: Any) -> dict[str, Any]:
-    if not isinstance(params, list):
-        return {}
-    out: dict[str, Any] = {}
-    for param in params:
-        if isinstance(param, dict) and param.get("name"):
-            out[str(param["name"])] = param.get("value")
-    return out
-
-
-def _stock_rule_persona_id(rule_id: str) -> str:
-    safe = "".join(ch if ch.isalnum() else "_" for ch in rule_id.lower()).strip("_")
-    return f"stock_rule_{safe}"
-
-
-def _admission_trial_row(row: dict[str, Any]) -> dict[str, Any]:
-    keys = [
-        "trial_number",
-        "train_rank",
-        "admission_status",
-        "excess_return_vs_best_benchmark",
-        "train_money_weighted_return",
-        "full_money_weighted_return",
-        "full_net_profit_krw",
-        "full_max_drawdown",
-        "full_trade_count",
-        "full_open_positions",
-        "min_target_upside_at_pub",
-        "max_target_upside_at_pub",
-        "target_hit_multiplier",
-        "require_mtt",
-        "trend_filter",
-        "fast_ma_window",
-        "slow_ma_window",
-        "max_positions",
-        "universe",
-        "trend_filter",
-        "atr_period_days",
-        "supertrend_multiplier",
-        "breakout_lookback_days",
-        "breakout_atr_multiple",
-        "top_up_cadence",
-        "stop_loss_pct",
-        "take_profit_pct",
-        "report_age_stop_days",
-    ]
-    return {key: row.get(key) for key in keys if key in row}
-
-
-def _boolish(value: Any) -> bool:
-    if isinstance(value, bool):
-        return value
-    if isinstance(value, (int, float)) and not isinstance(value, bool):
-        return value != 0
-    if isinstance(value, str):
-        return value.strip().lower() in {"1", "true", "t", "yes", "y"}
-    return False
-
-
-def _persona_config_by_id(path: Path) -> dict[str, dict[str, Any]]:
-    if not path.exists():
-        raise RuntimeError(f"Required simulation config artifact is missing: {path}")
-    data = _read_json(path)
-    personas = data.get("personas") if isinstance(data, dict) else None
-    if not isinstance(personas, list):
-        raise RuntimeError(f"{path} must contain personas for strategy catalog export.")
-    out: dict[str, dict[str, Any]] = {}
-    for item in personas:
-        if not isinstance(item, dict):
-            continue
-        strategy_id = item.get("persona_name")
-        if strategy_id:
-            out[str(strategy_id)] = _clean(item)
-    return out
-
-
-def _strategy_kind(strategy_id: str) -> str:
-    if strategy_id == "weak_oracle":
-        return "oracle"
-    if strategy_id in BENCHMARK_PERSONA_IDS:
-        return "benchmark"
-    return "strategy"
+    return sorted(rows, key=_account_catalog_sort_key)
 
 
 def _benchmark_group(strategy_id: str) -> str | None:
@@ -2097,692 +1692,92 @@ def _benchmark_group(strategy_id: str) -> str | None:
 
 def _strategy_short_label(strategy_id: str, label: str) -> str:
     labels = {
-        "all_weather": "올웨더",
-        "smic_follower": "단순 추종 v1",
-        "smic_follower_v2": "손절 추종",
+        "all_weather": "All Weather",
+        "smic_follower": "SMIC Follower v1",
+        "smic_follower_v2": "SMIC Follower v2",
         "benchmark_kodex200": "KODEX200",
         "benchmark_qqq": "QQQ",
         "benchmark_spy": "SPY",
         "benchmark_gld": "GLD",
-        "weak_oracle": "미래정보 상한선",
+        "weak_oracle": "Weak Oracle",
     }
-    if strategy_id in labels:
-        return labels[strategy_id]
-    if strategy_id.startswith("stock_rule_"):
-        return label
-    if strategy_id.startswith("pit_research_board_"):
-        return label
-    if strategy_id.startswith("smic_mtt_strategy"):
-        return label.replace(" Report ", " ").replace(" Strategy ", " ")
-    if strategy_id.startswith("smic_rsi_reversal"):
-        return "RSI 반등"
-    return label
+    return labels.get(strategy_id, label)
 
 
 def _strategy_display_label(strategy_id: str, config: dict[str, Any], fallback: str) -> str:
-    baseline_labels = {
-        "all_weather": "올웨더",
-        "smic_follower": "단순 리포트 추종",
-        "smic_follower_v2": "손절 리포트 추종",
-        "weak_oracle": "미래정보 상한선",
+    labels = {
+        "all_weather": "All Weather",
+        "smic_follower": "SMIC Report Follower",
+        "smic_follower_v2": "SMIC Report Follower with Stops",
+        "weak_oracle": "Forward-Looking Diagnostic",
     }
-    if strategy_id in baseline_labels:
-        return baseline_labels[strategy_id]
-    if strategy_id.startswith("stock_rule_"):
-        symbol = config.get("symbol")
-        family = _stock_family_label(config.get("family") or config.get("rule_family"))
-        ordinal = _stock_rule_ordinal(fallback or str(config.get("label") or ""))
-        prefix = f"종목룰 {ordinal}" if ordinal else "종목룰"
-        if symbol:
-            return f"{prefix}: {symbol} {family}"
-        return f"{prefix}: {family}"
-    if strategy_id.startswith("pit_research_board_"):
-        top_n = int(config.get("top_n") or 0)
-        mode = _pit_research_board_score_label(config, short=True)
-        suffix = f" 상위 {top_n}" if top_n else ""
-        if config.get("score_mode") == "ta_momentum_score":
-            return f"리서치보드 TA 모멘텀{suffix}"
-        if config.get("require_ma_stack"):
-            return f"리서치보드 정배열{suffix}"
-        if config.get("require_near_52w_high"):
-            return f"리서치보드 52주 고점근접{suffix}"
-        bucket = str(config.get("bucket_filter") or "all")
-        if bucket != "all":
-            return f"리서치보드 {_pit_research_board_bucket_label(bucket)}{suffix}"
-        return f"리서치보드 {mode}{suffix}"
-    if strategy_id.startswith("smic_rsi_reversal"):
-        return "RSI 반등 전략"
-    if not strategy_id.startswith("smic_mtt_strategy"):
-        return fallback
-    rank = strategy_id.removeprefix("smic_mtt_strategy_top") if "_top" in strategy_id else ""
-    universe = {"all": "전세계", "domestic": "국내", "overseas": "해외"}.get(
-        str(config.get("universe") or "all"), "전세계"
-    )
-    signal = _strategy_signal_label(config)
-    max_positions = int(config.get("max_positions") or 0)
-    concentration = "집중형" if max_positions <= 10 else "균형형" if max_positions <= 25 else "분산형"
-    suffix = f" #{rank}" if rank else ""
-    return f"{universe} 리포트 {signal} {concentration}{suffix}"
-
-
-def _stock_rule_ordinal(label: str) -> str:
-    match = re.search(r"(?:Stock Rule|종목룰)\s+(\d+)", label)
-    return match.group(1) if match else ""
-
-
-def _pit_research_board_bucket_label(bucket: str) -> str:
-    return PIT_RESEARCH_BOARD_BUCKET_LABELS.get(bucket, bucket.replace("-", " "))
+    return labels.get(strategy_id, fallback)
 
 
 def _methodology_summary(strategy_id: str, config: dict[str, Any]) -> str:
     if strategy_id == "all_weather":
-        return "GLD, QQQ, SPY, KODEX200을 같은 비중으로 보유하며 월 단위로 리밸런싱하는 분산 기준선입니다."
+        return "Equal-weight GLD, QQQ, SPY, and KODEX200 benchmark with periodic rebalancing."
     if strategy_id.startswith("benchmark_"):
         assets = config.get("assets") if isinstance(config.get("assets"), list) else []
         name = assets[0].get("name") if assets and isinstance(assets[0], dict) else strategy_id
-        return f"{name} 단일 자산을 추적하는 시장 기준선입니다."
+        return f"Single-asset market benchmark tracking {name}."
     if strategy_id == "smic_follower":
-        return "가격 매칭된 상승 리포트를 1/N으로 추종하는 단순 기준선입니다."
+        return "Point-in-time SMIC report follower that buys active reports with target prices and holds until target hit or expiry."
     if strategy_id == "smic_follower_v2":
-        return "단순 리포트 추종에 시간 손실, 물타기 손실, 리포트 만료 손절 규칙을 추가한 기준선입니다."
+        return "SMIC report follower with time-loss, averaged-down loss, and report-age stop rules."
     if strategy_id == "weak_oracle":
-        return (
-            "미래 가격 정보를 일부 사용하는 강한 상한선 기준입니다. 투자 가능한 전략으로 해석하지 않습니다."
-        )
-    if strategy_id.startswith("smic_mtt_strategy"):
-        return "리포트 업사이드와 가격 추세 조건(MTT·슈퍼트렌드·ATR 돌파)을 통과한 종목만 실제 주식 수량 단위로 매수·보유·매도하는 포트폴리오 전략입니다. MTT는 전략명 자체가 아니라 내부 추세 필터 중 하나입니다."
-    if strategy_id.startswith("stock_rule_"):
-        return _stock_rule_plain_summary(config)
-    if strategy_id.startswith("pit_research_board_"):
-        top_n = int(config.get("top_n") or 0)
-        cadence = _pit_research_board_cadence(config)
-        score = _pit_research_board_score_label(config)
-        exits = []
-        if float(config.get("stop_loss_pct") or 0) > 0:
-            exits.append(f"손절 {_pct(config.get('stop_loss_pct'))}")
-        if float(config.get("take_profit_pct") or 0) > 0:
-            exits.append(f"익절 {_pct(config.get('take_profit_pct'))}")
-        if int(config.get("max_holding_days") or 0) > 0:
-            exits.append(f"최대 보유 {int(config.get('max_holding_days') or 0)}일")
-        if config.get("hold_target_winners"):
-            exits.append("목표가 도달 후 winner pool 보유")
-            if float(config.get("target_winner_trailing_stop_pct") or 0) > 0:
-                exits.append(f"winner trailing stop {_pct(config.get('target_winner_trailing_stop_pct'))}")
-        exit_text = f" 매도는 {' · '.join(exits)} 조건을 추가로 적용합니다." if exits else ""
-        return (
-            f"{cadence}마다 그 날짜에 이미 발간된 리포트와 그 날짜까지의 가격만으로 리서치보드를 다시 만듭니다. "
-            f"목표가 미도달·미만료 종목을 {score}로 정렬해 상위 {top_n}개를 다음 거래일 실제 주식 수량으로 편입합니다."
-            f"{exit_text}"
-        )
-    return "시뮬레이션에 포함된 전략입니다."
-
-
-def _strategy_signal_label(config: dict[str, Any]) -> str:
-    if not config.get("require_mtt", True):
-        return "모멘텀"
-    trend_filter = str(config.get("trend_filter") or "mtt")
-    if trend_filter == "supertrend":
-        return "슈퍼트렌드"
-    if trend_filter == "atr_breakout":
-        return "돌파"
-    return "추세"
-
-
-def _stock_rule_plain_summary(config: dict[str, Any]) -> str:
-    family = str(config.get("family") or "")
-    fast = int(config.get("fast_ma_days") or 0)
-    slow = int(config.get("slow_ma_days") or 0)
-    hold_top = int(config.get("hold_top") or 0)
-    top_pool = int(config.get("top_pool") or 0)
-    cadence = _stock_rule_cadence(config)
-    weighting = _stock_rule_weighting(config)
-    coverage = _stock_rule_coverage_text(config)
-    quality = _stock_rule_quality_text(config)
-    carry = _stock_rule_carry_text(config)
-    if family == "ma_crossover":
-        return (
-            f"리포트가 발간되어 투자 가능 종목으로 등록된 뒤에만 {cadence} 가격 추세를 재평가합니다. "
-            f"{coverage} "
-            f"{fast}일 이동평균이 {slow}일 이동평균 위에 있는 종목만 후보로 삼습니다. "
-            f"{quality}{carry}"
-            f"후보를 단기 추세 강도 순으로 정렬해 상위 {top_pool}개를 압축하고, 실제로는 {hold_top}개만 {weighting}으로 보유합니다."
-        )
-    if family == "price_momentum":
-        return (
-            f"리포트 발간 이후 투자 가능 universe에 들어온 종목만 대상으로 {cadence} 최근 가격 모멘텀을 순위화합니다. "
-            f"{coverage} "
-            f"{quality}{carry}"
-            f"상위 {top_pool}개 후보 중 {hold_top}개만 {weighting}으로 보유하고, 다음 재평가 때 더 강한 종목으로 교체합니다."
-        )
-    if family == "rsi_reversal":
-        return (
-            f"리포트 발간 이후 투자 가능 종목으로 등록된 뒤에만 {cadence} 과매도 후 반등 가능성이 있는 종목을 찾습니다. "
-            f"{coverage} "
-            f"{quality}{carry}"
-            f"RSI가 낮고 장기 추세가 완전히 깨지지 않은 후보 중 {hold_top}개만 보유합니다."
-        )
-    if family == "target_upside_momentum":
-        return (
-            f"리포트 발간 이후 {cadence} 목표가까지 남은 상승여력과 가격 추세를 함께 봅니다. "
-            f"{quality}{carry}"
-            f"{fast}일선이 {slow}일선 위에 있는 종목 중 상승여력·추세 점수가 높은 상위 {top_pool}개를 압축하고 {hold_top}개만 {weighting}으로 보유합니다."
-        )
-    if family == "fresh_report_momentum":
-        return (
-            f"발간 후 {cadence} 아직 신선한 리포트 종목 중 가격 추세가 살아 있는 후보를 찾습니다. "
-            f"{quality}{carry}"
-            f"목표가 상승여력과 최근 모멘텀을 섞어 상위 {top_pool}개를 고르고 {hold_top}개만 {weighting}으로 보유합니다."
-        )
-    if family == "target_gap_reversal":
-        return (
-            f"리포트 발간 이후 {cadence} 목표가까지 괴리가 남아 있고 단기 되돌림 여지가 큰 종목을 찾습니다. "
-            f"{quality}{carry}"
-            f"반등 점수가 높은 후보를 상위 {top_pool}개로 압축하고 {hold_top}개만 {weighting}으로 보유합니다."
-        )
-    return f"리포트 발간으로 투자 가능 종목이 된 뒤 {cadence} 정해진 가격/리포트 신호로 점수화하고 상위 {hold_top}개만 실제 포트폴리오에 편입합니다."
-
-
-def _stock_rule_buy_rules(config: dict[str, Any]) -> list[str]:
-    family = str(config.get("family") or "")
-    fast = int(config.get("fast_ma_days") or 0)
-    slow = int(config.get("slow_ma_days") or 0)
-    top_pool = int(config.get("top_pool") or 0)
-    hold_top = int(config.get("hold_top") or 0)
-    cadence = _stock_rule_cadence(config)
-    weighting = _stock_rule_weighting(config)
-    coverage_failure_days = int(config.get("coverage_failure_trading_days") or 0)
-    coverage_rule = (
-        f"최신 리포트 발간 후 {coverage_failure_days}거래일 안에 목표가를 터치하지 못하면 coverage pool에서 제외합니다."
-        if coverage_failure_days > 0
-        else None
-    )
-    if family == "ma_crossover":
-        rules = [
-            "첫 리포트 발간 전에는 아무리 가격 조건이 좋아도 후보에 넣지 않습니다.",
-            f"{cadence} 종가 기준으로 {fast}일선과 {slow}일선을 다시 계산합니다.",
-            f"{fast}일선이 {slow}일선보다 높고, 현재가가 {slow}일선 위인 종목만 후보가 됩니다.",
-            f"후보를 '이동평균 격차 70% + {slow}일 모멘텀 30%' 점수로 정렬합니다.",
-            f"상위 {top_pool}개 후보를 검토하되 실제 보유는 {hold_top}개로 제한합니다.",
-            f"비중은 {weighting}으로 배분합니다.",
-        ]
-        rules.extend(_stock_rule_quality_rules(config))
-        if coverage_rule:
-            rules.insert(1, coverage_rule)
-        return rules
-    if family == "price_momentum":
-        rules = [
-            "첫 리포트 발간 전에는 해당 종목을 투자 가능 universe에 넣지 않습니다.",
-            f"{cadence} 최근 {slow}일 가격 모멘텀을 계산합니다.",
-            f"현재가가 {slow}일선 위에 있고 {fast}일선이 {slow}일선보다 높은 종목만 후보가 됩니다.",
-            f"가격 모멘텀 점수가 높은 상위 {top_pool}개 중 {hold_top}개를 보유합니다.",
-            f"비중은 {weighting}으로 배분합니다.",
-        ]
-        rules.extend(_stock_rule_quality_rules(config))
-        if coverage_rule:
-            rules.insert(1, coverage_rule)
-        return rules
-    if family == "rsi_reversal":
-        rules = [
-            "첫 리포트 발간 전에는 해당 종목을 후보로 보지 않습니다.",
-            f"{cadence} RSI가 낮아진 과매도 후보를 찾습니다.",
-            f"현재가가 {slow}일선의 90% 이상을 유지하는 종목만 후보가 됩니다.",
-            f"후보 중 반등 점수가 높은 {hold_top}개를 보유합니다.",
-        ]
-        rules.extend(_stock_rule_quality_rules(config))
-        if coverage_rule:
-            rules.insert(1, coverage_rule)
-        return rules
-    if family == "target_upside_momentum":
-        rules = [
-            "첫 리포트 발간 전에는 해당 종목을 후보로 보지 않습니다.",
-            f"{cadence} 목표가 대비 현재가의 남은 상승여력을 다시 계산합니다.",
-            f"{fast}일선이 {slow}일선 위에 있고 현재가가 {slow}일선 위인 종목만 후보가 됩니다.",
-            "목표가 상승여력과 가격 모멘텀을 섞은 점수로 후보를 정렬합니다.",
-            f"상위 {top_pool}개 후보 중 {hold_top}개만 보유합니다.",
-        ]
-        rules.extend(_stock_rule_quality_rules(config))
-        if coverage_rule:
-            rules.insert(1, coverage_rule)
-        return rules
-    if family == "fresh_report_momentum":
-        rules = [
-            "첫 리포트 발간 전에는 해당 종목을 후보로 보지 않습니다.",
-            f"발간 후 {int(config.get('max_report_age_days') or 0)}일 이내의 리포트만 신선한 후보로 봅니다.",
-            f"{fast}일선이 {slow}일선 위에 있고 최근 모멘텀이 양수인 종목만 후보가 됩니다.",
-            "목표가 상승여력과 최근 가격 모멘텀을 함께 점수화합니다.",
-            f"상위 {top_pool}개 후보 중 {hold_top}개만 보유합니다.",
-        ]
-        rules.extend(_stock_rule_quality_rules(config))
-        if coverage_rule:
-            rules.insert(1, coverage_rule)
-        return rules
-    if family == "target_gap_reversal":
-        rules = [
-            "첫 리포트 발간 전에는 해당 종목을 후보로 보지 않습니다.",
-            f"발간 후 {int(config.get('min_report_age_days') or 0)}~{int(config.get('max_report_age_days') or 0)}일 구간의 리포트만 봅니다.",
-            "목표가까지의 괴리와 단기 되돌림 여지를 함께 점수화합니다.",
-            "설정된 pullback 조건을 통과한 종목만 후보가 됩니다.",
-            f"상위 {top_pool}개 후보 중 {hold_top}개만 보유합니다.",
-        ]
-        rules.extend(_stock_rule_quality_rules(config))
-        if coverage_rule:
-            rules.insert(1, coverage_rule)
-        return rules
-    return [f"{cadence} 정해진 점수식으로 후보를 정렬하고 상위 {hold_top}개를 보유합니다."]
-
-
-def _stock_rule_cadence(config: dict[str, Any]) -> str:
-    return {"D": "매일", "W": "매주", "M": "매월 말"}.get(str(config.get("rebalance") or ""), "정기적으로")
-
-
-def _stock_rule_coverage_text(config: dict[str, Any]) -> str:
-    days = int(config.get("coverage_failure_trading_days") or 0)
-    if days <= 0:
-        return "한 번 커버된 종목은 설정된 리포트 age 범위 안에서 계속 후보 pool에 남습니다."
-    return f"최신 리포트가 {days}거래일 안에 목표가를 한 번도 못 터치하면 research failure로 보고 pool에서 제외합니다."
-
-
-def _stock_rule_weighting(config: dict[str, Any]) -> str:
-    mode = str(config.get("weight_mode") or "")
-    hold_top = int(config.get("hold_top") or 0)
-    if mode == "winner_compress" and hold_top > 1:
-        return f"1위 약 55%, 나머지 {hold_top - 1}개가 45%를 나눠 갖는 집중형"
-    if mode == "equal":
-        return "동일비중"
-    if mode == "rank_linear":
-        return "순위가 높을수록 더 크게 담는 선형 비중"
-    if mode == "score_proportional":
-        return "점수 비례 비중"
-    return mode or "기록된 비중 규칙"
-
-
-def _stock_rule_quality_text(config: dict[str, Any]) -> str:
-    rules = _stock_rule_quality_rules(config)
-    if not rules:
-        return ""
-    return " ".join(rules[:3]) + " "
-
-
-def _stock_rule_quality_rules(config: dict[str, Any]) -> list[str]:
-    rules: list[str] = []
-    active = [
-        f"{label} 수익률 {_pct(config.get(key))} 이상"
-        for label, key in (
-            ("1개월", "min_return_21d"),
-            ("3개월", "min_return_63d"),
-            ("6개월", "min_return_126d"),
-        )
-        if float(config.get(key, -1.0) or -1.0) > -1.0
-    ]
-    if active:
-        rules.append("loser quarantine: " + ", ".join(active) + "인 종목만 후보로 둡니다.")
-    if float(config.get("min_distance_from_52w_high", -1.0) or -1.0) > -1.0:
-        rules.append(
-            f"52주 고점 대비 {_pct(config.get('min_distance_from_52w_high'))} 이상 버틴 종목만 통과합니다."
-        )
-    if config.get("require_ma_stack"):
-        rules.append("20일선 ≥ 60일선 ≥ 120일선 정배열이고 현재가가 20일선 위인 종목만 통과합니다.")
-    if config.get("hold_target_winners"):
-        rules.append("목표가 터치 winner는 추세와 trailing 조건이 깨지기 전까지 보유 후보로 유지합니다.")
-    if int(config.get("risk_off_ma_days") or 0) > 0:
-        symbol = str(config.get("risk_off_symbol") or "069500.KS")
-        rules.append(
-            f"risk-off: {symbol}가 {int(config.get('risk_off_ma_days') or 0)}일선 아래면 신규 주식 비중을 0으로 둡니다."
-        )
-    if config.get("fallback_symbol"):
-        rules.append(f"buy 후보가 없고 risk-on이면 {config.get('fallback_symbol')}를 기본 보유합니다.")
-    return rules
-
-
-def _stock_rule_carry_text(config: dict[str, Any]) -> str:
-    if not config.get("hold_target_winners"):
-        return ""
-    parts = ["목표가를 터치한 winner는 목표가 괴리가 사라져도 추세가 살아 있으면 계속 후보로 둡니다."]
-    if int(config.get("target_carry_ma_days") or 0) > 0:
-        parts.append(f"{int(config.get('target_carry_ma_days') or 0)}일선 이탈 전까지 carry를 허용합니다.")
-    if float(config.get("target_winner_trailing_stop_pct") or 0) > 0:
-        parts.append(
-            f"최근 고점 대비 {_pct(config.get('target_winner_trailing_stop_pct'))} 이상 밀리면 carry를 중단합니다."
-        )
-    return " ".join(parts) + " "
-
-
-def _pit_research_board_cadence(config: dict[str, Any]) -> str:
-    return {"D": "매일", "W": "매주 첫 거래일", "M": "매월 첫 거래일"}.get(
-        str(config.get("rebalance") or ""), "정기적으로"
-    )
-
-
-def _pit_research_board_weighting(config: dict[str, Any]) -> str:
-    mode = str(config.get("weight_mode") or "")
-    if mode == "winner_compress":
-        return "1위 55%, 나머지 후보 45% 분산"
-    if mode == "score_proportional":
-        return "선정 점수 비례 비중"
-    if mode == "equal":
-        return "동일비중"
-    return mode or "기록된 비중 규칙"
-
-
-def _pit_research_board_score_label(config: dict[str, Any], *, short: bool = False) -> str:
-    mode = str(config.get("score_mode") or "board_score")
-    if mode == "ta_momentum_score":
-        return "TA 모멘텀 점수" if short else "TA 모멘텀 점수"
-    if mode == "candidate_score":
-        return "업사이드 후보점수" if short else "목표가 업사이드 후보점수"
-    return "종합점수" if short else "리서치보드 종합점수"
-
-
-def _pit_research_board_buy_rules(config: dict[str, Any]) -> list[str]:
-    top_n = int(config.get("top_n") or 0)
-    score = _pit_research_board_score_label(config)
-    rules = [
-        "판단일 기준 이미 발간된 리포트만 투자 가능 universe에 넣습니다.",
-        "판단일 기준 이미 관측된 종가·이동평균·52주 고점 정보만 계산에 사용합니다.",
-        "목표가를 이미 달성했거나 리포트 유효기간이 지난 종목은 제외합니다.",
-        f"{score}가 높은 상위 {top_n}개를 다음 거래일에 실제 주식 수량으로 편입합니다.",
-        f"비중은 {_pit_research_board_weighting(config)}으로 배분합니다.",
-    ]
-    bucket = str(config.get("bucket_filter") or "all")
-    if bucket != "all":
-        rules.append(f"후보 유형은 {_pit_research_board_bucket_label(bucket)} 버킷으로 제한합니다.")
-    if config.get("require_ma_stack"):
-        rules.append("현재가 ≥ 20일선 ≥ 50일선 ≥ 200일선 정배열인 종목만 통과합니다.")
-    if config.get("require_ema_stack"):
-        rules.append("현재가 ≥ 20일 EMA ≥ 50일 EMA ≥ 200일 EMA 정배열인 종목만 통과합니다.")
-    if config.get("require_macd_bullish"):
-        rules.append("MACD 라인이 시그널 위에 있고 히스토그램이 양수인 종목만 통과합니다.")
-    if config.get("require_near_52w_high"):
-        rules.append("판단일 기준 52주 고점 대비 -10% 이내 종목만 통과합니다.")
-    if config.get("hold_target_winners"):
-        rules.append("목표가를 터치한 종목은 후보 밖으로 밀려도 winner pool로 승격해 계속 보유합니다.")
-    min_age = int(config.get("min_report_age_days") or 0)
-    if min_age > 0:
-        rules.append(f"발간 후 최소 {min_age}일이 지나 가격 확인 신호가 생긴 종목만 통과합니다.")
-    min_upside = float(config.get("min_target_upside_at_pub") or 0)
-    if min_upside > 0:
-        rules.append(f"발간가 대비 목표 업사이드 {_pct(min_upside)} 이상만 통과합니다.")
-    max_current = float(config.get("max_current_return") or 20)
-    if max_current < 20:
-        rules.append(f"이미 발간가 대비 {_pct(max_current)} 이상 오른 종목은 제외합니다.")
-    min_current = float(config.get("min_current_return") or -1)
-    if min_current > -1:
-        rules.append(f"현재 수익률 {_pct(min_current)} 이상인 종목만 통과합니다.")
-    min_return_1m = float(config.get("min_return_1m") or -1)
-    if min_return_1m > -1:
-        rules.append(f"최근 1개월 수익률 {_pct(min_return_1m)} 이상인 종목만 통과합니다.")
-    min_return_3m = float(config.get("min_return_3m") or -1)
-    if min_return_3m > -1:
-        rules.append(f"최근 3개월 수익률 {_pct(min_return_3m)} 이상인 종목만 통과합니다.")
-    min_return_6m = float(config.get("min_return_6m") or -1)
-    if min_return_6m > -1:
-        rules.append(f"최근 6개월 수익률 {_pct(min_return_6m)} 이상인 종목만 통과합니다.")
-    min_return_1y = float(config.get("min_return_1y") or -1)
-    if min_return_1y > -1:
-        rules.append(f"최근 1년 수익률 {_pct(min_return_1y)} 이상인 종목만 통과합니다.")
-    min_high_gap = float(config.get("min_distance_from_52w_high") or -1)
-    if min_high_gap > -1 and not config.get("require_near_52w_high"):
-        rules.append(f"52주 고점 대비 {_pct(abs(min_high_gap))} 이내 하락 폭만 허용합니다.")
-    return rules
+        return "Forward-looking diagnostic baseline; it is not a tradable strategy."
+    return "Fixed simulation persona included in the simulation artifact."
 
 
 def _buy_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
-    if strategy_id.startswith("stock_rule_"):
-        return _stock_rule_buy_rules(config)
-    if strategy_id.startswith("pit_research_board_"):
-        return _pit_research_board_buy_rules(config)
-    if strategy_id.startswith("smic_mtt_strategy"):
-        if not config:
-            return ["세부 조건 artifact 없음", "성과·보유·매매내역만 검증 가능"]
-        rules = [
-            f"발간 시 목표 업사이드 {_pct(config.get('min_target_upside_at_pub'))} 이상",
-            f"목표 업사이드 {_pct(config.get('max_target_upside_at_pub'))} 이하",
-            f"최대 보유 {int(config.get('max_positions') or 0)}개 슬롯",
-            f"투자 유니버스: {config.get('universe', 'all')}",
-        ]
-        if config.get("require_mtt"):
-            trend_filter = str(config.get("trend_filter") or "mtt")
-            if trend_filter == "supertrend":
-                rules.extend(
-                    [
-                        f"슈퍼트렌드 근사: ATR {int(config.get('atr_period_days') or 0)}일",
-                        f"슈퍼트렌드 배수 {float(config.get('supertrend_multiplier') or 0):.1f}x",
-                    ]
-                )
-            elif trend_filter == "atr_breakout":
-                rules.extend(
-                    [
-                        f"ATR 돌파 근사: 직전 {int(config.get('breakout_lookback_days') or 0)}거래일 고가 돌파",
-                        f"돌파 여유 ATR {float(config.get('breakout_atr_multiple') or 0):.2f}x",
-                    ]
-                )
-            else:
-                rules.extend(
-                    [
-                        f"52주 저점 대비 {_pct(config.get('min_price_vs_52w_low'))} 이상",
-                        f"52주 고점 대비 {_pct(config.get('max_pct_below_52w_high'))} 이내",
-                        f"200일선 1개월 변화율 {_pct(config.get('min_ma200_1m_return'))} 이상",
-                    ]
-                )
-        return rules
-    if strategy_id.startswith("smic_rsi_reversal"):
-        if not config:
-            return ["세부 조건 artifact 없음", "성과·보유·매매내역만 검증 가능"]
-        return [
-            f"발간 시 목표 업사이드 {_pct(config.get('min_target_upside_at_pub'))} 이상",
-            f"목표 업사이드 {_pct(config.get('max_target_upside_at_pub'))} 이하",
-            f"{int(config.get('rsi_window') or 0)}일 RSI가 {float(config.get('max_entry_rsi') or 0):.1f} 이하",
-            f"{int(config.get('pullback_lookback_days') or 0)}일 고점 대비 {_pct(config.get('min_pullback_pct'))} 이상 하락",
-            f"신호 유효기간 {int(config.get('signal_valid_days') or 0)}일",
-            f"최대 보유 {int(config.get('max_positions') or 0)}개 슬롯",
-        ]
     if strategy_id == "smic_follower":
-        return ["상승 목표가가 있는 가격 매칭 리포트를 1/N으로 편입"]
+        return ["Buy active point-in-time SMIC reports with usable target prices on an equal-weight basis."]
     if strategy_id == "smic_follower_v2":
         return [
-            "상승 목표가가 있는 가격 매칭 리포트를 1/N으로 편입",
-            "리포트/가격 조건에 따라 일별로 매수 판단",
+            "Buy active point-in-time SMIC reports with usable target prices on an equal-weight basis.",
+            "Apply stop-rule checks before opening or adding exposure.",
         ]
     if strategy_id == "weak_oracle":
-        return [f"{int(config.get('lookahead_months') or 0)}개월 앞 수익률 정보를 사용해 월간 비중 산정"]
+        return [f"Uses a {int(config.get('lookahead_months') or 0)} month future window for diagnostic weighting."]
     if strategy_id in BENCHMARK_PERSONA_IDS:
-        return ["정해진 기준 자산을 월간 리밸런싱"]
+        return ["Hold the configured benchmark asset mix and rebalance on schedule."]
     return []
 
 
 def _sell_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
-    if strategy_id.startswith("stock_rule_"):
-        cadence = _stock_rule_cadence(config)
-        rules = [
-            f"{cadence} 재평가 때 보유 순위 밖으로 밀리면 축소 또는 매도합니다.",
-            "새 후보가 기존 보유보다 점수가 높으면 낮은 점수 포지션을 교체합니다.",
-            "매도 사유는 거래 원장의 rebalance_sell/교체 체결로 확인합니다.",
-        ]
-        if int(config.get("coverage_failure_trading_days") or 0) > 0:
-            rules.insert(
-                0, "coverage 실패 판정으로 후보 pool에서 빠진 종목은 다음 재평가 때 편출 대상이 됩니다."
-            )
-        if config.get("hold_target_winners"):
-            rules.append(
-                "목표가를 터치한 winner는 목표가 도달만으로 팔지 않고 추세/트레일링 이탈 때 편출합니다."
-            )
-            if float(config.get("target_winner_trailing_stop_pct") or 0) > 0:
-                rules.append(
-                    f"winner가 최근 고점 대비 {_pct(config.get('target_winner_trailing_stop_pct'))} 이상 밀리면 carry를 중단합니다."
-                )
-        if int(config.get("risk_off_ma_days") or 0) > 0:
-            rules.append(
-                f"{config.get('risk_off_symbol') or '069500.KS'}가 {int(config.get('risk_off_ma_days') or 0)}일선 아래면 다음 재평가 때 현금 비중으로 대피합니다."
-            )
-        return rules
-    if strategy_id.startswith("pit_research_board_"):
-        cadence = _pit_research_board_cadence(config)
-        rules = [
-            f"{cadence} 재평가 때 상위 후보에서 밀리면 축소 또는 전량 매도합니다.",
-            f"리포트 발간 후 {int(config.get('max_report_age_days') or 0)}일을 넘기면 만료 청산합니다.",
-        ]
-        if config.get("hold_target_winners"):
-            rules.append(
-                f"목표가 {float(config.get('target_hit_multiplier') or 1):.2f}x를 터치하면 청산하지 않고 winner pool로 보유합니다."
-            )
-            if float(config.get("target_winner_trailing_stop_pct") or 0) > 0:
-                rules.append(
-                    f"winner pool 고점 대비 {_pct(config.get('target_winner_trailing_stop_pct'))} 하락 시 청산합니다."
-                )
-        else:
-            rules.append(
-                f"목표가 {float(config.get('target_hit_multiplier') or 1):.2f}x를 터치하면 target_hit 사유로 청산합니다."
-            )
-        if float(config.get("stop_loss_pct") or 0) > 0:
-            rules.append(f"평균단가 대비 손절 {_pct(config.get('stop_loss_pct'))}")
-        if float(config.get("take_profit_pct") or 0) > 0:
-            rules.append(f"평균단가 대비 익절 {_pct(config.get('take_profit_pct'))}")
-        if int(config.get("max_holding_days") or 0) > 0:
-            rules.append(f"최대 보유 {int(config.get('max_holding_days') or 0)}일")
-        rules.append("모든 매도는 포트폴리오 거래 원장의 날짜·수량·사유로 확인합니다.")
-        return rules
-    if strategy_id.startswith("smic_mtt_strategy"):
-        if not config:
-            return ["세부 조건 artifact 없음", "매도 사유는 매매내역과 포지션 기록에서 확인"]
-        return [
-            f"손절 {_pct(config.get('stop_loss_pct'))}",
-            f"익절 {_pct(config.get('take_profit_pct'))}",
-            f"리포트 발간 후 {int(config.get('report_age_stop_days') or 0)}일 경과",
-            f"목표가 도달 배수 {float(config.get('target_hit_multiplier') or 1):.2f}x",
-        ]
-    if strategy_id.startswith("smic_rsi_reversal"):
-        if not config:
-            return ["세부 조건 artifact 없음", "매도 사유는 매매내역과 포지션 기록에서 확인"]
-        return [
-            f"손절 {_pct(config.get('stop_loss_pct'))}",
-            f"익절 {_pct(config.get('take_profit_pct'))}",
-            f"RSI 반등 {float(config.get('rebound_exit_rsi') or 0):.1f} 이상",
-            f"최대 보유 {int(config.get('max_holding_days') or 0)}일",
-            f"목표가 도달 배수 {float(config.get('target_hit_multiplier') or 1):.2f}x",
-        ]
     if strategy_id == "smic_follower_v2":
         return [
-            f"{int(config.get('time_loss_days') or 0)}일 보유 후 손실이면 정리",
-            f"물타기 포지션 손실 {_pct(config.get('averaged_down_stop_pct'))} 초과 시 정리",
-            f"리포트 발간 후 {int(config.get('report_age_stop_days') or 0)}일 경과",
+            f"Exit after {int(config.get('time_loss_days') or 0)} loss-making holding days.",
+            f"Exit averaged-down positions beyond {_pct(config.get('averaged_down_stop_pct'))} loss.",
+            f"Exit after report age exceeds {int(config.get('report_age_stop_days') or 0)} days.",
         ]
     if strategy_id == "smic_follower":
-        return ["목표가 도달 또는 리포트 만료 기준으로 정리"]
+        return ["Exit when the report target is reached or the report expires."]
     if strategy_id in BENCHMARK_PERSONA_IDS:
-        return ["월간 리밸런싱으로 비중 조정"]
+        return ["Rebalance to the configured benchmark weights on schedule."]
     return []
 
 
 def _risk_controls(strategy_id: str, config: dict[str, Any]) -> list[str]:
-    if strategy_id.startswith("stock_rule_"):
-        return [
-            "성과 검증·후보 압축 기준은 내부 품질관리 영역으로 숨기고, 사용자 화면에는 실제 운용 규칙만 노출합니다.",
-            "리포트 발간 전 가격 데이터는 과거 차트 계산에는 존재하더라도 실제 편입 후보로는 쓰지 않습니다.",
-            "같은 수익률 경로를 반복하는 유사 전략은 하나의 대표 전략만 남깁니다.",
-            "체결은 정수 주식 수량, 수수료·세금, RP이자 현금 잔고를 반영합니다.",
-        ]
-    if strategy_id.startswith("pit_research_board_"):
-        return [
-            "현재 웹 리서치보드 화면의 최신값을 역사용으로 재사용하지 않고, 각 판단일마다 시점별 보드를 재구성합니다.",
-            "판단일 보드에서 고른 종목은 다음 거래일 체결하므로 리포트 발간일보다 빠른 매수는 구조적으로 불가능합니다.",
-            "벤치마크 대비 성과는 감사 지표로 표시하고, 유사한 수익률 경로는 상관 압축으로 대표 전략만 남깁니다.",
-            "체결은 정수 주식 수량, 수수료·세금, RP이자 현금 잔고를 반영합니다.",
-        ]
-    if strategy_id.startswith("smic_mtt_strategy"):
-        if not config:
-            return ["정수 주식 수량 기반 체결", "수수료·세금 반영", "누락된 조건은 데이터 품질 항목으로 표시"]
-        cadence = config.get("top_up_cadence", "monthly")
-        return [
-            f"추가 매수 주기: {cadence}",
-            "정수 주식 수량 기반 체결",
-            "수수료·세금 반영",
-            "미충족 후보가 없으면 RP이자 보유",
-        ]
-    if strategy_id.startswith("smic_rsi_reversal"):
-        if not config:
-            return ["정수 주식 수량 기반 체결", "수수료·세금 반영", "누락된 조건은 데이터 품질 항목으로 표시"]
-        return [
-            f"투자 유니버스: {config.get('universe', 'all')}",
-            "정수 주식 수량 기반 체결",
-            "수수료·세금 반영",
-            "단기 반등 신호가 없으면 RP이자 보유",
-        ]
-    if strategy_id == "weak_oracle":
-        return [
-            f"개별 자산 최대 비중 {_pct(config.get('max_weight'))}",
-            "미래정보 사용 기준선",
-        ]
-    return ["벤치마크 비교용 기준선"] if strategy_id in BENCHMARK_PERSONA_IDS else []
+    return ["Benchmark-only baseline."] if strategy_id in BENCHMARK_PERSONA_IDS else []
 
 
 def _strategy_params(strategy_id: str, config: dict[str, Any]) -> dict[str, Any]:
     excluded = {"persona_name", "label", "assets"}
-    if strategy_id.startswith("stock_rule_"):
-        public_keys = {
-            "family",
-            "fast_ma_days",
-            "slow_ma_days",
-            "rebalance",
-            "top_pool",
-            "hold_top",
-            "weight_mode",
-            "score_mode",
-            "coverage_failure_trading_days",
-            "min_return_21d",
-            "min_return_63d",
-            "min_return_126d",
-            "min_distance_from_52w_high",
-            "require_ma_stack",
-            "hold_target_winners",
-            "target_winner_trailing_stop_pct",
-            "target_carry_ma_days",
-            "risk_off_ma_days",
-            "risk_off_symbol",
-            "fallback_symbol",
-        }
-        return {key: value for key, value in config.items() if key in public_keys}
-    if strategy_id.startswith("pit_research_board_"):
-        public_keys = {
-            "top_n",
-            "rebalance",
-            "score_mode",
-            "weight_mode",
-            "universe",
-            "max_report_age_days",
-            "min_score",
-            "bucket_filter",
-            "require_ma_stack",
-            "require_ema_stack",
-            "require_macd_bullish",
-            "require_near_52w_high",
-            "min_return_1m",
-            "min_return_3m",
-            "min_return_6m",
-            "min_return_1y",
-            "min_distance_from_52w_high",
-        }
-        return {key: value for key, value in config.items() if key in public_keys}
     return {key: value for key, value in config.items() if key not in excluded}
 
-
-def _stock_family_label(value: Any) -> str:
-    labels = {**STOCK_RULE_FAMILY_LABELS, "atr_breakout": "ATR 돌파", "mtt": "MTT 추세"}
-    family = str(value or "rule")
-    return labels.get(family, family.replace("_", " "))
-
-
-def _strategy_catalog_sort_key(row: dict[str, Any]) -> tuple[int, float, str]:
-    strategy_id = str(row.get("strategy_id") or "")
+def _account_catalog_sort_key(row: dict[str, Any]) -> tuple[int, float, str]:
+    strategy_id = str(row.get("account_id") or "")
     order = {
         "all_weather": 0,
         "smic_follower": 1,
         "smic_follower_v2": 2,
-        "smic_rsi_reversal": 3,
-        "benchmark_kodex200": 4,
-        "benchmark_qqq": 5,
-        "benchmark_spy": 6,
-        "benchmark_gld": 7,
-        "weak_oracle": 8,
+        "benchmark_kodex200": 3,
+        "benchmark_qqq": 4,
+        "benchmark_spy": 5,
+        "benchmark_gld": 6,
+        "weak_oracle": 7,
     }
     if strategy_id in order:
         return (order[strategy_id], 0.0, strategy_id)
@@ -3264,7 +2259,7 @@ def _write_download_csvs(
     out: Path,
     report_rows: list[dict[str, Any]],
     data_quality: dict[str, Any],
-    strategy_catalog: list[dict[str, Any]],
+    account_catalog: list[dict[str, Any]],
 ) -> None:
     report_columns = [
         "report_id",
@@ -3303,12 +2298,12 @@ def _write_download_csvs(
         report_download_rows.append(csv_row)
     _write_csv(out / "table-download-reports.csv", report_download_rows, report_columns)
 
-    strategy_rows = _strategy_download_rows(strategy_catalog)
-    strategy_columns = (
-        sorted({key for row in strategy_rows for key in row}) if strategy_rows else ["strategy_id"]
+    account_rows = _account_download_rows(account_catalog)
+    account_columns = (
+        sorted({key for row in account_rows for key in row}) if account_rows else ["account_id"]
     )
-    preferred_strategy_columns = [
-        "strategy_id",
+    preferred_account_columns = [
+        "account_id",
         "label",
         "kind",
         "final_equity_krw",
@@ -3320,11 +2315,11 @@ def _write_download_csvs(
         "trade_count",
         "open_positions",
     ]
-    strategy_columns = [
-        *[column for column in preferred_strategy_columns if column in strategy_columns],
-        *[column for column in strategy_columns if column not in preferred_strategy_columns],
+    account_columns = [
+        *[column for column in preferred_account_columns if column in account_columns],
+        *[column for column in account_columns if column not in preferred_account_columns],
     ]
-    _write_csv(out / "table-download-strategies.csv", strategy_rows, strategy_columns)
+    _write_csv(out / "table-download-accounts.csv", account_rows, account_columns)
 
     quality_rows = [
         {"section": "coverage", "metric": metric, "value": value}
@@ -3337,10 +2332,10 @@ def _write_download_csvs(
     _write_csv(out / "data-quality-download.csv", quality_rows, ["section", "metric", "value"])
 
 
-def _strategy_download_rows(strategy_catalog: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _account_download_rows(account_catalog: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [
         {
-            "strategy_id": row.get("strategy_id"),
+            "account_id": row.get("account_id"),
             "label": row.get("label"),
             "kind": row.get("kind"),
             "final_equity_krw": (row.get("metrics") or {}).get("final_equity_krw"),
@@ -3354,7 +2349,7 @@ def _strategy_download_rows(strategy_catalog: list[dict[str, Any]]) -> list[dict
             "trade_count": (row.get("metrics") or {}).get("trade_count"),
             "open_positions": (row.get("metrics") or {}).get("open_positions"),
         }
-        for row in strategy_catalog
+        for row in account_catalog
     ]
 
 
@@ -3442,3 +2437,4 @@ def _write_price_artifacts(
             prices_out / f"{symbol}.json",
             {"symbol": symbol, "currency": "KRW", "missing_price": True, "prices": []},
         )
+

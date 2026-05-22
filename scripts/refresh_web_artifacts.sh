@@ -43,7 +43,7 @@ PY
 
 mkdir -p apps/web/public/downloads
 cp data/web/table-download-reports.csv apps/web/public/downloads/snusmic-reports.csv
-cp data/web/table-download-strategies.csv apps/web/public/downloads/snusmic-strategies.csv
+cp data/web/table-download-accounts.csv apps/web/public/downloads/snusmic-accounts.csv
 cp data/web/data-quality-download.csv apps/web/public/downloads/snusmic-data-quality.csv
 
 

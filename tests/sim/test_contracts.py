@@ -16,8 +16,6 @@ from snusmic_pipeline.sim.contracts import (
     SavingsPlan,
     SimulationConfig,
     SmicFollowerConfig,
-    SmicMttStrategyConfig,
-    SmicRsiReversalConfig,
     Trade,
 )
 
@@ -45,7 +43,7 @@ def test_simulation_config_roundtrip():
     assert rebuilt == cfg
 
 
-def test_default_personas_are_benchmarks_plus_promotable_search_targets():
+def test_default_personas_are_benchmarks_plus_pit_baselines():
     cfg = SimulationConfig(start_date=date(2021, 1, 4), end_date=date(2026, 4, 1))
     names = [persona.persona_name for persona in cfg.personas]
     assert names == [
@@ -74,11 +72,6 @@ def test_simulation_config_rejects_duplicate_persona_names():
             end_date=date(2026, 4, 1),
             personas=(ProphetConfig(), ProphetConfig()),
         )
-
-
-def test_rsi_reversal_config_rejects_non_rebound_exit_band():
-    with pytest.raises(ValidationError):
-        SmicRsiReversalConfig(max_entry_rsi=55.0, rebound_exit_rsi=55.0)
 
 
 def test_all_weather_weights_must_sum_to_one():
@@ -143,12 +136,3 @@ def test_equity_point_serializes_to_json():
 def test_simulation_config_extras_forbidden():
     with pytest.raises(ValidationError):
         SimulationConfig.model_validate({"start_date": "2021-01-04", "end_date": "2026-04-01", "unknown": 1})
-
-
-def test_smic_mtt_rejects_invalid_ma_window_order():
-    with pytest.raises(ValidationError):
-        SmicMttStrategyConfig(
-            trend_filter="ma_crossover",
-            fast_ma_window=60,
-            slow_ma_window=20,
-        )

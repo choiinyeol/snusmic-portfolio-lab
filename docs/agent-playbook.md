@@ -1,4 +1,4 @@
-# Agent Playbook
+﻿# Agent Playbook
 
 Last updated: 2026-05-23
 Status: canonical agent guidance
@@ -17,7 +17,7 @@ Status: canonical agent guidance
 
 - Prefer deletion, consolidation, and existing abstractions before new surfaces.
 - Do not add script wrappers for package commands.
-- Keep exploratory lanes opt-in. Expensive stock/PIT strategy search belongs inside `generate-strategies`, not as standalone public CLI.
+- Keep exploratory lanes opt-in. PIT board export is the canonical standalone `export-pit-board` CLI and must not generate strategies.
 - Treat generated artifacts separately from code changes.
 - Preserve point-in-time behavior before optimizing performance.
 - Use Pydantic for config/artifact boundaries, not for inner numeric loops.

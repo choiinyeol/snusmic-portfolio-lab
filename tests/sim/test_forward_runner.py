@@ -7,10 +7,9 @@ import pandas as pd
 import pytest
 
 from snusmic_pipeline.sim.brokerage import Account
-from snusmic_pipeline.sim.contracts import BrokerageFees, SimulationConfig, SmicMttStrategyConfig
+from snusmic_pipeline.sim.contracts import BrokerageFees, SimulationConfig
 from snusmic_pipeline.sim.forward_runner import run_daily_forward
 from snusmic_pipeline.sim.personas.smic_follower import FollowerState
-from snusmic_pipeline.sim.personas.smic_mtt_strategy import ActiveCandidate, MttStrategyState
 
 WAREHOUSE = Path("data/warehouse")
 
@@ -40,28 +39,6 @@ def test_persona_state_snapshots_roundtrip_private_cursor_state() -> None:
     assert follower_restored.stopped_out == follower.stopped_out
     assert follower_restored._absorbed_ids == follower._absorbed_ids
     assert follower_restored._cursor == follower._cursor
-
-    mtt = MttStrategyState()
-    mtt.active = {
-        "AAA": ActiveCandidate(
-            report_id="r1",
-            symbol="AAA",
-            publication_date=date(2024, 1, 2),
-            target_price_krw=12_000,
-            target_upside_at_pub=0.2,
-            momentum_return=0.1,
-            relative_strength_percentile=0.8,
-        )
-    }
-    mtt.stopped_out = {"BBB": date(2024, 1, 3)}
-    mtt._absorbed_ids = {"r1", "r2"}
-
-    mtt_restored, cursor = MttStrategyState.from_snapshot(mtt.to_snapshot(cursor=4))
-
-    assert cursor == 4
-    assert mtt_restored.active == mtt.active
-    assert mtt_restored.stopped_out == mtt.stopped_out
-    assert mtt_restored._absorbed_ids == mtt._absorbed_ids
 
 
 @pytest.mark.slow
@@ -150,7 +127,7 @@ def test_checkpoint_after_requested_end_falls_back_to_full_replay(tmp_path: Path
 def _test_config(start: date, end: date) -> SimulationConfig:
     base = SimulationConfig(start_date=start, end_date=end)
     personas = tuple(persona for persona in base.personas if persona.persona_name != "weak_oracle")
-    return base.model_copy(update={"personas": (*personas, SmicMttStrategyConfig())})
+    return base.model_copy(update={"personas": personas})
 
 
 def _copy_minimal_warehouse(src: Path, dst: Path) -> None:

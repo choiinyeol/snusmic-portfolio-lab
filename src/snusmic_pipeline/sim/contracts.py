@@ -194,249 +194,11 @@ class SmicFollowerV2Config(_PersonaBase):
     report_age_stop_days: Annotated[int, Field(ge=30, le=3650)] = 730
 
 
-class SmicMttStrategyConfig(_PersonaBase):
-    """Share-ledger SMIC strategy with MTT trend filters and bounded slots.
-
-    This is the practical strategy persona: it trades actual integer shares,
-    keeps cash, pays costs, never sells just to restore weights, and only acts
-    on report-day signals, deposits, scheduled top-ups, target hits, stops,
-    and report expiry.
-    """
-
-    persona_name: Annotated[str, Field(pattern=r"^smic_mtt_strategy(_top[0-9]+)?$")] = "smic_mtt_strategy"
-    label: str = "Report Trend Strategy"
-
-    # Report valuation gate, evaluated at publication using market prices.
-    min_target_upside_at_pub: Annotated[float, Field(ge=0.0, le=10.0)] = 0.30
-    max_target_upside_at_pub: Annotated[float, Field(gt=0.0, le=20.0)] = 5.0
-    target_hit_multiplier: Annotated[float, Field(gt=0.0, le=2.0)] = 1.0
-
-    # Minervini-style trend template, implemented only with local OHLC history.
-    require_mtt: bool = True
-    trend_filter: Literal["mtt", "supertrend", "atr_breakout", "ma_crossover"] = "mtt"
-    fast_ma_window: Annotated[int, Field(ge=5, le=120)] = 50
-    slow_ma_window: Annotated[int, Field(ge=10, le=300)] = 200
-    min_price_vs_52w_low: Annotated[float, Field(ge=0.0, le=10.0)] = 0.30
-    max_pct_below_52w_high: Annotated[float, Field(ge=0.0, le=1.0)] = 0.25
-    min_ma200_1m_return: Annotated[float, Field(ge=-1.0, le=1.0)] = 0.0
-    atr_period_days: Annotated[int, Field(ge=5, le=60)] = 14
-    supertrend_multiplier: Annotated[float, Field(gt=0.0, le=10.0)] = 3.0
-    breakout_lookback_days: Annotated[int, Field(ge=5, le=252)] = 20
-    breakout_atr_multiple: Annotated[float, Field(ge=0.0, le=5.0)] = 0.0
-
-    # Relative-strength overlay: rank candidates by trailing performance within
-    # the available report universe. Defaults keep legacy behavior permissive.
-    relative_strength_lookback_days: Annotated[int, Field(ge=20, le=504)] = 126
-    min_relative_strength_percentile: Annotated[float, Field(ge=0.0, le=1.0)] = 0.0
-    min_momentum_return: Annotated[float, Field(ge=-1.0, le=10.0)] = -1.0
-
-    # Real account controls.
-    max_positions: Annotated[int, Field(ge=1, le=200)] = 10
-    universe: Literal["all", "domestic", "overseas"] = "overseas"
-    top_up_cadence: Literal["deposit_only", "monthly", "quarterly"] = "monthly"
-    stop_loss_pct: Annotated[float, Field(gt=0.0, lt=1.0)] = 0.10
-    take_profit_pct: Annotated[float, Field(gt=0.0, le=10.0)] = 2.0
-    report_age_stop_days: Annotated[int, Field(ge=30, le=3650)] = 730
-    source_trial_number: Annotated[int, Field(ge=0)] | None = None
-    selection_rank: Annotated[int, Field(ge=1)] | None = None
-    train_money_weighted_return: float | None = None
-
-    @model_validator(mode="after")
-    def _check_target_upside_band(self) -> SmicMttStrategyConfig:
-        if self.max_target_upside_at_pub <= self.min_target_upside_at_pub:
-            raise ValueError(
-                "max_target_upside_at_pub must exceed min_target_upside_at_pub; "
-                f"got {self.max_target_upside_at_pub} <= {self.min_target_upside_at_pub}"
-            )
-        return self
-
-    @model_validator(mode="after")
-    def _check_ma_crossover_windows(self) -> SmicMttStrategyConfig:
-        if self.trend_filter == "ma_crossover" and self.fast_ma_window >= self.slow_ma_window:
-            raise ValueError(
-                "fast_ma_window must be strictly smaller than slow_ma_window for MA crossover trend filter"
-            )
-        return self
-
-
-class SmicRsiReversalConfig(_PersonaBase):
-    """Short-term broker-ledger strategy for oversold report pullbacks.
-
-    The strategy keeps the same realistic account constraints as
-    :class:`SmicMttStrategyConfig`, but its buy signal is deliberately
-    contrarian: a still-valid SMIC report with enough target upside is bought
-    only after a short-term pullback leaves the symbol oversold by RSI.
-    Positions exit quickly on rebound, target/profit, stop-loss, or max hold
-    age so this persona tests a reversal-buy lane rather than another trend
-    follower.
-    """
-
-    persona_name: Annotated[str, Field(pattern=r"^smic_rsi_reversal(_top[0-9]+)?$")] = "smic_rsi_reversal"
-    label: str = "RSI Reversal Strategy"
-
-    min_target_upside_at_pub: Annotated[float, Field(ge=0.0, le=10.0)] = 0.10
-    max_target_upside_at_pub: Annotated[float, Field(gt=0.0, le=20.0)] = 5.0
-    target_hit_multiplier: Annotated[float, Field(gt=0.0, le=2.0)] = 1.0
-
-    rsi_window: Annotated[int, Field(ge=5, le=60)] = 14
-    max_entry_rsi: Annotated[float, Field(gt=0.0, lt=100.0)] = 35.0
-    rebound_exit_rsi: Annotated[float, Field(gt=0.0, lt=100.0)] = 55.0
-    pullback_lookback_days: Annotated[int, Field(ge=5, le=252)] = 20
-    min_pullback_pct: Annotated[float, Field(ge=0.0, le=1.0)] = 0.05
-
-    max_positions: Annotated[int, Field(ge=1, le=200)] = 10
-    universe: Literal["all", "domestic", "overseas"] = "all"
-    top_up_cadence: Literal["deposit_only", "monthly", "quarterly"] = "monthly"
-    signal_valid_days: Annotated[int, Field(ge=1, le=3650)] = 90
-    stop_loss_pct: Annotated[float, Field(gt=0.0, lt=1.0)] = 0.12
-    take_profit_pct: Annotated[float, Field(gt=0.0, le=10.0)] = 0.25
-    max_holding_days: Annotated[int, Field(ge=1, le=3650)] = 60
-
-    @model_validator(mode="after")
-    def _check_reversal_bands(self) -> SmicRsiReversalConfig:
-        if self.max_target_upside_at_pub <= self.min_target_upside_at_pub:
-            raise ValueError(
-                "max_target_upside_at_pub must exceed min_target_upside_at_pub; "
-                f"got {self.max_target_upside_at_pub} <= {self.min_target_upside_at_pub}"
-            )
-        if self.rebound_exit_rsi <= self.max_entry_rsi:
-            raise ValueError(
-                "rebound_exit_rsi must exceed max_entry_rsi; "
-                f"got {self.rebound_exit_rsi} <= {self.max_entry_rsi}"
-            )
-        return self
-
-
-class StockRulePersonaConfig(_PersonaBase):
-    """OOS-admitted stock-level ranking rule promoted into the portfolio engine.
-
-    These personas are created by the stock-rule search lane.  They trade real
-    shares in the same account ledger as the hand-written personas, but the
-    signal itself is a frozen, audited rule discovered in an in-sample window
-    and admitted only after out-of-sample replay.
-    """
-
-    persona_name: Annotated[str, Field(pattern=r"^stock_rule_[a-z0-9_]+$")]
-    label: str
-    rule_id: Annotated[str, Field(min_length=1)]
-    family: Literal[
-        "target_upside_momentum",
-        "fresh_report_momentum",
-        "target_gap_reversal",
-        "price_momentum",
-        "ma_crossover",
-        "rsi_reversal",
-    ]
-    fast_ma_days: Annotated[int, Field(ge=1, le=300)]
-    slow_ma_days: Annotated[int, Field(ge=1, le=500)]
-    min_report_age_days: Annotated[int, Field(ge=0, le=3650)]
-    max_report_age_days: Annotated[int, Field(ge=0, le=3650)]
-    rebalance: Literal["D", "W", "M"]
-    top_pool: Annotated[int, Field(ge=1, le=200)]
-    hold_top: Annotated[int, Field(ge=1, le=200)]
-    weight_mode: Literal["equal", "rank_linear", "winner_compress", "score_proportional"]
-    score_mode: Literal[
-        "dynamic_upside",
-        "blend",
-        "momentum_blend",
-        "reversal_gap",
-        "price_momentum",
-        "ma_cross",
-        "rsi_reversal",
-    ]
-    min_dynamic_upside: float = 0.0
-    min_momentum_return: float = -1.0
-    min_pullback_pct: float = 0.0
-    coverage_failure_trading_days: Annotated[int, Field(ge=0, le=5000)] = 0
-    min_return_21d: Annotated[float, Field(ge=-1.0, le=20.0)] = -1.0
-    min_return_63d: Annotated[float, Field(ge=-1.0, le=20.0)] = -1.0
-    min_return_126d: Annotated[float, Field(ge=-1.0, le=20.0)] = -1.0
-    min_distance_from_52w_high: Annotated[float, Field(ge=-1.0, le=0.0)] = -1.0
-    require_ma_stack: bool = False
-    hold_target_winners: bool = False
-    target_winner_trailing_stop_pct: Annotated[float, Field(ge=0.0, lt=1.0)] = 0.0
-    target_carry_ma_days: Annotated[int, Field(ge=0, le=500)] = 0
-    risk_off_ma_days: Annotated[int, Field(ge=0, le=500)] = 0
-    risk_off_symbol: str = "069500.KS"
-    fallback_symbol: str = ""
-    source_search_start: date | None = None
-    source_search_end: date | None = None
-    source_oos_start: date | None = None
-    source_oos_end: date | None = None
-    source_oos_total_return: float | None = None
-    source_oos_sharpe: float | None = None
-    source_oos_sortino: float | None = None
-
-    @model_validator(mode="after")
-    def _check_stock_rule_bounds(self) -> StockRulePersonaConfig:
-        if self.slow_ma_days < self.fast_ma_days:
-            raise ValueError("slow_ma_days must be >= fast_ma_days")
-        if self.max_report_age_days < self.min_report_age_days:
-            raise ValueError("max_report_age_days must be >= min_report_age_days")
-        if self.hold_top > self.top_pool:
-            raise ValueError("hold_top must be <= top_pool")
-        return self
-
-
-class PitResearchBoardConfig(_PersonaBase):
-    """Point-in-time research-board score rotation.
-
-    The strategy rebuilds the product screener board for each decision date
-    using only reports/prices known as of that date, then trades the top-N
-    rows in the real share ledger on the next trading day.
-    """
-
-    persona_name: Annotated[str, Field(pattern=r"^pit_research_board_[a-z0-9_]+$")]
-    label: str
-    top_n: Annotated[int, Field(ge=1, le=50)] = 10
-    rebalance: Literal["D", "W", "M"] = "M"
-    score_mode: Literal["candidate_score", "board_score", "ta_momentum_score"] = "board_score"
-    weight_mode: Literal["equal", "score_proportional", "winner_compress"] = "equal"
-    universe: Literal["all", "domestic", "overseas"] = "all"
-    min_report_age_days: Annotated[int, Field(ge=0, le=3650)] = 0
-    max_report_age_days: Annotated[int, Field(ge=30, le=3650)] = 730
-    min_score: Annotated[float, Field(ge=0.0, le=100.0)] = 0.0
-    bucket_filter: Literal["all", "fresh", "large-upside", "near-target", "active"] = "all"
-    require_ma_stack: bool = False
-    require_near_52w_high: bool = False
-    min_target_upside_at_pub: Annotated[float, Field(ge=0.0, le=10.0)] = 0.0
-    max_target_upside_at_pub: Annotated[float, Field(gt=0.0, le=20.0)] = 20.0
-    min_current_return: Annotated[float, Field(ge=-1.0, le=20.0)] = -1.0
-    max_current_return: Annotated[float, Field(ge=-1.0, le=20.0)] = 20.0
-    min_return_1m: Annotated[float, Field(ge=-1.0, le=20.0)] = -1.0
-    min_return_3m: Annotated[float, Field(ge=-1.0, le=20.0)] = -1.0
-    min_return_6m: Annotated[float, Field(ge=-1.0, le=20.0)] = -1.0
-    min_return_1y: Annotated[float, Field(ge=-1.0, le=20.0)] = -1.0
-    min_distance_from_52w_high: Annotated[float, Field(ge=-1.0, le=0.0)] = -1.0
-    require_ema_stack: bool = False
-    require_macd_bullish: bool = False
-    target_hit_multiplier: Annotated[float, Field(gt=0.0, le=2.0)] = 1.0
-    stop_loss_pct: Annotated[float, Field(ge=0.0, lt=1.0)] = 0.0
-    take_profit_pct: Annotated[float, Field(ge=0.0, le=10.0)] = 0.0
-    max_holding_days: Annotated[int, Field(ge=0, le=3650)] = 0
-    hold_target_winners: bool = False
-    target_winner_trailing_stop_pct: Annotated[float, Field(ge=0.0, lt=1.0)] = 0.0
-
-    @model_validator(mode="after")
-    def _check_alpha_rule_bounds(self) -> PitResearchBoardConfig:
-        if self.max_report_age_days < self.min_report_age_days:
-            raise ValueError("max_report_age_days must be >= min_report_age_days")
-        if self.max_target_upside_at_pub <= self.min_target_upside_at_pub:
-            raise ValueError("max_target_upside_at_pub must exceed min_target_upside_at_pub")
-        if self.max_current_return < self.min_current_return:
-            raise ValueError("max_current_return must be >= min_current_return")
-        return self
-
-
 PersonaConfig = (
     ProphetConfig
     | WeakProphetConfig
     | SmicFollowerConfig
     | SmicFollowerV2Config
-    | SmicMttStrategyConfig
-    | SmicRsiReversalConfig
-    | StockRulePersonaConfig
-    | PitResearchBoardConfig
     | AllWeatherConfig
 )
 
@@ -445,18 +207,11 @@ PersonaName = Literal[
     "weak_oracle",
     "smic_follower",
     "smic_follower_v2",
-    "smic_mtt_strategy",
-    "smic_rsi_reversal",
     "all_weather",
     "benchmark_qqq",
     "benchmark_spy",
     "benchmark_kodex200",
     "benchmark_gld",
-    "pit_research_board_score_top5",
-    "pit_research_board_score_top10",
-    "pit_research_board_large_upside_top10",
-    "pit_research_board_trend_top10",
-    "pit_research_board_near_high_top10",
 ]
 
 
@@ -743,7 +498,6 @@ PERSONA_REGISTRY_KEYS: tuple[str, ...] = (
     "weak_oracle",
     "smic_follower",
     "smic_follower_v2",
-    "smic_mtt_strategy",
     "all_weather",
     "benchmark_qqq",
     "benchmark_spy",

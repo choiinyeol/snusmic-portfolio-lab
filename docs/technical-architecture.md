@@ -1,11 +1,11 @@
-# Technical Architecture
+﻿# Technical Architecture
 
 Last updated: 2026-05-23
 Status: canonical implementation map
 
 ## Boundary
 
-Python owns collection, normalization, price refresh, simulation, strategy generation, and artifact export. The Next.js app is a static reader over committed artifacts.
+Python owns collection, normalization, price refresh, PIT board export, fixed simulation baselines, and artifact export. The Next.js app is a static reader over committed artifacts.
 
 No frontend route may call live market APIs or reconstruct simulation logic.
 
@@ -15,7 +15,7 @@ No frontend route may call live market APIs or reconstruct simulation logic.
 SMIC reports
   -> data warehouse
   -> price history
-  -> strategy generation / daily forward
+  -> PIT board export / daily forward
   -> account simulation artifacts
   -> web artifacts
   -> static Next.js pages
@@ -28,7 +28,7 @@ Primary commands:
 | `python -m snusmic_pipeline sync` | Fetch reports and extract rows. |
 | `python -m snusmic_pipeline refresh-market` | Build warehouse and refresh prices. |
 | `python -m snusmic_pipeline daily-forward` | Advance the current core account path. |
-| `python -m snusmic_pipeline generate-strategies` | Regenerate research/strategy artifacts. |
+| `python -m snusmic_pipeline export-pit-board` | Export point-in-time research-board rows. |
 | `python -m snusmic_pipeline run-sim` | Run the package-owned account simulation. |
 | `python -m snusmic_pipeline export-web` | Write `data/web` artifacts. |
 
@@ -44,7 +44,7 @@ Important artifact groups:
 | `overview/*.json` | Snapshot, research pulse, and data-quality summaries. |
 | `reports/*.json` | Report tables, rankings, return windows, and detail metrics. |
 | `portfolio/*.json` | Ledger, holdings, trades, daily decisions, and equity paths. |
-| `strategies/*.json` | Catalog, leaderboard, curves, taxonomy, and strategy metadata. |
+| `accounts/*.json` | Fixed account-simulation catalog, leaderboard, curves, and taxonomy metadata. |
 | `prices/*.json` | Symbol price series for static charts. |
 
 Schemas under `docs/schemas/*.schema.json` are generated contracts used by compatibility checks. Do not delete them unless the validation scripts are changed first.
@@ -64,7 +64,7 @@ Pages should be server-first. Client components are for charts, table controls, 
 
 ## Incremental Forward
 
-`daily-forward` is the normal operating lane after new prices arrive. It may reuse checkpoints only when the persona config, price basis, and report basis still match. If those inputs change, run `generate-strategies` or `run-sim` instead of silently falling back.
+`daily-forward` is the normal operating lane after new prices arrive. It may reuse checkpoints only when the persona config, price basis, and report basis still match. If those inputs change, run `run-sim` for a full replay and `export-pit-board` for the manual PIT dataset.
 
 ## Validation
 

@@ -1,10 +1,8 @@
-"""Per-persona behavior on the synthetic three-symbol universe."""
+﻿"""Per-persona behavior on the synthetic three-symbol universe."""
 
 from __future__ import annotations
 
 from datetime import date
-
-import pandas as pd
 
 from snusmic_pipeline.sim.contracts import (
     BrokerageFees,
@@ -13,19 +11,13 @@ from snusmic_pipeline.sim.contracts import (
     SavingsPlan,
     SmicFollowerConfig,
     SmicFollowerV2Config,
-    SmicMttStrategyConfig,
-    SmicRsiReversalConfig,
     WeakProphetConfig,
 )
-from snusmic_pipeline.sim.market import PriceBoard
 from snusmic_pipeline.sim.personas import (
     simulate_prophet,
     simulate_smic_follower,
     simulate_smic_follower_v2,
-    simulate_smic_mtt_strategy,
-    simulate_smic_rsi_reversal,
     simulate_weak_prophet,
-    smic_mtt_strategy,
 )
 from snusmic_pipeline.sim.personas.base import sharpe_ratio, sortino_ratio
 from snusmic_pipeline.sim.savings import build_cash_flow_schedule
@@ -87,230 +79,6 @@ def test_smic_follower_v2_stops_out_long_held_loser(synthetic_board, synthetic_r
     assert reasons & {"stop_loss_time", "stop_loss_average_down", "stop_loss_report_age"}
     # v2 evaluates sell signals daily, but it must not churn the book through
     # daily equal-weight rebalance sells.
-    assert not any(t.reason == "rebalance_sell" for t in sells)
-
-
-def test_smic_mtt_strategy_uses_broker_slots_without_rebalance_sells(
-    synthetic_board, synthetic_reports, synthetic_dates
-):
-    plan, fees, cashflows = _common_inputs(synthetic_dates)
-    cfg = SmicMttStrategyConfig(
-        require_mtt=False,
-        universe="all",
-        min_target_upside_at_pub=0.05,
-        max_positions=1,
-        target_hit_multiplier=2.0,
-        take_profit_pct=3.0,
-        top_up_cadence="deposit_only",
-    )
-    out = simulate_smic_mtt_strategy(
-        cfg, plan, fees, synthetic_board, synthetic_reports, cashflows, synthetic_dates
-    )
-
-    buys = [t for t in out.account.trades if t.side == "buy"]
-    sells = [t for t in out.account.trades if t.side == "sell"]
-    assert buys
-    assert {t.symbol for t in buys} == {"WIN"}
-    assert not any(t.reason == "rebalance_sell" for t in sells)
-    assert max(ep.open_positions for ep in out.equity_points) <= 1
-
-
-def test_smic_mtt_strategy_fills_close_signal_on_next_session_open() -> None:
-    trading_dates = [d.date() for d in pd.bdate_range("2025-01-02", periods=4)]
-    close = pd.DataFrame({"WIN": [100.0, 120.0, 130.0, 140.0]}, index=pd.to_datetime(trading_dates))
-    open_ = pd.DataFrame({"WIN": [99.0, 150.0, 131.0, 141.0]}, index=pd.to_datetime(trading_dates))
-    board = PriceBoard(close=close, open=open_, high=close.copy(), low=close.copy())
-    reports = pd.DataFrame(
-        [
-            {
-                "report_id": "next-open",
-                "symbol": "WIN",
-                "company": "Winner",
-                "exchange": "NASDAQ",
-                "publication_date": pd.Timestamp(trading_dates[0]),
-                "target_price": 180.0,
-            }
-        ]
-    )
-    plan = SavingsPlan(initial_capital_krw=1_000_000, monthly_contribution_krw=0)
-    fees = BrokerageFees(commission_bps=0, sell_tax_bps=0, slippage_bps=0)
-    cashflows = build_cash_flow_schedule(trading_dates, plan)
-    cfg = SmicMttStrategyConfig(
-        require_mtt=False,
-        universe="all",
-        min_target_upside_at_pub=0.0,
-        max_target_upside_at_pub=10.0,
-        max_positions=1,
-        top_up_cadence="deposit_only",
-        target_hit_multiplier=2.0,
-        take_profit_pct=10.0,
-    )
-
-    out = simulate_smic_mtt_strategy(cfg, plan, fees, board, reports, cashflows, trading_dates)
-
-    buy = next(t for t in out.account.trades if t.side == "buy")
-    assert buy.date == trading_dates[1]
-    assert buy.fill_price_krw == 150.0
-
-
-def test_smic_mtt_strategy_does_not_buy_new_position_from_missing_open_close_fallback() -> None:
-    trading_dates = [d.date() for d in pd.bdate_range("2025-01-02", periods=3)]
-    close = pd.DataFrame({"WIN": [100.0, 120.0, 130.0]}, index=pd.to_datetime(trading_dates))
-    open_ = pd.DataFrame({"WIN": [99.0, pd.NA, 131.0]}, index=pd.to_datetime(trading_dates))
-    board = PriceBoard(close=close, open=open_, high=close.copy(), low=close.copy())
-    reports = pd.DataFrame(
-        [
-            {
-                "report_id": "missing-open",
-                "symbol": "WIN",
-                "company": "Winner",
-                "exchange": "NASDAQ",
-                "publication_date": pd.Timestamp(trading_dates[0]),
-                "target_price": 180.0,
-            }
-        ]
-    )
-    plan = SavingsPlan(initial_capital_krw=1_000_000, monthly_contribution_krw=0)
-    fees = BrokerageFees(commission_bps=0, sell_tax_bps=0, slippage_bps=0)
-    cfg = SmicMttStrategyConfig(
-        require_mtt=False,
-        universe="all",
-        min_target_upside_at_pub=0.0,
-        max_target_upside_at_pub=10.0,
-        max_positions=1,
-        top_up_cadence="deposit_only",
-        target_hit_multiplier=2.0,
-        take_profit_pct=10.0,
-    )
-
-    out = simulate_smic_mtt_strategy(
-        cfg, plan, fees, board, reports, build_cash_flow_schedule(trading_dates, plan), trading_dates
-    )
-
-    buy = next(t for t in out.account.trades if t.side == "buy")
-    assert buy.date == trading_dates[2]
-    assert buy.fill_price_krw == 131.0
-
-
-def test_smic_mtt_strategy_filters_non_mtt_reports(synthetic_board, synthetic_dates):
-    plan, fees, cashflows = _common_inputs(synthetic_dates)
-    reports = pd.DataFrame(
-        [
-            {
-                "report_id": "mtt-win",
-                "symbol": "WIN",
-                "company": "Winners Co",
-                "exchange": "NASDAQ",
-                "publication_date": pd.Timestamp("2025-03-03"),
-                "target_price": 250.0,
-            },
-            {
-                "report_id": "mtt-loss",
-                "symbol": "LOSS",
-                "company": "Losers Co",
-                "exchange": "NASDAQ",
-                "publication_date": pd.Timestamp("2025-03-03"),
-                "target_price": 130.0,
-            },
-        ]
-    )
-    cfg = SmicMttStrategyConfig(
-        universe="all",
-        min_target_upside_at_pub=0.05,
-        max_positions=2,
-        top_up_cadence="deposit_only",
-        target_hit_multiplier=2.0,
-        take_profit_pct=3.0,
-    )
-    out = simulate_smic_mtt_strategy(cfg, plan, fees, synthetic_board, reports, cashflows, synthetic_dates)
-
-    buys = [t for t in out.account.trades if t.side == "buy"]
-    assert any(t.symbol == "WIN" for t in buys)
-    assert not any(t.symbol == "LOSS" for t in buys)
-
-
-def test_smic_mtt_strategy_relative_strength_prefers_trailing_winner(synthetic_board, synthetic_dates):
-    plan, fees, cashflows = _common_inputs(synthetic_dates)
-    reports = pd.DataFrame(
-        [
-            {
-                "report_id": "rs-win",
-                "symbol": "WIN",
-                "company": "Winners Co",
-                "exchange": "NASDAQ",
-                "publication_date": pd.Timestamp("2025-03-03"),
-                "target_price": 220.0,
-            },
-            {
-                "report_id": "rs-loss",
-                "symbol": "LOSS",
-                "company": "Losers Co",
-                "exchange": "NASDAQ",
-                "publication_date": pd.Timestamp("2025-03-03"),
-                "target_price": 200.0,
-            },
-        ]
-    )
-    cfg = SmicMttStrategyConfig(
-        require_mtt=False,
-        universe="all",
-        min_target_upside_at_pub=0.05,
-        max_target_upside_at_pub=5.0,
-        max_positions=1,
-        top_up_cadence="deposit_only",
-        target_hit_multiplier=2.0,
-        take_profit_pct=3.0,
-        relative_strength_lookback_days=126,
-        min_relative_strength_percentile=0.60,
-        min_momentum_return=0.0,
-    )
-
-    out = simulate_smic_mtt_strategy(cfg, plan, fees, synthetic_board, reports, cashflows, synthetic_dates)
-
-    buys = [t for t in out.account.trades if t.side == "buy"]
-    assert buys
-    assert {t.symbol for t in buys} == {"WIN"}
-
-
-def test_smic_rsi_reversal_buys_oversold_report_and_exits_on_rebound():
-    trading_dates = [d.date() for d in pd.bdate_range("2024-01-02", periods=80)]
-    drawdown = [100.0 - (22.0 * (i + 1) / 20) for i in range(20)]
-    rebound = [78.0 + (42.0 * (i + 1) / 55) for i in range(55)]
-    close = pd.DataFrame({"DIP": [100.0] * 5 + drawdown + rebound}, index=pd.to_datetime(trading_dates))
-    board = PriceBoard(close=close, open=close.copy(), high=close.copy(), low=close.copy())
-    reports = pd.DataFrame(
-        [
-            {
-                "report_id": "r-dip",
-                "symbol": "DIP",
-                "company": "Dip Buyer",
-                "exchange": "KRX",
-                "publication_date": pd.Timestamp("2024-01-02"),
-                "target_price": 140.0,
-            }
-        ]
-    )
-    plan, fees, cashflows = _common_inputs(trading_dates)
-    cfg = SmicRsiReversalConfig(
-        max_positions=1,
-        rsi_window=14,
-        max_entry_rsi=35.0,
-        rebound_exit_rsi=55.0,
-        min_pullback_pct=0.05,
-        pullback_lookback_days=20,
-        signal_valid_days=80,
-        stop_loss_pct=0.20,
-        take_profit_pct=10.0,
-        top_up_cadence="deposit_only",
-    )
-
-    out = simulate_smic_rsi_reversal(cfg, plan, fees, board, reports, cashflows, trading_dates)
-
-    buys = [t for t in out.account.trades if t.side == "buy"]
-    sells = [t for t in out.account.trades if t.side == "sell"]
-    assert buys
-    assert {t.symbol for t in buys} == {"DIP"}
-    assert any(t.symbol == "DIP" and t.reason == "rebound_exit" for t in sells)
     assert not any(t.reason == "rebalance_sell" for t in sells)
 
 
@@ -388,42 +156,3 @@ def test_risk_metrics_from_equity_points():
     assert sortino is None
 
 
-def test_ma_crossover_passes_only_when_cross_happens_today(synthetic_dates):
-    dates = synthetic_dates[:15]
-    close_values = []
-    for i in range(15):
-        if i < 10:
-            close_values.append(120.0 - i * 2.0)
-        else:
-            close_values.append(100.0 + (i - 9) * 3.0)
-    board = PriceBoard(
-        close=pd.Series(close_values, index=pd.to_datetime(dates), name="WIN").to_frame(),
-        open=pd.Series(close_values, index=pd.to_datetime(dates), name="WIN").to_frame(),
-    )
-    fast = pd.Series(close_values, index=pd.to_datetime(dates)).rolling(5, min_periods=5).mean()
-    slow = pd.Series(close_values, index=pd.to_datetime(dates)).rolling(10, min_periods=10).mean()
-    cross_idx = None
-    for idx in range(10, len(close_values)):
-        if pd.isna(fast.iloc[idx - 1]) or pd.isna(slow.iloc[idx - 1]):
-            continue
-        if fast.iloc[idx] > slow.iloc[idx] and fast.iloc[idx - 1] <= slow.iloc[idx - 1]:
-            cross_idx = idx
-            break
-    assert cross_idx is not None
-
-    cfg = SmicMttStrategyConfig(
-        require_mtt=True,
-        trend_filter="ma_crossover",
-        fast_ma_window=5,
-        slow_ma_window=10,
-        universe="all",
-        min_target_upside_at_pub=0.0,
-        max_target_upside_at_pub=10.0,
-        top_up_cadence="deposit_only",
-        min_price_vs_52w_low=0.0,
-    )
-
-    day_before = dates[cross_idx - 1]
-    day_at = dates[cross_idx]
-    assert not smic_mtt_strategy._passes_ma_crossover(board, pd.Timestamp(day_before).date(), "WIN", cfg)
-    assert smic_mtt_strategy._passes_ma_crossover(board, day_at, "WIN", cfg)

@@ -1,4 +1,4 @@
-import 'server-only';
+﻿import 'server-only';
 import {
   getCurrentHoldings,
   getOverview,
@@ -379,7 +379,5 @@ export function compactStrategyLabel(id: string, label: string): string {
   if (id === 'benchmark_spy') return 'SPY';
   if (id === 'benchmark_gld') return 'GLD';
   if (id === 'weak_oracle') return '미래정보 상한선';
-  const match = id.match(/^smic_mtt_strategy_top([0-9]+)$/);
-  if (match) return `리포트 추세 #${match[1]}`;
   return label;
 }

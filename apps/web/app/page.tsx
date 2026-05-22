@@ -97,7 +97,7 @@ export default function LandingPage() {
             <Metric label="평가액" value={formatKrw(portfolio.finalEquityKrw)} />
             <Metric label="RP이자 비중" value={formatPercent(portfolio.cashWeight)} />
             <Metric label="리포트" value={`${manifest.row_counts.reports.toLocaleString('ko-KR')}건`} />
-            <Metric label="전략" value={`${manifest.row_counts.strategy_catalog.toLocaleString('ko-KR')}개`} />
+            <Metric label="계정" value={`${manifest.row_counts.account_catalog.toLocaleString('ko-KR')}개`} />
           </div>
           <div className="grid gap-1 border-t border-slate-200 p-3">
             {links.map((item) => {

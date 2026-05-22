@@ -17,10 +17,10 @@ from .fetch_index import fetch_reports, parse_pages
 from .github_urls import github_pdf_url
 from .markdown_export import export_markdown
 from .models import DownloadedPdf, ExtractedReport, ReportMeta
-from .sim.contracts import SimulationConfig, SmicMttStrategyConfig
+from .sim.contracts import SimulationConfig
 from .sim.forward_runner import load_config_from_persona_artifact, run_daily_forward
 from .sim.persona_sim import main as run_persona_simulation_command
-from .sim.strategy_generation import StrategyGenerationConfig, run_strategy_generation
+from .sim.pit_board_export import main as run_pit_board_export_command
 from .sim.warehouse import build_warehouse, refresh_price_history
 from .web_artifacts import ExportInputs, check_web_artifacts, export_web_artifacts
 
@@ -409,40 +409,6 @@ def run_export_web(args: argparse.Namespace) -> int:
     return 0
 
 
-def run_generate_strategies(args: argparse.Namespace) -> int:
-    result = run_strategy_generation(
-        StrategyGenerationConfig(
-            warehouse_dir=Path(args.warehouse),
-            out_dir=Path(args.out),
-            start_date=date.fromisoformat(args.start),
-            end_date=date.fromisoformat(args.end),
-            is_start=date.fromisoformat(args.is_start),
-            is_end=date.fromisoformat(args.is_end),
-            stock_oos_start=date.fromisoformat(args.stock_oos_start),
-            stock_oos_end=date.fromisoformat(args.stock_oos_end) if args.stock_oos_end else None,
-            max_stock_configs=args.max_stock_configs,
-            is_top=args.is_top,
-            admit_top=args.admit_top,
-            stock_persona_top=args.stock_persona_top,
-            pit_strategy_top=args.pit_strategy_top,
-            max_correlation=args.max_correlation,
-            goal_min_sharpe=args.goal_min_sharpe,
-            goal_min_sortino=args.goal_min_sortino,
-            goal_min_return=args.goal_min_return,
-            goal_max_drawdown=args.goal_max_drawdown,
-            broker_strategy_trials=args.broker_strategy_trials,
-            broker_strategy_top=args.broker_strategy_top,
-            broker_strategy_seed=args.broker_strategy_seed,
-            broker_strategy_train_start=date.fromisoformat(args.broker_strategy_train_start),
-            broker_strategy_train_end=date.fromisoformat(args.broker_strategy_train_end),
-            include_oracle=args.include_oracle,
-            refresh_benchmark=args.refresh_benchmark,
-        )
-    )
-    print(json.dumps(result.__dict__, ensure_ascii=False, indent=2, sort_keys=True))
-    return 0
-
-
 def run_daily_forward_cli(args: argparse.Namespace) -> int:
     start = date.fromisoformat(args.start)
     end = date.fromisoformat(args.end)
@@ -459,7 +425,7 @@ def run_daily_forward_cli(args: argparse.Namespace) -> int:
     if config is None:
         base = SimulationConfig(start_date=start, end_date=end)
         personas = tuple(persona for persona in base.personas if persona.persona_name != "weak_oracle")
-        config = base.model_copy(update={"personas": (*personas, SmicMttStrategyConfig())})
+        config = base.model_copy(update={"personas": personas})
     report = run_daily_forward(
         config,
         Path(args.warehouse),
@@ -493,34 +459,32 @@ def run_persona_sim(args: argparse.Namespace) -> int:
     ]
     if args.refresh_benchmark:
         forwarded.append("--refresh-benchmark")
-    if args.disable_broker_strategy_search:
-        forwarded.append("--disable-broker-strategy-search")
-    if args.broker_strategy_personas:
-        forwarded.extend(["--broker-strategy-personas", str(args.broker_strategy_personas)])
-    if args.stock_rule_personas:
-        forwarded.extend(["--stock-rule-personas", str(args.stock_rule_personas)])
-    if args.pit_research_board_personas:
-        forwarded.extend(["--pit-research-board-personas", str(args.pit_research_board_personas)])
-    forwarded.extend(
-        [
-            "--broker-strategy-trials",
-            str(args.broker_strategy_trials),
-            "--broker-strategy-top",
-            str(args.broker_strategy_top),
-            "--broker-strategy-seed",
-            str(args.broker_strategy_seed),
-            "--broker-strategy-train-start",
-            args.broker_strategy_train_start,
-            "--broker-strategy-train-end",
-            args.broker_strategy_train_end,
-        ]
-    )
     return run_persona_simulation_command(forwarded)
+
+
+def run_export_pit_board(args: argparse.Namespace) -> int:
+    forwarded = [
+        "--start",
+        args.start,
+        "--end",
+        args.end,
+        "--warehouse",
+        str(args.warehouse),
+        "--out",
+        str(args.out),
+        "--cadence",
+        args.cadence,
+        "--max-report-age-days",
+        str(args.max_report_age_days),
+        "--universe",
+        args.universe,
+    ]
+    return run_pit_board_export_command(forwarded)
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Collect SNUSMIC PDFs, extract target prices, and run persona simulations."
+        description="Collect SNUSMIC PDFs, extract target prices, and export PIT research data."
     )
     subparsers = parser.add_subparsers(dest="command")
 
@@ -635,73 +599,22 @@ def build_parser() -> argparse.ArgumentParser:
     export_web.add_argument("--check", action="store_true", help="Verify deterministic artifact output.")
     export_web.set_defaults(func=run_export_web)
 
-    generate = subparsers.add_parser(
-        "generate-strategies",
-        help="Generate benchmark-approved strategy personas through the structural pipeline.",
+    pit_board = subparsers.add_parser(
+        "export-pit-board",
+        help="Export point-in-time research-board rows for manual PIT review.",
     )
-    generate.add_argument("--start", default="2021-01-04")
-    generate.add_argument("--end", default=date.today().isoformat())
-    generate.add_argument("--warehouse", default=str(REPO_ROOT / "data" / "warehouse"))
-    generate.add_argument("--out", default=str(REPO_ROOT / "data" / "sim"))
-    generate.add_argument("--is-start", default="2021-01-04")
-    generate.add_argument("--is-end", default="2022-12-31")
-    generate.add_argument("--stock-oos-start", default="2023-01-02")
-    generate.add_argument("--stock-oos-end", default=None)
-    generate.add_argument("--max-stock-configs", type=int, default=0)
-    generate.add_argument("--is-top", type=int, default=75)
-    generate.add_argument("--admit-top", type=int, default=0)
-    generate.add_argument(
-        "--stock-persona-top",
-        type=int,
-        default=int(os.environ.get("STOCK_RULE_PERSONA_TOP", "0")),
-        help=(
-            "Promote this many stock-rule search personas. Defaults to 0 because "
-            "stock-rule search is an expensive experimental lane; set >0 to opt in."
-        ),
-    )
-    generate.add_argument(
-        "--pit-strategy-top",
-        type=int,
-        default=int(os.environ.get("PIT_RESEARCH_BOARD_STRATEGY_TOP", "0")),
-        help=(
-            "Promote this many point-in-time research-board strategies. Defaults to 0 because "
-            "PIT board simulation is an expensive candidate-board research lane."
-        ),
-    )
-    generate.add_argument("--max-correlation", type=float, default=0.95)
-    generate.add_argument("--goal-min-sharpe", type=float, default=0.7)
-    generate.add_argument("--goal-min-sortino", type=float, default=0.7)
-    generate.add_argument("--goal-min-return", type=float, default=2.0)
-    generate.add_argument("--goal-max-drawdown", type=float, default=0.65)
-    generate.add_argument(
-        "--broker-strategy-trials",
-        type=int,
-        default=int(os.environ.get("SMIC_BROKER_STRATEGY_TRIALS", "120")),
-    )
-    generate.add_argument(
-        "--broker-strategy-top", type=int, default=int(os.environ.get("SMIC_BROKER_STRATEGY_TOP", "3"))
-    )
-    generate.add_argument(
-        "--broker-strategy-seed", type=int, default=int(os.environ.get("SMIC_BROKER_STRATEGY_SEED", "42"))
-    )
-    generate.add_argument(
-        "--broker-strategy-train-start",
-        default=os.environ.get("SMIC_BROKER_STRATEGY_TRAIN_START", "2021-01-01"),
-    )
-    generate.add_argument(
-        "--broker-strategy-train-end", default=os.environ.get("SMIC_BROKER_STRATEGY_TRAIN_END", "2023-12-31")
-    )
-    generate.add_argument(
-        "--include-oracle",
-        action="store_true",
-        help="Include the future-information weak_oracle upper-bound benchmark. Slow; off by default.",
-    )
-    generate.add_argument("--refresh-benchmark", action="store_true")
-    generate.set_defaults(func=run_generate_strategies)
+    pit_board.add_argument("--start", default="2021-01-04")
+    pit_board.add_argument("--end", default=date.today().isoformat())
+    pit_board.add_argument("--warehouse", default=str(REPO_ROOT / "data" / "warehouse"))
+    pit_board.add_argument("--out", default=str(REPO_ROOT / "data" / "sim" / "pit-research-board.csv"))
+    pit_board.add_argument("--cadence", choices=("D", "W", "M"), default="M")
+    pit_board.add_argument("--max-report-age-days", type=int, default=730)
+    pit_board.add_argument("--universe", choices=("all", "domestic", "overseas"), default="all")
+    pit_board.set_defaults(func=run_export_pit_board)
 
     daily_forward = subparsers.add_parser(
         "daily-forward",
-        help="Advance core investable personas from the latest checkpoint and write sim artifacts.",
+        help="Advance core benchmark/follower simulations from the latest checkpoint and write sim artifacts.",
     )
     daily_forward.add_argument("--start", default="2021-01-04")
     daily_forward.add_argument("--end", default=date.today().isoformat())
@@ -711,11 +624,11 @@ def build_parser() -> argparse.ArgumentParser:
     daily_forward.add_argument(
         "--ignore-persona-artifact",
         action="store_true",
-        help="Ignore data/sim/persona-configs.json and use the built-in core persona set.",
+        help="Ignore data/sim/persona-configs.json and use the built-in benchmark/follower set.",
     )
     daily_forward.set_defaults(func=run_daily_forward_cli)
 
-    sim = subparsers.add_parser("run-sim", help="Run the package-owned persona simulation.")
+    sim = subparsers.add_parser("run-sim", help="Run the package-owned benchmark/follower simulation.")
     sim.add_argument("--start", default="2021-01-04")
     sim.add_argument("--end", default=date.today().isoformat())
     sim.add_argument("--warehouse", default=str(REPO_ROOT / "data" / "warehouse"))
@@ -724,46 +637,6 @@ def build_parser() -> argparse.ArgumentParser:
         "--refresh-benchmark",
         action="store_true",
         help="Force re-download of the All-Weather benchmark prices.",
-    )
-    sim.add_argument("--disable-broker-strategy-search", action="store_true")
-    sim.add_argument(
-        "--broker-strategy-trials",
-        type=int,
-        default=int(os.environ.get("SMIC_BROKER_STRATEGY_TRIALS", "400")),
-    )
-    sim.add_argument(
-        "--broker-strategy-top",
-        type=int,
-        default=int(os.environ.get("SMIC_BROKER_STRATEGY_TOP", "0")),
-        help="Maximum number of broker-ledger strategies to promote after risk/diversity gates. Use 0 for every qualifying strategy.",
-    )
-    sim.add_argument(
-        "--broker-strategy-seed",
-        type=int,
-        default=int(os.environ.get("SMIC_BROKER_STRATEGY_SEED", "42")),
-    )
-    sim.add_argument(
-        "--broker-strategy-personas",
-        default=None,
-        help="Optional JSON artifact containing SmicMttStrategyConfig rows to include.",
-    )
-    sim.add_argument(
-        "--broker-strategy-train-start",
-        default=os.environ.get("SMIC_BROKER_STRATEGY_TRAIN_START", "2021-01-01"),
-    )
-    sim.add_argument(
-        "--broker-strategy-train-end",
-        default=os.environ.get("SMIC_BROKER_STRATEGY_TRAIN_END", "2023-12-31"),
-    )
-    sim.add_argument(
-        "--stock-rule-personas",
-        default=None,
-        help="Optional JSON list of OOS-admitted StockRulePersonaConfig rows to include.",
-    )
-    sim.add_argument(
-        "--pit-research-board-personas",
-        default=None,
-        help="Optional JSON list of admitted PIT research-board persona configs to include.",
     )
     sim.set_defaults(func=run_persona_sim)
 

@@ -33,7 +33,6 @@ PERSONA_COLORS = {
     "weak_oracle": "#2563eb",
     "smic_follower": "#f59e0b",
     "smic_follower_v2": "#dc2626",
-    "smic_mtt_strategy": "#7c3aed",
     "all_weather": "#475569",
     "benchmark_qqq": "#0ea5e9",
     "benchmark_spy": "#64748b",

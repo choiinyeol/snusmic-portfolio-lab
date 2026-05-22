@@ -200,7 +200,7 @@ export const WebDataQualitySchema = z
 
 export const StrategyCatalogRowSchema = z
   .object({
-    strategy_id: z.string(),
+    account_id: z.string(),
     label: z.string(),
     short_label: z.string(),
     kind: z.enum(['benchmark', 'strategy', 'oracle']),

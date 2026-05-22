@@ -7,7 +7,7 @@ import pandas as pd
 import pytest
 
 import snusmic_pipeline.web_artifacts as web_artifacts
-from snusmic_pipeline.sim.contracts import SimulationConfig, SmicMttStrategyConfig
+from snusmic_pipeline.sim.contracts import SimulationConfig
 from snusmic_pipeline.sim.forward_runner import run_daily_forward
 from snusmic_pipeline.web_artifacts import (
     ExportInputs,
@@ -95,7 +95,7 @@ def test_daily_decision_artifacts_expose_checkpoint_metadata(tmp_path: Path) -> 
         start_date=pd.Timestamp("2021-01-04").date(), end_date=pd.Timestamp("2021-02-10").date()
     )
     personas = tuple(persona for persona in base.personas if persona.persona_name != "weak_oracle")
-    config = base.model_copy(update={"personas": (*personas, SmicMttStrategyConfig())})
+    config = base.model_copy(update={"personas": personas})
     run_daily_forward(config, Path("data/warehouse"), sim)
 
     export_web_artifacts(
@@ -216,7 +216,7 @@ def test_extended_web_artifacts_support_insights_and_downloads(tmp_path: Path) -
     assert page_rankings == rankings
     assert screener_candidates
     assert (out / "table-download-reports.csv").read_text(encoding="utf-8").startswith("report_id,date")
-    assert (out / "table-download-strategies.csv").read_text(encoding="utf-8").startswith("strategy_id,label")
+    assert (out / "table-download-accounts.csv").read_text(encoding="utf-8").startswith("account_id,label")
     assert (out / "data-quality-download.csv").read_text(encoding="utf-8").startswith("section,metric,value")
 
 
@@ -245,15 +245,14 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(tmp_path: Path) 
     assert manifest["row_counts"]["reports"] == 202
     expected_personas = len(pd.read_csv(Path("data/sim") / "summary.csv"))
     assert manifest["row_counts"]["personas"] == expected_personas
-    assert manifest["row_counts"]["strategy_catalog"] == expected_personas
+    assert manifest["row_counts"]["account_catalog"] == expected_personas
     assert manifest["row_counts"]["screener_candidates"] > 0
     assert manifest["data_quality"]["reports_with_prices"] == 202
     assert manifest["data_quality"]["missing_price_symbols"] == 5
     assert "overview/snapshot.json" in manifest["artifacts"]
     assert "portfolio/holdings.json" in manifest["artifacts"]
     assert "reports/table.json" in manifest["artifacts"]
-    assert "strategies/catalog.json" in manifest["artifacts"]
-    assert "strategies/admission.json" in manifest["artifacts"]
+    assert "accounts/catalog.json" in manifest["artifacts"]
     assert "screener/candidates.json" in manifest["artifacts"]
     assert "reports.json" in manifest["artifacts"]
     assert "prices/QQQ.json" in manifest["artifacts"]
@@ -286,7 +285,7 @@ def test_export_web_artifacts_keeps_existing_output_when_staged_validation_fails
 
 @pytest.mark.slow
 @pytest.mark.contract
-def test_strategy_catalog_uses_behavior_labels_and_admission_audit(tmp_path: Path) -> None:
+def test_account_catalog_has_no_retired_generated_strategy_personas(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
         ExportInputs(
@@ -297,58 +296,20 @@ def test_strategy_catalog_uses_behavior_labels_and_admission_audit(tmp_path: Pat
         )
     )
 
-    catalog = json.loads((out / "strategies" / "catalog.json").read_text(encoding="utf-8"))
-    promoted = [row for row in catalog if str(row.get("strategy_id", "")).startswith("stock_rule_")]
-    for row in promoted:
-        assert str(row["label"]).startswith("종목룰")
-        assert "리포트" in row["methodology_summary"]
-        assert "Full Sample validation" not in row["methodology_summary"]
-        assert "search_is" not in row["methodology_summary"]
-        assert row["is_selectable"] is True
-
-    admission = json.loads((out / "strategies" / "admission.json").read_text(encoding="utf-8"))
-    assert admission["schema_version"] == "1.0.0"
-    assert admission["stock_accepted_count"] == len(promoted)
-    assert admission["stock_admission"]["accepted_count"] == len(promoted)
-    assert {row["persona"] for row in admission["stock_admission"]["accepted_rules"]} == {
-        row["strategy_id"] for row in promoted
+    catalog = json.loads((out / "accounts" / "catalog.json").read_text(encoding="utf-8"))
+    strategy_ids = {str(row.get("account_id") or "") for row in catalog}
+    assert not {
+        item
+        for item in strategy_ids
+        if item.startswith(("stock_rule_", "pit_research_board_", "smic_mtt_strategy"))
     }
 
-    csv_text = (out / "table-download-strategies.csv").read_text(encoding="utf-8")
+    csv_text = (out / "table-download-accounts.csv").read_text(encoding="utf-8")
     assert "SMIC MTT Strategy" not in csv_text
+    assert "smic_mtt_strategy" not in csv_text
+    assert "stock_rule_" not in csv_text
+    assert "pit_research_board_" not in csv_text
 
-
-@pytest.mark.slow
-@pytest.mark.contract
-def test_stock_rule_holdings_do_not_precede_first_report_publication(tmp_path: Path) -> None:
-    out = tmp_path / "web"
-    export_web_artifacts(
-        ExportInputs(
-            warehouse=Path("data/warehouse"),
-            sim=Path("data/sim"),
-            out=out,
-            extraction_quality=Path("data/extraction_quality.json"),
-        )
-    )
-
-    reports = pd.read_csv(Path("data/warehouse") / "reports.csv", usecols=["symbol", "publication_date"])
-    reports["publication_date"] = pd.to_datetime(reports["publication_date"]).dt.strftime("%Y-%m-%d")
-    first_report_by_symbol = reports.groupby("symbol")["publication_date"].min().to_dict()
-    holdings = json.loads((out / "current-holdings.json").read_text(encoding="utf-8"))
-    leaks = [
-        (
-            row.get("persona"),
-            row.get("symbol"),
-            row.get("first_buy_date"),
-            first_report_by_symbol.get(str(row.get("symbol"))),
-        )
-        for row in holdings
-        if str(row.get("persona", "")).startswith("stock_rule_")
-        and row.get("first_buy_date")
-        and first_report_by_symbol.get(str(row.get("symbol")))
-        and str(row["first_buy_date"]) < str(first_report_by_symbol[str(row["symbol"])])
-    ]
-    assert leaks == []
 
 
 @pytest.mark.slow
@@ -401,59 +362,8 @@ def test_holdings_artifact_exposes_native_currency_for_foreign_positions(tmp_pat
     assert qqq["last_close_krw"] > 100_000
 
 
-@pytest.mark.slow
-@pytest.mark.contract
-def test_holdings_are_rebuilt_from_open_position_episodes_for_all_personas(tmp_path: Path) -> None:
-    out = tmp_path / "web"
-    export_web_artifacts(
-        ExportInputs(
-            warehouse=Path("data/warehouse"),
-            sim=Path("data/sim"),
-            out=out,
-            extraction_quality=Path("data/extraction_quality.json"),
-        )
-    )
-
-    holdings = json.loads((out / "current-holdings.json").read_text(encoding="utf-8"))
-    episodes = json.loads((out / "position-episodes.json").read_text(encoding="utf-8"))
-    open_episode_personas = {
-        row["persona"]
-        for row in episodes
-        if row.get("status") == "open" and str(row.get("persona", "")).startswith("stock_rule_")
-    }
-    holding_personas = {
-        row["persona"]
-        for row in holdings
-        if str(row.get("persona", "")).startswith("stock_rule_") and (row.get("market_value_krw") or 0) > 0
-    }
-    assert open_episode_personas <= holding_personas
 
 
-@pytest.mark.slow
-@pytest.mark.contract
-def test_accounting_reconciliation_explains_strategy_cash_vs_realized_pnl(tmp_path: Path) -> None:
-    out = tmp_path / "web"
-    export_web_artifacts(
-        ExportInputs(
-            warehouse=Path("data/warehouse"),
-            sim=Path("data/sim"),
-            out=out,
-            extraction_quality=Path("data/extraction_quality.json"),
-        )
-    )
-
-    rows = json.loads((out / "portfolio" / "accounting-reconciliation.json").read_text(encoding="utf-8"))
-    explained = [
-        row
-        for row in rows
-        if str(row.get("persona", "")).startswith("stock_rule_")
-        and row["realized_pnl_krw"] > row["final_cash_krw"]
-        and row["open_cost_basis_krw"] > 0
-    ]
-    for row in explained:
-        assert row["status"] == "ok"
-        assert abs(row["cash_gap_krw"]) < 5_000
-        assert "매입 원가" in row["explanation_ko"]
 
 
 @pytest.mark.slow

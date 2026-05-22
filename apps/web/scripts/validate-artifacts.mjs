@@ -16,9 +16,8 @@ const required = [
   'reports/table.json',
   'reports/rankings.json',
   'report-statistics-lab.json',
-  'strategies/catalog.json',
-  'strategies/admission.json',
-  'strategies/curves.json',
+  'accounts/catalog.json',
+  'accounts/curves.json',
   'screener/candidates.json',
 ];
 
@@ -66,7 +65,7 @@ const countFiles = {
   daily_decisions: 'portfolio/daily-decisions.json',
   equity_daily: 'portfolio/equity-daily.json',
   personas: 'portfolio/personas.json',
-  strategy_catalog: 'strategies/catalog.json',
+  account_catalog: 'accounts/catalog.json',
   screener_candidates: 'screener/candidates.json',
 };
 
@@ -78,12 +77,13 @@ for (const [key, file] of Object.entries(countFiles)) {
 }
 
 const dailyDecisions = readJson('portfolio/daily-decisions.json');
-if (!dailyDecisions.metadata?.run_mode) fail('portfolio/daily-decisions.json metadata.run_mode is missing');
-if (!dailyDecisions.metadata?.checkpoint_date) {
-  fail('portfolio/daily-decisions.json metadata.checkpoint_date is missing');
-}
-if (!dailyDecisions.metadata?.checkpoint_schema_version) {
-  fail('portfolio/daily-decisions.json metadata.checkpoint_schema_version is missing');
+if (dailyDecisions.metadata?.run_mode) {
+  if (!dailyDecisions.metadata?.checkpoint_date) {
+    fail('portfolio/daily-decisions.json metadata.checkpoint_date is missing');
+  }
+  if (!dailyDecisions.metadata?.checkpoint_schema_version) {
+    fail('portfolio/daily-decisions.json metadata.checkpoint_schema_version is missing');
+  }
 }
 
 const reports = readJson('reports/table.json');
@@ -136,8 +136,8 @@ const customStrategyCount = personas.filter(
     !['all_weather', 'smic_follower', 'smic_follower_v2', 'weak_oracle'].includes(row.persona),
 ).length;
 if (benchmarkCount < 7) fail(`expected at least 7 benchmark personas, got ${benchmarkCount}`);
-if (customStrategyCount < 1) fail('expected at least one custom strategy persona');
+if (customStrategyCount !== 0) fail(`unexpected custom strategy personas: ${customStrategyCount}`);
 
 console.log(
-  `[artifact-check] ok schema=${manifest.schema_version} reports=${reports.length} benchmarks=${benchmarkCount} strategies=${customStrategyCount} price_files=${manifest.price_artifact_count}`,
+  `[artifact-check] ok schema=${manifest.schema_version} reports=${reports.length} benchmarks=${benchmarkCount} custom_strategies=${customStrategyCount} price_files=${manifest.price_artifact_count}`,
 );

@@ -16,15 +16,11 @@ from .contracts import (
     AllWeatherConfig,
     MonthlyHolding,
     PersonaConfig,
-    PitResearchBoardConfig,
     ProphetConfig,
     SimulationConfig,
     SimulationResult,
     SmicFollowerConfig,
     SmicFollowerV2Config,
-    SmicMttStrategyConfig,
-    SmicRsiReversalConfig,
-    StockRulePersonaConfig,
     WeakProphetConfig,
 )
 from .holdings import (
@@ -40,12 +36,8 @@ from .personas import (
     simulate_prophet,
     simulate_smic_follower,
     simulate_smic_follower_v2,
-    simulate_smic_mtt_strategy,
-    simulate_smic_rsi_reversal,
-    simulate_stock_rule_persona,
     simulate_weak_prophet,
 )
-from .pit_research_board import PitResearchBoardCache, simulate_pit_research_board
 from .report_stats import aggregate_report_stats, compute_report_performance
 from .savings import build_cash_flow_schedule
 from .target_adjustment import align_report_targets_to_market_scale
@@ -89,12 +81,6 @@ def run_simulation(
             refresh=refresh_benchmark,
         )
 
-    pit_board_cache = (
-        PitResearchBoardCache(reports, board)
-        if any(isinstance(persona, PitResearchBoardConfig) for persona in config.personas)
-        else None
-    )
-
     outputs: list[PersonaRunOutput] = []
     for persona in config.personas:
         outputs.append(
@@ -106,7 +92,6 @@ def run_simulation(
                 reports,
                 cashflows,
                 trading_dates,
-                pit_board_cache,
             )
         )
 
@@ -225,7 +210,6 @@ def _dispatch(
     reports: pd.DataFrame,
     cashflows,
     trading_dates: list[date],
-    pit_board_cache: PitResearchBoardCache | None,
 ) -> PersonaRunOutput:
     if isinstance(persona, ProphetConfig):
         return simulate_prophet(
@@ -256,47 +240,6 @@ def _dispatch(
             cashflows,
             trading_dates,
             expiry_days=config.report_expiry_days,
-        )
-    if isinstance(persona, SmicMttStrategyConfig):
-        return simulate_smic_mtt_strategy(
-            persona,
-            config.savings_plan,
-            config.fees,
-            board,
-            reports,
-            cashflows,
-            trading_dates,
-        )
-    if isinstance(persona, SmicRsiReversalConfig):
-        return simulate_smic_rsi_reversal(
-            persona,
-            config.savings_plan,
-            config.fees,
-            board,
-            reports,
-            cashflows,
-            trading_dates,
-        )
-    if isinstance(persona, StockRulePersonaConfig):
-        return simulate_stock_rule_persona(
-            persona,
-            config.savings_plan,
-            config.fees,
-            board,
-            reports,
-            cashflows,
-            trading_dates,
-        )
-    if isinstance(persona, PitResearchBoardConfig):
-        return simulate_pit_research_board(
-            persona,
-            config.savings_plan,
-            config.fees,
-            board,
-            reports,
-            cashflows,
-            trading_dates,
-            row_cache=pit_board_cache,
         )
     if isinstance(persona, AllWeatherConfig):
         if benchmark_board is None or benchmark_board.is_empty:

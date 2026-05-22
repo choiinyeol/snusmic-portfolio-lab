@@ -12,6 +12,7 @@ from typing import Annotated, Literal
 import pandas as pd
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
+from .artifacts import write_simulation_artifacts
 from .brokerage import Account, AccountSnapshot
 from .contracts import (
     AllWeatherConfig,
@@ -21,7 +22,6 @@ from .contracts import (
     SimulationResult,
     SmicFollowerConfig,
     SmicFollowerV2Config,
-    SmicMttStrategyConfig,
 )
 from .market import PriceBoard, load_benchmark_prices
 from .personas import PersonaRunOutput
@@ -38,15 +38,8 @@ from .personas.smic_follower import (
     step_smic_follower_day,
 )
 from .personas.smic_follower_v2 import make_smic_follower_v2_stop_loss_hook
-from .personas.smic_mtt_strategy import (
-    MttStrategyState,
-    MttStrategyStateSnapshot,
-    build_smic_mtt_runtime,
-    step_smic_mtt_day,
-)
 from .runner import _prepare_reports, finalize_simulation_outputs, run_simulation
 from .savings import build_cash_flow_schedule
-from .strategy_generation import write_simulation_artifacts
 from .target_adjustment import align_report_targets_to_market_scale
 from .warehouse import read_table
 
@@ -68,15 +61,6 @@ class FollowerPersonaCheckpoint(_CheckpointModel):
     equity_points: tuple[EquityPoint, ...]
 
 
-class MttPersonaCheckpoint(_CheckpointModel):
-    kind: Literal["mtt"]
-    persona_name: str
-    account: AccountSnapshot
-    state: MttStrategyStateSnapshot
-    previous_day: date | None
-    equity_points: tuple[EquityPoint, ...]
-
-
 class AllWeatherPersonaCheckpoint(_CheckpointModel):
     kind: Literal["all_weather"]
     persona_name: str
@@ -86,7 +70,7 @@ class AllWeatherPersonaCheckpoint(_CheckpointModel):
 
 
 PersonaCheckpoint = Annotated[
-    FollowerPersonaCheckpoint | MttPersonaCheckpoint | AllWeatherPersonaCheckpoint,
+    FollowerPersonaCheckpoint | AllWeatherPersonaCheckpoint,
     Field(discriminator="kind"),
 ]
 
@@ -214,9 +198,7 @@ def load_config_from_persona_artifact(path: Path, *, start: date, end: date) -> 
 def _core_personas(personas: tuple[PersonaConfig, ...]) -> tuple[PersonaConfig, ...]:
     core: list[PersonaConfig] = []
     for persona in personas:
-        if isinstance(
-            persona, AllWeatherConfig | SmicFollowerConfig | SmicFollowerV2Config | SmicMttStrategyConfig
-        ):
+        if isinstance(persona, AllWeatherConfig | SmicFollowerConfig | SmicFollowerV2Config):
             core.append(persona)
     return tuple(core)
 
@@ -369,56 +351,6 @@ def _run_core_personas(
                 equity_points=tuple(follower_runtime.equity_points),
             )
             continue
-
-        if isinstance(persona, SmicMttStrategyConfig):
-            account = (
-                Account.from_snapshot(prior.account)
-                if isinstance(prior, MttPersonaCheckpoint)
-                else Account(persona=persona.persona_name, fees=config.fees)
-            )
-            if isinstance(prior, MttPersonaCheckpoint):
-                mtt_state, cursor = MttStrategyState.from_snapshot(prior.state)
-                previous_day = prior.previous_day
-                equity_points = list(prior.equity_points)
-            else:
-                mtt_state, cursor, previous_day, equity_points = None, 0, None, []
-            mtt_runtime = build_smic_mtt_runtime(
-                config=persona,
-                plan=config.savings_plan,
-                reports=reports,
-                board=board,
-                cashflows=cashflows,
-                trading_dates=trading_dates,
-                account=account,
-                state=mtt_state,
-                cursor=cursor,
-                previous_day=previous_day,
-                equity_points=equity_points,
-            )
-            for day in tail_dates:
-                step_smic_mtt_day(mtt_runtime, day)
-            outputs.append(
-                PersonaRunOutput(
-                    account=mtt_runtime.account,
-                    equity_points=mtt_runtime.equity_points,
-                    summary=build_summary(
-                        persona.persona_name,
-                        persona.label,
-                        mtt_runtime.account,
-                        mtt_runtime.equity_points,
-                        cashflows,
-                        config.savings_plan.initial_capital_krw,
-                    ),
-                )
-            )
-            persona_checkpoints[persona.persona_name] = MttPersonaCheckpoint(
-                kind="mtt",
-                persona_name=persona.persona_name,
-                account=mtt_runtime.account.to_snapshot(),
-                state=mtt_runtime.state.to_snapshot(cursor=mtt_runtime.cursor),
-                previous_day=mtt_runtime.previous_day,
-                equity_points=tuple(mtt_runtime.equity_points),
-            )
 
     latest = trading_dates[-1]
     return outputs, ForwardCheckpoint(
