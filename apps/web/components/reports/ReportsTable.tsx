@@ -15,9 +15,10 @@ import {
 } from '@tanstack/react-table';
 import { Fragment, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { CsvDownloadButton, DataPanel, EmptyTableState, downloadCsv } from '@/components/ui/data-panel';
+import { Money } from '@/components/ui/Money';
 import { useSearchShortcut } from '@/components/ui/use-search-shortcut';
 import type { ReportRow } from '@/lib/artifacts';
-import { formatDateKo, formatDays, formatNative, formatPercent } from '@/lib/format';
+import { formatDateKo, formatDays, formatPercent } from '@/lib/format';
 
 type HitFilter = 'all' | 'hit' | 'open' | 'expired';
 type ReturnFilter = 'all' | 'positive' | 'negative';
@@ -110,13 +111,29 @@ export function ReportsTable({ reports }: ReportsTableProps) {
       },
       {
         accessorKey: 'entryPriceNative',
+        sortingFn: krwPriceSort('entryPriceKrw'),
         header: '진입가',
-        cell: ({ row }) => formatNative(row.original.entryPriceNative, row.original.currency),
+        cell: ({ row }) => (
+          <Money
+            native={row.original.entryPriceNative}
+            krw={row.original.entryPriceKrw}
+            currency={row.original.currency}
+            layout="inline"
+          />
+        ),
       },
       {
         accessorKey: 'targetPriceNative',
+        sortingFn: krwPriceSort('targetPriceKrw'),
         header: '목표가',
-        cell: ({ row }) => formatNative(row.original.targetPriceNative, row.original.currency),
+        cell: ({ row }) => (
+          <Money
+            native={row.original.targetPriceNative}
+            krw={row.original.targetPriceKrw}
+            currency={row.original.currency}
+            layout="inline"
+          />
+        ),
       },
       {
         accessorKey: 'targetUpsideAtPub',
@@ -577,6 +594,14 @@ export function ReportsTable({ reports }: ReportsTableProps) {
       </table>
     </DataPanel>
   );
+}
+
+function krwPriceSort(field: 'entryPriceKrw' | 'targetPriceKrw') {
+  return (a: Row<ReportRow>, b: Row<ReportRow>) => {
+    const left = a.original[field] ?? Number.NEGATIVE_INFINITY;
+    const right = b.original[field] ?? Number.NEGATIVE_INFINITY;
+    return left === right ? 0 : left > right ? 1 : -1;
+  };
 }
 
 function downloadReports(rows: ReportRow[]) {

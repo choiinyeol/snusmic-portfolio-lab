@@ -9,14 +9,18 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
 if command -v uv >/dev/null 2>&1; then
-  PYTHON_CMD=(uv run python)
+  PYTHON_CMD=(uv run --locked python)
+elif command -v uv.exe >/dev/null 2>&1; then
+  PYTHON_CMD=(uv.exe run --locked python)
 elif [ -x ".venv/bin/python" ]; then
   PYTHON_CMD=(.venv/bin/python)
+elif [ -x ".venv/Scripts/python.exe" ]; then
+  PYTHON_CMD=(.venv/Scripts/python.exe)
 else
   PYTHON_CMD=(python)
 fi
 
-PRICE_END="$("${PYTHON_CMD[@]}" - <<'PY'
+PRICE_END="$("${PYTHON_CMD[@]}" - <<'PY' | tr -d '\r'
 from pathlib import Path
 import pandas as pd
 

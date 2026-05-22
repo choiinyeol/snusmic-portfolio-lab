@@ -2,8 +2,8 @@
   "accepted_count": 3,
   "accepted_strategy_ids": [
     "smic_mtt_strategy_top2",
-    "smic_mtt_strategy_top3",
-    "smic_mtt_strategy_top1"
+    "smic_mtt_strategy_top1",
+    "smic_mtt_strategy_top3"
   ],
   "accepted_trials": [],
   "has_trial_rows": false,

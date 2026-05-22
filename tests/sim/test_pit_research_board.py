@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import date
 
 import pandas as pd
+import pytest
 
 from snusmic_pipeline.sim.brokerage import Account
 from snusmic_pipeline.sim.contracts import BrokerageFees, PitResearchBoardConfig, SavingsPlan
@@ -292,6 +293,33 @@ def test_sub_target_multiplier_means_progress_not_discounted_target_price() -> N
     assert target_sells
     assert target_sells[0].fill_price_krw == 114.0
     assert target_sells[0].fill_price_krw > 100.0
+
+
+def test_pit_board_uses_market_scale_entry_for_adjusted_targets() -> None:
+    close = pd.DataFrame(
+        {"SPLT.KQ": [25_000.0, 26_000.0]},
+        index=pd.to_datetime(["2024-01-08", "2024-01-09"]),
+    )
+    board = PriceBoard(close=close, open=close.copy(), high=close.copy(), low=close.copy())
+    reports = pd.DataFrame(
+        [
+            {
+                "report_id": "r-split",
+                "symbol": "SPLT.KQ",
+                "company": "Split Co",
+                "publication_date": pd.Timestamp("2024-01-06"),
+                "report_current_price_krw": 100_000.0,
+                "target_price_krw": 40_000.0,
+                "target_price_scale_factor": 0.25,
+            },
+        ]
+    )
+
+    [row] = build_pit_research_board(reports, board, date(2024, 1, 9), max_report_age_days=3650)
+
+    assert row.entry_price_krw == 25_000.0
+    assert row.target_price_krw == 40_000.0
+    assert row.target_upside_at_pub == pytest.approx(0.6)
 
 
 def test_retained_winner_does_not_starve_new_candidate_sleeve() -> None:

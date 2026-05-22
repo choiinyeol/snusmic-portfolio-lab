@@ -32,12 +32,12 @@ jobs:
         uses: astral-sh/setup-uv@v6
 
       - name: Install dependencies
-        run: uv sync --group dev
+        run: uv sync --locked --group dev
 
       - name: Refresh yfinance metrics
         run: |
-          uv run python -m snusmic_pipeline build-warehouse
-          uv run python -m snusmic_pipeline refresh-prices
+          uv run --locked python -m snusmic_pipeline build-warehouse
+          uv run --locked python -m snusmic_pipeline refresh-prices
           scripts/refresh_web_artifacts.sh
 
       - name: Commit market data updates

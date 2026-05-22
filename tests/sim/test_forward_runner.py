@@ -4,6 +4,7 @@ from datetime import date
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
 from snusmic_pipeline.sim.brokerage import Account
 from snusmic_pipeline.sim.contracts import BrokerageFees, SimulationConfig, SmicMttStrategyConfig
@@ -63,6 +64,7 @@ def test_persona_state_snapshots_roundtrip_private_cursor_state() -> None:
     assert mtt_restored._absorbed_ids == mtt._absorbed_ids
 
 
+@pytest.mark.slow
 def test_checkpoint_tail_matches_full_replay_for_core_personas(tmp_path: Path) -> None:
     config = _test_config(date(2021, 1, 4), date(2021, 2, 15))
     forward_out = tmp_path / "forward"
@@ -90,6 +92,7 @@ def test_checkpoint_tail_matches_full_replay_for_core_personas(tmp_path: Path) -
         assert left.equals(right), name
 
 
+@pytest.mark.slow
 def test_all_weather_checkpoint_crosses_new_rebalance_month(tmp_path: Path) -> None:
     config = _test_config(date(2021, 1, 4), date(2021, 3, 5))
     forward_out = tmp_path / "forward"
@@ -111,6 +114,7 @@ def test_all_weather_checkpoint_crosses_new_rebalance_month(tmp_path: Path) -> N
         assert left.equals(right), name
 
 
+@pytest.mark.slow
 def test_historical_source_change_falls_back_to_full_replay(tmp_path: Path) -> None:
     config = _test_config(date(2021, 1, 4), date(2021, 2, 10))
     warehouse = tmp_path / "warehouse"
@@ -130,6 +134,7 @@ def test_historical_source_change_falls_back_to_full_replay(tmp_path: Path) -> N
     assert rerun.fallback_reason == "historical_source_changed"
 
 
+@pytest.mark.slow
 def test_checkpoint_after_requested_end_falls_back_to_full_replay(tmp_path: Path) -> None:
     config = _test_config(date(2021, 1, 4), date(2021, 2, 15))
     out = tmp_path / "out"

@@ -6,6 +6,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
+import snusmic_pipeline.web_artifacts as web_artifacts
 from snusmic_pipeline.sim.contracts import SimulationConfig, SmicMttStrategyConfig
 from snusmic_pipeline.sim.forward_runner import run_daily_forward
 from snusmic_pipeline.web_artifacts import (
@@ -16,6 +17,8 @@ from snusmic_pipeline.web_artifacts import (
 )
 
 
+@pytest.mark.slow
+@pytest.mark.contract
 def test_export_web_artifacts_matches_baseline_counts(tmp_path: Path) -> None:
     out = tmp_path / "web"
     result = export_web_artifacts(
@@ -45,6 +48,8 @@ def test_export_web_artifacts_matches_baseline_counts(tmp_path: Path) -> None:
     assert result["missing_symbols"] == ["003410.KS", "010620.KS", "287410.KQ", "NETI", "VTNR"]
 
 
+@pytest.mark.slow
+@pytest.mark.contract
 def test_reports_artifact_contains_be_h_symbol_fix(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
@@ -63,6 +68,8 @@ def test_reports_artifact_contains_be_h_symbol_fix(tmp_path: Path) -> None:
     assert be_h[0]["report_id"] == "6615fd1894ed9c54"
 
 
+@pytest.mark.slow
+@pytest.mark.contract
 def test_check_web_artifacts_requires_deterministic_json(tmp_path: Path) -> None:
     out = tmp_path / "web"
     result = check_web_artifacts(
@@ -79,6 +86,8 @@ def test_check_web_artifacts_requires_deterministic_json(tmp_path: Path) -> None
     assert result["artifact_count"] > 8
 
 
+@pytest.mark.slow
+@pytest.mark.contract
 def test_daily_decision_artifacts_expose_checkpoint_metadata(tmp_path: Path) -> None:
     sim = tmp_path / "sim"
     out = tmp_path / "web"
@@ -153,6 +162,8 @@ def test_price_artifacts_preserve_split_diagnostics(tmp_path: Path) -> None:
     assert point["split_adjusted_volume"] == 40.0
 
 
+@pytest.mark.slow
+@pytest.mark.contract
 def test_extended_web_artifacts_support_insights_and_downloads(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
@@ -209,6 +220,8 @@ def test_extended_web_artifacts_support_insights_and_downloads(tmp_path: Path) -
     assert (out / "data-quality-download.csv").read_text(encoding="utf-8").startswith("section,metric,value")
 
 
+@pytest.mark.slow
+@pytest.mark.contract
 def test_manifest_records_snapshot_lineage_counts_and_checksums(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
@@ -243,11 +256,36 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(tmp_path: Path) 
     assert "strategies/admission.json" in manifest["artifacts"]
     assert "screener/candidates.json" in manifest["artifacts"]
     assert "reports.json" in manifest["artifacts"]
-    assert "prices/QQQ.json" not in manifest["checksums"]
+    assert "prices/QQQ.json" in manifest["artifacts"]
+    assert len(manifest["checksums"]["prices/QQQ.json"]) == 64
     assert len(manifest["checksums"]["reports/table.json"]) == 64
     assert len(manifest["checksums"]["reports.json"]) == 64
 
 
+def test_export_web_artifacts_keeps_existing_output_when_staged_validation_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    out = tmp_path / "web"
+    out.mkdir()
+    sentinel = out / "sentinel.json"
+    sentinel.write_text('{"ok": true}\n', encoding="utf-8")
+
+    def broken_export(inputs: ExportInputs) -> dict[str, object]:
+        inputs.out.mkdir(parents=True, exist_ok=True)
+        (inputs.out / "overview.json").write_text("{}", encoding="utf-8")
+        return {"out": str(inputs.out), "artifacts": ["overview.json"]}
+
+    monkeypatch.setattr(web_artifacts, "_export_web_artifacts_unchecked", broken_export)
+
+    with pytest.raises(RuntimeError, match="Missing required web artifacts"):
+        export_web_artifacts(ExportInputs(out=out))
+
+    assert sentinel.exists()
+    assert json.loads(sentinel.read_text(encoding="utf-8")) == {"ok": True}
+
+
+@pytest.mark.slow
+@pytest.mark.contract
 def test_strategy_catalog_uses_behavior_labels_and_admission_audit(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
@@ -280,6 +318,8 @@ def test_strategy_catalog_uses_behavior_labels_and_admission_audit(tmp_path: Pat
     assert "SMIC MTT Strategy" not in csv_text
 
 
+@pytest.mark.slow
+@pytest.mark.contract
 def test_stock_rule_holdings_do_not_precede_first_report_publication(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
@@ -311,6 +351,8 @@ def test_stock_rule_holdings_do_not_precede_first_report_publication(tmp_path: P
     assert leaks == []
 
 
+@pytest.mark.slow
+@pytest.mark.contract
 def test_optional_monthly_holdings_drop_retired_strategy_personas(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
@@ -330,6 +372,8 @@ def test_optional_monthly_holdings_drop_retired_strategy_personas(tmp_path: Path
     assert exported_personas <= valid_personas
 
 
+@pytest.mark.slow
+@pytest.mark.contract
 def test_holdings_artifact_exposes_native_currency_for_foreign_positions(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
@@ -357,6 +401,8 @@ def test_holdings_artifact_exposes_native_currency_for_foreign_positions(tmp_pat
     assert qqq["last_close_krw"] > 100_000
 
 
+@pytest.mark.slow
+@pytest.mark.contract
 def test_holdings_are_rebuilt_from_open_position_episodes_for_all_personas(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
@@ -383,6 +429,8 @@ def test_holdings_are_rebuilt_from_open_position_episodes_for_all_personas(tmp_p
     assert open_episode_personas <= holding_personas
 
 
+@pytest.mark.slow
+@pytest.mark.contract
 def test_accounting_reconciliation_explains_strategy_cash_vs_realized_pnl(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
@@ -408,6 +456,8 @@ def test_accounting_reconciliation_explains_strategy_cash_vs_realized_pnl(tmp_pa
         assert "매입 원가" in row["explanation_ko"]
 
 
+@pytest.mark.slow
+@pytest.mark.contract
 def test_price_artifacts_keep_asset_prices_native_and_krw_for_valuation_only(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
@@ -437,7 +487,11 @@ def test_price_artifacts_keep_asset_prices_native_and_krw_for_valuation_only(tmp
     assert camt["target_hit_date"] is None
 
 
-def test_reports_artifact_excludes_scaled_target_that_is_not_actionable(tmp_path: Path) -> None:
+@pytest.mark.slow
+@pytest.mark.contract
+def test_report_performance_scales_weekend_publication_target_to_first_actionable_close(
+    tmp_path: Path,
+) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
         ExportInputs(
@@ -448,13 +502,19 @@ def test_reports_artifact_excludes_scaled_target_that_is_not_actionable(tmp_path
         )
     )
 
-    reports = json.loads((out / "reports.json").read_text(encoding="utf-8"))
-    assert all(row["symbol"] != "353810.KQ" for row in reports)
+    performance = pd.read_csv(Path("data/sim") / "report_performance.csv")
+    eb = performance[performance["symbol"].astype(str).eq("353810.KQ")].iloc[0]
+    assert eb["report_id"] == "7e687ca6a743eff4"
+    assert eb["entry_price_krw"] == pytest.approx(5379.9463)
+    assert eb["target_price_krw"] == pytest.approx(7231.4862)
+    assert eb["target_upside_at_pub"] == pytest.approx(0.3442)
 
     csv_text = (out / "table-download-reports.csv").read_text(encoding="utf-8")
     assert "7e687ca6a743eff4" not in csv_text
 
 
+@pytest.mark.slow
+@pytest.mark.contract
 def test_reports_artifact_excludes_target_below_entry_rows(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
@@ -470,6 +530,8 @@ def test_reports_artifact_excludes_target_below_entry_rows(tmp_path: Path) -> No
     assert all(row["symbol"] != "476830.KQ" for row in reports)
 
 
+@pytest.mark.slow
+@pytest.mark.contract
 def test_reports_artifact_infers_native_entry_for_foreign_report_display_ssot(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
@@ -494,6 +556,8 @@ def test_reports_artifact_infers_native_entry_for_foreign_report_display_ssot(tm
     assert "entry_price_native_inferred" in sxt["caveat_flags"]
 
 
+@pytest.mark.slow
+@pytest.mark.contract
 def test_reports_artifact_populates_native_entry_for_krw_rows(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
@@ -514,6 +578,8 @@ def test_reports_artifact_populates_native_entry_for_krw_rows(tmp_path: Path) ->
     assert all(row["entry_price_native"] is not None and row["entry_price_native"] > 0 for row in krw_rows)
 
 
+@pytest.mark.slow
+@pytest.mark.contract
 def test_reports_download_csv_carries_display_price_ssot_fields(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
@@ -533,6 +599,8 @@ def test_reports_download_csv_carries_display_price_ssot_fields(tmp_path: Path) 
     assert "target_direction" in header
 
 
+@pytest.mark.slow
+@pytest.mark.contract
 def test_reports_artifact_freezes_expired_report_at_pub_plus_730d(tmp_path: Path) -> None:
     """A report past its 730-day window must be flagged expired and have its
     current_return frozen at the close on (or just before) expiry — not today.

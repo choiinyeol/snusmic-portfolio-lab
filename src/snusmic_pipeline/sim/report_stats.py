@@ -193,72 +193,27 @@ def _coerce_float(value) -> float | None:
 
 
 def _first_close_on_or_after(board: PriceBoard, start: date, end: date, symbol: str) -> float | None:
-    if board.is_empty or symbol not in board.close.columns:
-        return None
-    col = board.close[symbol]
-    ts_start = pd.Timestamp(start)
-    ts_end = pd.Timestamp(end)
-    series = col.loc[(col.index >= ts_start) & (col.index <= ts_end)].dropna()
-    if series.empty:
-        return None
-    val = float(series.iloc[0])
-    return val if val > 0 else None
+    return board.first_close_on_or_after(start, end, symbol)
 
 
 def _last_close_in_window(
     board: PriceBoard, start: date, end: date, symbol: str
 ) -> tuple[float | None, date | None]:
-    if board.is_empty or symbol not in board.close.columns:
-        return None, None
-    col = board.close[symbol]
-    ts_start = pd.Timestamp(start)
-    ts_end = pd.Timestamp(end)
-    series = col.loc[(col.index >= ts_start) & (col.index <= ts_end)].dropna()
-    if series.empty:
-        return None, None
-    val = float(series.iloc[-1])
-    if val <= 0:
-        return None, None
-    return val, series.index[-1].date()
+    return board.last_close_in_window(start, end, symbol)
 
 
 def _max_close_after(board: PriceBoard, start: date, end: date, symbol: str) -> float | None:
-    if board.is_empty or symbol not in board.close.columns:
-        return None
-    col = board.close[symbol]
-    ts_start = pd.Timestamp(start)
-    ts_end = pd.Timestamp(end)
-    series = col.loc[(col.index >= ts_start) & (col.index <= ts_end)].dropna()
-    if series.empty:
-        return None
-    return float(series.max())
+    return board.max_close_in_window(start, end, symbol)
 
 
 def _min_close_after(board: PriceBoard, start: date, end: date, symbol: str) -> float | None:
-    if board.is_empty or symbol not in board.close.columns:
-        return None
-    col = board.close[symbol]
-    ts_start = pd.Timestamp(start)
-    ts_end = pd.Timestamp(end)
-    series = col.loc[(col.index >= ts_start) & (col.index <= ts_end)].dropna()
-    if series.empty:
-        return None
-    return float(series.min())
+    return board.min_close_in_window(start, end, symbol)
 
 
 def _first_ohlc_touch_at_or_above(
     board: PriceBoard, start: date, end: date, symbol: str, threshold: float
 ) -> date | None:
-    if board.is_empty or symbol not in board.close.columns:
-        return None
-    col = (board.high if board.high is not None else board.close)[symbol]
-    ts_start = pd.Timestamp(start)
-    ts_end = pd.Timestamp(end)
-    series = col.loc[(col.index >= ts_start) & (col.index <= ts_end)].dropna()
-    above = series[series >= threshold]
-    if above.empty:
-        return None
-    return above.index[0].date()
+    return board.first_touch_in_window(start, end, symbol, threshold)
 
 
 def _target_direction(target: float | None, entry_price: float | None) -> str | None:
@@ -274,13 +229,4 @@ def _target_direction(target: float | None, entry_price: float | None) -> str | 
 def _first_ohlc_touch_at_or_below(
     board: PriceBoard, start: date, end: date, symbol: str, threshold: float
 ) -> date | None:
-    if board.is_empty or symbol not in board.close.columns:
-        return None
-    col = (board.low if board.low is not None else board.close)[symbol]
-    ts_start = pd.Timestamp(start)
-    ts_end = pd.Timestamp(end)
-    series = col.loc[(col.index >= ts_start) & (col.index <= ts_end)].dropna()
-    below = series[series <= threshold]
-    if below.empty:
-        return None
-    return below.index[0].date()
+    return board.first_touch_in_window(start, end, symbol, threshold, direction="downside")

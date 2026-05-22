@@ -41,6 +41,11 @@ testpaths = ["tests"]
 pythonpath = ["src"]
 addopts = "--strict-markers"
 xfail_strict = true
+markers = [
+  "slow: full-data regression tests that are valuable but too slow for the inner development loop",
+  "contract: boundary-contract tests for data/artifact/schema compatibility",
+  "performance: lightweight performance smoke tests or benchmarks",
+]
 
 [tool.ruff]
 line-length = 110

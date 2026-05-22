@@ -233,20 +233,13 @@ def select_benchmark_summary(
     config: StrategyGenerationConfig,
     base_config: SimulationConfig,
 ) -> BenchmarkSelection:
-    """Select the comparison benchmark without replaying immutable history when possible."""
+    """Select the comparison benchmark from the current run identity.
 
-    if not config.refresh_benchmark:
-        summary_path = config.out_dir / "summary.csv"
-        if summary_path.exists():
-            frame = pd.read_csv(summary_path)
-            if {"persona", "money_weighted_return"}.issubset(frame.columns):
-                candidates = frame[frame["persona"].isin(BENCHMARK_PERSONAS)]
-                if not candidates.empty:
-                    row = candidates.sort_values("money_weighted_return", ascending=False).iloc[0]
-                    return BenchmarkSelection(
-                        persona=str(row["persona"]),
-                        money_weighted_return=float(row["money_weighted_return"]),
-                    )
+    Reusing ``out_dir/summary.csv`` without checking date range, config digest,
+    warehouse identity, and persona set can promote/reject strategies against a
+    stale benchmark. Until the summary cache carries that metadata, recompute
+    the baseline through the simulation cache.
+    """
 
     baseline = run_simulation_cached(config, base_config, stage="baseline")
     benchmark = best_benchmark_summary(baseline)
@@ -412,28 +405,31 @@ def _load_reusable_broker_strategy_search(
         return None
     frame = pd.read_csv(path)
     required = {
+        "admission_policy_version",
         "train_rank",
-        "full_money_weighted_return",
-        "full_net_profit_krw",
-        "full_max_drawdown",
-        "full_trade_count",
-        "full_open_positions",
+        "train_money_weighted_return",
+        "train_max_drawdown",
+        "train_sharpe",
+        "train_sortino",
+        "train_trade_count",
+        "train_open_positions",
     }
     if frame.empty or not required.issubset(frame.columns):
         return None
 
     updated = frame.sort_values("train_rank", ascending=True).copy()
-    seen_behavior_keys: set[tuple[float, float, float, int, int]] = set()
+    if not updated["admission_policy_version"].astype(str).eq("train-risk-v2").all():
+        return None
+    seen_behavior_keys: set[tuple[float, float, int, int]] = set()
     accepted_flags: list[bool] = []
     statuses: list[str] = []
     for row in updated.to_dict("records"):
         meets_risk_gate = str(row.get("admission_status") or "") != "below_risk_gate"
         behavior_key = (
-            round(float(row.get("full_money_weighted_return") or 0.0), 6),
-            round(float(row.get("full_net_profit_krw") or 0.0), 2),
-            round(float(row.get("full_max_drawdown") or 0.0), 6),
-            int(row.get("full_trade_count") or 0),
-            int(row.get("full_open_positions") or 0),
+            round(float(row.get("train_money_weighted_return") or 0.0), 6),
+            round(float(row.get("train_max_drawdown") or 0.0), 6),
+            int(row.get("train_trade_count") or 0),
+            int(row.get("train_open_positions") or 0),
         )
         duplicate_behavior = behavior_key in seen_behavior_keys
         accepted = meets_risk_gate and not duplicate_behavior

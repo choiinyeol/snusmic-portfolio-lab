@@ -1,15 +1,15 @@
 {
   "schema_version": "1.0.0",
-  "run_mode": "full_replay_fallback",
-  "latest_date": "2026-05-22",
-  "checkpoint_date": "2026-05-22",
+  "run_mode": "noop",
+  "latest_date": "2026-05-21",
+  "checkpoint_date": "2026-05-21",
   "checkpoint_schema_version": "1.0.0",
-  "fallback_reason": "historical_source_changed",
+  "fallback_reason": null,
   "source_fingerprint": {
-    "reports.csv": "0099edadee9b1c324a2f1d16ad8aa06e245bd16d528bb8c013245def35a8ad11",
-    "daily_prices.csv": "dc99093b926d9787e38302ec5ef735c34434ff0d6cf63d33503ae2a03168ec1a",
-    "benchmark_prices.csv": "606c9029956592b4af7e646c158f2f34aa72da3a637a7855196b0cd51c3a5497",
-    "fx_rates.csv": "695018fb2fb7a601df9ac3c9751599f517324eaa2a485700e3d022c07ce5bb89"
+    "reports.csv": "d4b185cbe880a445ee718af696d1dfc5e775db448b5a1ee4046761fe69663762",
+    "daily_prices.csv": "ebb806c9d918666f7cbc0eb35603c810db1667be600ddca1ffbaaa43b454023e",
+    "benchmark_prices.csv": "f46b4e8fe4e1f38f1c095056aada772885d677f1537c461290bb777c031af5c4",
+    "fx_rates.csv": "7c67339fd6c3ae6dee2d91b9d685a9835abc7666b094228f33569972d42bcf4e"
   },
   "config_digest": "55188b25df28c64d0b6cd8b4f5e17d72a69d6454f0dd959d83a9982de3ca8905"
 }

@@ -115,6 +115,83 @@ def test_smic_mtt_strategy_uses_broker_slots_without_rebalance_sells(
     assert max(ep.open_positions for ep in out.equity_points) <= 1
 
 
+def test_smic_mtt_strategy_fills_close_signal_on_next_session_open() -> None:
+    trading_dates = [d.date() for d in pd.bdate_range("2025-01-02", periods=4)]
+    close = pd.DataFrame({"WIN": [100.0, 120.0, 130.0, 140.0]}, index=pd.to_datetime(trading_dates))
+    open_ = pd.DataFrame({"WIN": [99.0, 150.0, 131.0, 141.0]}, index=pd.to_datetime(trading_dates))
+    board = PriceBoard(close=close, open=open_, high=close.copy(), low=close.copy())
+    reports = pd.DataFrame(
+        [
+            {
+                "report_id": "next-open",
+                "symbol": "WIN",
+                "company": "Winner",
+                "exchange": "NASDAQ",
+                "publication_date": pd.Timestamp(trading_dates[0]),
+                "target_price": 180.0,
+            }
+        ]
+    )
+    plan = SavingsPlan(initial_capital_krw=1_000_000, monthly_contribution_krw=0)
+    fees = BrokerageFees(commission_bps=0, sell_tax_bps=0, slippage_bps=0)
+    cashflows = build_cash_flow_schedule(trading_dates, plan)
+    cfg = SmicMttStrategyConfig(
+        require_mtt=False,
+        universe="all",
+        min_target_upside_at_pub=0.0,
+        max_target_upside_at_pub=10.0,
+        max_positions=1,
+        top_up_cadence="deposit_only",
+        target_hit_multiplier=2.0,
+        take_profit_pct=10.0,
+    )
+
+    out = simulate_smic_mtt_strategy(cfg, plan, fees, board, reports, cashflows, trading_dates)
+
+    buy = next(t for t in out.account.trades if t.side == "buy")
+    assert buy.date == trading_dates[1]
+    assert buy.fill_price_krw == 150.0
+
+
+def test_smic_mtt_strategy_does_not_buy_new_position_from_missing_open_close_fallback() -> None:
+    trading_dates = [d.date() for d in pd.bdate_range("2025-01-02", periods=3)]
+    close = pd.DataFrame({"WIN": [100.0, 120.0, 130.0]}, index=pd.to_datetime(trading_dates))
+    open_ = pd.DataFrame({"WIN": [99.0, pd.NA, 131.0]}, index=pd.to_datetime(trading_dates))
+    board = PriceBoard(close=close, open=open_, high=close.copy(), low=close.copy())
+    reports = pd.DataFrame(
+        [
+            {
+                "report_id": "missing-open",
+                "symbol": "WIN",
+                "company": "Winner",
+                "exchange": "NASDAQ",
+                "publication_date": pd.Timestamp(trading_dates[0]),
+                "target_price": 180.0,
+            }
+        ]
+    )
+    plan = SavingsPlan(initial_capital_krw=1_000_000, monthly_contribution_krw=0)
+    fees = BrokerageFees(commission_bps=0, sell_tax_bps=0, slippage_bps=0)
+    cfg = SmicMttStrategyConfig(
+        require_mtt=False,
+        universe="all",
+        min_target_upside_at_pub=0.0,
+        max_target_upside_at_pub=10.0,
+        max_positions=1,
+        top_up_cadence="deposit_only",
+        target_hit_multiplier=2.0,
+        take_profit_pct=10.0,
+    )
+
+    out = simulate_smic_mtt_strategy(
+        cfg, plan, fees, board, reports, build_cash_flow_schedule(trading_dates, plan), trading_dates
+    )
+
+    buy = next(t for t in out.account.trades if t.side == "buy")
+    assert buy.date == trading_dates[2]
+    assert buy.fill_price_krw == 131.0
+
+
 def test_smic_mtt_strategy_filters_non_mtt_reports(synthetic_board, synthetic_dates):
     plan, fees, cashflows = _common_inputs(synthetic_dates)
     reports = pd.DataFrame(

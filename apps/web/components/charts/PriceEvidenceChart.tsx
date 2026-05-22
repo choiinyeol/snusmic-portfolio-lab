@@ -386,13 +386,6 @@ export function PriceEvidenceChart({
     volumeData,
   ]);
 
-  if (priceSeries.length === 0) {
-    return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm">
-        이 리포트 종목의 가격 경로를 찾을 수 없습니다.
-      </div>
-    );
-  }
   // Measurement mode wholesale flips off the chart's pan/zoom handlers so
   // the drag-to-measure overlay can't fight the library for the gesture.
   useEffect(() => {
@@ -410,6 +403,14 @@ export function PriceEvidenceChart({
   useEffect(() => {
     dragPrimitiveRef.current?.setState(drag);
   }, [drag]);
+
+  if (priceSeries.length === 0) {
+    return (
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm">
+        이 리포트 종목의 가격 경로를 찾을 수 없습니다.
+      </div>
+    );
+  }
 
   // Drag-to-measure handlers attached to a transparent overlay div that
   // covers the chart canvas only while measureMode is on. Pointer events go

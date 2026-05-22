@@ -88,11 +88,34 @@ if (!dailyDecisions.metadata?.checkpoint_schema_version) {
 
 const reports = readJson('reports/table.json');
 const reportIds = new Set();
+const reportSymbols = new Set();
 for (const [index, report] of reports.entries()) {
   if (!report.report_id) fail(`reports/table.json[${index}].report_id is missing`);
   if (reportIds.has(report.report_id)) fail(`duplicate report_id: ${report.report_id}`);
   reportIds.add(report.report_id);
   if (!report.symbol) fail(`reports/table.json[${index}].symbol is missing`);
+  reportSymbols.add(report.symbol);
+}
+
+const priceDir = path.join(webRoot, 'prices');
+const priceFiles = fs.existsSync(priceDir)
+  ? fs
+      .readdirSync(priceDir)
+      .filter((file) => file.endsWith('.json'))
+      .sort()
+  : [];
+if (priceFiles.length !== manifest.price_artifact_count) {
+  fail(`manifest price_artifact_count=${manifest.price_artifact_count}, actual ${priceFiles.length}`);
+}
+for (const symbol of reportSymbols) {
+  if (!fs.existsSync(path.join(priceDir, `${symbol}.json`))) {
+    fail(`missing price artifact for report symbol: ${symbol}`);
+  }
+}
+for (const artifact of manifest.artifacts ?? []) {
+  if (artifact.includes('\\')) fail(`manifest artifact path is not POSIX: ${artifact}`);
+  if (!fs.existsSync(path.join(webRoot, artifact))) fail(`manifest lists missing artifact: ${artifact}`);
+  if (!manifest.checksums?.[artifact]) fail(`manifest checksum missing for artifact: ${artifact}`);
 }
 
 const personas = readJson('portfolio/personas.json');

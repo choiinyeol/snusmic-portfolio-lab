@@ -448,7 +448,18 @@ def read_reports(data_dir: Path) -> pd.DataFrame:
                     else "",
                 }
             )
-    return pd.DataFrame(rows).sort_values(["publication_date", "symbol"])
+    reports = pd.DataFrame(rows)
+    if not reports.empty and reports["report_id"].duplicated(keep=False).any():
+        duplicate_mask = reports["report_id"].duplicated(keep=False)
+        reports.loc[duplicate_mask, "report_id"] = reports.loc[duplicate_mask].apply(
+            lambda row: stable_report_id_with_symbol(
+                str(row["publication_date"]),
+                str(row["title"]),
+                str(row["symbol"]),
+            ),
+            axis=1,
+        )
+    return reports.sort_values(["publication_date", "symbol"])
 
 
 def apply_report_krw_targets(reports: pd.DataFrame, fx_rates: pd.DataFrame) -> pd.DataFrame:
@@ -690,7 +701,17 @@ def infer_yfinance_symbol(ticker: str, exchange: str) -> str:
 
 
 def stable_report_id(date: str, title: str, symbol: str) -> str:
+    """Stable legacy report id.
+
+    Public artifacts and warehouse rows were originally keyed by date/title.
+    Keep that identity stable and disambiguate only the rare duplicate after
+    all rows are known.
+    """
     return hashlib.sha1(f"{date}|{title}".encode()).hexdigest()[:16]
+
+
+def stable_report_id_with_symbol(date: str, title: str, symbol: str) -> str:
+    return hashlib.sha1(f"{date}|{symbol}|{title}".encode()).hexdigest()[:16]
 
 
 def format_date(value: str) -> str:

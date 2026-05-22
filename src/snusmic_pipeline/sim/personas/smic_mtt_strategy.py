@@ -244,9 +244,22 @@ def step_smic_mtt_day(runtime: MttRuntime, day: date) -> EquityPoint:
 
     _apply_sell_rules(runtime.account, day, runtime.board, runtime.state, config)
 
-    should_top_up = deposit_today > 0 or has_new_signal or day in runtime.top_up_days
-    if should_top_up:
-        _buy_or_top_up_slots(runtime.account, day, runtime.board, runtime.state, config, deposit_today > 0)
+    has_pending_signal = runtime.previous_day is not None and any(
+        candidate.publication_date <= runtime.previous_day
+        and candidate.symbol not in runtime.account.holdings
+        for candidate in runtime.state.active.values()
+    )
+    should_top_up = deposit_today > 0 or has_new_signal or has_pending_signal or day in runtime.top_up_days
+    if should_top_up and runtime.previous_day is not None:
+        _buy_or_top_up_slots(
+            runtime.account,
+            day,
+            runtime.previous_day,
+            runtime.board,
+            runtime.state,
+            config,
+            deposit_today > 0,
+        )
 
     point = record_equity_point(
         runtime.account,
@@ -621,20 +634,22 @@ def _apply_sell_rules(
 def _buy_or_top_up_slots(
     account: Account,
     day: date,
+    signal_day: date,
     board: PriceBoard,
     state: MttStrategyState,
     config: SmicMttStrategyConfig,
     deposit_today: bool,
 ) -> None:
-    prices = _price_view(account, day, board)
+    prices = _fill_price_view(account, day, board)
     if not prices:
         return
     candidates = [
         c
         for c in state.active.values()
         if c.symbol in prices
+        and c.publication_date <= signal_day
         and c.symbol not in state.stopped_out
-        and (not config.require_mtt or _passes_trend_filter(board, day, c.symbol, config))
+        and (not config.require_mtt or _passes_trend_filter(board, signal_day, c.symbol, config))
     ]
     candidates.sort(
         key=lambda c: (
@@ -686,6 +701,17 @@ def _buy_or_top_up_slots(
 
 def _price_view(account: Account, day: date, board: PriceBoard) -> dict[str, float]:
     prices = board.close_on(day)
+    for symbol, lot in account.holdings.items():
+        if lot.qty <= 0 or symbol in prices:
+            continue
+        mid = board.asof(day, symbol)
+        if mid is not None and mid > 0:
+            prices[symbol] = mid
+    return prices
+
+
+def _fill_price_view(account: Account, day: date, board: PriceBoard) -> dict[str, float]:
+    prices = board.open_on(day)
     for symbol, lot in account.holdings.items():
         if lot.qty <= 0 or symbol in prices:
             continue

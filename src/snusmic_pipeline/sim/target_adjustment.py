@@ -54,6 +54,11 @@ def market_scale_factor(
     symbol = str(record.get("symbol") or "")
     if quoted_close is None or not symbol:
         return 1.0
+    # Keep scaling point-in-time relative to the first actionable market print.
+    # Weekend/holiday publications cannot observe a same-day close, so the
+    # first close on or after publication is the earliest usable anchor. Bound
+    # the lookup to ``end_day`` so callers cannot accidentally scan beyond the
+    # simulation/evidence window.
     market_close = first_close_on_or_after(board, pub_day, end_day, symbol)
     if market_close is None:
         return 1.0
@@ -88,14 +93,7 @@ def adjusted_target_price_krw(
 
 
 def first_close_on_or_after(board: PriceBoard, start: date, end: date, symbol: str) -> float | None:
-    if board.is_empty or symbol not in board.close.columns:
-        return None
-    col = board.close[symbol]
-    window = col.loc[(col.index >= pd.Timestamp(start)) & (col.index <= pd.Timestamp(end))].dropna()
-    if window.empty:
-        return None
-    first = float(window.iloc[0])
-    return first if first > 0 else None
+    return board.first_close_on_or_after(start, end, symbol)
 
 
 def align_report_targets_to_market_scale(

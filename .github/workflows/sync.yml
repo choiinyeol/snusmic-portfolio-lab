@@ -92,7 +92,7 @@ jobs:
         uses: astral-sh/setup-uv@v6
 
       - name: Install dependencies
-        run: uv sync --group dev --extra ocr
+        run: uv sync --locked --group dev --extra ocr
 
       - name: Run tests
         run: uv run pytest
@@ -100,7 +100,7 @@ jobs:
       - name: Start OpenDataLoader hybrid OCR backend
         if: env.ENABLE_HYBRID_OCR == 'true'
         run: |
-          uv run opendataloader-pdf-hybrid --port 5002 --force-ocr --ocr-lang "ko,en" --device cpu > /tmp/opendataloader-hybrid.log 2>&1 &
+          uv run --locked opendataloader-pdf-hybrid --port 5002 --force-ocr --ocr-lang "ko,en" --device cpu > /tmp/opendataloader-hybrid.log 2>&1 &
           for i in {1..60}; do
             python -c 'import socket; s=socket.socket(); s.settimeout(1); s.connect(("127.0.0.1", 5002)); s.close()' && exit 0 || true
             sleep 2
@@ -112,15 +112,15 @@ jobs:
       - name: Sync reports
         run: |
           if [ "$ENABLE_HYBRID_OCR" = "true" ]; then
-            uv run python -m snusmic_pipeline sync --pages "$REPORT_PAGES" --opendataloader-hybrid docling-fast
+            uv run --locked python -m snusmic_pipeline sync --pages "$REPORT_PAGES" --opendataloader-hybrid docling-fast
           else
-            uv run python -m snusmic_pipeline sync --pages "$REPORT_PAGES"
+            uv run --locked python -m snusmic_pipeline sync --pages "$REPORT_PAGES"
           fi
 
       - name: Build simulation data artifacts
         run: |
-          uv run python -m snusmic_pipeline build-warehouse
-          uv run python -m snusmic_pipeline refresh-prices
+          uv run --locked python -m snusmic_pipeline build-warehouse
+          uv run --locked python -m snusmic_pipeline refresh-prices
           scripts/refresh_web_artifacts.sh
 
       - name: Commit data updates

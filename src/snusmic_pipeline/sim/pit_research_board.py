@@ -138,9 +138,11 @@ class PitResearchBoardCache:
     _price_date_by_key: dict[tuple[str, date], date | None] = field(
         default_factory=dict, init=False, repr=False
     )
+    _indicator_cache: _PitTechnicalIndicatorCache = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
         self._prepared_reports = _prepare_pit_reports(self.reports)
+        self._indicator_cache = _PitTechnicalIndicatorCache(self.board)
 
     def rows(
         self,
@@ -172,7 +174,7 @@ class PitResearchBoardCache:
         key = (symbol, as_of)
         cached = self._technicals_by_key.get(key)
         if cached is None:
-            cached = _technicals_asof(self.board, symbol, as_of, current)
+            cached = self._indicator_cache.technicals(symbol, as_of, current)
             self._technicals_by_key[key] = cached
         return cached
 
@@ -187,6 +189,108 @@ class PitResearchBoardCache:
         if key not in self._price_date_by_key:
             self._price_date_by_key[key] = _price_date_asof(self.board, as_of, symbol)
         return self._price_date_by_key[key]
+
+
+@dataclass
+class _PitTechnicalIndicatorCache:
+    """Lazy per-symbol rolling indicator cache for repeated PIT board snapshots."""
+
+    board: PriceBoard
+    _series_by_symbol: dict[str, pd.Series] = field(default_factory=dict, init=False, repr=False)
+    _frames_by_symbol: dict[str, pd.DataFrame] = field(default_factory=dict, init=False, repr=False)
+
+    def technicals(
+        self,
+        symbol: str,
+        as_of: date,
+        current: float,
+    ) -> dict[str, float | bool | None]:
+        series = self._series(symbol)
+        if series is None or series.empty:
+            return {}
+        ts = pd.Timestamp(as_of)
+        end_pos = int(series.index.searchsorted(ts, side="right") - 1)
+        if end_pos < 0:
+            return {}
+        indicators = self._indicator_frame(symbol, series)
+        row = indicators.iloc[end_pos]
+        ytd = _return_since_position(series, pd.Timestamp(date(as_of.year, 1, 1)), current, end_pos)
+        ret_1m = _return_since_position(series, ts - pd.Timedelta(days=30), current, end_pos)
+        ret_3m = _return_since_position(series, ts - pd.Timedelta(days=90), current, end_pos)
+        ret_6m = _return_since_position(series, ts - pd.Timedelta(days=180), current, end_pos)
+        ret_1y = _return_since_position(series, ts - pd.Timedelta(days=365), current, end_pos)
+        high52 = _float_or_none(row.get("high52"))
+        sma20 = _float_or_none(row.get("sma20"))
+        sma50 = _float_or_none(row.get("sma50"))
+        sma200 = _float_or_none(row.get("sma200"))
+        ema20 = _float_or_none(row.get("ema20"))
+        ema50 = _float_or_none(row.get("ema50"))
+        ema200 = _float_or_none(row.get("ema200"))
+        macd_line = _float_or_none(row.get("macd_line"))
+        macd_signal = _float_or_none(row.get("macd_signal"))
+        macd_hist = _float_or_none(row.get("macd_hist"))
+        ma_stack = (
+            None
+            if sma20 is None or sma50 is None or sma200 is None
+            else bool(current >= sma20 >= sma50 >= sma200)
+        )
+        ema_stack = (
+            None
+            if ema20 is None or ema50 is None or ema200 is None
+            else bool(current >= ema20 >= ema50 >= ema200)
+        )
+        macd_bullish = (
+            None
+            if macd_line is None or macd_signal is None or macd_hist is None
+            else bool(macd_line >= macd_signal and macd_hist >= 0)
+        )
+        return {
+            "ytd_return": ytd,
+            "return_1m": ret_1m,
+            "return_3m": ret_3m,
+            "return_6m": ret_6m,
+            "return_1y": ret_1y,
+            "distance_from_52w_high": (current / high52 - 1.0) if high52 and high52 > 0 else None,
+            "above_20ma": _above(current, sma20),
+            "above_50ma": _above(current, sma50),
+            "above_200ma": _above(current, sma200),
+            "ma_stack": ma_stack,
+            "ema_stack": ema_stack,
+            "macd_line": macd_line,
+            "macd_signal": macd_signal,
+            "macd_hist": macd_hist,
+            "macd_bullish": macd_bullish,
+        }
+
+    def _series(self, symbol: str) -> pd.Series | None:
+        cached = self._series_by_symbol.get(symbol)
+        if cached is not None:
+            return cached
+        if symbol not in self.board.close.columns:
+            return None
+        series = self.board.close[symbol].dropna().astype(float)
+        self._series_by_symbol[symbol] = series
+        return series
+
+    def _indicator_frame(self, symbol: str, series: pd.Series) -> pd.DataFrame:
+        cached = self._frames_by_symbol.get(symbol)
+        if cached is not None:
+            return cached
+        frame = pd.DataFrame(index=series.index)
+        frame["high52"] = series.rolling("365D", min_periods=1).max()
+        frame["sma20"] = series.rolling(20, min_periods=20).mean()
+        frame["sma50"] = series.rolling(50, min_periods=50).mean()
+        frame["sma200"] = series.rolling(200, min_periods=200).mean()
+        frame["ema20"] = series.ewm(span=20, adjust=False, min_periods=20).mean()
+        frame["ema50"] = series.ewm(span=50, adjust=False, min_periods=50).mean()
+        frame["ema200"] = series.ewm(span=200, adjust=False, min_periods=200).mean()
+        fast = series.ewm(span=12, adjust=False, min_periods=12).mean()
+        slow = series.ewm(span=26, adjust=False, min_periods=26).mean()
+        frame["macd_line"] = fast - slow
+        frame["macd_signal"] = frame["macd_line"].ewm(span=9, adjust=False, min_periods=9).mean()
+        frame["macd_hist"] = frame["macd_line"] - frame["macd_signal"]
+        self._frames_by_symbol[symbol] = frame
+        return frame
 
 
 def default_pit_research_board_configs() -> tuple[PitResearchBoardConfig, ...]:
@@ -466,7 +570,7 @@ def _row_from_report(
     )
     if current is None or current <= 0 or price_date is None or price_date > as_of:
         return None
-    entry = _number(record.get("report_current_price_krw")) or board.asof(publication_date, symbol)
+    entry = _market_scale_entry_price(record, board, symbol, publication_date, as_of)
     if entry is None or entry <= 0:
         return None
     target_upside = target / entry - 1.0
@@ -817,10 +921,28 @@ def _target_threshold_for_report(
 ) -> float:
     """Translate target-hit multiplier into price progress from entry to target."""
 
-    entry = _number(report.get("report_current_price_krw")) or board.asof(publication_date, symbol)
+    entry = _market_scale_entry_price(report, board, symbol, publication_date, publication_date)
     if entry is None or entry <= 0 or entry >= target:
         return target * config.target_hit_multiplier
     return entry + (target - entry) * config.target_hit_multiplier
+
+
+def _market_scale_entry_price(
+    record: dict[str, object],
+    board: PriceBoard,
+    symbol: str,
+    publication_date: date,
+    end_date: date,
+) -> float | None:
+    quoted_entry = _number(record.get("report_current_price_krw"))
+    scale_factor = _number(record.get("target_price_scale_factor"))
+    if quoted_entry is not None and quoted_entry > 0 and scale_factor is not None and scale_factor > 0:
+        return quoted_entry * scale_factor
+    if quoted_entry is not None and quoted_entry > 0:
+        return quoted_entry
+    return board.first_close_on_or_after(publication_date, end_date, symbol) or board.asof(
+        publication_date, symbol
+    )
 
 
 def _is_retained_winner(
@@ -1017,6 +1139,26 @@ def _return_since(series: pd.Series, start: pd.Timestamp, current: float) -> flo
     return current / anchor - 1.0
 
 
+def _return_since_position(
+    series: pd.Series,
+    start: pd.Timestamp,
+    current: float,
+    end_pos: int,
+) -> float | None:
+    effective = series.iloc[: end_pos + 1]
+    if effective.empty:
+        return None
+    start_pos = int(effective.index.searchsorted(start, side="left"))
+    if start_pos >= len(effective):
+        start_pos = int(effective.index.searchsorted(start, side="right") - 1)
+    if start_pos < 0:
+        return None
+    anchor = float(effective.iloc[start_pos])
+    if anchor <= 0:
+        return None
+    return current / anchor - 1.0
+
+
 def _sma(series: pd.Series, window: int) -> float | None:
     if len(series) < window:
         return None
@@ -1060,15 +1202,16 @@ def _bool_or_none(value: object) -> bool | None:
 
 
 def _target_hit_asof(board: PriceBoard, symbol: str, start: date, end: date, target: float) -> bool:
-    if board.close.empty:
-        return False
-    frame = board.high if board.high is not None else board.close
-    if symbol not in frame.columns:
-        return False
-    series = (
-        frame[symbol].loc[(frame.index > pd.Timestamp(start)) & (frame.index <= pd.Timestamp(end))].dropna()
+    return (
+        board.first_touch_in_window(
+            start,
+            end,
+            symbol,
+            target,
+            include_start=False,
+        )
+        is not None
     )
-    return bool(not series.empty and float(series.max()) >= target)
 
 
 def _price_date_asof(board: PriceBoard, as_of: date, symbol: str) -> date | None:

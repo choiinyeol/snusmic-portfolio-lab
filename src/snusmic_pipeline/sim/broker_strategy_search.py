@@ -42,13 +42,13 @@ def find_top_broker_strategy_configs(
     min_sharpe: float | None = None,
     min_sortino: float | None = None,
 ) -> BrokerStrategySearchResult:
-    """Select Optuna train winners, then admit up to ``top_n`` full-period winners.
+    """Select Optuna train winners, then replay full-period evidence.
 
     Selection is intentionally two-stage:
     1. Optuna maximizes actual train-period broker-ledger performance.
-    2. Candidate configs are replayed on the full window and accepted by
-       risk/diversity gates. Benchmark-relative return is recorded as
-       comparative evidence, not a hard disqualification.
+    2. Candidate configs are admitted using train-period risk/diversity gates.
+       Full-window replay is recorded as comparative evidence only; it must not
+       decide promotion.
 
     ``top_n`` is optional. When it is positive, it caps the promoted strategy
     count; when it is zero or negative, every qualifying distinct strategy is
@@ -154,22 +154,23 @@ def find_top_broker_strategy_configs(
         summary = output.summary
         excess = summary.money_weighted_return - benchmark_money_weighted_return
         meets_risk_gate = _meets_risk_gate(
-            sharpe=summary.sharpe,
-            sortino=summary.sortino,
+            sharpe=_optional_float(trial.user_attrs["train_sharpe"]),
+            sortino=_optional_float(trial.user_attrs["train_sortino"]),
             min_sharpe=min_sharpe,
             min_sortino=min_sortino,
         )
         behavior_key = (
-            round(summary.money_weighted_return, 6),
-            round(summary.net_profit_krw, 2),
-            round(summary.max_drawdown, 6),
-            summary.trade_count,
-            summary.open_positions,
+            round(float(trial.user_attrs["train_money_weighted_return"]), 6),
+            round(float(trial.user_attrs["train_max_drawdown"]), 6),
+            int(trial.user_attrs["train_trade_count"]),
+            int(trial.user_attrs["train_open_positions"]),
+            0,
         )
         duplicate_behavior = behavior_key in seen_behavior_keys
         accepted = meets_risk_gate and not duplicate_behavior
         row = {
             "trial_number": trial.number,
+            "admission_policy_version": "train-risk-v2",
             "train_rank": train_rank,
             "accepted": accepted,
             "admission_status": _admission_status(
@@ -253,6 +254,12 @@ def _meets_risk_gate(
     has_sharpe = sharpe is not None and sharpe >= min_sharpe if min_sharpe is not None else False
     has_sortino = sortino is not None and sortino >= min_sortino if min_sortino is not None else False
     return has_sharpe or has_sortino
+
+
+def _optional_float(value: Any) -> float | None:
+    if value is None:
+        return None
+    return float(value)
 
 
 def _score_summary(

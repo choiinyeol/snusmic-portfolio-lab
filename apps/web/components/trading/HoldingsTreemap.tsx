@@ -97,6 +97,14 @@ export function HoldingsTreemap({
     if (overlayCtx) overlayCtx.clearRect(0, 0, size.width, size.height);
   }, [compact, root, size.width, size.height]);
 
+  const sortedHoldings = useMemo(
+    () =>
+      [...holdings]
+        .filter((row) => (row.marketValueKrw ?? 0) > 0)
+        .sort((a, b) => (b.marketValueKrw ?? 0) - (a.marketValueKrw ?? 0)),
+    [holdings],
+  );
+
   if (!holdings.length || totalValue <= 0) {
     return <TreemapEmptyState height={height} />;
   }
@@ -128,21 +136,12 @@ export function HoldingsTreemap({
   };
 
   const handleClick = () => {
-    const fallback = root?.leaves().filter(isLeafNode)[0] ?? null;
-    const target = hoveredRef.current ?? fallback;
+    const target = hoveredRef.current;
     if (!target) return;
     const href = holdingHref(target.data, hrefBySymbol);
     if (!href) return;
     router.push(href);
   };
-
-  const sortedHoldings = useMemo(
-    () =>
-      [...holdings]
-        .filter((row) => (row.marketValueKrw ?? 0) > 0)
-        .sort((a, b) => (b.marketValueKrw ?? 0) - (a.marketValueKrw ?? 0)),
-    [holdings],
-  );
 
   return (
     <section className="grid gap-2" aria-labelledby="treemap-heading">

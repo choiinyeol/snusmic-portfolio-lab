@@ -56,7 +56,8 @@ export class DragSelectionPrimitive implements IPanePrimitive<Time> {
             const toX = timeScale.timeToCoordinate(state.toTime as Time);
             if (fromX === null || toX === null) return;
             const ret = state.fromPrice ? state.toPrice / state.fromPrice - 1 : null;
-            target.useMediaCoordinateSpace(({ context: ctx, mediaSize }) => {
+            const drawInMediaSpace = target.useMediaCoordinateSpace.bind(target);
+            drawInMediaSpace(({ context: ctx, mediaSize }) => {
               const left = Math.min(fromX, toX);
               const width = Math.max(1, Math.abs(toX - fromX));
               const height = mediaSize.height;

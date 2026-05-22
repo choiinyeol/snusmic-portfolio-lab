@@ -11,11 +11,13 @@ from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any
+from typing import Any, cast
 
 import pandas as pd
 
 from .currency import currency_for_symbol, normalize_currency
+from .sim.stock_admission import StockAdmissionArtifact
+from .web_contracts import HOLDING_ROWS, REPORT_ROWS, TRADE_ROWS, ArtifactManifest, WebOverview
 
 REQUIRED_ARTIFACTS = [
     "manifest.json",
@@ -67,6 +69,24 @@ REQUIRED_ARTIFACTS = [
 ]
 
 
+def _frame_series(frame: pd.DataFrame, column: str, default: Any = pd.NA) -> pd.Series:
+    if column in frame.columns:
+        return frame[column]
+    return pd.Series(default, index=frame.index)
+
+
+def _numeric_series(frame: pd.DataFrame, column: str, default: Any = pd.NA) -> pd.Series:
+    return pd.to_numeric(_frame_series(frame, column, default), errors="coerce")
+
+
+def _to_numeric(value: Any) -> Any:
+    return pd.to_numeric(cast(Any, value), errors="coerce")
+
+
+def _to_datetime(value: Any) -> Any:
+    return pd.to_datetime(cast(Any, value), errors="coerce")
+
+
 def _enrich_holdings_with_native(
     holdings: pd.DataFrame,
     prices: pd.DataFrame,
@@ -92,14 +112,14 @@ def _enrich_holdings_with_native(
             _holding_close_krw(out, close_column),
             out["currency"],
             fx_rates,
-            pd.to_datetime(out.get("month_end"), errors="coerce") if "month_end" in out.columns else None,
+            _to_datetime(out["month_end"]) if "month_end" in out.columns else None,
         )
         return out
 
     work = prices.dropna(subset=["symbol", "date"]).copy()
     work["date"] = pd.to_datetime(work["date"], errors="coerce")
-    work["close"] = pd.to_numeric(work.get("close"), errors="coerce")
-    work["krw_per_unit"] = pd.to_numeric(work.get("krw_per_unit"), errors="coerce")
+    work["close"] = _numeric_series(work, "close")
+    work["krw_per_unit"] = _numeric_series(work, "krw_per_unit")
     work = work.dropna(subset=["date"]).sort_values(["symbol", "date"])
     out = holdings.copy()
     if "month_end" in out.columns:
@@ -184,8 +204,8 @@ def _attach_monthly_native_close(
 def _holding_close_krw(holdings: pd.DataFrame, close_column: str) -> pd.Series:
     if close_column in holdings.columns:
         return pd.to_numeric(holdings[close_column], errors="coerce")
-    qty = pd.to_numeric(holdings.get("qty"), errors="coerce")
-    market_value = pd.to_numeric(holdings.get("market_value_krw"), errors="coerce")
+    qty = _numeric_series(holdings, "qty")
+    market_value = _numeric_series(holdings, "market_value_krw")
     return market_value / qty.where(qty.ne(0))
 
 
@@ -209,7 +229,8 @@ def _infer_native_from_krw(
     native = pd.to_numeric(close_krw, errors="coerce").copy()
     normalized = currency.fillna("KRW").astype(str).map(normalize_currency)
     if fx_rates.empty:
-        return native.where(normalized.eq("KRW"), pd.NA)
+        native.loc[~normalized.eq("KRW")] = pd.NA
+        return native
 
     rates = fx_rates.copy()
     rates["date"] = pd.to_datetime(rates["date"], errors="coerce")
@@ -249,6 +270,34 @@ class ExportInputs:
 
 
 def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
+    """Export deterministic JSON artifacts through a guarded atomic swap."""
+
+    out = inputs.out
+    _guard_export_destination(inputs)
+    with TemporaryDirectory(
+        dir=str(out.resolve().parent if out.resolve().parent.exists() else Path.cwd())
+    ) as tmpdir:
+        staged_out = Path(tmpdir) / out.name
+        staged_inputs = ExportInputs(
+            warehouse=inputs.warehouse,
+            sim=inputs.sim,
+            out=staged_out,
+            extraction_quality=inputs.extraction_quality,
+        )
+        result = _export_web_artifacts_unchecked(staged_inputs)
+        missing = [name for name in REQUIRED_ARTIFACTS if not (staged_out / name).exists()]
+        if missing:
+            raise RuntimeError(f"Missing required web artifacts in staged export: {', '.join(missing)}")
+        manifest = _read_json(staged_out / "manifest.json")
+        bad_paths = [name for name in manifest.get("artifacts", []) if "\\" in str(name)]
+        if bad_paths:
+            raise RuntimeError(f"Manifest contains non-POSIX artifact paths: {bad_paths[:5]}")
+        _replace_directory(staged_out, out)
+    result["out"] = str(out)
+    return result
+
+
+def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     """Export deterministic JSON artifacts for the static web showcase."""
 
     stage_seconds: dict[str, float] = {}
@@ -369,6 +418,14 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     screener_candidates = _build_screener_candidates(report_rows)
     mark("build_portfolio_rows")
 
+    _validate_boundary_artifacts(
+        overview=overview,
+        reports=report_rows,
+        holdings=enriched_current_holdings,
+        trades=trade_rows,
+    )
+    mark("validate_boundary_artifacts")
+
     _write_page_bundles(
         out,
         overview=overview,
@@ -438,7 +495,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     mark("write_manifest")
 
     written = sorted(
-        str(path.relative_to(out)) for path in out.rglob("*") if path.suffix in {".json", ".csv"}
+        _relative_posix(path, out) for path in out.rglob("*") if path.suffix in {".json", ".csv"}
     )
     return {
         "out": str(out),
@@ -471,6 +528,52 @@ def check_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     if first_bytes != second_bytes:
         raise RuntimeError("Web artifact export is not deterministic under repeated export")
     return first
+
+
+def _guard_export_destination(inputs: ExportInputs) -> None:
+    resolved = inputs.out.resolve()
+    cwd = Path.cwd().resolve()
+    home = Path.home().resolve()
+    anchors = {Path(resolved.anchor).resolve(), cwd, home}
+    if resolved in anchors:
+        raise ValueError(f"Refusing to export web artifacts into protected path: {resolved}")
+    if resolved.parent == Path(resolved.anchor).resolve():
+        raise ValueError(f"Refusing to export web artifacts into drive/root child: {resolved}")
+    for label, source in {
+        "warehouse": inputs.warehouse,
+        "simulation": inputs.sim,
+        "extraction_quality": inputs.extraction_quality,
+    }.items():
+        source_resolved = source.resolve()
+        if (
+            resolved == source_resolved
+            or resolved in source_resolved.parents
+            or source_resolved in resolved.parents
+        ):
+            raise ValueError(
+                f"Refusing to export web artifacts into overlapping {label} path: "
+                f"out={resolved}, {label}={source_resolved}"
+            )
+
+
+def _replace_directory(staged: Path, destination: Path) -> None:
+    destination = destination.resolve()
+    backup = destination.with_name(f"{destination.name}.previous-export")
+    if backup.exists():
+        shutil.rmtree(backup)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    if destination.exists():
+        destination.rename(backup)
+    try:
+        shutil.move(str(staged), str(destination))
+    except Exception:
+        if destination.exists():
+            shutil.rmtree(destination)
+        if backup.exists():
+            backup.rename(destination)
+        raise
+    if backup.exists():
+        shutil.rmtree(backup)
 
 
 def _assert_no_stale_strategy_personas(frames: dict[str, pd.DataFrame]) -> None:
@@ -564,7 +667,7 @@ def _read_stock_admission_artifact(sim_dir: Path) -> dict[str, Any] | None:
             data = _read_json(path)
             if not isinstance(data, dict):
                 raise RuntimeError(f"{path} must contain a JSON object.")
-            return data
+            return StockAdmissionArtifact.model_validate(data).model_dump(mode="json")
     return None
 
 
@@ -587,14 +690,14 @@ def _current_holdings_from_open_episodes(
     if open_rows.empty:
         return existing_holdings
 
-    qty_bought = pd.to_numeric(open_rows.get("total_qty_bought"), errors="coerce").fillna(0)
-    qty_sold = pd.to_numeric(open_rows.get("total_qty_sold"), errors="coerce").fillna(0)
+    qty_bought = _numeric_series(open_rows, "total_qty_bought").fillna(0)
+    qty_sold = _numeric_series(open_rows, "total_qty_sold").fillna(0)
     qty = qty_bought - qty_sold
-    avg_cost = pd.to_numeric(open_rows.get("avg_entry_price_krw"), errors="coerce")
-    last_close = pd.to_numeric(open_rows.get("last_close_krw"), errors="coerce").fillna(avg_cost)
+    avg_cost = _numeric_series(open_rows, "avg_entry_price_krw")
+    last_close = _numeric_series(open_rows, "last_close_krw").fillna(avg_cost)
     market_value = qty * last_close
     cost_value = qty * avg_cost
-    unrealized = pd.to_numeric(open_rows.get("unrealized_pnl_krw"), errors="coerce")
+    unrealized = _numeric_series(open_rows, "unrealized_pnl_krw")
     unrealized = unrealized.fillna(market_value - cost_value)
 
     rebuilt = pd.DataFrame(
@@ -608,7 +711,7 @@ def _current_holdings_from_open_episodes(
             "market_value_krw": market_value,
             "unrealized_pnl_krw": unrealized,
             "unrealized_return": (last_close / avg_cost - 1).where(avg_cost.gt(0)),
-            "holding_days": pd.to_numeric(open_rows.get("holding_days"), errors="coerce"),
+            "holding_days": _numeric_series(open_rows, "holding_days"),
             "first_buy_date": open_rows.get("open_date"),
         }
     )
@@ -730,6 +833,19 @@ def _write_json(path: Path, data: Any) -> None:
         json.dumps(_clean(data), ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
+
+
+def _validate_boundary_artifacts(
+    *,
+    overview: dict[str, Any],
+    reports: list[dict[str, Any]],
+    holdings: list[dict[str, Any]],
+    trades: list[dict[str, Any]],
+) -> None:
+    WebOverview.model_validate(overview)
+    REPORT_ROWS.validate_python(reports)
+    HOLDING_ROWS.validate_python(holdings)
+    TRADE_ROWS.validate_python(trades)
 
 
 def _write_product_json(path: Path, data: Any) -> None:
@@ -943,13 +1059,13 @@ def _compact_equity_curves(rows: list[dict[str, Any]]) -> dict[str, Any]:
     for persona in sorted(by_persona):
         equity_values: list[int | None] = []
         return_values: list[float | None] = []
-        for row in by_persona[persona]:
-            if row is None:
+        for row_data in by_persona[persona]:
+            if row_data is None:
                 equity_values.append(None)
                 return_values.append(None)
                 continue
-            equity = _numeric_or_none(row.get("equity_krw"))
-            capital = _numeric_or_none(row.get("contributed_capital_krw"))
+            equity = _numeric_or_none(row_data.get("equity_krw"))
+            capital = _numeric_or_none(row_data.get("contributed_capital_krw"))
             equity_values.append(None if equity is None else int(round(equity)))
             if equity is None or capital is None or capital <= 0:
                 return_values.append(None)
@@ -985,10 +1101,14 @@ def _numeric_or_none(value: Any) -> float | None:
 
 def _snapshot_json_bytes(root: Path) -> dict[str, bytes]:
     return {
-        str(path.relative_to(root)): path.read_bytes()
+        _relative_posix(path, root): path.read_bytes()
         for path in sorted(root.rglob("*"))
         if path.suffix in {".json", ".csv"}
     }
+
+
+def _relative_posix(path: Path, root: Path) -> str:
+    return path.relative_to(root).as_posix()
 
 
 def write_web_manifest(out: Path) -> Path:
@@ -1013,11 +1133,10 @@ def _build_manifest(out: Path, overview: dict[str, Any]) -> dict[str, Any]:
     price_end = simulation_window.get("price_end") if isinstance(simulation_window, dict) else None
     generated_at = f"{price_end}T00:00:00+09:00" if price_end else None
     artifacts = sorted(
-        str(path.relative_to(out))
+        _relative_posix(path, out)
         for path in out.rglob("*")
         if path.suffix in {".json", ".csv"} and path.name != "manifest.json"
     )
-    top_level_artifacts = [name for name in artifacts if not name.startswith("prices/")]
     row_counts = {
         "reports": _json_row_count(out / "reports" / "table.json"),
         "current_holdings": _json_row_count(out / "portfolio" / "holdings.json"),
@@ -1038,7 +1157,7 @@ def _build_manifest(out: Path, overview: dict[str, Any]) -> dict[str, Any]:
     }
     report_counts = overview.get("report_counts", {}) if isinstance(overview, dict) else {}
     target_stats = overview.get("target_stats", {}) if isinstance(overview, dict) else {}
-    return {
+    manifest = {
         "schema_version": "1.0.0",
         "generated_at": generated_at,
         "artifact_root": "data/web",
@@ -1052,14 +1171,15 @@ def _build_manifest(out: Path, overview: dict[str, Any]) -> dict[str, Any]:
             "missing_price_symbols": report_counts.get("missing_price_symbols"),
             "target_hit_count": target_stats.get("target_hit_count"),
         },
-        "artifacts": top_level_artifacts,
+        "artifacts": artifacts,
         "price_artifact_count": sum(1 for name in artifacts if name.startswith("prices/")),
         "checksums": {
             name: sha256((out / name).read_bytes()).hexdigest()
-            for name in top_level_artifacts
+            for name in artifacts
             if (out / name).is_file()
         },
     }
+    return ArtifactManifest.model_validate(manifest).model_dump(mode="json")
 
 
 def _range(mapping: Any, start_key: str, end_key: str) -> dict[str, Any]:
@@ -1115,12 +1235,14 @@ def _number(value: Any) -> float | None:
     return parsed
 
 
-def _mean(values: list[float]) -> float | None:
-    return sum(values) / len(values) if values else None
+def _mean(values: list[float | None]) -> float | None:
+    finite = [value for value in values if value is not None]
+    return sum(finite) / len(finite) if finite else None
 
 
-def _median(values: list[float]) -> float | None:
-    return float(statistics.median(values)) if values else None
+def _median(values: list[float | None]) -> float | None:
+    finite = [value for value in values if value is not None]
+    return float(statistics.median(finite)) if finite else None
 
 
 def _round_number(value: Any, digits: int = 4) -> float | None:
@@ -1140,17 +1262,17 @@ def _price_frame_with_native(prices: pd.DataFrame) -> pd.DataFrame:
     if prices.empty:
         return prices.copy()
     out = prices.copy()
-    source_currency = out.get("source_currency", "KRW")
-    display_currency = out.get("display_currency", source_currency)
+    source_currency = _frame_series(out, "source_currency", "KRW")
+    display_currency = _frame_series(out, "display_currency", source_currency)
     out["_source_currency_norm"] = (
         pd.Series(source_currency, index=out.index).astype(str).map(normalize_currency)
     )
     out["_display_currency_norm"] = (
         pd.Series(display_currency, index=out.index).astype(str).map(normalize_currency)
     )
-    out["_krw_per_unit_num"] = pd.to_numeric(out.get("krw_per_unit", 1.0), errors="coerce")
+    out["_krw_per_unit_num"] = _numeric_series(out, "krw_per_unit", 1.0)
     for column in ("open", "high", "low", "close"):
-        values = pd.to_numeric(out.get(column), errors="coerce")
+        values = _numeric_series(out, column)
         out[f"{column}_native"] = _native_from_display_prices(
             values,
             out["_source_currency_norm"],
@@ -1170,7 +1292,7 @@ def _price_frame_with_native(prices: pd.DataFrame) -> pd.DataFrame:
     ):
         if column not in out:
             continue
-        values = pd.to_numeric(out.get(column), errors="coerce")
+        values = _numeric_series(out, column)
         out[f"{column}_native"] = _native_from_display_prices(
             values,
             out["_source_currency_norm"],
@@ -1333,7 +1455,7 @@ def _build_report_rows(
             continue
         caveats = []
         caveats.extend(review_reasons.get(report_id, []))
-        context = _report_price_context(row, perf, symbol)
+        context = _report_price_context(cast(dict[str, Any], row), cast(dict[str, Any], perf), symbol)
         raw_target_price_krw = context["raw_target_price_krw"]
         target_price_krw = context["target_price_krw"]
         target_price_native = context["target_price_native"]
@@ -1431,7 +1553,7 @@ def _build_report_exclusion_counts(
             counts["sell_opinion"] += 1
             continue
 
-        context = _report_price_context(row, perf, symbol)
+        context = _report_price_context(cast(dict[str, Any], row), cast(dict[str, Any], perf), symbol)
         target_upside_at_pub = context["target_upside_at_pub"]
         if target_upside_at_pub is not None and target_upside_at_pub <= 0:
             counts["non_positive_upside"] += 1
@@ -1817,7 +1939,8 @@ def _stock_admission_summary(artifact: dict[str, Any] | None) -> dict[str, Any] 
         else:
             rejected.append(row)
 
-    window = artifact.get("window") if isinstance(artifact.get("window"), dict) else {}
+    raw_window = artifact.get("window")
+    window = cast(dict[str, Any], raw_window) if isinstance(raw_window, dict) else {}
     validation_mode = str(window.get("validation_mode") or "oos")
     validation_note = (
         "현재 기본값은 IS 랭킹 후 이후 OOS 검증이며, 높은 상관의 전략끼리는 최고 점수 1개만 남깁니다."
@@ -1849,15 +1972,12 @@ def _stock_admission_summary(artifact: dict[str, Any] | None) -> dict[str, Any] 
 
 
 def _stock_admission_decision_row(decision: dict[str, Any]) -> dict[str, Any]:
-    candidate = decision.get("candidate") if isinstance(decision.get("candidate"), dict) else {}
-    in_sample = (
-        candidate.get("in_sample_metrics") if isinstance(candidate.get("in_sample_metrics"), dict) else {}
-    )
-    out_of_sample = (
-        decision.get("out_of_sample_metrics")
-        if isinstance(decision.get("out_of_sample_metrics"), dict)
-        else {}
-    )
+    raw_candidate = decision.get("candidate")
+    candidate = cast(dict[str, Any], raw_candidate) if isinstance(raw_candidate, dict) else {}
+    raw_in_sample = candidate.get("in_sample_metrics")
+    in_sample = cast(dict[str, Any], raw_in_sample) if isinstance(raw_in_sample, dict) else {}
+    raw_out_of_sample = decision.get("out_of_sample_metrics")
+    out_of_sample = cast(dict[str, Any], raw_out_of_sample) if isinstance(raw_out_of_sample, dict) else {}
     rule_id = str(candidate.get("rule_id") or "")
     return {
         "rule_id": rule_id,
@@ -2783,12 +2903,14 @@ def _build_return_windows(
         symbol = str(report.get("symbol") or "")
         group = price_groups.get(symbol)
         entry_price = _number(report.get("entry_price_krw")) or _number(report.get("publication_price_krw"))
-        publication_date = pd.to_datetime(report.get("date"), errors="coerce")
-        if group is None or entry_price in (None, 0) or pd.isna(publication_date):
+        publication_date = _to_datetime(report.get("date"))
+        window_values: dict[str, Any]
+        if group is None or entry_price is None or entry_price == 0 or pd.isna(publication_date):
             window_values = {f"return_{days}d": None for days in windows}
             window_values.update({f"price_{days}d_krw": None for days in windows})
             window_values.update({f"date_{days}d": None for days in windows})
         else:
+            entry_price_value = float(entry_price)
             window_values = {}
             for days in windows:
                 target_date = publication_date + pd.Timedelta(days=days)
@@ -2800,7 +2922,9 @@ def _build_return_windows(
                     continue
                 price_row = candidates.iloc[0]
                 price = _number(price_row.get("close_krw"))
-                window_values[f"return_{days}d"] = round((price / entry_price) - 1, 6) if price else None
+                window_values[f"return_{days}d"] = (
+                    round((price / entry_price_value) - 1, 6) if price else None
+                )
                 window_values[f"price_{days}d_krw"] = round(price, 4) if price is not None else None
                 window_values[f"date_{days}d"] = price_row["date"].date().isoformat()
         results.append(
@@ -2842,7 +2966,7 @@ def _build_detail_metrics(
     details: dict[str, dict[str, Any]] = {}
     for report in sorted(report_rows, key=lambda row: str(row.get("report_id"))):
         report_id = str(report["report_id"])
-        publication_date = pd.to_datetime(report.get("date"), errors="coerce")
+        publication_date = _to_datetime(report.get("date"))
         history = price_groups.get(str(report.get("symbol") or ""))
         after_publication = (
             history[history["date"] >= publication_date].copy()
@@ -2861,9 +2985,9 @@ def _build_detail_metrics(
         ]
         peak = trough = None
         if not after_publication.empty:
-            peak_row = after_publication.loc[after_publication["close_krw"].idxmax()]
-            trough_row = after_publication.loc[after_publication["close_krw"].idxmin()]
-            last_row = after_publication.iloc[-1]
+            peak_row = cast(pd.Series, after_publication.loc[after_publication["close_krw"].idxmax()])
+            trough_row = cast(pd.Series, after_publication.loc[after_publication["close_krw"].idxmin()])
+            last_row = cast(pd.Series, after_publication.iloc[-1])
             peak = _price_marker(peak_row, "peak", "발간 후 고점")
             trough = _price_marker(trough_row, "trough", "발간 후 저점")
             markers.extend([peak, trough, _price_marker(last_row, "latest", "최근 종가")])
@@ -2919,7 +3043,7 @@ def _price_marker(row: pd.Series, marker_type: str, label: str) -> dict[str, Any
 
 
 def _build_target_hit_distribution(report_rows: list[dict[str, Any]]) -> dict[str, Any]:
-    bins = [
+    bins: list[tuple[str, float, float | None]] = [
         ("0-30일", 0, 30),
         ("31-60일", 31, 60),
         ("61-90일", 61, 90),
@@ -2942,13 +3066,14 @@ def _build_target_hit_distribution(report_rows: list[dict[str, Any]]) -> dict[st
         day_buckets.append({"bucket": label, "count": count})
 
     upside_buckets = []
-    for label, lower, upper in [
+    upside_bins: list[tuple[str, float, float | None]] = [
         ("0-25%", 0, 0.25),
         ("25-50%", 0.25, 0.5),
         ("50-100%", 0.5, 1.0),
         ("100-200%", 1.0, 2.0),
         ("200%+", 2.0, None),
-    ]:
+    ]
+    for label, lower, upper in upside_bins:
         bucket_rows = [
             row
             for row in report_rows
@@ -2957,11 +3082,7 @@ def _build_target_hit_distribution(report_rows: list[dict[str, Any]]) -> dict[st
             and (upper is None or upside < upper)
         ]
         hit_count = sum(1 for row in bucket_rows if row.get("target_hit"))
-        returns = [
-            _number(row.get("current_return"))
-            for row in bucket_rows
-            if _number(row.get("current_return")) is not None
-        ]
+        returns = [value for row in bucket_rows if (value := _number(row.get("current_return"))) is not None]
         upside_buckets.append(
             {
                 "bucket": label,
@@ -3268,8 +3389,9 @@ def _write_price_artifacts(
     filtered = filtered[filtered["symbol"].astype(str).isin(symbols)].copy()
     filtered.sort_values(["symbol", "date"], inplace=True)
     written: set[str] = set()
-    for symbol, group in filtered.groupby("symbol", sort=True):
-        written.add(str(symbol))
+    for symbol_key, group in filtered.groupby("symbol", sort=True):
+        symbol = str(symbol_key)
+        written.add(symbol)
         split_series = (
             pd.to_numeric(group["stock_split"], errors="coerce").fillna(0)
             if "stock_split" in group

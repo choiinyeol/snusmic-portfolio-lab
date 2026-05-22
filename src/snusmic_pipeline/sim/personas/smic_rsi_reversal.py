@@ -116,7 +116,16 @@ def simulate_smic_rsi_reversal(
 
         _apply_sell_rules(account, day, board, state, config)
 
-        _buy_short_term_reversals(account, day, board, state, config, deposit_today > 0 or has_new_signal)
+        if previous_day is not None:
+            _buy_short_term_reversals(
+                account,
+                day,
+                previous_day,
+                board,
+                state,
+                config,
+                deposit_today > 0 or has_new_signal,
+            )
 
         equity_points.append(
             record_equity_point(
@@ -228,19 +237,20 @@ def _apply_sell_rules(
 def _buy_short_term_reversals(
     account: Account,
     day: date,
+    signal_day: date,
     board: PriceBoard,
     state: RsiReversalState,
     config: SmicRsiReversalConfig,
     deposit_today: bool,
 ) -> None:
-    prices = _price_view(account, day, board)
+    prices = _fill_price_view(account, day, board)
     if not prices:
         return
     signals = [
         signal
-        for candidate in state.valid_candidates(day, config)
+        for candidate in state.valid_candidates(signal_day, config)
         if candidate.symbol in prices and not _has_open_position(account, candidate.symbol)
-        for signal in [_reversal_signal(board, day, candidate, config)]
+        for signal in [_reversal_signal(board, signal_day, candidate, config)]
         if signal is not None
     ]
     signals.sort(
@@ -314,6 +324,17 @@ def _pullback_pct(board: PriceBoard, day: date, symbol: str, lookback_days: int)
 
 def _price_view(account: Account, day: date, board: PriceBoard) -> dict[str, float]:
     prices = board.close_on(day)
+    for symbol, lot in account.holdings.items():
+        if lot.qty <= 0 or symbol in prices:
+            continue
+        mid = board.asof(day, symbol)
+        if mid is not None and mid > 0:
+            prices[symbol] = mid
+    return prices
+
+
+def _fill_price_view(account: Account, day: date, board: PriceBoard) -> dict[str, float]:
+    prices = board.open_on(day)
     for symbol, lot in account.holdings.items():
         if lot.qty <= 0 or symbol in prices:
             continue

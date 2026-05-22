@@ -15,6 +15,7 @@ from snusmic_pipeline.sim.contracts import (
 from snusmic_pipeline.sim.strategy_generation import (
     PortfolioGateResult,
     StrategyGenerationConfig,
+    _load_reusable_broker_strategy_search,
     annotate_stock_trial_gate,
     portfolio_gate_personas,
 )
@@ -105,6 +106,42 @@ def test_stock_trial_annotation_marks_portfolio_benchmark_lag() -> None:
     assert by_rule.loc["rule-a", "admission_status"] == "below_portfolio_benchmark"
     assert bool(by_rule.loc["rule-b", "accepted"])
     assert by_rule.loc["rule-b", "admission_status"] == "accepted"
+
+
+def test_broker_strategy_reuse_rejects_legacy_full_window_admission_cache(tmp_path: Path) -> None:
+    out_dir = tmp_path / "sim"
+    out_dir.mkdir()
+    pd.DataFrame(
+        [
+            {
+                "train_rank": 1,
+                "accepted": True,
+                "admission_status": "accepted",
+                "train_money_weighted_return": 0.1,
+                "train_max_drawdown": 0.2,
+                "train_sharpe": 1.0,
+                "train_sortino": 1.0,
+                "train_trade_count": 10,
+                "train_open_positions": 1,
+                "full_money_weighted_return": 9.0,
+                "full_net_profit_krw": 9_000_000,
+                "full_max_drawdown": 0.01,
+                "full_trade_count": 2,
+                "full_open_positions": 1,
+            }
+        ]
+    ).to_csv(out_dir / "broker_strategy_trials.csv", index=False)
+
+    result = _load_reusable_broker_strategy_search(
+        StrategyGenerationConfig(
+            warehouse_dir=tmp_path / "warehouse",
+            out_dir=out_dir,
+            start_date=date(2024, 1, 2),
+            end_date=date(2024, 1, 4),
+        )
+    )
+
+    assert result is None
 
 
 def _summary(persona: str, label: str, *, money_weighted_return: float) -> PersonaSummary:

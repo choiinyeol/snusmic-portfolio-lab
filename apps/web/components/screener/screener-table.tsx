@@ -15,10 +15,11 @@ import { SearchX } from 'lucide-react';
 import Link from 'next/link';
 import { Fragment, useCallback, useDeferredValue, useMemo, useReducer, useState } from 'react';
 import { CsvDownloadButton, downloadCsv } from '@/components/ui/data-panel';
+import { Money } from '@/components/ui/Money';
 import { BlockPagination } from '@/components/trading/TableControls';
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import { useSearchShortcut } from '@/components/ui/use-search-shortcut';
-import { formatDateKo, formatNative, formatPercent, numCellClass, signedTextClass } from '@/lib/format';
+import { formatDateKo, formatPercent, numCellClass, signedTextClass } from '@/lib/format';
 
 export type ScreenerBoardRow = {
   symbol: string;
@@ -831,11 +832,15 @@ function buildColumns(): ColumnDef<ScreenerBoardRow>[] {
     {
       id: 'lastCloseNative',
       accessorKey: 'lastCloseNative',
+      sortingFn: krwPriceSort('lastCloseKrw'),
       header: '현재가',
       cell: ({ row }) => (
-        <span className="font-mono tabular-nums">
-          {formatNative(row.original.lastCloseNative, row.original.currency)}
-        </span>
+        <Money
+          native={row.original.lastCloseNative}
+          krw={row.original.lastCloseKrw}
+          currency={row.original.currency}
+          layout="inline"
+        />
       ),
     },
     {
@@ -847,21 +852,29 @@ function buildColumns(): ColumnDef<ScreenerBoardRow>[] {
     {
       id: 'entryPriceNative',
       accessorKey: 'entryPriceNative',
+      sortingFn: krwPriceSort('entryPriceKrw'),
       header: '진입가',
       cell: ({ row }) => (
-        <span className="font-mono tabular-nums">
-          {formatNative(row.original.entryPriceNative, row.original.currency)}
-        </span>
+        <Money
+          native={row.original.entryPriceNative}
+          krw={row.original.entryPriceKrw}
+          currency={row.original.currency}
+          layout="inline"
+        />
       ),
     },
     {
       id: 'targetPriceNative',
       accessorKey: 'targetPriceNative',
+      sortingFn: krwPriceSort('targetPriceKrw'),
       header: '목표가',
       cell: ({ row }) => (
-        <span className="font-mono tabular-nums">
-          {formatNative(row.original.targetPriceNative, row.original.currency)}
-        </span>
+        <Money
+          native={row.original.targetPriceNative}
+          krw={row.original.targetPriceKrw}
+          currency={row.original.currency}
+          layout="inline"
+        />
       ),
     },
     {
@@ -1019,6 +1032,14 @@ function buildColumns(): ColumnDef<ScreenerBoardRow>[] {
       ),
     },
   ];
+}
+
+function krwPriceSort(field: 'lastCloseKrw' | 'entryPriceKrw' | 'targetPriceKrw') {
+  return (a: Row<ScreenerBoardRow>, b: Row<ScreenerBoardRow>) => {
+    const left = a.original[field] ?? Number.NEGATIVE_INFINITY;
+    const right = b.original[field] ?? Number.NEGATIVE_INFINITY;
+    return left === right ? 0 : left > right ? 1 : -1;
+  };
 }
 
 function rowPassesFilters(

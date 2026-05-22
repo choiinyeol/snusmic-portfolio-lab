@@ -480,7 +480,7 @@ export type ReportStatisticsLabSummary = {
 };
 
 function fullPath(relativePath: string): string {
-  return path.join(repoRoot, relativePath);
+  return path.join(/* turbopackIgnore: true */ repoRoot, relativePath);
 }
 
 let artifactCacheStamp: number | undefined;
@@ -763,6 +763,7 @@ function withLatestNativeClose(report: ReportRow): ReportRow {
     entryPriceKrw,
     targetPriceNative,
     targetPriceKrw,
+    lastCloseKrw: latest.closeKrw ?? report.lastCloseKrw,
     lastCloseNative,
     lastCloseDate: latest.time ?? report.lastCloseDate,
     currentReturn,

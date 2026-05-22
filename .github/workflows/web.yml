@@ -68,7 +68,7 @@ jobs:
 
       - name: Install Python dependencies
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.refresh_artifacts == 'true'
-        run: uv sync --group dev
+        run: uv sync --locked --group dev
 
       - name: Refresh web data artifacts
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.refresh_artifacts == 'true'
@@ -113,7 +113,7 @@ jobs:
 
       - name: Install Vercel CLI
         if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && env.VERCEL_TOKEN != '' && env.VERCEL_ORG_ID != '' && env.VERCEL_PROJECT_ID != ''
-        run: npm install --global vercel@latest
+        run: npm install --global vercel@54.3.0
 
       - name: Link Vercel project for prebuilt deploy
         if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && env.VERCEL_TOKEN != '' && env.VERCEL_ORG_ID != '' && env.VERCEL_PROJECT_ID != ''
@@ -128,5 +128,5 @@ jobs:
       - name: Explain skipped Vercel deployment
         if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (env.VERCEL_TOKEN == '' || env.VERCEL_ORG_ID == '' || env.VERCEL_PROJECT_ID == '')
         run: |
-          echo "Skipped Vercel deploy because VERCEL_TOKEN, VERCEL_ORG_ID, or VERCEL_PROJECT_ID is missing."
-          echo "Set the GitHub repository secrets before relying on CI/CD deployment."
+          echo "::error::Cannot deploy because VERCEL_TOKEN, VERCEL_ORG_ID, or VERCEL_PROJECT_ID is missing."
+          exit 1

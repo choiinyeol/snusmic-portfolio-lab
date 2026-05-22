@@ -52,6 +52,11 @@ class PriceBoard:
 
     Build via :func:`PriceBoard.from_warehouse`. Empty boards are legal —
     callers must check ``board.is_empty`` before driving the engine.
+
+    The public DataFrames remain available for compatibility. If callers edit
+    frame values in place after construction, they must call :meth:`refresh`
+    before using cached lookups again; replacing whole frames is detected and
+    normalized automatically on the next lookup.
     """
 
     close: pd.DataFrame  # index = pd.DatetimeIndex (UTC-naive midnight), columns = symbol
@@ -66,6 +71,96 @@ class PriceBoard:
     _price_on_cache: dict[tuple[int, date, str], float | None] = field(
         default_factory=dict, init=False, repr=False
     )
+    _dates_ns: np.ndarray = field(init=False, repr=False)
+    _trading_dates: list[date] = field(init=False, repr=False)
+    _symbols: list[str] = field(init=False, repr=False)
+    _symbol_to_idx: dict[str, int] = field(init=False, repr=False)
+    _date_to_idx: dict[date, int] = field(init=False, repr=False)
+    _frame_arrays: dict[int, np.ndarray] = field(init=False, repr=False)
+    _state_signature: tuple[object, ...] = field(init=False, repr=False)
+
+    def __post_init__(self) -> None:
+        self._normalize_ohlc_frames()
+        self._rebuild_numpy_state()
+
+    def _normalize_ohlc_frames(self) -> None:
+        self.close = self._normalize_frame(self.close)
+        self.open = self._normalize_frame(self.open).reindex(
+            index=self.close.index, columns=self.close.columns
+        )
+        if self.high is not None:
+            self.high = self._normalize_frame(self.high).reindex(
+                index=self.close.index, columns=self.close.columns
+            )
+        if self.low is not None:
+            self.low = self._normalize_frame(self.low).reindex(
+                index=self.close.index, columns=self.close.columns
+            )
+
+    def _current_state_signature(self) -> tuple[object, ...]:
+        return (
+            self._frame_signature(self.close),
+            self._frame_signature(self.open),
+            self._frame_signature(self.high),
+            self._frame_signature(self.low),
+        )
+
+    @staticmethod
+    def _frame_signature(frame: pd.DataFrame | None) -> tuple[object, ...] | None:
+        if frame is None:
+            return None
+        return (
+            id(frame),
+            frame.shape,
+            tuple(str(column) for column in frame.columns),
+            tuple(pd.DatetimeIndex(frame.index).astype("datetime64[ns]").view("int64")),
+        )
+
+    def refresh(self) -> None:
+        """Normalize frames and rebuild NumPy lookup state after external edits."""
+        self._normalize_ohlc_frames()
+        self._close_on_cache.clear()
+        self._asof_cache.clear()
+        self._date_asof_cache.clear()
+        self._price_on_cache.clear()
+        self._rebuild_numpy_state()
+
+    def _ensure_numpy_state(self) -> None:
+        if self._current_state_signature() != self._state_signature:
+            self.refresh()
+
+    def _rebuild_numpy_state(self) -> None:
+        self._state_signature = self._current_state_signature()
+        if self.close.empty:
+            self._dates_ns = np.array([], dtype=np.int64)
+            self._trading_dates = []
+            self._symbols = []
+            self._symbol_to_idx = {}
+            self._date_to_idx = {}
+            self._frame_arrays = {}
+            return
+        self._dates_ns = self.close.index.astype("datetime64[ns]").view("int64")
+        self._trading_dates = [ts.date() for ts in self.close.index]
+        self._symbols = [str(symbol) for symbol in self.close.columns]
+        self._symbol_to_idx = {symbol: index for index, symbol in enumerate(self._symbols)}
+        self._date_to_idx = {day: index for index, day in enumerate(self._trading_dates)}
+        self._frame_arrays = {
+            id(self.close): self.close.to_numpy(dtype=float, copy=False),
+            id(self.open): self.open.to_numpy(dtype=float, copy=False),
+        }
+        if self.high is not None:
+            self._frame_arrays[id(self.high)] = self.high.to_numpy(dtype=float, copy=False)
+        if self.low is not None:
+            self._frame_arrays[id(self.low)] = self.low.to_numpy(dtype=float, copy=False)
+
+    @staticmethod
+    def _normalize_frame(frame: pd.DataFrame) -> pd.DataFrame:
+        if frame.empty:
+            return frame.copy()
+        out = frame.copy()
+        out.index = pd.to_datetime(out.index).tz_localize(None)
+        out.columns = [str(column) for column in out.columns]
+        return out.apply(pd.to_numeric, errors="coerce").sort_index()
 
     @classmethod
     def from_warehouse(cls, warehouse_dir: Path) -> PriceBoard:
@@ -90,64 +185,93 @@ class PriceBoard:
         return self.close.empty
 
     def trading_dates(self, start: date | None = None, end: date | None = None) -> list[date]:
+        self._ensure_numpy_state()
         if self.close.empty:
             return []
-        idx = self.close.index
-        if start is not None:
-            idx = idx[idx >= pd.Timestamp(start)]
-        if end is not None:
-            idx = idx[idx <= pd.Timestamp(end)]
-        return [ts.date() for ts in idx]
+        left = 0 if start is None else int(np.searchsorted(self._dates_ns, pd.Timestamp(start).value, "left"))
+        right = (
+            len(self._dates_ns)
+            if end is None
+            else int(np.searchsorted(self._dates_ns, pd.Timestamp(end).value, "right"))
+        )
+        return self._trading_dates[left:right]
 
     def close_on(self, day: date) -> dict[str, float]:
         """Closes available on ``day``. Symbols missing a close are omitted."""
+        self._ensure_numpy_state()
         cached = self._close_on_cache.get(day)
         if cached is not None:
             return cached
-        ts = pd.Timestamp(day)
-        if self.close.empty or ts not in self.close.index:
+        row_idx = self._date_to_idx.get(day)
+        if row_idx is None:
             return {}
-        row = self.close.loc[ts]
-        closes = {sym: float(val) for sym, val in row.items() if pd.notna(val) and float(val) > 0}
+        values = self._frame_arrays[id(self.close)][row_idx]
+        mask = np.isfinite(values) & (values > 0)
+        closes = {
+            symbol: float(values[col_idx])
+            for col_idx, symbol in enumerate(self._symbols)
+            if bool(mask[col_idx])
+        }
         self._close_on_cache[day] = closes
         return closes
 
+    def open_on(self, day: date) -> dict[str, float]:
+        """Opens available on ``day``. Symbols missing an open are omitted."""
+        self._ensure_numpy_state()
+        row_idx = self._date_to_idx.get(day)
+        if row_idx is None or self.open.empty:
+            return {}
+        values = self._frame_arrays[id(self.open)][row_idx]
+        mask = np.isfinite(values) & (values > 0)
+        return {
+            symbol: float(values[col_idx])
+            for col_idx, symbol in enumerate(self._symbols)
+            if bool(mask[col_idx])
+        }
+
     def asof(self, day: date, symbol: str) -> float | None:
         """Latest known close for ``symbol`` on or before ``day``."""
+        self._ensure_numpy_state()
         key = (day, symbol)
         if key in self._asof_cache:
             return self._asof_cache[key]
-        if self.close.empty or symbol not in self.close.columns:
+        col_idx = self._symbol_to_idx.get(symbol)
+        if col_idx is None:
             self._asof_cache[key] = None
             return None
-        ts = pd.Timestamp(day)
-        col = self.close[symbol]
-        value = col.asof(ts)
-        if pd.isna(value) or float(value) <= 0:
+        row_idx = int(np.searchsorted(self._dates_ns, pd.Timestamp(day).value, side="right") - 1)
+        if row_idx < 0:
             self._asof_cache[key] = None
             return None
-        result = float(value)
+        values = self._frame_arrays[id(self.close)][: row_idx + 1, col_idx]
+        valid = np.flatnonzero(np.isfinite(values) & (values > 0))
+        if valid.size == 0:
+            self._asof_cache[key] = None
+            return None
+        result = float(values[int(valid[-1])])
         self._asof_cache[key] = result
         return result
 
     def date_asof(self, day: date, symbol: str) -> date | None:
         """Date of the latest valid close for ``symbol`` on or before ``day``."""
+        self._ensure_numpy_state()
         key = (day, symbol)
         if key in self._date_asof_cache:
             return self._date_asof_cache[key]
-        if self.close.empty or symbol not in self.close.columns:
+        col_idx = self._symbol_to_idx.get(symbol)
+        if col_idx is None:
             self._date_asof_cache[key] = None
             return None
-        ts = pd.Timestamp(day)
-        series = self.close[symbol]
-        idx = int(series.index.searchsorted(ts, side="right") - 1)
-        while idx >= 0:
-            value = series.iat[idx]
-            if pd.notna(value) and float(value) > 0:
-                result = series.index[idx].date()
-                self._date_asof_cache[key] = result
-                return result
-            idx -= 1
+        row_idx = int(np.searchsorted(self._dates_ns, pd.Timestamp(day).value, side="right") - 1)
+        if row_idx < 0:
+            self._date_asof_cache[key] = None
+            return None
+        values = self._frame_arrays[id(self.close)][: row_idx + 1, col_idx]
+        valid = np.flatnonzero(np.isfinite(values) & (values > 0))
+        if valid.size:
+            result = self._trading_dates[int(valid[-1])]
+            self._date_asof_cache[key] = result
+            return result
         self._date_asof_cache[key] = None
         return None
 
@@ -171,20 +295,111 @@ class PriceBoard:
         return high is not None and high >= threshold
 
     def _price_on(self, day: date, symbol: str, frame: pd.DataFrame) -> float | None:
+        self._ensure_numpy_state()
         key = (id(frame), day, symbol)
         if key in self._price_on_cache:
             return self._price_on_cache[key]
-        if frame.empty or symbol not in frame.columns:
+        row_idx = self._date_to_idx.get(day)
+        col_idx = self._symbol_to_idx.get(symbol)
+        array = self._frame_arrays.get(id(frame))
+        if row_idx is None or col_idx is None or array is None:
             self._price_on_cache[key] = None
             return None
-        ts = pd.Timestamp(day)
-        if ts not in frame.index:
-            self._price_on_cache[key] = None
-            return None
-        value = frame.at[ts, symbol]
-        result = float(value) if pd.notna(value) and float(value) > 0 else None
+        value = array[row_idx, col_idx]
+        result = float(value) if np.isfinite(value) and float(value) > 0 else None
         self._price_on_cache[key] = result
         return result
+
+    def first_close_on_or_after(self, start: date, end: date, symbol: str) -> float | None:
+        values = self._window_values(self.close, start, end, symbol)
+        if values is None:
+            return None
+        _, window = values
+        finite = np.flatnonzero(np.isfinite(window))
+        if finite.size == 0:
+            return None
+        first = float(window[int(finite[0])])
+        return first if first > 0 else None
+
+    def last_close_in_window(self, start: date, end: date, symbol: str) -> tuple[float | None, date | None]:
+        values = self._window_values(self.close, start, end, symbol)
+        if values is None:
+            return None, None
+        dates, window = values
+        finite = np.flatnonzero(np.isfinite(window))
+        if finite.size == 0:
+            return None, None
+        last_idx = int(finite[-1])
+        last = float(window[last_idx])
+        if last <= 0:
+            return None, None
+        return last, dates[last_idx]
+
+    def max_close_in_window(self, start: date, end: date, symbol: str) -> float | None:
+        return self._window_extreme(self.close, start, end, symbol, np.nanmax)
+
+    def min_close_in_window(self, start: date, end: date, symbol: str) -> float | None:
+        return self._window_extreme(self.close, start, end, symbol, np.nanmin)
+
+    def first_touch_in_window(
+        self,
+        start: date,
+        end: date,
+        symbol: str,
+        threshold: float,
+        *,
+        direction: str = "upside",
+        include_start: bool = True,
+    ) -> date | None:
+        frame = self.low if direction == "downside" and self.low is not None else self.high
+        if frame is None:
+            frame = self.close
+        values = self._window_values(frame, start, end, symbol, include_start=include_start)
+        if values is None:
+            return None
+        dates, window = values
+        valid = np.isfinite(window)
+        touched = valid & (window <= threshold) if direction == "downside" else valid & (window >= threshold)
+        indexes = np.flatnonzero(touched)
+        return None if indexes.size == 0 else dates[int(indexes[0])]
+
+    def _window_extreme(
+        self,
+        frame: pd.DataFrame,
+        start: date,
+        end: date,
+        symbol: str,
+        reducer,
+    ) -> float | None:
+        values = self._window_values(frame, start, end, symbol)
+        if values is None:
+            return None
+        _, window = values
+        finite = window[np.isfinite(window)]
+        if finite.size == 0:
+            return None
+        return float(reducer(finite))
+
+    def _window_values(
+        self,
+        frame: pd.DataFrame,
+        start: date,
+        end: date,
+        symbol: str,
+        *,
+        include_start: bool = True,
+    ) -> tuple[list[date], np.ndarray] | None:
+        self._ensure_numpy_state()
+        col_idx = self._symbol_to_idx.get(symbol)
+        array = self._frame_arrays.get(id(frame))
+        if self.close.empty or col_idx is None or array is None:
+            return None
+        left_side = "left" if include_start else "right"
+        left = int(np.searchsorted(self._dates_ns, pd.Timestamp(start).value, left_side))
+        right = int(np.searchsorted(self._dates_ns, pd.Timestamp(end).value, "right"))
+        if left >= right:
+            return None
+        return self._trading_dates[left:right], array[left:right, col_idx]
 
     def returns_window(
         self,
@@ -296,11 +511,11 @@ def load_benchmark_prices(
     needed = set(symbols)
     have = set(cached["symbol"].astype(str)) if not cached.empty else set()
     missing = needed - have
-    if refresh or missing:
+    stale = _stale_benchmark_symbols(cached, needed, start, end)
+    refresh_symbols = needed if refresh else missing | stale
+    if refresh_symbols:
         frames: list[pd.DataFrame] = []
-        for symbol in sorted(needed):
-            if not refresh and symbol in have:
-                continue
+        for symbol in sorted(refresh_symbols):
             history = download_history(
                 symbol,
                 datetime.combine(start, datetime.min.time(), tzinfo=UTC),
@@ -313,7 +528,7 @@ def load_benchmark_prices(
             frames.append(history)
         if frames:
             new_prices = pd.concat(frames, ignore_index=True)
-            currencies = {_currency_for_benchmark_symbol(s) for s in symbols}
+            currencies = {_currency_for_benchmark_symbol(s) for s in refresh_symbols}
             fx = download_fx_rates(
                 currencies,
                 datetime.combine(start, datetime.min.time(), tzinfo=UTC),
@@ -321,15 +536,26 @@ def load_benchmark_prices(
                 download_history,
             )
             reports = pd.DataFrame(
-                [{"symbol": s, "exchange": "KRX" if s.endswith(".KS") else "NYSE"} for s in symbols]
+                [{"symbol": s, "exchange": "KRX" if s.endswith(".KS") else "NYSE"} for s in refresh_symbols]
             )
             new_prices = apply_daily_price_krw_conversion(new_prices, reports, fx)
             if not cached.empty:
-                cached = cached[~cached["symbol"].astype(str).isin([str(s) for s in needed])]
+                cached = cached[~cached["symbol"].astype(str).isin([str(s) for s in refresh_symbols])]
                 cached = pd.concat([cached, new_prices], ignore_index=True)
             else:
                 cached = new_prices
             write_table(warehouse_dir, _BENCHMARK_TABLE, cached)
+    remaining_stale = _stale_benchmark_symbols(cached, needed, start, end)
+    remaining_missing = needed - (set(cached["symbol"].astype(str)) if not cached.empty else set())
+    if remaining_missing or remaining_stale:
+        problems = []
+        if remaining_missing:
+            problems.append(f"missing symbols={sorted(remaining_missing)}")
+        if remaining_stale:
+            problems.append(f"incomplete date coverage={sorted(remaining_stale)}")
+        raise RuntimeError(
+            f"Benchmark price cache cannot cover requested window {start}..{end}: {'; '.join(problems)}"
+        )
     if cached.empty:
         return PriceBoard(close=pd.DataFrame(), open=pd.DataFrame())
     cached = cached.copy()
@@ -349,6 +575,23 @@ def load_benchmark_prices(
     else:
         open_pivot = close
     return PriceBoard(close=close, open=open_pivot)
+
+
+def _stale_benchmark_symbols(cached: pd.DataFrame, symbols: set[str], start: date, end: date) -> set[str]:
+    if cached.empty:
+        return set(symbols)
+    frame = cached.copy()
+    frame["symbol"] = frame["symbol"].astype(str)
+    frame["date"] = pd.to_datetime(frame["date"], errors="coerce").dt.date
+    stale: set[str] = set()
+    for symbol in symbols:
+        dates = frame.loc[frame["symbol"] == symbol, "date"].dropna()
+        if dates.empty:
+            stale.add(symbol)
+            continue
+        if min(dates) > start or max(dates) < end:
+            stale.add(symbol)
+    return stale
 
 
 def _currency_for_benchmark_symbol(symbol: str) -> str:

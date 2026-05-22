@@ -54,13 +54,14 @@ def pdf_url_from_content(rendered_content: str) -> str:
 
 def fetch_page(page: int, session: requests.Session | None = None) -> list[dict]:
     client = session or requests.Session()
+    params: dict[str, str | int] = {
+        "per_page": 12,
+        "page": page,
+        "_fields": "date,link,title,slug,content",
+    }
     response = client.get(
         POSTS_ENDPOINT,
-        params={
-            "per_page": 12,
-            "page": page,
-            "_fields": "date,link,title,slug,content",
-        },
+        params=params,
         headers={"User-Agent": "Mozilla/5.0 snusmic-portfolio-lab/0.1"},
         timeout=DEFAULT_TIMEOUT,
     )
