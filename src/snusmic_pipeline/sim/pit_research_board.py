@@ -512,7 +512,9 @@ def _ta_momentum_score(
     score += min(max(current_return, 0.0), 2.0) * 0.15
     high_gap = tech.get("distance_from_52w_high")
     if isinstance(high_gap, (int, float)):
-        score += 0.20 if high_gap >= -0.05 else 0.12 if high_gap >= -0.10 else 0.06 if high_gap >= -0.15 else 0
+        score += (
+            0.20 if high_gap >= -0.05 else 0.12 if high_gap >= -0.10 else 0.06 if high_gap >= -0.15 else 0
+        )
     if tech.get("ma_stack") is True:
         score += 0.12
     if tech.get("ema_stack") is True:

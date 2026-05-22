@@ -28,12 +28,12 @@ ROUND_NDIGITS = 4
 
 def write_simulation_artifacts(result: SimulationResult, out: Path) -> None:
     out.mkdir(parents=True, exist_ok=True)
-    (out / "personas.json").write_text(
+    (out / "accounts.json").write_text(
         json.dumps(_round_floats(result.model_dump(mode="json")), ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
-    (out / "persona-configs.json").write_text(
-        json.dumps(_persona_config_artifact(result.config), ensure_ascii=False, indent=2, sort_keys=True)
+    (out / "account-configs.json").write_text(
+        json.dumps(_account_config_artifact(result.config), ensure_ascii=False, indent=2, sort_keys=True)
         + "\n",
         encoding="utf-8",
     )
@@ -68,10 +68,10 @@ def write_simulation_artifacts(result: SimulationResult, out: Path) -> None:
         plot_portfolio_composition(result, out / "portfolio_composition.png")
 
 
-def _persona_config_artifact(config: SimulationConfig) -> dict[str, object]:
+def _account_config_artifact(config: SimulationConfig) -> dict[str, object]:
     return {
         "schema_version": "1.0.0",
-        "personas": [_round_floats(persona.model_dump(mode="json")) for persona in config.personas],
+        "accounts": [_round_floats(account_id.model_dump(mode="json")) for account_id in config.accounts],
     }
 
 

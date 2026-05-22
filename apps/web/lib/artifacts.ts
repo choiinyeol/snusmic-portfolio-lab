@@ -1,4 +1,4 @@
-﻿import 'server-only';
+import 'server-only';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
@@ -13,7 +13,7 @@ import {
   ScreenerCandidateSchema,
   RawTradeRowSchema,
   StrategyCatalogRowSchema,
-  WebPersonaSchema,
+  WebAccountSchema,
   WebDataQualitySchema,
   WebOverviewSchema,
 } from '@/lib/schemas';
@@ -66,7 +66,7 @@ export type ReportRow = {
 };
 
 export type HoldingRow = {
-  persona: string;
+  account_id: string;
   symbol: string;
   company: string;
   qty: number | null;
@@ -82,7 +82,7 @@ export type HoldingRow = {
 };
 
 export type MonthlyHoldingRow = {
-  persona: string;
+  account_id: string;
   monthEnd: string;
   symbol: string;
   company: string;
@@ -98,7 +98,7 @@ export type MonthlyHoldingRow = {
 };
 
 export type TradeRow = {
-  persona: string;
+  account_id: string;
   date: string;
   symbol: string;
   company: string;
@@ -115,7 +115,7 @@ export type TradeRow = {
 };
 
 export type PositionEpisodeRow = {
-  persona: string;
+  account_id: string;
   symbol: string;
   company: string;
   openDate: string;
@@ -174,14 +174,14 @@ export type ReportTargetDigest = {
   targetUpsideAtPub: number | null;
 };
 export type EquityPoint = {
-  persona: string;
+  account_id: string;
   date: string;
   equityKrw: number | null;
   contributedCapitalKrw: number | null;
   cumulativeReturn: number | null;
 };
 export type SummaryRow = {
-  persona: string;
+  account_id: string;
   label?: string;
   finalEquityKrw: number | null;
   finalCashKrw?: number | null;
@@ -196,7 +196,7 @@ export type SummaryRow = {
 };
 
 export type AccountingReconciliationRow = {
-  persona: string;
+  account_id: string;
   label?: string;
   totalContributedKrw: number | null;
   realizedPnlKrw: number | null;
@@ -265,8 +265,8 @@ export type ScreenerCandidateRow = {
   targetGapPct: number | null;
 };
 
-export type WebPersona = {
-  persona: string;
+export type WebAccount = {
+  account_id: string;
   label?: string;
   final_equity_krw: number | null;
   final_cash_krw?: number | null;
@@ -317,7 +317,7 @@ export type ReportCounts = {
 };
 
 export type WebOverview = {
-  baseline_personas: WebPersona[];
+  baseline_accounts: WebAccount[];
   generated_from?: Record<string, string>;
   report_counts?: ReportCounts;
   simulation_window?: Record<string, string | null>;
@@ -909,13 +909,13 @@ export function getMarkdownSnippet(report: ReportRow): string {
 
 export function getSummaryRows(): SummaryRow[] {
   const raw = parseRows(
-    'portfolio/personas.json',
-    WebPersonaSchema,
-    readRequiredJson<unknown>('data/web/portfolio/personas.json'),
+    'portfolio/accounts.json',
+    WebAccountSchema,
+    readRequiredJson<unknown>('data/web/portfolio/accounts.json'),
   );
   return (
     raw?.map((row) => ({
-      persona: row.persona,
+      account_id: row.account_id,
       label: row.label,
       finalEquityKrw: num(row.final_equity_krw),
       finalCashKrw: num(row.final_cash_krw),
@@ -936,7 +936,7 @@ export function getAccountingReconciliations(): AccountingReconciliationRow[] {
     readRequiredJson<unknown>('data/web/portfolio/accounting-reconciliation.json'),
   );
   return raw.map((row) => ({
-    persona: row.persona,
+    account_id: row.account_id,
     label: row.label,
     totalContributedKrw: row.total_contributed_krw,
     realizedPnlKrw: row.realized_pnl_krw,
@@ -1091,7 +1091,7 @@ export function getCurrentHoldings(): HoldingRow[] {
   );
   holdingsCache = raw
     .map((row) => ({
-      persona: row.persona,
+      account_id: row.account_id,
       symbol: row.symbol,
       company: row.company || row.symbol,
       qty: row.qty,
@@ -1113,7 +1113,7 @@ let monthlyHoldingsCache: MonthlyHoldingRow[] | undefined;
 export function getMonthlyHoldings(): MonthlyHoldingRow[] {
   if (artifactCacheValid() && monthlyHoldingsCache) return monthlyHoldingsCache;
   const raw = readCompactTable('data/web/portfolio/monthly-holdings.json', [
-    'persona',
+    'account_id',
     'month_end',
     'symbol',
     'company',
@@ -1133,19 +1133,19 @@ export function getMonthlyHoldings(): MonthlyHoldingRow[] {
 }
 
 function enrichMonthlyHolding(row: RawReport, costBySnapshot: Map<string, number | null>): MonthlyHoldingRow {
-  const persona = String(row.persona ?? '');
+  const account_id = String(row.account_id ?? '');
   const monthEnd = String(row.month_end ?? row.monthEnd ?? '');
   const symbol = String(row.symbol ?? '');
   const qty = num(row.qty);
   const marketValueKrw = num(row.market_value_krw ?? row.marketValueKrw);
   const monthCloseKrw = qty && qty > 0 && marketValueKrw !== null ? marketValueKrw / qty : null;
-  const avgCostKrw = costBySnapshot.get(`${persona}|${monthEnd}|${symbol}`) ?? null;
+  const avgCostKrw = costBySnapshot.get(`${account_id}|${monthEnd}|${symbol}`) ?? null;
   const costValueKrw = avgCostKrw !== null && qty !== null ? avgCostKrw * qty : null;
   const unrealizedPnlKrw = marketValueKrw !== null && costValueKrw !== null ? marketValueKrw - costValueKrw : null;
   const unrealizedReturn =
     avgCostKrw !== null && avgCostKrw > 0 && monthCloseKrw !== null ? monthCloseKrw / avgCostKrw - 1 : null;
   return {
-    persona,
+    account_id,
     monthEnd,
     symbol,
     company: String(row.company ?? row.symbol ?? ''),
@@ -1166,15 +1166,15 @@ function enrichMonthlyHolding(row: RawReport, costBySnapshot: Map<string, number
 function buildMonthlyCostBasis(rows: RawReport[]): Map<string, number | null> {
   const snapshots = [...rows]
     .map((row) => ({
-      persona: String(row.persona ?? ''),
+      account_id: String(row.account_id ?? ''),
       monthEnd: String(row.month_end ?? row.monthEnd ?? ''),
       symbol: String(row.symbol ?? ''),
       qty: num(row.qty),
     }))
-    .filter((row) => row.persona && row.monthEnd && row.symbol)
+    .filter((row) => row.account_id && row.monthEnd && row.symbol)
     .sort((a, b) => a.monthEnd.localeCompare(b.monthEnd));
   const trades = readCompactTable('data/web/portfolio/trades.json', [
-    'persona',
+    'account_id',
     'date',
     'symbol',
     'side',
@@ -1186,7 +1186,7 @@ function buildMonthlyCostBasis(rows: RawReport[]): Map<string, number | null> {
     'report_id',
   ])
     .map((row) => ({
-      persona: String(row.persona ?? ''),
+      account_id: String(row.account_id ?? ''),
       date: String(row.date ?? ''),
       symbol: String(row.symbol ?? ''),
       side: String(row.side ?? ''),
@@ -1202,21 +1202,21 @@ function buildMonthlyCostBasis(rows: RawReport[]): Map<string, number | null> {
       applyCostBasisTrade(state, trades[tradeIndex]);
       tradeIndex += 1;
     }
-    const key = `${snapshot.persona}|${snapshot.symbol}`;
+    const key = `${snapshot.account_id}|${snapshot.symbol}`;
     const lot = state.get(key);
     const avgCost = lot && lot.qty > 0 ? lot.cost / lot.qty : null;
-    out.set(`${snapshot.persona}|${snapshot.monthEnd}|${snapshot.symbol}`, avgCost);
+    out.set(`${snapshot.account_id}|${snapshot.monthEnd}|${snapshot.symbol}`, avgCost);
   }
   return out;
 }
 
 function applyCostBasisTrade(
   state: Map<string, { qty: number; cost: number }>,
-  trade: { persona: string; symbol: string; side: string; qty: number | null; price: number | null },
+  trade: { account_id: string; symbol: string; side: string; qty: number | null; price: number | null },
 ) {
-  if (!trade.persona || !trade.symbol || !trade.qty || trade.qty <= 0 || trade.price === null || trade.price <= 0)
+  if (!trade.account_id || !trade.symbol || !trade.qty || trade.qty <= 0 || trade.price === null || trade.price <= 0)
     return;
-  const key = `${trade.persona}|${trade.symbol}`;
+  const key = `${trade.account_id}|${trade.symbol}`;
   const lot = state.get(key) ?? { qty: 0, cost: 0 };
   if (trade.side === 'buy') {
     state.set(key, { qty: lot.qty + trade.qty, cost: lot.cost + trade.qty * trade.price });
@@ -1236,7 +1236,7 @@ export function getTrades(): TradeRow[] {
     'portfolio/trades.json',
     RawTradeRowSchema,
     readCompactTable('data/web/portfolio/trades.json', [
-      'persona',
+      'account_id',
       'date',
       'symbol',
       'side',
@@ -1255,7 +1255,7 @@ export function getTrades(): TradeRow[] {
       const fillPriceNative = nativeFromKrwAtSymbolDate(row.symbol, row.date, row.fill_price_krw);
       const target = (row.report_id ? targetsByReportId[row.report_id] : undefined) ?? targetsBySymbol[row.symbol];
       return {
-        persona: row.persona,
+        account_id: row.account_id,
         date: row.date,
         symbol: row.symbol,
         company: target?.company ?? row.symbol,
@@ -1279,7 +1279,7 @@ let positionEpisodesCache: PositionEpisodeRow[] | undefined;
 export function getPositionEpisodes(): PositionEpisodeRow[] {
   if (artifactCacheValid() && positionEpisodesCache) return positionEpisodesCache;
   positionEpisodesCache = readCompactTable('data/web/portfolio/episodes.json', [
-    'persona',
+    'account_id',
     'symbol',
     'company',
     'open_date',
@@ -1306,7 +1306,7 @@ export function getPositionEpisodes(): PositionEpisodeRow[] {
       const avgExitPriceKrw = num(row.avg_exit_price_krw);
       const lastCloseKrw = num(row.last_close_krw);
       return {
-        persona: String(row.persona ?? ''),
+        account_id: String(row.account_id ?? ''),
         symbol,
         company: String(row.company ?? row.symbol ?? ''),
         openDate,
@@ -1333,8 +1333,8 @@ export function getPositionEpisodes(): PositionEpisodeRow[] {
   return positionEpisodesCache;
 }
 
-export function getPersonaLabel(persona: string): string {
-  return getSummaryRows().find((row) => row.persona === persona)?.label ?? persona;
+export function getAccountLabel(account_id: string): string {
+  return getSummaryRows().find((row) => row.account_id === account_id)?.label ?? account_id;
 }
 
 let equityDailyCache: EquityPoint[] | undefined;
@@ -1383,17 +1383,17 @@ function readCompactEquityCurves(filePath: string): EquityPoint[] {
   for (const series of artifact.series) {
     if (series.equity_krw.length !== artifact.dates.length) {
       throw new Error(
-        `Schema mismatch in ${filePath}.${series.persona}.equity_krw: expected ${artifact.dates.length} points, got ${series.equity_krw.length}.`,
+        `Schema mismatch in ${filePath}.${series.account_id}.equity_krw: expected ${artifact.dates.length} points, got ${series.equity_krw.length}.`,
       );
     }
     if (series.cumulative_return.length !== artifact.dates.length) {
       throw new Error(
-        `Schema mismatch in ${filePath}.${series.persona}.cumulative_return: expected ${artifact.dates.length} points, got ${series.cumulative_return.length}.`,
+        `Schema mismatch in ${filePath}.${series.account_id}.cumulative_return: expected ${artifact.dates.length} points, got ${series.cumulative_return.length}.`,
       );
     }
     artifact.dates.forEach((date, index) => {
       rows.push({
-        persona: series.persona,
+        account_id: series.account_id,
         date,
         equityKrw: series.equity_krw[index] ?? null,
         contributedCapitalKrw: null,

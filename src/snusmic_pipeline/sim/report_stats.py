@@ -1,12 +1,12 @@
-"""Persona-agnostic statistics on the SMIC report universe itself.
+"""Account-agnostic statistics on the SMIC report universe itself.
 
 Answers the questions: how many reports actually hit their target? Which
 reports were the biggest winners and losers in raw price terms? Which
 reports had the most ambitious targets at publication? Which targets
 ended up furthest from the realised price?
 
-This view is independent of any investor persona — it just asks "what
-did the price do after this report came out?". The persona simulators
+This view is independent of any investor account_id — it just asks "what
+did the price do after this report came out?". The account_id simulators
 trade on top of it.
 """
 

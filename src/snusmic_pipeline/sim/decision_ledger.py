@@ -13,7 +13,7 @@ from .contracts import SimulationResult
 
 DECISION_COLUMNS = [
     "date",
-    "persona",
+    "account_id",
     "decision",
     "buy_count",
     "sell_count",
@@ -30,7 +30,7 @@ DECISION_COLUMNS = [
 
 
 def build_daily_decision_ledger(result: SimulationResult) -> pd.DataFrame:
-    """Return one row per persona per trading day.
+    """Return one row per account_id per trading day.
 
     Trade rows already contain fill-level detail. This ledger is the daily
     decision surface: buy/sell/rebalance/hold plus the post-decision account
@@ -41,7 +41,7 @@ def build_daily_decision_ledger(result: SimulationResult) -> pd.DataFrame:
     if equity.empty:
         return pd.DataFrame(columns=DECISION_COLUMNS)
     equity["date"] = equity["date"].astype(str)
-    equity["persona"] = equity["persona"].astype(str)
+    equity["account_id"] = equity["account_id"].astype(str)
 
     trades = pd.DataFrame([trade.model_dump() for trade in result.trades])
     if trades.empty:
@@ -52,27 +52,27 @@ def build_daily_decision_ledger(result: SimulationResult) -> pd.DataFrame:
         out["trade_count"] = 0
         out["symbols"] = ""
         out["reasons"] = ""
-        return out[DECISION_COLUMNS].sort_values(["date", "persona"]).reset_index(drop=True)
+        return out[DECISION_COLUMNS].sort_values(["date", "account_id"]).reset_index(drop=True)
 
     trades["date"] = trades["date"].astype(str)
-    trades["persona"] = trades["persona"].astype(str)
+    trades["account_id"] = trades["account_id"].astype(str)
     trades["symbol"] = trades["symbol"].astype(str)
     trades["reason"] = trades["reason"].astype(str)
     trades["side"] = trades["side"].astype(str)
-    grouped = trades.groupby(["date", "persona"], as_index=False).agg(
+    grouped = trades.groupby(["date", "account_id"], as_index=False).agg(
         buy_count=("side", lambda values: int((values == "buy").sum())),
         sell_count=("side", lambda values: int((values == "sell").sum())),
         trade_count=("side", "size"),
         symbols=("symbol", _join_unique),
         reasons=("reason", _join_unique),
     )
-    out = equity.merge(grouped, on=["date", "persona"], how="left")
+    out = equity.merge(grouped, on=["date", "account_id"], how="left")
     for column in ("buy_count", "sell_count", "trade_count"):
         out[column] = pd.to_numeric(out[column], errors="coerce").fillna(0).astype(int)
     out["symbols"] = out["symbols"].fillna("")
     out["reasons"] = out["reasons"].fillna("")
     out["decision"] = out.apply(_decision_label, axis=1)
-    return out[DECISION_COLUMNS].sort_values(["date", "persona"]).reset_index(drop=True)
+    return out[DECISION_COLUMNS].sort_values(["date", "account_id"]).reset_index(drop=True)
 
 
 def _join_unique(values: pd.Series) -> str:

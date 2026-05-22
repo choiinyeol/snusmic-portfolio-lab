@@ -2,7 +2,7 @@
 
 Pure functions only — given a :class:`SavingsPlan` and an ordered list of
 trading dates, return the deposit cash-flow stream. The runner consumes the
-stream as the input to every persona's brokerage account, so the escalation
+stream as the input to every account's brokerage account, so the escalation
 math lives in exactly one place.
 """
 

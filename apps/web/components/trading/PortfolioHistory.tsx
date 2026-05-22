@@ -12,8 +12,8 @@ import { SortHeader, pageRows, sortRows, type SortState } from './TableControls'
 type Props = {
   monthly: MonthlyHoldingRow[];
   /** Strategy controlled by the parent — single source of truth. */
-  persona: string;
-  personaLabels: Record<string, string>;
+  account_id: string;
+  accountLabels: Record<string, string>;
   targetsBySymbol: Record<string, ReportTargetDigest>;
 };
 
@@ -45,7 +45,7 @@ const STACK_COLORS = [
   '#cbd5e1',
 ];
 
-export function PortfolioHistory({ monthly, persona, personaLabels, targetsBySymbol }: Props) {
+export function PortfolioHistory({ monthly, account_id, accountLabels, targetsBySymbol }: Props) {
   const months = useMemo(
     () =>
       Array.from(new Set(monthly.map((row) => row.monthEnd)))
@@ -59,14 +59,14 @@ export function PortfolioHistory({ monthly, persona, personaLabels, targetsBySym
   const [pageSize, setPageSize] = useState(25);
 
   const filtered = useMemo(
-    () => monthly.filter((row) => row.persona === persona && (!month || row.monthEnd === month)),
-    [month, monthly, persona],
+    () => monthly.filter((row) => row.account_id === account_id && (!month || row.monthEnd === month)),
+    [month, monthly, account_id],
   );
   const sorted = useMemo(
     () =>
       sortRows(filtered, sort, {
         month: (row) => row.monthEnd,
-        strategy: (row) => personaLabels[row.persona] ?? row.persona,
+        strategy: (row) => accountLabels[row.account_id] ?? row.account_id,
         market: (row) => marketLabel(targetsBySymbol[row.symbol]?.marketRegion),
         symbol: (row) => row.company || row.symbol,
         target: (row) => targetsBySymbol[row.symbol]?.targetPriceNative ?? targetsBySymbol[row.symbol]?.targetPriceKrw,
@@ -80,10 +80,10 @@ export function PortfolioHistory({ monthly, persona, personaLabels, targetsBySym
         targetPnl: (row) => targetPnl(row, targetsBySymbol[row.symbol]),
         weight: (row) => row.weightInPortfolio,
       }),
-    [filtered, personaLabels, sort, targetsBySymbol],
+    [filtered, accountLabels, sort, targetsBySymbol],
   );
   const rows = useMemo(() => pageRows(sorted, page, pageSize), [page, pageSize, sorted]);
-  const stacks = useMemo(() => buildStacks(monthly, persona), [monthly, persona]);
+  const stacks = useMemo(() => buildStacks(monthly, account_id), [monthly, account_id]);
   const updateSort = (key: MonthlySortKey) => {
     setSort((current) => ({ key, direction: current.key === key && current.direction === 'desc' ? 'asc' : 'desc' }));
     setPage(0);
@@ -212,9 +212,9 @@ export function PortfolioHistory({ monthly, persona, personaLabels, targetsBySym
               const evalNative =
                 row.monthCloseNative !== null && row.qty !== null ? row.monthCloseNative * row.qty : null;
               return (
-                <tr key={`${row.persona}-${row.monthEnd}-${row.symbol}`}>
+                <tr key={`${row.account_id}-${row.monthEnd}-${row.symbol}`}>
                   <td className="font-mono text-xs">{row.monthEnd}</td>
-                  <td>{personaLabels[row.persona] ?? row.persona}</td>
+                  <td>{accountLabels[row.account_id] ?? row.account_id}</td>
                   <td>
                     <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-600">
                       {marketLabel(target?.marketRegion)}
@@ -277,10 +277,10 @@ export function PortfolioHistory({ monthly, persona, personaLabels, targetsBySym
   );
 }
 
-function buildStacks(rows: MonthlyHoldingRow[], persona: string) {
+function buildStacks(rows: MonthlyHoldingRow[], account_id: string) {
   const groups = new Map<string, MonthlyHoldingRow[]>();
   for (const row of rows) {
-    if (row.persona !== persona) continue;
+    if (row.account_id !== account_id) continue;
     const key = row.monthEnd;
     groups.set(key, [...(groups.get(key) ?? []), row]);
   }
@@ -306,7 +306,7 @@ function buildStacks(rows: MonthlyHoldingRow[], persona: string) {
 function downloadMonthly(rows: MonthlyHoldingRow[], targetsBySymbol: Record<string, ReportTargetDigest>) {
   const headers = [
     'month_end',
-    'persona',
+    'account_id',
     'market_region',
     'symbol',
     'company',
@@ -326,7 +326,7 @@ function downloadMonthly(rows: MonthlyHoldingRow[], targetsBySymbol: Record<stri
     const target = targetsBySymbol[row.symbol];
     return [
       row.monthEnd,
-      row.persona,
+      row.account_id,
       target?.marketRegion ?? '',
       row.symbol,
       row.company,

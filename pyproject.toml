@@ -64,7 +64,7 @@ python_version = "3.11"
 files = ["src/snusmic_pipeline/sim"]
 ignore_missing_imports = true
 warn_unused_ignores = false
-# Baseline rules that pass on the persona-simulation module.
+# Baseline rules that pass on the account_id-simulation module.
 check_untyped_defs = true
 warn_return_any = false
 warn_unused_configs = true
@@ -74,7 +74,7 @@ module = ["yfinance.*", "duckdb.*"]
 ignore_missing_imports = true
 
 # Pandas-stubs / matplotlib stubs are installed but the sim mixes Series /
-# DataFrame in ways the stubs narrow imprecisely, and the personas module
+# DataFrame in ways the stubs narrow imprecisely, and the accounts module
 # relies on optional-keyed sort/dict comprehensions that the stricter sort
 # protocol rejects. Allow these call-sites to keep Any-typed intermediates
 # without forcing a typed-coercion refactor inside this scope.

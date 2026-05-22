@@ -1,4 +1,4 @@
-"""Account-level persona simulation.
+"""Account-level account simulation.
 
 The canonical (and only) simulation surface in this repo. Simulates a real
 Korean brokerage: KRW cash ledger, integer-share holdings, fees and sell-side
@@ -8,15 +8,15 @@ See ``docs/backtest-contract.md`` for the contract.
 """
 
 from .contracts import (
+    AccountConfig,
+    AccountId,
+    AccountSummary,
     AllWeatherConfig,
     BenchmarkAsset,
     BrokerageFees,
     CurrentHolding,
     EquityPoint,
     MonthlyHolding,
-    PersonaConfig,
-    PersonaName,
-    PersonaSummary,
     PositionEpisode,
     ProphetConfig,
     ReportPerformance,
@@ -38,9 +38,9 @@ __all__ = [
     "CurrentHolding",
     "EquityPoint",
     "MonthlyHolding",
-    "PersonaConfig",
-    "PersonaName",
-    "PersonaSummary",
+    "AccountConfig",
+    "AccountId",
+    "AccountSummary",
     "PositionEpisode",
     "ProphetConfig",
     "ReportPerformance",

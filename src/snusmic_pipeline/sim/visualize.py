@@ -3,9 +3,9 @@
 Two figures:
 
 * ``plot_equity_curves`` — line chart of equity over time, one line per
-  persona, plus a dashed line of cumulative contributions to make
+  account_id, plus a dashed line of cumulative contributions to make
   net-of-deposit performance obvious.
-* ``plot_net_profit_bars`` — final-day net profit per persona, sorted.
+* ``plot_net_profit_bars`` — final-day net profit per account_id, sorted.
 
 Each figure is saved at the requested path. The callers (CLI / tests) own
 choosing where artifacts land — this module never picks paths.
@@ -75,35 +75,35 @@ def plot_equity_curves(result: SimulationResult, out_path: Path) -> Path:
     wealth multiplier on every won the user has deposited up to that date,
     which is what a brokerage app shows as "your account is up X%". Log Y
     so a constant compound growth rate reads as a straight line and
-    Prophet's 184× outcome doesn't crush mid-tier personas visually.
+    Prophet's 184× outcome doesn't crush mid-tier accounts visually.
     """
     if not result.equity_points:
         raise ValueError("SimulationResult has no equity points to plot.")
-    by_persona: dict[str, list[tuple[date, float]]] = defaultdict(list)
+    by_account: dict[str, list[tuple[date, float]]] = defaultdict(list)
     for ep in result.equity_points:
         if ep.contributed_capital_krw > 0:
             mult = ep.equity_krw / ep.contributed_capital_krw
         else:
             mult = 1.0
-        by_persona[ep.persona].append((ep.date, mult))
+        by_account[ep.account_id].append((ep.date, mult))
 
     fig, ax = plt.subplots(figsize=(12, 6))
-    persona_labels = {s.persona: s.label for s in result.summaries}
-    for persona, points in by_persona.items():
+    account_labels = {s.account_id: s.label for s in result.summaries}
+    for account_id, points in by_account.items():
         points.sort(key=lambda x: x[0])
         xs = [p[0] for p in points]
         ys = [p[1] for p in points]
         ax.plot(
             xs,
             ys,
-            label=persona_labels.get(persona, persona),
-            color=PERSONA_COLORS.get(persona),
+            label=account_labels.get(account_id, account_id),
+            color=PERSONA_COLORS.get(account_id),
             linewidth=1.6,
         )
     ax.axhline(1.0, color="black", linestyle="--", linewidth=0.9, alpha=0.6, label="Breakeven (+0%)")
 
     ax.set_yscale("log")
-    # Decades plus 2× and 5× intermediates so mid-tier personas (+30%, +100%,
+    # Decades plus 2× and 5× intermediates so mid-tier accounts (+30%, +100%,
     # +400%) get readable tick labels instead of disappearing into the gap
     # between +0% and +900%.
     ax.yaxis.set_major_locator(mticker.LogLocator(base=10.0, subs=(1.0, 2.0, 5.0), numticks=12))
@@ -112,7 +112,7 @@ def plot_equity_curves(result: SimulationResult, out_path: Path) -> Path:
     )
     ax.yaxis.set_major_formatter(mticker.FuncFormatter(_multiplier_to_pct_label))
     ax.yaxis.set_minor_formatter(mticker.NullFormatter())
-    ax.set_title("Persona cumulative return — equity ÷ cumulative deposits (log scale)")
+    ax.set_title("Account cumulative return — equity ÷ cumulative deposits (log scale)")
     ax.set_xlabel("Date")
     ax.set_ylabel("Cumulative return")
     ax.grid(True, which="both", alpha=0.3)
@@ -126,11 +126,11 @@ def plot_equity_curves(result: SimulationResult, out_path: Path) -> Path:
 
 
 def plot_net_profit_bars(result: SimulationResult, out_path: Path) -> Path:
-    """Bar chart of final total return (%) per persona (sorted ascending).
+    """Bar chart of final total return (%) per account_id (sorted ascending).
 
     Total return is ``net_profit / total_contributed`` — i.e. "for every
-    won deposited, how many won did the persona end up with on top".
-    Comparable across personas and immune to the absolute scale of the
+    won deposited, how many won did the account_id end up with on top".
+    Comparable across accounts and immune to the absolute scale of the
     savings plan.
     """
     if not result.summaries:
@@ -144,7 +144,7 @@ def plot_net_profit_bars(result: SimulationResult, out_path: Path) -> Path:
     summaries = sorted(result.summaries, key=total_return_pct)
     labels = [s.label for s in summaries]
     values = [total_return_pct(s) for s in summaries]
-    colors = [PERSONA_COLORS.get(s.persona, "#6b7280") for s in summaries]
+    colors = [PERSONA_COLORS.get(s.account_id, "#6b7280") for s in summaries]
 
     fig, ax = plt.subplots(figsize=(10, 5.5))
     bars = ax.barh(labels, values, color=colors)
@@ -159,7 +159,7 @@ def plot_net_profit_bars(result: SimulationResult, out_path: Path) -> Path:
             fontsize=9,
         )
     ax.axvline(0, color="black", linewidth=0.6)
-    ax.set_title("Persona total return (%) — net profit ÷ total contributed")
+    ax.set_title("Account total return (%) — net profit ÷ total contributed")
     ax.set_xlabel("Total Return (%)")
     ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _p: f"{v:,.0f}%"))
     ax.grid(True, axis="x", alpha=0.3)
@@ -176,30 +176,30 @@ def plot_portfolio_composition(
     *,
     top_k: int = 8,
 ) -> Path:
-    """Stacked-area chart of every persona's month-end portfolio composition.
+    """Stacked-area chart of every account's month-end portfolio composition.
 
-    One subplot per persona, each showing the top ``top_k`` holdings by
+    One subplot per account_id, each showing the top ``top_k`` holdings by
     end-of-sim weight as named bands plus an "others" band. The Y axis
     is the share of the invested book (cash excluded), so each subplot's
     bands always sum to 1.0 on any given month-end.
     """
     if not result.monthly_holdings:
         raise ValueError("SimulationResult has no monthly_holdings to plot.")
-    persona_labels = {s.persona: s.label for s in result.summaries}
+    account_labels = {s.account_id: s.label for s in result.summaries}
     rows = [m.model_dump() for m in result.monthly_holdings]
     df = pd.DataFrame(rows)
     if df.empty:
         raise ValueError("monthly_holdings rendered an empty frame.")
-    personas = sorted(
-        df["persona"].unique(), key=lambda p: -result.summaries[0].final_equity_krw if False else 0
+    accounts = sorted(
+        df["account_id"].unique(), key=lambda p: -result.summaries[0].final_equity_krw if False else 0
     )
-    personas = list(df["persona"].unique())
-    n = len(personas)
+    accounts = list(df["account_id"].unique())
+    n = len(accounts)
     fig, axes = plt.subplots(n, 1, figsize=(13, 3.0 * n), sharex=True)
     if n == 1:
         axes = [axes]
-    for ax, persona in zip(axes, personas, strict=True):
-        sub = df[df["persona"] == persona].copy()
+    for ax, account_id in zip(axes, accounts, strict=True):
+        sub = df[df["account_id"] == account_id].copy()
         # Pick the top_k symbols by their FINAL-month weight.
         last_month = sub["month_end"].max()
         last_slice = sub[sub["month_end"] == last_month]
@@ -234,7 +234,7 @@ def plot_portfolio_composition(
                 comp = sym_to_company.get(col, "")
                 labels.append(f"{col} {comp[:14]}" if comp else col)
         ax.stackplot(wide.index, wide.values.T, labels=labels, alpha=0.85)
-        ax.set_title(persona_labels.get(persona, persona))
+        ax.set_title(account_labels.get(account_id, account_id))
         ax.set_ylim(0, 1)
         ax.set_ylabel("Weight")
         ax.legend(loc="upper left", fontsize=7, ncol=2, framealpha=0.85)
@@ -249,15 +249,15 @@ def plot_portfolio_composition(
 
 
 def plot_drawdowns(result: SimulationResult, out_path: Path) -> Path:
-    """Drawdown curve (= equity / running peak − 1) per persona."""
+    """Drawdown curve (= equity / running peak − 1) per account_id."""
     if not result.equity_points:
         raise ValueError("SimulationResult has no equity points to plot.")
     fig, ax = plt.subplots(figsize=(12, 5))
-    by_persona: dict[str, list[tuple[date, float]]] = defaultdict(list)
+    by_account: dict[str, list[tuple[date, float]]] = defaultdict(list)
     for ep in result.equity_points:
-        by_persona[ep.persona].append((ep.date, ep.equity_krw))
-    persona_labels = {s.persona: s.label for s in result.summaries}
-    for persona, points in by_persona.items():
+        by_account[ep.account_id].append((ep.date, ep.equity_krw))
+    account_labels = {s.account_id: s.label for s in result.summaries}
+    for account_id, points in by_account.items():
         points.sort(key=lambda x: x[0])
         xs, equity = zip(*points, strict=True)
         peak = 0.0
@@ -271,11 +271,11 @@ def plot_drawdowns(result: SimulationResult, out_path: Path) -> Path:
         ax.plot(
             xs,
             dd,
-            label=persona_labels.get(persona, persona),
-            color=PERSONA_COLORS.get(persona),
+            label=account_labels.get(account_id, account_id),
+            color=PERSONA_COLORS.get(account_id),
             linewidth=1.4,
         )
-    ax.set_title("Drawdown (%) by persona")
+    ax.set_title("Drawdown (%) by account_id")
     ax.set_ylabel("Drawdown (%)")
     ax.set_xlabel("Date")
     ax.grid(True, alpha=0.3)

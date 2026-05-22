@@ -14,7 +14,7 @@
 - `uv run ruff check ...`
 - `uv run ruff format --check ...`
 - `uv run mypy src`
-- `uv run pytest -q tests/sim/test_persona_sim_loader.py tests/sim/test_stock_rule_search.py tests/sim/test_strategy_generation.py` → `16 passed`
+- `uv run pytest -q tests/sim/test_account_sim_loader.py tests/sim/test_stock_rule_search.py tests/sim/test_strategy_generation.py` → `16 passed`
 - markdown link sanity check
 - `python -m snusmic_pipeline --help`에서 `stock-rule-search` public CLI 제거 확인
 
@@ -46,7 +46,7 @@
 
 ### 추가
 - `daily-forward` CLI를 추가해 매일 새 가격/리포트만 들어오는 운영 경로에서 마지막 checkpoint 이후 거래일만 전진 처리할 수 있게 했습니다.
-- `Account`, follower, follower v2, MTT, All Weather persona에 snapshot/restore와 persona-local daily step을 추가했습니다.
+- `Account`, follower, follower v2, MTT, All Weather persona에 snapshot/restore와 account_id-local daily step을 추가했습니다.
 - `daily_decisions.csv`, `data/web/daily-decisions.json`, `data/web/portfolio/daily-decisions.json`을 생성해 매일 pool/candidate/buy/sell 의사결정을 감사할 수 있게 했습니다.
 - `docs/product-spec.md`, `docs/backtest-contract.md`, `docs/technical-architecture.md`, `docs/agent-playbook.md`로 LLM/agent가 같은 목적과 실행 계약을 읽고 작업하도록 정리했습니다.
 
@@ -57,7 +57,7 @@
 - 웹 artifact validator가 daily decision metadata와 compact portfolio daily decision artifact를 필수 산출물로 검증합니다.
 
 ### 검증
-- `ruff check src/snusmic_pipeline/sim/brokerage.py src/snusmic_pipeline/sim/personas/smic_follower.py src/snusmic_pipeline/sim/personas/smic_follower_v2.py src/snusmic_pipeline/sim/personas/smic_mtt_strategy.py src/snusmic_pipeline/sim/personas/all_weather.py src/snusmic_pipeline/sim/runner.py src/snusmic_pipeline/sim/forward_runner.py src/snusmic_pipeline/cli.py src/snusmic_pipeline/web_artifacts.py tests/sim/test_forward_runner.py tests/test_web_artifacts.py`
+- `ruff check src/snusmic_pipeline/sim/brokerage.py src/snusmic_pipeline/sim/accounts/smic_follower.py src/snusmic_pipeline/sim/accounts/smic_follower_v2.py src/snusmic_pipeline/sim/accounts/smic_mtt_strategy.py src/snusmic_pipeline/sim/accounts/all_weather.py src/snusmic_pipeline/sim/runner.py src/snusmic_pipeline/sim/forward_runner.py src/snusmic_pipeline/cli.py src/snusmic_pipeline/web_artifacts.py tests/sim/test_forward_runner.py tests/test_web_artifacts.py`
 - `pytest tests/sim/test_strategy_generation.py tests/sim/test_stock_rule_search.py tests/sim/test_forward_runner.py tests/sim/test_decision_ledger.py tests/test_web_artifacts.py::test_daily_decision_artifacts_expose_checkpoint_metadata tests/test_web_artifacts.py::test_extended_web_artifacts_support_insights_and_downloads -q` → `24 passed`
 - `bash scripts/refresh_web_artifacts.sh` → `daily-forward` `mode=noop`, `latest_date=2026-05-21`
 - `pnpm --dir apps/web artifact:check` → `ok schema=1.0.0 reports=202 benchmarks=7 strategies=3 price_files=212`
@@ -67,12 +67,12 @@
 
 ### 변경
 - `Stock Rule`, `PIT Research Board`, `Top 10`, `Weak Prophet`, `SMIC Follower`처럼 섞여 보이던 전략 표시명을 `종목룰`, `리서치보드`, `상위`, `미래정보 상한선`, `리포트 추종` 계열로 통일했습니다.
-- stock-rule persona 생성기, PIT 리서치보드 기본 config, persona simulation loader, 웹 strategy catalog export가 같은 한글 라벨 계약을 쓰도록 맞췄습니다.
+- stock-rule account_id 생성기, PIT 리서치보드 기본 config, account simulation loader, 웹 strategy catalog export가 같은 한글 라벨 계약을 쓰도록 맞췄습니다.
 - `/portfolio`의 비교 기준선·효율 곡선 문구에서 `benchmark`, `oracle`, `frontier` 등 화면 노출 영어를 한글 설명으로 바꿨습니다.
 - `data/sim`과 `data/web` 산출물 및 다운로드 CSV를 새 표시명으로 재생성했습니다.
 
 ### 검증
-- `ruff check src/snusmic_pipeline/sim/stock_rule_admission.py src/snusmic_pipeline/sim/persona_sim.py src/snusmic_pipeline/web_artifacts.py src/snusmic_pipeline/sim/pit_research_board.py src/snusmic_pipeline/sim/contracts.py tests/test_web_artifacts.py`
+- `ruff check src/snusmic_pipeline/sim/stock_rule_admission.py src/snusmic_pipeline/sim/account_sim.py src/snusmic_pipeline/web_artifacts.py src/snusmic_pipeline/sim/pit_research_board.py src/snusmic_pipeline/sim/contracts.py tests/test_web_artifacts.py`
 - `pytest tests/test_web_artifacts.py::test_strategy_catalog_uses_behavior_labels_and_admission_audit -q`
 - strategy label scan: 주요 `data/sim`, `data/web`, 다운로드 산출물에서 예전 영어 표시명 없음
 
@@ -91,7 +91,7 @@
 ## v0.26.0-stock-rule-oos.1 — 2026-05-22
 
 ### 추가
-- 개별 종목 룰 기반 `stock_rule_*` persona 10개를 strict point-in-time OOS admission으로 생성해 `/portfolio/[strategy]` 원장에 통합했습니다.
+- 개별 종목 룰 기반 `stock_rule_*` account_id 10개를 strict point-in-time OOS admission으로 생성해 `/portfolio/[strategy]` 원장에 통합했습니다.
 - stock-rule admission artifact가 실제 룰 패밀리(`target_upside_momentum`, `target_gap_reversal`, `price_momentum` 등)를 그대로 보존하도록 schema/test를 고정했습니다.
 - OOS materialization gate를 추가했습니다: OOS Sharpe/Sortino `>= 0.7` 또는 OOS total return `>= 200%`, 그리고 OOS MDD `<= 65%`.
 - `.omx/quant-insights/stock-rule-oos-admission-20260522.md`에 IS/OOS split, admission count, materialization gate, 병목 개선 결과를 기록했습니다.
@@ -107,10 +107,10 @@
 
 ### 검증
 - `ruff check scripts src tests`
-- `pytest tests/sim/test_stock_rule_search.py tests/sim/test_persona_sim_loader.py tests/sim/test_stock_admission.py tests/sim/test_pit_research_board.py -q`
+- `pytest tests/sim/test_stock_rule_search.py tests/sim/test_account_sim_loader.py tests/sim/test_stock_admission.py tests/sim/test_pit_research_board.py -q`
 - `mypy src/snusmic_pipeline/sim src/snusmic_pipeline/cli.py`
-- `python -m snusmic_pipeline generate-strategies ... --stock-persona-top 10` → 1,368 searched / 75 IS finalists / 53 OOS admissions / 10 materialized personas
-- `python -m snusmic_pipeline run-sim ... --disable-broker-strategy-search --stock-rule-personas data/sim/stock-rule-personas.json`
+- `python -m snusmic_pipeline generate-strategies ... --stock-account_id-top 10` → 1,368 searched / 75 IS finalists / 53 OOS admissions / 10 materialized accounts
+- `python -m snusmic_pipeline run-sim ... --disable-broker-strategy-search --stock-rule-accounts data/sim/stock-rule-accounts.json`
 - `python -m snusmic_pipeline export-web --warehouse data/warehouse --sim data/sim --out data/web --check`
 - `node scripts/validate-artifacts.mjs` → 15 strategies / 212 price files
 - `scripts/vercel_build.sh` → 425 static pages
@@ -152,7 +152,7 @@
 - Renamed portfolio cash-weight UI copy to RP 비중 / RP 대기자금 to make idle capital less confusing.
 
 ### Verification
-- `uv run --with scipy python -m pytest tests/sim/test_brokerage.py tests/sim/test_personas.py tests/sim/test_runner.py tests/sim/test_all_weather.py -q`
+- `uv run --with scipy python -m pytest tests/sim/test_brokerage.py tests/sim/test_accounts.py tests/sim/test_runner.py tests/sim/test_all_weather.py -q`
 - Regenerated `data/sim` and `data/web` artifacts through 2026-05-18 with existing promoted strategy configs.
 
 ## Unreleased
@@ -255,7 +255,7 @@
 - `pnpm --dir apps/web lint`
 - `pnpm --dir apps/web check`
 - `pnpm --dir apps/web build`
-- `apps/web/out/portfolio`에서 제외 대상 persona 라벨/id exact-string scan
+- `apps/web/out/portfolio`에서 제외 대상 account_id 라벨/id exact-string scan
 
 ## v0.22.0-datapanel-unify.1 — 2026-05-19
 

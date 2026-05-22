@@ -8,33 +8,33 @@ import type { StrategyLeaderboardRow } from '@/lib/product-model';
 
 type Props = {
   equity: EquityPoint[];
-  persona: string;
+  account_id: string;
   rows: StrategyLeaderboardRow[];
-  personaLabels: Record<string, string>;
+  accountLabels: Record<string, string>;
 };
 
 const CHART_COLORS = ['#111827', '#2563eb', '#059669', '#dc2626', '#7c3aed'];
 const BENCHMARKS = ['benchmark_kodex200', 'benchmark_qqq', 'benchmark_spy'];
 
-export function PortfolioAnalyticsPanel({ equity, persona, rows, personaLabels }: Props) {
+export function PortfolioAnalyticsPanel({ equity, account_id, rows, accountLabels }: Props) {
   const rowById = useMemo(() => new Map(rows.map((row) => [row.id, row])), [rows]);
-  const selected = rowById.get(persona);
+  const selected = rowById.get(account_id);
   const compareIds = useMemo(() => {
-    const ids = [persona, ...BENCHMARKS.filter((id) => id !== persona)];
-    return ids.filter((id, index) => ids.indexOf(id) === index && equity.some((point) => point.persona === id));
-  }, [equity, persona]);
+    const ids = [account_id, ...BENCHMARKS.filter((id) => id !== account_id)];
+    return ids.filter((id, index) => ids.indexOf(id) === index && equity.some((point) => point.account_id === id));
+  }, [equity, account_id]);
   const series = useMemo<ReturnSeries[]>(
     () =>
       compareIds.map((id, index) => ({
         id,
-        label: personaLabels[id] ?? rowById.get(id)?.label ?? id,
-        shortLabel: rowById.get(id)?.shortLabel ?? personaLabels[id] ?? id,
+        label: accountLabels[id] ?? rowById.get(id)?.label ?? id,
+        shortLabel: rowById.get(id)?.shortLabel ?? accountLabels[id] ?? id,
         color: CHART_COLORS[index % CHART_COLORS.length],
         points: equity
-          .filter((point) => point.persona === id && point.cumulativeReturn !== null)
+          .filter((point) => point.account_id === id && point.cumulativeReturn !== null)
           .map((point) => ({ time: point.date, value: point.cumulativeReturn ?? 0 })),
       })),
-    [compareIds, equity, personaLabels, rowById],
+    [compareIds, equity, accountLabels, rowById],
   );
   const frontierRows = useMemo(
     () =>
@@ -70,7 +70,7 @@ export function PortfolioAnalyticsPanel({ equity, persona, rows, personaLabels }
             x축은 최대낙폭, y축은 MWR입니다. 선은 실제 전략 조합 최적화가 아니라 현재 산출물의 위험-수익 상단입니다.
           </p>
         </div>
-        <FrontierPlot rows={frontierRows} efficientIds={efficientIds} selectedId={persona} />
+        <FrontierPlot rows={frontierRows} efficientIds={efficientIds} selectedId={account_id} />
         <div className="mt-4 grid grid-cols-3 gap-2 text-sm">
           <Stat label="선택 MWR" value={formatPercent(selected?.returnPct)} />
           <Stat label="선택 MDD" value={formatPercent(selected?.maxDrawdown)} />

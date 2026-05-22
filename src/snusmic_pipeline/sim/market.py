@@ -1,11 +1,11 @@
-"""Market data adapter for the persona simulation.
+"""Market data adapter for the account simulation.
 
 Two responsibilities:
 
 1. **PriceBoard** — wraps the KRW-converted ``daily_prices.csv`` warehouse
    table in a date-indexed wide pivot for fast ``(date, symbol) → close``
    lookups. Adds asof helpers and a forward-window slice the prophet
-   personas need.
+   accounts need.
 
 2. **Benchmark loader** — downloads (and caches) the All-Weather basket's
    USD ETFs and KOSPI ETF in KRW, reusing the existing

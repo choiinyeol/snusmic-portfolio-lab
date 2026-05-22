@@ -12,7 +12,7 @@ import {
 } from '@/lib/artifacts';
 import {
   getBenchmarkRows,
-  getDefaultPortfolioPersona,
+  getDefaultPortfolioAccount,
   getExecutiveOverview,
   getObjectivePassingRows,
   getStrategyLeaderboard,
@@ -37,8 +37,8 @@ export type DashboardViewModel = ReturnType<typeof getDashboardViewModel>;
 
 export function getDashboardViewModel() {
   const strategyRows = getStrategyLeaderboard();
-  const selectedPersona = getDefaultPortfolioPersona();
-  const overview = getExecutiveOverview(selectedPersona);
+  const selectedAccount = getDefaultPortfolioAccount();
+  const overview = getExecutiveOverview(selectedAccount);
   const artifactOverview = getOverview();
   const trades = getTrades();
   const reports = getReportRows();
@@ -52,18 +52,18 @@ export function getDashboardViewModel() {
   const equity = getStrategyCurves();
   const benchmarkRows = getBenchmarkRows(strategyRows);
   const selectableRows = getObjectivePassingRows(strategyRows);
-  const selectedStrategy = selectableRows.find((row) => row.id === selectedPersona);
+  const selectedStrategy = selectableRows.find((row) => row.id === selectedAccount);
   const chartSeries = buildDashboardSeries(equity, benchmarkRows, selectedStrategy, selectableRows);
   const objectiveRows = selectableRows;
   const benchmarkToBeat = benchmarkRows.find((row) => row.id === TARGET_BENCHMARK_ID);
   const recentBuys = trades
-    .filter((trade) => trade.persona === selectedPersona && trade.side === 'buy')
+    .filter((trade) => trade.account_id === selectedAccount && trade.side === 'buy')
     .sort((a, b) => b.date.localeCompare(a.date))
     .slice(0, 7);
 
   return {
     strategyRows,
-    selectedPersona,
+    selectedAccount,
     overview,
     reports,
     dataQuality,
@@ -85,13 +85,13 @@ export function getDashboardViewModel() {
 export function withCashHolding(
   holdings: HoldingRow[],
   cashKrw: number | null | undefined,
-  persona: string,
+  account_id: string,
 ): HoldingRow[] {
   if (!cashKrw || cashKrw <= 0) return holdings;
   return [
     ...holdings,
     {
-      persona,
+      account_id,
       symbol: 'CASH',
       company: 'RP이자',
       qty: null,
@@ -151,7 +151,7 @@ function buildDashboardSeries(
       shortLabel: row.shortLabel,
       color: SERIES_COLORS[index % SERIES_COLORS.length],
       points: equity
-        .filter((point) => point.persona === row.id && point.cumulativeReturn !== null)
+        .filter((point) => point.account_id === row.id && point.cumulativeReturn !== null)
         .map((point) => ({ time: point.date, value: point.cumulativeReturn ?? 0 })),
     }))
     .filter((series) => series.points.length > 0);

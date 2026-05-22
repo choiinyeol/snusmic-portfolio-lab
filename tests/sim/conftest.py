@@ -1,4 +1,4 @@
-"""Shared fixtures for the persona simulation tests.
+"""Shared fixtures for the account simulation tests.
 
 Builds a small synthetic SNUSMIC-style universe with three symbols and a
 two-year price window so the engine has something deterministic to chew

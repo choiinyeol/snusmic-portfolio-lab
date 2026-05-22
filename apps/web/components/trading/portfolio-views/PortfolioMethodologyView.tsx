@@ -5,11 +5,11 @@ import type { StrategyMethod } from './types';
 
 export function PortfolioMethodologyView({
   method,
-  personaLabel,
+  accountLabel,
   strategyId,
 }: {
   method: StrategyMethod | undefined;
-  personaLabel: string;
+  accountLabel: string;
   strategyId: string;
 }) {
   if (!method) {
@@ -25,7 +25,7 @@ export function PortfolioMethodologyView({
         <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
           strategy playbook
         </div>
-        <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">{personaLabel} 운용 방법론</h2>
+        <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">{accountLabel} 운용 방법론</h2>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{method.summary}</p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Link

@@ -8,7 +8,7 @@ const required = [
   'overview/snapshot.json',
   'overview/research-pulse.json',
   'overview/data-quality.json',
-  'portfolio/personas.json',
+  'portfolio/accounts.json',
   'portfolio/holdings.json',
   'portfolio/trades.json',
   'portfolio/daily-decisions.json',
@@ -64,7 +64,7 @@ const countFiles = {
   trades: 'portfolio/trades.json',
   daily_decisions: 'portfolio/daily-decisions.json',
   equity_daily: 'portfolio/equity-daily.json',
-  personas: 'portfolio/personas.json',
+  accounts: 'portfolio/accounts.json',
   account_catalog: 'accounts/catalog.json',
   screener_candidates: 'screener/candidates.json',
 };
@@ -118,8 +118,8 @@ for (const artifact of manifest.artifacts ?? []) {
   if (!manifest.checksums?.[artifact]) fail(`manifest checksum missing for artifact: ${artifact}`);
 }
 
-const personas = readJson('portfolio/personas.json');
-const benchmarkCount = personas.filter((row) =>
+const accounts = readJson('portfolio/accounts.json');
+const benchmarkCount = accounts.filter((row) =>
   [
     'all_weather',
     'smic_follower',
@@ -128,15 +128,15 @@ const benchmarkCount = personas.filter((row) =>
     'benchmark_qqq',
     'benchmark_spy',
     'benchmark_gld',
-  ].includes(row.persona),
+  ].includes(row.account_id),
 ).length;
-const customStrategyCount = personas.filter(
+const customStrategyCount = accounts.filter(
   (row) =>
-    !row.persona.startsWith('benchmark_') &&
-    !['all_weather', 'smic_follower', 'smic_follower_v2', 'weak_oracle'].includes(row.persona),
+    !row.account_id.startsWith('benchmark_') &&
+    !['all_weather', 'smic_follower', 'smic_follower_v2', 'weak_oracle'].includes(row.account_id),
 ).length;
-if (benchmarkCount < 7) fail(`expected at least 7 benchmark personas, got ${benchmarkCount}`);
-if (customStrategyCount !== 0) fail(`unexpected custom strategy personas: ${customStrategyCount}`);
+if (benchmarkCount < 7) fail(`expected at least 7 benchmark accounts, got ${benchmarkCount}`);
+if (customStrategyCount !== 0) fail(`unexpected custom strategy accounts: ${customStrategyCount}`);
 
 console.log(
   `[artifact-check] ok schema=${manifest.schema_version} reports=${reports.length} benchmarks=${benchmarkCount} custom_strategies=${customStrategyCount} price_files=${manifest.price_artifact_count}`,

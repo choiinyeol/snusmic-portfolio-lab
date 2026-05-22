@@ -1,4 +1,4 @@
-persona,date,symbol,side,qty,fill_price_krw,gross_krw,commission_krw,tax_krw,cash_after_krw,reason,report_id
+account_id,date,symbol,side,qty,fill_price_krw,gross_krw,commission_krw,tax_krw,cash_after_krw,reason,report_id
 all_weather,2021-01-04,GLD,buy,12,197877.7087,2374532.5048,356.1799,0.0,7625111.3153,rebalance_buy,
 all_weather,2021-01-04,QQQ,buy,7,335685.5865,2349799.1057,352.4699,0.0,5274959.7398,rebalance_buy,
 all_weather,2021-01-04,SPY,buy,6,400237.5976,2401425.5853,360.2138,0.0,2873173.9406,rebalance_buy,

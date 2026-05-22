@@ -6,11 +6,11 @@ from snusmic_pipeline.sim.decision_ledger import build_daily_decision_ledger
 
 def test_daily_decision_ledger_records_hold_days_and_trade_days() -> None:
     result = SimulationResult(
-        config=SimulationConfig(start_date=date(2024, 1, 2), end_date=date(2024, 1, 3), personas=()),
+        config=SimulationConfig(start_date=date(2024, 1, 2), end_date=date(2024, 1, 3), accounts=()),
         summaries=(),
         equity_points=(
             EquityPoint(
-                persona="p",
+                account_id="p",
                 date=date(2024, 1, 2),
                 cash_krw=900_000,
                 holdings_value_krw=100_000,
@@ -20,7 +20,7 @@ def test_daily_decision_ledger_records_hold_days_and_trade_days() -> None:
                 open_positions=1,
             ),
             EquityPoint(
-                persona="p",
+                account_id="p",
                 date=date(2024, 1, 3),
                 cash_krw=1_100_000,
                 holdings_value_krw=0,
@@ -32,7 +32,7 @@ def test_daily_decision_ledger_records_hold_days_and_trade_days() -> None:
         ),
         trades=(
             Trade(
-                persona="p",
+                account_id="p",
                 date=date(2024, 1, 2),
                 symbol="AAA",
                 side="buy",
@@ -45,7 +45,7 @@ def test_daily_decision_ledger_records_hold_days_and_trade_days() -> None:
                 reason="deposit_buy",
             ),
             Trade(
-                persona="p",
+                account_id="p",
                 date=date(2024, 1, 3),
                 symbol="AAA",
                 side="sell",
@@ -70,11 +70,11 @@ def test_daily_decision_ledger_records_hold_days_and_trade_days() -> None:
 
 def test_daily_decision_ledger_makes_no_trade_days_explicit() -> None:
     result = SimulationResult(
-        config=SimulationConfig(start_date=date(2024, 1, 2), end_date=date(2024, 1, 3), personas=()),
+        config=SimulationConfig(start_date=date(2024, 1, 2), end_date=date(2024, 1, 3), accounts=()),
         summaries=(),
         equity_points=(
             EquityPoint(
-                persona="p",
+                account_id="p",
                 date=date(2024, 1, 2),
                 cash_krw=1_000_000,
                 holdings_value_krw=0,

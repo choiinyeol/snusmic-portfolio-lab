@@ -9,50 +9,50 @@ import { formatKrw, formatPercent } from '@/lib/format';
 type Props = {
   equity: EquityPoint[];
   trades: TradeRow[];
-  persona: string;
-  personaLabels: Record<string, string>;
-  benchmarkPersonas?: string[];
+  account_id: string;
+  accountLabels: Record<string, string>;
+  benchmarkAccounts?: string[];
 };
 
 const PAGE_SIZE_OPTIONS = [30, 90, 180, 365] as const;
 
-export function DailyEquityHistory({ equity, trades, persona, personaLabels, benchmarkPersonas = [] }: Props) {
+export function DailyEquityHistory({ equity, trades, account_id, accountLabels, benchmarkAccounts = [] }: Props) {
   const [windowSize, setWindowSize] = useState<(typeof PAGE_SIZE_OPTIONS)[number]>(90);
 
-  const personaEquity = useMemo(
-    () => equity.filter((row) => row.persona === persona).sort((a, b) => a.date.localeCompare(b.date)),
-    [equity, persona],
+  const accountEquity = useMemo(
+    () => equity.filter((row) => row.account_id === account_id).sort((a, b) => a.date.localeCompare(b.date)),
+    [equity, account_id],
   );
-  const personaTrades = useMemo(
-    () => trades.filter((row) => row.persona === persona).sort((a, b) => b.date.localeCompare(a.date)),
-    [trades, persona],
+  const accountTrades = useMemo(
+    () => trades.filter((row) => row.account_id === account_id).sort((a, b) => b.date.localeCompare(a.date)),
+    [trades, account_id],
   );
 
   const summary = useMemo(() => {
-    if (!personaEquity.length) return null;
-    const first = personaEquity[0];
-    const last = personaEquity[personaEquity.length - 1];
-    const peak = personaEquity.reduce(
+    if (!accountEquity.length) return null;
+    const first = accountEquity[0];
+    const last = accountEquity[accountEquity.length - 1];
+    const peak = accountEquity.reduce(
       (best, point) => ((point.equityKrw ?? 0) > (best.equityKrw ?? 0) ? point : best),
       first,
     );
-    const trough = personaEquity.reduce(
+    const trough = accountEquity.reduce(
       (worst, point) => ((point.equityKrw ?? Infinity) < (worst.equityKrw ?? Infinity) ? point : worst),
       first,
     );
     const peakEquity = peak.equityKrw ?? 0;
     const drawdown = peakEquity > 0 && last.equityKrw !== null ? last.equityKrw / peakEquity - 1 : null;
     return { first, last, peak, trough, drawdown };
-  }, [personaEquity]);
+  }, [accountEquity]);
 
-  const recentDays = useMemo(() => personaEquity.slice(-windowSize).reverse(), [personaEquity, windowSize]);
+  const recentDays = useMemo(() => accountEquity.slice(-windowSize).reverse(), [accountEquity, windowSize]);
   const tradeCountByDate = useMemo(() => {
     const map = new Map<string, number>();
-    for (const trade of personaTrades) {
+    for (const trade of accountTrades) {
       map.set(trade.date, (map.get(trade.date) ?? 0) + 1);
     }
     return map;
-  }, [personaTrades]);
+  }, [accountTrades]);
 
   if (!summary) {
     return (
@@ -92,15 +92,15 @@ export function DailyEquityHistory({ equity, trades, persona, personaLabels, ben
         <div className="flex flex-col gap-2 p-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-slate-600">누적 수익률 (일별)</h3>
-            <span className="text-xs text-slate-950/55">{personaEquity.length.toLocaleString('ko-KR')}거래일</span>
+            <span className="text-xs text-slate-950/55">{accountEquity.length.toLocaleString('ko-KR')}거래일</span>
           </div>
           <PortfolioEquityTradeChart
             equity={equity}
-            benchmarkPersonas={benchmarkPersonas}
+            benchmarkAccounts={benchmarkAccounts}
             trades={trades}
-            persona={persona}
-            label={personaLabels[persona] ?? persona}
-            personaLabels={personaLabels}
+            account_id={account_id}
+            label={accountLabels[account_id] ?? account_id}
+            accountLabels={accountLabels}
           />
         </div>
       </section>

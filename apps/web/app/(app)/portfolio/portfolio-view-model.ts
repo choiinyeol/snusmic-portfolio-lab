@@ -8,7 +8,7 @@ import {
   getCurrentHoldings,
   getEquityDaily,
   getLatestReportTargetsBySymbol,
-  getPersonaLabel,
+  getAccountLabel,
   getPositionEpisodes,
   getReportSymbolById,
   getReportTargetsById,
@@ -16,7 +16,7 @@ import {
   getTrades,
 } from '@/lib/artifacts';
 import {
-  getDefaultPortfolioPersona,
+  getDefaultPortfolioAccount,
   getObjectivePassingRows,
   getStrategyLeaderboard,
   portfolioStrategyHref,
@@ -35,17 +35,17 @@ export function buildPortfolioLandingModel(): PortfolioLandingModel {
   const allWeatherReturn = leaderboardRows.find((row) => row.id === ALL_WEATHER_PERSONA)?.returnPct ?? null;
   const portfolioRows = getPortfolioRows(leaderboardRows);
   const benchmarkRows = leaderboardRows.filter((row) => row.kind === 'benchmark');
-  const defaultPersona = defaultPortfolioPersona(portfolioRows);
+  const defaultAccount = defaultPortfolioAccount(portfolioRows);
   const portfolioIds = new Set(portfolioRows.map((row) => row.id));
   const frontierIds = new Set([...portfolioRows.map((row) => row.id), ...benchmarkRows.map((row) => row.id)]);
-  const personaLabels = Object.fromEntries(portfolioRows.map((row) => [row.id, row.label]));
-  const summaryById = new Map(summaries.map((row) => [row.persona, row]));
-  const holdingsByPersona = groupByPersona(allHoldings.filter((row) => frontierIds.has(row.persona)));
-  const trades = allTrades.filter((row) => portfolioIds.has(row.persona));
-  const equity = allEquity.filter((row) => frontierIds.has(row.persona));
+  const accountLabels = Object.fromEntries(portfolioRows.map((row) => [row.id, row.label]));
+  const summaryById = new Map(summaries.map((row) => [row.account_id, row]));
+  const holdingsByAccount = groupByAccount(allHoldings.filter((row) => frontierIds.has(row.account_id)));
+  const trades = allTrades.filter((row) => portfolioIds.has(row.account_id));
+  const equity = allEquity.filter((row) => frontierIds.has(row.account_id));
   const snapshotFromRow = (row: StrategyLeaderboardRow): PortfolioStrategySnapshot => {
     const summary = summaryById.get(row.id);
-    const holdings = holdingsByPersona.get(row.id) ?? [];
+    const holdings = holdingsByAccount.get(row.id) ?? [];
     const holdingsValue =
       summary?.finalHoldingsValueKrw ?? holdings.reduce((sum, holding) => sum + (holding.marketValueKrw ?? 0), 0);
     const cashKrw = summary?.finalCashKrw ?? 0;
@@ -74,19 +74,19 @@ export function buildPortfolioLandingModel(): PortfolioLandingModel {
   const strategies = portfolioRows.map(snapshotFromRow);
   const frontierRows = [...strategies, ...benchmarkRows.map(snapshotFromRow)];
   return {
-    defaultPersona,
+    defaultAccount,
     latestEquityDate: equity.reduce((latest, row) => (row.date > latest ? row.date : latest), ''),
     strategies,
     frontierRows,
     allWeatherReturn,
-    holdings: allHoldings.filter((row) => portfolioIds.has(row.persona)),
+    holdings: allHoldings.filter((row) => portfolioIds.has(row.account_id)),
     equity,
     trades,
-    personaLabels,
+    accountLabels,
   };
 }
 
-export function buildPortfolioViewModel(selectedPersona?: string): PortfolioViewModel {
+export function buildPortfolioViewModel(selectedAccount?: string): PortfolioViewModel {
   const allHoldings = getCurrentHoldings();
   const allAccounting = getAccountingReconciliations();
   const allEquity = getEquityDaily();
@@ -97,44 +97,47 @@ export function buildPortfolioViewModel(selectedPersona?: string): PortfolioView
   const allTargetsByReportId = getReportTargetsById();
   const portfolioRows = getPortfolioRows();
   const benchmarkRows = getStrategyLeaderboard().filter((row) => row.kind === 'benchmark');
-  const defaultPersona = defaultPortfolioPersona(portfolioRows);
+  const defaultAccount = defaultPortfolioAccount(portfolioRows);
 
   const portfolioRowById = new Map(portfolioRows.map((row) => [row.id, row]));
-  const dataPersonaIds = new Set([
-    ...summaries.map((row) => row.persona),
-    ...allHoldings.map((row) => row.persona),
-    ...allTrades.map((row) => row.persona),
-    ...allEquity.map((row) => row.persona),
+  const dataAccountIds = new Set([
+    ...summaries.map((row) => row.account_id),
+    ...allHoldings.map((row) => row.account_id),
+    ...allTrades.map((row) => row.account_id),
+    ...allEquity.map((row) => row.account_id),
   ]);
-  const personas = Array.from(new Set([defaultPersona, ...portfolioRows.map((row) => row.id)])).filter((persona) =>
-    dataPersonaIds.has(persona),
+  const accounts = Array.from(new Set([defaultAccount, ...portfolioRows.map((row) => row.id)])).filter((account_id) =>
+    dataAccountIds.has(account_id),
   );
-  const activePersona = selectedPersona && personas.includes(selectedPersona) ? selectedPersona : defaultPersona;
-  const invalidStrategyId = selectedPersona && !personas.includes(selectedPersona) ? selectedPersona : null;
-  const personaLabels = Object.fromEntries([
-    ...personas.map((persona) => [persona, portfolioRowById.get(persona)?.label ?? getPersonaLabel(persona)]),
+  const activeAccount = selectedAccount && accounts.includes(selectedAccount) ? selectedAccount : defaultAccount;
+  const invalidStrategyId = selectedAccount && !accounts.includes(selectedAccount) ? selectedAccount : null;
+  const accountLabels = Object.fromEntries([
+    ...accounts.map((account_id) => [
+      account_id,
+      portfolioRowById.get(account_id)?.label ?? getAccountLabel(account_id),
+    ]),
     ...benchmarkRows.map((row) => [row.id, row.shortLabel || row.label]),
   ]);
-  const strategyOptions = personas.map((persona) => {
-    const row = portfolioRowById.get(persona);
+  const strategyOptions = accounts.map((account_id) => {
+    const row = portfolioRowById.get(account_id);
     return {
-      id: persona,
-      label: row?.label ?? getPersonaLabel(persona),
-      shortLabel: row?.shortLabel ?? getPersonaLabel(persona),
+      id: account_id,
+      label: row?.label ?? getAccountLabel(account_id),
+      shortLabel: row?.shortLabel ?? getAccountLabel(account_id),
       kind: 'strategy' as const,
-      href: portfolioStrategyHref(persona),
-      isDefault: persona === defaultPersona,
+      href: portfolioStrategyHref(account_id),
+      isDefault: account_id === defaultAccount,
     };
   });
-  const capitalByPersona = Object.fromEntries(
+  const capitalByAccount = Object.fromEntries(
     summaries
-      .filter((row) => personas.includes(row.persona))
-      .map((row) => [row.persona, row.totalContributedKrw ?? row.finalEquityKrw ?? 0]),
+      .filter((row) => accounts.includes(row.account_id))
+      .map((row) => [row.account_id, row.totalContributedKrw ?? row.finalEquityKrw ?? 0]),
   );
-  const cashByPersona = Object.fromEntries(
-    summaries.filter((row) => personas.includes(row.persona)).map((row) => [row.persona, row.finalCashKrw ?? 0]),
+  const cashByAccount = Object.fromEntries(
+    summaries.filter((row) => accounts.includes(row.account_id)).map((row) => [row.account_id, row.finalCashKrw ?? 0]),
   );
-  const methodsByPersona = Object.fromEntries(
+  const methodsByAccount = Object.fromEntries(
     portfolioRows.map((row) => [
       row.id,
       {
@@ -147,12 +150,12 @@ export function buildPortfolioViewModel(selectedPersona?: string): PortfolioView
     ]),
   );
 
-  const holdings = allHoldings.filter((row) => row.persona === activePersona);
-  const accounting = allAccounting.filter((row) => row.persona === activePersona);
+  const holdings = allHoldings.filter((row) => row.account_id === activeAccount);
+  const accounting = allAccounting.filter((row) => row.account_id === activeAccount);
   const benchmarkIds = new Set(benchmarkRows.map((row) => row.id));
-  const equity = allEquity.filter((row) => row.persona === activePersona || benchmarkIds.has(row.persona));
-  const trades = allTrades.filter((row) => row.persona === activePersona);
-  const episodes = allEpisodes.filter((row) => row.persona === activePersona);
+  const equity = allEquity.filter((row) => row.account_id === activeAccount || benchmarkIds.has(row.account_id));
+  const trades = allTrades.filter((row) => row.account_id === activeAccount);
+  const episodes = allEpisodes.filter((row) => row.account_id === activeAccount);
   const relevantSymbols = new Set([
     ...holdings.map((row) => row.symbol),
     ...trades.map((row) => row.symbol),
@@ -175,7 +178,7 @@ export function buildPortfolioViewModel(selectedPersona?: string): PortfolioView
       .filter((entry): entry is [string, string] => Boolean(entry[1])),
   );
   const latestEquityDate = allEquity
-    .filter((row) => personas.includes(row.persona))
+    .filter((row) => accounts.includes(row.account_id))
     .reduce((latest, row) => (row.date > latest ? row.date : latest), '');
   return {
     holdings,
@@ -183,27 +186,27 @@ export function buildPortfolioViewModel(selectedPersona?: string): PortfolioView
     equity,
     trades,
     episodes,
-    personas,
-    benchmarkPersonas: benchmarkRows.map((row) => row.id),
-    personaLabels,
+    accounts,
+    benchmarkAccounts: benchmarkRows.map((row) => row.id),
+    accountLabels,
     strategyOptions,
-    defaultPersona,
-    selectedPersona: activePersona,
+    defaultAccount,
+    selectedAccount: activeAccount,
     invalidStrategyId,
-    methodsByPersona,
-    capitalByPersona,
-    cashByPersona,
+    methodsByAccount,
+    capitalByAccount,
+    cashByAccount,
     reportSymbolsById,
     targetsBySymbol,
     targetsByReportId,
-    portfolioStrategyCount: personas.length,
+    portfolioStrategyCount: accounts.length,
     latestEquityDate,
   };
 }
 
 export function getPortfolioStaticParams() {
   const summaries = getSummaryRows();
-  const summaryIds = new Set(summaries.map((row) => row.persona));
+  const summaryIds = new Set(summaries.map((row) => row.account_id));
   const params = getPortfolioRows(getStrategyLeaderboard())
     .filter((row) => summaryIds.has(row.id))
     .map((row) => ({ strategy: row.id }));
@@ -219,8 +222,8 @@ function getPortfolioRows(rows: StrategyLeaderboardRow[] = getStrategyLeaderboar
   });
 }
 
-function defaultPortfolioPersona(rows: StrategyLeaderboardRow[]): string {
-  const productDefault = getDefaultPortfolioPersona();
+function defaultPortfolioAccount(rows: StrategyLeaderboardRow[]): string {
+  const productDefault = getDefaultPortfolioAccount();
   if (rows.some((row) => row.id === productDefault)) return productDefault;
   const fallback = rows[0]?.id;
   if (fallback) return fallback;
@@ -243,12 +246,12 @@ function dominates(candidate: StrategyLeaderboardRow, target: StrategyLeaderboar
   return noWorseReturn && noWorseDrawdown && strictlyBetter;
 }
 
-function groupByPersona<T extends { persona: string }>(rows: T[]): Map<string, T[]> {
+function groupByAccount<T extends { account_id: string }>(rows: T[]): Map<string, T[]> {
   const map = new Map<string, T[]>();
   for (const row of rows) {
-    const group = map.get(row.persona) ?? [];
+    const group = map.get(row.account_id) ?? [];
     group.push(row);
-    map.set(row.persona, group);
+    map.set(row.account_id, group);
   }
   return map;
 }

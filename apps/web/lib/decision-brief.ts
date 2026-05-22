@@ -218,7 +218,7 @@ function exactReportHref(report: ReportRow): string {
 
 function exactTradeReportHref(trade: TradeRow): string {
   if (!trade.reportId) {
-    return `/portfolio/${encodeURIComponent(trade.persona)}`;
+    return `/portfolio/${encodeURIComponent(trade.account_id)}`;
   }
   return `/reports/${encodeURIComponent(trade.symbol)}/${encodeURIComponent(trade.reportId)}`;
 }

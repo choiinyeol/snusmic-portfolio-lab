@@ -22,16 +22,16 @@ export type PortfolioViewModel = {
   equity: EquityPoint[];
   trades: TradeRow[];
   episodes: PositionEpisodeRow[];
-  personas: string[];
-  benchmarkPersonas: string[];
-  personaLabels: Record<string, string>;
+  accounts: string[];
+  benchmarkAccounts: string[];
+  accountLabels: Record<string, string>;
   strategyOptions: StrategySelectorOption[];
-  defaultPersona: string;
-  selectedPersona: string;
+  defaultAccount: string;
+  selectedAccount: string;
   invalidStrategyId: string | null;
-  methodsByPersona: Record<string, StrategyMethod>;
-  capitalByPersona: Record<string, number>;
-  cashByPersona: Record<string, number>;
+  methodsByAccount: Record<string, StrategyMethod>;
+  capitalByAccount: Record<string, number>;
+  cashByAccount: Record<string, number>;
   reportSymbolsById: Record<string, string>;
   targetsBySymbol: Record<string, ReportTargetDigest>;
   targetsByReportId: Record<string, ReportTargetDigest>;
@@ -59,7 +59,7 @@ export type PortfolioStrategySnapshot = {
 };
 
 export type PortfolioLandingModel = {
-  defaultPersona: string;
+  defaultAccount: string;
   latestEquityDate: string;
   strategies: PortfolioStrategySnapshot[];
   frontierRows: PortfolioStrategySnapshot[];
@@ -67,5 +67,5 @@ export type PortfolioLandingModel = {
   holdings: HoldingRow[];
   equity: EquityPoint[];
   trades: TradeRow[];
-  personaLabels: Record<string, string>;
+  accountLabels: Record<string, string>;
 };

@@ -4,14 +4,14 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getOverview, getReportRows } from '@/lib/artifacts';
 import { formatDays, formatPercent } from '@/lib/format';
-import { getDefaultPortfolioPersona, getPortfolioSnapshot, getStrategyLeaderboard } from '@/lib/product-model';
+import { getDefaultPortfolioAccount, getPortfolioSnapshot, getStrategyLeaderboard } from '@/lib/product-model';
 
 export default function GuidePage() {
   const reports = getReportRows();
   const overview = getOverview();
   const strategyRows = getStrategyLeaderboard();
-  const defaultPersona = getDefaultPortfolioPersona();
-  const portfolio = getPortfolioSnapshot(defaultPersona);
+  const defaultAccount = getDefaultPortfolioAccount();
+  const portfolio = getPortfolioSnapshot(defaultAccount);
   const reportStats = buildGuideReportStats(reports);
   const bestRealStrategy = strategyRows.find((row) => row.kind === 'strategy' && row.id !== 'weak_oracle');
   const follower = strategyRows.find((row) => row.id === 'smic_follower_v2');

@@ -1,12 +1,12 @@
-persona,symbol,company,episodes,total_buy_fills,total_sell_fills,total_holding_days,total_realized_pnl_krw,is_currently_held,current_qty,current_unrealized_pnl_krw
+account_id,symbol,company,episodes,total_buy_fills,total_sell_fills,total_holding_days,total_realized_pnl_krw,is_currently_held,current_qty,current_unrealized_pnl_krw
 all_weather,069500.KS,KODEX 200,1,51,13,1964,13972814.7521,True,518,43655050.5518
-all_weather,GLD,Gold,1,40,11,1964,2977955.8274,True,78,26060618.9379
-all_weather,QQQ,NASDAQ-100,1,35,2,1964,679072.8932,True,55,27350171.6413
-all_weather,SPY,S&P 500,1,34,0,1964,0.0,True,50,21260997.3432
-benchmark_gld,GLD,Gold,1,65,0,1964,0.0,True,368,129823952.3155
+all_weather,GLD,Gold,1,40,11,1964,2977955.8274,True,78,26068184.6321
+all_weather,QQQ,NASDAQ-100,1,35,2,1964,679072.8932,True,55,27427102.5949
+all_weather,SPY,S&P 500,1,34,0,1964,0.0,True,50,21288021.1515
+benchmark_gld,GLD,Gold,1,65,0,1964,0.0,True,368,129859646.873
 benchmark_kodex200,069500.KS,KODEX 200,1,65,0,1964,0.0,True,2623,221646019.7229
-benchmark_qqq,QQQ,NASDAQ-100,1,65,0,1964,0.0,True,196,112631419.157
-benchmark_spy,SPY,S&P 500,1,65,0,1964,0.0,True,163,83103413.362
+benchmark_qqq,QQQ,NASDAQ-100,1,65,0,1964,0.0,True,196,112905573.1006
+benchmark_spy,SPY,S&P 500,1,65,0,1964,0.0,True,163,83191510.9772
 smic_follower,FLNC,Fluence Energy Inc.,1,15,1,422,10889850.8997,False,0,
 smic_follower,ANET,Arista Networks,1,4,1,567,4328511.9133,False,0,
 smic_follower,475960.KQ,토모큐브,1,1,1,287,3817287.2198,False,0,

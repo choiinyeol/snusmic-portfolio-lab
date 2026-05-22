@@ -89,7 +89,7 @@ def test_renderers_emit_nonempty_pngs(tmp_path: Path, viz_warehouse: Path):
         end_date=date(2024, 12, 31),
         savings_plan=SavingsPlan(monthly_contribution_krw=500_000),
         fees=BrokerageFees(),
-        personas=(ProphetConfig(), SmicFollowerConfig()),
+        accounts=(ProphetConfig(), SmicFollowerConfig()),
     )
     result = run_simulation(cfg, viz_warehouse)
     eq = plot_equity_curves(result, tmp_path / "eq.png")

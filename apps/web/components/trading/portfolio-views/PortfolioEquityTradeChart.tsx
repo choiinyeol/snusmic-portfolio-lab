@@ -29,10 +29,10 @@ type Tooltip = {
 type Props = {
   equity: EquityPoint[];
   trades: TradeRow[];
-  persona: string;
+  account_id: string;
   label: string;
-  benchmarkPersonas?: string[];
-  personaLabels?: Record<string, string>;
+  benchmarkAccounts?: string[];
+  accountLabels?: Record<string, string>;
   height?: number;
 };
 
@@ -41,47 +41,47 @@ const BENCHMARK_COLORS = ['#64748b', '#94a3b8', '#a855f7', '#f59e0b'];
 export function PortfolioEquityTradeChart({
   equity,
   trades,
-  persona,
+  account_id,
   label,
-  benchmarkPersonas = [],
-  personaLabels = {},
+  benchmarkAccounts = [],
+  accountLabels = {},
   height = 420,
 }: Props) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
-  const personaEquity = useMemo(
-    () => equity.filter((row) => row.persona === persona).sort((a, b) => a.date.localeCompare(b.date)),
-    [equity, persona],
+  const accountEquity = useMemo(
+    () => equity.filter((row) => row.account_id === account_id).sort((a, b) => a.date.localeCompare(b.date)),
+    [equity, account_id],
   );
-  const personaTrades = useMemo(
-    () => trades.filter((row) => row.persona === persona).sort((a, b) => a.date.localeCompare(b.date)),
-    [trades, persona],
+  const accountTrades = useMemo(
+    () => trades.filter((row) => row.account_id === account_id).sort((a, b) => a.date.localeCompare(b.date)),
+    [trades, account_id],
   );
-  const tradesByDate = useMemo(() => groupTradesByDate(personaTrades), [personaTrades]);
+  const tradesByDate = useMemo(() => groupTradesByDate(accountTrades), [accountTrades]);
   const lineData = useMemo(
     () =>
-      personaEquity
+      accountEquity
         .filter((row) => row.cumulativeReturn !== null)
         .map((row) => ({ time: row.date as Time, value: (row.cumulativeReturn ?? 0) * 100 })),
-    [personaEquity],
+    [accountEquity],
   );
   const benchmarkSeries = useMemo(
     () =>
-      benchmarkPersonas
-        .map((benchmarkPersona, index) => ({
-          persona: benchmarkPersona,
-          label: personaLabels[benchmarkPersona] ?? benchmarkPersona,
+      benchmarkAccounts
+        .map((benchmarkAccount, index) => ({
+          account_id: benchmarkAccount,
+          label: accountLabels[benchmarkAccount] ?? benchmarkAccount,
           color: BENCHMARK_COLORS[index % BENCHMARK_COLORS.length],
           points: equity
-            .filter((row) => row.persona === benchmarkPersona && row.cumulativeReturn !== null)
+            .filter((row) => row.account_id === benchmarkAccount && row.cumulativeReturn !== null)
             .sort((a, b) => a.date.localeCompare(b.date))
             .map((row) => ({ time: row.date as Time, value: (row.cumulativeReturn ?? 0) * 100 })),
         }))
         .filter((series) => series.points.length),
-    [benchmarkPersonas, equity, personaLabels],
+    [benchmarkAccounts, equity, accountLabels],
   );
-  const equityByDate = useMemo(() => new Map(personaEquity.map((row) => [row.date, row])), [personaEquity]);
-  const markers = useMemo(() => buildTradeMarkers(personaTrades), [personaTrades]);
+  const equityByDate = useMemo(() => new Map(accountEquity.map((row) => [row.date, row])), [accountEquity]);
+  const markers = useMemo(() => buildTradeMarkers(accountTrades), [accountTrades]);
 
   useEffect(() => {
     if (!ref.current || !lineData.length) return;
@@ -170,7 +170,7 @@ export function PortfolioEquityTradeChart({
           {label}
         </span>
         {benchmarkSeries.map((series) => (
-          <span className="inline-flex items-center gap-1.5" key={series.persona}>
+          <span className="inline-flex items-center gap-1.5" key={series.account_id}>
             <span className="h-2 w-2 rounded-full" style={{ backgroundColor: series.color }} />
             {series.label}
           </span>

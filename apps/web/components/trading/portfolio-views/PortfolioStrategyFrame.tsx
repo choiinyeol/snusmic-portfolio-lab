@@ -17,8 +17,8 @@ type PortfolioRouteSegment = (typeof ROUTE_LINKS)[number]['segment'];
 
 export function PortfolioStrategyFrame({ children, model }: { children: ReactNode; model: PortfolioViewModel }) {
   const segment = useSelectedLayoutSegment() as PortfolioRouteSegment;
-  const persona = model.selectedPersona;
-  const baseHref = `/portfolio/${encodeURIComponent(persona)}`;
+  const account_id = model.selectedAccount;
+  const baseHref = `/portfolio/${encodeURIComponent(account_id)}`;
   const activeSegment = ROUTE_LINKS.some((link) => link.segment === segment) ? segment : null;
 
   return (

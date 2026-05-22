@@ -17,7 +17,7 @@ SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, f
 - No broker strategy search.
 - No stock-rule search or admission.
 - No PIT strategy generation.
-- No MTT strategy persona.
+- No MTT strategy account_id.
 - No `strategy-admission.json` web contract.
 - No hidden legacy/fallback strategy path.
 

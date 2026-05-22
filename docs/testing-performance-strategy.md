@@ -1,4 +1,4 @@
-﻿# Testing and Performance Strategy
+# Testing and Performance Strategy
 
 Last updated: 2026-05-23
 Status: canonical verification guidance

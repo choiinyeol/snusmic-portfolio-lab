@@ -1,4 +1,4 @@
-"""Single source of truth for the persona simulation.
+"""Single source of truth for the account simulation.
 
 Every contract that crosses a module boundary in :mod:`snusmic_pipeline.sim`
 is a frozen Pydantic v2 model with ``extra='forbid'``. This guarantees:
@@ -83,7 +83,7 @@ class BenchmarkAsset(_FrozenModel):
 class AllWeatherConfig(_FrozenModel):
     """Buy-and-hold benchmark basket with monthly rebalance."""
 
-    persona_name: Annotated[str, Field(pattern=r"^(all_weather|benchmark_[a-z0-9_]+)$")] = "all_weather"
+    account_id: Annotated[str, Field(pattern=r"^(all_weather|benchmark_[a-z0-9_]+)$")] = "all_weather"
     label: str = "올웨더 (25/25/25/25)"
     assets: tuple[BenchmarkAsset, ...] = (
         BenchmarkAsset(name="Gold", symbol="GLD", weight=0.25),
@@ -104,16 +104,16 @@ class AllWeatherConfig(_FrozenModel):
 
 
 # ---------------------------------------------------------------------------
-# Persona configs. Each carries its own knobs; a discriminator union via
-# ``persona_name`` lets the runner dispatch without isinstance().
+# Account configs. Each carries its own knobs; a discriminator union via
+# ``account_id`` lets the runner dispatch without isinstance().
 # ---------------------------------------------------------------------------
 
 
-class _PersonaBase(_FrozenModel):
+class _AccountBase(_FrozenModel):
     label: str  # human-readable label for legends / tables
 
 
-class ProphetConfig(_PersonaBase):
+class ProphetConfig(_AccountBase):
     """SMIC-constrained prophet — knows which reports will hit target.
 
     Trade-off framing: free-form 'pick top-K future winners' compounds
@@ -138,14 +138,14 @@ class ProphetConfig(_PersonaBase):
     the prophet's deployable AUM tracks the universe's market depth.
     """
 
-    persona_name: Literal["oracle"] = "oracle"
+    account_id: Literal["oracle"] = "oracle"
     label: str = "Prophet"
     lookahead_months: Annotated[int, Field(ge=1, le=24)] = 6
     target_hit_multiplier: Annotated[float, Field(gt=0.0, le=2.0)] = 1.0
     rebalance: Literal["monthly", "quarterly"] = "monthly"
 
 
-class WeakProphetConfig(_PersonaBase):
+class WeakProphetConfig(_AccountBase):
     """Forward-looking max-Sharpe oracle benchmark.
 
     It is deliberately stronger than realistic strategies: the benchmark can
@@ -154,7 +154,7 @@ class WeakProphetConfig(_PersonaBase):
     a tradable strategy.
     """
 
-    persona_name: Literal["weak_oracle"] = "weak_oracle"
+    account_id: Literal["weak_oracle"] = "weak_oracle"
     label: str = "미래정보 상한선 (3개월)"
     lookahead_months: Annotated[int, Field(ge=1, le=24)] = 3
     risk_free_rate: Annotated[float, Field(ge=0.0, le=0.20)] = 0.0
@@ -163,10 +163,10 @@ class WeakProphetConfig(_PersonaBase):
     min_history_days: Annotated[int, Field(ge=20, le=252)] = 20
 
 
-class SmicFollowerConfig(_PersonaBase):
+class SmicFollowerConfig(_AccountBase):
     """Pure 1/N true-believer: never sells at a loss."""
 
-    persona_name: Literal["smic_follower"] = "smic_follower"
+    account_id: Literal["smic_follower"] = "smic_follower"
     label: str = "단순 리포트 추종"
     target_hit_multiplier: Annotated[float, Field(gt=0.0, le=2.0)] = 1.0
     # SMIC reports drop on irregular dates, so the realistic baseline is to
@@ -176,10 +176,10 @@ class SmicFollowerConfig(_PersonaBase):
     rebalance: Literal["daily", "monthly", "quarterly"] = "daily"
 
 
-class SmicFollowerV2Config(_PersonaBase):
+class SmicFollowerV2Config(_AccountBase):
     """1/N follower with three stop-loss escape hatches."""
 
-    persona_name: Literal["smic_follower_v2"] = "smic_follower_v2"
+    account_id: Literal["smic_follower_v2"] = "smic_follower_v2"
     label: str = "손절 리포트 추종"
     target_hit_multiplier: Annotated[float, Field(gt=0.0, le=2.0)] = 1.0
     rebalance: Literal["daily", "monthly", "quarterly"] = "daily"
@@ -194,15 +194,11 @@ class SmicFollowerV2Config(_PersonaBase):
     report_age_stop_days: Annotated[int, Field(ge=30, le=3650)] = 730
 
 
-PersonaConfig = (
-    ProphetConfig
-    | WeakProphetConfig
-    | SmicFollowerConfig
-    | SmicFollowerV2Config
-    | AllWeatherConfig
+AccountConfig = (
+    ProphetConfig | WeakProphetConfig | SmicFollowerConfig | SmicFollowerV2Config | AllWeatherConfig
 )
 
-PersonaName = Literal[
+AccountId = Literal[
     "oracle",
     "weak_oracle",
     "smic_follower",
@@ -227,25 +223,25 @@ class SimulationConfig(_FrozenModel):
     end_date: date
     savings_plan: SavingsPlan = SavingsPlan()
     fees: BrokerageFees = BrokerageFees()
-    personas: tuple[PersonaConfig, ...] = (
+    accounts: tuple[AccountConfig, ...] = (
         AllWeatherConfig(),
         AllWeatherConfig(
-            persona_name="benchmark_qqq",
+            account_id="benchmark_qqq",
             label="QQQ (NASDAQ-100)",
             assets=(BenchmarkAsset(name="NASDAQ-100", symbol="QQQ", weight=1.0),),
         ),
         AllWeatherConfig(
-            persona_name="benchmark_spy",
+            account_id="benchmark_spy",
             label="SPY (S&P 500)",
             assets=(BenchmarkAsset(name="S&P 500", symbol="SPY", weight=1.0),),
         ),
         AllWeatherConfig(
-            persona_name="benchmark_kodex200",
+            account_id="benchmark_kodex200",
             label="KODEX 200 (069500.KS)",
             assets=(BenchmarkAsset(name="KODEX 200", symbol="069500.KS", weight=1.0),),
         ),
         AllWeatherConfig(
-            persona_name="benchmark_gld",
+            account_id="benchmark_gld",
             label="GLD (Gold ETF)",
             assets=(BenchmarkAsset(name="Gold", symbol="GLD", weight=1.0),),
         ),
@@ -269,9 +265,9 @@ class SimulationConfig(_FrozenModel):
     def _check_dates(self) -> SimulationConfig:
         if self.end_date <= self.start_date:
             raise ValueError(f"end_date {self.end_date} must be after start_date {self.start_date}")
-        names = [p.persona_name for p in self.personas]
+        names = [p.account_id for p in self.accounts]
         if len(set(names)) != len(names):
-            raise ValueError(f"persona_name must be unique; got {names}")
+            raise ValueError(f"account_id must be unique; got {names}")
         return self
 
 
@@ -299,7 +295,7 @@ TradeReason = Literal[
 class Trade(_FrozenModel):
     """One executed fill. Quantity is integer shares; cash effect is signed."""
 
-    persona: str
+    account_id: str
     date: date
     symbol: str
     side: TradeSide
@@ -314,9 +310,9 @@ class Trade(_FrozenModel):
 
 
 class EquityPoint(_FrozenModel):
-    """Daily mark-to-market snapshot for one persona."""
+    """Daily mark-to-market snapshot for one account_id."""
 
-    persona: str
+    account_id: str
     date: date
     cash_krw: float
     holdings_value_krw: float
@@ -327,18 +323,18 @@ class EquityPoint(_FrozenModel):
 
 
 class PositionEpisode(_FrozenModel):
-    """One contiguous holding period for a (persona, symbol) pair.
+    """One contiguous holding period for a (account_id, symbol) pair.
 
     An "episode" opens when ``qty`` goes from 0 → >0 and closes when ``qty``
     returns to 0. A partial sell that does NOT fully close the position
-    stays inside the same episode. Symbols that the persona buys, sells
+    stays inside the same episode. Symbols that the account_id buys, sells
     fully, then buys again will produce two distinct episodes.
 
     ``status`` is ``"closed"`` once ``close_date`` is set, otherwise
     ``"open"`` (still held at the end of the simulation).
     """
 
-    persona: str
+    account_id: str
     symbol: str
     company: str | None
     open_date: date
@@ -360,7 +356,7 @@ class PositionEpisode(_FrozenModel):
 class CurrentHolding(_FrozenModel):
     """A still-open position at the end of the simulation."""
 
-    persona: str
+    account_id: str
     symbol: str
     company: str | None
     qty: Annotated[int, Field(ge=1)]
@@ -376,7 +372,7 @@ class CurrentHolding(_FrozenModel):
 class ReportPerformance(_FrozenModel):
     """One SMIC report's realised outcome between publication and ``as_of_date``.
 
-    Persona-agnostic: this is just "how did the price move after the report
+    Account-agnostic: this is just "how did the price move after the report
     came out". Used by :class:`ReportStats` to aggregate target-hit rates,
     top winners/losers, and target-gap analysis.
     """
@@ -424,13 +420,13 @@ class ReportStats(_FrozenModel):
 
 
 class MonthlyHolding(_FrozenModel):
-    """Month-end snapshot of one (persona, symbol) pair.
+    """Month-end snapshot of one (account_id, symbol) pair.
 
     Used to render the portfolio-evolution stacked-area chart and to
     produce the monthly_holdings.csv long-form table.
     """
 
-    persona: str
+    account_id: str
     month_end: date
     symbol: str
     company: str
@@ -440,9 +436,9 @@ class MonthlyHolding(_FrozenModel):
 
 
 class SymbolStat(_FrozenModel):
-    """Aggregated lifetime stats for a (persona, symbol) pair across all episodes."""
+    """Aggregated lifetime stats for a (account_id, symbol) pair across all episodes."""
 
-    persona: str
+    account_id: str
     symbol: str
     company: str | None
     episodes: int
@@ -455,10 +451,10 @@ class SymbolStat(_FrozenModel):
     current_unrealized_pnl_krw: float | None
 
 
-class PersonaSummary(_FrozenModel):
-    """Top-line stats for a persona at the end of the simulation."""
+class AccountSummary(_FrozenModel):
+    """Top-line stats for a account_id at the end of the simulation."""
 
-    persona: str
+    account_id: str
     label: str
     initial_capital_krw: float
     total_contributed_krw: float
@@ -481,7 +477,7 @@ class SimulationResult(_FrozenModel):
     """Output bundle written by :func:`runner.run_simulation`."""
 
     config: SimulationConfig
-    summaries: tuple[PersonaSummary, ...]
+    summaries: tuple[AccountSummary, ...]
     equity_points: tuple[EquityPoint, ...]
     trades: tuple[Trade, ...]
     position_episodes: tuple[PositionEpisode, ...] = ()
@@ -492,8 +488,8 @@ class SimulationResult(_FrozenModel):
     report_stats: ReportStats | None = None
 
 
-# Discriminator helper so the runner can dispatch by ``persona_name``.
-PERSONA_REGISTRY_KEYS: tuple[str, ...] = (
+# Discriminator helper so the runner can dispatch by ``account_id``.
+ACCOUNT_REGISTRY_KEYS: tuple[str, ...] = (
     "oracle",
     "weak_oracle",
     "smic_follower",

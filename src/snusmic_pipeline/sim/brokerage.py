@@ -80,7 +80,7 @@ class LotSnapshot(_SnapshotModel):
 
 
 class AccountSnapshot(_SnapshotModel):
-    persona: str
+    account_id: str
     fees: BrokerageFees
     cash_krw: float
     contributed_krw: float
@@ -92,9 +92,9 @@ class AccountSnapshot(_SnapshotModel):
 
 @dataclass
 class Account:
-    """A single persona's share-based account."""
+    """A single account's share-based account."""
 
-    persona: str
+    account_id: str
     fees: BrokerageFees
     cash_krw: float = 0.0
     contributed_krw: float = 0.0
@@ -105,7 +105,7 @@ class Account:
 
     def to_snapshot(self) -> AccountSnapshot:
         return AccountSnapshot(
-            persona=self.persona,
+            account_id=self.account_id,
             fees=self.fees,
             cash_krw=self.cash_krw,
             contributed_krw=self.contributed_krw,
@@ -118,7 +118,7 @@ class Account:
     @classmethod
     def from_snapshot(cls, snapshot: AccountSnapshot) -> Account:
         return cls(
-            persona=snapshot.persona,
+            account_id=snapshot.account_id,
             fees=snapshot.fees,
             cash_krw=snapshot.cash_krw,
             contributed_krw=snapshot.contributed_krw,
@@ -220,7 +220,7 @@ class Account:
             lot.first_buy_date = when
         self.trades.append(
             Trade(
-                persona=self.persona,
+                account_id=self.account_id,
                 date=when,
                 symbol=symbol,
                 side="buy",
@@ -270,7 +270,7 @@ class Account:
             lot.buy_count = 0
         self.trades.append(
             Trade(
-                persona=self.persona,
+                account_id=self.account_id,
                 date=when,
                 symbol=symbol,
                 side="sell",

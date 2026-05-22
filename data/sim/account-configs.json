@@ -1,0 +1,104 @@
+{
+  "accounts": [
+    {
+      "account_id": "all_weather",
+      "assets": [
+        {
+          "name": "Gold",
+          "symbol": "GLD",
+          "weight": 0.25
+        },
+        {
+          "name": "NASDAQ-100",
+          "symbol": "QQQ",
+          "weight": 0.25
+        },
+        {
+          "name": "S&P 500",
+          "symbol": "SPY",
+          "weight": 0.25
+        },
+        {
+          "name": "KOSPI 200",
+          "symbol": "069500.KS",
+          "weight": 0.25
+        }
+      ],
+      "label": "올웨더 (25/25/25/25)",
+      "rebalance": "monthly"
+    },
+    {
+      "account_id": "benchmark_qqq",
+      "assets": [
+        {
+          "name": "NASDAQ-100",
+          "symbol": "QQQ",
+          "weight": 1.0
+        }
+      ],
+      "label": "QQQ (NASDAQ-100)",
+      "rebalance": "monthly"
+    },
+    {
+      "account_id": "benchmark_spy",
+      "assets": [
+        {
+          "name": "S&P 500",
+          "symbol": "SPY",
+          "weight": 1.0
+        }
+      ],
+      "label": "SPY (S&P 500)",
+      "rebalance": "monthly"
+    },
+    {
+      "account_id": "benchmark_kodex200",
+      "assets": [
+        {
+          "name": "KODEX 200",
+          "symbol": "069500.KS",
+          "weight": 1.0
+        }
+      ],
+      "label": "KODEX 200 (069500.KS)",
+      "rebalance": "monthly"
+    },
+    {
+      "account_id": "benchmark_gld",
+      "assets": [
+        {
+          "name": "Gold",
+          "symbol": "GLD",
+          "weight": 1.0
+        }
+      ],
+      "label": "GLD (Gold ETF)",
+      "rebalance": "monthly"
+    },
+    {
+      "account_id": "smic_follower",
+      "label": "단순 리포트 추종",
+      "rebalance": "daily",
+      "target_hit_multiplier": 1.0
+    },
+    {
+      "account_id": "smic_follower_v2",
+      "averaged_down_stop_pct": 0.2,
+      "label": "손절 리포트 추종",
+      "rebalance": "daily",
+      "report_age_stop_days": 730,
+      "target_hit_multiplier": 1.0,
+      "time_loss_days": 365
+    },
+    {
+      "account_id": "weak_oracle",
+      "label": "미래정보 상한선 (3개월)",
+      "lookahead_months": 3,
+      "max_weight": 1.0,
+      "min_history_days": 20,
+      "rebalance": "monthly",
+      "risk_free_rate": 0.0
+    }
+  ],
+  "schema_version": "1.0.0"
+}

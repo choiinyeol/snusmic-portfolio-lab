@@ -1,7 +1,7 @@
 """Top-level simulation runner.
 
 Reads :class:`SimulationConfig` + the warehouse on disk and produces a
-:class:`SimulationResult` covering every requested persona. Network I/O is
+:class:`SimulationResult` covering every requested account_id. Network I/O is
 limited to the All-Weather benchmark loader (which caches on disk).
 """
 
@@ -12,10 +12,18 @@ from pathlib import Path
 
 import pandas as pd
 
+from .accounts import (
+    AccountRunOutput,
+    simulate_all_weather,
+    simulate_prophet,
+    simulate_smic_follower,
+    simulate_smic_follower_v2,
+    simulate_weak_prophet,
+)
 from .contracts import (
+    AccountConfig,
     AllWeatherConfig,
     MonthlyHolding,
-    PersonaConfig,
     ProphetConfig,
     SimulationConfig,
     SimulationResult,
@@ -30,14 +38,6 @@ from .holdings import (
     compute_symbol_stats,
 )
 from .market import PriceBoard, load_benchmark_prices
-from .personas import (
-    PersonaRunOutput,
-    simulate_all_weather,
-    simulate_prophet,
-    simulate_smic_follower,
-    simulate_smic_follower_v2,
-    simulate_weak_prophet,
-)
 from .report_stats import aggregate_report_stats, compute_report_performance
 from .savings import build_cash_flow_schedule
 from .target_adjustment import align_report_targets_to_market_scale
@@ -50,7 +50,7 @@ def run_simulation(
     *,
     refresh_benchmark: bool = False,
 ) -> SimulationResult:
-    """Run every persona in ``config.personas`` and return a result bundle."""
+    """Run every account_id in ``config.accounts`` and return a result bundle."""
     board = PriceBoard.from_warehouse(warehouse_dir)
     if board.is_empty:
         raise RuntimeError(f"Warehouse {warehouse_dir} has no daily_prices rows; nothing to simulate.")
@@ -67,10 +67,10 @@ def run_simulation(
     reports = align_report_targets_to_market_scale(reports, board, config.end_date)
 
     benchmark_board: PriceBoard | None = None
-    benchmark_personas = {p.persona_name for p in config.personas if isinstance(p, AllWeatherConfig)}
-    if benchmark_personas:
+    benchmark_accounts = {p.account_id for p in config.accounts if isinstance(p, AllWeatherConfig)}
+    if benchmark_accounts:
         symbols_needed: set[str] = set()
-        for p in config.personas:
+        for p in config.accounts:
             if isinstance(p, AllWeatherConfig):
                 symbols_needed.update(a.symbol for a in p.assets)
         benchmark_board = load_benchmark_prices(
@@ -81,11 +81,11 @@ def run_simulation(
             refresh=refresh_benchmark,
         )
 
-    outputs: list[PersonaRunOutput] = []
-    for persona in config.personas:
+    outputs: list[AccountRunOutput] = []
+    for account_id in config.accounts:
         outputs.append(
             _dispatch(
-                persona,
+                account_id,
                 config,
                 board,
                 benchmark_board,
@@ -104,9 +104,9 @@ def finalize_simulation_outputs(
     board: PriceBoard,
     benchmark_board: PriceBoard | None,
     trading_dates: list[date],
-    outputs: list[PersonaRunOutput],
+    outputs: list[AccountRunOutput],
 ) -> SimulationResult:
-    """Build the shared SimulationResult tables from completed persona outputs."""
+    """Build the shared SimulationResult tables from completed account outputs."""
 
     summaries = tuple(o.summary for o in outputs)
     equity_points = tuple(p for o in outputs for p in o.equity_points)
@@ -114,16 +114,16 @@ def finalize_simulation_outputs(
 
     # Holdings reports — single source of truth is the trade ledger, which is
     # how a brokerage app reconstructs past positions from statements. Each
-    # persona's episodes are marked against its own price board (SNUSMIC
-    # universe for the four research personas; All-Weather basket for the
+    # account's episodes are marked against its own price board (SNUSMIC
+    # universe for the four research accounts; All-Weather basket for the
     # benchmark) so the unrealized PnL on still-open positions is correct.
-    benchmark_personas = {p.persona_name for p in config.personas if isinstance(p, AllWeatherConfig)}
+    benchmark_accounts = {p.account_id for p in config.accounts if isinstance(p, AllWeatherConfig)}
     company_by_symbol = _company_lookup(reports)
-    benchmark_company_by_symbol = _benchmark_company_lookup(config.personas)
+    benchmark_company_by_symbol = _benchmark_company_lookup(config.accounts)
     last_day = trading_dates[-1]
     episodes = list(
         compute_position_episodes(
-            (t for t in trades if t.persona not in benchmark_personas),
+            (t for t in trades if t.account_id not in benchmark_accounts),
             board,
             last_day,
             company_by_symbol,
@@ -132,7 +132,7 @@ def finalize_simulation_outputs(
     if benchmark_board is not None:
         episodes.extend(
             compute_position_episodes(
-                (t for t in trades if t.persona in benchmark_personas),
+                (t for t in trades if t.account_id in benchmark_accounts),
                 benchmark_board,
                 last_day,
                 benchmark_company_by_symbol,
@@ -142,18 +142,18 @@ def finalize_simulation_outputs(
     current_holdings = tuple(compute_current_holdings(episodes_tuple, board=None, end_date=last_day))
     symbol_stats = tuple(compute_symbol_stats(episodes_tuple))
 
-    # Month-end portfolio composition. Each persona is marked against its
+    # Month-end portfolio composition. Each account_id is marked against its
     # own price board; All-Weather goes to the benchmark board.
-    boards_by_persona: dict[str, PriceBoard] = {p.persona_name: board for p in config.personas}
+    boards_by_account: dict[str, PriceBoard] = {p.account_id: board for p in config.accounts}
     if benchmark_board is not None and not benchmark_board.is_empty:
-        for persona_name in benchmark_personas:
-            boards_by_persona[persona_name] = benchmark_board
-    monthly_df = compute_monthly_holdings(trades, boards_by_persona, last_day, company_by_symbol)
+        for account_id in benchmark_accounts:
+            boards_by_account[account_id] = benchmark_board
+    monthly_df = compute_monthly_holdings(trades, boards_by_account, last_day, company_by_symbol)
     monthly_holdings = (
         tuple(MonthlyHolding(**row) for row in monthly_df.to_dict("records")) if not monthly_df.empty else ()
     )
 
-    # Persona-agnostic SMIC report statistics.
+    # Account-agnostic SMIC report statistics.
     report_perf = tuple(
         compute_report_performance(reports, board, last_day, expiry_days=config.report_expiry_days)
     )
@@ -181,11 +181,11 @@ _ALL_WEATHER_LABELS: dict[str, str] = {
 }
 
 
-def _benchmark_company_lookup(personas: tuple[PersonaConfig, ...]) -> dict[str, str]:
+def _benchmark_company_lookup(accounts: tuple[AccountConfig, ...]) -> dict[str, str]:
     labels = dict(_ALL_WEATHER_LABELS)
-    for persona in personas:
-        if isinstance(persona, AllWeatherConfig):
-            for asset in persona.assets:
+    for account_id in accounts:
+        if isinstance(account_id, AllWeatherConfig):
+            for asset in account_id.assets:
                 labels[asset.symbol] = asset.name
     return labels
 
@@ -203,25 +203,25 @@ def _company_lookup(reports: pd.DataFrame) -> dict[str, str]:
 
 
 def _dispatch(
-    persona: PersonaConfig,
+    account_id: AccountConfig,
     config: SimulationConfig,
     board: PriceBoard,
     benchmark_board: PriceBoard | None,
     reports: pd.DataFrame,
     cashflows,
     trading_dates: list[date],
-) -> PersonaRunOutput:
-    if isinstance(persona, ProphetConfig):
+) -> AccountRunOutput:
+    if isinstance(account_id, ProphetConfig):
         return simulate_prophet(
-            persona, config.savings_plan, config.fees, board, reports, cashflows, trading_dates
+            account_id, config.savings_plan, config.fees, board, reports, cashflows, trading_dates
         )
-    if isinstance(persona, WeakProphetConfig):
+    if isinstance(account_id, WeakProphetConfig):
         return simulate_weak_prophet(
-            persona, config.savings_plan, config.fees, board, reports, cashflows, trading_dates
+            account_id, config.savings_plan, config.fees, board, reports, cashflows, trading_dates
         )
-    if isinstance(persona, SmicFollowerConfig):
+    if isinstance(account_id, SmicFollowerConfig):
         return simulate_smic_follower(
-            persona,
+            account_id,
             config.savings_plan,
             config.fees,
             board,
@@ -230,9 +230,9 @@ def _dispatch(
             trading_dates,
             expiry_days=config.report_expiry_days,
         )
-    if isinstance(persona, SmicFollowerV2Config):
+    if isinstance(account_id, SmicFollowerV2Config):
         return simulate_smic_follower_v2(
-            persona,
+            account_id,
             config.savings_plan,
             config.fees,
             board,
@@ -241,18 +241,18 @@ def _dispatch(
             trading_dates,
             expiry_days=config.report_expiry_days,
         )
-    if isinstance(persona, AllWeatherConfig):
+    if isinstance(account_id, AllWeatherConfig):
         if benchmark_board is None or benchmark_board.is_empty:
-            raise RuntimeError("All-Weather persona requested but benchmark prices unavailable.")
+            raise RuntimeError("All-Weather account_id requested but benchmark prices unavailable.")
         return simulate_all_weather(
-            persona,
+            account_id,
             config.savings_plan,
             config.fees,
             benchmark_board,
             cashflows,
             trading_dates,
         )
-    raise TypeError(f"unknown persona config: {type(persona).__name__}")
+    raise TypeError(f"unknown account config: {type(account_id).__name__}")
 
 
 def _prepare_reports(reports: pd.DataFrame, start: date, end: date) -> pd.DataFrame:

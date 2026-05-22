@@ -1,18 +1,18 @@
-"""Per-persona holdings reports derived from the trade ledger.
+"""Per-account_id holdings reports derived from the trade ledger.
 
 Four views, all reconstructed from :class:`Trade` records (not from
 intermediate engine state — so they round-trip through ``trades.csv``):
 
 * :func:`compute_position_episodes` — every contiguous holding period
-  (qty 0 → >0 → ... → 0) for each (persona, symbol). Captures
+  (qty 0 → >0 → ... → 0) for each (account_id, symbol). Captures
   open/close dates, holding days, partial-fill counts, weighted-average
   entry/exit prices, and realised PnL for that one episode.
 * :func:`compute_current_holdings` — the still-open positions on the
   last simulation day, marked-to-market against the price board.
-* :func:`compute_symbol_stats` — episode aggregates per (persona,
+* :func:`compute_symbol_stats` — episode aggregates per (account_id,
   symbol): total holding days, total realised PnL, current open status.
 * :func:`compute_monthly_holdings` — month-end snapshot of each
-  persona's book (qty + market value + weight per symbol). Drives the
+  account's book (qty + market value + weight per symbol). Drives the
   portfolio-evolution stacked-area chart in the README.
 
 The arithmetic is the same moving-average cost basis used by the
@@ -56,7 +56,7 @@ def compute_position_episodes(
     end_date: date,
     company_by_symbol: Mapping[str, str] | None = None,
 ) -> list[PositionEpisode]:
-    """Reconstruct round-trip episodes per (persona, symbol).
+    """Reconstruct round-trip episodes per (account_id, symbol).
 
     Parameters
     ----------
@@ -75,10 +75,10 @@ def compute_position_episodes(
     company_lookup = dict(company_by_symbol or {})
     grouped: dict[tuple[str, str], list[Trade]] = defaultdict(list)
     for t in trades:
-        grouped[(t.persona, t.symbol)].append(t)
+        grouped[(t.account_id, t.symbol)].append(t)
 
     episodes: list[PositionEpisode] = []
-    for (persona, symbol), group in grouped.items():
+    for (account_id, symbol), group in grouped.items():
         group.sort(key=lambda x: (x.date, x.side))  # buys before sells when same day
         state = _RunningPosition()
         for t in group:
@@ -112,7 +112,7 @@ def compute_position_episodes(
                 if t.reason and t.reason not in state.exit_reasons:
                     state.exit_reasons.append(t.reason)
                 if state.qty == 0:
-                    episodes.append(_finalize_episode(persona, symbol, state, company_lookup, closed=True))
+                    episodes.append(_finalize_episode(account_id, symbol, state, company_lookup, closed=True))
                     # Reset for a possible later re-entry.
                     state = _RunningPosition()
         if state.qty > 0:
@@ -122,7 +122,7 @@ def compute_position_episodes(
             unreal = (mid - avg_cost) * state.qty if (mid is not None and avg_cost > 0) else None
             episodes.append(
                 _finalize_episode(
-                    persona,
+                    account_id,
                     symbol,
                     state,
                     company_lookup,
@@ -132,12 +132,12 @@ def compute_position_episodes(
                     unrealized=unreal,
                 )
             )
-    episodes.sort(key=lambda e: (e.persona, e.open_date, e.symbol))
+    episodes.sort(key=lambda e: (e.account_id, e.open_date, e.symbol))
     return episodes
 
 
 def _finalize_episode(
-    persona: str,
+    account_id: str,
     symbol: str,
     state: _RunningPosition,
     company_lookup: Mapping[str, str],
@@ -166,7 +166,7 @@ def _finalize_episode(
         avg_exit = None
         status = "open"
     return PositionEpisode(
-        persona=persona,
+        account_id=account_id,
         symbol=symbol,
         company=company_lookup.get(symbol),
         open_date=open_date,
@@ -208,7 +208,7 @@ def compute_current_holdings(
         unreal_ret = (last_close / avg_cost - 1.0) if (last_close and avg_cost > 0) else None
         holdings.append(
             CurrentHolding(
-                persona=ep.persona,
+                account_id=ep.account_id,
                 symbol=ep.symbol,
                 company=ep.company,
                 qty=qty,
@@ -221,56 +221,56 @@ def compute_current_holdings(
                 first_buy_date=ep.open_date,
             )
         )
-    holdings.sort(key=lambda h: (h.persona, -h.market_value_krw))
+    holdings.sort(key=lambda h: (h.account_id, -h.market_value_krw))
     return holdings
 
 
 def compute_monthly_holdings(
     trades: Iterable[Trade],
-    boards_by_persona: Mapping[str, PriceBoard],
+    boards_by_account: Mapping[str, PriceBoard],
     end_date: date,
     company_by_symbol: Mapping[str, str] | None = None,
 ) -> pd.DataFrame:
-    """Month-end snapshot of every still-open position per persona.
+    """Month-end snapshot of every still-open position per account_id.
 
-    Walks the trade ledger chronologically per persona, keeping a running
+    Walks the trade ledger chronologically per account_id, keeping a running
     integer-share book. At every calendar month-end inside the simulation
-    window it freezes the book against the persona's price board, then
-    emits one row per ``(persona, month_end, symbol)`` with positive qty.
+    window it freezes the book against the account's price board, then
+    emits one row per ``(account_id, month_end, symbol)`` with positive qty.
 
-    Output columns: ``persona``, ``month_end``, ``symbol``, ``company``,
+    Output columns: ``account_id``, ``month_end``, ``symbol``, ``company``,
     ``qty``, ``market_value_krw``, ``weight_in_portfolio`` (share of the
     invested book on that date, ignoring cash). Sorted ascending by
-    persona then month_end then descending market value.
+    account_id then month_end then descending market value.
 
-    ``boards_by_persona`` is a dict like ``{"oracle": board, "all_weather":
-    benchmark_board}``. Personas not in the dict fall back to whatever
+    ``boards_by_account`` is a dict like ``{"oracle": board, "all_weather":
+    benchmark_board}``. Accounts not in the dict fall back to whatever
     is keyed under ``"_default"`` (or no MTM if neither exists).
     """
     grouped: dict[str, list[Trade]] = defaultdict(list)
     for t in trades:
-        grouped[t.persona].append(t)
+        grouped[t.account_id].append(t)
     if not grouped:
         return pd.DataFrame()
 
     company_lookup = dict(company_by_symbol or {})
     rows: list[dict] = []
-    default_board = boards_by_persona.get("_default")
+    default_board = boards_by_account.get("_default")
 
-    for persona, persona_trades in grouped.items():
-        persona_trades.sort(key=lambda t: (t.date, t.side))
-        board = boards_by_persona.get(persona, default_board)
+    for account_id, account_trades in grouped.items():
+        account_trades.sort(key=lambda t: (t.date, t.side))
+        board = boards_by_account.get(account_id, default_board)
         if board is None:
             continue
-        first_date = persona_trades[0].date
+        first_date = account_trades[0].date
         month_ends = _month_ends_between(first_date, end_date)
         if not month_ends:
             continue
         positions: dict[str, dict[str, float]] = {}
         cursor = 0
         for month_end in month_ends:
-            while cursor < len(persona_trades) and persona_trades[cursor].date <= month_end:
-                t = persona_trades[cursor]
+            while cursor < len(account_trades) and account_trades[cursor].date <= month_end:
+                t = account_trades[cursor]
                 cursor += 1
                 pos = positions.setdefault(t.symbol, {"qty": 0, "cost": 0.0})
                 if t.side == "buy":
@@ -299,7 +299,7 @@ def compute_monthly_holdings(
             for symbol, qty, value in snapshot:
                 rows.append(
                     {
-                        "persona": persona,
+                        "account_id": account_id,
                         "month_end": month_end,
                         "symbol": symbol,
                         "company": company_lookup.get(symbol, ""),
@@ -311,7 +311,7 @@ def compute_monthly_holdings(
     if not rows:
         return pd.DataFrame()
     df = pd.DataFrame(rows)
-    df = df.sort_values(["persona", "month_end", "market_value_krw"], ascending=[True, True, False])
+    df = df.sort_values(["account_id", "month_end", "market_value_krw"], ascending=[True, True, False])
     return df.reset_index(drop=True)
 
 
@@ -334,12 +334,12 @@ def _month_ends_between(start: date, end: date) -> list[date]:
 
 
 def compute_symbol_stats(episodes: Iterable[PositionEpisode]) -> list[SymbolStat]:
-    """One row per (persona, symbol) summarising every episode for that pair."""
+    """One row per (account_id, symbol) summarising every episode for that pair."""
     grouped: dict[tuple[str, str], list[PositionEpisode]] = defaultdict(list)
     for ep in episodes:
-        grouped[(ep.persona, ep.symbol)].append(ep)
+        grouped[(ep.account_id, ep.symbol)].append(ep)
     stats: list[SymbolStat] = []
-    for (persona, symbol), eps in grouped.items():
+    for (account_id, symbol), eps in grouped.items():
         company = next((e.company for e in eps if e.company), None)
         open_eps = [e for e in eps if e.status == "open"]
         is_open = bool(open_eps)
@@ -347,7 +347,7 @@ def compute_symbol_stats(episodes: Iterable[PositionEpisode]) -> list[SymbolStat
         current_unreal = sum(e.unrealized_pnl_krw or 0.0 for e in open_eps) if is_open else None
         stats.append(
             SymbolStat(
-                persona=persona,
+                account_id=account_id,
                 symbol=symbol,
                 company=company,
                 episodes=len(eps),
@@ -360,5 +360,5 @@ def compute_symbol_stats(episodes: Iterable[PositionEpisode]) -> list[SymbolStat
                 current_unrealized_pnl_krw=current_unreal,
             )
         )
-    stats.sort(key=lambda s: (s.persona, -s.total_realized_pnl_krw))
+    stats.sort(key=lambda s: (s.account_id, -s.total_realized_pnl_krw))
     return stats

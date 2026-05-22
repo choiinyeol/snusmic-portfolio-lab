@@ -11,15 +11,15 @@ import { PortfolioEquityTradeChart } from './PortfolioEquityTradeChart';
 import type { PortfolioViewModel } from './types';
 
 export function PortfolioOverviewView({ model }: { model: PortfolioViewModel }) {
-  const persona = model.selectedPersona;
-  const personaHoldings = useMemo(
-    () => model.holdings.filter((row) => row.persona === persona),
-    [model.holdings, persona],
+  const account_id = model.selectedAccount;
+  const accountHoldings = useMemo(
+    () => model.holdings.filter((row) => row.account_id === account_id),
+    [model.holdings, account_id],
   );
-  const cashKrw = model.cashByPersona[persona] ?? 0;
+  const cashKrw = model.cashByAccount[account_id] ?? 0;
   const treemapHoldings = useMemo(
-    () => withCashHolding(personaHoldings, cashKrw, persona),
-    [cashKrw, personaHoldings, persona],
+    () => withCashHolding(accountHoldings, cashKrw, account_id),
+    [cashKrw, accountHoldings, account_id],
   );
   const reportHrefBySymbol = useMemo(
     () =>
@@ -31,13 +31,13 @@ export function PortfolioOverviewView({ model }: { model: PortfolioViewModel }) 
   const recentTrades = useMemo(
     () =>
       [...model.trades]
-        .filter((row) => row.persona === persona)
+        .filter((row) => row.account_id === account_id)
         .sort((a, b) => b.date.localeCompare(a.date))
         .slice(0, 8),
-    [model.trades, persona],
+    [model.trades, account_id],
   );
-  const method = model.methodsByPersona[persona];
-  const personaLabel = model.personaLabels[persona] ?? persona;
+  const method = model.methodsByAccount[account_id];
+  const accountLabel = model.accountLabels[account_id] ?? account_id;
 
   return (
     <div className="grid min-w-0 gap-5">
@@ -54,16 +54,16 @@ export function PortfolioOverviewView({ model }: { model: PortfolioViewModel }) 
               </p>
             </div>
             <Button asChild size="sm" variant="outline">
-              <Link href={`/portfolio/${encodeURIComponent(persona)}/equity`}>일별 평가</Link>
+              <Link href={`/portfolio/${encodeURIComponent(account_id)}/equity`}>일별 평가</Link>
             </Button>
           </div>
           <PortfolioEquityTradeChart
             equity={model.equity}
-            benchmarkPersonas={model.benchmarkPersonas}
+            benchmarkAccounts={model.benchmarkAccounts}
             trades={model.trades}
-            persona={persona}
-            label={personaLabel}
-            personaLabels={model.personaLabels}
+            account_id={account_id}
+            label={accountLabel}
+            accountLabels={model.accountLabels}
             height={460}
           />
           <TradeEventTimeline
@@ -82,7 +82,7 @@ export function PortfolioOverviewView({ model }: { model: PortfolioViewModel }) 
               <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">현재 보유 비중</h2>
             </div>
             <Button asChild size="sm" variant="outline">
-              <Link href={`/portfolio/${encodeURIComponent(persona)}/holdings`}>보유 표</Link>
+              <Link href={`/portfolio/${encodeURIComponent(account_id)}/holdings`}>보유 표</Link>
             </Button>
           </div>
           <HoldingsTreemap
@@ -105,7 +105,7 @@ export function PortfolioOverviewView({ model }: { model: PortfolioViewModel }) 
               <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">최근 매매</h2>
             </div>
             <Button asChild size="sm" variant="outline">
-              <Link href={`/portfolio/${encodeURIComponent(persona)}/trades`}>전체 ledger</Link>
+              <Link href={`/portfolio/${encodeURIComponent(account_id)}/trades`}>전체 ledger</Link>
             </Button>
           </div>
           <RecentTradeList trades={recentTrades} />
@@ -120,7 +120,7 @@ export function PortfolioOverviewView({ model }: { model: PortfolioViewModel }) 
               <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">매매 로직</h2>
             </div>
             <Button asChild size="sm" variant="outline">
-              <Link href={`/portfolio/${encodeURIComponent(persona)}/methodology`}>규칙 보기</Link>
+              <Link href={`/portfolio/${encodeURIComponent(account_id)}/methodology`}>규칙 보기</Link>
             </Button>
           </div>
           {method ? (
@@ -262,12 +262,12 @@ function reportTargetHref(target: ReportTargetDigest): string {
   return `/reports/${encodeURIComponent(target.symbol)}/${encodeURIComponent(target.reportId)}`;
 }
 
-function withCashHolding(holdings: HoldingRow[], cashKrw: number, persona: string): HoldingRow[] {
+function withCashHolding(holdings: HoldingRow[], cashKrw: number, account_id: string): HoldingRow[] {
   if (cashKrw <= 0) return holdings;
   return [
     ...holdings,
     {
-      persona,
+      account_id,
       symbol: 'CASH',
       company: 'RP이자',
       qty: null,

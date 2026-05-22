@@ -10,11 +10,17 @@ import { formatKrw, formatPercent } from '@/lib/format';
 import type { PortfolioViewModel } from './types';
 
 export function PortfolioHoldingsView({ model }: { model: PortfolioViewModel }) {
-  const persona = model.selectedPersona;
-  const personaLabel = model.personaLabels[persona] ?? persona;
-  const holdings = useMemo(() => model.holdings.filter((row) => row.persona === persona), [model.holdings, persona]);
-  const cashKrw = model.cashByPersona[persona] ?? 0;
-  const allocationHoldings = useMemo(() => withCashHolding(holdings, cashKrw, persona), [cashKrw, holdings, persona]);
+  const account_id = model.selectedAccount;
+  const accountLabel = model.accountLabels[account_id] ?? account_id;
+  const holdings = useMemo(
+    () => model.holdings.filter((row) => row.account_id === account_id),
+    [model.holdings, account_id],
+  );
+  const cashKrw = model.cashByAccount[account_id] ?? 0;
+  const allocationHoldings = useMemo(
+    () => withCashHolding(holdings, cashKrw, account_id),
+    [cashKrw, holdings, account_id],
+  );
   const totalValue = allocationHoldings.reduce((sum, row) => sum + (row.marketValueKrw ?? 0), 0);
   const topHoldings = useMemo(
     () => [...holdings].sort((a, b) => (b.marketValueKrw ?? 0) - (a.marketValueKrw ?? 0)).slice(0, 4),
@@ -60,7 +66,7 @@ export function PortfolioHoldingsView({ model }: { model: PortfolioViewModel }) 
             </div>
             <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">리스크 집중</h2>
             <p className="mt-1 text-sm leading-6 text-slate-500">
-              {personaLabel}의 현재 위험은 보유 비중 상위 종목이 결정합니다. 비중·미실현 수익률·보유일·최근 리포트
+              {accountLabel}의 현재 위험은 보유 비중 상위 종목이 결정합니다. 비중·미실현 수익률·보유일·최근 리포트
               맥락을 한 번에 확인합니다.
             </p>
           </div>
@@ -69,7 +75,7 @@ export function PortfolioHoldingsView({ model }: { model: PortfolioViewModel }) 
               <HoldingEvidenceCard
                 holding={holding}
                 index={index}
-                key={`${holding.persona}-${holding.symbol}`}
+                key={`${holding.account_id}-${holding.symbol}`}
                 target={model.targetsBySymbol[holding.symbol]}
                 totalValue={totalValue}
               />
@@ -80,10 +86,10 @@ export function PortfolioHoldingsView({ model }: { model: PortfolioViewModel }) 
       </section>
 
       <PortfolioTables
-        capitalByPersona={model.capitalByPersona}
+        capitalByAccount={model.capitalByAccount}
         holdings={model.holdings}
-        persona={model.selectedPersona}
-        personaLabels={model.personaLabels}
+        account_id={model.selectedAccount}
+        accountLabels={model.accountLabels}
         targetsBySymbol={model.targetsBySymbol}
       />
     </div>
@@ -153,12 +159,12 @@ function formatHoldingDays(value: number | null | undefined): string {
   return `${Math.round(value).toLocaleString('ko-KR')}일`;
 }
 
-function withCashHolding(holdings: HoldingRow[], cashKrw: number, persona: string): HoldingRow[] {
+function withCashHolding(holdings: HoldingRow[], cashKrw: number, account_id: string): HoldingRow[] {
   if (cashKrw <= 0) return holdings;
   return [
     ...holdings,
     {
-      persona,
+      account_id,
       symbol: 'CASH',
       company: 'RP이자',
       qty: null,

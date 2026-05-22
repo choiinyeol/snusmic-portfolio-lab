@@ -5,6 +5,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from snusmic_pipeline.sim.accounts import simulate_all_weather
 from snusmic_pipeline.sim.contracts import (
     AllWeatherConfig,
     BenchmarkAsset,
@@ -12,7 +13,6 @@ from snusmic_pipeline.sim.contracts import (
     SavingsPlan,
 )
 from snusmic_pipeline.sim.market import PriceBoard
-from snusmic_pipeline.sim.personas import simulate_all_weather
 from snusmic_pipeline.sim.savings import build_cash_flow_schedule
 
 
@@ -73,7 +73,7 @@ def test_all_weather_balanced_within_a_few_percent_at_rebalance(synthetic_dates)
 
 
 def test_all_weather_handles_partial_basket_when_one_symbol_missing():
-    """If one ETF is missing for the date, the persona must still rebalance the rest."""
+    """If one ETF is missing for the date, the account_id must still rebalance the rest."""
     plan = SavingsPlan(initial_capital_krw=10_000_000, monthly_contribution_krw=0)
     fees = BrokerageFees()
     board = _bench_board()

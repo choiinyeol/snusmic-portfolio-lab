@@ -21,7 +21,7 @@
 - Chronological split robustness: **mixed**.
   - 2021-2023 Sharpe `1.401686` and downside-std Sortino `1.862727` are below 2.0, but LPM0 Sortino `2.200674` is above 2.0.
   - 2024-2026 Sharpe `2.079009`, LPM0 Sortino `3.157876`, and downside-std Sortino `2.572879` all exceed 2.0.
-- Weak oracle exclusion: **PASS** — corrected script skips `persona == 'weak_oracle'` before pivoting returns.
+- Weak oracle exclusion: **PASS** — corrected script skips `account_id == 'weak_oracle'` before pivoting returns.
 - No-lookahead guard: **PASS** by source inspection and recomputation — trailing rotation scores are shifted one trading day before same-day returns.
 - Old artifact status: **INVALID/SUPERSEDED** — the first `leader-meta-search.json` overstated the hit; its best `smic_mtt_strategy_top21_mom_vol0.08_lb63` is not present in the corrected top-50.
 
@@ -37,10 +37,10 @@
 For the corrected target, I recomputed from `data/sim/equity_daily.csv`:
 
 ```text
-flow_adjusted_ret(persona,t) = (equity_t - equity_(t-1) - Δcontributed_capital_t) / equity_(t-1)
-mat = all non-weak_oracle persona return series with >=1000 observations, missing returns filled with 0
+flow_adjusted_ret(account_id,t) = (equity_t - equity_(t-1) - Δcontributed_capital_t) / equity_(t-1)
+mat = all non-weak_oracle account_id return series with >=1000 observations, missing returns filled with 0
 score_t = trailing_mean_189(mat) / trailing_std_189(mat)
-selected_t = top 4 personas by score_(t-1)
+selected_t = top 4 accounts by score_(t-1)
 strategy_ret_t = average current-day returns of selected_t
 ```
 
@@ -49,11 +49,11 @@ This exactly matched `leader-meta-search-fixed.json` for full and split metrics;
 ## Corrected script rerun/source checks
 - `leader-meta-search-fixed.py` generated `candidate_count=2772` and `goal_hit_count=255` in the checked artifact.
 - Source guards confirmed:
-  - weak oracle skipped before pivot: `if persona=='weak_oracle': continue`
+  - weak oracle skipped before pivot: `if account_id=='weak_oracle': continue`
   - flow-adjusted returns: `eq-eq.shift(1)-(cc-cc.shift(1))`
   - rotation score shifted: `sc=score.shift(1)`
   - rotation momentum gate shifted: `mom_s=mom.shift(1)`
-  - persona momentum overlays shifted: `sig=((eq/eq.shift(look)-1)>0).shift(1)`
+  - account_id momentum overlays shifted: `sig=((eq/eq.shift(look)-1)>0).shift(1)`
   - vol-cap overlays shifted: rolling std `.shift(1)*sqrt(252)`
 - The specific target `rotate_trail_sharpe_lb189_top4_none` is a rotation ensemble using the shifted trailing-Sharpe score, `lookback=189`, `top_k=4`, `gate=none`.
 

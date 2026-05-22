@@ -1,4 +1,4 @@
-﻿# Agent Playbook
+# Agent Playbook
 
 Last updated: 2026-05-23
 Status: canonical agent guidance

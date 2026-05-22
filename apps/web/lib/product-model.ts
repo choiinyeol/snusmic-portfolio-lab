@@ -1,8 +1,8 @@
-﻿import 'server-only';
+import 'server-only';
 import {
   getCurrentHoldings,
   getOverview,
-  getPersonaLabel,
+  getAccountLabel,
   getReportRows,
   getScreenerCandidates,
   getStrategyCatalog,
@@ -24,7 +24,7 @@ export const BENCHMARK_IDS = getStrategyCatalog()
 export type StrategyKind = 'benchmark' | 'strategy' | 'oracle';
 
 export type PortfolioSnapshot = {
-  persona: string;
+  account_id: string;
   label: string;
   finalEquityKrw: number | null;
   cashKrw: number | null;
@@ -99,13 +99,13 @@ export type ExecutiveOverview = {
   researchCandidates: ResearchCandidate[];
 };
 
-export function getDefaultPortfolioPersona(): string {
+export function getDefaultPortfolioAccount(): string {
   const summaries = getSummaryRows();
   const holdings = getCurrentHoldings();
-  const summaryIds = new Set(summaries.map((row) => row.persona));
-  const personasWithOpenHoldings = new Set(holdings.map((row) => row.persona));
+  const summaryIds = new Set(summaries.map((row) => row.account_id));
+  const accountsWithOpenHoldings = new Set(holdings.map((row) => row.account_id));
   const rankedStrategies = getObjectivePassingRows(getStrategyLeaderboard()).filter((row) => summaryIds.has(row.id));
-  const topWithOpenHoldings = rankedStrategies.find((row) => personasWithOpenHoldings.has(row.id));
+  const topWithOpenHoldings = rankedStrategies.find((row) => accountsWithOpenHoldings.has(row.id));
   if (topWithOpenHoldings) {
     return topWithOpenHoldings.id;
   }
@@ -117,7 +117,7 @@ export function getDefaultPortfolioPersona(): string {
     return TARGET_BENCHMARK_ID;
   }
   const withOpenHoldings = summaries
-    .filter((summary) => holdings.some((holding) => holding.persona === summary.persona))
+    .filter((summary) => holdings.some((holding) => holding.account_id === summary.account_id))
     .sort(
       (a, b) =>
         (b.moneyWeightedReturn ?? Number.NEGATIVE_INFINITY) - (a.moneyWeightedReturn ?? Number.NEGATIVE_INFINITY),
@@ -126,15 +126,15 @@ export function getDefaultPortfolioPersona(): string {
   if (!fallback) {
     throw new Error('Strategy catalog has no selectable strategy for the default portfolio view.');
   }
-  return fallback.persona;
+  return fallback.account_id;
 }
 
-export function getExecutiveOverview(persona = getDefaultPortfolioPersona()): ExecutiveOverview {
+export function getExecutiveOverview(account_id = getDefaultPortfolioAccount()): ExecutiveOverview {
   const overview = getOverview();
   const reports = getReportRows();
   return {
     snapshotDate: overview.simulation_window?.price_end ?? overview.simulation_window?.report_end ?? '',
-    portfolio: getPortfolioSnapshot(persona),
+    portfolio: getPortfolioSnapshot(account_id),
     reportStats: buildReportStats(reports),
     bestStrategies: getObjectivePassingRows(getStrategyLeaderboard()).slice(0, 5),
     recentReports: [...reports].sort((a, b) => b.publicationDate.localeCompare(a.publicationDate)).slice(0, 6),
@@ -144,19 +144,19 @@ export function getExecutiveOverview(persona = getDefaultPortfolioPersona()): Ex
 
 export function getPrimaryHoldings(): HoldingRow[] {
   return getCurrentHoldings()
-    .filter((row) => row.persona === getDefaultPortfolioPersona())
+    .filter((row) => row.account_id === getDefaultPortfolioAccount())
     .sort((a, b) => (b.marketValueKrw ?? 0) - (a.marketValueKrw ?? 0));
 }
 
-export function getPortfolioSnapshot(persona = getDefaultPortfolioPersona()): PortfolioSnapshot {
+export function getPortfolioSnapshot(account_id = getDefaultPortfolioAccount()): PortfolioSnapshot {
   const holdings = getCurrentHoldings()
-    .filter((row) => row.persona === persona)
+    .filter((row) => row.account_id === account_id)
     .sort((a, b) => (b.marketValueKrw ?? 0) - (a.marketValueKrw ?? 0));
-  const summary = getSummaryRows().find((row) => row.persona === persona);
+  const summary = getSummaryRows().find((row) => row.account_id === account_id);
   const unrealizedPnlKrw = holdings.reduce((sum, row) => sum + (row.unrealizedPnlKrw ?? 0), 0);
   return {
-    persona,
-    label: getPersonaLabel(persona),
+    account_id,
+    label: getAccountLabel(account_id),
     finalEquityKrw: summary?.finalEquityKrw ?? null,
     cashKrw: summary?.finalCashKrw ?? null,
     holdingsValueKrw: summary?.finalHoldingsValueKrw ?? null,
@@ -226,8 +226,8 @@ export function getStrategyLeaderboard(): StrategyLeaderboardRow[] {
   const equity = getStrategyCurves();
   const benchmark = targetBenchmark(summaries);
   const catalogById = new Map(getStrategyCatalog().map((row) => [row.strategyId, row]));
-  const personaRows = summaries.map((summary) => strategyRowFromSummary(summary, equity, benchmark, catalogById));
-  return personaRows
+  const accountRows = summaries.map((summary) => strategyRowFromSummary(summary, equity, benchmark, catalogById));
+  return accountRows
     .map((row) => ({ ...row, benchmarkLabel: benchmark?.label ?? 'KOSPI/KODEX 200' }))
     .sort((a, b) => (b.returnPct ?? Number.NEGATIVE_INFINITY) - (a.returnPct ?? Number.NEGATIVE_INFINITY));
 }
@@ -247,8 +247,8 @@ export function getObjectivePassingRows(rows = getStrategyLeaderboard()): Strate
   return getSelectableStrategyRows(rows).filter((row) => row.objectivePassed);
 }
 
-export function isBenchmarkPersona(persona: string): boolean {
-  return getStrategyCatalog().some((row) => row.strategyId === persona && row.kind !== 'strategy');
+export function isBenchmarkAccount(account_id: string): boolean {
+  return getStrategyCatalog().some((row) => row.strategyId === account_id && row.kind !== 'strategy');
 }
 
 function strategyRowFromSummary(
@@ -257,20 +257,20 @@ function strategyRowFromSummary(
   benchmark: SummaryRow | undefined,
   catalogById: Map<string, StrategyCatalogRow>,
 ): StrategyLeaderboardRow {
-  const catalog = catalogById.get(summary.persona);
+  const catalog = catalogById.get(summary.account_id);
   const metrics = riskMetricsFromCumulative(
     equity
-      .filter((point) => point.persona === summary.persona && point.cumulativeReturn !== null)
+      .filter((point) => point.account_id === summary.account_id && point.cumulativeReturn !== null)
       .map((point) => point.cumulativeReturn ?? 0),
   );
-  const kind: StrategyKind = catalog?.kind ?? (isBenchmarkPersona(summary.persona) ? 'benchmark' : 'strategy');
+  const kind: StrategyKind = catalog?.kind ?? (isBenchmarkAccount(summary.account_id) ? 'benchmark' : 'strategy');
   const returnPct = summary.moneyWeightedReturn ?? null;
   const objective = objectiveGate(kind, returnPct, summary.maxDrawdown, benchmark?.moneyWeightedReturn ?? null);
-  const label = catalog?.label ?? summary.label ?? getPersonaLabel(summary.persona);
+  const label = catalog?.label ?? summary.label ?? getAccountLabel(summary.account_id);
   return {
-    id: summary.persona,
+    id: summary.account_id,
     label,
-    shortLabel: catalog?.shortLabel ?? compactStrategyLabel(summary.persona, label),
+    shortLabel: catalog?.shortLabel ?? compactStrategyLabel(summary.account_id, label),
     kind,
     benchmarkGroup: catalog?.benchmarkGroup ?? null,
     returnPct,
@@ -279,8 +279,8 @@ function strategyRowFromSummary(
     sortino: metrics.sortino,
     tradeCount: summary.tradeCount,
     benchmarkExcess:
-      benchmark?.persona &&
-      benchmark.persona !== summary.persona &&
+      benchmark?.account_id &&
+      benchmark.account_id !== summary.account_id &&
       summary.moneyWeightedReturn !== null &&
       summary.moneyWeightedReturn !== undefined
         ? summary.moneyWeightedReturn - (benchmark.moneyWeightedReturn ?? 0)
@@ -297,12 +297,12 @@ function strategyRowFromSummary(
     riskControls: catalog?.riskControls ?? [],
     params: catalog?.params ?? {},
     href:
-      kind === 'strategy' && (catalog?.isSelectable ?? true) ? portfolioStrategyHref(summary.persona) : '/portfolio',
+      kind === 'strategy' && (catalog?.isSelectable ?? true) ? portfolioStrategyHref(summary.account_id) : '/portfolio',
   };
 }
 
 function targetBenchmark(summaries: SummaryRow[]): SummaryRow | undefined {
-  return summaries.find((row) => row.persona === TARGET_BENCHMARK_ID);
+  return summaries.find((row) => row.account_id === TARGET_BENCHMARK_ID);
 }
 
 function objectiveGate(

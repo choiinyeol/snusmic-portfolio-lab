@@ -17,10 +17,10 @@ annualized_sortino = mean(flow_adjusted_return) / sqrt(mean(min(return, 0)^2)) *
 This avoids treating monthly deposits as investment alpha.
 
 ## Existing leader-output sanity results
-- Excluding `weak_oracle` because it is explicitly a forward-looking 3-month oracle benchmark, **no existing persona reaches annualized Sharpe >= 2.0 or Sortino >= 2.0** under the flow-adjusted return check.
+- Excluding `weak_oracle` because it is explicitly a forward-looking 3-month oracle benchmark, **no existing account_id reaches annualized Sharpe >= 2.0 or Sortino >= 2.0** under the flow-adjusted return check.
 - `weak_oracle` does exceed the threshold (Sharpe 4.8476 / Sortino 4.8180), but it should not count as a valid deployable strategy because it uses lookahead by design.
 
-| persona | label | annualized_sharpe | annualized_sortino | cagr | max_drawdown | money_weighted_return | trade_count | open_positions | days |
+| account_id | label | annualized_sharpe | annualized_sortino | cagr | max_drawdown | money_weighted_return | trade_count | open_positions | days |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | weak_oracle | Weak Prophet (3M oracle) | 4.8476 | 4.8180 | 1.0253 | 0.2163 | 1.6815 | 2504 | 0 | 1398 |
 | all_weather | All-Weather (25/25/25/25) | 1.5058 | 1.4955 | 0.1635 | 0.0946 | 0.3133 | 186 | 4 | 1398 |
@@ -40,7 +40,7 @@ This avoids treating monthly deposits as investment alpha.
 ## Split-window anti-overfit check
 The strongest valid MTT candidates are materially below the target in both train/test windows; they also show high drawdowns (~42%).
 
-| persona | label | annualized_sharpe_2021-2023 | annualized_sortino_2021-2023 | annualized_sharpe_2024-2026 | annualized_sortino_2024-2026 | days_2021-2023 | days_2024-2026 |
+| account_id | label | annualized_sharpe_2021-2023 | annualized_sortino_2021-2023 | annualized_sharpe_2024-2026 | annualized_sortino_2024-2026 | days_2021-2023 | days_2024-2026 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | all_weather | All-Weather (25/25/25/25) | 0.6784 | 0.6801 | 2.4154 | 2.3390 | 779.0000 | 618.0000 |
 | smic_mtt_strategy_top1 | Global Report Trend Broad #1 | 1.4144 | 1.4571 | 1.0206 | 1.0390 | 779.0000 | 618.0000 |
@@ -68,7 +68,7 @@ The strongest valid MTT candidates are materially below the target in both train
 python3 - <<'PY_METRICS'
 import pandas as pd, numpy as np
 E=pd.read_csv('data/sim/equity_daily.csv', parse_dates=['date'])
-for persona,g in E.groupby('persona'):
+for account_id,g in E.groupby('account_id'):
     g=g.sort_values('date')
     r=(g.equity_krw-g.equity_krw.shift(1)-g.contributed_capital_krw.diff().fillna(0))/g.equity_krw.shift(1)
     r=r.replace([np.inf,-np.inf],np.nan).dropna()
@@ -76,7 +76,7 @@ for persona,g in E.groupby('persona'):
         down=r[r<0]
         sharpe=r.mean()/r.std(ddof=1)*np.sqrt(252)
         sortino=r.mean()/np.sqrt((down**2).mean())*np.sqrt(252) if len(down) else np.nan
-        print(persona, round(float(sharpe),4), round(float(sortino),4), len(r))
+        print(account_id, round(float(sharpe),4), round(float(sortino),4), len(r))
 PY_METRICS
 
 # Audit available candidate files

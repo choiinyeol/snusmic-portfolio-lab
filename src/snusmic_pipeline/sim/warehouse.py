@@ -1,4 +1,4 @@
-"""Warehouse IO layer for the persona simulation.
+"""Warehouse IO layer for the account simulation.
 
 Salvaged from the legacy ``snusmic_pipeline.backtest.warehouse`` module so the
 sim has its own canonical IO surface (read/write CSV tables, FX-aware KRW

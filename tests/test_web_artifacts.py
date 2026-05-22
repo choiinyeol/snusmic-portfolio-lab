@@ -94,8 +94,8 @@ def test_daily_decision_artifacts_expose_checkpoint_metadata(tmp_path: Path) -> 
     base = SimulationConfig(
         start_date=pd.Timestamp("2021-01-04").date(), end_date=pd.Timestamp("2021-02-10").date()
     )
-    personas = tuple(persona for persona in base.personas if persona.persona_name != "weak_oracle")
-    config = base.model_copy(update={"personas": personas})
+    accounts = tuple(account_id for account_id in base.accounts if account_id.account_id != "weak_oracle")
+    config = base.model_copy(update={"accounts": accounts})
     run_daily_forward(config, Path("data/warehouse"), sim)
 
     export_web_artifacts(
@@ -243,9 +243,9 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(tmp_path: Path) 
         "end": warehouse_prices["date"].astype(str).max(),
     }
     assert manifest["row_counts"]["reports"] == 202
-    expected_personas = len(pd.read_csv(Path("data/sim") / "summary.csv"))
-    assert manifest["row_counts"]["personas"] == expected_personas
-    assert manifest["row_counts"]["account_catalog"] == expected_personas
+    expected_accounts = len(pd.read_csv(Path("data/sim") / "summary.csv"))
+    assert manifest["row_counts"]["accounts"] == expected_accounts
+    assert manifest["row_counts"]["account_catalog"] == expected_accounts
     assert manifest["row_counts"]["screener_candidates"] > 0
     assert manifest["data_quality"]["reports_with_prices"] == 202
     assert manifest["data_quality"]["missing_price_symbols"] == 5
@@ -285,7 +285,7 @@ def test_export_web_artifacts_keeps_existing_output_when_staged_validation_fails
 
 @pytest.mark.slow
 @pytest.mark.contract
-def test_account_catalog_has_no_retired_generated_strategy_personas(tmp_path: Path) -> None:
+def test_account_catalog_has_no_retired_generated_strategy_accounts(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
         ExportInputs(
@@ -311,10 +311,9 @@ def test_account_catalog_has_no_retired_generated_strategy_personas(tmp_path: Pa
     assert "pit_research_board_" not in csv_text
 
 
-
 @pytest.mark.slow
 @pytest.mark.contract
-def test_optional_monthly_holdings_drop_retired_strategy_personas(tmp_path: Path) -> None:
+def test_optional_monthly_holdings_drop_retired_strategy_accounts(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
         ExportInputs(
@@ -325,12 +324,12 @@ def test_optional_monthly_holdings_drop_retired_strategy_personas(tmp_path: Path
         )
     )
 
-    valid_personas = set(pd.read_csv(Path("data/sim") / "summary.csv")["persona"].astype(str))
+    valid_accounts = set(pd.read_csv(Path("data/sim") / "summary.csv")["account_id"].astype(str))
     monthly = json.loads((out / "portfolio" / "monthly-holdings.json").read_text(encoding="utf-8"))
     columns = monthly["columns"]
-    persona_index = columns.index("persona")
-    exported_personas = {str(row[persona_index]) for row in monthly["rows"]}
-    assert exported_personas <= valid_personas
+    account_index = columns.index("account_id")
+    exported_accounts = {str(row[account_index]) for row in monthly["rows"]}
+    assert exported_accounts <= valid_accounts
 
 
 @pytest.mark.slow
@@ -356,14 +355,10 @@ def test_holdings_artifact_exposes_native_currency_for_foreign_positions(tmp_pat
         assert row["last_close_native"] is not None and 0 < row["last_close_native"] < 5_000
         assert row["last_close_krw"] is not None and row["last_close_krw"] > 1_000
     qqq = next((row for row in holdings if row["symbol"] == "QQQ"), None)
-    assert qqq is not None, "QQQ should always be held by the all_weather persona"
+    assert qqq is not None, "QQQ should always be held by the all_weather account_id"
     assert qqq["currency"] == "USD"
     assert qqq["last_close_native"] < 1_000
     assert qqq["last_close_krw"] > 100_000
-
-
-
-
 
 
 @pytest.mark.slow

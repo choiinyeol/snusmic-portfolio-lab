@@ -1,4 +1,4 @@
-﻿# Technical Architecture
+# Technical Architecture
 
 Last updated: 2026-05-23
 Status: canonical implementation map
@@ -64,7 +64,7 @@ Pages should be server-first. Client components are for charts, table controls, 
 
 ## Incremental Forward
 
-`daily-forward` is the normal operating lane after new prices arrive. It may reuse checkpoints only when the persona config, price basis, and report basis still match. If those inputs change, run `run-sim` for a full replay and `export-pit-board` for the manual PIT dataset.
+`daily-forward` is the normal operating lane after new prices arrive. It may reuse checkpoints only when the account config, price basis, and report basis still match. If those inputs change, run `run-sim` for a full replay and `export-pit-board` for the manual PIT dataset.
 
 ## Validation
 

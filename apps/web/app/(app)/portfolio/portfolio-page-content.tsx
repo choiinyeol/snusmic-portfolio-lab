@@ -28,11 +28,11 @@ export function EmptyPortfolioRouteContent() {
 }
 
 export function PortfolioPageShell({ children, model }: { children: ReactNode; model: PortfolioViewModel }) {
-  const persona = model.selectedPersona;
-  const label = model.personaLabels[persona] ?? persona;
-  const shortLabel = model.strategyOptions.find((row) => row.id === persona)?.shortLabel ?? label;
+  const account_id = model.selectedAccount;
+  const label = model.accountLabels[account_id] ?? account_id;
+  const shortLabel = model.strategyOptions.find((row) => row.id === account_id)?.shortLabel ?? label;
   const holdingsValue = model.holdings.reduce((sum, row) => sum + (row.marketValueKrw ?? 0), 0);
-  const cashKrw = model.cashByPersona[persona] ?? 0;
+  const cashKrw = model.cashByAccount[account_id] ?? 0;
   const totalValue = holdingsValue + cashKrw;
   const totalPnl = model.holdings.reduce((sum, row) => sum + (row.unrealizedPnlKrw ?? 0), 0);
   const latestEquity = [...model.equity].sort((a, b) => b.date.localeCompare(a.date))[0];
@@ -83,13 +83,13 @@ export function PortfolioPageShell({ children, model }: { children: ReactNode; m
 }
 
 export function PortfolioRouteContent({
-  selectedPersona,
+  selectedAccount,
   view,
 }: {
-  selectedPersona: string;
+  selectedAccount: string;
   view: PortfolioRouteView;
 }) {
-  const model = buildPortfolioViewModel(selectedPersona);
+  const model = buildPortfolioViewModel(selectedAccount);
   return <PortfolioRouteContentFromModel model={model} view={view} />;
 }
 
@@ -106,9 +106,9 @@ export function PortfolioRouteContentFromModel({
   if (view === 'methodology') {
     return (
       <PortfolioMethodologyView
-        method={model.methodsByPersona[model.selectedPersona]}
-        personaLabel={model.personaLabels[model.selectedPersona] ?? model.selectedPersona}
-        strategyId={model.selectedPersona}
+        method={model.methodsByAccount[model.selectedAccount]}
+        accountLabel={model.accountLabels[model.selectedAccount] ?? model.selectedAccount}
+        strategyId={model.selectedAccount}
       />
     );
   }

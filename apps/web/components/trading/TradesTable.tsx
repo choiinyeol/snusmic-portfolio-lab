@@ -13,8 +13,8 @@ import { SortHeader, pageRows, sortRows, type SortState } from './TableControls'
 type Props = {
   trades: TradeRow[];
   /** Strategy controlled by the parent — single source of truth. */
-  persona: string;
-  personaLabels: Record<string, string>;
+  account_id: string;
+  accountLabels: Record<string, string>;
   reportSymbolsById: Record<string, string>;
   targetsBySymbol: Record<string, ReportTargetDigest>;
   targetsByReportId: Record<string, ReportTargetDigest>;
@@ -35,8 +35,8 @@ type TradeSortKey =
 
 export function TradesTable({
   trades,
-  persona,
-  personaLabels,
+  account_id,
+  accountLabels,
   reportSymbolsById,
   targetsBySymbol,
   targetsByReportId,
@@ -53,18 +53,18 @@ export function TradesTable({
   const filteredTrades = useMemo(
     () =>
       trades.filter((trade) => {
-        if (trade.persona !== persona) return false;
+        if (trade.account_id !== account_id) return false;
         if (side !== 'all' && trade.side !== side) return false;
         const haystack = `${trade.symbol} ${trade.company} ${trade.reason} ${trade.reportId ?? ''}`.toLowerCase();
         return haystack.includes(normalizedQuery);
       }),
-    [normalizedQuery, persona, side, trades],
+    [normalizedQuery, account_id, side, trades],
   );
   const sortedTrades = useMemo(
     () =>
       sortRows(filteredTrades, tradeSort, {
         date: (row) => row.date,
-        strategy: (row) => personaLabels[row.persona] ?? row.persona,
+        strategy: (row) => accountLabels[row.account_id] ?? row.account_id,
         market: (row) =>
           marketLabel(
             (row.reportId ? targetsByReportId[row.reportId]?.marketRegion : undefined) ??
@@ -82,7 +82,7 @@ export function TradesTable({
         cash: (row) => row.cashAfterKrw,
         reason: (row) => row.reason,
       }),
-    [filteredTrades, personaLabels, targetsByReportId, targetsBySymbol, tradeSort],
+    [filteredTrades, accountLabels, targetsByReportId, targetsBySymbol, tradeSort],
   );
   const tradeRows = useMemo(
     () => pageRows(sortedTrades, tradePage, tradePageSize),
@@ -206,10 +206,10 @@ export function TradesTable({
                 return (
                   <tr
                     className="hover:bg-slate-50"
-                    key={`${trade.persona}-${trade.date}-${trade.symbol}-${trade.side}-${trade.qty ?? 'q'}-${trade.fillPriceKrw ?? 'p'}-${trade.grossKrw ?? 'g'}-${trade.reportId ?? 'no-report'}-${trade.cashAfterKrw ?? 'cash'}`}
+                    key={`${trade.account_id}-${trade.date}-${trade.symbol}-${trade.side}-${trade.qty ?? 'q'}-${trade.fillPriceKrw ?? 'p'}-${trade.grossKrw ?? 'g'}-${trade.reportId ?? 'no-report'}-${trade.cashAfterKrw ?? 'cash'}`}
                   >
                     <td className="px-3 py-2 font-mono text-xs text-slate-950">{trade.date}</td>
-                    <td className="px-3 py-2 text-sm">{personaLabels[trade.persona] ?? trade.persona}</td>
+                    <td className="px-3 py-2 text-sm">{accountLabels[trade.account_id] ?? trade.account_id}</td>
                     <td className="px-3 py-2">
                       <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-600">
                         {marketLabel(target?.marketRegion)}
@@ -297,7 +297,7 @@ function humanReason(reason: string): string {
 function downloadTrades(rows: TradeRow[]) {
   const headers = [
     'date',
-    'persona',
+    'account_id',
     'side',
     'symbol',
     'company',
@@ -313,7 +313,7 @@ function downloadTrades(rows: TradeRow[]) {
   ];
   const data = rows.map((row) => [
     row.date,
-    row.persona,
+    row.account_id,
     row.side,
     row.symbol,
     row.company,

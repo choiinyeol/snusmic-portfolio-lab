@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import json
 import math
@@ -22,7 +22,7 @@ REQUIRED_ARTIFACTS = [
     "overview/snapshot.json",
     "overview/research-pulse.json",
     "overview/data-quality.json",
-    "portfolio/personas.json",
+    "portfolio/accounts.json",
     "portfolio/holdings.json",
     "portfolio/monthly-holdings.json",
     "portfolio/trades.json",
@@ -41,7 +41,7 @@ REQUIRED_ARTIFACTS = [
     "accounts/curves.json",
     "screener/candidates.json",
     "overview.json",
-    "personas.json",
+    "accounts.json",
     "reports.json",
     "report-rankings.json",
     "report-detail-metrics.json",
@@ -323,15 +323,15 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     extraction_quality = _read_json(inputs.extraction_quality) if inputs.extraction_quality.exists() else {}
     mark("read_inputs")
 
-    valid_personas = _summary_personas(summary)
-    current_holdings = _guard_persona_frame(current_holdings, valid_personas, "current_holdings")
-    monthly_holdings = _guard_persona_frame(
-        monthly_holdings, valid_personas, "monthly_holdings", allow_filter=True
+    valid_accounts = _summary_accounts(summary)
+    current_holdings = _guard_account_frame(current_holdings, valid_accounts, "current_holdings")
+    monthly_holdings = _guard_account_frame(
+        monthly_holdings, valid_accounts, "monthly_holdings", allow_filter=True
     )
-    trades = _guard_persona_frame(trades, valid_personas, "trades")
-    daily_decisions = _guard_persona_frame(daily_decisions, valid_personas, "daily_decisions")
-    position_episodes = _guard_persona_frame(position_episodes, valid_personas, "position_episodes")
-    equity_daily = _guard_persona_frame(equity_daily, valid_personas, "equity_daily")
+    trades = _guard_account_frame(trades, valid_accounts, "trades")
+    daily_decisions = _guard_account_frame(daily_decisions, valid_accounts, "daily_decisions")
+    position_episodes = _guard_account_frame(position_episodes, valid_accounts, "position_episodes")
+    equity_daily = _guard_account_frame(equity_daily, valid_accounts, "equity_daily")
 
     out = inputs.out
     prices_out = out / "prices"
@@ -356,9 +356,9 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     overview = _build_overview(
         reports, prices, summary, report_stats, missing_symbols, report_rows, report_exclusions
     )
-    account_catalog = _build_account_catalog(summary, inputs.sim / "persona-configs.json")
+    account_catalog = _build_account_catalog(summary, inputs.sim / "account-configs.json")
     account_labels = {str(row["account_id"]): str(row["label"]) for row in account_catalog}
-    _apply_account_labels(overview.get("baseline_personas", []), account_labels)
+    _apply_account_labels(overview.get("baseline_accounts", []), account_labels)
     priced_prices = _price_frame_with_native(prices)
     mark("build_overview")
 
@@ -376,8 +376,8 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     mark("build_report_metrics")
 
     current_holdings = _current_holdings_from_open_episodes(position_episodes, current_holdings)
-    persona_rows = _enrich_persona_rows_with_catalog(_records(summary), account_catalog)
-    _apply_account_labels(persona_rows, account_labels)
+    account_rows = _enrich_account_rows_with_catalog(_records(summary), account_catalog)
+    _apply_account_labels(account_rows, account_labels)
     enriched_current_holdings = _records(_enrich_holdings_with_native(current_holdings, prices, fx_rates))
     enriched_monthly_holdings = _records(
         _enrich_holdings_with_native(monthly_holdings, prices, fx_rates, close_column="month_close_krw")
@@ -386,7 +386,7 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     daily_decision_rows = _records(daily_decisions)
     episode_rows = _records(position_episodes)
     equity_rows = _records(equity_daily)
-    accounting_rows = _build_accounting_reconciliation(persona_rows, enriched_current_holdings)
+    accounting_rows = _build_accounting_reconciliation(account_rows, enriched_current_holdings)
     screener_candidates = _build_screener_candidates(report_rows)
     mark("build_portfolio_rows")
 
@@ -403,7 +403,7 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
         overview=overview,
         insights=insights,
         data_quality=data_quality,
-        personas=persona_rows,
+        accounts=account_rows,
         holdings=enriched_current_holdings,
         monthly_holdings=enriched_monthly_holdings,
         trades=trade_rows,
@@ -423,7 +423,7 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     mark("write_page_bundles")
 
     _write_json(out / "overview.json", overview)
-    _write_json(out / "personas.json", persona_rows)
+    _write_json(out / "accounts.json", account_rows)
     _write_json(out / "reports.json", report_rows)
     _write_json(out / "report-rankings.json", rankings)
     _write_json(out / "report-detail-metrics.json", detail_metrics)
@@ -542,44 +542,44 @@ def _replace_directory(staged: Path, destination: Path) -> None:
         shutil.rmtree(backup)
 
 
-def _summary_personas(summary: pd.DataFrame) -> set[str]:
-    if summary.empty or "persona" not in summary.columns:
-        raise RuntimeError("Simulation summary must contain a persona column.")
-    personas = {str(value) for value in summary["persona"].dropna().astype(str) if str(value)}
-    if not personas:
-        raise RuntimeError("Simulation summary does not contain any personas.")
-    return personas
+def _summary_accounts(summary: pd.DataFrame) -> set[str]:
+    if summary.empty or "account_id" not in summary.columns:
+        raise RuntimeError("Simulation summary must contain a account_id column.")
+    accounts = {str(value) for value in summary["account_id"].dropna().astype(str) if str(value)}
+    if not accounts:
+        raise RuntimeError("Simulation summary does not contain any accounts.")
+    return accounts
 
 
-def _guard_persona_frame(
+def _guard_account_frame(
     frame: pd.DataFrame,
-    valid_personas: set[str],
+    valid_accounts: set[str],
     name: str,
     *,
     allow_filter: bool = False,
 ) -> pd.DataFrame:
-    """Prevent stale optional sim artifacts from reintroducing retired personas.
+    """Prevent stale optional sim artifacts from reintroducing retired accounts.
 
     The summary file is the current simulation contract. Ignored/generated
-    companion CSVs can survive from older runs, so every persona-bearing frame is
+    companion CSVs can survive from older runs, so every account_id-bearing frame is
     checked against summary before export. Required ledgers fail loudly; the
     optional monthly holding history is filtered because an absent/fresh file is
     acceptable and stale rows should not contaminate the product UI.
     """
 
-    if frame.empty or "persona" not in frame.columns:
+    if frame.empty or "account_id" not in frame.columns:
         return frame
-    personas = {str(value) for value in frame["persona"].dropna().astype(str) if str(value)}
-    unknown = sorted(personas - valid_personas)
+    accounts = {str(value) for value in frame["account_id"].dropna().astype(str) if str(value)}
+    unknown = sorted(accounts - valid_accounts)
     if not unknown:
         return frame
     if not allow_filter:
         preview = ", ".join(unknown[:5])
         raise RuntimeError(
-            f"{name} contains personas not present in summary.csv: {preview}. "
+            f"{name} contains accounts not present in summary.csv: {preview}. "
             "Regenerate simulation artifacts before export-web."
         )
-    return frame[frame["persona"].astype(str).isin(valid_personas)].copy()
+    return frame[frame["account_id"].astype(str).isin(valid_accounts)].copy()
 
 
 def _read_csv(path: Path) -> pd.DataFrame:
@@ -632,7 +632,7 @@ def _current_holdings_from_open_episodes(
 
     rebuilt = pd.DataFrame(
         {
-            "persona": open_rows.get("persona"),
+            "account_id": open_rows.get("account_id"),
             "symbol": open_rows.get("symbol"),
             "company": open_rows.get("company"),
             "qty": qty,
@@ -645,32 +645,34 @@ def _current_holdings_from_open_episodes(
             "first_buy_date": open_rows.get("open_date"),
         }
     )
-    return rebuilt[rebuilt["qty"].gt(0)].sort_values(["persona", "market_value_krw"], ascending=[True, False])
+    return rebuilt[rebuilt["qty"].gt(0)].sort_values(
+        ["account_id", "market_value_krw"], ascending=[True, False]
+    )
 
 
 def _build_accounting_reconciliation(
-    persona_rows: list[dict[str, Any]], holdings: list[dict[str, Any]]
+    account_rows: list[dict[str, Any]], holdings: list[dict[str, Any]]
 ) -> list[dict[str, Any]]:
-    holdings_by_persona: dict[str, list[dict[str, Any]]] = {}
+    holdings_by_account: dict[str, list[dict[str, Any]]] = {}
     for row in holdings:
-        holdings_by_persona.setdefault(str(row.get("persona") or ""), []).append(row)
+        holdings_by_account.setdefault(str(row.get("account_id") or ""), []).append(row)
 
     rows: list[dict[str, Any]] = []
     tolerance = 5_000.0
-    for persona in persona_rows:
-        persona_id = str(persona.get("persona") or "")
-        persona_holdings = holdings_by_persona.get(persona_id, [])
-        contributed = _number(persona.get("total_contributed_krw")) or 0.0
-        realized = _number(persona.get("realized_pnl_krw")) or 0.0
-        cash = _number(persona.get("final_cash_krw")) or 0.0
-        equity = _number(persona.get("final_equity_krw")) or 0.0
-        holdings_value = _number(persona.get("final_holdings_value_krw")) or 0.0
-        net_profit = _number(persona.get("net_profit_krw")) or 0.0
+    for account in account_rows:
+        account_id = str(account.get("account_id") or "")
+        account_holdings = holdings_by_account.get(account_id, [])
+        contributed = _number(account.get("total_contributed_krw")) or 0.0
+        realized = _number(account.get("realized_pnl_krw")) or 0.0
+        cash = _number(account.get("final_cash_krw")) or 0.0
+        equity = _number(account.get("final_equity_krw")) or 0.0
+        holdings_value = _number(account.get("final_holdings_value_krw")) or 0.0
+        net_profit = _number(account.get("net_profit_krw")) or 0.0
         open_cost = sum(
             ((_number(row.get("avg_cost_krw")) or 0.0) * (_number(row.get("qty")) or 0.0))
-            for row in persona_holdings
+            for row in account_holdings
         )
-        unrealized = sum(_number(row.get("unrealized_pnl_krw")) or 0.0 for row in persona_holdings)
+        unrealized = sum(_number(row.get("unrealized_pnl_krw")) or 0.0 for row in account_holdings)
         raw_expected_cash = contributed + realized - open_cost
         raw_cash_gap = cash - raw_expected_cash
         raw_profit_gap = net_profit - (realized + unrealized)
@@ -685,8 +687,8 @@ def _build_accounting_reconciliation(
         status = "ok" if max(abs(cash_gap), abs(equity_gap), abs(profit_gap)) <= tolerance else "warning"
         rows.append(
             {
-                "persona": persona_id,
-                "label": persona.get("label"),
+                "account_id": account_id,
+                "label": account.get("label"),
                 "total_contributed_krw": contributed,
                 "realized_pnl_krw": realized,
                 "final_cash_krw": cash,
@@ -714,28 +716,28 @@ def _build_accounting_reconciliation(
 
 def _apply_account_labels(rows: list[dict[str, Any]], labels_by_id: dict[str, str]) -> None:
     for row in rows:
-        persona = str(row.get("persona") or "")
-        label = labels_by_id.get(persona)
+        account_id = str(row.get("account_id") or "")
+        label = labels_by_id.get(account_id)
         if label:
             row["label"] = label
 
 
-def _enrich_persona_rows_with_catalog(
-    personas: list[dict[str, Any]],
+def _enrich_account_rows_with_catalog(
+    accounts: list[dict[str, Any]],
     account_catalog: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    """Attach product methodology fields to portfolio/persona bundles.
+    """Attach product methodology fields to portfolio/account_id bundles.
 
-    ``portfolio/personas.json`` is the portfolio route's compact persona list.
+    ``portfolio/accounts.json`` is the portfolio route's compact account list.
     It should not need to re-join the strategy catalog to explain why a
     stock-level strategy exists after the meta-quant route is removed.
     """
 
     catalog_by_id = {str(row.get("account_id") or ""): row for row in account_catalog}
     enriched: list[dict[str, Any]] = []
-    for persona in personas:
-        row = dict(persona)
-        catalog = catalog_by_id.get(str(row.get("persona") or ""))
+    for account_id in accounts:
+        row = dict(account_id)
+        catalog = catalog_by_id.get(str(row.get("account_id") or ""))
         if catalog:
             for key in (
                 "short_label",
@@ -814,7 +816,7 @@ def _write_page_bundles(
     overview: dict[str, Any],
     insights: list[dict[str, Any]],
     data_quality: dict[str, Any],
-    personas: list[dict[str, Any]],
+    accounts: list[dict[str, Any]],
     holdings: list[dict[str, Any]],
     monthly_holdings: list[dict[str, Any]],
     trades: list[dict[str, Any]],
@@ -842,7 +844,7 @@ def _write_page_bundles(
     _write_product_json(out / "overview" / "research-pulse.json", insights)
     _write_product_json(out / "overview" / "data-quality.json", data_quality)
 
-    _write_product_json(out / "portfolio" / "personas.json", personas)
+    _write_product_json(out / "portfolio" / "accounts.json", accounts)
     _write_product_json(out / "portfolio" / "holdings.json", holdings)
     _write_product_json(
         out / "portfolio" / "monthly-holdings.json", _compact_monthly_holdings(monthly_holdings)
@@ -863,7 +865,7 @@ def _write_page_bundles(
     _write_product_json(out / "reports" / "target-hit-distribution.json", target_distribution)
 
     _write_product_json(out / "accounts" / "catalog.json", account_catalog)
-    _write_product_json(out / "accounts" / "leaderboard.json", personas)
+    _write_product_json(out / "accounts" / "leaderboard.json", accounts)
     _write_product_json(out / "accounts" / "curves.json", _compact_equity_curves(equity_daily))
 
     _write_product_json(out / "screener" / "candidates.json", screener_candidates)
@@ -871,7 +873,7 @@ def _write_page_bundles(
 
 def _compact_monthly_holdings(rows: list[dict[str, Any]]) -> dict[str, Any]:
     columns = [
-        "persona",
+        "account_id",
         "month_end",
         "symbol",
         "company",
@@ -886,7 +888,7 @@ def _compact_monthly_holdings(rows: list[dict[str, Any]]) -> dict[str, Any]:
 
 def _compact_trades(rows: list[dict[str, Any]]) -> dict[str, Any]:
     columns = [
-        "persona",
+        "account_id",
         "date",
         "symbol",
         "side",
@@ -905,7 +907,7 @@ def _compact_daily_decisions(
 ) -> dict[str, Any]:
     columns = [
         "date",
-        "persona",
+        "account_id",
         "decision",
         "buy_count",
         "sell_count",
@@ -936,7 +938,7 @@ def _daily_forward_metadata(metadata: dict[str, Any]) -> dict[str, Any]:
 
 def _compact_episodes(rows: list[dict[str, Any]]) -> dict[str, Any]:
     columns = [
-        "persona",
+        "account_id",
         "symbol",
         "company",
         "open_date",
@@ -967,19 +969,19 @@ def _compact_table(rows: list[dict[str, Any]], columns: list[str]) -> dict[str, 
 def _compact_equity_curves(rows: list[dict[str, Any]]) -> dict[str, Any]:
     dates = sorted({str(row.get("date", "")) for row in rows if row.get("date")})
     date_index = {date: index for index, date in enumerate(dates)}
-    by_persona: dict[str, list[dict[str, Any] | None]] = {}
+    by_account: dict[str, list[dict[str, Any] | None]] = {}
     for row in rows:
-        persona = str(row.get("persona", ""))
+        account_id = str(row.get("account_id", ""))
         date = str(row.get("date", ""))
-        if not persona or date not in date_index:
+        if not account_id or date not in date_index:
             continue
-        by_persona.setdefault(persona, [None] * len(dates))[date_index[date]] = row
+        by_account.setdefault(account_id, [None] * len(dates))[date_index[date]] = row
 
     series = []
-    for persona in sorted(by_persona):
+    for account_id in sorted(by_account):
         equity_values: list[int | None] = []
         return_values: list[float | None] = []
-        for row_data in by_persona[persona]:
+        for row_data in by_account[account_id]:
             if row_data is None:
                 equity_values.append(None)
                 return_values.append(None)
@@ -991,7 +993,9 @@ def _compact_equity_curves(rows: list[dict[str, Any]]) -> dict[str, Any]:
                 return_values.append(None)
             else:
                 return_values.append(round(equity / capital - 1, 6))
-        series.append({"persona": persona, "equity_krw": equity_values, "cumulative_return": return_values})
+        series.append(
+            {"account_id": account_id, "equity_krw": equity_values, "cumulative_return": return_values}
+        )
     return {"dates": dates, "series": series}
 
 
@@ -1065,7 +1069,7 @@ def _build_manifest(out: Path, overview: dict[str, Any]) -> dict[str, Any]:
         "daily_decisions": _json_row_count(out / "portfolio" / "daily-decisions.json"),
         "position_episodes": _json_row_count(out / "portfolio" / "episodes.json"),
         "equity_daily": _json_row_count(out / "portfolio" / "equity-daily.json"),
-        "personas": _json_row_count(out / "portfolio" / "personas.json"),
+        "accounts": _json_row_count(out / "portfolio" / "accounts.json"),
         "account_catalog": _json_row_count(out / "accounts" / "catalog.json"),
         "screener_candidates": _json_row_count(out / "screener" / "candidates.json"),
     }
@@ -1556,7 +1560,7 @@ def _build_overview(
             "avg_current_return": _mean(current_returns),
             "median_current_return": _median(current_returns),
         },
-        "baseline_personas": _records(summary),
+        "baseline_accounts": _records(summary),
         "simulation_window": {
             "report_start": min(dates) if dates else None,
             "report_end": max(dates) if dates else None,
@@ -1580,18 +1584,19 @@ BENCHMARK_PERSONA_IDS = {
 TARGET_BENCHMARK_ID = "benchmark_kodex200"
 OBJECTIVE_MAX_DRAWDOWN = 0.15
 
-def _persona_config_by_id(path: Path) -> dict[str, dict[str, Any]]:
+
+def _account_config_by_id(path: Path) -> dict[str, dict[str, Any]]:
     if not path.exists():
         raise RuntimeError(f"Required simulation config artifact is missing: {path}")
     data = _read_json(path)
-    personas = data.get("personas") if isinstance(data, dict) else None
-    if not isinstance(personas, list):
-        raise RuntimeError(f"{path} must contain personas for strategy catalog export.")
+    accounts = data.get("accounts") if isinstance(data, dict) else None
+    if not isinstance(accounts, list):
+        raise RuntimeError(f"{path} must contain accounts for strategy catalog export.")
     out: dict[str, dict[str, Any]] = {}
-    for item in personas:
+    for item in accounts:
         if not isinstance(item, dict):
             continue
-        strategy_id = item.get("persona_name")
+        strategy_id = item.get("account_id")
         if strategy_id:
             out[str(strategy_id)] = _clean(item)
     return out
@@ -1614,14 +1619,14 @@ def _build_account_catalog(summary: pd.DataFrame, sim_config_path: Path) -> list
     exported together with the simulation output.
     """
 
-    config_by_id = _persona_config_by_id(sim_config_path)
+    config_by_id = _account_config_by_id(sim_config_path)
     summary_rows = _records(summary)
-    summary_by_id = {str(row.get("persona")): row for row in summary_rows if row.get("persona")}
+    summary_by_id = {str(row.get("account_id")): row for row in summary_rows if row.get("account_id")}
     benchmark_return = _number(summary_by_id.get(TARGET_BENCHMARK_ID, {}).get("money_weighted_return"))
     rows: list[dict[str, Any]] = []
 
     for row in summary_rows:
-        strategy_id = str(row.get("persona") or "")
+        strategy_id = str(row.get("account_id") or "")
         if not strategy_id:
             continue
         config = config_by_id.get(strategy_id, {})
@@ -1727,7 +1732,7 @@ def _methodology_summary(strategy_id: str, config: dict[str, Any]) -> str:
         return "SMIC report follower with time-loss, averaged-down loss, and report-age stop rules."
     if strategy_id == "weak_oracle":
         return "Forward-looking diagnostic baseline; it is not a tradable strategy."
-    return "Fixed simulation persona included in the simulation artifact."
+    return "Fixed simulation account_id included in the simulation artifact."
 
 
 def _buy_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
@@ -1739,7 +1744,9 @@ def _buy_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
             "Apply stop-rule checks before opening or adding exposure.",
         ]
     if strategy_id == "weak_oracle":
-        return [f"Uses a {int(config.get('lookahead_months') or 0)} month future window for diagnostic weighting."]
+        return [
+            f"Uses a {int(config.get('lookahead_months') or 0)} month future window for diagnostic weighting."
+        ]
     if strategy_id in BENCHMARK_PERSONA_IDS:
         return ["Hold the configured benchmark asset mix and rebalance on schedule."]
     return []
@@ -1764,8 +1771,9 @@ def _risk_controls(strategy_id: str, config: dict[str, Any]) -> list[str]:
 
 
 def _strategy_params(strategy_id: str, config: dict[str, Any]) -> dict[str, Any]:
-    excluded = {"persona_name", "label", "assets"}
+    excluded = {"account_id", "label", "assets"}
     return {key: value for key, value in config.items() if key not in excluded}
+
 
 def _account_catalog_sort_key(row: dict[str, Any]) -> tuple[int, float, str]:
     strategy_id = str(row.get("account_id") or "")
@@ -2299,9 +2307,7 @@ def _write_download_csvs(
     _write_csv(out / "table-download-reports.csv", report_download_rows, report_columns)
 
     account_rows = _account_download_rows(account_catalog)
-    account_columns = (
-        sorted({key for row in account_rows for key in row}) if account_rows else ["account_id"]
-    )
+    account_columns = sorted({key for row in account_rows for key in row}) if account_rows else ["account_id"]
     preferred_account_columns = [
         "account_id",
         "label",
@@ -2437,4 +2443,3 @@ def _write_price_artifacts(
             prices_out / f"{symbol}.json",
             {"symbol": symbol, "currency": "KRW", "missing_price": True, "prices": []},
         )
-

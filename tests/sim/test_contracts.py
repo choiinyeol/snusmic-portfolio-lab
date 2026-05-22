@@ -43,9 +43,9 @@ def test_simulation_config_roundtrip():
     assert rebuilt == cfg
 
 
-def test_default_personas_are_benchmarks_plus_pit_baselines():
+def test_default_accounts_are_benchmarks_plus_pit_baselines():
     cfg = SimulationConfig(start_date=date(2021, 1, 4), end_date=date(2026, 4, 1))
-    names = [persona.persona_name for persona in cfg.personas]
+    names = [account_id.account_id for account_id in cfg.accounts]
     assert names == [
         "all_weather",
         "benchmark_qqq",
@@ -65,12 +65,12 @@ def test_simulation_config_rejects_inverted_dates():
         SimulationConfig(start_date=date(2026, 1, 1), end_date=date(2025, 1, 1))
 
 
-def test_simulation_config_rejects_duplicate_persona_names():
+def test_simulation_config_rejects_duplicate_account_ids():
     with pytest.raises(ValidationError):
         SimulationConfig(
             start_date=date(2021, 1, 4),
             end_date=date(2026, 4, 1),
-            personas=(ProphetConfig(), ProphetConfig()),
+            accounts=(ProphetConfig(), ProphetConfig()),
         )
 
 
@@ -94,7 +94,7 @@ def test_all_weather_rejects_duplicate_symbols():
         )
 
 
-def test_persona_configs_are_frozen():
+def test_account_configs_are_frozen():
     cfg = SmicFollowerConfig()
     with pytest.raises(ValidationError):
         cfg.target_hit_multiplier = 1.5  # type: ignore[misc]
@@ -103,7 +103,7 @@ def test_persona_configs_are_frozen():
 def test_trade_record_rejects_negative_qty():
     with pytest.raises(ValidationError):
         Trade(
-            persona="x",
+            account_id="x",
             date=date(2024, 1, 1),
             symbol="A",
             side="buy",
@@ -119,7 +119,7 @@ def test_trade_record_rejects_negative_qty():
 
 def test_equity_point_serializes_to_json():
     p = EquityPoint(
-        persona="oracle",
+        account_id="oracle",
         date=date(2024, 1, 1),
         cash_krw=1.0,
         holdings_value_krw=2.0,

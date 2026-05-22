@@ -13,19 +13,19 @@ import type { PortfolioLandingModel, PortfolioStrategySnapshot } from './types';
 const SERIES_COLORS = ['#111827', '#2563eb', '#059669', '#f29423', '#7c3aed', '#dc2626'];
 
 export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }) {
-  const [selectedId, setSelectedId] = useState(model.defaultPersona);
+  const [selectedId, setSelectedId] = useState(model.defaultAccount);
   const selected = model.strategies.find((row) => row.id === selectedId) ?? model.strategies[0];
   const benchmarkCount = model.frontierRows.filter((row) => row.kind === 'benchmark').length;
   const selectedHoldings = useMemo(
     () =>
       withCashHolding(
-        model.holdings.filter((row) => row.persona === selected?.id),
+        model.holdings.filter((row) => row.account_id === selected?.id),
         selected,
       ),
     [model.holdings, selected],
   );
   const selectedEquity = useMemo(
-    () => model.equity.filter((row) => row.persona === selected?.id).sort((a, b) => a.date.localeCompare(b.date)),
+    () => model.equity.filter((row) => row.account_id === selected?.id).sort((a, b) => a.date.localeCompare(b.date)),
     [model.equity, selected],
   );
   const chartSeries = useMemo<ReturnSeries[]>(() => {
@@ -37,7 +37,7 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
       shortLabel: strategy.shortLabel,
       color: SERIES_COLORS[index % SERIES_COLORS.length],
       points: model.equity
-        .filter((point) => point.persona === strategy.id && point.cumulativeReturn !== null)
+        .filter((point) => point.account_id === strategy.id && point.cumulativeReturn !== null)
         .map((point) => ({ time: point.date, value: point.cumulativeReturn ?? 0 })),
     }));
   }, [model.equity, model.frontierRows, model.strategies]);
@@ -68,8 +68,8 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
           </div>
           <h1 className="text-3xl font-semibold tracking-[-0.04em] text-slate-950 md:text-5xl">포트폴리오</h1>
           <p className="max-w-3xl text-sm leading-6 text-slate-600 md:text-base">
-            실제 주식 수량 단위로 매수·보유·매도한 포트폴리오 persona를 한 화면에서 봅니다. 통과 전략은 선택·원장으로
-            열고, 벤치마크 점은 수익률과 낙폭의 위치 비교용으로만 사용합니다.
+            실제 주식 수량 단위로 매수·보유·매도한 포트폴리오 계정을 한 화면에서 봅니다. 통과 전략은 선택·원장으로 열고,
+            벤치마크 점은 수익률과 낙폭의 위치 비교용으로만 사용합니다.
           </p>
           <div className="flex flex-wrap gap-2">
             <Button asChild size="sm" variant="secondary">
@@ -161,7 +161,7 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
             <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">승인된 주식 전략 선택</h2>
           </div>
           <span className="text-xs font-medium text-slate-500">
-            stock-level persona · {model.strategies.length.toLocaleString('ko-KR')}개 버튼
+            stock-level account_id · {model.strategies.length.toLocaleString('ko-KR')}개 버튼
           </span>
         </div>
         <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
@@ -681,7 +681,7 @@ function withCashHolding(holdings: HoldingRow[], selected: PortfolioStrategySnap
   return [
     ...holdings,
     {
-      persona: selected.id,
+      account_id: selected.id,
       symbol: 'CASH',
       company: 'RP이자',
       qty: null,

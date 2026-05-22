@@ -52,7 +52,7 @@ export const RawReportRowSchema = z
 
 export const RawHoldingRowSchema = z
   .object({
-    persona: z.string(),
+    account_id: z.string(),
     symbol: z.string(),
     company: z.string(),
     qty: NullableNumber,
@@ -70,7 +70,7 @@ export const RawHoldingRowSchema = z
 
 export const RawTradeRowSchema = z
   .object({
-    persona: z.string(),
+    account_id: z.string(),
     date: z.string(),
     symbol: z.string(),
     side: z.string(),
@@ -85,7 +85,7 @@ export const RawTradeRowSchema = z
 
 export const RawEquityPointSchema = z
   .object({
-    persona: z.string(),
+    account_id: z.string(),
     date: z.string(),
     equity_krw: NullableNumber,
     contributed_capital_krw: NullableNumber,
@@ -105,7 +105,7 @@ export const CompactEquityArtifactSchema = z
     series: z.array(
       z
         .object({
-          persona: z.string(),
+          account_id: z.string(),
           equity_krw: z.array(NullableNumber),
           cumulative_return: z.array(NullableNumber),
         })
@@ -114,9 +114,9 @@ export const CompactEquityArtifactSchema = z
   })
   .passthrough();
 
-export const WebPersonaSchema = z
+export const WebAccountSchema = z
   .object({
-    persona: z.string(),
+    account_id: z.string(),
     label: z.string().optional(),
     final_equity_krw: NullableNumber,
     final_cash_krw: NullableNumber.optional(),
@@ -134,7 +134,7 @@ export const WebPersonaSchema = z
 
 export const AccountingReconciliationRowSchema = z
   .object({
-    persona: z.string(),
+    account_id: z.string(),
     label: z.string().optional(),
     total_contributed_krw: NullableNumber,
     realized_pnl_krw: NullableNumber,
@@ -174,7 +174,7 @@ export const WebOverviewSchema = z
     generated_from: z.record(z.string(), z.string()).optional(),
     report_counts: WebReportCountsSchema.optional(),
     target_stats: z.record(z.string(), NullableNumber).optional(),
-    baseline_personas: z.array(WebPersonaSchema),
+    baseline_accounts: z.array(WebAccountSchema),
     simulation_window: z.record(z.string(), z.union([z.string(), z.null()])).optional(),
   })
   .passthrough();

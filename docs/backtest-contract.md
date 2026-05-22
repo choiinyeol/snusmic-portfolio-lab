@@ -1,4 +1,4 @@
-﻿# Backtest Contract
+# Backtest Contract
 
 Last updated: 2026-05-23
 Status: canonical simulation contract
@@ -54,10 +54,10 @@ Default operation should stay fast and account-realistic.
 | `export-pit-board` | manual | explicit command | Exports point-in-time research-board rows for manual analysis. |
 | Future-information oracle | diagnostic | config-only baseline | Upper-bound diagnostic, not an investable strategy. |
 
-## Persona Taxonomy
+## Account Taxonomy
 
 Benchmarks and any future strategies must be separated in artifacts and UI.
 
 Benchmarks include All-Weather, SMIC follower baselines, broad market proxies, and Weak Prophet when explicitly enabled. There are no generated selectable strategies in the current pipeline.
 
-The frontend must read current account taxonomy from `data/web/accounts/catalog.json`; it must not infer business meaning from persona IDs. Future strategy work should extend that account taxonomy only after explicit buy, sell, sizing, cash, and rebalance rules are declared.
+The frontend must read current account taxonomy from `data/web/accounts/catalog.json`; it must not infer business meaning from account_id IDs. Future strategy work should extend that account taxonomy only after explicit buy, sell, sizing, cash, and rebalance rules are declared.

@@ -1,4 +1,4 @@
-"""Daily-forward checkpoint runner for the core investable personas."""
+"""Daily-forward checkpoint runner for the core investable accounts."""
 
 from __future__ import annotations
 
@@ -12,32 +12,32 @@ from typing import Annotated, Literal
 import pandas as pd
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
+from .accounts import AccountRunOutput
+from .accounts.all_weather import (
+    AllWeatherStateSnapshot,
+    build_all_weather_runtime,
+    step_all_weather_day,
+)
+from .accounts.base import build_summary
+from .accounts.smic_follower import (
+    FollowerState,
+    FollowerStateSnapshot,
+    build_smic_follower_runtime,
+    step_smic_follower_day,
+)
+from .accounts.smic_follower_v2 import make_smic_follower_v2_stop_loss_hook
 from .artifacts import write_simulation_artifacts
 from .brokerage import Account, AccountSnapshot
 from .contracts import (
+    AccountConfig,
     AllWeatherConfig,
     EquityPoint,
-    PersonaConfig,
     SimulationConfig,
     SimulationResult,
     SmicFollowerConfig,
     SmicFollowerV2Config,
 )
 from .market import PriceBoard, load_benchmark_prices
-from .personas import PersonaRunOutput
-from .personas.all_weather import (
-    AllWeatherStateSnapshot,
-    build_all_weather_runtime,
-    step_all_weather_day,
-)
-from .personas.base import build_summary
-from .personas.smic_follower import (
-    FollowerState,
-    FollowerStateSnapshot,
-    build_smic_follower_runtime,
-    step_smic_follower_day,
-)
-from .personas.smic_follower_v2 import make_smic_follower_v2_stop_loss_hook
 from .runner import _prepare_reports, finalize_simulation_outputs, run_simulation
 from .savings import build_cash_flow_schedule
 from .target_adjustment import align_report_targets_to_market_scale
@@ -52,25 +52,25 @@ class _CheckpointModel(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
 
-class FollowerPersonaCheckpoint(_CheckpointModel):
+class FollowerAccountCheckpoint(_CheckpointModel):
     kind: Literal["follower"]
-    persona_name: str
+    account_id: str
     account: AccountSnapshot
     state: FollowerStateSnapshot
     previous_day: date | None
     equity_points: tuple[EquityPoint, ...]
 
 
-class AllWeatherPersonaCheckpoint(_CheckpointModel):
+class AllWeatherAccountCheckpoint(_CheckpointModel):
     kind: Literal["all_weather"]
-    persona_name: str
+    account_id: str
     account: AccountSnapshot
     state: AllWeatherStateSnapshot
     equity_points: tuple[EquityPoint, ...]
 
 
-PersonaCheckpoint = Annotated[
-    FollowerPersonaCheckpoint | AllWeatherPersonaCheckpoint,
+AccountCheckpoint = Annotated[
+    FollowerAccountCheckpoint | AllWeatherAccountCheckpoint,
     Field(discriminator="kind"),
 ]
 
@@ -82,7 +82,7 @@ class ForwardCheckpoint(_CheckpointModel):
     end_date: date
     config_digest: str
     source_fingerprint: dict[str, str]
-    personas: dict[str, PersonaCheckpoint]
+    accounts: dict[str, AccountCheckpoint]
 
 
 @dataclass(frozen=True)
@@ -102,16 +102,16 @@ def run_daily_forward(
     *,
     refresh_benchmark: bool = False,
 ) -> ForwardRunReport:
-    """Run core personas from the latest checkpoint and write sim artifacts."""
+    """Run core accounts from the latest checkpoint and write sim artifacts."""
 
     out_dir.mkdir(parents=True, exist_ok=True)
     checkpoint_dir = out_dir / "checkpoints"
     checkpoint_path = checkpoint_dir / CHECKPOINT_FILE
     metadata_path = out_dir / METADATA_FILE
 
-    core_config = config.model_copy(update={"personas": _core_personas(config.personas)})
-    if not core_config.personas:
-        raise RuntimeError("daily-forward requires at least one core persona")
+    core_config = config.model_copy(update={"accounts": _core_accounts(config.accounts)})
+    if not core_config.accounts:
+        raise RuntimeError("daily-forward requires at least one core account_id")
 
     board = PriceBoard.from_warehouse(warehouse_dir)
     trading_dates = board.trading_dates(start=core_config.start_date, end=core_config.end_date)
@@ -145,7 +145,7 @@ def run_daily_forward(
         mode = "full_replay_fallback"
         start_after = None
 
-    outputs, new_checkpoint = _run_core_personas(
+    outputs, new_checkpoint = _run_core_accounts(
         config=core_config,
         reports=reports,
         board=board,
@@ -183,23 +183,23 @@ def run_daily_forward(
     )
 
 
-def load_config_from_persona_artifact(path: Path, *, start: date, end: date) -> SimulationConfig | None:
+def load_config_from_account_artifact(path: Path, *, start: date, end: date) -> SimulationConfig | None:
     if not path.exists():
         return None
     data = json.loads(path.read_text(encoding="utf-8"))
-    raw_personas = data.get("personas") if isinstance(data, dict) else None
-    if not isinstance(raw_personas, list):
+    raw_accounts = data.get("accounts") if isinstance(data, dict) else None
+    if not isinstance(raw_accounts, list):
         return None
-    adapter: TypeAdapter[PersonaConfig] = TypeAdapter(PersonaConfig)
-    personas = tuple(adapter.validate_python(item) for item in raw_personas)
-    return SimulationConfig(start_date=start, end_date=end, personas=personas)
+    adapter: TypeAdapter[AccountConfig] = TypeAdapter(AccountConfig)
+    accounts = tuple(adapter.validate_python(item) for item in raw_accounts)
+    return SimulationConfig(start_date=start, end_date=end, accounts=accounts)
 
 
-def _core_personas(personas: tuple[PersonaConfig, ...]) -> tuple[PersonaConfig, ...]:
-    core: list[PersonaConfig] = []
-    for persona in personas:
-        if isinstance(persona, AllWeatherConfig | SmicFollowerConfig | SmicFollowerV2Config):
-            core.append(persona)
+def _core_accounts(accounts: tuple[AccountConfig, ...]) -> tuple[AccountConfig, ...]:
+    core: list[AccountConfig] = []
+    for account_id in accounts:
+        if isinstance(account_id, AllWeatherConfig | SmicFollowerConfig | SmicFollowerV2Config):
+            core.append(account_id)
     return tuple(core)
 
 
@@ -209,9 +209,9 @@ def _load_benchmark_board(
     refresh_benchmark: bool,
 ) -> PriceBoard | None:
     symbols: set[str] = set()
-    for persona in config.personas:
-        if isinstance(persona, AllWeatherConfig):
-            symbols.update(asset.symbol for asset in persona.assets)
+    for account_id in config.accounts:
+        if isinstance(account_id, AllWeatherConfig):
+            symbols.update(asset.symbol for asset in account_id.assets)
     if not symbols:
         return None
     return load_benchmark_prices(
@@ -223,7 +223,7 @@ def _load_benchmark_board(
     )
 
 
-def _run_core_personas(
+def _run_core_accounts(
     *,
     config: SimulationConfig,
     reports: pd.DataFrame,
@@ -234,29 +234,29 @@ def _run_core_personas(
     start_after: date | None,
     source_fingerprint: dict[str, str],
     config_digest: str,
-) -> tuple[list[PersonaRunOutput], ForwardCheckpoint]:
+) -> tuple[list[AccountRunOutput], ForwardCheckpoint]:
     cashflows = build_cash_flow_schedule(trading_dates, config.savings_plan)
     tail_dates = [day for day in trading_dates if start_after is None or day > start_after]
-    outputs: list[PersonaRunOutput] = []
-    persona_checkpoints: dict[str, PersonaCheckpoint] = {}
+    outputs: list[AccountRunOutput] = []
+    account_checkpoints: dict[str, AccountCheckpoint] = {}
 
-    for persona in config.personas:
-        prior = checkpoint.personas.get(persona.persona_name) if checkpoint else None
-        if isinstance(persona, AllWeatherConfig):
+    for account_id in config.accounts:
+        prior = checkpoint.accounts.get(account_id.account_id) if checkpoint else None
+        if isinstance(account_id, AllWeatherConfig):
             if benchmark_board is None:
                 raise RuntimeError("All Weather daily-forward requires benchmark prices")
             account = (
                 Account.from_snapshot(prior.account)
-                if isinstance(prior, AllWeatherPersonaCheckpoint)
-                else Account(persona=persona.persona_name, fees=config.fees)
+                if isinstance(prior, AllWeatherAccountCheckpoint)
+                else Account(account_id=account_id.account_id, fees=config.fees)
             )
-            state_snapshot = prior.state if isinstance(prior, AllWeatherPersonaCheckpoint) else None
+            state_snapshot = prior.state if isinstance(prior, AllWeatherAccountCheckpoint) else None
             equity_points = (
-                list(prior.equity_points) if isinstance(prior, AllWeatherPersonaCheckpoint) else []
+                list(prior.equity_points) if isinstance(prior, AllWeatherAccountCheckpoint) else []
             )
             all_weather_runtime = build_all_weather_runtime(
-                config=persona,
-                label=persona.label,
+                config=account_id,
+                label=account_id.label,
                 plan=config.savings_plan,
                 benchmark_board=benchmark_board,
                 cashflows=cashflows,
@@ -268,12 +268,12 @@ def _run_core_personas(
             for day in tail_dates:
                 step_all_weather_day(all_weather_runtime, day)
             outputs.append(
-                PersonaRunOutput(
+                AccountRunOutput(
                     account=all_weather_runtime.account,
                     equity_points=all_weather_runtime.equity_points,
                     summary=build_summary(
-                        persona.persona_name,
-                        persona.label,
+                        account_id.account_id,
+                        account_id.label,
                         all_weather_runtime.account,
                         all_weather_runtime.equity_points,
                         cashflows,
@@ -281,38 +281,38 @@ def _run_core_personas(
                     ),
                 )
             )
-            persona_checkpoints[persona.persona_name] = AllWeatherPersonaCheckpoint(
+            account_checkpoints[account_id.account_id] = AllWeatherAccountCheckpoint(
                 kind="all_weather",
-                persona_name=persona.persona_name,
+                account_id=account_id.account_id,
                 account=all_weather_runtime.account.to_snapshot(),
                 state=all_weather_runtime.to_state_snapshot(),
                 equity_points=tuple(all_weather_runtime.equity_points),
             )
             continue
 
-        if isinstance(persona, SmicFollowerConfig | SmicFollowerV2Config):
+        if isinstance(account_id, SmicFollowerConfig | SmicFollowerV2Config):
             account = (
                 Account.from_snapshot(prior.account)
-                if isinstance(prior, FollowerPersonaCheckpoint)
-                else Account(persona=persona.persona_name, fees=config.fees)
+                if isinstance(prior, FollowerAccountCheckpoint)
+                else Account(account_id=account_id.account_id, fees=config.fees)
             )
             state = (
                 FollowerState.from_snapshot(prior.state)
-                if isinstance(prior, FollowerPersonaCheckpoint)
+                if isinstance(prior, FollowerAccountCheckpoint)
                 else None
             )
-            previous_day = prior.previous_day if isinstance(prior, FollowerPersonaCheckpoint) else None
-            equity_points = list(prior.equity_points) if isinstance(prior, FollowerPersonaCheckpoint) else []
+            previous_day = prior.previous_day if isinstance(prior, FollowerAccountCheckpoint) else None
+            equity_points = list(prior.equity_points) if isinstance(prior, FollowerAccountCheckpoint) else []
             stop_loss_hook = (
-                make_smic_follower_v2_stop_loss_hook(persona)
-                if isinstance(persona, SmicFollowerV2Config)
+                make_smic_follower_v2_stop_loss_hook(account_id)
+                if isinstance(account_id, SmicFollowerV2Config)
                 else None
             )
             follower_runtime = build_smic_follower_runtime(
-                persona=persona.persona_name,
-                label=persona.label,
-                rebalance_cadence=persona.rebalance,
-                target_hit_multiplier=persona.target_hit_multiplier,
+                account_id=account_id.account_id,
+                label=account_id.label,
+                rebalance_cadence=account_id.rebalance,
+                target_hit_multiplier=account_id.target_hit_multiplier,
                 plan=config.savings_plan,
                 reports=reports,
                 board=board,
@@ -329,12 +329,12 @@ def _run_core_personas(
             for day in tail_dates:
                 step_smic_follower_day(follower_runtime, day)
             outputs.append(
-                PersonaRunOutput(
+                AccountRunOutput(
                     account=follower_runtime.account,
                     equity_points=follower_runtime.equity_points,
                     summary=build_summary(
-                        persona.persona_name,
-                        persona.label,
+                        account_id.account_id,
+                        account_id.label,
                         follower_runtime.account,
                         follower_runtime.equity_points,
                         cashflows,
@@ -342,9 +342,9 @@ def _run_core_personas(
                     ),
                 )
             )
-            persona_checkpoints[persona.persona_name] = FollowerPersonaCheckpoint(
+            account_checkpoints[account_id.account_id] = FollowerAccountCheckpoint(
                 kind="follower",
-                persona_name=persona.persona_name,
+                account_id=account_id.account_id,
                 account=follower_runtime.account.to_snapshot(),
                 state=follower_runtime.state.to_snapshot(),
                 previous_day=follower_runtime.previous_day,
@@ -360,7 +360,7 @@ def _run_core_personas(
         end_date=config.end_date,
         config_digest=config_digest,
         source_fingerprint=source_fingerprint,
-        personas=persona_checkpoints,
+        accounts=account_checkpoints,
     )
 
 
@@ -380,9 +380,9 @@ def _load_usable_checkpoint(
         return None, "checkpoint_schema_mismatch"
     if checkpoint.config_digest != config_digest:
         return None, "config_mismatch"
-    expected_personas = {persona.persona_name for persona in _core_personas(config.personas)}
-    if set(checkpoint.personas) != expected_personas:
-        return None, "persona_set_mismatch"
+    expected_accounts = {account_id.account_id for account_id in _core_accounts(config.accounts)}
+    if set(checkpoint.accounts) != expected_accounts:
+        return None, "account_set_mismatch"
     current_historical = _source_fingerprint(warehouse_dir, checkpoint.latest_date)
     if current_historical != checkpoint.source_fingerprint:
         return None, "historical_source_changed"
@@ -426,7 +426,7 @@ def full_replay_core(
     """Explicit full replay helper for tests and emergency fallback comparisons."""
 
     return run_simulation(
-        config.model_copy(update={"personas": _core_personas(config.personas)}),
+        config.model_copy(update={"accounts": _core_accounts(config.accounts)}),
         warehouse_dir,
         refresh_benchmark=refresh_benchmark,
     )

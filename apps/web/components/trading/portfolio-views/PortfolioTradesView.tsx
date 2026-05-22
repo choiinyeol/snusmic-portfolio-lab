@@ -7,7 +7,7 @@ import { tradeDisplayName } from '../helpers';
 import type { PortfolioViewModel } from './types';
 
 export function PortfolioTradesView({ model }: { model: PortfolioViewModel }) {
-  const trades = model.trades.filter((row) => row.persona === model.selectedPersona);
+  const trades = model.trades.filter((row) => row.account_id === model.selectedAccount);
   const summary = buildTradeNarrative(trades);
 
   return (
@@ -92,8 +92,8 @@ export function PortfolioTradesView({ model }: { model: PortfolioViewModel }) {
       </section>
 
       <TradesTable
-        persona={model.selectedPersona}
-        personaLabels={model.personaLabels}
+        account_id={model.selectedAccount}
+        accountLabels={model.accountLabels}
         reportSymbolsById={model.reportSymbolsById}
         targetsByReportId={model.targetsByReportId}
         targetsBySymbol={model.targetsBySymbol}

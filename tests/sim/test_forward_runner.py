@@ -6,16 +6,18 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
+from snusmic_pipeline.sim.accounts.smic_follower import FollowerState
 from snusmic_pipeline.sim.brokerage import Account
 from snusmic_pipeline.sim.contracts import BrokerageFees, SimulationConfig
 from snusmic_pipeline.sim.forward_runner import run_daily_forward
-from snusmic_pipeline.sim.personas.smic_follower import FollowerState
 
 WAREHOUSE = Path("data/warehouse")
 
 
 def test_account_snapshot_roundtrips_complete_brokerage_state() -> None:
-    account = Account(persona="p", fees=BrokerageFees(commission_bps=1.0, sell_tax_bps=2.0, slippage_bps=0.0))
+    account = Account(
+        account_id="p", fees=BrokerageFees(commission_bps=1.0, sell_tax_bps=2.0, slippage_bps=0.0)
+    )
     account.deposit(date(2024, 1, 2), 1_000_000)
     account.buy_value(date(2024, 1, 2), "AAA", 10_000, 500_000, "deposit_buy", "r1")
     account.sell_qty(date(2024, 1, 3), "AAA", 11_000, 10, "target_hit", "r1")
@@ -26,7 +28,7 @@ def test_account_snapshot_roundtrips_complete_brokerage_state() -> None:
     assert restored.to_snapshot() == account.to_snapshot()
 
 
-def test_persona_state_snapshots_roundtrip_private_cursor_state() -> None:
+def test_account_state_snapshots_roundtrip_private_cursor_state() -> None:
     follower = FollowerState()
     follower.open_reports = {"AAA": [("r1", 12_000.0, date(2024, 1, 2))]}
     follower.stopped_out = {"BBB": date(2024, 1, 3)}
@@ -42,7 +44,7 @@ def test_persona_state_snapshots_roundtrip_private_cursor_state() -> None:
 
 
 @pytest.mark.slow
-def test_checkpoint_tail_matches_full_replay_for_core_personas(tmp_path: Path) -> None:
+def test_checkpoint_tail_matches_full_replay_for_core_accounts(tmp_path: Path) -> None:
     config = _test_config(date(2021, 1, 4), date(2021, 2, 15))
     forward_out = tmp_path / "forward"
     full_out = tmp_path / "full"
@@ -126,8 +128,8 @@ def test_checkpoint_after_requested_end_falls_back_to_full_replay(tmp_path: Path
 
 def _test_config(start: date, end: date) -> SimulationConfig:
     base = SimulationConfig(start_date=start, end_date=end)
-    personas = tuple(persona for persona in base.personas if persona.persona_name != "weak_oracle")
-    return base.model_copy(update={"personas": personas})
+    accounts = tuple(account_id for account_id in base.accounts if account_id.account_id != "weak_oracle")
+    return base.model_copy(update={"accounts": accounts})
 
 
 def _copy_minimal_warehouse(src: Path, dst: Path) -> None:

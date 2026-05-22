@@ -17,9 +17,9 @@ from .fetch_index import fetch_reports, parse_pages
 from .github_urls import github_pdf_url
 from .markdown_export import export_markdown
 from .models import DownloadedPdf, ExtractedReport, ReportMeta
+from .sim.account_sim import main as run_account_simulation_command
 from .sim.contracts import SimulationConfig
-from .sim.forward_runner import load_config_from_persona_artifact, run_daily_forward
-from .sim.persona_sim import main as run_persona_simulation_command
+from .sim.forward_runner import load_config_from_account_artifact, run_daily_forward
 from .sim.pit_board_export import main as run_pit_board_export_command
 from .sim.warehouse import build_warehouse, refresh_price_history
 from .web_artifacts import ExportInputs, check_web_artifacts, export_web_artifacts
@@ -415,17 +415,17 @@ def run_daily_forward_cli(args: argparse.Namespace) -> int:
     out_dir = Path(args.out)
     config = (
         None
-        if args.ignore_persona_artifact
-        else load_config_from_persona_artifact(
-            out_dir / "persona-configs.json",
+        if args.ignore_account_artifact
+        else load_config_from_account_artifact(
+            out_dir / "account-configs.json",
             start=start,
             end=end,
         )
     )
     if config is None:
         base = SimulationConfig(start_date=start, end_date=end)
-        personas = tuple(persona for persona in base.personas if persona.persona_name != "weak_oracle")
-        config = base.model_copy(update={"personas": personas})
+        accounts = tuple(account_id for account_id in base.accounts if account_id.account_id != "weak_oracle")
+        config = base.model_copy(update={"accounts": accounts})
     report = run_daily_forward(
         config,
         Path(args.warehouse),
@@ -438,14 +438,14 @@ def run_daily_forward_cli(args: argparse.Namespace) -> int:
         "checkpoint_path": str(report.checkpoint_path),
         "metadata_path": str(report.metadata_path),
         "fallback_reason": report.fallback_reason,
-        "personas": [summary.persona for summary in report.result.summaries],
+        "accounts": [summary.account_id for summary in report.result.summaries],
     }
     print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
     return 0
 
 
-def run_persona_sim(args: argparse.Namespace) -> int:
-    """Run the persona simulation through the package-owned command module."""
+def run_account_sim(args: argparse.Namespace) -> int:
+    """Run the account simulation through the package-owned command module."""
 
     forwarded: list[str] = [
         "--start",
@@ -459,7 +459,7 @@ def run_persona_sim(args: argparse.Namespace) -> int:
     ]
     if args.refresh_benchmark:
         forwarded.append("--refresh-benchmark")
-    return run_persona_simulation_command(forwarded)
+    return run_account_simulation_command(forwarded)
 
 
 def run_export_pit_board(args: argparse.Namespace) -> int:
@@ -622,9 +622,9 @@ def build_parser() -> argparse.ArgumentParser:
     daily_forward.add_argument("--out", default=str(REPO_ROOT / "data" / "sim"))
     daily_forward.add_argument("--refresh-benchmark", action="store_true")
     daily_forward.add_argument(
-        "--ignore-persona-artifact",
+        "--ignore-account_id-artifact",
         action="store_true",
-        help="Ignore data/sim/persona-configs.json and use the built-in benchmark/follower set.",
+        help="Ignore data/sim/account-configs.json and use the built-in benchmark/follower set.",
     )
     daily_forward.set_defaults(func=run_daily_forward_cli)
 
@@ -638,7 +638,7 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Force re-download of the All-Weather benchmark prices.",
     )
-    sim.set_defaults(func=run_persona_sim)
+    sim.set_defaults(func=run_account_sim)
 
     return parser
 

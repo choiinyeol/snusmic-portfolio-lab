@@ -1,4 +1,4 @@
-﻿# Product Spec
+# Product Spec
 
 Last updated: 2026-05-23
 Status: canonical product intent

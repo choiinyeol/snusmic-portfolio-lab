@@ -31,7 +31,7 @@ export default function AppRouteLayout({ children }: Readonly<{ children: React.
 
 /** Build the cmd-K command palette index. APP_NAV is the spine; symbols and
  * strategies are appended so power users can jump straight to a ticker or a
- * persona without going through the screener first. */
+ * account_id without going through the screener first. */
 function buildCommandTargets(): CommandTarget[] {
   const navTargets: CommandTarget[] = APP_NAV.map((item) => ({
     kind: 'nav',

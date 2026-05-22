@@ -1,0 +1,156 @@
+"""Per-account_id behavior on the synthetic three-symbol universe."""
+
+from __future__ import annotations
+
+from datetime import date
+
+from snusmic_pipeline.sim.accounts import (
+    simulate_prophet,
+    simulate_smic_follower,
+    simulate_smic_follower_v2,
+    simulate_weak_prophet,
+)
+from snusmic_pipeline.sim.accounts.base import sharpe_ratio, sortino_ratio
+from snusmic_pipeline.sim.contracts import (
+    BrokerageFees,
+    EquityPoint,
+    ProphetConfig,
+    SavingsPlan,
+    SmicFollowerConfig,
+    SmicFollowerV2Config,
+    WeakProphetConfig,
+)
+from snusmic_pipeline.sim.savings import build_cash_flow_schedule
+
+
+def _common_inputs(synthetic_dates):
+    plan = SavingsPlan(
+        initial_capital_krw=10_000_000,
+        monthly_contribution_krw=1_000_000,
+        escalation_step_krw=500_000,
+    )
+    fees = BrokerageFees()
+    cashflows = build_cash_flow_schedule(synthetic_dates, plan)
+    return plan, fees, cashflows
+
+
+def test_prophet_concentrates_on_realised_winner(synthetic_board, synthetic_reports, synthetic_dates):
+    plan, fees, cashflows = _common_inputs(synthetic_dates)
+    # Synthetic fixture: WIN ramps 100→200 (target 180 → hit), LOSS slides
+    # 100→70 (target 130 → never hit), FLAT around 100 (target 110 → hit).
+    # Prophet should buy WIN/FLAT (will hit) and avoid LOSS (will not hit).
+    cfg = ProphetConfig(lookahead_months=24, target_hit_multiplier=1.0)
+    out = simulate_prophet(cfg, plan, fees, synthetic_board, synthetic_reports, cashflows, synthetic_dates)
+    buys = [t for t in out.account.trades if t.side == "buy"]
+    assert any(t.symbol == "WIN" for t in buys)
+    assert not any(t.symbol == "LOSS" for t in buys)
+    assert out.summary.net_profit_krw > 0
+
+
+def test_smic_follower_holds_losers_and_sells_only_at_target(
+    synthetic_board, synthetic_reports, synthetic_dates
+):
+    plan, fees, cashflows = _common_inputs(synthetic_dates)
+    cfg = SmicFollowerConfig()
+    out = simulate_smic_follower(
+        cfg, plan, fees, synthetic_board, synthetic_reports, cashflows, synthetic_dates
+    )
+    # WIN crosses its target (180) — there should be at least one target_hit sell.
+    sells = [t for t in out.account.trades if t.side == "sell"]
+    target_hits = [t for t in sells if t.reason == "target_hit"]
+    assert any(t.symbol == "WIN" for t in target_hits)
+    # LOSS slid from 100 → ~70 — its target was 130 so it never hit; the follower
+    # must NOT have sold it for any reason other than the end-of-sim cleanup.
+    loss_sells = [t for t in sells if t.symbol == "LOSS" and t.reason != "end_of_sim"]
+    assert loss_sells == []
+    assert not any(t.symbol == "LOSS" and t.reason == "rebalance_sell" for t in sells)
+
+
+def test_smic_follower_v2_stops_out_long_held_loser(synthetic_board, synthetic_reports, synthetic_dates):
+    plan, fees, cashflows = _common_inputs(synthetic_dates)
+    # Tighten time-loss to 200 days so it actually fires inside the 2y fixture.
+    cfg = SmicFollowerV2Config(time_loss_days=200, report_age_stop_days=600, averaged_down_stop_pct=0.10)
+    out = simulate_smic_follower_v2(
+        cfg, plan, fees, synthetic_board, synthetic_reports, cashflows, synthetic_dates
+    )
+    sells = [t for t in out.account.trades if t.side == "sell"]
+    reasons = {t.reason for t in sells}
+    # At least one of the LOSS-driven stop-loss rules must have fired.
+    assert reasons & {"stop_loss_time", "stop_loss_average_down", "stop_loss_report_age"}
+    # v2 evaluates sell signals daily, but it must not churn the book through
+    # daily equal-weight rebalance sells.
+    assert not any(t.reason == "rebalance_sell" for t in sells)
+
+
+def test_weak_prophet_empty_rebalance_sells_to_cash(synthetic_board, synthetic_reports):
+    trading_dates = [date(2024, 1, 2), date(2024, 2, 1)]
+    plan, fees, cashflows = _common_inputs(trading_dates)
+    cfg = WeakProphetConfig(lookahead_months=3, max_weight=1.0, min_history_days=20)
+    out = simulate_weak_prophet(cfg, plan, fees, synthetic_board, synthetic_reports, cashflows, trading_dates)
+
+    assert any(t.side == "buy" for t in out.account.trades)
+    assert any(t.side == "sell" and t.reason == "rebalance_sell" for t in out.account.trades)
+    assert out.account.open_position_count() == 0
+    assert out.account.cash_krw > 0
+
+
+def test_weak_prophet_runs_and_picks_winners(synthetic_board, synthetic_reports, synthetic_dates):
+    plan, fees, cashflows = _common_inputs(synthetic_dates)
+    cfg = WeakProphetConfig(lookahead_months=3, max_weight=1.0, min_history_days=30)
+    out = simulate_weak_prophet(
+        cfg, plan, fees, synthetic_board, synthetic_reports, cashflows, synthetic_dates
+    )
+    # Should beat raw deposits since WIN has positive expected return.
+    assert out.summary.final_equity_krw > out.summary.total_contributed_krw * 0.95
+    # Should have made at least a few buys.
+    assert sum(1 for t in out.account.trades if t.side == "buy") >= 1
+
+
+def test_followers_v1_and_v2_diverge(synthetic_board, synthetic_reports, synthetic_dates):
+    plan, fees, cashflows = _common_inputs(synthetic_dates)
+    v1 = simulate_smic_follower(
+        SmicFollowerConfig(), plan, fees, synthetic_board, synthetic_reports, cashflows, synthetic_dates
+    )
+    v2 = simulate_smic_follower_v2(
+        SmicFollowerV2Config(time_loss_days=200, averaged_down_stop_pct=0.10, report_age_stop_days=600),
+        plan,
+        fees,
+        synthetic_board,
+        synthetic_reports,
+        cashflows,
+        synthetic_dates,
+    )
+    # Different exit policies must produce different trade counts in this fixture.
+    assert v1.summary.trade_count != v2.summary.trade_count
+
+
+def test_account_summaries_have_finite_irr(synthetic_board, synthetic_reports, synthetic_dates):
+    import math
+
+    plan, fees, cashflows = _common_inputs(synthetic_dates)
+    out = simulate_prophet(
+        ProphetConfig(), plan, fees, synthetic_board, synthetic_reports, cashflows, synthetic_dates
+    )
+    irr = out.summary.money_weighted_return
+    assert math.isfinite(irr)
+
+
+def test_risk_metrics_from_equity_points():
+    points = [
+        EquityPoint(
+            account_id="x",
+            date=date(2024, 1, i),
+            cash_krw=1000.0,
+            holdings_value_krw=0.0,
+            equity_krw=1000.0 + i * 10.0,
+            contributed_capital_krw=1000.0,
+            net_profit_krw=i * 10.0,
+            open_positions=0,
+        )
+        for i in range(1, 6)
+    ]
+    sharpe = sharpe_ratio(points)
+    sortino = sortino_ratio(points)
+    assert sharpe is not None and sharpe > 0
+    # Monotone uptrend has only positive returns; Sortino is undefined with zero downside.
+    assert sortino is None

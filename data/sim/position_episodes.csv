@@ -1,4 +1,4 @@
-persona,symbol,company,open_date,close_date,holding_days,buy_fills,sell_fills,total_qty_bought,total_qty_sold,avg_entry_price_krw,avg_exit_price_krw,realized_pnl_krw,unrealized_pnl_krw,last_close_krw,status,exit_reasons
+account_id,symbol,company,open_date,close_date,holding_days,buy_fills,sell_fills,total_qty_bought,total_qty_sold,avg_entry_price_krw,avg_exit_price_krw,realized_pnl_krw,unrealized_pnl_krw,last_close_krw,status,exit_reasons
 smic_follower,GTT.PA,Gaztransport&technigaz,2021-01-04,2022-03-07,427,4,1,57,57,105727.3923,124595.6808,1075492.4461,,,closed,"('target_hit',)"
 smic_follower,ROKU,Roku,2021-01-04,2021-01-05,1,1,1,9,9,345059.8232,356662.6207,104425.1775,,,closed,"('target_hit',)"
 smic_follower,SE,SEA ltd.,2021-01-04,2021-06-17,164,2,1,23,23,215537.6185,316578.628,2323943.2172,,,closed,"('target_hit',)"
@@ -1026,10 +1026,10 @@ weak_oracle,TSM,TSMC,2026-04-01,2026-05-01,30,1,1,34,34,513705.8624,584734.0364,
 weak_oracle,VRT,Vertiv Holdings Co.,2026-04-01,2026-05-01,30,1,1,45,45,390172.1597,482747.0606,4165870.5381,,,closed,"('rebalance_sell',)"
 weak_oracle,WFG,West Fraser Timber. Co. Ltd,2026-04-01,2026-05-01,30,1,1,182,182,98381.6954,91738.2627,-1209104.7355,,,closed,"('rebalance_sell',)"
 all_weather,069500.KS,KODEX 200,2021-01-04,,1964,51,13,978,460,39073.8406,,13972814.7521,43655050.5518,123350.0,open,"('rebalance_sell',)"
-all_weather,GLD,Gold,2021-01-04,,1964,40,11,97,19,295179.0443,,2977955.8274,26060618.9379,629289.5435,open,"('rebalance_sell',)"
-all_weather,QQQ,NASDAQ-100,2021-01-04,,1964,35,2,57,2,594228.4292,,679072.8932,27350171.6413,1091504.2772,open,"('rebalance_sell',)"
-all_weather,SPY,S&P 500,2021-01-04,,1964,34,0,50,0,707918.4065,,0.0,21260997.3432,1133138.3533,open,()
-benchmark_gld,GLD,Gold,2021-01-04,,1964,65,0,368,0,276507.0644,,0.0,129823952.3155,629289.5435,open,()
+all_weather,GLD,Gold,2021-01-04,,1964,40,11,97,19,295179.0443,,2977955.8274,26068184.6321,629386.5396,open,"('rebalance_sell',)"
+all_weather,QQQ,NASDAQ-100,2021-01-04,,1964,35,2,57,2,594228.4292,,679072.8932,27427102.5949,1092903.0218,open,"('rebalance_sell',)"
+all_weather,SPY,S&P 500,2021-01-04,,1964,34,0,50,0,707918.4065,,0.0,21288021.1515,1133678.8295,open,()
+benchmark_gld,GLD,Gold,2021-01-04,,1964,65,0,368,0,276507.0644,,0.0,129859646.873,629386.5396,open,()
 benchmark_kodex200,069500.KS,KODEX 200,2021-01-04,,1964,65,0,2623,0,38849.0394,,0.0,221646019.7229,123350.0,open,()
-benchmark_qqq,QQQ,NASDAQ-100,2021-01-04,,1964,65,0,196,0,516854.1795,,0.0,112631419.157,1091504.2772,open,()
-benchmark_spy,SPY,S&P 500,2021-01-04,,1964,65,0,163,0,623301.4615,,0.0,83103413.362,1133138.3533,open,()
+benchmark_qqq,QQQ,NASDAQ-100,2021-01-04,,1964,65,0,196,0,516854.1795,,0.0,112905573.1006,1092903.0218,open,()
+benchmark_spy,SPY,S&P 500,2021-01-04,,1964,65,0,163,0,623301.4615,,0.0,83191510.9772,1133678.8295,open,()

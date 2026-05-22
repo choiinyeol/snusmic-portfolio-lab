@@ -9,7 +9,7 @@ from snusmic_pipeline.sim.contracts import BrokerageFees
 
 
 def _zero_fee_account() -> Account:
-    return Account(persona="t", fees=BrokerageFees(commission_bps=0, sell_tax_bps=0, slippage_bps=0))
+    return Account(account_id="t", fees=BrokerageFees(commission_bps=0, sell_tax_bps=0, slippage_bps=0))
 
 
 def test_deposit_increments_cash_and_contributed():
@@ -30,7 +30,7 @@ def test_buy_value_rounds_down_to_whole_shares():
 
 
 def test_buy_value_includes_commission_and_slippage():
-    acc = Account(persona="t", fees=BrokerageFees(commission_bps=10, sell_tax_bps=0, slippage_bps=20))
+    acc = Account(account_id="t", fees=BrokerageFees(commission_bps=10, sell_tax_bps=0, slippage_bps=20))
     acc.deposit(date(2024, 1, 1), 1_000_000)
     # Slippage 0.2% pushes fill_price to 300_600; commission 0.1% on gross.
     qty = acc.buy_value(
@@ -50,7 +50,7 @@ def test_buy_zero_qty_when_budget_too_small():
 
 
 def test_sell_qty_realises_pnl_and_pays_tax():
-    acc = Account(persona="t", fees=BrokerageFees(commission_bps=0, sell_tax_bps=20, slippage_bps=0))
+    acc = Account(account_id="t", fees=BrokerageFees(commission_bps=0, sell_tax_bps=20, slippage_bps=0))
     acc.deposit(date(2024, 1, 1), 1_000_000)
     acc.buy_value(date(2024, 1, 1), "A", 100_000, 1_000_000, "deposit_buy")
     assert acc.holdings["A"].qty == 10

@@ -111,7 +111,7 @@ def _config_without_all_weather() -> SimulationConfig:
         end_date=date(2025, 12, 31),
         savings_plan=SavingsPlan(),
         fees=BrokerageFees(),
-        personas=(
+        accounts=(
             ProphetConfig(),
             WeakProphetConfig(lookahead_months=3, min_history_days=30),
             SmicFollowerConfig(),
@@ -120,11 +120,11 @@ def _config_without_all_weather() -> SimulationConfig:
     )
 
 
-def test_runner_returns_one_summary_per_persona(fake_warehouse: Path):
+def test_runner_returns_one_summary_per_account(fake_warehouse: Path):
     cfg = _config_without_all_weather()
     result = run_simulation(cfg, fake_warehouse)
     assert len(result.summaries) == 4
-    by_name = {s.persona for s in result.summaries}
+    by_name = {s.account_id for s in result.summaries}
     assert by_name == {
         "oracle",
         "weak_oracle",
@@ -137,8 +137,8 @@ def test_runner_is_deterministic_across_repeated_runs(fake_warehouse: Path):
     cfg = _config_without_all_weather()
     a = run_simulation(cfg, fake_warehouse)
     b = run_simulation(cfg, fake_warehouse)
-    a_summaries = sorted((s.model_dump() for s in a.summaries), key=lambda d: d["persona"])
-    b_summaries = sorted((s.model_dump() for s in b.summaries), key=lambda d: d["persona"])
+    a_summaries = sorted((s.model_dump() for s in a.summaries), key=lambda d: d["account_id"])
+    b_summaries = sorted((s.model_dump() for s in b.summaries), key=lambda d: d["account_id"])
     assert a_summaries == b_summaries
     assert len(a.equity_points) == len(b.equity_points)
     assert len(a.trades) == len(b.trades)
@@ -155,7 +155,7 @@ def test_runner_serialises_to_json(fake_warehouse: Path):
 def test_prophet_beats_smic_follower_on_synthetic_universe(fake_warehouse: Path):
     cfg = _config_without_all_weather()
     result = run_simulation(cfg, fake_warehouse)
-    by_name = {s.persona: s for s in result.summaries}
+    by_name = {s.account_id: s for s in result.summaries}
     assert by_name["oracle"].net_profit_krw >= by_name["smic_follower"].net_profit_krw
 
 
@@ -215,7 +215,7 @@ def test_split_scaled_report_target_is_aligned_to_market_price_units(tmp_path: P
             end_date=date(2024, 1, 3),
             savings_plan=SavingsPlan(initial_capital_krw=1_000_000, monthly_contribution_krw=0),
             fees=BrokerageFees(commission_bps=0, sell_tax_bps=0, slippage_bps=0),
-            personas=(SmicFollowerConfig(),),
+            accounts=(SmicFollowerConfig(),),
         ),
         warehouse,
     )
@@ -330,7 +330,7 @@ def test_current_price_scale_mismatch_does_not_expand_plausible_target(tmp_path:
             end_date=date(2024, 1, 3),
             savings_plan=SavingsPlan(initial_capital_krw=1_000_000, monthly_contribution_krw=0),
             fees=BrokerageFees(commission_bps=0, sell_tax_bps=0, slippage_bps=0),
-            personas=(SmicFollowerConfig(),),
+            accounts=(SmicFollowerConfig(),),
         ),
         warehouse,
     )
@@ -396,7 +396,7 @@ def test_downside_target_uses_first_close_at_or_below_target(tmp_path: Path):
             end_date=date(2024, 1, 8),
             savings_plan=SavingsPlan(initial_capital_krw=1_000_000, monthly_contribution_krw=0),
             fees=BrokerageFees(commission_bps=0, sell_tax_bps=0, slippage_bps=0),
-            personas=(SmicFollowerConfig(),),
+            accounts=(SmicFollowerConfig(),),
         ),
         warehouse,
     )
@@ -466,7 +466,7 @@ def test_downside_target_is_hit_when_close_falls_to_bearish_target(tmp_path: Pat
             end_date=date(2024, 1, 3),
             savings_plan=SavingsPlan(initial_capital_krw=1_000_000, monthly_contribution_krw=0),
             fees=BrokerageFees(commission_bps=0, sell_tax_bps=0, slippage_bps=0),
-            personas=(SmicFollowerConfig(),),
+            accounts=(SmicFollowerConfig(),),
         ),
         warehouse,
     )

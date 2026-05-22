@@ -37,7 +37,7 @@ class WebReportRow(_ArtifactModel):
 
 
 class WebHoldingRow(_ArtifactModel):
-    persona: str
+    account_id: str
     symbol: str
     company: str | None = None
     qty: float | None
@@ -53,7 +53,7 @@ class WebHoldingRow(_ArtifactModel):
 
 
 class WebTradeRow(_ArtifactModel):
-    persona: str
+    account_id: str
     date: str
     symbol: str
     side: str
@@ -82,7 +82,7 @@ class WebOverview(_ArtifactModel):
     generated_from: dict[str, str] | None = None
     report_counts: WebReportCounts | None = None
     target_stats: dict[str, float | None] | None = None
-    baseline_personas: list[dict[str, Any]]
+    baseline_accounts: list[dict[str, Any]]
     simulation_window: dict[str, str | None] | None = None
 
 

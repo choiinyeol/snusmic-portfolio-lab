@@ -90,7 +90,7 @@ Pages do not infer business taxonomy from string names. Strategy/benchmark/repor
 data/web/
   manifest.json
   overview/        snapshot.json · research-pulse.json · data-quality.json
-  portfolio/       personas.json · holdings.json · monthly-holdings.json · trades.json · episodes.json · equity-daily.json
+  portfolio/       accounts.json · holdings.json · monthly-holdings.json · trades.json · episodes.json · equity-daily.json
   reports/         table.json · rankings.json · detail-metrics.json · return-windows.json · target-hit-distribution.json
   strategies/      catalog.json · leaderboard.json · curves.json
   screener/        candidates.json

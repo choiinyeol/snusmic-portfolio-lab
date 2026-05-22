@@ -59,8 +59,8 @@ def _measure_forward_smoke(warehouse: Path) -> dict[str, Any]:
     with TemporaryDirectory() as tmpdir:
         out = Path(tmpdir) / "sim"
         base = SimulationConfig(start_date=date(2021, 1, 4), end_date=date(2021, 2, 10))
-        personas = tuple(persona for persona in base.personas if persona.persona_name != "weak_oracle")
-        config = base.model_copy(update={"personas": personas})
+        accounts = tuple(account_id for account_id in base.accounts if account_id.account_id != "weak_oracle")
+        config = base.model_copy(update={"accounts": accounts})
         started = time.perf_counter()
         result = run_daily_forward(config, warehouse, out)
         duration = time.perf_counter() - started
@@ -69,7 +69,7 @@ def _measure_forward_smoke(warehouse: Path) -> dict[str, Any]:
             "seconds": round(duration, 4),
             "mode": result.mode,
             "latest_date": result.latest_date.isoformat(),
-            "personas": sorted(summary["persona"].astype(str).tolist()),
+            "accounts": sorted(summary["account_id"].astype(str).tolist()),
             "summary_rows": int(len(summary)),
         }
 
