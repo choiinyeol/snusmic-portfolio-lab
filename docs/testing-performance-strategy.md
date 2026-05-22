@@ -31,6 +31,8 @@ uv run mypy src
 uv run pytest -q -m "not slow"
 ```
 
+GitHub `ci.yml` uses the same fast lane. Slow replay and full artifact contract tests are intentionally excluded from default CI; run them manually when changing checkpoint replay, benchmark cache behavior, or full artifact export.
+
 Targeted strategy loop:
 
 ```bash
