@@ -2,6 +2,30 @@
 
 이 프로젝트의 사용자 가시 변경사항을 모두 정리합니다. 릴리스의 진실은 git 태그이며, 본 파일은 태그 단위로 의도를 한국어로 기록합니다.
 
+## v0.28.0-performance-contracts.1 — 2026-05-23
+
+### 추가
+- `web_contracts` Pydantic 모델을 추가해 웹 artifact 경계에서 manifest, portfolio, report, strategy 산출물의 구조를 명시적으로 검증합니다.
+- `scripts/perf_semantic_smoke.py`를 추가해 기본 개발 루프에서 느린 전체 replay 대신 핵심 semantic/export 계약을 빠르게 확인할 수 있게 했습니다.
+- market benchmark cache와 target adjustment 회귀 테스트를 추가해 계산 경로 최적화 후에도 의미가 흔들리지 않도록 고정했습니다.
+- `docs/testing-performance-strategy.md`에 fast/slow/contract 테스트 계층과 릴리즈 검증 기준을 문서화했습니다.
+
+### 변경
+- 시뮬레이션 hot path는 Pandas 행 단위 계산 대신 NumPy 배열, vectorized 연산, 캐시 재사용을 우선하도록 정리했습니다.
+- Pydantic은 계산 루프 내부가 아니라 입출력/웹 산출물 경계에 배치해 타입 안정성과 성능을 동시에 유지했습니다.
+- 장시간 전체 replay 성격의 테스트는 `slow`/`contract` 계층으로 분리하고, 기본 `not slow` 테스트는 개발 중 빠르게 돌 수 있도록 재조정했습니다.
+- 웹 artifact validator와 CI/deploy 스크립트가 새 계약 검증 및 fast smoke 경로를 사용하도록 맞췄습니다.
+- price refresh와 public artifact 산출물을 재생성해 새 검증 계약과 현재 데이터 스냅샷을 일치시켰습니다.
+
+### 검증
+- `uv run ruff check ...` touched files 통과
+- `uv run ruff format --check ...` touched files 통과
+- `uv run mypy src` → `45 source files` 통과
+- `uv run pytest -q -m "not slow"` → `163 passed, 23 deselected`
+- `uv run pytest -q` → `186 passed`
+- `uv run python scripts/perf_semantic_smoke.py` → `artifact_count=260`, `price_artifact_count=212`, `web_report_rows=202`, `summary_rows=8`
+- Rebase 후 재검증: conflict marker 없음, `uv run python scripts/perf_semantic_smoke.py` 통과, `uv run pytest -q -m "not slow"` → `163 passed, 23 deselected`
+
 ## v0.27.0-daily-forward-checkpoints.1 — 2026-05-22
 
 ### 추가

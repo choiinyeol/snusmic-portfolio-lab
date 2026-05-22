@@ -5,7 +5,7 @@
 SMIC가 커버한 종목만으로 직장인 적립식 계좌를 운용했을 때,
 올웨더보다 더 벌 수 있는지 검증하는 **일별 종가 기준 액티브 매매 백테스트 랩**
 
-[![release](https://img.shields.io/badge/release-v0.27.0-1b64da)](./CHANGELOG.md)
+[![release](https://img.shields.io/badge/release-v0.28.0-1b64da)](./CHANGELOG.md)
 [![Next.js](https://img.shields.io/badge/Next.js-16-000000)](https://nextjs.org/)
 [![Python](https://img.shields.io/badge/Python-3.13-3776ab)](https://www.python.org/)
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8)](https://tailwindcss.com/)
@@ -266,6 +266,7 @@ python -m snusmic_pipeline generate-strategies \
 
 | 태그 | 핵심 |
 |---|---|
+| **`v0.28.0-performance-contracts.1`** | Pydantic 경계 검증, NumPy/vectorized 계산 경로, fast/slow 테스트 계층, 웹 artifact 계약 검증 |
 | **`v0.27.0-daily-forward-checkpoints.1`** | daily-forward checkpoint 운영 경로, 일별 의사결정 원장, agent-friendly 명세/검증 문서 |
 | **`v0.26.2-korean-strategy-labels.1`** | 전략·리서치보드·기준선 표시명을 한글 체계로 통일하고 산출물 라벨을 재생성 |
 | **`v0.26.1-portfolio-objective-gate.1`** | objective-passed 전략만 실제 포트폴리오 선택지로 노출, 전부 실패하면 “승인 전략 없음” 상태 표시 |
