@@ -1,22 +1,20 @@
 {
   "schema_version": "1.0.0",
-  "generated_at": "2026-05-20T10:49:34.005541+00:00",
+  "generated_at": "2026-05-22T09:40:24.206497+00:00",
   "approval_source_of_truth": "final_portfolio_simulation",
+  "include_oracle": false,
+  "stage_seconds": {
+    "benchmark": 0.0022,
+    "stock_rule_candidates": 0.0001,
+    "stock_rule_gate": 0.0067,
+    "pit_gate": 0.0017,
+    "broker_search": 0.005,
+    "final_simulation": 1.859
+  },
   "benchmark_persona": "benchmark_kodex200",
-  "benchmark_money_weighted_return": 0.4173,
-  "stock_promoted": [
-    "stock_rule_ma_crossover_ma5_20_m_age0_3650_pool5_hold3_equal_ma_cross",
-    "stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool3_hold2_equal_blend",
-    "stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool3_hold2_equal_dynamic_upside",
-    "stock_rule_target_gap_reversal_ma10_30_m_age7_120_pool3_hold2_winner_compress_reversal_gap"
-  ],
-  "pit_promoted": [
-    "pit_research_board_score_top10",
-    "pit_research_board_score_top5",
-    "pit_research_board_trend_top10",
-    "pit_research_board_near_high_top10",
-    "pit_research_board_large_upside_top10"
-  ],
+  "benchmark_money_weighted_return": 0.4165,
+  "stock_promoted": [],
+  "pit_promoted": [],
   "broker_promoted": [
     "smic_mtt_strategy_top1",
     "smic_mtt_strategy_top2",

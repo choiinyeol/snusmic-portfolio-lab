@@ -10,15 +10,16 @@ price stop, and stale-report stop.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from math import isfinite
 from typing import Any, cast
 
 import pandas as pd
+from pydantic import BaseModel, ConfigDict
 
 from ..brokerage import Account
-from ..contracts import BrokerageFees, SavingsPlan, SmicMttStrategyConfig, TradeReason
+from ..contracts import BrokerageFees, EquityPoint, SavingsPlan, SmicMttStrategyConfig, TradeReason
 from ..market import PriceBoard
 from ..savings import CashFlowEvent
 from .base import (
@@ -30,6 +31,10 @@ from .base import (
 )
 
 
+class _MttSnapshotModel(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+
 @dataclass(frozen=True)
 class ActiveCandidate:
     report_id: str
@@ -39,6 +44,63 @@ class ActiveCandidate:
     target_upside_at_pub: float
     momentum_return: float
     relative_strength_percentile: float
+
+    def to_snapshot(self) -> ActiveCandidateSnapshot:
+        return ActiveCandidateSnapshot(
+            report_id=self.report_id,
+            symbol=self.symbol,
+            publication_date=self.publication_date,
+            target_price_krw=self.target_price_krw,
+            target_upside_at_pub=self.target_upside_at_pub,
+            momentum_return=self.momentum_return,
+            relative_strength_percentile=self.relative_strength_percentile,
+        )
+
+    @classmethod
+    def from_snapshot(cls, snapshot: ActiveCandidateSnapshot) -> ActiveCandidate:
+        return cls(
+            report_id=snapshot.report_id,
+            symbol=snapshot.symbol,
+            publication_date=snapshot.publication_date,
+            target_price_krw=snapshot.target_price_krw,
+            target_upside_at_pub=snapshot.target_upside_at_pub,
+            momentum_return=snapshot.momentum_return,
+            relative_strength_percentile=snapshot.relative_strength_percentile,
+        )
+
+
+class ActiveCandidateSnapshot(_MttSnapshotModel):
+    report_id: str
+    symbol: str
+    publication_date: date
+    target_price_krw: float
+    target_upside_at_pub: float
+    momentum_return: float
+    relative_strength_percentile: float
+
+
+class MttStrategyStateSnapshot(_MttSnapshotModel):
+    active: dict[str, ActiveCandidateSnapshot]
+    stopped_out: dict[str, date]
+    absorbed_ids: tuple[str, ...]
+    cursor: int
+
+
+@dataclass
+class MttRuntime:
+    config: SmicMttStrategyConfig
+    plan: SavingsPlan
+    board: PriceBoard
+    report_rows: list[dict[str, Any]]
+    cashflow_by_date: dict[date, float]
+    daily_closes: dict[date, dict[str, float]]
+    contributions: dict[date, float]
+    top_up_days: set[date]
+    account: Account
+    state: MttStrategyState
+    cursor: int = 0
+    previous_day: date | None = None
+    equity_points: list[EquityPoint] = field(default_factory=list)
 
 
 class MttStrategyState:
@@ -80,6 +142,24 @@ class MttStrategyState:
         if stopped:
             self.stopped_out[symbol] = day
 
+    def to_snapshot(self, *, cursor: int) -> MttStrategyStateSnapshot:
+        return MttStrategyStateSnapshot(
+            active={symbol: candidate.to_snapshot() for symbol, candidate in self.active.items()},
+            stopped_out=dict(self.stopped_out),
+            absorbed_ids=tuple(sorted(self._absorbed_ids)),
+            cursor=cursor,
+        )
+
+    @classmethod
+    def from_snapshot(cls, snapshot: MttStrategyStateSnapshot) -> tuple[MttStrategyState, int]:
+        state = cls()
+        state.active = {
+            symbol: ActiveCandidate.from_snapshot(candidate) for symbol, candidate in snapshot.active.items()
+        }
+        state.stopped_out = dict(snapshot.stopped_out)
+        state._absorbed_ids = set(snapshot.absorbed_ids)
+        return state, snapshot.cursor
+
 
 def simulate_smic_mtt_strategy(
     config: SmicMttStrategyConfig,
@@ -92,8 +172,6 @@ def simulate_smic_mtt_strategy(
 ) -> PersonaRunOutput:
     persona = config.persona_name
     account = Account(persona=persona, fees=fees)
-    cashflow_by_date: dict[date, float] = {e.date: e.amount_krw for e in cashflows}
-
     if not trading_dates:
         return PersonaRunOutput(
             account=account,
@@ -101,46 +179,86 @@ def simulate_smic_mtt_strategy(
             summary=build_summary(persona, config.label, account, [], cashflows, plan.initial_capital_krw),
         )
 
-    reports = _prepare_reports(reports)
-    report_rows = cast(list[dict[str, Any]], reports.to_dict("records"))
-    daily_closes = {d: board.close_on(d) for d in trading_dates}
-    contributions = cumulative_contributions(cashflows, trading_dates)
-    top_up_days = _top_up_days(trading_dates, config.top_up_cadence)
-    state = MttStrategyState()
-    equity_points: list = []
-    previous_day: date | None = None
-    cursor = 0
+    runtime = build_smic_mtt_runtime(
+        config=config,
+        plan=plan,
+        reports=reports,
+        board=board,
+        cashflows=cashflows,
+        trading_dates=trading_dates,
+        account=account,
+    )
 
     for day in trading_dates:
-        accrue_cash_yield_since_previous(account, day, previous_day, plan)
-        cursor, has_new_signal = state.absorb_reports(report_rows, cursor, day, board, config)
-
-        deposit_today = cashflow_by_date.get(day, 0.0)
-        if deposit_today > 0:
-            account.deposit(day, deposit_today)
-
-        _apply_sell_rules(account, day, board, state, config)
-
-        should_top_up = deposit_today > 0 or has_new_signal or day in top_up_days
-        if should_top_up:
-            _buy_or_top_up_slots(account, day, board, state, config, deposit_today > 0)
-
-        equity_points.append(
-            record_equity_point(
-                account,
-                persona,
-                day,
-                daily_closes[day],
-                contributions[day],
-                board=board,
-            )
-        )
-        previous_day = day
+        step_smic_mtt_day(runtime, day)
 
     summary = build_summary(
-        persona, config.label, account, equity_points, cashflows, plan.initial_capital_krw
+        persona, config.label, runtime.account, runtime.equity_points, cashflows, plan.initial_capital_krw
     )
-    return PersonaRunOutput(account=account, equity_points=equity_points, summary=summary)
+    return PersonaRunOutput(account=runtime.account, equity_points=runtime.equity_points, summary=summary)
+
+
+def build_smic_mtt_runtime(
+    *,
+    config: SmicMttStrategyConfig,
+    plan: SavingsPlan,
+    reports: pd.DataFrame,
+    board: PriceBoard,
+    cashflows: list[CashFlowEvent],
+    trading_dates: list[date],
+    account: Account,
+    state: MttStrategyState | None = None,
+    cursor: int = 0,
+    previous_day: date | None = None,
+    equity_points: list[EquityPoint] | None = None,
+) -> MttRuntime:
+    prepared_reports = _prepare_reports(reports)
+    report_rows = cast(list[dict[str, Any]], prepared_reports.to_dict("records"))
+    return MttRuntime(
+        config=config,
+        plan=plan,
+        board=board,
+        report_rows=report_rows,
+        cashflow_by_date={e.date: e.amount_krw for e in cashflows},
+        daily_closes={d: board.close_on(d) for d in trading_dates},
+        contributions=cumulative_contributions(cashflows, trading_dates),
+        top_up_days=_top_up_days(trading_dates, config.top_up_cadence),
+        account=account,
+        state=state or MttStrategyState(),
+        cursor=cursor,
+        previous_day=previous_day,
+        equity_points=equity_points or [],
+    )
+
+
+def step_smic_mtt_day(runtime: MttRuntime, day: date) -> EquityPoint:
+    config = runtime.config
+    accrue_cash_yield_since_previous(runtime.account, day, runtime.previous_day, runtime.plan)
+    runtime.cursor, has_new_signal = runtime.state.absorb_reports(
+        runtime.report_rows, runtime.cursor, day, runtime.board, config
+    )
+
+    deposit_today = runtime.cashflow_by_date.get(day, 0.0)
+    if deposit_today > 0:
+        runtime.account.deposit(day, deposit_today)
+
+    _apply_sell_rules(runtime.account, day, runtime.board, runtime.state, config)
+
+    should_top_up = deposit_today > 0 or has_new_signal or day in runtime.top_up_days
+    if should_top_up:
+        _buy_or_top_up_slots(runtime.account, day, runtime.board, runtime.state, config, deposit_today > 0)
+
+    point = record_equity_point(
+        runtime.account,
+        config.persona_name,
+        day,
+        runtime.daily_closes[day],
+        runtime.contributions[day],
+        board=runtime.board,
+    )
+    runtime.equity_points.append(point)
+    runtime.previous_day = day
+    return point
 
 
 def _prepare_reports(reports: pd.DataFrame) -> pd.DataFrame:

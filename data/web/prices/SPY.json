@@ -1,6 +1,1 @@
-{
-  "currency": "KRW",
-  "missing_price": true,
-  "prices": [],
-  "symbol": "SPY"
-}
+{"symbol":"SPY","currency":"KRW","missing_price":true,"prices":[]}

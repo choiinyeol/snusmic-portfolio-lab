@@ -54,15 +54,15 @@ These are benchmarks and should be shown as comparison lines/cards, not marketed
 
 Every persona/row outside the benchmark set is a proprietary/selectable broker-ledger strategy. UI should group these separately from benchmarks and make their methodology explicit. The frontend must read this taxonomy from `strategies/catalog.json` instead of hardcoding business meaning from persona IDs.
 
-### Personal objective gate
+### Personal objective
 
-The primary product gate is:
+The primary product objective is:
 
 ```text
-MDD <= 15% and return > KOSPI/KODEX 200 benchmark
+final equity and MWR > All-Weather under the same savings cash flows
 ```
 
-Strategy tables and charts should surface this gate directly. If no candidate passes, say so clearly; do not bury the failure behind a sorted return table.
+Strategy tables and charts should surface All-Weather-relative final wealth and MWR directly. MDD remains visible as a secondary risk metric, but it must not silently override the account-return objective.
 
 ## Quant methodology guardrails
 

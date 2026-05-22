@@ -348,6 +348,17 @@ class StockRulePersonaConfig(_PersonaBase):
     min_momentum_return: float = -1.0
     min_pullback_pct: float = 0.0
     coverage_failure_trading_days: Annotated[int, Field(ge=0, le=5000)] = 0
+    min_return_21d: Annotated[float, Field(ge=-1.0, le=20.0)] = -1.0
+    min_return_63d: Annotated[float, Field(ge=-1.0, le=20.0)] = -1.0
+    min_return_126d: Annotated[float, Field(ge=-1.0, le=20.0)] = -1.0
+    min_distance_from_52w_high: Annotated[float, Field(ge=-1.0, le=0.0)] = -1.0
+    require_ma_stack: bool = False
+    hold_target_winners: bool = False
+    target_winner_trailing_stop_pct: Annotated[float, Field(ge=0.0, lt=1.0)] = 0.0
+    target_carry_ma_days: Annotated[int, Field(ge=0, le=500)] = 0
+    risk_off_ma_days: Annotated[int, Field(ge=0, le=500)] = 0
+    risk_off_symbol: str = "069500.KS"
+    fallback_symbol: str = ""
     source_search_start: date | None = None
     source_search_end: date | None = None
     source_oos_start: date | None = None

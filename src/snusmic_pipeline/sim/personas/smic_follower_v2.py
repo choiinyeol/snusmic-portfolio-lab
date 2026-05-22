@@ -43,6 +43,24 @@ def simulate_smic_follower_v2(
     *,
     expiry_days: int | None = None,
 ) -> PersonaRunOutput:
+    return _simulate_follower(
+        persona=config.persona_name,
+        label=config.label,
+        rebalance_cadence=config.rebalance,
+        target_hit_multiplier=config.target_hit_multiplier,
+        plan=plan,
+        fees=fees,
+        board=board,
+        reports=reports,
+        cashflows=cashflows,
+        trading_dates=trading_dates,
+        stop_loss_hook=make_smic_follower_v2_stop_loss_hook(config),
+        expiry_days=expiry_days,
+        allow_rebalance_sells=False,
+    )
+
+
+def make_smic_follower_v2_stop_loss_hook(config: SmicFollowerV2Config):
     def stop_loss_hook(
         account: Account,
         day: date,
@@ -85,18 +103,4 @@ def simulate_smic_follower_v2(
                 state.close_reports(symbol)
                 state.stopped_out[symbol] = day
 
-    return _simulate_follower(
-        persona=config.persona_name,
-        label=config.label,
-        rebalance_cadence=config.rebalance,
-        target_hit_multiplier=config.target_hit_multiplier,
-        plan=plan,
-        fees=fees,
-        board=board,
-        reports=reports,
-        cashflows=cashflows,
-        trading_dates=trading_dates,
-        stop_loss_hook=stop_loss_hook,
-        expiry_days=expiry_days,
-        allow_rebalance_sells=False,
-    )
+    return stop_loss_hook

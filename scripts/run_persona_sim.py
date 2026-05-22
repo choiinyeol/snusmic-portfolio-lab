@@ -35,6 +35,7 @@ from snusmic_pipeline.sim.contracts import (  # noqa: E402
     SmicMttStrategyConfig,
     StockRulePersonaConfig,
 )
+from snusmic_pipeline.sim.decision_ledger import build_daily_decision_ledger  # noqa: E402
 from snusmic_pipeline.sim.pit_research_board import default_pit_research_board_configs  # noqa: E402
 from snusmic_pipeline.sim.runner import run_simulation  # noqa: E402
 from snusmic_pipeline.sim.visualize import (  # noqa: E402
@@ -243,6 +244,7 @@ def main() -> int:
     _to_csv_rounded(pd.DataFrame([s.model_dump() for s in result.summaries]), out / "summary.csv")
     _to_csv_rounded(pd.DataFrame([p.model_dump() for p in result.equity_points]), out / "equity_daily.csv")
     _to_csv_rounded(pd.DataFrame([t.model_dump() for t in result.trades]), out / "trades.csv")
+    _to_csv_rounded(build_daily_decision_ledger(result), out / "daily_decisions.csv")
     _to_csv_rounded(
         pd.DataFrame([e.model_dump() for e in result.position_episodes]),
         out / "position_episodes.csv",

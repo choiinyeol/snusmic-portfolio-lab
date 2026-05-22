@@ -19,6 +19,8 @@ from .fetch_index import fetch_reports, parse_pages
 from .github_urls import github_pdf_url
 from .markdown_export import export_markdown
 from .models import DownloadedPdf, ExtractedReport, ReportMeta
+from .sim.contracts import SimulationConfig, SmicMttStrategyConfig
+from .sim.forward_runner import load_config_from_persona_artifact, run_daily_forward
 from .sim.strategy_generation import StrategyGenerationConfig, run_strategy_generation
 from .sim.warehouse import build_warehouse, refresh_price_history
 from .web_artifacts import ExportInputs, check_web_artifacts, export_web_artifacts
@@ -435,10 +437,46 @@ def run_generate_strategies(args: argparse.Namespace) -> int:
             broker_strategy_seed=args.broker_strategy_seed,
             broker_strategy_train_start=date.fromisoformat(args.broker_strategy_train_start),
             broker_strategy_train_end=date.fromisoformat(args.broker_strategy_train_end),
+            include_oracle=args.include_oracle,
             refresh_benchmark=args.refresh_benchmark,
         )
     )
     print(json.dumps(result.__dict__, ensure_ascii=False, indent=2, sort_keys=True))
+    return 0
+
+
+def run_daily_forward_cli(args: argparse.Namespace) -> int:
+    start = date.fromisoformat(args.start)
+    end = date.fromisoformat(args.end)
+    out_dir = Path(args.out)
+    config = (
+        None
+        if args.ignore_persona_artifact
+        else load_config_from_persona_artifact(
+            out_dir / "persona-configs.json",
+            start=start,
+            end=end,
+        )
+    )
+    if config is None:
+        base = SimulationConfig(start_date=start, end_date=end)
+        personas = tuple(persona for persona in base.personas if persona.persona_name != "weak_oracle")
+        config = base.model_copy(update={"personas": (*personas, SmicMttStrategyConfig())})
+    report = run_daily_forward(
+        config,
+        Path(args.warehouse),
+        out_dir,
+        refresh_benchmark=args.refresh_benchmark,
+    )
+    payload = {
+        "mode": report.mode,
+        "latest_date": report.latest_date.isoformat(),
+        "checkpoint_path": str(report.checkpoint_path),
+        "metadata_path": str(report.metadata_path),
+        "fallback_reason": report.fallback_reason,
+        "personas": [summary.persona for summary in report.result.summaries],
+    }
+    print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
     return 0
 
 
@@ -615,8 +653,24 @@ def build_parser() -> argparse.ArgumentParser:
     generate.add_argument("--max-stock-configs", type=int, default=0)
     generate.add_argument("--is-top", type=int, default=75)
     generate.add_argument("--admit-top", type=int, default=0)
-    generate.add_argument("--stock-persona-top", type=int, default=10)
-    generate.add_argument("--pit-strategy-top", type=int, default=5)
+    generate.add_argument(
+        "--stock-persona-top",
+        type=int,
+        default=int(os.environ.get("STOCK_RULE_PERSONA_TOP", "0")),
+        help=(
+            "Promote this many stock-rule search personas. Defaults to 0 because "
+            "stock-rule search is an expensive experimental lane; set >0 to opt in."
+        ),
+    )
+    generate.add_argument(
+        "--pit-strategy-top",
+        type=int,
+        default=int(os.environ.get("PIT_RESEARCH_BOARD_STRATEGY_TOP", "0")),
+        help=(
+            "Promote this many point-in-time research-board strategies. Defaults to 0 because "
+            "PIT board simulation is an expensive candidate-board research lane."
+        ),
+    )
     generate.add_argument("--max-correlation", type=float, default=0.95)
     generate.add_argument("--goal-min-sharpe", type=float, default=0.7)
     generate.add_argument("--goal-min-sortino", type=float, default=0.7)
@@ -640,8 +694,29 @@ def build_parser() -> argparse.ArgumentParser:
     generate.add_argument(
         "--broker-strategy-train-end", default=os.environ.get("SMIC_BROKER_STRATEGY_TRAIN_END", "2023-12-31")
     )
+    generate.add_argument(
+        "--include-oracle",
+        action="store_true",
+        help="Include the future-information weak_oracle upper-bound benchmark. Slow; off by default.",
+    )
     generate.add_argument("--refresh-benchmark", action="store_true")
     generate.set_defaults(func=run_generate_strategies)
+
+    daily_forward = subparsers.add_parser(
+        "daily-forward",
+        help="Advance core investable personas from the latest checkpoint and write sim artifacts.",
+    )
+    daily_forward.add_argument("--start", default="2021-01-04")
+    daily_forward.add_argument("--end", default=date.today().isoformat())
+    daily_forward.add_argument("--warehouse", default=str(REPO_ROOT / "data" / "warehouse"))
+    daily_forward.add_argument("--out", default=str(REPO_ROOT / "data" / "sim"))
+    daily_forward.add_argument("--refresh-benchmark", action="store_true")
+    daily_forward.add_argument(
+        "--ignore-persona-artifact",
+        action="store_true",
+        help="Ignore data/sim/persona-configs.json and use the built-in core persona set.",
+    )
+    daily_forward.set_defaults(func=run_daily_forward_cli)
 
     sim = subparsers.add_parser(
         "run-sim", help="Run the persona simulation (delegates to scripts/run_persona_sim.py)."

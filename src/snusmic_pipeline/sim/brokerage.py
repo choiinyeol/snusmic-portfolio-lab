@@ -20,7 +20,13 @@ import math
 from dataclasses import dataclass, field
 from datetime import date
 
+from pydantic import BaseModel, ConfigDict
+
 from .contracts import BrokerageFees, Trade, TradeReason
+
+
+class _SnapshotModel(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
 
 @dataclass
@@ -39,6 +45,50 @@ class Lot:
     def is_open(self) -> bool:
         return self.qty > 0
 
+    def to_snapshot(self) -> LotSnapshot:
+        return LotSnapshot(
+            qty=self.qty,
+            avg_cost_krw=self.avg_cost_krw,
+            total_cost_krw=self.total_cost_krw,
+            first_buy_date=self.first_buy_date,
+            last_buy_date=self.last_buy_date,
+            buy_count=self.buy_count,
+            realized_pnl_krw=self.realized_pnl_krw,
+        )
+
+    @classmethod
+    def from_snapshot(cls, snapshot: LotSnapshot) -> Lot:
+        return cls(
+            qty=snapshot.qty,
+            avg_cost_krw=snapshot.avg_cost_krw,
+            total_cost_krw=snapshot.total_cost_krw,
+            first_buy_date=snapshot.first_buy_date,
+            last_buy_date=snapshot.last_buy_date,
+            buy_count=snapshot.buy_count,
+            realized_pnl_krw=snapshot.realized_pnl_krw,
+        )
+
+
+class LotSnapshot(_SnapshotModel):
+    qty: int
+    avg_cost_krw: float
+    total_cost_krw: float
+    first_buy_date: date | None = None
+    last_buy_date: date | None = None
+    buy_count: int
+    realized_pnl_krw: float
+
+
+class AccountSnapshot(_SnapshotModel):
+    persona: str
+    fees: BrokerageFees
+    cash_krw: float
+    contributed_krw: float
+    realized_pnl_krw: float
+    cash_yield_krw: float
+    holdings: dict[str, LotSnapshot]
+    trades: tuple[Trade, ...]
+
 
 @dataclass
 class Account:
@@ -52,6 +102,31 @@ class Account:
     cash_yield_krw: float = 0.0
     holdings: dict[str, Lot] = field(default_factory=dict)
     trades: list[Trade] = field(default_factory=list)
+
+    def to_snapshot(self) -> AccountSnapshot:
+        return AccountSnapshot(
+            persona=self.persona,
+            fees=self.fees,
+            cash_krw=self.cash_krw,
+            contributed_krw=self.contributed_krw,
+            realized_pnl_krw=self.realized_pnl_krw,
+            cash_yield_krw=self.cash_yield_krw,
+            holdings={symbol: lot.to_snapshot() for symbol, lot in self.holdings.items()},
+            trades=tuple(self.trades),
+        )
+
+    @classmethod
+    def from_snapshot(cls, snapshot: AccountSnapshot) -> Account:
+        return cls(
+            persona=snapshot.persona,
+            fees=snapshot.fees,
+            cash_krw=snapshot.cash_krw,
+            contributed_krw=snapshot.contributed_krw,
+            realized_pnl_krw=snapshot.realized_pnl_krw,
+            cash_yield_krw=snapshot.cash_yield_krw,
+            holdings={symbol: Lot.from_snapshot(lot) for symbol, lot in snapshot.holdings.items()},
+            trades=list(snapshot.trades),
+        )
 
     # ------------------------------------------------------------------
     # Cash deposits.

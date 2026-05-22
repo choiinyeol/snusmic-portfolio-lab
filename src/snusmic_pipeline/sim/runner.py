@@ -110,6 +110,19 @@ def run_simulation(
             )
         )
 
+    return finalize_simulation_outputs(config, reports, board, benchmark_board, trading_dates, outputs)
+
+
+def finalize_simulation_outputs(
+    config: SimulationConfig,
+    reports: pd.DataFrame,
+    board: PriceBoard,
+    benchmark_board: PriceBoard | None,
+    trading_dates: list[date],
+    outputs: list[PersonaRunOutput],
+) -> SimulationResult:
+    """Build the shared SimulationResult tables from completed persona outputs."""
+
     summaries = tuple(o.summary for o in outputs)
     equity_points = tuple(p for o in outputs for p in o.equity_points)
     trades = tuple(t for o in outputs for t in o.account.trades)
@@ -119,6 +132,7 @@ def run_simulation(
     # persona's episodes are marked against its own price board (SNUSMIC
     # universe for the four research personas; All-Weather basket for the
     # benchmark) so the unrealized PnL on still-open positions is correct.
+    benchmark_personas = {p.persona_name for p in config.personas if isinstance(p, AllWeatherConfig)}
     company_by_symbol = _company_lookup(reports)
     benchmark_company_by_symbol = _benchmark_company_lookup(config.personas)
     last_day = trading_dates[-1]

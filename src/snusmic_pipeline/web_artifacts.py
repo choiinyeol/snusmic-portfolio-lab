@@ -6,6 +6,7 @@ import re
 import shutil
 import statistics
 import subprocess
+import time
 from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
@@ -25,6 +26,7 @@ REQUIRED_ARTIFACTS = [
     "portfolio/holdings.json",
     "portfolio/monthly-holdings.json",
     "portfolio/trades.json",
+    "portfolio/daily-decisions.json",
     "portfolio/episodes.json",
     "portfolio/equity-daily.json",
     "portfolio/accounting-reconciliation.json",
@@ -55,6 +57,7 @@ REQUIRED_ARTIFACTS = [
     "pit-research-board-admission.json",
     "pit-research-board-snapshots.json",
     "trades.json",
+    "daily-decisions.json",
     "position-episodes.json",
     "equity-daily.json",
     "accounting-reconciliation.json",
@@ -140,8 +143,12 @@ def _attach_monthly_native_close(
     out["month_end_dt"] = pd.to_datetime(out["month_end"], errors="coerce")
     chunks: list[pd.DataFrame] = []
     price_columns = ["date", "source_currency", "close", "krw_per_unit"]
+    prices_by_symbol = {
+        str(symbol): group[price_columns].sort_values("date")
+        for symbol, group in prices.groupby("symbol", sort=False)
+    }
     for symbol, group in out.groupby("symbol", sort=False):
-        price_group = prices[prices["symbol"] == symbol][price_columns].sort_values("date")
+        price_group = prices_by_symbol.get(str(symbol), pd.DataFrame(columns=price_columns))
         if price_group.empty:
             missing = group.copy()
             missing["currency"] = missing["symbol"].map(currency_for_symbol).fillna("KRW")
@@ -244,6 +251,15 @@ class ExportInputs:
 def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     """Export deterministic JSON artifacts for the static web showcase."""
 
+    stage_seconds: dict[str, float] = {}
+    stage_started = time.perf_counter()
+
+    def mark(stage: str) -> None:
+        nonlocal stage_started
+        now = time.perf_counter()
+        stage_seconds[stage] = round(now - stage_started, 4)
+        stage_started = now
+
     reports = _read_csv(inputs.warehouse / "reports.csv")
     prices = _read_csv(inputs.warehouse / "daily_prices.csv")
     fx_rates = _read_optional_csv(inputs.warehouse / "fx_rates.csv")
@@ -253,6 +269,12 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     report_performance = _read_csv(inputs.sim / "report_performance.csv")
     report_stats = _read_json(inputs.sim / "report_stats.json")
     trades = _read_csv(inputs.sim / "trades.csv")
+    daily_decisions = _read_optional_csv(inputs.sim / "daily_decisions.csv")
+    daily_forward_metadata = (
+        _read_json(inputs.sim / "daily-forward-metadata.json")
+        if (inputs.sim / "daily-forward-metadata.json").exists()
+        else {}
+    )
     position_episodes = _read_csv(inputs.sim / "position_episodes.csv")
     equity_daily = _read_csv(inputs.sim / "equity_daily.csv")
     broker_strategy_trials = _read_optional_csv(inputs.sim / "broker_strategy_trials.csv")
@@ -260,6 +282,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     pit_research_board_snapshots = _read_optional_csv(inputs.sim / "pit-research-board-snapshots.csv")
     stock_admission = _read_stock_admission_artifact(inputs.sim)
     extraction_quality = _read_json(inputs.extraction_quality) if inputs.extraction_quality.exists() else {}
+    mark("read_inputs")
 
     _assert_no_stale_strategy_personas(
         {
@@ -267,6 +290,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
             "current_holdings": current_holdings,
             "monthly_holdings": monthly_holdings,
             "trades": trades,
+            "daily_decisions": daily_decisions,
             "position_episodes": position_episodes,
             "equity_daily": equity_daily,
         }
@@ -277,6 +301,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
         monthly_holdings, valid_personas, "monthly_holdings", allow_filter=True
     )
     trades = _guard_persona_frame(trades, valid_personas, "trades")
+    daily_decisions = _guard_persona_frame(daily_decisions, valid_personas, "daily_decisions")
     position_episodes = _guard_persona_frame(position_episodes, valid_personas, "position_episodes")
     equity_daily = _guard_persona_frame(equity_daily, valid_personas, "equity_daily")
 
@@ -285,6 +310,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     if out.exists():
         shutil.rmtree(out)
     prices_out.mkdir(parents=True, exist_ok=True)
+    mark("prepare_output")
 
     price_symbols = set(prices["symbol"].dropna().astype(str)) if not prices.empty else set()
     report_symbols = set(reports["symbol"].dropna().astype(str)) if not reports.empty else set()
@@ -312,14 +338,21 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     pit_research_board_admission_rows = _pit_research_board_admission_rows(pit_research_board_admission)
     strategy_labels = {str(row["strategy_id"]): str(row["label"]) for row in strategy_catalog}
     _apply_strategy_labels(overview.get("baseline_personas", []), strategy_labels)
-    return_windows = _build_return_windows(report_rows, prices)
-    detail_metrics = _build_detail_metrics(report_rows, prices, return_windows)
+    priced_prices = _price_frame_with_native(prices)
+    mark("build_overview")
+
+    price_groups = _price_groups_by_symbol(priced_prices, prices_are_native=True)
+    return_windows = _build_return_windows(report_rows, price_groups=price_groups)
+    detail_metrics = _build_detail_metrics(
+        report_rows, priced_prices, return_windows, price_groups=price_groups
+    )
     target_distribution = _build_target_hit_distribution(report_rows)
     rankings = _build_rankings(report_stats, report_rows)
     data_quality = _build_data_quality(
         extraction_quality, missing_symbols, reports, report_performance, report_exclusions
     )
     insights = _build_insights(overview, rankings, target_distribution, return_windows, data_quality)
+    mark("build_report_metrics")
 
     current_holdings = _current_holdings_from_open_episodes(position_episodes, current_holdings)
     persona_rows = _enrich_persona_rows_with_catalog(_records(summary), strategy_catalog)
@@ -329,10 +362,12 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
         _enrich_holdings_with_native(monthly_holdings, prices, fx_rates, close_column="month_close_krw")
     )
     trade_rows = _records(trades)
+    daily_decision_rows = _records(daily_decisions)
     episode_rows = _records(position_episodes)
     equity_rows = _records(equity_daily)
     accounting_rows = _build_accounting_reconciliation(persona_rows, enriched_current_holdings)
     screener_candidates = _build_screener_candidates(report_rows)
+    mark("build_portfolio_rows")
 
     _write_page_bundles(
         out,
@@ -343,6 +378,8 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
         holdings=enriched_current_holdings,
         monthly_holdings=enriched_monthly_holdings,
         trades=trade_rows,
+        daily_decisions=daily_decision_rows,
+        daily_forward_metadata=daily_forward_metadata,
         episodes=episode_rows,
         equity_daily=equity_rows,
         accounting_reconciliation=accounting_rows,
@@ -357,6 +394,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
         pit_research_board_snapshots=_records(pit_research_board_snapshots),
         screener_candidates=screener_candidates,
     )
+    mark("write_page_bundles")
 
     _write_json(out / "overview.json", overview)
     _write_json(out / "personas.json", persona_rows)
@@ -380,13 +418,24 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     _write_json(out / "pit-research-board-admission.json", pit_research_board_admission_rows)
     _write_json(out / "pit-research-board-snapshots.json", _records(pit_research_board_snapshots))
     _write_json(out / "trades.json", trade_rows)
+    _write_machine_json(
+        out / "daily-decisions.json",
+        {"metadata": _daily_forward_metadata(daily_forward_metadata), "rows": daily_decision_rows},
+    )
     _write_json(out / "position-episodes.json", episode_rows)
     _write_json(out / "equity-daily.json", equity_rows)
     _write_json(out / "accounting-reconciliation.json", accounting_rows)
     _write_download_csvs(out, report_rows, data_quality, strategy_catalog)
-    _write_price_artifacts(prices, artifact_symbols, prices_out)
+    mark("write_tables")
+
+    _write_price_artifacts(priced_prices, artifact_symbols, prices_out, prices_are_native=True)
+    mark("write_price_artifacts")
+
     _write_report_statistics_lab(out)
+    mark("write_report_statistics_lab")
+
     write_web_manifest(out)
+    mark("write_manifest")
 
     written = sorted(
         str(path.relative_to(out)) for path in out.rglob("*") if path.suffix in {".json", ".csv"}
@@ -397,6 +446,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
         "artifacts": written,
         "overview": overview,
         "missing_symbols": missing_symbols,
+        "stage_seconds": stage_seconds,
     }
 
 
@@ -697,6 +747,21 @@ def _write_product_json(path: Path, data: Any) -> None:
     )
 
 
+def _write_machine_json(path: Path, data: Any) -> None:
+    """Write large generated data in deterministic compact form.
+
+    Price series dominate the export size and are consumed by code, not read by
+    people. The caller builds rows with plain Python values, so this avoids the
+    expensive recursive clean pass used for ad-hoc mixed Pandas objects.
+    """
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(data, ensure_ascii=False, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+    )
+
+
 def _write_page_bundles(
     out: Path,
     *,
@@ -707,6 +772,8 @@ def _write_page_bundles(
     holdings: list[dict[str, Any]],
     monthly_holdings: list[dict[str, Any]],
     trades: list[dict[str, Any]],
+    daily_decisions: list[dict[str, Any]],
+    daily_forward_metadata: dict[str, Any],
     episodes: list[dict[str, Any]],
     equity_daily: list[dict[str, Any]],
     accounting_reconciliation: list[dict[str, Any]],
@@ -738,6 +805,10 @@ def _write_page_bundles(
         out / "portfolio" / "monthly-holdings.json", _compact_monthly_holdings(monthly_holdings)
     )
     _write_product_json(out / "portfolio" / "trades.json", _compact_trades(trades))
+    _write_product_json(
+        out / "portfolio" / "daily-decisions.json",
+        _compact_daily_decisions(daily_decisions, daily_forward_metadata),
+    )
     _write_product_json(out / "portfolio" / "episodes.json", _compact_episodes(episodes))
     _write_product_json(out / "portfolio" / "equity-daily.json", _compact_equity_curves(equity_daily))
     _write_product_json(out / "portfolio" / "accounting-reconciliation.json", accounting_reconciliation)
@@ -791,6 +862,40 @@ def _compact_trades(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "report_id",
     ]
     return _compact_table(rows, columns)
+
+
+def _compact_daily_decisions(
+    rows: list[dict[str, Any]], metadata: dict[str, Any] | None = None
+) -> dict[str, Any]:
+    columns = [
+        "date",
+        "persona",
+        "decision",
+        "buy_count",
+        "sell_count",
+        "trade_count",
+        "symbols",
+        "reasons",
+        "cash_krw",
+        "holdings_value_krw",
+        "equity_krw",
+        "net_profit_krw",
+        "open_positions",
+    ]
+    table = _compact_table(rows, columns)
+    table["metadata"] = _daily_forward_metadata(metadata or {})
+    return table
+
+
+def _daily_forward_metadata(metadata: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "run_mode": metadata.get("run_mode"),
+        "checkpoint_date": metadata.get("checkpoint_date"),
+        "latest_date": metadata.get("latest_date"),
+        "checkpoint_schema_version": metadata.get("checkpoint_schema_version"),
+        "source_fingerprint": metadata.get("source_fingerprint") or {},
+        "fallback_reason": metadata.get("fallback_reason"),
+    }
 
 
 def _compact_episodes(rows: list[dict[str, Any]]) -> dict[str, Any]:
@@ -918,6 +1023,7 @@ def _build_manifest(out: Path, overview: dict[str, Any]) -> dict[str, Any]:
         "current_holdings": _json_row_count(out / "portfolio" / "holdings.json"),
         "monthly_holdings": _json_row_count(out / "portfolio" / "monthly-holdings.json"),
         "trades": _json_row_count(out / "portfolio" / "trades.json"),
+        "daily_decisions": _json_row_count(out / "portfolio" / "daily-decisions.json"),
         "position_episodes": _json_row_count(out / "portfolio" / "episodes.json"),
         "equity_daily": _json_row_count(out / "portfolio" / "equity-daily.json"),
         "personas": _json_row_count(out / "portfolio" / "personas.json"),
@@ -968,6 +1074,10 @@ def _json_row_count(path: Path) -> int:
     data = _read_json(path)
     if isinstance(data, list):
         return len(data)
+    if isinstance(data, dict):
+        rows = data.get("rows")
+        if isinstance(rows, list):
+            return len(rows)
     return 1
 
 
@@ -1074,6 +1184,19 @@ def _price_frame_with_native(prices: pd.DataFrame) -> pd.DataFrame:
         )
     out["currency"] = out["_source_currency_norm"].replace("", "KRW")
     return out
+
+
+def _price_groups_by_symbol(
+    prices: pd.DataFrame,
+    *,
+    prices_are_native: bool = False,
+) -> dict[str, pd.DataFrame]:
+    if prices.empty:
+        return {}
+    priced = prices.copy() if prices_are_native else _price_frame_with_native(prices)
+    priced["date"] = pd.to_datetime(priced["date"], errors="coerce")
+    priced = priced.dropna(subset=["date", "symbol"])
+    return {str(symbol): group.sort_values("date") for symbol, group in priced.groupby("symbol", sort=True)}
 
 
 def _native_from_display_prices(
@@ -1484,8 +1607,8 @@ def _build_strategy_catalog(summary: pd.DataFrame, sim_config_path: Path) -> lis
                 "short_label": _strategy_short_label(strategy_id, label),
                 "kind": kind,
                 "benchmark_group": _benchmark_group(strategy_id),
-                "is_selectable": kind == "strategy",
-                "is_default_candidate": kind == "strategy",
+                "is_selectable": objective_passed,
+                "is_default_candidate": objective_passed,
                 "objective_passed": objective_passed,
                 "objective_return_excess": return_excess,
                 "objective_mdd_slack": mdd_slack,
@@ -1994,38 +2117,46 @@ def _stock_rule_plain_summary(config: dict[str, Any]) -> str:
     cadence = _stock_rule_cadence(config)
     weighting = _stock_rule_weighting(config)
     coverage = _stock_rule_coverage_text(config)
+    quality = _stock_rule_quality_text(config)
+    carry = _stock_rule_carry_text(config)
     if family == "ma_crossover":
         return (
             f"리포트가 발간되어 투자 가능 종목으로 등록된 뒤에만 {cadence} 가격 추세를 재평가합니다. "
             f"{coverage} "
             f"{fast}일 이동평균이 {slow}일 이동평균 위에 있는 종목만 후보로 삼습니다. "
+            f"{quality}{carry}"
             f"후보를 단기 추세 강도 순으로 정렬해 상위 {top_pool}개를 압축하고, 실제로는 {hold_top}개만 {weighting}으로 보유합니다."
         )
     if family == "price_momentum":
         return (
             f"리포트 발간 이후 투자 가능 universe에 들어온 종목만 대상으로 {cadence} 최근 가격 모멘텀을 순위화합니다. "
             f"{coverage} "
+            f"{quality}{carry}"
             f"상위 {top_pool}개 후보 중 {hold_top}개만 {weighting}으로 보유하고, 다음 재평가 때 더 강한 종목으로 교체합니다."
         )
     if family == "rsi_reversal":
         return (
             f"리포트 발간 이후 투자 가능 종목으로 등록된 뒤에만 {cadence} 과매도 후 반등 가능성이 있는 종목을 찾습니다. "
             f"{coverage} "
+            f"{quality}{carry}"
             f"RSI가 낮고 장기 추세가 완전히 깨지지 않은 후보 중 {hold_top}개만 보유합니다."
         )
     if family == "target_upside_momentum":
         return (
             f"리포트 발간 이후 {cadence} 목표가까지 남은 상승여력과 가격 추세를 함께 봅니다. "
+            f"{quality}{carry}"
             f"{fast}일선이 {slow}일선 위에 있는 종목 중 상승여력·추세 점수가 높은 상위 {top_pool}개를 압축하고 {hold_top}개만 {weighting}으로 보유합니다."
         )
     if family == "fresh_report_momentum":
         return (
             f"발간 후 {cadence} 아직 신선한 리포트 종목 중 가격 추세가 살아 있는 후보를 찾습니다. "
+            f"{quality}{carry}"
             f"목표가 상승여력과 최근 모멘텀을 섞어 상위 {top_pool}개를 고르고 {hold_top}개만 {weighting}으로 보유합니다."
         )
     if family == "target_gap_reversal":
         return (
             f"리포트 발간 이후 {cadence} 목표가까지 괴리가 남아 있고 단기 되돌림 여지가 큰 종목을 찾습니다. "
+            f"{quality}{carry}"
             f"반등 점수가 높은 후보를 상위 {top_pool}개로 압축하고 {hold_top}개만 {weighting}으로 보유합니다."
         )
     return f"리포트 발간으로 투자 가능 종목이 된 뒤 {cadence} 정해진 가격/리포트 신호로 점수화하고 상위 {hold_top}개만 실제 포트폴리오에 편입합니다."
@@ -2054,6 +2185,7 @@ def _stock_rule_buy_rules(config: dict[str, Any]) -> list[str]:
             f"상위 {top_pool}개 후보를 검토하되 실제 보유는 {hold_top}개로 제한합니다.",
             f"비중은 {weighting}으로 배분합니다.",
         ]
+        rules.extend(_stock_rule_quality_rules(config))
         if coverage_rule:
             rules.insert(1, coverage_rule)
         return rules
@@ -2065,6 +2197,7 @@ def _stock_rule_buy_rules(config: dict[str, Any]) -> list[str]:
             f"가격 모멘텀 점수가 높은 상위 {top_pool}개 중 {hold_top}개를 보유합니다.",
             f"비중은 {weighting}으로 배분합니다.",
         ]
+        rules.extend(_stock_rule_quality_rules(config))
         if coverage_rule:
             rules.insert(1, coverage_rule)
         return rules
@@ -2075,6 +2208,7 @@ def _stock_rule_buy_rules(config: dict[str, Any]) -> list[str]:
             f"현재가가 {slow}일선의 90% 이상을 유지하는 종목만 후보가 됩니다.",
             f"후보 중 반등 점수가 높은 {hold_top}개를 보유합니다.",
         ]
+        rules.extend(_stock_rule_quality_rules(config))
         if coverage_rule:
             rules.insert(1, coverage_rule)
         return rules
@@ -2086,6 +2220,7 @@ def _stock_rule_buy_rules(config: dict[str, Any]) -> list[str]:
             "목표가 상승여력과 가격 모멘텀을 섞은 점수로 후보를 정렬합니다.",
             f"상위 {top_pool}개 후보 중 {hold_top}개만 보유합니다.",
         ]
+        rules.extend(_stock_rule_quality_rules(config))
         if coverage_rule:
             rules.insert(1, coverage_rule)
         return rules
@@ -2097,6 +2232,7 @@ def _stock_rule_buy_rules(config: dict[str, Any]) -> list[str]:
             "목표가 상승여력과 최근 가격 모멘텀을 함께 점수화합니다.",
             f"상위 {top_pool}개 후보 중 {hold_top}개만 보유합니다.",
         ]
+        rules.extend(_stock_rule_quality_rules(config))
         if coverage_rule:
             rules.insert(1, coverage_rule)
         return rules
@@ -2108,6 +2244,7 @@ def _stock_rule_buy_rules(config: dict[str, Any]) -> list[str]:
             "설정된 pullback 조건을 통과한 종목만 후보가 됩니다.",
             f"상위 {top_pool}개 후보 중 {hold_top}개만 보유합니다.",
         ]
+        rules.extend(_stock_rule_quality_rules(config))
         if coverage_rule:
             rules.insert(1, coverage_rule)
         return rules
@@ -2137,6 +2274,57 @@ def _stock_rule_weighting(config: dict[str, Any]) -> str:
     if mode == "score_proportional":
         return "점수 비례 비중"
     return mode or "기록된 비중 규칙"
+
+
+def _stock_rule_quality_text(config: dict[str, Any]) -> str:
+    rules = _stock_rule_quality_rules(config)
+    if not rules:
+        return ""
+    return " ".join(rules[:3]) + " "
+
+
+def _stock_rule_quality_rules(config: dict[str, Any]) -> list[str]:
+    rules: list[str] = []
+    active = [
+        f"{label} 수익률 {_pct(config.get(key))} 이상"
+        for label, key in (
+            ("1개월", "min_return_21d"),
+            ("3개월", "min_return_63d"),
+            ("6개월", "min_return_126d"),
+        )
+        if float(config.get(key, -1.0) or -1.0) > -1.0
+    ]
+    if active:
+        rules.append("loser quarantine: " + ", ".join(active) + "인 종목만 후보로 둡니다.")
+    if float(config.get("min_distance_from_52w_high", -1.0) or -1.0) > -1.0:
+        rules.append(
+            f"52주 고점 대비 {_pct(config.get('min_distance_from_52w_high'))} 이상 버틴 종목만 통과합니다."
+        )
+    if config.get("require_ma_stack"):
+        rules.append("20일선 ≥ 60일선 ≥ 120일선 정배열이고 현재가가 20일선 위인 종목만 통과합니다.")
+    if config.get("hold_target_winners"):
+        rules.append("목표가 터치 winner는 추세와 trailing 조건이 깨지기 전까지 보유 후보로 유지합니다.")
+    if int(config.get("risk_off_ma_days") or 0) > 0:
+        symbol = str(config.get("risk_off_symbol") or "069500.KS")
+        rules.append(
+            f"risk-off: {symbol}가 {int(config.get('risk_off_ma_days') or 0)}일선 아래면 신규 주식 비중을 0으로 둡니다."
+        )
+    if config.get("fallback_symbol"):
+        rules.append(f"buy 후보가 없고 risk-on이면 {config.get('fallback_symbol')}를 기본 보유합니다.")
+    return rules
+
+
+def _stock_rule_carry_text(config: dict[str, Any]) -> str:
+    if not config.get("hold_target_winners"):
+        return ""
+    parts = ["목표가를 터치한 winner는 목표가 괴리가 사라져도 추세가 살아 있으면 계속 후보로 둡니다."]
+    if int(config.get("target_carry_ma_days") or 0) > 0:
+        parts.append(f"{int(config.get('target_carry_ma_days') or 0)}일선 이탈 전까지 carry를 허용합니다.")
+    if float(config.get("target_winner_trailing_stop_pct") or 0) > 0:
+        parts.append(
+            f"최근 고점 대비 {_pct(config.get('target_winner_trailing_stop_pct'))} 이상 밀리면 carry를 중단합니다."
+        )
+    return " ".join(parts) + " "
 
 
 def _pit_research_board_cadence(config: dict[str, Any]) -> str:
@@ -2294,6 +2482,18 @@ def _sell_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
             rules.insert(
                 0, "coverage 실패 판정으로 후보 pool에서 빠진 종목은 다음 재평가 때 편출 대상이 됩니다."
             )
+        if config.get("hold_target_winners"):
+            rules.append(
+                "목표가를 터치한 winner는 목표가 도달만으로 팔지 않고 추세/트레일링 이탈 때 편출합니다."
+            )
+            if float(config.get("target_winner_trailing_stop_pct") or 0) > 0:
+                rules.append(
+                    f"winner가 최근 고점 대비 {_pct(config.get('target_winner_trailing_stop_pct'))} 이상 밀리면 carry를 중단합니다."
+                )
+        if int(config.get("risk_off_ma_days") or 0) > 0:
+            rules.append(
+                f"{config.get('risk_off_symbol') or '069500.KS'}가 {int(config.get('risk_off_ma_days') or 0)}일선 아래면 다음 재평가 때 현금 비중으로 대피합니다."
+            )
         return rules
     if strategy_id.startswith("pit_research_board_"):
         cadence = _pit_research_board_cadence(config)
@@ -2408,6 +2608,17 @@ def _strategy_params(strategy_id: str, config: dict[str, Any]) -> dict[str, Any]
             "weight_mode",
             "score_mode",
             "coverage_failure_trading_days",
+            "min_return_21d",
+            "min_return_63d",
+            "min_return_126d",
+            "min_distance_from_52w_high",
+            "require_ma_stack",
+            "hold_target_winners",
+            "target_winner_trailing_stop_pct",
+            "target_carry_ma_days",
+            "risk_off_ma_days",
+            "risk_off_symbol",
+            "fallback_symbol",
         }
         return {key: value for key, value in config.items() if key in public_keys}
     if strategy_id.startswith("pit_research_board_"):
@@ -2554,19 +2765,23 @@ def _rank(rows: list[dict[str, Any]], metric: str, descending: bool, limit: int 
 
 
 def _build_return_windows(
-    report_rows: list[dict[str, Any]], prices: pd.DataFrame, windows: tuple[int, ...] = (30, 60, 90, 180)
+    report_rows: list[dict[str, Any]],
+    prices: pd.DataFrame | None = None,
+    windows: tuple[int, ...] = (30, 60, 90, 180),
+    *,
+    prices_are_native: bool = False,
+    price_groups: dict[str, pd.DataFrame] | None = None,
 ) -> list[dict[str, Any]]:
-    if prices.empty:
+    if price_groups is None:
+        if prices is None or prices.empty:
+            return []
+        price_groups = _price_groups_by_symbol(prices, prices_are_native=prices_are_native)
+    if not price_groups:
         return []
-    priced = _price_frame_with_native(prices)
-    priced["date"] = pd.to_datetime(priced["date"], errors="coerce")
-    by_symbol = {
-        str(symbol): group.sort_values("date") for symbol, group in priced.groupby("symbol", sort=True)
-    }
     results: list[dict[str, Any]] = []
     for report in sorted(report_rows, key=lambda row: str(row.get("report_id"))):
         symbol = str(report.get("symbol") or "")
-        group = by_symbol.get(symbol)
+        group = price_groups.get(symbol)
         entry_price = _number(report.get("entry_price_krw")) or _number(report.get("publication_price_krw"))
         publication_date = pd.to_datetime(report.get("date"), errors="coerce")
         if group is None or entry_price in (None, 0) or pd.isna(publication_date):
@@ -2605,23 +2820,30 @@ def _build_detail_metrics(
     report_rows: list[dict[str, Any]],
     prices: pd.DataFrame,
     return_windows: list[dict[str, Any]],
+    *,
+    prices_are_native: bool = False,
+    price_groups: dict[str, pd.DataFrame] | None = None,
 ) -> dict[str, dict[str, Any]]:
     windows_by_id = {str(row.get("report_id")): row for row in return_windows}
-    if prices.empty:
+    if price_groups is None:
+        if prices.empty:
+            return {
+                str(row["report_id"]): _detail_without_prices(
+                    row, windows_by_id.get(str(row["report_id"]), {})
+                )
+                for row in report_rows
+            }
+        price_groups = _price_groups_by_symbol(prices, prices_are_native=prices_are_native)
+    if not price_groups:
         return {
             str(row["report_id"]): _detail_without_prices(row, windows_by_id.get(str(row["report_id"]), {}))
             for row in report_rows
         }
-    priced = _price_frame_with_native(prices)
-    priced["date"] = pd.to_datetime(priced["date"], errors="coerce")
-    by_symbol = {
-        str(symbol): group.sort_values("date") for symbol, group in priced.groupby("symbol", sort=True)
-    }
     details: dict[str, dict[str, Any]] = {}
     for report in sorted(report_rows, key=lambda row: str(row.get("report_id"))):
         report_id = str(report["report_id"])
         publication_date = pd.to_datetime(report.get("date"), errors="coerce")
-        history = by_symbol.get(str(report.get("symbol") or ""))
+        history = price_groups.get(str(report.get("symbol") or ""))
         after_publication = (
             history[history["date"] >= publication_date].copy()
             if history is not None and not pd.isna(publication_date)
@@ -3028,15 +3250,21 @@ def _csv_cell(value: Any) -> Any:
     return _clean(value)
 
 
-def _write_price_artifacts(prices: pd.DataFrame, symbols: set[str], prices_out: Path) -> None:
+def _write_price_artifacts(
+    prices: pd.DataFrame,
+    symbols: set[str],
+    prices_out: Path,
+    *,
+    prices_are_native: bool = False,
+) -> None:
     if prices.empty:
         for symbol in sorted(str(symbol) for symbol in symbols):
-            _write_json(
+            _write_machine_json(
                 prices_out / f"{symbol}.json",
                 {"symbol": symbol, "currency": "KRW", "missing_price": True, "prices": []},
             )
         return
-    filtered = _price_frame_with_native(prices)
+    filtered = prices if prices_are_native else _price_frame_with_native(prices)
     filtered = filtered[filtered["symbol"].astype(str).isin(symbols)].copy()
     filtered.sort_values(["symbol", "date"], inplace=True)
     written: set[str] = set()
@@ -3084,9 +3312,11 @@ def _write_price_artifacts(prices: pd.DataFrame, symbols: set[str], prices_out: 
                 price_row.update({key: value for key, value in optional_fields.items() if value is not None})
             rows.append(price_row)
         currency = str(group.iloc[-1].get("currency") or "KRW")
-        _write_json(prices_out / f"{symbol}.json", {"symbol": symbol, "currency": currency, "prices": rows})
+        _write_machine_json(
+            prices_out / f"{symbol}.json", {"symbol": symbol, "currency": currency, "prices": rows}
+        )
     for symbol in sorted(str(symbol) for symbol in {str(symbol) for symbol in symbols} - written):
-        _write_json(
+        _write_machine_json(
             prices_out / f"{symbol}.json",
             {"symbol": symbol, "currency": "KRW", "missing_price": True, "prices": []},
         )

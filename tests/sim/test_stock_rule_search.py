@@ -153,6 +153,204 @@ def test_stock_rule_pre_window_target_touch_keeps_coverage_live() -> None:
     assert weights[-1, 0] > 0
 
 
+def test_stock_rule_loser_quarantine_filters_negative_momentum() -> None:
+    dates = pd.bdate_range("2024-01-02", periods=90)
+    close = pd.DataFrame(
+        {
+            "WIN": [100 + idx for idx in range(len(dates))],
+            "LOSE": [180 - idx for idx in range(len(dates))],
+        },
+        index=dates,
+    )
+    board = PriceBoard(close=close, open=close.copy(), high=close.copy(), low=close.copy())
+    reports = pd.DataFrame(
+        [
+            {
+                "report_id": "r-win",
+                "symbol": "WIN",
+                "publication_date": dates[0],
+                "report_current_price_krw": 100.0,
+                "target_price_krw": 300.0,
+            },
+            {
+                "report_id": "r-lose",
+                "symbol": "LOSE",
+                "publication_date": dates[0],
+                "report_current_price_krw": 180.0,
+                "target_price_krw": 300.0,
+            },
+        ]
+    )
+    state = _report_state_matrices(dates, ["WIN", "LOSE"], _prepare_stock_reports(reports, board), board.high)
+    weights, _ = _weights_for_config(
+        close,
+        state,
+        StockRuleConfig(
+            rule_id="quality_test",
+            family="price_momentum",
+            fast_ma_days=5,
+            slow_ma_days=20,
+            min_report_age_days=0,
+            max_report_age_days=3650,
+            rebalance="D",
+            top_pool=2,
+            hold_top=2,
+            weight_mode="equal",
+            score_mode="price_momentum",
+            min_return_63d=0.0,
+            min_distance_from_52w_high=-0.25,
+        ),
+    )
+
+    assert weights[-1, 0] > 0
+    assert weights[-1, 1] == 0
+
+
+def test_stock_rule_target_winner_carry_keeps_multibagger_after_target() -> None:
+    dates = pd.bdate_range("2024-01-02", periods=90)
+    close = pd.DataFrame({"AAA": [100 + idx * 2 for idx in range(len(dates))]}, index=dates)
+    high = close.copy()
+    high.loc[dates[10], "AAA"] = 125.0
+    board = PriceBoard(close=close, open=close.copy(), high=high, low=close.copy())
+    reports = pd.DataFrame(_reports(target_price=120.0))
+    state = _report_state_matrices(dates, ["AAA"], _prepare_stock_reports(reports, board), high)
+
+    without_carry, _ = _weights_for_config(
+        close,
+        state,
+        StockRuleConfig(
+            rule_id="no_carry",
+            family="target_upside_momentum",
+            fast_ma_days=5,
+            slow_ma_days=20,
+            min_report_age_days=0,
+            max_report_age_days=3650,
+            rebalance="D",
+            top_pool=1,
+            hold_top=1,
+            weight_mode="equal",
+            score_mode="dynamic_upside",
+        ),
+    )
+    with_carry, _ = _weights_for_config(
+        close,
+        state,
+        StockRuleConfig(
+            rule_id="carry",
+            family="target_upside_momentum",
+            fast_ma_days=5,
+            slow_ma_days=20,
+            min_report_age_days=0,
+            max_report_age_days=3650,
+            rebalance="D",
+            top_pool=1,
+            hold_top=1,
+            weight_mode="equal",
+            score_mode="dynamic_upside",
+            hold_target_winners=True,
+            target_winner_trailing_stop_pct=0.25,
+            target_carry_ma_days=20,
+        ),
+    )
+
+    assert without_carry[-1, 0] == 0
+    assert with_carry[-1, 0] > 0
+
+
+def test_stock_rule_risk_off_overlay_moves_to_cash() -> None:
+    dates = pd.bdate_range("2024-01-02", periods=90)
+    close = pd.DataFrame(
+        {
+            "AAA": [100 + idx for idx in range(len(dates))],
+            "069500.KS": [200 - idx for idx in range(len(dates))],
+        },
+        index=dates,
+    )
+    board = PriceBoard(close=close, open=close.copy(), high=close.copy(), low=close.copy())
+    reports = pd.DataFrame(
+        [
+            {
+                "report_id": "r-aaa",
+                "symbol": "AAA",
+                "publication_date": dates[0],
+                "report_current_price_krw": 100.0,
+                "target_price_krw": 300.0,
+            }
+        ]
+    )
+    state = _report_state_matrices(
+        dates, list(close.columns), _prepare_stock_reports(reports, board), board.high
+    )
+    weights, _ = _weights_for_config(
+        close,
+        state,
+        StockRuleConfig(
+            rule_id="risk_off",
+            family="price_momentum",
+            fast_ma_days=5,
+            slow_ma_days=20,
+            min_report_age_days=0,
+            max_report_age_days=3650,
+            rebalance="D",
+            top_pool=1,
+            hold_top=1,
+            weight_mode="equal",
+            score_mode="price_momentum",
+            risk_off_ma_days=20,
+        ),
+    )
+
+    assert weights[30:, 0].sum() == 0
+
+
+def test_stock_rule_fallback_symbol_keeps_capital_working_when_no_candidate() -> None:
+    dates = pd.bdate_range("2024-01-02", periods=90)
+    close = pd.DataFrame(
+        {
+            "AAA": [100 - idx * 0.5 for idx in range(len(dates))],
+            "069500.KS": [100 + idx for idx in range(len(dates))],
+        },
+        index=dates,
+    )
+    board = PriceBoard(close=close, open=close.copy(), high=close.copy(), low=close.copy())
+    reports = pd.DataFrame(
+        [
+            {
+                "report_id": "r-aaa",
+                "symbol": "AAA",
+                "publication_date": dates[0],
+                "report_current_price_krw": 100.0,
+                "target_price_krw": 300.0,
+            }
+        ]
+    )
+    state = _report_state_matrices(
+        dates, list(close.columns), _prepare_stock_reports(reports, board), board.high
+    )
+    weights, _ = _weights_for_config(
+        close,
+        state,
+        StockRuleConfig(
+            rule_id="fallback",
+            family="price_momentum",
+            fast_ma_days=5,
+            slow_ma_days=20,
+            min_report_age_days=0,
+            max_report_age_days=3650,
+            rebalance="D",
+            top_pool=1,
+            hold_top=1,
+            weight_mode="equal",
+            score_mode="price_momentum",
+            min_return_63d=0.0,
+            fallback_symbol="069500.KS",
+        ),
+    )
+
+    assert weights[-1, 0] == 0
+    assert weights[-1, 1] == 1
+
+
 def test_stock_rule_diversity_gate_never_exceeds_persona_top_with_coverage_representatives() -> None:
     frame = pd.DataFrame(
         [

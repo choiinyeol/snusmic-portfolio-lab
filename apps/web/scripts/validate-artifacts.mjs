@@ -11,6 +11,7 @@ const required = [
   'portfolio/personas.json',
   'portfolio/holdings.json',
   'portfolio/trades.json',
+  'portfolio/daily-decisions.json',
   'portfolio/equity-daily.json',
   'reports/table.json',
   'reports/rankings.json',
@@ -41,6 +42,7 @@ function readJson(relativePath) {
 
 function rowCount(data) {
   if (Array.isArray(data)) return data.length;
+  if (Array.isArray(data?.rows)) return data.rows.length;
   return 1;
 }
 
@@ -61,6 +63,7 @@ const countFiles = {
   reports: 'reports/table.json',
   current_holdings: 'portfolio/holdings.json',
   trades: 'portfolio/trades.json',
+  daily_decisions: 'portfolio/daily-decisions.json',
   equity_daily: 'portfolio/equity-daily.json',
   personas: 'portfolio/personas.json',
   strategy_catalog: 'strategies/catalog.json',
@@ -72,6 +75,15 @@ for (const [key, file] of Object.entries(countFiles)) {
   if (typeof expected !== 'number') fail(`manifest row_counts.${key} is missing`);
   const actual = rowCount(readJson(file));
   if (actual !== expected) fail(`manifest row_counts.${key}=${expected}, actual ${actual} in ${file}`);
+}
+
+const dailyDecisions = readJson('portfolio/daily-decisions.json');
+if (!dailyDecisions.metadata?.run_mode) fail('portfolio/daily-decisions.json metadata.run_mode is missing');
+if (!dailyDecisions.metadata?.checkpoint_date) {
+  fail('portfolio/daily-decisions.json metadata.checkpoint_date is missing');
+}
+if (!dailyDecisions.metadata?.checkpoint_schema_version) {
+  fail('portfolio/daily-decisions.json metadata.checkpoint_schema_version is missing');
 }
 
 const reports = readJson('reports/table.json');
@@ -93,7 +105,6 @@ const benchmarkCount = personas.filter((row) =>
     'benchmark_qqq',
     'benchmark_spy',
     'benchmark_gld',
-    'weak_oracle',
   ].includes(row.persona),
 ).length;
 const customStrategyCount = personas.filter(
@@ -101,7 +112,7 @@ const customStrategyCount = personas.filter(
     !row.persona.startsWith('benchmark_') &&
     !['all_weather', 'smic_follower', 'smic_follower_v2', 'weak_oracle'].includes(row.persona),
 ).length;
-if (benchmarkCount < 8) fail(`expected at least 8 benchmark personas, got ${benchmarkCount}`);
+if (benchmarkCount < 7) fail(`expected at least 7 benchmark personas, got ${benchmarkCount}`);
 if (customStrategyCount < 1) fail('expected at least one custom strategy persona');
 
 console.log(

@@ -55,31 +55,3 @@ smic_follower_v2,IRMD,Iradimed Corporation,119,144620.9436,132558.9249,15774512.
 smic_follower_v2,017960.KS,한국카본,434,33751.8809,35750.0,15515500.0,867183.6821,0.0592,191,2025-11-11
 smic_follower_v2,CAMT,Camtek,7,275258.5633,237269.4536,1660886.1755,-265923.7675,-0.138,20,2026-05-01
 smic_follower_v2,187790.KS,나노,2,6364.1345,6600.0,13200.0,471.731,0.0371,17,2026-05-04
-stock_rule_ma_crossover_ma5_20_m_age0_3650_fail500t_pool5_hold3_equal_ma_cross,950160.KQ,코오롱티슈진,426,103414.1316,103000.0,43878000.0,-176420.0719,-0.004,108,2026-02-02
-stock_rule_ma_crossover_ma5_20_m_age0_3650_fail500t_pool5_hold3_equal_ma_cross,003030.KS,세아제강지주,211,219642.6915,170900.0,36059900.0,-10284707.8986,-0.2219,50,2026-04-01
-stock_rule_ma_crossover_ma5_20_m_age0_3650_fail500t_pool5_hold3_equal_ma_cross,476830.KQ,알지노믹스,203,228648.5421,130000.0,26390000.0,-20025654.0539,-0.4314,50,2026-04-01
-stock_rule_target_gap_reversal_ma10_30_m_age7_120_pool10_hold5_winner_compress_reversal_gap,214450.KQ,파마리서치,361,313203.4735,293500.0,105953500.0,-7112953.9245,-0.0629,50,2026-04-01
-stock_rule_target_gap_reversal_ma10_30_m_age7_120_pool10_hold5_winner_compress_reversal_gap,122640.KQ,예스티,1513,20413.2615,25750.0,38959750.0,8074485.3051,0.2614,50,2026-04-01
-stock_rule_target_gap_reversal_ma10_30_m_age7_120_pool10_hold5_winner_compress_reversal_gap,010950.KS,S-OIL,273,112973.3935,107300.0,29292900.0,-1548836.4166,-0.0502,50,2026-04-01
-stock_rule_target_gap_reversal_ma10_30_m_age7_120_pool3_hold2_winner_compress_reversal_gap,122640.KQ,예스티,3737,20413.2615,25750.0,96227750.0,19943391.6624,0.2614,50,2026-04-01
-stock_rule_target_gap_reversal_ma10_30_m_age7_120_pool3_hold2_winner_compress_reversal_gap,214450.KQ,파마리서치,297,313203.4735,293500.0,87169500.0,-5851931.6221,-0.0629,50,2026-04-01
-stock_rule_target_gap_reversal_ma10_30_m_age7_120_pool5_hold3_equal_reversal_gap,122640.KQ,예스티,2784,20413.2615,25750.0,71688000.0,14857479.9005,0.2614,50,2026-04-01
-stock_rule_target_gap_reversal_ma10_30_m_age7_120_pool5_hold3_equal_reversal_gap,214450.KQ,파마리서치,181,313203.4735,293500.0,53123500.0,-3566328.699,-0.0629,50,2026-04-01
-stock_rule_target_gap_reversal_ma10_30_w_age0_60_pool10_hold5_winner_compress_reversal_gap,187790.KS,나노,19389,6284.0825,6600.0,127967400.0,6125324.9698,0.0503,10,2026-05-11
-stock_rule_target_gap_reversal_ma10_30_w_age0_60_pool10_hold5_winner_compress_reversal_gap,252990.KS,샘씨엔에스,2121,11737.6254,11870.0,25176270.0,280766.5696,0.0113,3,2026-05-18
-stock_rule_target_gap_reversal_ma10_30_w_age0_60_pool10_hold5_winner_compress_reversal_gap,100090.KS,SK오션플랜트,1302,20963.6191,18350.0,23891700.0,-3402932.0308,-0.1247,10,2026-05-11
-stock_rule_target_gap_reversal_ma10_30_w_age0_60_pool10_hold5_winner_compress_reversal_gap,213420.KS,덕산네오룩스,551,45129.3184,42150.0,23224650.0,-1641604.4288,-0.066,3,2026-05-18
-stock_rule_target_gap_reversal_ma10_30_w_age0_60_pool10_hold5_winner_compress_reversal_gap,355150.KS,코스텍시스,429,57637.4443,44850.0,19240650.0,-5485813.6133,-0.2219,3,2026-05-18
-stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool3_hold2_equal_blend,187790.KS,나노,16430,6093.959,6600.0,108438000.0,8314254.3406,0.083,9,2026-05-12
-stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool3_hold2_equal_blend,355150.KS,코스텍시스,1762,56536.7292,44850.0,79025700.0,-20592016.9165,-0.2067,9,2026-05-12
-stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool3_hold2_equal_dynamic_upside,187790.KS,나노,15935,6093.959,6600.0,105171000.0,8063764.0242,0.083,9,2026-05-12
-stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool3_hold2_equal_dynamic_upside,355150.KS,코스텍시스,1709,56536.7292,44850.0,76648650.0,-19972620.2669,-0.2067,9,2026-05-12
-stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool5_hold3_equal_dynamic_upside,187790.KS,나노,8618,6093.959,6600.0,56878800.0,4361061.7107,0.083,9,2026-05-12
-stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool5_hold3_equal_dynamic_upside,GLNG,Golar LNG,632,85250.3099,81674.5179,51618295.3128,-2259900.5695,-0.0419,3,2026-05-18
-stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool5_hold3_equal_dynamic_upside,355150.KS,코스텍시스,940,56253.8475,44850.0,42159000.0,-10719616.6645,-0.2027,9,2026-05-12
-stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool5_hold3_winner_compress_dynamic_upside,187790.KS,나노,14071,6093.959,6600.0,92868600.0,7120503.5196,0.083,9,2026-05-12
-stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool5_hold3_winner_compress_dynamic_upside,GLNG,Golar LNG,422,85250.3099,81674.5179,34466646.5538,-1508984.241,-0.0419,3,2026-05-18
-stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool5_hold3_winner_compress_dynamic_upside,355150.KS,코스텍시스,628,56170.9491,44850.0,28165800.0,-7109556.0257,-0.2015,9,2026-05-12
-stock_rule_target_upside_momentum_ma10_30_w_age7_120_pool10_hold5_equal_dynamic_upside,187790.KS,나노,7980,6284.0825,6600.0,52668000.0,2521021.8814,0.0503,3,2026-05-18
-stock_rule_target_upside_momentum_ma10_30_w_age7_120_pool10_hold5_equal_dynamic_upside,GLNG,Golar LNG,585,83126.7075,81674.5179,47779592.9715,-849530.8989,-0.0175,10,2026-05-11
-stock_rule_target_upside_momentum_ma10_30_w_age7_120_pool10_hold5_equal_dynamic_upside,355150.KS,코스텍시스,870,57637.4443,44850.0,39019500.0,-11125076.5584,-0.2219,3,2026-05-18

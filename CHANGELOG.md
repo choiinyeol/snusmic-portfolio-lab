@@ -2,6 +2,27 @@
 
 이 프로젝트의 사용자 가시 변경사항을 모두 정리합니다. 릴리스의 진실은 git 태그이며, 본 파일은 태그 단위로 의도를 한국어로 기록합니다.
 
+## v0.27.0-daily-forward-checkpoints.1 — 2026-05-22
+
+### 추가
+- `daily-forward` CLI를 추가해 매일 새 가격/리포트만 들어오는 운영 경로에서 마지막 checkpoint 이후 거래일만 전진 처리할 수 있게 했습니다.
+- `Account`, follower, follower v2, MTT, All Weather persona에 snapshot/restore와 persona-local daily step을 추가했습니다.
+- `daily_decisions.csv`, `data/web/daily-decisions.json`, `data/web/portfolio/daily-decisions.json`을 생성해 매일 pool/candidate/buy/sell 의사결정을 감사할 수 있게 했습니다.
+- `docs/product-spec.md`, `docs/backtest-contract.md`, `docs/agent-playbook.md`, `docs/incremental-forward-contract.md`, `docs/simplification-candidates.md`로 LLM/agent가 같은 목적과 실행 계약을 읽고 작업하도록 정리했습니다.
+
+### 변경
+- `scripts/refresh_web_artifacts.sh`의 기본 운영 경로를 full strategy generation에서 `daily-forward -> export-web`으로 바꾸고, full rebuild는 `scripts/full_rebuild_web_artifacts.sh`로 분리했습니다.
+- checkpoint가 없거나 과거 가격/리포트/config/schema가 바뀌거나 요청 종료일이 checkpoint보다 과거이면 full replay fallback을 수행하고 `daily-forward-metadata.json`에 사유를 남깁니다.
+- All Weather checkpoint 복원 시 과거의 유한한 rebalance calendar를 재사용하지 않고, 새 요청 기간으로 다시 계산한 future calendar를 유지하도록 수정했습니다.
+- 웹 artifact validator가 daily decision metadata와 compact portfolio daily decision artifact를 필수 산출물로 검증합니다.
+
+### 검증
+- `ruff check src/snusmic_pipeline/sim/brokerage.py src/snusmic_pipeline/sim/personas/smic_follower.py src/snusmic_pipeline/sim/personas/smic_follower_v2.py src/snusmic_pipeline/sim/personas/smic_mtt_strategy.py src/snusmic_pipeline/sim/personas/all_weather.py src/snusmic_pipeline/sim/runner.py src/snusmic_pipeline/sim/forward_runner.py src/snusmic_pipeline/cli.py src/snusmic_pipeline/web_artifacts.py tests/sim/test_forward_runner.py tests/test_web_artifacts.py`
+- `pytest tests/sim/test_strategy_generation.py tests/sim/test_stock_rule_search.py tests/sim/test_forward_runner.py tests/sim/test_decision_ledger.py tests/test_web_artifacts.py::test_daily_decision_artifacts_expose_checkpoint_metadata tests/test_web_artifacts.py::test_extended_web_artifacts_support_insights_and_downloads -q` → `24 passed`
+- `bash scripts/refresh_web_artifacts.sh` → `daily-forward` `mode=noop`, `latest_date=2026-05-21`
+- `pnpm --dir apps/web artifact:check` → `ok schema=1.0.0 reports=202 benchmarks=7 strategies=3 price_files=212`
+- Architect verification: All Weather 월 경계 checkpoint bug fix 후 `APPROVE`
+
 ## v0.26.2-korean-strategy-labels.1 — 2026-05-22
 
 ### 변경

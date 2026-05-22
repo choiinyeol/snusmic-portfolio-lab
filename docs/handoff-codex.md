@@ -1,5 +1,7 @@
 # Codex handoff — 2026-05-19
 
+> Superseded note, 2026-05-22: 이 문서는 과거 인수인계 기록이다. 제품 목적과 새 작업 기준은 `docs/product-spec.md`, `docs/backtest-contract.md`, `docs/agent-playbook.md`를 우선한다. 아래 내용은 당시 코드 상태를 이해하기 위한 historical context로만 사용한다.
+
 이 문서는 다른 코딩 에이전트(Codex 등)가 작업을 이어받을 때 필요한 현재 컨텍스트를 코드 기준으로 정리한다. **최종 truth는 코드와 산출물이다.** `DESIGN.md`와 계획 문서는 의도·맥락·작업 순서를 돕는 문서이며, 코드와 충돌하면 코드를 먼저 확인한다.
 
 ---

@@ -20,10 +20,13 @@ not the SNUSMIC report universe.
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass, field
 from datetime import date
 
+from pydantic import BaseModel, ConfigDict
+
 from ..brokerage import Account
-from ..contracts import AllWeatherConfig, BrokerageFees, SavingsPlan
+from ..contracts import AllWeatherConfig, BrokerageFees, EquityPoint, SavingsPlan
 from ..market import PriceBoard
 from ..savings import CashFlowEvent
 from .base import (
@@ -33,6 +36,47 @@ from .base import (
     cumulative_contributions,
     record_equity_point,
 )
+
+
+class _AllWeatherSnapshotModel(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+
+class AllWeatherStateSnapshot(_AllWeatherSnapshotModel):
+    previous_day: date | None = None
+    target_weights: dict[str, float]
+    asset_rebalance_days: dict[str, tuple[date, ...]]
+
+
+@dataclass
+class AllWeatherRuntime:
+    config: AllWeatherConfig
+    label: str
+    plan: SavingsPlan
+    benchmark_board: PriceBoard
+    cashflow_by_date: dict[date, float]
+    daily_closes: dict[date, dict[str, float]]
+    contributions: dict[date, float]
+    target_weights: dict[str, float]
+    asset_rebalance_days: dict[str, frozenset[date]]
+    account: Account
+    previous_day: date | None = None
+    equity_points: list[EquityPoint] = field(default_factory=list)
+
+    def to_state_snapshot(self) -> AllWeatherStateSnapshot:
+        return AllWeatherStateSnapshot(
+            previous_day=self.previous_day,
+            target_weights=dict(self.target_weights),
+            asset_rebalance_days={
+                symbol: tuple(sorted(days)) for symbol, days in self.asset_rebalance_days.items()
+            },
+        )
+
+    def restore_state_snapshot(self, snapshot: AllWeatherStateSnapshot) -> None:
+        # Target weights and rebalance dates are derived from the full requested
+        # window, so an extended forward run must keep the freshly recomputed
+        # future calendar instead of restoring the finite old one.
+        self.previous_day = snapshot.previous_day
 
 
 def simulate_all_weather(
@@ -47,7 +91,6 @@ def simulate_all_weather(
     persona = config.persona_name
     label = config.label if label is None else label
     account = Account(persona=persona, fees=fees)
-    cashflow_by_date: dict[date, float] = {e.date: e.amount_krw for e in cashflows}
 
     if not trading_dates or benchmark_board.is_empty:
         return PersonaRunOutput(
@@ -56,6 +99,38 @@ def simulate_all_weather(
             summary=build_summary(persona, label, account, [], cashflows, plan.initial_capital_krw),
         )
 
+    runtime = build_all_weather_runtime(
+        config=config,
+        label=label,
+        plan=plan,
+        benchmark_board=benchmark_board,
+        cashflows=cashflows,
+        trading_dates=trading_dates,
+        account=account,
+    )
+
+    for day in trading_dates:
+        step_all_weather_day(runtime, day)
+
+    summary = build_summary(
+        persona, label, runtime.account, runtime.equity_points, cashflows, plan.initial_capital_krw
+    )
+    return PersonaRunOutput(account=runtime.account, equity_points=runtime.equity_points, summary=summary)
+
+
+def build_all_weather_runtime(
+    *,
+    config: AllWeatherConfig,
+    label: str,
+    plan: SavingsPlan,
+    benchmark_board: PriceBoard,
+    cashflows: list[CashFlowEvent],
+    trading_dates: list[date],
+    account: Account,
+    state_snapshot: AllWeatherStateSnapshot | None = None,
+    previous_day: date | None = None,
+    equity_points: list[EquityPoint] | None = None,
+) -> AllWeatherRuntime:
     target_weights_full = {asset.symbol: asset.weight for asset in config.assets}
     daily_closes = {d: benchmark_board.close_on(d) for d in trading_dates}
 
@@ -83,39 +158,56 @@ def simulate_all_weather(
     )
 
     contributions = cumulative_contributions(cashflows, trading_dates)
-    equity_points: list = []
-    previous_day: date | None = None
+    runtime = AllWeatherRuntime(
+        config=config,
+        label=label,
+        plan=plan,
+        benchmark_board=benchmark_board,
+        cashflow_by_date={e.date: e.amount_krw for e in cashflows},
+        daily_closes=daily_closes,
+        contributions=contributions,
+        target_weights=target_weights,
+        asset_rebalance_days=asset_rebalance_days,
+        account=account,
+        previous_day=previous_day,
+        equity_points=equity_points or [],
+    )
+    if state_snapshot is not None:
+        runtime.restore_state_snapshot(state_snapshot)
+    return runtime
 
-    for day in trading_dates:
-        accrue_cash_yield_since_previous(account, day, previous_day, plan)
-        deposit = cashflow_by_date.get(day, 0.0)
-        if deposit > 0:
-            account.deposit(day, deposit)
-        # Per-asset rebalance: each ETF whose own exchange is at its
-        # first-of-period today rebalances itself toward
-        # ``target_weight × current_equity``. Other ETFs' share counts are
-        # untouched — their next firing on their own market will catch up.
-        due_today = [sym for sym in target_weights if day in asset_rebalance_days.get(sym, frozenset())]
-        if due_today:
-            prices = _build_price_view(benchmark_board, daily_closes.get(day, {}), account, day)
-            equity_now = account.equity(prices)
-            for sym in due_today:
-                target_value = equity_now * target_weights[sym]
-                _rebalance_one_asset(account, day, sym, target_value, prices.get(sym))
-        equity_points.append(
-            record_equity_point(
-                account,
-                persona,
-                day,
-                daily_closes.get(day, {}),
-                contributions[day],
-                board=benchmark_board,
-            )
+
+def step_all_weather_day(runtime: AllWeatherRuntime, day: date) -> EquityPoint:
+    account = runtime.account
+    accrue_cash_yield_since_previous(account, day, runtime.previous_day, runtime.plan)
+    deposit = runtime.cashflow_by_date.get(day, 0.0)
+    if deposit > 0:
+        account.deposit(day, deposit)
+    due_today = [
+        sym for sym in runtime.target_weights if day in runtime.asset_rebalance_days.get(sym, frozenset())
+    ]
+    if due_today:
+        prices = _build_price_view(
+            runtime.benchmark_board,
+            runtime.daily_closes.get(day, {}),
+            account,
+            day,
         )
-        previous_day = day
-
-    summary = build_summary(persona, label, account, equity_points, cashflows, plan.initial_capital_krw)
-    return PersonaRunOutput(account=account, equity_points=equity_points, summary=summary)
+        equity_now = account.equity(prices)
+        for sym in due_today:
+            target_value = equity_now * runtime.target_weights[sym]
+            _rebalance_one_asset(account, day, sym, target_value, prices.get(sym))
+    point = record_equity_point(
+        account,
+        runtime.config.persona_name,
+        day,
+        runtime.daily_closes.get(day, {}),
+        runtime.contributions[day],
+        board=runtime.benchmark_board,
+    )
+    runtime.equity_points.append(point)
+    runtime.previous_day = day
+    return point
 
 
 def _per_asset_rebalance_days(

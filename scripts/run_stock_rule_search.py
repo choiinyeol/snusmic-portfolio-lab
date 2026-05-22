@@ -503,13 +503,24 @@ def _passes_goal(
     min_return: float,
     max_drawdown: float,
 ) -> bool:
+    # Daily stock-rule rotations look attractive in vector OOS, but the real
+    # share ledger pays taxes/fees on every rebalance and those candidates have
+    # repeatedly flipped from high paper returns to negative deployable IRR.
+    if str(row.get("rebalance") or "") == "D":
+        return False
     risk_ok = max_drawdown <= 0 or abs(float(row.get("oos_max_drawdown") or 0.0)) <= max_drawdown
     quality_ok = (
         float(row.get("oos_annualized_sharpe") or 0.0) >= min_sharpe
         or float(row.get("oos_annualized_sortino") or 0.0) >= min_sortino
         or float(row.get("oos_total_return") or 0.0) >= min_return
     )
-    return risk_ok and quality_ok
+    low_turnover_quality_ok = (
+        str(row.get("rebalance") or "") in {"W", "M"}
+        and float(row.get("oos_total_return") or 0.0) >= 0.50
+        and float(row.get("oos_annualized_sortino") or 0.0) >= 0.45
+        and abs(float(row.get("oos_max_drawdown") or 0.0)) <= 0.60
+    )
+    return (risk_ok and quality_ok) or low_turnover_quality_ok
 
 
 def _stock_persona_configs(
@@ -529,7 +540,7 @@ def _stock_persona_configs(
                 persona_name=_stock_rule_persona_id(rule_id),
                 label=_stock_rule_label(index, family),
                 rule_id=rule_id,
-                family=family,
+                family=cast(Any, family),
                 fast_ma_days=int(row["fast_ma_days"]),
                 slow_ma_days=int(row["slow_ma_days"]),
                 min_report_age_days=int(row["min_report_age_days"]),
@@ -543,6 +554,17 @@ def _stock_persona_configs(
                 min_momentum_return=float(row.get("min_momentum_return") or -1.0),
                 min_pullback_pct=float(row.get("min_pullback_pct") or 0.0),
                 coverage_failure_trading_days=int(row.get("coverage_failure_trading_days") or 0),
+                min_return_21d=float(row.get("min_return_21d", -1.0)),
+                min_return_63d=float(row.get("min_return_63d", -1.0)),
+                min_return_126d=float(row.get("min_return_126d", -1.0)),
+                min_distance_from_52w_high=float(row.get("min_distance_from_52w_high", -1.0)),
+                require_ma_stack=_boolish(row.get("require_ma_stack", False)),
+                hold_target_winners=_boolish(row.get("hold_target_winners", False)),
+                target_winner_trailing_stop_pct=float(row.get("target_winner_trailing_stop_pct") or 0.0),
+                target_carry_ma_days=int(row.get("target_carry_ma_days") or 0),
+                risk_off_ma_days=int(row.get("risk_off_ma_days") or 0),
+                risk_off_symbol=str(row.get("risk_off_symbol") or "069500.KS"),
+                fallback_symbol=str(row.get("fallback_symbol") or ""),
                 source_search_start=search_start,
                 source_search_end=search_end,
                 source_oos_start=oos_start,
@@ -620,6 +642,17 @@ def _stock_admission_artifact(
                     "min_momentum_return",
                     "min_pullback_pct",
                     "coverage_failure_trading_days",
+                    "min_return_21d",
+                    "min_return_63d",
+                    "min_return_126d",
+                    "min_distance_from_52w_high",
+                    "require_ma_stack",
+                    "hold_target_winners",
+                    "target_winner_trailing_stop_pct",
+                    "target_carry_ma_days",
+                    "risk_off_ma_days",
+                    "risk_off_symbol",
+                    "fallback_symbol",
                 )
             ),
             in_sample_metrics=_metrics(row, "is"),
@@ -678,6 +711,8 @@ def _metrics(row: dict[str, Any], prefix: str) -> StockRuleMetrics:
 def _artifact_status(row: dict[str, Any], *, passes_goal: bool) -> StockAdmissionStatus:
     if not bool(row.get("accepted")):
         status = str(row.get("admission_status") or "")
+        if "benchmark" in status:
+            return "below_benchmark"
         if "duplicate" in status:
             return "duplicate_behavior"
         if "activity" in status:
@@ -691,6 +726,8 @@ def _artifact_reasons(row: dict[str, Any]) -> list[StockAdmissionReason]:
     if str(row.get("diversity_status") or "") == "correlation_rejected":
         return ["duplicate_behavior"]
     status = str(row.get("admission_status") or "")
+    if "benchmark" in status:
+        return ["below_oos_benchmark"]
     if "duplicate" in status:
         return ["duplicate_behavior"]
     if "correlation" in status:
@@ -733,6 +770,14 @@ def _representative_symbol(row: dict[str, Any]) -> str:
 def _stock_rule_persona_id(rule_id: str) -> str:
     safe = "".join(ch if ch.isalnum() else "_" for ch in rule_id.lower()).strip("_")
     return f"stock_rule_{safe}"
+
+
+def _boolish(value: object) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "y"}
+    return bool(value)
 
 
 def _stock_rule_label(index: int, family: str) -> str:

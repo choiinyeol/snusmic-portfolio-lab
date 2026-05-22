@@ -69,7 +69,7 @@ class PriceBoard:
 
     @classmethod
     def from_warehouse(cls, warehouse_dir: Path) -> PriceBoard:
-        prices = read_table(warehouse_dir, "daily_prices")
+        prices = _read_price_board_frame(warehouse_dir)
         if prices.empty:
             return cls(close=pd.DataFrame(), open=pd.DataFrame())
         prices = prices.copy()
@@ -249,6 +249,26 @@ class PriceBoard:
         if future.empty:
             return None
         return future.idxmax().date()
+
+
+def _read_price_board_frame(warehouse_dir: Path) -> pd.DataFrame:
+    """Read only the OHLC columns needed by ``PriceBoard``.
+
+    ``warehouse.read_table`` validates every row with Pydantic, which is useful
+    at schema boundaries but too expensive for repeated simulation reads. The
+    simulation hot path only needs already-committed OHLC columns, so it uses a
+    narrow typed CSV read and lets artifact/schema checks own full validation.
+    """
+
+    path = warehouse_dir / "daily_prices.csv"
+    if not path.exists() or path.stat().st_size == 0:
+        return pd.DataFrame()
+    wanted = {"date", "symbol", "open", "high", "low", "close"}
+    return pd.read_csv(
+        path,
+        usecols=lambda column: column in wanted,
+        dtype={"date": "str", "symbol": "str"},
+    )
 
 
 # ---------------------------------------------------------------------------

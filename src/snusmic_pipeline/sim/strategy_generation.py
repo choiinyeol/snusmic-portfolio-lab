@@ -3,9 +3,8 @@
 The pipeline has one approval source of truth: a generated strategy is promoted
 from frozen search candidates by the *final portfolio simulation ledger* and a
 high-correlation compression gate.  Benchmark-relative return is retained as
-comparative evidence, but a benchmark lag is not a hard rejection reason because
-some validation windows can legitimately favor the benchmark while the strategy
-still contributes useful absolute or diversifying behavior.
+comparative evidence; the web product layer decides which promoted candidates
+are selectable portfolio strategies by objective pass/fail.
 """
 
 from __future__ import annotations
@@ -14,6 +13,7 @@ import hashlib
 import importlib.util
 import json
 import os
+import time
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
@@ -36,6 +36,7 @@ from .contracts import (
     SmicMttStrategyConfig,
     StockRulePersonaConfig,
 )
+from .decision_ledger import build_daily_decision_ledger
 from .market import PriceBoard
 from .pit_research_board import default_pit_research_board_configs, snapshot_rows_for_config
 from .runner import _prepare_reports, run_simulation
@@ -63,7 +64,7 @@ class StrategyGenerationConfig:
     is_top: int = 75
     admit_top: int = 0
     stock_persona_top: int = 10
-    pit_strategy_top: int = 5
+    pit_strategy_top: int = 0
     max_correlation: float = 0.95
     goal_min_sharpe: float = 0.7
     goal_min_sortino: float = 0.7
@@ -74,6 +75,7 @@ class StrategyGenerationConfig:
     broker_strategy_seed: int = 42
     broker_strategy_train_start: date = date(2021, 1, 1)
     broker_strategy_train_end: date = date(2023, 12, 31)
+    include_oracle: bool = False
     refresh_benchmark: bool = False
 
 
@@ -86,6 +88,7 @@ class GenerationResult:
     broker_promoted: tuple[str, ...]
     rejected_by_portfolio_benchmark: tuple[str, ...]
     rejected_by_correlation: tuple[str, ...]
+    stage_seconds: dict[str, float]
 
 
 @dataclass(frozen=True)
@@ -96,11 +99,19 @@ class BenchmarkSelection:
 
 def run_strategy_generation(config: StrategyGenerationConfig) -> GenerationResult:
     """Generate, gate, write, and simulate approved strategy personas."""
+    stage_seconds: dict[str, float] = {}
     config.out_dir.mkdir(parents=True, exist_ok=True)
-    base_config = SimulationConfig(start_date=config.start_date, end_date=config.end_date)
-    benchmark = select_benchmark_summary(config, base_config)
+    base_config = base_simulation_config(config)
 
+    started = time.perf_counter()
+    benchmark = select_benchmark_summary(config, base_config)
+    stage_seconds["benchmark"] = _elapsed(started)
+
+    started = time.perf_counter()
     stock_candidates, stock_trials = generate_stock_rule_candidates(config, benchmark.money_weighted_return)
+    stage_seconds["stock_rule_candidates"] = _elapsed(started)
+
+    started = time.perf_counter()
     stock_promoted, stock_gate = portfolio_gate(
         config=config,
         base_personas=base_config.personas,
@@ -111,7 +122,9 @@ def run_strategy_generation(config: StrategyGenerationConfig) -> GenerationResul
     )
     stock_trials = annotate_stock_trial_gate(stock_trials, stock_gate)
     write_stock_outputs(config, stock_promoted, stock_trials, benchmark.money_weighted_return)
+    stage_seconds["stock_rule_gate"] = _elapsed(started)
 
+    started = time.perf_counter()
     pit_candidates = default_pit_research_board_configs()[: max(0, config.pit_strategy_top)]
     pit_promoted_generic, pit_gate = portfolio_gate_personas(
         config=config,
@@ -123,10 +136,14 @@ def run_strategy_generation(config: StrategyGenerationConfig) -> GenerationResul
     )
     pit_promoted = tuple(p for p in pit_promoted_generic if isinstance(p, PitResearchBoardConfig))
     write_pit_outputs(config, pit_candidates, pit_promoted, pit_gate, benchmark.money_weighted_return)
+    stage_seconds["pit_gate"] = _elapsed(started)
 
+    started = time.perf_counter()
     broker_search = broker_strategy_search_cached(config, base_config, benchmark.money_weighted_return)
     _to_csv_rounded(broker_search.trial_rows, config.out_dir / "broker_strategy_trials.csv")
+    stage_seconds["broker_search"] = _elapsed(started)
 
+    started = time.perf_counter()
     final_personas: tuple[PersonaConfig, ...] = (
         *base_config.personas,
         *broker_search.configs,
@@ -136,11 +153,14 @@ def run_strategy_generation(config: StrategyGenerationConfig) -> GenerationResul
     final_config = base_config.model_copy(update={"personas": final_personas})
     final_result = run_simulation_cached(config, final_config, stage="final")
     write_simulation_artifacts(final_result, config.out_dir)
+    stage_seconds["final_simulation"] = _elapsed(started)
 
     summary = {
         "schema_version": "1.0.0",
         "generated_at": datetime.now(UTC).isoformat(),
         "approval_source_of_truth": "final_portfolio_simulation",
+        "include_oracle": config.include_oracle,
+        "stage_seconds": stage_seconds,
         "benchmark_persona": benchmark.persona,
         "benchmark_money_weighted_return": benchmark.money_weighted_return,
         "stock_promoted": [p.persona_name for p in stock_promoted],
@@ -173,7 +193,23 @@ def run_strategy_generation(config: StrategyGenerationConfig) -> GenerationResul
         rejected_by_correlation=tuple(
             sorted(set(stock_gate.rejected_by_correlation) | set(pit_gate.rejected_by_correlation))
         ),
+        stage_seconds=stage_seconds,
     )
+
+
+def base_simulation_config(config: StrategyGenerationConfig) -> SimulationConfig:
+    """Return the baseline personas for the product's default end-to-end path.
+
+    Future-information oracle personas are useful as research upper bounds, but
+    they are not part of the investable account objective and their SLSQP
+    optimizer dominates runtime on this small dataset. Keep them opt-in.
+    """
+
+    base = SimulationConfig(start_date=config.start_date, end_date=config.end_date)
+    if config.include_oracle:
+        return base
+    personas = tuple(persona for persona in base.personas if persona.persona_name not in ORACLE_PERSONAS)
+    return base.model_copy(update={"personas": personas})
 
 
 def _load_stock_rule_script():
@@ -224,6 +260,9 @@ def generate_stock_rule_candidates(
     config: StrategyGenerationConfig,
     benchmark_money_weighted_return: float,
 ) -> tuple[tuple[StockRulePersonaConfig, ...], pd.DataFrame]:
+    if config.stock_persona_top <= 0:
+        return (), pd.DataFrame()
+
     # Import script helpers only for artifact compatibility while the search
     # primitives stay in snusmic_pipeline.sim.  This keeps the new pipeline as
     # the orchestration surface without duplicating the public stock-admission
@@ -493,9 +532,10 @@ def portfolio_gate_personas(
         summary = summaries.get(candidate.persona_name)
         if summary is None:
             continue
+        excess_vs_benchmark = summary.money_weighted_return - benchmark_money_weighted_return
         metrics_by_rule_id[candidate_key] = {
             "portfolio_money_weighted_return": summary.money_weighted_return,
-            "portfolio_excess_vs_benchmark": summary.money_weighted_return - benchmark_money_weighted_return,
+            "portfolio_excess_vs_benchmark": excess_vs_benchmark,
             "portfolio_sharpe": summary.sharpe,
             "portfolio_sortino": summary.sortino,
             "portfolio_max_drawdown": summary.max_drawdown,
@@ -558,6 +598,9 @@ def annotate_stock_trial_gate(frame: pd.DataFrame, gate: PortfolioGateResult) ->
         if rule_id in gate.accepted_rule_ids:
             accepted.append(True)
             statuses.append("accepted")
+        elif rule_id in gate.rejected_by_benchmark:
+            accepted.append(False)
+            statuses.append("below_portfolio_benchmark")
         elif rule_id in gate.rejected_by_correlation:
             accepted.append(False)
             statuses.append("portfolio_correlation_rejected")
@@ -650,6 +693,8 @@ def write_pit_outputs(
         metrics = gate.metrics_by_rule_id.get(key, {})
         if key in gate.accepted_rule_ids:
             status = "accepted"
+        elif key in gate.rejected_by_benchmark:
+            status = "below_portfolio_benchmark"
         elif key in gate.rejected_by_correlation:
             status = "portfolio_correlation_rejected"
         else:
@@ -798,6 +843,10 @@ def run_simulation_cached(
     return result
 
 
+def _elapsed(started: float) -> float:
+    return round(time.perf_counter() - started, 4)
+
+
 def _warehouse_fingerprint(warehouse_dir: Path) -> dict[str, dict[str, int | str]]:
     files = ("reports.csv", "daily_prices.csv", "benchmark_prices.csv", "fx_rates.csv")
     fingerprint: dict[str, dict[str, int | str]] = {}
@@ -842,6 +891,7 @@ def write_simulation_artifacts(result: SimulationResult, out: Path) -> None:
     _to_csv_rounded(pd.DataFrame([s.model_dump() for s in result.summaries]), out / "summary.csv")
     _to_csv_rounded(pd.DataFrame([p.model_dump() for p in result.equity_points]), out / "equity_daily.csv")
     _to_csv_rounded(pd.DataFrame([t.model_dump() for t in result.trades]), out / "trades.csv")
+    _to_csv_rounded(build_daily_decision_ledger(result), out / "daily_decisions.csv")
     _to_csv_rounded(
         pd.DataFrame([e.model_dump() for e in result.position_episodes]), out / "position_episodes.csv"
     )

@@ -64,6 +64,17 @@ class StockRuleConfig:
     min_momentum_return: float = -1.0
     min_pullback_pct: float = 0.0
     coverage_failure_trading_days: int = 0
+    min_return_21d: float = -1.0
+    min_return_63d: float = -1.0
+    min_return_126d: float = -1.0
+    min_distance_from_52w_high: float = -1.0
+    require_ma_stack: bool = False
+    hold_target_winners: bool = False
+    target_winner_trailing_stop_pct: float = 0.0
+    target_carry_ma_days: int = 0
+    risk_off_ma_days: int = 0
+    risk_off_symbol: str = "069500.KS"
+    fallback_symbol: str = ""
 
     def to_row(self) -> dict[str, Any]:
         return asdict(self)
@@ -302,6 +313,18 @@ def default_stock_rule_configs() -> tuple[StockRuleConfig, ...]:
                                             min_momentum_return=min_momentum,
                                             min_pullback_pct=min_pullback,
                                             coverage_failure_trading_days=0,
+                                            min_return_21d=-0.20,
+                                            min_return_63d=-0.10 if family == "target_gap_reversal" else 0.0,
+                                            min_return_126d=-0.20,
+                                            min_distance_from_52w_high=-0.40
+                                            if family == "target_gap_reversal"
+                                            else -0.30,
+                                            require_ma_stack=family != "target_gap_reversal",
+                                            hold_target_winners=True,
+                                            target_winner_trailing_stop_pct=0.25,
+                                            target_carry_ma_days=60,
+                                            risk_off_ma_days=120,
+                                            fallback_symbol="069500.KS",
                                         )
                                     )
 
@@ -333,6 +356,16 @@ def default_stock_rule_configs() -> tuple[StockRuleConfig, ...]:
                                     min_momentum_return=0.0 if family != "rsi_reversal" else -1.0,
                                     min_pullback_pct=0.0,
                                     coverage_failure_trading_days=500,
+                                    min_return_21d=-0.10,
+                                    min_return_63d=0.0 if family != "rsi_reversal" else -0.15,
+                                    min_return_126d=-0.05,
+                                    min_distance_from_52w_high=-0.30,
+                                    require_ma_stack=family != "rsi_reversal",
+                                    hold_target_winners=True,
+                                    target_winner_trailing_stop_pct=0.22,
+                                    target_carry_ma_days=60,
+                                    risk_off_ma_days=120,
+                                    fallback_symbol="069500.KS",
                                 )
                             )
     return tuple(configs)
@@ -354,12 +387,37 @@ def _config(
     min_momentum_return: float,
     min_pullback_pct: float,
     coverage_failure_trading_days: int,
+    min_return_21d: float,
+    min_return_63d: float,
+    min_return_126d: float,
+    min_distance_from_52w_high: float,
+    require_ma_stack: bool,
+    hold_target_winners: bool,
+    target_winner_trailing_stop_pct: float,
+    target_carry_ma_days: int,
+    risk_off_ma_days: int,
+    fallback_symbol: str,
 ) -> StockRuleConfig:
     failure_suffix = f"_fail{coverage_failure_trading_days}t" if coverage_failure_trading_days > 0 else ""
+    quality_suffix = (
+        f"_q21{_pct_token(min_return_21d)}"
+        f"_q63{_pct_token(min_return_63d)}"
+        f"_q126{_pct_token(min_return_126d)}"
+        f"_hi{_pct_token(min_distance_from_52w_high)}"
+    )
+    stack_suffix = "_stack" if require_ma_stack else ""
+    carry_suffix = (
+        f"_carry{_pct_token(target_winner_trailing_stop_pct)}ma{target_carry_ma_days}"
+        if hold_target_winners
+        else ""
+    )
+    risk_suffix = f"_risk{risk_off_ma_days}" if risk_off_ma_days > 0 else ""
+    fallback_suffix = f"_fb{_safe_token(fallback_symbol)}" if fallback_symbol else ""
     rule_id = (
         f"{family}_ma{fast_ma_days}_{slow_ma_days}_{rebalance}"
         f"_age{min_report_age_days}-{max_report_age_days}"
         f"{failure_suffix}_pool{top_pool}_hold{hold_top}_{weight_mode}_{score_mode}"
+        f"{quality_suffix}{stack_suffix}{carry_suffix}{risk_suffix}{fallback_suffix}"
     )
     return StockRuleConfig(
         rule_id=rule_id,
@@ -377,7 +435,26 @@ def _config(
         min_momentum_return=min_momentum_return,
         min_pullback_pct=min_pullback_pct,
         coverage_failure_trading_days=coverage_failure_trading_days,
+        min_return_21d=min_return_21d,
+        min_return_63d=min_return_63d,
+        min_return_126d=min_return_126d,
+        min_distance_from_52w_high=min_distance_from_52w_high,
+        require_ma_stack=require_ma_stack,
+        hold_target_winners=hold_target_winners,
+        target_winner_trailing_stop_pct=target_winner_trailing_stop_pct,
+        target_carry_ma_days=target_carry_ma_days,
+        risk_off_ma_days=risk_off_ma_days,
+        fallback_symbol=fallback_symbol,
     )
+
+
+def _pct_token(value: float) -> str:
+    scaled = int(round(value * 100))
+    return f"m{abs(scaled)}" if scaled < 0 else str(scaled)
+
+
+def _safe_token(value: str) -> str:
+    return "".join(ch.lower() for ch in value if ch.isalnum())
 
 
 def _load_market(warehouse_dir: Path, start_date: date, end_date: date) -> _PreparedMarket:
@@ -661,11 +738,16 @@ def _weights_for_config(
     close_np = close.to_numpy(float)
     fast_ma = _moving_average(close, config.fast_ma_days, moving_average_cache)
     slow_ma = _moving_average(close, config.slow_ma_days, moving_average_cache)
+    return_21d = _period_return(close, 21, indicator_cache)
+    return_63d = _period_return(close, 63, indicator_cache)
+    return_126d = _period_return(close, 126, indicator_cache)
+    high_252d = _rolling_high(close, 252, indicator_cache)
     with np.errstate(divide="ignore", invalid="ignore"):
         dynamic_upside = report_state["target"] / close_np - 1.0
         momentum = close_np / slow_ma - 1.0
         pullback = fast_ma / close_np - 1.0
         ma_spread = fast_ma / slow_ma - 1.0
+        distance_from_high = close_np / high_252d - 1.0
 
     rsi = _rsi_14(close, indicator_cache)
 
@@ -703,6 +785,33 @@ def _weights_for_config(
     else:
         score = 0.65 * dynamic_upside + 0.25 * static_upside + 0.35 * momentum
 
+    loser_quarantine = (
+        _threshold_ok(return_21d, config.min_return_21d)
+        & _threshold_ok(return_63d, config.min_return_63d)
+        & _threshold_ok(return_126d, config.min_return_126d)
+        & _threshold_ok(distance_from_high, config.min_distance_from_52w_high)
+    )
+    if config.require_ma_stack:
+        ma20 = _moving_average(close, 20, moving_average_cache)
+        ma60 = _moving_average(close, 60, moving_average_cache)
+        ma120 = _moving_average(close, 120, moving_average_cache)
+        loser_quarantine &= (close_np >= ma20) & (ma20 >= ma60) & (ma60 >= ma120)
+
+    carry_ok = np.full((n_days, n_symbols), False)
+    if config.hold_target_winners:
+        carry_ok = target_touched & (close_np >= slow_ma) & np.isfinite(momentum)
+        if config.target_carry_ma_days > 0:
+            carry_ma = _moving_average(close, config.target_carry_ma_days, moving_average_cache)
+            carry_ok &= close_np >= carry_ma
+        if config.target_winner_trailing_stop_pct > 0:
+            carry_peak = _rolling_high(close, 63, indicator_cache)
+            carry_ok &= close_np >= carry_peak * (1.0 - config.target_winner_trailing_stop_pct)
+        score = np.where(
+            carry_ok & (dynamic_upside < config.min_dynamic_upside),
+            0.65 * momentum + 0.35 * ma_spread + 0.10 * static_upside,
+            score,
+        )
+
     # Every stock rule ranks symbols that entered the investable universe via a
     # published research report.  Even price-only families must therefore wait
     # until the first publication date; otherwise a later report would leak the
@@ -721,17 +830,25 @@ def _weights_for_config(
         trend
         & np.isfinite(score)
         & coverage_live
+        & loser_quarantine
         & (momentum >= config.min_momentum_return)
         & (age >= config.min_report_age_days)
         & (age <= config.max_report_age_days)
     )
     if report_family:
-        valid = valid & np.isfinite(dynamic_upside) & (dynamic_upside >= config.min_dynamic_upside)
+        upside_ok = np.isfinite(dynamic_upside) & (dynamic_upside >= config.min_dynamic_upside)
+        valid = valid & (upside_ok | carry_ok)
+    risk_on = _risk_on_mask(close, config, moving_average_cache)
+    if risk_on is not None:
+        valid = valid & risk_on[:, None]
     rebalance_indices = _cached_rebalance_indices(close.index, config.rebalance, rebalance_cache)
     if len(rebalance_indices) == 0:
         return np.zeros((n_days, n_symbols)), np.zeros((0, n_symbols))
 
     rebalance_weights: list[np.ndarray] = []
+    fallback_idx = (
+        list(close.columns).index(config.fallback_symbol) if config.fallback_symbol in close.columns else None
+    )
     for day_idx in rebalance_indices:
         weights = np.zeros(n_symbols)
         day_score = np.where(valid[day_idx], score[day_idx], np.nan)
@@ -740,6 +857,8 @@ def _weights_for_config(
             selected = ok[np.argsort(day_score[ok])[::-1]][: config.top_pool][: config.hold_top]
             if selected.size:
                 weights[selected] = _selected_weights(day_score[selected], config.weight_mode)
+        if weights.sum() <= 0 and fallback_idx is not None and (risk_on is None or bool(risk_on[day_idx])):
+            weights[fallback_idx] = 1.0
         rebalance_weights.append(weights)
 
     rebalance_matrix = np.vstack(rebalance_weights)
@@ -767,6 +886,62 @@ def _moving_average(
     if cache is not None:
         cache[days] = values
     return values
+
+
+def _period_return(
+    close: pd.DataFrame,
+    days: int,
+    cache: dict[str, np.ndarray] | None,
+) -> np.ndarray:
+    key = f"return_{days}"
+    cached = cache.get(key) if cache is not None else None
+    if cached is not None:
+        return cached
+    values = (
+        close.pct_change(periods=days, fill_method=None).replace([np.inf, -np.inf], np.nan).to_numpy(float)
+    )
+    if cache is not None:
+        cache[key] = values
+    return values
+
+
+def _threshold_ok(values: np.ndarray, minimum: float) -> np.ndarray:
+    if minimum <= -1.0:
+        return np.full(values.shape, True)
+    return np.isfinite(values) & (values >= minimum)
+
+
+def _rolling_high(
+    close: pd.DataFrame,
+    days: int,
+    cache: dict[str, np.ndarray] | None,
+) -> np.ndarray:
+    key = f"rolling_high_{days}"
+    cached = cache.get(key) if cache is not None else None
+    if cached is not None:
+        return cached
+    values = close.rolling(days, min_periods=3).max().to_numpy(float)
+    if cache is not None:
+        cache[key] = values
+    return values
+
+
+def _risk_on_mask(
+    close: pd.DataFrame,
+    config: StockRuleConfig,
+    moving_average_cache: dict[int, np.ndarray] | None,
+) -> np.ndarray | None:
+    if config.risk_off_ma_days <= 0:
+        return None
+    if config.risk_off_symbol in close.columns:
+        symbol_idx = list(close.columns).index(config.risk_off_symbol)
+        ma = _moving_average(close, config.risk_off_ma_days, moving_average_cache)
+        close_np = close.to_numpy(float)
+        return close_np[:, symbol_idx] >= ma[:, symbol_idx]
+    long_ma = _moving_average(close, config.risk_off_ma_days, moving_average_cache)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        breadth = np.nanmean(close.to_numpy(float) >= long_ma, axis=1)
+    return breadth >= 0.40
 
 
 def _rsi_14(close: pd.DataFrame, cache: dict[str, np.ndarray] | None) -> np.ndarray:
@@ -1032,4 +1207,23 @@ def _config_from_row(row: Mapping[str, Any]) -> StockRuleConfig:
         min_momentum_return=float(row.get("min_momentum_return", -1.0)),
         min_pullback_pct=float(row.get("min_pullback_pct", 0.0)),
         coverage_failure_trading_days=int(row.get("coverage_failure_trading_days") or 0),
+        min_return_21d=float(row.get("min_return_21d", -1.0)),
+        min_return_63d=float(row.get("min_return_63d", -1.0)),
+        min_return_126d=float(row.get("min_return_126d", -1.0)),
+        min_distance_from_52w_high=float(row.get("min_distance_from_52w_high", -1.0)),
+        require_ma_stack=_boolish(row.get("require_ma_stack", False)),
+        hold_target_winners=_boolish(row.get("hold_target_winners", False)),
+        target_winner_trailing_stop_pct=float(row.get("target_winner_trailing_stop_pct", 0.0)),
+        target_carry_ma_days=int(row.get("target_carry_ma_days") or 0),
+        risk_off_ma_days=int(row.get("risk_off_ma_days") or 0),
+        risk_off_symbol=str(row.get("risk_off_symbol") or "069500.KS"),
+        fallback_symbol=str(row.get("fallback_symbol") or ""),
     )
+
+
+def _boolish(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "y"}
+    return bool(value)

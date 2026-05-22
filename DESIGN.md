@@ -1,7 +1,7 @@
 # SNUSMIC Portfolio Lab — Design Notes
 
-Last updated: 2026-05-19
-Status: code-traced design notes. The implementation and exported artifacts are the source of truth; this document records the intended product shape and must be corrected when it drifts from code.
+Last updated: 2026-05-22
+Status: code-traced design notes. The implementation and exported artifacts are the source of truth for runtime behavior; `docs/product-spec.md` is the source of truth for product intent.
 
 ---
 
@@ -18,17 +18,17 @@ Per-section revision markers (`<!-- rev: YYYY-MM-DD -->`) record the last substa
 
 ## 1. Product frame [FIXED]
 
-<!-- rev: 2026-05-19 -->
+<!-- rev: 2026-05-22 -->
 
-SNUSMIC Portfolio Lab is the public, static, artifact-backed research archive of the Seoul National University 학부 투자 동아리 SMIC. It records, for already-published reports, how the price actually behaved within a fixed validity window.
+SNUSMIC Portfolio Lab is an artifact-backed active trading backtest lab for a salaried-worker savings account. It asks whether an investor who relies on SMIC for stock coverage, but chooses their own buy/sell/position-management rules, could beat All-Weather using daily-close data.
 
-It is **not**: a trading terminal, broker app, order-entry UI, black-box recommender, market-data feed, or signal product.
+It is **not**: a trading terminal, broker app, order-entry UI, black-box recommender, market-data feed, live signal product, or report-author grading scoreboard.
 
-The tone is **academic appendix, not pitch**. We log what happened. We do not sell, recommend, or motivate.
+The tone is **research ledger, not pitch**. We log what happened, preserve failed experiments, and separate account-level strategy evidence from report-level labels.
 
 One-line product sentence:
 
-> 발간된 분석 리포트가 시장에서 어떻게 끝났는지를 기록하는, 학부 동아리의 정적 검증 원장.
+> SMIC 커버 종목만으로 직장인 적립식 계좌가 올웨더보다 더 벌 수 있는지 검증하는, 일별 종가 기준 액티브 매매 백테스트 원장.
 
 ---
 
@@ -169,13 +169,13 @@ Benchmarks (selectable=false unless oracle, presented as comparison baselines, n
 
 Everything else is a selectable strategy unless the catalog says otherwise.
 
-Personal objective gate:
+Personal objective:
 
 ```text
-MDD <= 15% AND return > KODEX 200 / KOSPI proxy
+final equity and MWR > All-Weather under the same savings cash flows
 ```
 
-Must be shown on strategy comparisons. Drives the default "best strategy" only after the taxonomy is established.
+MDD is a secondary explainability and survivability metric, not the first objective. Strategy comparisons may still show KODEX 200, QQQ, SPY, and GLD, but the product's primary hurdle is beating All-Weather in the salaried-worker account scenario.
 
 ---
 

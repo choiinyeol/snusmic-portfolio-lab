@@ -135,6 +135,17 @@ def _stock_rule_config(config: StockRulePersonaConfig) -> StockRuleConfig:
         min_momentum_return=config.min_momentum_return,
         min_pullback_pct=config.min_pullback_pct,
         coverage_failure_trading_days=config.coverage_failure_trading_days,
+        min_return_21d=config.min_return_21d,
+        min_return_63d=config.min_return_63d,
+        min_return_126d=config.min_return_126d,
+        min_distance_from_52w_high=config.min_distance_from_52w_high,
+        require_ma_stack=config.require_ma_stack,
+        hold_target_winners=config.hold_target_winners,
+        target_winner_trailing_stop_pct=config.target_winner_trailing_stop_pct,
+        target_carry_ma_days=config.target_carry_ma_days,
+        risk_off_ma_days=config.risk_off_ma_days,
+        risk_off_symbol=config.risk_off_symbol,
+        fallback_symbol=config.fallback_symbol,
     )
 
 

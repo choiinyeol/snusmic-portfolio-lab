@@ -11,12 +11,15 @@ Per the user spec: "1/n씩 사고, 현금이 생기면 비중 재조정.
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from datetime import date
+from typing import Any, cast
 
 import pandas as pd
+from pydantic import BaseModel, ConfigDict
 
 from ..brokerage import Account
-from ..contracts import BrokerageFees, SavingsPlan, SmicFollowerConfig
+from ..contracts import BrokerageFees, EquityPoint, SavingsPlan, SmicFollowerConfig
 from ..market import PriceBoard
 from ..savings import CashFlowEvent
 from .base import (
@@ -26,6 +29,46 @@ from .base import (
     cumulative_contributions,
     record_equity_point,
 )
+
+
+class _FollowerSnapshotModel(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+
+class FollowerOpenReportSnapshot(_FollowerSnapshotModel):
+    report_id: str
+    target_price: float
+    publication_date: date
+
+
+class FollowerStateSnapshot(_FollowerSnapshotModel):
+    open_reports: dict[str, tuple[FollowerOpenReportSnapshot, ...]]
+    stopped_out: dict[str, date]
+    absorbed_ids: tuple[str, ...]
+    cursor: int
+
+
+@dataclass
+class FollowerRuntime:
+    persona: str
+    label: str
+    rebalance_cadence: str
+    target_hit_multiplier: float
+    plan: SavingsPlan
+    board: PriceBoard
+    reports: pd.DataFrame
+    report_rows: list[dict[str, Any]]
+    cashflow_by_date: dict[date, float]
+    daily_closes: dict[date, dict[str, float]]
+    contributions: dict[date, float]
+    rebalance_days: set[date]
+    account: Account
+    state: FollowerState
+    equity_points: list[EquityPoint] = field(default_factory=list)
+    previous_day: date | None = None
+    stop_loss_hook: Any = None
+    expiry_days: int | None = None
+    allow_rebalance_sells: bool = True
 
 
 def simulate_smic_follower(
@@ -87,7 +130,6 @@ def _simulate_follower(
     preserving v2's full rebalance behavior.
     """
     account = Account(persona=persona, fees=fees)
-    cashflow_by_date: dict[date, float] = {e.date: e.amount_krw for e in cashflows}
 
     if not trading_dates:
         return PersonaRunOutput(
@@ -96,43 +138,104 @@ def _simulate_follower(
             summary=build_summary(persona, label, account, [], cashflows, plan.initial_capital_krw),
         )
 
-    daily_closes = {d: board.close_on(d) for d in trading_dates}
-    contributions = cumulative_contributions(cashflows, trading_dates)
-    rebalance_days = _rebalance_days(trading_dates, rebalance_cadence)
-
-    pub = pd.to_datetime(reports["publication_date"]).dt.date
-    reports = reports.assign(_pub=pub).sort_values("_pub").reset_index(drop=True)
-
-    state = FollowerState()
-    equity_points: list = []
-    previous_day: date | None = None
-
+    runtime = build_smic_follower_runtime(
+        persona=persona,
+        label=label,
+        rebalance_cadence=rebalance_cadence,
+        target_hit_multiplier=target_hit_multiplier,
+        plan=plan,
+        reports=reports,
+        board=board,
+        cashflows=cashflows,
+        trading_dates=trading_dates,
+        account=account,
+        stop_loss_hook=stop_loss_hook,
+        expiry_days=expiry_days,
+        allow_rebalance_sells=allow_rebalance_sells,
+    )
     for day in trading_dates:
-        accrue_cash_yield_since_previous(account, day, previous_day, plan)
-        state.absorb_reports(reports, day, board)
-        deposit_today = cashflow_by_date.get(day, 0.0)
-        if deposit_today > 0:
-            account.deposit(day, deposit_today)
-        if expiry_days and expiry_days > 0:
-            _expire_stale_positions(account, day, board, state, expiry_days)
-        if stop_loss_hook is not None:
-            stop_loss_hook(account, day, board, reports, state)
-        _check_target_hits(account, day, board, target_hit_multiplier, state)
-        if deposit_today > 0 or day in rebalance_days:
-            _rebalance_to_one_n(
-                account,
-                day,
-                board,
-                daily_closes[day],
-                state,
-                allow_sells=allow_rebalance_sells,
-            )
-        equity_points.append(
-            record_equity_point(account, persona, day, daily_closes[day], contributions[day], board=board)
+        step_smic_follower_day(runtime, day)
+    summary = build_summary(
+        persona, label, runtime.account, runtime.equity_points, cashflows, plan.initial_capital_krw
+    )
+    return PersonaRunOutput(account=runtime.account, equity_points=runtime.equity_points, summary=summary)
+
+
+def build_smic_follower_runtime(
+    *,
+    persona: str,
+    label: str,
+    rebalance_cadence: str,
+    target_hit_multiplier: float,
+    plan: SavingsPlan,
+    reports: pd.DataFrame,
+    board: PriceBoard,
+    cashflows: list[CashFlowEvent],
+    trading_dates: list[date],
+    account: Account,
+    stop_loss_hook: Any = None,
+    expiry_days: int | None = None,
+    allow_rebalance_sells: bool = True,
+    state: FollowerState | None = None,
+    previous_day: date | None = None,
+    equity_points: list[EquityPoint] | None = None,
+) -> FollowerRuntime:
+    pub = pd.to_datetime(reports["publication_date"]).dt.date
+    prepared_reports = reports.assign(_pub=pub).sort_values("_pub").reset_index(drop=True)
+    return FollowerRuntime(
+        persona=persona,
+        label=label,
+        rebalance_cadence=rebalance_cadence,
+        target_hit_multiplier=target_hit_multiplier,
+        plan=plan,
+        board=board,
+        reports=prepared_reports,
+        report_rows=cast(list[dict[str, Any]], prepared_reports.to_dict("records")),
+        cashflow_by_date={e.date: e.amount_krw for e in cashflows},
+        daily_closes={d: board.close_on(d) for d in trading_dates},
+        contributions=cumulative_contributions(cashflows, trading_dates),
+        rebalance_days=_rebalance_days(trading_dates, rebalance_cadence),
+        account=account,
+        state=state or FollowerState(),
+        equity_points=equity_points or [],
+        previous_day=previous_day,
+        stop_loss_hook=stop_loss_hook,
+        expiry_days=expiry_days,
+        allow_rebalance_sells=allow_rebalance_sells,
+    )
+
+
+def step_smic_follower_day(runtime: FollowerRuntime, day: date) -> EquityPoint:
+    accrue_cash_yield_since_previous(runtime.account, day, runtime.previous_day, runtime.plan)
+    runtime.state.absorb_reports(runtime.report_rows, day, runtime.board)
+    deposit_today = runtime.cashflow_by_date.get(day, 0.0)
+    if deposit_today > 0:
+        runtime.account.deposit(day, deposit_today)
+    if runtime.expiry_days and runtime.expiry_days > 0:
+        _expire_stale_positions(runtime.account, day, runtime.board, runtime.state, runtime.expiry_days)
+    if runtime.stop_loss_hook is not None:
+        runtime.stop_loss_hook(runtime.account, day, runtime.board, runtime.reports, runtime.state)
+    _check_target_hits(runtime.account, day, runtime.board, runtime.target_hit_multiplier, runtime.state)
+    if deposit_today > 0 or day in runtime.rebalance_days:
+        _rebalance_to_one_n(
+            runtime.account,
+            day,
+            runtime.board,
+            runtime.daily_closes[day],
+            runtime.state,
+            allow_sells=runtime.allow_rebalance_sells,
         )
-        previous_day = day
-    summary = build_summary(persona, label, account, equity_points, cashflows, plan.initial_capital_krw)
-    return PersonaRunOutput(account=account, equity_points=equity_points, summary=summary)
+    point = record_equity_point(
+        runtime.account,
+        runtime.persona,
+        day,
+        runtime.daily_closes[day],
+        runtime.contributions[day],
+        board=runtime.board,
+    )
+    runtime.equity_points.append(point)
+    runtime.previous_day = day
+    return point
 
 
 class FollowerState:
@@ -147,12 +250,14 @@ class FollowerState:
         self.open_reports: dict[str, list[tuple[str, float, date]]] = {}
         self.stopped_out: dict[str, date] = {}  # symbol → last stop-out date
         self._absorbed_ids: set[str] = set()
+        self._cursor = 0
 
-    def absorb_reports(self, reports: pd.DataFrame, day: date, board: PriceBoard) -> None:
-        if reports.empty:
+    def absorb_reports(self, reports: list[dict[str, Any]], day: date, board: PriceBoard) -> None:
+        if not reports:
             return
-        cohort = reports[(reports["_pub"] <= day)]
-        for record in cohort.to_dict("records"):
+        while self._cursor < len(reports) and reports[self._cursor]["_pub"] <= day:
+            record = reports[self._cursor]
+            self._cursor += 1
             report_id = str(record.get("report_id") or "")
             if not report_id or report_id in self._absorbed_ids:
                 continue
@@ -196,6 +301,36 @@ class FollowerState:
 
     def close_reports(self, symbol: str) -> None:
         self.open_reports.pop(symbol, None)
+
+    def to_snapshot(self) -> FollowerStateSnapshot:
+        return FollowerStateSnapshot(
+            open_reports={
+                symbol: tuple(
+                    FollowerOpenReportSnapshot(
+                        report_id=report_id,
+                        target_price=target_price,
+                        publication_date=publication_date,
+                    )
+                    for report_id, target_price, publication_date in items
+                )
+                for symbol, items in self.open_reports.items()
+            },
+            stopped_out=dict(self.stopped_out),
+            absorbed_ids=tuple(sorted(self._absorbed_ids)),
+            cursor=self._cursor,
+        )
+
+    @classmethod
+    def from_snapshot(cls, snapshot: FollowerStateSnapshot) -> FollowerState:
+        state = cls()
+        state.open_reports = {
+            symbol: [(item.report_id, item.target_price, item.publication_date) for item in items]
+            for symbol, items in snapshot.open_reports.items()
+        }
+        state.stopped_out = dict(snapshot.stopped_out)
+        state._absorbed_ids = set(snapshot.absorbed_ids)
+        state._cursor = snapshot.cursor
+        return state
 
 
 def _rebalance_days(trading_dates: list[date], cadence: str) -> set[date]:
