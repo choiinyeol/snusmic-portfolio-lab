@@ -15,7 +15,6 @@ import {
   getDefaultPortfolioPersona,
   getExecutiveOverview,
   getObjectivePassingRows,
-  getSelectableStrategyRows,
   getStrategyLeaderboard,
   TARGET_BENCHMARK_ID,
   type StrategyLeaderboardRow,
@@ -52,10 +51,10 @@ export function getDashboardViewModel() {
   );
   const equity = getStrategyCurves();
   const benchmarkRows = getBenchmarkRows(strategyRows);
-  const selectableRows = getSelectableStrategyRows(strategyRows);
+  const selectableRows = getObjectivePassingRows(strategyRows);
   const selectedStrategy = selectableRows.find((row) => row.id === selectedPersona);
   const chartSeries = buildDashboardSeries(equity, benchmarkRows, selectedStrategy, selectableRows);
-  const objectiveRows = getObjectivePassingRows(strategyRows);
+  const objectiveRows = selectableRows;
   const benchmarkToBeat = benchmarkRows.find((row) => row.id === TARGET_BENCHMARK_ID);
   const recentBuys = trades
     .filter((trade) => trade.persona === selectedPersona && trade.side === 'buy')

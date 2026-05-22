@@ -104,7 +104,7 @@ export function getDefaultPortfolioPersona(): string {
   const holdings = getCurrentHoldings();
   const summaryIds = new Set(summaries.map((row) => row.persona));
   const personasWithOpenHoldings = new Set(holdings.map((row) => row.persona));
-  const rankedStrategies = getSelectableStrategyRows(getStrategyLeaderboard()).filter((row) => summaryIds.has(row.id));
+  const rankedStrategies = getObjectivePassingRows(getStrategyLeaderboard()).filter((row) => summaryIds.has(row.id));
   const topWithOpenHoldings = rankedStrategies.find((row) => personasWithOpenHoldings.has(row.id));
   if (topWithOpenHoldings) {
     return topWithOpenHoldings.id;
@@ -112,6 +112,9 @@ export function getDefaultPortfolioPersona(): string {
   const topStrategy = rankedStrategies[0];
   if (topStrategy) {
     return topStrategy.id;
+  }
+  if (summaryIds.has(TARGET_BENCHMARK_ID)) {
+    return TARGET_BENCHMARK_ID;
   }
   const withOpenHoldings = summaries
     .filter((summary) => holdings.some((holding) => holding.persona === summary.persona))
@@ -133,7 +136,7 @@ export function getExecutiveOverview(persona = getDefaultPortfolioPersona()): Ex
     snapshotDate: overview.simulation_window?.price_end ?? overview.simulation_window?.report_end ?? '',
     portfolio: getPortfolioSnapshot(persona),
     reportStats: buildReportStats(reports),
-    bestStrategies: getSelectableStrategyRows(getStrategyLeaderboard()).slice(0, 5),
+    bestStrategies: getObjectivePassingRows(getStrategyLeaderboard()).slice(0, 5),
     recentReports: [...reports].sort((a, b) => b.publicationDate.localeCompare(a.publicationDate)).slice(0, 6),
     researchCandidates: getResearchCandidates(),
   };

@@ -1,6 +1,16 @@
-import { PortfolioRouteContent } from '../../portfolio-page-content';
+import {
+  EmptyPortfolioRouteContent,
+  PortfolioRouteContent,
+  getPortfolioStaticParams,
+} from '../../portfolio-page-content';
+import { NO_ADMITTED_STRATEGY_PARAM } from '../../portfolio-view-model';
+
+export function generateStaticParams() {
+  return getPortfolioStaticParams();
+}
 
 export default async function PortfolioTradesPage({ params }: { params: Promise<{ strategy: string }> }) {
   const { strategy } = await params;
+  if (strategy === NO_ADMITTED_STRATEGY_PARAM) return <EmptyPortfolioRouteContent />;
   return <PortfolioRouteContent selectedPersona={strategy} view="trades" />;
 }

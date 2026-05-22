@@ -44,8 +44,17 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
 
   if (!selected) {
     return (
-      <div className="rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-500">
-        표시할 실제 포트폴리오 전략이 없습니다. benchmark와 oracle은 이 원장에 포함하지 않습니다.
+      <div className="grid gap-3 rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-600">
+        <h1 className="text-xl font-semibold text-slate-950">승인된 포트폴리오 전략이 없습니다</h1>
+        <p className="max-w-3xl leading-6">
+          현재 계산된 stock-rule/PIT 후보는 모두 목표 벤치마크와 낙폭 기준을 통과하지 못했습니다. benchmark와 oracle은
+          비교 기준선이라 실제 포트폴리오 선택지에 섞지 않습니다.
+        </p>
+        <div>
+          <Button asChild size="sm" variant="outline">
+            <Link href="/statistics">리포트 통계 보기</Link>
+          </Button>
+        </div>
       </div>
     );
   }

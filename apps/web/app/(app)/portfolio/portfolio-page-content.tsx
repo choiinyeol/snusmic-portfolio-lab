@@ -23,6 +23,10 @@ export function PortfolioPageContent() {
   return <PortfolioLandingView model={buildPortfolioLandingModel()} />;
 }
 
+export function EmptyPortfolioRouteContent() {
+  return <PortfolioPageContent />;
+}
+
 export function PortfolioPageShell({ children, model }: { children: ReactNode; model: PortfolioViewModel }) {
   const persona = model.selectedPersona;
   const label = model.personaLabels[persona] ?? persona;

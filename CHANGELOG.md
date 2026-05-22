@@ -2,6 +2,18 @@
 
 이 프로젝트의 사용자 가시 변경사항을 모두 정리합니다. 릴리스의 진실은 git 태그이며, 본 파일은 태그 단위로 의도를 한국어로 기록합니다.
 
+## v0.26.1-portfolio-objective-gate.1 — 2026-05-22
+
+### 변경
+- `/portfolio`가 더 이상 후보끼리의 efficient frontier만으로 전략을 노출하지 않고, `objective_passed=true`인 전략만 실제 포트폴리오 선택지로 보여주도록 수정했습니다.
+- 목표 벤치마크·낙폭 기준을 통과한 전략이 없으면 포트폴리오 화면, 동적 전략 라우트, 사이드바 전략 수, 커맨드 팔레트가 모두 “승인 전략 없음/0개” 상태를 따릅니다.
+- 메인 대시보드의 전략 차트와 best-strategy 요약도 objective-passed 전략만 사용하도록 맞췄습니다.
+
+### 검증
+- `pnpm --dir apps/web check`
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web build`
+
 ## v0.26.0-stock-rule-oos.1 — 2026-05-22
 
 ### 추가

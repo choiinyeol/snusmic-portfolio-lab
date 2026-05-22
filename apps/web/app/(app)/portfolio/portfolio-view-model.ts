@@ -17,13 +17,14 @@ import {
 } from '@/lib/artifacts';
 import {
   getDefaultPortfolioPersona,
-  getSelectableStrategyRows,
+  getObjectivePassingRows,
   getStrategyLeaderboard,
   portfolioStrategyHref,
   type StrategyLeaderboardRow,
 } from '@/lib/product-model';
 
 const ALL_WEATHER_PERSONA = 'all_weather';
+export const NO_ADMITTED_STRATEGY_PARAM = 'no-admitted-strategy';
 
 export function buildPortfolioLandingModel(): PortfolioLandingModel {
   const allHoldings = getCurrentHoldings();
@@ -203,13 +204,14 @@ export function buildPortfolioViewModel(selectedPersona?: string): PortfolioView
 export function getPortfolioStaticParams() {
   const summaries = getSummaryRows();
   const summaryIds = new Set(summaries.map((row) => row.persona));
-  return getPortfolioRows(getStrategyLeaderboard())
+  const params = getPortfolioRows(getStrategyLeaderboard())
     .filter((row) => summaryIds.has(row.id))
     .map((row) => ({ strategy: row.id }));
+  return params.length ? params : [{ strategy: NO_ADMITTED_STRATEGY_PARAM }];
 }
 
 function getPortfolioRows(rows: StrategyLeaderboardRow[] = getStrategyLeaderboard()) {
-  const selectable = getSelectableStrategyRows(rows).filter((row) => row.kind === 'strategy' && row.isSelectable);
+  const selectable = getObjectivePassingRows(rows).filter((row) => row.kind === 'strategy' && row.isSelectable);
   const nonDominated = selectable.filter((row) => !selectable.some((candidate) => dominates(candidate, row)));
   return nonDominated.sort((a, b) => {
     if (a.objectivePassed !== b.objectivePassed) return a.objectivePassed ? -1 : 1;

@@ -1,7 +1,7 @@
 import { AppShell } from '@/components/ui/AppShell';
 import type { CommandTarget } from '@/components/ui/CommandPalette';
-import { getArtifactManifest, getOverview, getPersonaLabel, getReportRows, getStrategyCatalog } from '@/lib/artifacts';
-import { getDefaultPortfolioPersona } from '@/lib/product-model';
+import { getArtifactManifest, getOverview, getReportRows, getStrategyCatalog } from '@/lib/artifacts';
+import { getObjectivePassingRows } from '@/lib/product-model';
 import { APP_NAV } from '@/components/ui/app-shell-nav';
 import './reports/report-detail.css';
 
@@ -9,7 +9,8 @@ export default function AppRouteLayout({ children }: Readonly<{ children: React.
   const overview = getOverview();
   const manifest = getArtifactManifest();
   const snapshotDate = overview.simulation_window?.price_end ?? overview.simulation_window?.report_end ?? '—';
-  const primaryBookLabel = getPersonaLabel(getDefaultPortfolioPersona());
+  const admittedStrategies = getObjectivePassingRows();
+  const primaryBookLabel = admittedStrategies[0]?.shortLabel ?? admittedStrategies[0]?.label ?? '승인 전략 없음';
 
   const commandTargets = buildCommandTargets();
 
@@ -21,7 +22,7 @@ export default function AppRouteLayout({ children }: Readonly<{ children: React.
       reportCount={manifest.row_counts.reports}
       reportRange={manifest.report_range}
       snapshotDate={snapshotDate}
-      strategyCount={manifest.row_counts.strategy_catalog}
+      strategyCount={admittedStrategies.length}
     >
       {children}
     </AppShell>
@@ -57,8 +58,9 @@ function buildCommandTargets(): CommandTarget[] {
     });
   }
 
+  const admittedIds = new Set(getObjectivePassingRows().map((strategy) => strategy.id));
   const strategyTargets: CommandTarget[] = getStrategyCatalog()
-    .filter((strategy) => strategy.isSelectable)
+    .filter((strategy) => strategy.isSelectable && admittedIds.has(strategy.strategyId))
     .map((strategy) => ({
       kind: 'strategy',
       label: strategy.label,

@@ -5,7 +5,7 @@
 서울대 SMIC 학회의 리서치 리포트 · 가격 데이터 · 포트폴리오 시뮬레이션 · 전략 검증을
 한 화면에서 같은 기준으로 추적하는 **읽기 전용 정적 리서치 대시보드**
 
-[![release](https://img.shields.io/badge/release-v0.26.0-1b64da)](./CHANGELOG.md)
+[![release](https://img.shields.io/badge/release-v0.26.1-1b64da)](./CHANGELOG.md)
 [![Next.js](https://img.shields.io/badge/Next.js-16-000000)](https://nextjs.org/)
 [![Python](https://img.shields.io/badge/Python-3.13-3776ab)](https://www.python.org/)
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8)](https://tailwindcss.com/)
@@ -248,6 +248,7 @@ PIT 리서치보드 `alpha_top*` 실험은 같은 OOS admission 계약이 아직
 
 | 태그 | 핵심 |
 |---|---|
+| **`v0.26.1-portfolio-objective-gate.1`** | objective-passed 전략만 실제 포트폴리오 선택지로 노출, 전부 실패하면 “승인 전략 없음” 상태 표시 |
 | **`v0.26.0-stock-rule-oos.1`** | strict OOS stock-rule admission 10개 persona, deployability gate, search cache, `/portfolio/[strategy]` 통합 |
 | `v0.25.3-mpt-frontier.1` | portfolio frontier 차트와 compact 전략 선택 버튼 |
 | `v0.25.2-portfolio-ux-refine.1` | 포트폴리오 원장 UX와 상세 하위 화면 정리 |
