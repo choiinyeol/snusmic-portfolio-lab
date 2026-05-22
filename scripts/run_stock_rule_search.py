@@ -37,6 +37,14 @@ from snusmic_pipeline.sim.stock_admission import (  # noqa: E402
 
 ValidationMode = Literal["oos", "full_sample"]
 _COVERAGE_POOL_REPRESENTATIVE_FAMILIES = ("price_momentum", "ma_crossover")
+_STOCK_RULE_FAMILY_LABELS = {
+    "fresh_report_momentum": "신규 리포트 추세",
+    "ma_crossover": "이동평균 정배열",
+    "price_momentum": "가격 추세",
+    "rsi_reversal": "RSI 반등",
+    "target_gap_reversal": "목표가 괴리 되돌림",
+    "target_upside_momentum": "목표가 상승여력 추세",
+}
 from snusmic_pipeline.sim.stock_rule_search import (  # noqa: E402
     admit_oos,
     default_stock_rule_configs,
@@ -515,13 +523,13 @@ def _stock_persona_configs(
     configs: list[StockRulePersonaConfig] = []
     for index, row in enumerate(rows, start=1):
         rule_id = str(row["rule_id"])
-        family_label = str(row["family"]).replace("_", " ").title()
+        family = str(row["family"])
         configs.append(
             StockRulePersonaConfig(
                 persona_name=_stock_rule_persona_id(rule_id),
-                label=f"Stock Rule {index:02d}: {family_label}",
+                label=_stock_rule_label(index, family),
                 rule_id=rule_id,
-                family=row["family"],
+                family=family,
                 fast_ma_days=int(row["fast_ma_days"]),
                 slow_ma_days=int(row["slow_ma_days"]),
                 min_report_age_days=int(row["min_report_age_days"]),
@@ -725,6 +733,11 @@ def _representative_symbol(row: dict[str, Any]) -> str:
 def _stock_rule_persona_id(rule_id: str) -> str:
     safe = "".join(ch if ch.isalnum() else "_" for ch in rule_id.lower()).strip("_")
     return f"stock_rule_{safe}"
+
+
+def _stock_rule_label(index: int, family: str) -> str:
+    family_label = _STOCK_RULE_FAMILY_LABELS.get(family, family.replace("_", " "))
+    return f"종목룰 {index:02d}: {family_label}"
 
 
 if __name__ == "__main__":

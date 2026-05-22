@@ -42,16 +42,16 @@ export function PortfolioPageShell({ children, model }: { children: ReactNode; m
       <header className="grid gap-4 border-b border-slate-200 pb-5">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="outline">운용 보고서</Badge>
-          <Badge variant="secondary">benchmark 제외</Badge>
+          <Badge variant="secondary">비교 기준선 제외</Badge>
           <span className="font-mono text-xs text-slate-500">{model.latestEquityDate || '—'} 평가</span>
         </div>
         <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(420px,.75fr)] xl:items-end">
           <div className="min-w-0">
             <h1 className="text-2xl font-semibold tracking-[-0.02em] text-slate-950 md:text-4xl">{shortLabel}</h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-              {label}의 실제 보유, RP이자, 체결, 매매 로직을 투자 보고서 형태로 보여줍니다.
-              benchmark·follower·oracle류는 선택 가능한 실제 보유 원장에는 섞지 않고, 상위 포트폴리오 화면에서 비교
-              기준선으로만 함께 보여줍니다.
+              {label}의 실제 보유, RP이자, 체결, 매매 로직을 투자 보고서 형태로 보여줍니다. 벤치마크·추종
+              기준선·상한선류는 선택 가능한 실제 보유 원장에는 섞지 않고, 상위 포트폴리오 화면에서 비교 기준선으로만
+              함께 보여줍니다.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Button asChild size="sm" variant="outline">

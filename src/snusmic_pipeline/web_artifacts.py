@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import math
+import re
 import shutil
 import statistics
 import subprocess
@@ -1419,6 +1420,23 @@ BENCHMARK_PERSONA_IDS = {
 
 TARGET_BENCHMARK_ID = "benchmark_kodex200"
 OBJECTIVE_MAX_DRAWDOWN = 0.15
+STOCK_RULE_FAMILY_LABELS = {
+    "fresh_report_momentum": "신규 리포트 추세",
+    "ma_crossover": "이동평균 정배열",
+    "price_momentum": "가격 추세",
+    "relative_strength": "상대강도",
+    "report_upside": "리포트 업사이드",
+    "rsi_reversal": "RSI 반등",
+    "target_gap_reversal": "목표가 괴리 되돌림",
+    "target_upside_momentum": "목표가 상승여력 추세",
+}
+PIT_RESEARCH_BOARD_BUCKET_LABELS = {
+    "active": "활성 리포트",
+    "all": "전체",
+    "fresh": "신규 리포트",
+    "large-upside": "목표가 업사이드",
+    "near-target": "목표가 근접",
+}
 
 
 def _build_strategy_catalog(summary: pd.DataFrame, sim_config_path: Path) -> list[dict[str, Any]]:
@@ -1598,7 +1616,7 @@ def _pit_research_board_admission_summary(frame: pd.DataFrame | None) -> dict[st
             reverse=True,
         )[:12],
         "notes": [
-            "PIT research-board 후보는 현재 리서치보드 최신값을 재사용하지 않고 판단일별 보드를 재구성합니다.",
+            "시점별 리서치보드 후보는 현재 리서치보드 최신값을 재사용하지 않고 판단일별 보드를 재구성합니다.",
             "벤치마크 대비 성과는 감사 지표로 남기되, 현재 승격은 절대 성과와 상관 압축 게이트로 결정합니다.",
         ],
     }
@@ -1633,10 +1651,12 @@ def _pit_research_board_admission_rows(frame: pd.DataFrame | None) -> list[dict[
             for key in raw
             if key.startswith("config_") and key.removeprefix("config_") in config_keys
         }
+        persona_name = str(raw.get("persona_name") or "")
+        label = _strategy_display_label(persona_name, config, str(raw.get("label") or persona_name))
         rows.append(
             {
-                "persona_name": raw.get("persona_name"),
-                "label": raw.get("label"),
+                "persona_name": persona_name,
+                "label": label,
                 "accepted": _boolish(raw.get("accepted")),
                 "admission_status": raw.get("admission_status"),
                 "benchmark_money_weighted_return": _number(raw.get("benchmark_money_weighted_return")),
@@ -1834,62 +1854,81 @@ def _benchmark_group(strategy_id: str) -> str | None:
 
 def _strategy_short_label(strategy_id: str, label: str) -> str:
     labels = {
-        "all_weather": "All-Weather",
-        "smic_follower": "Follower v1",
-        "smic_follower_v2": "Follower SL",
+        "all_weather": "올웨더",
+        "smic_follower": "단순 추종 v1",
+        "smic_follower_v2": "손절 추종",
         "benchmark_kodex200": "KODEX200",
         "benchmark_qqq": "QQQ",
         "benchmark_spy": "SPY",
         "benchmark_gld": "GLD",
-        "weak_oracle": "Weak Prophet",
+        "weak_oracle": "미래정보 상한선",
     }
     if strategy_id in labels:
         return labels[strategy_id]
     if strategy_id.startswith("stock_rule_"):
-        return label.replace("Stock Rule: ", "")
+        return label
     if strategy_id.startswith("pit_research_board_"):
-        return label.replace("PIT Research Board ", "PIT Board ").replace("PIT ", "")
+        return label
     if strategy_id.startswith("smic_mtt_strategy"):
         return label.replace(" Report ", " ").replace(" Strategy ", " ")
     if strategy_id.startswith("smic_rsi_reversal"):
-        return "RSI Reversal"
+        return "RSI 반등"
     return label
 
 
 def _strategy_display_label(strategy_id: str, config: dict[str, Any], fallback: str) -> str:
+    baseline_labels = {
+        "all_weather": "올웨더",
+        "smic_follower": "단순 리포트 추종",
+        "smic_follower_v2": "손절 리포트 추종",
+        "weak_oracle": "미래정보 상한선",
+    }
+    if strategy_id in baseline_labels:
+        return baseline_labels[strategy_id]
     if strategy_id.startswith("stock_rule_"):
         symbol = config.get("symbol")
         family = _stock_family_label(config.get("family") or config.get("rule_family"))
+        ordinal = _stock_rule_ordinal(fallback or str(config.get("label") or ""))
+        prefix = f"종목룰 {ordinal}" if ordinal else "종목룰"
         if symbol:
-            return f"Stock Rule: {symbol} {family}"
-        return fallback if fallback != strategy_id else f"Stock Rule: {family}"
+            return f"{prefix}: {symbol} {family}"
+        return f"{prefix}: {family}"
     if strategy_id.startswith("pit_research_board_"):
         top_n = int(config.get("top_n") or 0)
         mode = _pit_research_board_score_label(config, short=True)
-        suffix = f" Top {top_n}" if top_n else ""
+        suffix = f" 상위 {top_n}" if top_n else ""
         if config.get("score_mode") == "ta_momentum_score":
-            return f"PIT 리서치보드 TA 모멘텀{suffix}"
+            return f"리서치보드 TA 모멘텀{suffix}"
         if config.get("require_ma_stack"):
-            return f"PIT 리서치보드 정배열{suffix}"
+            return f"리서치보드 정배열{suffix}"
         if config.get("require_near_52w_high"):
-            return f"PIT 리서치보드 52주고점근접{suffix}"
+            return f"리서치보드 52주 고점근접{suffix}"
         bucket = str(config.get("bucket_filter") or "all")
         if bucket != "all":
-            return f"PIT 리서치보드 {bucket}{suffix}"
-        return f"PIT 리서치보드 {mode}{suffix}"
+            return f"리서치보드 {_pit_research_board_bucket_label(bucket)}{suffix}"
+        return f"리서치보드 {mode}{suffix}"
     if strategy_id.startswith("smic_rsi_reversal"):
-        return "RSI Reversal Strategy"
+        return "RSI 반등 전략"
     if not strategy_id.startswith("smic_mtt_strategy"):
         return fallback
     rank = strategy_id.removeprefix("smic_mtt_strategy_top") if "_top" in strategy_id else ""
-    universe = {"all": "Global", "domestic": "Korea", "overseas": "Overseas"}.get(
-        str(config.get("universe") or "all"), "Global"
+    universe = {"all": "전세계", "domestic": "국내", "overseas": "해외"}.get(
+        str(config.get("universe") or "all"), "전세계"
     )
     signal = _strategy_signal_label(config)
     max_positions = int(config.get("max_positions") or 0)
-    concentration = "Focused" if max_positions <= 10 else "Balanced" if max_positions <= 25 else "Broad"
+    concentration = "집중형" if max_positions <= 10 else "균형형" if max_positions <= 25 else "분산형"
     suffix = f" #{rank}" if rank else ""
-    return f"{universe} Report {signal} {concentration}{suffix}"
+    return f"{universe} 리포트 {signal} {concentration}{suffix}"
+
+
+def _stock_rule_ordinal(label: str) -> str:
+    match = re.search(r"(?:Stock Rule|종목룰)\s+(\d+)", label)
+    return match.group(1) if match else ""
+
+
+def _pit_research_board_bucket_label(bucket: str) -> str:
+    return PIT_RESEARCH_BOARD_BUCKET_LABELS.get(bucket, bucket.replace("-", " "))
 
 
 def _methodology_summary(strategy_id: str, config: dict[str, Any]) -> str:
@@ -1902,13 +1941,13 @@ def _methodology_summary(strategy_id: str, config: dict[str, Any]) -> str:
     if strategy_id == "smic_follower":
         return "가격 매칭된 상승 리포트를 1/N으로 추종하는 단순 기준선입니다."
     if strategy_id == "smic_follower_v2":
-        return "SMIC Follower에 시간 손실, 물타기 손실, 리포트 만료 손절 규칙을 추가한 기준선입니다."
+        return "단순 리포트 추종에 시간 손실, 물타기 손실, 리포트 만료 손절 규칙을 추가한 기준선입니다."
     if strategy_id == "weak_oracle":
         return (
             "미래 가격 정보를 일부 사용하는 강한 상한선 기준입니다. 투자 가능한 전략으로 해석하지 않습니다."
         )
     if strategy_id.startswith("smic_mtt_strategy"):
-        return "리포트 업사이드와 가격 추세 조건(MTT·Supertrend·ATR breakout)을 통과한 종목만 실제 주식 수량 단위로 매수·보유·매도하는 포트폴리오 전략입니다. MTT는 전략명 자체가 아니라 내부 추세 필터 중 하나입니다."
+        return "리포트 업사이드와 가격 추세 조건(MTT·슈퍼트렌드·ATR 돌파)을 통과한 종목만 실제 주식 수량 단위로 매수·보유·매도하는 포트폴리오 전략입니다. MTT는 전략명 자체가 아니라 내부 추세 필터 중 하나입니다."
     if strategy_id.startswith("stock_rule_"):
         return _stock_rule_plain_summary(config)
     if strategy_id.startswith("pit_research_board_"):
@@ -1937,13 +1976,13 @@ def _methodology_summary(strategy_id: str, config: dict[str, Any]) -> str:
 
 def _strategy_signal_label(config: dict[str, Any]) -> str:
     if not config.get("require_mtt", True):
-        return "Momentum"
+        return "모멘텀"
     trend_filter = str(config.get("trend_filter") or "mtt")
     if trend_filter == "supertrend":
-        return "Supertrend"
+        return "슈퍼트렌드"
     if trend_filter == "atr_breakout":
-        return "Breakout"
-    return "Trend"
+        return "돌파"
+    return "추세"
 
 
 def _stock_rule_plain_summary(config: dict[str, Any]) -> str:
@@ -2138,7 +2177,7 @@ def _pit_research_board_buy_rules(config: dict[str, Any]) -> list[str]:
     ]
     bucket = str(config.get("bucket_filter") or "all")
     if bucket != "all":
-        rules.append(f"후보 유형은 {bucket} 버킷으로 제한합니다.")
+        rules.append(f"후보 유형은 {_pit_research_board_bucket_label(bucket)} 버킷으로 제한합니다.")
     if config.get("require_ma_stack"):
         rules.append("현재가 ≥ 20일선 ≥ 50일선 ≥ 200일선 정배열인 종목만 통과합니다.")
     if config.get("require_ema_stack"):
@@ -2198,14 +2237,14 @@ def _buy_rules(strategy_id: str, config: dict[str, Any]) -> list[str]:
             if trend_filter == "supertrend":
                 rules.extend(
                     [
-                        f"Supertrend 근사: ATR {int(config.get('atr_period_days') or 0)}일",
-                        f"Supertrend 배수 {float(config.get('supertrend_multiplier') or 0):.1f}x",
+                        f"슈퍼트렌드 근사: ATR {int(config.get('atr_period_days') or 0)}일",
+                        f"슈퍼트렌드 배수 {float(config.get('supertrend_multiplier') or 0):.1f}x",
                     ]
                 )
             elif trend_filter == "atr_breakout":
                 rules.extend(
                     [
-                        f"ATR breakout 근사: 직전 {int(config.get('breakout_lookback_days') or 0)}거래일 고가 돌파",
+                        f"ATR 돌파 근사: 직전 {int(config.get('breakout_lookback_days') or 0)}거래일 고가 돌파",
                         f"돌파 여유 ATR {float(config.get('breakout_atr_multiple') or 0):.2f}x",
                     ]
                 )
@@ -2324,7 +2363,7 @@ def _risk_controls(strategy_id: str, config: dict[str, Any]) -> list[str]:
         ]
     if strategy_id.startswith("pit_research_board_"):
         return [
-            "현재 웹 리서치보드 화면의 최신값을 역사용으로 재사용하지 않고, 각 판단일마다 PIT 보드를 재구성합니다.",
+            "현재 웹 리서치보드 화면의 최신값을 역사용으로 재사용하지 않고, 각 판단일마다 시점별 보드를 재구성합니다.",
             "판단일 보드에서 고른 종목은 다음 거래일 체결하므로 리포트 발간일보다 빠른 매수는 구조적으로 불가능합니다.",
             "벤치마크 대비 성과는 감사 지표로 표시하고, 유사한 수익률 경로는 상관 압축으로 대표 전략만 남깁니다.",
             "체결은 정수 주식 수량, 수수료·세금, RP이자 현금 잔고를 반영합니다.",
@@ -2396,16 +2435,9 @@ def _strategy_params(strategy_id: str, config: dict[str, Any]) -> dict[str, Any]
 
 
 def _stock_family_label(value: Any) -> str:
-    labels = {
-        "report_upside": "Report Upside",
-        "mtt": "MTT",
-        "rsi_reversal": "RSI Reversal",
-        "ma_crossover": "MA Crossover",
-        "atr_breakout": "ATR Breakout",
-        "relative_strength": "Relative Strength",
-    }
+    labels = {**STOCK_RULE_FAMILY_LABELS, "atr_breakout": "ATR 돌파", "mtt": "MTT 추세"}
     family = str(value or "rule")
-    return labels.get(family, family.replace("_", " ").title())
+    return labels.get(family, family.replace("_", " "))
 
 
 def _strategy_catalog_sort_key(row: dict[str, Any]) -> tuple[int, float, str]:

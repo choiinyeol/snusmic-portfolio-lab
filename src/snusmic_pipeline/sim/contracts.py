@@ -84,7 +84,7 @@ class AllWeatherConfig(_FrozenModel):
     """Buy-and-hold benchmark basket with monthly rebalance."""
 
     persona_name: Annotated[str, Field(pattern=r"^(all_weather|benchmark_[a-z0-9_]+)$")] = "all_weather"
-    label: str = "All-Weather (25/25/25/25)"
+    label: str = "올웨더 (25/25/25/25)"
     assets: tuple[BenchmarkAsset, ...] = (
         BenchmarkAsset(name="Gold", symbol="GLD", weight=0.25),
         BenchmarkAsset(name="NASDAQ-100", symbol="QQQ", weight=0.25),
@@ -155,7 +155,7 @@ class WeakProphetConfig(_PersonaBase):
     """
 
     persona_name: Literal["weak_oracle"] = "weak_oracle"
-    label: str = "Weak Prophet (3M oracle)"
+    label: str = "미래정보 상한선 (3개월)"
     lookahead_months: Annotated[int, Field(ge=1, le=24)] = 3
     risk_free_rate: Annotated[float, Field(ge=0.0, le=0.20)] = 0.0
     max_weight: Annotated[float, Field(gt=0.0, le=1.0)] = 1.0
@@ -167,7 +167,7 @@ class SmicFollowerConfig(_PersonaBase):
     """Pure 1/N true-believer: never sells at a loss."""
 
     persona_name: Literal["smic_follower"] = "smic_follower"
-    label: str = "SMIC Follower (1/N)"
+    label: str = "단순 리포트 추종"
     target_hit_multiplier: Annotated[float, Field(gt=0.0, le=2.0)] = 1.0
     # SMIC reports drop on irregular dates, so the realistic baseline is to
     # rebalance on every trading day — react when a new report arrives or a
@@ -180,7 +180,7 @@ class SmicFollowerV2Config(_PersonaBase):
     """1/N follower with three stop-loss escape hatches."""
 
     persona_name: Literal["smic_follower_v2"] = "smic_follower_v2"
-    label: str = "SMIC Follower v2 (with stop-loss)"
+    label: str = "손절 리포트 추종"
     target_hit_multiplier: Annotated[float, Field(gt=0.0, le=2.0)] = 1.0
     rebalance: Literal["daily", "monthly", "quarterly"] = "daily"
 
@@ -484,9 +484,9 @@ class SimulationConfig(_FrozenModel):
             assets=(BenchmarkAsset(name="Gold", symbol="GLD", weight=1.0),),
         ),
         SmicFollowerConfig(),
-        SmicFollowerV2Config(label="SMIC Follower (SL)"),
+        SmicFollowerV2Config(label="손절 리포트 추종"),
         WeakProphetConfig(
-            label="Weak Prophet (3M oracle)",
+            label="미래정보 상한선 (3개월)",
             lookahead_months=3,
             risk_free_rate=0.0,
             max_weight=1.0,

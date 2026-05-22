@@ -5,7 +5,7 @@
 서울대 SMIC 학회의 리서치 리포트 · 가격 데이터 · 포트폴리오 시뮬레이션 · 전략 검증을
 한 화면에서 같은 기준으로 추적하는 **읽기 전용 정적 리서치 대시보드**
 
-[![release](https://img.shields.io/badge/release-v0.26.1-1b64da)](./CHANGELOG.md)
+[![release](https://img.shields.io/badge/release-v0.26.2-1b64da)](./CHANGELOG.md)
 [![Next.js](https://img.shields.io/badge/Next.js-16-000000)](https://nextjs.org/)
 [![Python](https://img.shields.io/badge/Python-3.13-3776ab)](https://www.python.org/)
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8)](https://tailwindcss.com/)
@@ -189,16 +189,16 @@ uv run pytest
 
 **벤치마크 세트**
 
-1. All-Weather
-2. SMIC Follower v1
-3. SMIC Follower v2 / SL
+1. 올웨더
+2. 단순 리포트 추종
+3. 손절 리포트 추종
 4. KODEX 200 (`069500.KS`)
 5. QQQ
 6. SPY
 7. GLD
-8. Weak Prophet (미래정보 상한선)
+8. 미래정보 상한선
 
-**Stock-rule OOS admission**
+**종목룰 OOS admission**
 
 ```bash
 python scripts/run_stock_rule_search.py \
@@ -229,8 +229,8 @@ PIT 리서치보드 `alpha_top*` 실험은 같은 OOS admission 계약이 아직
 | OOS validation admissions | 53 |
 | materialized stock-rule personas | 10 |
 
-주의: OOS stock-rule persona는 모두 실제 ledger에서 수익을 냈지만, 2021년부터 누적한
-현재 산출물 기준으로는 KODEX200/All-Weather를 일관되게 이기지는 못했습니다. 따라서
+주의: OOS 종목룰 persona는 모두 실제 ledger에서 수익을 냈지만, 2021년부터 누적한
+현재 산출물 기준으로는 KODEX200/올웨더를 일관되게 이기지는 못했습니다. 따라서
 이 화면은 "성공 포장"이 아니라 pool/candidate/buy 룰의 실험 원장입니다.
 
 ## 원칙
@@ -248,6 +248,7 @@ PIT 리서치보드 `alpha_top*` 실험은 같은 OOS admission 계약이 아직
 
 | 태그 | 핵심 |
 |---|---|
+| **`v0.26.2-korean-strategy-labels.1`** | 전략·리서치보드·기준선 표시명을 한글 체계로 통일하고 산출물 라벨을 재생성 |
 | **`v0.26.1-portfolio-objective-gate.1`** | objective-passed 전략만 실제 포트폴리오 선택지로 노출, 전부 실패하면 “승인 전략 없음” 상태 표시 |
 | **`v0.26.0-stock-rule-oos.1`** | strict OOS stock-rule admission 10개 persona, deployability gate, search cache, `/portfolio/[strategy]` 통합 |
 | `v0.25.3-mpt-frontier.1` | portfolio frontier 차트와 compact 전략 선택 버튼 |

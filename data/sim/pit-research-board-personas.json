@@ -1,6 +1,6 @@
 [
   {
-    "label": "PIT Research Board Score Top 10",
+    "label": "리서치보드 종합점수 상위 10",
     "persona_name": "pit_research_board_score_top10",
     "top_n": 10,
     "rebalance": "M",
@@ -32,7 +32,7 @@
     "target_winner_trailing_stop_pct": 0.0
   },
   {
-    "label": "PIT Research Board Score Top 5",
+    "label": "리서치보드 종합점수 상위 5",
     "persona_name": "pit_research_board_score_top5",
     "top_n": 5,
     "rebalance": "M",
@@ -64,7 +64,7 @@
     "target_winner_trailing_stop_pct": 0.0
   },
   {
-    "label": "PIT Trend-Confirmed Top 10",
+    "label": "리서치보드 정배열 상위 10",
     "persona_name": "pit_research_board_trend_top10",
     "top_n": 10,
     "rebalance": "M",
@@ -96,7 +96,7 @@
     "target_winner_trailing_stop_pct": 0.0
   },
   {
-    "label": "PIT Near-High Top 10",
+    "label": "리서치보드 52주 고점근접 상위 10",
     "persona_name": "pit_research_board_near_high_top10",
     "top_n": 10,
     "rebalance": "M",
@@ -128,7 +128,7 @@
     "target_winner_trailing_stop_pct": 0.0
   },
   {
-    "label": "PIT Large Upside Top 10",
+    "label": "리서치보드 목표가 업사이드 상위 10",
     "persona_name": "pit_research_board_large_upside_top10",
     "top_n": 10,
     "rebalance": "M",

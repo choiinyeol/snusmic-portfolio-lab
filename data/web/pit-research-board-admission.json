@@ -15,7 +15,7 @@
       "universe": "all",
       "weight_mode": "equal"
     },
-    "label": "PIT Research Board Score Top 5",
+    "label": "리서치보드 종합점수 상위 5",
     "persona_name": "pit_research_board_score_top5",
     "portfolio_correlated_with_rule_id": "",
     "portfolio_excess_vs_benchmark": -0.2137804856218689,
@@ -41,7 +41,7 @@
       "universe": "all",
       "weight_mode": "score_proportional"
     },
-    "label": "PIT Research Board Score Top 10",
+    "label": "리서치보드 종합점수 상위 10",
     "persona_name": "pit_research_board_score_top10",
     "portfolio_correlated_with_rule_id": "",
     "portfolio_excess_vs_benchmark": -0.0787371993552777,
@@ -67,7 +67,7 @@
       "universe": "all",
       "weight_mode": "equal"
     },
-    "label": "PIT Large Upside Top 10",
+    "label": "리서치보드 목표가 업사이드 상위 10",
     "persona_name": "pit_research_board_large_upside_top10",
     "portfolio_correlated_with_rule_id": "",
     "portfolio_excess_vs_benchmark": -0.3769262064146867,
@@ -93,7 +93,7 @@
       "universe": "all",
       "weight_mode": "score_proportional"
     },
-    "label": "PIT Trend-Confirmed Top 10",
+    "label": "리서치보드 정배열 상위 10",
     "persona_name": "pit_research_board_trend_top10",
     "portfolio_correlated_with_rule_id": "",
     "portfolio_excess_vs_benchmark": -0.215619850461703,
@@ -119,7 +119,7 @@
       "universe": "all",
       "weight_mode": "equal"
     },
-    "label": "PIT Near-High Top 10",
+    "label": "리서치보드 52주 고점근접 상위 10",
     "persona_name": "pit_research_board_near_high_top10",
     "portfolio_correlated_with_rule_id": "",
     "portfolio_excess_vs_benchmark": -0.3020711526215426,

@@ -2,6 +2,19 @@
 
 이 프로젝트의 사용자 가시 변경사항을 모두 정리합니다. 릴리스의 진실은 git 태그이며, 본 파일은 태그 단위로 의도를 한국어로 기록합니다.
 
+## v0.26.2-korean-strategy-labels.1 — 2026-05-22
+
+### 변경
+- `Stock Rule`, `PIT Research Board`, `Top 10`, `Weak Prophet`, `SMIC Follower`처럼 섞여 보이던 전략 표시명을 `종목룰`, `리서치보드`, `상위`, `미래정보 상한선`, `리포트 추종` 계열로 통일했습니다.
+- stock-rule persona 생성기, PIT 리서치보드 기본 config, persona simulation loader, 웹 strategy catalog export가 같은 한글 라벨 계약을 쓰도록 맞췄습니다.
+- `/portfolio`의 비교 기준선·효율 곡선 문구에서 `benchmark`, `oracle`, `frontier` 등 화면 노출 영어를 한글 설명으로 바꿨습니다.
+- `data/sim`과 `data/web` 산출물 및 다운로드 CSV를 새 표시명으로 재생성했습니다.
+
+### 검증
+- `ruff check scripts/run_stock_rule_search.py scripts/run_persona_sim.py src/snusmic_pipeline/web_artifacts.py src/snusmic_pipeline/sim/pit_research_board.py src/snusmic_pipeline/sim/contracts.py tests/test_web_artifacts.py`
+- `pytest tests/test_web_artifacts.py::test_strategy_catalog_uses_behavior_labels_and_admission_audit -q`
+- strategy label scan: 주요 `data/sim`, `data/web`, 다운로드 산출물에서 예전 영어 표시명 없음
+
 ## v0.26.1-portfolio-objective-gate.1 — 2026-05-22
 
 ### 변경

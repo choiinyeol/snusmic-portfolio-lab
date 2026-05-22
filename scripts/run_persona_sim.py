@@ -35,6 +35,7 @@ from snusmic_pipeline.sim.contracts import (  # noqa: E402
     SmicMttStrategyConfig,
     StockRulePersonaConfig,
 )
+from snusmic_pipeline.sim.pit_research_board import default_pit_research_board_configs  # noqa: E402
 from snusmic_pipeline.sim.runner import run_simulation  # noqa: E402
 from snusmic_pipeline.sim.visualize import (  # noqa: E402
     plot_drawdowns,
@@ -368,9 +369,12 @@ def _load_pit_research_board_personas(path: Path) -> tuple[PitResearchBoardConfi
     data = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(data, list):
         raise ValueError(f"{path} must be a JSON list of PIT research-board persona configs")
+    default_labels = {config.persona_name: config.label for config in default_pit_research_board_configs()}
     configs = tuple(PitResearchBoardConfig.model_validate(row) for row in data)
     return tuple(
-        config for config in configs if not config.persona_name.startswith(EXPERIMENTAL_PIT_ALPHA_PREFIX)
+        config.model_copy(update={"label": default_labels.get(config.persona_name, config.label)})
+        for config in configs
+        if not config.persona_name.startswith(EXPERIMENTAL_PIT_ALPHA_PREFIX)
     )
 
 

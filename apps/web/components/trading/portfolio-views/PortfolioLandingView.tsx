@@ -47,8 +47,8 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
       <div className="grid gap-3 rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-600">
         <h1 className="text-xl font-semibold text-slate-950">승인된 포트폴리오 전략이 없습니다</h1>
         <p className="max-w-3xl leading-6">
-          현재 계산된 stock-rule/PIT 후보는 모두 목표 벤치마크와 낙폭 기준을 통과하지 못했습니다. benchmark와 oracle은
-          비교 기준선이라 실제 포트폴리오 선택지에 섞지 않습니다.
+          현재 계산된 종목룰·시점별 리서치보드 후보는 모두 목표 벤치마크와 낙폭 기준을 통과하지 못했습니다. 벤치마크와
+          상한선은 비교 기준선이라 실제 포트폴리오 선택지에 섞지 않습니다.
         </p>
         <div>
           <Button asChild size="sm" variant="outline">
@@ -69,7 +69,7 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
           <h1 className="text-3xl font-semibold tracking-[-0.04em] text-slate-950 md:text-5xl">포트폴리오</h1>
           <p className="max-w-3xl text-sm leading-6 text-slate-600 md:text-base">
             실제 주식 수량 단위로 매수·보유·매도한 포트폴리오 persona를 한 화면에서 봅니다. 통과 전략은 선택·원장으로
-            열고, benchmark 점은 수익률과 낙폭의 위치 비교용으로만 사용합니다.
+            열고, 벤치마크 점은 수익률과 낙폭의 위치 비교용으로만 사용합니다.
           </p>
           <div className="flex flex-wrap gap-2">
             <Button asChild size="sm" variant="secondary">
@@ -81,9 +81,9 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
           <div className="text-xs font-medium text-slate-500">포트폴리오 범위</div>
           <dl className="grid grid-cols-2 gap-2 text-sm">
             <Fact label="실제 전략" value={`${model.strategies.length}개`} />
-            <Fact label="frontier 기준선" value={`${benchmarkCount}개`} />
+            <Fact label="곡선 기준선" value={`${benchmarkCount}개`} />
             <Fact label="최근 평가" value={model.latestEquityDate || '—'} />
-            <Fact label="All-Weather" value={formatPercent(model.allWeatherReturn)} />
+            <Fact label="올웨더" value={formatPercent(model.allWeatherReturn)} />
           </dl>
         </div>
       </header>
@@ -119,12 +119,12 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
           <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <div className="mb-3">
               <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                portfolio frontier
+                효율 곡선
               </div>
               <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">수익률 / 낙폭 곡선으로 선택</h2>
               <p className="mt-1 text-sm leading-6 text-slate-500">
-                MPT의 efficient frontier처럼, 더 높은 낙폭에 더 낮은 수익률인 지배 전략은 포트폴리오 후보에서
-                제외합니다. 전략 점은 클릭해서 포트폴리오를 바꾸고, benchmark 점은 위치 비교용입니다.
+                MPT의 효율 곡선처럼, 더 높은 낙폭에 더 낮은 수익률인 지배 전략은 포트폴리오 후보에서 제외합니다. 전략
+                점은 클릭해서 포트폴리오를 바꾸고, 벤치마크 점은 위치 비교용입니다.
               </p>
             </div>
             <PortfolioFrontierChart rows={model.frontierRows} selectedId={selected.id} onSelect={setSelectedId} />
@@ -313,7 +313,7 @@ function PortfolioFrontierChart({
           </span>
           <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white/85 px-2 py-1 text-slate-600">
             <span className="size-2 rotate-45 bg-slate-400" />
-            benchmark
+            벤치마크
           </span>
           <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-emerald-700">
             지배 전략 제외 후 {strategyRows.length.toLocaleString('ko-KR')}개
@@ -323,7 +323,7 @@ function PortfolioFrontierChart({
           className="h-full w-full"
           viewBox="0 0 360 280"
           role="img"
-          aria-label="실제 포트폴리오 전략과 benchmark의 MDD 대비 수익률 곡선"
+          aria-label="실제 포트폴리오 전략과 벤치마크의 MDD 대비 수익률 곡선"
         >
           <defs>
             <linearGradient id="frontierStroke" x1="0%" x2="100%" y1="0%" y2="0%">
@@ -380,7 +380,7 @@ function PortfolioFrontierChart({
               <g key={row.id}>
                 {benchmark ? (
                   <rect
-                    aria-label={`${row.shortLabel} benchmark 상세 보기`}
+                    aria-label={`${row.shortLabel} 벤치마크 상세 보기`}
                     className="cursor-default outline-none"
                     fill={hovered ? '#64748b' : '#94a3b8'}
                     height={hovered ? 11 : 9}
@@ -554,12 +554,12 @@ function FrontierDetailCard({
   if (!activeRow) {
     return (
       <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-        표시할 frontier 점이 없습니다.
+        표시할 효율 곡선 점이 없습니다.
       </div>
     );
   }
   const isBenchmark = activeRow.kind === 'benchmark';
-  const stateLabel = isBenchmark ? 'benchmark 비교점' : '효율 전략';
+  const stateLabel = isBenchmark ? '벤치마크 비교점' : '효율 전략';
   const stateTone = isBenchmark
     ? 'border-slate-200 bg-slate-50 text-slate-600'
     : 'border-emerald-200 bg-emerald-50 text-emerald-700';
@@ -585,7 +585,7 @@ function FrontierDetailCard({
           </div>
           <h3 className="mt-2 truncate text-base font-semibold text-slate-950">{activeRow.shortLabel}</h3>
           <p className="mt-1 text-xs leading-5 text-slate-500">
-            포트폴리오 후보는 지배 전략을 제거한 {frontierCount.toLocaleString('ko-KR')}개 전략만 남깁니다. benchmark는
+            포트폴리오 후보는 지배 전략을 제거한 {frontierCount.toLocaleString('ko-KR')}개 전략만 남깁니다. 벤치마크는
             선택 대상이 아니라 위치 비교용입니다.
           </p>
         </div>
@@ -640,7 +640,7 @@ function paddedDomain(values: number[], options: { floor?: number; minSpan: numb
 }
 
 function shortChartLabel(label: string): string {
-  return label.replace('Overseas Trend ', 'Overseas ').replace('Global Trend ', 'Global ');
+  return label;
 }
 
 function efficientFrontier(rows: PortfolioStrategySnapshot[]): PortfolioStrategySnapshot[] {

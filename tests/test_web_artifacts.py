@@ -230,7 +230,7 @@ def test_strategy_catalog_uses_behavior_labels_and_admission_audit(tmp_path: Pat
     catalog = json.loads((out / "strategies" / "catalog.json").read_text(encoding="utf-8"))
     promoted = [row for row in catalog if str(row.get("strategy_id", "")).startswith("stock_rule_")]
     for row in promoted:
-        assert str(row["label"]).startswith("Stock Rule")
+        assert str(row["label"]).startswith("종목룰")
         assert "리포트" in row["methodology_summary"]
         assert "Full Sample validation" not in row["methodology_summary"]
         assert "search_is" not in row["methodology_summary"]

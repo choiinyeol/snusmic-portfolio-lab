@@ -1,6 +1,6 @@
 [
   {
-    "label": "Stock Rule 01: Target Gap Reversal",
+    "label": "종목룰 01: 목표가 괴리 되돌림",
     "persona_name": "stock_rule_target_gap_reversal_ma10_30_m_age7_120_pool10_hold5_winner_compress_reversal_gap",
     "rule_id": "target_gap_reversal_ma10_30_M_age7-120_pool10_hold5_winner_compress_reversal_gap",
     "family": "target_gap_reversal",
@@ -26,7 +26,7 @@
     "source_oos_sortino": 2.4126424519705223
   },
   {
-    "label": "Stock Rule 02: Target Gap Reversal",
+    "label": "종목룰 02: 목표가 괴리 되돌림",
     "persona_name": "stock_rule_target_gap_reversal_ma10_30_m_age7_120_pool5_hold3_equal_reversal_gap",
     "rule_id": "target_gap_reversal_ma10_30_M_age7-120_pool5_hold3_equal_reversal_gap",
     "family": "target_gap_reversal",
@@ -52,7 +52,7 @@
     "source_oos_sortino": 1.9873215660162826
   },
   {
-    "label": "Stock Rule 03: Target Upside Momentum",
+    "label": "종목룰 03: 목표가 상승여력 추세",
     "persona_name": "stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool3_hold2_equal_blend",
     "rule_id": "target_upside_momentum_ma10_30_D_age7-120_pool3_hold2_equal_blend",
     "family": "target_upside_momentum",
@@ -78,7 +78,7 @@
     "source_oos_sortino": 2.331470860924801
   },
   {
-    "label": "Stock Rule 04: Target Gap Reversal",
+    "label": "종목룰 04: 목표가 괴리 되돌림",
     "persona_name": "stock_rule_target_gap_reversal_ma10_30_m_age7_120_pool3_hold2_winner_compress_reversal_gap",
     "rule_id": "target_gap_reversal_ma10_30_M_age7-120_pool3_hold2_winner_compress_reversal_gap",
     "family": "target_gap_reversal",
@@ -104,7 +104,7 @@
     "source_oos_sortino": 1.9528853781742013
   },
   {
-    "label": "Stock Rule 05: Target Upside Momentum",
+    "label": "종목룰 05: 목표가 상승여력 추세",
     "persona_name": "stock_rule_target_upside_momentum_ma10_30_w_age7_120_pool10_hold5_equal_dynamic_upside",
     "rule_id": "target_upside_momentum_ma10_30_W_age7-120_pool10_hold5_equal_dynamic_upside",
     "family": "target_upside_momentum",
@@ -130,7 +130,7 @@
     "source_oos_sortino": 2.1392311995742195
   },
   {
-    "label": "Stock Rule 06: Target Gap Reversal",
+    "label": "종목룰 06: 목표가 괴리 되돌림",
     "persona_name": "stock_rule_target_gap_reversal_ma10_30_w_age0_60_pool10_hold5_winner_compress_reversal_gap",
     "rule_id": "target_gap_reversal_ma10_30_W_age0-60_pool10_hold5_winner_compress_reversal_gap",
     "family": "target_gap_reversal",
@@ -156,7 +156,7 @@
     "source_oos_sortino": 1.503372544279832
   },
   {
-    "label": "Stock Rule 07: Target Upside Momentum",
+    "label": "종목룰 07: 목표가 상승여력 추세",
     "persona_name": "stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool3_hold2_equal_dynamic_upside",
     "rule_id": "target_upside_momentum_ma10_30_D_age7-120_pool3_hold2_equal_dynamic_upside",
     "family": "target_upside_momentum",
@@ -182,7 +182,7 @@
     "source_oos_sortino": 2.0643285437530396
   },
   {
-    "label": "Stock Rule 08: Target Upside Momentum",
+    "label": "종목룰 08: 목표가 상승여력 추세",
     "persona_name": "stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool5_hold3_winner_compress_dynamic_upside",
     "rule_id": "target_upside_momentum_ma10_30_D_age7-120_pool5_hold3_winner_compress_dynamic_upside",
     "family": "target_upside_momentum",
@@ -208,7 +208,7 @@
     "source_oos_sortino": 1.717950852135933
   },
   {
-    "label": "Stock Rule 09: Target Upside Momentum",
+    "label": "종목룰 09: 목표가 상승여력 추세",
     "persona_name": "stock_rule_target_upside_momentum_ma10_30_d_age7_120_pool5_hold3_equal_dynamic_upside",
     "rule_id": "target_upside_momentum_ma10_30_D_age7-120_pool5_hold3_equal_dynamic_upside",
     "family": "target_upside_momentum",
@@ -234,7 +234,7 @@
     "source_oos_sortino": 1.6784142085024907
   },
   {
-    "label": "Stock Rule 10: Ma Crossover",
+    "label": "종목룰 10: 이동평균 정배열",
     "persona_name": "stock_rule_ma_crossover_ma5_20_m_age0_3650_fail500t_pool5_hold3_equal_ma_cross",
     "rule_id": "ma_crossover_ma5_20_M_age0-3650_fail500t_pool5_hold3_equal_ma_cross",
     "family": "ma_crossover",

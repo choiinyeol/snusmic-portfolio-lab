@@ -194,21 +194,21 @@ def default_pit_research_board_configs() -> tuple[PitResearchBoardConfig, ...]:
     return (
         PitResearchBoardConfig(
             persona_name="pit_research_board_score_top5",
-            label="PIT Research Board Score Top 5",
+            label="리서치보드 종합점수 상위 5",
             top_n=5,
             score_mode="board_score",
             weight_mode="equal",
         ),
         PitResearchBoardConfig(
             persona_name="pit_research_board_score_top10",
-            label="PIT Research Board Score Top 10",
+            label="리서치보드 종합점수 상위 10",
             top_n=10,
             score_mode="board_score",
             weight_mode="score_proportional",
         ),
         PitResearchBoardConfig(
             persona_name="pit_research_board_large_upside_top10",
-            label="PIT Large Upside Top 10",
+            label="리서치보드 목표가 업사이드 상위 10",
             top_n=10,
             score_mode="candidate_score",
             bucket_filter="large-upside",
@@ -216,7 +216,7 @@ def default_pit_research_board_configs() -> tuple[PitResearchBoardConfig, ...]:
         ),
         PitResearchBoardConfig(
             persona_name="pit_research_board_trend_top10",
-            label="PIT Trend-Confirmed Top 10",
+            label="리서치보드 정배열 상위 10",
             top_n=10,
             score_mode="board_score",
             require_ma_stack=True,
@@ -224,7 +224,7 @@ def default_pit_research_board_configs() -> tuple[PitResearchBoardConfig, ...]:
         ),
         PitResearchBoardConfig(
             persona_name="pit_research_board_near_high_top10",
-            label="PIT Near-High Top 10",
+            label="리서치보드 52주 고점근접 상위 10",
             top_n=10,
             score_mode="board_score",
             require_near_52w_high=True,

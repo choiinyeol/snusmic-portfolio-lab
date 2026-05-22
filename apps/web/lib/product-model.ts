@@ -371,15 +371,15 @@ function isFiniteNumber(value: unknown): value is number {
 }
 
 export function compactStrategyLabel(id: string, label: string): string {
-  if (id === 'all_weather') return 'All-Weather';
-  if (id === 'smic_follower') return 'Follower v1';
-  if (id === 'smic_follower_v2') return 'Follower SL';
+  if (id === 'all_weather') return '올웨더';
+  if (id === 'smic_follower') return '리포트 추종 v1';
+  if (id === 'smic_follower_v2') return '손절 리포트 추종';
   if (id === 'benchmark_kodex200') return 'KODEX200';
   if (id === 'benchmark_qqq') return 'QQQ';
   if (id === 'benchmark_spy') return 'SPY';
   if (id === 'benchmark_gld') return 'GLD';
-  if (id === 'weak_oracle') return 'Weak Prophet';
+  if (id === 'weak_oracle') return '미래정보 상한선';
   const match = id.match(/^smic_mtt_strategy_top([0-9]+)$/);
-  if (match) return `Report Trend #${match[1]}`;
+  if (match) return `리포트 추세 #${match[1]}`;
   return label;
 }
