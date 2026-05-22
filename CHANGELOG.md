@@ -2,6 +2,33 @@
 
 이 프로젝트의 사용자 가시 변경사항을 모두 정리합니다. 릴리스의 진실은 git 태그이며, 본 파일은 태그 단위로 의도를 한국어로 기록합니다.
 
+## v0.26.0-stock-rule-oos.1 — 2026-05-22
+
+### 추가
+- 개별 종목 룰 기반 `stock_rule_*` persona 10개를 strict point-in-time OOS admission으로 생성해 `/portfolio/[strategy]` 원장에 통합했습니다.
+- stock-rule admission artifact가 실제 룰 패밀리(`target_upside_momentum`, `target_gap_reversal`, `price_momentum` 등)를 그대로 보존하도록 schema/test를 고정했습니다.
+- OOS materialization gate를 추가했습니다: OOS Sharpe/Sortino `>= 0.7` 또는 OOS total return `>= 200%`, 그리고 OOS MDD `<= 65%`.
+- `.omx/quant-insights/stock-rule-oos-admission-20260522.md`에 IS/OOS split, admission count, materialization gate, 병목 개선 결과를 기록했습니다.
+
+### 변경
+- `scripts/run_stock_rule_search.py` 기본 validation mode를 full-sample에서 strict OOS로 전환했습니다.
+- stock-rule search가 동일 window의 report-state, returns, MA/RSI, rebalance index를 캐시해 1,368개 룰 grid 재생성 시간을 약 `78s`에서 `19s`로 줄였습니다.
+- `generate-strategies` 경로도 `2023-01-02` 이후 stock OOS window와 `validation_mode=oos` artifact를 쓰도록 맞췄습니다.
+- 목표가를 failure window 이후에 늦게 터치한 종목이 다시 coverage pool로 살아나지 않도록 stock-rule coverage failure 판정을 고정했습니다.
+- OOS admission 계약이 없는 `pit_research_board_alpha_top*` 실험 persona는 자동 포트폴리오 노출에서 제외했습니다.
+- `scripts/refresh_web_artifacts.sh`가 OOS stock-rule admission과 deployability gate를 기본값으로 사용합니다.
+- README를 현재 `/portfolio/[strategy]` 중심 구조와 OOS stock-rule pipeline 기준으로 정리했습니다.
+
+### 검증
+- `ruff check scripts src tests`
+- `pytest tests/sim/test_stock_rule_search.py tests/sim/test_persona_sim_loader.py tests/sim/test_stock_admission.py tests/sim/test_pit_research_board.py -q`
+- `mypy src/snusmic_pipeline/sim scripts/run_stock_rule_search.py src/snusmic_pipeline/cli.py scripts/run_persona_sim.py scripts/run_strategy_generation_pipeline.py`
+- `python scripts/run_stock_rule_search.py ... --validation-mode oos` → 1,368 searched / 75 IS finalists / 53 OOS admissions / 10 materialized personas
+- `python scripts/run_persona_sim.py ... --disable-broker-strategy-search --stock-rule-personas data/sim/stock-rule-personas.json`
+- `python scripts/export_web_artifacts.py --warehouse data/warehouse --sim data/sim --out data/web --check`
+- `node scripts/validate-artifacts.mjs` → 15 strategies / 212 price files
+- `scripts/vercel_build.sh` → 425 static pages
+
 ## v0.25.3-mpt-frontier.1 — 2026-05-20
 
 ### 변경

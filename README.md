@@ -5,12 +5,12 @@
 서울대 SMIC 학회의 리서치 리포트 · 가격 데이터 · 포트폴리오 시뮬레이션 · 전략 검증을
 한 화면에서 같은 기준으로 추적하는 **읽기 전용 정적 리서치 대시보드**
 
-[![release](https://img.shields.io/badge/release-v0.21.4-1b64da)](./CHANGELOG.md)
+[![release](https://img.shields.io/badge/release-v0.26.0-1b64da)](./CHANGELOG.md)
 [![Next.js](https://img.shields.io/badge/Next.js-16-000000)](https://nextjs.org/)
 [![Python](https://img.shields.io/badge/Python-3.13-3776ab)](https://www.python.org/)
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8)](https://tailwindcss.com/)
 [![Vercel](https://img.shields.io/badge/Vercel-static_export-000000)](https://vercel.com/)
-[![pages](https://img.shields.io/badge/static_pages-413-16a368)](#)
+[![pages](https://img.shields.io/badge/static_pages-425-16a368)](#)
 
 [**라이브 →**](https://smic-portfolio.vercel.app) · [**변경 이력 →**](./CHANGELOG.md) · [**디자인 시스템 →**](./DESIGN.md)
 
@@ -22,6 +22,7 @@
 
 > **리포트 추천이 실제 가격 경로에서 어떤 결과로 이어졌는가**를 표 중심으로 추적합니다.
 > 카드 벽 없이, 스크리너처럼 모든 화면을 정렬·필터·연산자 표로 통일했습니다.
+> 개별 종목 룰은 IS에서만 찾고 OOS에서 재생한 뒤, `/portfolio/[strategy]`의 실제 원장으로만 노출합니다.
 
 ```mermaid
 flowchart LR
@@ -39,7 +40,7 @@ flowchart LR
 |---|---|
 | **리포트 검증** | 발간가 → 목표가 약속이 실제 가격 경로에서 어디까지 도달했는가, 도중 최대 손실, 현재 수익률 |
 | **포트폴리오 원장** | share-based 보유 종목, 평가액 트리맵(±25% 연속 색), 매매내역, 현금 비중 |
-| **전략 비교** | 벤치마크 vs 고유 전략, MDD ≤ 15% 가드를 통과한 전략만 강조 |
+| **전략 비교** | 벤치마크 vs 고유 전략, OOS admission·낙폭·실제 원장 성과를 같은 표에서 비교 |
 | **후보 탐색** | 스크리너 — 컬럼별 연산자 필터(`>=100`, `<=-10`, `>=2025-01-01`), 프리셋 10종, j/k 키보드 이동 |
 | **리포트 통계** | 도달률·중앙값·경로 분포·익절선 검정을 한 페이지에서 |
 | **명령 팔레트** | `⌘K` / `Ctrl+K` — 페이지·전략·종목 한 곳에서 점프 |
@@ -52,7 +53,6 @@ flowchart TD
   Main --> Portfolio["/portfolio<br/>포트폴리오"]
   Main --> Reports["/reports<br/>리포트 표"]
   Main --> Stats["/reports/statistics<br/>리포트 통계"]
-  Main --> Strategies["/strategies<br/>전략"]
   Main --> Guide["/guide<br/>읽는 법"]
   Reports --> Detail["/reports/:symbol/:reportId<br/>리포트 상세"]
   Portfolio --> StrategyView["/portfolio/:strategy<br/>전략별 원장"]
@@ -67,7 +67,8 @@ flowchart TB
     direction TB
     PDF[/PDF 원본/] --> Warehouse[(data/warehouse<br/>정규화된 리포트·가격·환율)]
     YF[/yfinance/] --> Warehouse
-    Warehouse --> Sim[run_persona_sim.py<br/>페르소나 시뮬레이션]
+    Warehouse --> Rules[run_stock_rule_search.py<br/>IS search / OOS admission]
+    Rules --> Sim[run_persona_sim.py<br/>페르소나 시뮬레이션]
     Sim --> SimOut[(data/sim<br/>원장·매매·월간 보유)]
     Warehouse --> Export[export_web_artifacts.py]
     SimOut --> Export
@@ -77,7 +78,7 @@ flowchart TB
     direction TB
     WebData --> Reader[apps/web/lib/artifacts.ts]
     Reader --> Pages["app/(app)/* 라우트"]
-    Pages --> StaticOut[(apps/web/out<br/>413 정적 페이지)]
+    Pages --> StaticOut[(apps/web/out<br/>425 정적 페이지)]
   end
   StaticOut --> Vercel((Vercel CDN))
 ```
@@ -115,7 +116,7 @@ uv sync --group dev
 # 2) 웹 의존성
 pnpm --dir apps/web install
 
-# 3) 아티팩트 일괄 갱신 (가격 + 시뮬 + JSON 내보내기)
+# 3) 아티팩트 일괄 갱신 (OOS stock-rule admission + 시뮬 + JSON 내보내기)
 bash scripts/refresh_web_artifacts.sh
 
 # 4) 개발 서버
@@ -149,7 +150,7 @@ uv run pytest
 | **상태** | useReducer + 판별 액션 (스크리너 필터) |
 | **데이터** | DuckDB, pandas, yfinance, pdfplumber |
 | **품질** | tsc, biome, ruff, pytest, pre-commit |
-| **배포** | Vercel 정적 export — 413 페이지 prebuild |
+| **배포** | Vercel 정적 export — 425 페이지 prebuild |
 
 ## 디렉토리
 
@@ -197,13 +198,40 @@ uv run pytest
 7. GLD
 8. Weak Prophet (미래정보 상한선)
 
-**고유 전략 통과 조건**
+**Stock-rule OOS admission**
 
-```text
-MDD ≤ 15% AND return > KOSPI/KODEX 200 benchmark
+```bash
+python scripts/run_stock_rule_search.py \
+  --warehouse data/warehouse \
+  --validation-mode oos \
+  --is-start 2021-01-04 --is-end 2022-12-31 \
+  --oos-start 2023-01-02 --oos-end 2026-05-22 \
+  --out data/sim \
+  --goal-min-sharpe 0.7 --goal-min-sortino 0.7 \
+  --goal-min-return 2.0 --goal-max-drawdown 0.65
 ```
 
-수익률이 높아도 MDD가 15%를 넘으면 통과로 표시하지 않습니다. MDD는 음수가 아니라 **양수 손실폭**입니다.
+기본 룰은 리포트 발간 이후 pool에 들어온 종목만 대상으로 합니다. IS 구간에서 룰을 찾고,
+OOS 구간에서 frozen config를 재생한 뒤 Sharpe/Sortino/수익률/낙폭/상관 게이트를 통과한
+10개 `stock_rule_*` persona만 `/portfolio/[strategy]`에 노출합니다. MDD는 음수가 아니라
+**양수 손실폭**으로 표시합니다.
+
+PIT 리서치보드 `alpha_top*` 실험은 같은 OOS admission 계약이 아직 없으므로 자동 포트폴리오
+노출에서 제외합니다. 포트폴리오 화면에는 strict OOS stock-rule persona와 기존 기준선/리서치보드
+원장만 남깁니다.
+
+최근 strict OOS 산출물 기준:
+
+| 항목 | 값 |
+|---|---:|
+| 검색 룰 grid | 1,368 |
+| IS finalists | 75 |
+| OOS validation admissions | 53 |
+| materialized stock-rule personas | 10 |
+
+주의: OOS stock-rule persona는 모두 실제 ledger에서 수익을 냈지만, 2021년부터 누적한
+현재 산출물 기준으로는 KODEX200/All-Weather를 일관되게 이기지는 못했습니다. 따라서
+이 화면은 "성공 포장"이 아니라 pool/candidate/buy 룰의 실험 원장입니다.
 
 ## 원칙
 
@@ -220,12 +248,11 @@ MDD ≤ 15% AND return > KOSPI/KODEX 200 benchmark
 
 | 태그 | 핵심 |
 |---|---|
-| **`v0.21.4-slim-report-detail.1`** | 리포트 상세 표 중심 슬림화, sparkline 클램프 제거, 사이드바 활성 텍스트 흰색 보장, 문서 한국어화 |
-| `v0.21.3-ultragoal-polish.1` | 모바일 포커스 트랩, 명령 팔레트 확장(전략+종목), 스크리너 useReducer + COLUMN_META, 트리맵 연속 색 |
-| `v0.21.2-command-palette.1` | ⌘K 명령 팔레트, 퀀타일 1회 정렬, PageHero 표준화 |
-| `v0.21.1-mobile-and-polish.1` | 모바일 햄버거 드로어, 사이드바 활성 강조, 제네릭 Select |
-| `v0.21.0-product-density-i18n.1` | 컬럼 헤더 한국어화, j/k 행 이동, badge CSS 정의, route error 핸들러 |
-| `v0.20.4-ui-density-a11y.1` | globals.css 정리, skip-link, loading.tsx, not-found.tsx |
+| **`v0.26.0-stock-rule-oos.1`** | strict OOS stock-rule admission 10개 persona, deployability gate, search cache, `/portfolio/[strategy]` 통합 |
+| `v0.25.3-mpt-frontier.1` | portfolio frontier 차트와 compact 전략 선택 버튼 |
+| `v0.25.2-portfolio-ux-refine.1` | 포트폴리오 원장 UX와 상세 하위 화면 정리 |
+| `v0.25.1-rp-cash-allocation.1` | RP 대기자금 이자 모델링 |
+| `v0.25.0-portfolio-trade-narrative.1` | 거래 이벤트 타임라인과 원장 내러티브 |
 
 전체 이력은 [`CHANGELOG.md`](./CHANGELOG.md) 참고.
 

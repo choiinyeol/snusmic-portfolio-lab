@@ -47,11 +47,11 @@ def simulate_stock_rule_persona(
         )
 
     rule = _stock_rule_config(config)
-    close = board.close.loc[
-        (board.close.index >= pd.Timestamp(trading_dates[0]))
-        & (board.close.index <= pd.Timestamp(trading_dates[-1]))
+    full_close = board.close.ffill(limit=3).dropna(how="all")
+    close = full_close.loc[
+        (full_close.index >= pd.Timestamp(trading_dates[0]))
+        & (full_close.index <= pd.Timestamp(trading_dates[-1]))
     ].copy()
-    close = close.ffill(limit=3).dropna(how="all")
     if close.empty:
         return PersonaRunOutput(
             account=account,
@@ -60,8 +60,17 @@ def simulate_stock_rule_persona(
         )
 
     prepared_reports = _prepare_stock_reports(reports, board)
+    if board.high is not None:
+        high = board.high.reindex(index=full_close.index, columns=full_close.columns).copy()
+    else:
+        high = full_close.copy()
+    high = high.where(high.notna(), full_close)
     report_state = _report_state_matrices(
-        pd.DatetimeIndex(close.index), list(close.columns), prepared_reports
+        pd.DatetimeIndex(close.index),
+        list(close.columns),
+        prepared_reports,
+        high,
+        trading_calendar=pd.DatetimeIndex(full_close.index),
     )
     weights, _ = _weights_for_config(close, report_state, rule)
     weights_by_day = {
@@ -125,6 +134,7 @@ def _stock_rule_config(config: StockRulePersonaConfig) -> StockRuleConfig:
         min_dynamic_upside=config.min_dynamic_upside,
         min_momentum_return=config.min_momentum_return,
         min_pullback_pct=config.min_pullback_pct,
+        coverage_failure_trading_days=config.coverage_failure_trading_days,
     )
 
 

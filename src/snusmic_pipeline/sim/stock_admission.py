@@ -28,6 +28,10 @@ StockRuleFamily: TypeAlias = Literal[
     "ma_crossover",
     "atr_breakout",
     "relative_strength",
+    "target_upside_momentum",
+    "fresh_report_momentum",
+    "target_gap_reversal",
+    "price_momentum",
 ]
 StockAdmissionStatus: TypeAlias = Literal[
     "accepted",

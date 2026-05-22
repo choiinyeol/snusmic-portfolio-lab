@@ -16,7 +16,7 @@ from collections.abc import Mapping, Sequence
 # the public dataclasses typed and avoid forcing broad casts through every
 # vectorized intermediate.
 # mypy: disable-error-code="arg-type,assignment,return-value,dict-item,call-overload,type-arg,misc,union-attr,index"
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import date
 from math import isfinite, sqrt
 from pathlib import Path
@@ -63,6 +63,7 @@ class StockRuleConfig:
     min_dynamic_upside: float = 0.0
     min_momentum_return: float = -1.0
     min_pullback_pct: float = 0.0
+    coverage_failure_trading_days: int = 0
 
     def to_row(self) -> dict[str, Any]:
         return asdict(self)
@@ -77,9 +78,23 @@ class StockRuleSearchResult:
 
 
 @dataclass(frozen=True)
+class _PreparedWindow:
+    close: pd.DataFrame
+    columns: tuple[str, ...]
+    report_state: dict[str, np.ndarray]
+    returns: np.ndarray
+    moving_average_cache: dict[int, np.ndarray] = field(default_factory=dict, compare=False)
+    indicator_cache: dict[str, np.ndarray] = field(default_factory=dict, compare=False)
+    rebalance_cache: dict[RebalanceCadence, np.ndarray] = field(default_factory=dict, compare=False)
+
+
+@dataclass(frozen=True)
 class _PreparedMarket:
     close: pd.DataFrame
+    high: pd.DataFrame
+    trading_calendar: pd.DatetimeIndex
     reports: pd.DataFrame
+    window_cache: dict[tuple[date, date], _PreparedWindow] = field(default_factory=dict, compare=False)
 
 
 @dataclass(frozen=True)
@@ -286,6 +301,7 @@ def default_stock_rule_configs() -> tuple[StockRuleConfig, ...]:
                                             min_dynamic_upside=0.0,
                                             min_momentum_return=min_momentum,
                                             min_pullback_pct=min_pullback,
+                                            coverage_failure_trading_days=0,
                                         )
                                     )
 
@@ -316,6 +332,7 @@ def default_stock_rule_configs() -> tuple[StockRuleConfig, ...]:
                                     min_dynamic_upside=0.0,
                                     min_momentum_return=0.0 if family != "rsi_reversal" else -1.0,
                                     min_pullback_pct=0.0,
+                                    coverage_failure_trading_days=500,
                                 )
                             )
     return tuple(configs)
@@ -336,11 +353,13 @@ def _config(
     min_dynamic_upside: float,
     min_momentum_return: float,
     min_pullback_pct: float,
+    coverage_failure_trading_days: int,
 ) -> StockRuleConfig:
+    failure_suffix = f"_fail{coverage_failure_trading_days}t" if coverage_failure_trading_days > 0 else ""
     rule_id = (
         f"{family}_ma{fast_ma_days}_{slow_ma_days}_{rebalance}"
         f"_age{min_report_age_days}-{max_report_age_days}"
-        f"_pool{top_pool}_hold{hold_top}_{weight_mode}_{score_mode}"
+        f"{failure_suffix}_pool{top_pool}_hold{hold_top}_{weight_mode}_{score_mode}"
     )
     return StockRuleConfig(
         rule_id=rule_id,
@@ -357,6 +376,7 @@ def _config(
         min_dynamic_upside=min_dynamic_upside,
         min_momentum_return=min_momentum_return,
         min_pullback_pct=min_pullback_pct,
+        coverage_failure_trading_days=coverage_failure_trading_days,
     )
 
 
@@ -364,18 +384,54 @@ def _load_market(warehouse_dir: Path, start_date: date, end_date: date) -> _Prep
     board = PriceBoard.from_warehouse(warehouse_dir)
     if board.is_empty:
         raise RuntimeError(f"Warehouse {warehouse_dir} has no daily_prices rows; cannot search stock rules.")
-    close = board.close.loc[
-        (board.close.index >= pd.Timestamp(start_date)) & (board.close.index <= pd.Timestamp(end_date))
+    full_close = board.close.ffill(limit=3).dropna(how="all")
+    close = full_close.loc[
+        (full_close.index >= pd.Timestamp(start_date)) & (full_close.index <= pd.Timestamp(end_date))
     ].copy()
-    close = close.ffill(limit=3).dropna(how="all")
     if len(close) < 2:
         raise RuntimeError(f"Not enough price rows in {start_date}..{end_date} to search stock rules.")
+
+    if board.high is not None:
+        high = board.high.reindex(index=full_close.index, columns=full_close.columns).copy()
+    else:
+        high = full_close.copy()
+    high = high.where(high.notna(), full_close)
 
     reports = read_table(warehouse_dir, "reports")
     reports = _prepare_reports(reports, start_date, end_date)
     reports = align_report_targets_to_market_scale(reports, board, end_date)
     reports = _prepare_stock_reports(reports, board)
-    return _PreparedMarket(close=close, reports=reports)
+    return _PreparedMarket(
+        close=close, high=high, trading_calendar=pd.DatetimeIndex(full_close.index), reports=reports
+    )
+
+
+def _prepared_window(prepared: _PreparedMarket, start_date: date, end_date: date) -> _PreparedWindow:
+    """Cache point-in-time invariant arrays for one evaluation window."""
+
+    key = (start_date, end_date)
+    cached = prepared.window_cache.get(key)
+    if cached is not None:
+        return cached
+
+    close = prepared.close.loc[
+        (prepared.close.index >= pd.Timestamp(start_date)) & (prepared.close.index <= pd.Timestamp(end_date))
+    ].copy()
+    close = close.dropna(how="all")
+    columns = tuple(close.columns)
+    report_state = _report_state_matrices(
+        close.index,
+        list(columns),
+        prepared.reports,
+        prepared.high,
+        trading_calendar=prepared.trading_calendar,
+    )
+    returns = (
+        close.pct_change(fill_method=None).replace([np.inf, -np.inf], np.nan).fillna(0.0).to_numpy(float)
+    )
+    window = _PreparedWindow(close=close, columns=columns, report_state=report_state, returns=returns)
+    prepared.window_cache[key] = window
+    return window
 
 
 def _prepare_stock_reports(reports: pd.DataFrame, board: PriceBoard) -> pd.DataFrame:
@@ -429,27 +485,28 @@ def _evaluate_config(
     min_observations: int,
     min_noncash_fraction: float,
 ) -> _Evaluation:
-    close = prepared.close.loc[
-        (prepared.close.index >= pd.Timestamp(start_date)) & (prepared.close.index <= pd.Timestamp(end_date))
-    ].copy()
-    close = close.dropna(how="all")
+    window = _prepared_window(prepared, start_date, end_date)
+    close = window.close
     if len(close) < 2:
         return _empty_evaluation(config, "insufficient_activity", "not_enough_price_rows")
 
-    columns = list(close.columns)
+    columns = list(window.columns)
     if not columns:
         return _empty_evaluation(config, "insufficient_activity", "no_price_symbols")
 
-    report_state = _report_state_matrices(close.index, columns, prepared.reports)
-    returns = (
-        close.pct_change(fill_method=None).replace([np.inf, -np.inf], np.nan).fillna(0.0).to_numpy(float)
+    weights, rebalance_weights = _weights_for_config(
+        close,
+        window.report_state,
+        config,
+        moving_average_cache=window.moving_average_cache,
+        indicator_cache=window.indicator_cache,
+        rebalance_cache=window.rebalance_cache,
     )
-    weights, rebalance_weights = _weights_for_config(close, report_state, config)
     if weights.size == 0:
         return _empty_evaluation(config, "insufficient_activity", "no_rebalance_rows")
 
     start_idx = 1
-    portfolio_returns = np.sum(weights * returns, axis=1)[start_idx:]
+    portfolio_returns = np.sum(weights * window.returns, axis=1)[start_idx:]
     active = np.sum(weights, axis=1) > 0
     metrics = _metrics(
         portfolio_returns,
@@ -485,17 +542,43 @@ def _report_state_matrices(
     dates: pd.DatetimeIndex,
     columns: list[str],
     reports: pd.DataFrame,
+    high: pd.DataFrame | None = None,
+    *,
+    trading_calendar: pd.DatetimeIndex | None = None,
 ) -> dict[str, np.ndarray]:
+    dates = pd.DatetimeIndex(dates)
     n_days = len(dates)
     n_symbols = len(columns)
     target = np.full((n_days, n_symbols), np.nan)
     static_upside = np.full((n_days, n_symbols), np.nan)
     report_age = np.full((n_days, n_symbols), np.nan)
-    if reports.empty:
-        return {"target": target, "static_upside": static_upside, "report_age": report_age}
+    trading_age = np.full((n_days, n_symbols), np.nan)
+    target_touched = np.full((n_days, n_symbols), False)
+    target_touch_trading_age = np.full((n_days, n_symbols), np.inf)
+    if n_days == 0 or reports.empty:
+        return {
+            "target": target,
+            "static_upside": static_upside,
+            "report_age": report_age,
+            "trading_age": trading_age,
+            "target_touched": target_touched,
+            "target_touch_trading_age": target_touch_trading_age,
+        }
 
     ordinal_dates = dates.values.astype("datetime64[D]").astype(np.int64)
+    if trading_calendar is None:
+        trading_calendar = pd.DatetimeIndex(high.index) if high is not None else dates
+    calendar = pd.DatetimeIndex(trading_calendar).sort_values().unique()
+    calendar_ord = calendar.values.astype("datetime64[D]").astype(np.int64)
+    if len(calendar_ord) == 0:
+        calendar = dates
+        calendar_ord = ordinal_dates
+    date_calendar_pos = np.searchsorted(calendar_ord, ordinal_dates, side="left")
+    exact_dates = (date_calendar_pos < len(calendar_ord)) & (
+        calendar_ord[np.minimum(date_calendar_pos, len(calendar_ord) - 1)] == ordinal_dates
+    )
     by_symbol = {symbol: idx for idx, symbol in enumerate(columns)}
+    high_np = high.reindex(index=calendar, columns=columns).to_numpy(float) if high is not None else None
     for symbol, group in reports.groupby("symbol", sort=False):
         col_idx = by_symbol.get(str(symbol))
         if col_idx is None:
@@ -511,40 +594,87 @@ def _report_state_matrices(
         target[ok, col_idx] = target_values[idx[ok]]
         static_upside[ok, col_idx] = static_values[idx[ok]]
         report_age[ok, col_idx] = ordinal_dates[ok] - pub_ord[idx[ok]]
-    return {"target": target, "static_upside": static_upside, "report_age": report_age}
+        out_positions = np.searchsorted(ordinal_dates, pub_ord, side="left")
+        calendar_positions = np.searchsorted(calendar_ord, pub_ord, side="left")
+        for report_idx, out_start in enumerate(out_positions):
+            out_end = int(out_positions[report_idx + 1]) if report_idx + 1 < len(out_positions) else n_days
+            if out_start >= n_days or out_end <= out_start:
+                continue
+            out_start = max(0, int(out_start))
+            out_end = min(n_days, out_end)
+            segment_calendar_pos = date_calendar_pos[out_start:out_end]
+            start_calendar_pos = max(0, int(calendar_positions[report_idx]))
+            trading_age[out_start:out_end, col_idx] = np.where(
+                exact_dates[out_start:out_end] & (segment_calendar_pos >= start_calendar_pos),
+                segment_calendar_pos - start_calendar_pos,
+                np.nan,
+            )
+            if high_np is None:
+                observed = np.zeros(out_end - out_start, dtype=bool)
+                touch_age = np.full(out_end - out_start, np.inf)
+            else:
+                end_calendar_pos = (
+                    int(calendar_positions[report_idx + 1])
+                    if report_idx + 1 < len(calendar_positions)
+                    else len(calendar_ord)
+                )
+                end_calendar_pos = max(start_calendar_pos, min(len(calendar_ord), end_calendar_pos))
+                calendar_observed = (
+                    high_np[start_calendar_pos:end_calendar_pos, col_idx] >= target_values[report_idx]
+                )
+                calendar_observed = np.where(
+                    np.isfinite(high_np[start_calendar_pos:end_calendar_pos, col_idx]),
+                    calendar_observed,
+                    False,
+                )
+                touched_so_far = np.maximum.accumulate(calendar_observed)
+                touch_positions = np.flatnonzero(calendar_observed)
+                first_touch_age = float(touch_positions[0]) if len(touch_positions) > 0 else np.inf
+                lookup = segment_calendar_pos - start_calendar_pos
+                observed = np.zeros(out_end - out_start, dtype=bool)
+                valid_lookup = exact_dates[out_start:out_end] & (lookup >= 0) & (lookup < len(touched_so_far))
+                observed[valid_lookup] = touched_so_far[lookup[valid_lookup]]
+                touch_age = np.full(out_end - out_start, np.inf)
+                touch_age[valid_lookup & observed] = first_touch_age
+            target_touched[out_start:out_end, col_idx] = observed
+            target_touch_trading_age[out_start:out_end, col_idx] = touch_age
+    return {
+        "target": target,
+        "static_upside": static_upside,
+        "report_age": report_age,
+        "trading_age": trading_age,
+        "target_touched": target_touched,
+        "target_touch_trading_age": target_touch_trading_age,
+    }
 
 
 def _weights_for_config(
     close: pd.DataFrame,
     report_state: Mapping[str, np.ndarray],
     config: StockRuleConfig,
+    *,
+    moving_average_cache: dict[int, np.ndarray] | None = None,
+    indicator_cache: dict[str, np.ndarray] | None = None,
+    rebalance_cache: dict[RebalanceCadence, np.ndarray] | None = None,
 ) -> tuple[np.ndarray, np.ndarray]:
     n_days, n_symbols = close.shape
     close_np = close.to_numpy(float)
-    fast_ma = (
-        close.rolling(config.fast_ma_days, min_periods=max(3, config.fast_ma_days // 2))
-        .mean()
-        .to_numpy(float)
-    )
-    slow_ma = (
-        close.rolling(config.slow_ma_days, min_periods=max(3, config.slow_ma_days // 2))
-        .mean()
-        .to_numpy(float)
-    )
+    fast_ma = _moving_average(close, config.fast_ma_days, moving_average_cache)
+    slow_ma = _moving_average(close, config.slow_ma_days, moving_average_cache)
     with np.errstate(divide="ignore", invalid="ignore"):
         dynamic_upside = report_state["target"] / close_np - 1.0
         momentum = close_np / slow_ma - 1.0
         pullback = fast_ma / close_np - 1.0
         ma_spread = fast_ma / slow_ma - 1.0
 
-    returns_frame = close.pct_change(fill_method=None).replace([np.inf, -np.inf], np.nan)
-    losses = (-returns_frame.clip(upper=0)).rolling(14, min_periods=7).mean().to_numpy(float)
-    gains = returns_frame.clip(lower=0).rolling(14, min_periods=7).mean().to_numpy(float)
-    with np.errstate(divide="ignore", invalid="ignore"):
-        rsi = 100.0 - (100.0 / (1.0 + gains / losses))
-    rsi = np.where((losses == 0) & np.isfinite(gains), 100.0, rsi)
+    rsi = _rsi_14(close, indicator_cache)
 
     age = report_state["report_age"]
+    trading_age = report_state["trading_age"]
+    target_touched = report_state["target_touched"].astype(bool)
+    target_touch_trading_age = report_state.get("target_touch_trading_age")
+    if target_touch_trading_age is None:
+        target_touch_trading_age = np.full_like(trading_age, np.inf, dtype=float)
     static_upside = report_state["static_upside"]
     trend = close_np > slow_ma
     report_family = config.family in {
@@ -577,17 +707,27 @@ def _weights_for_config(
     # published research report.  Even price-only families must therefore wait
     # until the first publication date; otherwise a later report would leak the
     # symbol into an earlier rebalance.
+    coverage_live = np.isfinite(age)
+    if config.coverage_failure_trading_days > 0:
+        timely_target_touch = target_touched & (
+            target_touch_trading_age <= config.coverage_failure_trading_days
+        )
+        coverage_live = coverage_live & (
+            timely_target_touch
+            | (np.isfinite(trading_age) & (trading_age <= config.coverage_failure_trading_days))
+        )
+
     valid = (
         trend
         & np.isfinite(score)
-        & np.isfinite(age)
+        & coverage_live
         & (momentum >= config.min_momentum_return)
         & (age >= config.min_report_age_days)
         & (age <= config.max_report_age_days)
     )
     if report_family:
         valid = valid & np.isfinite(dynamic_upside) & (dynamic_upside >= config.min_dynamic_upside)
-    rebalance_indices = _rebalance_indices(close.index, config.rebalance)
+    rebalance_indices = _cached_rebalance_indices(close.index, config.rebalance, rebalance_cache)
     if len(rebalance_indices) == 0:
         return np.zeros((n_days, n_symbols)), np.zeros((0, n_symbols))
 
@@ -613,6 +753,49 @@ def _weights_for_config(
         if day_idx + 1 < n_days:
             daily_weights[day_idx + 1] = current
     return daily_weights, rebalance_matrix
+
+
+def _moving_average(
+    close: pd.DataFrame,
+    days: int,
+    cache: dict[int, np.ndarray] | None,
+) -> np.ndarray:
+    cached = cache.get(days) if cache is not None else None
+    if cached is not None:
+        return cached
+    values = close.rolling(days, min_periods=max(3, days // 2)).mean().to_numpy(float)
+    if cache is not None:
+        cache[days] = values
+    return values
+
+
+def _rsi_14(close: pd.DataFrame, cache: dict[str, np.ndarray] | None) -> np.ndarray:
+    cached = cache.get("rsi_14") if cache is not None else None
+    if cached is not None:
+        return cached
+    returns_frame = close.pct_change(fill_method=None).replace([np.inf, -np.inf], np.nan)
+    losses = (-returns_frame.clip(upper=0)).rolling(14, min_periods=7).mean().to_numpy(float)
+    gains = returns_frame.clip(lower=0).rolling(14, min_periods=7).mean().to_numpy(float)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        rsi = 100.0 - (100.0 / (1.0 + gains / losses))
+    rsi = np.where((losses == 0) & np.isfinite(gains), 100.0, rsi)
+    if cache is not None:
+        cache["rsi_14"] = rsi
+    return rsi
+
+
+def _cached_rebalance_indices(
+    index: pd.DatetimeIndex,
+    cadence: RebalanceCadence,
+    cache: dict[RebalanceCadence, np.ndarray] | None,
+) -> np.ndarray:
+    cached = cache.get(cadence) if cache is not None else None
+    if cached is not None:
+        return cached
+    indices = _rebalance_indices(index, cadence)
+    if cache is not None:
+        cache[cadence] = indices
+    return indices
 
 
 def _rebalance_indices(index: pd.DatetimeIndex, cadence: RebalanceCadence) -> np.ndarray:
@@ -848,4 +1031,5 @@ def _config_from_row(row: Mapping[str, Any]) -> StockRuleConfig:
         min_dynamic_upside=float(row.get("min_dynamic_upside", 0.0)),
         min_momentum_return=float(row.get("min_momentum_return", -1.0)),
         min_pullback_pct=float(row.get("min_pullback_pct", 0.0)),
+        coverage_failure_trading_days=int(row.get("coverage_failure_trading_days") or 0),
     )

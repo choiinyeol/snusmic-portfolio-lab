@@ -57,15 +57,18 @@ class StrategyGenerationConfig:
     end_date: date
     is_start: date = date(2021, 1, 4)
     is_end: date = date(2022, 12, 31)
+    stock_oos_start: date = date(2023, 1, 2)
+    stock_oos_end: date | None = None
     max_stock_configs: int = 0
     is_top: int = 75
     admit_top: int = 0
     stock_persona_top: int = 10
     pit_strategy_top: int = 5
     max_correlation: float = 0.95
-    goal_min_sharpe: float = 1.5
-    goal_min_sortino: float = 1.5
-    goal_min_return: float = 5.0
+    goal_min_sharpe: float = 0.7
+    goal_min_sortino: float = 0.7
+    goal_min_return: float = 2.0
+    goal_max_drawdown: float = 0.65
     broker_strategy_trials: int = 120
     broker_strategy_top: int = 3
     broker_strategy_seed: int = 42
@@ -238,6 +241,7 @@ def generate_stock_rule_candidates(
             min_sharpe=config.goal_min_sharpe,
             min_sortino=config.goal_min_sortino,
             min_return=config.goal_min_return,
+            max_drawdown=config.goal_max_drawdown,
             max_correlation=config.max_correlation,
         )
         personas = tuple(
@@ -245,8 +249,8 @@ def generate_stock_rule_candidates(
                 goal_rows,
                 search_start=config.is_start,
                 search_end=config.is_end,
-                oos_start=config.start_date,
-                oos_end=config.end_date,
+                oos_start=config.stock_oos_start,
+                oos_end=_stock_oos_end(config),
             )
         )
         return personas, trials
@@ -266,8 +270,8 @@ def generate_stock_rule_candidates(
         configs=is_result,
         is_start=config.is_start,
         is_end=config.is_end,
-        oos_start=config.start_date,
-        oos_end=config.end_date,
+        oos_start=config.stock_oos_start,
+        oos_end=_stock_oos_end(config),
         benchmark_total_return=benchmark_money_weighted_return,
         top_n=config.admit_top,
     )
@@ -278,6 +282,7 @@ def generate_stock_rule_candidates(
         min_sharpe=config.goal_min_sharpe,
         min_sortino=config.goal_min_sortino,
         min_return=config.goal_min_return,
+        max_drawdown=config.goal_max_drawdown,
         max_correlation=config.max_correlation,
     )
     personas = tuple(
@@ -285,8 +290,8 @@ def generate_stock_rule_candidates(
             goal_rows,
             search_start=config.is_start,
             search_end=config.is_end,
-            oos_start=config.start_date,
-            oos_end=config.end_date,
+            oos_start=config.stock_oos_start,
+            oos_end=_stock_oos_end(config),
         )
     )
     _write_rows(is_result.trial_rows, config.out_dir / "is-search.csv", config.out_dir / "is-search.json")
@@ -610,19 +615,24 @@ def write_stock_outputs(
         selected_rule_ids={p.rule_id for p in stock_promoted},
         search_start=config.is_start,
         search_end=config.is_end,
-        oos_start=config.start_date,
-        oos_end=config.end_date,
-        validation_mode="full_sample",
+        oos_start=config.stock_oos_start,
+        oos_end=_stock_oos_end(config),
+        validation_mode="oos",
         benchmark_total_return=benchmark_money_weighted_return,
         min_oos_excess_return=0.0,
         min_sharpe=config.goal_min_sharpe,
         min_sortino=config.goal_min_sortino,
         min_return=config.goal_min_return,
+        max_drawdown=config.goal_max_drawdown,
     )
     (config.out_dir / "stock-admission.json").write_text(
         json.dumps(_json_safe(artifact.model_dump(mode="json")), ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
+
+
+def _stock_oos_end(config: StrategyGenerationConfig) -> date:
+    return config.stock_oos_end or config.end_date
 
 
 def write_pit_outputs(

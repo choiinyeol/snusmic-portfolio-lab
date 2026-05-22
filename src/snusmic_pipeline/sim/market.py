@@ -15,7 +15,7 @@ Two responsibilities:
 from __future__ import annotations
 
 from collections.abc import Iterable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
@@ -58,6 +58,14 @@ class PriceBoard:
     open: pd.DataFrame  # may be the same as close if no opens were captured
     high: pd.DataFrame | None = None  # falls back to close when unavailable
     low: pd.DataFrame | None = None  # falls back to close when unavailable
+    _close_on_cache: dict[date, dict[str, float]] = field(default_factory=dict, init=False, repr=False)
+    _asof_cache: dict[tuple[date, str], float | None] = field(default_factory=dict, init=False, repr=False)
+    _date_asof_cache: dict[tuple[date, str], date | None] = field(
+        default_factory=dict, init=False, repr=False
+    )
+    _price_on_cache: dict[tuple[int, date, str], float | None] = field(
+        default_factory=dict, init=False, repr=False
+    )
 
     @classmethod
     def from_warehouse(cls, warehouse_dir: Path) -> PriceBoard:
@@ -93,23 +101,55 @@ class PriceBoard:
 
     def close_on(self, day: date) -> dict[str, float]:
         """Closes available on ``day``. Symbols missing a close are omitted."""
+        cached = self._close_on_cache.get(day)
+        if cached is not None:
+            return cached
         ts = pd.Timestamp(day)
         if self.close.empty or ts not in self.close.index:
             return {}
         row = self.close.loc[ts]
-        return {sym: float(val) for sym, val in row.items() if pd.notna(val) and float(val) > 0}
+        closes = {sym: float(val) for sym, val in row.items() if pd.notna(val) and float(val) > 0}
+        self._close_on_cache[day] = closes
+        return closes
 
     def asof(self, day: date, symbol: str) -> float | None:
         """Latest known close for ``symbol`` on or before ``day``."""
+        key = (day, symbol)
+        if key in self._asof_cache:
+            return self._asof_cache[key]
         if self.close.empty or symbol not in self.close.columns:
+            self._asof_cache[key] = None
             return None
         ts = pd.Timestamp(day)
         col = self.close[symbol]
-        slice_ = col.loc[col.index <= ts].dropna()
-        if slice_.empty:
+        value = col.asof(ts)
+        if pd.isna(value) or float(value) <= 0:
+            self._asof_cache[key] = None
             return None
-        last = slice_.iloc[-1]
-        return float(last) if last > 0 else None
+        result = float(value)
+        self._asof_cache[key] = result
+        return result
+
+    def date_asof(self, day: date, symbol: str) -> date | None:
+        """Date of the latest valid close for ``symbol`` on or before ``day``."""
+        key = (day, symbol)
+        if key in self._date_asof_cache:
+            return self._date_asof_cache[key]
+        if self.close.empty or symbol not in self.close.columns:
+            self._date_asof_cache[key] = None
+            return None
+        ts = pd.Timestamp(day)
+        series = self.close[symbol]
+        idx = int(series.index.searchsorted(ts, side="right") - 1)
+        while idx >= 0:
+            value = series.iat[idx]
+            if pd.notna(value) and float(value) > 0:
+                result = series.index[idx].date()
+                self._date_asof_cache[key] = result
+                return result
+            idx -= 1
+        self._date_asof_cache[key] = None
+        return None
 
     def intraday_high_on(self, day: date, symbol: str) -> float | None:
         return self._price_on(day, symbol, self.high if self.high is not None else self.close)
@@ -131,13 +171,20 @@ class PriceBoard:
         return high is not None and high >= threshold
 
     def _price_on(self, day: date, symbol: str, frame: pd.DataFrame) -> float | None:
+        key = (id(frame), day, symbol)
+        if key in self._price_on_cache:
+            return self._price_on_cache[key]
         if frame.empty or symbol not in frame.columns:
+            self._price_on_cache[key] = None
             return None
         ts = pd.Timestamp(day)
         if ts not in frame.index:
+            self._price_on_cache[key] = None
             return None
         value = frame.at[ts, symbol]
-        return float(value) if pd.notna(value) and float(value) > 0 else None
+        result = float(value) if pd.notna(value) and float(value) > 0 else None
+        self._price_on_cache[key] = result
+        return result
 
     def returns_window(
         self,

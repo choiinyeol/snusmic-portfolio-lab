@@ -418,12 +418,18 @@ def run_generate_strategies(args: argparse.Namespace) -> int:
             end_date=date.fromisoformat(args.end),
             is_start=date.fromisoformat(args.is_start),
             is_end=date.fromisoformat(args.is_end),
+            stock_oos_start=date.fromisoformat(args.stock_oos_start),
+            stock_oos_end=date.fromisoformat(args.stock_oos_end) if args.stock_oos_end else None,
             max_stock_configs=args.max_stock_configs,
             is_top=args.is_top,
             admit_top=args.admit_top,
             stock_persona_top=args.stock_persona_top,
             pit_strategy_top=args.pit_strategy_top,
             max_correlation=args.max_correlation,
+            goal_min_sharpe=args.goal_min_sharpe,
+            goal_min_sortino=args.goal_min_sortino,
+            goal_min_return=args.goal_min_return,
+            goal_max_drawdown=args.goal_max_drawdown,
             broker_strategy_trials=args.broker_strategy_trials,
             broker_strategy_top=args.broker_strategy_top,
             broker_strategy_seed=args.broker_strategy_seed,
@@ -604,12 +610,18 @@ def build_parser() -> argparse.ArgumentParser:
     generate.add_argument("--out", default=str(REPO_ROOT / "data" / "sim"))
     generate.add_argument("--is-start", default="2021-01-04")
     generate.add_argument("--is-end", default="2022-12-31")
+    generate.add_argument("--stock-oos-start", default="2023-01-02")
+    generate.add_argument("--stock-oos-end", default=None)
     generate.add_argument("--max-stock-configs", type=int, default=0)
     generate.add_argument("--is-top", type=int, default=75)
     generate.add_argument("--admit-top", type=int, default=0)
     generate.add_argument("--stock-persona-top", type=int, default=10)
     generate.add_argument("--pit-strategy-top", type=int, default=5)
     generate.add_argument("--max-correlation", type=float, default=0.95)
+    generate.add_argument("--goal-min-sharpe", type=float, default=0.7)
+    generate.add_argument("--goal-min-sortino", type=float, default=0.7)
+    generate.add_argument("--goal-min-return", type=float, default=2.0)
+    generate.add_argument("--goal-max-drawdown", type=float, default=0.65)
     generate.add_argument(
         "--broker-strategy-trials",
         type=int,

@@ -10,6 +10,7 @@ from snusmic_pipeline.sim.stock_admission import (
     StockAdmissionDecision,
     StockAdmissionWindow,
     StockRuleCandidate,
+    StockRuleFamily,
     StockRuleMetrics,
     StockRuleParam,
 )
@@ -133,6 +134,24 @@ def test_stock_rule_candidate_rejects_duplicate_param_names() -> None:
             ),
             in_sample_metrics=_metrics(mwr=0.42),
         )
+
+
+def test_stock_rule_candidate_preserves_actual_rule_family_names() -> None:
+    families: tuple[StockRuleFamily, ...] = (
+        "target_upside_momentum",
+        "fresh_report_momentum",
+        "target_gap_reversal",
+        "price_momentum",
+        "ma_crossover",
+        "rsi_reversal",
+    )
+
+    for family in families:
+        candidate = StockRuleCandidate.model_validate(
+            {**_candidate().model_dump(mode="python"), "family": family}
+        )
+
+        assert candidate.family == family
 
 
 def test_stock_admission_artifact_roundtrips_and_exposes_accepted_decisions() -> None:

@@ -131,7 +131,7 @@
     "report_age_days": 58,
     "report_id": "aca3b0e80e5d334c",
     "return_1m": 0.227022109355989,
-    "return_1y": 3.709830560373669,
+    "return_1y": 3.7098305603736694,
     "return_3m": 0.3852739394970594,
     "score_mode": "board_score",
     "symbol": "SE",
@@ -347,7 +347,7 @@
     "report_age_days": 86,
     "report_id": "aca3b0e80e5d334c",
     "return_1m": 0.0698026142170624,
-    "return_1y": 3.842239272085679,
+    "return_1y": 3.8422392720856786,
     "return_3m": 0.4197843932123257,
     "score_mode": "board_score",
     "symbol": "SE",
@@ -3597,7 +3597,7 @@
     "target_upside_at_pub": 1.103747124338454,
     "trade_date": "2022-01-04",
     "weight": 0.0845008460144688,
-    "ytd_return": 3.670717592544285
+    "ytd_return": 3.6707175925442854
   },
   {
     "above_200ma": "True",
@@ -3659,7 +3659,7 @@
     "report_age_days": 34,
     "report_id": "e4f61fb5a56f7d82",
     "return_1m": -0.0395937150620675,
-    "return_1y": 2.108251556809817,
+    "return_1y": 2.1082515568098175,
     "return_3m": -0.0631426522004319,
     "score_mode": "board_score",
     "symbol": "INMD",
@@ -5588,7 +5588,7 @@
     "bucket": "fresh",
     "candidate_score": 29.428527,
     "company": "GrafTech International Ltd.",
-    "current_return": 7.924578686032452,
+    "current_return": 7.9245786860324525,
     "distance_from_52w_high": -0.4117623497833939,
     "entry_price_krw": 10403.167419433594,
     "expired": false,
@@ -7748,7 +7748,7 @@
     "bucket": "large-upside",
     "candidate_score": 26.270305,
     "company": "GrafTech International Ltd.",
-    "current_return": 4.766356737639208,
+    "current_return": 4.7663567376392075,
     "distance_from_52w_high": -0.5863845152081036,
     "entry_price_krw": 10403.167419433594,
     "expired": false,
@@ -7842,7 +7842,7 @@
     "target_gap_pct": -0.8305164365096831,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-01-03",
     "weight": 0.0870929698360642,
     "ytd_return": 0.0
@@ -8202,7 +8202,7 @@
     "target_gap_pct": -0.8084507042253521,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-02-02",
     "weight": 0.0903550126209763,
     "ytd_return": 0.1301939363907207
@@ -8562,7 +8562,7 @@
     "target_gap_pct": -0.8169014084507042,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-03-02",
     "weight": 0.0900667122793705,
     "ytd_return": 0.0803324391970123
@@ -8958,7 +8958,7 @@
     "target_gap_pct": -0.8103286339128521,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-04-04",
     "weight": 0.0912422919210058,
     "ytd_return": 0.1191136307326012
@@ -9282,7 +9282,7 @@
     "target_gap_pct": -0.7868544646786972,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-05-02",
     "weight": 0.0965805556644465,
     "ytd_return": 0.257617735500826
@@ -9678,7 +9678,7 @@
     "target_gap_pct": -0.8014084507042254,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-06-02",
     "weight": 0.0886113722739492,
     "ytd_return": 0.1717451840521442
@@ -9753,7 +9753,7 @@
     "target_upside_at_pub": 2.0522388059701493,
     "trade_date": "2023-06-02",
     "weight": 0.0577327636189873,
-    "ytd_return": 2.188908145580589
+    "ytd_return": 2.1889081455805894
   },
   {
     "above_200ma": "False",
@@ -9888,7 +9888,7 @@
     "report_id": "28902e013d64471e",
     "return_1m": 0.2583333333333333,
     "return_1y": 1.059090909090909,
-    "return_3m": 2.203677510608204,
+    "return_3m": 2.2036775106082036,
     "score_mode": "board_score",
     "symbol": "363250.KQ",
     "target_gap_pct": -0.3094512195121951,
@@ -10002,7 +10002,7 @@
     "target_gap_pct": -0.7718309859154929,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-07-04",
     "weight": 0.090555541465746,
     "ytd_return": 0.346260424230123
@@ -10221,7 +10221,7 @@
     "target_upside_at_pub": 1.2329545239443291,
     "trade_date": "2023-07-04",
     "weight": 0.0357684682391681,
-    "ytd_return": 3.029378124228128
+    "ytd_return": 3.0293781242281277
   },
   {
     "above_200ma": "True",
@@ -10268,7 +10268,7 @@
     "bucket": "large-upside",
     "candidate_score": 27.00221,
     "company": "GrafTech International Ltd.",
-    "current_return": 5.498261449199648,
+    "current_return": 5.4982614491996475,
     "distance_from_52w_high": -0.3373296866105065,
     "entry_price_krw": 10403.167419433594,
     "expired": false,
@@ -10362,7 +10362,7 @@
     "target_gap_pct": -0.7906103240536972,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-08-02",
     "weight": 0.0851405539651891,
     "ytd_return": 0.2354571241845873
@@ -10427,7 +10427,7 @@
     "report_age_days": 68,
     "report_id": "73eb3af5c6c360ec",
     "return_1m": 0.217741935483871,
-    "return_1y": 3.652118100128369,
+    "return_1y": 3.65211810012837,
     "return_3m": 2.02,
     "score_mode": "board_score",
     "symbol": "328130.KQ",
@@ -10758,7 +10758,7 @@
     "target_gap_pct": -0.7929577464788733,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-09-04",
     "weight": 0.0878864679071576,
     "ytd_return": 0.2216066812458526
@@ -11118,7 +11118,7 @@
     "target_gap_pct": -0.7990610282790493,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-10-03",
     "weight": 0.0919957229356981,
     "ytd_return": 0.1855956269908789
@@ -11514,7 +11514,7 @@
     "target_gap_pct": -0.8093896759463028,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-11-02",
     "weight": 0.0016345265093535,
     "ytd_return": 0.1246537429842706
@@ -11874,7 +11874,7 @@
     "target_gap_pct": -0.8,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-12-04",
     "weight": 0.001532288813411,
     "ytd_return": 0.1800554335844288
@@ -12234,7 +12234,7 @@
     "target_gap_pct": -0.795774647887324,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-01-03",
     "weight": 0.0015271289945882,
     "ytd_return": 0.0
@@ -12558,7 +12558,7 @@
     "target_gap_pct": -0.7826291125660212,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-02-02",
     "weight": 0.0957666787193589,
     "ytd_return": 0.0643677936422413
@@ -12918,7 +12918,7 @@
     "target_gap_pct": -0.7868544646786972,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-03-04",
     "weight": 0.0939686213905483,
     "ytd_return": 0.0436781384698274
@@ -13278,7 +13278,7 @@
     "target_gap_pct": -0.7258216054137324,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-04-02",
     "weight": 0.1021639771689815,
     "ytd_return": 0.3425286907327587
@@ -13602,7 +13602,7 @@
     "target_gap_pct": -0.6963380281690141,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-05-02",
     "weight": 0.1019495730937994,
     "ytd_return": 0.4868965517241379
@@ -13926,7 +13926,7 @@
     "target_gap_pct": -0.7169014084507042,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-06-04",
     "weight": 0.187300089802927,
     "ytd_return": 0.3862068965517242
@@ -14286,7 +14286,7 @@
     "target_gap_pct": -0.6738028169014085,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-07-02",
     "weight": 0.1947193367235603,
     "ytd_return": 0.5972413793103448
@@ -14465,7 +14465,7 @@
     "symbol": "PLTR",
     "target_gap_pct": -0.3612188976448276,
     "target_hit": false,
-    "target_price_krw": 55921.9816003418,
+    "target_price_krw": 55921.981600341795,
     "target_upside_at_pub": 0.9462160663753684,
     "trade_date": "2024-07-02",
     "weight": 0.0570251441144449,
@@ -14646,7 +14646,7 @@
     "target_gap_pct": -0.6222535211267606,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-08-02",
     "weight": 0.2106487508198218,
     "ytd_return": 0.8496551724137931
@@ -14825,7 +14825,7 @@
     "symbol": "PLTR",
     "target_gap_pct": -0.3620513146924735,
     "target_hit": false,
-    "target_price_krw": 55921.9816003418,
+    "target_price_krw": 55921.981600341795,
     "target_upside_at_pub": 0.9462160663753684,
     "trade_date": "2024-08-02",
     "weight": 0.0508781924460228,
@@ -15006,7 +15006,7 @@
     "target_gap_pct": -0.6292957746478873,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-09-03",
     "weight": 0.2061654696364038,
     "ytd_return": 0.8151724137931033
@@ -15149,7 +15149,7 @@
     "symbol": "PLTR",
     "target_gap_pct": -0.2496857095759561,
     "target_hit": false,
-    "target_price_krw": 55921.9816003418,
+    "target_price_krw": 55921.981600341795,
     "target_upside_at_pub": 0.9462160663753684,
     "trade_date": "2024-09-03",
     "weight": 0.0677016344200415,
@@ -15366,7 +15366,7 @@
     "target_gap_pct": -0.640281690140845,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-10-02",
     "weight": 0.1982492913231945,
     "ytd_return": 0.7613793103448276
@@ -15509,7 +15509,7 @@
     "symbol": "PLTR",
     "target_gap_pct": -0.1424315158166668,
     "target_hit": false,
-    "target_price_krw": 55921.9816003418,
+    "target_price_krw": 55921.981600341795,
     "target_upside_at_pub": 0.9462160663753684,
     "trade_date": "2024-10-02",
     "weight": 0.0743652695113998,
@@ -15726,7 +15726,7 @@
     "target_gap_pct": -0.6405633802816901,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-11-04",
     "weight": 0.215557819878553,
     "ytd_return": 0.76
@@ -16050,7 +16050,7 @@
     "target_gap_pct": -0.4909859154929578,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-12-03",
     "weight": 0.2953138848033734,
     "ytd_return": 1.4924137931034482
@@ -18347,7 +18347,7 @@
     "report_age_days": 44,
     "report_id": "9d989772df4a7b0f",
     "return_1m": 0.0975609756097561,
-    "return_1y": 2.4220532319391634,
+    "return_1y": 2.422053231939163,
     "return_3m": 0.6780609073958981,
     "score_mode": "board_score",
     "symbol": "119850.KQ",
@@ -18357,7 +18357,7 @@
     "target_upside_at_pub": 1.0576623376623375,
     "trade_date": "2025-06-03",
     "weight": 0.0982396183760762,
-    "ytd_return": 2.117782909930716
+    "ytd_return": 2.1177829099307157
   },
   {
     "above_200ma": "True",
@@ -20004,7 +20004,7 @@
     "report_id": "9ea31c54d63ef212",
     "return_1m": 0.4349189754312599,
     "return_1y": 14.784933870040254,
-    "return_3m": 2.3353584447144597,
+    "return_3m": 2.3353584447144593,
     "score_mode": "board_score",
     "symbol": "108490.KQ",
     "target_gap_pct": -0.2284991568296795,
@@ -20445,7 +20445,7 @@
     "target_upside_at_pub": 1.542016806722689,
     "trade_date": "2025-12-02",
     "weight": 0.1212374833543482,
-    "ytd_return": 2.607438016528925
+    "ytd_return": 2.6074380165289255
   },
   {
     "above_200ma": "",
@@ -20651,7 +20651,7 @@
     "report_age_days": 20,
     "report_id": "370191c7afc9d3fc",
     "return_1m": -0.1817288801571709,
-    "return_1y": 3.273986659825552,
+    "return_1y": 3.2739866598255514,
     "return_3m": 0.5657894736842106,
     "score_mode": "board_score",
     "symbol": "000150.KS",
@@ -21119,7 +21119,7 @@
     "report_age_days": 83,
     "report_id": "9783da1e007737e2",
     "return_1m": 0.4311543810848401,
-    "return_1y": 2.424292845257904,
+    "return_1y": 2.4242928452579036,
     "return_3m": 1.154973821989529,
     "score_mode": "board_score",
     "symbol": "950160.KQ",
@@ -21407,7 +21407,7 @@
     "report_age_days": 102,
     "report_id": "2427c05877a23528",
     "return_1m": 0.0755336617405582,
-    "return_1y": 2.7145557655954637,
+    "return_1y": 2.7145557655954633,
     "return_3m": -0.2654205607476635,
     "score_mode": "board_score",
     "symbol": "098120.KQ",
@@ -22307,7 +22307,7 @@
     "report_age_days": 171,
     "report_id": "370191c7afc9d3fc",
     "return_1m": 0.4339622641509433,
-    "return_1y": 3.7856071964018,
+    "return_1y": 3.785607196401799,
     "return_3m": 0.9182692307692308,
     "score_mode": "board_score",
     "symbol": "000150.KS",
@@ -22631,7 +22631,7 @@
     "report_age_days": 58,
     "report_id": "aca3b0e80e5d334c",
     "return_1m": 0.227022109355989,
-    "return_1y": 3.709830560373669,
+    "return_1y": 3.7098305603736694,
     "return_3m": 0.3852739394970594,
     "score_mode": "board_score",
     "symbol": "SE",
@@ -22811,7 +22811,7 @@
     "report_age_days": 86,
     "report_id": "aca3b0e80e5d334c",
     "return_1m": 0.0698026142170624,
-    "return_1y": 3.842239272085679,
+    "return_1y": 3.8422392720856786,
     "return_3m": 0.4197843932123257,
     "score_mode": "board_score",
     "symbol": "SE",
@@ -24693,7 +24693,7 @@
     "target_upside_at_pub": 1.103747124338454,
     "trade_date": "2022-01-04",
     "weight": 0.2,
-    "ytd_return": 3.670717592544285
+    "ytd_return": 3.6707175925442854
   },
   {
     "above_200ma": "True",
@@ -25604,7 +25604,7 @@
     "bucket": "fresh",
     "candidate_score": 29.428527,
     "company": "GrafTech International Ltd.",
-    "current_return": 7.924578686032452,
+    "current_return": 7.9245786860324525,
     "distance_from_52w_high": -0.4117623497833939,
     "entry_price_krw": 10403.167419433594,
     "expired": false,
@@ -26684,7 +26684,7 @@
     "bucket": "large-upside",
     "candidate_score": 26.270305,
     "company": "GrafTech International Ltd.",
-    "current_return": 4.766356737639208,
+    "current_return": 4.7663567376392075,
     "distance_from_52w_high": -0.5863845152081036,
     "entry_price_krw": 10403.167419433594,
     "expired": false,
@@ -26778,7 +26778,7 @@
     "target_gap_pct": -0.8305164365096831,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-01-03",
     "weight": 0.2,
     "ytd_return": 0.0
@@ -26958,7 +26958,7 @@
     "target_gap_pct": -0.8084507042253521,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-02-02",
     "weight": 0.2,
     "ytd_return": 0.1301939363907207
@@ -27138,7 +27138,7 @@
     "target_gap_pct": -0.8169014084507042,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-03-02",
     "weight": 0.2,
     "ytd_return": 0.0803324391970123
@@ -27354,7 +27354,7 @@
     "target_gap_pct": -0.8103286339128521,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-04-04",
     "weight": 0.2,
     "ytd_return": 0.1191136307326012
@@ -27498,7 +27498,7 @@
     "target_gap_pct": -0.7868544646786972,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-05-02",
     "weight": 0.2,
     "ytd_return": 0.257617735500826
@@ -27714,7 +27714,7 @@
     "target_gap_pct": -0.8014084507042254,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-06-02",
     "weight": 0.2,
     "ytd_return": 0.1717451840521442
@@ -27858,7 +27858,7 @@
     "target_gap_pct": -0.7718309859154929,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-07-04",
     "weight": 0.2,
     "ytd_return": 0.346260424230123
@@ -27944,7 +27944,7 @@
     "bucket": "large-upside",
     "candidate_score": 27.00221,
     "company": "GrafTech International Ltd.",
-    "current_return": 5.498261449199648,
+    "current_return": 5.4982614491996475,
     "distance_from_52w_high": -0.3373296866105065,
     "entry_price_krw": 10403.167419433594,
     "expired": false,
@@ -28038,7 +28038,7 @@
     "target_gap_pct": -0.7906103240536972,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-08-02",
     "weight": 0.2,
     "ytd_return": 0.2354571241845873
@@ -28103,7 +28103,7 @@
     "report_age_days": 68,
     "report_id": "73eb3af5c6c360ec",
     "return_1m": 0.217741935483871,
-    "return_1y": 3.652118100128369,
+    "return_1y": 3.65211810012837,
     "return_3m": 2.02,
     "score_mode": "board_score",
     "symbol": "328130.KQ",
@@ -28254,7 +28254,7 @@
     "target_gap_pct": -0.7929577464788733,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-09-04",
     "weight": 0.2,
     "ytd_return": 0.2216066812458526
@@ -28434,7 +28434,7 @@
     "target_gap_pct": -0.7990610282790493,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-10-03",
     "weight": 0.2,
     "ytd_return": 0.1855956269908789
@@ -28650,7 +28650,7 @@
     "target_gap_pct": -0.8093896759463028,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-11-02",
     "weight": 0.2,
     "ytd_return": 0.1246537429842706
@@ -28830,7 +28830,7 @@
     "target_gap_pct": -0.8,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-12-04",
     "weight": 0.2,
     "ytd_return": 0.1800554335844288
@@ -29010,7 +29010,7 @@
     "target_gap_pct": -0.795774647887324,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-01-03",
     "weight": 0.2,
     "ytd_return": 0.0
@@ -29154,7 +29154,7 @@
     "target_gap_pct": -0.7826291125660212,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-02-02",
     "weight": 0.2,
     "ytd_return": 0.0643677936422413
@@ -29334,7 +29334,7 @@
     "target_gap_pct": -0.7868544646786972,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-03-04",
     "weight": 0.2,
     "ytd_return": 0.0436781384698274
@@ -29514,7 +29514,7 @@
     "target_gap_pct": -0.7258216054137324,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-04-02",
     "weight": 0.2,
     "ytd_return": 0.3425286907327587
@@ -29658,7 +29658,7 @@
     "target_gap_pct": -0.6963380281690141,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-05-02",
     "weight": 0.2,
     "ytd_return": 0.4868965517241379
@@ -29802,7 +29802,7 @@
     "target_gap_pct": -0.7169014084507042,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-06-04",
     "weight": 0.2,
     "ytd_return": 0.3862068965517242
@@ -29982,7 +29982,7 @@
     "target_gap_pct": -0.6738028169014085,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-07-02",
     "weight": 0.2,
     "ytd_return": 0.5972413793103448
@@ -30162,7 +30162,7 @@
     "target_gap_pct": -0.6222535211267606,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-08-02",
     "weight": 0.2,
     "ytd_return": 0.8496551724137931
@@ -30342,7 +30342,7 @@
     "target_gap_pct": -0.6292957746478873,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-09-03",
     "weight": 0.2,
     "ytd_return": 0.8151724137931033
@@ -30522,7 +30522,7 @@
     "target_gap_pct": -0.640281690140845,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-10-02",
     "weight": 0.2,
     "ytd_return": 0.7613793103448276
@@ -30702,7 +30702,7 @@
     "target_gap_pct": -0.6405633802816901,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-11-04",
     "weight": 0.2,
     "ytd_return": 0.76
@@ -30846,7 +30846,7 @@
     "target_gap_pct": -0.4909859154929578,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-12-03",
     "weight": 0.2,
     "ytd_return": 1.4924137931034482
@@ -32063,7 +32063,7 @@
     "report_age_days": 44,
     "report_id": "9d989772df4a7b0f",
     "return_1m": 0.0975609756097561,
-    "return_1y": 2.4220532319391634,
+    "return_1y": 2.422053231939163,
     "return_3m": 0.6780609073958981,
     "score_mode": "board_score",
     "symbol": "119850.KQ",
@@ -32073,7 +32073,7 @@
     "target_upside_at_pub": 1.0576623376623375,
     "trade_date": "2025-06-03",
     "weight": 0.2,
-    "ytd_return": 2.117782909930716
+    "ytd_return": 2.1177829099307157
   },
   {
     "above_200ma": "True",
@@ -32820,7 +32820,7 @@
     "report_id": "9ea31c54d63ef212",
     "return_1m": 0.4349189754312599,
     "return_1y": 14.784933870040254,
-    "return_3m": 2.3353584447144597,
+    "return_3m": 2.3353584447144593,
     "score_mode": "board_score",
     "symbol": "108490.KQ",
     "target_gap_pct": -0.2284991568296795,
@@ -33081,7 +33081,7 @@
     "target_upside_at_pub": 1.542016806722689,
     "trade_date": "2025-12-02",
     "weight": 0.2,
-    "ytd_return": 2.607438016528925
+    "ytd_return": 2.6074380165289255
   },
   {
     "above_200ma": "",
@@ -33395,7 +33395,7 @@
     "report_age_days": 83,
     "report_id": "9783da1e007737e2",
     "return_1m": 0.4311543810848401,
-    "return_1y": 2.424292845257904,
+    "return_1y": 2.4242928452579036,
     "return_3m": 1.154973821989529,
     "score_mode": "board_score",
     "symbol": "950160.KQ",
@@ -34043,7 +34043,7 @@
     "report_age_days": 171,
     "report_id": "370191c7afc9d3fc",
     "return_1m": 0.4339622641509433,
-    "return_1y": 3.7856071964018,
+    "return_1y": 3.785607196401799,
     "return_3m": 0.9182692307692308,
     "score_mode": "board_score",
     "symbol": "000150.KS",
@@ -34079,7 +34079,7 @@
     "report_age_days": 58,
     "report_id": "aca3b0e80e5d334c",
     "return_1m": 0.227022109355989,
-    "return_1y": 3.709830560373669,
+    "return_1y": 3.7098305603736694,
     "return_3m": 0.3852739394970594,
     "score_mode": "board_score",
     "symbol": "SE",
@@ -37398,7 +37398,7 @@
     "target_gap_pct": -0.7868544646786972,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-05-02",
     "weight": 0.2958603065119681,
     "ytd_return": 0.257617735500826
@@ -37761,7 +37761,7 @@
     "target_upside_at_pub": 2.0522388059701493,
     "trade_date": "2023-06-02",
     "weight": 0.1817292186055495,
-    "ytd_return": 2.188908145580589
+    "ytd_return": 2.1889081455805894
   },
   {
     "above_200ma": "True",
@@ -37824,7 +37824,7 @@
     "report_id": "28902e013d64471e",
     "return_1m": 0.2583333333333333,
     "return_1y": 1.059090909090909,
-    "return_3m": 2.203677510608204,
+    "return_3m": 2.2036775106082036,
     "score_mode": "board_score",
     "symbol": "363250.KQ",
     "target_gap_pct": -0.3094512195121951,
@@ -38082,7 +38082,7 @@
     "target_gap_pct": -0.7718309859154929,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-07-04",
     "weight": 0.195893193574372,
     "ytd_return": 0.346260424230123
@@ -38229,7 +38229,7 @@
     "target_upside_at_pub": 1.2329545239443291,
     "trade_date": "2023-07-04",
     "weight": 0.0773757117369186,
-    "ytd_return": 3.029378124228128
+    "ytd_return": 3.0293781242281277
   },
   {
     "above_200ma": "True",
@@ -38471,7 +38471,7 @@
     "report_age_days": 68,
     "report_id": "73eb3af5c6c360ec",
     "return_1m": 0.217741935483871,
-    "return_1y": 3.652118100128369,
+    "return_1y": 3.65211810012837,
     "return_3m": 2.02,
     "score_mode": "board_score",
     "symbol": "328130.KQ",
@@ -39587,7 +39587,7 @@
     "report_age_days": 9,
     "report_id": "616b5a7fe9444744",
     "return_1m": 0.0775871355051258,
-    "return_1y": 2.220751465595848,
+    "return_1y": 2.2207514655958476,
     "return_3m": 0.1349556624217172,
     "score_mode": "board_score",
     "symbol": "VRT",
@@ -40782,7 +40782,7 @@
     "target_gap_pct": -0.7258216054137324,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-04-02",
     "weight": 0.2666952164424501,
     "ytd_return": 0.3425286907327587
@@ -41106,7 +41106,7 @@
     "target_gap_pct": -0.6963380281690141,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-05-02",
     "weight": 0.2788640282374968,
     "ytd_return": 0.4868965517241379
@@ -41862,7 +41862,7 @@
     "target_gap_pct": -0.6738028169014085,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-07-02",
     "weight": 0.2635957169722391,
     "ytd_return": 0.5972413793103448
@@ -41933,7 +41933,7 @@
     "symbol": "PLTR",
     "target_gap_pct": -0.3612188976448276,
     "target_hit": false,
-    "target_price_krw": 55921.9816003418,
+    "target_price_krw": 55921.981600341795,
     "target_upside_at_pub": 0.9462160663753684,
     "trade_date": "2024-07-02",
     "weight": 0.0771961531978329,
@@ -42150,7 +42150,7 @@
     "target_gap_pct": -0.6222535211267606,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-08-02",
     "weight": 0.7322822845383852,
     "ytd_return": 0.8496551724137931
@@ -42293,7 +42293,7 @@
     "symbol": "PLTR",
     "target_gap_pct": -0.2496857095759561,
     "target_hit": false,
-    "target_price_krw": 55921.9816003418,
+    "target_price_krw": 55921.981600341795,
     "target_upside_at_pub": 0.9462160663753684,
     "trade_date": "2024-09-03",
     "weight": 0.3619967123337094,
@@ -42509,7 +42509,7 @@
     "symbol": "PLTR",
     "target_gap_pct": -0.1424315158166668,
     "target_hit": false,
-    "target_price_krw": 55921.9816003418,
+    "target_price_krw": 55921.981600341795,
     "target_upside_at_pub": 0.9462160663753684,
     "trade_date": "2024-10-02",
     "weight": 0.1745575295829599,
@@ -42798,7 +42798,7 @@
     "target_gap_pct": -0.4909859154929578,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-12-03",
     "weight": 0.4930953011757329,
     "ytd_return": 1.4924137931034482
@@ -44303,7 +44303,7 @@
     "report_age_days": 12,
     "report_id": "d10fea659a518441",
     "return_1m": 0.1842496285289747,
-    "return_1y": 2.2540721036490354,
+    "return_1y": 2.254072103649035,
     "return_3m": 0.9925,
     "score_mode": "board_score",
     "symbol": "012450.KS",
@@ -46248,7 +46248,7 @@
     "report_id": "9ea31c54d63ef212",
     "return_1m": 0.4349189754312599,
     "return_1y": 14.784933870040254,
-    "return_3m": 2.3353584447144597,
+    "return_3m": 2.3353584447144593,
     "score_mode": "board_score",
     "symbol": "108490.KQ",
     "target_gap_pct": -0.2284991568296795,
@@ -46653,7 +46653,7 @@
     "target_upside_at_pub": 1.542016806722689,
     "trade_date": "2025-12-02",
     "weight": 0.2490288474458439,
-    "ytd_return": 2.607438016528925
+    "ytd_return": 2.6074380165289255
   },
   {
     "above_200ma": "True",
@@ -46757,7 +46757,7 @@
     "symbol": "IRMD",
     "target_gap_pct": -0.3677397427493578,
     "target_hit": false,
-    "target_price_krw": 213980.51928710932,
+    "target_price_krw": 213980.51928710935,
     "target_upside_at_pub": 0.5816271678192442,
     "trade_date": "2025-12-02",
     "weight": 0.0751367716583296,
@@ -46860,7 +46860,7 @@
     "report_id": "1986a142e4bb3a97",
     "return_1m": -0.0431334202992343,
     "return_1y": 0.0815591953854868,
-    "return_3m": 1.9439712283716652,
+    "return_3m": 1.9439712283716657,
     "score_mode": "board_score",
     "symbol": "FLNC",
     "target_gap_pct": -0.3682141984546714,
@@ -47111,7 +47111,7 @@
     "report_age_days": 83,
     "report_id": "9783da1e007737e2",
     "return_1m": 0.4311543810848401,
-    "return_1y": 2.424292845257904,
+    "return_1y": 2.4242928452579036,
     "return_3m": 1.154973821989529,
     "score_mode": "board_score",
     "symbol": "950160.KQ",
@@ -47867,7 +47867,7 @@
     "report_age_days": 171,
     "report_id": "370191c7afc9d3fc",
     "return_1m": 0.4339622641509433,
-    "return_1y": 3.7856071964018,
+    "return_1y": 3.785607196401799,
     "return_3m": 0.9182692307692308,
     "score_mode": "board_score",
     "symbol": "000150.KS",
@@ -48155,7 +48155,7 @@
     "report_age_days": 15,
     "report_id": "23d6d08a6edd02cd",
     "return_1m": 0.1529948741937445,
-    "return_1y": 1.9327247006519797,
+    "return_1y": 1.9327247006519792,
     "return_3m": 0.3376587852487986,
     "score_mode": "board_score",
     "symbol": "CAMT",
@@ -48227,7 +48227,7 @@
     "report_age_days": 58,
     "report_id": "aca3b0e80e5d334c",
     "return_1m": 0.227022109355989,
-    "return_1y": 3.709830560373669,
+    "return_1y": 3.7098305603736694,
     "return_3m": 0.3852739394970594,
     "score_mode": "board_score",
     "symbol": "SE",
@@ -48299,7 +48299,7 @@
     "report_age_days": 86,
     "report_id": "aca3b0e80e5d334c",
     "return_1m": 0.0698026142170624,
-    "return_1y": 3.842239272085679,
+    "return_1y": 3.8422392720856786,
     "return_3m": 0.4197843932123257,
     "score_mode": "board_score",
     "symbol": "SE",
@@ -52482,7 +52482,7 @@
     "target_gap_pct": -0.7868544646786972,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-05-02",
     "weight": 0.1,
     "ytd_return": 0.257617735500826
@@ -52881,7 +52881,7 @@
     "target_upside_at_pub": 2.0522388059701493,
     "trade_date": "2023-06-02",
     "weight": 0.1,
-    "ytd_return": 2.188908145580589
+    "ytd_return": 2.1889081455805894
   },
   {
     "above_200ma": "True",
@@ -52944,7 +52944,7 @@
     "report_id": "28902e013d64471e",
     "return_1m": 0.2583333333333333,
     "return_1y": 1.059090909090909,
-    "return_3m": 2.203677510608204,
+    "return_3m": 2.2036775106082036,
     "score_mode": "board_score",
     "symbol": "363250.KQ",
     "target_gap_pct": -0.3094512195121951,
@@ -53202,7 +53202,7 @@
     "target_gap_pct": -0.7718309859154929,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-07-04",
     "weight": 0.1,
     "ytd_return": 0.346260424230123
@@ -53562,7 +53562,7 @@
     "target_gap_pct": -0.7906103240536972,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-08-02",
     "weight": 0.1111111111111111,
     "ytd_return": 0.2354571241845873
@@ -53627,7 +53627,7 @@
     "report_age_days": 68,
     "report_id": "73eb3af5c6c360ec",
     "return_1m": 0.217741935483871,
-    "return_1y": 3.652118100128369,
+    "return_1y": 3.65211810012837,
     "return_3m": 2.02,
     "score_mode": "board_score",
     "symbol": "328130.KQ",
@@ -53922,7 +53922,7 @@
     "target_gap_pct": -0.7929577464788733,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-09-04",
     "weight": 0.1111111111111111,
     "ytd_return": 0.2216066812458526
@@ -54923,7 +54923,7 @@
     "report_age_days": 9,
     "report_id": "616b5a7fe9444744",
     "return_1m": 0.0775871355051258,
-    "return_1y": 2.220751465595848,
+    "return_1y": 2.2207514655958476,
     "return_3m": 0.1349556624217172,
     "score_mode": "board_score",
     "symbol": "VRT",
@@ -56190,7 +56190,7 @@
     "target_gap_pct": -0.7258216054137324,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-04-02",
     "weight": 0.1,
     "ytd_return": 0.3425286907327587
@@ -56550,7 +56550,7 @@
     "target_gap_pct": -0.6963380281690141,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-05-02",
     "weight": 0.1,
     "ytd_return": 0.4868965517241379
@@ -57269,7 +57269,7 @@
     "symbol": "PLTR",
     "target_gap_pct": -0.3612188976448276,
     "target_hit": false,
-    "target_price_krw": 55921.9816003418,
+    "target_price_krw": 55921.981600341795,
     "target_upside_at_pub": 0.9462160663753684,
     "trade_date": "2024-07-02",
     "weight": 0.1,
@@ -57917,7 +57917,7 @@
     "symbol": "PLTR",
     "target_gap_pct": -0.2496857095759561,
     "target_hit": false,
-    "target_price_krw": 55921.9816003418,
+    "target_price_krw": 55921.981600341795,
     "target_upside_at_pub": 0.9462160663753684,
     "trade_date": "2024-09-03",
     "weight": 0.1,
@@ -58277,7 +58277,7 @@
     "symbol": "PLTR",
     "target_gap_pct": -0.1424315158166668,
     "target_hit": false,
-    "target_price_krw": 55921.9816003418,
+    "target_price_krw": 55921.981600341795,
     "target_upside_at_pub": 0.9462160663753684,
     "trade_date": "2024-10-02",
     "weight": 0.125,
@@ -58782,7 +58782,7 @@
     "target_gap_pct": -0.4909859154929578,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-12-03",
     "weight": 0.1,
     "ytd_return": 1.4924137931034482
@@ -60791,7 +60791,7 @@
     "report_age_days": 12,
     "report_id": "d10fea659a518441",
     "return_1m": 0.1842496285289747,
-    "return_1y": 2.2540721036490354,
+    "return_1y": 2.254072103649035,
     "return_3m": 0.9925,
     "score_mode": "board_score",
     "symbol": "012450.KS",
@@ -60899,7 +60899,7 @@
     "report_age_days": 44,
     "report_id": "9d989772df4a7b0f",
     "return_1m": 0.0975609756097561,
-    "return_1y": 2.4220532319391634,
+    "return_1y": 2.422053231939163,
     "return_3m": 0.6780609073958981,
     "score_mode": "board_score",
     "symbol": "119850.KQ",
@@ -60909,7 +60909,7 @@
     "target_upside_at_pub": 1.0576623376623375,
     "trade_date": "2025-06-03",
     "weight": 0.1,
-    "ytd_return": 2.117782909930716
+    "ytd_return": 2.1177829099307157
   },
   {
     "above_200ma": "True",
@@ -62700,7 +62700,7 @@
     "report_id": "9ea31c54d63ef212",
     "return_1m": 0.4349189754312599,
     "return_1y": 14.784933870040254,
-    "return_3m": 2.3353584447144597,
+    "return_3m": 2.3353584447144593,
     "score_mode": "board_score",
     "symbol": "108490.KQ",
     "target_gap_pct": -0.2284991568296795,
@@ -63105,7 +63105,7 @@
     "target_upside_at_pub": 1.542016806722689,
     "trade_date": "2025-12-02",
     "weight": 0.1,
-    "ytd_return": 2.607438016528925
+    "ytd_return": 2.6074380165289255
   },
   {
     "above_200ma": "True",
@@ -63281,7 +63281,7 @@
     "symbol": "IRMD",
     "target_gap_pct": -0.3677397427493578,
     "target_hit": false,
-    "target_price_krw": 213980.51928710932,
+    "target_price_krw": 213980.51928710935,
     "target_upside_at_pub": 0.5816271678192442,
     "trade_date": "2025-12-02",
     "weight": 0.1,
@@ -63641,7 +63641,7 @@
     "symbol": "IRMD",
     "target_gap_pct": -0.3557001270104347,
     "target_hit": false,
-    "target_price_krw": 213980.51928710932,
+    "target_price_krw": 213980.51928710935,
     "target_upside_at_pub": 0.5816271678192442,
     "trade_date": "2026-01-05",
     "weight": 0.125,
@@ -63707,7 +63707,7 @@
     "report_age_days": 83,
     "report_id": "9783da1e007737e2",
     "return_1m": 0.4311543810848401,
-    "return_1y": 2.424292845257904,
+    "return_1y": 2.4242928452579036,
     "return_3m": 1.154973821989529,
     "score_mode": "board_score",
     "symbol": "950160.KQ",
@@ -63965,7 +63965,7 @@
     "symbol": "IRMD",
     "target_gap_pct": -0.3296997067217371,
     "target_hit": false,
-    "target_price_krw": 213980.51928710932,
+    "target_price_krw": 213980.51928710935,
     "target_upside_at_pub": 0.5816271678192442,
     "trade_date": "2026-02-03",
     "weight": 0.125,
@@ -64469,7 +64469,7 @@
     "symbol": "IRMD",
     "target_gap_pct": -0.3217537941426883,
     "target_hit": false,
-    "target_price_krw": 213980.51928710932,
+    "target_price_krw": 213980.51928710935,
     "target_upside_at_pub": 0.5816271678192442,
     "trade_date": "2026-04-02",
     "weight": 0.2,
@@ -64571,7 +64571,7 @@
     "report_age_days": 171,
     "report_id": "370191c7afc9d3fc",
     "return_1m": 0.4339622641509433,
-    "return_1y": 3.7856071964018,
+    "return_1y": 3.785607196401799,
     "return_3m": 0.9182692307692308,
     "score_mode": "board_score",
     "symbol": "000150.KS",
@@ -70640,7 +70640,7 @@
     "bucket": "large-upside",
     "candidate_score": 26.270305,
     "company": "GrafTech International Ltd.",
-    "current_return": 4.766356737639208,
+    "current_return": 4.7663567376392075,
     "distance_from_52w_high": -0.5863845152081036,
     "entry_price_krw": 10403.167419433594,
     "expired": false,
@@ -72174,7 +72174,7 @@
     "target_gap_pct": -0.7868544646786972,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-05-02",
     "weight": 0.1,
     "ytd_return": 0.257617735500826
@@ -72534,7 +72534,7 @@
     "target_gap_pct": -0.8014084507042254,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-06-02",
     "weight": 0.1,
     "ytd_return": 0.1717451840521442
@@ -72894,7 +72894,7 @@
     "target_gap_pct": -0.7718309859154929,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-07-04",
     "weight": 0.1,
     "ytd_return": 0.346260424230123
@@ -73113,7 +73113,7 @@
     "target_upside_at_pub": 1.2329545239443291,
     "trade_date": "2023-07-04",
     "weight": 0.1,
-    "ytd_return": 3.029378124228128
+    "ytd_return": 3.0293781242281277
   },
   {
     "above_200ma": "False",
@@ -73160,7 +73160,7 @@
     "bucket": "large-upside",
     "candidate_score": 27.00221,
     "company": "GrafTech International Ltd.",
-    "current_return": 5.498261449199648,
+    "current_return": 5.4982614491996475,
     "distance_from_52w_high": -0.3373296866105065,
     "entry_price_krw": 10403.167419433594,
     "expired": false,
@@ -73254,7 +73254,7 @@
     "target_gap_pct": -0.7906103240536972,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-08-02",
     "weight": 0.1,
     "ytd_return": 0.2354571241845873
@@ -73614,7 +73614,7 @@
     "target_gap_pct": -0.7929577464788733,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-09-04",
     "weight": 0.1,
     "ytd_return": 0.2216066812458526
@@ -73974,7 +73974,7 @@
     "target_gap_pct": -0.7990610282790493,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-10-03",
     "weight": 0.1,
     "ytd_return": 0.1855956269908789
@@ -74370,7 +74370,7 @@
     "target_gap_pct": -0.8093896759463028,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-11-02",
     "weight": 0.1,
     "ytd_return": 0.1246537429842706
@@ -74730,7 +74730,7 @@
     "target_gap_pct": -0.8,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2023-12-04",
     "weight": 0.1,
     "ytd_return": 0.1800554335844288
@@ -75090,7 +75090,7 @@
     "target_gap_pct": -0.795774647887324,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-01-03",
     "weight": 0.1,
     "ytd_return": 0.0
@@ -75450,7 +75450,7 @@
     "target_gap_pct": -0.7826291125660212,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-02-02",
     "weight": 0.1,
     "ytd_return": 0.0643677936422413
@@ -75810,7 +75810,7 @@
     "target_gap_pct": -0.7868544646786972,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-03-04",
     "weight": 0.1,
     "ytd_return": 0.0436781384698274
@@ -76170,7 +76170,7 @@
     "target_gap_pct": -0.7258216054137324,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-04-02",
     "weight": 0.1,
     "ytd_return": 0.3425286907327587
@@ -76494,7 +76494,7 @@
     "target_gap_pct": -0.6963380281690141,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-05-02",
     "weight": 0.1,
     "ytd_return": 0.4868965517241379
@@ -76818,7 +76818,7 @@
     "target_gap_pct": -0.7169014084507042,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-06-04",
     "weight": 0.1,
     "ytd_return": 0.3862068965517242
@@ -77178,7 +77178,7 @@
     "target_gap_pct": -0.6738028169014085,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-07-02",
     "weight": 0.1,
     "ytd_return": 0.5972413793103448
@@ -77538,7 +77538,7 @@
     "target_gap_pct": -0.6222535211267606,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-08-02",
     "weight": 0.1,
     "ytd_return": 0.8496551724137931
@@ -77898,7 +77898,7 @@
     "target_gap_pct": -0.6292957746478873,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-09-03",
     "weight": 0.1,
     "ytd_return": 0.8151724137931033
@@ -78258,7 +78258,7 @@
     "target_gap_pct": -0.640281690140845,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-10-02",
     "weight": 0.1,
     "ytd_return": 0.7613793103448276
@@ -78401,7 +78401,7 @@
     "symbol": "PLTR",
     "target_gap_pct": -0.1424315158166668,
     "target_hit": false,
-    "target_price_krw": 55921.9816003418,
+    "target_price_krw": 55921.981600341795,
     "target_upside_at_pub": 0.9462160663753684,
     "trade_date": "2024-10-02",
     "weight": 0.1,
@@ -78618,7 +78618,7 @@
     "target_gap_pct": -0.6405633802816901,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-11-04",
     "weight": 0.1,
     "ytd_return": 0.76
@@ -78942,7 +78942,7 @@
     "target_gap_pct": -0.4909859154929578,
     "target_hit": false,
     "target_price_krw": 35500.0,
-    "target_upside_at_pub": 4.285359929565368,
+    "target_upside_at_pub": 4.2853599295653675,
     "trade_date": "2024-12-03",
     "weight": 0.1,
     "ytd_return": 1.4924137931034482
