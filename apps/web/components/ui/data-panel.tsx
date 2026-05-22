@@ -8,7 +8,7 @@ import { BlockPagination } from '@/components/trading/TableControls';
  * scrollable body with sticky `<thead>` (via global CSS), and a centered
  * pagination footer. Every dense table on the site should consume this
  * panel so the layout is consistent and affordances (sort/page/CSV/search)
- * stay aligned. See `docs/portfolio-restructure-plan.md`. */
+ * stay aligned. See `DESIGN.md`. */
 export type DataPanelProps = {
   title: ReactNode;
   subtitle?: ReactNode;

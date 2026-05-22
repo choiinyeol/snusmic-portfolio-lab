@@ -1,82 +1,54 @@
 # Product Spec
 
-Last updated: 2026-05-22
+Last updated: 2026-05-23
 Status: canonical product intent
 
-## One-line product
+## One Line
 
-SMIC가 커버한 종목만으로, 직장인 적립식 계좌가 올웨더보다 더 벌 수 있는지 검증하는 일별 종가 기준 액티브 매매 백테스트 랩.
+SNUSMIC Portfolio Lab tests whether a real account that only buys stocks covered by SMIC reports can beat All-Weather under the same cash-flow schedule.
 
-## Why this exists
+## User
 
-이 저장소의 목적은 SMIC 리포트가 예쁜 분류표에서 얼마나 맞았는지 보여주는 데서 끝나지 않는다. 핵심 질문은 더 실전적이다.
+The user is an individual investor, not an institutional quant desk. They need a defensible, replayable account ledger: what could be bought, when it was bought, why it was sold, and whether the result beat a simple benchmark after costs.
 
-> 종목 리서치는 개인이 하지 않고 SMIC 커버리지에 맡긴다. 대신 개인은 언제 사고, 얼마나 사고, 언제 팔지로 알파를 만들 수 있는가?
+## Core Questions
 
-따라서 제품의 중심은 리포트 단위 품질 점수가 아니라 계좌 단위 운용 결과다. 리포트는 투자 가능 종목을 pool에 넣는 사건이고, 전략은 그 pool 안에서 매수 후보를 고르고 보유, 익절, 손절, 현금화, 재진입을 결정한다.
+1. Does an investable SNUSMIC-covered-stock strategy beat All-Weather on final equity and money-weighted return?
+2. Which buy, sell, sizing, and cash rules explain the result?
+3. Did the strategy obey point-in-time data boundaries?
+4. Which failures are useful evidence, and which are just overfit noise?
 
-## Primary scenario
+## Product Model
 
-| 항목 | 결정 |
+| Concept | Meaning |
 | --- | --- |
-| 사용자 | 직장인 개인 투자자 |
-| 계좌 | 초기 10,000,000원 + 월별 적립금 |
-| 리서치 제약 | SMIC가 발간 또는 커버한 종목만 직접 주식 매수 후보가 된다 |
-| 매매 제약 | 일별 데이터 기반 종가 매매 |
-| 목표 | 같은 현금흐름 기준 올웨더보다 더 큰 최종 부와 MWR을 만든다 |
-| 리스크 태도 | MDD는 보조 지표다. 돈을 더 벌기 위한 전략 탐색이 우선이다 |
+| Report | A point-in-time SMIC coverage event for one stock. |
+| Pool | Stocks currently eligible because SMIC covered them and they have not expired or failed a rule. |
+| Candidate | A pool member that passes today's buy filters. |
+| Strategy | Buy, sell, sizing, cash, and fallback rules declared before replay. |
+| Ledger | Cash, holdings, trades, realized/unrealized PnL, fees, taxes, and monthly contributions. |
+| Benchmark | A comparison account with the same cash-flow basis, especially All-Weather. |
 
-## Product questions
+## Success
 
-| 우선순위 | 질문 | 제품이 답해야 하는 방식 |
-| --- | --- | --- |
-| 1 | SMIC 커버 종목만 사고팔면 올웨더보다 돈을 더 벌 수 있나? | 동일 적립식 현금흐름의 계좌 원장, MWR, 최종 평가액, 순손익으로 비교 |
-| 2 | 언제 사고 언제 팔아야 했나? | pool → candidate → buy → sell의 규칙과 실제 체결 사유를 남김 |
-| 3 | 손실 종목을 피하거나 빨리 자를 수 있었나? | 손절, 추세 이탈, 기간 만료, 재진입 규칙의 계좌 효과로 검증 |
-| 4 | 특정 팩터나 차트 신호가 도움 됐나? | 수익률, MA/EMA, MACD, 52주 고점 근접 등은 매수/매도 후보 규칙으로 실험 |
-| 5 | 리포트가 좋은 리포트였나? | 보조 분석으로만 유지. 최종 판단은 실제 계좌 운용 결과가 우선 |
+Primary success is account-level outperformance: final equity and MWR beat All-Weather under the same deposits, dates, costs, and market data.
 
-## Core domain model
+MDD, win rate, hit rate, and report target achievement are diagnostic metrics. They can explain a strategy, but they must not replace the account objective.
 
-| 개념 | 의미 |
-| --- | --- |
-| Report | SMIC가 특정 날짜에 특정 종목을 커버했다는 point-in-time 사건 |
-| Pool | 발간 이후 매매 후보로 인정되는 종목 집합. 기본적으로 반영구적이지만 만료와 실패 규칙을 둘 수 있다 |
-| Candidate | 오늘 종가 기준 매수 검토 대상. pool 안의 일부다 |
-| Buy | 실제 계좌가 정해진 비중, 슬롯, 현금 조건으로 매수한 사건 |
-| Sell | 목표가, 추세 이탈, 손절, 기간 만료, 현금 필요, 리밸런싱 등으로 청산한 사건 |
-| Strategy | candidate, buy, sell, sizing, cash/fallback 규칙의 묶음 |
-| Benchmark | 같은 적립식 현금흐름으로 산 올웨더, KODEX 200 등 비교 기준 |
+## Non-Goals
 
-## Success definition
+- Live trading advice or broker order entry.
+- Ranking analysts or grading report authors.
+- Choosing stocks with future information.
+- Promoting failed experiments by hiding the ledger.
+- Building a factor zoo that cannot be explained through account decisions.
 
-전략은 다음을 같은 기간, 같은 현금흐름, 같은 비용 가정에서 보여줘야 한다.
+## UI Contract
 
-| 등급 | 조건 |
-| --- | --- |
-| Primary win | 올웨더보다 최종 평가액과 MWR이 높다 |
-| Useful experiment | 올웨더를 이기지 못해도 어떤 buy/sell 규칙이 돈을 벌거나 손실을 줄였는지 설명한다 |
-| Failed experiment | 계좌 성과도 낮고, 매매 규칙에 남길 만한 증거가 없다 |
+The UI should show the account first, then the reason trail:
 
-MDD, 승률, 리포트 목표가 도달률은 설명 변수다. 제품의 첫 화면이나 기본 선택은 계좌 성과를 우선한다.
-
-## Non-goals
-
-- 실시간 매수 추천 서비스
-- 브로커 주문 UI
-- SMIC 리포트 작성자를 평가하는 성적표
-- 목표가 도달률만으로 전략을 고르는 UI
-- 미래 정보를 써서 좋은 종목을 미리 아는 전략
-- 모든 SMIC 종목에 공통된 불변 팩터를 반드시 찾는 연구
-
-## Design implication
-
-웹 UI와 문서는 다음 순서로 정보를 노출한다.
-
-1. 적립식 계좌 성과와 올웨더 대비 초과수익
-2. 현재 보유, 현금, 최근 매수/매도 사유
-3. 전략 규칙과 파라미터
-4. 후보 pool과 리포트 경로 분석
-5. 실패한 실험과 리포트 품질 라벨
-
-실패 후보를 숨기는 것이 목적이 아니다. 다만 실제로 살 만한 전략과 실패한 연구 후보는 화면 위계가 달라야 한다.
+1. Final equity, MWR, excess return versus All-Weather.
+2. Current holdings, cash, recent buys, recent sells, and reasons.
+3. Strategy rules and parameters.
+4. Candidate pool and report lineage.
+5. Failed experiments only when they teach something concrete.

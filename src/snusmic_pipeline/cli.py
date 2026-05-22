@@ -5,8 +5,6 @@ import csv
 import json
 import math
 import os
-import subprocess
-import sys
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -21,6 +19,7 @@ from .markdown_export import export_markdown
 from .models import DownloadedPdf, ExtractedReport, ReportMeta
 from .sim.contracts import SimulationConfig, SmicMttStrategyConfig
 from .sim.forward_runner import load_config_from_persona_artifact, run_daily_forward
+from .sim.persona_sim import main as run_persona_simulation_command
 from .sim.strategy_generation import StrategyGenerationConfig, run_strategy_generation
 from .sim.warehouse import build_warehouse, refresh_price_history
 from .web_artifacts import ExportInputs, check_web_artifacts, export_web_artifacts
@@ -48,7 +47,6 @@ REPORT_HEADERS = [
 ]
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-PERSONA_SIM_SCRIPT = REPO_ROOT / "scripts" / "run_persona_sim.py"
 
 
 def _json_default(value: Any) -> Any:
@@ -481,11 +479,8 @@ def run_daily_forward_cli(args: argparse.Namespace) -> int:
 
 
 def run_persona_sim(args: argparse.Namespace) -> int:
-    """Thin wrapper around ``scripts/run_persona_sim.py``.
+    """Run the persona simulation through the package-owned command module."""
 
-    Forwards the standard CLI arguments so ``python -m snusmic_pipeline run-sim``
-    behaves identically to the standalone script callers already use.
-    """
     forwarded: list[str] = [
         "--start",
         args.start,
@@ -500,6 +495,12 @@ def run_persona_sim(args: argparse.Namespace) -> int:
         forwarded.append("--refresh-benchmark")
     if args.disable_broker_strategy_search:
         forwarded.append("--disable-broker-strategy-search")
+    if args.broker_strategy_personas:
+        forwarded.extend(["--broker-strategy-personas", str(args.broker_strategy_personas)])
+    if args.stock_rule_personas:
+        forwarded.extend(["--stock-rule-personas", str(args.stock_rule_personas)])
+    if args.pit_research_board_personas:
+        forwarded.extend(["--pit-research-board-personas", str(args.pit_research_board_personas)])
     forwarded.extend(
         [
             "--broker-strategy-trials",
@@ -514,11 +515,7 @@ def run_persona_sim(args: argparse.Namespace) -> int:
             args.broker_strategy_train_end,
         ]
     )
-    completed = subprocess.run(
-        [sys.executable, str(PERSONA_SIM_SCRIPT), *forwarded],
-        check=False,
-    )
-    return completed.returncode
+    return run_persona_simulation_command(forwarded)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -718,9 +715,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     daily_forward.set_defaults(func=run_daily_forward_cli)
 
-    sim = subparsers.add_parser(
-        "run-sim", help="Run the persona simulation (delegates to scripts/run_persona_sim.py)."
-    )
+    sim = subparsers.add_parser("run-sim", help="Run the package-owned persona simulation.")
     sim.add_argument("--start", default="2021-01-04")
     sim.add_argument("--end", default=date.today().isoformat())
     sim.add_argument("--warehouse", default=str(REPO_ROOT / "data" / "warehouse"))
@@ -748,12 +743,27 @@ def build_parser() -> argparse.ArgumentParser:
         default=int(os.environ.get("SMIC_BROKER_STRATEGY_SEED", "42")),
     )
     sim.add_argument(
+        "--broker-strategy-personas",
+        default=None,
+        help="Optional JSON artifact containing SmicMttStrategyConfig rows to include.",
+    )
+    sim.add_argument(
         "--broker-strategy-train-start",
         default=os.environ.get("SMIC_BROKER_STRATEGY_TRAIN_START", "2021-01-01"),
     )
     sim.add_argument(
         "--broker-strategy-train-end",
         default=os.environ.get("SMIC_BROKER_STRATEGY_TRAIN_END", "2023-12-31"),
+    )
+    sim.add_argument(
+        "--stock-rule-personas",
+        default=None,
+        help="Optional JSON list of OOS-admitted StockRulePersonaConfig rows to include.",
+    )
+    sim.add_argument(
+        "--pit-research-board-personas",
+        default=None,
+        help="Optional JSON list of admitted PIT research-board persona configs to include.",
     )
     sim.set_defaults(func=run_persona_sim)
 

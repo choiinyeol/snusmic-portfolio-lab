@@ -20,7 +20,7 @@ This folder holds the small set of components every page must reuse. The user ha
 
 ## Number/currency rule
 
-Per [`docs/frontend-product-direction.md`](../../../docs/frontend-product-direction.md) §3.4:
+Per [`DESIGN.md`](../../../../DESIGN.md):
 
 - US/JP/HK stock: USD/JPY/HKD primary, KRW secondary
 - KR stock: KRW only

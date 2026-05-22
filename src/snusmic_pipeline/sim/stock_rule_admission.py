@@ -1,29 +1,17 @@
-#!/usr/bin/env python3
-"""Run stock-level IS search and full-sample validation admission.
-
-Example:
-    uv run python scripts/run_stock_rule_search.py \
-      --warehouse data/warehouse --is-start 2021-01-04 --is-end 2022-12-31 \
-      --full-start 2021-01-04 --full-end 2026-05-11 --out data/sim
-"""
+"""Stock-level admission helpers used by the strategy generation pipeline."""
 
 from __future__ import annotations
 
-import argparse
 import json
-import sys
-from datetime import UTC, date, datetime
+from datetime import date
 from pathlib import Path
 from typing import Any, Literal, cast
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "src"))
+import numpy as np
+import pandas as pd
 
-import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
-
-from snusmic_pipeline.sim.contracts import StockRulePersonaConfig  # noqa: E402
-from snusmic_pipeline.sim.stock_admission import (  # noqa: E402
+from snusmic_pipeline.sim.contracts import StockRulePersonaConfig
+from snusmic_pipeline.sim.stock_admission import (
     StockAdmissionArtifact,
     StockAdmissionDecision,
     StockAdmissionReason,
@@ -45,11 +33,6 @@ _STOCK_RULE_FAMILY_LABELS = {
     "target_gap_reversal": "목표가 괴리 되돌림",
     "target_upside_momentum": "목표가 상승여력 추세",
 }
-from snusmic_pipeline.sim.stock_rule_search import (  # noqa: E402
-    admit_oos,
-    default_stock_rule_configs,
-    search_is,
-)
 
 
 def _json_safe(value: Any) -> Any:
@@ -71,192 +54,6 @@ def _write_rows(frame: pd.DataFrame, csv_path: Path, json_path: Path) -> None:
     frame.to_csv(csv_path, index=False)
     rows = [_json_safe(row) for row in cast(list[dict[str, Any]], frame.to_dict("records"))]
     json_path.write_text(json.dumps(rows, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-
-
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--warehouse", type=Path, default=ROOT / "data" / "warehouse")
-    parser.add_argument("--is-start", type=str, default="2021-01-04")
-    parser.add_argument("--is-end", type=str, default="2022-12-31")
-    parser.add_argument("--validation-mode", choices=("full_sample", "oos"), default="oos")
-    parser.add_argument(
-        "--full-start", type=str, default=None, help="Full-sample replay start; defaults to --is-start"
-    )
-    parser.add_argument(
-        "--full-end", type=str, default=None, help="Full-sample replay end; defaults to --oos-end"
-    )
-    parser.add_argument("--oos-start", type=str, default="2023-01-02")
-    parser.add_argument("--oos-end", type=str, default=date.today().isoformat())
-    parser.add_argument("--out", type=Path, default=ROOT / ".omx" / "quant-insights" / "stock-rule-search")
-    parser.add_argument("--is-top", type=int, default=75)
-    parser.add_argument(
-        "--max-configs",
-        type=int,
-        default=0,
-        help="Limit the deterministic rule grid before IS search; 0 searches the full bounded grid.",
-    )
-    parser.add_argument("--admit-top", type=int, default=0, help="0 means evaluate all IS finalists")
-    parser.add_argument("--benchmark-total-return", type=float, default=0.0)
-    parser.add_argument("--min-oos-excess-return", type=float, default=0.0)
-    parser.add_argument("--min-is-total-return", type=float, default=0.0)
-    parser.add_argument("--min-is-sharpe", type=float, default=None)
-    parser.add_argument("--min-oos-sharpe", type=float, default=None)
-    parser.add_argument("--persona-top", type=int, default=10)
-    parser.add_argument(
-        "--max-correlation",
-        type=float,
-        default=0.95,
-        help="Greedy diversity gate: keep only the best rule when validation return correlation is >= this value; 0 disables.",
-    )
-    parser.add_argument("--goal-min-sharpe", type=float, default=0.7)
-    parser.add_argument("--goal-min-sortino", type=float, default=0.7)
-    parser.add_argument("--goal-min-return", type=float, default=2.0)
-    parser.add_argument(
-        "--goal-max-drawdown",
-        type=float,
-        default=0.65,
-        help="Maximum validation drawdown for persona materialization; <=0 disables the deployability gate.",
-    )
-    return parser.parse_args()
-
-
-def main() -> int:
-    args = parse_args()
-    is_start = date.fromisoformat(args.is_start)
-    is_end = date.fromisoformat(args.is_end)
-    requested_oos_start = date.fromisoformat(args.oos_start)
-    requested_oos_end = date.fromisoformat(args.oos_end)
-    validation_start = (
-        date.fromisoformat(args.full_start)
-        if args.validation_mode == "full_sample" and args.full_start
-        else is_start
-        if args.validation_mode == "full_sample"
-        else requested_oos_start
-    )
-    validation_end = (
-        date.fromisoformat(args.full_end)
-        if args.validation_mode == "full_sample" and args.full_end
-        else requested_oos_end
-    )
-    out: Path = args.out
-    out.mkdir(parents=True, exist_ok=True)
-
-    configs = default_stock_rule_configs()
-    if args.max_configs > 0:
-        configs = configs[: args.max_configs]
-    is_result = search_is(
-        warehouse_dir=args.warehouse,
-        start_date=is_start,
-        end_date=is_end,
-        configs=configs,
-        top_n=args.is_top,
-    )
-    admitted = admit_oos(
-        warehouse_dir=args.warehouse,
-        configs=is_result,
-        is_start=is_start,
-        is_end=is_end,
-        oos_start=validation_start,
-        oos_end=validation_end,
-        benchmark_total_return=args.benchmark_total_return,
-        top_n=args.admit_top,
-        min_oos_excess_return=args.min_oos_excess_return,
-        min_is_total_return=args.min_is_total_return,
-        min_is_sharpe=args.min_is_sharpe,
-        min_oos_sharpe=args.min_oos_sharpe,
-    )
-
-    trial_rows, goal_rows, diversity_summary = _apply_diversity_gate(
-        admitted.trial_rows,
-        returns_by_rule_id=admitted.trial_rows.attrs.get("oos_daily_returns", {}),
-        persona_top=args.persona_top,
-        min_sharpe=args.goal_min_sharpe,
-        min_sortino=args.goal_min_sortino,
-        min_return=args.goal_min_return,
-        max_drawdown=args.goal_max_drawdown,
-        max_correlation=args.max_correlation,
-    )
-
-    _write_rows(is_result.trial_rows, out / "is-search.csv", out / "is-search.json")
-    _write_rows(trial_rows, out / "validation-admission.csv", out / "validation-admission.json")
-    _write_rows(trial_rows, out / "oos-admission.csv", out / "oos-admission.json")
-
-    accepted = trial_rows[trial_rows["accepted"]] if not trial_rows.empty else pd.DataFrame()
-    persona_configs = _stock_persona_configs(
-        goal_rows,
-        search_start=is_start,
-        search_end=is_end,
-        oos_start=validation_start,
-        oos_end=validation_end,
-    )
-    artifact = _stock_admission_artifact(
-        trial_rows,
-        selected_rule_ids={config.rule_id for config in persona_configs},
-        search_start=is_start,
-        search_end=is_end,
-        oos_start=validation_start,
-        oos_end=validation_end,
-        validation_mode=args.validation_mode,
-        benchmark_total_return=args.benchmark_total_return,
-        min_oos_excess_return=args.min_oos_excess_return,
-        min_sharpe=args.goal_min_sharpe,
-        min_sortino=args.goal_min_sortino,
-        min_return=args.goal_min_return,
-        max_drawdown=args.goal_max_drawdown,
-    )
-    (out / "stock-rule-personas.json").write_text(
-        json.dumps(
-            [_json_safe(config.model_dump(mode="json")) for config in persona_configs],
-            ensure_ascii=False,
-            indent=2,
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-    (out / "stock-admission.json").write_text(
-        json.dumps(_json_safe(artifact.model_dump(mode="json")), ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
-    summary = {
-        "schema_version": "1.0.0",
-        "generated_at": datetime.now(UTC).isoformat(),
-        "data_sources": [str(args.warehouse / "daily_prices.csv"), str(args.warehouse / "reports.csv")],
-        "windows": {
-            "is": {"start": args.is_start, "end": args.is_end},
-            "validation": {
-                "mode": args.validation_mode,
-                "start": validation_start.isoformat(),
-                "end": validation_end.isoformat(),
-            },
-        },
-        "searched_count": int(len(is_result.trial_rows)),
-        "is_finalist_count": int(len(is_result.configs)),
-        "accepted_count": int(len(admitted.configs)),
-        "goal_persona_count": len(persona_configs),
-        "accepted_rule_ids": [config.rule_id for config in admitted.configs],
-        "goal_persona_ids": [config.persona_name for config in persona_configs],
-        "diversity": diversity_summary,
-        "methodology": (
-            "Stock-level report rules rank individual symbols from report/price data available at "
-            "rebalance close, shift holdings one trading day, then replay frozen rules on the configured "
-            "validation window. Current default is IS ranking -> later OOS validation, with correlated "
-            "return paths compressed to the best-scoring persona and high-drawdown candidates filtered "
-            "before persona materialization."
-        ),
-    }
-    (out / "summary.json").write_text(
-        json.dumps(_json_safe(summary), ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
-    print(
-        f"stock-rule search: {len(is_result.trial_rows)} IS rows, "
-        f"{len(is_result.configs)} finalists, {len(admitted.configs)} validation admissions, "
-        f"{len(persona_configs)} diverse goal personas"
-    )
-    if not accepted.empty:
-        print(
-            accepted[["rule_id", "oos_total_return", "oos_annualized_sharpe"]].head(10).to_string(index=False)
-        )
-    return 0
 
 
 def _apply_diversity_gate(
@@ -783,7 +580,3 @@ def _boolish(value: object) -> bool:
 def _stock_rule_label(index: int, family: str) -> str:
     family_label = _STOCK_RULE_FAMILY_LABELS.get(family, family.replace("_", " "))
     return f"종목룰 {index:02d}: {family_label}"
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

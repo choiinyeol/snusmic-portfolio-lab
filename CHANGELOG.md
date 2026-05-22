@@ -2,6 +2,22 @@
 
 이 프로젝트의 사용자 가시 변경사항을 모두 정리합니다. 릴리스의 진실은 git 태그이며, 본 파일은 태그 단위로 의도를 한국어로 기록합니다.
 
+## v0.28.1-cli-docs-cleanup.1 — 2026-05-23
+
+### 변경
+- 백테스트/시뮬레이션 진입점을 패키지 내부로 정리하고 `scripts/`의 중복 Python wrapper를 제거했습니다.
+- `run-sim`은 script subprocess 대신 package-owned simulation module을 직접 호출합니다.
+- stock-rule search는 standalone public CLI가 아니라 `generate-strategies` 내부 helper 경로로만 남겼습니다.
+- `docs/`를 canonical 문서 5개와 generated schema 계약 2개로 축소했습니다.
+
+### 검증
+- `uv run ruff check ...`
+- `uv run ruff format --check ...`
+- `uv run mypy src`
+- `uv run pytest -q tests/sim/test_persona_sim_loader.py tests/sim/test_stock_rule_search.py tests/sim/test_strategy_generation.py` → `16 passed`
+- markdown link sanity check
+- `python -m snusmic_pipeline --help`에서 `stock-rule-search` public CLI 제거 확인
+
 ## v0.28.0-performance-contracts.1 — 2026-05-23
 
 ### 추가
@@ -32,7 +48,7 @@
 - `daily-forward` CLI를 추가해 매일 새 가격/리포트만 들어오는 운영 경로에서 마지막 checkpoint 이후 거래일만 전진 처리할 수 있게 했습니다.
 - `Account`, follower, follower v2, MTT, All Weather persona에 snapshot/restore와 persona-local daily step을 추가했습니다.
 - `daily_decisions.csv`, `data/web/daily-decisions.json`, `data/web/portfolio/daily-decisions.json`을 생성해 매일 pool/candidate/buy/sell 의사결정을 감사할 수 있게 했습니다.
-- `docs/product-spec.md`, `docs/backtest-contract.md`, `docs/agent-playbook.md`, `docs/incremental-forward-contract.md`, `docs/simplification-candidates.md`로 LLM/agent가 같은 목적과 실행 계약을 읽고 작업하도록 정리했습니다.
+- `docs/product-spec.md`, `docs/backtest-contract.md`, `docs/technical-architecture.md`, `docs/agent-playbook.md`로 LLM/agent가 같은 목적과 실행 계약을 읽고 작업하도록 정리했습니다.
 
 ### 변경
 - `scripts/refresh_web_artifacts.sh`의 기본 운영 경로를 full strategy generation에서 `daily-forward -> export-web`으로 바꾸고, full rebuild는 `scripts/full_rebuild_web_artifacts.sh`로 분리했습니다.
@@ -56,7 +72,7 @@
 - `data/sim`과 `data/web` 산출물 및 다운로드 CSV를 새 표시명으로 재생성했습니다.
 
 ### 검증
-- `ruff check scripts/run_stock_rule_search.py scripts/run_persona_sim.py src/snusmic_pipeline/web_artifacts.py src/snusmic_pipeline/sim/pit_research_board.py src/snusmic_pipeline/sim/contracts.py tests/test_web_artifacts.py`
+- `ruff check src/snusmic_pipeline/sim/stock_rule_admission.py src/snusmic_pipeline/sim/persona_sim.py src/snusmic_pipeline/web_artifacts.py src/snusmic_pipeline/sim/pit_research_board.py src/snusmic_pipeline/sim/contracts.py tests/test_web_artifacts.py`
 - `pytest tests/test_web_artifacts.py::test_strategy_catalog_uses_behavior_labels_and_admission_audit -q`
 - strategy label scan: 주요 `data/sim`, `data/web`, 다운로드 산출물에서 예전 영어 표시명 없음
 
@@ -81,7 +97,7 @@
 - `.omx/quant-insights/stock-rule-oos-admission-20260522.md`에 IS/OOS split, admission count, materialization gate, 병목 개선 결과를 기록했습니다.
 
 ### 변경
-- `scripts/run_stock_rule_search.py` 기본 validation mode를 full-sample에서 strict OOS로 전환했습니다.
+- stock-rule admission 기본 validation mode를 full-sample에서 strict OOS로 전환했습니다.
 - stock-rule search가 동일 window의 report-state, returns, MA/RSI, rebalance index를 캐시해 1,368개 룰 grid 재생성 시간을 약 `78s`에서 `19s`로 줄였습니다.
 - `generate-strategies` 경로도 `2023-01-02` 이후 stock OOS window와 `validation_mode=oos` artifact를 쓰도록 맞췄습니다.
 - 목표가를 failure window 이후에 늦게 터치한 종목이 다시 coverage pool로 살아나지 않도록 stock-rule coverage failure 판정을 고정했습니다.
@@ -92,10 +108,10 @@
 ### 검증
 - `ruff check scripts src tests`
 - `pytest tests/sim/test_stock_rule_search.py tests/sim/test_persona_sim_loader.py tests/sim/test_stock_admission.py tests/sim/test_pit_research_board.py -q`
-- `mypy src/snusmic_pipeline/sim scripts/run_stock_rule_search.py src/snusmic_pipeline/cli.py scripts/run_persona_sim.py scripts/run_strategy_generation_pipeline.py`
-- `python scripts/run_stock_rule_search.py ... --validation-mode oos` → 1,368 searched / 75 IS finalists / 53 OOS admissions / 10 materialized personas
-- `python scripts/run_persona_sim.py ... --disable-broker-strategy-search --stock-rule-personas data/sim/stock-rule-personas.json`
-- `python scripts/export_web_artifacts.py --warehouse data/warehouse --sim data/sim --out data/web --check`
+- `mypy src/snusmic_pipeline/sim src/snusmic_pipeline/cli.py`
+- `python -m snusmic_pipeline generate-strategies ... --stock-persona-top 10` → 1,368 searched / 75 IS finalists / 53 OOS admissions / 10 materialized personas
+- `python -m snusmic_pipeline run-sim ... --disable-broker-strategy-search --stock-rule-personas data/sim/stock-rule-personas.json`
+- `python -m snusmic_pipeline export-web --warehouse data/warehouse --sim data/sim --out data/web --check`
 - `node scripts/validate-artifacts.mjs` → 15 strategies / 212 price files
 - `scripts/vercel_build.sh` → 425 static pages
 
@@ -168,7 +184,7 @@
 - `/portfolio/[strategy]/methodology`가 strategy catalog의 실제 `params`를 읽어 `실제 파라미터`로 표시합니다.
 
 ### 문서
-- `DESIGN.md`, `docs/handoff-codex.md`, `docs/portfolio-restructure-plan.md`에 portfolio narrative phase 3와 `/strategies`/`/portfolio` 역할 분리를 반영했습니다.
+- `DESIGN.md`, `docs/product-spec.md`, `docs/technical-architecture.md`에 portfolio narrative phase 3와 `/strategies`/`/portfolio` 역할 분리를 반영했습니다.
 
 ### 검증
 - `pnpm --dir apps/web typecheck`
@@ -187,7 +203,7 @@
 - 상세 헤더의 `포트폴리오 원장` 라벨을 `운용 보고서`로 바꾸고, `/portfolio` landing에서 사용하지 않는 합산 평가/총 거래수 모델 필드를 제거했습니다. 실제 strategy ledger만 다루는 계약도 문서에 다시 고정했습니다.
 
 ### 문서
-- `DESIGN.md`, `docs/handoff-codex.md`, `docs/portfolio-restructure-plan.md`에 portfolio detail phase 2의 KPI 축소, holdings 근거 연결, methodology 구조를 반영했습니다.
+- `DESIGN.md`, `docs/product-spec.md`, `docs/technical-architecture.md`에 portfolio detail phase 2의 KPI 축소, holdings 근거 연결, methodology 구조를 반영했습니다.
 
 ### 검증
 - `pnpm --dir apps/web typecheck`
@@ -213,7 +229,7 @@
 - 회계 검산은 `accounting-reconciliation.json`과 테스트/내부 데이터 계약으로만 유지하고, 사용자 화면은 보유·현금 비중·손익 경로·매매 시점·운용 로직에 집중합니다.
 
 ### 문서
-- `docs/decisions/2026-05-14-plain-language-accounting.md`에 cash check는 내부 검산이라는 최신 UX 결정을 반영했습니다.
+- `docs/product-spec.md`와 `DESIGN.md`에 cash check는 내부 검산이라는 최신 UX 결정을 반영했습니다.
 
 ### 검증
 - `pnpm --dir apps/web typecheck`
@@ -232,7 +248,7 @@
 - `DataPanel` toolbar가 외부 검색 input ref를 받을 수 있게 해 dense table chrome 재사용성을 높였습니다.
 
 ### 문서
-- `DESIGN.md`, `docs/handoff-codex.md`, `docs/portfolio-restructure-plan.md`에 portfolio는 실제 strategy ledger만 다룬다는 계약과 새 route/view-model 구조를 반영했습니다.
+- `DESIGN.md`, `docs/backtest-contract.md`, `docs/technical-architecture.md`에 portfolio는 실제 strategy ledger만 다룬다는 계약과 새 route/view-model 구조를 반영했습니다.
 
 ### 검증
 - `pnpm --dir apps/web typecheck`
@@ -271,7 +287,7 @@ ultragoal 7개 스토리 모두 완료. 모든 dense 표가 같은 chrome을 공
 - 영향 받은 페이지: `/portfolio`의 PortfolioTables · TradesTable · PortfolioHistory.
 
 ### 문서
-- `docs/portfolio-restructure-plan.md` 추가. portfolio를 페이지 내 탭에서 `/portfolio/[strategy]/{holdings,equity,trades,methodology}` 하위 라우트 객체로 재구성하는 제안 (실행 대기).
+- `docs/technical-architecture.md`에 portfolio를 페이지 내 탭에서 `/portfolio/[strategy]/{holdings,equity,trades,methodology}` 하위 라우트 객체로 재구성하는 제안을 반영했습니다.
 
 ### 검증
 - `pnpm --dir apps/web build` (정적 페이지 413개)

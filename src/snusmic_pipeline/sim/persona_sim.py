@@ -1,8 +1,8 @@
-"""CLI entrypoint for the persona simulation.
+"""Persona simulation command implementation.
 
-Run from the repo root::
+Run from the package CLI::
 
-    uv run python scripts/run_persona_sim.py \
+    uv run python -m snusmic_pipeline run-sim \
         --start 2021-01-04 --end 2026-05-11 \
         --warehouse data/warehouse \
         --out data/sim
@@ -15,36 +15,31 @@ Produces ``personas.json``, ``persona-configs.json``, ``equity_daily.csv``,
 from __future__ import annotations
 
 import argparse
+import json
 import os
-import sys
 from datetime import date
 from pathlib import Path
 
-# Make `src/` importable when launched as a plain script.
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "src"))
+import pandas as pd
 
-import json  # noqa: E402
-
-import pandas as pd  # noqa: E402
-
-from snusmic_pipeline.sim.broker_strategy_search import find_top_broker_strategy_configs  # noqa: E402
-from snusmic_pipeline.sim.contracts import (  # noqa: E402
+from snusmic_pipeline.sim.broker_strategy_search import find_top_broker_strategy_configs
+from snusmic_pipeline.sim.contracts import (
     PitResearchBoardConfig,
     SimulationConfig,
     SmicMttStrategyConfig,
     StockRulePersonaConfig,
 )
-from snusmic_pipeline.sim.decision_ledger import build_daily_decision_ledger  # noqa: E402
-from snusmic_pipeline.sim.pit_research_board import default_pit_research_board_configs  # noqa: E402
-from snusmic_pipeline.sim.runner import run_simulation  # noqa: E402
-from snusmic_pipeline.sim.visualize import (  # noqa: E402
+from snusmic_pipeline.sim.decision_ledger import build_daily_decision_ledger
+from snusmic_pipeline.sim.pit_research_board import default_pit_research_board_configs
+from snusmic_pipeline.sim.runner import run_simulation
+from snusmic_pipeline.sim.visualize import (
     plot_drawdowns,
     plot_equity_curves,
     plot_net_profit_bars,
     plot_portfolio_composition,
 )
 
+REPO_ROOT = Path(__file__).resolve().parents[3]
 ROUND_NDIGITS = 4
 EXPERIMENTAL_PIT_ALPHA_PREFIX = "pit_research_board_alpha_"
 
@@ -52,7 +47,7 @@ EXPERIMENTAL_PIT_ALPHA_PREFIX = "pit_research_board_alpha_"
 def _to_csv_rounded(df: pd.DataFrame, path: Path) -> None:
     """Write ``df`` to ``path`` with every float column rounded to ROUND_NDIGITS.
 
-    Keeps integer columns intact. Writes regardless of whether ``df`` is empty —
+    Keeps integer columns intact. Writes regardless of whether ``df`` is empty -
     callers always want the file to exist with at least a header.
     """
     if df.empty:
@@ -92,12 +87,12 @@ def _persona_config_artifact(config: SimulationConfig) -> dict[str, object]:
     }
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--start", type=str, default="2021-01-04")
     parser.add_argument("--end", type=str, default=date.today().isoformat())
-    parser.add_argument("--warehouse", type=Path, default=ROOT / "data" / "warehouse")
-    parser.add_argument("--out", type=Path, default=ROOT / "data" / "sim")
+    parser.add_argument("--warehouse", type=Path, default=REPO_ROOT / "data" / "warehouse")
+    parser.add_argument("--out", type=Path, default=REPO_ROOT / "data" / "sim")
     parser.add_argument(
         "--refresh-benchmark",
         action="store_true",
@@ -156,11 +151,11 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Optional JSON list of admitted PIT research-board persona configs to include.",
     )
-    return parser.parse_args()
+    return parser.parse_args(argv)
 
 
-def main() -> int:
-    args = parse_args()
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(argv)
     out: Path = args.out
     out.mkdir(parents=True, exist_ok=True)
     config = SimulationConfig(

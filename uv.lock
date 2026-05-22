@@ -3619,7 +3619,7 @@ wheels = [
 
 [[package]]
 name = "snusmic-portfolio-lab"
-version = "0.28.0"
+version = "0.28.1"
 source = { editable = "." }
 dependencies = [
     { name = "duckdb" },

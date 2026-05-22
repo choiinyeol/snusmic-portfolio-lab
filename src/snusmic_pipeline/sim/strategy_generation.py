@@ -10,7 +10,6 @@ are selectable portfolio strategies by objective pass/fail.
 from __future__ import annotations
 
 import hashlib
-import importlib.util
 import json
 import os
 import time
@@ -40,6 +39,11 @@ from .decision_ledger import build_daily_decision_ledger
 from .market import PriceBoard
 from .pit_research_board import default_pit_research_board_configs, snapshot_rows_for_config
 from .runner import _prepare_reports, run_simulation
+from .stock_rule_admission import (
+    _apply_diversity_gate,
+    _stock_admission_artifact,
+    _stock_persona_configs,
+)
 from .stock_rule_search import admit_oos, default_stock_rule_configs, search_is
 from .target_adjustment import align_report_targets_to_market_scale
 from .visualize import plot_drawdowns, plot_equity_curves, plot_net_profit_bars, plot_portfolio_composition
@@ -212,16 +216,6 @@ def base_simulation_config(config: StrategyGenerationConfig) -> SimulationConfig
     return base.model_copy(update={"personas": personas})
 
 
-def _load_stock_rule_script():
-    script_path = Path(__file__).resolve().parents[3] / "scripts" / "run_stock_rule_search.py"
-    spec = importlib.util.spec_from_file_location("_snusmic_run_stock_rule_search", script_path)
-    if spec is None or spec.loader is None:
-        raise RuntimeError(f"Cannot load stock-rule artifact helpers from {script_path}")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
 def best_benchmark_summary(result: SimulationResult):
     candidates = [s for s in result.summaries if s.persona in BENCHMARK_PERSONAS]
     if not candidates:
@@ -255,14 +249,6 @@ def generate_stock_rule_candidates(
 ) -> tuple[tuple[StockRulePersonaConfig, ...], pd.DataFrame]:
     if config.stock_persona_top <= 0:
         return (), pd.DataFrame()
-
-    # Import script helpers only for artifact compatibility while the search
-    # primitives stay in snusmic_pipeline.sim.  This keeps the new pipeline as
-    # the orchestration surface without duplicating the public stock-admission
-    # JSON contract in this patch.
-    stock_script = _load_stock_rule_script()
-    _apply_diversity_gate = stock_script._apply_diversity_gate
-    _stock_persona_configs = stock_script._stock_persona_configs
 
     reused_trials = _load_reusable_stock_trials(config.out_dir)
     if reused_trials is not None:
@@ -634,8 +620,6 @@ def write_stock_outputs(
     stock_trials: pd.DataFrame,
     benchmark_money_weighted_return: float,
 ) -> None:
-    _stock_admission_artifact = _load_stock_rule_script()._stock_admission_artifact
-
     _write_rows(
         stock_trials,
         config.out_dir / "validation-admission.csv",

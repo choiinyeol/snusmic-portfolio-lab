@@ -5,7 +5,7 @@
 SMIC가 커버한 종목만으로 직장인 적립식 계좌를 운용했을 때,
 올웨더보다 더 벌 수 있는지 검증하는 **일별 종가 기준 액티브 매매 백테스트 랩**
 
-[![release](https://img.shields.io/badge/release-v0.28.0-1b64da)](./CHANGELOG.md)
+[![release](https://img.shields.io/badge/release-v0.28.1-1b64da)](./CHANGELOG.md)
 [![Next.js](https://img.shields.io/badge/Next.js-16-000000)](https://nextjs.org/)
 [![Python](https://img.shields.io/badge/Python-3.13-3776ab)](https://www.python.org/)
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8)](https://tailwindcss.com/)
@@ -40,8 +40,9 @@ flowchart LR
 |---|---|
 | [`docs/product-spec.md`](./docs/product-spec.md) | 제품 목적과 우선순위 |
 | [`docs/backtest-contract.md`](./docs/backtest-contract.md) | 계좌 원장, point-in-time, no-lookahead 계약 |
+| [`docs/technical-architecture.md`](./docs/technical-architecture.md) | pipeline, artifact, route contract |
 | [`docs/agent-playbook.md`](./docs/agent-playbook.md) | 앞으로의 LLM/agent 작업 규칙 |
-| [`docs/simplification-candidates.md`](./docs/simplification-candidates.md) | 삭제, 병합, archive 후보 |
+| [`docs/testing-performance-strategy.md`](./docs/testing-performance-strategy.md) | test scope and performance rules |
 | [`DESIGN.md`](./DESIGN.md) | UI 톤과 화면 설계 |
 
 ## 핵심 기능
@@ -81,7 +82,7 @@ flowchart TB
     Warehouse --> Strategy[generate-strategies<br/>계좌형 전략 생성]
     Strategy --> Sim[run-sim<br/>share-based 원장 시뮬레이션]
     Sim --> SimOut[(data/sim<br/>원장·매매·월간 보유)]
-    Warehouse --> Export[export_web_artifacts.py]
+    Warehouse --> Export[snusmic_pipeline export-web]
     SimOut --> Export
     Export --> WebData[(data/web<br/>JSON / CSV / 가격)]
   end
@@ -186,10 +187,10 @@ uv run pytest
 ├── src/snusmic_pipeline/            # 시뮬레이션 + 웹 아티팩트 내보내기
 ├── scripts/
 │   ├── refresh_web_artifacts.sh
-│   ├── run_persona_sim.py
-│   └── export_web_artifacts.py
+│   ├── full_rebuild_web_artifacts.sh
+│   └── vercel_build.sh
 ├── tests/                           # pytest 스위트
-├── docs/                            # 설계·결정·UI 원칙
+├── docs/                            # canonical docs and generated schemas
 ├── DESIGN.md                        # 디자인 시스템 명세
 └── CHANGELOG.md                     # 릴리스 노트
 ```

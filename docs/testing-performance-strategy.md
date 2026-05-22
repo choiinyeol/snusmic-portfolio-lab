@@ -1,81 +1,54 @@
 # Testing and Performance Strategy
 
-This repo now treats tests as a tiered safety system instead of one large inner loop.
+Last updated: 2026-05-23
+Status: canonical verification guidance
 
-## Keep
+## Test Shape
 
-Keep tests that protect money movement, price timing, lookahead boundaries, target scaling,
-artifact contracts, schema compatibility, and release reproducibility. These tests may be slow,
-but they guard mistakes that are hard to spot visually.
+Keep tests that protect contracts and delete tests that only freeze implementation trivia.
 
-## Simplify or Delete Candidates
+| Keep | Reason |
+| --- | --- |
+| Pydantic contract tests | Boundary stability for configs and artifacts. |
+| Ledger/accounting tests | Prevent silent backtest corruption. |
+| No-lookahead tests | Preserve the product's credibility. |
+| Artifact schema/check tests | Keep frontend and pipeline aligned. |
+| Small regression tests for known bugs | Cheap protection against repeated mistakes. |
 
-A test can be simplified, merged, or deleted when all of these are true:
-
-- It has no unique failure signal after another contract or artifact test covers the same behavior.
-- It asserts implementation shape rather than product or accounting behavior.
-- It repeats a full-data export or replay only to inspect one field that can be tested with a
-  smaller fixture.
-- It slows the suite materially and has a clear smaller replacement.
-
-Do not delete accounting, lookahead, benchmark coverage, target-hit, or artifact-contract tests
-without adding equivalent smaller coverage first.
+| Avoid | Reason |
+| --- | --- |
+| Full replay in ordinary unit tests | Too slow for local development. |
+| Snapshotting huge generated files | Creates churn without proving behavior. |
+| Testing private formatting details | Blocks cleanup. |
 
 ## Local Loops
 
 Fast Python loop:
 
-```powershell
-uv run ruff check .
-uv run ruff format --check .
+```bash
+uv run ruff check src tests
 uv run mypy src
 uv run pytest -q -m "not slow"
 ```
 
-Full Python loop:
+Targeted strategy loop:
 
-```powershell
-uv run pytest -q
+```bash
+uv run pytest -q tests/sim/test_strategy_generation.py tests/sim/test_stock_rule_search.py
 ```
 
-Web loop:
+Frontend loop:
 
-```powershell
-corepack pnpm --dir apps/web check
-corepack pnpm --dir apps/web typecheck
-corepack pnpm --dir apps/web artifact:check
+```bash
+pnpm --dir apps/web artifact:check
+pnpm --dir apps/web typecheck
+pnpm --dir apps/web exec biome check .
 ```
 
-Final gate adds:
+## Performance Rules
 
-```powershell
-corepack pnpm --dir apps/web build
-corepack pnpm --dir apps/web audit --prod
-```
-
-## Refactor Smoke
-
-Use this before and after NumPy/vectorization changes:
-
-```powershell
-uv run python scripts/perf_semantic_smoke.py --json
-```
-
-The smoke output is not a strict benchmark. It gives a quick semantic fingerprint and rough
-runtime signal for web export and forward simulation so regressions are visible before the full
-suite runs.
-
-## Intentional Loops
-
-The remaining daily trading loops are stateful by design: cash deposits, position sizing,
-tax/fee accounting, stop-loss exits, retained winners, and rebalance decisions all depend on the
-account state produced by prior days. Those loops are not good vectorization targets unless the
-simulation contract itself changes.
-
-Calculation-heavy work should stay outside those loops where possible:
-
-- Pydantic validates I/O and web-artifact boundaries, not every numeric row in an inner simulation pass.
-- `PriceBoard` owns NumPy-backed date/symbol lookup and report-window price statistics.
-- PIT research-board snapshots reuse cached target-hit, price-date, and per-symbol rolling-indicator computations.
-- Pandas remains acceptable for one-time table shaping and artifact assembly, but repeated per-report
-  or per-day price scans should move to `PriceBoard` or a dedicated cache.
+- Measure before claiming speedup.
+- Keep pandas at data boundaries and use NumPy/vectorized arrays in hot calculations.
+- Cache only with explicit invalidation inputs.
+- Do not keep legacy fallback paths just because they make a benchmark pass.
+- Slow end-to-end replays should be explicit, not hidden inside the default test lane.

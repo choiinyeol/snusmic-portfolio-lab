@@ -7,8 +7,8 @@ is a frozen Pydantic v2 model with ``extra='forbid'``. This guarantees:
 * a config hashed with ``model_dump_json(sort_keys=True)`` is reproducible,
 * downstream consumers (engine, viz, JSON export) never disagree on shape.
 
-The runner reads ``SimulationConfig`` and never relies on globals — to add a
-new knob, extend the relevant config model. See ``docs/decisions/persona-simulation.md``
+The runner reads ``SimulationConfig`` and never relies on globals; to add a
+new knob, extend the relevant config model. See ``docs/backtest-contract.md``
 for the methodology.
 """
 

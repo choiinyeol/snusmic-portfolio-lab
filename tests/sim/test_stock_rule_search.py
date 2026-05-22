@@ -1,28 +1,15 @@
 from __future__ import annotations
 
-import runpy
-from collections.abc import Callable
-from pathlib import Path
-from typing import cast
-
 import pandas as pd
 
 from snusmic_pipeline.sim.market import PriceBoard
+from snusmic_pipeline.sim.stock_rule_admission import _apply_diversity_gate, _artifact_family, _passes_goal
 from snusmic_pipeline.sim.stock_rule_search import (
     StockRuleConfig,
     _prepare_stock_reports,
     _report_state_matrices,
     _weights_for_config,
 )
-
-_SCRIPT_PATH = Path(__file__).resolve().parents[2] / "scripts" / "run_stock_rule_search.py"
-_SCRIPT_HELPERS = runpy.run_path(str(_SCRIPT_PATH))
-_apply_diversity_gate = cast(
-    Callable[..., tuple[pd.DataFrame, list[dict[str, object]], dict[str, object]]],
-    _SCRIPT_HELPERS["_apply_diversity_gate"],
-)
-_artifact_family = cast(Callable[[str], str], _SCRIPT_HELPERS["_artifact_family"])
-_passes_goal = cast(Callable[..., bool], _SCRIPT_HELPERS["_passes_goal"])
 
 
 def test_stock_rule_admission_artifact_preserves_actual_rule_family_names() -> None:

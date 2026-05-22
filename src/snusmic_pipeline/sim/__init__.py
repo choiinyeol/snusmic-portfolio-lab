@@ -4,7 +4,7 @@ The canonical (and only) simulation surface in this repo. Simulates a real
 Korean brokerage: KRW cash ledger, integer-share holdings, fees and sell-side
 tax, and a step-up monthly contribution.
 
-See ``docs/decisions/persona-simulation.md`` for the contract.
+See ``docs/backtest-contract.md`` for the contract.
 """
 
 from .contracts import (
