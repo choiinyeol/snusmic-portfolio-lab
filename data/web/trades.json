@@ -34300,11 +34300,11 @@
     "tax_krw": 0.0
   },
   {
-    "cash_after_krw": 1019.0154,
-    "commission_krw": 0.4637,
-    "date": "2026-05-21",
-    "fill_price_krw": 3091.545,
-    "gross_krw": 3091.545,
+    "cash_after_krw": 894.2155,
+    "commission_krw": 0.4825,
+    "date": "2026-05-22",
+    "fill_price_krw": 3216.6075,
+    "gross_krw": 3216.6075,
     "persona": "smic_follower",
     "qty": 1,
     "reason": "rebalance_buy",
