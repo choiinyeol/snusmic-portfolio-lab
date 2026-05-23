@@ -247,13 +247,6 @@ class SimulationConfig(_FrozenModel):
         ),
         SmicFollowerConfig(),
         SmicFollowerV2Config(label="손절 리포트 추종"),
-        WeakProphetConfig(
-            label="미래정보 상한선 (3개월)",
-            lookahead_months=3,
-            risk_free_rate=0.0,
-            max_weight=1.0,
-            min_history_days=20,
-        ),
     )
     seed: int = 42  # used only for tie-breaking; the engine itself is deterministic.
 

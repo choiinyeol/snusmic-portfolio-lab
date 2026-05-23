@@ -378,6 +378,5 @@ export function compactAccountLabel(id: string, label: string): string {
   if (id === 'benchmark_qqq') return 'QQQ';
   if (id === 'benchmark_spy') return 'SPY';
   if (id === 'benchmark_gld') return 'GLD';
-  if (id === 'weak_oracle') return '미래정보 상한선';
   return label;
 }

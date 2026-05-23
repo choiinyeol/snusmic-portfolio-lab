@@ -33,7 +33,8 @@ Before adding a new account rule, declare:
 | `benchmark_gld` | benchmark | Gold market baseline. |
 | `smic_follower` | account | Fixed report-follower account. |
 | `smic_follower_v2` | account | Fixed report-follower account with declared stop rules. |
-| `weak_oracle` | oracle | Diagnostic upper bound, not investable. |
+
+Forward-looking oracle implementations may be used in tests or notebooks as diagnostics, but they are not product accounts and must not be exported in the web account catalog.
 
 ## Verification
 

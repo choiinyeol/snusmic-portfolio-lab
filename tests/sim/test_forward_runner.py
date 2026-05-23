@@ -94,7 +94,7 @@ def test_all_weather_checkpoint_crosses_new_rebalance_month(tmp_path: Path) -> N
 
 
 @pytest.mark.slow
-def test_historical_source_change_falls_back_to_full_replay(tmp_path: Path) -> None:
+def test_historical_source_change_uses_deterministic_replay(tmp_path: Path) -> None:
     config = _test_config(date(2021, 1, 4), date(2021, 2, 10))
     warehouse = tmp_path / "warehouse"
     _copy_minimal_warehouse(WAREHOUSE, warehouse)
@@ -114,7 +114,7 @@ def test_historical_source_change_falls_back_to_full_replay(tmp_path: Path) -> N
 
 
 @pytest.mark.slow
-def test_checkpoint_after_requested_end_falls_back_to_full_replay(tmp_path: Path) -> None:
+def test_checkpoint_after_requested_end_uses_deterministic_replay(tmp_path: Path) -> None:
     config = _test_config(date(2021, 1, 4), date(2021, 2, 15))
     out = tmp_path / "out"
 
@@ -127,9 +127,7 @@ def test_checkpoint_after_requested_end_falls_back_to_full_replay(tmp_path: Path
 
 
 def _test_config(start: date, end: date) -> SimulationConfig:
-    base = SimulationConfig(start_date=start, end_date=end)
-    accounts = tuple(account_id for account_id in base.accounts if account_id.account_id != "weak_oracle")
-    return base.model_copy(update={"accounts": accounts})
+    return SimulationConfig(start_date=start, end_date=end)
 
 
 def _copy_minimal_warehouse(src: Path, dst: Path) -> None:

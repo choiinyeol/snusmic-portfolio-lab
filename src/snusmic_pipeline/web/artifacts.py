@@ -558,7 +558,7 @@ def _guard_account_frame(
     *,
     allow_filter: bool = False,
 ) -> pd.DataFrame:
-    """Prevent stale optional sim artifacts from reintroducing retired accounts.
+    """Keep optional sim artifacts inside the current account contract.
 
     The summary file is the current simulation contract. Ignored/generated
     companion CSVs can survive from older runs, so every account_id-bearing frame is
@@ -1572,13 +1572,15 @@ def _build_overview(
 
 BENCHMARK_ACCOUNT_IDS = {
     "all_weather",
-    "smic_follower",
-    "smic_follower_v2",
     "benchmark_kodex200",
     "benchmark_qqq",
     "benchmark_spy",
     "benchmark_gld",
-    "weak_oracle",
+}
+
+PRODUCT_ACCOUNT_IDS = {
+    "smic_follower",
+    "smic_follower_v2",
 }
 
 TARGET_BENCHMARK_ID = "benchmark_kodex200"
@@ -1603,10 +1605,10 @@ def _account_config_by_id(path: Path) -> dict[str, dict[str, Any]]:
 
 
 def _account_kind(account_id: str) -> str:
-    if account_id == "weak_oracle":
-        return "oracle"
     if account_id in BENCHMARK_ACCOUNT_IDS:
         return "benchmark"
+    if account_id in PRODUCT_ACCOUNT_IDS:
+        return "account"
     return "account"
 
 
@@ -1687,11 +1689,9 @@ def _benchmark_group(account_id: str) -> str | None:
     if account_id == "all_weather":
         return "allocation"
     if account_id in {"smic_follower", "smic_follower_v2"}:
-        return "follower"
+        return "report_follower"
     if account_id in {"benchmark_kodex200", "benchmark_qqq", "benchmark_spy", "benchmark_gld"}:
         return "market"
-    if account_id == "weak_oracle":
-        return "oracle"
     return None
 
 
@@ -1704,7 +1704,6 @@ def _account_short_label(account_id: str, label: str) -> str:
         "benchmark_qqq": "QQQ",
         "benchmark_spy": "SPY",
         "benchmark_gld": "GLD",
-        "weak_oracle": "Weak Oracle",
     }
     return labels.get(account_id, label)
 
@@ -1714,7 +1713,6 @@ def _account_display_label(account_id: str, config: dict[str, Any], default_labe
         "all_weather": "All Weather",
         "smic_follower": "SMIC Report Follower",
         "smic_follower_v2": "SMIC Report Follower with Stops",
-        "weak_oracle": "Forward-Looking Diagnostic",
     }
     return labels.get(account_id, default_label)
 
@@ -1730,8 +1728,6 @@ def _methodology_summary(account_id: str, config: dict[str, Any]) -> str:
         return "Point-in-time SMIC report follower that buys active reports with target prices and holds until target hit or expiry."
     if account_id == "smic_follower_v2":
         return "SMIC report follower with time-loss, averaged-down loss, and report-age stop rules."
-    if account_id == "weak_oracle":
-        return "Forward-looking diagnostic baseline; it is not a tradable account."
     return "Fixed simulation account_id included in the simulation artifact."
 
 
@@ -1742,10 +1738,6 @@ def _buy_rules(account_id: str, config: dict[str, Any]) -> list[str]:
         return [
             "Buy active point-in-time SMIC reports with usable target prices on an equal-weight basis.",
             "Apply stop-rule checks before opening or adding exposure.",
-        ]
-    if account_id == "weak_oracle":
-        return [
-            f"Uses a {int(config.get('lookahead_months') or 0)} month future window for diagnostic weighting."
         ]
     if account_id in BENCHMARK_ACCOUNT_IDS:
         return ["Hold the configured benchmark asset mix and rebalance on schedule."]
@@ -1767,7 +1759,17 @@ def _sell_rules(account_id: str, config: dict[str, Any]) -> list[str]:
 
 
 def _risk_controls(account_id: str, config: dict[str, Any]) -> list[str]:
-    return ["Benchmark-only baseline."] if account_id in BENCHMARK_ACCOUNT_IDS else []
+    if account_id in BENCHMARK_ACCOUNT_IDS:
+        return ["Benchmark-only baseline."]
+    if account_id == "smic_follower_v2":
+        return [
+            f"Time-loss exit after {int(config.get('time_loss_days') or 0)} days.",
+            f"Averaged-down loss exit at {_pct(config.get('averaged_down_stop_pct'))}.",
+            f"Report-age exit after {int(config.get('report_age_stop_days') or 0)} days.",
+        ]
+    if account_id == "smic_follower":
+        return ["Report expiry closes stale thesis exposure."]
+    return []
 
 
 def _account_params(account_id: str, config: dict[str, Any]) -> dict[str, Any]:
@@ -1785,7 +1787,6 @@ def _account_catalog_sort_key(row: dict[str, Any]) -> tuple[int, float, str]:
         "benchmark_qqq": 4,
         "benchmark_spy": 5,
         "benchmark_gld": 6,
-        "weak_oracle": 7,
     }
     if account_id in order:
         return (order[account_id], 0.0, account_id)

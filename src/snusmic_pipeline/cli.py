@@ -423,9 +423,7 @@ def daily_forward_config(
         )
     )
     if config is None:
-        base = SimulationConfig(start_date=start, end_date=end)
-        accounts = tuple(account_id for account_id in base.accounts if account_id.account_id != "weak_oracle")
-        config = base.model_copy(update={"accounts": accounts})
+        config = SimulationConfig(start_date=start, end_date=end)
     return config
 
 

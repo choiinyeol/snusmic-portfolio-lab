@@ -54,10 +54,7 @@ def test_default_accounts_are_benchmarks_plus_pit_baselines():
         "benchmark_gld",
         "smic_follower",
         "smic_follower_v2",
-        "weak_oracle",
     ]
-    assert "oracle" not in names
-    assert "smic_mtt_strategy" not in names
 
 
 def test_simulation_config_rejects_inverted_dates():

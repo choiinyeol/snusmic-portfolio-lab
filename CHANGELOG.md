@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.29.3 - PIT artifact boundary cleanup
+
+- Removes the committed daily-forward checkpoint cache from Git and ignores future checkpoint files.
+- Makes `weak_oracle` an explicit diagnostic implementation instead of a default/product account.
+- Separates web benchmark rows from report-follower account rows and validates account `kind` in Python tests plus the web artifact checker.
+- Adds a data artifact policy that defines which generated data is committed and which cache paths stay local.
+
+Verification:
+
+- `uv run ruff check src tests scripts`
+- `uv run mypy src`
+- `uv run pytest tests/sim/test_contracts.py tests/sim/test_forward_runner.py tests/test_web_artifacts.py -q -x`
+- `uv run pytest -q -m "not slow" -x`
+- `uv run pytest -q`
+- `uv run python scripts/export_schemas.py --check`
+- `uv run python -m snusmic_pipeline export-web --check`
+- `pnpm --dir apps/web artifact:check`
+- `pnpm --dir apps/web check`
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web build`
+- `uv run pre-commit run --all-files --show-diff-on-failure`
+
 ## v0.29.2 - CI action pin
 
 - Pins `astral-sh/setup-uv` to `v8.1.0` because the v8 major alias is not published.

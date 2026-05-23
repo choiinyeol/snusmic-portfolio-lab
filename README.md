@@ -17,8 +17,7 @@ SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, f
 - No broker rule search.
 - No stock-rule search or admission.
 - No PIT rule generation.
-- No MTT account_id.
-- No `strategy-admission.json` web contract.
+- No generated account admission.
 - No hidden migration, rollback, or safety-net path.
 
 ## Core Commands
@@ -78,9 +77,8 @@ The default simulation config contains fixed baselines only:
 - GLD
 - SMIC Report Follower
 - SMIC Report Follower with Stops
-- Weak Oracle diagnostic baseline
 
-`weak_oracle` is a diagnostic upper bound in the default full simulation config. It is not a tradable account and `daily-forward` excludes it from checkpointed core operation.
+Forward-looking oracle simulations remain testable diagnostics, but they are not default accounts and are not exported into the web account catalog.
 
 ## Data Flow
 
@@ -104,6 +102,7 @@ flowchart TB
 | Document | Purpose |
 | --- | --- |
 | [docs/product-spec.md](./docs/product-spec.md) | Product intent and priorities |
+| [docs/data-artifact-policy.md](./docs/data-artifact-policy.md) | Committed data ownership and generated-cache policy |
 | [docs/backtest-contract.md](./docs/backtest-contract.md) | Account, PIT, and no-lookahead contract |
 | [docs/technical-architecture.md](./docs/technical-architecture.md) | Pipeline, artifact, and route map |
 | [DESIGN.md](./DESIGN.md) | UI design system |

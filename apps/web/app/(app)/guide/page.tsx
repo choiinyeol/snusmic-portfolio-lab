@@ -13,7 +13,7 @@ export default function GuidePage() {
   const defaultAccount = getDefaultPortfolioAccount();
   const portfolio = getPortfolioSnapshot(defaultAccount);
   const reportStats = buildGuideReportStats(reports);
-  const bestRealAccount = accountRows.find((row) => row.kind === 'account' && row.id !== 'weak_oracle');
+  const bestRealAccount = accountRows.find((row) => row.kind === 'account');
   const follower = accountRows.find((row) => row.id === 'smic_follower_v2');
   const kodex = accountRows.find((row) => row.id === 'benchmark_kodex200');
 

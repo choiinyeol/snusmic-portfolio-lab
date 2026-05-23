@@ -91,11 +91,9 @@ def test_check_web_artifacts_requires_deterministic_json(tmp_path: Path) -> None
 def test_daily_decision_artifacts_expose_checkpoint_metadata(tmp_path: Path) -> None:
     sim = tmp_path / "sim"
     out = tmp_path / "web"
-    base = SimulationConfig(
+    config = SimulationConfig(
         start_date=pd.Timestamp("2021-01-04").date(), end_date=pd.Timestamp("2021-02-10").date()
     )
-    accounts = tuple(account_id for account_id in base.accounts if account_id.account_id != "weak_oracle")
-    config = base.model_copy(update={"accounts": accounts})
     run_daily_forward(config, Path("data/warehouse"), sim)
 
     export_web_artifacts(
@@ -285,7 +283,7 @@ def test_export_web_artifacts_keeps_existing_output_when_staged_validation_fails
 
 @pytest.mark.slow
 @pytest.mark.contract
-def test_account_catalog_has_no_retired_generated_account_accounts(tmp_path: Path) -> None:
+def test_account_catalog_matches_committed_account_config(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
         ExportInputs(
@@ -297,23 +295,31 @@ def test_account_catalog_has_no_retired_generated_account_accounts(tmp_path: Pat
     )
 
     catalog = json.loads((out / "accounts" / "catalog.json").read_text(encoding="utf-8"))
-    account_ids = {str(row.get("account_id") or "") for row in catalog}
-    assert not {
-        item
-        for item in account_ids
-        if item.startswith(("stock_rule_", "pit_research_board_", "smic_mtt_strategy"))
+    actual_ids = [str(row.get("account_id") or "") for row in catalog]
+    actual_kind_by_id = {str(row.get("account_id") or ""): str(row.get("kind") or "") for row in catalog}
+    config = json.loads((Path("data/sim") / "account-configs.json").read_text(encoding="utf-8"))
+    expected_ids = [str(row["account_id"]) for row in config["accounts"]]
+    assert set(actual_ids) == set(expected_ids)
+    assert len(actual_ids) == len(expected_ids)
+    assert actual_kind_by_id == {
+        "all_weather": "benchmark",
+        "benchmark_qqq": "benchmark",
+        "benchmark_spy": "benchmark",
+        "benchmark_kodex200": "benchmark",
+        "benchmark_gld": "benchmark",
+        "smic_follower": "account",
+        "smic_follower_v2": "account",
     }
 
-    csv_text = (out / "table-download-accounts.csv").read_text(encoding="utf-8")
-    assert "SMIC MTT Strategy" not in csv_text
-    assert "smic_mtt_strategy" not in csv_text
-    assert "stock_rule_" not in csv_text
-    assert "pit_research_board_" not in csv_text
+    csv_rows = pd.read_csv(out / "table-download-accounts.csv")
+    csv_ids = list(csv_rows["account_id"].astype(str))
+    assert set(csv_ids) == set(expected_ids)
+    assert len(csv_ids) == len(expected_ids)
 
 
 @pytest.mark.slow
 @pytest.mark.contract
-def test_optional_monthly_holdings_drop_retired_strategy_accounts(tmp_path: Path) -> None:
+def test_monthly_holdings_reference_current_account_artifact(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
         ExportInputs(

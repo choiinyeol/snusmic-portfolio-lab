@@ -13,9 +13,8 @@ SNUSMIC Portfolio Lab builds point-in-time SMIC report data and static account-r
 
 - No broker-style rule search.
 - No generated account admission.
-- No MTT account.
 - No hidden migration, rollback, or safety-net path.
-- No UI route that presents accounts as personas.
+- UI account routes describe declared account rules and account taxonomy.
 
 ## Objective
 

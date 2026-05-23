@@ -119,25 +119,36 @@ for (const artifact of manifest.artifacts ?? []) {
 }
 
 const accounts = readJson('portfolio/accounts.json');
-const benchmarkCount = accounts.filter((row) =>
-  [
-    'all_weather',
-    'smic_follower',
-    'smic_follower_v2',
-    'benchmark_kodex200',
-    'benchmark_qqq',
-    'benchmark_spy',
-    'benchmark_gld',
-  ].includes(row.account_id),
-).length;
-const customAccountCount = accounts.filter(
-  (row) =>
-    !row.account_id.startsWith('benchmark_') &&
-    !['all_weather', 'smic_follower', 'smic_follower_v2', 'weak_oracle'].includes(row.account_id),
-).length;
-if (benchmarkCount < 7) fail(`expected at least 7 benchmark accounts, got ${benchmarkCount}`);
-if (customAccountCount !== 0) fail(`unexpected custom account rows: ${customAccountCount}`);
+const expectedAccountIds = [
+  'all_weather',
+  'smic_follower',
+  'smic_follower_v2',
+  'benchmark_kodex200',
+  'benchmark_qqq',
+  'benchmark_spy',
+  'benchmark_gld',
+];
+const accountIds = accounts.map((row) => row.account_id);
+const unexpectedAccountIds = accountIds.filter((id) => !expectedAccountIds.includes(id));
+const missingAccountIds = expectedAccountIds.filter((id) => !accountIds.includes(id));
+if (unexpectedAccountIds.length) fail(`unexpected account rows: ${unexpectedAccountIds.join(', ')}`);
+if (missingAccountIds.length) fail(`missing account rows: ${missingAccountIds.join(', ')}`);
+const expectedAccountKinds = new Map([
+  ['all_weather', 'benchmark'],
+  ['smic_follower', 'account'],
+  ['smic_follower_v2', 'account'],
+  ['benchmark_kodex200', 'benchmark'],
+  ['benchmark_qqq', 'benchmark'],
+  ['benchmark_spy', 'benchmark'],
+  ['benchmark_gld', 'benchmark'],
+]);
+for (const row of accounts) {
+  const expectedKind = expectedAccountKinds.get(row.account_id);
+  if (row.kind !== expectedKind) {
+    fail(`account ${row.account_id} has kind=${row.kind}, expected ${expectedKind}`);
+  }
+}
 
 console.log(
-  `[artifact-check] ok schema=${manifest.schema_version} reports=${reports.length} benchmarks=${benchmarkCount} custom_accounts=${customAccountCount} price_files=${manifest.price_artifact_count}`,
+  `[artifact-check] ok schema=${manifest.schema_version} reports=${reports.length} accounts=${accountIds.length} price_files=${manifest.price_artifact_count}`,
 );

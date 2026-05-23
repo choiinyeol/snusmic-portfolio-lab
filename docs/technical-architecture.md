@@ -4,7 +4,7 @@ The repository is layered by job:
 
 - `src/snusmic_pipeline/ingest`: source discovery, PDF download, extraction, quality checks, markdown export, and report metadata models.
 - `src/snusmic_pipeline/market_data`: currency and market-data normalization helpers.
-- `src/snusmic_pipeline/sim`: fixed account simulation, PIT warehouse IO, brokerage math, daily-forward checkpoints, and visualization.
+- `src/snusmic_pipeline/sim`: fixed account simulation, PIT warehouse IO, brokerage math, local daily-forward checkpoints, and visualization.
 - `src/snusmic_pipeline/web`: Python-side web artifact contracts and exporters.
 - `apps/web`: static Next.js reader for generated JSON artifacts.
 - `scripts`: small CI/deployment utilities only; data refresh and rebuild flows live in the package CLI.
@@ -30,3 +30,5 @@ The repository is layered by job:
 ## Contracts
 
 Python exporters own data shape. TypeScript Zod schemas validate those generated artifacts at build time. The frontend reads `data/web/accounts/catalog.json` for account taxonomy and must not infer meaning from account-id strings.
+
+Daily-forward checkpoints are local replay caches. They are not committed product artifacts; deleting them only makes the next run replay from the warehouse.

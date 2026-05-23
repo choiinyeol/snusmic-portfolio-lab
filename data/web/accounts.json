@@ -201,7 +201,7 @@
   },
   {
     "account_id": "smic_follower",
-    "benchmark_group": "follower",
+    "benchmark_group": "report_follower",
     "buy_rules": [
       "Buy active point-in-time SMIC reports with usable target prices on an equal-weight basis."
     ],
@@ -212,7 +212,7 @@
     "initial_capital_krw": 10000000.0,
     "is_default_candidate": false,
     "is_selectable": false,
-    "kind": "benchmark",
+    "kind": "account",
     "label": "SMIC Report Follower",
     "max_drawdown": 0.1917,
     "methodology_summary": "Point-in-time SMIC report follower that buys active reports with target prices and holds until target hit or expiry.",
@@ -228,7 +228,7 @@
     },
     "realized_pnl_krw": 65173697.085,
     "risk_controls": [
-      "Benchmark-only baseline."
+      "Report expiry closes stale thesis exposure."
     ],
     "sell_rules": [
       "Exit when the report target is reached or the report expires."
@@ -242,7 +242,7 @@
   },
   {
     "account_id": "smic_follower_v2",
-    "benchmark_group": "follower",
+    "benchmark_group": "report_follower",
     "buy_rules": [
       "Buy active point-in-time SMIC reports with usable target prices on an equal-weight basis.",
       "Apply stop-rule checks before opening or adding exposure."
@@ -254,7 +254,7 @@
     "initial_capital_krw": 10000000.0,
     "is_default_candidate": false,
     "is_selectable": false,
-    "kind": "benchmark",
+    "kind": "account",
     "label": "SMIC Report Follower with Stops",
     "max_drawdown": 0.1862,
     "methodology_summary": "SMIC report follower with time-loss, averaged-down loss, and report-age stop rules.",
@@ -273,7 +273,9 @@
     },
     "realized_pnl_krw": 38607915.9402,
     "risk_controls": [
-      "Benchmark-only baseline."
+      "Time-loss exit after 365 days.",
+      "Averaged-down loss exit at 20%.",
+      "Report-age exit after 730 days."
     ],
     "sell_rules": [
       "Exit after 365 loss-making holding days.",

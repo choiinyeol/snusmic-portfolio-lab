@@ -22,10 +22,9 @@ data/warehouse/*.duckdb.wal
 data/warehouse/benchmark_prices.csv
 data/sim/equity_daily.csv
 data/sim/trades.csv
-data/sim/personas.json
 data/sim/monthly_holdings.csv
-data/sim/broker_strategy_trials.csv
 data/sim/.cache/
+data/sim/checkpoints/
 .omc/
 apps/web/.next/
 apps/web/node_modules/
@@ -34,12 +33,3 @@ apps/web/tsconfig.tsbuildinfo
 data/optuna/
 /public/
 .vercel/
-
-# Stock-rule search scratch outputs (stock-admission/personas are committed product inputs)
-data/sim/is-search.csv
-data/sim/is-search.json
-data/sim/oos-admission.csv
-data/sim/oos-admission.json
-data/sim/validation-admission.csv
-data/sim/validation-admission.json
-data/sim/summary.json
