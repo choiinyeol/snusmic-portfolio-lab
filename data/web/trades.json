@@ -34300,20 +34300,6 @@
     "tax_krw": 0.0
   },
   {
-    "account_id": "smic_follower",
-    "cash_after_krw": 894.2155,
-    "commission_krw": 0.4825,
-    "date": "2026-05-22",
-    "fill_price_krw": 3216.6075,
-    "gross_krw": 3216.6075,
-    "qty": 1,
-    "reason": "rebalance_buy",
-    "report_id": "",
-    "side": "buy",
-    "symbol": "234300.KQ",
-    "tax_krw": 0.0
-  },
-  {
     "account_id": "smic_follower_v2",
     "cash_after_krw": 6689657.6653,
     "commission_krw": 496.4769,

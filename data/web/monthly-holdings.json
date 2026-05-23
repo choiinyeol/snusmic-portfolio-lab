@@ -2824,40 +2824,40 @@
     "month_end": "2026-05-22",
     "qty": 518,
     "symbol": "069500.KS",
-    "weight_in_portfolio": 0.2781
+    "weight_in_portfolio": 0.2804
   },
   {
     "account_id": "all_weather",
     "company": "",
     "currency": "USD",
-    "last_close_native": 721.5881984069156,
-    "market_value_krw": 60109666.2008,
+    "last_close_native": 717.5399780269559,
+    "market_value_krw": 59370693.8254,
     "month_end": "2026-05-22",
     "qty": 55,
     "symbol": "QQQ",
-    "weight_in_portfolio": 0.2616
+    "weight_in_portfolio": 0.2605
   },
   {
     "account_id": "all_weather",
     "company": "",
     "currency": "USD",
-    "last_close_native": 748.5103872978138,
-    "market_value_krw": 56683941.475,
+    "last_close_native": 745.6400146489618,
+    "market_value_krw": 56087042.8121,
     "month_end": "2026-05-22",
     "qty": 50,
     "symbol": "SPY",
-    "weight_in_portfolio": 0.2467
+    "weight_in_portfolio": 0.2461
   },
   {
     "account_id": "all_weather",
     "company": "",
     "currency": "USD",
-    "last_close_native": 415.5518743547881,
-    "market_value_krw": 49092150.0887,
+    "last_close_native": 413.82000732436006,
+    "market_value_krw": 48558964.6715,
     "month_end": "2026-05-22",
     "qty": 78,
     "symbol": "GLD",
-    "weight_in_portfolio": 0.2136
+    "weight_in_portfolio": 0.2131
   },
   {
     "account_id": "benchmark_gld",
@@ -3567,8 +3567,8 @@
     "account_id": "benchmark_gld",
     "company": "",
     "currency": "USD",
-    "last_close_native": 415.5518743545581,
-    "market_value_krw": 231614246.5722,
+    "last_close_native": 413.82000732414247,
+    "market_value_krw": 229098705.1167,
     "month_end": "2026-05-22",
     "qty": 368,
     "symbol": "GLD",
@@ -4997,8 +4997,8 @@
     "account_id": "benchmark_qqq",
     "company": "",
     "currency": "USD",
-    "last_close_native": 721.588198406193,
-    "market_value_krw": 214208992.279,
+    "last_close_native": 717.5399780272394,
+    "market_value_krw": 211575563.4506,
     "month_end": "2026-05-22",
     "qty": 196,
     "symbol": "QQQ",
@@ -5712,8 +5712,8 @@
     "account_id": "benchmark_spy",
     "company": "",
     "currency": "USD",
-    "last_close_native": 748.5103872974088,
-    "market_value_krw": 184789649.2084,
+    "last_close_native": 745.6400146483663,
+    "market_value_krw": 182843759.5673,
     "month_end": "2026-05-22",
     "qty": 163,
     "symbol": "SPY",
@@ -31794,22 +31794,11 @@
     "company": "JAC recruitment Co. Ltd",
     "currency": "JPY",
     "last_close_native": 860.0,
-    "market_value_krw": 7843200.0,
+    "market_value_krw": 7867967.7795,
     "month_end": "2026-05-22",
     "qty": 960,
     "symbol": "2124.T",
-    "weight_in_portfolio": 0.0484
-  },
-  {
-    "account_id": "smic_follower",
-    "company": "Funko Inc.",
-    "currency": "USD",
-    "last_close_native": 5.230000019073486,
-    "market_value_krw": 6891490.2832,
-    "month_end": "2026-05-22",
-    "qty": 870,
-    "symbol": "FNKO",
-    "weight_in_portfolio": 0.0425
+    "weight_in_portfolio": 0.0481
   },
   {
     "account_id": "smic_follower",
@@ -31820,18 +31809,18 @@
     "month_end": "2026-05-22",
     "qty": 184,
     "symbol": "098120.KQ",
-    "weight_in_portfolio": 0.0421
+    "weight_in_portfolio": 0.0417
   },
   {
     "account_id": "smic_follower",
-    "company": "Coreweave",
+    "company": "Funko Inc.",
     "currency": "USD",
-    "last_close_native": 107.22000122070312,
-    "market_value_krw": 6495730.5895,
+    "last_close_native": 5.210000038146973,
+    "market_value_krw": 6818994.0406,
     "month_end": "2026-05-22",
-    "qty": 40,
-    "symbol": "CRWV",
-    "weight_in_portfolio": 0.04
+    "qty": 870,
+    "symbol": "FNKO",
+    "weight_in_portfolio": 0.0417
   },
   {
     "account_id": "smic_follower",
@@ -31842,18 +31831,29 @@
     "month_end": "2026-05-22",
     "qty": 211,
     "symbol": "122640.KQ",
-    "weight_in_portfolio": 0.0392
+    "weight_in_portfolio": 0.0388
+  },
+  {
+    "account_id": "smic_follower",
+    "company": "Coreweave",
+    "currency": "USD",
+    "last_close_native": 105.48999786376953,
+    "market_value_krw": 6347966.2145,
+    "month_end": "2026-05-22",
+    "qty": 40,
+    "symbol": "CRWV",
+    "weight_in_portfolio": 0.0388
   },
   {
     "account_id": "smic_follower",
     "company": "Cover Corp",
     "currency": "JPY",
     "last_close_native": 1760.0,
-    "market_value_krw": 5467440.0,
+    "market_value_krw": 5484705.4463,
     "month_end": "2026-05-22",
     "qty": 327,
     "symbol": "5253.T",
-    "weight_in_portfolio": 0.0337
+    "weight_in_portfolio": 0.0335
   },
   {
     "account_id": "smic_follower",
@@ -31864,7 +31864,7 @@
     "month_end": "2026-05-22",
     "qty": 792,
     "symbol": "016380.KS",
-    "weight_in_portfolio": 0.033
+    "weight_in_portfolio": 0.0327
   },
   {
     "account_id": "smic_follower",
@@ -31875,18 +31875,29 @@
     "month_end": "2026-05-22",
     "qty": 72,
     "symbol": "489790.KS",
-    "weight_in_portfolio": 0.0318
+    "weight_in_portfolio": 0.0315
   },
   {
     "account_id": "smic_follower",
     "company": "Establishment Labs Holdings",
     "currency": "USD",
-    "last_close_native": 71.98999786376953,
-    "market_value_krw": 5124626.5666,
+    "last_close_native": 72.19000244140625,
+    "market_value_krw": 5104324.1475,
     "month_end": "2026-05-22",
     "qty": 47,
     "symbol": "ESTA",
-    "weight_in_portfolio": 0.0316
+    "weight_in_portfolio": 0.0312
+  },
+  {
+    "account_id": "smic_follower",
+    "company": "크래프톤",
+    "currency": "KRW",
+    "last_close_native": 271000.0,
+    "market_value_krw": 4878000.0,
+    "month_end": "2026-05-22",
+    "qty": 18,
+    "symbol": "259960.KQ",
+    "weight_in_portfolio": 0.0298
   },
   {
     "account_id": "smic_follower",
@@ -31897,40 +31908,51 @@
     "month_end": "2026-05-22",
     "qty": 92,
     "symbol": "112610.KS",
-    "weight_in_portfolio": 0.0299
-  },
-  {
-    "account_id": "smic_follower",
-    "company": "Cellebrite DI",
-    "currency": "USD",
-    "last_close_native": 13.33500003814697,
-    "market_value_krw": 4786670.9339,
-    "month_end": "2026-05-22",
-    "qty": 237,
-    "symbol": "CLBT",
-    "weight_in_portfolio": 0.0295
+    "weight_in_portfolio": 0.0296
   },
   {
     "account_id": "smic_follower",
     "company": "Levi Strauss & Co",
     "currency": "USD",
-    "last_close_native": 21.90999984741211,
-    "market_value_krw": 4712191.4181,
+    "last_close_native": 22.020000457763672,
+    "market_value_krw": 4704018.2701,
     "month_end": "2026-05-22",
     "qty": 142,
     "symbol": "LEVI",
-    "weight_in_portfolio": 0.029
+    "weight_in_portfolio": 0.0288
   },
   {
     "account_id": "smic_follower",
-    "company": "크래프톤",
-    "currency": "KRW",
-    "last_close_native": 258000.0,
-    "market_value_krw": 4644000.0,
+    "company": "Cellebrite DI",
+    "currency": "USD",
+    "last_close_native": 13.180000305175783,
+    "market_value_krw": 4699234.2891,
     "month_end": "2026-05-22",
-    "qty": 18,
-    "symbol": "259960.KQ",
-    "weight_in_portfolio": 0.0286
+    "qty": 237,
+    "symbol": "CLBT",
+    "weight_in_portfolio": 0.0287
+  },
+  {
+    "account_id": "smic_follower",
+    "company": "나노",
+    "currency": "KRW",
+    "last_close_native": 7280.0,
+    "market_value_krw": 4659200.0,
+    "month_end": "2026-05-22",
+    "qty": 640,
+    "symbol": "187790.KS",
+    "weight_in_portfolio": 0.0285
+  },
+  {
+    "account_id": "smic_follower",
+    "company": "샘씨엔에스",
+    "currency": "KRW",
+    "last_close_native": 14940.0,
+    "market_value_krw": 4571640.0,
+    "month_end": "2026-05-22",
+    "qty": 306,
+    "symbol": "252990.KS",
+    "weight_in_portfolio": 0.0279
   },
   {
     "account_id": "smic_follower",
@@ -31941,18 +31963,18 @@
     "month_end": "2026-05-22",
     "qty": 201,
     "symbol": "294870.KS",
-    "weight_in_portfolio": 0.0273
+    "weight_in_portfolio": 0.027
   },
   {
     "account_id": "smic_follower",
-    "company": "나노",
+    "company": "브이티",
     "currency": "KRW",
-    "last_close_native": 6750.0,
-    "market_value_krw": 4320000.0,
+    "last_close_native": 15050.0,
+    "market_value_krw": 4394600.0,
     "month_end": "2026-05-22",
-    "qty": 640,
-    "symbol": "187790.KS",
-    "weight_in_portfolio": 0.0266
+    "qty": 292,
+    "symbol": "018290.KS",
+    "weight_in_portfolio": 0.0269
   },
   {
     "account_id": "smic_follower",
@@ -31963,7 +31985,18 @@
     "month_end": "2026-05-22",
     "qty": 68,
     "symbol": "035900.KQ",
-    "weight_in_portfolio": 0.0258
+    "weight_in_portfolio": 0.0256
+  },
+  {
+    "account_id": "smic_follower",
+    "company": "IMAX Corp",
+    "currency": "USD",
+    "last_close_native": 39.119998931884766,
+    "market_value_krw": 4178501.0417,
+    "month_end": "2026-05-22",
+    "qty": 71,
+    "symbol": "IMAX",
+    "weight_in_portfolio": 0.0255
   },
   {
     "account_id": "smic_follower",
@@ -31974,51 +32007,29 @@
     "month_end": "2026-05-22",
     "qty": 421,
     "symbol": "049720.KQ",
-    "weight_in_portfolio": 0.0257
+    "weight_in_portfolio": 0.0255
   },
   {
     "account_id": "smic_follower",
     "company": "Sensient Technologies Corp",
     "currency": "USD",
-    "last_close_native": 114.0999984741211,
-    "market_value_krw": 4147525.6962,
+    "last_close_native": 114.44000244140624,
+    "market_value_krw": 4131925.0192,
     "month_end": "2026-05-22",
     "qty": 24,
     "symbol": "SXT",
-    "weight_in_portfolio": 0.0256
+    "weight_in_portfolio": 0.0253
   },
   {
     "account_id": "smic_follower",
     "company": "에스트래픽",
     "currency": "KRW",
     "last_close_native": 3215.0,
-    "market_value_krw": 4124845.0,
+    "market_value_krw": 4121630.0,
     "month_end": "2026-05-22",
-    "qty": 1283,
+    "qty": 1282,
     "symbol": "234300.KQ",
-    "weight_in_portfolio": 0.0254
-  },
-  {
-    "account_id": "smic_follower",
-    "company": "IMAX Corp",
-    "currency": "USD",
-    "last_close_native": 38.2400016784668,
-    "market_value_krw": 4112145.3444,
-    "month_end": "2026-05-22",
-    "qty": 71,
-    "symbol": "IMAX",
-    "weight_in_portfolio": 0.0254
-  },
-  {
-    "account_id": "smic_follower",
-    "company": "브이티",
-    "currency": "KRW",
-    "last_close_native": 14030.0,
-    "market_value_krw": 4096760.0,
-    "month_end": "2026-05-22",
-    "qty": 292,
-    "symbol": "018290.KS",
-    "weight_in_portfolio": 0.0253
+    "weight_in_portfolio": 0.0252
   },
   {
     "account_id": "smic_follower",
@@ -32029,7 +32040,7 @@
     "month_end": "2026-05-22",
     "qty": 77,
     "symbol": "067160.KQ",
-    "weight_in_portfolio": 0.0253
+    "weight_in_portfolio": 0.025
   },
   {
     "account_id": "smic_follower",
@@ -32040,7 +32051,7 @@
     "month_end": "2026-05-22",
     "qty": 110,
     "symbol": "017960.KS",
-    "weight_in_portfolio": 0.025
+    "weight_in_portfolio": 0.0247
   },
   {
     "account_id": "smic_follower",
@@ -32051,29 +32062,7 @@
     "month_end": "2026-05-22",
     "qty": 828,
     "symbol": "472850.KQ",
-    "weight_in_portfolio": 0.0248
-  },
-  {
-    "account_id": "smic_follower",
-    "company": "샘씨엔에스",
-    "currency": "KRW",
-    "last_close_native": 13080.0,
-    "market_value_krw": 4002480.0,
-    "month_end": "2026-05-22",
-    "qty": 306,
-    "symbol": "252990.KS",
-    "weight_in_portfolio": 0.0247
-  },
-  {
-    "account_id": "smic_follower",
-    "company": "Iradimed Corporation",
-    "currency": "USD",
-    "last_close_native": 93.61499786376953,
-    "market_value_krw": 3970047.1818,
-    "month_end": "2026-05-22",
-    "qty": 28,
-    "symbol": "IRMD",
-    "weight_in_portfolio": 0.0245
+    "weight_in_portfolio": 0.0246
   },
   {
     "account_id": "smic_follower",
@@ -32084,7 +32073,7 @@
     "month_end": "2026-05-22",
     "qty": 13,
     "symbol": "214450.KQ",
-    "weight_in_portfolio": 0.0244
+    "weight_in_portfolio": 0.0242
   },
   {
     "account_id": "smic_follower",
@@ -32095,29 +32084,51 @@
     "month_end": "2026-05-22",
     "qty": 1593,
     "symbol": "310200.KQ",
-    "weight_in_portfolio": 0.0243
+    "weight_in_portfolio": 0.0241
   },
   {
     "account_id": "smic_follower",
     "company": "비츠로셀",
     "currency": "KRW",
-    "last_close_native": 52000.0,
-    "market_value_krw": 3796000.0,
+    "last_close_native": 53700.0,
+    "market_value_krw": 3920100.0,
     "month_end": "2026-05-22",
     "qty": 73,
     "symbol": "082920.KS",
-    "weight_in_portfolio": 0.0234
+    "weight_in_portfolio": 0.024
+  },
+  {
+    "account_id": "smic_follower",
+    "company": "Iradimed Corporation",
+    "currency": "USD",
+    "last_close_native": 92.0999984741211,
+    "market_value_krw": 3879546.7187,
+    "month_end": "2026-05-22",
+    "qty": 28,
+    "symbol": "IRMD",
+    "weight_in_portfolio": 0.0237
   },
   {
     "account_id": "smic_follower",
     "company": "OSAKA Titanium Technologies Co.,Ltd.",
     "currency": "JPY",
     "last_close_native": 2303.0,
-    "market_value_krw": 3697466.5,
+    "market_value_krw": 3709142.6061,
     "month_end": "2026-05-22",
     "qty": 169,
     "symbol": "5726.T",
-    "weight_in_portfolio": 0.0228
+    "weight_in_portfolio": 0.0227
+  },
+  {
+    "account_id": "smic_follower",
+    "company": "덕산네오룩스",
+    "currency": "KRW",
+    "last_close_native": 45950.0,
+    "market_value_krw": 3676000.0,
+    "month_end": "2026-05-22",
+    "qty": 80,
+    "symbol": "213420.KS",
+    "weight_in_portfolio": 0.0225
   },
   {
     "account_id": "smic_follower",
@@ -32128,18 +32139,7 @@
     "month_end": "2026-05-22",
     "qty": 189,
     "symbol": "100090.KS",
-    "weight_in_portfolio": 0.022
-  },
-  {
-    "account_id": "smic_follower",
-    "company": "덕산네오룩스",
-    "currency": "KRW",
-    "last_close_native": 44450.0,
-    "market_value_krw": 3556000.0,
-    "month_end": "2026-05-22",
-    "qty": 80,
-    "symbol": "213420.KS",
-    "weight_in_portfolio": 0.0219
+    "weight_in_portfolio": 0.0218
   },
   {
     "account_id": "smic_follower",
@@ -32150,29 +32150,29 @@
     "month_end": "2026-05-22",
     "qty": 56,
     "symbol": "456160.KQ",
-    "weight_in_portfolio": 0.0217
+    "weight_in_portfolio": 0.0215
   },
   {
     "account_id": "smic_follower",
     "company": "Doximity",
     "currency": "USD",
-    "last_close_native": 19.555000305175778,
-    "market_value_krw": 3465260.5458,
+    "last_close_native": 19.940000534057617,
+    "market_value_krw": 3509735.263,
     "month_end": "2026-05-22",
     "qty": 117,
     "symbol": "DOCS",
-    "weight_in_portfolio": 0.0214
+    "weight_in_portfolio": 0.0215
   },
   {
     "account_id": "smic_follower",
     "company": "Sportradar",
     "currency": "USD",
-    "last_close_native": 13.100099563598633,
-    "market_value_krw": 3253948.3083,
+    "last_close_native": 13.029999732971191,
+    "market_value_krw": 3214782.4343,
     "month_end": "2026-05-22",
     "qty": 164,
     "symbol": "SRAD",
-    "weight_in_portfolio": 0.0201
+    "weight_in_portfolio": 0.0197
   },
   {
     "account_id": "smic_follower",
@@ -32189,8 +32189,8 @@
     "account_id": "smic_follower",
     "company": "Tempus AI Inc",
     "currency": "USD",
-    "last_close_native": 46.81999969482422,
-    "market_value_krw": 212737.8992,
+    "last_close_native": 46.18000030517578,
+    "market_value_krw": 208419.5808,
     "month_end": "2026-05-22",
     "qty": 3,
     "symbol": "TEM",
@@ -32200,8 +32200,8 @@
     "account_id": "smic_follower",
     "company": "코스텍시스",
     "currency": "KRW",
-    "last_close_native": 39800.0,
-    "market_value_krw": 79600.0,
+    "last_close_native": 42500.0,
+    "market_value_krw": 85000.0,
     "month_end": "2026-05-22",
     "qty": 2,
     "symbol": "355150.KS",
@@ -44558,51 +44558,40 @@
     "month_end": "2026-05-22",
     "qty": 873,
     "symbol": "122640.KQ",
-    "weight_in_portfolio": 0.1661
+    "weight_in_portfolio": 0.1667
   },
   {
     "account_id": "smic_follower_v2",
     "company": "Sensient Technologies Corp",
     "currency": "USD",
-    "last_close_native": 114.0999984741211,
-    "market_value_krw": 23329832.0411,
+    "last_close_native": 114.44000244140624,
+    "market_value_krw": 23242078.233,
     "month_end": "2026-05-22",
     "qty": 135,
     "symbol": "SXT",
-    "weight_in_portfolio": 0.1475
+    "weight_in_portfolio": 0.1474
   },
   {
     "account_id": "smic_follower_v2",
     "company": "Establishment Labs Holdings",
     "currency": "USD",
-    "last_close_native": 71.98999786376953,
-    "market_value_krw": 21370783.129,
+    "last_close_native": 72.19000244140625,
+    "market_value_krw": 21286117.7213,
     "month_end": "2026-05-22",
     "qty": 196,
     "symbol": "ESTA",
-    "weight_in_portfolio": 0.1351
+    "weight_in_portfolio": 0.135
   },
   {
     "account_id": "smic_follower_v2",
     "company": "IMAX Corp",
     "currency": "USD",
-    "last_close_native": 38.2400016784668,
-    "market_value_krw": 18012354.9592,
+    "last_close_native": 39.119998931884766,
+    "market_value_krw": 18303011.6053,
     "month_end": "2026-05-22",
     "qty": 311,
     "symbol": "IMAX",
-    "weight_in_portfolio": 0.1139
-  },
-  {
-    "account_id": "smic_follower_v2",
-    "company": "Cellebrite DI",
-    "currency": "USD",
-    "last_close_native": 13.33500003814697,
-    "market_value_krw": 17328960.5962,
-    "month_end": "2026-05-22",
-    "qty": 858,
-    "symbol": "CLBT",
-    "weight_in_portfolio": 0.1096
+    "weight_in_portfolio": 0.1161
   },
   {
     "account_id": "smic_follower_v2",
@@ -44613,18 +44602,29 @@
     "month_end": "2026-05-22",
     "qty": 1741,
     "symbol": "049720.KQ",
-    "weight_in_portfolio": 0.1092
+    "weight_in_portfolio": 0.1096
+  },
+  {
+    "account_id": "smic_follower_v2",
+    "company": "Cellebrite DI",
+    "currency": "USD",
+    "last_close_native": 13.180000305175783,
+    "market_value_krw": 17012417.806,
+    "month_end": "2026-05-22",
+    "qty": 858,
+    "symbol": "CLBT",
+    "weight_in_portfolio": 0.1079
   },
   {
     "account_id": "smic_follower_v2",
     "company": "Iradimed Corporation",
     "currency": "USD",
-    "last_close_native": 93.61499786376953,
-    "market_value_krw": 16872700.5227,
+    "last_close_native": 92.0999984741211,
+    "market_value_krw": 16488073.5544,
     "month_end": "2026-05-22",
     "qty": 119,
     "symbol": "IRMD",
-    "weight_in_portfolio": 0.1067
+    "weight_in_portfolio": 0.1046
   },
   {
     "account_id": "smic_follower_v2",
@@ -44635,25 +44635,25 @@
     "month_end": "2026-05-22",
     "qty": 434,
     "symbol": "017960.KS",
-    "weight_in_portfolio": 0.101
+    "weight_in_portfolio": 0.1013
   },
   {
     "account_id": "smic_follower_v2",
     "company": "Camtek",
     "currency": "USD",
-    "last_close_native": 161.30499267578122,
-    "market_value_krw": 1710165.161,
+    "last_close_native": 167.3699951171875,
+    "market_value_krw": 1762539.9732,
     "month_end": "2026-05-22",
     "qty": 7,
     "symbol": "CAMT",
-    "weight_in_portfolio": 0.0108
+    "weight_in_portfolio": 0.0112
   },
   {
     "account_id": "smic_follower_v2",
     "company": "나노",
     "currency": "KRW",
-    "last_close_native": 6750.0,
-    "market_value_krw": 13500.0,
+    "last_close_native": 7280.0,
+    "market_value_krw": 14560.0,
     "month_end": "2026-05-22",
     "qty": 2,
     "symbol": "187790.KS",

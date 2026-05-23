@@ -39,28 +39,28 @@
       "target_hit_rate": 0.846154
     },
     {
-      "avg_current_return": 0.306467,
+      "avg_current_return": 0.307854,
       "bucket": "25-50%",
       "count": 70,
       "target_hit_count": 42,
       "target_hit_rate": 0.6
     },
     {
-      "avg_current_return": 0.388362,
+      "avg_current_return": 0.389427,
       "bucket": "50-100%",
       "count": 81,
       "target_hit_count": 23,
       "target_hit_rate": 0.283951
     },
     {
-      "avg_current_return": 0.142658,
+      "avg_current_return": 0.148458,
       "bucket": "100-200%",
       "count": 24,
       "target_hit_count": 5,
       "target_hit_rate": 0.208333
     },
     {
-      "avg_current_return": 0.269023,
+      "avg_current_return": 0.267792,
       "bucket": "200%+",
       "count": 13,
       "target_hit_count": 2,
