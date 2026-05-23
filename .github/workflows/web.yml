@@ -63,7 +63,7 @@ jobs:
 
       - name: Set up uv
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.refresh_artifacts == 'true'
-        uses: astral-sh/setup-uv@v8
+        uses: astral-sh/setup-uv@v8.1.0
 
       - name: Install Python dependencies
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.refresh_artifacts == 'true'

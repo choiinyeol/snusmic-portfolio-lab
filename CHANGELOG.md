@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.29.2 - CI action pin
+
+- Pins `astral-sh/setup-uv` to `v8.1.0` because the v8 major alias is not published.
+- Keeps the PIT account cleanup release changes intact while unblocking GitHub Actions job setup.
+
+Verification:
+
+- `uv run pre-commit run --all-files --show-diff-on-failure`
+- GitHub workflow YAML parse check
+
 ## v0.29.1 - PIT account cleanup
 
 - Removed strategy-search surfaces from the current product path.
