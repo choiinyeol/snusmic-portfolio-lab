@@ -18,145 +18,145 @@
       {
         "threshold": 0.6,
         "horizonDays": 30,
-        "hitRate": 0.167513,
+        "hitRate": 0.15736,
         "sampleSize": 197,
-        "hitCount": 33,
+        "hitCount": 31,
         "medianDaysToHit": 15,
         "ci95": [
-          0.121836,
-          0.225909
+          0.113128,
+          0.2147
         ]
       },
       {
         "threshold": 0.6,
         "horizonDays": 60,
-        "hitRate": 0.304569,
+        "hitRate": 0.294416,
         "sampleSize": 197,
-        "hitCount": 60,
-        "medianDaysToHit": 23,
+        "hitCount": 58,
+        "medianDaysToHit": 24.5,
         "ci95": [
-          0.244547,
-          0.372066
+          0.235191,
+          0.361506
         ]
       },
       {
         "threshold": 0.6,
         "horizonDays": 120,
-        "hitRate": 0.416244,
+        "hitRate": 0.406091,
         "sampleSize": 197,
-        "hitCount": 82,
-        "medianDaysToHit": 36.5,
+        "hitCount": 80,
+        "medianDaysToHit": 38,
         "ci95": [
-          0.349653,
-          0.486039
+          0.339943,
+          0.475832
         ]
       },
       {
         "threshold": 0.6,
         "horizonDays": 250,
-        "hitRate": 0.48731,
+        "hitRate": 0.477157,
         "sampleSize": 197,
-        "hitCount": 96,
-        "medianDaysToHit": 43.5,
+        "hitCount": 94,
+        "medianDaysToHit": 46,
         "ci95": [
-          0.418423,
-          0.556682
+          0.408514,
+          0.546675
         ]
       },
       {
         "threshold": 0.8,
         "horizonDays": 30,
-        "hitRate": 0.096447,
+        "hitRate": 0.091371,
         "sampleSize": 197,
-        "hitCount": 19,
+        "hitCount": 18,
         "medianDaysToHit": 17,
         "ci95": [
-          0.062615,
-          0.145716
+          0.058578,
+          0.139796
         ]
       },
       {
         "threshold": 0.8,
         "horizonDays": 60,
-        "hitRate": 0.203046,
+        "hitRate": 0.19797,
         "sampleSize": 197,
-        "hitCount": 40,
-        "medianDaysToHit": 32.5,
+        "hitCount": 39,
+        "medianDaysToHit": 33,
         "ci95": [
-          0.152802,
-          0.264649
+          0.148335,
+          0.259158
         ]
       },
       {
         "threshold": 0.8,
         "horizonDays": 120,
-        "hitRate": 0.329949,
+        "hitRate": 0.319797,
         "sampleSize": 197,
-        "hitCount": 65,
+        "hitCount": 63,
         "medianDaysToHit": 43,
         "ci95": [
-          0.268092,
-          0.398312
+          0.258648,
+          0.38784
         ]
       },
       {
         "threshold": 0.8,
         "horizonDays": 250,
-        "hitRate": 0.395939,
+        "hitRate": 0.385787,
         "sampleSize": 197,
-        "hitCount": 78,
+        "hitCount": 76,
         "medianDaysToHit": 56.5,
         "ci95": [
-          0.330263,
-          0.465596
+          0.320613,
+          0.45533
         ]
       },
       {
         "threshold": 1,
         "horizonDays": 30,
-        "hitRate": 0.055838,
+        "hitRate": 0.050761,
         "sampleSize": 197,
-        "hitCount": 11,
-        "medianDaysToHit": 19,
+        "hitCount": 10,
+        "medianDaysToHit": 20,
         "ci95": [
-          0.031461,
-          0.097205
+          0.027803,
+          0.090906
         ]
       },
       {
         "threshold": 1,
         "horizonDays": 60,
-        "hitRate": 0.121827,
+        "hitRate": 0.116751,
         "sampleSize": 197,
-        "hitCount": 24,
-        "medianDaysToHit": 32.5,
+        "hitCount": 23,
+        "medianDaysToHit": 34,
         "ci95": [
-          0.083249,
-          0.174872
+          0.079069,
+          0.169095
         ]
       },
       {
         "threshold": 1,
         "horizonDays": 120,
-        "hitRate": 0.263959,
+        "hitRate": 0.253807,
         "sampleSize": 197,
-        "hitCount": 52,
+        "hitCount": 50,
         "medianDaysToHit": 64.5,
         "ci95": [
-          0.207347,
-          0.329602
+          0.198145,
+          0.318888
         ]
       },
       {
         "threshold": 1,
         "horizonDays": 250,
-        "hitRate": 0.345178,
+        "hitRate": 0.335025,
         "sampleSize": 197,
-        "hitCount": 68,
-        "medianDaysToHit": 78,
+        "hitCount": 66,
+        "medianDaysToHit": 80.5,
         "ci95": [
-          0.28232,
-          0.413958
+          0.272826,
+          0.403536
         ]
       }
     ],
@@ -170,7 +170,7 @@
         "p25Return": -0.084,
         "p75Return": 0.127953,
         "winRate": 0.538071,
-        "hitRate08": 0.096447,
+        "hitRate08": 0.091371,
         "medianDrawdown": -0.090722
       },
       {
@@ -182,7 +182,7 @@
         "p25Return": -0.113146,
         "p75Return": 0.164567,
         "winRate": 0.538071,
-        "hitRate08": 0.218274,
+        "hitRate08": 0.213198,
         "medianDrawdown": -0.122137
       },
       {
@@ -194,7 +194,7 @@
         "p25Return": -0.169312,
         "p75Return": 0.226804,
         "winRate": 0.482234,
-        "hitRate08": 0.329949,
+        "hitRate08": 0.319797,
         "medianDrawdown": -0.16917
       },
       {
@@ -206,7 +206,7 @@
         "p25Return": -0.295652,
         "p75Return": 0.266044,
         "winRate": 0.436548,
-        "hitRate08": 0.406091,
+        "hitRate08": 0.395939,
         "medianDrawdown": -0.237946
       },
       {
@@ -218,7 +218,7 @@
         "p25Return": -0.087459,
         "p75Return": 0.127711,
         "winRate": 0.517766,
-        "hitRate08": 0.091371,
+        "hitRate08": 0.086294,
         "medianDrawdown": -0.099281
       },
       {
@@ -230,7 +230,7 @@
         "p25Return": -0.111574,
         "p75Return": 0.158701,
         "winRate": 0.527919,
-        "hitRate08": 0.213198,
+        "hitRate08": 0.208122,
         "medianDrawdown": -0.130952
       },
       {
@@ -242,7 +242,7 @@
         "p25Return": -0.17801,
         "p75Return": 0.211712,
         "winRate": 0.492386,
-        "hitRate08": 0.324873,
+        "hitRate08": 0.314721,
         "medianDrawdown": -0.173913
       },
       {
@@ -254,7 +254,7 @@
         "p25Return": -0.310541,
         "p75Return": 0.271446,
         "winRate": 0.441624,
-        "hitRate08": 0.401015,
+        "hitRate08": 0.390863,
         "medianDrawdown": -0.242857
       },
       {
@@ -266,7 +266,7 @@
         "p25Return": -0.104478,
         "p75Return": 0.10084,
         "winRate": 0.472081,
-        "hitRate08": 0.096447,
+        "hitRate08": 0.091371,
         "medianDrawdown": -0.095238
       },
       {
@@ -278,7 +278,7 @@
         "p25Return": -0.128984,
         "p75Return": 0.161818,
         "winRate": 0.517766,
-        "hitRate08": 0.203046,
+        "hitRate08": 0.19797,
         "medianDrawdown": -0.123748
       },
       {
@@ -290,7 +290,7 @@
         "p25Return": -0.184028,
         "p75Return": 0.220149,
         "winRate": 0.472081,
-        "hitRate08": 0.314721,
+        "hitRate08": 0.304569,
         "medianDrawdown": -0.173524
       },
       {
@@ -302,7 +302,7 @@
         "p25Return": -0.290446,
         "p75Return": 0.283582,
         "winRate": 0.431472,
-        "hitRate08": 0.390863,
+        "hitRate08": 0.380711,
         "medianDrawdown": -0.244824
       },
       {
@@ -314,7 +314,7 @@
         "p25Return": -0.099708,
         "p75Return": 0.112903,
         "winRate": 0.472081,
-        "hitRate08": 0.106599,
+        "hitRate08": 0.101523,
         "medianDrawdown": -0.094787
       },
       {
@@ -326,7 +326,7 @@
         "p25Return": -0.128631,
         "p75Return": 0.173333,
         "winRate": 0.517766,
-        "hitRate08": 0.19797,
+        "hitRate08": 0.192893,
         "medianDrawdown": -0.130014
       },
       {
@@ -338,7 +338,7 @@
         "p25Return": -0.200743,
         "p75Return": 0.228155,
         "winRate": 0.502538,
-        "hitRate08": 0.314721,
+        "hitRate08": 0.304569,
         "medianDrawdown": -0.175
       },
       {
@@ -350,7 +350,7 @@
         "p25Return": -0.319244,
         "p75Return": 0.294785,
         "winRate": 0.451777,
-        "hitRate08": 0.390863,
+        "hitRate08": 0.380711,
         "medianDrawdown": -0.250407
       },
       {
@@ -362,7 +362,7 @@
         "p25Return": -0.089583,
         "p75Return": 0.106,
         "winRate": 0.472081,
-        "hitRate08": 0.126904,
+        "hitRate08": 0.121827,
         "medianDrawdown": -0.095665
       },
       {
@@ -374,7 +374,7 @@
         "p25Return": -0.124874,
         "p75Return": 0.142212,
         "winRate": 0.477157,
-        "hitRate08": 0.218274,
+        "hitRate08": 0.208122,
         "medianDrawdown": -0.144262
       },
       {
@@ -386,7 +386,7 @@
         "p25Return": -0.183585,
         "p75Return": 0.258687,
         "winRate": 0.467005,
-        "hitRate08": 0.314721,
+        "hitRate08": 0.304569,
         "medianDrawdown": -0.185897
       },
       {
@@ -398,7 +398,7 @@
         "p25Return": -0.33439,
         "p75Return": 0.313253,
         "winRate": 0.416244,
-        "hitRate08": 0.390863,
+        "hitRate08": 0.380711,
         "medianDrawdown": -0.25439
       },
       {
@@ -410,7 +410,7 @@
         "p25Return": -0.077189,
         "p75Return": 0.10403,
         "winRate": 0.543147,
-        "hitRate08": 0.142132,
+        "hitRate08": 0.137056,
         "medianDrawdown": -0.088584
       },
       {
@@ -422,7 +422,7 @@
         "p25Return": -0.095827,
         "p75Return": 0.178571,
         "winRate": 0.517766,
-        "hitRate08": 0.243655,
+        "hitRate08": 0.233503,
         "medianDrawdown": -0.125371
       },
       {
@@ -434,7 +434,7 @@
         "p25Return": -0.196596,
         "p75Return": 0.253247,
         "winRate": 0.48731,
-        "hitRate08": 0.314721,
+        "hitRate08": 0.304569,
         "medianDrawdown": -0.179104
       },
       {
@@ -446,7 +446,7 @@
         "p25Return": -0.303621,
         "p75Return": 0.260563,
         "winRate": 0.436548,
-        "hitRate08": 0.401015,
+        "hitRate08": 0.390863,
         "medianDrawdown": -0.262609
       }
     ],
@@ -455,112 +455,112 @@
         "type": "dip",
         "triggerPct": 0.03,
         "horizonDays": 30,
-        "entryRate": 0.730964,
+        "entryRate": 0.741117,
         "sampleSize": 197,
-        "enteredCount": 144,
-        "medianReturn": 0.01339,
-        "meanReturn": 0.033702,
-        "hitRate08": 0.041667,
+        "enteredCount": 146,
+        "medianReturn": 0.016897,
+        "meanReturn": 0.034851,
+        "hitRate08": 0.041096,
         "medianDrawdown": -0.094062,
-        "missedOpportunityRate": 0.045685,
+        "missedOpportunityRate": 0.040609,
         "falseBreakoutRate": null
       },
       {
         "type": "dip",
         "triggerPct": 0.03,
         "horizonDays": 60,
-        "entryRate": 0.730964,
+        "entryRate": 0.741117,
         "sampleSize": 197,
-        "enteredCount": 144,
+        "enteredCount": 146,
         "medianReturn": 0.032987,
-        "meanReturn": 0.049697,
-        "hitRate08": 0.145833,
+        "meanReturn": 0.048765,
+        "hitRate08": 0.143836,
         "medianDrawdown": -0.121168,
-        "missedOpportunityRate": 0.045685,
+        "missedOpportunityRate": 0.040609,
         "falseBreakoutRate": null
       },
       {
         "type": "dip",
         "triggerPct": 0.03,
         "horizonDays": 120,
-        "entryRate": 0.730964,
+        "entryRate": 0.741117,
         "sampleSize": 197,
-        "enteredCount": 144,
+        "enteredCount": 146,
         "medianReturn": 0.031929,
-        "meanReturn": 0.095172,
-        "hitRate08": 0.270833,
+        "meanReturn": 0.095011,
+        "hitRate08": 0.267123,
         "medianDrawdown": -0.165225,
-        "missedOpportunityRate": 0.045685,
+        "missedOpportunityRate": 0.040609,
         "falseBreakoutRate": null
       },
       {
         "type": "dip",
         "triggerPct": 0.03,
         "horizonDays": 250,
-        "entryRate": 0.730964,
+        "entryRate": 0.741117,
         "sampleSize": 197,
-        "enteredCount": 144,
+        "enteredCount": 146,
         "medianReturn": -0.042214,
-        "meanReturn": 0.153706,
-        "hitRate08": 0.326389,
+        "meanReturn": 0.149769,
+        "hitRate08": 0.321918,
         "medianDrawdown": -0.227958,
-        "missedOpportunityRate": 0.045685,
+        "missedOpportunityRate": 0.040609,
         "falseBreakoutRate": null
       },
       {
         "type": "dip",
         "triggerPct": 0.05,
         "horizonDays": 30,
-        "entryRate": 0.614213,
+        "entryRate": 0.624365,
         "sampleSize": 197,
-        "enteredCount": 121,
-        "medianReturn": 0.00999,
-        "meanReturn": 0.035764,
-        "hitRate08": 0.041322,
+        "enteredCount": 123,
+        "medianReturn": 0.012987,
+        "meanReturn": 0.038732,
+        "hitRate08": 0.04065,
         "medianDrawdown": -0.103448,
-        "missedOpportunityRate": 0.045685,
+        "missedOpportunityRate": 0.040609,
         "falseBreakoutRate": null
       },
       {
         "type": "dip",
         "triggerPct": 0.05,
         "horizonDays": 60,
-        "entryRate": 0.614213,
+        "entryRate": 0.624365,
         "sampleSize": 197,
-        "enteredCount": 121,
+        "enteredCount": 123,
         "medianReturn": 0.013245,
-        "meanReturn": 0.051401,
-        "hitRate08": 0.132231,
+        "meanReturn": 0.050218,
+        "hitRate08": 0.130081,
         "medianDrawdown": -0.126126,
-        "missedOpportunityRate": 0.045685,
+        "missedOpportunityRate": 0.040609,
         "falseBreakoutRate": null
       },
       {
         "type": "dip",
         "triggerPct": 0.05,
         "horizonDays": 120,
-        "entryRate": 0.614213,
+        "entryRate": 0.624365,
         "sampleSize": 197,
-        "enteredCount": 121,
+        "enteredCount": 123,
         "medianReturn": 0.014663,
-        "meanReturn": 0.086285,
-        "hitRate08": 0.239669,
+        "meanReturn": 0.087528,
+        "hitRate08": 0.235772,
         "medianDrawdown": -0.180835,
-        "missedOpportunityRate": 0.045685,
+        "missedOpportunityRate": 0.040609,
         "falseBreakoutRate": null
       },
       {
         "type": "dip",
         "triggerPct": 0.05,
         "horizonDays": 250,
-        "entryRate": 0.614213,
+        "entryRate": 0.624365,
         "sampleSize": 197,
-        "enteredCount": 121,
+        "enteredCount": 123,
         "medianReturn": -0.036735,
-        "meanReturn": 0.132357,
-        "hitRate08": 0.305785,
+        "meanReturn": 0.129017,
+        "hitRate08": 0.300813,
         "medianDrawdown": -0.228102,
-        "missedOpportunityRate": 0.045685,
+        "missedOpportunityRate": 0.040609,
         "falseBreakoutRate": null
       },
       {
@@ -570,11 +570,11 @@
         "entryRate": 0.406091,
         "sampleSize": 197,
         "enteredCount": 80,
-        "medianReturn": -0.006006,
-        "meanReturn": 0.04293,
+        "medianReturn": 0.00658,
+        "meanReturn": 0.04464,
         "hitRate08": 0.0875,
         "medianDrawdown": -0.101222,
-        "missedOpportunityRate": 0.050761,
+        "missedOpportunityRate": 0.045685,
         "falseBreakoutRate": null
       },
       {
@@ -585,10 +585,10 @@
         "sampleSize": 197,
         "enteredCount": 80,
         "medianReturn": 0.00009,
-        "meanReturn": 0.063041,
+        "meanReturn": 0.060795,
         "hitRate08": 0.15,
         "medianDrawdown": -0.14272,
-        "missedOpportunityRate": 0.050761,
+        "missedOpportunityRate": 0.045685,
         "falseBreakoutRate": null
       },
       {
@@ -599,10 +599,10 @@
         "sampleSize": 197,
         "enteredCount": 80,
         "medianReturn": 0.007332,
-        "meanReturn": 0.097198,
+        "meanReturn": 0.094434,
         "hitRate08": 0.25,
         "medianDrawdown": -0.170743,
-        "missedOpportunityRate": 0.050761,
+        "missedOpportunityRate": 0.045685,
         "falseBreakoutRate": null
       },
       {
@@ -612,624 +612,624 @@
         "entryRate": 0.406091,
         "sampleSize": 197,
         "enteredCount": 80,
-        "medianReturn": -0.050697,
-        "meanReturn": 0.113095,
+        "medianReturn": -0.079136,
+        "meanReturn": 0.108766,
         "hitRate08": 0.2875,
         "medianDrawdown": -0.227531,
-        "missedOpportunityRate": 0.050761,
+        "missedOpportunityRate": 0.045685,
         "falseBreakoutRate": null
       },
       {
         "type": "rally",
         "triggerPct": 0.03,
         "horizonDays": 30,
-        "entryRate": 0.746193,
+        "entryRate": 0.751269,
         "sampleSize": 197,
-        "enteredCount": 147,
-        "medianReturn": 0.01947,
-        "meanReturn": 0.049382,
-        "hitRate08": 0.142857,
-        "medianDrawdown": -0.089184,
+        "enteredCount": 148,
+        "medianReturn": 0.019334,
+        "meanReturn": 0.048043,
+        "hitRate08": 0.135135,
+        "medianDrawdown": -0.089981,
         "missedOpportunityRate": null,
-        "falseBreakoutRate": 0.408163
+        "falseBreakoutRate": 0.418919
       },
       {
         "type": "rally",
         "triggerPct": 0.03,
         "horizonDays": 60,
-        "entryRate": 0.746193,
+        "entryRate": 0.751269,
         "sampleSize": 197,
-        "enteredCount": 147,
-        "medianReturn": 0.036036,
-        "meanReturn": 0.062732,
-        "hitRate08": 0.258503,
-        "medianDrawdown": -0.116,
+        "enteredCount": 148,
+        "medianReturn": 0.035639,
+        "meanReturn": 0.061536,
+        "hitRate08": 0.25,
+        "medianDrawdown": -0.117557,
         "missedOpportunityRate": null,
-        "falseBreakoutRate": 0.482993
+        "falseBreakoutRate": 0.493243
       },
       {
         "type": "rally",
         "triggerPct": 0.03,
         "horizonDays": 120,
-        "entryRate": 0.746193,
+        "entryRate": 0.751269,
         "sampleSize": 197,
-        "enteredCount": 147,
-        "medianReturn": -0.006723,
-        "meanReturn": 0.10423,
-        "hitRate08": 0.37415,
-        "medianDrawdown": -0.168269,
+        "enteredCount": 148,
+        "medianReturn": -0.008091,
+        "meanReturn": 0.102317,
+        "hitRate08": 0.358108,
+        "medianDrawdown": -0.168719,
         "missedOpportunityRate": null,
-        "falseBreakoutRate": 0.530612
+        "falseBreakoutRate": 0.540541
       },
       {
         "type": "rally",
         "triggerPct": 0.03,
         "horizonDays": 250,
-        "entryRate": 0.746193,
+        "entryRate": 0.751269,
         "sampleSize": 197,
-        "enteredCount": 147,
-        "medianReturn": -0.071713,
-        "meanReturn": 0.161522,
-        "hitRate08": 0.455782,
-        "medianDrawdown": -0.272198,
+        "enteredCount": 148,
+        "medianReturn": -0.066824,
+        "meanReturn": 0.161059,
+        "hitRate08": 0.439189,
+        "medianDrawdown": -0.272542,
         "missedOpportunityRate": null,
-        "falseBreakoutRate": 0.517007
+        "falseBreakoutRate": 0.527027
       },
       {
         "type": "rally",
         "triggerPct": 0.05,
         "horizonDays": 30,
-        "entryRate": 0.664975,
+        "entryRate": 0.670051,
         "sampleSize": 197,
-        "enteredCount": 131,
-        "medianReturn": 0.024263,
-        "meanReturn": 0.04977,
-        "hitRate08": 0.145038,
-        "medianDrawdown": -0.092409,
+        "enteredCount": 132,
+        "medianReturn": 0.023169,
+        "meanReturn": 0.04795,
+        "hitRate08": 0.136364,
+        "medianDrawdown": -0.09351,
         "missedOpportunityRate": null,
-        "falseBreakoutRate": 0.412214
+        "falseBreakoutRate": 0.424242
       },
       {
         "type": "rally",
         "triggerPct": 0.05,
         "horizonDays": 60,
-        "entryRate": 0.664975,
+        "entryRate": 0.670051,
         "sampleSize": 197,
-        "enteredCount": 131,
-        "medianReturn": 0.022044,
-        "meanReturn": 0.072577,
-        "hitRate08": 0.267176,
-        "medianDrawdown": -0.1202,
+        "enteredCount": 132,
+        "medianReturn": 0.02185,
+        "meanReturn": 0.071062,
+        "hitRate08": 0.257576,
+        "medianDrawdown": -0.121788,
         "missedOpportunityRate": null,
-        "falseBreakoutRate": 0.503817
+        "falseBreakoutRate": 0.515152
       },
       {
         "type": "rally",
         "triggerPct": 0.05,
         "horizonDays": 120,
-        "entryRate": 0.664975,
+        "entryRate": 0.670051,
         "sampleSize": 197,
-        "enteredCount": 131,
-        "medianReturn": -0.0354,
-        "meanReturn": 0.110478,
-        "hitRate08": 0.374046,
-        "medianDrawdown": -0.16917,
+        "enteredCount": 132,
+        "medianReturn": -0.037718,
+        "meanReturn": 0.108,
+        "hitRate08": 0.356061,
+        "medianDrawdown": -0.170317,
         "missedOpportunityRate": null,
-        "falseBreakoutRate": 0.549618
+        "falseBreakoutRate": 0.560606
       },
       {
         "type": "rally",
         "triggerPct": 0.05,
         "horizonDays": 250,
-        "entryRate": 0.664975,
+        "entryRate": 0.670051,
         "sampleSize": 197,
-        "enteredCount": 131,
-        "medianReturn": -0.098718,
-        "meanReturn": 0.163244,
-        "hitRate08": 0.450382,
-        "medianDrawdown": -0.269729,
+        "enteredCount": 132,
+        "medianReturn": -0.086601,
+        "meanReturn": 0.162503,
+        "hitRate08": 0.431818,
+        "medianDrawdown": -0.271308,
         "missedOpportunityRate": null,
-        "falseBreakoutRate": 0.526718
+        "falseBreakoutRate": 0.537879
       },
       {
         "type": "rally",
         "triggerPct": 0.1,
         "horizonDays": 30,
-        "entryRate": 0.522843,
+        "entryRate": 0.517766,
         "sampleSize": 197,
-        "enteredCount": 103,
-        "medianReturn": -0.004016,
-        "meanReturn": 0.047521,
-        "hitRate08": 0.203883,
-        "medianDrawdown": -0.098101,
+        "enteredCount": 102,
+        "medianReturn": -0.00033,
+        "meanReturn": 0.048743,
+        "hitRate08": 0.196078,
+        "medianDrawdown": -0.097331,
         "missedOpportunityRate": null,
-        "falseBreakoutRate": 0.417476
+        "falseBreakoutRate": 0.421569
       },
       {
         "type": "rally",
         "triggerPct": 0.1,
         "horizonDays": 60,
-        "entryRate": 0.522843,
+        "entryRate": 0.517766,
         "sampleSize": 197,
-        "enteredCount": 103,
-        "medianReturn": -0.001071,
-        "meanReturn": 0.058235,
-        "hitRate08": 0.330097,
-        "medianDrawdown": -0.134132,
+        "enteredCount": 102,
+        "medianReturn": -0.000098,
+        "meanReturn": 0.063956,
+        "hitRate08": 0.323529,
+        "medianDrawdown": -0.132936,
         "missedOpportunityRate": null,
-        "falseBreakoutRate": 0.514563
+        "falseBreakoutRate": 0.519608
       },
       {
         "type": "rally",
         "triggerPct": 0.1,
         "horizonDays": 120,
-        "entryRate": 0.522843,
+        "entryRate": 0.517766,
         "sampleSize": 197,
-        "enteredCount": 103,
-        "medianReturn": -0.047601,
-        "meanReturn": 0.105894,
-        "hitRate08": 0.427184,
-        "medianDrawdown": -0.187735,
+        "enteredCount": 102,
+        "medianReturn": -0.041735,
+        "meanReturn": 0.111847,
+        "hitRate08": 0.411765,
+        "medianDrawdown": -0.187705,
         "missedOpportunityRate": null,
-        "falseBreakoutRate": 0.533981
+        "falseBreakoutRate": 0.539216
       },
       {
         "type": "rally",
         "triggerPct": 0.1,
         "horizonDays": 250,
-        "entryRate": 0.522843,
+        "entryRate": 0.517766,
         "sampleSize": 197,
-        "enteredCount": 103,
-        "medianReturn": -0.121633,
-        "meanReturn": 0.152581,
-        "hitRate08": 0.504854,
-        "medianDrawdown": -0.282714,
+        "enteredCount": 102,
+        "medianReturn": -0.125692,
+        "meanReturn": 0.15659,
+        "hitRate08": 0.490196,
+        "medianDrawdown": -0.284826,
         "missedOpportunityRate": null,
-        "falseBreakoutRate": 0.485437
+        "falseBreakoutRate": 0.5
       }
     ],
     "postTargetDrift": [
       {
         "daysAfterTarget": 5,
-        "sampleSize": 104,
-        "medianReturn": -0.008085,
-        "meanReturn": -0.007615,
-        "p25Return": -0.054798,
-        "p75Return": 0.03434,
-        "p10Return": -0.12929,
-        "p90Return": 0.081019,
-        "sharePositive": 0.471154
+        "sampleSize": 103,
+        "medianReturn": -0.008929,
+        "meanReturn": -0.007214,
+        "p25Return": -0.053989,
+        "p75Return": 0.033516,
+        "p10Return": -0.126106,
+        "p90Return": 0.081468,
+        "sharePositive": 0.466019
       },
       {
         "daysAfterTarget": 20,
-        "sampleSize": 101,
-        "medianReturn": 0.0158,
-        "meanReturn": 0.024524,
-        "p25Return": -0.1,
-        "p75Return": 0.11746,
-        "p10Return": -0.235641,
-        "p90Return": 0.287358,
-        "sharePositive": 0.524752
+        "sampleSize": 100,
+        "medianReturn": 0.022795,
+        "meanReturn": 0.028622,
+        "p25Return": -0.098735,
+        "p75Return": 0.118126,
+        "p10Return": -0.237554,
+        "p90Return": 0.288066,
+        "sharePositive": 0.54
       },
       {
         "daysAfterTarget": 60,
-        "sampleSize": 94,
-        "medianReturn": 0.037025,
-        "meanReturn": 0.104574,
-        "p25Return": -0.158379,
-        "p75Return": 0.22598,
-        "p10Return": -0.304131,
-        "p90Return": 0.601336,
-        "sharePositive": 0.531915
+        "sampleSize": 93,
+        "medianReturn": 0.050813,
+        "meanReturn": 0.111554,
+        "p25Return": -0.149711,
+        "p75Return": 0.230483,
+        "p10Return": -0.305575,
+        "p90Return": 0.613571,
+        "sharePositive": 0.548387
       },
       {
         "daysAfterTarget": 120,
-        "sampleSize": 77,
-        "medianReturn": 0.026903,
-        "meanReturn": 0.114634,
-        "p25Return": -0.210608,
-        "p75Return": 0.266582,
-        "p10Return": -0.395577,
-        "p90Return": 0.567019,
-        "sharePositive": 0.545455
+        "sampleSize": 76,
+        "medianReturn": 0.040025,
+        "meanReturn": 0.129227,
+        "p25Return": -0.205594,
+        "p75Return": 0.266947,
+        "p10Return": -0.381629,
+        "p90Return": 0.567561,
+        "sharePositive": 0.565789
       }
     ],
     "optimalTargetMultiples": [
       {
         "targetMultiple": 0.4,
         "horizonDays": 30,
-        "hitRate": 0.294416,
-        "sampleSize": 197,
-        "medianReturn": 0.03594,
-        "meanReturn": 3.945083,
-        "p25Return": -0.078505,
-        "downsideRisk": 0.078505,
-        "rewardReliabilityScore": 0.082342
-      },
-      {
-        "targetMultiple": 0.4,
-        "horizonDays": 60,
-        "hitRate": 0.395939,
-        "sampleSize": 197,
-        "medianReturn": 0.062229,
-        "meanReturn": 3.945962,
-        "p25Return": -0.116784,
-        "downsideRisk": 0.116784,
-        "rewardReliabilityScore": 0.147729
-      },
-      {
-        "targetMultiple": 0.4,
-        "horizonDays": 120,
-        "hitRate": 0.522843,
-        "sampleSize": 197,
-        "medianReturn": 0.111965,
-        "meanReturn": 3.962098,
-        "p25Return": -0.120064,
-        "downsideRisk": 0.120064,
-        "rewardReliabilityScore": 0.344224
-      },
-      {
-        "targetMultiple": 0.4,
-        "horizonDays": 250,
-        "hitRate": 0.619289,
-        "sampleSize": 197,
-        "medianReturn": 0.140865,
-        "meanReturn": 3.964135,
-        "p25Return": -0.190558,
-        "downsideRisk": 0.190558,
-        "rewardReliabilityScore": 0.362641
-      },
-      {
-        "targetMultiple": 0.5,
-        "horizonDays": 30,
-        "hitRate": 0.233503,
-        "sampleSize": 197,
-        "medianReturn": 0.026063,
-        "meanReturn": 4.934595,
-        "p25Return": -0.089655,
-        "downsideRisk": 0.089655,
-        "rewardReliabilityScore": 0.043577
-      },
-      {
-        "targetMultiple": 0.5,
-        "horizonDays": 60,
-        "hitRate": 0.345178,
-        "sampleSize": 197,
-        "medianReturn": 0.056075,
-        "meanReturn": 4.939216,
-        "p25Return": -0.11859,
-        "downsideRisk": 0.11859,
-        "rewardReliabilityScore": 0.11481
-      },
-      {
-        "targetMultiple": 0.5,
-        "horizonDays": 120,
-        "hitRate": 0.467005,
-        "sampleSize": 197,
-        "medianReturn": 0.105085,
-        "meanReturn": 4.954766,
-        "p25Return": -0.165357,
-        "downsideRisk": 0.165357,
-        "rewardReliabilityScore": 0.227878
-      },
-      {
-        "targetMultiple": 0.5,
-        "horizonDays": 250,
-        "hitRate": 0.548223,
-        "sampleSize": 197,
-        "medianReturn": 0.141921,
-        "meanReturn": 4.958422,
-        "p25Return": -0.206337,
-        "downsideRisk": 0.206337,
-        "rewardReliabilityScore": 0.303524
-      },
-      {
-        "targetMultiple": 0.6,
-        "horizonDays": 30,
-        "hitRate": 0.167513,
-        "sampleSize": 197,
-        "medianReturn": 0.02069,
-        "meanReturn": 5.918574,
-        "p25Return": -0.089655,
-        "downsideRisk": 0.089655,
-        "rewardReliabilityScore": 0.024817
-      },
-      {
-        "targetMultiple": 0.6,
-        "horizonDays": 60,
-        "hitRate": 0.304569,
-        "sampleSize": 197,
-        "medianReturn": 0.049538,
-        "meanReturn": 5.931185,
-        "p25Return": -0.11859,
-        "downsideRisk": 0.11859,
-        "rewardReliabilityScore": 0.089494
-      },
-      {
-        "targetMultiple": 0.6,
-        "horizonDays": 120,
-        "hitRate": 0.416244,
-        "sampleSize": 197,
-        "medianReturn": 0.09393,
-        "meanReturn": 5.948283,
-        "p25Return": -0.165517,
-        "downsideRisk": 0.165517,
-        "rewardReliabilityScore": 0.181414
-      },
-      {
-        "targetMultiple": 0.6,
-        "horizonDays": 250,
-        "hitRate": 0.48731,
-        "sampleSize": 197,
-        "medianReturn": 0.139571,
-        "meanReturn": 5.934641,
-        "p25Return": -0.240349,
-        "downsideRisk": 0.240349,
-        "rewardReliabilityScore": 0.23425
-      },
-      {
-        "targetMultiple": 0.7,
-        "horizonDays": 30,
-        "hitRate": 0.096447,
-        "sampleSize": 197,
-        "medianReturn": 0.019319,
-        "meanReturn": 5.970705,
-        "p25Return": -0.089655,
-        "downsideRisk": 0.089655,
-        "rewardReliabilityScore": 0.013342
-      },
-      {
-        "targetMultiple": 0.7,
-        "horizonDays": 60,
-        "hitRate": 0.253807,
-        "sampleSize": 197,
-        "medianReturn": 0.043478,
-        "meanReturn": 6.916512,
-        "p25Return": -0.121127,
-        "downsideRisk": 0.121127,
-        "rewardReliabilityScore": 0.064484
-      },
-      {
-        "targetMultiple": 0.7,
-        "horizonDays": 120,
-        "hitRate": 0.370558,
-        "sampleSize": 197,
-        "medianReturn": 0.068327,
-        "meanReturn": 6.936318,
-        "p25Return": -0.166372,
-        "downsideRisk": 0.166372,
-        "rewardReliabilityScore": 0.117017
-      },
-      {
-        "targetMultiple": 0.7,
-        "horizonDays": 250,
-        "hitRate": 0.446701,
-        "sampleSize": 197,
-        "medianReturn": 0.11556,
-        "meanReturn": 6.926184,
-        "p25Return": -0.2465,
-        "downsideRisk": 0.2465,
-        "rewardReliabilityScore": 0.1741
-      },
-      {
-        "targetMultiple": 0.8,
-        "horizonDays": 30,
-        "hitRate": 0.096447,
-        "sampleSize": 197,
-        "medianReturn": 0.019319,
-        "meanReturn": 5.974743,
-        "p25Return": -0.089655,
-        "downsideRisk": 0.089655,
-        "rewardReliabilityScore": 0.013342
-      },
-      {
-        "targetMultiple": 0.8,
-        "horizonDays": 60,
-        "hitRate": 0.203046,
-        "sampleSize": 197,
-        "medianReturn": 0.026977,
-        "meanReturn": 5.914095,
-        "p25Return": -0.121127,
-        "downsideRisk": 0.121127,
-        "rewardReliabilityScore": 0.032009
-      },
-      {
-        "targetMultiple": 0.8,
-        "horizonDays": 120,
-        "hitRate": 0.329949,
-        "sampleSize": 197,
-        "medianReturn": 0.040629,
-        "meanReturn": 7.915425,
-        "p25Return": -0.182741,
-        "downsideRisk": 0.182741,
-        "rewardReliabilityScore": 0.057598
-      },
-      {
-        "targetMultiple": 0.8,
-        "horizonDays": 250,
-        "hitRate": 0.395939,
-        "sampleSize": 197,
-        "medianReturn": 0.075567,
-        "meanReturn": 7.909978,
-        "p25Return": -0.24948,
-        "downsideRisk": 0.24948,
-        "rewardReliabilityScore": 0.099906
-      },
-      {
-        "targetMultiple": 0.9,
-        "horizonDays": 30,
-        "hitRate": 0.081218,
-        "sampleSize": 197,
-        "medianReturn": 0.013953,
-        "meanReturn": 5.97687,
-        "p25Return": -0.089655,
-        "downsideRisk": 0.089655,
-        "rewardReliabilityScore": 0.008115
-      },
-      {
-        "targetMultiple": 0.9,
-        "horizonDays": 60,
-        "hitRate": 0.167513,
-        "sampleSize": 197,
-        "medianReturn": 0.016544,
-        "meanReturn": 5.912078,
-        "p25Return": -0.127503,
-        "downsideRisk": 0.127503,
-        "rewardReliabilityScore": 0.015613
-      },
-      {
-        "targetMultiple": 0.9,
-        "horizonDays": 120,
-        "hitRate": 0.294416,
-        "sampleSize": 197,
-        "medianReturn": 0.031567,
-        "meanReturn": 8.907215,
-        "p25Return": -0.190558,
-        "downsideRisk": 0.190558,
-        "rewardReliabilityScore": 0.038634
-      },
-      {
-        "targetMultiple": 0.9,
-        "horizonDays": 250,
-        "hitRate": 0.370558,
-        "sampleSize": 197,
-        "medianReturn": 0.006383,
-        "meanReturn": 8.900142,
-        "p25Return": -0.2623,
-        "downsideRisk": 0.2623,
-        "rewardReliabilityScore": 0.007574
-      },
-      {
-        "targetMultiple": 1,
-        "horizonDays": 30,
-        "hitRate": 0.055838,
-        "sampleSize": 197,
-        "medianReturn": 0.013953,
-        "meanReturn": 5.975121,
-        "p25Return": -0.089655,
-        "downsideRisk": 0.089655,
-        "rewardReliabilityScore": 0.005579
-      },
-      {
-        "targetMultiple": 1,
-        "horizonDays": 60,
-        "hitRate": 0.121827,
-        "sampleSize": 197,
-        "medianReturn": 0.004386,
-        "meanReturn": 5.907374,
-        "p25Return": -0.127503,
-        "downsideRisk": 0.127503,
-        "rewardReliabilityScore": 0.00301
-      },
-      {
-        "targetMultiple": 1,
-        "horizonDays": 120,
-        "hitRate": 0.263959,
-        "sampleSize": 197,
-        "medianReturn": 0.028169,
-        "meanReturn": 9.891365,
-        "p25Return": -0.198592,
-        "downsideRisk": 0.198592,
-        "rewardReliabilityScore": 0.02991
-      },
-      {
-        "targetMultiple": 1,
-        "horizonDays": 250,
-        "hitRate": 0.345178,
-        "sampleSize": 197,
-        "medianReturn": -0.002292,
-        "meanReturn": 9.887205,
-        "p25Return": -0.303906,
-        "downsideRisk": 0.303906,
-        "rewardReliabilityScore": -0.002235
-      },
-      {
-        "targetMultiple": 1.1,
-        "horizonDays": 30,
-        "hitRate": 0.045685,
-        "sampleSize": 197,
-        "medianReturn": 0.013953,
-        "meanReturn": 5.975383,
-        "p25Return": -0.089655,
-        "downsideRisk": 0.089655,
-        "rewardReliabilityScore": 0.004564
-      },
-      {
-        "targetMultiple": 1.1,
-        "horizonDays": 60,
-        "hitRate": 0.111675,
-        "sampleSize": 197,
-        "medianReturn": 0.004386,
-        "meanReturn": 5.908875,
-        "p25Return": -0.127503,
-        "downsideRisk": 0.127503,
-        "rewardReliabilityScore": 0.002759
-      },
-      {
-        "targetMultiple": 1.1,
-        "horizonDays": 120,
-        "hitRate": 0.228426,
-        "sampleSize": 197,
-        "medianReturn": 0.01996,
-        "meanReturn": 10.871919,
-        "p25Return": -0.198592,
-        "downsideRisk": 0.198592,
-        "rewardReliabilityScore": 0.018341
-      },
-      {
-        "targetMultiple": 1.1,
-        "horizonDays": 250,
-        "hitRate": 0.304569,
-        "sampleSize": 197,
-        "medianReturn": -0.043709,
-        "meanReturn": 10.855997,
-        "p25Return": -0.304225,
-        "downsideRisk": 0.304225,
-        "rewardReliabilityScore": -0.037582
-      },
-      {
-        "targetMultiple": 1.2,
-        "horizonDays": 30,
-        "hitRate": 0.045685,
-        "sampleSize": 197,
-        "medianReturn": 0.013953,
-        "meanReturn": 5.977297,
-        "p25Return": -0.089655,
-        "downsideRisk": 0.089655,
-        "rewardReliabilityScore": 0.004564
-      },
-      {
-        "targetMultiple": 1.2,
-        "horizonDays": 60,
-        "hitRate": 0.101523,
-        "sampleSize": 197,
-        "medianReturn": 0.004386,
-        "meanReturn": 5.911068,
-        "p25Return": -0.127503,
-        "downsideRisk": 0.127503,
-        "rewardReliabilityScore": 0.002509
-      },
-      {
-        "targetMultiple": 1.2,
-        "horizonDays": 120,
-        "hitRate": 0.192893,
-        "sampleSize": 197,
-        "medianReturn": 0.009029,
-        "meanReturn": 7.648699,
-        "p25Return": -0.198592,
-        "downsideRisk": 0.198592,
-        "rewardReliabilityScore": 0.007006
-      },
-      {
-        "targetMultiple": 1.2,
-        "horizonDays": 250,
         "hitRate": 0.284264,
         "sampleSize": 197,
+        "medianReturn": 0.027426,
+        "meanReturn": 0.01569,
+        "p25Return": -0.081928,
+        "downsideRisk": 0.081928,
+        "rewardReliabilityScore": 0.059095
+      },
+      {
+        "targetMultiple": 0.4,
+        "horizonDays": 60,
+        "hitRate": 0.385787,
+        "sampleSize": 197,
+        "medianReturn": 0.061457,
+        "meanReturn": 0.016694,
+        "p25Return": -0.116784,
+        "downsideRisk": 0.116784,
+        "rewardReliabilityScore": 0.142156
+      },
+      {
+        "targetMultiple": 0.4,
+        "horizonDays": 120,
+        "hitRate": 0.51269,
+        "sampleSize": 197,
+        "medianReturn": 0.106667,
+        "meanReturn": 0.033246,
+        "p25Return": -0.120064,
+        "downsideRisk": 0.120064,
+        "rewardReliabilityScore": 0.321568
+      },
+      {
+        "targetMultiple": 0.4,
+        "horizonDays": 250,
+        "hitRate": 0.609137,
+        "sampleSize": 197,
+        "medianReturn": 0.135841,
+        "meanReturn": 0.03237,
+        "p25Return": -0.190558,
+        "downsideRisk": 0.190558,
+        "rewardReliabilityScore": 0.343974
+      },
+      {
+        "targetMultiple": 0.5,
+        "horizonDays": 30,
+        "hitRate": 0.22335,
+        "sampleSize": 197,
+        "medianReturn": 0.023214,
+        "meanReturn": 0.021909,
+        "p25Return": -0.098376,
+        "downsideRisk": 0.098376,
+        "rewardReliabilityScore": 0.034944
+      },
+      {
+        "targetMultiple": 0.5,
+        "horizonDays": 60,
+        "hitRate": 0.335025,
+        "sampleSize": 197,
+        "medianReturn": 0.049538,
+        "meanReturn": 0.026655,
+        "p25Return": -0.11859,
+        "downsideRisk": 0.11859,
+        "rewardReliabilityScore": 0.098443
+      },
+      {
+        "targetMultiple": 0.5,
+        "horizonDays": 120,
+        "hitRate": 0.456853,
+        "sampleSize": 197,
+        "medianReturn": 0.1,
+        "meanReturn": 0.042621,
+        "p25Return": -0.165357,
+        "downsideRisk": 0.165357,
+        "rewardReliabilityScore": 0.212138
+      },
+      {
+        "targetMultiple": 0.5,
+        "horizonDays": 250,
+        "hitRate": 0.538071,
+        "sampleSize": 197,
+        "medianReturn": 0.133333,
+        "meanReturn": 0.043363,
+        "p25Return": -0.206337,
+        "downsideRisk": 0.206337,
+        "rewardReliabilityScore": 0.279876
+      },
+      {
+        "targetMultiple": 0.6,
+        "horizonDays": 30,
+        "hitRate": 0.15736,
+        "sampleSize": 197,
+        "medianReturn": 0.019319,
+        "meanReturn": 0.022595,
+        "p25Return": -0.098376,
+        "downsideRisk": 0.098376,
+        "rewardReliabilityScore": 0.020489
+      },
+      {
+        "targetMultiple": 0.6,
+        "horizonDays": 60,
+        "hitRate": 0.294416,
+        "sampleSize": 197,
+        "medianReturn": 0.049407,
+        "meanReturn": 0.035331,
+        "p25Return": -0.11859,
+        "downsideRisk": 0.11859,
+        "rewardReliabilityScore": 0.086282
+      },
+      {
+        "targetMultiple": 0.6,
+        "horizonDays": 120,
+        "hitRate": 0.406091,
+        "sampleSize": 197,
+        "medianReturn": 0.09296,
+        "meanReturn": 0.052844,
+        "p25Return": -0.165517,
+        "downsideRisk": 0.165517,
+        "rewardReliabilityScore": 0.175161
+      },
+      {
+        "targetMultiple": 0.6,
+        "horizonDays": 250,
+        "hitRate": 0.477157,
+        "sampleSize": 197,
+        "medianReturn": 0.138797,
+        "meanReturn": 0.036289,
+        "p25Return": -0.240349,
+        "downsideRisk": 0.240349,
+        "rewardReliabilityScore": 0.228098
+      },
+      {
+        "targetMultiple": 0.7,
+        "horizonDays": 30,
+        "hitRate": 0.091371,
+        "sampleSize": 197,
+        "medianReturn": 0.012105,
+        "meanReturn": 0.018293,
+        "p25Return": -0.098376,
+        "downsideRisk": 0.098376,
+        "rewardReliabilityScore": 0.007454
+      },
+      {
+        "targetMultiple": 0.7,
+        "horizonDays": 60,
+        "hitRate": 0.243655,
+        "sampleSize": 197,
+        "medianReturn": 0.033183,
+        "meanReturn": 0.037364,
+        "p25Return": -0.121127,
+        "downsideRisk": 0.121127,
+        "rewardReliabilityScore": 0.047247
+      },
+      {
+        "targetMultiple": 0.7,
+        "horizonDays": 120,
+        "hitRate": 0.360406,
+        "sampleSize": 197,
+        "medianReturn": 0.068091,
+        "meanReturn": 0.057587,
+        "p25Return": -0.166372,
+        "downsideRisk": 0.166372,
+        "rewardReliabilityScore": 0.113418
+      },
+      {
+        "targetMultiple": 0.7,
+        "horizonDays": 250,
+        "hitRate": 0.436548,
+        "sampleSize": 197,
+        "medianReturn": 0.107389,
+        "meanReturn": 0.044539,
+        "p25Return": -0.2465,
+        "downsideRisk": 0.2465,
+        "rewardReliabilityScore": 0.158113
+      },
+      {
+        "targetMultiple": 0.8,
+        "horizonDays": 30,
+        "hitRate": 0.091371,
+        "sampleSize": 197,
+        "medianReturn": 0.012105,
+        "meanReturn": 0.022033,
+        "p25Return": -0.098376,
+        "downsideRisk": 0.098376,
+        "rewardReliabilityScore": 0.007454
+      },
+      {
+        "targetMultiple": 0.8,
+        "horizonDays": 60,
+        "hitRate": 0.19797,
+        "sampleSize": 197,
+        "medianReturn": 0.018722,
+        "meanReturn": 0.040824,
+        "p25Return": -0.121127,
+        "downsideRisk": 0.121127,
+        "rewardReliabilityScore": 0.021659
+      },
+      {
+        "targetMultiple": 0.8,
+        "horizonDays": 120,
+        "hitRate": 0.319797,
+        "sampleSize": 197,
+        "medianReturn": 0.0391,
+        "meanReturn": 0.0534,
+        "p25Return": -0.182741,
+        "downsideRisk": 0.182741,
+        "rewardReliabilityScore": 0.053725
+      },
+      {
+        "targetMultiple": 0.8,
+        "horizonDays": 250,
+        "hitRate": 0.385787,
+        "sampleSize": 197,
+        "medianReturn": 0.040678,
+        "meanReturn": 0.045039,
+        "p25Return": -0.24948,
+        "downsideRisk": 0.24948,
+        "rewardReliabilityScore": 0.052401
+      },
+      {
+        "targetMultiple": 0.9,
+        "horizonDays": 30,
+        "hitRate": 0.076142,
+        "sampleSize": 197,
+        "medianReturn": 0.012105,
+        "meanReturn": 0.023861,
+        "p25Return": -0.098376,
+        "downsideRisk": 0.098376,
+        "rewardReliabilityScore": 0.006212
+      },
+      {
+        "targetMultiple": 0.9,
+        "horizonDays": 60,
+        "hitRate": 0.162437,
+        "sampleSize": 197,
+        "medianReturn": 0.009901,
+        "meanReturn": 0.038509,
+        "p25Return": -0.127503,
+        "downsideRisk": 0.127503,
+        "rewardReliabilityScore": 0.009061
+      },
+      {
+        "targetMultiple": 0.9,
+        "horizonDays": 120,
+        "hitRate": 0.284264,
+        "sampleSize": 197,
+        "medianReturn": 0.030986,
+        "meanReturn": 0.061897,
+        "p25Return": -0.190558,
+        "downsideRisk": 0.190558,
+        "rewardReliabilityScore": 0.036616
+      },
+      {
+        "targetMultiple": 0.9,
+        "horizonDays": 250,
+        "hitRate": 0.360406,
+        "sampleSize": 197,
+        "medianReturn": 0.003197,
+        "meanReturn": 0.05191,
+        "p25Return": -0.2623,
+        "downsideRisk": 0.2623,
+        "rewardReliabilityScore": 0.003689
+      },
+      {
+        "targetMultiple": 1,
+        "horizonDays": 30,
+        "hitRate": 0.050761,
+        "sampleSize": 197,
+        "medianReturn": 0.012105,
+        "meanReturn": 0.021813,
+        "p25Return": -0.098376,
+        "downsideRisk": 0.098376,
+        "rewardReliabilityScore": 0.004141
+      },
+      {
+        "targetMultiple": 1,
+        "horizonDays": 60,
+        "hitRate": 0.116751,
+        "sampleSize": 197,
+        "medianReturn": 0.003213,
+        "meanReturn": 0.033506,
+        "p25Return": -0.127503,
+        "downsideRisk": 0.127503,
+        "rewardReliabilityScore": 0.002113
+      },
+      {
+        "targetMultiple": 1,
+        "horizonDays": 120,
+        "hitRate": 0.253807,
+        "sampleSize": 197,
+        "medianReturn": 0.01996,
+        "meanReturn": 0.062753,
+        "p25Return": -0.198592,
+        "downsideRisk": 0.198592,
+        "rewardReliabilityScore": 0.020379
+      },
+      {
+        "targetMultiple": 1,
+        "horizonDays": 250,
+        "hitRate": 0.335025,
+        "sampleSize": 197,
+        "medianReturn": -0.017474,
+        "meanReturn": 0.05568,
+        "p25Return": -0.303906,
+        "downsideRisk": 0.303906,
+        "rewardReliabilityScore": -0.016542
+      },
+      {
+        "targetMultiple": 1.1,
+        "horizonDays": 30,
+        "hitRate": 0.040609,
+        "sampleSize": 197,
+        "medianReturn": 0.012105,
+        "meanReturn": 0.021777,
+        "p25Return": -0.098376,
+        "downsideRisk": 0.098376,
+        "rewardReliabilityScore": 0.003313
+      },
+      {
+        "targetMultiple": 1.1,
+        "horizonDays": 60,
+        "hitRate": 0.106599,
+        "sampleSize": 197,
+        "medianReturn": 0.003213,
+        "meanReturn": 0.03471,
+        "p25Return": -0.127503,
+        "downsideRisk": 0.127503,
+        "rewardReliabilityScore": 0.00193
+      },
+      {
+        "targetMultiple": 1.1,
+        "horizonDays": 120,
+        "hitRate": 0.218274,
+        "sampleSize": 197,
+        "medianReturn": 0.011765,
+        "meanReturn": 0.060014,
+        "p25Return": -0.198592,
+        "downsideRisk": 0.198592,
+        "rewardReliabilityScore": 0.01033
+      },
+      {
+        "targetMultiple": 1.1,
+        "horizonDays": 250,
+        "hitRate": 0.294416,
+        "sampleSize": 197,
         "medianReturn": -0.043891,
-        "meanReturn": 4.639896,
+        "meanReturn": 0.041178,
         "p25Return": -0.304225,
         "downsideRisk": 0.304225,
-        "rewardReliabilityScore": -0.035222
+        "rewardReliabilityScore": -0.03648
+      },
+      {
+        "targetMultiple": 1.2,
+        "horizonDays": 30,
+        "hitRate": 0.040609,
+        "sampleSize": 197,
+        "medianReturn": 0.012105,
+        "meanReturn": 0.023394,
+        "p25Return": -0.098376,
+        "downsideRisk": 0.098376,
+        "rewardReliabilityScore": 0.003313
+      },
+      {
+        "targetMultiple": 1.2,
+        "horizonDays": 60,
+        "hitRate": 0.096447,
+        "sampleSize": 197,
+        "medianReturn": 0.003213,
+        "meanReturn": 0.036604,
+        "p25Return": -0.127503,
+        "downsideRisk": 0.127503,
+        "rewardReliabilityScore": 0.001746
+      },
+      {
+        "targetMultiple": 1.2,
+        "horizonDays": 120,
+        "hitRate": 0.187817,
+        "sampleSize": 197,
+        "medianReturn": 0.005747,
+        "meanReturn": 0.056165,
+        "p25Return": -0.198592,
+        "downsideRisk": 0.198592,
+        "rewardReliabilityScore": 0.004342
+      },
+      {
+        "targetMultiple": 1.2,
+        "horizonDays": 250,
+        "hitRate": 0.279188,
+        "sampleSize": 197,
+        "medianReturn": -0.046154,
+        "meanReturn": 0.042546,
+        "p25Return": -0.304225,
+        "downsideRisk": 0.304225,
+        "rewardReliabilityScore": -0.036377
       }
     ],
     "riskScatter": [
@@ -1240,9 +1240,9 @@
         "publicationDate": "2020-12-05",
         "maxFavorableExcursion": 1.664188,
         "maxAdverseExcursion": -0.232342,
-        "upsideCaptureRatio": 8.881471,
+        "upsideCaptureRatio": 8.881451,
         "targetReturn": 0.187378,
-        "currentReturn": 0.3768,
+        "currentReturn": 2.4336,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -1256,7 +1256,7 @@
         "maxAdverseExcursion": -0.833652,
         "upsideCaptureRatio": 2.671183,
         "targetReturn": 0.424435,
-        "currentReturn": -0.7745,
+        "currentReturn": -0.419,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -1270,7 +1270,7 @@
         "maxAdverseExcursion": -0.812408,
         "upsideCaptureRatio": 1.760517,
         "targetReturn": 0.588116,
-        "currentReturn": -0.6437,
+        "currentReturn": -0.3899,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -1284,7 +1284,7 @@
         "maxAdverseExcursion": -0.820697,
         "upsideCaptureRatio": 4.131607,
         "targetReturn": 0.589325,
-        "currentReturn": -0.6747,
+        "currentReturn": -0.6703,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -1298,7 +1298,7 @@
         "maxAdverseExcursion": -0.12249,
         "upsideCaptureRatio": 3.825806,
         "targetReturn": 0.62249,
-        "currentReturn": 0.1981,
+        "currentReturn": 1.6119,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -1312,7 +1312,7 @@
         "maxAdverseExcursion": -0.7264,
         "upsideCaptureRatio": 1.076125,
         "targetReturn": 0.578,
-        "currentReturn": -0.3303,
+        "currentReturn": -0.5068,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -1326,7 +1326,7 @@
         "maxAdverseExcursion": -0.698886,
         "upsideCaptureRatio": 1.35839,
         "targetReturn": 0.22999,
-        "currentReturn": -0.0944,
+        "currentReturn": -0.2569,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -1340,7 +1340,7 @@
         "maxAdverseExcursion": -0.831509,
         "upsideCaptureRatio": -0.137787,
         "targetReturn": 1.308458,
-        "currentReturn": -0.3901,
+        "currentReturn": -0.4795,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1354,7 +1354,7 @@
         "maxAdverseExcursion": -0.578983,
         "upsideCaptureRatio": 0.778761,
         "targetReturn": 0.383051,
-        "currentReturn": 0.064,
+        "currentReturn": -0.2208,
         "hit06": true,
         "hit08": false,
         "hit10": false
@@ -1368,7 +1368,7 @@
         "maxAdverseExcursion": -0.736207,
         "upsideCaptureRatio": 0.048276,
         "targetReturn": 0.5,
-        "currentReturn": -0.4082,
+        "currentReturn": -0.7223,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1382,7 +1382,7 @@
         "maxAdverseExcursion": -0.64937,
         "upsideCaptureRatio": 0.230493,
         "targetReturn": 0.997264,
-        "currentReturn": -0.2798,
+        "currentReturn": -0.4181,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1396,7 +1396,7 @@
         "maxAdverseExcursion": -0.555797,
         "upsideCaptureRatio": 0.350649,
         "targetReturn": 0.557971,
-        "currentReturn": -0.4272,
+        "currentReturn": -0.3722,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1410,7 +1410,7 @@
         "maxAdverseExcursion": -0.606719,
         "upsideCaptureRatio": 0.287037,
         "targetReturn": 0.853755,
-        "currentReturn": -0.2586,
+        "currentReturn": -0.1606,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1424,7 +1424,7 @@
         "maxAdverseExcursion": -0.446307,
         "upsideCaptureRatio": 0.700421,
         "targetReturn": 0.473054,
-        "currentReturn": 0.0918,
+        "currentReturn": -0.1878,
         "hit06": true,
         "hit08": false,
         "hit10": false
@@ -1438,7 +1438,7 @@
         "maxAdverseExcursion": -0.749914,
         "upsideCaptureRatio": -0.111487,
         "targetReturn": 0.511226,
-        "currentReturn": -0.582,
+        "currentReturn": -0.5971,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1452,7 +1452,7 @@
         "maxAdverseExcursion": -0.853637,
         "upsideCaptureRatio": 1.017878,
         "targetReturn": 0.73532,
-        "currentReturn": -0.4936,
+        "currentReturn": -0.8386,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -1466,7 +1466,7 @@
         "maxAdverseExcursion": -0.552133,
         "upsideCaptureRatio": 0.423869,
         "targetReturn": 0.575829,
-        "currentReturn": -0.3966,
+        "currentReturn": -0.4387,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1480,7 +1480,7 @@
         "maxAdverseExcursion": -0.589765,
         "upsideCaptureRatio": 0.460744,
         "targetReturn": 0.812081,
-        "currentReturn": -0.3051,
+        "currentReturn": -0.5721,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1494,7 +1494,7 @@
         "maxAdverseExcursion": -0.42011,
         "upsideCaptureRatio": 12.517112,
         "targetReturn": 0.30854,
-        "currentReturn": -0.1481,
+        "currentReturn": 5.1159,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -1507,8 +1507,8 @@
         "maxFavorableExcursion": 0.070225,
         "maxAdverseExcursion": -0.939299,
         "upsideCaptureRatio": 0.108623,
-        "targetReturn": 0.6465,
-        "currentReturn": -0.7671,
+        "targetReturn": 0.646501,
+        "currentReturn": -0.8649,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1522,7 +1522,7 @@
         "maxAdverseExcursion": -0.264872,
         "upsideCaptureRatio": 0.423051,
         "targetReturn": 0.75641,
-        "currentReturn": 0.0407,
+        "currentReturn": 0.0926,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1536,7 +1536,7 @@
         "maxAdverseExcursion": -0.43907,
         "upsideCaptureRatio": 0.766257,
         "targetReturn": 0.75814,
-        "currentReturn": 0.0217,
+        "currentReturn": 0.7948,
         "hit06": true,
         "hit08": false,
         "hit10": false
@@ -1550,7 +1550,7 @@
         "maxAdverseExcursion": -0.639686,
         "upsideCaptureRatio": 0.226341,
         "targetReturn": 0.719867,
-        "currentReturn": -0.5808,
+        "currentReturn": -0.4098,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1564,7 +1564,7 @@
         "maxAdverseExcursion": -0.344138,
         "upsideCaptureRatio": 0.334728,
         "targetReturn": 0.824138,
-        "currentReturn": -0.2747,
+        "currentReturn": 0.0234,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1578,7 +1578,7 @@
         "maxAdverseExcursion": -0.291667,
         "upsideCaptureRatio": 2.457446,
         "targetReturn": 0.602564,
-        "currentReturn": 0.0657,
+        "currentReturn": 1.1657,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -1592,7 +1592,7 @@
         "maxAdverseExcursion": -0.737324,
         "upsideCaptureRatio": 0.954717,
         "targetReturn": 0.373239,
-        "currentReturn": -0.469,
+        "currentReturn": -0.4307,
         "hit06": true,
         "hit08": true,
         "hit10": false
@@ -1606,7 +1606,7 @@
         "maxAdverseExcursion": -0.90566,
         "upsideCaptureRatio": 1.530233,
         "targetReturn": 0.40566,
-        "currentReturn": -0.5543,
+        "currentReturn": -0.8764,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -1620,7 +1620,7 @@
         "maxAdverseExcursion": -0.235795,
         "upsideCaptureRatio": 2.428571,
         "targetReturn": 0.371212,
-        "currentReturn": 0.1426,
+        "currentReturn": 0.2988,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -1634,7 +1634,7 @@
         "maxAdverseExcursion": -0.866399,
         "upsideCaptureRatio": -1.161193,
         "targetReturn": 0.402806,
-        "currentReturn": -0.5068,
+        "currentReturn": -0.4373,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1648,7 +1648,7 @@
         "maxAdverseExcursion": -0.868,
         "upsideCaptureRatio": 0.094828,
         "targetReturn": 0.386667,
-        "currentReturn": -0.5546,
+        "currentReturn": -0.8634,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1662,7 +1662,7 @@
         "maxAdverseExcursion": -0.089286,
         "upsideCaptureRatio": 14.212903,
         "targetReturn": 1.383929,
-        "currentReturn": 1.4537,
+        "currentReturn": 18.7357,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -1676,7 +1676,7 @@
         "maxAdverseExcursion": -0.432318,
         "upsideCaptureRatio": 2.156806,
         "targetReturn": 0.571912,
-        "currentReturn": -0.3077,
+        "currentReturn": -0.5609,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -1690,7 +1690,7 @@
         "maxAdverseExcursion": -0.915634,
         "upsideCaptureRatio": 0.38961,
         "targetReturn": 0.433803,
-        "currentReturn": -0.7814,
+        "currentReturn": -0.9236,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1704,7 +1704,7 @@
         "maxAdverseExcursion": -0.903575,
         "upsideCaptureRatio": 0.284643,
         "targetReturn": 0.545455,
-        "currentReturn": -0.7712,
+        "currentReturn": -0.901,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1718,7 +1718,7 @@
         "maxAdverseExcursion": -0.561765,
         "upsideCaptureRatio": 1.517094,
         "targetReturn": 0.860294,
-        "currentReturn": -0.0082,
+        "currentReturn": 1.2463,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -1732,7 +1732,7 @@
         "maxAdverseExcursion": -0.720991,
         "upsideCaptureRatio": 0.132925,
         "targetReturn": 0.637549,
-        "currentReturn": -0.5248,
+        "currentReturn": -0.4132,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1745,8 +1745,8 @@
         "maxFavorableExcursion": 0.074734,
         "maxAdverseExcursion": -0.832632,
         "upsideCaptureRatio": 0.059097,
-        "targetReturn": 1.2646,
-        "currentReturn": -0.6619,
+        "targetReturn": 1.264599,
+        "currentReturn": -0.7716,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1760,7 +1760,7 @@
         "maxAdverseExcursion": -0.975388,
         "upsideCaptureRatio": -0.283774,
         "targetReturn": 0.713663,
-        "currentReturn": -0.7944,
+        "currentReturn": -0.6387,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1774,7 +1774,7 @@
         "maxAdverseExcursion": -0.605088,
         "upsideCaptureRatio": -0.148504,
         "targetReturn": 0.465778,
-        "currentReturn": -0.5204,
+        "currentReturn": -0.5044,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1787,8 +1787,8 @@
         "maxFavorableExcursion": 0.178393,
         "maxAdverseExcursion": -0.443393,
         "upsideCaptureRatio": 0.161625,
-        "targetReturn": 1.103747,
-        "currentReturn": -0.2542,
+        "targetReturn": 1.103746,
+        "currentReturn": -0.2319,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1802,7 +1802,7 @@
         "maxAdverseExcursion": -0.983776,
         "upsideCaptureRatio": 0.642247,
         "targetReturn": 0.603982,
-        "currentReturn": -0.6142,
+        "currentReturn": -0.9297,
         "hit06": true,
         "hit08": false,
         "hit10": false
@@ -1816,7 +1816,7 @@
         "maxAdverseExcursion": -0.86932,
         "upsideCaptureRatio": 0.03435,
         "targetReturn": 0.336329,
-        "currentReturn": -0.7204,
+        "currentReturn": -0.6531,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1830,7 +1830,7 @@
         "maxAdverseExcursion": -0.616915,
         "upsideCaptureRatio": 2.399039,
         "targetReturn": 0.517413,
-        "currentReturn": -0.1389,
+        "currentReturn": 0.824,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -1844,7 +1844,7 @@
         "maxAdverseExcursion": -0.140909,
         "upsideCaptureRatio": 4.147728,
         "targetReturn": 0.4,
-        "currentReturn": 0.7454,
+        "currentReturn": 0.5031,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -1858,7 +1858,7 @@
         "maxAdverseExcursion": -0.724217,
         "upsideCaptureRatio": 4.312218,
         "targetReturn": 0.610497,
-        "currentReturn": -0.2977,
+        "currentReturn": -0.6139,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -1872,7 +1872,7 @@
         "maxAdverseExcursion": -0.532031,
         "upsideCaptureRatio": 0.773684,
         "targetReturn": 0.445313,
-        "currentReturn": -0.5146,
+        "currentReturn": 0.1028,
         "hit06": true,
         "hit08": false,
         "hit10": false
@@ -1886,7 +1886,7 @@
         "maxAdverseExcursion": -0.333849,
         "upsideCaptureRatio": 2.956678,
         "targetReturn": 0.42813,
-        "currentReturn": 0.0969,
+        "currentReturn": 0.0476,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -1900,7 +1900,7 @@
         "maxAdverseExcursion": -0.525678,
         "upsideCaptureRatio": 0.530034,
         "targetReturn": 0.451356,
-        "currentReturn": -0.2687,
+        "currentReturn": -0.3495,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1914,7 +1914,7 @@
         "maxAdverseExcursion": -0.440265,
         "upsideCaptureRatio": 0.10366,
         "targetReturn": 0.405509,
-        "currentReturn": -0.4015,
+        "currentReturn": -0.2942,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1928,7 +1928,7 @@
         "maxAdverseExcursion": -0.643721,
         "upsideCaptureRatio": 0.879999,
         "targetReturn": 0.232558,
-        "currentReturn": -0.5018,
+        "currentReturn": -0.6376,
         "hit06": true,
         "hit08": true,
         "hit10": false
@@ -1942,7 +1942,7 @@
         "maxAdverseExcursion": -0.753911,
         "upsideCaptureRatio": 0.00448,
         "targetReturn": 0.498883,
-        "currentReturn": -0.5516,
+        "currentReturn": -0.7421,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1956,7 +1956,7 @@
         "maxAdverseExcursion": -0.353902,
         "upsideCaptureRatio": 1.986047,
         "targetReturn": 0.3902,
-        "currentReturn": -0.0159,
+        "currentReturn": 0.6731,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -1970,7 +1970,7 @@
         "maxAdverseExcursion": -0.55226,
         "upsideCaptureRatio": 0.409091,
         "targetReturn": 0.497175,
-        "currentReturn": -0.3559,
+        "currentReturn": -0.4859,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -1984,7 +1984,7 @@
         "maxAdverseExcursion": -0.475682,
         "upsideCaptureRatio": 2.02283,
         "targetReturn": 0.259786,
-        "currentReturn": -0.2526,
+        "currentReturn": -0.3568,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -1998,7 +1998,7 @@
         "maxAdverseExcursion": -0.445596,
         "upsideCaptureRatio": 1.507353,
         "targetReturn": 0.704663,
-        "currentReturn": 0.348,
+        "currentReturn": 0.8232,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2008,14 +2008,14 @@
         "symbol": "EAF",
         "company": "GrafTech International Ltd.",
         "publicationDate": "2022-05-25",
-        "maxFavorableExcursion": 10.236363,
-        "maxAdverseExcursion": -0.403636,
-        "upsideCaptureRatio": 17.41237,
+        "maxFavorableExcursion": 0.090588,
+        "maxAdverseExcursion": -0.942118,
+        "upsideCaptureRatio": 0.154093,
         "targetReturn": 0.587879,
-        "currentReturn": -0.7729,
-        "hit06": true,
-        "hit08": true,
-        "hit10": true
+        "currentReturn": -0.8723,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
       },
       {
         "reportId": "c631200d3a42357e",
@@ -2025,8 +2025,8 @@
         "maxFavorableExcursion": 0.355177,
         "maxAdverseExcursion": -0.482307,
         "upsideCaptureRatio": 0.044322,
-        "targetReturn": 8.013595,
-        "currentReturn": -0.1156,
+        "targetReturn": 8.013591,
+        "currentReturn": 0.1659,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -2036,14 +2036,14 @@
         "symbol": "TSM",
         "company": "TSMC",
         "publicationDate": "2022-05-25",
-        "maxFavorableExcursion": -0.20383,
-        "maxAdverseExcursion": -0.887868,
-        "upsideCaptureRatio": -0.461666,
-        "targetReturn": 0.441509,
-        "currentReturn": 0.9194,
-        "hit06": false,
-        "hit08": false,
-        "hit10": false
+        "maxFavorableExcursion": 3.667293,
+        "maxAdverseExcursion": -0.342661,
+        "upsideCaptureRatio": 8.306255,
+        "targetReturn": 0.44151,
+        "currentReturn": 4.338,
+        "hit06": true,
+        "hit08": true,
+        "hit10": true
       },
       {
         "reportId": "6405448206fb6311",
@@ -2054,7 +2054,7 @@
         "maxAdverseExcursion": -0.020955,
         "upsideCaptureRatio": 3.74791,
         "targetReturn": 0.534181,
-        "currentReturn": 1.7934,
+        "currentReturn": 2.0283,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2068,7 +2068,7 @@
         "maxAdverseExcursion": -0.323445,
         "upsideCaptureRatio": 0.306075,
         "targetReturn": 0.453271,
-        "currentReturn": -0.0396,
+        "currentReturn": -0.0732,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -2082,7 +2082,7 @@
         "maxAdverseExcursion": -0.209705,
         "upsideCaptureRatio": 7.483517,
         "targetReturn": 0.473137,
-        "currentReturn": 0.4506,
+        "currentReturn": 2.5009,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2096,7 +2096,7 @@
         "maxAdverseExcursion": -0.921304,
         "upsideCaptureRatio": 0.011672,
         "targetReturn": 0.505929,
-        "currentReturn": -0.8594,
+        "currentReturn": -0.9012,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -2110,7 +2110,7 @@
         "maxAdverseExcursion": -0.589706,
         "upsideCaptureRatio": 0.285294,
         "targetReturn": 0.5,
-        "currentReturn": -0.1209,
+        "currentReturn": -0.1015,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -2124,7 +2124,7 @@
         "maxAdverseExcursion": -0.250375,
         "upsideCaptureRatio": 5.402908,
         "targetReturn": 1.443778,
-        "currentReturn": 1.182,
+        "currentReturn": 6.9185,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2138,7 +2138,7 @@
         "maxAdverseExcursion": -0.976388,
         "upsideCaptureRatio": -3.368055,
         "targetReturn": 0.18251,
-        "currentReturn": -0.5878,
+        "currentReturn": -0.8996,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -2152,7 +2152,7 @@
         "maxAdverseExcursion": -0.349669,
         "upsideCaptureRatio": 2.626924,
         "targetReturn": 0.344371,
-        "currentReturn": 0.3492,
+        "currentReturn": -0.2539,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2166,7 +2166,7 @@
         "maxAdverseExcursion": -0.624027,
         "upsideCaptureRatio": 0.165004,
         "targetReturn": 0.539763,
-        "currentReturn": -0.4292,
+        "currentReturn": -0.6016,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -2180,7 +2180,7 @@
         "maxAdverseExcursion": -0.671555,
         "upsideCaptureRatio": 7.639846,
         "targetReturn": 0.461131,
-        "currentReturn": -0.6607,
+        "currentReturn": 2.3279,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2194,7 +2194,7 @@
         "maxAdverseExcursion": -0.669388,
         "upsideCaptureRatio": 0.739048,
         "targetReturn": 0.428571,
-        "currentReturn": -0.5976,
+        "currentReturn": 0.056,
         "hit06": true,
         "hit08": false,
         "hit10": false
@@ -2208,7 +2208,7 @@
         "maxAdverseExcursion": -0.049782,
         "upsideCaptureRatio": 9.246153,
         "targetReturn": 0.283843,
-        "currentReturn": 0.3538,
+        "currentReturn": 1.6513,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2222,7 +2222,7 @@
         "maxAdverseExcursion": -0.455338,
         "upsideCaptureRatio": 2.778502,
         "targetReturn": 0.334423,
-        "currentReturn": -0.3864,
+        "currentReturn": 0.2138,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2236,7 +2236,7 @@
         "maxAdverseExcursion": -0.038321,
         "upsideCaptureRatio": 74.962264,
         "targetReturn": 0.386861,
-        "currentReturn": 3.3019,
+        "currentReturn": 21.007,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2250,7 +2250,7 @@
         "maxAdverseExcursion": -0.545217,
         "upsideCaptureRatio": 1.9191,
         "targetReturn": 0.232619,
-        "currentReturn": 0.0317,
+        "currentReturn": 0.6285,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2264,7 +2264,7 @@
         "maxAdverseExcursion": -0.691407,
         "upsideCaptureRatio": 3.580613,
         "targetReturn": 0.583,
-        "currentReturn": -0.3731,
+        "currentReturn": 1.2117,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2292,7 +2292,7 @@
         "maxAdverseExcursion": -0.793825,
         "upsideCaptureRatio": 1.337628,
         "targetReturn": 0.270256,
-        "currentReturn": 2.1797,
+        "currentReturn": 4.1806,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2306,7 +2306,7 @@
         "maxAdverseExcursion": -0.228814,
         "upsideCaptureRatio": 6.700002,
         "targetReturn": 0.237288,
-        "currentReturn": -0.0733,
+        "currentReturn": 0.562,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2320,7 +2320,7 @@
         "maxAdverseExcursion": -0.312236,
         "upsideCaptureRatio": 4.316831,
         "targetReturn": 0.42616,
-        "currentReturn": -0.2518,
+        "currentReturn": 1.3067,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2334,7 +2334,7 @@
         "maxAdverseExcursion": -0.748359,
         "upsideCaptureRatio": 3.561266,
         "targetReturn": 0.553611,
-        "currentReturn": 1.464,
+        "currentReturn": 5.536,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2348,7 +2348,7 @@
         "maxAdverseExcursion": -0.310555,
         "upsideCaptureRatio": 1.604168,
         "targetReturn": 0.275862,
-        "currentReturn": 0.0612,
+        "currentReturn": 0.2785,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2362,7 +2362,7 @@
         "maxAdverseExcursion": -0.117021,
         "upsideCaptureRatio": 8.424999,
         "targetReturn": 0.425532,
-        "currentReturn": 0.1961,
+        "currentReturn": 2.649,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2376,7 +2376,7 @@
         "maxAdverseExcursion": 0,
         "upsideCaptureRatio": 25.250001,
         "targetReturn": 0.285714,
-        "currentReturn": 3.0397,
+        "currentReturn": 2.3664,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2390,7 +2390,7 @@
         "maxAdverseExcursion": -0.747037,
         "upsideCaptureRatio": 0.592648,
         "targetReturn": 0.503704,
-        "currentReturn": -0.6419,
+        "currentReturn": 0.2152,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -2404,7 +2404,7 @@
         "maxAdverseExcursion": -0.198773,
         "upsideCaptureRatio": 1.138843,
         "targetReturn": 0.742331,
-        "currentReturn": 0.2444,
+        "currentReturn": 0.2309,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2418,7 +2418,7 @@
         "maxAdverseExcursion": -0.292291,
         "upsideCaptureRatio": 3.582221,
         "targetReturn": 0.296053,
-        "currentReturn": 0.6086,
+        "currentReturn": 0.4355,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2432,7 +2432,7 @@
         "maxAdverseExcursion": -0.693802,
         "upsideCaptureRatio": 0.225988,
         "targetReturn": 0.731405,
-        "currentReturn": -0.3862,
+        "currentReturn": -0.695,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -2446,7 +2446,7 @@
         "maxAdverseExcursion": -0.385762,
         "upsideCaptureRatio": 3.09515,
         "targetReturn": 0.591611,
-        "currentReturn": 0.1232,
+        "currentReturn": 1.1074,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2460,7 +2460,7 @@
         "maxAdverseExcursion": -0.806559,
         "upsideCaptureRatio": 0.945982,
         "targetReturn": 0.823235,
-        "currentReturn": -0.4369,
+        "currentReturn": -0.7504,
         "hit06": true,
         "hit08": true,
         "hit10": false
@@ -2474,7 +2474,7 @@
         "maxAdverseExcursion": -0.329197,
         "upsideCaptureRatio": 3.194631,
         "targetReturn": 1.087591,
-        "currentReturn": 0.1208,
+        "currentReturn": 1.9282,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2488,7 +2488,7 @@
         "maxAdverseExcursion": -0.716143,
         "upsideCaptureRatio": 0.884485,
         "targetReturn": 0.704036,
-        "currentReturn": -0.6154,
+        "currentReturn": -0.4782,
         "hit06": true,
         "hit08": true,
         "hit10": false
@@ -2502,7 +2502,7 @@
         "maxAdverseExcursion": -0.883068,
         "upsideCaptureRatio": 0.194125,
         "targetReturn": 1.13314,
-        "currentReturn": -0.7374,
+        "currentReturn": -0.7938,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -2516,7 +2516,7 @@
         "maxAdverseExcursion": -0.123288,
         "upsideCaptureRatio": 6.187234,
         "targetReturn": 0.165086,
-        "currentReturn": 0.6066,
+        "currentReturn": 1.0981,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2530,7 +2530,7 @@
         "maxAdverseExcursion": -0.761773,
         "upsideCaptureRatio": 1.316327,
         "targetReturn": 0.78343,
-        "currentReturn": 0.1592,
+        "currentReturn": -0.5415,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2544,7 +2544,7 @@
         "maxAdverseExcursion": -0.203252,
         "upsideCaptureRatio": 2.44278,
         "targetReturn": 0.447154,
-        "currentReturn": -0.0746,
+        "currentReturn": 0.2598,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2558,7 +2558,7 @@
         "maxAdverseExcursion": -0.149533,
         "upsideCaptureRatio": 0.894273,
         "targetReturn": 1.060748,
-        "currentReturn": 0.1032,
+        "currentReturn": 0.1005,
         "hit06": true,
         "hit08": true,
         "hit10": false
@@ -2572,7 +2572,7 @@
         "maxAdverseExcursion": -0.156171,
         "upsideCaptureRatio": 0.80289,
         "targetReturn": 0.813602,
-        "currentReturn": 0.4411,
+        "currentReturn": 0.4617,
         "hit06": true,
         "hit08": true,
         "hit10": false
@@ -2586,7 +2586,7 @@
         "maxAdverseExcursion": -0.269222,
         "upsideCaptureRatio": 2.705415,
         "targetReturn": 0.497561,
-        "currentReturn": 0.7559,
+        "currentReturn": 0.5067,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2600,7 +2600,7 @@
         "maxAdverseExcursion": -0.310796,
         "upsideCaptureRatio": 0.86908,
         "targetReturn": 0.635398,
-        "currentReturn": -0.1852,
+        "currentReturn": 0.2399,
         "hit06": true,
         "hit08": true,
         "hit10": false
@@ -2614,7 +2614,7 @@
         "maxAdverseExcursion": -0.067362,
         "upsideCaptureRatio": 46.874686,
         "targetReturn": 0.319968,
-        "currentReturn": 2.7033,
+        "currentReturn": 14.4415,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2628,7 +2628,7 @@
         "maxAdverseExcursion": -0.480172,
         "upsideCaptureRatio": 0.747592,
         "targetReturn": 2.237069,
-        "currentReturn": 0.1926,
+        "currentReturn": 0.9768,
         "hit06": true,
         "hit08": false,
         "hit10": false
@@ -2638,14 +2638,14 @@
         "symbol": "089890.KQ",
         "company": "코세스",
         "publicationDate": "2023-10-19",
-        "maxFavorableExcursion": 5353.166667,
-        "maxAdverseExcursion": 600.041667,
-        "upsideCaptureRatio": 2.764351,
+        "maxFavorableExcursion": 4.58089,
+        "maxAdverseExcursion": -0.373507,
+        "upsideCaptureRatio": 0.002366,
         "targetReturn": 1936.5,
-        "currentReturn": 1.6276,
-        "hit06": true,
-        "hit08": true,
-        "hit10": true
+        "currentReturn": 3.43,
+        "hit06": false,
+        "hit08": false,
+        "hit10": false
       },
       {
         "reportId": "98f5913a5681e6f8",
@@ -2656,7 +2656,7 @@
         "maxAdverseExcursion": -0.085196,
         "upsideCaptureRatio": 19.830657,
         "targetReturn": 0.956704,
-        "currentReturn": 8.3944,
+        "currentReturn": 15.5211,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2670,7 +2670,7 @@
         "maxAdverseExcursion": -0.35501,
         "upsideCaptureRatio": 1.78889,
         "targetReturn": 0.368098,
-        "currentReturn": 0.1846,
+        "currentReturn": 0.033,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2684,7 +2684,7 @@
         "maxAdverseExcursion": -0.740686,
         "upsideCaptureRatio": 91.285716,
         "targetReturn": 0.031297,
-        "currentReturn": 0.3655,
+        "currentReturn": 5.7384,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2698,7 +2698,7 @@
         "maxAdverseExcursion": -0.178161,
         "upsideCaptureRatio": 1.502092,
         "targetReturn": 1.373563,
-        "currentReturn": 0.1111,
+        "currentReturn": 1.2276,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2712,7 +2712,7 @@
         "maxAdverseExcursion": -0.48834,
         "upsideCaptureRatio": 1.287626,
         "targetReturn": 0.410151,
-        "currentReturn": -0.4297,
+        "currentReturn": 0.1432,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2726,7 +2726,7 @@
         "maxAdverseExcursion": -0.58,
         "upsideCaptureRatio": 10.314285,
         "targetReturn": 0.266667,
-        "currentReturn": -0.1354,
+        "currentReturn": 2.1837,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2740,7 +2740,7 @@
         "maxAdverseExcursion": -0.765282,
         "upsideCaptureRatio": -0.850463,
         "targetReturn": 0.391943,
-        "currentReturn": 0.3209,
+        "currentReturn": 0.3228,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -2754,7 +2754,7 @@
         "maxAdverseExcursion": -0.046111,
         "upsideCaptureRatio": 3.485613,
         "targetReturn": 0.265625,
-        "currentReturn": 1.0256,
+        "currentReturn": 1.0787,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2768,7 +2768,7 @@
         "maxAdverseExcursion": -0.042717,
         "upsideCaptureRatio": 17.621274,
         "targetReturn": 0.446545,
-        "currentReturn": 3.1775,
+        "currentReturn": 7.7398,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2780,9 +2780,9 @@
         "publicationDate": "2023-11-22",
         "maxFavorableExcursion": 0.743561,
         "maxAdverseExcursion": -0.106708,
-        "upsideCaptureRatio": 4.447138,
+        "upsideCaptureRatio": 4.44714,
         "targetReturn": 0.1672,
-        "currentReturn": 0.8941,
+        "currentReturn": 0.8485,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2794,9 +2794,9 @@
         "publicationDate": "2023-11-22",
         "maxFavorableExcursion": 1.352196,
         "maxAdverseExcursion": -0.327534,
-        "upsideCaptureRatio": 4.830766,
+        "upsideCaptureRatio": 4.830772,
         "targetReturn": 0.279913,
-        "currentReturn": 0.2363,
+        "currentReturn": 1.8604,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2810,7 +2810,7 @@
         "maxAdverseExcursion": -0.112889,
         "upsideCaptureRatio": 5.915254,
         "targetReturn": 0.262222,
-        "currentReturn": 0.3653,
+        "currentReturn": 0.5124,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2824,7 +2824,7 @@
         "maxAdverseExcursion": -0.161198,
         "upsideCaptureRatio": 0.564946,
         "targetReturn": 0.911555,
-        "currentReturn": 0.1284,
+        "currentReturn": -0.1111,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -2838,7 +2838,7 @@
         "maxAdverseExcursion": -0.305982,
         "upsideCaptureRatio": 0.86246,
         "targetReturn": 0.947853,
-        "currentReturn": 0.1652,
+        "currentReturn": -0.1409,
         "hit06": true,
         "hit08": true,
         "hit10": false
@@ -2852,7 +2852,7 @@
         "maxAdverseExcursion": -0.45917,
         "upsideCaptureRatio": 1.05664,
         "targetReturn": 0.685408,
-        "currentReturn": -0.0515,
+        "currentReturn": 0.6036,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2866,7 +2866,7 @@
         "maxAdverseExcursion": -0.480941,
         "upsideCaptureRatio": 1.958975,
         "targetReturn": 0.458824,
-        "currentReturn": -0.1537,
+        "currentReturn": 0.8096,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2880,7 +2880,7 @@
         "maxAdverseExcursion": -0.261345,
         "upsideCaptureRatio": 6.976594,
         "targetReturn": 0.323109,
-        "currentReturn": 1.3041,
+        "currentReturn": 1.8051,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2894,7 +2894,7 @@
         "maxAdverseExcursion": -0.20048,
         "upsideCaptureRatio": 2.864423,
         "targetReturn": 0.372161,
-        "currentReturn": 0.7429,
+        "currentReturn": 0.7244,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2908,7 +2908,7 @@
         "maxAdverseExcursion": -0.162415,
         "upsideCaptureRatio": 3.845304,
         "targetReturn": 0.615646,
-        "currentReturn": 2.364,
+        "currentReturn": 1.693,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2922,7 +2922,7 @@
         "maxAdverseExcursion": -0.108772,
         "upsideCaptureRatio": 5.847222,
         "targetReturn": 0.757895,
-        "currentReturn": 3.4828,
+        "currentReturn": 3.2138,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2936,7 +2936,7 @@
         "maxAdverseExcursion": -0.666667,
         "upsideCaptureRatio": 0.833985,
         "targetReturn": 1.153153,
-        "currentReturn": 0.2022,
+        "currentReturn": 0.8889,
         "hit06": true,
         "hit08": true,
         "hit10": false
@@ -2950,7 +2950,7 @@
         "maxAdverseExcursion": -0.304433,
         "upsideCaptureRatio": 1.93495,
         "targetReturn": 0.893596,
-        "currentReturn": 1.0448,
+        "currentReturn": 0.9685,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2964,7 +2964,7 @@
         "maxAdverseExcursion": -0.4034,
         "upsideCaptureRatio": 0.282401,
         "targetReturn": 1.132921,
-        "currentReturn": -0.258,
+        "currentReturn": -0.3359,
         "hit06": false,
         "hit08": false,
         "hit10": false
@@ -2978,7 +2978,7 @@
         "maxAdverseExcursion": -0.118363,
         "upsideCaptureRatio": 6.322476,
         "targetReturn": 0.339602,
-        "currentReturn": 1.0041,
+        "currentReturn": 1.1454,
         "hit06": true,
         "hit08": true,
         "hit10": true
@@ -2992,7 +2992,7 @@
         "maxAdverseExcursion": -0.645435,
         "upsideCaptureRatio": 0.719212,
         "targetReturn": 0.861996,
-        "currentReturn": -0.5925,
+        "currentReturn": -0.6549,
         "hit06": true,
         "hit08": false,
         "hit10": false
@@ -3520,10 +3520,10 @@
         "symbol": "LIF",
         "company": "Life360 Inc",
         "publicationDate": "2025-05-25",
-        "maxFavorableExcursion": 0.813701,
+        "maxFavorableExcursion": 0.813702,
         "maxAdverseExcursion": -0.403545,
         "upsideCaptureRatio": 1.22104,
-        "targetReturn": 0.6664,
+        "targetReturn": 0.666401,
         "currentReturn": -0.2941,
         "hit06": true,
         "hit08": true,
@@ -3817,7 +3817,7 @@
         "maxFavorableExcursion": 0.352305,
         "maxAdverseExcursion": -0.136448,
         "upsideCaptureRatio": 0.236732,
-        "targetReturn": 1.4882,
+        "targetReturn": 1.488199,
         "currentReturn": 0.2281,
         "hit06": false,
         "hit08": false,
@@ -4002,7 +4002,7 @@
           "entryPrice": 33550,
           "targetPrice": 34600,
           "targetReturn": 0.031297,
-          "currentReturn": 0.3655,
+          "currentReturn": 5.7384,
           "maxFavorableExcursion": 2.85693,
           "maxAdverseExcursion": -0.740686,
           "upsideCaptureRatio": 91.285716,
@@ -4047,7 +4047,7 @@
           "entryPrice": 5480,
           "targetPrice": 7600,
           "targetReturn": 0.386861,
-          "currentReturn": 3.3019,
+          "currentReturn": 21.007,
           "maxFavorableExcursion": 29,
           "maxAdverseExcursion": -0.038321,
           "upsideCaptureRatio": 74.962264,
@@ -4092,7 +4092,7 @@
           "entryPrice": 124700,
           "targetPrice": 164600,
           "targetReturn": 0.319968,
-          "currentReturn": 2.7033,
+          "currentReturn": 14.4415,
           "maxFavorableExcursion": 14.998396,
           "maxAdverseExcursion": -0.067362,
           "upsideCaptureRatio": 46.874686,
@@ -4137,7 +4137,7 @@
           "entryPrice": 86800,
           "targetPrice": 111600,
           "targetReturn": 0.285714,
-          "currentReturn": 3.0397,
+          "currentReturn": 2.3664,
           "maxFavorableExcursion": 7.214286,
           "maxAdverseExcursion": 0,
           "upsideCaptureRatio": 25.250001,
@@ -4227,7 +4227,7 @@
           "entryPrice": 71600,
           "targetPrice": 140100,
           "targetReturn": 0.956704,
-          "currentReturn": 8.3944,
+          "currentReturn": 15.5211,
           "maxFavorableExcursion": 18.972067,
           "maxAdverseExcursion": -0.085196,
           "upsideCaptureRatio": 19.830657,
@@ -4272,7 +4272,7 @@
           "entryPrice": 42.84,
           "targetPrice": 61.97,
           "targetReturn": 0.446545,
-          "currentReturn": 3.1775,
+          "currentReturn": 7.7398,
           "maxFavorableExcursion": 7.868697,
           "maxAdverseExcursion": -0.042717,
           "upsideCaptureRatio": 17.621274,
@@ -4310,31 +4310,31 @@
           }
         },
         {
-          "reportId": "ae2cc012ee18fbdb",
-          "symbol": "EAF",
-          "company": "GrafTech International Ltd.",
-          "publicationDate": "2022-05-25",
-          "entryPrice": 8.25,
-          "targetPrice": 13.1,
-          "targetReturn": 0.587879,
-          "currentReturn": -0.7729,
-          "maxFavorableExcursion": 10.236363,
-          "maxAdverseExcursion": -0.403636,
-          "upsideCaptureRatio": 17.41237,
+          "reportId": "d4a970fee900b949",
+          "symbol": "036930.KQ",
+          "company": "주성엔지니어링",
+          "publicationDate": "2021-11-03",
+          "entryPrice": 11200,
+          "targetPrice": 26700,
+          "targetReturn": 1.383929,
+          "currentReturn": 18.7357,
+          "maxFavorableExcursion": 19.669643,
+          "maxAdverseExcursion": -0.089286,
+          "upsideCaptureRatio": 14.212903,
           "hit": {
             "1": {
               "hit": true,
-              "days": 0,
+              "days": 79,
               "within": {
-                "30": true,
-                "60": true,
+                "30": false,
+                "60": false,
                 "120": true,
                 "250": true
               }
             },
             "0.6": {
               "hit": true,
-              "days": 0,
+              "days": 23,
               "within": {
                 "30": true,
                 "60": true,
@@ -4344,9 +4344,9 @@
             },
             "0.8": {
               "hit": true,
-              "days": 0,
+              "days": 50,
               "within": {
-                "30": true,
+                "30": false,
                 "60": true,
                 "120": true,
                 "250": true
@@ -4364,7 +4364,7 @@
           "entryPrice": 45.9,
           "targetPrice": 72.95,
           "targetReturn": 0.589325,
-          "currentReturn": -0.6747,
+          "currentReturn": -0.6703,
           "maxFavorableExcursion": 2.434858,
           "maxAdverseExcursion": -0.820697,
           "upsideCaptureRatio": 4.131607,
@@ -4409,7 +4409,7 @@
           "entryPrice": 49350,
           "targetPrice": 60700,
           "targetReturn": 0.22999,
-          "currentReturn": -0.0944,
+          "currentReturn": -0.2569,
           "maxFavorableExcursion": 0.312416,
           "maxAdverseExcursion": -0.698886,
           "upsideCaptureRatio": 1.35839,
@@ -4447,51 +4447,6 @@
           }
         },
         {
-          "reportId": "ae2cc012ee18fbdb",
-          "symbol": "EAF",
-          "company": "GrafTech International Ltd.",
-          "publicationDate": "2022-05-25",
-          "entryPrice": 8.25,
-          "targetPrice": 13.1,
-          "targetReturn": 0.587879,
-          "currentReturn": -0.7729,
-          "maxFavorableExcursion": 10.236363,
-          "maxAdverseExcursion": -0.403636,
-          "upsideCaptureRatio": 17.41237,
-          "hit": {
-            "1": {
-              "hit": true,
-              "days": 0,
-              "within": {
-                "30": true,
-                "60": true,
-                "120": true,
-                "250": true
-              }
-            },
-            "0.6": {
-              "hit": true,
-              "days": 0,
-              "within": {
-                "30": true,
-                "60": true,
-                "120": true,
-                "250": true
-              }
-            },
-            "0.8": {
-              "hit": true,
-              "days": 0,
-              "within": {
-                "30": true,
-                "60": true,
-                "120": true,
-                "250": true
-              }
-            }
-          }
-        },
-        {
           "reportId": "0498c71baf800437",
           "symbol": "043650.KQ",
           "company": "국순당",
@@ -4499,7 +4454,7 @@
           "entryPrice": 10750,
           "targetPrice": 13250,
           "targetReturn": 0.232558,
-          "currentReturn": -0.5018,
+          "currentReturn": -0.6376,
           "maxFavorableExcursion": 0.204651,
           "maxAdverseExcursion": -0.643721,
           "upsideCaptureRatio": 0.879999,
@@ -4544,7 +4499,7 @@
           "entryPrice": 230,
           "targetPrice": 327.62,
           "targetReturn": 0.424435,
-          "currentReturn": -0.7745,
+          "currentReturn": -0.419,
           "maxFavorableExcursion": 1.133743,
           "maxAdverseExcursion": -0.833652,
           "upsideCaptureRatio": 2.671183,
@@ -4589,7 +4544,7 @@
           "entryPrice": 86800,
           "targetPrice": 111600,
           "targetReturn": 0.285714,
-          "currentReturn": 3.0397,
+          "currentReturn": 2.3664,
           "maxFavorableExcursion": 7.214286,
           "maxAdverseExcursion": 0,
           "upsideCaptureRatio": 25.250001,
@@ -4634,7 +4589,7 @@
           "entryPrice": 52500,
           "targetPrice": 66500,
           "targetReturn": 0.266667,
-          "currentReturn": -0.1354,
+          "currentReturn": 2.1837,
           "maxFavorableExcursion": 2.750476,
           "maxAdverseExcursion": -0.58,
           "upsideCaptureRatio": 10.314285,
@@ -4715,6 +4670,51 @@
               }
             }
           }
+        },
+        {
+          "reportId": "16ef439296056ba9",
+          "symbol": "006650.KS",
+          "company": "대한유화",
+          "publicationDate": "2021-01-16",
+          "entryPrice": 250000,
+          "targetPrice": 394500,
+          "targetReturn": 0.578,
+          "currentReturn": -0.5068,
+          "maxFavorableExcursion": 0.622,
+          "maxAdverseExcursion": -0.7264,
+          "upsideCaptureRatio": 1.076125,
+          "hit": {
+            "1": {
+              "hit": true,
+              "days": 19,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.6": {
+              "hit": true,
+              "days": 17,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            },
+            "0.8": {
+              "hit": true,
+              "days": 17,
+              "within": {
+                "30": true,
+                "60": true,
+                "120": true,
+                "250": true
+              }
+            }
+          }
         }
       ],
       "painfulWinners": [
@@ -4726,7 +4726,7 @@
           "entryPrice": 53000,
           "targetPrice": 74500,
           "targetReturn": 0.40566,
-          "currentReturn": -0.5543,
+          "currentReturn": -0.8764,
           "maxFavorableExcursion": 0.620755,
           "maxAdverseExcursion": -0.90566,
           "upsideCaptureRatio": 1.530233,
@@ -4771,7 +4771,7 @@
           "entryPrice": 114100,
           "targetPrice": 198000,
           "targetReturn": 0.73532,
-          "currentReturn": -0.4936,
+          "currentReturn": -0.8386,
           "maxFavorableExcursion": 0.748466,
           "maxAdverseExcursion": -0.853637,
           "upsideCaptureRatio": 1.017878,
@@ -4816,7 +4816,7 @@
           "entryPrice": 230,
           "targetPrice": 327.62,
           "targetReturn": 0.424435,
-          "currentReturn": -0.7745,
+          "currentReturn": -0.419,
           "maxFavorableExcursion": 1.133743,
           "maxAdverseExcursion": -0.833652,
           "upsideCaptureRatio": 2.671183,
@@ -4861,7 +4861,7 @@
           "entryPrice": 45.9,
           "targetPrice": 72.95,
           "targetReturn": 0.589325,
-          "currentReturn": -0.6747,
+          "currentReturn": -0.6703,
           "maxFavorableExcursion": 2.434858,
           "maxAdverseExcursion": -0.820697,
           "upsideCaptureRatio": 4.131607,
@@ -4906,7 +4906,7 @@
           "entryPrice": 183.11,
           "targetPrice": 290.8,
           "targetReturn": 0.588116,
-          "currentReturn": -0.6437,
+          "currentReturn": -0.3899,
           "maxFavorableExcursion": 1.035389,
           "maxAdverseExcursion": -0.812408,
           "upsideCaptureRatio": 1.760517,
@@ -4996,7 +4996,7 @@
           "entryPrice": 17990,
           "targetPrice": 32800,
           "targetReturn": 0.823235,
-          "currentReturn": -0.4369,
+          "currentReturn": -0.7504,
           "maxFavorableExcursion": 0.778766,
           "maxAdverseExcursion": -0.806559,
           "upsideCaptureRatio": 0.945982,
@@ -5041,7 +5041,7 @@
           "entryPrice": 132.06,
           "targetPrice": 167.75,
           "targetReturn": 0.270256,
-          "currentReturn": 2.1797,
+          "currentReturn": 4.1806,
           "maxFavorableExcursion": 0.361502,
           "maxAdverseExcursion": -0.793825,
           "upsideCaptureRatio": 1.337628,

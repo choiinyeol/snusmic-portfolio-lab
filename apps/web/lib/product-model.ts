@@ -4,7 +4,7 @@ import {
   getOverview,
   getAccountLabel,
   getReportRows,
-  getScreenerCandidates,
+  getReviewCandidates,
   getAccountCatalog,
   getAccountCurves,
   getSummaryRows,
@@ -72,11 +72,6 @@ export type AccountLeaderboardRow = {
   objectiveReturnExcess: number | null;
   isSelectable: boolean;
   sourceLabel: string;
-  methodologySummary: string;
-  buyRules: string[];
-  sellRules: string[];
-  riskControls: string[];
-  params: Record<string, unknown>;
   href: string;
 };
 
@@ -208,10 +203,10 @@ export function buildReportStats(reports = getReportRows()): ReportStats {
 
 export function getResearchCandidates(): ResearchCandidate[] {
   const reportsById = new Map(getReportRows().map((report) => [report.reportId, report]));
-  return getScreenerCandidates().map((candidate) => {
+  return getReviewCandidates().map((candidate) => {
     const report = reportsById.get(candidate.reportId);
     if (!report) {
-      throw new Error(`Screener candidate references missing report_id: ${candidate.reportId}`);
+      throw new Error(`Review candidate references missing report_id: ${candidate.reportId}`);
     }
     return {
       report,
@@ -290,12 +285,7 @@ function accountRowFromSummary(
     objectiveMddSlack: catalog?.objectiveMddSlack ?? objective.mddSlack,
     objectiveReturnExcess: catalog?.objectiveReturnExcess ?? objective.returnExcess,
     isSelectable: catalog?.isSelectable ?? kind === 'account',
-    sourceLabel: kind === 'account' ? '고유 전략' : kind === 'oracle' ? '오라클 기준선' : '벤치마크',
-    methodologySummary: catalog?.methodologySummary ?? '',
-    buyRules: catalog?.buyRules ?? [],
-    sellRules: catalog?.sellRules ?? [],
-    riskControls: catalog?.riskControls ?? [],
-    params: catalog?.params ?? {},
+    sourceLabel: kind === 'account' ? '계좌 원장' : kind === 'oracle' ? '오라클 기준선' : '벤치마크',
     href:
       kind === 'account' && (catalog?.isSelectable ?? true) ? portfolioAccountHref(summary.account_id) : '/portfolio',
   };
@@ -373,7 +363,7 @@ function isFiniteNumber(value: unknown): value is number {
 export function compactAccountLabel(id: string, label: string): string {
   if (id === 'all_weather') return '올웨더';
   if (id === 'smic_follower') return '리포트 추종 v1';
-  if (id === 'smic_follower_v2') return '손절 리포트 추종';
+  if (id === 'smic_follower_v2') return '정지룰 리포트 추종';
   if (id === 'benchmark_kodex200') return 'KODEX200';
   if (id === 'benchmark_qqq') return 'QQQ';
   if (id === 'benchmark_spy') return 'SPY';

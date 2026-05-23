@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react';
 import { APP_NAV, GITHUB_NAV_ITEM } from '@/components/ui/app-shell-nav';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { CommandPalette, type CommandTarget } from '@/components/ui/CommandPalette';
 import { Separator } from '@/components/ui/separator';
 import { SidebarNav } from '@/components/ui/SidebarNav';
@@ -71,9 +70,13 @@ export function AppShell({
   };
   const sidebarMetrics: ShellMetric[] = [
     { label: '기준일', value: snapshotDate || '—' },
-    { label: '리포트', value: reportCount.toLocaleString('ko-KR'), caption: reportRangeLabel(reportRange) },
-    { label: '가격', value: priceRange.end || '—', caption: reportRangeLabel(priceRange) },
-    { label: '전략 수', value: accountCount.toLocaleString('ko-KR'), caption: primaryBookLabel },
+    { label: '리포트', value: `${reportCount.toLocaleString('ko-KR')}기`, caption: reportRangeLabel(reportRange) },
+    { label: '가격', value: priceRange.end ? '정상' : '확인 필요', caption: reportRangeLabel(priceRange) },
+    {
+      label: '계좌',
+      value: accountCount > 0 ? `${accountCount.toLocaleString('ko-KR')}개` : '연결 안 됨',
+      caption: primaryBookLabel,
+    },
   ];
 
   return (
@@ -106,14 +109,14 @@ export function AppShell({
       >
         <Link
           className={cn('flex items-center rounded-lg px-2 py-2', sidebarCollapsed ? 'justify-center gap-0' : 'gap-3')}
-          href="/main"
-          aria-label="SNUSMIC Portfolio Lab 메인"
+          href="/"
+          aria-label="SNUSMIC Signal Research Board 홈"
         >
           <span className="grid size-8 place-items-center rounded-md bg-slate-950 text-xs font-semibold text-white">
             SM
           </span>
           <span className={cn('min-w-0 gap-0.5', sidebarCollapsed ? 'hidden' : 'grid')}>
-            <span className="truncate text-sm font-semibold tracking-tight">SNUSMIC</span>
+            <span className="truncate text-sm font-semibold">SNUSMIC</span>
             <span className="truncate font-mono text-[11px] uppercase tracking-[0.12em] text-slate-500">
               Portfolio Lab
             </span>
@@ -134,14 +137,22 @@ export function AppShell({
         <SidebarNav items={APP_NAV} compact={sidebarCollapsed} />
 
         <div className="mt-auto grid gap-3">
-          <Card className={cn('rounded-lg shadow-none', sidebarCollapsed && 'hidden')}>
-            <CardContent className="grid gap-3 p-3">
+          <section
+            className={cn(
+              'rounded-md border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600',
+              sidebarCollapsed && 'hidden',
+            )}
+            aria-label="Data Status"
+          >
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <span className="text-[11px] font-semibold uppercase text-slate-500">Data Status</span>
+              <span className="h-2 w-2 rounded-full bg-emerald-500" aria-label="정상" />
+            </div>
+            <div className="grid gap-2">
               {sidebarMetrics.map((metric) => (
-                <div className="grid gap-1" key={metric.label}>
+                <div className="grid gap-0.5" key={metric.label}>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-slate-500">
-                      {metric.label}
-                    </span>
+                    <span className="text-slate-500">{metric.label}</span>
                     <strong className="truncate font-mono text-xs tabular-nums text-slate-950">{metric.value}</strong>
                   </div>
                   {metric.caption ? (
@@ -149,8 +160,8 @@ export function AppShell({
                   ) : null}
                 </div>
               ))}
-            </CardContent>
-          </Card>
+            </div>
+          </section>
           <Button
             asChild
             className={cn('justify-start', sidebarCollapsed && 'justify-center px-0')}
@@ -179,9 +190,9 @@ export function AppShell({
                 {mobileNavOpen ? <X className="size-4" /> : <Menu className="size-4" />}
               </button>
               <Link
-                href="/main"
-                className="flex items-center gap-2 truncate text-sm font-semibold tracking-tight text-slate-950"
-                aria-label="SNUSMIC Portfolio Lab 메인"
+                href="/"
+                className="flex items-center gap-2 truncate text-sm font-semibold text-slate-950"
+                aria-label="SNUSMIC Signal Research Board 홈"
               >
                 <span className="grid size-7 place-items-center rounded-md bg-slate-950 text-[10px] font-semibold text-white">
                   SM
@@ -194,12 +205,12 @@ export function AppShell({
                 {snapshotDate || '—'}
               </Badge>
               <Button asChild size="sm" variant="outline">
-                <Link href="/guide">읽는 법</Link>
+                <Link href="/reports">리포트</Link>
               </Button>
             </div>
           </div>
         </header>
-        <main className="mx-auto w-full max-w-[1800px] px-3 py-5 sm:px-4 lg:px-5" id="main-content">
+        <main className="mx-auto w-full max-w-[1480px] px-3 py-4 sm:px-4 lg:px-5" id="main-content">
           {children}
         </main>
       </div>

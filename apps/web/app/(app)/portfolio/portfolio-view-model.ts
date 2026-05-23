@@ -137,19 +137,6 @@ export function buildPortfolioViewModel(selectedAccount?: string): PortfolioView
   const cashByAccount = Object.fromEntries(
     summaries.filter((row) => accounts.includes(row.account_id)).map((row) => [row.account_id, row.finalCashKrw ?? 0]),
   );
-  const methodsByAccount = Object.fromEntries(
-    portfolioRows.map((row) => [
-      row.id,
-      {
-        summary: row.methodologySummary,
-        buyRules: row.buyRules,
-        sellRules: row.sellRules,
-        riskControls: row.riskControls,
-        params: row.params,
-      },
-    ]),
-  );
-
   const holdings = allHoldings.filter((row) => row.account_id === activeAccount);
   const accounting = allAccounting.filter((row) => row.account_id === activeAccount);
   const benchmarkIds = new Set(benchmarkRows.map((row) => row.id));
@@ -193,7 +180,6 @@ export function buildPortfolioViewModel(selectedAccount?: string): PortfolioView
     defaultAccount,
     selectedAccount: activeAccount,
     invalidAccountId,
-    methodsByAccount,
     capitalByAccount,
     cashByAccount,
     reportSymbolsById,

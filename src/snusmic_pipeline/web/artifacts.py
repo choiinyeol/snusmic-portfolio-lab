@@ -39,7 +39,11 @@ REQUIRED_ARTIFACTS = [
     "accounts/catalog.json",
     "accounts/leaderboard.json",
     "accounts/curves.json",
-    "screener/candidates.json",
+    "review/candidates.json",
+    "pages/report-verification.json",
+    "pages/review-queue.json",
+    "pages/report-statistics.json",
+    "pages/portfolio-dashboard.json",
     "overview.json",
     "accounts.json",
     "reports.json",
@@ -351,7 +355,15 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
             )
     missing_symbols = sorted(report_symbols - price_symbols)
 
-    report_rows = _build_report_rows(reports, report_performance, extraction_quality, missing_symbols)
+    priced_prices = _price_frame_with_native(prices)
+    price_groups = _price_groups_by_symbol(priced_prices, prices_are_native=True)
+    report_rows = _build_report_rows(
+        reports,
+        report_performance,
+        extraction_quality,
+        missing_symbols,
+        price_groups=price_groups,
+    )
     report_exclusions = _build_report_exclusion_counts(reports, report_performance, missing_symbols)
     overview = _build_overview(
         reports, prices, summary, report_stats, missing_symbols, report_rows, report_exclusions
@@ -359,10 +371,8 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     account_catalog = _build_account_catalog(summary, inputs.sim / "account-configs.json")
     account_labels = {str(row["account_id"]): str(row["label"]) for row in account_catalog}
     _apply_account_labels(overview.get("baseline_accounts", []), account_labels)
-    priced_prices = _price_frame_with_native(prices)
     mark("build_overview")
 
-    price_groups = _price_groups_by_symbol(priced_prices, prices_are_native=True)
     return_windows = _build_return_windows(report_rows, price_groups=price_groups)
     detail_metrics = _build_detail_metrics(
         report_rows, priced_prices, return_windows, price_groups=price_groups
@@ -387,7 +397,7 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     episode_rows = _records(position_episodes)
     equity_rows = _records(equity_daily)
     accounting_rows = _build_accounting_reconciliation(account_rows, enriched_current_holdings)
-    screener_candidates = _build_screener_candidates(report_rows)
+    review_candidates = _build_review_candidates(report_rows)
     mark("build_portfolio_rows")
 
     _validate_boundary_artifacts(
@@ -418,7 +428,7 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
         return_windows=return_windows,
         target_distribution=target_distribution,
         account_catalog=account_catalog,
-        screener_candidates=screener_candidates,
+        review_candidates=review_candidates,
     )
     mark("write_page_bundles")
 
@@ -455,6 +465,17 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     mark("write_price_artifacts")
 
     _write_report_statistics_lab(out)
+    statistics_lab = _read_json(out / "report-statistics-lab.json")
+    _write_product_json(
+        out / "pages" / "report-statistics.json",
+        _report_statistics_page_bundle(
+            overview,
+            rankings,
+            target_distribution,
+            return_windows,
+            statistics_summary=statistics_lab.get("summary") if isinstance(statistics_lab, dict) else None,
+        ),
+    )
     mark("write_report_statistics_lab")
 
     write_web_manifest(out)
@@ -726,12 +747,7 @@ def _enrich_account_rows_with_catalog(
     accounts: list[dict[str, Any]],
     account_catalog: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    """Attach product methodology fields to portfolio/account_id bundles.
-
-    ``portfolio/accounts.json`` is the portfolio route's compact account list.
-    It should not need to re-join the account catalog to explain why a
-    stock-level account exists after the meta-quant route is removed.
-    """
+    """Attach account taxonomy fields to portfolio/account_id bundles."""
 
     catalog_by_id = {str(row.get("account_id") or ""): row for row in account_catalog}
     enriched: list[dict[str, Any]] = []
@@ -748,11 +764,6 @@ def _enrich_account_rows_with_catalog(
                 "objective_passed",
                 "objective_return_excess",
                 "objective_mdd_slack",
-                "methodology_summary",
-                "buy_rules",
-                "sell_rules",
-                "risk_controls",
-                "params",
             ):
                 row[key] = catalog.get(key)
         enriched.append(row)
@@ -831,7 +842,7 @@ def _write_page_bundles(
     return_windows: list[dict[str, Any]],
     target_distribution: dict[str, Any],
     account_catalog: list[dict[str, Any]],
-    screener_candidates: list[dict[str, Any]],
+    review_candidates: list[dict[str, Any]],
 ) -> None:
     """Write page-owned product bundles.
 
@@ -868,7 +879,149 @@ def _write_page_bundles(
     _write_product_json(out / "accounts" / "leaderboard.json", accounts)
     _write_product_json(out / "accounts" / "curves.json", _compact_equity_curves(equity_daily))
 
-    _write_product_json(out / "screener" / "candidates.json", screener_candidates)
+    _write_product_json(out / "review" / "candidates.json", review_candidates)
+
+    _write_product_json(
+        out / "pages" / "report-verification.json",
+        _report_verification_page_bundle(overview, data_quality, reports, review_candidates),
+    )
+    _write_product_json(
+        out / "pages" / "review-queue.json",
+        _review_queue_page_bundle(overview, reports, review_candidates),
+    )
+    _write_product_json(
+        out / "pages" / "report-statistics.json",
+        _report_statistics_page_bundle(overview, rankings, target_distribution, return_windows),
+    )
+    _write_product_json(
+        out / "pages" / "portfolio-dashboard.json",
+        _portfolio_dashboard_page_bundle(overview, accounts, holdings, trades),
+    )
+
+
+def _page_generated_at(overview: dict[str, Any]) -> str | None:
+    window = overview.get("simulation_window") if isinstance(overview.get("simulation_window"), dict) else {}
+    price_end = window.get("price_end") if isinstance(window, dict) else None
+    return f"{price_end}T00:00:00+09:00" if price_end else None
+
+
+def _page_as_of(overview: dict[str, Any]) -> dict[str, Any]:
+    window = overview.get("simulation_window") if isinstance(overview.get("simulation_window"), dict) else {}
+    return {
+        "report_date": window.get("report_end") if isinstance(window, dict) else None,
+        "price_date": window.get("price_end") if isinstance(window, dict) else None,
+    }
+
+
+def _metric(
+    id_: str, label: str, value: Any, tone: str = "neutral", helper: str | None = None
+) -> dict[str, Any]:
+    return {"id": id_, "label": label, "value": _clean(value), "tone": tone, "helper": helper}
+
+
+def _report_verification_page_bundle(
+    overview: dict[str, Any],
+    data_quality: dict[str, Any],
+    reports: list[dict[str, Any]],
+    review_candidates: list[dict[str, Any]],
+) -> dict[str, Any]:
+    counts = overview.get("report_counts", {}) if isinstance(overview, dict) else {}
+    stats = overview.get("target_stats", {}) if isinstance(overview, dict) else {}
+    excluded = counts.get("excluded_reports", 0)
+    warnings = []
+    missing = len(data_quality.get("missing_symbols", [])) if isinstance(data_quality, dict) else 0
+    if missing:
+        warnings.append({"level": "warning", "message": f"missing_price_symbols={missing}"})
+    if excluded:
+        warnings.append({"level": "info", "message": f"excluded_reports={excluded}"})
+    return {
+        "schema_version": "1.0.0",
+        "generated_at": _page_generated_at(overview),
+        "as_of": _page_as_of(overview),
+        "title": "report-verification",
+        "metrics": [
+            _metric("reports", "verified_reports", len(reports)),
+            _metric("active", "review_candidates", len(review_candidates), "positive"),
+            _metric("target_hit_rate", "target_hit_rate", stats.get("target_hit_rate"), "positive"),
+            _metric("median_current_return", "median_current_return", stats.get("median_current_return")),
+            _metric("median_days_to_target", "median_days_to_target", stats.get("median_days_to_target")),
+            _metric("excluded", "excluded_reports", excluded, "warning" if excluded else "neutral"),
+        ],
+        "views": [
+            {"id": "recent", "label": "recent", "count": len(reports)},
+            {"id": "review", "label": "review_candidates", "count": len(review_candidates)},
+            {"id": "target-hit", "label": "target_hit", "count": stats.get("target_hit_count")},
+        ],
+        "warnings": warnings,
+        "table": {"rows": reports},
+    }
+
+
+def _review_queue_page_bundle(
+    overview: dict[str, Any],
+    reports: list[dict[str, Any]],
+    review_candidates: list[dict[str, Any]],
+) -> dict[str, Any]:
+    priority = review_candidates[:5]
+    return {
+        "schema_version": "1.0.0",
+        "generated_at": _page_generated_at(overview),
+        "as_of": _page_as_of(overview),
+        "title": "review-queue",
+        "metrics": [
+            _metric("candidates", "candidate_symbols", len(review_candidates)),
+            _metric("reports", "source_reports", len(reports)),
+        ],
+        "priority": priority,
+        "table": {"rows": review_candidates},
+    }
+
+
+def _report_statistics_page_bundle(
+    overview: dict[str, Any],
+    rankings: dict[str, Any],
+    target_distribution: dict[str, Any],
+    return_windows: list[dict[str, Any]],
+    statistics_summary: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    stats = overview.get("target_stats", {}) if isinstance(overview, dict) else {}
+    return {
+        "schema_version": "1.0.0",
+        "generated_at": _page_generated_at(overview),
+        "as_of": _page_as_of(overview),
+        "title": "report-statistics",
+        "metrics": [
+            _metric("target_hit_rate", "target_hit_rate", stats.get("target_hit_rate"), "positive"),
+            _metric("median_days_to_target", "median_days_to_target", stats.get("median_days_to_target")),
+            _metric("median_current_return", "median_current_return", stats.get("median_current_return")),
+        ],
+        "rankings": rankings,
+        "target_distribution": target_distribution,
+        "return_windows": return_windows,
+        "summary": statistics_summary or {},
+    }
+
+
+def _portfolio_dashboard_page_bundle(
+    overview: dict[str, Any],
+    accounts: list[dict[str, Any]],
+    holdings: list[dict[str, Any]],
+    trades: list[dict[str, Any]],
+) -> dict[str, Any]:
+    selectable_accounts = [row for row in accounts if row.get("is_selectable")]
+    return {
+        "schema_version": "1.0.0",
+        "generated_at": _page_generated_at(overview),
+        "as_of": _page_as_of(overview),
+        "title": "portfolio-dashboard",
+        "metrics": [
+            _metric("accounts", "selectable_accounts", len(selectable_accounts)),
+            _metric("holdings", "open_holdings", len(holdings)),
+            _metric("trades", "trade_rows", len(trades)),
+        ],
+        "accounts": selectable_accounts,
+        "holdings": holdings,
+    }
 
 
 def _compact_monthly_holdings(rows: list[dict[str, Any]]) -> dict[str, Any]:
@@ -1071,7 +1224,7 @@ def _build_manifest(out: Path, overview: dict[str, Any]) -> dict[str, Any]:
         "equity_daily": _json_row_count(out / "portfolio" / "equity-daily.json"),
         "accounts": _json_row_count(out / "portfolio" / "accounts.json"),
         "account_catalog": _json_row_count(out / "accounts" / "catalog.json"),
-        "screener_candidates": _json_row_count(out / "screener" / "candidates.json"),
+        "review_candidates": _json_row_count(out / "review" / "candidates.json"),
     }
     report_counts = overview.get("report_counts", {}) if isinstance(overview, dict) else {}
     target_stats = overview.get("target_stats", {}) if isinstance(overview, dict) else {}
@@ -1356,10 +1509,12 @@ def _build_report_rows(
     report_performance: pd.DataFrame,
     extraction_quality: dict[str, Any],
     missing_symbols: list[str],
+    price_groups: dict[str, pd.DataFrame] | None = None,
 ) -> list[dict[str, Any]]:
     performance_by_id = {str(row["report_id"]): row for row in report_performance.to_dict(orient="records")}
     review_reasons = _review_reasons_by_report(reports, extraction_quality)
     missing = set(missing_symbols)
+    price_groups = price_groups or {}
     rows: list[dict[str, Any]] = []
     for row in reports.sort_values(["publication_date", "page", "ordinal", "report_id"]).to_dict(
         orient="records"
@@ -1400,45 +1555,148 @@ def _build_report_rows(
         days_to_target = _number(perf.get("days_to_target"))
         if target_hit and days_to_target is not None and days_to_target <= 1:
             continue
-        rows.append(
-            {
-                "report_id": report_id,
-                "date": row.get("publication_date"),
-                "company": row.get("company"),
-                "ticker": row.get("ticker"),
-                "exchange": row.get("exchange"),
-                "symbol": symbol,
-                "title": row.get("title"),
-                "rating": row.get("rating"),
-                "pdf_url": row.get("pdf_url"),
-                "markdown_filename": row.get("markdown_filename"),
-                "target_price": target_price,
-                "target_price_krw": target_price_krw,
-                "target_price_native": target_price_native,
-                "currency": price_currency,
-                "display_currency": price_currency,
-                "price_currency": price_currency,
-                "target_currency": target_currency,
-                "target_direction": target_direction,
-                "publication_price_krw": _number(row.get("report_current_price_krw")),
-                "entry_price_krw": entry_price_krw,
-                "entry_price_native": entry_price_native,
-                "target_upside_at_pub": target_upside_at_pub,
-                "target_hit": target_hit,
-                "target_hit_date": perf.get("target_hit_date") or None,
-                "days_to_target": days_to_target,
-                "last_close_krw": _number(perf.get("last_close_krw")),
-                "last_close_date": perf.get("last_close_date") or None,
-                "current_return": _number(perf.get("current_return")),
-                "peak_return": _number(perf.get("peak_return")),
-                "trough_return": _number(perf.get("trough_return")),
-                "target_gap_pct": _number(perf.get("target_gap_pct")),
-                "expiry_date": perf.get("expiry_date") or None,
-                "expired": _bool(perf.get("expired")),
-                "caveat_flags": sorted(set(caveats)),
-            }
-        )
+        report = {
+            "report_id": report_id,
+            "date": row.get("publication_date"),
+            "company": row.get("company"),
+            "ticker": row.get("ticker"),
+            "exchange": row.get("exchange"),
+            "symbol": symbol,
+            "title": row.get("title"),
+            "rating": row.get("rating"),
+            "pdf_url": row.get("pdf_url"),
+            "markdown_filename": row.get("markdown_filename"),
+            "target_price": target_price,
+            "target_price_krw": target_price_krw,
+            "target_price_native": target_price_native,
+            "currency": price_currency,
+            "display_currency": price_currency,
+            "price_currency": price_currency,
+            "target_currency": target_currency,
+            "target_direction": target_direction,
+            "publication_price_krw": _number(row.get("report_current_price_krw")),
+            "entry_price_krw": entry_price_krw,
+            "entry_price_native": entry_price_native,
+            "target_upside_at_pub": target_upside_at_pub,
+            "target_hit": target_hit,
+            "target_hit_date": perf.get("target_hit_date") or None,
+            "days_to_target": days_to_target,
+            "last_close_krw": _number(perf.get("last_close_krw")),
+            "last_close_native": None,
+            "last_close_date": perf.get("last_close_date") or None,
+            "current_return": _number(perf.get("current_return")),
+            "peak_return": _number(perf.get("peak_return")),
+            "trough_return": _number(perf.get("trough_return")),
+            "target_gap_pct": _number(perf.get("target_gap_pct")),
+            "evaluation_close_krw": _number(perf.get("evaluation_close_krw")),
+            "evaluation_close_date": perf.get("evaluation_close_date") or None,
+            "evaluation_return": _number(perf.get("evaluation_return")),
+            "target_remaining_pct": None,
+            "target_progress_pct": None,
+            "expiry_date": perf.get("expiry_date") or None,
+            "expired": _bool(perf.get("expired")),
+            "caveat_flags": sorted(set(caveats)),
+        }
+        rows.append(_enrich_report_row_with_price_series(report, price_groups.get(symbol)))
     return rows
+
+
+def _enrich_report_row_with_price_series(
+    report: dict[str, Any],
+    price_group: pd.DataFrame | None,
+) -> dict[str, Any]:
+    if price_group is None or price_group.empty:
+        return _with_report_target_metrics(report)
+
+    group = price_group.copy()
+    group["date"] = pd.to_datetime(group["date"], errors="coerce")
+    group = group.dropna(subset=["date"]).sort_values("date")
+    if group.empty:
+        return _with_report_target_metrics(report)
+
+    publication_ts = pd.to_datetime(report.get("date"), errors="coerce")
+    last_close_ts = pd.to_datetime(report.get("last_close_date"), errors="coerce")
+    if pd.isna(last_close_ts):
+        last_close_ts = group["date"].max()
+
+    bounded = group[group["date"].le(last_close_ts)]
+    last_row = bounded.iloc[-1] if not bounded.empty else group.iloc[-1]
+    last_close_native = _number(last_row.get("close_native"))
+    last_close_krw = _number(last_row.get("close_krw"))
+    entry_native = _number(report.get("entry_price_native"))
+    entry_krw = _number(report.get("entry_price_krw"))
+    target_native = _number(report.get("target_price_native"))
+    target_krw = _number(report.get("target_price_krw"))
+    caveats = list(report.get("caveat_flags") or [])
+
+    if not pd.isna(publication_ts) and entry_native is not None and entry_native > 0:
+        pub_candidates = group[group["date"].ge(publication_ts)]
+        if not pub_candidates.empty:
+            pub_close = _number(pub_candidates.iloc[0].get("close_native"))
+            if pub_close is not None and pub_close > 0:
+                ratio = entry_native / pub_close
+                if ratio > 5 or ratio < 0.2:
+                    if target_native is not None:
+                        target_native = target_native / ratio
+                    if target_krw is not None:
+                        target_krw = target_krw / ratio
+                    if entry_krw is not None:
+                        entry_krw = entry_krw / ratio
+                    entry_native = pub_close
+                    caveats.append("price_scale_adjusted_entry")
+
+    report.update(
+        {
+            "entry_price_native": _round_number(entry_native),
+            "entry_price_krw": _round_number(entry_krw),
+            "target_price_native": _round_number(target_native),
+            "target_price_krw": _round_number(target_krw),
+            "target_price": _round_number(target_native if target_native is not None else target_krw),
+            "target_direction": _target_direction(target_native, entry_native),
+            "last_close_native": _round_number(last_close_native),
+            "last_close_krw": _round_number(
+                last_close_krw if last_close_krw is not None else report.get("last_close_krw")
+            ),
+            "last_close_date": _date_string(last_row.get("date")) or report.get("last_close_date"),
+            "caveat_flags": sorted(set(caveats)),
+        }
+    )
+
+    return _with_report_target_metrics(report)
+
+
+def _with_report_target_metrics(report: dict[str, Any]) -> dict[str, Any]:
+    current = _number(report.get("last_close_native")) or _number(report.get("last_close_krw"))
+    target = _number(report.get("target_price_native")) or _number(report.get("target_price_krw"))
+    entry = _number(report.get("entry_price_native")) or _number(report.get("entry_price_krw"))
+    if current is None or target is None or entry is None or current <= 0 or target <= 0 or entry <= 0:
+        report["target_remaining_pct"] = None
+        report["target_progress_pct"] = None
+        return report
+
+    target_move = target - entry
+    report["target_progress_pct"] = _round_number((current - entry) / target_move) if target_move else None
+    if _bool(report.get("target_hit")):
+        report["target_remaining_pct"] = 0
+        return report
+
+    direction = report.get("target_direction")
+    if direction == "upside":
+        report["target_remaining_pct"] = _round_number(max(0.0, target / current - 1))
+    elif direction == "downside":
+        report["target_remaining_pct"] = _round_number(max(0.0, 1 - target / current))
+    else:
+        report["target_remaining_pct"] = None
+    return report
+
+
+def _date_string(value: Any) -> str | None:
+    if value is None or pd.isna(value):
+        return None
+    try:
+        return pd.Timestamp(value).strftime("%Y-%m-%d")
+    except (TypeError, ValueError):
+        return None
 
 
 def _build_report_exclusion_counts(
@@ -1613,12 +1871,12 @@ def _account_kind(account_id: str) -> str:
 
 
 def _build_account_catalog(summary: pd.DataFrame, sim_config_path: Path) -> list[dict[str, Any]]:
-    """Build the frontend account taxonomy and methodology contract.
+    """Build the frontend account taxonomy contract.
 
     The UI must not infer benchmark/account meaning from fragile string
     prefixes. This catalog is the product boundary: labels, short labels,
-    benchmark groups, account rules, objective gate, and searchable params are
-    exported together with the simulation output.
+    benchmark groups, and objective gate are exported together with the
+    simulation output.
     """
 
     config_by_id = _account_config_by_id(sim_config_path)
@@ -1662,11 +1920,6 @@ def _build_account_catalog(summary: pd.DataFrame, sim_config_path: Path) -> list
                 "objective_passed": objective_passed,
                 "objective_return_excess": return_excess,
                 "objective_mdd_slack": mdd_slack,
-                "methodology_summary": _methodology_summary(account_id, config),
-                "buy_rules": _buy_rules(account_id, config),
-                "sell_rules": _sell_rules(account_id, config),
-                "risk_controls": _risk_controls(account_id, config),
-                "params": _account_params(account_id, config),
                 "metrics": {
                     "final_equity_krw": _number(row.get("final_equity_krw")),
                     "final_cash_krw": _number(row.get("final_cash_krw")),
@@ -1717,66 +1970,6 @@ def _account_display_label(account_id: str, config: dict[str, Any], default_labe
     return labels.get(account_id, default_label)
 
 
-def _methodology_summary(account_id: str, config: dict[str, Any]) -> str:
-    if account_id == "all_weather":
-        return "Equal-weight GLD, QQQ, SPY, and KODEX200 benchmark with periodic rebalancing."
-    if account_id.startswith("benchmark_"):
-        assets = config.get("assets") if isinstance(config.get("assets"), list) else []
-        name = assets[0].get("name") if assets and isinstance(assets[0], dict) else account_id
-        return f"Single-asset market benchmark tracking {name}."
-    if account_id == "smic_follower":
-        return "Point-in-time SMIC report follower that buys active reports with target prices and holds until target hit or expiry."
-    if account_id == "smic_follower_v2":
-        return "SMIC report follower with time-loss, averaged-down loss, and report-age stop rules."
-    return "Fixed simulation account_id included in the simulation artifact."
-
-
-def _buy_rules(account_id: str, config: dict[str, Any]) -> list[str]:
-    if account_id == "smic_follower":
-        return ["Buy active point-in-time SMIC reports with usable target prices on an equal-weight basis."]
-    if account_id == "smic_follower_v2":
-        return [
-            "Buy active point-in-time SMIC reports with usable target prices on an equal-weight basis.",
-            "Apply stop-rule checks before opening or adding exposure.",
-        ]
-    if account_id in BENCHMARK_ACCOUNT_IDS:
-        return ["Hold the configured benchmark asset mix and rebalance on schedule."]
-    return []
-
-
-def _sell_rules(account_id: str, config: dict[str, Any]) -> list[str]:
-    if account_id == "smic_follower_v2":
-        return [
-            f"Exit after {int(config.get('time_loss_days') or 0)} loss-making holding days.",
-            f"Exit averaged-down positions beyond {_pct(config.get('averaged_down_stop_pct'))} loss.",
-            f"Exit after report age exceeds {int(config.get('report_age_stop_days') or 0)} days.",
-        ]
-    if account_id == "smic_follower":
-        return ["Exit when the report target is reached or the report expires."]
-    if account_id in BENCHMARK_ACCOUNT_IDS:
-        return ["Rebalance to the configured benchmark weights on schedule."]
-    return []
-
-
-def _risk_controls(account_id: str, config: dict[str, Any]) -> list[str]:
-    if account_id in BENCHMARK_ACCOUNT_IDS:
-        return ["Benchmark-only baseline."]
-    if account_id == "smic_follower_v2":
-        return [
-            f"Time-loss exit after {int(config.get('time_loss_days') or 0)} days.",
-            f"Averaged-down loss exit at {_pct(config.get('averaged_down_stop_pct'))}.",
-            f"Report-age exit after {int(config.get('report_age_stop_days') or 0)} days.",
-        ]
-    if account_id == "smic_follower":
-        return ["Report expiry closes stale thesis exposure."]
-    return []
-
-
-def _account_params(account_id: str, config: dict[str, Any]) -> dict[str, Any]:
-    excluded = {"account_id", "label", "assets"}
-    return {key: value for key, value in config.items() if key not in excluded}
-
-
 def _account_catalog_sort_key(row: dict[str, Any]) -> tuple[int, float, str]:
     account_id = str(row.get("account_id") or "")
     order = {
@@ -1793,13 +1986,6 @@ def _account_catalog_sort_key(row: dict[str, Any]) -> tuple[int, float, str]:
     metrics = row.get("metrics") if isinstance(row.get("metrics"), dict) else {}
     ret = _number(metrics.get("money_weighted_return")) if isinstance(metrics, dict) else None
     return (100, -(ret if ret is not None else -999.0), account_id)
-
-
-def _pct(value: Any) -> str:
-    number = _number(value)
-    if number is None:
-        return "—"
-    return f"{number * 100:.0f}%"
 
 
 def _build_rankings(report_stats: dict[str, Any], report_rows: list[dict[str, Any]]) -> dict[str, Any]:
@@ -2181,7 +2367,7 @@ def _build_insights(
     ]
 
 
-def _build_screener_candidates(report_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _build_review_candidates(report_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     candidates: list[dict[str, Any]] = []
     latest_date = max((str(row.get("date") or "") for row in report_rows), default="")
     for row in report_rows:
@@ -2292,11 +2478,14 @@ def _write_download_csvs(
         "target_hit_date",
         "days_to_target",
         "last_close_krw",
+        "last_close_native",
         "last_close_date",
         "current_return",
         "peak_return",
         "trough_return",
         "target_gap_pct",
+        "target_remaining_pct",
+        "target_progress_pct",
         "caveat_flags",
         "pdf_url",
     ]

@@ -36,7 +36,6 @@ export function PortfolioOverviewView({ model }: { model: PortfolioViewModel }) 
         .slice(0, 8),
     [model.trades, account_id],
   );
-  const method = model.methodsByAccount[account_id];
   const accountLabel = model.accountLabels[account_id] ?? account_id;
 
   return (
@@ -50,7 +49,7 @@ export function PortfolioOverviewView({ model }: { model: PortfolioViewModel }) 
               </div>
               <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">손익 경로와 매매 시점</h2>
               <p className="mt-1 text-sm leading-6 text-slate-500">
-                리포트 상세의 가격 경로처럼, 포트폴리오 평가 곡선 위에 매수·매도 마커를 같이 표시합니다.
+                리포트 상세의 가격 경로처럼, 계좌 평가 곡선 위에 매수·매도 마커를 같이 표시합니다.
               </p>
             </div>
             <Button asChild size="sm" variant="outline">
@@ -90,7 +89,7 @@ export function PortfolioOverviewView({ model }: { model: PortfolioViewModel }) 
             height={460}
             compact
             hrefBySymbol={reportHrefBySymbol}
-            caption="면적 = 평가액, 색 = 미실현 수익률. RP이자도 포트폴리오 비중으로 포함합니다."
+            caption="면적 = 평가액, 색 = 미실현 수익률. RP이자도 계좌 비중으로 포함합니다."
           />
         </article>
       </section>
@@ -112,29 +111,17 @@ export function PortfolioOverviewView({ model }: { model: PortfolioViewModel }) 
         </article>
 
         <article className="rounded-md border border-slate-200 bg-white p-4">
-          <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                logic
-              </div>
-              <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">매매 로직</h2>
+          <div className="mb-3">
+            <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+              audit focus
             </div>
-            <Button asChild size="sm" variant="outline">
-              <Link href={`/portfolio/${encodeURIComponent(account_id)}/methodology`}>규칙 보기</Link>
-            </Button>
+            <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">직접 확인할 질문</h2>
           </div>
-          {method ? (
-            <div className="grid gap-3">
-              <p className="text-sm leading-6 text-slate-600">{method.summary}</p>
-              <div className="grid gap-3 md:grid-cols-3">
-                <RulePreview title="매수" items={method.buyRules} />
-                <RulePreview title="매도" items={method.sellRules} />
-                <RulePreview title="위험" items={method.riskControls} />
-              </div>
-            </div>
-          ) : (
-            <p className="text-sm text-slate-500">기록된 운용 규칙이 없습니다.</p>
-          )}
+          <ul className="grid gap-3 text-sm leading-6 text-slate-600">
+            <li>매수 체결일 전후 리포트 근거와 가격 흐름이 납득되는가?</li>
+            <li>매도 체결이 손절, 익절, 리밸런싱 중 어떤 결과를 만들었는가?</li>
+            <li>동일 원금 경로에서 현금 비중과 보유 기간이 수익률을 어떻게 바꿨는가?</li>
+          </ul>
         </article>
       </section>
     </div>
@@ -177,7 +164,7 @@ function TradeEventTimeline({
             ? reportTargetHref(target)
             : trade.reportId
               ? `/reports/${encodeURIComponent(trade.symbol)}/${encodeURIComponent(trade.reportId)}`
-              : `/reports/${encodeURIComponent(trade.symbol)}`;
+              : `/portfolio/${encodeURIComponent(trade.account_id)}/trades`;
           const sideLabel = trade.side === 'sell' ? '매도' : '매수';
           return (
             <li
@@ -241,20 +228,6 @@ function RecentTradeList({ trades }: { trades: TradeRow[] }) {
         </li>
       ))}
     </ol>
-  );
-}
-
-function RulePreview({ title, items }: { title: string; items: string[] }) {
-  return (
-    <div className="rounded-md border border-slate-100 bg-slate-50 p-3">
-      <h3 className="text-xs font-semibold text-slate-950">{title}</h3>
-      <ul className="mt-2 grid gap-1 text-xs leading-5 text-slate-600">
-        {items.slice(0, 3).map((item) => (
-          <li key={item}>• {item}</li>
-        ))}
-        {!items.length ? <li>—</li> : null}
-      </ul>
-    </div>
   );
 }
 

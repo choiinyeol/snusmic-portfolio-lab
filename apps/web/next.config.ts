@@ -6,6 +6,7 @@ const repoRoot = path.resolve(process.cwd(), '../..');
 const nextConfig: NextConfig = {
   output: 'export',
   trailingSlash: true,
+  allowedDevOrigins: ['127.0.0.1'],
   poweredByHeader: false,
   images: { unoptimized: true },
   turbopack: {

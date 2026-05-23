@@ -47,7 +47,10 @@ export function getDashboardViewModel() {
   const sourceReports = artifactOverview.report_counts?.extracted_reports ?? dataQuality.totalReports;
   const latestReportsBySymbol = latestReportBySymbol(reports);
   const reportHrefBySymbol = Object.fromEntries(
-    [...latestReportsBySymbol.keys()].map((symbol) => [symbol, `/reports/${encodeURIComponent(symbol)}`]),
+    [...latestReportsBySymbol.values()].map((report) => [
+      report.symbol,
+      `/reports/${encodeURIComponent(report.symbol)}/${encodeURIComponent(report.reportId)}`,
+    ]),
   );
   const equity = getAccountCurves();
   const benchmarkRows = getBenchmarkRows(accountRows);

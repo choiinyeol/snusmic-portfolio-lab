@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import {
   flexRender,
@@ -17,11 +17,12 @@ import { Fragment, useCallback, useDeferredValue, useMemo, useReducer, useState 
 import { CsvDownloadButton, downloadCsv } from '@/components/ui/data-panel';
 import { Money } from '@/components/ui/Money';
 import { BlockPagination } from '@/components/trading/TableControls';
-import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
+import { SegmentedControl } from '@/components/ui/segmented-control';
+import { SelectMenu } from '@/components/ui/select-menu';
 import { useSearchShortcut } from '@/components/ui/use-search-shortcut';
 import { formatDateKo, formatPercent, numCellClass, signedTextClass } from '@/lib/format';
 
-export type ScreenerBoardRow = {
+export type ReviewBoardRow = {
   symbol: string;
   company: string;
   exchange: string;
@@ -67,8 +68,8 @@ export type ScreenerBoardRow = {
   sparkline: number[];
 };
 
-type ScreenerTableProps = {
-  rows: ScreenerBoardRow[];
+type ReviewTableProps = {
+  rows: ReviewBoardRow[];
 };
 
 type PresetId =
@@ -164,7 +165,7 @@ const COLUMN_META: Record<string, { kind: ColumnFilterKind; placeholder: string 
   // candidateBucket has its own rendering and matching branch — intentionally absent here.
 };
 
-function downloadScreenerRows(rows: ScreenerBoardRow[]) {
+function downloadReviewRows(rows: ReviewBoardRow[]) {
   const headers = [
     'symbol',
     'company',
@@ -231,7 +232,7 @@ function downloadScreenerRows(rows: ScreenerBoardRow[]) {
     row.above200ma === null ? '' : row.above200ma ? 'true' : 'false',
     row.maStack === null ? '' : row.maStack ? 'true' : 'false',
   ]);
-  downloadCsv('snusmic-screener-filtered.csv', headers, data);
+  downloadCsv('snusmic-review-filtered.csv', headers, data);
 }
 
 function columnFilterKind(columnId: string): ColumnFilterKind | undefined {
@@ -391,9 +392,9 @@ const PRESETS: Preset[] = [
   },
 ];
 
-export function ScreenerTable({ rows }: ScreenerTableProps) {
+export function ReviewTable({ rows }: ReviewTableProps) {
   const [sorting, setSorting] = useState<SortingState>([{ id: 'candidateScore', desc: true }]);
-  const [columnMode, setColumnMode] = useState<ColumnMode>('price');
+  const [columnMode, setColumnMode] = useState<ColumnMode>('core');
   const [globalFilter, setGlobalFilter] = useState('');
   const deferredGlobalFilter = useDeferredValue(globalFilter);
   const clearGlobalFilter = useCallback(() => setGlobalFilter(''), []);
@@ -413,7 +414,7 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
   } = filters;
   const setPage = useCallback((next: number) => dispatchFilters({ type: 'SET_PAGE', page: next }), []);
 
-  const columns = useMemo<ColumnDef<ScreenerBoardRow>[]>(() => buildColumns(), []);
+  const columns = useMemo<ColumnDef<ReviewBoardRow>[]>(() => buildColumns(), []);
   const columnVisibility = useMemo<VisibilityState>(() => buildColumnVisibility(columnMode), [columnMode]);
   const buckets = useMemo(
     () => [
@@ -487,9 +488,6 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
     dispatchFilters({ type: 'SET_COLUMN_FILTER', columnId, value });
   }, []);
   const clearColumnFilters = useCallback(() => dispatchFilters({ type: 'CLEAR_COLUMN_FILTERS' }), []);
-  const tableMinWidthClass =
-    columnMode === 'all' ? 'min-w-[2820px]' : columnMode === 'price' ? 'min-w-[1840px]' : 'min-w-[1480px]';
-
   return (
     <section className="grid gap-3">
       <div className="grid gap-3 md:grid-cols-4">
@@ -507,7 +505,7 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
         />
       </div>
 
-      <div className="w-full min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white">
+      <div className="w-full min-w-0 overflow-visible rounded-xl border border-slate-200 bg-white">
         <div className="grid gap-3 border-b border-slate-200 p-3">
           <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
             <div className="min-w-0">
@@ -527,37 +525,28 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
                 <span className="shrink-0 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
                   컬럼
                 </span>
-                <div className="inline-flex min-w-max overflow-hidden rounded-md border border-slate-200 bg-white">
-                  {(['core', 'price', 'all'] as const).map((mode, index) => {
-                    const isActive = columnMode === mode;
-                    return (
-                      <button
-                        key={mode}
-                        type="button"
-                        aria-pressed={isActive}
-                        className={[
-                          'inline-flex h-8 min-w-12 items-center justify-center whitespace-nowrap px-3 text-xs font-semibold transition-colors',
-                          index > 0 ? 'border-l border-slate-200' : '',
-                          isActive
-                            ? 'bg-slate-950 text-white'
-                            : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-950',
-                        ].join(' ')}
-                        onClick={() => setColumnMode(mode)}
-                      >
-                        {modeLabel(mode)}
-                      </button>
-                    );
-                  })}
-                </div>
+                <SegmentedControl
+                  ariaLabel="컬럼 보기"
+                  onValueChange={setColumnMode}
+                  options={[
+                    { value: 'core', label: '핵심' },
+                    { value: 'price', label: '가격' },
+                    { value: 'all', label: '전체 컬럼' },
+                  ]}
+                  value={columnMode}
+                />
               </div>
               <CsvDownloadButton
                 label="CSV"
-                onClick={() => downloadScreenerRows(filteredRows.map((row) => row.original))}
+                onClick={() => downloadReviewRows(filteredRows.map((row) => row.original))}
               />
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-1.5" aria-label="스크리너 프리셋">
+          <div
+            className="flex w-fit max-w-full flex-wrap gap-1 rounded-2xl bg-slate-100 p-1 ring-1 ring-slate-200/70"
+            aria-label="검토 보드 프리셋"
+          >
             {PRESETS.map((preset) => (
               <button
                 key={preset.id}
@@ -572,14 +561,14 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
             ))}
           </div>
 
-          <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-[minmax(300px,1.5fr)_repeat(6,minmax(140px,1fr))]">
-            <label className="grid gap-1 text-xs font-medium text-slate-500" htmlFor="screener-search">
+          <div className="grid gap-2 md:grid-cols-[minmax(280px,1fr)_auto] md:items-end">
+            <label className="grid gap-1 text-xs font-medium text-slate-500" htmlFor="review-search">
               <span>
                 검색 <span className="font-mono text-[10px] text-slate-400">(/ 단축키)</span>
               </span>
               <input
                 ref={searchInputRef}
-                id="screener-search"
+                id="review-search"
                 className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-950 outline-none focus:border-slate-400"
                 value={globalFilter}
                 placeholder="symbol, company, caveat, rank basis"
@@ -589,57 +578,62 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
                 }}
               />
             </label>
-            <Select
-              label="후보 유형"
-              value={bucketFilter}
-              onChange={(value) => dispatchFilters({ type: 'SET_BUCKET', value })}
-              options={buckets}
-            />
-            <Select<SignFilter>
-              label="수익률 방향"
-              value={returnFilter}
-              onChange={(value) => dispatchFilters({ type: 'SET_RETURN', value })}
-              options={['all', 'positive', 'negative'] as const}
-            />
-            <Select<BooleanFilter>
-              label="목표 도달"
-              value={targetHitFilter}
-              onChange={(value) => dispatchFilters({ type: 'SET_TARGET_HIT', value })}
-              options={['all', 'yes', 'no'] as const}
-            />
-            <Select<BooleanFilter>
-              label="만료"
-              value={expiredFilter}
-              onChange={(value) => dispatchFilters({ type: 'SET_EXPIRED', value })}
-              options={['no', 'all', 'yes'] as const}
-            />
-            <Select<MaFilter>
-              label="이동평균"
-              value={maFilter}
-              onChange={(value) => dispatchFilters({ type: 'SET_MA', value })}
-              options={['all', 'above', 'below'] as const}
-            />
-            <div className="grid gap-1 text-xs font-medium text-slate-500">
-              <span>52주 고점</span>
-              <button
-                type="button"
-                aria-pressed={nearHighOnly}
-                className={toggleClass(nearHighOnly)}
-                onClick={() => dispatchFilters({ type: 'TOGGLE_NEAR_HIGH' })}
-              >
-                -10% 이내
-              </button>
+            <div className="text-xs text-slate-500 md:text-right">
+              {filteredRows.length.toLocaleString('ko-KR')} / {rows.length.toLocaleString('ko-KR')}개 표시
             </div>
           </div>
 
-          <details className="rounded-lg border border-slate-200 bg-slate-50/70 p-2">
-            <summary className="cursor-pointer select-none px-1 text-xs font-semibold text-slate-700">
-              컬럼별 세부 필터
+          <details className="rounded-2xl border border-slate-200 bg-slate-50/80 p-2 shadow-inner shadow-white/60">
+            <summary className="cursor-pointer select-none rounded-xl px-2 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-white/70">
+              고급 필터
               <span className="ml-2 font-normal text-slate-500">
-                직접 입력·Y/N 선택은 표 밖에서 넓게 조정합니다
+                후보 유형, 수익률 방향, 목표 달성, 이동평균, 컬럼 조건
                 {activeColumnFilterCount > 0 ? ` · ${activeColumnFilterCount}개 적용 중` : ''}
               </span>
             </summary>
+            <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
+              <Select
+                label="후보 유형"
+                value={bucketFilter}
+                onChange={(value) => dispatchFilters({ type: 'SET_BUCKET', value })}
+                options={buckets}
+              />
+              <Select<SignFilter>
+                label="수익률 방향"
+                value={returnFilter}
+                onChange={(value) => dispatchFilters({ type: 'SET_RETURN', value })}
+                options={['all', 'positive', 'negative'] as const}
+              />
+              <Select<BooleanFilter>
+                label="목표 도달"
+                value={targetHitFilter}
+                onChange={(value) => dispatchFilters({ type: 'SET_TARGET_HIT', value })}
+                options={['all', 'yes', 'no'] as const}
+              />
+              <Select<BooleanFilter>
+                label="만료"
+                value={expiredFilter}
+                onChange={(value) => dispatchFilters({ type: 'SET_EXPIRED', value })}
+                options={['no', 'all', 'yes'] as const}
+              />
+              <Select<MaFilter>
+                label="이동평균"
+                value={maFilter}
+                onChange={(value) => dispatchFilters({ type: 'SET_MA', value })}
+                options={['all', 'above', 'below'] as const}
+              />
+              <div className="grid gap-1 text-xs font-medium text-slate-500">
+                <span>52주 고점</span>
+                <button
+                  type="button"
+                  aria-pressed={nearHighOnly}
+                  className={toggleClass(nearHighOnly)}
+                  onClick={() => dispatchFilters({ type: 'TOGGLE_NEAR_HIGH' })}
+                >
+                  -10% 이내
+                </button>
+              </div>
+            </div>
             <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
               {table
                 .getVisibleLeafColumns()
@@ -696,10 +690,8 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
           </div>
         ) : null}
 
-        <div className="w-full min-w-0 overflow-x-auto">
-          <table
-            className={`${tableMinWidthClass} w-full border-separate border-spacing-0 text-[11px] leading-4 [&_td]:border-b [&_td]:border-slate-100 [&_td]:px-2 [&_td]:py-1.5 [&_th]:border-b [&_th]:border-slate-200 [&_th]:px-2 [&_th]:py-1.5 [&_tr:hover_td]:bg-slate-50`}
-          >
+        <div className="w-full min-w-0 overflow-hidden">
+          <table className="w-full table-fixed border-separate border-spacing-0 text-[11px] leading-4 [&_td]:overflow-hidden [&_td]:text-ellipsis [&_td]:whitespace-nowrap [&_td]:border-b [&_td]:border-slate-100 [&_td]:px-2 [&_td]:py-1.5 [&_th]:overflow-hidden [&_th]:text-ellipsis [&_th]:whitespace-nowrap [&_th]:border-b [&_th]:border-slate-200 [&_th]:px-2 [&_th]:py-1.5 [&_tr:hover_td]:bg-slate-50">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
                 <Fragment key={headerGroup.id}>
@@ -782,7 +774,7 @@ export function ScreenerTable({ rows }: ScreenerTableProps) {
   );
 }
 
-function buildColumns(): ColumnDef<ScreenerBoardRow>[] {
+function buildColumns(): ColumnDef<ReviewBoardRow>[] {
   return [
     {
       id: 'symbol',
@@ -1035,7 +1027,7 @@ function buildColumns(): ColumnDef<ScreenerBoardRow>[] {
 }
 
 function krwPriceSort(field: 'lastCloseKrw' | 'entryPriceKrw' | 'targetPriceKrw') {
-  return (a: Row<ScreenerBoardRow>, b: Row<ScreenerBoardRow>) => {
+  return (a: Row<ReviewBoardRow>, b: Row<ReviewBoardRow>) => {
     const left = a.original[field] ?? Number.NEGATIVE_INFINITY;
     const right = b.original[field] ?? Number.NEGATIVE_INFINITY;
     return left === right ? 0 : left > right ? 1 : -1;
@@ -1043,7 +1035,7 @@ function krwPriceSort(field: 'lastCloseKrw' | 'entryPriceKrw' | 'targetPriceKrw'
 }
 
 function rowPassesFilters(
-  row: ScreenerBoardRow,
+  row: ReviewBoardRow,
   filters: {
     bucketFilter: string;
     returnFilter: SignFilter;
@@ -1070,7 +1062,7 @@ function rowPassesFilters(
   return true;
 }
 
-function rowPassesColumnFilters(row: ScreenerBoardRow, filters: ColumnFilterValues): boolean {
+function rowPassesColumnFilters(row: ReviewBoardRow, filters: ColumnFilterValues): boolean {
   for (const [columnId, rawValue] of Object.entries(filters)) {
     const filterValue = rawValue.trim();
     if (!filterValue) continue;
@@ -1079,7 +1071,7 @@ function rowPassesColumnFilters(row: ScreenerBoardRow, filters: ColumnFilterValu
   return true;
 }
 
-function matchesColumnFilter(row: ScreenerBoardRow, columnId: string, filterValue: string): boolean {
+function matchesColumnFilter(row: ReviewBoardRow, columnId: string, filterValue: string): boolean {
   if (columnId === 'symbol') {
     return textIncludes(`${row.symbol} ${row.company}`, filterValue);
   }
@@ -1092,9 +1084,9 @@ function matchesColumnFilter(row: ScreenerBoardRow, columnId: string, filterValu
   return textIncludes(String(columnValue(row, columnId) ?? ''), filterValue);
 }
 
-function columnValue(row: ScreenerBoardRow, columnId: string): unknown {
+function columnValue(row: ReviewBoardRow, columnId: string): unknown {
   if (columnId === 'caveatFlags') return row.caveatFlags.join(' ');
-  return row[columnId as keyof ScreenerBoardRow];
+  return row[columnId as keyof ReviewBoardRow];
 }
 
 function matchesBoolean(value: unknown, filterValue: string): boolean {
@@ -1166,7 +1158,7 @@ function textIncludes(value: string, filterValue: string): boolean {
   return value.toLocaleLowerCase('ko-KR').includes(filterValue.toLocaleLowerCase('ko-KR'));
 }
 
-function presetMatch(row: ScreenerBoardRow, preset: Preset): boolean {
+function presetMatch(row: ReviewBoardRow, preset: Preset): boolean {
   return (
     rowPassesFilters(row, {
       bucketFilter: 'all',
@@ -1181,7 +1173,7 @@ function presetMatch(row: ScreenerBoardRow, preset: Preset): boolean {
   );
 }
 
-function globalTextFilter(row: Row<ScreenerBoardRow>, _columnId: string, filterValue: string): boolean {
+function globalTextFilter(row: Row<ReviewBoardRow>, _columnId: string, filterValue: string): boolean {
   const needle = filterValue.trim().toLocaleLowerCase('ko-KR');
   if (!needle) return true;
   const item = row.original;
@@ -1262,13 +1254,12 @@ function Select<T extends string>({
   return (
     <div className="grid gap-1 text-xs font-medium text-slate-500">
       <span>{label}</span>
-      <NativeSelect aria-label={label} value={value} onChange={(event) => onChange(event.target.value as T)}>
-        {options.map((option) => (
-          <NativeSelectOption key={option} value={option}>
-            {filterOptionLabel(option)}
-          </NativeSelectOption>
-        ))}
-      </NativeSelect>
+      <SelectMenu
+        ariaLabel={label}
+        onValueChange={onChange}
+        options={options.map((option) => ({ value: option, label: filterOptionLabel(option) }))}
+        value={value}
+      />
     </div>
   );
 }
@@ -1301,38 +1292,37 @@ function ColumnFilterControl({
   if (columnId === 'sparkline' || columnId === 'detail') return null;
   if (columnId === 'candidateBucket') {
     return (
-      <NativeSelect
-        aria-label={`${columnLabel(columnId)} 컬럼 필터`}
-        className="h-9 w-full px-2 text-xs font-normal normal-case tracking-normal text-slate-700"
+      <SelectMenu
+        ariaLabel={`${columnLabel(columnId)} 컬럼 필터`}
+        className="w-full"
+        onValueChange={(nextValue) => onChange(nextValue)}
+        options={buckets.map((bucket) => ({
+          value: bucket === 'all' ? '' : bucket,
+          label: bucket === 'all' ? '전체' : bucket,
+        }))}
         value={value}
-        onChange={(event) => onChange(event.target.value)}
-      >
-        {buckets.map((bucket) => (
-          <NativeSelectOption key={bucket} value={bucket === 'all' ? '' : bucket}>
-            {bucket === 'all' ? '전체' : bucket}
-          </NativeSelectOption>
-        ))}
-      </NativeSelect>
+      />
     );
   }
   if (columnFilterKind(columnId) === 'boolean') {
     return (
-      <NativeSelect
-        aria-label={`${columnLabel(columnId)} 컬럼 필터`}
-        className="h-9 w-full px-2 text-xs font-normal normal-case tracking-normal text-slate-700"
+      <SelectMenu
+        ariaLabel={`${columnLabel(columnId)} 컬럼 필터`}
+        className="w-full"
+        onValueChange={(nextValue) => onChange(nextValue)}
+        options={[
+          { value: '', label: '전체' },
+          { value: 'yes', label: 'Y' },
+          { value: 'no', label: 'N' },
+        ]}
         value={value}
-        onChange={(event) => onChange(event.target.value)}
-      >
-        <NativeSelectOption value="">전체</NativeSelectOption>
-        <NativeSelectOption value="yes">Y</NativeSelectOption>
-        <NativeSelectOption value="no">N</NativeSelectOption>
-      </NativeSelect>
+      />
     );
   }
   return (
     <input
       aria-label={`${columnLabel(columnId)} 컬럼 필터`}
-      className="h-9 w-full rounded border border-slate-200 bg-white px-2 font-mono text-xs font-normal normal-case tracking-normal text-slate-700 outline-none placeholder:text-slate-300 focus:border-slate-400"
+      className="h-10 w-full rounded-xl border border-slate-200 bg-white/90 px-3 font-mono text-xs font-normal normal-case tracking-normal text-slate-700 outline-none placeholder:text-slate-300 focus:ring-2 focus:ring-slate-300"
       value={value}
       placeholder={columnFilterPlaceholder(columnId)}
       onChange={(event) => onChange(event.target.value)}
@@ -1345,17 +1335,17 @@ function isColumnFilterable(columnId: string): boolean {
 }
 
 function columnWidthClass(columnId: string): string {
-  if (columnId === 'symbol') return 'min-w-[150px]';
-  if (columnId === 'company') return 'min-w-[140px]';
-  if (columnId === 'latestReportDate') return 'min-w-[112px]';
-  if (columnId === 'currency' || columnId === 'detail') return 'min-w-[72px]';
-  if (columnId === 'sparkline') return 'min-w-[96px]';
-  if (columnId === 'candidateBucket') return 'min-w-[132px]';
-  if (columnId === 'rankBasis') return 'min-w-[150px]';
-  if (columnId === 'caveatFlags') return 'min-w-[86px]';
-  if (columnId === 'targetHit' || columnId === 'expired') return 'min-w-[82px]';
+  if (columnId === 'symbol') return 'w-[150px] max-w-[150px]';
+  if (columnId === 'company') return 'w-[140px] max-w-[140px]';
+  if (columnId === 'latestReportDate') return 'w-[112px] max-w-[112px]';
+  if (columnId === 'currency' || columnId === 'detail') return 'w-[72px] max-w-[72px]';
+  if (columnId === 'sparkline') return 'w-[96px] max-w-[96px]';
+  if (columnId === 'candidateBucket') return 'w-[132px] max-w-[132px]';
+  if (columnId === 'rankBasis') return 'w-[150px] max-w-[150px]';
+  if (columnId === 'caveatFlags') return 'w-[86px] max-w-[86px]';
+  if (columnId === 'targetHit' || columnId === 'expired') return 'w-[82px] max-w-[82px]';
   if (columnId === 'above20ma' || columnId === 'above50ma' || columnId === 'above200ma' || columnId === 'maStack') {
-    return 'min-w-[78px]';
+    return 'w-[78px] max-w-[78px]';
   }
   if (
     columnId === 'lastCloseNative' ||
@@ -1363,10 +1353,10 @@ function columnWidthClass(columnId: string): string {
     columnId === 'entryPriceNative' ||
     columnId === 'targetPriceNative'
   ) {
-    return 'min-w-[96px]';
+    return 'w-[96px] max-w-[96px]';
   }
-  if (columnId === 'daysToTarget' || columnId === 'candidateScore') return 'min-w-[86px]';
-  return 'min-w-[92px]';
+  if (columnId === 'daysToTarget' || columnId === 'candidateScore') return 'w-[86px] max-w-[86px]';
+  return 'w-[92px] max-w-[92px]';
 }
 
 function PercentCell({ value, heat = false }: { value: number | null; heat?: boolean }) {
@@ -1441,7 +1431,7 @@ function BooleanMark({ value }: { value: boolean }) {
   return <span className={`font-mono ${value ? 'text-rose-500' : 'text-slate-400'}`}>{value ? 'Y' : '—'}</span>;
 }
 
-function HitCell({ row }: { row: ScreenerBoardRow }) {
+function HitCell({ row }: { row: ReviewBoardRow }) {
   if (row.targetHit)
     return (
       <span className="rounded-md bg-emerald-50 px-1.5 py-0.5 text-[11px] font-medium text-emerald-700">도달</span>
@@ -1487,7 +1477,7 @@ function sparklinePoints(values: number[], width: number, height: number): { lin
   };
 }
 
-function buildBoardStats(rows: ScreenerBoardRow[]) {
+function buildBoardStats(rows: ReviewBoardRow[]) {
   const positiveCount = rows.filter((row) => (row.currentReturn ?? -Infinity) >= 0).length;
   return {
     positiveCount,
@@ -1497,7 +1487,7 @@ function buildBoardStats(rows: ScreenerBoardRow[]) {
   };
 }
 
-function detailHref(row: ScreenerBoardRow): string {
+function detailHref(row: ReviewBoardRow): string {
   return `/reports/${encodeURIComponent(row.symbol)}/${encodeURIComponent(row.latestReportId)}`;
 }
 
@@ -1522,14 +1512,8 @@ function formatDaysShort(value: number | null): string {
 
 function toggleClass(active: boolean): string {
   return active
-    ? 'inline-flex h-8 items-center whitespace-nowrap rounded-md border border-slate-950 bg-slate-950 px-2.5 text-xs font-semibold text-white'
-    : 'inline-flex h-8 items-center whitespace-nowrap rounded-md border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-950';
-}
-
-function modeLabel(mode: ColumnMode): string {
-  if (mode === 'core') return '핵심';
-  if (mode === 'price') return '가격';
-  return '전체 컬럼';
+    ? 'inline-flex h-8 items-center whitespace-nowrap rounded-full bg-white px-3 text-xs font-medium text-slate-950 shadow-sm ring-1 ring-slate-300'
+    : 'inline-flex h-8 items-center whitespace-nowrap rounded-full bg-transparent px-3 text-xs font-medium text-slate-500 transition-colors hover:bg-white/70 hover:text-slate-950';
 }
 
 function columnLabel(columnId: string): string {

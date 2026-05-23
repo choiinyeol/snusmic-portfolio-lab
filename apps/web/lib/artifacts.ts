@@ -1,6 +1,7 @@
-import 'server-only';
+﻿import 'server-only';
 import fs from 'node:fs';
 import path from 'node:path';
+import { readArtifact, WEB_DATA_ROOT } from '@/lib/data/artifact-reader';
 import {
   ArtifactManifestSchema,
   AccountingReconciliationRowSchema,
@@ -10,7 +11,10 @@ import {
   parseRows,
   RawHoldingRowSchema,
   RawReportRowSchema,
-  ScreenerCandidateSchema,
+  ReviewCandidateSchema,
+  ReportStatisticsPageBundleSchema,
+  ReportVerificationPageBundleSchema,
+  ReviewQueuePageBundleSchema,
   RawTradeRowSchema,
   AccountCatalogRowSchema,
   WebAccountSchema,
@@ -18,7 +22,7 @@ import {
   WebOverviewSchema,
 } from '@/lib/schemas';
 
-const repoRoot = path.resolve(/* turbopackIgnore: true */ process.cwd(), '../..');
+const repoRoot = path.resolve(/* turbopackIgnore: true */ WEB_DATA_ROOT, '../..');
 
 type RawReport = Record<string, unknown>;
 type CompactTableArtifact = {
@@ -54,6 +58,9 @@ export type ReportRow = {
   peakReturn: number | null;
   troughReturn: number | null;
   targetGapPct: number | null;
+  evaluationCloseKrw: number | null;
+  evaluationCloseDate: string | null;
+  evaluationReturn: number | null;
   /** Additional move (always >= 0) the current price must make to reach
    * the target. Null for hit/expired/no-target reports. */
   targetRemainingPct: number | null;
@@ -235,11 +242,6 @@ export type AccountCatalogRow = {
   objectivePassed: boolean;
   objectiveReturnExcess: number | null;
   objectiveMddSlack: number | null;
-  methodologySummary: string;
-  buyRules: string[];
-  sellRules: string[];
-  riskControls: string[];
-  params: Record<string, unknown>;
   metrics: {
     finalEquityKrw: number | null;
     finalCashKrw: number | null;
@@ -252,7 +254,7 @@ export type AccountCatalogRow = {
   };
 };
 
-export type ScreenerCandidateRow = {
+export type ReviewCandidateRow = {
   reportId: string;
   symbol: string;
   company: string;
@@ -263,6 +265,52 @@ export type ScreenerCandidateRow = {
   targetUpsideAtPub: number | null;
   currentReturn: number | null;
   targetGapPct: number | null;
+};
+
+export type PageBundleMetric = {
+  id: string;
+  label: string;
+  value: number | string | boolean | null;
+  tone?: 'neutral' | 'positive' | 'negative' | 'warning' | 'accent';
+  helper?: string | null;
+};
+
+export type PageBundleWarning = {
+  level: 'info' | 'warning' | 'error';
+  message: string;
+};
+
+export type ReportVerificationPageBundle = {
+  schema_version: '1.0.0';
+  generated_at: string | null;
+  as_of: { report_date: string | null; price_date: string | null };
+  title: string;
+  metrics: PageBundleMetric[];
+  views: Array<{ id: string; label: string; count: number | null }>;
+  warnings: PageBundleWarning[];
+  table: { rows: ReportRow[] };
+};
+
+export type ReviewQueuePageBundle = {
+  schema_version: '1.0.0';
+  generated_at: string | null;
+  as_of: { report_date: string | null; price_date: string | null };
+  title: string;
+  metrics: PageBundleMetric[];
+  priority: ReviewCandidateRow[];
+  table: { rows: ReviewCandidateRow[] };
+};
+
+export type ReportStatisticsPageBundle = {
+  schema_version: '1.0.0';
+  generated_at: string | null;
+  as_of: { report_date: string | null; price_date: string | null };
+  title: string;
+  metrics: PageBundleMetric[];
+  summary: ReportStatisticsLabSummary;
+  rankings: Record<string, unknown>;
+  target_distribution: Record<string, unknown>;
+  return_windows: Array<Record<string, unknown>>;
 };
 
 export type WebAccount = {
@@ -454,7 +502,7 @@ export type ReportStatisticsLabSummary = {
      * window is still in progress. */
     expiryCloseKrw?: number | null;
     /** ISO date string for the expiry day's bar. Useful when surfacing
-     * "만료 시점" rows on per-report views. */
+     * "留뚮즺 ?쒖젏" rows on per-report views. */
     expiryDate?: string | null;
     hit06: boolean;
     hit08: boolean;
@@ -491,7 +539,7 @@ function currentArtifactStamp(): number {
 function clearArtifactCaches() {
   reportCache = undefined;
   accountCatalogCache = undefined;
-  screenerCandidateCache = undefined;
+  reviewCandidateCache = undefined;
   holdingsCache = undefined;
   monthlyHoldingsCache = undefined;
   tradesCache = undefined;
@@ -545,6 +593,20 @@ export function getReportRows(): ReportRow[] {
   return reportCache;
 }
 
+export function getReportVerificationPageBundle(): ReportVerificationPageBundle {
+  const raw = readArtifact('pages/report-verification.json', ReportVerificationPageBundleSchema);
+  return {
+    ...raw,
+    table: {
+      rows: raw.table.rows
+        .map((row) => fromRawReport(row as RawReport))
+        .sort(
+          (a, b) => b.publicationDate.localeCompare(a.publicationDate) || a.company.localeCompare(b.company, 'ko-KR'),
+        ),
+    },
+  };
+}
+
 function fromRawReport(row: RawReport): ReportRow {
   const report: ReportRow = {
     reportId: String(row.report_id ?? row.reportId ?? ''),
@@ -577,190 +639,16 @@ function fromRawReport(row: RawReport): ReportRow {
     peakReturn: num(row.peak_return ?? row.peakReturn),
     troughReturn: num(row.trough_return ?? row.troughReturn),
     targetGapPct: num(row.target_gap_pct ?? row.targetGapPct),
-    targetRemainingPct: null,
-    targetProgressPct: null,
+    evaluationCloseKrw: num(row.evaluation_close_krw ?? row.evaluationCloseKrw),
+    evaluationCloseDate: strOrNull(row.evaluation_close_date ?? row.evaluationCloseDate),
+    evaluationReturn: num(row.evaluation_return ?? row.evaluationReturn),
+    targetRemainingPct: num(row.target_remaining_pct ?? row.targetRemainingPct),
+    targetProgressPct: num(row.target_progress_pct ?? row.targetProgressPct),
     expiryDate: strOrNull(row.expiry_date ?? row.expiryDate),
     expired: bool(row.expired),
     caveatFlags: Array.isArray(row.caveat_flags) ? row.caveat_flags : [],
   };
-  const enriched = withLatestNativeClose(report);
-  const hasTargetHitField = row.target_hit !== undefined || row.targetHit !== undefined;
-  const withHit = hasTargetHitField ? enriched : withOhlcTargetTouch(enriched);
-  return withTargetMetrics(withHit);
-}
-
-function withTargetMetrics(report: ReportRow): ReportRow {
-  const current = report.lastCloseNative ?? report.lastCloseKrw;
-  const target = report.targetPriceNative ?? report.targetPriceKrw;
-  if (!current || !target || current <= 0 || target <= 0) {
-    return { ...report, targetRemainingPct: null, targetProgressPct: null };
-  }
-  if (report.targetHit) {
-    // Resolved — no "remaining"; keep progress uncapped so overshoot remains visible.
-    return { ...report, targetRemainingPct: 0, targetProgressPct: targetProgressFromEntry(report) ?? 1 };
-  }
-  const targetProgressPct = targetProgressFromEntry(report);
-  if (report.targetDirection === 'upside') {
-    return {
-      ...report,
-      targetRemainingPct: Math.max(0, target / current - 1),
-      targetProgressPct,
-    };
-  }
-  if (report.targetDirection === 'downside') {
-    return {
-      ...report,
-      targetRemainingPct: Math.max(0, 1 - target / current),
-      targetProgressPct,
-    };
-  }
-  return { ...report, targetRemainingPct: null, targetProgressPct: null };
-}
-
-function targetProgressFromEntry(report: ReportRow): number | null {
-  const nativePrices =
-    report.lastCloseNative !== null && report.targetPriceNative !== null && report.entryPriceNative !== null
-      ? {
-          current: report.lastCloseNative,
-          target: report.targetPriceNative,
-          entry: report.entryPriceNative,
-        }
-      : null;
-  const krwPrices =
-    report.lastCloseKrw !== null && report.targetPriceKrw !== null && report.entryPriceKrw !== null
-      ? {
-          current: report.lastCloseKrw,
-          target: report.targetPriceKrw,
-          entry: report.entryPriceKrw,
-        }
-      : null;
-  const prices = nativePrices ?? krwPrices;
-  if (!prices || prices.current <= 0 || prices.target <= 0 || prices.entry <= 0) return null;
-
-  const targetMove = prices.target - prices.entry;
-  if (targetMove === 0) return null;
-
-  const progress = (prices.current - prices.entry) / targetMove;
-  return progress;
-}
-
-function withOhlcTargetTouch(report: ReportRow): ReportRow {
-  const targetPrice = report.targetPriceNative ?? report.targetPriceKrw;
-  const entryPrice = report.entryPriceNative ?? report.entryPriceKrw;
-  if (!report.symbol || !report.publicationDate || !targetPrice || !entryPrice || entryPrice <= 0) return report;
-  const direction = targetPrice > entryPrice ? 'upside' : targetPrice < entryPrice ? 'downside' : null;
-  if (!direction) return report;
-  const prices = getPriceSeries(report.symbol, report.publicationDate);
-  const hit = prices.find((point) => {
-    const high = point.high ?? point.close ?? point.value;
-    const low = point.low ?? point.close ?? point.value;
-    return direction === 'upside' ? high >= targetPrice : low <= targetPrice;
-  });
-  if (!hit) return { ...report, targetHit: false, targetHitDate: null, daysToTarget: null };
-  return {
-    ...report,
-    targetHit: true,
-    targetHitDate: hit.time,
-    daysToTarget: diffDays(report.publicationDate, hit.time),
-  };
-}
-
-/** Always recompute the report's latest price, current return, and peak/trough
- * return off the full price series so expired reports do not freeze at the
- * artifact's cap date. The artifact still owns target-hit semantics within the
- * validation window; this only refreshes the "as of today" view.
- *
- * Also corrects PDF-extracted entry/target prices that diverge ≥5× from the
- * publication-day close (a strong split / data-extraction signal). When that
- * happens, the entry snaps to the publication-day close and the target is
- * rescaled by the same ratio so 코세스-style "진입가 10원" artifacts stop
- * leaking through to the screener and report table. */
-function withLatestNativeClose(report: ReportRow): ReportRow {
-  if (!report.symbol) return report;
-  const fullPrices = getPriceSeries(report.symbol);
-  const latest = fullPrices.at(-1);
-  if (!latest) return report;
-  const lastCloseNative = latest.close ?? latest.value;
-  if (lastCloseNative === null || lastCloseNative === undefined || !Number.isFinite(lastCloseNative)) {
-    return report;
-  }
-
-  // Detect split / extraction errors before recomputing returns.
-  let entry: number | null = report.entryPriceNative;
-  let targetPriceNative = report.targetPriceNative;
-  let targetPriceKrw = report.targetPriceKrw;
-  let entryPriceKrw = report.entryPriceKrw;
-  const pubPoint = report.publicationDate ? fullPrices.find((point) => point.time >= report.publicationDate) : null;
-  const pubClose = pubPoint?.close ?? pubPoint?.value ?? null;
-  if (
-    pubClose !== null &&
-    pubClose !== undefined &&
-    Number.isFinite(pubClose) &&
-    pubClose > 0 &&
-    entry !== null &&
-    entry !== undefined &&
-    Number.isFinite(entry) &&
-    entry > 0
-  ) {
-    const ratio = entry / pubClose;
-    if (ratio > 5 || ratio < 0.2) {
-      // Treat as suspected split / extraction defect; rescale target by the same
-      // ratio so the relative upside stays intact while absolute prices align
-      // with the post-split series the chart already shows.
-      if (targetPriceNative !== null && Number.isFinite(targetPriceNative)) {
-        targetPriceNative = targetPriceNative / ratio;
-      }
-      if (targetPriceKrw !== null && Number.isFinite(targetPriceKrw)) {
-        targetPriceKrw = targetPriceKrw / ratio;
-      }
-      if (entryPriceKrw !== null && Number.isFinite(entryPriceKrw)) {
-        entryPriceKrw = entryPriceKrw / ratio;
-      }
-      entry = pubClose;
-    }
-  }
-
-  const currentReturn =
-    entry !== null && entry !== undefined && Number.isFinite(entry) && entry !== 0
-      ? lastCloseNative / entry - 1
-      : report.currentReturn;
-  // Peak/trough span the entire post-publication path so the table reflects the
-  // full lifetime, not just the validation window.
-  const pricesSincePublication = report.publicationDate
-    ? fullPrices.filter((point) => point.time >= report.publicationDate)
-    : fullPrices;
-  const closes = pricesSincePublication
-    .map((point) => point.close ?? point.value)
-    .filter((value): value is number => value !== null && value !== undefined && Number.isFinite(value));
-  const peakReturn =
-    entry && Number.isFinite(entry) && entry !== 0 && closes.length
-      ? Math.max(...closes) / entry - 1
-      : report.peakReturn;
-  const troughReturn =
-    entry && Number.isFinite(entry) && entry !== 0 && closes.length
-      ? Math.min(...closes) / entry - 1
-      : report.troughReturn;
-  return {
-    ...report,
-    currency: latest.currency ?? report.currency,
-    entryPriceNative: entry,
-    entryPriceKrw,
-    targetPriceNative,
-    targetPriceKrw,
-    lastCloseKrw: latest.closeKrw ?? report.lastCloseKrw,
-    lastCloseNative,
-    lastCloseDate: latest.time ?? report.lastCloseDate,
-    currentReturn,
-    peakReturn,
-    troughReturn,
-  };
-}
-
-function diffDays(start: string, end: string): number | null {
-  const startMs = Date.parse(`${start}T00:00:00Z`);
-  const endMs = Date.parse(`${end}T00:00:00Z`);
-  if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) return null;
-  return Math.round((endMs - startMs) / 86_400_000);
+  return report;
 }
 
 export function getReportById(reportId: string): ReportRow | undefined {
@@ -901,9 +789,9 @@ function currencyForPricePoint(symbol: string, date: string | null | undefined):
 }
 
 export function getMarkdownSnippet(report: ReportRow): string {
-  if (!report.markdownFilename) return '이 리포트에는 markdown 추출 파일이 기록되어 있지 않습니다.';
+  if (!report.markdownFilename) return '??由ы룷?몄뿉??markdown 異붿텧 ?뚯씪??湲곕줉?섏뼱 ?덉? ?딆뒿?덈떎.';
   const markdownPath = fullPath(`data/markdown/${report.markdownFilename}`);
-  if (!fs.existsSync(markdownPath)) return `markdown 추출 파일을 찾을 수 없습니다: ${report.markdownFilename}`;
+  if (!fs.existsSync(markdownPath)) return `markdown 異붿텧 ?뚯씪??李얠쓣 ???놁뒿?덈떎: ${report.markdownFilename}`;
   return fs.readFileSync(markdownPath, 'utf8').slice(0, 5000);
 }
 
@@ -1006,11 +894,6 @@ export function getAccountCatalog(): AccountCatalogRow[] {
     objectivePassed: row.objective_passed,
     objectiveReturnExcess: row.objective_return_excess,
     objectiveMddSlack: row.objective_mdd_slack,
-    methodologySummary: row.methodology_summary,
-    buyRules: row.buy_rules,
-    sellRules: row.sell_rules,
-    riskControls: row.risk_controls,
-    params: row.params,
     metrics: {
       finalEquityKrw: row.metrics.final_equity_krw,
       finalCashKrw: row.metrics.final_cash_krw,
@@ -1045,20 +928,53 @@ export function getReportStatisticsLabSummary(): ReportStatisticsLabSummary {
   return raw.summary;
 }
 
+export function getReportStatisticsPageBundle(): ReportStatisticsPageBundle {
+  const raw = readArtifact('pages/report-statistics.json', ReportStatisticsPageBundleSchema);
+  return {
+    ...raw,
+    summary: raw.summary as unknown as ReportStatisticsLabSummary,
+  };
+}
+
 export function getInsights(): Insight[] {
   return readRequiredJson<Insight[]>('data/web/overview/research-pulse.json');
 }
 
-let screenerCandidateCache: ScreenerCandidateRow[] | undefined;
+let reviewCandidateCache: ReviewCandidateRow[] | undefined;
 
-export function getScreenerCandidates(): ScreenerCandidateRow[] {
-  if (artifactCacheValid() && screenerCandidateCache) return screenerCandidateCache;
+export function getReviewCandidates(): ReviewCandidateRow[] {
+  if (artifactCacheValid() && reviewCandidateCache) return reviewCandidateCache;
   const raw = parseRows(
-    'screener/candidates.json',
-    ScreenerCandidateSchema,
-    readRequiredJson<unknown>('data/web/screener/candidates.json'),
+    'review/candidates.json',
+    ReviewCandidateSchema,
+    readRequiredJson<unknown>('data/web/review/candidates.json'),
   );
-  screenerCandidateCache = raw.map((row) => ({
+  reviewCandidateCache = raw.map(fromRawReviewCandidate);
+  return reviewCandidateCache;
+}
+
+export function getReviewQueuePageBundle(): ReviewQueuePageBundle {
+  const raw = readArtifact('pages/review-queue.json', ReviewQueuePageBundleSchema);
+  return {
+    ...raw,
+    priority: raw.priority.map(fromRawReviewCandidate),
+    table: { rows: raw.table.rows.map(fromRawReviewCandidate) },
+  };
+}
+
+function fromRawReviewCandidate(row: {
+  report_id: string;
+  symbol: string;
+  company: string;
+  date: string;
+  bucket: 'fresh' | 'large-upside' | 'near-target' | 'active';
+  rank_basis: string;
+  score: number;
+  target_upside_at_pub: number | null;
+  current_return: number | null;
+  target_gap_pct: number | null;
+}): ReviewCandidateRow {
+  return {
     reportId: row.report_id,
     symbol: row.symbol,
     company: row.company,
@@ -1069,8 +985,7 @@ export function getScreenerCandidates(): ScreenerCandidateRow[] {
     targetUpsideAtPub: row.target_upside_at_pub,
     currentReturn: row.current_return,
     targetGapPct: row.target_gap_pct,
-  }));
-  return screenerCandidateCache;
+  };
 }
 
 export function getDownloadHref(fileName: string): string {

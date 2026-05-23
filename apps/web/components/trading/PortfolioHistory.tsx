@@ -6,7 +6,7 @@ import { Money } from '@/components/ui/Money';
 import { formatDateKo, formatKrw, formatPercent } from '@/lib/format';
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import { CsvDownloadButton, DataPanel, downloadCsv } from '@/components/ui/data-panel';
-import { marketLabel, nativeFromKrw } from './helpers';
+import { marketLabel, nativeFromKrw, reportTargetHref } from './helpers';
 import { SortHeader, pageRows, sortRows, type SortState } from './TableControls';
 
 type Props = {
@@ -94,7 +94,7 @@ export function PortfolioHistory({ monthly, account_id, accountLabels, targetsBy
       <section className="rounded-md border border-slate-200 bg-white">
         <div className="flex flex-col gap-3 p-5">
           <h2 className="text-base font-semibold text-slate-950">비중 추이 — 100% 스택</h2>
-          <div className="grid gap-1" aria-label="월말 포트폴리오 비중 추이">
+          <div className="grid gap-1" aria-label="월말 계좌 비중 추이">
             {stacks.map((stack) => (
               <div className="grid grid-cols-[6rem_1fr_minmax(140px,16rem)] items-center gap-3" key={stack.month}>
                 <div className="font-mono text-xs text-slate-500">{stack.month}</div>
@@ -123,7 +123,7 @@ export function PortfolioHistory({ monthly, account_id, accountLabels, targetsBy
       </section>
 
       <DataPanel
-        title={`${month} 월말 포트폴리오`}
+        title={`${month} 월말 계좌`}
         subtitle={`${sorted.length.toLocaleString('ko-KR')}건`}
         actions={
           <>
@@ -164,7 +164,7 @@ export function PortfolioHistory({ monthly, account_id, accountLabels, targetsBy
                 <SortHeader label="월말" sortKey="month" sort={sort} onSort={updateSort} />
               </th>
               <th>
-                <SortHeader label="전략" sortKey="account" sort={sort} onSort={updateSort} />
+                <SortHeader label="계좌" sortKey="account" sort={sort} onSort={updateSort} />
               </th>
               <th>
                 <SortHeader label="시장" sortKey="market" sort={sort} onSort={updateSort} />
@@ -223,9 +223,13 @@ export function PortfolioHistory({ monthly, account_id, accountLabels, targetsBy
                   <td>
                     {row.company || row.symbol}
                     <div className="text-xs text-slate-950/55">
-                      <a className="text-slate-700 hover:underline" href={`/reports/${encodeURIComponent(row.symbol)}`}>
-                        {row.symbol}
-                      </a>
+                      {target ? (
+                        <a className="text-slate-700 hover:underline" href={reportTargetHref(target)}>
+                          {row.symbol}
+                        </a>
+                      ) : (
+                        <span>{row.symbol}</span>
+                      )}
                     </div>
                   </td>
                   <td>

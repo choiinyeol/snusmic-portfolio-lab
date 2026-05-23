@@ -19,7 +19,7 @@ type RiskSortKey =
 
 export function AccountRiskTable({
   rows,
-  title = '전략 성과',
+  title = '계좌 성과',
   csvFilename = 'snusmic-accounts.csv',
 }: {
   rows: AccountLeaderboardRow[];
@@ -145,7 +145,7 @@ function AccountName({ row }: { row: AccountLeaderboardRow }) {
 }
 
 function kindLabel(kind: AccountLeaderboardRow['kind']): string {
-  if (kind === 'account') return '고유 전략';
+  if (kind === 'account') return '계좌 원장';
   if (kind === 'oracle') return '상한선';
   return '벤치마크';
 }

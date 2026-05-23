@@ -161,9 +161,9 @@
     "report_start": "2020-12-05"
   },
   "target_stats": {
-    "avg_current_return": 0.31416218905472637,
+    "avg_current_return": 0.8939522388059702,
     "avg_days_to_target": 207.6987951807229,
-    "median_current_return": -0.007,
+    "median_current_return": 0.0926,
     "median_days_to_target": 135.0,
     "target_hit_count": 83,
     "target_hit_rate": 0.41089108910891087

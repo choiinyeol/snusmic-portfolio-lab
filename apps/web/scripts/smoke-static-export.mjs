@@ -1,0 +1,37 @@
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+import { cwd, exit } from 'node:process';
+
+const outDir = join(cwd(), 'out');
+
+const expected = [
+  ['/', 'index.html'],
+  ['/portfolio', 'portfolio/index.html'],
+  ['/reports', 'reports/index.html'],
+  ['/statistics', 'statistics/index.html'],
+];
+
+const retired = [
+  ['/review', 'review/index.html'],
+  ['/main', 'main/index.html'],
+  ['/guide', 'guide/index.html'],
+  ['/screener', 'screener/index.html'],
+  ['/portfolio/no-admitted-account/methodology', 'portfolio/no-admitted-account/methodology/index.html'],
+];
+
+const failures = [];
+
+for (const [route, file] of expected) {
+  if (!existsSync(join(outDir, file))) failures.push(`missing expected static route ${route}: out/${file}`);
+}
+
+for (const [route, file] of retired) {
+  if (existsSync(join(outDir, file))) failures.push(`retired route still exported ${route}: out/${file}`);
+}
+
+if (failures.length) {
+  console.error(failures.join('\n'));
+  exit(1);
+}
+
+console.log(`static export smoke passed: ${expected.length} present, ${retired.length} retired`);

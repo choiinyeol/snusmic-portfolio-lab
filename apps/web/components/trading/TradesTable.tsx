@@ -153,7 +153,7 @@ export function TradesTable({
                 <SortHeader label="일자" sortKey="date" sort={tradeSort} onSort={updateTradeSort} />
               </th>
               <th className="px-3 py-2 text-left">
-                <SortHeader label="전략" sortKey="account" sort={tradeSort} onSort={updateTradeSort} />
+                <SortHeader label="계좌" sortKey="account" sort={tradeSort} onSort={updateTradeSort} />
               </th>
               <th className="px-3 py-2 text-left">
                 <SortHeader label="시장" sortKey="market" sort={tradeSort} onSort={updateTradeSort} />
@@ -225,12 +225,15 @@ export function TradesTable({
                       </span>
                     </td>
                     <td className="px-3 py-2">
-                      <Link
-                        className="font-semibold text-slate-950 hover:underline"
-                        href={target ? reportTargetHref(target) : `/reports/${encodeURIComponent(trade.symbol)}`}
-                      >
-                        {tradeDisplayName(trade.symbol, target?.company ?? trade.company)}
-                      </Link>
+                      {target ? (
+                        <Link className="font-semibold text-slate-950 hover:underline" href={reportTargetHref(target)}>
+                          {tradeDisplayName(trade.symbol, target.company ?? trade.company)}
+                        </Link>
+                      ) : (
+                        <span className="font-semibold text-slate-950">
+                          {tradeDisplayName(trade.symbol, trade.company)}
+                        </span>
+                      )}
                       {tradeDisplayName(trade.symbol, target?.company ?? trade.company) !== trade.symbol ? (
                         <div className="mt-0.5 font-mono text-[11px] text-slate-400">{trade.symbol}</div>
                       ) : null}

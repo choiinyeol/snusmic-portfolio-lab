@@ -3,13 +3,12 @@ import type { ReactNode } from 'react';
 import { PortfolioEquityView } from '@/components/trading/portfolio-views/PortfolioEquityView';
 import { PortfolioHoldingsView } from '@/components/trading/portfolio-views/PortfolioHoldingsView';
 import { PortfolioLandingView } from '@/components/trading/portfolio-views/PortfolioLandingView';
-import { PortfolioMethodologyView } from '@/components/trading/portfolio-views/PortfolioMethodologyView';
 import { PortfolioOverviewView } from '@/components/trading/portfolio-views/PortfolioOverviewView';
 import { PortfolioAccountFrame } from '@/components/trading/portfolio-views/PortfolioAccountFrame';
 import { PortfolioTradesView } from '@/components/trading/portfolio-views/PortfolioTradesView';
 import type { PortfolioViewModel } from '@/components/trading/portfolio-views/types';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { PageHero } from '@/components/ui/PageHero';
 import { formatKrw, formatPercent } from '@/lib/format';
 import {
   buildPortfolioLandingModel,
@@ -17,7 +16,7 @@ import {
   getPortfolioStaticParams as getStaticParams,
 } from './portfolio-view-model';
 
-export type PortfolioRouteView = 'overview' | 'holdings' | 'equity' | 'trades' | 'methodology';
+export type PortfolioRouteView = 'overview' | 'holdings' | 'equity' | 'trades';
 
 export function PortfolioPageContent() {
   return <PortfolioLandingView model={buildPortfolioLandingModel()} />;
@@ -39,26 +38,20 @@ export function PortfolioPageShell({ children, model }: { children: ReactNode; m
 
   return (
     <div className="grid gap-5">
-      <header className="grid gap-4 border-b border-slate-200 pb-5">
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="outline">운용 보고서</Badge>
-          <Badge variant="secondary">비교 기준선 제외</Badge>
-          <span className="font-mono text-xs text-slate-500">{model.latestEquityDate || '—'} 평가</span>
-        </div>
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(420px,.75fr)] xl:items-end">
-          <div className="min-w-0">
-            <h1 className="text-2xl font-semibold tracking-[-0.02em] text-slate-950 md:text-4xl">{shortLabel}</h1>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-              {label}의 실제 보유, RP이자, 체결, 매매 로직을 투자 보고서 형태로 보여줍니다. 벤치마크·추종
-              기준선·상한선류는 선택 가능한 실제 보유 원장에는 섞지 않고, 상위 포트폴리오 화면에서 비교 기준선으로만
-              함께 보여줍니다.
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <Button asChild size="sm" variant="outline">
-                <Link href="/portfolio">포트폴리오 선택</Link>
-              </Button>
-            </div>
-          </div>
+      <PageHero
+        eyebrow="Portfolio report"
+        title={shortLabel}
+        subtitle={`${label}의 실제 보유, RP이자, 체결, 손익 경로를 계좌 보고서 형태로 보여줍니다. 벤치마크는 선택 가능한 실제 보유 원장에 섞지 않고 비교 기준선으로만 표시합니다.`}
+        badges={[
+          { label: '최근 평가', value: model.latestEquityDate || '—' },
+          { label: '표시 기준', value: '실제 보유 계좌' },
+        ]}
+        actions={
+          <Button asChild size="sm" variant="outline">
+            <Link href="/portfolio">계좌 선택</Link>
+          </Button>
+        }
+        kpis={
           <FactsTable
             rows={[
               { label: '현재 평가액', value: formatKrw(totalValue), tone: 'neutral' },
@@ -75,8 +68,8 @@ export function PortfolioPageShell({ children, model }: { children: ReactNode; m
               },
             ]}
           />
-        </div>
-      </header>
+        }
+      />
       <PortfolioAccountFrame model={model}>{children}</PortfolioAccountFrame>
     </div>
   );
@@ -103,15 +96,6 @@ export function PortfolioRouteContentFromModel({
   if (view === 'holdings') return <PortfolioHoldingsView model={model} />;
   if (view === 'equity') return <PortfolioEquityView model={model} />;
   if (view === 'trades') return <PortfolioTradesView model={model} />;
-  if (view === 'methodology') {
-    return (
-      <PortfolioMethodologyView
-        method={model.methodsByAccount[model.selectedAccount]}
-        accountLabel={model.accountLabels[model.selectedAccount] ?? model.selectedAccount}
-        accountId={model.selectedAccount}
-      />
-    );
-  }
   return <PortfolioOverviewView model={model} />;
 }
 
@@ -126,7 +110,7 @@ type FactRow = {
 
 function FactsTable({ rows }: { rows: FactRow[] }) {
   return (
-    <section className="overflow-hidden rounded-md border border-slate-200 bg-white" aria-label="포트폴리오 핵심 지표">
+    <section className="overflow-hidden rounded-md border border-slate-200 bg-white" aria-label="계좌 핵심 지표">
       <dl className="grid grid-cols-2 lg:grid-cols-4 [&>div]:border-b [&>div]:border-r [&>div]:border-slate-100">
         {rows.map((row) => (
           <div className="grid min-w-0 gap-0.5 p-3" key={row.label}>

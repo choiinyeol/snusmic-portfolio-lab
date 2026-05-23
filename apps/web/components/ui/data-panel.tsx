@@ -4,11 +4,6 @@ import { Download, SearchX } from 'lucide-react';
 import type { ReactNode, Ref } from 'react';
 import { BlockPagination } from '@/components/trading/TableControls';
 
-/** Shared dense-table chrome: header (title + actions + optional search),
- * scrollable body with sticky `<thead>` (via global CSS), and a centered
- * pagination footer. Every dense table on the site should consume this
- * panel so the layout is consistent and affordances (sort/page/CSV/search)
- * stay aligned. See `DESIGN.md`. */
 export type DataPanelProps = {
   title: ReactNode;
   subtitle?: ReactNode;
@@ -57,11 +52,11 @@ export function DataPanel({ title, subtitle, actions, search, toolbar, paginatio
         </div>
       </header>
       {toolbar ? <div className="border-b border-slate-200 bg-white px-4 py-3">{toolbar}</div> : null}
-      <div className="max-h-[72vh] overflow-auto">{children}</div>
+      <div className="max-h-[72vh] overflow-y-auto overflow-x-hidden">{children}</div>
       {pagination ? (
         <footer className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 border-t border-slate-200 bg-slate-50 px-4 py-2.5 font-mono text-[11px] text-slate-500">
           <span className="justify-self-start leading-normal">
-            총 {pagination.totalRows.toLocaleString('ko-KR')}행 ·{' '}
+            총 {pagination.totalRows.toLocaleString('ko-KR')}건 ·{' '}
             {pagination.pageCount ? Math.min(pagination.page, pagination.pageCount - 1) + 1 : 0}/
             {Math.max(1, pagination.pageCount)}쪽
           </span>
@@ -72,7 +67,7 @@ export function DataPanel({ title, subtitle, actions, search, toolbar, paginatio
           />
           {pagination.onPageSizeChange && pagination.pageSize !== undefined ? (
             <label className="inline-flex items-center justify-self-end gap-1.5">
-              <span>페이지당</span>
+              <span>페이지</span>
               <select
                 value={pagination.pageSize}
                 onChange={(event) => pagination.onPageSizeChange?.(Number(event.target.value))}
@@ -116,8 +111,6 @@ export function CsvDownloadButton({
   );
 }
 
-/** Standardized empty-state cell for a `<DataPanel>` table body. Pass
- * inside a `<tr>` spanning the full column count. */
 export function EmptyTableState({
   message,
   actionLabel,
@@ -146,16 +139,13 @@ export function EmptyTableState({
   );
 }
 
-/** Build a UTF-8 BOM-prefixed CSV blob and download it client-side.
- * Centralized so every table downloads CSVs with the same escape rules
- * and the BOM that lets Excel render Korean characters correctly. */
 export function downloadCsv(
   filename: string,
   headers: string[],
   rows: Array<Array<string | number | boolean | null | undefined>>,
 ) {
   const csv = [headers.join(','), ...rows.map((row) => row.map(csvEscape).join(','))].join('\n');
-  const blob = new Blob([`﻿${csv}`], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement('a');
   anchor.href = url;

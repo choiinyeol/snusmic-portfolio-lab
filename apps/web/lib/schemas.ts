@@ -39,11 +39,17 @@ export const RawReportRowSchema = z
     target_hit_date: NullableString,
     days_to_target: NullableNumber,
     last_close_krw: NullableNumber,
+    last_close_native: NullableNumber,
     last_close_date: NullableString,
     current_return: NullableNumber,
     peak_return: NullableNumber,
     trough_return: NullableNumber,
     target_gap_pct: NullableNumber,
+    evaluation_close_krw: NullableNumber.optional(),
+    evaluation_close_date: NullableString.optional(),
+    evaluation_return: NullableNumber.optional(),
+    target_remaining_pct: NullableNumber,
+    target_progress_pct: NullableNumber,
     expiry_date: NullableString,
     expired: Bool,
     caveat_flags: z.array(z.string()),
@@ -210,11 +216,6 @@ export const AccountCatalogRowSchema = z
     objective_passed: z.boolean(),
     objective_return_excess: NullableNumber,
     objective_mdd_slack: NullableNumber,
-    methodology_summary: z.string(),
-    buy_rules: z.array(z.string()),
-    sell_rules: z.array(z.string()),
-    risk_controls: z.array(z.string()),
-    params: z.record(z.string(), z.unknown()),
     metrics: z
       .object({
         final_equity_krw: NullableNumber,
@@ -230,7 +231,7 @@ export const AccountCatalogRowSchema = z
   })
   .passthrough();
 
-export const ScreenerCandidateSchema = z
+export const ReviewCandidateSchema = z
   .object({
     report_id: z.string(),
     symbol: z.string(),
@@ -242,6 +243,162 @@ export const ScreenerCandidateSchema = z
     target_upside_at_pub: NullableNumber,
     current_return: NullableNumber,
     target_gap_pct: NullableNumber,
+  })
+  .passthrough();
+
+const PageMetricSchema = z
+  .object({
+    id: z.string(),
+    label: z.string(),
+    value: z.union([z.number(), z.string(), z.boolean(), z.null()]),
+    tone: z.enum(['neutral', 'positive', 'negative', 'warning', 'accent']).optional(),
+    helper: z.string().nullable().optional(),
+  })
+  .passthrough();
+
+const PageAsOfSchema = z
+  .object({
+    report_date: NullableString,
+    price_date: NullableString,
+  })
+  .passthrough();
+
+const PageWarningSchema = z
+  .object({
+    level: z.enum(['info', 'warning', 'error']),
+    message: z.string(),
+  })
+  .passthrough();
+
+const ReportStatisticsSampleSchema = z
+  .object({
+    reportCount: z.number(),
+    eligibleReportCount: z.number(),
+    tickerCount: z.number(),
+    startDate: z.string(),
+    endDate: z.string(),
+    exclusions: z.record(z.string(), z.number()),
+  })
+  .passthrough();
+
+const ReportStatisticsRiskScatterSchema = z
+  .object({
+    reportId: z.string(),
+    symbol: z.string(),
+    company: z.string(),
+    publicationDate: z.string(),
+    maxFavorableExcursion: NullableNumber,
+    maxAdverseExcursion: NullableNumber,
+    upsideCaptureRatio: NullableNumber,
+    targetReturn: NullableNumber,
+    currentReturn: NullableNumber,
+    expiryReturn: NullableNumber.optional(),
+    expiryCloseKrw: NullableNumber.optional(),
+    expiryDate: NullableString.optional(),
+    hit06: z.boolean(),
+    hit08: z.boolean(),
+    hit10: z.boolean(),
+  })
+  .passthrough();
+
+const ReportStatisticsHitWithinSchema = z
+  .object({
+    '30': z.boolean(),
+    '60': z.boolean(),
+    '120': z.boolean(),
+    '250': z.boolean(),
+  })
+  .passthrough();
+
+const ReportStatisticsHitSchema = z
+  .object({
+    hit: z.boolean(),
+    days: NullableNumber,
+    within: ReportStatisticsHitWithinSchema,
+  })
+  .passthrough();
+
+const ReportStatisticsExampleSchema = z
+  .object({
+    reportId: z.string(),
+    symbol: z.string(),
+    company: z.string(),
+    publicationDate: z.string(),
+    entryPrice: NullableNumber,
+    targetPrice: NullableNumber,
+    targetReturn: NullableNumber,
+    currentReturn: NullableNumber,
+    maxFavorableExcursion: NullableNumber,
+    maxAdverseExcursion: NullableNumber,
+    upsideCaptureRatio: NullableNumber,
+    hit: z
+      .object({
+        '0.6': ReportStatisticsHitSchema.optional(),
+        '0.8': ReportStatisticsHitSchema.optional(),
+        '1': ReportStatisticsHitSchema.optional(),
+      })
+      .passthrough(),
+  })
+  .passthrough();
+
+export const ReportStatisticsLabSummarySchema = z
+  .object({
+    generatedAt: z.string(),
+    sample: ReportStatisticsSampleSchema,
+    fractionalHitRates: z.array(z.record(z.string(), z.unknown())),
+    delayedEntry: z.array(z.record(z.string(), z.unknown())),
+    entryTriggers: z.array(z.record(z.string(), z.unknown())),
+    postTargetDrift: z.array(z.record(z.string(), z.unknown())),
+    optimalTargetMultiples: z.array(z.record(z.string(), z.unknown())),
+    riskScatter: z.array(ReportStatisticsRiskScatterSchema),
+    topExamples: z.record(z.string(), z.array(ReportStatisticsExampleSchema)),
+  })
+  .passthrough();
+
+export const ReportVerificationPageBundleSchema = z
+  .object({
+    schema_version: z.literal('1.0.0'),
+    generated_at: NullableString,
+    as_of: PageAsOfSchema,
+    title: z.string(),
+    metrics: z.array(PageMetricSchema),
+    views: z.array(
+      z
+        .object({
+          id: z.string(),
+          label: z.string(),
+          count: z.number().nullable(),
+        })
+        .passthrough(),
+    ),
+    warnings: z.array(PageWarningSchema),
+    table: z.object({ rows: z.array(RawReportRowSchema) }).passthrough(),
+  })
+  .passthrough();
+
+export const ReviewQueuePageBundleSchema = z
+  .object({
+    schema_version: z.literal('1.0.0'),
+    generated_at: NullableString,
+    as_of: PageAsOfSchema,
+    title: z.string(),
+    metrics: z.array(PageMetricSchema),
+    priority: z.array(ReviewCandidateSchema),
+    table: z.object({ rows: z.array(ReviewCandidateSchema) }).passthrough(),
+  })
+  .passthrough();
+
+export const ReportStatisticsPageBundleSchema = z
+  .object({
+    schema_version: z.literal('1.0.0'),
+    generated_at: NullableString,
+    as_of: PageAsOfSchema,
+    title: z.string(),
+    metrics: z.array(PageMetricSchema),
+    summary: ReportStatisticsLabSummarySchema,
+    rankings: z.record(z.string(), z.unknown()),
+    target_distribution: z.record(z.string(), z.unknown()),
+    return_windows: z.array(z.record(z.string(), z.unknown())),
   })
   .passthrough();
 

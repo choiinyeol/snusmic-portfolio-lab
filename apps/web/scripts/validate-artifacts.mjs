@@ -18,7 +18,10 @@ const required = [
   'report-statistics-lab.json',
   'accounts/catalog.json',
   'accounts/curves.json',
-  'screener/candidates.json',
+  'pages/report-verification.json',
+  'pages/review-queue.json',
+  'pages/report-statistics.json',
+  'pages/portfolio-dashboard.json',
 ];
 
 function fail(message) {
@@ -66,7 +69,6 @@ const countFiles = {
   equity_daily: 'portfolio/equity-daily.json',
   accounts: 'portfolio/accounts.json',
   account_catalog: 'accounts/catalog.json',
-  screener_candidates: 'screener/candidates.json',
 };
 
 for (const [key, file] of Object.entries(countFiles)) {
@@ -87,6 +89,44 @@ if (dailyDecisions.metadata?.run_mode) {
 }
 
 const reports = readJson('reports/table.json');
+const pageBundles = [
+  'pages/report-verification.json',
+  'pages/review-queue.json',
+  'pages/report-statistics.json',
+  'pages/portfolio-dashboard.json',
+];
+for (const file of pageBundles) {
+  const page = readJson(file);
+  if (page.schema_version !== '1.0.0') fail(`${file} has invalid schema_version`);
+  if (!page.as_of?.report_date || !page.as_of?.price_date) fail(`${file} has incomplete as_of`);
+  if (!Array.isArray(page.metrics)) fail(`${file} metrics must be an array`);
+}
+const reportStatisticsPage = readJson('pages/report-statistics.json');
+const statisticsSummary = reportStatisticsPage.summary;
+if (!statisticsSummary || typeof statisticsSummary !== 'object') {
+  fail('pages/report-statistics.json summary is missing');
+}
+if (!statisticsSummary.sample || typeof statisticsSummary.sample.reportCount !== 'number') {
+  fail('pages/report-statistics.json summary.sample.reportCount is missing');
+}
+if (!Array.isArray(statisticsSummary.riskScatter)) {
+  fail('pages/report-statistics.json summary.riskScatter must be an array');
+}
+if (statisticsSummary.riskScatter.length === 0) {
+  fail('pages/report-statistics.json summary.riskScatter is empty');
+}
+for (const [index, row] of statisticsSummary.riskScatter.slice(0, 10).entries()) {
+  if (!row.reportId) fail(`pages/report-statistics.json summary.riskScatter[${index}].reportId is missing`);
+  if (!row.symbol) fail(`pages/report-statistics.json summary.riskScatter[${index}].symbol is missing`);
+  if (!row.publicationDate) {
+    fail(`pages/report-statistics.json summary.riskScatter[${index}].publicationDate is missing`);
+  }
+  for (const flag of ['hit06', 'hit08', 'hit10']) {
+    if (typeof row[flag] !== 'boolean') {
+      fail(`pages/report-statistics.json summary.riskScatter[${index}].${flag} must be boolean`);
+    }
+  }
+}
 const reportIds = new Set();
 const reportSymbols = new Set();
 for (const [index, report] of reports.entries()) {

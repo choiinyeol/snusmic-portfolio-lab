@@ -17,20 +17,33 @@ from snusmic_pipeline.web.artifacts import (
 )
 
 
-@pytest.mark.slow
-@pytest.mark.contract
-def test_export_web_artifacts_matches_baseline_counts(tmp_path: Path) -> None:
-    out = tmp_path / "web"
-    result = export_web_artifacts(
-        ExportInputs(
-            warehouse=Path("data/warehouse"),
-            sim=Path("data/sim"),
-            out=out,
-            extraction_quality=Path("data/extraction_quality.json"),
-        )
+def _baseline_export_inputs(out: Path) -> ExportInputs:
+    return ExportInputs(
+        warehouse=Path("data/warehouse"),
+        sim=Path("data/sim"),
+        out=out,
+        extraction_quality=Path("data/extraction_quality.json"),
     )
 
-    overview = json.loads((out / "overview.json").read_text(encoding="utf-8"))
+
+@pytest.fixture(scope="module")
+def web_export_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """Shared full export for read-only web artifact contract assertions.
+
+    Full web export is intentionally slow. Most tests in this module only read
+    generated artifacts, so exporting once keeps the contract suite useful
+    without turning every assertion into another full rebuild.
+    """
+
+    out = tmp_path_factory.mktemp("web-export") / "web"
+    export_web_artifacts(_baseline_export_inputs(out))
+    return out
+
+
+@pytest.mark.slow
+@pytest.mark.contract
+def test_export_web_artifacts_matches_baseline_counts(web_export_dir: Path) -> None:
+    overview = json.loads((web_export_dir / "overview.json").read_text(encoding="utf-8"))
     assert overview["report_counts"] == {
         "excluded_downside_target": 5,
         "excluded_instant_target_hit": 1,
@@ -45,23 +58,14 @@ def test_export_web_artifacts_matches_baseline_counts(tmp_path: Path) -> None:
         "report_stat_rows": 221,
         "web_report_rows": 202,
     }
-    assert result["missing_symbols"] == ["003410.KS", "010620.KS", "287410.KQ", "NETI", "VTNR"]
+    manifest = json.loads((web_export_dir / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["data_quality"]["missing_price_symbols"] == 5
 
 
 @pytest.mark.slow
 @pytest.mark.contract
-def test_reports_artifact_contains_be_h_symbol_fix(tmp_path: Path) -> None:
-    out = tmp_path / "web"
-    export_web_artifacts(
-        ExportInputs(
-            warehouse=Path("data/warehouse"),
-            sim=Path("data/sim"),
-            out=out,
-            extraction_quality=Path("data/extraction_quality.json"),
-        )
-    )
-
-    reports = json.loads((out / "reports.json").read_text(encoding="utf-8"))
+def test_reports_artifact_contains_be_h_symbol_fix(web_export_dir: Path) -> None:
+    reports = json.loads((web_export_dir / "reports.json").read_text(encoding="utf-8"))
     be_h = [row for row in reports if row["company"] == "비에이치"]
     assert len(be_h) == 1
     assert be_h[0]["symbol"] == "090460.KS"
@@ -162,16 +166,8 @@ def test_price_artifacts_preserve_split_diagnostics(tmp_path: Path) -> None:
 
 @pytest.mark.slow
 @pytest.mark.contract
-def test_extended_web_artifacts_support_insights_and_downloads(tmp_path: Path) -> None:
-    out = tmp_path / "web"
-    export_web_artifacts(
-        ExportInputs(
-            warehouse=Path("data/warehouse"),
-            sim=Path("data/sim"),
-            out=out,
-            extraction_quality=Path("data/extraction_quality.json"),
-        )
-    )
+def test_extended_web_artifacts_support_insights_and_downloads(web_export_dir: Path) -> None:
+    out = web_export_dir
 
     insights = json.loads((out / "insights.json").read_text(encoding="utf-8"))
     overview_insights = json.loads((out / "overview" / "research-pulse.json").read_text(encoding="utf-8"))
@@ -185,7 +181,7 @@ def test_extended_web_artifacts_support_insights_and_downloads(tmp_path: Path) -
     )
     rankings = json.loads((out / "report-rankings.json").read_text(encoding="utf-8"))
     page_rankings = json.loads((out / "reports" / "rankings.json").read_text(encoding="utf-8"))
-    screener_candidates = json.loads((out / "screener" / "candidates.json").read_text(encoding="utf-8"))
+    review_candidates = json.loads((out / "review" / "candidates.json").read_text(encoding="utf-8"))
 
     assert len(insights) >= 6
     assert overview_insights == insights
@@ -212,7 +208,7 @@ def test_extended_web_artifacts_support_insights_and_downloads(tmp_path: Path) -
     assert rankings["fastest_hits"]
     assert rankings["best_current_returns"]
     assert page_rankings == rankings
-    assert screener_candidates
+    assert review_candidates
     assert (out / "table-download-reports.csv").read_text(encoding="utf-8").startswith("report_id,date")
     assert (out / "table-download-accounts.csv").read_text(encoding="utf-8").startswith("account_id,label")
     assert (out / "data-quality-download.csv").read_text(encoding="utf-8").startswith("section,metric,value")
@@ -220,16 +216,8 @@ def test_extended_web_artifacts_support_insights_and_downloads(tmp_path: Path) -
 
 @pytest.mark.slow
 @pytest.mark.contract
-def test_manifest_records_snapshot_lineage_counts_and_checksums(tmp_path: Path) -> None:
-    out = tmp_path / "web"
-    export_web_artifacts(
-        ExportInputs(
-            warehouse=Path("data/warehouse"),
-            sim=Path("data/sim"),
-            out=out,
-            extraction_quality=Path("data/extraction_quality.json"),
-        )
-    )
+def test_manifest_records_snapshot_lineage_counts_and_checksums(web_export_dir: Path) -> None:
+    out = web_export_dir
 
     manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
     warehouse_prices = pd.read_csv(Path("data/warehouse") / "daily_prices.csv", usecols=["date"])
@@ -244,14 +232,14 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(tmp_path: Path) 
     expected_accounts = len(pd.read_csv(Path("data/sim") / "summary.csv"))
     assert manifest["row_counts"]["accounts"] == expected_accounts
     assert manifest["row_counts"]["account_catalog"] == expected_accounts
-    assert manifest["row_counts"]["screener_candidates"] > 0
+    assert manifest["row_counts"]["review_candidates"] > 0
     assert manifest["data_quality"]["reports_with_prices"] == 202
     assert manifest["data_quality"]["missing_price_symbols"] == 5
     assert "overview/snapshot.json" in manifest["artifacts"]
     assert "portfolio/holdings.json" in manifest["artifacts"]
     assert "reports/table.json" in manifest["artifacts"]
     assert "accounts/catalog.json" in manifest["artifacts"]
-    assert "screener/candidates.json" in manifest["artifacts"]
+    assert "review/candidates.json" in manifest["artifacts"]
     assert "reports.json" in manifest["artifacts"]
     assert "prices/QQQ.json" in manifest["artifacts"]
     assert len(manifest["checksums"]["prices/QQQ.json"]) == 64
@@ -283,16 +271,8 @@ def test_export_web_artifacts_keeps_existing_output_when_staged_validation_fails
 
 @pytest.mark.slow
 @pytest.mark.contract
-def test_account_catalog_matches_committed_account_config(tmp_path: Path) -> None:
-    out = tmp_path / "web"
-    export_web_artifacts(
-        ExportInputs(
-            warehouse=Path("data/warehouse"),
-            sim=Path("data/sim"),
-            out=out,
-            extraction_quality=Path("data/extraction_quality.json"),
-        )
-    )
+def test_account_catalog_matches_committed_account_config(web_export_dir: Path) -> None:
+    out = web_export_dir
 
     catalog = json.loads((out / "accounts" / "catalog.json").read_text(encoding="utf-8"))
     actual_ids = [str(row.get("account_id") or "") for row in catalog]
@@ -319,16 +299,8 @@ def test_account_catalog_matches_committed_account_config(tmp_path: Path) -> Non
 
 @pytest.mark.slow
 @pytest.mark.contract
-def test_monthly_holdings_reference_current_account_artifact(tmp_path: Path) -> None:
-    out = tmp_path / "web"
-    export_web_artifacts(
-        ExportInputs(
-            warehouse=Path("data/warehouse"),
-            sim=Path("data/sim"),
-            out=out,
-            extraction_quality=Path("data/extraction_quality.json"),
-        )
-    )
+def test_monthly_holdings_reference_current_account_artifact(web_export_dir: Path) -> None:
+    out = web_export_dir
 
     valid_accounts = set(pd.read_csv(Path("data/sim") / "summary.csv")["account_id"].astype(str))
     monthly = json.loads((out / "portfolio" / "monthly-holdings.json").read_text(encoding="utf-8"))
@@ -340,16 +312,8 @@ def test_monthly_holdings_reference_current_account_artifact(tmp_path: Path) -> 
 
 @pytest.mark.slow
 @pytest.mark.contract
-def test_holdings_artifact_exposes_native_currency_for_foreign_positions(tmp_path: Path) -> None:
-    out = tmp_path / "web"
-    export_web_artifacts(
-        ExportInputs(
-            warehouse=Path("data/warehouse"),
-            sim=Path("data/sim"),
-            out=out,
-            extraction_quality=Path("data/extraction_quality.json"),
-        )
-    )
+def test_holdings_artifact_exposes_native_currency_for_foreign_positions(web_export_dir: Path) -> None:
+    out = web_export_dir
 
     holdings = json.loads((out / "current-holdings.json").read_text(encoding="utf-8"))
     # Daily rebalance + stop-loss rotates specific foreign symbols in and out;
@@ -369,16 +333,8 @@ def test_holdings_artifact_exposes_native_currency_for_foreign_positions(tmp_pat
 
 @pytest.mark.slow
 @pytest.mark.contract
-def test_price_artifacts_keep_asset_prices_native_and_krw_for_valuation_only(tmp_path: Path) -> None:
-    out = tmp_path / "web"
-    export_web_artifacts(
-        ExportInputs(
-            warehouse=Path("data/warehouse"),
-            sim=Path("data/sim"),
-            out=out,
-            extraction_quality=Path("data/extraction_quality.json"),
-        )
-    )
+def test_price_artifacts_keep_asset_prices_native_and_krw_for_valuation_only(web_export_dir: Path) -> None:
+    out = web_export_dir
 
     camt_prices = json.loads((out / "prices" / "CAMT.json").read_text(encoding="utf-8"))
     latest = camt_prices["prices"][-1]
@@ -401,17 +357,9 @@ def test_price_artifacts_keep_asset_prices_native_and_krw_for_valuation_only(tmp
 @pytest.mark.slow
 @pytest.mark.contract
 def test_report_performance_scales_weekend_publication_target_to_first_actionable_close(
-    tmp_path: Path,
+    web_export_dir: Path,
 ) -> None:
-    out = tmp_path / "web"
-    export_web_artifacts(
-        ExportInputs(
-            warehouse=Path("data/warehouse"),
-            sim=Path("data/sim"),
-            out=out,
-            extraction_quality=Path("data/extraction_quality.json"),
-        )
-    )
+    out = web_export_dir
 
     performance = pd.read_csv(Path("data/sim") / "report_performance.csv")
     eb = performance[performance["symbol"].astype(str).eq("353810.KQ")].iloc[0]
@@ -426,16 +374,8 @@ def test_report_performance_scales_weekend_publication_target_to_first_actionabl
 
 @pytest.mark.slow
 @pytest.mark.contract
-def test_reports_artifact_excludes_target_below_entry_rows(tmp_path: Path) -> None:
-    out = tmp_path / "web"
-    export_web_artifacts(
-        ExportInputs(
-            warehouse=Path("data/warehouse"),
-            sim=Path("data/sim"),
-            out=out,
-            extraction_quality=Path("data/extraction_quality.json"),
-        )
-    )
+def test_reports_artifact_excludes_target_below_entry_rows(web_export_dir: Path) -> None:
+    out = web_export_dir
 
     reports = json.loads((out / "reports.json").read_text(encoding="utf-8"))
     assert all(row["symbol"] != "476830.KQ" for row in reports)
@@ -443,16 +383,8 @@ def test_reports_artifact_excludes_target_below_entry_rows(tmp_path: Path) -> No
 
 @pytest.mark.slow
 @pytest.mark.contract
-def test_reports_artifact_infers_native_entry_for_foreign_report_display_ssot(tmp_path: Path) -> None:
-    out = tmp_path / "web"
-    export_web_artifacts(
-        ExportInputs(
-            warehouse=Path("data/warehouse"),
-            sim=Path("data/sim"),
-            out=out,
-            extraction_quality=Path("data/extraction_quality.json"),
-        )
-    )
+def test_reports_artifact_infers_native_entry_for_foreign_report_display_ssot(web_export_dir: Path) -> None:
+    out = web_export_dir
 
     reports = json.loads((out / "reports.json").read_text(encoding="utf-8"))
     sxt = next(row for row in reports if row["symbol"] == "SXT")
@@ -469,16 +401,8 @@ def test_reports_artifact_infers_native_entry_for_foreign_report_display_ssot(tm
 
 @pytest.mark.slow
 @pytest.mark.contract
-def test_reports_artifact_populates_native_entry_for_krw_rows(tmp_path: Path) -> None:
-    out = tmp_path / "web"
-    export_web_artifacts(
-        ExportInputs(
-            warehouse=Path("data/warehouse"),
-            sim=Path("data/sim"),
-            out=out,
-            extraction_quality=Path("data/extraction_quality.json"),
-        )
-    )
+def test_reports_artifact_populates_native_entry_for_krw_rows(web_export_dir: Path) -> None:
+    out = web_export_dir
 
     reports = json.loads((out / "reports.json").read_text(encoding="utf-8"))
     krw_rows = [row for row in reports if row["currency"] == "KRW" and row["entry_price_krw"] is not None]
@@ -491,16 +415,8 @@ def test_reports_artifact_populates_native_entry_for_krw_rows(tmp_path: Path) ->
 
 @pytest.mark.slow
 @pytest.mark.contract
-def test_reports_download_csv_carries_display_price_ssot_fields(tmp_path: Path) -> None:
-    out = tmp_path / "web"
-    export_web_artifacts(
-        ExportInputs(
-            warehouse=Path("data/warehouse"),
-            sim=Path("data/sim"),
-            out=out,
-            extraction_quality=Path("data/extraction_quality.json"),
-        )
-    )
+def test_reports_download_csv_carries_display_price_ssot_fields(web_export_dir: Path) -> None:
+    out = web_export_dir
 
     header = (out / "table-download-reports.csv").read_text(encoding="utf-8").splitlines()[0].split(",")
     assert "currency" in header
@@ -512,33 +428,21 @@ def test_reports_download_csv_carries_display_price_ssot_fields(tmp_path: Path) 
 
 @pytest.mark.slow
 @pytest.mark.contract
-def test_reports_artifact_freezes_expired_report_at_pub_plus_730d(tmp_path: Path) -> None:
-    """A report past its 730-day window must be flagged expired and have its
-    current_return frozen at the close on (or just before) expiry — not today.
-    Fixture: 노바텍 (285490.KQ), pub 2021-01-16 → expiry 2023-01-16."""
-    out = tmp_path / "web"
-    export_web_artifacts(
-        ExportInputs(
-            warehouse=Path("data/warehouse"),
-            sim=Path("data/sim"),
-            out=out,
-            extraction_quality=Path("data/extraction_quality.json"),
-        )
-    )
+def test_reports_artifact_freezes_expired_report_at_pub_plus_730d(web_export_dir: Path) -> None:
+    """Expired reports keep both latest close and capped evaluation close.
+
+    Fixture: Novatech (285490.KQ), pub 2021-01-16 -> expiry 2023-01-16.
+    """
+    out = web_export_dir
 
     reports = json.loads((out / "reports.json").read_text(encoding="utf-8"))
     novatek = next(row for row in reports if row["symbol"] == "285490.KQ")
     assert novatek["expired"] is True
     assert novatek["expiry_date"] == "2023-01-16"
     assert novatek["target_hit"] is False
-    # last_close_date is capped at expiry_date (or the prior trading day if
-    # the expiry itself was a holiday). In either case, it must not extend
-    # past expiry — that would mean the freeze contract is broken.
+    # last_close_date is the latest available close for report detail pages.
     assert novatek["last_close_date"] is not None
-    assert novatek["last_close_date"] <= "2023-01-16"
-    # Frozen current_return should be deterministic (driven by sim CSV) and
-    # bounded — sanity-check it lives in the negative half-plane (the report
-    # underperformed) and is the same value re-exposed via current_return.
+    assert novatek["last_close_date"] > "2023-01-16"
     assert novatek["current_return"] is not None
     assert novatek["current_return"] < 0
     expected = (
@@ -546,3 +450,14 @@ def test_reports_artifact_freezes_expired_report_at_pub_plus_730d(tmp_path: Path
     )
     assert expected is not None
     assert novatek["current_return"] == pytest.approx(expected, abs=0.01)
+    # evaluation_close_date is capped at expiry_date (or the prior trading day
+    # if expiry was a holiday). This preserves the two-year evaluation window.
+    assert novatek["evaluation_close_date"] is not None
+    assert novatek["evaluation_close_date"] <= "2023-01-16"
+    evaluation_expected = (
+        novatek["evaluation_close_krw"] / novatek["entry_price_krw"] - 1
+        if novatek["entry_price_krw"]
+        else None
+    )
+    assert evaluation_expected is not None
+    assert novatek["evaluation_return"] == pytest.approx(evaluation_expected, abs=0.01)

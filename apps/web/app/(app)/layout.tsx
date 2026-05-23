@@ -10,7 +10,7 @@ export default function AppRouteLayout({ children }: Readonly<{ children: React.
   const manifest = getArtifactManifest();
   const snapshotDate = overview.simulation_window?.price_end ?? overview.simulation_window?.report_end ?? '—';
   const admittedAccounts = getObjectivePassingRows();
-  const primaryBookLabel = admittedAccounts[0]?.shortLabel ?? admittedAccounts[0]?.label ?? '승인 전략 없음';
+  const primaryBookLabel = admittedAccounts[0]?.shortLabel ?? admittedAccounts[0]?.label ?? '승인 계좌 없음';
 
   const commandTargets = buildCommandTargets();
 
@@ -31,7 +31,7 @@ export default function AppRouteLayout({ children }: Readonly<{ children: React.
 
 /** Build the cmd-K command palette index. APP_NAV is the spine; symbols and
  * accounts are appended so power users can jump straight to a ticker or a
- * account_id without going through the screener first. */
+ * account_id without going through the review board first. */
 function buildCommandTargets(): CommandTarget[] {
   const navTargets: CommandTarget[] = APP_NAV.map((item) => ({
     kind: 'nav',
@@ -53,7 +53,7 @@ function buildCommandTargets(): CommandTarget[] {
       kind: 'symbol',
       label: report.company || report.symbol,
       description: `${report.symbol} · ${report.exchange || ''}`.trim(),
-      href: `/reports/${encodeURIComponent(report.symbol)}`,
+      href: `/reports/${encodeURIComponent(report.symbol)}/${encodeURIComponent(report.reportId)}`,
       keywords: `${report.symbol} ${report.exchange ?? ''} ${report.company ?? ''}`,
     });
   }

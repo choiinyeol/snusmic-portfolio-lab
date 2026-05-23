@@ -1,11 +1,11 @@
 'use client';
 
-import { BarChart3, BookOpenText, FileText, GitBranch, Home, LineChart, Search, type LucideIcon } from 'lucide-react';
+import { BarChart3, FileText, GitBranch, Home, LineChart, Search, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
-export type NavIconKey = 'dashboard' | 'portfolio' | 'reports' | 'accounts' | 'screener' | 'guide' | 'github';
+export type NavIconKey = 'dashboard' | 'portfolio' | 'reports' | 'accounts' | 'review' | 'github';
 
 export type SidebarNavItem = {
   href: string;
@@ -20,8 +20,7 @@ const ICONS: Record<NavIconKey, LucideIcon> = {
   portfolio: BarChart3,
   reports: FileText,
   accounts: LineChart,
-  screener: Search,
-  guide: BookOpenText,
+  review: Search,
   github: GitBranch,
 };
 

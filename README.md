@@ -1,8 +1,8 @@
 # SNUSMIC Portfolio Lab
 
-SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, fixed account simulations, and static web artifacts. The current repository does **not** search for trading rules or promote generated account candidates. Rule discovery was removed deliberately; the PIT board is exported so a human can inspect the data and design rules explicitly.
+SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, fixed account simulations, and static web artifacts. The current repository does **not** search for trading rules or promote generated account candidates. Rule discovery was removed deliberately; report boards are exported so a human can inspect the data and design rules explicitly.
 
-[Live site](https://smic-portfolio.vercel.app) · [Changelog](./CHANGELOG.md) · [Design system](./DESIGN.md)
+[Live site](https://smic-portfolio.vercel.app) - [Changelog](./CHANGELOG.md) - [Design system](./DESIGN.md)
 
 ## What This Repo Does
 
@@ -11,6 +11,7 @@ SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, f
 - Exports a point-in-time research board at `data/sim/pit-research-board.csv`.
 - Runs fixed benchmark/follower account simulations with real ledger constraints: cash, deposits, integer shares, fees, taxes, trades, holdings, and equity paths.
 - Exports deterministic `data/web` JSON/CSV artifacts consumed by the static Next.js app.
+- Presents report verification, review queue, statistics, and account views through page-shaped frontend view models instead of raw artifact tables.
 
 ## What It Does Not Do
 
@@ -21,6 +22,8 @@ SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, f
 - No hidden migration, rollback, or safety-net path.
 
 ## Core Commands
+
+The repo uses Python and Node entrypoints instead of shell scripts so the same commands work on macOS and Windows.
 
 ```bash
 uv sync --group dev
@@ -42,28 +45,19 @@ python -m snusmic_pipeline rebuild-web-artifacts
 Manual PIT dataset export:
 
 ```bash
-python -m snusmic_pipeline export-pit-board \
-  --warehouse data/warehouse \
-  --out data/sim/pit-research-board.csv \
-  --start 2021-01-04 \
-  --cadence M
+python -m snusmic_pipeline export-pit-board --warehouse data/warehouse --out data/sim/pit-research-board.csv --start 2021-01-04 --cadence M
 ```
 
 Fixed account simulation:
 
 ```bash
-python -m snusmic_pipeline run-sim \
-  --warehouse data/warehouse \
-  --out data/sim
+python -m snusmic_pipeline run-sim --warehouse data/warehouse --out data/sim
 ```
 
 Web artifact export:
 
 ```bash
-python -m snusmic_pipeline export-web \
-  --warehouse data/warehouse \
-  --sim data/sim \
-  --out data/web
+python -m snusmic_pipeline export-web --warehouse data/warehouse --sim data/sim --out data/web
 ```
 
 ## Default Simulation Set
@@ -114,13 +108,13 @@ The web app is a static reader over committed artifacts. It must not call live m
 Main routes:
 
 - `/`
-- `/main`
 - `/portfolio`
 - `/portfolio/[account]`
+- `/portfolio/[account]/equity`
+- `/portfolio/[account]/holdings`
+- `/portfolio/[account]/trades`
 - `/reports`
-- `/reports/[symbol]`
 - `/reports/[symbol]/[reportId]`
-- `/screener`
 - `/statistics`
 
 ## Validation
@@ -132,6 +126,16 @@ pnpm --dir apps/web artifact:check
 pnpm --dir apps/web typecheck
 pnpm --dir apps/web exec biome check .
 pnpm --dir apps/web build
+pnpm --dir apps/web smoke:static
+```
+
+`tests/test_web_artifacts.py` is a release-gate contract suite. It performs a full web export and should not be used as the default edit-test loop.
+
+Deployment build, also cross-platform:
+
+```bash
+pnpm build
+node scripts/prepare_vercel_prebuilt.mjs
 ```
 
 ## Project Layout

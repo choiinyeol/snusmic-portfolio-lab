@@ -1,6 +1,9 @@
 export function formatPercent(value: number | null | undefined, digits = 2): string {
   if (value === null || value === undefined || !Number.isFinite(value)) return '—';
-  return `${(value * 100).toLocaleString('ko-KR', { maximumFractionDigits: digits, minimumFractionDigits: digits })}%`;
+  return `${(value * 100).toLocaleString('ko-KR', {
+    maximumFractionDigits: digits,
+    minimumFractionDigits: digits,
+  })}%`;
 }
 
 export function formatMultiple(value: number | null | undefined, digits = 2): string {
@@ -10,7 +13,7 @@ export function formatMultiple(value: number | null | undefined, digits = 2): st
 
 export function formatKrw(value: number | null | undefined): string {
   if (value === null || value === undefined || !Number.isFinite(value)) return '—';
-  return `${Math.round(value).toLocaleString('ko-KR')}원`;
+  return `₩${Math.round(value).toLocaleString('ko-KR')}`;
 }
 
 export function formatDays(value: number | null | undefined): string {
@@ -78,7 +81,10 @@ export function formatNative(value: number | null | undefined, currency: string 
   const symbol = CURRENCY_SYMBOL[code] ?? `${code} `;
   const digits = CURRENCY_DIGITS[code] ?? 2;
   const locale = CURRENCY_LOCALE[code] ?? 'en-US';
-  return `${symbol}${value.toLocaleString(locale, { maximumFractionDigits: digits, minimumFractionDigits: digits })}`;
+  return `${symbol}${value.toLocaleString(locale, {
+    maximumFractionDigits: digits,
+    minimumFractionDigits: digits,
+  })}`;
 }
 
 export function formatNativeWithKrw(
@@ -91,6 +97,6 @@ export function formatNativeWithKrw(
     return { primary: formatKrw(krw), secondary: null };
   }
   const primary = formatNative(native, code);
-  const secondary = krw !== null && krw !== undefined && Number.isFinite(krw) ? `≈ ${formatKrw(krw)}` : null;
+  const secondary = krw !== null && krw !== undefined && Number.isFinite(krw) ? `약 ${formatKrw(krw)}` : null;
   return { primary, secondary };
 }

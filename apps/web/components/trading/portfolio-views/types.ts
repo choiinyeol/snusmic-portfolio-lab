@@ -8,14 +8,6 @@ import type {
   TradeRow,
 } from '@/lib/artifacts';
 
-export type AccountMethod = {
-  summary: string;
-  buyRules: string[];
-  sellRules: string[];
-  riskControls: string[];
-  params: Record<string, unknown>;
-};
-
 export type PortfolioViewModel = {
   holdings: HoldingRow[];
   accounting: AccountingReconciliationRow[];
@@ -29,7 +21,6 @@ export type PortfolioViewModel = {
   defaultAccount: string;
   selectedAccount: string;
   invalidAccountId: string | null;
-  methodsByAccount: Record<string, AccountMethod>;
   capitalByAccount: Record<string, number>;
   cashByAccount: Record<string, number>;
   reportSymbolsById: Record<string, string>;

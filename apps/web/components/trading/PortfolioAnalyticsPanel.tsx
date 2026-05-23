@@ -51,7 +51,7 @@ export function PortfolioAnalyticsPanel({ equity, account_id, rows, accountLabel
         <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
           <div>
             <div className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">성과 경로</div>
-            <h2 className="mt-1 text-base font-semibold tracking-tight text-slate-950">선택 전략 vs 기준선</h2>
+            <h2 className="mt-1 text-base font-semibold tracking-tight text-slate-950">선택 계좌 vs 기준선</h2>
           </div>
           <div className="text-right text-xs text-slate-500">
             TradingView lightweight-charts
@@ -67,7 +67,7 @@ export function PortfolioAnalyticsPanel({ equity, account_id, rows, accountLabel
           <div className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">Risk / return</div>
           <h2 className="mt-1 text-base font-semibold tracking-tight text-slate-950">효율적 프론티어</h2>
           <p className="mt-1 text-sm leading-5 text-slate-500">
-            x축은 최대낙폭, y축은 MWR입니다. 선은 실제 전략 조합 최적화가 아니라 현재 산출물의 위험-수익 상단입니다.
+            x축은 최대낙폭, y축은 MWR입니다. 선은 실제 계좌 조합 최적화가 아니라 현재 산출물의 위험-수익 상단입니다.
           </p>
         </div>
         <FrontierPlot rows={frontierRows} efficientIds={efficientIds} selectedId={account_id} />
@@ -104,7 +104,7 @@ function FrontierPlot({
   return (
     <div className="grid gap-3">
       <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-        <span className="text-slate-500">점을 누르면 아래에 전략이 고정됩니다.</span>
+        <span className="text-slate-500">점을 누르면 아래에 계좌가 고정됩니다.</span>
         <div className="flex rounded-md border border-slate-200 bg-white p-0.5">
           {[
             ['all', '전체'],

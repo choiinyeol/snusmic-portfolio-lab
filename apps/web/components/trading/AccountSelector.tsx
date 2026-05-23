@@ -92,7 +92,7 @@ function kindBadge(
   variant: 'secondary' | 'warning' | 'outline';
 } {
   if (isDefault) return { label: '기본', variant: 'outline' };
-  if (kind === 'account') return { label: '전략', variant: 'outline' };
+  if (kind === 'account') return { label: '계좌', variant: 'outline' };
   if (kind === 'oracle') return { label: '상한', variant: 'warning' };
   return { label: '기준', variant: 'secondary' };
 }

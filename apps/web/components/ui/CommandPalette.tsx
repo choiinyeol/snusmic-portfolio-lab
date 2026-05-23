@@ -16,7 +16,7 @@ export type CommandTarget = {
 const KIND_LABEL: Record<CommandTarget['kind'], string> = {
   nav: '페이지',
   symbol: '종목',
-  account: '전략',
+  account: '계좌',
 };
 
 /** Lightweight global command palette wired to ⌘K / Ctrl+K. Filters the supplied
@@ -118,7 +118,7 @@ export function CommandPalette({ targets }: { targets: CommandTarget[] }) {
               setActiveIdx(0);
             }}
             onKeyDown={onListKey}
-            placeholder="페이지 검색 (메인, 포트폴리오, 스크리너…)"
+            placeholder="페이지 검색 (신호 보드, 계좌, 리포트…)"
             className="h-9 w-full border-0 bg-transparent text-sm text-slate-950 outline-none placeholder:text-slate-400"
             aria-controls={listId}
             aria-activedescendant={items[activeIdx] ? `${listId}-${activeIdx}` : undefined}

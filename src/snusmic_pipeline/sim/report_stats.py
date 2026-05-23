@@ -56,9 +56,10 @@ def compute_report_performance(
         window_end = min(end_date, expiry_day) if expiry_day is not None else end_date
         target = adjusted_target_price_krw(record, board, pub_day, window_end)
         entry_price = _first_close_on_or_after(board, pub_day, window_end, symbol)
-        last_close, last_close_date = _last_close_in_window(board, pub_day, window_end, symbol)
-        peak_close = _max_close_after(board, pub_day, window_end, symbol)
-        trough_close = _min_close_after(board, pub_day, window_end, symbol)
+        evaluation_close, evaluation_close_date = _last_close_in_window(board, pub_day, window_end, symbol)
+        last_close, last_close_date = _last_close_in_window(board, pub_day, end_date, symbol)
+        peak_close = _max_close_after(board, pub_day, end_date, symbol)
+        trough_close = _min_close_after(board, pub_day, end_date, symbol)
 
         target_upside_at_pub = (
             (target / entry_price - 1.0) if (target is not None and entry_price and entry_price > 0) else None
@@ -75,6 +76,11 @@ def compute_report_performance(
 
         current_return = (
             (last_close / entry_price - 1.0) if (last_close and entry_price and entry_price > 0) else None
+        )
+        evaluation_return = (
+            (evaluation_close / entry_price - 1.0)
+            if (evaluation_close and entry_price and entry_price > 0)
+            else None
         )
         peak_return = (
             (peak_close / entry_price - 1.0) if (peak_close and entry_price and entry_price > 0) else None
@@ -110,6 +116,9 @@ def compute_report_performance(
                 peak_return=peak_return,
                 trough_return=trough_return,
                 target_gap_pct=target_gap_pct,
+                evaluation_close_krw=evaluation_close,
+                evaluation_close_date=evaluation_close_date,
+                evaluation_return=evaluation_return,
                 expiry_date=expiry_day,
                 expired=expired,
             )

@@ -8,6 +8,16 @@ SNUSMIC Portfolio Lab builds point-in-time SMIC report data and static account-r
 - Normalize the data into a PIT warehouse with report publication dates, price windows, target-hit evidence, and report-level outcome factors.
 - Export fixed account baselines and follower accounts so the web app can compare actual account paths.
 - Export a PIT research board for manual rule design outside the pipeline.
+- Provide a single report verification board that merges the former report table and review queue into one workflow.
+- Provide report statistics that explain target-hit rate, peak return concentration, outcome buckets, and representative price paths.
+
+## Web Product Surfaces
+
+- `/`: current report verification and review board.
+- `/reports`: report table for sorting, filtering, and drilling into one report.
+- `/reports/[symbol]/[reportId]`: report evidence detail.
+- `/statistics`: outcome statistics and price-path diagnostics.
+- `/portfolio`: fixed account catalogue and account drilldowns.
 
 ## Non Goals
 
@@ -18,7 +28,7 @@ SNUSMIC Portfolio Lab builds point-in-time SMIC report data and static account-r
 
 ## Objective
 
-The account objective is still simple: compare final equity, money-weighted return, and maximum drawdown against `benchmark_kodex200`. Report-level factor views are diagnostic inputs for human research; they are not deployable rules by themselves.
+The account objective is still simple: compare final equity, money-weighted return, and maximum drawdown against `benchmark_kodex200`. Report-level factor views are diagnostic inputs for human research; they are not deployable rules by themselves. Product screens should guide the user toward what to inspect next rather than exposing raw artifact rows without hierarchy.
 
 ## Future Rule Work
 

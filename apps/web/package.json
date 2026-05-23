@@ -1,6 +1,6 @@
 {
   "name": "snusmic-portfolio-lab-web",
-  "version": "0.29.3",
+  "version": "0.29.4",
   "private": true,
   "packageManager": "pnpm@10.33.2",
   "scripts": {
@@ -13,7 +13,8 @@
     "check": "biome check .",
     "check:fix": "biome check --write .",
     "check:report-ui": "node scripts/check-report-ui.mjs",
-    "artifact:check": "node scripts/validate-artifacts.mjs"
+    "artifact:check": "node scripts/validate-artifacts.mjs",
+    "smoke:static": "node scripts/smoke-static-export.mjs"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.2.4",

@@ -13,20 +13,24 @@ type Props = {
 };
 
 export function PageHero({ eyebrow, title, subtitle, badges, actions, kpis }: Props) {
-  const hasRightRail = Boolean(kpis);
   return (
-    <header className="border-b border-slate-200 pb-5">
-      <div
-        className={`grid gap-5 ${hasRightRail ? 'xl:grid-cols-[minmax(0,1fr)_minmax(420px,.85fr)] xl:items-end' : ''}`}
-      >
-        <div className="grid min-w-0 gap-3">
+    <header className="rounded-md border border-slate-200 bg-white p-4">
+      <div className="grid gap-4">
+        <div className="grid min-w-0 gap-2">
           {eyebrow ? (
-            <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-              {eyebrow}
-            </div>
+            <div className="font-mono text-[11px] font-semibold uppercase text-slate-500">{eyebrow}</div>
           ) : null}
-          <h1 className="text-2xl font-semibold tracking-[-0.02em] text-slate-950 md:text-3xl">{title}</h1>
-          {subtitle ? <p className="max-w-3xl text-sm leading-6 text-slate-600">{subtitle}</p> : null}
+          <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
+            <div className="min-w-0">
+              <h1 className="text-2xl font-semibold text-slate-950 md:text-3xl">{title}</h1>
+              {subtitle ? (
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600 [overflow-wrap:anywhere] [word-break:break-all]">
+                  {subtitle}
+                </p>
+              ) : null}
+            </div>
+            {actions ? <div className="flex flex-wrap gap-2 md:justify-end">{actions}</div> : null}
+          </div>
           {badges?.length ? (
             <dl className="flex min-w-0 flex-wrap gap-1.5">
               {badges.map((badge) => (
@@ -39,7 +43,6 @@ export function PageHero({ eyebrow, title, subtitle, badges, actions, kpis }: Pr
               ))}
             </dl>
           ) : null}
-          {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
         </div>
         {kpis ? <div className="min-w-0">{kpis}</div> : null}
       </div>

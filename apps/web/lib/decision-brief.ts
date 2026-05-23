@@ -128,7 +128,7 @@ function buildDecisionItems({
         ? `최신 리포트 ${formatDateKo(report.publicationDate)}, 목표 진행 ${formatPercent(progress)}.`
         : '연결된 최신 리포트가 없어 근거 확인이 필요합니다.',
       metric: formatPercent(holding.unrealizedReturn),
-      href: report ? exactReportHref(report) : `/reports/${encodeURIComponent(holding.symbol)}`,
+      href: report ? exactReportHref(report) : '/portfolio',
       tone: needsReview ? 'review' : 'ok',
     });
   }

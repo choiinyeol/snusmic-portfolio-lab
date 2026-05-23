@@ -6,6 +6,7 @@ import { CumulativeReturnChart, type ReturnSeries } from '@/components/charts/Cu
 import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
 import { Button } from '@/components/ui/button';
 import { KpiTile } from '@/components/ui/KpiTile';
+import { PageHero } from '@/components/ui/PageHero';
 import type { HoldingRow } from '@/lib/artifacts';
 import { formatKrw, formatPercent } from '@/lib/format';
 import type { PortfolioLandingModel, PortfolioAccountSnapshot } from './types';
@@ -44,16 +45,23 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
 
   if (!selected) {
     return (
-      <div className="grid gap-3 rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-600">
-        <h1 className="text-xl font-semibold text-slate-950">승인된 포트폴리오 전략이 없습니다</h1>
-        <p className="max-w-3xl leading-6">
-          현재 계산된 종목룰·시점별 리서치보드 후보는 모두 목표 벤치마크와 낙폭 기준을 통과하지 못했습니다. 벤치마크와
-          상한선은 비교 기준선이라 실제 포트폴리오 선택지에 섞지 않습니다.
-        </p>
-        <div>
-          <Button asChild size="sm" variant="outline">
-            <Link href="/statistics">리포트 통계 보기</Link>
-          </Button>
+      <div className="grid gap-4">
+        <PageHero
+          eyebrow="Portfolio report"
+          title="계좌 원장 없음"
+          subtitle="실제 계좌 원장이 아직 없습니다."
+          badges={[
+            { label: '계좌', value: '0개' },
+            { label: '상태', value: '연결 안 됨' },
+          ]}
+          actions={
+            <Button asChild size="sm" variant="outline">
+              <Link href="/statistics">리포트 통계 보기</Link>
+            </Button>
+          }
+        />
+        <div className="rounded-md border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-600 [overflow-wrap:anywhere] [word-break:break-all]">
+          계좌 원장이 생기면 평가액, 보유 비중, 체결 기록이 여기에 표시됩니다.
         </div>
       </div>
     );
@@ -61,37 +69,55 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
 
   return (
     <div className="grid gap-5">
-      <header className="grid gap-5 border-b border-slate-200 pb-5 xl:grid-cols-[minmax(0,1fr)_minmax(360px,.62fr)] xl:items-end">
-        <div className="grid gap-3">
-          <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-            portfolio account hub
+      <PageHero
+        eyebrow="Portfolio account hub"
+        title="계좌 성과 보드"
+        subtitle="실제 주식 수량 단위로 매수·보유·매도한 계좌를 비교합니다. 벤치마크는 선택 대상이 아니라 수익률과 낙폭의 기준선으로만 표시합니다."
+        badges={[
+          { label: '최근 평가', value: model.latestEquityDate || '—' },
+          { label: '계좌', value: `${model.accounts.length}개` },
+          { label: '기준선', value: `${benchmarkCount}개` },
+        ]}
+        actions={
+          <Button asChild size="sm" variant="secondary">
+            <Link href={selected.href}>선택 계좌 열기</Link>
+          </Button>
+        }
+        kpis={
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <KpiTile
+              compact
+              label="선택 계좌 평가액"
+              value={formatKrw(selected.finalEquityKrw)}
+              caption={selected.shortLabel}
+            />
+            <KpiTile
+              compact
+              label="선택 계좌 수익률"
+              value={formatPercent(selected.moneyWeightedReturn)}
+              tone={(selected.moneyWeightedReturn ?? 0) >= 0 ? 'good' : 'bad'}
+              caption={`MDD ${formatPercent(selected.maxDrawdown)}`}
+            />
+            <KpiTile
+              compact
+              label="현금/RP 비중"
+              value={formatPercent(selected.cashWeight)}
+              caption={formatKrw(selected.cashKrw)}
+            />
+            <KpiTile
+              compact
+              label="올웨더 기준선"
+              value={formatPercent(model.allWeatherReturn)}
+              caption="비교용 벤치마크"
+            />
           </div>
-          <h1 className="text-3xl font-semibold tracking-[-0.04em] text-slate-950 md:text-5xl">포트폴리오</h1>
-          <p className="max-w-3xl text-sm leading-6 text-slate-600 md:text-base">
-            실제 주식 수량 단위로 매수·보유·매도한 포트폴리오 계정을 한 화면에서 봅니다. 통과 전략은 선택·원장으로 열고,
-            벤치마크 점은 수익률과 낙폭의 위치 비교용으로만 사용합니다.
-          </p>
-          <div className="flex flex-wrap gap-2">
-            <Button asChild size="sm" variant="secondary">
-              <Link href={selected.href}>선택 포트폴리오 열기</Link>
-            </Button>
-          </div>
-        </div>
-        <div className="grid gap-2 rounded-md border border-slate-200 bg-white p-3">
-          <div className="text-xs font-medium text-slate-500">포트폴리오 범위</div>
-          <dl className="grid grid-cols-2 gap-2 text-sm">
-            <Fact label="실제 전략" value={`${model.accounts.length}개`} />
-            <Fact label="곡선 기준선" value={`${benchmarkCount}개`} />
-            <Fact label="최근 평가" value={model.latestEquityDate || '—'} />
-            <Fact label="올웨더" value={formatPercent(model.allWeatherReturn)} />
-          </dl>
-        </div>
-      </header>
+        }
+      />
 
       <section
         id="benchmark-board"
         className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(420px,.65fr)]"
-        aria-label="현재 비중과 수익률 낙폭 곡선"
+        aria-label="현재 비중과 수익률 낙폭 지도"
       >
         <article className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
           <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
@@ -119,46 +145,36 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
           <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <div className="mb-3">
               <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                효율 곡선
+                계좌 후보 지도
               </div>
-              <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">수익률 / 낙폭 곡선으로 선택</h2>
+              <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">수익률 / 낙폭 지도로 선택</h2>
               <p className="mt-1 text-sm leading-6 text-slate-500">
-                MPT의 효율 곡선처럼, 더 높은 낙폭에 더 낮은 수익률인 지배 전략은 포트폴리오 후보에서 제외합니다. 전략
-                점은 클릭해서 포트폴리오를 바꾸고, 벤치마크 점은 위치 비교용입니다.
+                실제 계좌는 수익률과 최대 낙폭으로만 비교합니다. 더 큰 낙폭을 감수했는데도 수익률이 낮은 계좌는 뒤로
+                밀리고, 벤치마크 점은 위치 비교용입니다.
               </p>
             </div>
             <PortfolioFrontierChart rows={model.frontierRows} selectedId={selected.id} onSelect={setSelectedId} />
           </article>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <KpiTile label="평가액" value={formatKrw(selected.finalEquityKrw)} caption={selected.shortLabel} />
+            <KpiTile compact label="선택 계좌" value={selected.shortLabel} caption={selected.topHoldingLabel} />
             <KpiTile
-              label="누적 수익률"
-              value={formatPercent(selected.moneyWeightedReturn)}
-              tone={(selected.moneyWeightedReturn ?? 0) >= 0 ? 'good' : 'bad'}
-              caption={`MDD ${formatPercent(selected.maxDrawdown)}`}
-            />
-            <KpiTile
-              label="RP이자 비중"
-              value={formatPercent(selected.cashWeight)}
-              caption={formatKrw(selected.cashKrw)}
-            />
-            <KpiTile
-              label="체결"
+              compact
+              label="체결 기록"
               value={selected.tradeCount?.toLocaleString('ko-KR') ?? '—'}
-              caption="매수·매도 ledger"
+              caption="매수·매도 원장"
             />
           </div>
         </div>
       </section>
 
-      <section className="grid gap-3" aria-label="포트폴리오 선택 버튼">
+      <section className="grid gap-3" aria-label="계좌 선택 버튼">
         <div className="flex items-end justify-between gap-3">
           <div>
             <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-              choose portfolio
+              choose account
             </div>
-            <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">승인된 주식 전략 선택</h2>
+            <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">계좌 원장 선택</h2>
           </div>
           <span className="text-xs font-medium text-slate-500">
             stock-level account_id · {model.accounts.length.toLocaleString('ko-KR')}개 버튼
@@ -176,44 +192,18 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
         </div>
       </section>
 
-      <section className="rounded-md border border-slate-200 bg-white p-4" aria-label="전략 누적 수익률 비교">
+      <section className="rounded-md border border-slate-200 bg-white p-4" aria-label="계좌 누적 수익률 비교">
         <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
           <div>
             <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
               pnl path
             </div>
-            <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">실제 포트폴리오 손익 경로</h2>
+            <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">실제 계좌 손익 경로</h2>
           </div>
           <span className="text-xs text-slate-500">{selectedEquity.length.toLocaleString('ko-KR')} 거래일</span>
         </div>
         <CumulativeReturnChart series={chartSeries} />
       </section>
-    </div>
-  );
-}
-
-function Fact({
-  label,
-  value,
-  tone,
-  danger = false,
-}: {
-  label: string;
-  value: string;
-  tone?: number | null;
-  danger?: boolean;
-}) {
-  const color = danger
-    ? 'text-rose-600'
-    : tone === undefined || tone === null
-      ? 'text-slate-950'
-      : tone >= 0
-        ? 'text-emerald-600'
-        : 'text-rose-600';
-  return (
-    <div className="min-w-0 rounded-md bg-slate-50 px-2 py-1.5">
-      <dt className="truncate text-[10px] font-medium text-slate-500">{label}</dt>
-      <dd className={`truncate font-mono text-xs font-semibold tabular-nums ${color}`}>{value}</dd>
     </div>
   );
 }
@@ -309,21 +299,21 @@ function PortfolioFrontierChart({
         <div className="absolute left-3 top-3 z-10 flex max-w-[calc(100%-1.5rem)] flex-wrap gap-2 text-[10px] font-semibold">
           <span className="inline-flex items-center gap-1 rounded-full bg-slate-950 px-2 py-1 text-white">
             <span className="size-2 rounded-full bg-white" />
-            효율 전략
+            후보 계좌
           </span>
           <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white/85 px-2 py-1 text-slate-600">
             <span className="size-2 rotate-45 bg-slate-400" />
             벤치마크
           </span>
           <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-emerald-700">
-            지배 전략 제외 후 {accountRows.length.toLocaleString('ko-KR')}개
+            지배 계좌 제외 후 {accountRows.length.toLocaleString('ko-KR')}개
           </span>
         </div>
         <svg
           className="h-full w-full"
           viewBox="0 0 360 280"
           role="img"
-          aria-label="실제 포트폴리오 전략과 벤치마크의 MDD 대비 수익률 곡선"
+          aria-label="실제 포트폴리오 계좌와 벤치마크의 MDD 대비 수익률 지도"
         >
           <defs>
             <linearGradient id="frontierStroke" x1="0%" x2="100%" y1="0%" y2="0%">
@@ -554,12 +544,12 @@ function FrontierDetailCard({
   if (!activeRow) {
     return (
       <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-        표시할 효율 곡선 점이 없습니다.
+        표시할 계좌 후보 점이 없습니다.
       </div>
     );
   }
   const isBenchmark = activeRow.kind === 'benchmark';
-  const stateLabel = isBenchmark ? '벤치마크 비교점' : '효율 전략';
+  const stateLabel = isBenchmark ? '벤치마크 비교점' : '후보 계좌';
   const stateTone = isBenchmark
     ? 'border-slate-200 bg-slate-50 text-slate-600'
     : 'border-emerald-200 bg-emerald-50 text-emerald-700';
@@ -579,19 +569,19 @@ function FrontierDetailCard({
               </span>
             ) : (
               <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-semibold text-slate-600">
-                선택 전략
+                선택 계좌
               </span>
             )}
           </div>
           <h3 className="mt-2 truncate text-base font-semibold text-slate-950">{activeRow.shortLabel}</h3>
           <p className="mt-1 text-xs leading-5 text-slate-500">
-            포트폴리오 후보는 지배 전략을 제거한 {frontierCount.toLocaleString('ko-KR')}개 전략만 남깁니다. 벤치마크는
-            선택 대상이 아니라 위치 비교용입니다.
+            계좌 후보는 지배 계좌를 제거한 {frontierCount.toLocaleString('ko-KR')}개 계좌만 남깁니다. 벤치마크는 선택
+            대상이 아니라 위치 비교용입니다.
           </p>
         </div>
         {onSelect && inspecting ? (
           <Button size="sm" variant="outline" onClick={onSelect}>
-            이 전략 선택
+            이 계좌 선택
           </Button>
         ) : null}
       </div>

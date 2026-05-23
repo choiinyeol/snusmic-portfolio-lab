@@ -3,6 +3,16 @@
 import { useMemo, useState, type CSSProperties } from 'react';
 import { CumulativeReturnChart, type ReturnSeries } from '@/components/charts/CumulativeReturnChart';
 
+const PERIODS = [
+  { id: '1m', label: '1M', days: 31 },
+  { id: '3m', label: '3M', days: 93 },
+  { id: '6m', label: '6M', days: 186 },
+  { id: 'ytd', label: 'YTD', days: null },
+  { id: 'all', label: 'ALL', days: null },
+] as const;
+
+type PeriodId = (typeof PERIODS)[number]['id'];
+
 /** Convert a hex colour (#rgb / #rrggbb) into rgba(...) so the active toggle pill
  * can share one visual encoding with the chart line at a lower opacity. */
 function colorWithAlpha(color: string, alpha: number): string {
@@ -17,8 +27,17 @@ function colorWithAlpha(color: string, alpha: number): string {
 export function SeriesToggleChart({ series }: { series: ReturnSeries[] }) {
   const available = useMemo(() => series.filter((item) => item.points.length), [series]);
   const [activeIds, setActiveIds] = useState<Set<string>>(() => new Set(available.map((item) => item.id)));
-  const activeSeries = available.filter((item) => activeIds.has(item.id));
-  const hiddenCount = Math.max(0, available.length - activeSeries.length);
+  const [period, setPeriod] = useState<PeriodId>('all');
+  const activeSeries = useMemo(
+    () =>
+      filterSeriesByPeriod(
+        available.filter((item) => activeIds.has(item.id)),
+        period,
+      ),
+    [activeIds, available, period],
+  );
+  const activeCount = available.filter((item) => activeIds.has(item.id)).length;
+  const hiddenCount = Math.max(0, available.length - activeCount);
 
   function toggle(id: string) {
     setActiveIds((current) => {
@@ -44,11 +63,29 @@ export function SeriesToggleChart({ series }: { series: ReturnSeries[] }) {
   return (
     <div className="grid gap-3">
       <div className="grid min-w-0 gap-2">
-        <div className="flex min-w-0 items-center justify-between gap-2">
+        <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
           <div className="text-xs font-bold text-slate-950/45">
             표시 {activeSeries.length.toLocaleString('ko-KR')} · 숨김 {hiddenCount.toLocaleString('ko-KR')}
           </div>
-          <div className="flex shrink-0 gap-1.5">
+          <div className="flex min-w-0 flex-wrap gap-1.5">
+            <div
+              className="inline-flex max-w-full overflow-x-auto rounded-md border border-slate-200 bg-slate-50 p-0.5"
+              aria-label="성과 기간"
+            >
+              {PERIODS.map((item) => (
+                <button
+                  className={`min-h-7 rounded px-2 font-mono text-[11px] font-semibold transition ${
+                    period === item.id ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-950'
+                  }`}
+                  key={item.id}
+                  onClick={() => setPeriod(item.id)}
+                  type="button"
+                  aria-pressed={period === item.id}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
             <button className="snapshot-pill" onClick={setPrimaryOnly} type="button">
               핵심만
             </button>
@@ -88,4 +125,22 @@ export function SeriesToggleChart({ series }: { series: ReturnSeries[] }) {
       <CumulativeReturnChart series={activeSeries} showLegend={false} />
     </div>
   );
+}
+
+function filterSeriesByPeriod(series: ReturnSeries[], period: PeriodId): ReturnSeries[] {
+  if (period === 'all') return series;
+  const latestTime = series
+    .flatMap((item) => item.points.map((point) => Date.parse(point.time)))
+    .filter(Number.isFinite)
+    .sort((a, b) => b - a)[0];
+  if (!latestTime) return series;
+  const latest = new Date(latestTime);
+  const cutoff =
+    period === 'ytd'
+      ? Date.UTC(latest.getUTCFullYear(), 0, 1)
+      : latestTime - (PERIODS.find((item) => item.id === period)?.days ?? 0) * 24 * 60 * 60 * 1000;
+  return series.map((item) => ({
+    ...item,
+    points: item.points.filter((point) => Date.parse(point.time) >= cutoff),
+  }));
 }

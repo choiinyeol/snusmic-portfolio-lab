@@ -146,7 +146,7 @@ export function HoldingsTreemap({
   return (
     <section className="grid gap-2" aria-labelledby="treemap-heading">
       <h3 className="sr-only" id="treemap-heading">
-        포트폴리오 보유 종목 비중 트리맵
+        계좌 보유 종목 비중 트리맵
       </h3>
       {showToolbar ? (
         <div className="heatmap-toolbar">
@@ -205,7 +205,7 @@ function TreemapEmptyState({ height }: { height: number }) {
         <div className="mx-auto mb-3 grid h-10 w-10 place-items-center rounded-2xl bg-blue-50 text-blue-600">▦</div>
         <h3 className="text-base font-black tracking-[-0.02em]">표시할 보유 종목이 없습니다</h3>
         <p className="mt-2 text-sm text-slate-950/60">
-          선택한 전략에 평가액이 있는 포지션이 생성되면 면적 기반 트리맵으로 표시됩니다.
+          선택한 계좌에 평가액이 있는 포지션이 생성되면 면적 기반 트리맵으로 표시됩니다.
         </p>
       </div>
     </div>
@@ -421,7 +421,7 @@ function formatQuantity(value: number | null | undefined): string {
 function holdingHref(row: HoldingRow, hrefBySymbol: Record<string, string> | undefined): string | null {
   if (hrefBySymbol) return hrefBySymbol[row.symbol] ?? null;
   if (!row.symbol || row.symbol === 'CASH') return null;
-  return `/reports/${encodeURIComponent(row.symbol)}`;
+  return null;
 }
 
 function isCashHolding(row: Pick<HoldingRow, 'symbol'>): boolean {

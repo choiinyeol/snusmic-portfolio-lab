@@ -159,7 +159,7 @@ export function PortfolioEquityTradeChart({
   }, [benchmarkSeries, equityByDate, height, label, lineData, markers, tradesByDate]);
 
   if (!lineData.length) {
-    return <div className="chart-box empty-chart">포트폴리오 손익 경로 데이터가 없습니다.</div>;
+    return <div className="chart-box empty-chart">계좌 손익 경로 데이터가 없습니다.</div>;
   }
 
   return (

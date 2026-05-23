@@ -26,11 +26,17 @@ class WebReportRow(_ArtifactModel):
     target_hit_date: str | None
     days_to_target: float | None
     last_close_krw: float | None
+    last_close_native: float | None
     last_close_date: str | None
     current_return: float | None
     peak_return: float | None
     trough_return: float | None
     target_gap_pct: float | None
+    evaluation_close_krw: float | None = None
+    evaluation_close_date: str | None = None
+    evaluation_return: float | None = None
+    target_remaining_pct: float | None = None
+    target_progress_pct: float | None = None
     expiry_date: str | None
     expired: bool
     caveat_flags: list[str] = Field(default_factory=list)

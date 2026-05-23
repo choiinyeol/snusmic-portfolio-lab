@@ -45,7 +45,7 @@ export function PortfolioHoldingsView({ model }: { model: PortfolioViewModel }) 
               </div>
               <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">현재 보유 비중</h2>
               <p className="mt-1 text-sm leading-6 text-slate-500">
-                연 2.5% RP이자까지 별도 자산으로 포함한 실제 포트폴리오 비중입니다.
+                연 2.5% RP이자까지 별도 자산으로 포함한 실제 계좌 비중입니다.
               </p>
             </div>
             <span className="font-mono text-xs font-semibold text-slate-500">{formatKrw(totalValue)}</span>
@@ -55,7 +55,7 @@ export function PortfolioHoldingsView({ model }: { model: PortfolioViewModel }) 
             height={420}
             compact
             hrefBySymbol={hrefBySymbol}
-            caption="면적 = 평가액, 색 = 미실현 수익률. RP이자도 포트폴리오 비중으로 포함합니다."
+            caption="면적 = 평가액, 색 = 미실현 수익률. RP이자도 계좌 비중으로 포함합니다."
           />
         </article>
 
@@ -108,7 +108,7 @@ function HoldingEvidenceCard({
   totalValue: number;
 }) {
   const weight = totalValue > 0 ? (holding.marketValueKrw ?? 0) / totalValue : null;
-  const href = target ? reportTargetHref(target) : `/reports/${encodeURIComponent(holding.symbol)}`;
+  const href = target ? reportTargetHref(target) : `/portfolio/${encodeURIComponent(holding.account_id)}/holdings`;
   return (
     <Link
       className="grid gap-2 rounded-md border border-slate-200 p-3 transition-colors hover:border-slate-400 hover:bg-slate-50"

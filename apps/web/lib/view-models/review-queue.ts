@@ -1,28 +1,31 @@
-import type { Metadata } from 'next';
-import { ScreenerTable, type ScreenerBoardRow } from '@/components/screener/screener-table';
-import { PageHero } from '@/components/ui/PageHero';
-import { Section } from '@/components/ui/Section';
+import 'server-only';
+
 import {
-  getArtifactManifest,
   getPriceSeries,
-  getReportRows,
-  getScreenerCandidates,
+  getReportVerificationPageBundle,
+  getReviewQueuePageBundle,
   hasPriceArtifact,
   type PricePoint,
   type ReportRow,
-  type ScreenerCandidateRow,
+  type ReviewCandidateRow,
 } from '@/lib/artifacts';
+import type { ReviewBoardRow } from '@/components/review/review-table';
 import { formatDateKo, formatPercent } from '@/lib/format';
+import type { PageHeaderModel, PageMetric } from '@/lib/view-models/shared';
 
-export const metadata: Metadata = {
-  title: '후보 탐색 — SNUSMIC Portfolio Lab',
+export type ReviewQueueViewModel = {
+  header: PageHeaderModel;
+  metrics: PageMetric[];
+  priorityRows: ReviewBoardRow[];
+  rows: ReviewBoardRow[];
 };
 
-export default function ScreenerPage() {
-  const reports = getReportRows();
-  const candidates = getScreenerCandidates();
-  const manifest = getArtifactManifest();
-  const rows = buildScreenerRows(reports, candidates, manifest.price_range.end ?? null);
+export function getReviewQueueViewModel(): ReviewQueueViewModel {
+  const reportBundle = getReportVerificationPageBundle();
+  const queueBundle = getReviewQueuePageBundle();
+  const reports = reportBundle.table.rows;
+  const candidates = queueBundle.table.rows;
+  const rows = buildReviewRows(reports, candidates);
   const latestPublicationDate = rows
     .map((row) => row.latestReportDate)
     .filter(Boolean)
@@ -30,44 +33,55 @@ export default function ScreenerPage() {
   const positiveCurrentReturnCount = rows.filter((row) => (row.currentReturn ?? -Infinity) >= 0).length;
   const positiveCurrentReturnShare = rows.length ? positiveCurrentReturnCount / rows.length : null;
   const aboveAllMaCount = rows.filter((row) => row.maStack).length;
+  const priorityRows = rows.slice(0, 5);
 
-  return (
-    <>
-      <PageHero
-        eyebrow="Screener"
-        title="후보 탐색"
-        subtitle="발간된 리포트 universe에 가격 시계열과 후보 점수를 겹쳐 보는 검토 보드입니다."
-        badges={[
-          { label: '종목', value: `${rows.length.toLocaleString('ko-KR')}개` },
-          { label: '리포트', value: `${reports.length.toLocaleString('ko-KR')}건` },
-          { label: '최신 발간', value: formatDateKo(latestPublicationDate) },
-          {
-            label: '현재 플러스',
-            value: `${positiveCurrentReturnCount}개 · ${formatPercent(positiveCurrentReturnShare, 1)}`,
-          },
-          { label: '정배열', value: `${aboveAllMaCount.toLocaleString('ko-KR')}개` },
-          { label: '가격 기준일', value: manifest.price_range.end ?? '—' },
-        ]}
-      />
-
-      <div className="mt-5 grid gap-5">
-        <Section
-          eyebrow="Report universe × Price series × Candidate overlay"
-          title="종목 보드"
-          caption="리포트 발간 후 2년이 지난 행은 기본적으로 숨기고, 각 컬럼 필터를 중복 적용해 후보를 좁힙니다."
-        >
-          <ScreenerTable rows={rows} />
-        </Section>
-      </div>
-    </>
-  );
+  return {
+    header: {
+      eyebrow: 'Review Queue',
+      title: '검토 대기열',
+      description: '오늘 먼저 볼 후보를 점수, 가격 위치, 리포트 맥락으로 정렬합니다.',
+      badges: [
+        { label: '최신 발간', value: formatDateKo(latestPublicationDate) },
+        { label: '가격 기준', value: queueBundle.as_of.price_date ? formatDateKo(queueBundle.as_of.price_date) : null },
+        { label: '리포트', value: `${reports.length.toLocaleString('ko-KR')}건` },
+      ],
+    },
+    metrics: [
+      {
+        id: 'candidates',
+        label: '후보 종목',
+        value: `${rows.length.toLocaleString('ko-KR')}개`,
+        helper: 'page bundle 기준',
+        tone: 'neutral',
+      },
+      {
+        id: 'positive',
+        label: '현재 플러스',
+        value: `${positiveCurrentReturnCount.toLocaleString('ko-KR')}개`,
+        helper: formatPercent(positiveCurrentReturnShare, 1),
+        tone: positiveCurrentReturnCount > 0 ? 'positive' : 'neutral',
+      },
+      {
+        id: 'ma-stack',
+        label: '정배열',
+        value: `${aboveAllMaCount.toLocaleString('ko-KR')}개`,
+        helper: '20/50/200 SMA 기준',
+        tone: aboveAllMaCount > 0 ? 'positive' : 'neutral',
+      },
+      {
+        id: 'priority',
+        label: '오늘 우선순위',
+        value: `${priorityRows.length.toLocaleString('ko-KR')}개`,
+        helper: '상단 카드 표시',
+        tone: 'accent',
+      },
+    ],
+    priorityRows,
+    rows,
+  };
 }
 
-function buildScreenerRows(
-  reports: ReportRow[],
-  candidates: ScreenerCandidateRow[],
-  priceEndDate: string | null,
-): ScreenerBoardRow[] {
+function buildReviewRows(reports: ReportRow[], candidates: ReviewCandidateRow[]): ReviewBoardRow[] {
   const reportsBySymbol = new Map<string, ReportRow[]>();
   for (const report of reports) {
     const list = reportsBySymbol.get(report.symbol) ?? [];
@@ -76,7 +90,7 @@ function buildScreenerRows(
   }
 
   const candidateByReportId = new Map(candidates.map((candidate) => [candidate.reportId, candidate]));
-  const candidateBySymbol = new Map<string, ScreenerCandidateRow>();
+  const candidateBySymbol = new Map<string, ReviewCandidateRow>();
   for (const candidate of candidates) {
     const previous = candidateBySymbol.get(candidate.symbol);
     if (!previous || candidate.score > previous.score) candidateBySymbol.set(candidate.symbol, candidate);
@@ -85,15 +99,10 @@ function buildScreenerRows(
   const rows = Array.from(reportsBySymbol.entries()).map(([symbol, symbolReports]) => {
     const sortedReports = [...symbolReports].sort((a, b) => b.publicationDate.localeCompare(a.publicationDate));
     const latest = sortedReports[0];
-    if (!latest) throw new Error(`Missing latest report for screener symbol: ${symbol}`);
+    if (!latest) throw new Error(`Missing latest report for review symbol: ${symbol}`);
     const candidate = candidateByReportId.get(latest.reportId) ?? candidateBySymbol.get(symbol) ?? null;
     const prices = hasPriceArtifact(symbol) ? getPriceSeries(symbol) : [];
     const technicals = buildTechnicals(prices);
-    const ageDays = daysBetween(
-      latest.publicationDate,
-      priceEndDate ?? latest.lastCloseDate ?? technicals.lastCloseDate,
-    );
-    const expiredByAge = ageDays !== null && ageDays > 730;
     return {
       symbol,
       company: latest.company,
@@ -101,7 +110,7 @@ function buildScreenerRows(
       currency: latest.currency,
       latestReportId: latest.reportId,
       latestReportDate: latest.publicationDate,
-      reportAgeDays: ageDays,
+      reportAgeDays: null,
       reportCount: sortedReports.length,
       lastCloseNative: latest.lastCloseNative ?? technicals.lastPrice,
       lastCloseKrw: latest.lastCloseKrw,
@@ -121,8 +130,8 @@ function buildScreenerRows(
       targetHit: latest.targetHit,
       targetHitDate: latest.targetHitDate,
       daysToTarget: latest.daysToTarget,
-      expired: latest.expired || expiredByAge,
-      expiredByAge,
+      expired: latest.expired,
+      expiredByAge: false,
       caveatFlags: latest.caveatFlags,
       candidateBucket: candidate?.bucket ?? null,
       candidateScore: candidate?.score ?? null,
@@ -138,7 +147,7 @@ function buildScreenerRows(
       above200ma: technicals.above200ma,
       maStack: technicals.maStack,
       sparkline: technicals.sparkline,
-    } satisfies ScreenerBoardRow;
+    } satisfies ReviewBoardRow;
   });
 
   const rankedReturns = rows
@@ -154,14 +163,6 @@ function buildScreenerRows(
         (b.ytdReturn ?? -Infinity) - (a.ytdReturn ?? -Infinity) ||
         b.latestReportDate.localeCompare(a.latestReportDate),
     );
-}
-
-function daysBetween(startDate: string, endDate: string | null): number | null {
-  if (!startDate || !endDate) return null;
-  const start = Date.parse(`${startDate}T00:00:00.000Z`);
-  const end = Date.parse(`${endDate}T00:00:00.000Z`);
-  if (!Number.isFinite(start) || !Number.isFinite(end) || end < start) return null;
-  return Math.floor((end - start) / 86_400_000);
 }
 
 function buildTechnicals(prices: PricePoint[]) {

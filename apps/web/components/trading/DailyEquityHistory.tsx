@@ -57,7 +57,7 @@ export function DailyEquityHistory({ equity, trades, account_id, accountLabels, 
   if (!summary) {
     return (
       <p className="rounded-md border border-slate-200 bg-white p-5 text-sm text-slate-500">
-        해당 전략의 일별 평가 데이터가 없습니다.
+        해당 계좌의 일별 평가 데이터가 없습니다.
       </p>
     );
   }

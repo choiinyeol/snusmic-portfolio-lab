@@ -380,12 +380,15 @@ class ReportPerformance(_FrozenModel):
     target_hit: bool
     target_hit_date: date | None
     days_to_target: int | None  # None when not hit
-    last_close_krw: float | None
+    last_close_krw: float | None  # latest close at simulation end
     last_close_date: date | None
-    current_return: float | None  # last_close / entry − 1
+    current_return: float | None  # latest close / entry − 1
     peak_return: float | None
     trough_return: float | None
-    target_gap_pct: float | None  # (last_close − target) / target
+    target_gap_pct: float | None  # latest close vs target
+    evaluation_close_krw: float | None = None  # close at the capped report evaluation window
+    evaluation_close_date: date | None = None
+    evaluation_return: float | None = None  # evaluation_close / entry − 1
     expiry_date: date | None = None  # publication_date + config.report_expiry_days
     expired: bool = False  # True once today >= expiry_date and target was not hit in-window
 

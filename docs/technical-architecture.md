@@ -19,13 +19,27 @@ The repository is layered by job:
 
 ## Web Routes
 
-- `/main`: executive overview.
-- `/reports`: report table.
-- `/reports/[symbol]` and `/reports/[symbol]/[reportId]`: report evidence.
-- `/screener`: PIT report board.
-- `/statistics`: report-level outcome and factor diagnostics.
+- `/`: report verification and review board.
+- `/reports`: canonical report verification table.
+- `/reports/[symbol]/[reportId]`: report evidence detail.
+- `/statistics`: report-level outcome, concentration, and price-path diagnostics.
 - `/portfolio`: account chooser.
-- `/portfolio/[account]/*`: holdings, equity, trades, and methodology for one account.
+- `/portfolio/[account]`: account overview.
+- `/portfolio/[account]/equity`: account equity and trade path.
+- `/portfolio/[account]/holdings`: current holdings.
+- `/portfolio/[account]/trades`: trade ledger.
+
+The old `/main`, `/review`, `/screener`, `/guide`, `/reports/[symbol]`, and `/portfolio/[account]/methodology` routes were removed. The product now keeps one report-board entry point and one report-detail route instead of parallel prototype surfaces.
+
+## Frontend Data Bridge
+
+The web app remains a static reader over committed `data/web` artifacts. Route files should call page view models from `apps/web/lib/view-models/**`, then pass display-ready props into React components. Low-level file reads stay in server-only artifact readers; React components should not recompute target-hit, split adjustment, benchmark coverage, or report-window logic.
+
+Page bundles under `data/web/pages/**` are the preferred shape for screen-level metadata, metrics, views, warnings, and table/chart payloads. Canonical artifacts under `data/web/reports/**`, `data/web/portfolio/**`, and `data/web/prices/**` remain the source of truth for reusable data.
+
+## Cross-Platform Tooling
+
+Project scripts are Node or Python entrypoints rather than Bash wrappers. `pnpm build` calls `scripts/vercel_build.mjs`, and Vercel prebuilt output is prepared by `scripts/prepare_vercel_prebuilt.mjs`, so the same deploy build path works on macOS, Windows, and Linux CI.
 
 ## Contracts
 

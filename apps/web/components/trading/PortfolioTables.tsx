@@ -114,7 +114,7 @@ export function PortfolioTables({
         <thead>
           <tr>
             <th className="px-3 py-2 text-left">
-              <SortHeader label="전략" sortKey="account" sort={sort} onSort={updateSort} />
+              <SortHeader label="계좌" sortKey="account" sort={sort} onSort={updateSort} />
             </th>
             <th className="px-3 py-2 text-left">
               <SortHeader label="시장" sortKey="market" sort={sort} onSort={updateSort} />
@@ -177,12 +177,16 @@ export function PortfolioTables({
                     </span>
                   </td>
                   <td className="px-3 py-2">
-                    <Link
-                      className="font-semibold text-slate-950 hover:underline"
-                      href={targetHrefFor(row.symbol, targetsBySymbol)}
-                    >
-                      {row.company || row.symbol}
-                    </Link>
+                    {targetHrefFor(row.symbol, targetsBySymbol) ? (
+                      <Link
+                        className="font-semibold text-slate-950 hover:underline"
+                        href={targetHrefFor(row.symbol, targetsBySymbol) ?? ''}
+                      >
+                        {row.company || row.symbol}
+                      </Link>
+                    ) : (
+                      <span className="font-semibold text-slate-950">{row.company || row.symbol}</span>
+                    )}
                     <div className="mt-0.5 font-mono text-[11px] text-slate-500">{row.symbol}</div>
                   </td>
                   <td className="px-3 py-2">
@@ -294,7 +298,7 @@ function downloadHoldings(
   downloadCsv(`snusmic-holdings-${slug}.csv`, headers, data);
 }
 
-function targetHrefFor(symbol: string, targetsBySymbol: Record<string, ReportTargetDigest>): string {
+function targetHrefFor(symbol: string, targetsBySymbol: Record<string, ReportTargetDigest>): string | null {
   const target = targetsBySymbol[symbol];
-  return target ? reportTargetHref(target) : `/reports/${encodeURIComponent(symbol)}`;
+  return target ? reportTargetHref(target) : null;
 }

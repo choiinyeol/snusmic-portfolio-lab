@@ -1,12 +1,10 @@
 import type { SidebarNavItem } from '@/components/ui/SidebarNav';
 
 export const APP_NAV: SidebarNavItem[] = [
-  { href: '/main', label: '메인화면', description: '오늘 확인', icon: 'dashboard', activePath: '/main' },
-  { href: '/portfolio', label: '포트폴리오', description: '보유·매매', icon: 'portfolio' },
-  { href: '/reports', label: '리포트', description: '표본·검증', icon: 'reports' },
-  { href: '/screener', label: '후보 탐색', description: '검토 대기열', icon: 'screener' },
-  { href: '/statistics', label: '리포트 통계', description: '분포·경로', icon: 'reports' },
-  { href: '/guide', label: '가이드', description: '방법론', icon: 'guide' },
+  { href: '/', label: '신호 보드', description: '현재 상태', icon: 'dashboard', activePath: '/' },
+  { href: '/portfolio', label: '계좌 리포트', description: '보유·매매', icon: 'portfolio' },
+  { href: '/reports', label: '신호 검증 보드', description: '후보·리포트', icon: 'review' },
+  { href: '/statistics', label: '성과 통계', description: '분포·경로', icon: 'reports' },
 ];
 
 export const GITHUB_NAV_ITEM: SidebarNavItem = {

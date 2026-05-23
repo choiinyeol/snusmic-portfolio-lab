@@ -7,10 +7,10 @@ on:
       - "data/web/**"
       - "data/sim/**"
       - "data/warehouse/**"
-      - "scripts/prepare_vercel_prebuilt.sh"
+      - "scripts/prepare_vercel_prebuilt.mjs"
       - "package.json"
       - "vercel.json"
-      - "scripts/vercel_build.sh"
+      - "scripts/vercel_build.mjs"
       - ".github/workflows/web.yml"
   push:
     branches: [main]
@@ -19,10 +19,10 @@ on:
       - "data/web/**"
       - "data/sim/**"
       - "data/warehouse/**"
-      - "scripts/prepare_vercel_prebuilt.sh"
+      - "scripts/prepare_vercel_prebuilt.mjs"
       - "package.json"
       - "vercel.json"
-      - "scripts/vercel_build.sh"
+      - "scripts/vercel_build.mjs"
       - ".github/workflows/web.yml"
   workflow_dispatch:
     inputs:
@@ -107,8 +107,12 @@ jobs:
         working-directory: apps/web
         run: pnpm build
 
+      - name: Smoke exported routes
+        working-directory: apps/web
+        run: pnpm smoke:static
+
       - name: Prepare Vercel prebuilt output
-        run: scripts/prepare_vercel_prebuilt.sh
+        run: node scripts/prepare_vercel_prebuilt.mjs
 
       - name: Install Vercel CLI
         if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && env.VERCEL_TOKEN != '' && env.VERCEL_ORG_ID != '' && env.VERCEL_PROJECT_ID != ''

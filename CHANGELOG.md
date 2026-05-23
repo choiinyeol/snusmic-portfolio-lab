@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.29.4 - Report board and statistics product pass
+
+- Merges the report table and review queue into one report-board workflow so the web app has a single source of truth for report verification.
+- Adds page-shaped view models and static page bundles so route components render decision-ready props instead of raw artifact rows.
+- Retouches `/statistics` into a compact decision-first statistics board with executive metrics, distribution focus, concentration insight, whole-sample map guidance, and shorter price-path panels.
+- Improves report table density, sorting, row navigation, compact symbol/company display, moving-average grouping, signed progress gauge behavior, and KRW display with `₩`.
+- Separates latest report close from capped two-year evaluation close so expired report details can show the real latest close while preserving the evaluation-window evidence.
+- Removes prototype/legacy web routes and Bash deployment wrappers in favor of cross-platform Node/Python entrypoints.
+- Updates frontend design, chart, table, artifact, and architecture docs to match the current static artifact reader and page view-model contract.
+
+Verification:
+
+- `uv run --locked pytest tests/sim/test_report_stats.py`
+- `uv run --locked ruff check src/snusmic_pipeline/sim/contracts.py src/snusmic_pipeline/sim/report_stats.py src/snusmic_pipeline/web/artifacts.py src/snusmic_pipeline/web/contracts.py tests/sim/test_report_stats.py`
+- `pnpm --dir apps/web artifact:check`
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web build`
+
 ## v0.29.3 - PIT artifact boundary cleanup
 
 - Removes the committed daily-forward checkpoint cache from Git and ignores future checkpoint files.

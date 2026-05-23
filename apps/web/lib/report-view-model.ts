@@ -1,4 +1,4 @@
-import { formatDays, formatNative, formatPercent } from '@/lib/format';
+import { formatDateKo, formatDays, formatNative, formatPercent } from '@/lib/format';
 import type { PricePoint, ReportRow } from '@/lib/artifacts';
 
 export type PathEvidence = {
@@ -229,9 +229,13 @@ export function targetStatus(report: ReportRow): TargetStatus {
   if ((report.targetUpsideAtPub ?? 0) <= 0) {
     return { label: '비실행', detail: '첫 거래 가능 가격이 목표가 이상', tone: 'warn' };
   }
-  return report.targetHit
-    ? { label: '목표 도달', detail: `${report.targetHitDate} · ${formatDays(report.daysToTarget)}`, tone: 'good' }
-    : { label: '진행 중', detail: `목표까지 ${formatPercent(targetRemaining(report))}`, tone: 'accent' };
+  if (report.targetHit) {
+    return { label: '목표 도달', detail: `${report.targetHitDate} · ${formatDays(report.daysToTarget)}`, tone: 'good' };
+  }
+  if (report.expired) {
+    return { label: '검증 만료', detail: `${formatDateKo(report.expiryDate)}까지 목표 미도달`, tone: 'warn' };
+  }
+  return { label: '진행 중', detail: `목표까지 ${formatPercent(targetRemaining(report))}`, tone: 'accent' };
 }
 
 export function targetRemaining(report: ReportRow): number | null {
