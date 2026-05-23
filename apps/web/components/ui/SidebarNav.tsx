@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
-export type NavIconKey = 'dashboard' | 'portfolio' | 'reports' | 'strategies' | 'screener' | 'guide' | 'github';
+export type NavIconKey = 'dashboard' | 'portfolio' | 'reports' | 'accounts' | 'screener' | 'guide' | 'github';
 
 export type SidebarNavItem = {
   href: string;
@@ -19,7 +19,7 @@ const ICONS: Record<NavIconKey, LucideIcon> = {
   dashboard: Home,
   portfolio: BarChart3,
   reports: FileText,
-  strategies: LineChart,
+  accounts: LineChart,
   screener: Search,
   guide: BookOpenText,
   github: GitBranch,

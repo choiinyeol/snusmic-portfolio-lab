@@ -284,8 +284,8 @@ export function PriceEvidenceChart({
       }
       const time = String(params.time);
       const seriesData = params.seriesData.get(candleSeries);
-      const fallback = priceByTime.get(time);
-      const hoveredCandle = readCrosshairCandle(seriesData, fallback);
+      const referencePoint = priceByTime.get(time);
+      const hoveredCandle = readCrosshairCandle(seriesData, referencePoint);
       if (!hoveredCandle) {
         setTooltip(null);
         setHoverBar(null);
@@ -294,7 +294,7 @@ export function PriceEvidenceChart({
       }
       const { open, high, low, close } = hoveredCandle;
       const targetGapPct = isFinitePrice(targetPrice) ? (targetPrice - close) / close : null;
-      const nextBar = { time, open, high, low, close, volume: fallback?.volume ?? null };
+      const nextBar = { time, open, high, low, close, volume: referencePoint?.volume ?? null };
       setHoverBar(nextBar);
       setHoverMa(maByTime.get(time) ?? EMPTY_MA);
       setTooltip({
@@ -676,13 +676,16 @@ function activeBarFromPoint(point: PricePoint | undefined): OhlcState | null {
   return { time: point.time, ...candle, volume: point.volume ?? null };
 }
 
-function readCrosshairCandle(seriesData: unknown, fallback: PricePoint | undefined): Omit<CandlePoint, 'time'> | null {
+function readCrosshairCandle(
+  seriesData: unknown,
+  referencePoint: PricePoint | undefined,
+): Omit<CandlePoint, 'time'> | null {
   const closeRaw = isObjectWithNumber(seriesData, 'close')
     ? Number(seriesData.close)
-    : (fallback?.close ?? fallback?.value);
-  const openRaw = isObjectWithNumber(seriesData, 'open') ? Number(seriesData.open) : (fallback?.open ?? closeRaw);
-  const highRaw = isObjectWithNumber(seriesData, 'high') ? Number(seriesData.high) : (fallback?.high ?? closeRaw);
-  const lowRaw = isObjectWithNumber(seriesData, 'low') ? Number(seriesData.low) : (fallback?.low ?? closeRaw);
+    : (referencePoint?.close ?? referencePoint?.value);
+  const openRaw = isObjectWithNumber(seriesData, 'open') ? Number(seriesData.open) : (referencePoint?.open ?? closeRaw);
+  const highRaw = isObjectWithNumber(seriesData, 'high') ? Number(seriesData.high) : (referencePoint?.high ?? closeRaw);
+  const lowRaw = isObjectWithNumber(seriesData, 'low') ? Number(seriesData.low) : (referencePoint?.low ?? closeRaw);
   if (closeRaw === undefined || openRaw === undefined || highRaw === undefined || lowRaw === undefined) return null;
   if (!Number.isFinite(closeRaw) || !Number.isFinite(openRaw) || !Number.isFinite(highRaw) || !Number.isFinite(lowRaw))
     return null;

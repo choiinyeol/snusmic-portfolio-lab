@@ -28,7 +28,7 @@ from matplotlib import font_manager  # noqa: E402
 
 from .contracts import SimulationResult  # noqa: E402
 
-PERSONA_COLORS = {
+ACCOUNT_COLORS = {
     "oracle": "#16a34a",
     "weak_oracle": "#2563eb",
     "smic_follower": "#f59e0b",
@@ -97,7 +97,7 @@ def plot_equity_curves(result: SimulationResult, out_path: Path) -> Path:
             xs,
             ys,
             label=account_labels.get(account_id, account_id),
-            color=PERSONA_COLORS.get(account_id),
+            color=ACCOUNT_COLORS.get(account_id),
             linewidth=1.6,
         )
     ax.axhline(1.0, color="black", linestyle="--", linewidth=0.9, alpha=0.6, label="Breakeven (+0%)")
@@ -144,7 +144,7 @@ def plot_net_profit_bars(result: SimulationResult, out_path: Path) -> Path:
     summaries = sorted(result.summaries, key=total_return_pct)
     labels = [s.label for s in summaries]
     values = [total_return_pct(s) for s in summaries]
-    colors = [PERSONA_COLORS.get(s.account_id, "#6b7280") for s in summaries]
+    colors = [ACCOUNT_COLORS.get(s.account_id, "#6b7280") for s in summaries]
 
     fig, ax = plt.subplots(figsize=(10, 5.5))
     bars = ax.barh(labels, values, color=colors)
@@ -272,7 +272,7 @@ def plot_drawdowns(result: SimulationResult, out_path: Path) -> Path:
             xs,
             dd,
             label=account_labels.get(account_id, account_id),
-            color=PERSONA_COLORS.get(account_id),
+            color=ACCOUNT_COLORS.get(account_id),
             linewidth=1.4,
         )
     ax.set_title("Drawdown (%) by account_id")

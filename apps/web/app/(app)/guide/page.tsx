@@ -4,18 +4,18 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getOverview, getReportRows } from '@/lib/artifacts';
 import { formatDays, formatPercent } from '@/lib/format';
-import { getDefaultPortfolioAccount, getPortfolioSnapshot, getStrategyLeaderboard } from '@/lib/product-model';
+import { getDefaultPortfolioAccount, getPortfolioSnapshot, getAccountLeaderboard } from '@/lib/product-model';
 
 export default function GuidePage() {
   const reports = getReportRows();
   const overview = getOverview();
-  const strategyRows = getStrategyLeaderboard();
+  const accountRows = getAccountLeaderboard();
   const defaultAccount = getDefaultPortfolioAccount();
   const portfolio = getPortfolioSnapshot(defaultAccount);
   const reportStats = buildGuideReportStats(reports);
-  const bestRealStrategy = strategyRows.find((row) => row.kind === 'strategy' && row.id !== 'weak_oracle');
-  const follower = strategyRows.find((row) => row.id === 'smic_follower_v2');
-  const kodex = strategyRows.find((row) => row.id === 'benchmark_kodex200');
+  const bestRealAccount = accountRows.find((row) => row.kind === 'account' && row.id !== 'weak_oracle');
+  const follower = accountRows.find((row) => row.id === 'smic_follower_v2');
+  const kodex = accountRows.find((row) => row.id === 'benchmark_kodex200');
 
   const headlineMetrics: [string, string, string][] = [
     ['검증 표본', `${reportStats.total.toLocaleString('ko-KR')}건`, '가격 매칭·목표가 검증 대상'],
@@ -58,11 +58,11 @@ export default function GuidePage() {
     },
   ];
 
-  const strategyRowsData: StrategyRow[] = [
+  const accountRowsData: AccountGuideRow[] = [
     {
       label: '상위 고유 전략',
-      name: bestRealStrategy?.shortLabel ?? '—',
-      metric: `MWR ${formatPercent(bestRealStrategy?.returnPct)} · MDD ${formatPercent(bestRealStrategy?.maxDrawdown)}`,
+      name: bestRealAccount?.shortLabel ?? '—',
+      metric: `MWR ${formatPercent(bestRealAccount?.returnPct)} · MDD ${formatPercent(bestRealAccount?.maxDrawdown)}`,
     },
     {
       label: '기본 검토 포트폴리오',
@@ -150,10 +150,10 @@ export default function GuidePage() {
         </div>
       </section>
 
-      <section className="grid gap-2" aria-labelledby="strategy-heading">
+      <section className="grid gap-2" aria-labelledby="account-heading">
         <h2
           className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500"
-          id="strategy-heading"
+          id="account-heading"
         >
           전략 포트폴리오
         </h2>
@@ -167,7 +167,7 @@ export default function GuidePage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {strategyRowsData.map((row) => (
+              {accountRowsData.map((row) => (
                 <tr key={row.label}>
                   <td className="px-3 py-2 text-xs text-slate-500">{row.label}</td>
                   <td className="px-3 py-2 font-medium text-slate-950">{row.name}</td>
@@ -188,7 +188,7 @@ export default function GuidePage() {
 }
 
 type EvidenceRow = { state: string; title: string; metric: string; href: string };
-type StrategyRow = { label: string; name: string; metric: string };
+type AccountGuideRow = { label: string; name: string; metric: string };
 
 type GuideStats = {
   total: number;

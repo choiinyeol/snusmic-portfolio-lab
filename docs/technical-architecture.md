@@ -1,81 +1,32 @@
 # Technical Architecture
 
-Last updated: 2026-05-23
-Status: canonical implementation map
+The repository is layered by job:
 
-## Boundary
+- `src/snusmic_pipeline/ingest`: source discovery, PDF download, extraction, quality checks, markdown export, and report metadata models.
+- `src/snusmic_pipeline/market_data`: currency and market-data normalization helpers.
+- `src/snusmic_pipeline/sim`: fixed account simulation, PIT warehouse IO, brokerage math, daily-forward checkpoints, and visualization.
+- `src/snusmic_pipeline/web`: Python-side web artifact contracts and exporters.
+- `apps/web`: static Next.js reader for generated JSON artifacts.
+- `scripts`: small CI/deployment utilities only; data refresh and rebuild flows live in the package CLI.
 
-Python owns collection, normalization, price refresh, PIT board export, fixed simulation baselines, and artifact export. The Next.js app is a static reader over committed artifacts.
+## Data Flow
 
-No frontend route may call live market APIs or reconstruct simulation logic.
+1. `sync` and extraction commands produce raw report rows.
+2. `build-warehouse` writes typed PIT CSV tables.
+3. `refresh-prices` writes OHLCV price history.
+4. `refresh-web-artifacts` advances account artifacts to the latest warehouse price date and writes `data/web/**`.
+5. `rebuild-web-artifacts` performs the full fixed-account/PIT-board/web rebuild when a clean local regeneration is needed.
 
-## Pipeline
+## Web Routes
 
-```text
-SMIC reports
-  -> data warehouse
-  -> price history
-  -> PIT board export / daily forward
-  -> account simulation artifacts
-  -> web artifacts
-  -> static Next.js pages
-```
+- `/main`: executive overview.
+- `/reports`: report table.
+- `/reports/[symbol]` and `/reports/[symbol]/[reportId]`: report evidence.
+- `/screener`: PIT report board.
+- `/statistics`: report-level outcome and factor diagnostics.
+- `/portfolio`: account chooser.
+- `/portfolio/[account]/*`: holdings, equity, trades, and methodology for one account.
 
-Primary commands:
+## Contracts
 
-| Command | Role |
-| --- | --- |
-| `python -m snusmic_pipeline sync` | Fetch reports and extract rows. |
-| `python -m snusmic_pipeline refresh-market` | Build warehouse and refresh prices. |
-| `python -m snusmic_pipeline daily-forward` | Advance the current core account path. |
-| `python -m snusmic_pipeline export-pit-board` | Export point-in-time research-board rows. |
-| `python -m snusmic_pipeline run-sim` | Run the package-owned account simulation. |
-| `python -m snusmic_pipeline export-web` | Write `data/web` artifacts. |
-
-## Artifact Contract
-
-`data/web` is the frontend source of truth. `public/downloads` is a derived download surface, not a data source.
-
-Important artifact groups:
-
-| Path | Meaning |
-| --- | --- |
-| `manifest.json` | Snapshot timestamp, schema version, counts, checksums, and ranges. |
-| `overview/*.json` | Snapshot, research pulse, and data-quality summaries. |
-| `reports/*.json` | Report tables, rankings, return windows, and detail metrics. |
-| `portfolio/*.json` | Ledger, holdings, trades, daily decisions, and equity paths. |
-| `accounts/*.json` | Fixed account-simulation catalog, leaderboard, curves, and taxonomy metadata. |
-| `prices/*.json` | Symbol price series for static charts. |
-
-Schemas under `docs/schemas/*.schema.json` are generated contracts used by compatibility checks. Do not delete them unless the validation scripts are changed first.
-
-## Routes
-
-| Route | Job |
-| --- | --- |
-| `/` | Snapshot summary and entry points. |
-| `/reports` | Report table, quality, and rankings. |
-| `/reports/[symbol]` | Symbol-level report and price path evidence. |
-| `/portfolio` | Account strategy overview. |
-| `/portfolio/[strategy]/*` | Holdings, equity, trades, and methodology for one account. |
-| `/strategies` | Strategy catalog and benchmark separation. |
-
-Pages should be server-first. Client components are for charts, table controls, and small interactions only.
-
-## Incremental Forward
-
-`daily-forward` is the normal operating lane after new prices arrive. It may reuse checkpoints only when the account config, price basis, and report basis still match. If those inputs change, run `run-sim` for a full replay and `export-pit-board` for the manual PIT dataset.
-
-## Validation
-
-Baseline checks before claiming a code change:
-
-```bash
-uv run ruff check src scripts tests
-uv run mypy src
-uv run pytest -q -m "not slow"
-pnpm --dir apps/web artifact:check
-pnpm --dir apps/web typecheck
-pnpm --dir apps/web exec biome check .
-pnpm --dir apps/web build
-```
+Python exporters own data shape. TypeScript Zod schemas validate those generated artifacts at build time. The frontend reads `data/web/accounts/catalog.json` for account taxonomy and must not infer meaning from account-id strings.

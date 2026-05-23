@@ -11,7 +11,7 @@ import { SortHeader, pageRows, sortRows, type SortState } from './TableControls'
 
 type Props = {
   monthly: MonthlyHoldingRow[];
-  /** Strategy controlled by the parent — single source of truth. */
+  /** Account controlled by the parent — single source of truth. */
   account_id: string;
   accountLabels: Record<string, string>;
   targetsBySymbol: Record<string, ReportTargetDigest>;
@@ -19,7 +19,7 @@ type Props = {
 
 type MonthlySortKey =
   | 'month'
-  | 'strategy'
+  | 'account'
   | 'market'
   | 'symbol'
   | 'target'
@@ -66,7 +66,7 @@ export function PortfolioHistory({ monthly, account_id, accountLabels, targetsBy
     () =>
       sortRows(filtered, sort, {
         month: (row) => row.monthEnd,
-        strategy: (row) => accountLabels[row.account_id] ?? row.account_id,
+        account: (row) => accountLabels[row.account_id] ?? row.account_id,
         market: (row) => marketLabel(targetsBySymbol[row.symbol]?.marketRegion),
         symbol: (row) => row.company || row.symbol,
         target: (row) => targetsBySymbol[row.symbol]?.targetPriceNative ?? targetsBySymbol[row.symbol]?.targetPriceKrw,
@@ -164,7 +164,7 @@ export function PortfolioHistory({ monthly, account_id, accountLabels, targetsBy
                 <SortHeader label="월말" sortKey="month" sort={sort} onSort={updateSort} />
               </th>
               <th>
-                <SortHeader label="전략" sortKey="strategy" sort={sort} onSort={updateSort} />
+                <SortHeader label="전략" sortKey="account" sort={sort} onSort={updateSort} />
               </th>
               <th>
                 <SortHeader label="시장" sortKey="market" sort={sort} onSort={updateSort} />

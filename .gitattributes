@@ -1,6 +1,10 @@
 * text=auto
 *.json text eol=lf
+*.md text eol=lf
 *.mjs text eol=lf
+*.py text eol=lf
+*.csv text eol=lf
+*.png binary
 *.ts text eol=lf
 *.tsx text eol=lf
 *.toml text eol=lf

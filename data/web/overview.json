@@ -132,25 +132,6 @@
       "time_weighted_return": 0.6899,
       "total_contributed_krw": 102000000.0,
       "trade_count": 1583
-    },
-    {
-      "account_id": "weak_oracle",
-      "cagr": 0.971,
-      "final_cash_krw": 3918810150.4999,
-      "final_equity_krw": 3918810150.4999,
-      "final_holdings_value_krw": 0.0,
-      "initial_capital_krw": 10000000.0,
-      "label": "Forward-Looking Diagnostic",
-      "max_drawdown": 0.2163,
-      "money_weighted_return": 1.5984,
-      "net_profit_krw": 3816810150.4999,
-      "open_positions": 0,
-      "realized_pnl_krw": 3811172731.0644,
-      "sharpe": 3.0632,
-      "sortino": 3.7669,
-      "time_weighted_return": 172.5546,
-      "total_contributed_krw": 102000000.0,
-      "trade_count": 2038
     }
   ],
   "generated_from": {

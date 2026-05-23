@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0.0",
+  "run_mode": "full_replay",
+  "latest_date": "2026-05-22",
+  "checkpoint_date": "2026-05-22",
+  "checkpoint_schema_version": "1.0.0",
+  "full_replay_reason": "missing_checkpoint",
+  "source_fingerprint": {
+    "reports.csv": "d4b185cbe880a445ee718af696d1dfc5e775db448b5a1ee4046761fe69663762",
+    "daily_prices.csv": "474f25b0754769257987e0540abd06900ce5b4ba070e2f112b545b8736b65002",
+    "benchmark_prices.csv": "dd632aa18ad575f3a20387b16c80a3e7a67c95ebcc7800480f3ebf1a888871eb",
+    "fx_rates.csv": "2abd2e72b720faa4c0238b463085f330cd13d4e57ef93517969a7010ee20e39c"
+  },
+  "config_digest": "e345e9d1f247675b01aab87d811b5528b965a03deaa6e25b100eaf79bad8dd7e"
+}

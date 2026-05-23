@@ -1,6 +1,6 @@
 # SNUSMIC Portfolio Lab
 
-SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, fixed account simulations, and static web artifacts. The current repository does **not** search for strategies or promote generated strategy candidates. Strategy discovery was removed deliberately; the PIT board is exported so a human can inspect the data and design rules explicitly.
+SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, fixed account simulations, and static web artifacts. The current repository does **not** search for trading rules or promote generated account candidates. Rule discovery was removed deliberately; the PIT board is exported so a human can inspect the data and design rules explicitly.
 
 [Live site](https://smic-portfolio.vercel.app) · [Changelog](./CHANGELOG.md) · [Design system](./DESIGN.md)
 
@@ -14,12 +14,12 @@ SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, f
 
 ## What It Does Not Do
 
-- No broker strategy search.
+- No broker rule search.
 - No stock-rule search or admission.
-- No PIT strategy generation.
-- No MTT strategy account_id.
+- No PIT rule generation.
+- No MTT account_id.
 - No `strategy-admission.json` web contract.
-- No hidden legacy/fallback strategy path.
+- No hidden migration, rollback, or safety-net path.
 
 ## Core Commands
 
@@ -31,13 +31,13 @@ pnpm --dir apps/web install
 Refresh data and static artifacts:
 
 ```bash
-bash scripts/refresh_web_artifacts.sh
+python -m snusmic_pipeline refresh-web-artifacts
 ```
 
 Full rebuild:
 
 ```bash
-bash scripts/full_rebuild_web_artifacts.sh
+python -m snusmic_pipeline rebuild-web-artifacts
 ```
 
 Manual PIT dataset export:
@@ -80,7 +80,7 @@ The default simulation config contains fixed baselines only:
 - SMIC Report Follower with Stops
 - Weak Oracle diagnostic baseline
 
-`weak_oracle` is a diagnostic upper bound in the default full simulation config. It is not a tradable strategy and `daily-forward` excludes it from checkpointed core operation.
+`weak_oracle` is a diagnostic upper bound in the default full simulation config. It is not a tradable account and `daily-forward` excludes it from checkpointed core operation.
 
 ## Data Flow
 
@@ -106,8 +106,6 @@ flowchart TB
 | [docs/product-spec.md](./docs/product-spec.md) | Product intent and priorities |
 | [docs/backtest-contract.md](./docs/backtest-contract.md) | Account, PIT, and no-lookahead contract |
 | [docs/technical-architecture.md](./docs/technical-architecture.md) | Pipeline, artifact, and route map |
-| [docs/agent-playbook.md](./docs/agent-playbook.md) | Agent working rules |
-| [docs/testing-performance-strategy.md](./docs/testing-performance-strategy.md) | Test and performance scope |
 | [DESIGN.md](./DESIGN.md) | UI design system |
 
 ## Web App
@@ -119,7 +117,7 @@ Main routes:
 - `/`
 - `/main`
 - `/portfolio`
-- `/portfolio/[strategy]`
+- `/portfolio/[account]`
 - `/reports`
 - `/reports/[symbol]`
 - `/reports/[symbol]/[reportId]`
@@ -156,4 +154,4 @@ This repo is now intentionally PIT-first:
 
 1. Build trustworthy point-in-time data.
 2. Keep fixed baseline simulations for context.
-3. Let strategy design happen explicitly, outside the pipeline, until buy/sell/sizing/rebalance rules are clearly declared.
+3. Let future rule design happen explicitly, outside the pipeline, until buy/sell/sizing/rebalance rules are clearly declared.

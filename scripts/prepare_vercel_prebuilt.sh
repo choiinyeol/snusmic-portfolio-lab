@@ -13,7 +13,7 @@ STATIC_OUT="apps/web/out"
 PREBUILT_OUT=".vercel/output"
 
 if [ ! -d "$STATIC_OUT" ]; then
-  echo "$STATIC_OUT does not exist; run scripts/refresh_web_artifacts.sh and apps/web pnpm build first" >&2
+  echo "$STATIC_OUT does not exist; run python -m snusmic_pipeline refresh-web-artifacts and apps/web pnpm build first" >&2
   exit 1
 fi
 

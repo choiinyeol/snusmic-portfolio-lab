@@ -1,6 +1,6 @@
 import { AppShell } from '@/components/ui/AppShell';
 import type { CommandTarget } from '@/components/ui/CommandPalette';
-import { getArtifactManifest, getOverview, getReportRows, getStrategyCatalog } from '@/lib/artifacts';
+import { getArtifactManifest, getOverview, getReportRows, getAccountCatalog } from '@/lib/artifacts';
 import { getObjectivePassingRows } from '@/lib/product-model';
 import { APP_NAV } from '@/components/ui/app-shell-nav';
 import './reports/report-detail.css';
@@ -9,8 +9,8 @@ export default function AppRouteLayout({ children }: Readonly<{ children: React.
   const overview = getOverview();
   const manifest = getArtifactManifest();
   const snapshotDate = overview.simulation_window?.price_end ?? overview.simulation_window?.report_end ?? '—';
-  const admittedStrategies = getObjectivePassingRows();
-  const primaryBookLabel = admittedStrategies[0]?.shortLabel ?? admittedStrategies[0]?.label ?? '승인 전략 없음';
+  const admittedAccounts = getObjectivePassingRows();
+  const primaryBookLabel = admittedAccounts[0]?.shortLabel ?? admittedAccounts[0]?.label ?? '승인 전략 없음';
 
   const commandTargets = buildCommandTargets();
 
@@ -22,7 +22,7 @@ export default function AppRouteLayout({ children }: Readonly<{ children: React.
       reportCount={manifest.row_counts.reports}
       reportRange={manifest.report_range}
       snapshotDate={snapshotDate}
-      strategyCount={admittedStrategies.length}
+      accountCount={admittedAccounts.length}
     >
       {children}
     </AppShell>
@@ -30,7 +30,7 @@ export default function AppRouteLayout({ children }: Readonly<{ children: React.
 }
 
 /** Build the cmd-K command palette index. APP_NAV is the spine; symbols and
- * strategies are appended so power users can jump straight to a ticker or a
+ * accounts are appended so power users can jump straight to a ticker or a
  * account_id without going through the screener first. */
 function buildCommandTargets(): CommandTarget[] {
   const navTargets: CommandTarget[] = APP_NAV.map((item) => ({
@@ -58,16 +58,16 @@ function buildCommandTargets(): CommandTarget[] {
     });
   }
 
-  const admittedIds = new Set(getObjectivePassingRows().map((strategy) => strategy.id));
-  const strategyTargets: CommandTarget[] = getStrategyCatalog()
-    .filter((strategy) => strategy.isSelectable && admittedIds.has(strategy.strategyId))
-    .map((strategy) => ({
-      kind: 'strategy',
-      label: strategy.label,
-      description: strategy.shortLabel || strategy.strategyId,
-      href: `/portfolio/${encodeURIComponent(strategy.strategyId)}`,
-      keywords: strategy.strategyId,
+  const admittedIds = new Set(getObjectivePassingRows().map((account) => account.id));
+  const accountTargets: CommandTarget[] = getAccountCatalog()
+    .filter((account) => account.isSelectable && admittedIds.has(account.accountId))
+    .map((account) => ({
+      kind: 'account',
+      label: account.label,
+      description: account.shortLabel || account.accountId,
+      href: `/portfolio/${encodeURIComponent(account.accountId)}`,
+      keywords: account.accountId,
     }));
 
-  return [...navTargets, ...strategyTargets, ...symbolTargets];
+  return [...navTargets, ...accountTargets, ...symbolTargets];
 }

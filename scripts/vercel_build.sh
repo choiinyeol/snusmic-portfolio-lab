@@ -11,7 +11,7 @@ const path = require('node:path');
 const manifestPath = path.join('data', 'web', 'manifest.json');
 if (!fs.existsSync(manifestPath)) {
   console.error(`Missing required web artifact: ${manifestPath}`);
-  console.error('Run scripts/refresh_web_artifacts.sh before deploying.');
+  console.error('Run python -m snusmic_pipeline refresh-web-artifacts before deploying.');
   process.exit(1);
 }
 
@@ -26,7 +26,7 @@ for (const artifactName of artifacts) {
   const artifactPath = path.join('data', 'web', artifactName);
   if (!fs.existsSync(artifactPath) || fs.statSync(artifactPath).size === 0) {
     console.error(`Missing required web artifact: ${artifactPath}`);
-    console.error('Run scripts/refresh_web_artifacts.sh before deploying.');
+    console.error('Run python -m snusmic_pipeline refresh-web-artifacts before deploying.');
     process.exit(1);
   }
 }

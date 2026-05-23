@@ -1,4 +1,4 @@
-import type { StrategySelectorOption } from '@/components/trading/StrategySelector';
+import type { AccountSelectorOption } from '@/components/trading/AccountSelector';
 import type {
   AccountingReconciliationRow,
   EquityPoint,
@@ -8,7 +8,7 @@ import type {
   TradeRow,
 } from '@/lib/artifacts';
 
-export type StrategyMethod = {
+export type AccountMethod = {
   summary: string;
   buyRules: string[];
   sellRules: string[];
@@ -25,25 +25,25 @@ export type PortfolioViewModel = {
   accounts: string[];
   benchmarkAccounts: string[];
   accountLabels: Record<string, string>;
-  strategyOptions: StrategySelectorOption[];
+  accountOptions: AccountSelectorOption[];
   defaultAccount: string;
   selectedAccount: string;
-  invalidStrategyId: string | null;
-  methodsByAccount: Record<string, StrategyMethod>;
+  invalidAccountId: string | null;
+  methodsByAccount: Record<string, AccountMethod>;
   capitalByAccount: Record<string, number>;
   cashByAccount: Record<string, number>;
   reportSymbolsById: Record<string, string>;
   targetsBySymbol: Record<string, ReportTargetDigest>;
   targetsByReportId: Record<string, ReportTargetDigest>;
-  portfolioStrategyCount: number;
+  portfolioAccountCount: number;
   latestEquityDate: string;
 };
 
-export type PortfolioStrategySnapshot = {
+export type PortfolioAccountSnapshot = {
   id: string;
   label: string;
   shortLabel: string;
-  kind: 'strategy' | 'benchmark' | 'oracle';
+  kind: 'account' | 'benchmark' | 'oracle';
   href: string;
   finalEquityKrw: number | null;
   cashKrw: number | null;
@@ -61,8 +61,8 @@ export type PortfolioStrategySnapshot = {
 export type PortfolioLandingModel = {
   defaultAccount: string;
   latestEquityDate: string;
-  strategies: PortfolioStrategySnapshot[];
-  frontierRows: PortfolioStrategySnapshot[];
+  accounts: PortfolioAccountSnapshot[];
+  frontierRows: PortfolioAccountSnapshot[];
   allWeatherReturn: number | null;
   holdings: HoldingRow[];
   equity: EquityPoint[];

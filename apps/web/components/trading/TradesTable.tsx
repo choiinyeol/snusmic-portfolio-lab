@@ -12,7 +12,7 @@ import { SortHeader, pageRows, sortRows, type SortState } from './TableControls'
 
 type Props = {
   trades: TradeRow[];
-  /** Strategy controlled by the parent — single source of truth. */
+  /** Account controlled by the parent — single source of truth. */
   account_id: string;
   accountLabels: Record<string, string>;
   reportSymbolsById: Record<string, string>;
@@ -22,7 +22,7 @@ type Props = {
 
 type TradeSortKey =
   | 'date'
-  | 'strategy'
+  | 'account'
   | 'market'
   | 'side'
   | 'symbol'
@@ -64,7 +64,7 @@ export function TradesTable({
     () =>
       sortRows(filteredTrades, tradeSort, {
         date: (row) => row.date,
-        strategy: (row) => accountLabels[row.account_id] ?? row.account_id,
+        account: (row) => accountLabels[row.account_id] ?? row.account_id,
         market: (row) =>
           marketLabel(
             (row.reportId ? targetsByReportId[row.reportId]?.marketRegion : undefined) ??
@@ -153,7 +153,7 @@ export function TradesTable({
                 <SortHeader label="일자" sortKey="date" sort={tradeSort} onSort={updateTradeSort} />
               </th>
               <th className="px-3 py-2 text-left">
-                <SortHeader label="전략" sortKey="strategy" sort={tradeSort} onSort={updateTradeSort} />
+                <SortHeader label="전략" sortKey="account" sort={tradeSort} onSort={updateTradeSort} />
               </th>
               <th className="px-3 py-2 text-left">
                 <SortHeader label="시장" sortKey="market" sort={tradeSort} onSort={updateTradeSort} />

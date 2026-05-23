@@ -286,49 +286,5 @@
     "time_weighted_return": 0.6899,
     "total_contributed_krw": 102000000.0,
     "trade_count": 1583
-  },
-  {
-    "account_id": "weak_oracle",
-    "benchmark_group": "oracle",
-    "buy_rules": [
-      "Uses a 3 month future window for diagnostic weighting."
-    ],
-    "cagr": 0.971,
-    "final_cash_krw": 3918810150.4999,
-    "final_equity_krw": 3918810150.4999,
-    "final_holdings_value_krw": 0.0,
-    "initial_capital_krw": 10000000.0,
-    "is_default_candidate": false,
-    "is_selectable": false,
-    "kind": "oracle",
-    "label": "Forward-Looking Diagnostic",
-    "max_drawdown": 0.2163,
-    "methodology_summary": "Forward-looking diagnostic baseline; it is not a tradable strategy.",
-    "money_weighted_return": 1.5984,
-    "net_profit_krw": 3816810150.4999,
-    "objective_mdd_slack": -0.0663,
-    "objective_passed": false,
-    "objective_return_excess": 1.1522000000000001,
-    "open_positions": 0,
-    "params": {
-      "lookahead_months": 3,
-      "max_weight": 1.0,
-      "min_history_days": 20,
-      "rebalance": "monthly",
-      "risk_free_rate": 0.0
-    },
-    "realized_pnl_krw": 3811172731.0644,
-    "risk_controls": [
-      "Benchmark-only baseline."
-    ],
-    "sell_rules": [
-      "Rebalance to the configured benchmark weights on schedule."
-    ],
-    "sharpe": 3.0632,
-    "short_label": "Weak Oracle",
-    "sortino": 3.7669,
-    "time_weighted_return": 172.5546,
-    "total_contributed_krw": 102000000.0,
-    "trade_count": 2038
   }
 ]

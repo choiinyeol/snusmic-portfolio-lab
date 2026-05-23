@@ -24,7 +24,7 @@ type AppShellProps = {
   children: React.ReactNode;
   snapshotDate: string;
   reportCount: number;
-  strategyCount: number;
+  accountCount: number;
   reportRange: DateRange;
   priceRange: DateRange;
   primaryBookLabel: string;
@@ -35,7 +35,7 @@ export function AppShell({
   children,
   snapshotDate,
   reportCount,
-  strategyCount,
+  accountCount,
   reportRange,
   priceRange,
   primaryBookLabel,
@@ -73,7 +73,7 @@ export function AppShell({
     { label: '기준일', value: snapshotDate || '—' },
     { label: '리포트', value: reportCount.toLocaleString('ko-KR'), caption: reportRangeLabel(reportRange) },
     { label: '가격', value: priceRange.end || '—', caption: reportRangeLabel(priceRange) },
-    { label: '전략 수', value: strategyCount.toLocaleString('ko-KR'), caption: primaryBookLabel },
+    { label: '전략 수', value: accountCount.toLocaleString('ko-KR'), caption: primaryBookLabel },
   ];
 
   return (

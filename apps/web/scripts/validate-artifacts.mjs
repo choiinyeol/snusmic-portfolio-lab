@@ -130,14 +130,14 @@ const benchmarkCount = accounts.filter((row) =>
     'benchmark_gld',
   ].includes(row.account_id),
 ).length;
-const customStrategyCount = accounts.filter(
+const customAccountCount = accounts.filter(
   (row) =>
     !row.account_id.startsWith('benchmark_') &&
     !['all_weather', 'smic_follower', 'smic_follower_v2', 'weak_oracle'].includes(row.account_id),
 ).length;
 if (benchmarkCount < 7) fail(`expected at least 7 benchmark accounts, got ${benchmarkCount}`);
-if (customStrategyCount !== 0) fail(`unexpected custom strategy accounts: ${customStrategyCount}`);
+if (customAccountCount !== 0) fail(`unexpected custom account rows: ${customAccountCount}`);
 
 console.log(
-  `[artifact-check] ok schema=${manifest.schema_version} reports=${reports.length} benchmarks=${benchmarkCount} custom_strategies=${customStrategyCount} price_files=${manifest.price_artifact_count}`,
+  `[artifact-check] ok schema=${manifest.schema_version} reports=${reports.length} benchmarks=${benchmarkCount} custom_accounts=${customAccountCount} price_files=${manifest.price_artifact_count}`,
 );

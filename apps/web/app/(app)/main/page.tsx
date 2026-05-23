@@ -10,7 +10,7 @@ import { formatKrw, formatPercent } from '@/lib/format';
 export default function OverviewPage() {
   const view = getDashboardViewModel();
   const brief = buildDecisionBrief(view);
-  const { overview, selectedStrategy } = view;
+  const { overview, selectedAccountRow } = view;
   const reportStats = overview.reportStats;
 
   return (
@@ -20,7 +20,7 @@ export default function OverviewPage() {
           <div className="max-w-5xl">
             <div className="mb-3 flex flex-wrap items-center gap-2">
               <Badge variant="outline">{overview.snapshotDate || '기준일 없음'}</Badge>
-              <Badge variant="secondary">{selectedStrategy?.shortLabel || overview.portfolio.label}</Badge>
+              <Badge variant="secondary">{selectedAccountRow?.shortLabel || overview.portfolio.label}</Badge>
             </div>
             <h1 className="text-2xl font-semibold tracking-[-0.02em] text-slate-950 md:text-4xl">메인화면</h1>
           </div>

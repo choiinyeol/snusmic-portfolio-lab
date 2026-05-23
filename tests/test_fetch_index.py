@@ -1,7 +1,7 @@
 import json
 
 from snusmic_pipeline.cli import build_parser, resolve_sync_pages
-from snusmic_pipeline.fetch_index import clean_html_text, fetch_reports, parse_pages
+from snusmic_pipeline.ingest.fetch_index import clean_html_text, fetch_reports, parse_pages
 
 
 class FakeResponse:

@@ -1,10 +1,4 @@
-"""Warehouse IO layer for the account simulation.
-
-Salvaged from the legacy ``snusmic_pipeline.backtest.warehouse`` module so the
-sim has its own canonical IO surface (read/write CSV tables, FX-aware KRW
-conversion, yfinance OHLCV downloader). Only the helpers the sim consumes are
-kept; weight-based backtest exports were dropped.
-"""
+"""Warehouse IO layer for the account simulation."""
 
 from __future__ import annotations
 
@@ -14,7 +8,6 @@ import hashlib
 import io
 import json
 import math
-import os
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -24,14 +17,14 @@ import numpy as np
 import pandas as pd
 from pydantic import TypeAdapter
 
-from ..currency import (
+from ..ingest.github_urls import github_pdf_url
+from ..market_data.currency import (
     attach_krw_rate,
     convert_value_to_krw,
     currency_for_symbol,
     download_fx_rates,
     normalize_currency,
 )
-from ..github_urls import github_pdf_url
 from .schemas import TABLE_DTYPES, TABLE_MODELS
 
 WAREHOUSE_TABLES = ["reports", "fx_rates", "daily_prices"]
@@ -593,13 +586,6 @@ def download_history(symbol: str, start: datetime, end: datetime) -> pd.DataFram
     ).dropna(subset=["close"])
 
 
-def _use_pydantic_v2() -> bool:
-    """Feature-flag escape — set ``SNUSMIC_USE_PYDANTIC_V2=0`` to fall back to
-    raw ``pd.read_csv`` / ``to_csv`` (pre-migration path). Kept inline as a
-    one-env-var rollback."""
-    return os.environ.get("SNUSMIC_USE_PYDANTIC_V2", "1") != "0"
-
-
 def _validate_rows(table: str, frame: pd.DataFrame) -> None:
     """Validate every row of ``frame`` against ``TABLE_MODELS[table]``.
 
@@ -627,29 +613,26 @@ def _validate_rows(table: str, frame: pd.DataFrame) -> None:
 def write_table(warehouse_dir: Path, table: str, frame: pd.DataFrame) -> None:
     """Write a DataFrame to ``{warehouse_dir}/{table}.csv``.
 
-    If ``table`` is registered in :data:`TABLE_MODELS` and the Pydantic-v2
-    feature flag is on (default), every row is validated via ``TypeAdapter``
-    before ``to_csv`` — unknown or missing columns raise ``ValidationError``.
+    If ``table`` is registered in :data:`TABLE_MODELS`, every row is validated
+    via ``TypeAdapter`` before ``to_csv``; unknown or missing columns raise
+    ``ValidationError``.
     """
     warehouse_dir.mkdir(parents=True, exist_ok=True)
     path = warehouse_dir / f"{table}.csv"
-    if _use_pydantic_v2():
-        _validate_rows(table, frame)
+    _validate_rows(table, frame)
     frame.to_csv(path, index=False, encoding="utf-8")
 
 
 def read_table(warehouse_dir: Path, table: str) -> pd.DataFrame:
     """Read ``{warehouse_dir}/{table}.csv`` into a DataFrame.
 
-    Under the default Pydantic-v2 flag, rows are validated after ``pd.read_csv``
-    so downstream callers get a guaranteed-shape DataFrame. With
-    ``SNUSMIC_USE_PYDANTIC_V2=0`` we bypass validation (legacy path)."""
+    Rows are validated after ``pd.read_csv`` so downstream callers get a
+    guaranteed-shape DataFrame."""
     path = warehouse_dir / f"{table}.csv"
     if not path.exists() or path.stat().st_size == 0:
         return pd.DataFrame()
     frame = pd.read_csv(path, dtype=TABLE_DTYPES.get(table))
-    if _use_pydantic_v2():
-        _validate_rows(table, frame)
+    _validate_rows(table, frame)
     return frame
 
 
@@ -701,7 +684,7 @@ def infer_yfinance_symbol(ticker: str, exchange: str) -> str:
 
 
 def stable_report_id(date: str, title: str, symbol: str) -> str:
-    """Stable legacy report id.
+    """Stable public report id.
 
     Public artifacts and warehouse rows were originally keyed by date/title.
     Keep that identity stable and disambiguate only the rare duplicate after

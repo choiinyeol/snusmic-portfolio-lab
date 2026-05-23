@@ -24,12 +24,12 @@ export type DecisionBrief = {
 };
 
 export function buildDecisionBrief(view: DashboardViewModel): DecisionBrief {
-  const { overview, dataQuality, benchmarkToBeat, selectedStrategy, latestReportsBySymbol, recentBuys } = view;
+  const { overview, dataQuality, benchmarkToBeat, selectedAccountRow, latestReportsBySymbol, recentBuys } = view;
   const holdings = overview.portfolio.holdings;
   const reports = overview.recentReports;
   const candidates = overview.researchCandidates.map((candidate) => candidate.report);
   const insights = getInsights();
-  const benchmarkExcess = selectedStrategy?.benchmarkExcess ?? null;
+  const benchmarkExcess = selectedAccountRow?.benchmarkExcess ?? null;
   const dataExcluded = dataQuality.reportExclusions.excluded_reports ?? 0;
 
   return {

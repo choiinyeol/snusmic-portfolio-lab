@@ -8,13 +8,13 @@ import { Button } from '@/components/ui/button';
 import { KpiTile } from '@/components/ui/KpiTile';
 import type { HoldingRow } from '@/lib/artifacts';
 import { formatKrw, formatPercent } from '@/lib/format';
-import type { PortfolioLandingModel, PortfolioStrategySnapshot } from './types';
+import type { PortfolioLandingModel, PortfolioAccountSnapshot } from './types';
 
 const SERIES_COLORS = ['#111827', '#2563eb', '#059669', '#f29423', '#7c3aed', '#dc2626'];
 
 export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }) {
   const [selectedId, setSelectedId] = useState(model.defaultAccount);
-  const selected = model.strategies.find((row) => row.id === selectedId) ?? model.strategies[0];
+  const selected = model.accounts.find((row) => row.id === selectedId) ?? model.accounts[0];
   const benchmarkCount = model.frontierRows.filter((row) => row.kind === 'benchmark').length;
   const selectedHoldings = useMemo(
     () =>
@@ -30,17 +30,17 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
   );
   const chartSeries = useMemo<ReturnSeries[]>(() => {
     const benchmarkRows = model.frontierRows.filter((row) => row.kind === 'benchmark');
-    const rows = [...model.strategies, ...benchmarkRows];
-    return rows.map((strategy, index) => ({
-      id: strategy.id,
-      label: strategy.label,
-      shortLabel: strategy.shortLabel,
+    const rows = [...model.accounts, ...benchmarkRows];
+    return rows.map((account, index) => ({
+      id: account.id,
+      label: account.label,
+      shortLabel: account.shortLabel,
       color: SERIES_COLORS[index % SERIES_COLORS.length],
       points: model.equity
-        .filter((point) => point.account_id === strategy.id && point.cumulativeReturn !== null)
+        .filter((point) => point.account_id === account.id && point.cumulativeReturn !== null)
         .map((point) => ({ time: point.date, value: point.cumulativeReturn ?? 0 })),
     }));
-  }, [model.equity, model.frontierRows, model.strategies]);
+  }, [model.equity, model.frontierRows, model.accounts]);
 
   if (!selected) {
     return (
@@ -64,7 +64,7 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
       <header className="grid gap-5 border-b border-slate-200 pb-5 xl:grid-cols-[minmax(0,1fr)_minmax(360px,.62fr)] xl:items-end">
         <div className="grid gap-3">
           <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-            portfolio strategy hub
+            portfolio account hub
           </div>
           <h1 className="text-3xl font-semibold tracking-[-0.04em] text-slate-950 md:text-5xl">포트폴리오</h1>
           <p className="max-w-3xl text-sm leading-6 text-slate-600 md:text-base">
@@ -80,7 +80,7 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
         <div className="grid gap-2 rounded-md border border-slate-200 bg-white p-3">
           <div className="text-xs font-medium text-slate-500">포트폴리오 범위</div>
           <dl className="grid grid-cols-2 gap-2 text-sm">
-            <Fact label="실제 전략" value={`${model.strategies.length}개`} />
+            <Fact label="실제 전략" value={`${model.accounts.length}개`} />
             <Fact label="곡선 기준선" value={`${benchmarkCount}개`} />
             <Fact label="최근 평가" value={model.latestEquityDate || '—'} />
             <Fact label="올웨더" value={formatPercent(model.allWeatherReturn)} />
@@ -161,16 +161,16 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
             <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">승인된 주식 전략 선택</h2>
           </div>
           <span className="text-xs font-medium text-slate-500">
-            stock-level account_id · {model.strategies.length.toLocaleString('ko-KR')}개 버튼
+            stock-level account_id · {model.accounts.length.toLocaleString('ko-KR')}개 버튼
           </span>
         </div>
         <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-          {model.strategies.map((strategy) => (
+          {model.accounts.map((account) => (
             <PortfolioChoiceButton
-              key={strategy.id}
-              strategy={strategy}
-              selected={strategy.id === selected.id}
-              onSelect={() => setSelectedId(strategy.id)}
+              key={account.id}
+              account={account}
+              selected={account.id === selected.id}
+              onSelect={() => setSelectedId(account.id)}
             />
           ))}
         </div>
@@ -219,11 +219,11 @@ function Fact({
 }
 
 function PortfolioChoiceButton({
-  strategy,
+  account,
   selected,
   onSelect,
 }: {
-  strategy: PortfolioStrategySnapshot;
+  account: PortfolioAccountSnapshot;
   selected: boolean;
   onSelect: () => void;
 }) {
@@ -240,10 +240,10 @@ function PortfolioChoiceButton({
     >
       <span className="grid min-w-0 gap-1">
         <span className={`truncate text-sm font-semibold ${selected ? 'text-white' : 'text-slate-950'}`}>
-          {strategy.shortLabel}
+          {account.shortLabel}
         </span>
         <span className={`line-clamp-1 text-xs ${selected ? 'text-slate-300' : 'text-slate-500'}`}>
-          {strategy.topHoldingLabel} · 보유 {strategy.holdingCount.toLocaleString('ko-KR')}개
+          {account.topHoldingLabel} · 보유 {account.holdingCount.toLocaleString('ko-KR')}개
         </span>
       </span>
       <span className="grid grid-cols-2 gap-2">
@@ -253,10 +253,10 @@ function PortfolioChoiceButton({
           </span>
           <span
             className={`block font-mono text-sm font-semibold tabular-nums ${
-              selected ? 'text-white' : (strategy.moneyWeightedReturn ?? 0) >= 0 ? 'text-emerald-700' : 'text-rose-600'
+              selected ? 'text-white' : (account.moneyWeightedReturn ?? 0) >= 0 ? 'text-emerald-700' : 'text-rose-600'
             }`}
           >
-            {formatPercent(strategy.moneyWeightedReturn)}
+            {formatPercent(account.moneyWeightedReturn)}
           </span>
         </span>
         <span className={`rounded-lg px-2 py-1 ${selected ? 'bg-white/10' : 'bg-rose-50'}`}>
@@ -264,7 +264,7 @@ function PortfolioChoiceButton({
           <span
             className={`block font-mono text-sm font-semibold tabular-nums ${selected ? 'text-white' : 'text-rose-700'}`}
           >
-            {formatPercent(strategy.maxDrawdown)}
+            {formatPercent(account.maxDrawdown)}
           </span>
         </span>
       </span>
@@ -277,19 +277,19 @@ function PortfolioFrontierChart({
   selectedId,
   onSelect,
 }: {
-  rows: PortfolioStrategySnapshot[];
+  rows: PortfolioAccountSnapshot[];
   selectedId: string;
   onSelect: (id: string) => void;
 }) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const plottableRows = rows.filter((row) => row.maxDrawdown !== null && row.moneyWeightedReturn !== null);
-  const strategyRows = plottableRows.filter((row) => row.kind === 'strategy');
+  const accountRows = plottableRows.filter((row) => row.kind === 'account');
   const benchmarkRows = plottableRows.filter((row) => row.kind === 'benchmark');
-  const frontier = efficientFrontier(strategyRows);
+  const frontier = efficientFrontier(accountRows);
   const frontierIds = new Set(frontier.map((row) => row.id));
-  const selectedRow = plottableRows.find((row) => row.id === selectedId) ?? strategyRows[0] ?? benchmarkRows[0];
+  const selectedRow = plottableRows.find((row) => row.id === selectedId) ?? accountRows[0] ?? benchmarkRows[0];
   const activeRow = plottableRows.find((row) => row.id === (hoveredId ?? selectedId)) ?? selectedRow;
-  const visibleRows = uniqueRows([...strategyRows, ...benchmarkRows]);
+  const visibleRows = uniqueRows([...accountRows, ...benchmarkRows]);
   const domainRows = visibleRows.length ? visibleRows : plottableRows;
   const xValues = domainRows.map((row) => row.maxDrawdown ?? 0);
   const yValues = domainRows.map((row) => row.moneyWeightedReturn ?? 0);
@@ -316,7 +316,7 @@ function PortfolioFrontierChart({
             벤치마크
           </span>
           <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-emerald-700">
-            지배 전략 제외 후 {strategyRows.length.toLocaleString('ko-KR')}개
+            지배 전략 제외 후 {accountRows.length.toLocaleString('ko-KR')}개
           </span>
         </div>
         <svg
@@ -372,10 +372,10 @@ function PortfolioFrontierChart({
             const selected = row.id === selectedId;
             const hovered = row.id === hoveredId;
             const benchmark = row.kind === 'benchmark';
-            const efficient = row.kind === 'strategy' && frontierIds.has(row.id);
+            const efficient = row.kind === 'account' && frontierIds.has(row.id);
             const x = plotX(row.maxDrawdown ?? 0, minX, maxX);
             const y = plotY(row.moneyWeightedReturn ?? 0, minY, maxY);
-            const canSelect = row.kind === 'strategy';
+            const canSelect = row.kind === 'account';
             return (
               <g key={row.id}>
                 {benchmark ? (
@@ -434,7 +434,7 @@ function PortfolioFrontierChart({
           {maxScoreRow ? (
             <StarMarker
               label="최고 위험대비 점수"
-              selectable={maxScoreRow.kind === 'strategy'}
+              selectable={maxScoreRow.kind === 'account'}
               x={plotX(maxScoreRow.maxDrawdown ?? 0, minX, maxX)}
               y={plotY(maxScoreRow.moneyWeightedReturn ?? 0, minY, maxY)}
               onBlur={() => setHoveredId(null)}
@@ -442,7 +442,7 @@ function PortfolioFrontierChart({
               onMouseEnter={() => setHoveredId(maxScoreRow.id)}
               onMouseLeave={() => setHoveredId(null)}
               onSelect={() => {
-                if (maxScoreRow.kind === 'strategy') onSelect(maxScoreRow.id);
+                if (maxScoreRow.kind === 'account') onSelect(maxScoreRow.id);
               }}
             />
           ) : null}
@@ -477,7 +477,7 @@ function PortfolioFrontierChart({
         activeRow={activeRow}
         frontierCount={frontier.length}
         inspecting={hoveredId !== null && hoveredId !== selectedId}
-        onSelect={activeRow?.kind === 'strategy' ? () => onSelect(activeRow.id) : undefined}
+        onSelect={activeRow?.kind === 'account' ? () => onSelect(activeRow.id) : undefined}
       />
     </div>
   );
@@ -531,7 +531,7 @@ function StarMarker({
   );
 }
 
-function uniqueRows(rows: PortfolioStrategySnapshot[]): PortfolioStrategySnapshot[] {
+function uniqueRows(rows: PortfolioAccountSnapshot[]): PortfolioAccountSnapshot[] {
   const seen = new Set<string>();
   return rows.filter((row) => {
     if (seen.has(row.id)) return false;
@@ -546,7 +546,7 @@ function FrontierDetailCard({
   inspecting,
   onSelect,
 }: {
-  activeRow: PortfolioStrategySnapshot | undefined;
+  activeRow: PortfolioAccountSnapshot | undefined;
   frontierCount: number;
   inspecting: boolean;
   onSelect?: () => void;
@@ -643,7 +643,7 @@ function shortChartLabel(label: string): string {
   return label;
 }
 
-function efficientFrontier(rows: PortfolioStrategySnapshot[]): PortfolioStrategySnapshot[] {
+function efficientFrontier(rows: PortfolioAccountSnapshot[]): PortfolioAccountSnapshot[] {
   const sorted = [...rows]
     .filter((row) => row.moneyWeightedReturn !== null && row.maxDrawdown !== null)
     .sort((a, b) => (a.maxDrawdown ?? 0) - (b.maxDrawdown ?? 0));
@@ -656,9 +656,9 @@ function efficientFrontier(rows: PortfolioStrategySnapshot[]): PortfolioStrategy
   });
 }
 
-function bestRiskAdjustedRow(rows: PortfolioStrategySnapshot[]): PortfolioStrategySnapshot | null {
+function bestRiskAdjustedRow(rows: PortfolioAccountSnapshot[]): PortfolioAccountSnapshot | null {
   const riskFreeRate = 0.025;
-  return rows.reduce<PortfolioStrategySnapshot | null>((best, row) => {
+  return rows.reduce<PortfolioAccountSnapshot | null>((best, row) => {
     if (row.moneyWeightedReturn === null || row.maxDrawdown === null || row.maxDrawdown <= 0) return best;
     const score = (row.moneyWeightedReturn - riskFreeRate) / row.maxDrawdown;
     if (!Number.isFinite(score)) return best;
@@ -668,15 +668,15 @@ function bestRiskAdjustedRow(rows: PortfolioStrategySnapshot[]): PortfolioStrate
   }, null);
 }
 
-function minDrawdownRow(rows: PortfolioStrategySnapshot[]): PortfolioStrategySnapshot | null {
-  return rows.reduce<PortfolioStrategySnapshot | null>((best, row) => {
+function minDrawdownRow(rows: PortfolioAccountSnapshot[]): PortfolioAccountSnapshot | null {
+  return rows.reduce<PortfolioAccountSnapshot | null>((best, row) => {
     if (row.maxDrawdown === null) return best;
     if (!best || best.maxDrawdown === null) return row;
     return row.maxDrawdown < best.maxDrawdown ? row : best;
   }, null);
 }
 
-function withCashHolding(holdings: HoldingRow[], selected: PortfolioStrategySnapshot | undefined): HoldingRow[] {
+function withCashHolding(holdings: HoldingRow[], selected: PortfolioAccountSnapshot | undefined): HoldingRow[] {
   if (!selected?.cashKrw || selected.cashKrw <= 0) return holdings;
   return [
     ...holdings,

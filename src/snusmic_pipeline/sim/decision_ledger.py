@@ -1,7 +1,7 @@
 """Daily decision ledger derived from the account simulation.
 
 The full simulator can be replayed historically, but the product surface should
-think in one-day increments: after today's close, what did each strategy decide
+think in one-day increments: after today's close, what did each account decide
 to do, and what account state did that leave behind?
 """
 

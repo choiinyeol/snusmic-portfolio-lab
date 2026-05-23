@@ -131,24 +131,5 @@
     "status": "ok",
     "total_contributed_krw": 102000000.0,
     "unrealized_pnl_krw": 17552923.709599998
-  },
-  {
-    "account_id": "weak_oracle",
-    "cash_gap_krw": 0.0,
-    "cash_yield_krw": 5637419.435499668,
-    "equity_gap_krw": 0.0,
-    "expected_cash_krw": 3918810150.4999,
-    "explanation_ko": "현금, 보유 평가액, 확정·미실현 손익의 관계가 허용 오차 안에서 맞습니다.",
-    "final_cash_krw": 3918810150.4999,
-    "final_equity_krw": 3918810150.4999,
-    "label": "Forward-Looking Diagnostic",
-    "net_profit_krw": 3816810150.4999,
-    "open_cost_basis_krw": 0,
-    "open_market_value_krw": 0.0,
-    "profit_gap_krw": 0.0,
-    "realized_pnl_krw": 3811172731.0644,
-    "status": "ok",
-    "total_contributed_krw": 102000000.0,
-    "unrealized_pnl_krw": 0
   }
 ]

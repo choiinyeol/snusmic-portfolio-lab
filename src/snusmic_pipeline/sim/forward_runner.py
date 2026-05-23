@@ -87,11 +87,11 @@ class ForwardCheckpoint(_CheckpointModel):
 
 @dataclass(frozen=True)
 class ForwardRunReport:
-    mode: Literal["forward", "full_replay_fallback", "noop"]
+    mode: Literal["forward", "full_replay", "noop"]
     latest_date: date
     checkpoint_path: Path
     metadata_path: Path
-    fallback_reason: str | None
+    full_replay_reason: str | None
     result: SimulationResult
 
 
@@ -124,7 +124,7 @@ def run_daily_forward(
     benchmark_board = _load_benchmark_board(core_config, warehouse_dir, refresh_benchmark)
     config_digest = _config_digest(core_config)
 
-    checkpoint, fallback_reason = _load_usable_checkpoint(
+    checkpoint, full_replay_reason = _load_usable_checkpoint(
         checkpoint_path,
         warehouse_dir,
         config_digest,
@@ -133,16 +133,16 @@ def run_daily_forward(
     latest_available = trading_dates[-1]
     if checkpoint is not None and checkpoint.latest_date > latest_available:
         checkpoint = None
-        fallback_reason = "checkpoint_after_requested_end"
+        full_replay_reason = "checkpoint_after_requested_end"
 
     if checkpoint is not None and checkpoint.latest_date == latest_available:
-        mode: Literal["forward", "full_replay_fallback", "noop"] = "noop"
+        mode: Literal["forward", "full_replay", "noop"] = "noop"
         start_after = checkpoint.latest_date
     elif checkpoint is not None:
         mode = "forward"
         start_after = checkpoint.latest_date
     else:
-        mode = "full_replay_fallback"
+        mode = "full_replay"
         start_after = None
 
     outputs, new_checkpoint = _run_core_accounts(
@@ -161,14 +161,14 @@ def run_daily_forward(
 
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
     checkpoint_path.write_text(new_checkpoint.model_dump_json(indent=2), encoding="utf-8")
-    fallback_reason_value = fallback_reason if mode == "full_replay_fallback" else None
+    full_replay_reason_value = full_replay_reason if mode == "full_replay" else None
     metadata = {
         "schema_version": "1.0.0",
         "run_mode": mode,
         "latest_date": latest_available.isoformat(),
         "checkpoint_date": new_checkpoint.latest_date.isoformat(),
         "checkpoint_schema_version": CHECKPOINT_SCHEMA_VERSION,
-        "fallback_reason": fallback_reason_value,
+        "full_replay_reason": full_replay_reason_value,
         "source_fingerprint": new_checkpoint.source_fingerprint,
         "config_digest": config_digest,
     }
@@ -178,7 +178,7 @@ def run_daily_forward(
         latest_date=latest_available,
         checkpoint_path=checkpoint_path,
         metadata_path=metadata_path,
-        fallback_reason=fallback_reason_value,
+        full_replay_reason=full_replay_reason_value,
         result=result,
     )
 
@@ -423,7 +423,7 @@ def full_replay_core(
     *,
     refresh_benchmark: bool = False,
 ) -> SimulationResult:
-    """Explicit full replay helper for tests and emergency fallback comparisons."""
+    """Explicit full replay helper for tests and checkpoint comparisons."""
 
     return run_simulation(
         config.model_copy(update={"accounts": _core_accounts(config.accounts)}),

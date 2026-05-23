@@ -5,10 +5,10 @@ import { useEffect } from 'react';
 export type SortDirection = 'asc' | 'desc';
 export type SortState<Key extends string> = { key: Key; direction: SortDirection };
 
-export const DEFAULT_PERSONA = 'smic_follower_v2';
+export const DEFAULT_ACCOUNT = 'smic_follower_v2';
 
 export function defaultAccountFor(accounts: string[]): string {
-  return accounts.includes(DEFAULT_PERSONA) ? DEFAULT_PERSONA : (accounts[0] ?? '');
+  return accounts.includes(DEFAULT_ACCOUNT) ? DEFAULT_ACCOUNT : (accounts[0] ?? '');
 }
 
 export function SortHeader<Key extends string>({
@@ -148,27 +148,27 @@ export function BlockPagination({
   );
 }
 
-export function useUrlBackedStrategy(account_id: string, setAccount: (value: string) => void, validAccounts: string[]) {
+export function useUrlBackedAccount(account_id: string, setAccount: (value: string) => void, validAccounts: string[]) {
   useEffect(() => {
     if (validAccounts.length === 0) return;
     const query = new URLSearchParams(window.location.search);
-    const requested = query.get('strategy');
+    const requested = query.get('account');
     if (requested && validAccounts.includes(requested)) {
       if (requested !== account_id) setAccount(requested);
       return;
     }
     if (!validAccounts.includes(account_id)) {
-      const fallback = defaultAccountFor(validAccounts);
-      if (fallback && fallback !== account_id) setAccount(fallback);
+      const firstAvailable = defaultAccountFor(validAccounts);
+      if (firstAvailable && firstAvailable !== account_id) setAccount(firstAvailable);
     }
   }, [account_id, setAccount, validAccounts]);
 
   useEffect(() => {
     if (!account_id || !validAccounts.includes(account_id)) return;
     const url = new URL(window.location.href);
-    const requested = url.searchParams.get('strategy');
+    const requested = url.searchParams.get('account');
     if (requested && validAccounts.includes(requested) && requested !== account_id) return;
-    url.searchParams.set('strategy', account_id);
+    url.searchParams.set('account', account_id);
     const nextUrl = `${url.pathname}${url.search}${url.hash}`;
     const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
     if (nextUrl !== currentUrl) window.history.replaceState(null, '', nextUrl);

@@ -4,12 +4,12 @@ import { useMemo, useState } from 'react';
 import { CumulativeReturnChart, type ReturnSeries } from '@/components/charts/CumulativeReturnChart';
 import type { EquityPoint } from '@/lib/artifacts';
 import { formatPercent } from '@/lib/format';
-import type { StrategyLeaderboardRow } from '@/lib/product-model';
+import type { AccountLeaderboardRow } from '@/lib/product-model';
 
 type Props = {
   equity: EquityPoint[];
   account_id: string;
-  rows: StrategyLeaderboardRow[];
+  rows: AccountLeaderboardRow[];
   accountLabels: Record<string, string>;
 };
 
@@ -86,7 +86,7 @@ function FrontierPlot({
   efficientIds,
   selectedId,
 }: {
-  rows: StrategyLeaderboardRow[];
+  rows: AccountLeaderboardRow[];
   efficientIds: Set<string>;
   selectedId: string;
 }) {
@@ -148,7 +148,7 @@ function FrontierPlot({
               ? 'efficient'
               : row.kind === 'benchmark'
                 ? 'benchmark'
-                : 'strategy';
+                : 'account';
           return (
             <FrontierPoint
               key={row.id}
@@ -216,7 +216,7 @@ function FrontierPoint({
   y: number;
   label: string;
   meta: string;
-  tone: 'selected' | 'efficient' | 'benchmark' | 'strategy';
+  tone: 'selected' | 'efficient' | 'benchmark' | 'account';
   pinned?: boolean;
   rows: Array<[string, string]>;
   onSelect: () => void;
@@ -274,7 +274,7 @@ function xScale(value: number, min: number, max: number): number {
   return Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
 }
 
-function efficientFrontierIds(rows: StrategyLeaderboardRow[]): Set<string> {
+function efficientFrontierIds(rows: AccountLeaderboardRow[]): Set<string> {
   let best = Number.NEGATIVE_INFINITY;
   const ids = new Set<string>();
   for (const row of rows) {

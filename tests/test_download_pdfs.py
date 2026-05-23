@@ -1,5 +1,5 @@
-from snusmic_pipeline.download_pdfs import download_pdf, safe_pdf_filename
-from snusmic_pipeline.models import ReportMeta
+from snusmic_pipeline.ingest.download_pdfs import download_pdf, safe_pdf_filename
+from snusmic_pipeline.ingest.models import ReportMeta
 
 
 def test_safe_pdf_filename_decodes_korean_slug():

@@ -2,14 +2,14 @@
 
 Two responsibilities:
 
-1. **PriceBoard** — wraps the KRW-converted ``daily_prices.csv`` warehouse
-   table in a date-indexed wide pivot for fast ``(date, symbol) → close``
+1. **PriceBoard** ??wraps the KRW-converted ``daily_prices.csv`` warehouse
+   table in a date-indexed wide pivot for fast ``(date, symbol) ??close``
    lookups. Adds asof helpers and a forward-window slice the prophet
    accounts need.
 
-2. **Benchmark loader** — downloads (and caches) the All-Weather basket's
+2. **Benchmark loader** ??downloads (and caches) the All-Weather basket's
    USD ETFs and KOSPI ETF in KRW, reusing the existing
-   :mod:`snusmic_pipeline.currency` FX pipeline.
+   :mod:`snusmic_pipeline.market_data.currency` FX pipeline.
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from ..currency import download_fx_rates
+from ..market_data.currency import download_fx_rates
 from .warehouse import (
     apply_daily_price_krw_conversion,
     download_history,
@@ -31,7 +31,7 @@ from .warehouse import (
 )
 
 # ---------------------------------------------------------------------------
-# PriceBoard — fast lookups for the SNUSMIC report universe.
+# PriceBoard ??fast lookups for the SNUSMIC report universe.
 # ---------------------------------------------------------------------------
 
 
@@ -50,8 +50,7 @@ def _pivot_price(prices: pd.DataFrame, close: pd.DataFrame, column: str) -> pd.D
 class PriceBoard:
     """Date-indexed wide pivot of close prices in KRW.
 
-    Build via :func:`PriceBoard.from_warehouse`. Empty boards are legal —
-    callers must check ``board.is_empty`` before driving the engine.
+    Build via :func:`PriceBoard.from_warehouse`. Empty boards are legal ??    callers must check ``board.is_empty`` before driving the engine.
 
     The public DataFrames remain available for compatibility. If callers edit
     frame values in place after construction, they must call :meth:`refresh`
@@ -595,5 +594,5 @@ def _stale_benchmark_symbols(cached: pd.DataFrame, symbols: set[str], start: dat
 
 
 def _currency_for_benchmark_symbol(symbol: str) -> str:
-    """All-Weather defaults: yfinance ``.KS`` suffix → KRW; otherwise USD."""
+    """All-Weather defaults: yfinance ``.KS`` suffix ??KRW; otherwise USD."""
     return "KRW" if symbol.endswith(".KS") else "USD"

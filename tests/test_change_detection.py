@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from snusmic_pipeline.change_detection import (
+from snusmic_pipeline.ingest.change_detection import (
     SnusmicSiteUnavailable,
     fetch_page_one_post_urls,
     new_report_urls,

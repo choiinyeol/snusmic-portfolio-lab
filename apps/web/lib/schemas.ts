@@ -198,12 +198,12 @@ export const WebDataQualitySchema = z
   })
   .passthrough();
 
-export const StrategyCatalogRowSchema = z
+export const AccountCatalogRowSchema = z
   .object({
     account_id: z.string(),
     label: z.string(),
     short_label: z.string(),
-    kind: z.enum(['benchmark', 'strategy', 'oracle']),
+    kind: z.enum(['benchmark', 'account', 'oracle']),
     benchmark_group: z.string().nullable(),
     is_selectable: z.boolean(),
     is_default_candidate: z.boolean(),

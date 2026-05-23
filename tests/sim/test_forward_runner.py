@@ -58,7 +58,7 @@ def test_checkpoint_tail_matches_full_replay_for_core_accounts(tmp_path: Path) -
     full = run_daily_forward(config, WAREHOUSE, full_out)
 
     assert tail.mode == "forward"
-    assert full.mode == "full_replay_fallback"
+    assert full.mode == "full_replay"
     for name in (
         "trades.csv",
         "equity_daily.csv",
@@ -86,7 +86,7 @@ def test_all_weather_checkpoint_crosses_new_rebalance_month(tmp_path: Path) -> N
     full = run_daily_forward(config, WAREHOUSE, full_out)
 
     assert tail.mode == "forward"
-    assert full.mode == "full_replay_fallback"
+    assert full.mode == "full_replay"
     for name in ("trades.csv", "equity_daily.csv", "daily_decisions.csv"):
         left = pd.read_csv(forward_out / name).fillna("")
         right = pd.read_csv(full_out / name).fillna("")
@@ -109,8 +109,8 @@ def test_historical_source_change_falls_back_to_full_replay(tmp_path: Path) -> N
 
     rerun = run_daily_forward(config.model_copy(update={"end_date": date(2021, 2, 15)}), warehouse, out)
 
-    assert rerun.mode == "full_replay_fallback"
-    assert rerun.fallback_reason == "historical_source_changed"
+    assert rerun.mode == "full_replay"
+    assert rerun.full_replay_reason == "historical_source_changed"
 
 
 @pytest.mark.slow
@@ -121,8 +121,8 @@ def test_checkpoint_after_requested_end_falls_back_to_full_replay(tmp_path: Path
     run_daily_forward(config, WAREHOUSE, out)
     rerun = run_daily_forward(config.model_copy(update={"end_date": date(2021, 2, 10)}), WAREHOUSE, out)
 
-    assert rerun.mode == "full_replay_fallback"
-    assert rerun.fallback_reason == "checkpoint_after_requested_end"
+    assert rerun.mode == "full_replay"
+    assert rerun.full_replay_reason == "checkpoint_after_requested_end"
     assert rerun.latest_date == date(2021, 2, 10)
 
 

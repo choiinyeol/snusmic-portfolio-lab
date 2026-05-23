@@ -151,7 +151,7 @@ class WeakProphetConfig(_AccountBase):
     It is deliberately stronger than realistic strategies: the benchmark can
     see a future return window and concentrate in the names that the optimizer
     prefers. The web catalog marks it as ``oracle`` so it is never presented as
-    a tradable strategy.
+    a tradable account.
     """
 
     account_id: Literal["weak_oracle"] = "weak_oracle"

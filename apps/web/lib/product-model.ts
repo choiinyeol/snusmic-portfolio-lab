@@ -5,23 +5,23 @@ import {
   getAccountLabel,
   getReportRows,
   getScreenerCandidates,
-  getStrategyCatalog,
-  getStrategyCurves,
+  getAccountCatalog,
+  getAccountCurves,
   getSummaryRows,
   type EquityPoint,
   type HoldingRow,
   type ReportRow,
-  type StrategyCatalogRow,
+  type AccountCatalogRow,
   type SummaryRow,
 } from '@/lib/artifacts';
 
 export const TARGET_BENCHMARK_ID = 'benchmark_kodex200';
 export const OBJECTIVE_MAX_DRAWDOWN = 0.15;
-export const BENCHMARK_IDS = getStrategyCatalog()
-  .filter((row) => row.kind !== 'strategy')
-  .map((row) => row.strategyId);
+export const BENCHMARK_IDS = getAccountCatalog()
+  .filter((row) => row.kind !== 'account')
+  .map((row) => row.accountId);
 
-export type StrategyKind = 'benchmark' | 'strategy' | 'oracle';
+export type AccountKind = 'benchmark' | 'account' | 'oracle';
 
 export type PortfolioSnapshot = {
   account_id: string;
@@ -54,11 +54,11 @@ export type ReportStats = {
   latestPublicationDate: string;
 };
 
-export type StrategyLeaderboardRow = {
+export type AccountLeaderboardRow = {
   id: string;
   label: string;
   shortLabel: string;
-  kind: StrategyKind;
+  kind: AccountKind;
   benchmarkGroup: string | null;
   returnPct: number | null;
   maxDrawdown: number | null;
@@ -80,8 +80,8 @@ export type StrategyLeaderboardRow = {
   href: string;
 };
 
-export function portfolioStrategyHref(strategyId: string): string {
-  return `/portfolio/${encodeURIComponent(strategyId)}`;
+export function portfolioAccountHref(accountId: string): string {
+  return `/portfolio/${encodeURIComponent(accountId)}`;
 }
 
 export type ResearchCandidate = {
@@ -94,7 +94,7 @@ export type ExecutiveOverview = {
   snapshotDate: string;
   portfolio: PortfolioSnapshot;
   reportStats: ReportStats;
-  bestStrategies: StrategyLeaderboardRow[];
+  bestAccounts: AccountLeaderboardRow[];
   recentReports: ReportRow[];
   researchCandidates: ResearchCandidate[];
 };
@@ -104,14 +104,14 @@ export function getDefaultPortfolioAccount(): string {
   const holdings = getCurrentHoldings();
   const summaryIds = new Set(summaries.map((row) => row.account_id));
   const accountsWithOpenHoldings = new Set(holdings.map((row) => row.account_id));
-  const rankedStrategies = getObjectivePassingRows(getStrategyLeaderboard()).filter((row) => summaryIds.has(row.id));
-  const topWithOpenHoldings = rankedStrategies.find((row) => accountsWithOpenHoldings.has(row.id));
+  const rankedAccounts = getObjectivePassingRows(getAccountLeaderboard()).filter((row) => summaryIds.has(row.id));
+  const topWithOpenHoldings = rankedAccounts.find((row) => accountsWithOpenHoldings.has(row.id));
   if (topWithOpenHoldings) {
     return topWithOpenHoldings.id;
   }
-  const topStrategy = rankedStrategies[0];
-  if (topStrategy) {
-    return topStrategy.id;
+  const topAccount = rankedAccounts[0];
+  if (topAccount) {
+    return topAccount.id;
   }
   if (summaryIds.has(TARGET_BENCHMARK_ID)) {
     return TARGET_BENCHMARK_ID;
@@ -122,11 +122,11 @@ export function getDefaultPortfolioAccount(): string {
       (a, b) =>
         (b.moneyWeightedReturn ?? Number.NEGATIVE_INFINITY) - (a.moneyWeightedReturn ?? Number.NEGATIVE_INFINITY),
     );
-  const fallback = withOpenHoldings[0] ?? summaries[0];
-  if (!fallback) {
-    throw new Error('Strategy catalog has no selectable strategy for the default portfolio view.');
+  const firstAvailable = withOpenHoldings[0] ?? summaries[0];
+  if (!firstAvailable) {
+    throw new Error('Account catalog has no selectable account for the default portfolio view.');
   }
-  return fallback.account_id;
+  return firstAvailable.account_id;
 }
 
 export function getExecutiveOverview(account_id = getDefaultPortfolioAccount()): ExecutiveOverview {
@@ -136,7 +136,7 @@ export function getExecutiveOverview(account_id = getDefaultPortfolioAccount()):
     snapshotDate: overview.simulation_window?.price_end ?? overview.simulation_window?.report_end ?? '',
     portfolio: getPortfolioSnapshot(account_id),
     reportStats: buildReportStats(reports),
-    bestStrategies: getObjectivePassingRows(getStrategyLeaderboard()).slice(0, 5),
+    bestAccounts: getObjectivePassingRows(getAccountLeaderboard()).slice(0, 5),
     recentReports: [...reports].sort((a, b) => b.publicationDate.localeCompare(a.publicationDate)).slice(0, 6),
     researchCandidates: getResearchCandidates(),
   };
@@ -221,56 +221,56 @@ export function getResearchCandidates(): ResearchCandidate[] {
   });
 }
 
-export function getStrategyLeaderboard(): StrategyLeaderboardRow[] {
+export function getAccountLeaderboard(): AccountLeaderboardRow[] {
   const summaries = getSummaryRows();
-  const equity = getStrategyCurves();
+  const equity = getAccountCurves();
   const benchmark = targetBenchmark(summaries);
-  const catalogById = new Map(getStrategyCatalog().map((row) => [row.strategyId, row]));
-  const accountRows = summaries.map((summary) => strategyRowFromSummary(summary, equity, benchmark, catalogById));
+  const catalogById = new Map(getAccountCatalog().map((row) => [row.accountId, row]));
+  const accountRows = summaries.map((summary) => accountRowFromSummary(summary, equity, benchmark, catalogById));
   return accountRows
     .map((row) => ({ ...row, benchmarkLabel: benchmark?.label ?? 'KOSPI/KODEX 200' }))
     .sort((a, b) => (b.returnPct ?? Number.NEGATIVE_INFINITY) - (a.returnPct ?? Number.NEGATIVE_INFINITY));
 }
 
-export function getBenchmarkRows(rows = getStrategyLeaderboard()): StrategyLeaderboardRow[] {
+export function getBenchmarkRows(rows = getAccountLeaderboard()): AccountLeaderboardRow[] {
   const order = new Map<string, number>(BENCHMARK_IDS.map((id, index) => [id, index]));
   return rows
-    .filter((row) => row.kind !== 'strategy')
+    .filter((row) => row.kind !== 'account')
     .sort((a, b) => (order.get(a.id) ?? 999) - (order.get(b.id) ?? 999));
 }
 
-export function getSelectableStrategyRows(rows = getStrategyLeaderboard()): StrategyLeaderboardRow[] {
-  return rows.filter((row) => row.kind === 'strategy' && row.isSelectable);
+export function getSelectableAccountRows(rows = getAccountLeaderboard()): AccountLeaderboardRow[] {
+  return rows.filter((row) => row.kind === 'account' && row.isSelectable);
 }
 
-export function getObjectivePassingRows(rows = getStrategyLeaderboard()): StrategyLeaderboardRow[] {
-  return getSelectableStrategyRows(rows).filter((row) => row.objectivePassed);
+export function getObjectivePassingRows(rows = getAccountLeaderboard()): AccountLeaderboardRow[] {
+  return getSelectableAccountRows(rows).filter((row) => row.objectivePassed);
 }
 
 export function isBenchmarkAccount(account_id: string): boolean {
-  return getStrategyCatalog().some((row) => row.strategyId === account_id && row.kind !== 'strategy');
+  return getAccountCatalog().some((row) => row.accountId === account_id && row.kind !== 'account');
 }
 
-function strategyRowFromSummary(
+function accountRowFromSummary(
   summary: SummaryRow,
   equity: EquityPoint[],
   benchmark: SummaryRow | undefined,
-  catalogById: Map<string, StrategyCatalogRow>,
-): StrategyLeaderboardRow {
+  catalogById: Map<string, AccountCatalogRow>,
+): AccountLeaderboardRow {
   const catalog = catalogById.get(summary.account_id);
   const metrics = riskMetricsFromCumulative(
     equity
       .filter((point) => point.account_id === summary.account_id && point.cumulativeReturn !== null)
       .map((point) => point.cumulativeReturn ?? 0),
   );
-  const kind: StrategyKind = catalog?.kind ?? (isBenchmarkAccount(summary.account_id) ? 'benchmark' : 'strategy');
+  const kind: AccountKind = catalog?.kind ?? (isBenchmarkAccount(summary.account_id) ? 'benchmark' : 'account');
   const returnPct = summary.moneyWeightedReturn ?? null;
   const objective = objectiveGate(kind, returnPct, summary.maxDrawdown, benchmark?.moneyWeightedReturn ?? null);
   const label = catalog?.label ?? summary.label ?? getAccountLabel(summary.account_id);
   return {
     id: summary.account_id,
     label,
-    shortLabel: catalog?.shortLabel ?? compactStrategyLabel(summary.account_id, label),
+    shortLabel: catalog?.shortLabel ?? compactAccountLabel(summary.account_id, label),
     kind,
     benchmarkGroup: catalog?.benchmarkGroup ?? null,
     returnPct,
@@ -289,15 +289,15 @@ function strategyRowFromSummary(
     objectivePassed: catalog?.objectivePassed ?? objective.passed,
     objectiveMddSlack: catalog?.objectiveMddSlack ?? objective.mddSlack,
     objectiveReturnExcess: catalog?.objectiveReturnExcess ?? objective.returnExcess,
-    isSelectable: catalog?.isSelectable ?? kind === 'strategy',
-    sourceLabel: kind === 'strategy' ? '고유 전략' : kind === 'oracle' ? '오라클 기준선' : '벤치마크',
+    isSelectable: catalog?.isSelectable ?? kind === 'account',
+    sourceLabel: kind === 'account' ? '고유 전략' : kind === 'oracle' ? '오라클 기준선' : '벤치마크',
     methodologySummary: catalog?.methodologySummary ?? '',
     buyRules: catalog?.buyRules ?? [],
     sellRules: catalog?.sellRules ?? [],
     riskControls: catalog?.riskControls ?? [],
     params: catalog?.params ?? {},
     href:
-      kind === 'strategy' && (catalog?.isSelectable ?? true) ? portfolioStrategyHref(summary.account_id) : '/portfolio',
+      kind === 'account' && (catalog?.isSelectable ?? true) ? portfolioAccountHref(summary.account_id) : '/portfolio',
   };
 }
 
@@ -306,7 +306,7 @@ function targetBenchmark(summaries: SummaryRow[]): SummaryRow | undefined {
 }
 
 function objectiveGate(
-  kind: StrategyKind,
+  kind: AccountKind,
   returnPct: number | null,
   maxDrawdown: number | null,
   benchmarkReturn: number | null,
@@ -314,7 +314,7 @@ function objectiveGate(
   const mddSlack = maxDrawdown === null ? null : OBJECTIVE_MAX_DRAWDOWN - maxDrawdown;
   const returnExcess = returnPct !== null && benchmarkReturn !== null ? returnPct - benchmarkReturn : null;
   return {
-    passed: kind === 'strategy' && mddSlack !== null && mddSlack >= 0 && returnExcess !== null && returnExcess > 0,
+    passed: kind === 'account' && mddSlack !== null && mddSlack >= 0 && returnExcess !== null && returnExcess > 0,
     mddSlack,
     returnExcess,
   };
@@ -370,7 +370,7 @@ function isFiniteNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value);
 }
 
-export function compactStrategyLabel(id: string, label: string): string {
+export function compactAccountLabel(id: string, label: string): string {
   if (id === 'all_weather') return '올웨더';
   if (id === 'smic_follower') return '리포트 추종 v1';
   if (id === 'smic_follower_v2') return '손절 리포트 추종';

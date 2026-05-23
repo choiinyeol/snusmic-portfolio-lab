@@ -11,7 +11,7 @@ import { SortHeader, pageRows, sortRows, type SortState } from './TableControls'
 
 type Props = {
   holdings: HoldingRow[];
-  /** Strategy/account_id controlled by the parent — single source of truth so
+  /** Account/account_id controlled by the parent — single source of truth so
    * URL state and inner state cannot drift apart. */
   account_id: string;
   accountLabels: Record<string, string>;
@@ -20,7 +20,7 @@ type Props = {
 };
 
 type HoldingSortKey =
-  | 'strategy'
+  | 'account'
   | 'market'
   | 'symbol'
   | 'target'
@@ -59,7 +59,7 @@ export function PortfolioTables({
   const sorted = useMemo(
     () =>
       sortRows(searched, sort, {
-        strategy: (row) => accountLabels[row.account_id] ?? row.account_id,
+        account: (row) => accountLabels[row.account_id] ?? row.account_id,
         market: (row) => marketLabel(targetsBySymbol[row.symbol]?.marketRegion),
         symbol: (row) => row.company || row.symbol,
         target: (row) => targetsBySymbol[row.symbol]?.targetPriceNative ?? targetsBySymbol[row.symbol]?.targetPriceKrw,
@@ -114,7 +114,7 @@ export function PortfolioTables({
         <thead>
           <tr>
             <th className="px-3 py-2 text-left">
-              <SortHeader label="전략" sortKey="strategy" sort={sort} onSort={updateSort} />
+              <SortHeader label="전략" sortKey="account" sort={sort} onSort={updateSort} />
             </th>
             <th className="px-3 py-2 text-left">
               <SortHeader label="시장" sortKey="market" sort={sort} onSort={updateSort} />

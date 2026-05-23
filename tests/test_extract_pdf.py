@@ -1,4 +1,4 @@
-from snusmic_pipeline.extract_pdf import parse_money, parse_report_text
+from snusmic_pipeline.ingest.extract_pdf import parse_money, parse_report_text
 
 
 def test_parse_money_handles_commas_and_currency():
@@ -66,7 +66,7 @@ def test_parse_report_text_extracts_bear_base_bull():
 
 
 def test_known_overseas_company_mapping_beats_noisy_parentheses():
-    parsed = parse_report_text("JILPT (27E) noisy valuation text", fallback_company="JAC recruitment Co. Ltd")
+    parsed = parse_report_text("JILPT (27E) noisy valuation text", company_hint="JAC recruitment Co. Ltd")
 
     assert parsed["ticker"] == "2124"
     assert parsed["exchange"] == "TYO"
@@ -76,7 +76,7 @@ def test_known_overseas_company_mapping_beats_noisy_parentheses():
 def test_known_overseas_company_mapping_beats_page_number_parentheses():
     parsed = parse_report_text(
         "Bilibili(NASDAQ: BILI)\n# (075580)\n목표주가: 72.95(USD) 현재주가: 45.90(USD)",
-        fallback_company="Bili bili",
+        company_hint="Bili bili",
     )
 
     assert parsed["ticker"] == "BILI"
@@ -88,7 +88,7 @@ def test_known_overseas_company_mapping_beats_page_number_parentheses():
 def test_known_japanese_company_mapping_sets_jpy_currency():
     parsed = parse_report_text(
         "CyberAgent Inc. (4751.T)\n# (075580)\n목표주가(Bull): 3610엔 현재주가: 2,099엔",
-        fallback_company="Cyber Agent",
+        company_hint="Cyber Agent",
     )
 
     assert parsed["ticker"] == "4751"
@@ -97,7 +97,7 @@ def test_known_japanese_company_mapping_sets_jpy_currency():
 
 
 def test_known_z_holdings_mapping_sets_jpy_currency():
-    parsed = parse_report_text("Z Holdings (4689)\n목표주가: 1,210 JPY", fallback_company="Z-holdings")
+    parsed = parse_report_text("Z Holdings (4689)\n목표주가: 1,210 JPY", company_hint="Z-holdings")
 
     assert parsed["ticker"] == "4689"
     assert parsed["exchange"] == "TYO"
@@ -106,7 +106,7 @@ def test_known_z_holdings_mapping_sets_jpy_currency():
 
 def test_known_korean_company_mapping_beats_bad_pdf_ticker():
     parsed = parse_report_text(
-        "쿠쿠홈시스(003410)\n## (075580)\n목표주가: 66,500 원", fallback_company="쿠쿠홈시스"
+        "쿠쿠홈시스(003410)\n## (075580)\n목표주가: 66,500 원", company_hint="쿠쿠홈시스"
     )
 
     assert parsed["ticker"] == "284740"
@@ -116,7 +116,7 @@ def test_known_korean_company_mapping_beats_bad_pdf_ticker():
 def test_known_hanwha_solutions_mapping_beats_bad_pdf_ticker():
     parsed = parse_report_text(
         "|한화솔루션 (009380) 2020년 11월 28일|\n현재주가: 49,000 원\n목표주가: 75,000 원",
-        fallback_company="한화솔루션",
+        company_hint="한화솔루션",
     )
 
     assert parsed["ticker"] == "009830"
@@ -158,7 +158,7 @@ def test_base_case_eps_is_not_used_as_target_price():
 def test_target_price_before_korean_label_beats_following_year_noise():
     text = "8,100원을 Base case 목표주가로 제시한다. 동사는 22년 코스닥으로 이전 상장했다."
 
-    parsed = parse_report_text(text, fallback_company="인카금융서비스")
+    parsed = parse_report_text(text, company_hint="인카금융서비스")
 
     assert parsed["base_target"] == 8100
 
@@ -166,7 +166,7 @@ def test_target_price_before_korean_label_beats_following_year_noise():
 def test_current_price_before_target_label_does_not_become_target():
     text = "현재주가: 23,300 원 목표주가: 41,600 원 상승여력: 78.5%"
 
-    parsed = parse_report_text(text, fallback_company="SK오션플랜트")
+    parsed = parse_report_text(text, company_hint="SK오션플랜트")
 
     assert parsed["report_current_price"] == 23300
     assert parsed["base_target"] == 41600
@@ -192,7 +192,7 @@ def test_equal_current_and_target_candidate_uses_next_target_candidate():
         "현재주가 : 238.30 위안 목표주가 238.30\n현재주가 : 238.30 위안 목표주가 : 331.70 위안 상승여력: 39%"
     )
 
-    parsed = parse_report_text(text, fallback_company="BYD")
+    parsed = parse_report_text(text, company_hint="BYD")
 
     assert parsed["report_current_price"] == 238.30
     assert parsed["base_target"] == 331.70

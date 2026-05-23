@@ -2,7 +2,8 @@ from datetime import datetime
 
 import pandas as pd
 
-from snusmic_pipeline.currency import (
+from snusmic_pipeline.ingest.extract_pdf import infer_currency, infer_exchange
+from snusmic_pipeline.market_data.currency import (
     convert_ohlcv_to_krw,
     convert_value_to_krw,
     currency_for_symbol,
@@ -11,7 +12,6 @@ from snusmic_pipeline.currency import (
     yfinance_fx_symbol,
     yfinance_symbol,
 )
-from snusmic_pipeline.extract_pdf import infer_currency, infer_exchange
 
 
 def fake_downloader(symbol: str, start: datetime, end: datetime) -> pd.DataFrame:

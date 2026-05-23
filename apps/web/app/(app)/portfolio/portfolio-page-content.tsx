@@ -5,7 +5,7 @@ import { PortfolioHoldingsView } from '@/components/trading/portfolio-views/Port
 import { PortfolioLandingView } from '@/components/trading/portfolio-views/PortfolioLandingView';
 import { PortfolioMethodologyView } from '@/components/trading/portfolio-views/PortfolioMethodologyView';
 import { PortfolioOverviewView } from '@/components/trading/portfolio-views/PortfolioOverviewView';
-import { PortfolioStrategyFrame } from '@/components/trading/portfolio-views/PortfolioStrategyFrame';
+import { PortfolioAccountFrame } from '@/components/trading/portfolio-views/PortfolioAccountFrame';
 import { PortfolioTradesView } from '@/components/trading/portfolio-views/PortfolioTradesView';
 import type { PortfolioViewModel } from '@/components/trading/portfolio-views/types';
 import { Badge } from '@/components/ui/badge';
@@ -30,7 +30,7 @@ export function EmptyPortfolioRouteContent() {
 export function PortfolioPageShell({ children, model }: { children: ReactNode; model: PortfolioViewModel }) {
   const account_id = model.selectedAccount;
   const label = model.accountLabels[account_id] ?? account_id;
-  const shortLabel = model.strategyOptions.find((row) => row.id === account_id)?.shortLabel ?? label;
+  const shortLabel = model.accountOptions.find((row) => row.id === account_id)?.shortLabel ?? label;
   const holdingsValue = model.holdings.reduce((sum, row) => sum + (row.marketValueKrw ?? 0), 0);
   const cashKrw = model.cashByAccount[account_id] ?? 0;
   const totalValue = holdingsValue + cashKrw;
@@ -77,7 +77,7 @@ export function PortfolioPageShell({ children, model }: { children: ReactNode; m
           />
         </div>
       </header>
-      <PortfolioStrategyFrame model={model}>{children}</PortfolioStrategyFrame>
+      <PortfolioAccountFrame model={model}>{children}</PortfolioAccountFrame>
     </div>
   );
 }
@@ -108,7 +108,7 @@ export function PortfolioRouteContentFromModel({
       <PortfolioMethodologyView
         method={model.methodsByAccount[model.selectedAccount]}
         accountLabel={model.accountLabels[model.selectedAccount] ?? model.selectedAccount}
-        strategyId={model.selectedAccount}
+        accountId={model.selectedAccount}
       />
     );
   }

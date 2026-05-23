@@ -7,7 +7,6 @@ on:
       - "data/web/**"
       - "data/sim/**"
       - "data/warehouse/**"
-      - "scripts/refresh_web_artifacts.sh"
       - "scripts/prepare_vercel_prebuilt.sh"
       - "package.json"
       - "vercel.json"
@@ -20,7 +19,6 @@ on:
       - "data/web/**"
       - "data/sim/**"
       - "data/warehouse/**"
-      - "scripts/refresh_web_artifacts.sh"
       - "scripts/prepare_vercel_prebuilt.sh"
       - "package.json"
       - "vercel.json"
@@ -41,6 +39,7 @@ permissions:
   contents: read
 
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -54,17 +53,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.refresh_artifacts == 'true'
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
       - name: Set up uv
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.refresh_artifacts == 'true'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v8
 
       - name: Install Python dependencies
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.refresh_artifacts == 'true'
@@ -72,10 +71,10 @@ jobs:
 
       - name: Refresh web data artifacts
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.refresh_artifacts == 'true'
-        run: scripts/refresh_web_artifacts.sh
+        run: uv run --locked python -m snusmic_pipeline refresh-web-artifacts
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "22"
 

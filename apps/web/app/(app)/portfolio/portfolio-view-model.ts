@@ -1,6 +1,6 @@
 import type {
   PortfolioLandingModel,
-  PortfolioStrategySnapshot,
+  PortfolioAccountSnapshot,
   PortfolioViewModel,
 } from '@/components/trading/portfolio-views/types';
 import {
@@ -18,21 +18,21 @@ import {
 import {
   getDefaultPortfolioAccount,
   getObjectivePassingRows,
-  getStrategyLeaderboard,
-  portfolioStrategyHref,
-  type StrategyLeaderboardRow,
+  getAccountLeaderboard,
+  portfolioAccountHref,
+  type AccountLeaderboardRow,
 } from '@/lib/product-model';
 
-const ALL_WEATHER_PERSONA = 'all_weather';
-export const NO_ADMITTED_STRATEGY_PARAM = 'no-admitted-strategy';
+const ALL_WEATHER_ACCOUNT = 'all_weather';
+export const NO_ADMITTED_ACCOUNT_PARAM = 'no-admitted-account';
 
 export function buildPortfolioLandingModel(): PortfolioLandingModel {
   const allHoldings = getCurrentHoldings();
   const allEquity = getEquityDaily();
   const summaries = getSummaryRows();
   const allTrades = getTrades();
-  const leaderboardRows = getStrategyLeaderboard();
-  const allWeatherReturn = leaderboardRows.find((row) => row.id === ALL_WEATHER_PERSONA)?.returnPct ?? null;
+  const leaderboardRows = getAccountLeaderboard();
+  const allWeatherReturn = leaderboardRows.find((row) => row.id === ALL_WEATHER_ACCOUNT)?.returnPct ?? null;
   const portfolioRows = getPortfolioRows(leaderboardRows);
   const benchmarkRows = leaderboardRows.filter((row) => row.kind === 'benchmark');
   const defaultAccount = defaultPortfolioAccount(portfolioRows);
@@ -43,7 +43,7 @@ export function buildPortfolioLandingModel(): PortfolioLandingModel {
   const holdingsByAccount = groupByAccount(allHoldings.filter((row) => frontierIds.has(row.account_id)));
   const trades = allTrades.filter((row) => portfolioIds.has(row.account_id));
   const equity = allEquity.filter((row) => frontierIds.has(row.account_id));
-  const snapshotFromRow = (row: StrategyLeaderboardRow): PortfolioStrategySnapshot => {
+  const snapshotFromRow = (row: AccountLeaderboardRow): PortfolioAccountSnapshot => {
     const summary = summaryById.get(row.id);
     const holdings = holdingsByAccount.get(row.id) ?? [];
     const holdingsValue =
@@ -71,12 +71,12 @@ export function buildPortfolioLandingModel(): PortfolioLandingModel {
       objectivePassed: row.objectivePassed,
     };
   };
-  const strategies = portfolioRows.map(snapshotFromRow);
-  const frontierRows = [...strategies, ...benchmarkRows.map(snapshotFromRow)];
+  const accounts = portfolioRows.map(snapshotFromRow);
+  const frontierRows = [...accounts, ...benchmarkRows.map(snapshotFromRow)];
   return {
     defaultAccount,
     latestEquityDate: equity.reduce((latest, row) => (row.date > latest ? row.date : latest), ''),
-    strategies,
+    accounts,
     frontierRows,
     allWeatherReturn,
     holdings: allHoldings.filter((row) => portfolioIds.has(row.account_id)),
@@ -96,7 +96,7 @@ export function buildPortfolioViewModel(selectedAccount?: string): PortfolioView
   const allTargetsBySymbol = getLatestReportTargetsBySymbol();
   const allTargetsByReportId = getReportTargetsById();
   const portfolioRows = getPortfolioRows();
-  const benchmarkRows = getStrategyLeaderboard().filter((row) => row.kind === 'benchmark');
+  const benchmarkRows = getAccountLeaderboard().filter((row) => row.kind === 'benchmark');
   const defaultAccount = defaultPortfolioAccount(portfolioRows);
 
   const portfolioRowById = new Map(portfolioRows.map((row) => [row.id, row]));
@@ -110,7 +110,7 @@ export function buildPortfolioViewModel(selectedAccount?: string): PortfolioView
     dataAccountIds.has(account_id),
   );
   const activeAccount = selectedAccount && accounts.includes(selectedAccount) ? selectedAccount : defaultAccount;
-  const invalidStrategyId = selectedAccount && !accounts.includes(selectedAccount) ? selectedAccount : null;
+  const invalidAccountId = selectedAccount && !accounts.includes(selectedAccount) ? selectedAccount : null;
   const accountLabels = Object.fromEntries([
     ...accounts.map((account_id) => [
       account_id,
@@ -118,14 +118,14 @@ export function buildPortfolioViewModel(selectedAccount?: string): PortfolioView
     ]),
     ...benchmarkRows.map((row) => [row.id, row.shortLabel || row.label]),
   ]);
-  const strategyOptions = accounts.map((account_id) => {
+  const accountOptions = accounts.map((account_id) => {
     const row = portfolioRowById.get(account_id);
     return {
       id: account_id,
       label: row?.label ?? getAccountLabel(account_id),
       shortLabel: row?.shortLabel ?? getAccountLabel(account_id),
-      kind: 'strategy' as const,
-      href: portfolioStrategyHref(account_id),
+      kind: 'account' as const,
+      href: portfolioAccountHref(account_id),
       isDefault: account_id === defaultAccount,
     };
   });
@@ -189,17 +189,17 @@ export function buildPortfolioViewModel(selectedAccount?: string): PortfolioView
     accounts,
     benchmarkAccounts: benchmarkRows.map((row) => row.id),
     accountLabels,
-    strategyOptions,
+    accountOptions,
     defaultAccount,
     selectedAccount: activeAccount,
-    invalidStrategyId,
+    invalidAccountId,
     methodsByAccount,
     capitalByAccount,
     cashByAccount,
     reportSymbolsById,
     targetsBySymbol,
     targetsByReportId,
-    portfolioStrategyCount: accounts.length,
+    portfolioAccountCount: accounts.length,
     latestEquityDate,
   };
 }
@@ -207,14 +207,14 @@ export function buildPortfolioViewModel(selectedAccount?: string): PortfolioView
 export function getPortfolioStaticParams() {
   const summaries = getSummaryRows();
   const summaryIds = new Set(summaries.map((row) => row.account_id));
-  const params = getPortfolioRows(getStrategyLeaderboard())
+  const params = getPortfolioRows(getAccountLeaderboard())
     .filter((row) => summaryIds.has(row.id))
-    .map((row) => ({ strategy: row.id }));
-  return params.length ? params : [{ strategy: NO_ADMITTED_STRATEGY_PARAM }];
+    .map((row) => ({ account: row.id }));
+  return params.length ? params : [{ account: NO_ADMITTED_ACCOUNT_PARAM }];
 }
 
-function getPortfolioRows(rows: StrategyLeaderboardRow[] = getStrategyLeaderboard()) {
-  const selectable = getObjectivePassingRows(rows).filter((row) => row.kind === 'strategy' && row.isSelectable);
+function getPortfolioRows(rows: AccountLeaderboardRow[] = getAccountLeaderboard()) {
+  const selectable = getObjectivePassingRows(rows).filter((row) => row.kind === 'account' && row.isSelectable);
   const nonDominated = selectable.filter((row) => !selectable.some((candidate) => dominates(candidate, row)));
   return nonDominated.sort((a, b) => {
     if (a.objectivePassed !== b.objectivePassed) return a.objectivePassed ? -1 : 1;
@@ -222,15 +222,15 @@ function getPortfolioRows(rows: StrategyLeaderboardRow[] = getStrategyLeaderboar
   });
 }
 
-function defaultPortfolioAccount(rows: StrategyLeaderboardRow[]): string {
+function defaultPortfolioAccount(rows: AccountLeaderboardRow[]): string {
   const productDefault = getDefaultPortfolioAccount();
   if (rows.some((row) => row.id === productDefault)) return productDefault;
-  const fallback = rows[0]?.id;
-  if (fallback) return fallback;
+  const firstAvailable = rows[0]?.id;
+  if (firstAvailable) return firstAvailable;
   return productDefault;
 }
 
-function dominates(candidate: StrategyLeaderboardRow, target: StrategyLeaderboardRow): boolean {
+function dominates(candidate: AccountLeaderboardRow, target: AccountLeaderboardRow): boolean {
   if (
     candidate.id === target.id ||
     candidate.returnPct === null ||

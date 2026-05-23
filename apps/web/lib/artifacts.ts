@@ -12,7 +12,7 @@ import {
   RawReportRowSchema,
   ScreenerCandidateSchema,
   RawTradeRowSchema,
-  StrategyCatalogRowSchema,
+  AccountCatalogRowSchema,
   WebAccountSchema,
   WebDataQualitySchema,
   WebOverviewSchema,
@@ -224,11 +224,11 @@ export type DataQuality = {
   extractionQuality: Record<string, unknown>;
 };
 
-export type StrategyCatalogRow = {
-  strategyId: string;
+export type AccountCatalogRow = {
+  accountId: string;
   label: string;
   shortLabel: string;
-  kind: 'benchmark' | 'strategy' | 'oracle';
+  kind: 'benchmark' | 'account' | 'oracle';
   benchmarkGroup: string | null;
   isSelectable: boolean;
   isDefaultCandidate: boolean;
@@ -490,14 +490,14 @@ function currentArtifactStamp(): number {
 
 function clearArtifactCaches() {
   reportCache = undefined;
-  strategyCatalogCache = undefined;
+  accountCatalogCache = undefined;
   screenerCandidateCache = undefined;
   holdingsCache = undefined;
   monthlyHoldingsCache = undefined;
   tradesCache = undefined;
   positionEpisodesCache = undefined;
   equityDailyCache = undefined;
-  strategyCurvesCache = undefined;
+  accountCurvesCache = undefined;
   priceSeriesCache.clear();
   nativePricePointCache.clear();
 }
@@ -987,16 +987,16 @@ export function getOverview(): WebOverview {
   );
 }
 
-let strategyCatalogCache: StrategyCatalogRow[] | undefined;
-export function getStrategyCatalog(): StrategyCatalogRow[] {
-  if (artifactCacheValid() && strategyCatalogCache) return strategyCatalogCache;
+let accountCatalogCache: AccountCatalogRow[] | undefined;
+export function getAccountCatalog(): AccountCatalogRow[] {
+  if (artifactCacheValid() && accountCatalogCache) return accountCatalogCache;
   const raw = parseRows(
     'accounts/catalog.json',
-    StrategyCatalogRowSchema,
+    AccountCatalogRowSchema,
     readRequiredJson<unknown>('data/web/accounts/catalog.json'),
   );
-  strategyCatalogCache = raw.map((row) => ({
-    strategyId: row.account_id,
+  accountCatalogCache = raw.map((row) => ({
+    accountId: row.account_id,
     label: row.label,
     shortLabel: row.short_label,
     kind: row.kind,
@@ -1022,7 +1022,7 @@ export function getStrategyCatalog(): StrategyCatalogRow[] {
       openPositions: row.metrics.open_positions,
     },
   }));
-  return strategyCatalogCache;
+  return accountCatalogCache;
 }
 
 export function getArtifactManifest(): ArtifactManifest {
@@ -1344,11 +1344,11 @@ export function getEquityDaily(): EquityPoint[] {
   return equityDailyCache;
 }
 
-let strategyCurvesCache: EquityPoint[] | undefined;
-export function getStrategyCurves(): EquityPoint[] {
-  if (artifactCacheValid() && strategyCurvesCache) return strategyCurvesCache;
-  strategyCurvesCache = readCompactEquityCurves('data/web/accounts/curves.json');
-  return strategyCurvesCache;
+let accountCurvesCache: EquityPoint[] | undefined;
+export function getAccountCurves(): EquityPoint[] {
+  if (artifactCacheValid() && accountCurvesCache) return accountCurvesCache;
+  accountCurvesCache = readCompactEquityCurves('data/web/accounts/curves.json');
+  return accountCurvesCache;
 }
 
 function readCompactTable(filePath: string, expectedColumns: string[]): RawReport[] {

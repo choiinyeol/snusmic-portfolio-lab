@@ -185,7 +185,7 @@ function delaySimulation(report, prices, originalEntry, target, delay, horizon) 
   return {
     reportId: report.report_id,
     symbol: report.symbol,
-    strategy: 'delay',
+    analysisType: 'delay',
     delayDays: delay,
     horizonDays: horizon,
     entered: true,
@@ -209,7 +209,7 @@ function triggerSimulation(report, prices, entry, target, type, triggerPct, hori
   const base = {
     reportId: report.report_id,
     symbol: report.symbol,
-    strategy: type === 'dip' ? 'dip_entry' : 'rally_entry',
+    analysisType: type === 'dip' ? 'dip_entry' : 'rally_entry',
     triggerPct,
     horizonDays: horizon,
     entered: triggerIndex >= 0,
@@ -253,7 +253,7 @@ function targetMultipleSimulation(report, prices, entry, target, targetMultiple,
   return {
     reportId: report.report_id,
     symbol: report.symbol,
-    strategy: 'take_profit_multiple',
+    analysisType: 'take_profit_multiple',
     targetMultiple,
     horizonDays: horizon,
     entered: true,
@@ -289,7 +289,7 @@ function buildDelayedEntry(rows) {
   return DELAYS.flatMap((delay) =>
     HORIZONS.map((horizon) =>
       summarizeSimulations(
-        rows.filter((row) => row.strategy === 'delay' && row.delayDays === delay && row.horizonDays === horizon),
+        rows.filter((row) => row.analysisType === 'delay' && row.delayDays === delay && row.horizonDays === horizon),
         { delayDays: delay, horizonDays: horizon },
       ),
     ),
@@ -297,16 +297,16 @@ function buildDelayedEntry(rows) {
 }
 
 function buildEntryTriggers(rows) {
-  return ['dip_entry', 'rally_entry'].flatMap((strategy) =>
+  return ['dip_entry', 'rally_entry'].flatMap((analysisType) =>
     TRIGGERS.flatMap((triggerPct) =>
       HORIZONS.map((horizon) => {
         const subset = rows.filter(
-          (row) => row.strategy === strategy && row.triggerPct === triggerPct && row.horizonDays === horizon,
+          (row) => row.analysisType === analysisType && row.triggerPct === triggerPct && row.horizonDays === horizon,
         );
         const entered = subset.filter((row) => row.entered);
         const returns = entered.map((row) => row.realizedReturn).filter(Number.isFinite);
         return {
-          type: strategy === 'dip_entry' ? 'dip' : 'rally',
+          type: analysisType === 'dip_entry' ? 'dip' : 'rally',
           triggerPct,
           horizonDays: horizon,
           entryRate: ratio(entered.length, subset.length),
@@ -317,11 +317,11 @@ function buildEntryTriggers(rows) {
           hitRate08: ratio(entered.filter((row) => row.hit08).length, entered.length),
           medianDrawdown: median(entered.map((row) => row.maxDrawdownAfterEntry).filter(Number.isFinite)),
           missedOpportunityRate:
-            strategy === 'dip_entry'
+            analysisType === 'dip_entry'
               ? ratio(subset.filter((row) => row.missedOpportunity).length, subset.length)
               : null,
           falseBreakoutRate:
-            strategy === 'rally_entry'
+            analysisType === 'rally_entry'
               ? ratio(entered.filter((row) => row.falseBreakout).length, entered.length)
               : null,
         };
@@ -361,7 +361,7 @@ function buildOptimalTargetMultiples(rows) {
     HORIZONS.map((horizon) => {
       const subset = rows.filter(
         (row) =>
-          row.strategy === 'take_profit_multiple' &&
+          row.analysisType === 'take_profit_multiple' &&
           row.targetMultiple === targetMultiple &&
           row.horizonDays === horizon,
       );

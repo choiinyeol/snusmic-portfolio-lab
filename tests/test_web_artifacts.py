@@ -6,10 +6,10 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-import snusmic_pipeline.web_artifacts as web_artifacts
+import snusmic_pipeline.web.artifacts as web_artifacts
 from snusmic_pipeline.sim.contracts import SimulationConfig
 from snusmic_pipeline.sim.forward_runner import run_daily_forward
-from snusmic_pipeline.web_artifacts import (
+from snusmic_pipeline.web.artifacts import (
     ExportInputs,
     _write_price_artifacts,
     check_web_artifacts,
@@ -110,7 +110,7 @@ def test_daily_decision_artifacts_expose_checkpoint_metadata(tmp_path: Path) -> 
     raw = json.loads((out / "daily-decisions.json").read_text(encoding="utf-8"))
     compact = json.loads((out / "portfolio" / "daily-decisions.json").read_text(encoding="utf-8"))
 
-    assert raw["metadata"]["run_mode"] == "full_replay_fallback"
+    assert raw["metadata"]["run_mode"] == "full_replay"
     assert raw["metadata"]["checkpoint_date"] == "2021-02-10"
     assert raw["metadata"]["checkpoint_schema_version"] == "1.0.0"
     assert raw["metadata"]["source_fingerprint"]
@@ -285,7 +285,7 @@ def test_export_web_artifacts_keeps_existing_output_when_staged_validation_fails
 
 @pytest.mark.slow
 @pytest.mark.contract
-def test_account_catalog_has_no_retired_generated_strategy_accounts(tmp_path: Path) -> None:
+def test_account_catalog_has_no_retired_generated_account_accounts(tmp_path: Path) -> None:
     out = tmp_path / "web"
     export_web_artifacts(
         ExportInputs(
@@ -297,10 +297,10 @@ def test_account_catalog_has_no_retired_generated_strategy_accounts(tmp_path: Pa
     )
 
     catalog = json.loads((out / "accounts" / "catalog.json").read_text(encoding="utf-8"))
-    strategy_ids = {str(row.get("account_id") or "") for row in catalog}
+    account_ids = {str(row.get("account_id") or "") for row in catalog}
     assert not {
         item
-        for item in strategy_ids
+        for item in account_ids
         if item.startswith(("stock_rule_", "pit_research_board_", "smic_mtt_strategy"))
     }
 

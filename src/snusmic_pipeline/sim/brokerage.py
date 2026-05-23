@@ -313,7 +313,7 @@ class Account:
     ) -> None:
         """Trade the holdings to match ``weights`` (sum ≤ 1).
 
-        Strategy:
+        Account rule:
 
         1. Mark the entire book to market today.
         2. Compute target value per symbol = ``equity × weight``.

@@ -1,16 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import type { StrategyMethod } from './types';
+import type { AccountMethod } from './types';
 
 export function PortfolioMethodologyView({
   method,
   accountLabel,
-  strategyId,
+  accountId,
 }: {
-  method: StrategyMethod | undefined;
+  method: AccountMethod | undefined;
   accountLabel: string;
-  strategyId: string;
+  accountId: string;
 }) {
   if (!method) {
     return (
@@ -23,20 +23,20 @@ export function PortfolioMethodologyView({
     <article className="grid gap-4">
       <section className="rounded-md border border-slate-200 bg-white p-4">
         <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-          strategy playbook
+          account playbook
         </div>
         <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">{accountLabel} 운용 방법론</h2>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{method.summary}</p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Link
             className="rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-slate-800 active:bg-slate-950 active:text-white"
-            href={`/portfolio/${strategyId}/holdings`}
+            href={`/portfolio/${accountId}/holdings`}
           >
             현재 보유 보기
           </Link>
           <Link
             className="rounded-md border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-400 hover:bg-slate-50 active:border-slate-950 active:bg-slate-950 active:text-white"
-            href={`/portfolio/${strategyId}/trades`}
+            href={`/portfolio/${accountId}/trades`}
           >
             실제 매매 원장 보기
           </Link>

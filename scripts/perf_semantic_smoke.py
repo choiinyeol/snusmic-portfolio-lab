@@ -12,7 +12,7 @@ import pandas as pd
 
 from snusmic_pipeline.sim.contracts import SimulationConfig
 from snusmic_pipeline.sim.forward_runner import run_daily_forward
-from snusmic_pipeline.web_artifacts import ExportInputs, export_web_artifacts
+from snusmic_pipeline.web.artifacts import ExportInputs, export_web_artifacts
 
 
 def main() -> None:

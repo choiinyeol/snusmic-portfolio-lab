@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 
 export type CommandTarget = {
-  kind: 'nav' | 'symbol' | 'strategy';
+  kind: 'nav' | 'symbol' | 'account';
   label: string;
   description?: string;
   href: string;
@@ -16,7 +16,7 @@ export type CommandTarget = {
 const KIND_LABEL: Record<CommandTarget['kind'], string> = {
   nav: '페이지',
   symbol: '종목',
-  strategy: '전략',
+  account: '전략',
 };
 
 /** Lightweight global command palette wired to ⌘K / Ctrl+K. Filters the supplied

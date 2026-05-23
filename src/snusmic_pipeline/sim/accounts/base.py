@@ -71,7 +71,7 @@ def record_equity_point(
        (forward-fill). This is the critical step: when a symbol simply has
        no quote published today, the holding stays marked at yesterday's
        price rather than collapsing back to weighted-average cost.
-    3. ``lot.avg_cost_krw`` — final fallback for a holding that was bought
+    3. ``lot.avg_cost_krw`` — final source for a holding that was bought
        and then never had any subsequent quote (extremely rare).
 
     Without step 2 the equity curve develops fake one-day −30% spikes on

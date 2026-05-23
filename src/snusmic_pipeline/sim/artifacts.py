@@ -1,7 +1,7 @@
 """Shared writers for simulation artifacts.
 
 This module is deliberately boring: it serializes a completed
-``SimulationResult``. Strategy discovery used to own this code, which made the
+``SimulationResult``. Older discovery code used to own this module, which made the
 daily runner depend on the exploratory lane. Keep artifact writing independent
 from research workflows.
 """

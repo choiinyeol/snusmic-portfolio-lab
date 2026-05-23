@@ -1,54 +1,32 @@
 # Product Spec
 
-Last updated: 2026-05-23
-Status: canonical product intent
+SNUSMIC Portfolio Lab builds point-in-time SMIC report data and static account-report artifacts. It does not search for trading rules, generate candidate accounts, or admit automated accounts.
 
-## One Line
+## Current Product
 
-SNUSMIC Portfolio Lab tests whether a real account that only buys stocks covered by SMIC reports can beat All-Weather under the same cash-flow schedule.
+- Ingest SMIC report metadata, PDFs, extracted targets, ratings, and caveats.
+- Normalize the data into a PIT warehouse with report publication dates, price windows, target-hit evidence, and report-level outcome factors.
+- Export fixed account baselines and follower accounts so the web app can compare actual account paths.
+- Export a PIT research board for manual rule design outside the pipeline.
 
-## User
+## Non Goals
 
-The user is an individual investor, not an institutional quant desk. They need a defensible, replayable account ledger: what could be bought, when it was bought, why it was sold, and whether the result beat a simple benchmark after costs.
+- No broker-style rule search.
+- No generated account admission.
+- No MTT account.
+- No hidden migration, rollback, or safety-net path.
+- No UI route that presents accounts as personas.
 
-## Core Questions
+## Objective
 
-1. Does an investable SNUSMIC-covered-stock strategy beat All-Weather on final equity and money-weighted return?
-2. Which buy, sell, sizing, and cash rules explain the result?
-3. Did the strategy obey point-in-time data boundaries?
-4. Which failures are useful evidence, and which are just overfit noise?
+The account objective is still simple: compare final equity, money-weighted return, and maximum drawdown against `benchmark_kodex200`. Report-level factor views are diagnostic inputs for human research; they are not deployable rules by themselves.
 
-## Product Model
+## Future Rule Work
 
-| Concept | Meaning |
-| --- | --- |
-| Report | A point-in-time SMIC coverage event for one stock. |
-| Pool | Stocks currently eligible because SMIC covered them and they have not expired or failed a rule. |
-| Candidate | A pool member that passes today's buy filters. |
-| Strategy | Buy, sell, sizing, cash, and fallback rules declared before replay. |
-| Ledger | Cash, holdings, trades, realized/unrealized PnL, fees, taxes, and monthly contributions. |
-| Benchmark | A comparison account with the same cash-flow basis, especially All-Weather. |
+Future rules must be explicit before implementation:
 
-## Success
-
-Primary success is account-level outperformance: final equity and MWR beat All-Weather under the same deposits, dates, costs, and market data.
-
-MDD, win rate, hit rate, and report target achievement are diagnostic metrics. They can explain a strategy, but they must not replace the account objective.
-
-## Non-Goals
-
-- Live trading advice or broker order entry.
-- Ranking analysts or grading report authors.
-- Choosing stocks with future information.
-- Promoting failed experiments by hiding the ledger.
-- Building a factor zoo that cannot be explained through account decisions.
-
-## UI Contract
-
-The UI should show the account first, then the reason trail:
-
-1. Final equity, MWR, excess return versus All-Weather.
-2. Current holdings, cash, recent buys, recent sells, and reasons.
-3. Strategy rules and parameters.
-4. Candidate pool and report lineage.
-5. Failed experiments only when they teach something concrete.
+- Buy condition and execution timing.
+- Sell condition, stop loss, take profit, and expiry handling.
+- Position sizing and cash policy.
+- Rebalancing cadence.
+- PIT observability proof for every signal.

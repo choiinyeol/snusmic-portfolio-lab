@@ -5,24 +5,25 @@ import csv
 import json
 import math
 import os
+import shutil
 from datetime import date
 from pathlib import Path
 from typing import Any
 
-from .change_detection import PAGE_ONE_POST_LIMIT, new_report_urls
-from .download_pdfs import download_all
-from .extract_pdf import extract_report, parse_report_text
-from .extraction_quality import analyze_extraction_quality
-from .fetch_index import fetch_reports, parse_pages
-from .github_urls import github_pdf_url
-from .markdown_export import export_markdown
-from .models import DownloadedPdf, ExtractedReport, ReportMeta
+from .ingest.change_detection import PAGE_ONE_POST_LIMIT, new_report_urls
+from .ingest.download_pdfs import download_all
+from .ingest.extract_pdf import extract_report, parse_report_text
+from .ingest.extraction_quality import analyze_extraction_quality
+from .ingest.fetch_index import fetch_reports, parse_pages
+from .ingest.github_urls import github_pdf_url
+from .ingest.markdown_export import export_markdown
+from .ingest.models import DownloadedPdf, ExtractedReport, ReportMeta
 from .sim.account_sim import main as run_account_simulation_command
 from .sim.contracts import SimulationConfig
 from .sim.forward_runner import load_config_from_account_artifact, run_daily_forward
 from .sim.pit_board_export import main as run_pit_board_export_command
 from .sim.warehouse import build_warehouse, refresh_price_history
-from .web_artifacts import ExportInputs, check_web_artifacts, export_web_artifacts
+from .web.artifacts import ExportInputs, check_web_artifacts, export_web_artifacts
 
 REPORT_HEADERS = [
     "페이지",
@@ -278,7 +279,7 @@ def run_ocr_reextract(args: argparse.Namespace) -> int:
             missing_markdown += 1
             continue
         text = markdown_path.read_text(encoding="utf-8", errors="replace")
-        parsed = parse_report_text(text, fallback_company=report.meta.company)
+        parsed = parse_report_text(text, company_hint=report.meta.company)
         apply_parsed_report(report, parsed, source=source)
         if (
             args.preserve_existing_targets
@@ -409,13 +410,12 @@ def run_export_web(args: argparse.Namespace) -> int:
     return 0
 
 
-def run_daily_forward_cli(args: argparse.Namespace) -> int:
-    start = date.fromisoformat(args.start)
-    end = date.fromisoformat(args.end)
-    out_dir = Path(args.out)
+def daily_forward_config(
+    start: date, end: date, out_dir: Path, *, ignore_account_artifact: bool
+) -> SimulationConfig:
     config = (
         None
-        if args.ignore_account_artifact
+        if ignore_account_artifact
         else load_config_from_account_artifact(
             out_dir / "account-configs.json",
             start=start,
@@ -426,6 +426,19 @@ def run_daily_forward_cli(args: argparse.Namespace) -> int:
         base = SimulationConfig(start_date=start, end_date=end)
         accounts = tuple(account_id for account_id in base.accounts if account_id.account_id != "weak_oracle")
         config = base.model_copy(update={"accounts": accounts})
+    return config
+
+
+def run_daily_forward_cli(args: argparse.Namespace) -> int:
+    start = date.fromisoformat(args.start)
+    end = date.fromisoformat(args.end)
+    out_dir = Path(args.out)
+    config = daily_forward_config(
+        start,
+        end,
+        out_dir,
+        ignore_account_artifact=args.ignore_account_artifact,
+    )
     report = run_daily_forward(
         config,
         Path(args.warehouse),
@@ -437,8 +450,131 @@ def run_daily_forward_cli(args: argparse.Namespace) -> int:
         "latest_date": report.latest_date.isoformat(),
         "checkpoint_path": str(report.checkpoint_path),
         "metadata_path": str(report.metadata_path),
-        "fallback_reason": report.fallback_reason,
+        "full_replay_reason": report.full_replay_reason,
         "accounts": [summary.account_id for summary in report.result.summaries],
+    }
+    print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
+    return 0
+
+
+def latest_warehouse_price_date(warehouse_dir: Path) -> date:
+    path = warehouse_dir / "daily_prices.csv"
+    if not path.exists():
+        raise SystemExit(f"{path} does not exist; run build-warehouse and refresh-prices first")
+    with path.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        latest = max((row["date"] for row in reader if row.get("date")), default="")
+    if not latest:
+        raise SystemExit(f"{path} is empty")
+    return date.fromisoformat(latest)
+
+
+def copy_web_downloads(web_dir: Path, downloads_dir: Path) -> None:
+    downloads_dir.mkdir(parents=True, exist_ok=True)
+    sources = {
+        "table-download-reports.csv": "snusmic-reports.csv",
+        "table-download-accounts.csv": "snusmic-accounts.csv",
+        "data-quality-download.csv": "snusmic-data-quality.csv",
+    }
+    for source_name, dest_name in sources.items():
+        source = web_dir / source_name
+        if not source.exists():
+            raise SystemExit(f"{source} does not exist; export-web did not produce the expected download")
+        shutil.copyfile(source, downloads_dir / dest_name)
+
+
+def run_refresh_web_artifacts(args: argparse.Namespace) -> int:
+    warehouse_dir = Path(args.warehouse)
+    sim_dir = Path(args.sim)
+    web_dir = Path(args.out)
+    price_end = latest_warehouse_price_date(warehouse_dir)
+    start = date.fromisoformat(args.start)
+
+    report = run_daily_forward(
+        daily_forward_config(
+            start,
+            price_end,
+            sim_dir,
+            ignore_account_artifact=args.ignore_account_artifact,
+        ),
+        warehouse_dir,
+        sim_dir,
+        refresh_benchmark=args.refresh_benchmark,
+    )
+    result = export_web_artifacts(
+        ExportInputs(
+            warehouse=warehouse_dir,
+            sim=sim_dir,
+            out=web_dir,
+            extraction_quality=Path(args.extraction_quality),
+        )
+    )
+    copy_web_downloads(web_dir, Path(args.downloads))
+    payload = {
+        "mode": "daily-forward",
+        "latest_date": report.latest_date.isoformat(),
+        "full_replay_reason": report.full_replay_reason,
+        "artifact_count": result.get("artifact_count"),
+        "web_out": str(web_dir),
+        "downloads": str(Path(args.downloads)),
+    }
+    print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
+    return 0
+
+
+def run_rebuild_web_artifacts(args: argparse.Namespace) -> int:
+    warehouse_dir = Path(args.warehouse)
+    sim_dir = Path(args.sim)
+    web_dir = Path(args.out)
+    price_end = latest_warehouse_price_date(warehouse_dir)
+    start = date.fromisoformat(args.start)
+
+    account_result = run_account_simulation_command(
+        [
+            "--start",
+            start.isoformat(),
+            "--end",
+            price_end.isoformat(),
+            "--warehouse",
+            str(warehouse_dir),
+            "--out",
+            str(sim_dir),
+        ]
+    )
+    if account_result != 0:
+        return account_result
+    pit_result = run_pit_board_export_command(
+        [
+            "--start",
+            start.isoformat(),
+            "--end",
+            price_end.isoformat(),
+            "--warehouse",
+            str(warehouse_dir),
+            "--out",
+            str(sim_dir / "pit-research-board.csv"),
+            "--cadence",
+            args.cadence,
+        ]
+    )
+    if pit_result != 0:
+        return pit_result
+    result = export_web_artifacts(
+        ExportInputs(
+            warehouse=warehouse_dir,
+            sim=sim_dir,
+            out=web_dir,
+            extraction_quality=Path(args.extraction_quality),
+        )
+    )
+    copy_web_downloads(web_dir, Path(args.downloads))
+    payload = {
+        "mode": "full-rebuild",
+        "latest_date": price_end.isoformat(),
+        "artifact_count": result.get("artifact_count"),
+        "pit_board": str(sim_dir / "pit-research-board.csv"),
+        "web_out": str(web_dir),
+        "downloads": str(Path(args.downloads)),
     }
     print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
     return 0
@@ -622,11 +758,46 @@ def build_parser() -> argparse.ArgumentParser:
     daily_forward.add_argument("--out", default=str(REPO_ROOT / "data" / "sim"))
     daily_forward.add_argument("--refresh-benchmark", action="store_true")
     daily_forward.add_argument(
-        "--ignore-account_id-artifact",
+        "--ignore-account-artifact",
         action="store_true",
         help="Ignore data/sim/account-configs.json and use the built-in benchmark/follower set.",
     )
     daily_forward.set_defaults(func=run_daily_forward_cli)
+
+    refresh_web = subparsers.add_parser(
+        "refresh-web-artifacts",
+        help="Advance checkpointed account artifacts to the latest warehouse price date and export web data.",
+    )
+    refresh_web.add_argument("--start", default="2021-01-04")
+    refresh_web.add_argument("--warehouse", default=str(REPO_ROOT / "data" / "warehouse"))
+    refresh_web.add_argument("--sim", default=str(REPO_ROOT / "data" / "sim"))
+    refresh_web.add_argument("--out", default=str(REPO_ROOT / "data" / "web"))
+    refresh_web.add_argument("--downloads", default=str(REPO_ROOT / "apps" / "web" / "public" / "downloads"))
+    refresh_web.add_argument(
+        "--extraction-quality", default=str(REPO_ROOT / "data" / "extraction_quality.json")
+    )
+    refresh_web.add_argument("--refresh-benchmark", action="store_true")
+    refresh_web.add_argument(
+        "--ignore-account-artifact",
+        action="store_true",
+        help="Ignore data/sim/account-configs.json and use the built-in benchmark/follower set.",
+    )
+    refresh_web.set_defaults(func=run_refresh_web_artifacts)
+
+    rebuild_web = subparsers.add_parser(
+        "rebuild-web-artifacts",
+        help="Rebuild fixed account artifacts, PIT board, web data, and public downloads from committed inputs.",
+    )
+    rebuild_web.add_argument("--start", default="2021-01-04")
+    rebuild_web.add_argument("--warehouse", default=str(REPO_ROOT / "data" / "warehouse"))
+    rebuild_web.add_argument("--sim", default=str(REPO_ROOT / "data" / "sim"))
+    rebuild_web.add_argument("--out", default=str(REPO_ROOT / "data" / "web"))
+    rebuild_web.add_argument("--downloads", default=str(REPO_ROOT / "apps" / "web" / "public" / "downloads"))
+    rebuild_web.add_argument(
+        "--extraction-quality", default=str(REPO_ROOT / "data" / "extraction_quality.json")
+    )
+    rebuild_web.add_argument("--cadence", choices=("D", "W", "M"), default="M")
+    rebuild_web.set_defaults(func=run_rebuild_web_artifacts)
 
     sim = subparsers.add_parser("run-sim", help="Run the package-owned benchmark/follower simulation.")
     sim.add_argument("--start", default="2021-01-04")

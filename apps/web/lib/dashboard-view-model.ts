@@ -4,7 +4,7 @@ import {
   getDataQuality,
   getOverview,
   getReportRows,
-  getStrategyCurves,
+  getAccountCurves,
   getTrades,
   type EquityPoint,
   type HoldingRow,
@@ -15,9 +15,9 @@ import {
   getDefaultPortfolioAccount,
   getExecutiveOverview,
   getObjectivePassingRows,
-  getStrategyLeaderboard,
+  getAccountLeaderboard,
   TARGET_BENCHMARK_ID,
-  type StrategyLeaderboardRow,
+  type AccountLeaderboardRow,
 } from '@/lib/product-model';
 
 const SERIES_COLORS = [
@@ -36,7 +36,7 @@ const SERIES_COLORS = [
 export type DashboardViewModel = ReturnType<typeof getDashboardViewModel>;
 
 export function getDashboardViewModel() {
-  const strategyRows = getStrategyLeaderboard();
+  const accountRows = getAccountLeaderboard();
   const selectedAccount = getDefaultPortfolioAccount();
   const overview = getExecutiveOverview(selectedAccount);
   const artifactOverview = getOverview();
@@ -49,11 +49,11 @@ export function getDashboardViewModel() {
   const reportHrefBySymbol = Object.fromEntries(
     [...latestReportsBySymbol.keys()].map((symbol) => [symbol, `/reports/${encodeURIComponent(symbol)}`]),
   );
-  const equity = getStrategyCurves();
-  const benchmarkRows = getBenchmarkRows(strategyRows);
-  const selectableRows = getObjectivePassingRows(strategyRows);
-  const selectedStrategy = selectableRows.find((row) => row.id === selectedAccount);
-  const chartSeries = buildDashboardSeries(equity, benchmarkRows, selectedStrategy, selectableRows);
+  const equity = getAccountCurves();
+  const benchmarkRows = getBenchmarkRows(accountRows);
+  const selectableRows = getObjectivePassingRows(accountRows);
+  const selectedAccountRow = selectableRows.find((row) => row.id === selectedAccount);
+  const chartSeries = buildDashboardSeries(equity, benchmarkRows, selectedAccountRow, selectableRows);
   const objectiveRows = selectableRows;
   const benchmarkToBeat = benchmarkRows.find((row) => row.id === TARGET_BENCHMARK_ID);
   const recentBuys = trades
@@ -62,7 +62,7 @@ export function getDashboardViewModel() {
     .slice(0, 7);
 
   return {
-    strategyRows,
+    accountRows,
     selectedAccount,
     overview,
     reports,
@@ -74,7 +74,7 @@ export function getDashboardViewModel() {
     equity,
     benchmarkRows,
     selectableRows,
-    selectedStrategy,
+    selectedAccountRow,
     chartSeries,
     objectiveRows,
     benchmarkToBeat,
@@ -134,9 +134,9 @@ export function currencyExposure(
 
 function buildDashboardSeries(
   equity: EquityPoint[],
-  benchmarks: StrategyLeaderboardRow[],
-  selected: StrategyLeaderboardRow | undefined,
-  selectable: StrategyLeaderboardRow[],
+  benchmarks: AccountLeaderboardRow[],
+  selected: AccountLeaderboardRow | undefined,
+  selectable: AccountLeaderboardRow[],
 ): ReturnSeries[] {
   const rows = uniqueSeriesRows([
     ...benchmarks,
@@ -157,9 +157,9 @@ function buildDashboardSeries(
     .filter((series) => series.points.length > 0);
 }
 
-function uniqueSeriesRows(rows: StrategyLeaderboardRow[]): StrategyLeaderboardRow[] {
+function uniqueSeriesRows(rows: AccountLeaderboardRow[]): AccountLeaderboardRow[] {
   const seen = new Set<string>();
-  const out: StrategyLeaderboardRow[] = [];
+  const out: AccountLeaderboardRow[] = [];
   for (const row of rows) {
     if (seen.has(row.id)) continue;
     seen.add(row.id);

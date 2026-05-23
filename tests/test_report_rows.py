@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from snusmic_pipeline.cli import build_report_rows
-from snusmic_pipeline.models import ExtractedReport, ReportMeta
+from snusmic_pipeline.ingest.models import ExtractedReport, ReportMeta
 
 
 def sample_report() -> ExtractedReport:

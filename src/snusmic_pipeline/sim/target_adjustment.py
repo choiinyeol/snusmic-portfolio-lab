@@ -102,7 +102,7 @@ def align_report_targets_to_market_scale(
     """Return reports with target columns scaled to the warehouse price board.
 
     Adds ``target_price_scale_factor`` for diagnostics. The public simulation
-    contracts keep using ``target_price_krw``; downstream target-hit and strategy
+    contracts keep using ``target_price_krw``; downstream target-hit and account
     logic therefore receives adjusted targets automatically.
     """
     if reports.empty:

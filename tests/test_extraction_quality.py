@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from snusmic_pipeline.extraction_quality import analyze_extraction_quality
-from snusmic_pipeline.models import ExtractedReport, ReportMeta
+from snusmic_pipeline.ingest.extraction_quality import analyze_extraction_quality
+from snusmic_pipeline.ingest.models import ExtractedReport, ReportMeta
 
 
 def report(**kwargs):

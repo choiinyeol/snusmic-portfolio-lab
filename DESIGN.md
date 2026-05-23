@@ -98,7 +98,7 @@ data/web/
   report-statistics-lab.json
 ```
 
-Routes use page-owned readers. Required artifacts fail loudly when missing; do not add fallback/legacy/deprecated wrappers.
+Routes use page-owned readers. Required artifacts fail loudly when missing; do not add compatibility/deprecated wrappers.
 
 ### 4.3 Strategy catalog contract
 
@@ -360,7 +360,7 @@ Page-specific duplicates를 만들지 말고 공유 컴포넌트로 정렬.
 - No new runtime dependencies without explicit approval.
 - No live market API in web runtime.
 - No external runtime scraping.
-- Required artifacts fast-fail. No fallback/legacy/deprecated branches.
+- Required artifacts fast-fail. No compatibility/deprecated branches.
 
 ---
 
@@ -376,7 +376,7 @@ Decision pending. If empty, this section is deleted.
 ### 해결됨 (2026-05-19)
 
 - [x] ReportsTable per-column filter row — `DataPanel` chrome, sticky 2-row header, kind-driven column filters, global/dropdown/column reset.
-- [x] `/portfolio/[strategy]` 객체 sub-route 분리 — overview/holdings/equity/trades/methodology URL surface, shared shell, benchmark/follower/oracle 원장 제외.
+- [x] `/portfolio/[account]` 객체 sub-route 분리 — overview/holdings/equity/trades/methodology URL surface, shared shell, benchmark/follower/oracle 원장 제외.
 - [x] `/portfolio` UI 재정의 — 메인은 실제 전략 선택 + 현재 비중 treemap + strategy-only frontier, 상세는 report-detail식 4-KPI header + PnL chart with trade markers, holdings evidence links, Entry/Rebalance/Exit-Risk/Exceptions methodology dossier.
 - [x] `/main` Dashboard의 KPI strip — `buildDecisionBrief(view).state`로 5-tile(평가액·현금비중·낙폭·기준선 대비·데이터 제외) 이미 구현돼 있음.
 
