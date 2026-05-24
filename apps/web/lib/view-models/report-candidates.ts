@@ -3,29 +3,29 @@ import 'server-only';
 import {
   getPriceSeries,
   getReportVerificationPageBundle,
-  getReviewQueuePageBundle,
+  getReportBoardPageBundle,
   hasPriceArtifact,
   type PricePoint,
   type ReportRow,
-  type ReviewCandidateRow,
+  type ReportBoardCandidateRow,
 } from '@/lib/artifacts';
-import type { ReviewBoardRow } from '@/components/review/review-table';
+import type { ReportBoardRow } from '@/components/report-board/report-board-table';
 import { formatDateKo, formatPercent } from '@/lib/format';
 import type { PageHeaderModel, PageMetric } from '@/lib/view-models/shared';
 
-export type ReviewQueueViewModel = {
+export type ReportCandidateViewModel = {
   header: PageHeaderModel;
   metrics: PageMetric[];
-  priorityRows: ReviewBoardRow[];
-  rows: ReviewBoardRow[];
+  priorityRows: ReportBoardRow[];
+  rows: ReportBoardRow[];
 };
 
-export function getReviewQueueViewModel(): ReviewQueueViewModel {
+export function getReportCandidateViewModel(): ReportCandidateViewModel {
   const reportBundle = getReportVerificationPageBundle();
-  const queueBundle = getReviewQueuePageBundle();
+  const boardBundle = getReportBoardPageBundle();
   const reports = reportBundle.table.rows;
-  const candidates = queueBundle.table.rows;
-  const rows = buildReviewRows(reports, candidates);
+  const candidates = boardBundle.table.rows;
+  const rows = buildReportBoardRows(reports, candidates);
   const latestPublicationDate = rows
     .map((row) => row.latestReportDate)
     .filter(Boolean)
@@ -37,12 +37,12 @@ export function getReviewQueueViewModel(): ReviewQueueViewModel {
 
   return {
     header: {
-      eyebrow: 'Review Queue',
-      title: '검토 대기열',
+      eyebrow: 'Report Candidates',
+      title: '리포트 후보',
       description: '오늘 먼저 볼 후보를 점수, 가격 위치, 리포트 맥락으로 정렬합니다.',
       badges: [
         { label: '최신 발간', value: formatDateKo(latestPublicationDate) },
-        { label: '가격 기준', value: queueBundle.as_of.price_date ? formatDateKo(queueBundle.as_of.price_date) : null },
+        { label: '가격 기준', value: boardBundle.as_of.price_date ? formatDateKo(boardBundle.as_of.price_date) : null },
         { label: '리포트', value: `${reports.length.toLocaleString('ko-KR')}건` },
       ],
     },
@@ -81,7 +81,7 @@ export function getReviewQueueViewModel(): ReviewQueueViewModel {
   };
 }
 
-function buildReviewRows(reports: ReportRow[], candidates: ReviewCandidateRow[]): ReviewBoardRow[] {
+function buildReportBoardRows(reports: ReportRow[], candidates: ReportBoardCandidateRow[]): ReportBoardRow[] {
   const reportsBySymbol = new Map<string, ReportRow[]>();
   for (const report of reports) {
     const list = reportsBySymbol.get(report.symbol) ?? [];
@@ -90,7 +90,7 @@ function buildReviewRows(reports: ReportRow[], candidates: ReviewCandidateRow[])
   }
 
   const candidateByReportId = new Map(candidates.map((candidate) => [candidate.reportId, candidate]));
-  const candidateBySymbol = new Map<string, ReviewCandidateRow>();
+  const candidateBySymbol = new Map<string, ReportBoardCandidateRow>();
   for (const candidate of candidates) {
     const previous = candidateBySymbol.get(candidate.symbol);
     if (!previous || candidate.score > previous.score) candidateBySymbol.set(candidate.symbol, candidate);
@@ -99,7 +99,7 @@ function buildReviewRows(reports: ReportRow[], candidates: ReviewCandidateRow[])
   const rows = Array.from(reportsBySymbol.entries()).map(([symbol, symbolReports]) => {
     const sortedReports = [...symbolReports].sort((a, b) => b.publicationDate.localeCompare(a.publicationDate));
     const latest = sortedReports[0];
-    if (!latest) throw new Error(`Missing latest report for review symbol: ${symbol}`);
+    if (!latest) throw new Error(`Missing latest report for board symbol: ${symbol}`);
     const candidate = candidateByReportId.get(latest.reportId) ?? candidateBySymbol.get(symbol) ?? null;
     const prices = hasPriceArtifact(symbol) ? getPriceSeries(symbol) : [];
     const technicals = buildTechnicals(prices);
@@ -147,7 +147,7 @@ function buildReviewRows(reports: ReportRow[], candidates: ReviewCandidateRow[])
       above200ma: technicals.above200ma,
       maStack: technicals.maStack,
       sparkline: technicals.sparkline,
-    } satisfies ReviewBoardRow;
+    } satisfies ReportBoardRow;
   });
 
   const rankedReturns = rows

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import {
   flexRender,
@@ -22,7 +22,7 @@ import { SelectMenu } from '@/components/ui/select-menu';
 import { useSearchShortcut } from '@/components/ui/use-search-shortcut';
 import { formatDateKo, formatPercent, numCellClass, signedTextClass } from '@/lib/format';
 
-export type ReviewBoardRow = {
+export type ReportBoardRow = {
   symbol: string;
   company: string;
   exchange: string;
@@ -69,7 +69,7 @@ export type ReviewBoardRow = {
 };
 
 type ReviewTableProps = {
-  rows: ReviewBoardRow[];
+  rows: ReportBoardRow[];
 };
 
 type PresetId =
@@ -165,7 +165,7 @@ const COLUMN_META: Record<string, { kind: ColumnFilterKind; placeholder: string 
   // candidateBucket has its own rendering and matching branch — intentionally absent here.
 };
 
-function downloadReviewRows(rows: ReviewBoardRow[]) {
+function downloadReportBoardRows(rows: ReportBoardRow[]) {
   const headers = [
     'symbol',
     'company',
@@ -232,7 +232,7 @@ function downloadReviewRows(rows: ReviewBoardRow[]) {
     row.above200ma === null ? '' : row.above200ma ? 'true' : 'false',
     row.maStack === null ? '' : row.maStack ? 'true' : 'false',
   ]);
-  downloadCsv('snusmic-review-filtered.csv', headers, data);
+  downloadCsv('snusmic-report-board-filtered.csv', headers, data);
 }
 
 function columnFilterKind(columnId: string): ColumnFilterKind | undefined {
@@ -414,7 +414,7 @@ export function ReviewTable({ rows }: ReviewTableProps) {
   } = filters;
   const setPage = useCallback((next: number) => dispatchFilters({ type: 'SET_PAGE', page: next }), []);
 
-  const columns = useMemo<ColumnDef<ReviewBoardRow>[]>(() => buildColumns(), []);
+  const columns = useMemo<ColumnDef<ReportBoardRow>[]>(() => buildColumns(), []);
   const columnVisibility = useMemo<VisibilityState>(() => buildColumnVisibility(columnMode), [columnMode]);
   const buckets = useMemo(
     () => [
@@ -538,7 +538,7 @@ export function ReviewTable({ rows }: ReviewTableProps) {
               </div>
               <CsvDownloadButton
                 label="CSV"
-                onClick={() => downloadReviewRows(filteredRows.map((row) => row.original))}
+                onClick={() => downloadReportBoardRows(filteredRows.map((row) => row.original))}
               />
             </div>
           </div>
@@ -562,13 +562,13 @@ export function ReviewTable({ rows }: ReviewTableProps) {
           </div>
 
           <div className="grid gap-2 md:grid-cols-[minmax(280px,1fr)_auto] md:items-end">
-            <label className="grid gap-1 text-xs font-medium text-slate-500" htmlFor="review-search">
+            <label className="grid gap-1 text-xs font-medium text-slate-500" htmlFor="report-board-search">
               <span>
                 검색 <span className="font-mono text-[10px] text-slate-400">(/ 단축키)</span>
               </span>
               <input
                 ref={searchInputRef}
-                id="review-search"
+                id="report-board-search"
                 className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-950 outline-none focus:border-slate-400"
                 value={globalFilter}
                 placeholder="symbol, company, caveat, rank basis"
@@ -774,7 +774,7 @@ export function ReviewTable({ rows }: ReviewTableProps) {
   );
 }
 
-function buildColumns(): ColumnDef<ReviewBoardRow>[] {
+function buildColumns(): ColumnDef<ReportBoardRow>[] {
   return [
     {
       id: 'symbol',
@@ -1027,7 +1027,7 @@ function buildColumns(): ColumnDef<ReviewBoardRow>[] {
 }
 
 function krwPriceSort(field: 'lastCloseKrw' | 'entryPriceKrw' | 'targetPriceKrw') {
-  return (a: Row<ReviewBoardRow>, b: Row<ReviewBoardRow>) => {
+  return (a: Row<ReportBoardRow>, b: Row<ReportBoardRow>) => {
     const left = a.original[field] ?? Number.NEGATIVE_INFINITY;
     const right = b.original[field] ?? Number.NEGATIVE_INFINITY;
     return left === right ? 0 : left > right ? 1 : -1;
@@ -1035,7 +1035,7 @@ function krwPriceSort(field: 'lastCloseKrw' | 'entryPriceKrw' | 'targetPriceKrw'
 }
 
 function rowPassesFilters(
-  row: ReviewBoardRow,
+  row: ReportBoardRow,
   filters: {
     bucketFilter: string;
     returnFilter: SignFilter;
@@ -1062,7 +1062,7 @@ function rowPassesFilters(
   return true;
 }
 
-function rowPassesColumnFilters(row: ReviewBoardRow, filters: ColumnFilterValues): boolean {
+function rowPassesColumnFilters(row: ReportBoardRow, filters: ColumnFilterValues): boolean {
   for (const [columnId, rawValue] of Object.entries(filters)) {
     const filterValue = rawValue.trim();
     if (!filterValue) continue;
@@ -1071,7 +1071,7 @@ function rowPassesColumnFilters(row: ReviewBoardRow, filters: ColumnFilterValues
   return true;
 }
 
-function matchesColumnFilter(row: ReviewBoardRow, columnId: string, filterValue: string): boolean {
+function matchesColumnFilter(row: ReportBoardRow, columnId: string, filterValue: string): boolean {
   if (columnId === 'symbol') {
     return textIncludes(`${row.symbol} ${row.company}`, filterValue);
   }
@@ -1084,9 +1084,9 @@ function matchesColumnFilter(row: ReviewBoardRow, columnId: string, filterValue:
   return textIncludes(String(columnValue(row, columnId) ?? ''), filterValue);
 }
 
-function columnValue(row: ReviewBoardRow, columnId: string): unknown {
+function columnValue(row: ReportBoardRow, columnId: string): unknown {
   if (columnId === 'caveatFlags') return row.caveatFlags.join(' ');
-  return row[columnId as keyof ReviewBoardRow];
+  return row[columnId as keyof ReportBoardRow];
 }
 
 function matchesBoolean(value: unknown, filterValue: string): boolean {
@@ -1158,7 +1158,7 @@ function textIncludes(value: string, filterValue: string): boolean {
   return value.toLocaleLowerCase('ko-KR').includes(filterValue.toLocaleLowerCase('ko-KR'));
 }
 
-function presetMatch(row: ReviewBoardRow, preset: Preset): boolean {
+function presetMatch(row: ReportBoardRow, preset: Preset): boolean {
   return (
     rowPassesFilters(row, {
       bucketFilter: 'all',
@@ -1173,7 +1173,7 @@ function presetMatch(row: ReviewBoardRow, preset: Preset): boolean {
   );
 }
 
-function globalTextFilter(row: Row<ReviewBoardRow>, _columnId: string, filterValue: string): boolean {
+function globalTextFilter(row: Row<ReportBoardRow>, _columnId: string, filterValue: string): boolean {
   const needle = filterValue.trim().toLocaleLowerCase('ko-KR');
   if (!needle) return true;
   const item = row.original;
@@ -1431,7 +1431,7 @@ function BooleanMark({ value }: { value: boolean }) {
   return <span className={`font-mono ${value ? 'text-rose-500' : 'text-slate-400'}`}>{value ? 'Y' : '—'}</span>;
 }
 
-function HitCell({ row }: { row: ReviewBoardRow }) {
+function HitCell({ row }: { row: ReportBoardRow }) {
   if (row.targetHit)
     return (
       <span className="rounded-md bg-emerald-50 px-1.5 py-0.5 text-[11px] font-medium text-emerald-700">도달</span>
@@ -1477,7 +1477,7 @@ function sparklinePoints(values: number[], width: number, height: number): { lin
   };
 }
 
-function buildBoardStats(rows: ReviewBoardRow[]) {
+function buildBoardStats(rows: ReportBoardRow[]) {
   const positiveCount = rows.filter((row) => (row.currentReturn ?? -Infinity) >= 0).length;
   return {
     positiveCount,
@@ -1487,7 +1487,7 @@ function buildBoardStats(rows: ReviewBoardRow[]) {
   };
 }
 
-function detailHref(row: ReviewBoardRow): string {
+function detailHref(row: ReportBoardRow): string {
   return `/reports/${encodeURIComponent(row.symbol)}/${encodeURIComponent(row.latestReportId)}`;
 }
 

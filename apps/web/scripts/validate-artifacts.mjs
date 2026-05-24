@@ -18,8 +18,9 @@ const required = [
   'report-statistics-lab.json',
   'accounts/catalog.json',
   'accounts/curves.json',
+  'report-board/candidates.json',
   'pages/report-verification.json',
-  'pages/review-queue.json',
+  'pages/report-board.json',
   'pages/report-statistics.json',
   'pages/portfolio-dashboard.json',
 ];
@@ -69,6 +70,7 @@ const countFiles = {
   equity_daily: 'portfolio/equity-daily.json',
   accounts: 'portfolio/accounts.json',
   account_catalog: 'accounts/catalog.json',
+  report_board_candidates: 'report-board/candidates.json',
 };
 
 for (const [key, file] of Object.entries(countFiles)) {
@@ -91,7 +93,7 @@ if (dailyDecisions.metadata?.run_mode) {
 const reports = readJson('reports/table.json');
 const pageBundles = [
   'pages/report-verification.json',
-  'pages/review-queue.json',
+  'pages/report-board.json',
   'pages/report-statistics.json',
   'pages/portfolio-dashboard.json',
 ];

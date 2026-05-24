@@ -1,6 +1,6 @@
 # SNUSMIC Portfolio Lab
 
-SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, fixed account simulations, and static web artifacts. The current repository does **not** search for trading rules or promote generated account candidates. Rule discovery was removed deliberately; report boards are exported so a human can inspect the data and design rules explicitly.
+SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, fixed account simulations, and static web artifacts. The current repository does **not** search for trading rules or promote generated account candidates; report boards are exported so a human can inspect the data and design rules explicitly.
 
 [Live site](https://smic-portfolio.vercel.app) - [Changelog](./CHANGELOG.md) - [Design system](./DESIGN.md)
 
@@ -11,7 +11,7 @@ SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, f
 - Exports a point-in-time research board at `data/sim/pit-research-board.csv`.
 - Runs fixed benchmark/follower account simulations with real ledger constraints: cash, deposits, integer shares, fees, taxes, trades, holdings, and equity paths.
 - Exports deterministic `data/web` JSON/CSV artifacts consumed by the static Next.js app.
-- Presents report verification, review queue, statistics, and account views through page-shaped frontend view models instead of raw artifact tables.
+- Presents report verification, statistics, and account views through page-shaped frontend view models instead of raw artifact tables.
 
 ## What It Does Not Do
 
@@ -19,7 +19,6 @@ SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, f
 - No stock-rule search or admission.
 - No PIT rule generation.
 - No generated account admission.
-- No hidden migration, rollback, or safety-net path.
 
 ## Core Commands
 

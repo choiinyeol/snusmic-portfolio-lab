@@ -19,6 +19,8 @@ jobs:
         with:
           enable-cache: true
       - run: uv sync --locked --group dev
+      - name: active contract check
+        run: node scripts/check_active_contracts.mjs
       - name: ruff check
         run: uv run ruff check .
       - name: ruff format --check

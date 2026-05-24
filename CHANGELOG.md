@@ -7,7 +7,7 @@
 - Retouches `/statistics` into a compact decision-first statistics board with executive metrics, distribution focus, concentration insight, whole-sample map guidance, and shorter price-path panels.
 - Improves report table density, sorting, row navigation, compact symbol/company display, moving-average grouping, signed progress gauge behavior, and KRW display with `₩`.
 - Separates latest report close from capped two-year evaluation close so expired report details can show the real latest close while preserving the evaluation-window evidence.
-- Removes prototype/legacy web routes and Bash deployment wrappers in favor of cross-platform Node/Python entrypoints.
+- Streamlines web routing and deployment wrappers around the current cross-platform Node/Python entrypoints.
 - Updates frontend design, chart, table, artifact, and architecture docs to match the current static artifact reader and page view-model contract.
 
 Verification:

@@ -2,7 +2,8 @@
   "private": true,
   "scripts": {
     "vercel-build": "node scripts/vercel_build.mjs",
-    "build": "node scripts/vercel_build.mjs"
+    "build": "node scripts/vercel_build.mjs",
+    "check:active-contracts": "node scripts/check_active_contracts.mjs"
   },
   "packageManager": "pnpm@10.33.2"
 }

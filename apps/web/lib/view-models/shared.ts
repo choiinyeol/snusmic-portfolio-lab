@@ -1,6 +1,6 @@
 import type { ReportRow } from '@/lib/artifacts';
 
-export type MetricTone = 'neutral' | 'positive' | 'negative' | 'warning' | 'accent';
+export type MetricTone = 'neutral' | 'positive' | 'negative' | 'warning' | 'data' | 'accent';
 
 export type PageMetric = {
   id: string;
@@ -19,7 +19,9 @@ export type DataWarning = {
 export type PageHeaderModel = {
   eyebrow?: string;
   title: string;
+  meta?: string;
   description?: string;
+  actions?: string[];
   badges?: Array<{ label: string; value?: string | number | null }>;
 };
 
@@ -60,6 +62,6 @@ export function metricToneToKpiTone(tone: MetricTone): 'neutral' | 'good' | 'bad
   if (tone === 'positive') return 'good';
   if (tone === 'negative') return 'bad';
   if (tone === 'warning') return 'warn';
-  if (tone === 'accent') return 'accent';
+  if (tone === 'accent' || tone === 'data') return 'accent';
   return 'neutral';
 }

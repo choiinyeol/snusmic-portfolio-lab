@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
-import type { ReviewBoardRow } from '@/components/review/review-table';
+import type { ReportBoardRow } from '@/components/report-board/report-board-table';
 import { CsvDownloadButton, DataPanel, EmptyTableState, downloadCsv } from '@/components/ui/data-panel';
 import { Money } from '@/components/ui/Money';
 import { SegmentedControl } from '@/components/ui/segmented-control';
@@ -14,7 +14,7 @@ import type { ReportVerificationDisplayRow } from '@/lib/view-models/shared';
 
 type ReportsTableProps = {
   reports: ReportRow[];
-  marketRows?: ReviewBoardRow[];
+  marketRows?: ReportBoardRow[];
   viewRows?: ReportVerificationDisplayRow[];
 };
 
@@ -480,7 +480,7 @@ function Td({ children, className = '' }: { children: ReactNode; className?: str
   return <td className={`min-w-0 overflow-hidden px-1.5 py-2 align-middle ${className}`}>{children}</td>;
 }
 
-function FocusedReportSummary({ report, market }: { report: ReportRow; market?: ReviewBoardRow }) {
+function FocusedReportSummary({ report, market }: { report: ReportRow; market?: ReportBoardRow }) {
   return (
     <div className="grid gap-2 border-b border-slate-100 bg-white px-3 py-2 md:grid-cols-[minmax(0,1.3fr)_repeat(3,minmax(0,.7fr))] md:items-center">
       <div className="min-w-0">
@@ -697,7 +697,7 @@ function sortReports(
   rows: ReportRow[],
   sort: SortId,
   columnSort: ColumnSortState | null,
-  marketRowsBySymbol: Map<string, ReviewBoardRow>,
+  marketRowsBySymbol: Map<string, ReportBoardRow>,
 ): ReportRow[] {
   return [...rows].sort((a, b) => {
     if (columnSort) {
@@ -719,7 +719,7 @@ function sortReports(
 function getColumnSortValue(
   report: ReportRow,
   key: ColumnSortKey,
-  marketRowsBySymbol: Map<string, ReviewBoardRow>,
+  marketRowsBySymbol: Map<string, ReportBoardRow>,
 ): string | number | boolean | null {
   const market = marketRowsBySymbol.get(report.symbol);
   if (key === 'company') return report.company || report.symbol;
@@ -787,7 +787,7 @@ function downloadReports(rows: ReportRow[]) {
   );
 }
 
-function movingAverageScore(market: ReviewBoardRow | undefined): number | null {
+function movingAverageScore(market: ReportBoardRow | undefined): number | null {
   if (!market) return null;
   const values = [market.above20ma, market.above50ma, market.above200ma].filter((value) => value !== null);
   if (values.length === 0) return null;

@@ -42,7 +42,7 @@ export function getReportVerificationViewModel(): ReportVerificationViewModel {
     table: {
       rows: reports.map(toReportVerificationDisplayRow),
       sourceRows: reports,
-      defaultView: 'review',
+      defaultView: 'all',
       views: buildViewPresets(bundle.views, reports),
     },
   };
@@ -54,7 +54,7 @@ function buildMetrics(
 ): PageMetric[] {
   const byId = new Map(metrics.map((metric) => [metric.id, metric]));
   const reportCount = Number(byId.get('reports')?.value ?? reports.length);
-  const active = Number(byId.get('active')?.value ?? reports.filter((report) => isReviewCandidate(report)).length);
+  const active = Number(byId.get('active')?.value ?? reports.filter((report) => isReportBoardCandidate(report)).length);
   const hitRate =
     nullableNumber(byId.get('target_hit_rate')?.value) ??
     safeRatio(reports.filter((report) => report.targetHit).length, reports.length);
@@ -139,9 +139,9 @@ function buildViewPresets(
   const bundleCounts = new Map(views.map((view) => [view.id, view.count ?? 0]));
   return [
     {
-      id: 'review',
+      id: 'candidate',
       label: '검토 후보',
-      count: bundleCounts.get('review') ?? reports.filter((report) => isReviewCandidate(report)).length,
+      count: bundleCounts.get('candidate') ?? reports.filter((report) => isReportBoardCandidate(report)).length,
       description: '아직 목표가에 닿지 않았고 만료되지 않은 후보',
     },
     {
@@ -171,7 +171,7 @@ function buildViewPresets(
   ];
 }
 
-function isReviewCandidate(report: ReportRow): boolean {
+function isReportBoardCandidate(report: ReportRow): boolean {
   return !report.targetHit && !report.expired && (report.targetUpsideAtPub ?? 0) > 0;
 }
 

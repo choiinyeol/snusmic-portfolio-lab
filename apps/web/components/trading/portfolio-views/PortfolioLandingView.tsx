@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { CumulativeReturnChart, type ReturnSeries } from '@/components/charts/CumulativeReturnChart';
+import type { ReturnSeries } from '@/components/charts/CumulativeReturnChart';
+import { SeriesToggleChart } from '@/components/charts/SeriesToggleChart';
 import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
 import { Button } from '@/components/ui/button';
 import { KpiTile } from '@/components/ui/KpiTile';
@@ -201,7 +202,7 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
           </div>
           <span className="text-xs text-slate-500">{selectedEquity.length.toLocaleString('ko-KR')} 거래일</span>
         </div>
-        <CumulativeReturnChart series={chartSeries} />
+        <SeriesToggleChart series={chartSeries} />
       </section>
     </div>
   );

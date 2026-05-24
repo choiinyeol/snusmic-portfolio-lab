@@ -322,15 +322,14 @@ function drawHeatmap(
 function drawLabel(ctx: CanvasRenderingContext2D, leaf: LeafNode, w: number, h: number, compact: boolean): void {
   const x = leaf.x0;
   const y = leaf.y0;
-  const symbol = leaf.data.symbol;
-  const company = leaf.data.company || symbol;
+  const displayName = leaf.data.company || leaf.data.symbol;
   const pad = compact ? 6 : 8;
   if (w < 42 || h < 24) return;
 
   ctx.fillStyle = 'rgba(255,255,255,0.96)';
   ctx.textBaseline = 'top';
   ctx.font = `${compact ? 700 : 800} ${compact ? 11 : 13}px system-ui, -apple-system, BlinkMacSystemFont, sans-serif`;
-  ctx.fillText(w >= 92 && h >= 48 ? company : symbol, x + pad, y + pad, w - pad * 2);
+  ctx.fillText(displayName, x + pad, y + pad, w - pad * 2);
 
   if (w >= 70 && h >= 44) {
     ctx.fillStyle = 'rgba(255,255,255,0.86)';

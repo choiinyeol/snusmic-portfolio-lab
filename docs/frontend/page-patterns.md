@@ -22,17 +22,17 @@ Use this structure:
 4. Detail tabs or sections for holdings, signals, trades, logs, and diagnostics.
 5. Footer metadata for data source, refresh time, and known limitations.
 
-## Signal Review Page
+## Report Board Page
 
 Use this structure:
 
-1. Plain-language goal: what report evidence is being reviewed and why.
+1. Plain-language goal: what report evidence is being inspected and why.
 2. Compact metric strip: target hit rate, current return, progress, and recent action.
 3. Main table: the full report universe with sorting and compact default columns.
-4. Current candidates: rows that still need human review.
+4. Current candidates: rows that still need human inspection.
 5. Data quality and caveats below the main workflow.
 
-Do not invent strategy names or buy/sell logic. If the data only supports "review candidate", say that.
+Do not invent strategy names or buy/sell logic. If the data only supports "report candidate", say that.
 
 Avoid separate controls that restate the same concept. If a board already has a full-table universe, do not add another top-level tab group for "all / active / hit" unless each mode changes the user's next action.
 

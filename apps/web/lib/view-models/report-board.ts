@@ -1,8 +1,8 @@
 import 'server-only';
 
-import type { ReviewBoardRow } from '@/components/review/review-table';
+import type { ReportBoardRow } from '@/components/report-board/report-board-table';
 import { getReportVerificationViewModel } from '@/lib/view-models/report-verification';
-import { getReviewQueueViewModel } from '@/lib/view-models/review-queue';
+import { getReportCandidateViewModel } from '@/lib/view-models/report-candidates';
 import type { DataWarning, PageHeaderModel, PageMetric, ReportVerificationTableModel } from '@/lib/view-models/shared';
 
 export type ReportBoardViewModel = {
@@ -10,14 +10,14 @@ export type ReportBoardViewModel = {
   metrics: PageMetric[];
   candidateMetrics: PageMetric[];
   warnings: DataWarning[];
-  priorityRows: ReviewBoardRow[];
-  candidateRows: ReviewBoardRow[];
+  priorityRows: ReportBoardRow[];
+  candidateRows: ReportBoardRow[];
   reportTable: ReportVerificationTableModel;
 };
 
 export function getReportBoardViewModel(): ReportBoardViewModel {
   const verification = getReportVerificationViewModel();
-  const queue = getReviewQueueViewModel();
+  const candidates = getReportCandidateViewModel();
 
   return {
     header: {
@@ -29,10 +29,10 @@ export function getReportBoardViewModel(): ReportBoardViewModel {
     metrics: verification.metrics.filter((metric) =>
       ['active', 'hit-rate', 'median-return', 'median-days'].includes(metric.id),
     ),
-    candidateMetrics: queue.metrics,
+    candidateMetrics: candidates.metrics,
     warnings: [],
-    priorityRows: queue.priorityRows,
-    candidateRows: queue.rows,
+    priorityRows: candidates.priorityRows,
+    candidateRows: candidates.rows,
     reportTable: verification.table,
   };
 }

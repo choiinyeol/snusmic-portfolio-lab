@@ -23,7 +23,7 @@ Use the smallest check that proves the change.
 - For Python-only edits, prefer targeted `uv run ruff check ...` and the smallest relevant `uv run pytest ...` selection.
 - For formatting-only Python edits, `uv run ruff format ...` is enough unless behavior changed.
 - For web-only edits, prefer `pnpm --dir apps/web check` or `pnpm --dir apps/web typecheck`; run a full build only when routing, generated pages, artifacts, or rendering behavior changed.
-- For static-export route smoke, do not start a web server. After `pnpm --dir apps/web build`, use `pnpm --dir apps/web smoke:static` to check exported/retired routes.
+- For static-export route smoke, do not start a web server. After `pnpm --dir apps/web build`, use `pnpm --dir apps/web smoke:static` to check expected exported routes.
 - Treat full `uv run pytest -q`, `uv run pre-commit run --all-files`, `uv run pytest tests/test_web_artifacts.py -q -x`, `uv run python -m snusmic_pipeline export-web --check`, release builds, and CI watching as release-gate checks, not the default inner loop.
 - If a check takes too long for the scope, stop using it as a default and replace it with a narrower smoke check.
 
@@ -33,14 +33,15 @@ Tests should support human review, not replace judgment.
 
 - Keep tests that protect money-facing calculations, PIT data integrity, artifact contracts, CLI behavior, and web artifact validity.
 - Prefer a small positive smoke test over many brittle absence checks.
-- Delete or avoid tests that only assert retired names, old implementation details, duplicated contracts, or historical AI-generated scaffolding.
+- Delete or avoid tests that only assert discarded names, old implementation details, duplicated contracts, or historical AI-generated scaffolding.
 - Before keeping broad tests, classify them mentally as `product-critical`, `useful-smoke`, `duplicate`, or `AI-slop`; only the first two deserve to stay by default.
 - Do not add broad regression suites just to lock in cleanup work unless the behavior is truly product-critical.
 
 ## Cleanup Policy
 
-- Prefer deletion over wrappers, compatibility layers, fallback paths, legacy aliases, and "just in case" safety nets.
-- Do not preserve unused code as `legacy`, `fallback`, `deprecated`, or `safe` variants.
+- Active docs describe only current surfaces and contracts. Do not keep historical name inventories or "do not bring this back" sections in active docs.
+- Prefer deletion over wrappers, alternate execution paths, aliases, and "just in case" branches.
+- Do not preserve unused code as archived variants under new names.
 - Remove scripts, docs, tests, and code paths that no current workflow uses.
 - Keep boundaries simple: PIT data generation and reporting are current product concerns; strategy search/backtest exploration is not a default concern unless the user asks for it.
 - Rename misleading concepts when they distort the model. In particular, avoid treating account/report variants as investor "personas" unless the domain really requires that abstraction.

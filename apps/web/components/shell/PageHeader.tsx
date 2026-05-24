@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { PageHero } from '@/components/ui/PageHero';
+import { PageHeader as LedgerPageHeader } from '@/components/ui/PageHeader';
 import type { PageHeaderModel } from '@/lib/view-models/shared';
 
 export function PageHeader({
@@ -11,14 +11,5 @@ export function PageHeader({
   actions?: ReactNode;
   metrics?: ReactNode;
 }) {
-  return (
-    <PageHero
-      actions={actions}
-      badges={header.badges}
-      eyebrow={header.eyebrow}
-      kpis={metrics}
-      subtitle={header.description}
-      title={header.title}
-    />
-  );
+  return <LedgerPageHeader actions={actions} header={header} metrics={metrics} />;
 }

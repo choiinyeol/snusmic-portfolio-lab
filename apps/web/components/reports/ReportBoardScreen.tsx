@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import type { ReviewBoardRow } from '@/components/review/review-table';
+import type { ReportBoardRow } from '@/components/report-board/report-board-table';
 import { ReportsTable } from '@/components/reports/ReportsTable';
 import { MetricStrip } from '@/components/shell/MetricStrip';
 import { PageHeader } from '@/components/shell/PageHeader';
@@ -22,11 +22,9 @@ export function ReportBoardScreen({ model }: { model: ReportBoardViewModel }) {
       />
 
       <Section
-        eyebrow="Today"
         title="오늘 볼 후보"
         caption="지금 먼저 볼 종목만 압축해서 보여줍니다. 전체 표본은 아래 테이블에서 정렬과 컬럼 모드로 확인합니다."
       >
-        <MetricStrip metrics={model.candidateMetrics} />
         <div className="mt-3 grid gap-3 xl:grid-cols-5">
           {model.priorityRows.map((row) => (
             <PriorityCandidateCard key={row.symbol} row={row} />
@@ -35,7 +33,6 @@ export function ReportBoardScreen({ model }: { model: ReportBoardViewModel }) {
       </Section>
 
       <Section
-        eyebrow="Report Table"
         title="리포트 테이블"
         caption="전체 리포트를 한 기준으로 두고, 현재 수익률·진행률·가격 경로를 같은 줄에서 비교합니다."
       >
@@ -49,7 +46,7 @@ export function ReportBoardScreen({ model }: { model: ReportBoardViewModel }) {
   );
 }
 
-function PriorityCandidateCard({ row }: { row: ReviewBoardRow }) {
+function PriorityCandidateCard({ row }: { row: ReportBoardRow }) {
   const href = `/reports/${encodeURIComponent(row.symbol)}/${encodeURIComponent(row.latestReportId)}`;
   return (
     <Link

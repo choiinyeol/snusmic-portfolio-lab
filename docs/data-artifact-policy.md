@@ -11,7 +11,7 @@ The repository is a PIT data product, not an account-generation factory. Committ
 | `data/sim/*.csv` except checkpoint/cache paths | Simulation export | Commit current fixed-account outputs consumed by web exports. |
 | `data/web/**` | Web artifact exporter | Commit static deploy artifacts validated by the web app. |
 | `data/web/pages/**` | Web artifact exporter | Commit page-shaped bundles used by frontend view models. |
-| `data/web/review/**` | Web artifact exporter | Commit review-board payloads while they are consumed by the report board. |
+| `data/web/report-board/**` | Web artifact exporter | Commit report-board payloads while they are consumed by the report board. |
 | `apps/web/public/downloads/*.csv` | Web artifact exporter | Commit downloadable mirrors of the current web tables. |
 | `data/sim/checkpoints/**` | Daily-forward runner | Do not commit. This is a replay cache. |
 | `data/sim/.cache/**` | Local tooling | Do not commit. |

@@ -1,4 +1,4 @@
-﻿import 'server-only';
+import 'server-only';
 import fs from 'node:fs';
 import path from 'node:path';
 import { readArtifact, WEB_DATA_ROOT } from '@/lib/data/artifact-reader';
@@ -11,10 +11,10 @@ import {
   parseRows,
   RawHoldingRowSchema,
   RawReportRowSchema,
-  ReviewCandidateSchema,
+  ReportBoardCandidateSchema,
   ReportStatisticsPageBundleSchema,
   ReportVerificationPageBundleSchema,
-  ReviewQueuePageBundleSchema,
+  ReportBoardPageBundleSchema,
   RawTradeRowSchema,
   AccountCatalogRowSchema,
   WebAccountSchema,
@@ -254,7 +254,7 @@ export type AccountCatalogRow = {
   };
 };
 
-export type ReviewCandidateRow = {
+export type ReportBoardCandidateRow = {
   reportId: string;
   symbol: string;
   company: string;
@@ -291,14 +291,14 @@ export type ReportVerificationPageBundle = {
   table: { rows: ReportRow[] };
 };
 
-export type ReviewQueuePageBundle = {
+export type ReportBoardPageBundle = {
   schema_version: '1.0.0';
   generated_at: string | null;
   as_of: { report_date: string | null; price_date: string | null };
   title: string;
   metrics: PageBundleMetric[];
-  priority: ReviewCandidateRow[];
-  table: { rows: ReviewCandidateRow[] };
+  priority: ReportBoardCandidateRow[];
+  table: { rows: ReportBoardCandidateRow[] };
 };
 
 export type ReportStatisticsPageBundle = {
@@ -539,7 +539,7 @@ function currentArtifactStamp(): number {
 function clearArtifactCaches() {
   reportCache = undefined;
   accountCatalogCache = undefined;
-  reviewCandidateCache = undefined;
+  reportBoardCandidateCache = undefined;
   holdingsCache = undefined;
   monthlyHoldingsCache = undefined;
   tradesCache = undefined;
@@ -940,29 +940,29 @@ export function getInsights(): Insight[] {
   return readRequiredJson<Insight[]>('data/web/overview/research-pulse.json');
 }
 
-let reviewCandidateCache: ReviewCandidateRow[] | undefined;
+let reportBoardCandidateCache: ReportBoardCandidateRow[] | undefined;
 
-export function getReviewCandidates(): ReviewCandidateRow[] {
-  if (artifactCacheValid() && reviewCandidateCache) return reviewCandidateCache;
+export function getReportBoardCandidates(): ReportBoardCandidateRow[] {
+  if (artifactCacheValid() && reportBoardCandidateCache) return reportBoardCandidateCache;
   const raw = parseRows(
-    'review/candidates.json',
-    ReviewCandidateSchema,
-    readRequiredJson<unknown>('data/web/review/candidates.json'),
+    'report-board/candidates.json',
+    ReportBoardCandidateSchema,
+    readRequiredJson<unknown>('data/web/report-board/candidates.json'),
   );
-  reviewCandidateCache = raw.map(fromRawReviewCandidate);
-  return reviewCandidateCache;
+  reportBoardCandidateCache = raw.map(fromRawReportBoardCandidate);
+  return reportBoardCandidateCache;
 }
 
-export function getReviewQueuePageBundle(): ReviewQueuePageBundle {
-  const raw = readArtifact('pages/review-queue.json', ReviewQueuePageBundleSchema);
+export function getReportBoardPageBundle(): ReportBoardPageBundle {
+  const raw = readArtifact('pages/report-board.json', ReportBoardPageBundleSchema);
   return {
     ...raw,
-    priority: raw.priority.map(fromRawReviewCandidate),
-    table: { rows: raw.table.rows.map(fromRawReviewCandidate) },
+    priority: raw.priority.map(fromRawReportBoardCandidate),
+    table: { rows: raw.table.rows.map(fromRawReportBoardCandidate) },
   };
 }
 
-function fromRawReviewCandidate(row: {
+function fromRawReportBoardCandidate(row: {
   report_id: string;
   symbol: string;
   company: string;
@@ -973,7 +973,7 @@ function fromRawReviewCandidate(row: {
   target_upside_at_pub: number | null;
   current_return: number | null;
   target_gap_pct: number | null;
-}): ReviewCandidateRow {
+}): ReportBoardCandidateRow {
   return {
     reportId: row.report_id,
     symbol: row.symbol,

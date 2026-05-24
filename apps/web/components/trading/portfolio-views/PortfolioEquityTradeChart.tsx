@@ -264,14 +264,7 @@ function buildTradeMarkers(trades: TradeRow[]): SeriesMarker<Time>[] {
       position: row.side === 'buy' ? ('belowBar' as const) : ('aboveBar' as const),
       color: row.side === 'buy' ? '#16a368' : '#ef4452',
       shape: row.side === 'buy' ? ('arrowUp' as const) : ('arrowDown' as const),
-      text: `${row.side === 'buy' ? '매수' : '매도'}${row.count > 1 ? ` ${row.count}` : ''} · ${formatCompactKrw(row.grossKrw)}`,
+      text: row.count > 1 ? `${row.count}` : '',
     }))
     .sort((a, b) => String(a.time).localeCompare(String(b.time)));
-}
-
-function formatCompactKrw(value: number): string {
-  if (!Number.isFinite(value) || value <= 0) return '—';
-  if (value >= 100_000_000) return `${(value / 100_000_000).toFixed(1)}억`;
-  if (value >= 10_000) return `${Math.round(value / 10_000).toLocaleString('ko-KR')}만`;
-  return value.toLocaleString('ko-KR');
 }

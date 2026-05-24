@@ -4,7 +4,7 @@ import {
   getOverview,
   getAccountLabel,
   getReportRows,
-  getReviewCandidates,
+  getReportBoardCandidates,
   getAccountCatalog,
   getAccountCurves,
   getSummaryRows,
@@ -208,7 +208,7 @@ export function buildReportStats(reports = getReportRows()): ReportStats {
 
 export function getResearchCandidates(): ResearchCandidate[] {
   const reportsById = new Map(getReportRows().map((report) => [report.reportId, report]));
-  return getReviewCandidates().map((candidate) => {
+  return getReportBoardCandidates().map((candidate) => {
     const report = reportsById.get(candidate.reportId);
     if (!report) {
       throw new Error(`Review candidate references missing report_id: ${candidate.reportId}`);

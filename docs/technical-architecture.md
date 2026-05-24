@@ -19,7 +19,7 @@ The repository is layered by job:
 
 ## Web Routes
 
-- `/`: report verification and review board.
+- `/`: report verification and report board.
 - `/reports`: canonical report verification table.
 - `/reports/[symbol]/[reportId]`: report evidence detail.
 - `/statistics`: report-level outcome, concentration, and price-path diagnostics.
@@ -29,7 +29,7 @@ The repository is layered by job:
 - `/portfolio/[account]/holdings`: current holdings.
 - `/portfolio/[account]/trades`: trade ledger.
 
-The old `/main`, `/review`, `/screener`, `/guide`, `/reports/[symbol]`, and `/portfolio/[account]/methodology` routes were removed. The product now keeps one report-board entry point and one report-detail route instead of parallel prototype surfaces.
+This list is the current web product inventory. Route files outside this inventory need a product decision before implementation.
 
 ## Frontend Data Bridge
 

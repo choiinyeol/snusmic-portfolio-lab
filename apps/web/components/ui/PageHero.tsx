@@ -13,16 +13,14 @@ type Props = {
 };
 
 export function PageHero({ eyebrow, title, subtitle, badges, actions, kpis }: Props) {
+  void eyebrow;
   return (
-    <header className="rounded-md border border-slate-200 bg-white p-4">
-      <div className="grid gap-4">
+    <header className="rounded-md border border-slate-200 bg-white px-4 py-3">
+      <div className="grid gap-3">
         <div className="grid min-w-0 gap-2">
-          {eyebrow ? (
-            <div className="font-mono text-[11px] font-semibold uppercase text-slate-500">{eyebrow}</div>
-          ) : null}
           <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
             <div className="min-w-0">
-              <h1 className="text-2xl font-semibold text-slate-950 md:text-3xl">{title}</h1>
+              <h1 className="text-2xl font-semibold tracking-tight text-slate-950 md:text-[1.7rem]">{title}</h1>
               {subtitle ? (
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600 [overflow-wrap:anywhere] [word-break:break-all]">
                   {subtitle}

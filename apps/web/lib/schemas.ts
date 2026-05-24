@@ -231,7 +231,7 @@ export const AccountCatalogRowSchema = z
   })
   .passthrough();
 
-export const ReviewCandidateSchema = z
+export const ReportBoardCandidateSchema = z
   .object({
     report_id: z.string(),
     symbol: z.string(),
@@ -376,15 +376,15 @@ export const ReportVerificationPageBundleSchema = z
   })
   .passthrough();
 
-export const ReviewQueuePageBundleSchema = z
+export const ReportBoardPageBundleSchema = z
   .object({
     schema_version: z.literal('1.0.0'),
     generated_at: NullableString,
     as_of: PageAsOfSchema,
     title: z.string(),
     metrics: z.array(PageMetricSchema),
-    priority: z.array(ReviewCandidateSchema),
-    table: z.object({ rows: z.array(ReviewCandidateSchema) }).passthrough(),
+    priority: z.array(ReportBoardCandidateSchema),
+    table: z.object({ rows: z.array(ReportBoardCandidateSchema) }).passthrough(),
   })
   .passthrough();
 

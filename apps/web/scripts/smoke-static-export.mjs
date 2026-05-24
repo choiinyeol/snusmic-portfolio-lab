@@ -11,22 +11,10 @@ const expected = [
   ['/statistics', 'statistics/index.html'],
 ];
 
-const retired = [
-  ['/review', 'review/index.html'],
-  ['/main', 'main/index.html'],
-  ['/guide', 'guide/index.html'],
-  ['/screener', 'screener/index.html'],
-  ['/portfolio/no-admitted-account/methodology', 'portfolio/no-admitted-account/methodology/index.html'],
-];
-
 const failures = [];
 
 for (const [route, file] of expected) {
   if (!existsSync(join(outDir, file))) failures.push(`missing expected static route ${route}: out/${file}`);
-}
-
-for (const [route, file] of retired) {
-  if (existsSync(join(outDir, file))) failures.push(`retired route still exported ${route}: out/${file}`);
 }
 
 if (failures.length) {
@@ -34,4 +22,4 @@ if (failures.length) {
   exit(1);
 }
 
-console.log(`static export smoke passed: ${expected.length} present, ${retired.length} retired`);
+console.log(`static export smoke passed: ${expected.length} present`);

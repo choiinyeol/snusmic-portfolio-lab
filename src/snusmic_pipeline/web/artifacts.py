@@ -39,9 +39,9 @@ REQUIRED_ARTIFACTS = [
     "accounts/catalog.json",
     "accounts/leaderboard.json",
     "accounts/curves.json",
-    "review/candidates.json",
+    "report-board/candidates.json",
     "pages/report-verification.json",
-    "pages/review-queue.json",
+    "pages/report-board.json",
     "pages/report-statistics.json",
     "pages/portfolio-dashboard.json",
     "overview.json",
@@ -397,7 +397,7 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     episode_rows = _records(position_episodes)
     equity_rows = _records(equity_daily)
     accounting_rows = _build_accounting_reconciliation(account_rows, enriched_current_holdings)
-    review_candidates = _build_review_candidates(report_rows)
+    report_board_candidates = _build_report_board_candidates(report_rows)
     mark("build_portfolio_rows")
 
     _validate_boundary_artifacts(
@@ -428,7 +428,7 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
         return_windows=return_windows,
         target_distribution=target_distribution,
         account_catalog=account_catalog,
-        review_candidates=review_candidates,
+        report_board_candidates=report_board_candidates,
     )
     mark("write_page_bundles")
 
@@ -842,7 +842,7 @@ def _write_page_bundles(
     return_windows: list[dict[str, Any]],
     target_distribution: dict[str, Any],
     account_catalog: list[dict[str, Any]],
-    review_candidates: list[dict[str, Any]],
+    report_board_candidates: list[dict[str, Any]],
 ) -> None:
     """Write page-owned product bundles.
 
@@ -879,15 +879,15 @@ def _write_page_bundles(
     _write_product_json(out / "accounts" / "leaderboard.json", accounts)
     _write_product_json(out / "accounts" / "curves.json", _compact_equity_curves(equity_daily))
 
-    _write_product_json(out / "review" / "candidates.json", review_candidates)
+    _write_product_json(out / "report-board" / "candidates.json", report_board_candidates)
 
     _write_product_json(
         out / "pages" / "report-verification.json",
-        _report_verification_page_bundle(overview, data_quality, reports, review_candidates),
+        _report_verification_page_bundle(overview, data_quality, reports, report_board_candidates),
     )
     _write_product_json(
-        out / "pages" / "review-queue.json",
-        _review_queue_page_bundle(overview, reports, review_candidates),
+        out / "pages" / "report-board.json",
+        _report_board_page_bundle(overview, reports, report_board_candidates),
     )
     _write_product_json(
         out / "pages" / "report-statistics.json",
@@ -923,7 +923,7 @@ def _report_verification_page_bundle(
     overview: dict[str, Any],
     data_quality: dict[str, Any],
     reports: list[dict[str, Any]],
-    review_candidates: list[dict[str, Any]],
+    report_board_candidates: list[dict[str, Any]],
 ) -> dict[str, Any]:
     counts = overview.get("report_counts", {}) if isinstance(overview, dict) else {}
     stats = overview.get("target_stats", {}) if isinstance(overview, dict) else {}
@@ -941,7 +941,7 @@ def _report_verification_page_bundle(
         "title": "report-verification",
         "metrics": [
             _metric("reports", "verified_reports", len(reports)),
-            _metric("active", "review_candidates", len(review_candidates), "positive"),
+            _metric("active", "report_board_candidates", len(report_board_candidates), "positive"),
             _metric("target_hit_rate", "target_hit_rate", stats.get("target_hit_rate"), "positive"),
             _metric("median_current_return", "median_current_return", stats.get("median_current_return")),
             _metric("median_days_to_target", "median_days_to_target", stats.get("median_days_to_target")),
@@ -949,7 +949,7 @@ def _report_verification_page_bundle(
         ],
         "views": [
             {"id": "recent", "label": "recent", "count": len(reports)},
-            {"id": "review", "label": "review_candidates", "count": len(review_candidates)},
+            {"id": "candidate", "label": "report_board_candidates", "count": len(report_board_candidates)},
             {"id": "target-hit", "label": "target_hit", "count": stats.get("target_hit_count")},
         ],
         "warnings": warnings,
@@ -957,23 +957,23 @@ def _report_verification_page_bundle(
     }
 
 
-def _review_queue_page_bundle(
+def _report_board_page_bundle(
     overview: dict[str, Any],
     reports: list[dict[str, Any]],
-    review_candidates: list[dict[str, Any]],
+    report_board_candidates: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    priority = review_candidates[:5]
+    priority = report_board_candidates[:5]
     return {
         "schema_version": "1.0.0",
         "generated_at": _page_generated_at(overview),
         "as_of": _page_as_of(overview),
-        "title": "review-queue",
+        "title": "report-board",
         "metrics": [
-            _metric("candidates", "candidate_symbols", len(review_candidates)),
+            _metric("candidates", "candidate_symbols", len(report_board_candidates)),
             _metric("reports", "source_reports", len(reports)),
         ],
         "priority": priority,
-        "table": {"rows": review_candidates},
+        "table": {"rows": report_board_candidates},
     }
 
 
@@ -1224,7 +1224,7 @@ def _build_manifest(out: Path, overview: dict[str, Any]) -> dict[str, Any]:
         "equity_daily": _json_row_count(out / "portfolio" / "equity-daily.json"),
         "accounts": _json_row_count(out / "portfolio" / "accounts.json"),
         "account_catalog": _json_row_count(out / "accounts" / "catalog.json"),
-        "review_candidates": _json_row_count(out / "review" / "candidates.json"),
+        "report_board_candidates": _json_row_count(out / "report-board" / "candidates.json"),
     }
     report_counts = overview.get("report_counts", {}) if isinstance(overview, dict) else {}
     target_stats = overview.get("target_stats", {}) if isinstance(overview, dict) else {}
@@ -2367,7 +2367,7 @@ def _build_insights(
     ]
 
 
-def _build_review_candidates(report_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _build_report_board_candidates(report_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     candidates: list[dict[str, Any]] = []
     latest_date = max((str(row.get("date") or "") for row in report_rows), default="")
     for row in report_rows:

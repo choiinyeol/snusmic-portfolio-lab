@@ -181,7 +181,7 @@ def test_extended_web_artifacts_support_insights_and_downloads(web_export_dir: P
     )
     rankings = json.loads((out / "report-rankings.json").read_text(encoding="utf-8"))
     page_rankings = json.loads((out / "reports" / "rankings.json").read_text(encoding="utf-8"))
-    review_candidates = json.loads((out / "review" / "candidates.json").read_text(encoding="utf-8"))
+    report_board_candidates = json.loads((out / "report-board" / "candidates.json").read_text(encoding="utf-8"))
 
     assert len(insights) >= 6
     assert overview_insights == insights
@@ -208,7 +208,7 @@ def test_extended_web_artifacts_support_insights_and_downloads(web_export_dir: P
     assert rankings["fastest_hits"]
     assert rankings["best_current_returns"]
     assert page_rankings == rankings
-    assert review_candidates
+    assert report_board_candidates
     assert (out / "table-download-reports.csv").read_text(encoding="utf-8").startswith("report_id,date")
     assert (out / "table-download-accounts.csv").read_text(encoding="utf-8").startswith("account_id,label")
     assert (out / "data-quality-download.csv").read_text(encoding="utf-8").startswith("section,metric,value")
@@ -232,14 +232,14 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(web_export_dir: 
     expected_accounts = len(pd.read_csv(Path("data/sim") / "summary.csv"))
     assert manifest["row_counts"]["accounts"] == expected_accounts
     assert manifest["row_counts"]["account_catalog"] == expected_accounts
-    assert manifest["row_counts"]["review_candidates"] > 0
+    assert manifest["row_counts"]["report_board_candidates"] > 0
     assert manifest["data_quality"]["reports_with_prices"] == 202
     assert manifest["data_quality"]["missing_price_symbols"] == 5
     assert "overview/snapshot.json" in manifest["artifacts"]
     assert "portfolio/holdings.json" in manifest["artifacts"]
     assert "reports/table.json" in manifest["artifacts"]
     assert "accounts/catalog.json" in manifest["artifacts"]
-    assert "review/candidates.json" in manifest["artifacts"]
+    assert "report-board/candidates.json" in manifest["artifacts"]
     assert "reports.json" in manifest["artifacts"]
     assert "prices/QQQ.json" in manifest["artifacts"]
     assert len(manifest["checksums"]["prices/QQQ.json"]) == 64

@@ -42,7 +42,7 @@ addopts = "--strict-markers"
 xfail_strict = true
 markers = [
   "slow: full-data regression tests that are valuable but too slow for the inner development loop",
-  "contract: boundary-contract tests for data/artifact/schema compatibility",
+  "contract: boundary-contract tests for data/artifact/schema checks",
   "performance: lightweight performance smoke tests or benchmarks",
 ]
 
