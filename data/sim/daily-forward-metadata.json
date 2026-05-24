@@ -4,10 +4,10 @@
   "latest_date": "2026-05-22",
   "checkpoint_date": "2026-05-22",
   "checkpoint_schema_version": "1.0.0",
-  "full_replay_reason": "historical_source_changed",
+  "full_replay_reason": "missing_checkpoint",
   "source_fingerprint": {
     "reports.csv": "0099edadee9b1c324a2f1d16ad8aa06e245bd16d528bb8c013245def35a8ad11",
-    "daily_prices.csv": "87a445d8bafb4ef25d5c03f4606a6b64deed9d6cd57d83b81e337e2424eec8c9",
+    "daily_prices.csv": "f4110a57f747593f125cd2624fddabb84d5b384e8a41b1cdb5f7367a2db28802",
     "benchmark_prices.csv": "37a494fa1117a27dfef199347717779b589a09e42b5b6908d80bce10319f4f00",
     "fx_rates.csv": "1164ce7132a41a4604078ef9004f342e336915d71964451c3ce28c09cfe4246d"
   },
