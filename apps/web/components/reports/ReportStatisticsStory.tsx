@@ -12,28 +12,16 @@ import {
 } from 'lightweight-charts';
 import type { ReportStatisticsLabSummary } from '@/lib/artifacts';
 import { formatDateKo, formatPercent } from '@/lib/format';
-import { formatMultiple, isNumber, mean, quantileFromSorted, trimmedMean, wilsonCI } from '@/lib/report-statistics';
-
-export type PricePathBar = {
-  day: number;
-  time: string;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-  closeKrw: number;
-};
-
-export type PricePathSeries = {
-  reportId: string;
-  symbol: string;
-  company: string;
-  currency: string;
-  publicationDate: string;
-  peakReturn: number;
-  baseKrw: number;
-  bars: PricePathBar[];
-};
+import {
+  buildPeakReturnDistribution,
+  formatMultiple,
+  isNumber,
+  mean,
+  quantileFromSorted,
+  trimmedMean,
+  wilsonCI,
+} from '@/lib/report-statistics';
+import type { PricePathSeries } from '@/lib/view-models/report-statistics';
 
 export type FeatureBucket = {
   group: 'alignment' | 'high52w';
@@ -530,8 +518,8 @@ function WholeSampleMap({
             const x = sortedRows.length <= 1 ? 50 : (index / (sortedRows.length - 1)) * 100;
             const compressed = compressReturn(value);
             const y = 100 - ((compressed - yLo) / (yHi - yLo)) * 100;
-            const category = classifyOutcome(row);
-            const tone = OUTCOME_CATEGORIES.find((meta) => meta.id === category)?.tone ?? 'neutral';
+            const category = classifyScatterTone(row);
+            const tone = SCATTER_TONE_CATEGORIES.find((meta) => meta.id === category)?.tone ?? 'neutral';
             const isTopWinner = topThreeIds.has(row.reportId);
             return (
               <DataPoint
@@ -588,119 +576,165 @@ function WholeSampleMap({
 type RiskScatterRow = ReportStatisticsLabSummary['riskScatter'][number];
 
 function OutcomeBreakdownPanel({ rows }: { rows: RiskScatterRow[] }) {
-  const counts = new Map<OutcomeCategory, number>();
-  for (const row of rows) {
-    const id = classifyOutcome(row);
-    counts.set(id, (counts.get(id) ?? 0) + 1);
-  }
   const total = rows.length;
-  const successCount = OUTCOME_CATEGORIES.filter((c) => c.kind === 'success').reduce(
-    (sum, c) => sum + (counts.get(c.id) ?? 0),
-    0,
-  );
-  const failureCount = total - successCount;
+  const distribution = buildPeakReturnDistribution(rows);
+  const [selectedBinId, setSelectedBinId] = useState<string | null>(distribution.defaultBinId);
+  const selectedBin = distribution.bins.find((bin) => bin.id === selectedBinId) ?? distribution.bins[0];
+  const selectedRows = selectedBin?.rows ?? [];
+
   return (
     <div className="rounded-md border border-slate-200 bg-white p-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="text-sm font-semibold text-slate-950">결과 분류</h3>
-        <p className="font-mono text-[11px] text-slate-500">
-          성공 {successCount}건 ({total ? formatPercent(successCount / total) : '—'}) · 실패 {failureCount}건 (
-          {total ? formatPercent(failureCount / total) : '—'})
-        </p>
+        <h3 className="text-sm font-semibold text-slate-950">고점 수익률 구간 분포</h3>
+        <p className="font-mono text-[11px] text-slate-500">n={total.toLocaleString('ko-KR')}</p>
       </div>
       <p className="mt-1 text-xs text-slate-500">
-        목표 도달, 부분 도달, +30% 이상 상승 기회는 긍정 경로로 묶고, 횡보·손실·큰 손실은 우선 검토가 필요한 경로로
-        묶었습니다.
+        성공/실패 판정보다 발간 후 한 번이라도 도달한 고점 수익률을 구간으로 봅니다. 평균이 중앙값보다 높고 P90이 멀리
+        벌어질수록 우측 꼬리가 긴 분포입니다.
       </p>
-      <div className="mt-4 grid gap-2">
-        {OUTCOME_CATEGORIES.map((category) => {
-          const count = counts.get(category.id) ?? 0;
-          const share = total ? count / total : 0;
-          return (
-            <div
-              className="grid grid-cols-[1rem_minmax(0,16rem)_minmax(0,1fr)_5rem_3rem] items-center gap-3"
-              key={category.id}
-            >
-              <span aria-hidden="true" className={`inline-block size-2.5 rounded-full ${category.swatchClass}`} />
-              <div>
-                <div className="text-sm font-semibold text-slate-950">{category.label}</div>
-                <div className="mt-0.5 text-[11px] leading-4 text-slate-500">{category.description}</div>
+      <div className="mt-4 grid grid-cols-3 gap-2 md:max-w-xl">
+        <DistributionMetric label="평균 고점" value={formatPercent(distribution.mean)} />
+        <DistributionMetric label="중앙 고점" value={formatPercent(distribution.median)} />
+        <DistributionMetric label="P90 고점" value={formatPercent(distribution.p90)} />
+      </div>
+      <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1fr)_24rem]">
+        <div className="grid gap-1.5">
+          {distribution.bins.map((bin) => {
+            const selected = selectedBin?.id === bin.id;
+            return (
+              <button
+                aria-pressed={selected}
+                className={`grid grid-cols-[5.25rem_minmax(0,1fr)_4.5rem_4rem] items-center gap-3 rounded-md px-2 py-2 text-left transition ${
+                  selected ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
+                }`}
+                key={bin.id}
+                onClick={() => setSelectedBinId(bin.id)}
+                type="button"
+              >
+                <span
+                  className={`font-mono text-[11px] font-semibold tabular-nums ${selected ? 'text-white' : bin.textClass}`}
+                >
+                  {bin.label}
+                </span>
+                <span className={`h-2 overflow-hidden rounded-full ${selected ? 'bg-white/20' : 'bg-slate-200'}`}>
+                  <span
+                    className={`block h-full rounded-full ${selected ? 'bg-white' : bin.barClass}`}
+                    style={{ width: `${Math.max(2, bin.share * 100)}%` }}
+                  />
+                </span>
+                <span className="text-right font-mono text-xs font-semibold tabular-nums">
+                  {bin.count.toLocaleString('ko-KR')}건
+                </span>
+                <span
+                  className={`text-right font-mono text-[11px] tabular-nums ${selected ? 'text-white/70' : 'text-slate-500'}`}
+                >
+                  {formatPercent(bin.share)}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+        <div className="rounded-md border border-slate-200 bg-slate-50 p-3">
+          <div className="flex items-baseline justify-between gap-2">
+            <h4 className="text-sm font-semibold text-slate-950">{selectedBin?.label ?? '구간'} 종목</h4>
+            <span className="font-mono text-[11px] text-slate-500">
+              {selectedRows.length.toLocaleString('ko-KR')}건
+            </span>
+          </div>
+          <div className="mt-3 max-h-80 overflow-y-auto pr-1">
+            {selectedRows.length ? (
+              <div className="grid gap-1.5">
+                {selectedRows.map((row) => (
+                  <Link
+                    className="grid grid-cols-[minmax(0,1fr)_4.5rem] gap-3 rounded-md bg-white px-3 py-2 text-xs transition hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500"
+                    href={`/reports/${encodeURIComponent(row.symbol)}/${encodeURIComponent(row.reportId)}`}
+                    key={row.reportId}
+                  >
+                    <span className="min-w-0">
+                      <span className="block truncate font-semibold text-slate-950">{statisticsReportName(row)}</span>
+                      <span className="mt-0.5 block truncate font-mono text-[11px] text-slate-500">
+                        {row.publicationDate}
+                      </span>
+                    </span>
+                    <span
+                      className={`text-right font-mono text-xs font-semibold tabular-nums ${signedTextClass(row.maxFavorableExcursion ?? 0)}`}
+                    >
+                      {formatPercent(row.maxFavorableExcursion ?? null)}
+                    </span>
+                  </Link>
+                ))}
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-slate-100">
-                <div className={`h-full rounded-full ${category.swatchClass}`} style={{ width: `${share * 100}%` }} />
+            ) : (
+              <div className="rounded-md bg-white px-3 py-6 text-center text-xs text-slate-500">
+                해당 구간의 표본이 없습니다.
               </div>
-              <span className="text-right font-mono text-sm font-semibold tabular-nums text-slate-950">
-                {count.toLocaleString('ko-KR')}건
-              </span>
-              <span className="text-right font-mono text-xs tabular-nums text-slate-500">{formatPercent(share)}</span>
-            </div>
-          );
-        })}
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-type OutcomeCategory = 'target' | 'partial' | 'upside' | 'flat' | 'declining' | 'devastating';
+function DistributionMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+      <div className="text-[11px] text-slate-500">{label}</div>
+      <div className="mt-1 font-mono text-sm font-semibold tabular-nums text-slate-950">{value}</div>
+    </div>
+  );
+}
 
-type OutcomeMeta = {
-  id: OutcomeCategory;
-  label: string;
-  description: string;
+function statisticsReportName(row: RiskScatterRow): string {
+  const symbol = stripMarketSuffix(row.symbol);
+  if (row.symbol.endsWith('.KS') || row.symbol.endsWith('.KQ')) return row.company || symbol;
+  if (!row.symbol.includes('.')) return symbol;
+
+  const hasReadableLocalName = Array.from(row.company).some((char) => char.charCodeAt(0) > 127);
+  return hasReadableLocalName ? row.company : symbol;
+}
+
+function stripMarketSuffix(symbol: string): string {
+  return symbol.replace(/\.(KS|KQ|KONEX|T|HK|SS|SZ|AS|PA|SW)$/i, '');
+}
+
+function signedTextClass(value: number): string {
+  if (value > 0) return 'text-emerald-600';
+  if (value < 0) return 'text-rose-600';
+  return 'text-slate-500';
+}
+
+type ScatterToneCategory = 'target' | 'partial' | 'upside' | 'flat' | 'declining' | 'devastating';
+
+type ScatterToneMeta = {
+  id: ScatterToneCategory;
   tone: 'good' | 'accent' | 'teal' | 'neutral' | 'warning' | 'bad';
-  swatchClass: string;
-  /** 기회비용 관점에서 횡보/손실/치명적은 모두 실패로 본다. */
-  kind: 'success' | 'failure';
 };
 
-const OUTCOME_CATEGORIES: OutcomeMeta[] = [
+const SCATTER_TONE_CATEGORIES: ScatterToneMeta[] = [
   {
     id: 'target',
-    label: '1.0x 목표 도달',
-    description: '발간 후 500거래일 안에 목표가에 한 번이라도 도달',
     tone: 'good',
-    swatchClass: 'bg-blue-600',
-    kind: 'success',
   },
   {
     id: 'partial',
-    label: '부분 도달 (0.6–0.8x)',
-    description: '목표가의 60–80% 구간까지 도달',
     tone: 'accent',
-    swatchClass: 'bg-violet-600',
-    kind: 'success',
   },
   {
     id: 'upside',
-    label: '상승 기회 있었음',
-    description: '목표 미도달이지만 발간 후 한 번이라도 +30% 이상 올랐던 표본',
     tone: 'teal',
-    swatchClass: 'bg-teal-600',
-    kind: 'success',
   },
   {
     id: 'flat',
-    label: '횡보',
-    description: '발간 후 큰 등락 없이 ±10% 안쪽으로 끝남 — 기회비용 기준 실패',
     tone: 'neutral',
-    swatchClass: 'bg-slate-400',
-    kind: 'failure',
   },
   {
     id: 'declining',
-    label: '손실 (-10% ~ -30%)',
-    description: '만료 시점 종가가 -10% ~ -30% 사이',
     tone: 'warning',
-    swatchClass: 'bg-amber-500',
-    kind: 'failure',
   },
   {
     id: 'devastating',
-    label: '계속 하락 · 치명적 손실',
-    description: '발간 후 거의 못 오르고 만료 종가가 -30% 이하 — "사면 안 됐던" 표본',
     tone: 'bad',
-    swatchClass: 'bg-rose-600',
-    kind: 'failure',
   },
 ];
 
@@ -709,7 +743,7 @@ const OUTCOME_CATEGORIES: OutcomeMeta[] = [
  * upside misses with positive MFE are "OK", but unilateral losses get
  * two buckets (-10–30% and -30%+) because catastrophic losses are the
  * dominant risk on this page. */
-function classifyOutcome(row: RiskScatterRow): OutcomeCategory {
+function classifyScatterTone(row: RiskScatterRow): ScatterToneCategory {
   if (row.hit10) return 'target';
   if (row.hit08 || row.hit06) return 'partial';
   const peak = row.maxFavorableExcursion ?? 0;

@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 export type SortDirection = 'asc' | 'desc';
 export type SortState<Key extends string> = { key: Key; direction: SortDirection };
 
-export const DEFAULT_ACCOUNT = 'smic_follower_v2';
+export const DEFAULT_ACCOUNT = 'smic_follower';
 
 export function defaultAccountFor(accounts: string[]): string {
   return accounts.includes(DEFAULT_ACCOUNT) ? DEFAULT_ACCOUNT : (accounts[0] ?? '');

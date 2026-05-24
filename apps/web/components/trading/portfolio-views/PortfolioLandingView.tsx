@@ -70,9 +70,9 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
   return (
     <div className="grid gap-5">
       <PageHero
-        eyebrow="Portfolio account hub"
-        title="계좌 성과 보드"
-        subtitle="실제 주식 수량 단위로 매수·보유·매도한 계좌를 비교합니다. 벤치마크는 선택 대상이 아니라 수익률과 낙폭의 기준선으로만 표시합니다."
+        eyebrow="SMIC follower account"
+        title="SMIC Follower 포트폴리오"
+        subtitle="리포트 신호를 실제 수량 단위 매수·보유·매도 원장으로 추적합니다. 벤치마크는 선택 대상이 아니라 수익률과 낙폭의 기준선으로만 표시합니다."
         badges={[
           { label: '최근 평가', value: model.latestEquityDate || '—' },
           { label: '계좌', value: `${model.accounts.length}개` },
@@ -145,12 +145,11 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
           <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <div className="mb-3">
               <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                계좌 후보 지도
+                Follower 위치 지도
               </div>
-              <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">수익률 / 낙폭 지도로 선택</h2>
+              <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">Follower 수익률 / 낙폭 위치</h2>
               <p className="mt-1 text-sm leading-6 text-slate-500">
-                실제 계좌는 수익률과 최대 낙폭으로만 비교합니다. 더 큰 낙폭을 감수했는데도 수익률이 낮은 계좌는 뒤로
-                밀리고, 벤치마크 점은 위치 비교용입니다.
+                SMIC follower 계좌의 수익률과 최대 낙폭을 기준선과 비교합니다. 벤치마크 점은 위치 비교용입니다.
               </p>
             </div>
             <PortfolioFrontierChart rows={model.frontierRows} selectedId={selected.id} onSelect={setSelectedId} />
@@ -177,7 +176,7 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
             <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">계좌 원장 선택</h2>
           </div>
           <span className="text-xs font-medium text-slate-500">
-            stock-level account_id · {model.accounts.length.toLocaleString('ko-KR')}개 버튼
+            SMIC follower · {model.accounts.length.toLocaleString('ko-KR')}개 계좌
           </span>
         </div>
         <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">

@@ -1,8 +1,28 @@
-import type { PricePathSeries } from '@/components/reports/ReportStatisticsStory';
 import { getPriceSeries, getReportStatisticsPageBundle, hasPriceArtifact } from '@/lib/artifacts';
 import type { PricePoint, ReportStatisticsLabSummary } from '@/lib/artifacts';
 
 const CHART_WINDOW_DAYS = 500;
+
+export type PricePathBar = {
+  day: number;
+  time: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  closeKrw: number;
+};
+
+export type PricePathSeries = {
+  reportId: string;
+  symbol: string;
+  company: string;
+  currency: string;
+  publicationDate: string;
+  peakReturn: number;
+  baseKrw: number;
+  bars: PricePathBar[];
+};
 
 function closeKrwOf(point: PricePoint): number {
   return point.closeKrw ?? point.close ?? point.value ?? 0;

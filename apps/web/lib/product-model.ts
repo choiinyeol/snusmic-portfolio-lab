@@ -17,6 +17,7 @@ import {
 
 export const TARGET_BENCHMARK_ID = 'benchmark_kodex200';
 export const OBJECTIVE_MAX_DRAWDOWN = 0.15;
+export const FOLLOWER_ACCOUNT_IDS = ['smic_follower', 'smic_follower_v2'] as const;
 export const BENCHMARK_IDS = getAccountCatalog()
   .filter((row) => row.kind !== 'account')
   .map((row) => row.accountId);
@@ -98,6 +99,10 @@ export function getDefaultPortfolioAccount(): string {
   const summaries = getSummaryRows();
   const holdings = getCurrentHoldings();
   const summaryIds = new Set(summaries.map((row) => row.account_id));
+  const preferredFollower = FOLLOWER_ACCOUNT_IDS.find((accountId) => summaryIds.has(accountId));
+  if (preferredFollower) {
+    return preferredFollower;
+  }
   const accountsWithOpenHoldings = new Set(holdings.map((row) => row.account_id));
   const rankedAccounts = getObjectivePassingRows(getAccountLeaderboard()).filter((row) => summaryIds.has(row.id));
   const topWithOpenHoldings = rankedAccounts.find((row) => accountsWithOpenHoldings.has(row.id));
@@ -235,7 +240,7 @@ export function getBenchmarkRows(rows = getAccountLeaderboard()): AccountLeaderb
 }
 
 export function getSelectableAccountRows(rows = getAccountLeaderboard()): AccountLeaderboardRow[] {
-  return rows.filter((row) => row.kind === 'account' && row.isSelectable);
+  return rows.filter((row) => row.kind === 'account' && (row.isSelectable || isFollowerAccount(row.id)));
 }
 
 export function getObjectivePassingRows(rows = getAccountLeaderboard()): AccountLeaderboardRow[] {
@@ -284,15 +289,21 @@ function accountRowFromSummary(
     objectivePassed: catalog?.objectivePassed ?? objective.passed,
     objectiveMddSlack: catalog?.objectiveMddSlack ?? objective.mddSlack,
     objectiveReturnExcess: catalog?.objectiveReturnExcess ?? objective.returnExcess,
-    isSelectable: catalog?.isSelectable ?? kind === 'account',
+    isSelectable: kind === 'account' && ((catalog?.isSelectable ?? true) || isFollowerAccount(summary.account_id)),
     sourceLabel: kind === 'account' ? '계좌 원장' : kind === 'oracle' ? '오라클 기준선' : '벤치마크',
     href:
-      kind === 'account' && (catalog?.isSelectable ?? true) ? portfolioAccountHref(summary.account_id) : '/portfolio',
+      kind === 'account' && ((catalog?.isSelectable ?? true) || isFollowerAccount(summary.account_id))
+        ? portfolioAccountHref(summary.account_id)
+        : '/portfolio',
   };
 }
 
 function targetBenchmark(summaries: SummaryRow[]): SummaryRow | undefined {
   return summaries.find((row) => row.account_id === TARGET_BENCHMARK_ID);
+}
+
+export function isFollowerAccount(accountId: string): boolean {
+  return (FOLLOWER_ACCOUNT_IDS as readonly string[]).includes(accountId);
 }
 
 function objectiveGate(

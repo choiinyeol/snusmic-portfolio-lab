@@ -57,7 +57,6 @@ export function getDashboardViewModel() {
   const selectableRows = getObjectivePassingRows(accountRows);
   const selectedAccountRow = selectableRows.find((row) => row.id === selectedAccount);
   const chartSeries = buildDashboardSeries(equity, benchmarkRows, selectedAccountRow, selectableRows);
-  const objectiveRows = selectableRows;
   const benchmarkToBeat = benchmarkRows.find((row) => row.id === TARGET_BENCHMARK_ID);
   const recentBuys = trades
     .filter((trade) => trade.account_id === selectedAccount && trade.side === 'buy')
@@ -79,7 +78,6 @@ export function getDashboardViewModel() {
     selectableRows,
     selectedAccountRow,
     chartSeries,
-    objectiveRows,
     benchmarkToBeat,
     recentBuys,
   };

@@ -20,7 +20,7 @@ import { getDashboardViewModel, type DashboardViewModel } from '@/lib/dashboard-
 import { formatDateKo, formatKrw, formatPercent } from '@/lib/format';
 
 type Report = DashboardViewModel['reports'][number];
-type StrategyRow = DashboardViewModel['accountRows'][number];
+type AccountPerformanceRow = DashboardViewModel['accountRows'][number];
 type Holding = DashboardViewModel['overview']['portfolio']['holdings'][number];
 type Trade = DashboardViewModel['recentBuys'][number];
 
@@ -33,7 +33,7 @@ export default function OverviewPage() {
   const activeCandidate = overview.researchCandidates[0]?.report ?? activeReportCandidate(view.reports);
   const recentTrade = view.recentBuys[0];
   const topHolding = overview.portfolio.holdings[0];
-  const strategyRows = strategyScoreRows(view);
+  const accountPerformanceRows = accountPerformanceRowsForBoard(view);
   const selectedLeaderboardRow = view.accountRows.find((row) => row.id === view.selectedAccount) ?? selectedAccountRow;
   const benchmarkExcess =
     selectedLeaderboardRow?.benchmarkExcess ??
@@ -174,8 +174,8 @@ export default function OverviewPage() {
             {
               id: 'performance',
               label: '성과 경로',
-              meta: String(strategyRows.length),
-              content: <StrategyTable rows={strategyRows} />,
+              meta: String(accountPerformanceRows.length),
+              content: <AccountPerformanceTable rows={accountPerformanceRows} />,
             },
             {
               id: 'holdings',
@@ -285,7 +285,7 @@ function JudgmentCard({
   );
 }
 
-function StrategyTable({ rows }: { rows: StrategyRow[] }) {
+function AccountPerformanceTable({ rows }: { rows: AccountPerformanceRow[] }) {
   return (
     <Table>
       <TableHeader>
@@ -509,7 +509,7 @@ function activeReportCandidate(reports: Report[]): Report | undefined {
     .sort((a, b) => (b.targetRemainingPct ?? 0) - (a.targetRemainingPct ?? 0))[0];
 }
 
-function strategyScoreRows(view: DashboardViewModel): StrategyRow[] {
+function accountPerformanceRowsForBoard(view: DashboardViewModel): AccountPerformanceRow[] {
   const accountRows = view.accountRows.filter((row) => row.kind === 'account');
   if (accountRows.length) return accountRows.slice(0, 5);
   return view.benchmarkRows.slice(0, 5);

@@ -16,8 +16,8 @@ import {
   getTrades,
 } from '@/lib/artifacts';
 import {
+  FOLLOWER_ACCOUNT_IDS,
   getDefaultPortfolioAccount,
-  getObjectivePassingRows,
   getAccountLeaderboard,
   portfolioAccountHref,
   type AccountLeaderboardRow,
@@ -200,12 +200,10 @@ export function getPortfolioStaticParams() {
 }
 
 function getPortfolioRows(rows: AccountLeaderboardRow[] = getAccountLeaderboard()) {
-  const selectable = getObjectivePassingRows(rows).filter((row) => row.kind === 'account' && row.isSelectable);
-  const nonDominated = selectable.filter((row) => !selectable.some((candidate) => dominates(candidate, row)));
-  return nonDominated.sort((a, b) => {
-    if (a.objectivePassed !== b.objectivePassed) return a.objectivePassed ? -1 : 1;
-    return (b.returnPct ?? Number.NEGATIVE_INFINITY) - (a.returnPct ?? Number.NEGATIVE_INFINITY);
-  });
+  const followerOrder = new Map<string, number>(FOLLOWER_ACCOUNT_IDS.map((accountId, index) => [accountId, index]));
+  return rows
+    .filter((row) => row.kind === 'account' && followerOrder.has(row.id))
+    .sort((a, b) => (followerOrder.get(a.id) ?? 999) - (followerOrder.get(b.id) ?? 999));
 }
 
 function defaultPortfolioAccount(rows: AccountLeaderboardRow[]): string {
@@ -214,22 +212,6 @@ function defaultPortfolioAccount(rows: AccountLeaderboardRow[]): string {
   const firstAvailable = rows[0]?.id;
   if (firstAvailable) return firstAvailable;
   return productDefault;
-}
-
-function dominates(candidate: AccountLeaderboardRow, target: AccountLeaderboardRow): boolean {
-  if (
-    candidate.id === target.id ||
-    candidate.returnPct === null ||
-    candidate.maxDrawdown === null ||
-    target.returnPct === null ||
-    target.maxDrawdown === null
-  ) {
-    return false;
-  }
-  const noWorseReturn = candidate.returnPct >= target.returnPct;
-  const noWorseDrawdown = candidate.maxDrawdown <= target.maxDrawdown;
-  const strictlyBetter = candidate.returnPct > target.returnPct || candidate.maxDrawdown < target.maxDrawdown;
-  return noWorseReturn && noWorseDrawdown && strictlyBetter;
 }
 
 function groupByAccount<T extends { account_id: string }>(rows: T[]): Map<string, T[]> {
