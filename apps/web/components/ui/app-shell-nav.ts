@@ -3,7 +3,8 @@ import type { SidebarNavItem } from '@/components/ui/SidebarNav';
 export const APP_NAV: SidebarNavItem[] = [
   { href: '/', label: '신호 보드', description: '현재 상태', icon: 'dashboard', activePath: '/' },
   { href: '/portfolio', label: '계좌 리포트', description: '보유·매매', icon: 'portfolio' },
-  { href: '/reports', label: '신호 검증 보드', description: '후보·리포트', icon: 'review' },
+  { href: '/reports', label: '리포트 검증', description: '후보·성과', icon: 'review' },
+  { href: '/calendar', label: '리포트 캘린더', description: '시점별 후보', icon: 'accounts' },
   { href: '/statistics', label: '성과 통계', description: '분포·경로', icon: 'reports' },
 ];
 

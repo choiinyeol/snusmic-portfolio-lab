@@ -10,6 +10,7 @@ from snusmic_pipeline.sim.contracts import SavingsPlan
 from snusmic_pipeline.sim.savings import (
     build_cash_flow_schedule,
     contribution_amount,
+    contribution_day_per_month,
     first_trading_day_per_month,
     total_contributed,
 )
@@ -23,6 +24,14 @@ def test_first_trading_day_per_month_picks_earliest():
     days = _bdates("2024-01-01", "2024-03-31")
     firsts = first_trading_day_per_month(days)
     assert firsts == [date(2024, 1, 1), date(2024, 2, 1), date(2024, 3, 1)]
+
+
+def test_contribution_day_per_month_picks_requested_timing():
+    days = _bdates("2024-01-01", "2024-02-29")
+
+    assert contribution_day_per_month(days, "first") == [date(2024, 1, 1), date(2024, 2, 1)]
+    assert contribution_day_per_month(days, "middle") == [date(2024, 1, 16), date(2024, 2, 15)]
+    assert contribution_day_per_month(days, "last") == [date(2024, 1, 31), date(2024, 2, 29)]
 
 
 def test_contribution_amount_step_up_every_two_years():
@@ -54,6 +63,22 @@ def test_build_cash_flow_schedule_initial_then_monthly():
     # Monthly contribution count = months in range minus the initial month.
     expected_months = len({(d.year, d.month) for d in days}) - 1
     assert len(events) - 1 == expected_months
+
+
+def test_build_cash_flow_schedule_uses_monthly_timing():
+    plan = SavingsPlan()
+    days = _bdates("2024-01-01", "2024-03-31")
+    middle_events = build_cash_flow_schedule(days, plan, monthly_timing="middle")
+    last_events = build_cash_flow_schedule(days, plan, monthly_timing="last")
+
+    assert [e.date for e in middle_events if e.kind == "monthly"] == [
+        date(2024, 2, 15),
+        date(2024, 3, 15),
+    ]
+    assert [e.date for e in last_events if e.kind == "monthly"] == [
+        date(2024, 2, 29),
+        date(2024, 3, 29),
+    ]
 
 
 def test_build_cash_flow_schedule_escalates_at_year_boundaries():

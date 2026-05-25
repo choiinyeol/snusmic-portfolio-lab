@@ -1,5 +1,5 @@
 export function formatPercent(value: number | null | undefined, digits = 2): string {
-  if (value === null || value === undefined || !Number.isFinite(value)) return '—';
+  if (value === null || value === undefined || !Number.isFinite(value)) return '-';
   return `${(value * 100).toLocaleString('ko-KR', {
     maximumFractionDigits: digits,
     minimumFractionDigits: digits,
@@ -7,22 +7,22 @@ export function formatPercent(value: number | null | undefined, digits = 2): str
 }
 
 export function formatMultiple(value: number | null | undefined, digits = 2): string {
-  if (value === null || value === undefined || !Number.isFinite(value)) return '—';
-  return `${value.toLocaleString('ko-KR', { maximumFractionDigits: digits })}배`;
+  if (value === null || value === undefined || !Number.isFinite(value)) return '-';
+  return `${value.toLocaleString('ko-KR', { maximumFractionDigits: digits })}x`;
 }
 
 export function formatKrw(value: number | null | undefined): string {
-  if (value === null || value === undefined || !Number.isFinite(value)) return '—';
+  if (value === null || value === undefined || !Number.isFinite(value)) return '-';
   return `₩${Math.round(value).toLocaleString('ko-KR')}`;
 }
 
 export function formatDays(value: number | null | undefined): string {
-  if (value === null || value === undefined || !Number.isFinite(value)) return '—';
-  return `${Math.round(value).toLocaleString('ko-KR')}거래일`;
+  if (value === null || value === undefined || !Number.isFinite(value)) return '-';
+  return `${Math.round(value).toLocaleString('ko-KR')}일`;
 }
 
 export function formatDateKo(value: string | null | undefined): string {
-  if (!value) return '—';
+  if (!value) return '-';
   const [year, month, day] = value.slice(0, 10).split('-');
   if (!year || !month || !day) return value;
   return `${year}.${month}.${day}`;
@@ -75,7 +75,7 @@ const CURRENCY_DIGITS: Record<string, number> = {
 };
 
 export function formatNative(value: number | null | undefined, currency: string | null | undefined): string {
-  if (value === null || value === undefined || !Number.isFinite(value)) return '—';
+  if (value === null || value === undefined || !Number.isFinite(value)) return '-';
   const code = (currency ?? 'KRW').toUpperCase();
   if (code === 'KRW') return formatKrw(value);
   const symbol = CURRENCY_SYMBOL[code] ?? `${code} `;

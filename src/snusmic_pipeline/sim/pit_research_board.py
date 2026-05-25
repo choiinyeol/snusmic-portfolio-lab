@@ -30,6 +30,9 @@ class PitResearchBoardRow:
     publication_date: date
     report_age_days: int
     entry_price_krw: float
+    entry_price_source: str
+    entry_price_scale_factor: float | None
+    price_quality_flag: str
     target_price_krw: float
     last_close_krw: float
     target_upside_at_pub: float
@@ -69,6 +72,9 @@ class PitResearchBoardRow:
             "publication_date": self.publication_date.isoformat(),
             "report_age_days": self.report_age_days,
             "entry_price_krw": self.entry_price_krw,
+            "entry_price_source": self.entry_price_source,
+            "entry_price_scale_factor": self.entry_price_scale_factor,
+            "price_quality_flag": self.price_quality_flag,
             "target_price_krw": self.target_price_krw,
             "last_close_krw": self.last_close_krw,
             "target_upside_at_pub": self.target_upside_at_pub,
@@ -248,6 +254,14 @@ class _PitTechnicalIndicatorCache:
         return frame
 
 
+@dataclass(frozen=True)
+class _EntryPriceEstimate:
+    value: float
+    source: str
+    scale_factor: float | None
+    quality_flag: str
+
+
 def build_pit_research_board(
     reports: pd.DataFrame,
     board: PriceBoard,
@@ -365,9 +379,10 @@ def _row_from_report(
     )
     if current is None or current <= 0 or price_date is None or price_date > as_of:
         return None
-    entry = _market_scale_entry_price(record, board, symbol, publication_date, as_of)
-    if entry is None or entry <= 0:
+    entry_estimate = _market_scale_entry_price(record, board, symbol, publication_date, as_of, target)
+    if entry_estimate is None or entry_estimate.value <= 0:
         return None
+    entry = entry_estimate.value
     target_upside = target / entry - 1.0
     if target_upside <= 0:
         return None
@@ -397,6 +412,9 @@ def _row_from_report(
         publication_date=publication_date,
         report_age_days=age,
         entry_price_krw=float(entry),
+        entry_price_source=entry_estimate.source,
+        entry_price_scale_factor=entry_estimate.scale_factor,
+        price_quality_flag=entry_estimate.quality_flag,
         target_price_krw=float(target),
         last_close_krw=float(current),
         target_upside_at_pub=float(target_upside),
@@ -433,16 +451,68 @@ def _market_scale_entry_price(
     symbol: str,
     publication_date: date,
     end_date: date,
-) -> float | None:
+    target_price_krw: float,
+) -> _EntryPriceEstimate | None:
     quoted_entry = _number(record.get("report_current_price_krw"))
     scale_factor = _number(record.get("target_price_scale_factor"))
-    if quoted_entry is not None and quoted_entry > 0 and scale_factor is not None and scale_factor > 0:
-        return quoted_entry * scale_factor
-    if quoted_entry is not None and quoted_entry > 0:
-        return quoted_entry
-    return board.first_close_on_or_after(publication_date, end_date, symbol) or board.asof(
+    market_entry = board.first_close_on_or_after(publication_date, end_date, symbol) or board.asof(
         publication_date, symbol
     )
+    if (
+        quoted_entry is not None
+        and quoted_entry > 0
+        and scale_factor is not None
+        and scale_factor > 0
+        and not math.isclose(scale_factor, 1.0)
+    ):
+        return _EntryPriceEstimate(
+            value=quoted_entry * scale_factor,
+            source="scaled_report_quote",
+            scale_factor=float(scale_factor),
+            quality_flag="explicit_scale",
+        )
+    if quoted_entry is not None and quoted_entry > 0:
+        inferred_scale = _entry_unit_scale_factor(quoted_entry, target_price_krw, market_entry)
+        if inferred_scale is not None and market_entry is not None and market_entry > 0:
+            return _EntryPriceEstimate(
+                value=float(market_entry),
+                source="market_price",
+                scale_factor=float(inferred_scale),
+                quality_flag="entry_unit_scaled",
+            )
+        return _EntryPriceEstimate(
+            value=float(quoted_entry),
+            source="report_quote",
+            scale_factor=1.0,
+            quality_flag="ok",
+        )
+    if market_entry is None or market_entry <= 0:
+        return None
+    return _EntryPriceEstimate(
+        value=float(market_entry),
+        source="market_price",
+        scale_factor=None,
+        quality_flag="market_entry",
+    )
+
+
+def _entry_unit_scale_factor(
+    quoted_entry: float,
+    target_price_krw: float,
+    market_entry: float | None,
+) -> float | None:
+    if market_entry is None or market_entry <= 0 or quoted_entry <= 0:
+        return None
+    scale = market_entry / quoted_entry
+    if 0.05 < scale < 20.0:
+        return None
+    target_multiple_on_quote = target_price_krw / quoted_entry if target_price_krw > 0 else None
+    target_multiple_on_market = target_price_krw / market_entry if target_price_krw > 0 else None
+    if target_multiple_on_quote is None or target_multiple_on_market is None:
+        return scale
+    if target_multiple_on_quote >= 10.0 and 0.2 <= target_multiple_on_market <= 10.0:
+        return scale
+    return None
 
 
 def _decision_day(day: date, previous_day: date | None, cadence: Cadence) -> bool:

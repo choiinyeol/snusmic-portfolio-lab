@@ -172,6 +172,22 @@ def test_current_price_before_target_label_does_not_become_target():
     assert parsed["base_target"] == 41600
 
 
+def test_szse_six_digit_ticker_allows_cny_decimal_target():
+    text = """
+    GEM Co., Ltd.GEM (格林美, 002340.SZ)
+    목표주가: 11.35 위안 현재주가: 7.63 위안 상승여력: 49%
+    """
+
+    parsed = parse_report_text(text, company_hint="GEM Co., Ltd.")
+
+    assert parsed["ticker"] == "002340"
+    assert parsed["exchange"] == "SZSE"
+    assert parsed["target_currency"] == "CNY"
+    assert parsed["report_current_price"] == 7.63
+    assert parsed["base_target"] == 11.35
+    assert parsed["status"] == "ok"
+
+
 def test_target_price_label_with_preferred_stock_market_cap_noise():
     text = """
     S-Oil (010950)

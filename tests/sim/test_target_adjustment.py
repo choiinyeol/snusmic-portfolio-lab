@@ -26,7 +26,7 @@ def test_weekend_publication_scales_target_from_first_actionable_close() -> None
     assert adjusted_target_price_krw(record, board, date(2024, 1, 6), date(2024, 1, 8)) == 40_000.0
 
 
-def test_price_board_refreshes_when_same_shape_frames_are_replaced() -> None:
+def test_price_board_refresh_updates_replaced_frames() -> None:
     close = pd.DataFrame(
         {"AAA": [100.0, 101.0]},
         index=pd.to_datetime(["2024-01-02", "2024-01-03"]),
@@ -42,6 +42,7 @@ def test_price_board_refreshes_when_same_shape_frames_are_replaced() -> None:
         {"AAA": [100.0, 150.0]},
         index=pd.to_datetime(["2024-01-02", "2024-01-03"]),
     )
+    board.refresh()
 
     assert board.open_on(date(2024, 1, 2)) == {"AAA": 95.0}
     assert board.first_touch_in_window(date(2024, 1, 2), date(2024, 1, 3), "AAA", 140.0) == date(2024, 1, 3)

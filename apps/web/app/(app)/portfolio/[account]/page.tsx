@@ -8,5 +8,5 @@ export function generateStaticParams() {
 export default async function PortfolioAccountPage({ params }: { params: Promise<{ account: string }> }) {
   const { account } = await params;
   if (account === NO_ADMITTED_ACCOUNT_PARAM) return <EmptyPortfolioRouteContent />;
-  return <PortfolioRouteContent selectedAccount={account} view="overview" />;
+  return <PortfolioRouteContent selectedAccount={account} view="ledger" />;
 }

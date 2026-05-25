@@ -66,20 +66,32 @@ export function DataPanel({ title, subtitle, actions, search, toolbar, paginatio
             onPageChange={pagination.onPageChange}
           />
           {pagination.onPageSizeChange && pagination.pageSize !== undefined ? (
-            <label className="inline-flex items-center justify-self-end gap-1.5">
-              <span>페이지</span>
-              <select
-                value={pagination.pageSize}
-                onChange={(event) => pagination.onPageSizeChange?.(Number(event.target.value))}
-                className="min-h-8 rounded-md border border-slate-200 bg-white px-2 py-1 text-xs leading-normal"
+            <div className="inline-flex items-center justify-self-end gap-1.5">
+              <span>행</span>
+              <div
+                className="inline-flex rounded-full bg-slate-100 p-0.5 ring-1 ring-slate-200"
+                role="radiogroup"
+                aria-label="페이지당 행 수"
               >
-                {(pagination.pageSizeOptions ?? [10, 25, 50, 100]).map((size) => (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
-                ))}
-              </select>
-            </label>
+                {(pagination.pageSizeOptions ?? [10, 25, 50, 100]).map((size) => {
+                  const selected = size === pagination.pageSize;
+                  return (
+                    <button
+                      key={size}
+                      type="button"
+                      role="radio"
+                      aria-checked={selected}
+                      onClick={() => pagination.onPageSizeChange?.(size)}
+                      className={`min-h-7 rounded-full px-2.5 text-xs font-semibold transition ${
+                        selected ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-950'
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           ) : (
             <span aria-hidden="true" />
           )}

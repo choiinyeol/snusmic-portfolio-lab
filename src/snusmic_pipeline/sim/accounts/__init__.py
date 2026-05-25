@@ -8,6 +8,7 @@ based on the ``account_id`` discriminator on the account config.
 
 from .all_weather import simulate_all_weather
 from .base import AccountRunOutput, build_summary, record_equity_point
+from .pit_score import simulate_pit_score_top_n, simulate_pit_signal_rule
 from .prophet import simulate_prophet
 from .smic_follower import simulate_smic_follower
 from .smic_follower_v2 import simulate_smic_follower_v2
@@ -18,6 +19,8 @@ __all__ = [
     "build_summary",
     "record_equity_point",
     "simulate_all_weather",
+    "simulate_pit_score_top_n",
+    "simulate_pit_signal_rule",
     "simulate_prophet",
     "simulate_smic_follower",
     "simulate_smic_follower_v2",

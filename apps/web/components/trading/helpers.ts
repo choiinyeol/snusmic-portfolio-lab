@@ -1,21 +1,17 @@
 import type { ReportTargetDigest } from '@/lib/artifacts';
 
-/** Domestic / overseas market-region label shared by every portfolio
- * surface so the badge wording stays in sync. */
+/** Domestic / overseas market-region label shared by portfolio surfaces. */
 export function marketLabel(region: 'domestic' | 'overseas' | undefined): string {
   return region === 'domestic' ? '국내' : '해외';
 }
 
-/** Per-row contribution to total deployed capital (pnl ÷ capital). Returns
- * null when either operand is missing or capital is non-positive. */
+/** Per-row contribution to total deployed capital. */
 export function capitalContribution(pnl: number | null, capital: number | undefined): number | null {
   if (pnl === null || pnl === undefined || !capital || capital <= 0) return null;
   return pnl / capital;
 }
 
-/** Convert a KRW value back to native currency using the row's native-
- * vs-KRW pair. Used for cells that need both the KRW and the source-
- * currency representation (e.g., average cost). */
+/** Convert a KRW value back to native currency using the row's native-vs-KRW pair. */
 export function nativeFromKrw(
   krw: number | null,
   nativeReference: number | null,
@@ -25,15 +21,29 @@ export function nativeFromKrw(
   return (krw * nativeReference) / krwReference;
 }
 
-/** Canonical link to a report detail page given its target digest. */
 export function reportTargetHref(target: ReportTargetDigest): string {
   return `/reports/${encodeURIComponent(target.symbol)}/${encodeURIComponent(target.reportId)}`;
 }
 
-/** Display stocks the way a person scans them: US-style alphabetic tickers can
- * stay as tickers, while numeric domestic/Japan/HK tickers are easier to read
- * as company names. */
 export function tradeDisplayName(symbol: string, company?: string | null): string {
-  if (/^[A-Z]{1,5}$/.test(symbol)) return symbol;
-  return company || symbol;
+  return stockDisplayName(symbol, company);
+}
+
+export function compactTicker(symbol: string): string {
+  return symbol.replace(/\.(KS|KQ)$/u, '');
+}
+
+export function stockDisplayName(symbol: string, company?: string | null): string {
+  if (symbol === 'CASH') return company || '현금/RP';
+  if (isUsTicker(symbol)) return compactTicker(symbol);
+  if (isDomesticTicker(symbol)) return company || compactTicker(symbol);
+  return company || compactTicker(symbol);
+}
+
+function isUsTicker(symbol: string): boolean {
+  return /^[A-Z]{1,5}$/u.test(symbol);
+}
+
+function isDomesticTicker(symbol: string): boolean {
+  return /^\d{6}(\.(KS|KQ))?$/u.test(symbol);
 }

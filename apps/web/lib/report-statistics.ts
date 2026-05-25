@@ -40,13 +40,15 @@ export const RETURN_BINS: ReturnBin[] = [
   },
   { id: '0-5', label: '0-5%', min: 0, max: 0.05, barClass: 'bg-slate-400', textClass: 'text-slate-600' },
   { id: '5-10', label: '5-10%', min: 0.05, max: 0.1, barClass: 'bg-slate-500', textClass: 'text-slate-600' },
-  { id: '10-20', label: '10-20%', min: 0.1, max: 0.2, barClass: 'bg-emerald-400', textClass: 'text-emerald-600' },
+  { id: '10-15', label: '10-15%', min: 0.1, max: 0.15, barClass: 'bg-emerald-300', textClass: 'text-emerald-600' },
+  { id: '15-20', label: '15-20%', min: 0.15, max: 0.2, barClass: 'bg-emerald-400', textClass: 'text-emerald-600' },
   { id: '20-30', label: '20-30%', min: 0.2, max: 0.3, barClass: 'bg-emerald-500', textClass: 'text-emerald-600' },
   { id: '30-50', label: '30-50%', min: 0.3, max: 0.5, barClass: 'bg-teal-500', textClass: 'text-teal-600' },
   { id: '50-80', label: '50-80%', min: 0.5, max: 0.8, barClass: 'bg-sky-500', textClass: 'text-sky-600' },
   { id: '80-120', label: '80-120%', min: 0.8, max: 1.2, barClass: 'bg-blue-500', textClass: 'text-blue-600' },
   { id: '120-200', label: '120-200%', min: 1.2, max: 2, barClass: 'bg-indigo-500', textClass: 'text-indigo-600' },
-  { id: 'over-200', label: '200%+', min: 2, max: null, barClass: 'bg-slate-950', textClass: 'text-slate-950' },
+  { id: '200-500', label: '200-500%', min: 2, max: 5, barClass: 'bg-violet-500', textClass: 'text-violet-600' },
+  { id: 'over-500', label: '500%+', min: 5, max: null, barClass: 'bg-slate-950', textClass: 'text-slate-950' },
 ];
 
 export function isNumber(value: unknown): value is number {

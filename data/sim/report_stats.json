@@ -7,8 +7,8 @@
   "median_days_to_target": 133.0,
   "avg_current_return": 0.9036,
   "median_current_return": 0.1028,
-  "avg_target_upside_at_pub": 0.7385,
-  "avg_target_gap_pct": -0.399,
+  "avg_target_upside_at_pub": 0.704,
+  "avg_target_gap_pct": -0.3941,
   "top_winners": [
     {
       "report_id": "fea27bf20d0f8d88",
@@ -1403,29 +1403,6 @@
   ],
   "most_aggressive_targets": [
     {
-      "report_id": "c631200d3a42357e",
-      "symbol": "002340.SZ",
-      "company": "GEM Co., Ltd.",
-      "publication_date": "2022-05-25",
-      "entry_price_krw": 1587.8499,
-      "target_price_krw": 14312.2364,
-      "target_upside_at_pub": 8.0136,
-      "target_hit": false,
-      "target_hit_date": null,
-      "days_to_target": null,
-      "last_close_krw": 1851.2974,
-      "last_close_date": "2026-05-22",
-      "current_return": 0.1659,
-      "peak_return": 0.3864,
-      "trough_return": -0.4367,
-      "target_gap_pct": -0.8706,
-      "evaluation_close_krw": 1404.221,
-      "evaluation_close_date": "2024-05-24",
-      "evaluation_return": -0.1156,
-      "expiry_date": "2024-05-24",
-      "expired": true
-    },
-    {
       "report_id": "9b739307066946a9",
       "symbol": "100840.KQ",
       "company": "SNT에너지",
@@ -1630,6 +1607,29 @@
       "evaluation_close_date": "2025-10-17",
       "evaluation_return": 0.1926,
       "expiry_date": "2025-10-18",
+      "expired": true
+    },
+    {
+      "report_id": "c36f87938dfe83da",
+      "symbol": "368600.KQ",
+      "company": "아이씨에이치",
+      "publication_date": "2022-10-13",
+      "entry_price_krw": 9050.0,
+      "target_price_krw": 31100.0,
+      "target_upside_at_pub": 2.4365,
+      "target_hit": false,
+      "target_hit_date": null,
+      "days_to_target": null,
+      "last_close_krw": 909.0,
+      "last_close_date": "2026-05-22",
+      "current_return": -0.8996,
+      "peak_return": 0.0707,
+      "trough_return": -0.9305,
+      "target_gap_pct": -0.9708,
+      "evaluation_close_krw": 3730.0,
+      "evaluation_close_date": "2024-10-11",
+      "evaluation_return": -0.5878,
+      "expiry_date": "2024-10-12",
       "expired": true
     }
   ]

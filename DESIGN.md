@@ -32,6 +32,7 @@ Only these web routes are active product surfaces:
 | `/` | Report board | 지금 어떤 리포트와 후보를 먼저 봐야 하나? |
 | `/reports` | Report table | 전체 리포트를 한 표에서 어떻게 비교하나? |
 | `/reports/[symbol]/[reportId]` | Report detail | 발간일 이후 이 리포트는 어떻게 끝났나? |
+| `/calendar` | Report calendar | 과거 특정 날짜에 어떤 후보를 볼 수 있었고 이후 어떻게 검증됐나? |
 | `/statistics` | Report statistics | 전체 표본의 수익/실패 분포와 반복 패턴은 무엇인가? |
 | `/portfolio` | Account chooser/dashboard | SMIC follower 계좌와 benchmark는 어떻게 비교되나? |
 | `/portfolio/[account]` | Account overview | 선택 계좌의 현재 보유와 리스크는 무엇인가? |
@@ -86,6 +87,9 @@ data/web/
     report-board.json
     report-statistics.json
     portfolio-dashboard.json
+    research-calendar.json
+  research-calendar/
+    calendar.json
   reports/
     table.json
     rankings.json
@@ -253,6 +257,7 @@ For report rows:
 - Korean listings show company names first.
 - US listings may show ticker first.
 - Exchange suffixes and market codes stay secondary or hidden when they do not help scanning.
+- Portfolio treemaps, holdings tables, and priority cards use the shared stock-display helper so the same symbol does not switch between company and ticker labels across screens.
 
 ---
 
@@ -275,7 +280,7 @@ Use custom SVG only for static analytical graphics:
 
 Multi-series performance charts must have on/off controls. Strategy/account and benchmark lines should be visible together when comparing performance.
 
-Trade markers may use tooltips, but portfolio pages must also expose a visible trade-event timeline or ledger.
+Trade markers may use tooltips, but portfolio pages must also expose a visible trade-event timeline or ledger. Dense trade markers are opt-in controls on performance charts because marker text can drown out account and benchmark curves.
 
 ---
 
@@ -312,7 +317,7 @@ Current metric meanings:
 
 Outcome buckets are diagnostic categories for research. They are not buy/sell recommendations.
 
-When statistics show a distribution, the UI should let users inspect which stocks are in a bucket when practical.
+When statistics show a distribution, the UI should let users inspect which stocks are in a bucket when practical. Peak-return distributions use fine-grained bins so the right-tail shape is visible instead of compressing every strong winner into one bucket.
 
 ---
 

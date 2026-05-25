@@ -22,7 +22,7 @@ const buttonVariants = cva(
       },
     },
     defaultVariants: {
-      variant: 'default',
+      variant: 'outline',
       size: 'default',
     },
   },
@@ -35,7 +35,8 @@ function Button({
   asChild = false,
   ...props
 }: React.ComponentProps<'button'> &
-  VariantProps<typeof buttonVariants> & {
+  Omit<VariantProps<typeof buttonVariants>, 'variant'> & {
+    variant: NonNullable<VariantProps<typeof buttonVariants>['variant']>;
     asChild?: boolean;
   }) {
   const Comp = asChild ? Slot.Root : 'button';

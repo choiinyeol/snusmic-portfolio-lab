@@ -53,9 +53,9 @@ class PriceBoard:
     Build via :func:`PriceBoard.from_warehouse`. Empty boards are legal ??    callers must check ``board.is_empty`` before driving the engine.
 
     The public DataFrames remain available for compatibility. If callers edit
-    frame values in place after construction, they must call :meth:`refresh`
-    before using cached lookups again; replacing whole frames is detected and
-    normalized automatically on the next lookup.
+    or replace frames after construction, they must call :meth:`refresh` before
+    using cached lookups again. Lookups deliberately avoid per-call mutation
+    detection because this class sits on the simulation hot path.
     """
 
     close: pd.DataFrame  # index = pd.DatetimeIndex (UTC-naive midnight), columns = symbol
@@ -76,7 +76,6 @@ class PriceBoard:
     _symbol_to_idx: dict[str, int] = field(init=False, repr=False)
     _date_to_idx: dict[date, int] = field(init=False, repr=False)
     _frame_arrays: dict[int, np.ndarray] = field(init=False, repr=False)
-    _state_signature: tuple[object, ...] = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
         self._normalize_ohlc_frames()
@@ -96,25 +95,6 @@ class PriceBoard:
                 index=self.close.index, columns=self.close.columns
             )
 
-    def _current_state_signature(self) -> tuple[object, ...]:
-        return (
-            self._frame_signature(self.close),
-            self._frame_signature(self.open),
-            self._frame_signature(self.high),
-            self._frame_signature(self.low),
-        )
-
-    @staticmethod
-    def _frame_signature(frame: pd.DataFrame | None) -> tuple[object, ...] | None:
-        if frame is None:
-            return None
-        return (
-            id(frame),
-            frame.shape,
-            tuple(str(column) for column in frame.columns),
-            tuple(pd.DatetimeIndex(frame.index).astype("datetime64[ns]").view("int64")),
-        )
-
     def refresh(self) -> None:
         """Normalize frames and rebuild NumPy lookup state after external edits."""
         self._normalize_ohlc_frames()
@@ -124,12 +104,16 @@ class PriceBoard:
         self._price_on_cache.clear()
         self._rebuild_numpy_state()
 
-    def _ensure_numpy_state(self) -> None:
-        if self._current_state_signature() != self._state_signature:
-            self.refresh()
+    def clone(self) -> PriceBoard:
+        """Return an independent lookup board over the same price values."""
+        return PriceBoard(
+            close=self.close.copy(deep=False),
+            open=self.open.copy(deep=False),
+            high=None if self.high is None else self.high.copy(deep=False),
+            low=None if self.low is None else self.low.copy(deep=False),
+        )
 
     def _rebuild_numpy_state(self) -> None:
-        self._state_signature = self._current_state_signature()
         if self.close.empty:
             self._dates_ns = np.array([], dtype=np.int64)
             self._trading_dates = []
@@ -184,7 +168,6 @@ class PriceBoard:
         return self.close.empty
 
     def trading_dates(self, start: date | None = None, end: date | None = None) -> list[date]:
-        self._ensure_numpy_state()
         if self.close.empty:
             return []
         left = 0 if start is None else int(np.searchsorted(self._dates_ns, pd.Timestamp(start).value, "left"))
@@ -197,7 +180,6 @@ class PriceBoard:
 
     def close_on(self, day: date) -> dict[str, float]:
         """Closes available on ``day``. Symbols missing a close are omitted."""
-        self._ensure_numpy_state()
         cached = self._close_on_cache.get(day)
         if cached is not None:
             return cached
@@ -216,7 +198,6 @@ class PriceBoard:
 
     def open_on(self, day: date) -> dict[str, float]:
         """Opens available on ``day``. Symbols missing an open are omitted."""
-        self._ensure_numpy_state()
         row_idx = self._date_to_idx.get(day)
         if row_idx is None or self.open.empty:
             return {}
@@ -230,7 +211,6 @@ class PriceBoard:
 
     def asof(self, day: date, symbol: str) -> float | None:
         """Latest known close for ``symbol`` on or before ``day``."""
-        self._ensure_numpy_state()
         key = (day, symbol)
         if key in self._asof_cache:
             return self._asof_cache[key]
@@ -253,7 +233,6 @@ class PriceBoard:
 
     def date_asof(self, day: date, symbol: str) -> date | None:
         """Date of the latest valid close for ``symbol`` on or before ``day``."""
-        self._ensure_numpy_state()
         key = (day, symbol)
         if key in self._date_asof_cache:
             return self._date_asof_cache[key]
@@ -294,7 +273,6 @@ class PriceBoard:
         return high is not None and high >= threshold
 
     def _price_on(self, day: date, symbol: str, frame: pd.DataFrame) -> float | None:
-        self._ensure_numpy_state()
         key = (id(frame), day, symbol)
         if key in self._price_on_cache:
             return self._price_on_cache[key]
@@ -388,7 +366,6 @@ class PriceBoard:
         *,
         include_start: bool = True,
     ) -> tuple[list[date], np.ndarray] | None:
-        self._ensure_numpy_state()
         col_idx = self._symbol_to_idx.get(symbol)
         array = self._frame_arrays.get(id(frame))
         if self.close.empty or col_idx is None or array is None:

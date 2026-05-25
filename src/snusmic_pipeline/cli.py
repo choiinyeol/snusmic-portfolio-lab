@@ -18,10 +18,22 @@ from .ingest.fetch_index import fetch_reports, parse_pages
 from .ingest.github_urls import github_pdf_url
 from .ingest.markdown_export import export_markdown
 from .ingest.models import DownloadedPdf, ExtractedReport, ReportMeta
+from .sim.account_path_audit import build_account_path_audit_report
 from .sim.account_sim import main as run_account_simulation_command
 from .sim.contracts import SimulationConfig
 from .sim.forward_runner import load_config_from_account_artifact, run_daily_forward
 from .sim.pit_board_export import main as run_pit_board_export_command
+from .sim.replacement_audit import (
+    build_replacement_event_audit_report,
+    build_replacement_feature_audit_report,
+)
+from .sim.research_report import build_research_report
+from .sim.selection_audit import (
+    build_entry_timing_audit_report,
+    build_rebalance_state_audit_report,
+    build_selection_audit_report,
+    build_selection_diff_audit_report,
+)
 from .sim.warehouse import build_warehouse, refresh_price_history
 from .web.artifacts import ExportInputs, check_web_artifacts, export_web_artifacts
 
@@ -616,6 +628,148 @@ def run_export_pit_board(args: argparse.Namespace) -> int:
     return run_pit_board_export_command(forwarded)
 
 
+def run_research_report(args: argparse.Namespace) -> int:
+    account_ids = [part.strip() for part in args.accounts.split(",") if part.strip()]
+    report = build_research_report(
+        Path(args.sim),
+        account_ids,
+        baseline_id=args.baseline or None,
+        title=args.title,
+    )
+    if args.out:
+        out_path = Path(args.out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(report, encoding="utf-8")
+    else:
+        print(report)
+    return 0
+
+
+def run_selection_audit(args: argparse.Namespace) -> int:
+    report = build_selection_audit_report(
+        Path(args.warehouse),
+        Path(args.sim),
+        args.account,
+        start=date.fromisoformat(args.start),
+        end=date.fromisoformat(args.end),
+        recent_rebalances=args.recent_rebalances,
+    )
+    if args.out:
+        out_path = Path(args.out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(report, encoding="utf-8")
+    else:
+        print(report)
+    return 0
+
+
+def run_selection_diff_audit(args: argparse.Namespace) -> int:
+    report = build_selection_diff_audit_report(
+        Path(args.warehouse),
+        args.account,
+        start=date.fromisoformat(args.start),
+        end=date.fromisoformat(args.end),
+    )
+    if args.out:
+        out_path = Path(args.out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(report, encoding="utf-8")
+    else:
+        print(report)
+    return 0
+
+
+def run_entry_timing_audit(args: argparse.Namespace) -> int:
+    report = build_entry_timing_audit_report(
+        Path(args.warehouse),
+        Path(args.sim),
+        args.account,
+        args.baseline,
+        start=date.fromisoformat(args.start),
+        end=date.fromisoformat(args.end),
+    )
+    if args.out:
+        out_path = Path(args.out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(report, encoding="utf-8")
+    else:
+        print(report)
+    return 0
+
+
+def run_rebalance_state_audit(args: argparse.Namespace) -> int:
+    account_ids = [part.strip() for part in args.accounts.split(",") if part.strip()]
+    audit_dates = [date.fromisoformat(part.strip()) for part in args.dates.split(",") if part.strip()]
+    report = build_rebalance_state_audit_report(
+        Path(args.warehouse),
+        Path(args.sim),
+        account_ids,
+        audit_dates=audit_dates,
+        start=date.fromisoformat(args.start),
+        end=date.fromisoformat(args.end),
+        top_rows=args.top_rows,
+    )
+    if args.out:
+        out_path = Path(args.out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(report, encoding="utf-8")
+    else:
+        print(report)
+    return 0
+
+
+def run_replacement_event_audit(args: argparse.Namespace) -> int:
+    report = build_replacement_event_audit_report(
+        Path(args.warehouse),
+        Path(args.sim),
+        args.account,
+        start=date.fromisoformat(args.start),
+        end=date.fromisoformat(args.end),
+        top_rows=args.top_rows,
+    )
+    if args.out:
+        out_path = Path(args.out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(report, encoding="utf-8")
+    else:
+        print(report)
+    return 0
+
+
+def run_replacement_feature_audit(args: argparse.Namespace) -> int:
+    report = build_replacement_feature_audit_report(
+        Path(args.warehouse),
+        Path(args.sim),
+        args.account,
+        start=date.fromisoformat(args.start),
+        end=date.fromisoformat(args.end),
+    )
+    if args.out:
+        out_path = Path(args.out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(report, encoding="utf-8")
+    else:
+        print(report)
+    return 0
+
+
+def run_account_path_audit(args: argparse.Namespace) -> int:
+    report = build_account_path_audit_report(
+        Path(args.sim),
+        args.account,
+        args.baseline,
+        title=args.title,
+        top_symbols=args.top_symbols,
+    )
+    if args.out:
+        out_path = Path(args.out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(report, encoding="utf-8")
+    else:
+        print(report)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Collect SNUSMIC PDFs, extract target prices, and export PIT research data."
@@ -745,6 +899,148 @@ def build_parser() -> argparse.ArgumentParser:
     pit_board.add_argument("--max-report-age-days", type=int, default=730)
     pit_board.add_argument("--universe", choices=("all", "domestic", "overseas"), default="all")
     pit_board.set_defaults(func=run_export_pit_board)
+
+    research_report = subparsers.add_parser(
+        "research-report",
+        help="Emit Markdown comparison tables from generated simulation artifacts.",
+    )
+    research_report.add_argument("--sim", default=str(REPO_ROOT / "data" / "sim"))
+    research_report.add_argument(
+        "--accounts",
+        required=True,
+        help="Comma-separated account ids in display order.",
+    )
+    research_report.add_argument(
+        "--baseline",
+        default="",
+        help="Optional account id for daily equity-delta comparison.",
+    )
+    research_report.add_argument("--title", default="Strategy Research Extract")
+    research_report.add_argument("--out", default="", help="Optional Markdown output path.")
+    research_report.set_defaults(func=run_research_report)
+
+    selection_audit = subparsers.add_parser(
+        "selection-audit",
+        help="Emit a Markdown explanation of PIT strategy selection mechanics.",
+    )
+    selection_audit.add_argument("--warehouse", default=str(REPO_ROOT / "data" / "warehouse"))
+    selection_audit.add_argument("--sim", default=str(REPO_ROOT / "data" / "sim"))
+    selection_audit.add_argument(
+        "--account",
+        default="pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5",
+    )
+    selection_audit.add_argument("--start", default="2021-01-04")
+    selection_audit.add_argument("--end", default=date.today().isoformat())
+    selection_audit.add_argument("--recent-rebalances", type=int, default=8)
+    selection_audit.add_argument("--out", default="", help="Optional Markdown output path.")
+    selection_audit.set_defaults(func=run_selection_audit)
+
+    selection_diff_audit = subparsers.add_parser(
+        "selection-diff-audit",
+        help="Emit ex-post differences between candidate-score and board-score PIT selections.",
+    )
+    selection_diff_audit.add_argument("--warehouse", default=str(REPO_ROOT / "data" / "warehouse"))
+    selection_diff_audit.add_argument(
+        "--account",
+        default="pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5",
+    )
+    selection_diff_audit.add_argument("--start", default="2021-01-04")
+    selection_diff_audit.add_argument("--end", default=date.today().isoformat())
+    selection_diff_audit.add_argument("--out", default="", help="Optional Markdown output path.")
+    selection_diff_audit.set_defaults(func=run_selection_diff_audit)
+
+    entry_timing_audit = subparsers.add_parser(
+        "entry-timing-audit",
+        help="Emit PIT rank-board evidence for symbols first bought on different dates.",
+    )
+    entry_timing_audit.add_argument("--warehouse", default=str(REPO_ROOT / "data" / "warehouse"))
+    entry_timing_audit.add_argument("--sim", default=str(REPO_ROOT / "data" / "sim"))
+    entry_timing_audit.add_argument(
+        "--account",
+        default="pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5",
+    )
+    entry_timing_audit.add_argument(
+        "--baseline",
+        default="pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5",
+    )
+    entry_timing_audit.add_argument("--start", default="2021-01-04")
+    entry_timing_audit.add_argument("--end", default=date.today().isoformat())
+    entry_timing_audit.add_argument("--out", default="", help="Optional Markdown output path.")
+    entry_timing_audit.set_defaults(func=run_entry_timing_audit)
+
+    rebalance_state_audit = subparsers.add_parser(
+        "rebalance-state-audit",
+        help="Emit account-state evidence for selected PIT rebalance dates.",
+    )
+    rebalance_state_audit.add_argument("--warehouse", default=str(REPO_ROOT / "data" / "warehouse"))
+    rebalance_state_audit.add_argument("--sim", default=str(REPO_ROOT / "data" / "sim"))
+    rebalance_state_audit.add_argument(
+        "--accounts",
+        default=(
+            "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,"
+            "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5"
+        ),
+        help="Comma-separated account ids to compare.",
+    )
+    rebalance_state_audit.add_argument(
+        "--dates",
+        default="2024-07-01,2024-10-01",
+        help="Comma-separated rebalance dates to audit.",
+    )
+    rebalance_state_audit.add_argument("--start", default="2021-01-04")
+    rebalance_state_audit.add_argument("--end", default=date.today().isoformat())
+    rebalance_state_audit.add_argument("--top-rows", type=int, default=10)
+    rebalance_state_audit.add_argument("--out", default="", help="Optional Markdown output path.")
+    rebalance_state_audit.set_defaults(func=run_rebalance_state_audit)
+
+    replacement_event_audit = subparsers.add_parser(
+        "replacement-event-audit",
+        help="Emit ex-post audit evidence for same-rebalance replacement buys.",
+    )
+    replacement_event_audit.add_argument("--warehouse", default=str(REPO_ROOT / "data" / "warehouse"))
+    replacement_event_audit.add_argument("--sim", default=str(REPO_ROOT / "data" / "sim"))
+    replacement_event_audit.add_argument(
+        "--account",
+        default="pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5",
+    )
+    replacement_event_audit.add_argument("--start", default="2021-01-04")
+    replacement_event_audit.add_argument("--end", default=date.today().isoformat())
+    replacement_event_audit.add_argument("--top-rows", type=int, default=20)
+    replacement_event_audit.add_argument("--out", default="", help="Optional Markdown output path.")
+    replacement_event_audit.set_defaults(func=run_replacement_event_audit)
+
+    replacement_feature_audit = subparsers.add_parser(
+        "replacement-feature-audit",
+        help="Bucket replacement buys by observable PIT features and ex-post next-rebalance returns.",
+    )
+    replacement_feature_audit.add_argument("--warehouse", default=str(REPO_ROOT / "data" / "warehouse"))
+    replacement_feature_audit.add_argument("--sim", default=str(REPO_ROOT / "data" / "sim"))
+    replacement_feature_audit.add_argument(
+        "--account",
+        default="pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5",
+    )
+    replacement_feature_audit.add_argument("--start", default="2021-01-04")
+    replacement_feature_audit.add_argument("--end", default=date.today().isoformat())
+    replacement_feature_audit.add_argument("--out", default="", help="Optional Markdown output path.")
+    replacement_feature_audit.set_defaults(func=run_replacement_feature_audit)
+
+    account_path_audit = subparsers.add_parser(
+        "account-path-audit",
+        help="Emit Markdown path attribution between two generated simulation accounts.",
+    )
+    account_path_audit.add_argument("--sim", default=str(REPO_ROOT / "data" / "sim"))
+    account_path_audit.add_argument(
+        "--account",
+        default="pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5",
+    )
+    account_path_audit.add_argument(
+        "--baseline",
+        default="pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5",
+    )
+    account_path_audit.add_argument("--title", default="Account Path Audit")
+    account_path_audit.add_argument("--top-symbols", type=int, default=12)
+    account_path_audit.add_argument("--out", default="", help="Optional Markdown output path.")
+    account_path_audit.set_defaults(func=run_account_path_audit)
 
     daily_forward = subparsers.add_parser(
         "daily-forward",

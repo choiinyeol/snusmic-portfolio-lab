@@ -123,3 +123,34 @@ def test_pit_board_uses_market_scale_entry_for_adjusted_targets() -> None:
     assert row.entry_price_krw == 25_000.0
     assert row.target_price_krw == 40_000.0
     assert row.target_upside_at_pub == pytest.approx(0.6)
+    assert row.price_quality_flag == "explicit_scale"
+
+
+def test_pit_board_repairs_report_quote_unit_errors_against_market_price() -> None:
+    close = pd.DataFrame(
+        {"UNIT.KQ": [9_210.0, 9_500.0]},
+        index=pd.to_datetime(["2023-10-19", "2023-10-20"]),
+    )
+    board = PriceBoard(close=close, open=close.copy(), high=close.copy(), low=close.copy())
+    reports = pd.DataFrame(
+        [
+            {
+                "report_id": "r-unit",
+                "symbol": "UNIT.KQ",
+                "company": "Unit Broken",
+                "publication_date": pd.Timestamp("2023-10-19"),
+                "report_current_price_krw": 9.6,
+                "target_price_krw": 18_600.0,
+                "target_price_scale_factor": 1.0,
+            },
+        ]
+    )
+
+    [row] = build_pit_research_board(reports, board, date(2023, 10, 20), max_report_age_days=3650)
+
+    assert row.entry_price_krw == 9_210.0
+    assert row.target_price_krw == 18_600.0
+    assert row.target_upside_at_pub == pytest.approx(18_600.0 / 9_210.0 - 1.0)
+    assert row.current_return == pytest.approx(9_500.0 / 9_210.0 - 1.0)
+    assert row.price_quality_flag == "entry_unit_scaled"
+    assert row.entry_price_source == "market_price"

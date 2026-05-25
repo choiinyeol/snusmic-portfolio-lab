@@ -2,21 +2,21 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { PortfolioEquityView } from '@/components/trading/portfolio-views/PortfolioEquityView';
 import { PortfolioHoldingsView } from '@/components/trading/portfolio-views/PortfolioHoldingsView';
+import { displayPortfolioName, strategyMeta } from '@/components/trading/portfolio-views/strategy-display';
 import { PortfolioLandingView } from '@/components/trading/portfolio-views/PortfolioLandingView';
 import { PortfolioOverviewView } from '@/components/trading/portfolio-views/PortfolioOverviewView';
 import { PortfolioAccountFrame } from '@/components/trading/portfolio-views/PortfolioAccountFrame';
 import { PortfolioTradesView } from '@/components/trading/portfolio-views/PortfolioTradesView';
 import type { PortfolioViewModel } from '@/components/trading/portfolio-views/types';
 import { Button } from '@/components/ui/button';
-import { PageHero } from '@/components/ui/PageHero';
-import { formatKrw, formatPercent } from '@/lib/format';
+import { formatKrw, formatMultiple, formatPercent } from '@/lib/format';
 import {
   buildPortfolioLandingModel,
   buildPortfolioViewModel,
   getPortfolioStaticParams as getStaticParams,
 } from './portfolio-view-model';
 
-export type PortfolioRouteView = 'overview' | 'holdings' | 'equity' | 'trades';
+export type PortfolioRouteView = 'ledger' | 'holdings' | 'equity' | 'trades';
 
 export function PortfolioPageContent() {
   return <PortfolioLandingView model={buildPortfolioLandingModel()} />;
@@ -27,49 +27,66 @@ export function EmptyPortfolioRouteContent() {
 }
 
 export function PortfolioPageShell({ children, model }: { children: ReactNode; model: PortfolioViewModel }) {
-  const account_id = model.selectedAccount;
-  const label = model.accountLabels[account_id] ?? account_id;
-  const shortLabel = model.accountOptions.find((row) => row.id === account_id)?.shortLabel ?? label;
-  const holdingsValue = model.holdings.reduce((sum, row) => sum + (row.marketValueKrw ?? 0), 0);
-  const cashKrw = model.cashByAccount[account_id] ?? 0;
-  const totalValue = holdingsValue + cashKrw;
-  const totalPnl = model.holdings.reduce((sum, row) => sum + (row.unrealizedPnlKrw ?? 0), 0);
-  const latestEquity = [...model.equity].sort((a, b) => b.date.localeCompare(a.date))[0];
+  const accountId = model.selectedAccount;
+  const label = model.accountLabels[accountId] ?? accountId;
+  const fallback = model.accountOptions.find((row) => row.id === accountId)?.shortLabel ?? label;
+  const shortLabel = displayPortfolioName(accountId, fallback);
+  const diagnostics = model.ledgerDiagnostics;
+  const meta = strategyMeta(accountId);
 
   return (
     <div className="grid gap-5">
-      <PageHero
-        eyebrow="Portfolio report"
-        title={shortLabel}
-        subtitle={`${label}의 실제 보유, RP이자, 체결, 손익 경로를 계좌 보고서 형태로 보여줍니다. 벤치마크는 선택 가능한 실제 보유 원장에 섞지 않고 비교 기준선으로만 표시합니다.`}
-        badges={[
-          { label: '최근 평가', value: model.latestEquityDate || '—' },
-          { label: '표시 기준', value: '실제 보유 계좌' },
-        ]}
-        actions={
+      <section className="rounded-md border border-slate-200 bg-white p-4">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0">
+            <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+              account ledger
+            </div>
+            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-slate-950">{shortLabel} 원장</h1>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
+              현재 보유, 실현손익, 미실현손익, 승률과 손익비를 한 화면에서 확인합니다.
+            </p>
+          </div>
           <Button asChild size="sm" variant="outline">
-            <Link href="/portfolio">계좌 선택</Link>
+            <Link href="/portfolio">포트폴리오 홈</Link>
           </Button>
-        }
-        kpis={
-          <FactsTable
-            rows={[
-              { label: '현재 평가액', value: formatKrw(totalValue), tone: 'neutral' },
-              {
-                label: 'RP이자 비중',
-                value: formatPercent(totalValue > 0 ? cashKrw / totalValue : null),
-                caption: formatKrw(cashKrw),
-              },
-              { label: '미실현 손익', value: formatKrw(totalPnl), tone: totalPnl >= 0 ? 'good' : 'bad' },
-              {
-                label: '누적 수익률',
-                value: formatPercent(latestEquity?.cumulativeReturn ?? null),
-                tone: (latestEquity?.cumulativeReturn ?? 0) >= 0 ? 'good' : 'bad',
-              },
-            ]}
-          />
-        }
-      />
+        </div>
+
+        <div className="mt-4 rounded-md border border-slate-200 bg-slate-50 p-3">
+          <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+            {meta.role}
+          </div>
+          <div className="mt-1 text-sm font-semibold text-slate-950">{meta.subtitle}</div>
+          <p className="mt-1 max-w-5xl text-sm leading-6 text-slate-600">{meta.description}</p>
+        </div>
+
+        <FactsTable
+          rows={[
+            { label: '평가액', value: formatKrw(diagnostics.currentValueKrw), tone: 'neutral' },
+            {
+              label: '누적수익률',
+              value: formatPercent(diagnostics.cumulativeReturn),
+              tone: (diagnostics.cumulativeReturn ?? 0) >= 0 ? 'good' : 'bad',
+            },
+            {
+              label: '실현손익',
+              value: formatKrw(diagnostics.realizedPnlKrw),
+              tone: (diagnostics.realizedPnlKrw ?? 0) >= 0 ? 'good' : 'bad',
+            },
+            {
+              label: '미실현손익',
+              value: formatKrw(diagnostics.unrealizedPnlKrw),
+              tone: (diagnostics.unrealizedPnlKrw ?? 0) >= 0 ? 'good' : 'bad',
+            },
+            {
+              label: '승률',
+              value: formatPercent(diagnostics.winRate),
+              caption: `${diagnostics.closedEpisodeCount.toLocaleString('ko-KR')}개 마감 포지션`,
+            },
+            { label: '손익비', value: formatMultiple(diagnostics.payoffRatio) },
+          ]}
+        />
+      </section>
       <PortfolioAccountFrame model={model}>{children}</PortfolioAccountFrame>
     </div>
   );
@@ -83,7 +100,11 @@ export function PortfolioRouteContent({
   view: PortfolioRouteView;
 }) {
   const model = buildPortfolioViewModel(selectedAccount);
-  return <PortfolioRouteContentFromModel model={model} view={view} />;
+  return (
+    <PortfolioPageShell model={model}>
+      <PortfolioRouteContentFromModel model={model} view={view} />
+    </PortfolioPageShell>
+  );
 }
 
 export function PortfolioRouteContentFromModel({
@@ -110,8 +131,8 @@ type FactRow = {
 
 function FactsTable({ rows }: { rows: FactRow[] }) {
   return (
-    <section className="overflow-hidden rounded-md border border-slate-200 bg-white" aria-label="계좌 핵심 지표">
-      <dl className="grid grid-cols-2 lg:grid-cols-4 [&>div]:border-b [&>div]:border-r [&>div]:border-slate-100">
+    <section className="mt-4 overflow-hidden rounded-md border border-slate-200 bg-white" aria-label="계좌 핵심 지표">
+      <dl className="grid grid-cols-2 lg:grid-cols-6 [&>div]:border-b [&>div]:border-r [&>div]:border-slate-100">
         {rows.map((row) => (
           <div className="grid min-w-0 gap-0.5 p-3" key={row.label}>
             <dt className="text-xs font-medium text-slate-500">{row.label}</dt>

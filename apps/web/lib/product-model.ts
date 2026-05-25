@@ -17,7 +17,106 @@ import {
 
 export const TARGET_BENCHMARK_ID = 'benchmark_kodex200';
 export const OBJECTIVE_MAX_DRAWDOWN = 0.15;
-export const FOLLOWER_ACCOUNT_IDS = ['smic_follower', 'smic_follower_v2'] as const;
+export const FOLLOWER_ACCOUNT_IDS = [
+  'smic_follower',
+  'smic_follower_v2',
+  'pit_score_top3',
+  'pit_score_top5',
+  'pit_score_top10',
+  'pit_momentum_top5',
+  'pit_trend_top5',
+  'pit_fresh_top5',
+  'pit_trend_top7',
+  'pit_trend_stop_top5',
+  'pit_trend_stop_top7',
+  'pit_trend_rotate_top5',
+  'pit_trend_rotate_fast_top5',
+  'pit_trend_rotate_stop_top5',
+  'pit_trend_persist20_top5',
+  'pit_trend_persist30_top5',
+  'pit_trend_persist20_hold90_top5',
+  'pit_trend_persist20_top3',
+  'pit_trend_persist20_top7',
+  'pit_trend_persist20_52w10_top5',
+  'pit_trend_persist20_domestic_top5',
+  'pit_trend_persist20_score_top5',
+  'pit_trend_persist20_scorecap_top5',
+  'pit_trend_persist20_invvol_top5',
+  'pit_trend_persist20_invvolcap_top5',
+  'pit_trend_persist20_semimonthly_top5',
+  'pit_trend_persist20_quarterly_top5',
+  'pit_trend_persist30_quarterly_top5',
+  'pit_trend_persist20_quarterly_risk_top5',
+  'pit_trend_persist30_quarterly_risk_top5',
+  'pit_trend_persist20_quarterly_hold120_top5',
+  'pit_trend_quarterly_ret3_top5',
+  'pit_trend_quarterly_ret6_top5',
+  'pit_trend_quarterly_ret36_top5',
+  'pit_trend_quarterly_fresh365_top5',
+  'pit_trend_quarterly_fresh540_top5',
+  'pit_trend_persist20_fresh540_top5',
+  'pit_trend_persist20_fresh540_top3',
+  'pit_trend_persist20_fresh540_top7',
+  'pit_trend_quarterly_fresh540_top3',
+  'pit_trend_quarterly_fresh540_top7',
+  'pit_trend_quarterly_fresh540_gross_top5',
+  'pit_trend_quarterly_fresh540_slip25_top5',
+  'pit_trend_quarterly_fresh540_slip50_top5',
+  'pit_trend_quarterly_fresh540_feb_top5',
+  'pit_trend_quarterly_fresh540_mar_top5',
+  'pit_trend_quarterly_fresh540_cash90_top5',
+  'pit_trend_quarterly_fresh540_cash80_top5',
+  'pit_trend_quarterly_fresh540_vol35_top5',
+  'pit_trend_quarterly_fresh540_vol40_top5',
+  'pit_trend_quarterly_fresh540_vol45_top5',
+  'pit_trend_quarterly_fresh540_vol50_top5',
+  'pit_trend_quarterly_fresh540_vol55_top5',
+  'pit_trend_quarterly_fresh540_mar_vol45_top5',
+  'pit_trend_quarterly_fresh540_entry270_top5',
+  'pit_trend_quarterly_fresh540_entry270_vol50_top5',
+  'pit_trend_quarterly_fresh540_entry270_mar_top5',
+  'pit_trend_quarterly_fresh540_entry365_top5',
+  'pit_trend_quarterly_fresh540_entry450_top5',
+  'pit_trend_quarterly_fresh540_entry365_vol50_top5',
+  'pit_trend_quarterly_fresh540_rank15_top5',
+  'pit_trend_quarterly_fresh540_rank25_top5',
+  'pit_trend_quarterly_fresh540_runwinners_top5',
+  'pit_trend_quarterly_fresh540_runwinners_vol50_top5',
+  'pit_trend_quarterly_fresh540_runwinners_top3',
+  'pit_trend_quarterly_fresh540_runwinners_top7',
+  'pit_trend_quarterly_fresh540_runwinners_feb_top5',
+  'pit_trend_quarterly_fresh540_runwinners_mar_top5',
+  'pit_trend_quarterly_fresh540_runwinners_slip25_top5',
+  'pit_trend_quarterly_fresh540_runwinners_slip50_top5',
+  'pit_trend_quarterly_fresh540_runwinners_cap40_top5',
+  'pit_trend_quarterly_fresh540_runwinners_cap35_top5',
+  'pit_trend_quarterly_fresh540_runwinners_soft45_top5',
+  'pit_trend_quarterly_fresh540_runwinners_vol50_cap40_top5',
+  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_top5',
+  'pit_trend_quarterly_fresh540_runwinners_dailycap45_top5',
+  'pit_trend_quarterly_fresh540_runwinners_vol50_weeklycap45_top5',
+  'pit_trend_quarterly_fresh540_runwinners_weeklycap50_top5',
+  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit10_top5',
+  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit25_top5',
+  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit40_top5',
+  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5',
+  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5',
+  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top3',
+  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top7',
+  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_slip25_top5',
+  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_slip50_top5',
+  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_midcontrib_top5',
+  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_lastcontrib_top5',
+  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_momentum_top5',
+  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_midcontrib_top5',
+  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_lastcontrib_top5',
+  'pit_trend_quarterly_fresh540_runwinners_dailycap45_profit25_top5',
+  'pit_trend_quarterly_fresh540_confirm5_top5',
+  'pit_trend_quarterly_fresh540_confirm10_top5',
+  'pit_trend_quarterly_fresh540_confirm10_vol50_top5',
+  'pit_trend_persist20_kodex50_top5',
+  'pit_trend_persist20_kodex200_top5',
+] as const;
 export const BENCHMARK_IDS = getAccountCatalog()
   .filter((row) => row.kind !== 'account')
   .map((row) => row.accountId);
@@ -375,6 +474,77 @@ export function compactAccountLabel(id: string, label: string): string {
   if (id === 'all_weather') return '올웨더';
   if (id === 'smic_follower') return '리포트 추종 v1';
   if (id === 'smic_follower_v2') return '정지룰 리포트 추종';
+  if (id === 'pit_score_top3') return 'PIT Top 3';
+  if (id === 'pit_score_top5') return 'PIT Top 5';
+  if (id === 'pit_score_top10') return 'PIT Top 10';
+  if (id === 'pit_momentum_top5') return 'PIT Momentum';
+  if (id === 'pit_trend_top5') return 'PIT Trend';
+  if (id === 'pit_fresh_top5') return 'PIT Fresh';
+  if (id === 'pit_trend_top7') return 'PIT Trend 7';
+  if (id === 'pit_trend_stop_top5') return 'PIT Stop 5';
+  if (id === 'pit_trend_stop_top7') return 'PIT Stop 7';
+  if (id === 'pit_trend_rotate_top5') return 'PIT Rotate';
+  if (id === 'pit_trend_rotate_fast_top5') return 'PIT Rotate 2x';
+  if (id === 'pit_trend_rotate_stop_top5') return 'PIT Stop Rotate';
+  if (id === 'pit_trend_persist20_top5') return 'PIT Persist 20';
+  if (id === 'pit_trend_persist30_top5') return 'PIT Persist 30';
+  if (id === 'pit_trend_persist20_hold90_top5') return 'PIT Persist 20/90';
+  if (id === 'pit_trend_persist20_top3') return 'PIT Persist 20 Top3';
+  if (id === 'pit_trend_persist20_top7') return 'PIT Persist 20 Top7';
+  if (id === 'pit_trend_persist20_52w10_top5') return 'PIT Persist 52W';
+  if (id === 'pit_trend_persist20_domestic_top5') return 'PIT Persist Korea';
+  if (id === 'pit_trend_persist20_score_top5') return 'PIT Persist Score';
+  if (id === 'pit_trend_persist20_scorecap_top5') return 'PIT Persist Score Cap';
+  if (id === 'pit_trend_persist20_invvol_top5') return 'PIT Persist InvVol';
+  if (id === 'pit_trend_persist20_invvolcap_top5') return 'PIT Persist InvVol Cap';
+  if (id === 'pit_trend_persist20_semimonthly_top5') return 'PIT Persist 2x';
+  if (id === 'pit_trend_persist20_quarterly_top5') return 'PIT Persist Quarterly';
+  if (id === 'pit_trend_persist30_quarterly_top5') return 'PIT Quarterly Top30';
+  if (id === 'pit_trend_persist20_quarterly_risk_top5') return 'PIT Quarterly Risk';
+  if (id === 'pit_trend_persist30_quarterly_risk_top5') return 'PIT Quarterly Top30 Risk';
+  if (id === 'pit_trend_persist20_quarterly_hold120_top5') return 'PIT Quarterly Hold120';
+  if (id === 'pit_trend_quarterly_ret3_top5') return 'PIT Quarterly 3M';
+  if (id === 'pit_trend_quarterly_ret6_top5') return 'PIT Quarterly 6M';
+  if (id === 'pit_trend_quarterly_ret36_top5') return 'PIT Quarterly 3M+6M';
+  if (id === 'pit_trend_quarterly_fresh365_top5') return 'PIT Quarterly Fresh365';
+  if (id === 'pit_trend_quarterly_fresh540_top5') return 'PIT Quarterly Fresh540';
+  if (id === 'pit_trend_persist20_fresh540_top5') return 'PIT Monthly Fresh540';
+  if (id === 'pit_trend_persist20_fresh540_top3') return 'PIT Monthly Fresh540 Top3';
+  if (id === 'pit_trend_persist20_fresh540_top7') return 'PIT Monthly Fresh540 Top7';
+  if (id === 'pit_trend_quarterly_fresh540_top3') return 'PIT Quarterly Fresh540 Top3';
+  if (id === 'pit_trend_quarterly_fresh540_top7') return 'PIT Quarterly Fresh540 Top7';
+  if (id === 'pit_trend_quarterly_fresh540_gross_top5') return 'PIT Quarterly Fresh540 Gross';
+  if (id === 'pit_trend_quarterly_fresh540_slip25_top5') return 'PIT Quarterly Fresh540 Slip25';
+  if (id === 'pit_trend_quarterly_fresh540_slip50_top5') return 'PIT Quarterly Fresh540 Slip50';
+  if (id === 'pit_trend_quarterly_fresh540_feb_top5') return 'PIT Quarterly Fresh540 Feb';
+  if (id === 'pit_trend_quarterly_fresh540_mar_top5') return 'PIT Quarterly Fresh540 Mar';
+  if (id === 'pit_trend_quarterly_fresh540_cash90_top5') return 'PIT Quarterly Fresh540 Cash10';
+  if (id === 'pit_trend_quarterly_fresh540_cash80_top5') return 'PIT Quarterly Fresh540 Cash20';
+  if (id === 'pit_trend_quarterly_fresh540_vol35_top5') return 'PIT Quarterly Fresh540 Vol35';
+  if (id === 'pit_trend_quarterly_fresh540_vol40_top5') return 'PIT Quarterly Fresh540 Vol40';
+  if (id === 'pit_trend_quarterly_fresh540_vol45_top5') return 'PIT Quarterly Fresh540 Vol45';
+  if (id === 'pit_trend_quarterly_fresh540_vol50_top5') return 'PIT Quarterly Fresh540 Vol50';
+  if (id === 'pit_trend_quarterly_fresh540_vol55_top5') return 'PIT Quarterly Fresh540 Vol55';
+  if (id === 'pit_trend_quarterly_fresh540_mar_vol45_top5') return 'PIT Quarterly Fresh540 Mar Vol45';
+  if (id === 'pit_trend_quarterly_fresh540_entry270_top5') return 'PIT Quarterly Fresh540 Entry270';
+  if (id === 'pit_trend_quarterly_fresh540_entry270_vol50_top5') {
+    return 'PIT Quarterly Fresh540 Entry270 Vol50';
+  }
+  if (id === 'pit_trend_quarterly_fresh540_entry270_mar_top5') return 'PIT Quarterly Fresh540 Entry270 Mar';
+  if (id === 'pit_trend_quarterly_fresh540_entry365_top5') return 'PIT Quarterly Fresh540 Entry365';
+  if (id === 'pit_trend_quarterly_fresh540_entry450_top5') return 'PIT Quarterly Fresh540 Entry450';
+  if (id === 'pit_trend_quarterly_fresh540_entry365_vol50_top5') {
+    return 'PIT Quarterly Fresh540 Entry365 Vol50';
+  }
+  if (id === 'pit_trend_quarterly_fresh540_rank15_top5') return 'PIT Quarterly Fresh540 Rank15';
+  if (id === 'pit_trend_quarterly_fresh540_rank25_top5') return 'PIT Quarterly Fresh540 Rank25';
+  if (id === 'pit_trend_quarterly_fresh540_confirm5_top5') return 'PIT Quarterly Fresh540 Confirm5';
+  if (id === 'pit_trend_quarterly_fresh540_confirm10_top5') return 'PIT Quarterly Fresh540 Confirm10';
+  if (id === 'pit_trend_quarterly_fresh540_confirm10_vol50_top5') {
+    return 'PIT Quarterly Fresh540 Confirm10 Vol50';
+  }
+  if (id === 'pit_trend_persist20_kodex50_top5') return 'PIT Persist KODEX 50';
+  if (id === 'pit_trend_persist20_kodex200_top5') return 'PIT Persist KODEX 200';
   if (id === 'benchmark_kodex200') return 'KODEX200';
   if (id === 'benchmark_qqq') return 'QQQ';
   if (id === 'benchmark_spy') return 'SPY';

@@ -6,13 +6,18 @@ import { Money } from '@/components/ui/Money';
 import { CsvDownloadButton, DataPanel, EmptyTableState, downloadCsv } from '@/components/ui/data-panel';
 import type { HoldingRow, ReportTargetDigest } from '@/lib/artifacts';
 import { formatDateKo, formatDays, formatKrw, formatPercent } from '@/lib/format';
-import { capitalContribution, marketLabel, nativeFromKrw, reportTargetHref } from './helpers';
+import {
+  capitalContribution,
+  compactTicker,
+  marketLabel,
+  nativeFromKrw,
+  reportTargetHref,
+  stockDisplayName,
+} from './helpers';
 import { SortHeader, pageRows, sortRows, type SortState } from './TableControls';
 
 type Props = {
   holdings: HoldingRow[];
-  /** Account/account_id controlled by the parent — single source of truth so
-   * URL state and inner state cannot drift apart. */
   account_id: string;
   accountLabels: Record<string, string>;
   capitalByAccount: Record<string, number>;
@@ -61,7 +66,7 @@ export function PortfolioTables({
       sortRows(searched, sort, {
         account: (row) => accountLabels[row.account_id] ?? row.account_id,
         market: (row) => marketLabel(targetsBySymbol[row.symbol]?.marketRegion),
-        symbol: (row) => row.company || row.symbol,
+        symbol: (row) => stockDisplayName(row.symbol, row.company),
         target: (row) => targetsBySymbol[row.symbol]?.targetPriceNative ?? targetsBySymbol[row.symbol]?.targetPriceKrw,
         qty: (row) => row.qty,
         avgCost: (row) => row.avgCostKrw,
@@ -90,7 +95,7 @@ export function PortfolioTables({
           setSearch(value);
           setPage(0);
         },
-        placeholder: '종목·심볼 검색',
+        placeholder: '종목·티커 검색',
       }}
       actions={
         <CsvDownloadButton
@@ -154,7 +159,7 @@ export function PortfolioTables({
               <td colSpan={11}>
                 <EmptyTableState
                   message="조건에 맞는 보유 종목이 없습니다"
-                  actionLabel="검색·필터 초기화"
+                  actionLabel="검색 초기화"
                   onAction={() => {
                     setSearch('');
                     setPage(0);
@@ -166,6 +171,8 @@ export function PortfolioTables({
             visibleRows.map((row) => {
               const contribution = capitalContribution(row.unrealizedPnlKrw, capitalByAccount[row.account_id]);
               const target = targetsBySymbol[row.symbol];
+              const displayName = stockDisplayName(row.symbol, row.company);
+              const ticker = compactTicker(row.symbol);
               const nativeValue =
                 row.lastCloseNative !== null && row.qty !== null ? row.lastCloseNative * row.qty : null;
               return (
@@ -182,12 +189,14 @@ export function PortfolioTables({
                         className="font-semibold text-slate-950 hover:underline"
                         href={targetHrefFor(row.symbol, targetsBySymbol) ?? ''}
                       >
-                        {row.company || row.symbol}
+                        {displayName}
                       </Link>
                     ) : (
-                      <span className="font-semibold text-slate-950">{row.company || row.symbol}</span>
+                      <span className="font-semibold text-slate-950">{displayName}</span>
                     )}
-                    <div className="mt-0.5 font-mono text-[11px] text-slate-500">{row.symbol}</div>
+                    {displayName !== ticker ? (
+                      <div className="mt-0.5 font-mono text-[11px] text-slate-500">{ticker}</div>
+                    ) : null}
                   </td>
                   <td className="px-3 py-2">
                     {target ? (
@@ -202,11 +211,11 @@ export function PortfolioTables({
                         </div>
                       </>
                     ) : (
-                      '—'
+                      '-'
                     )}
                   </td>
                   <td className="px-3 py-2 text-right font-mono tabular-nums">
-                    {row.qty?.toLocaleString('ko-KR') ?? '—'}
+                    {row.qty?.toLocaleString('ko-KR') ?? '-'}
                   </td>
                   <td className="px-3 py-2">
                     <Money

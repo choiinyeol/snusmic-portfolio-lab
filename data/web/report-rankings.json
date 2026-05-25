@@ -849,27 +849,6 @@
   ],
   "most_aggressive_targets": [
     {
-      "company": "GEM Co., Ltd.",
-      "current_return": 0.1659,
-      "date": "2022-05-25",
-      "days_to_target": null,
-      "entry_price_krw": 1587.8499,
-      "last_close_date": "2026-05-22",
-      "last_close_krw": 1851.2974,
-      "metric": "target_upside_at_pub",
-      "peak_return": 0.3864,
-      "publication_date": "2022-05-25",
-      "report_id": "c631200d3a42357e",
-      "symbol": "002340.SZ",
-      "target_gap_pct": -0.8706,
-      "target_hit": false,
-      "target_hit_date": null,
-      "target_price_krw": 14312.2364,
-      "target_upside_at_pub": 8.0136,
-      "trough_return": -0.4367,
-      "value": 8.0136
-    },
-    {
       "company": "SNT에너지",
       "current_return": 5.536,
       "date": "2022-12-08",
@@ -1057,6 +1036,27 @@
       "target_upside_at_pub": 2.4849,
       "trough_return": -0.4404,
       "value": 2.4849
+    },
+    {
+      "company": "아이씨에이치",
+      "current_return": -0.8996,
+      "date": "2022-10-13",
+      "days_to_target": null,
+      "entry_price_krw": 9050.0,
+      "last_close_date": "2026-05-22",
+      "last_close_krw": 909.0,
+      "metric": "target_upside_at_pub",
+      "peak_return": 0.0707,
+      "publication_date": "2022-10-13",
+      "report_id": "c36f87938dfe83da",
+      "symbol": "368600.KQ",
+      "target_gap_pct": -0.9708,
+      "target_hit": false,
+      "target_hit_date": null,
+      "target_price_krw": 31100.0,
+      "target_upside_at_pub": 2.4365,
+      "trough_return": -0.9305,
+      "value": 2.4365
     }
   ],
   "slowest_hits": [

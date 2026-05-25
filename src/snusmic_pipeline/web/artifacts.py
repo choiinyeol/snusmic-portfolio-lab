@@ -40,10 +40,12 @@ REQUIRED_ARTIFACTS = [
     "accounts/leaderboard.json",
     "accounts/curves.json",
     "report-board/candidates.json",
+    "research-calendar/calendar.json",
     "pages/report-verification.json",
     "pages/report-board.json",
     "pages/report-statistics.json",
     "pages/portfolio-dashboard.json",
+    "pages/research-calendar.json",
     "overview.json",
     "accounts.json",
     "reports.json",
@@ -324,6 +326,7 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     )
     position_episodes = _read_csv(inputs.sim / "position_episodes.csv")
     equity_daily = _read_csv(inputs.sim / "equity_daily.csv")
+    pit_research_board = _read_csv(inputs.sim / "pit-research-board.csv")
     extraction_quality = _read_json(inputs.extraction_quality) if inputs.extraction_quality.exists() else {}
     mark("read_inputs")
 
@@ -383,6 +386,7 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
         extraction_quality, missing_symbols, reports, report_performance, report_exclusions
     )
     insights = _build_insights(overview, rankings, target_distribution, return_windows, data_quality)
+    research_calendar = _build_research_calendar(pit_research_board, price_groups, overview)
     mark("build_report_metrics")
 
     current_holdings = _current_holdings_from_open_episodes(position_episodes, current_holdings)
@@ -392,7 +396,7 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     enriched_monthly_holdings = _records(
         _enrich_holdings_with_native(monthly_holdings, prices, fx_rates, close_column="month_close_krw")
     )
-    trade_rows = _records(trades)
+    trade_rows = _records(_require_trade_realized_pnl(trades))
     daily_decision_rows = _records(daily_decisions)
     episode_rows = _records(position_episodes)
     equity_rows = _records(equity_daily)
@@ -429,6 +433,7 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
         target_distribution=target_distribution,
         account_catalog=account_catalog,
         report_board_candidates=report_board_candidates,
+        research_calendar=research_calendar,
     )
     mark("write_page_bundles")
 
@@ -843,6 +848,7 @@ def _write_page_bundles(
     target_distribution: dict[str, Any],
     account_catalog: list[dict[str, Any]],
     report_board_candidates: list[dict[str, Any]],
+    research_calendar: dict[str, Any],
 ) -> None:
     """Write page-owned product bundles.
 
@@ -880,6 +886,7 @@ def _write_page_bundles(
     _write_product_json(out / "accounts" / "curves.json", _compact_equity_curves(equity_daily))
 
     _write_product_json(out / "report-board" / "candidates.json", report_board_candidates)
+    _write_product_json(out / "research-calendar" / "calendar.json", research_calendar)
 
     _write_product_json(
         out / "pages" / "report-verification.json",
@@ -897,6 +904,7 @@ def _write_page_bundles(
         out / "pages" / "portfolio-dashboard.json",
         _portfolio_dashboard_page_bundle(overview, accounts, holdings, trades),
     )
+    _write_product_json(out / "pages" / "research-calendar.json", research_calendar)
 
 
 def _page_generated_at(overview: dict[str, Any]) -> str | None:
@@ -1024,6 +1032,278 @@ def _portfolio_dashboard_page_bundle(
     }
 
 
+def _build_research_calendar(
+    pit_research_board: pd.DataFrame,
+    price_groups: dict[str, pd.DataFrame],
+    overview: dict[str, Any],
+) -> dict[str, Any]:
+    if pit_research_board.empty:
+        raise RuntimeError("pit-research-board.csv is empty; run export-pit-board before export-web.")
+
+    required = {
+        "as_of_date",
+        "price_date",
+        "report_id",
+        "symbol",
+        "company",
+        "publication_date",
+        "rank",
+        "candidate_score",
+    }
+    missing = sorted(required - set(pit_research_board.columns))
+    if missing:
+        raise RuntimeError(f"pit-research-board.csv is missing required columns: {', '.join(missing)}")
+
+    frame = pit_research_board.copy()
+    for column in (
+        "rank",
+        "report_age_days",
+        "entry_price_krw",
+        "entry_price_scale_factor",
+        "target_price_krw",
+        "last_close_krw",
+        "target_upside_at_pub",
+        "current_return",
+        "target_gap_pct",
+        "ytd_return",
+        "return_1m",
+        "return_3m",
+        "return_6m",
+        "return_1y",
+        "distance_from_52w_high",
+        "candidate_score",
+        "board_score",
+        "ta_momentum_score",
+    ):
+        if column in frame.columns:
+            frame[column] = pd.to_numeric(frame[column], errors="coerce")
+
+    for column in ("above_20ma", "above_50ma", "above_200ma", "macd_bullish", "target_hit", "expired"):
+        if column in frame.columns:
+            frame[column] = frame[column].map(_nullable_bool)
+
+    frame = _attach_research_calendar_forward_returns(frame, price_groups)
+    frame = frame.sort_values(["as_of_date", "rank", "candidate_score"], ascending=[False, True, False])
+
+    columns = [
+        "as_of_date",
+        "price_date",
+        "report_id",
+        "symbol",
+        "company",
+        "publication_date",
+        "report_age_days",
+        "rank",
+        "bucket",
+        "rank_basis",
+        "candidate_score",
+        "board_score",
+        "ta_momentum_score",
+        "entry_price_krw",
+        "entry_price_source",
+        "entry_price_scale_factor",
+        "price_quality_flag",
+        "target_price_krw",
+        "last_close_krw",
+        "target_upside_at_pub",
+        "current_return",
+        "target_gap_pct",
+        "ytd_return",
+        "return_1m",
+        "return_3m",
+        "return_6m",
+        "return_1y",
+        "distance_from_52w_high",
+        "above_20ma",
+        "above_50ma",
+        "above_200ma",
+        "ma_stack",
+        "macd_bullish",
+        "target_hit",
+        "expired",
+        "forward_return_21d",
+        "forward_return_63d",
+        "forward_return_126d",
+        "forward_return_252d",
+        "forward_return_500d",
+        "forward_return_latest",
+        "forward_peak_252d",
+        "forward_trough_252d",
+        "forward_peak_500d",
+        "forward_trough_500d",
+        "forward_observed_days",
+    ]
+    rows = _records(frame[[column for column in columns if column in frame.columns]])
+    summaries = _research_calendar_date_summaries(frame)
+    first_date = frame["as_of_date"].min()
+    last_date = frame["as_of_date"].max()
+    return {
+        "schema_version": "1.0.0",
+        "generated_at": _page_generated_at(overview),
+        "as_of": _page_as_of(overview),
+        "date_range": {"start": first_date, "end": last_date},
+        "summary": {
+            "date_count": len(summaries),
+            "row_count": len(rows),
+            "symbol_count": int(frame["symbol"].nunique()),
+            "latest_date": last_date,
+        },
+        "date_summaries": summaries,
+        "table": _compact_table(rows, columns),
+    }
+
+
+def _attach_research_calendar_forward_returns(
+    frame: pd.DataFrame, price_groups: dict[str, pd.DataFrame]
+) -> pd.DataFrame:
+    out = frame.copy()
+    for column in (
+        "forward_return_21d",
+        "forward_return_63d",
+        "forward_return_126d",
+        "forward_return_252d",
+        "forward_return_500d",
+        "forward_return_latest",
+        "forward_peak_252d",
+        "forward_trough_252d",
+        "forward_peak_500d",
+        "forward_trough_500d",
+        "forward_observed_days",
+    ):
+        out[column] = pd.NA
+
+    publication_dates = pd.to_datetime(out["publication_date"], errors="coerce")
+    entry_prices = pd.to_numeric(out["entry_price_krw"], errors="coerce")
+    horizons = {
+        "forward_return_21d": 21,
+        "forward_return_63d": 63,
+        "forward_return_126d": 126,
+        "forward_return_252d": 252,
+        "forward_return_500d": 500,
+    }
+    for symbol, indexes in out.groupby("symbol", sort=False).groups.items():
+        prices = price_groups.get(str(symbol))
+        if prices is None or prices.empty:
+            continue
+        price_frame = prices.copy()
+        price_frame["date"] = pd.to_datetime(price_frame["date"], errors="coerce")
+        price_frame = price_frame.dropna(subset=["date"]).sort_values("date")
+        if price_frame.empty:
+            continue
+        dates = price_frame["date"].reset_index(drop=True)
+        closes = pd.to_numeric(price_frame["close_krw"], errors="coerce").reset_index(drop=True)
+        highs = pd.to_numeric(
+            price_frame.get("high_krw", price_frame["close_krw"]), errors="coerce"
+        ).reset_index(drop=True)
+        lows = pd.to_numeric(
+            price_frame.get("low_krw", price_frame["close_krw"]), errors="coerce"
+        ).reset_index(drop=True)
+        for row_index in indexes:
+            lookup_date = publication_dates.loc[row_index]
+            start_close = _number(entry_prices.loc[row_index])
+            if pd.isna(lookup_date) or start_close is None or start_close <= 0:
+                continue
+            start_pos = int(dates.searchsorted(lookup_date, side="left"))
+            if start_pos < 0 or start_pos >= len(closes):
+                continue
+            observed_days = max(0, len(closes) - start_pos - 1)
+            out.at[row_index, "forward_observed_days"] = observed_days
+            if observed_days > 0:
+                latest_close = _number(closes.iloc[-1])
+                if latest_close is not None and latest_close > 0:
+                    out.at[row_index, "forward_return_latest"] = round(latest_close / start_close - 1, 6)
+            for column, horizon in horizons.items():
+                target_pos = start_pos + horizon
+                if target_pos >= len(closes):
+                    continue
+                close = _number(closes.iloc[target_pos])
+                if close is not None and close > 0:
+                    out.at[row_index, column] = round(close / start_close - 1, 6)
+            for horizon, peak_column, trough_column in (
+                (252, "forward_peak_252d", "forward_trough_252d"),
+                (500, "forward_peak_500d", "forward_trough_500d"),
+            ):
+                end_pos = min(start_pos + horizon, len(closes) - 1)
+                if end_pos <= start_pos:
+                    continue
+                peak = _number(highs.iloc[start_pos + 1 : end_pos + 1].max())
+                trough = _number(lows.iloc[start_pos + 1 : end_pos + 1].min())
+                if peak is not None and peak > 0:
+                    out.at[row_index, peak_column] = round(peak / start_close - 1, 6)
+                if trough is not None and trough > 0:
+                    out.at[row_index, trough_column] = round(trough / start_close - 1, 6)
+    return out
+
+
+def _research_calendar_date_summaries(frame: pd.DataFrame) -> list[dict[str, Any]]:
+    summaries: list[dict[str, Any]] = []
+    for date, group in frame.groupby("as_of_date", sort=True):
+        forward_63 = pd.to_numeric(group["forward_return_63d"], errors="coerce")
+        forward_500 = pd.to_numeric(group["forward_return_500d"], errors="coerce")
+        forward_latest = pd.to_numeric(group["forward_return_latest"], errors="coerce")
+        observed_days = pd.to_numeric(group.get("forward_observed_days"), errors="coerce")
+        valid_forward_63 = forward_63.dropna()
+        valid_forward_500 = forward_500.dropna()
+        valid_forward_latest = forward_latest.dropna()
+        valid_observed_days = observed_days.dropna()
+        report_age_days = pd.to_numeric(group.get("report_age_days"), errors="coerce")
+        recent_report_mask = report_age_days.ge(0) & report_age_days.le(365)
+        top_rows = group.sort_values(["board_score", "rank"], ascending=[False, True]).head(3)
+        summaries.append(
+            {
+                "date": str(date),
+                "candidate_count": int(len(group)),
+                "fresh_count": int(recent_report_mask.sum()),
+                "target_hit_count": int(group["target_hit"].eq(True).sum()) if "target_hit" in group else 0,
+                "momentum_count": int(
+                    (
+                        group.get("above_20ma", pd.Series(False, index=group.index)).eq(True)
+                        & group.get("above_50ma", pd.Series(False, index=group.index)).eq(True)
+                        & group.get("above_200ma", pd.Series(False, index=group.index)).eq(True)
+                    ).sum()
+                ),
+                "near_high_count": int(
+                    pd.to_numeric(group.get("distance_from_52w_high"), errors="coerce").ge(-0.1).sum()
+                ),
+                "forward_positive_63d_count": int(valid_forward_63.gt(0).sum()),
+                "forward_positive_63d_sample": int(valid_forward_63.count()),
+                "median_forward_return_63d": _round_number(valid_forward_63.median()),
+                "forward_positive_500d_count": int(valid_forward_500.gt(0).sum()),
+                "forward_positive_500d_sample": int(valid_forward_500.count()),
+                "median_forward_return_500d": _round_number(valid_forward_500.median()),
+                "forward_positive_latest_count": int(valid_forward_latest.gt(0).sum()),
+                "forward_positive_latest_sample": int(valid_forward_latest.count()),
+                "median_forward_return_latest": _round_number(valid_forward_latest.median()),
+                "forward_observed_sample": int(valid_observed_days.gt(0).sum()),
+                "max_forward_observed_days": int(valid_observed_days.max())
+                if not valid_observed_days.empty
+                else 0,
+                "top_symbols": [
+                    {
+                        "symbol": str(row.get("symbol")),
+                        "company": str(row.get("company")),
+                        "score": _round_number(row.get("board_score")),
+                    }
+                    for row in top_rows.to_dict(orient="records")
+                ],
+            }
+        )
+    return summaries
+
+
+def _nullable_bool(value: Any) -> bool | None:
+    if value in {"", None}:
+        return None
+    if isinstance(value, bool):
+        return value
+    text = str(value).strip().lower()
+    if text in {"true", "1", "y", "yes"}:
+        return True
+    if text in {"false", "0", "n", "no"}:
+        return False
+    return None
+
+
 def _compact_monthly_holdings(rows: list[dict[str, Any]]) -> dict[str, Any]:
     columns = [
         "account_id",
@@ -1039,6 +1319,16 @@ def _compact_monthly_holdings(rows: list[dict[str, Any]]) -> dict[str, Any]:
     return _compact_table(rows, columns)
 
 
+def _require_trade_realized_pnl(trades: pd.DataFrame) -> pd.DataFrame:
+    if "realized_pnl_krw" not in trades.columns:
+        raise RuntimeError(
+            "data/sim/trades.csv is missing realized_pnl_krw; rerun the account simulation first"
+        )
+    out = trades.copy()
+    out["realized_pnl_krw"] = pd.to_numeric(out["realized_pnl_krw"], errors="coerce")
+    return out
+
+
 def _compact_trades(rows: list[dict[str, Any]]) -> dict[str, Any]:
     columns = [
         "account_id",
@@ -1048,6 +1338,7 @@ def _compact_trades(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "qty",
         "fill_price_krw",
         "gross_krw",
+        "realized_pnl_krw",
         "cash_after_krw",
         "reason",
         "report_id",
@@ -1225,6 +1516,7 @@ def _build_manifest(out: Path, overview: dict[str, Any]) -> dict[str, Any]:
         "accounts": _json_row_count(out / "portfolio" / "accounts.json"),
         "account_catalog": _json_row_count(out / "accounts" / "catalog.json"),
         "report_board_candidates": _json_row_count(out / "report-board" / "candidates.json"),
+        "research_calendar_rows": _json_row_count(out / "research-calendar" / "calendar.json"),
     }
     report_counts = overview.get("report_counts", {}) if isinstance(overview, dict) else {}
     target_stats = overview.get("target_stats", {}) if isinstance(overview, dict) else {}
@@ -1269,6 +1561,9 @@ def _json_row_count(path: Path) -> int:
         rows = data.get("rows")
         if isinstance(rows, list):
             return len(rows)
+        table = data.get("table")
+        if isinstance(table, dict) and isinstance(table.get("rows"), list):
+            return len(table["rows"])
     return 1
 
 
@@ -1666,16 +1961,19 @@ def _enrich_report_row_with_price_series(
 
 
 def _with_report_target_metrics(report: dict[str, Any]) -> dict[str, Any]:
-    current = _number(report.get("last_close_native")) or _number(report.get("last_close_krw"))
-    target = _number(report.get("target_price_native")) or _number(report.get("target_price_krw"))
-    entry = _number(report.get("entry_price_native")) or _number(report.get("entry_price_krw"))
+    current = _number(report.get("last_close_krw")) or _number(report.get("last_close_native"))
+    target = _number(report.get("target_price_krw")) or _number(report.get("target_price_native"))
+    entry = _number(report.get("entry_price_krw")) or _number(report.get("entry_price_native"))
     if current is None or target is None or entry is None or current <= 0 or target <= 0 or entry <= 0:
         report["target_remaining_pct"] = None
         report["target_progress_pct"] = None
         return report
 
     target_move = target - entry
-    report["target_progress_pct"] = _round_number((current - entry) / target_move) if target_move else None
+    progress = (current - entry) / target_move if target_move else None
+    report["target_progress_pct"] = (
+        _round_number(min(max(progress, 0.0), 1.0)) if progress is not None else None
+    )
     if _bool(report.get("target_hit")):
         report["target_remaining_pct"] = 0
         return report
@@ -1839,6 +2137,102 @@ BENCHMARK_ACCOUNT_IDS = {
 PRODUCT_ACCOUNT_IDS = {
     "smic_follower",
     "smic_follower_v2",
+    "pit_score_top3",
+    "pit_score_top5",
+    "pit_score_top10",
+    "pit_momentum_top5",
+    "pit_trend_top5",
+    "pit_fresh_top5",
+    "pit_trend_top7",
+    "pit_trend_stop_top5",
+    "pit_trend_stop_top7",
+    "pit_trend_rotate_top5",
+    "pit_trend_rotate_fast_top5",
+    "pit_trend_rotate_stop_top5",
+    "pit_trend_persist20_top5",
+    "pit_trend_persist30_top5",
+    "pit_trend_persist20_hold90_top5",
+    "pit_trend_persist20_top3",
+    "pit_trend_persist20_top7",
+    "pit_trend_persist20_52w10_top5",
+    "pit_trend_persist20_domestic_top5",
+    "pit_trend_persist20_score_top5",
+    "pit_trend_persist20_scorecap_top5",
+    "pit_trend_persist20_invvol_top5",
+    "pit_trend_persist20_invvolcap_top5",
+    "pit_trend_persist20_semimonthly_top5",
+    "pit_trend_persist20_quarterly_top5",
+    "pit_trend_persist30_quarterly_top5",
+    "pit_trend_persist20_quarterly_risk_top5",
+    "pit_trend_persist30_quarterly_risk_top5",
+    "pit_trend_persist20_quarterly_hold120_top5",
+    "pit_trend_quarterly_ret3_top5",
+    "pit_trend_quarterly_ret6_top5",
+    "pit_trend_quarterly_ret36_top5",
+    "pit_trend_quarterly_fresh365_top5",
+    "pit_trend_quarterly_fresh540_top5",
+    "pit_trend_persist20_fresh540_top5",
+    "pit_trend_persist20_fresh540_top3",
+    "pit_trend_persist20_fresh540_top7",
+    "pit_trend_quarterly_fresh540_top3",
+    "pit_trend_quarterly_fresh540_top7",
+    "pit_trend_quarterly_fresh540_gross_top5",
+    "pit_trend_quarterly_fresh540_slip25_top5",
+    "pit_trend_quarterly_fresh540_slip50_top5",
+    "pit_trend_quarterly_fresh540_feb_top5",
+    "pit_trend_quarterly_fresh540_mar_top5",
+    "pit_trend_quarterly_fresh540_cash90_top5",
+    "pit_trend_quarterly_fresh540_cash80_top5",
+    "pit_trend_quarterly_fresh540_vol35_top5",
+    "pit_trend_quarterly_fresh540_vol40_top5",
+    "pit_trend_quarterly_fresh540_vol45_top5",
+    "pit_trend_quarterly_fresh540_vol50_top5",
+    "pit_trend_quarterly_fresh540_vol55_top5",
+    "pit_trend_quarterly_fresh540_mar_vol45_top5",
+    "pit_trend_quarterly_fresh540_entry270_top5",
+    "pit_trend_quarterly_fresh540_entry270_vol50_top5",
+    "pit_trend_quarterly_fresh540_entry270_mar_top5",
+    "pit_trend_quarterly_fresh540_entry365_top5",
+    "pit_trend_quarterly_fresh540_entry450_top5",
+    "pit_trend_quarterly_fresh540_entry365_vol50_top5",
+    "pit_trend_quarterly_fresh540_rank15_top5",
+    "pit_trend_quarterly_fresh540_rank25_top5",
+    "pit_trend_quarterly_fresh540_runwinners_top5",
+    "pit_trend_quarterly_fresh540_runwinners_vol50_top5",
+    "pit_trend_quarterly_fresh540_runwinners_top3",
+    "pit_trend_quarterly_fresh540_runwinners_top7",
+    "pit_trend_quarterly_fresh540_runwinners_feb_top5",
+    "pit_trend_quarterly_fresh540_runwinners_mar_top5",
+    "pit_trend_quarterly_fresh540_runwinners_slip25_top5",
+    "pit_trend_quarterly_fresh540_runwinners_slip50_top5",
+    "pit_trend_quarterly_fresh540_runwinners_cap40_top5",
+    "pit_trend_quarterly_fresh540_runwinners_cap35_top5",
+    "pit_trend_quarterly_fresh540_runwinners_soft45_top5",
+    "pit_trend_quarterly_fresh540_runwinners_vol50_cap40_top5",
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_top5",
+    "pit_trend_quarterly_fresh540_runwinners_dailycap45_top5",
+    "pit_trend_quarterly_fresh540_runwinners_vol50_weeklycap45_top5",
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap50_top5",
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit10_top5",
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit25_top5",
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit40_top5",
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5",
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5",
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top3",
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top7",
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_slip25_top5",
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_slip50_top5",
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_midcontrib_top5",
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_lastcontrib_top5",
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_momentum_top5",
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_midcontrib_top5",
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_lastcontrib_top5",
+    "pit_trend_quarterly_fresh540_runwinners_dailycap45_profit25_top5",
+    "pit_trend_quarterly_fresh540_confirm5_top5",
+    "pit_trend_quarterly_fresh540_confirm10_top5",
+    "pit_trend_quarterly_fresh540_confirm10_vol50_top5",
+    "pit_trend_persist20_kodex50_top5",
+    "pit_trend_persist20_kodex200_top5",
 }
 
 TARGET_BENCHMARK_ID = "benchmark_kodex200"
@@ -1915,7 +2309,7 @@ def _build_account_catalog(summary: pd.DataFrame, sim_config_path: Path) -> list
                 "short_label": _account_short_label(account_id, label),
                 "kind": kind,
                 "benchmark_group": _benchmark_group(account_id),
-                "is_selectable": objective_passed,
+                "is_selectable": kind == "account",
                 "is_default_candidate": objective_passed,
                 "objective_passed": objective_passed,
                 "objective_return_excess": return_excess,
@@ -1943,6 +2337,105 @@ def _benchmark_group(account_id: str) -> str | None:
         return "allocation"
     if account_id in {"smic_follower", "smic_follower_v2"}:
         return "report_follower"
+    if account_id in {
+        "pit_score_top3",
+        "pit_score_top5",
+        "pit_score_top10",
+        "pit_momentum_top5",
+        "pit_trend_top5",
+        "pit_fresh_top5",
+        "pit_trend_top7",
+        "pit_trend_stop_top5",
+        "pit_trend_stop_top7",
+        "pit_trend_rotate_top5",
+        "pit_trend_rotate_fast_top5",
+        "pit_trend_rotate_stop_top5",
+        "pit_trend_persist20_top5",
+        "pit_trend_persist30_top5",
+        "pit_trend_persist20_hold90_top5",
+        "pit_trend_persist20_top3",
+        "pit_trend_persist20_top7",
+        "pit_trend_persist20_52w10_top5",
+        "pit_trend_persist20_domestic_top5",
+        "pit_trend_persist20_score_top5",
+        "pit_trend_persist20_scorecap_top5",
+        "pit_trend_persist20_invvol_top5",
+        "pit_trend_persist20_invvolcap_top5",
+        "pit_trend_persist20_semimonthly_top5",
+        "pit_trend_persist20_quarterly_top5",
+        "pit_trend_persist30_quarterly_top5",
+        "pit_trend_persist20_quarterly_risk_top5",
+        "pit_trend_persist30_quarterly_risk_top5",
+        "pit_trend_persist20_quarterly_hold120_top5",
+        "pit_trend_quarterly_ret3_top5",
+        "pit_trend_quarterly_ret6_top5",
+        "pit_trend_quarterly_ret36_top5",
+        "pit_trend_quarterly_fresh365_top5",
+        "pit_trend_quarterly_fresh540_top5",
+        "pit_trend_persist20_fresh540_top5",
+        "pit_trend_persist20_fresh540_top3",
+        "pit_trend_persist20_fresh540_top7",
+        "pit_trend_quarterly_fresh540_top3",
+        "pit_trend_quarterly_fresh540_top7",
+        "pit_trend_quarterly_fresh540_gross_top5",
+        "pit_trend_quarterly_fresh540_slip25_top5",
+        "pit_trend_quarterly_fresh540_slip50_top5",
+        "pit_trend_quarterly_fresh540_feb_top5",
+        "pit_trend_quarterly_fresh540_mar_top5",
+        "pit_trend_quarterly_fresh540_cash90_top5",
+        "pit_trend_quarterly_fresh540_cash80_top5",
+        "pit_trend_quarterly_fresh540_vol35_top5",
+        "pit_trend_quarterly_fresh540_vol40_top5",
+        "pit_trend_quarterly_fresh540_vol45_top5",
+        "pit_trend_quarterly_fresh540_vol50_top5",
+        "pit_trend_quarterly_fresh540_vol55_top5",
+        "pit_trend_quarterly_fresh540_mar_vol45_top5",
+        "pit_trend_quarterly_fresh540_entry270_top5",
+        "pit_trend_quarterly_fresh540_entry270_vol50_top5",
+        "pit_trend_quarterly_fresh540_entry270_mar_top5",
+        "pit_trend_quarterly_fresh540_entry365_top5",
+        "pit_trend_quarterly_fresh540_entry450_top5",
+        "pit_trend_quarterly_fresh540_entry365_vol50_top5",
+        "pit_trend_quarterly_fresh540_rank15_top5",
+        "pit_trend_quarterly_fresh540_rank25_top5",
+        "pit_trend_quarterly_fresh540_runwinners_top5",
+        "pit_trend_quarterly_fresh540_runwinners_vol50_top5",
+        "pit_trend_quarterly_fresh540_runwinners_top3",
+        "pit_trend_quarterly_fresh540_runwinners_top7",
+        "pit_trend_quarterly_fresh540_runwinners_feb_top5",
+        "pit_trend_quarterly_fresh540_runwinners_mar_top5",
+        "pit_trend_quarterly_fresh540_runwinners_slip25_top5",
+        "pit_trend_quarterly_fresh540_runwinners_slip50_top5",
+        "pit_trend_quarterly_fresh540_runwinners_cap40_top5",
+        "pit_trend_quarterly_fresh540_runwinners_cap35_top5",
+        "pit_trend_quarterly_fresh540_runwinners_soft45_top5",
+        "pit_trend_quarterly_fresh540_runwinners_vol50_cap40_top5",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_top5",
+        "pit_trend_quarterly_fresh540_runwinners_dailycap45_top5",
+        "pit_trend_quarterly_fresh540_runwinners_vol50_weeklycap45_top5",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap50_top5",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit10_top5",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit25_top5",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit40_top5",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top3",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top7",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_slip25_top5",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_slip50_top5",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_midcontrib_top5",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_lastcontrib_top5",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_momentum_top5",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_midcontrib_top5",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_lastcontrib_top5",
+        "pit_trend_quarterly_fresh540_runwinners_dailycap45_profit25_top5",
+        "pit_trend_quarterly_fresh540_confirm5_top5",
+        "pit_trend_quarterly_fresh540_confirm10_top5",
+        "pit_trend_quarterly_fresh540_confirm10_vol50_top5",
+        "pit_trend_persist20_kodex50_top5",
+        "pit_trend_persist20_kodex200_top5",
+    }:
+        return "pit_score"
     if account_id in {"benchmark_kodex200", "benchmark_qqq", "benchmark_spy", "benchmark_gld"}:
         return "market"
     return None
@@ -1953,6 +2446,102 @@ def _account_short_label(account_id: str, label: str) -> str:
         "all_weather": "All Weather",
         "smic_follower": "SMIC Follower v1",
         "smic_follower_v2": "SMIC Follower v2",
+        "pit_score_top3": "PIT Top 3",
+        "pit_score_top5": "PIT Top 5",
+        "pit_score_top10": "PIT Top 10",
+        "pit_momentum_top5": "PIT Momentum",
+        "pit_trend_top5": "PIT Trend",
+        "pit_fresh_top5": "PIT Fresh",
+        "pit_trend_top7": "PIT Trend 7",
+        "pit_trend_stop_top5": "PIT Trend Stop 5",
+        "pit_trend_stop_top7": "PIT Trend Stop 7",
+        "pit_trend_rotate_top5": "PIT Trend Rotate",
+        "pit_trend_rotate_fast_top5": "PIT Trend Rotate 2x",
+        "pit_trend_rotate_stop_top5": "PIT Trend Stop Rotate",
+        "pit_trend_persist20_top5": "PIT Persist 20",
+        "pit_trend_persist30_top5": "PIT Persist 30",
+        "pit_trend_persist20_hold90_top5": "PIT Persist 20/90",
+        "pit_trend_persist20_top3": "PIT Persist 20 Top3",
+        "pit_trend_persist20_top7": "PIT Persist 20 Top7",
+        "pit_trend_persist20_52w10_top5": "PIT Persist 52W",
+        "pit_trend_persist20_domestic_top5": "PIT Persist Korea",
+        "pit_trend_persist20_score_top5": "PIT Persist Score",
+        "pit_trend_persist20_scorecap_top5": "PIT Persist Score Cap",
+        "pit_trend_persist20_invvol_top5": "PIT Persist InvVol",
+        "pit_trend_persist20_invvolcap_top5": "PIT Persist InvVol Cap",
+        "pit_trend_persist20_semimonthly_top5": "PIT Persist 2x",
+        "pit_trend_persist20_quarterly_top5": "PIT Persist Quarterly",
+        "pit_trend_persist30_quarterly_top5": "PIT Quarterly Top30",
+        "pit_trend_persist20_quarterly_risk_top5": "PIT Quarterly Risk",
+        "pit_trend_persist30_quarterly_risk_top5": "PIT Quarterly Top30 Risk",
+        "pit_trend_persist20_quarterly_hold120_top5": "PIT Quarterly Hold120",
+        "pit_trend_quarterly_ret3_top5": "PIT Quarterly 3M",
+        "pit_trend_quarterly_ret6_top5": "PIT Quarterly 6M",
+        "pit_trend_quarterly_ret36_top5": "PIT Quarterly 3M+6M",
+        "pit_trend_quarterly_fresh365_top5": "PIT Quarterly Fresh365",
+        "pit_trend_quarterly_fresh540_top5": "PIT Quarterly Fresh540",
+        "pit_trend_persist20_fresh540_top5": "PIT Monthly Fresh540",
+        "pit_trend_persist20_fresh540_top3": "PIT Monthly Fresh540 Top3",
+        "pit_trend_persist20_fresh540_top7": "PIT Monthly Fresh540 Top7",
+        "pit_trend_quarterly_fresh540_top3": "PIT Quarterly Fresh540 Top3",
+        "pit_trend_quarterly_fresh540_top7": "PIT Quarterly Fresh540 Top7",
+        "pit_trend_quarterly_fresh540_gross_top5": "PIT Quarterly Fresh540 Gross",
+        "pit_trend_quarterly_fresh540_slip25_top5": "PIT Quarterly Fresh540 Slip25",
+        "pit_trend_quarterly_fresh540_slip50_top5": "PIT Quarterly Fresh540 Slip50",
+        "pit_trend_quarterly_fresh540_feb_top5": "PIT Quarterly Fresh540 Feb",
+        "pit_trend_quarterly_fresh540_mar_top5": "PIT Quarterly Fresh540 Mar",
+        "pit_trend_quarterly_fresh540_cash90_top5": "PIT Quarterly Fresh540 Cash10",
+        "pit_trend_quarterly_fresh540_cash80_top5": "PIT Quarterly Fresh540 Cash20",
+        "pit_trend_quarterly_fresh540_vol35_top5": "PIT Quarterly Fresh540 Vol35",
+        "pit_trend_quarterly_fresh540_vol40_top5": "PIT Quarterly Fresh540 Vol40",
+        "pit_trend_quarterly_fresh540_vol45_top5": "PIT Quarterly Fresh540 Vol45",
+        "pit_trend_quarterly_fresh540_vol50_top5": "PIT Quarterly Fresh540 Vol50",
+        "pit_trend_quarterly_fresh540_vol55_top5": "PIT Quarterly Fresh540 Vol55",
+        "pit_trend_quarterly_fresh540_mar_vol45_top5": "PIT Quarterly Fresh540 Mar Vol45",
+        "pit_trend_quarterly_fresh540_entry270_top5": "PIT Quarterly Fresh540 Entry270",
+        "pit_trend_quarterly_fresh540_entry270_vol50_top5": "PIT Quarterly Fresh540 Entry270 Vol50",
+        "pit_trend_quarterly_fresh540_entry270_mar_top5": "PIT Quarterly Fresh540 Entry270 Mar",
+        "pit_trend_quarterly_fresh540_entry365_top5": "PIT Quarterly Fresh540 Entry365",
+        "pit_trend_quarterly_fresh540_entry450_top5": "PIT Quarterly Fresh540 Entry450",
+        "pit_trend_quarterly_fresh540_entry365_vol50_top5": "PIT Quarterly Fresh540 Entry365 Vol50",
+        "pit_trend_quarterly_fresh540_rank15_top5": "PIT Quarterly Fresh540 Rank15",
+        "pit_trend_quarterly_fresh540_rank25_top5": "PIT Quarterly Fresh540 Rank25",
+        "pit_trend_quarterly_fresh540_runwinners_top5": "PIT Quarterly Fresh540 Run Winners",
+        "pit_trend_quarterly_fresh540_runwinners_vol50_top5": "PIT Quarterly Fresh540 Run Winners Vol50",
+        "pit_trend_quarterly_fresh540_runwinners_top3": "PIT Quarterly Fresh540 Run Winners Top3",
+        "pit_trend_quarterly_fresh540_runwinners_top7": "PIT Quarterly Fresh540 Run Winners Top7",
+        "pit_trend_quarterly_fresh540_runwinners_feb_top5": "PIT Quarterly Fresh540 Run Winners Feb",
+        "pit_trend_quarterly_fresh540_runwinners_mar_top5": "PIT Quarterly Fresh540 Run Winners Mar",
+        "pit_trend_quarterly_fresh540_runwinners_slip25_top5": "PIT Quarterly Fresh540 Run Winners Slip25",
+        "pit_trend_quarterly_fresh540_runwinners_slip50_top5": "PIT Quarterly Fresh540 Run Winners Slip50",
+        "pit_trend_quarterly_fresh540_runwinners_cap40_top5": "PIT Quarterly Fresh540 Run Winners Cap40",
+        "pit_trend_quarterly_fresh540_runwinners_cap35_top5": "PIT Quarterly Fresh540 Run Winners Cap35",
+        "pit_trend_quarterly_fresh540_runwinners_soft45_top5": "PIT Quarterly Fresh540 Run Winners Soft45",
+        "pit_trend_quarterly_fresh540_runwinners_vol50_cap40_top5": "PIT Quarterly Fresh540 Run Winners Vol50 Cap40",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_top5": "PIT Quarterly Fresh540 Run Winners WeeklyCap45",
+        "pit_trend_quarterly_fresh540_runwinners_dailycap45_top5": "PIT Quarterly Fresh540 Run Winners DailyCap45",
+        "pit_trend_quarterly_fresh540_runwinners_vol50_weeklycap45_top5": "PIT Quarterly Fresh540 Run Winners Vol50 WeeklyCap45",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap50_top5": "PIT Quarterly Fresh540 Run Winners WeeklyCap50",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit10_top5": "PIT Quarterly Fresh540 Run Winners WeeklyCap45 Profit10",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit25_top5": "PIT Quarterly Fresh540 Run Winners WeeklyCap45 Profit25",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit40_top5": "PIT Quarterly Fresh540 Run Winners WeeklyCap45 Profit40",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5": "PIT Quarterly Fresh540 Run Winners WeeklyCap45 Profit60",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5": "PIT Quarterly Fresh540 Run Winners Profit60 Candidate Score",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top3": "PIT Quarterly Fresh540 Run Winners Profit60 Candidate Top3",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top7": "PIT Quarterly Fresh540 Run Winners Profit60 Candidate Top7",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_slip25_top5": "PIT Quarterly Fresh540 Run Winners Profit60 Candidate Slip25",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_slip50_top5": "PIT Quarterly Fresh540 Run Winners Profit60 Candidate Slip50",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_midcontrib_top5": "PIT Quarterly Fresh540 Run Winners Profit60 Candidate Mid-Contribution",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_lastcontrib_top5": "PIT Quarterly Fresh540 Run Winners Profit60 Candidate Last-Contribution",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_momentum_top5": "PIT Quarterly Fresh540 Run Winners Profit60 Momentum Score",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_midcontrib_top5": "PIT Quarterly Fresh540 Run Winners Profit60 Mid-Contribution",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_lastcontrib_top5": "PIT Quarterly Fresh540 Run Winners Profit60 Last-Contribution",
+        "pit_trend_quarterly_fresh540_runwinners_dailycap45_profit25_top5": "PIT Quarterly Fresh540 Run Winners DailyCap45 Profit25",
+        "pit_trend_quarterly_fresh540_confirm5_top5": "PIT Quarterly Fresh540 Confirm5",
+        "pit_trend_quarterly_fresh540_confirm10_top5": "PIT Quarterly Fresh540 Confirm10",
+        "pit_trend_quarterly_fresh540_confirm10_vol50_top5": "PIT Quarterly Fresh540 Confirm10 Vol50",
+        "pit_trend_persist20_kodex50_top5": "PIT Persist KODEX 50",
+        "pit_trend_persist20_kodex200_top5": "PIT Persist KODEX 200",
         "benchmark_kodex200": "KODEX200",
         "benchmark_qqq": "QQQ",
         "benchmark_spy": "SPY",
@@ -1966,6 +2555,102 @@ def _account_display_label(account_id: str, config: dict[str, Any], default_labe
         "all_weather": "All Weather",
         "smic_follower": "SMIC Report Follower",
         "smic_follower_v2": "SMIC Report Follower with Stops",
+        "pit_score_top3": "PIT Score Top 3 Equal Weight",
+        "pit_score_top5": "PIT Score Top 5 Equal Weight",
+        "pit_score_top10": "PIT Score Top 10 Equal Weight",
+        "pit_momentum_top5": "PIT Momentum Top 5",
+        "pit_trend_top5": "PIT Trend Top 5",
+        "pit_fresh_top5": "PIT Fresh Top 5",
+        "pit_trend_top7": "PIT Trend Top 7",
+        "pit_trend_stop_top5": "PIT Trend Stop Top 5",
+        "pit_trend_stop_top7": "PIT Trend Stop Top 7",
+        "pit_trend_rotate_top5": "PIT Trend Rotate Top 5",
+        "pit_trend_rotate_fast_top5": "PIT Trend Rotate Top 5 Twice Monthly",
+        "pit_trend_rotate_stop_top5": "PIT Trend Stop Rotate Top 5",
+        "pit_trend_persist20_top5": "PIT Trend Persist Top 20 Band",
+        "pit_trend_persist30_top5": "PIT Trend Persist Top 30 Band",
+        "pit_trend_persist20_hold90_top5": "PIT Trend Persist Top 20 Hold 90",
+        "pit_trend_persist20_top3": "PIT Trend Persist Top 20 Band Top 3",
+        "pit_trend_persist20_top7": "PIT Trend Persist Top 20 Band Top 7",
+        "pit_trend_persist20_52w10_top5": "PIT Trend Persist Top 20 Near High",
+        "pit_trend_persist20_domestic_top5": "PIT Trend Persist Top 20 Domestic",
+        "pit_trend_persist20_score_top5": "PIT Trend Persist Score Weight",
+        "pit_trend_persist20_scorecap_top5": "PIT Trend Persist Score Cap",
+        "pit_trend_persist20_invvol_top5": "PIT Trend Persist Inverse Vol",
+        "pit_trend_persist20_invvolcap_top5": "PIT Trend Persist Inverse Vol Cap",
+        "pit_trend_persist20_semimonthly_top5": "PIT Trend Persist Twice Monthly",
+        "pit_trend_persist20_quarterly_top5": "PIT Trend Persist Quarterly",
+        "pit_trend_persist30_quarterly_top5": "PIT Trend Persist Quarterly Top 30 Band",
+        "pit_trend_persist20_quarterly_risk_top5": "PIT Trend Persist Quarterly 50MA Risk Review",
+        "pit_trend_persist30_quarterly_risk_top5": "PIT Trend Persist Quarterly Top 30 50MA Risk Review",
+        "pit_trend_persist20_quarterly_hold120_top5": "PIT Trend Persist Quarterly Hold 120",
+        "pit_trend_quarterly_ret3_top5": "PIT Trend Quarterly 3M Return Gate",
+        "pit_trend_quarterly_ret6_top5": "PIT Trend Quarterly 6M Return Gate",
+        "pit_trend_quarterly_ret36_top5": "PIT Trend Quarterly 3M+6M Return Gate",
+        "pit_trend_quarterly_fresh365_top5": "PIT Trend Quarterly Fresh 365",
+        "pit_trend_quarterly_fresh540_top5": "PIT Trend Quarterly Fresh 540",
+        "pit_trend_persist20_fresh540_top5": "PIT Trend Monthly Fresh 540",
+        "pit_trend_persist20_fresh540_top3": "PIT Trend Monthly Fresh 540 Top 3",
+        "pit_trend_persist20_fresh540_top7": "PIT Trend Monthly Fresh 540 Top 7",
+        "pit_trend_quarterly_fresh540_top3": "PIT Trend Quarterly Fresh 540 Top 3",
+        "pit_trend_quarterly_fresh540_top7": "PIT Trend Quarterly Fresh 540 Top 7",
+        "pit_trend_quarterly_fresh540_gross_top5": "PIT Trend Quarterly Fresh 540 Gross",
+        "pit_trend_quarterly_fresh540_slip25_top5": "PIT Trend Quarterly Fresh 540 Slip 25",
+        "pit_trend_quarterly_fresh540_slip50_top5": "PIT Trend Quarterly Fresh 540 Slip 50",
+        "pit_trend_quarterly_fresh540_feb_top5": "PIT Trend Quarterly Fresh 540 Feb Cycle",
+        "pit_trend_quarterly_fresh540_mar_top5": "PIT Trend Quarterly Fresh 540 Mar Cycle",
+        "pit_trend_quarterly_fresh540_cash90_top5": "PIT Trend Quarterly Fresh 540 90% Invested",
+        "pit_trend_quarterly_fresh540_cash80_top5": "PIT Trend Quarterly Fresh 540 80% Invested",
+        "pit_trend_quarterly_fresh540_vol35_top5": "PIT Trend Quarterly Fresh 540 35% Vol Cap",
+        "pit_trend_quarterly_fresh540_vol40_top5": "PIT Trend Quarterly Fresh 540 40% Vol Cap",
+        "pit_trend_quarterly_fresh540_vol45_top5": "PIT Trend Quarterly Fresh 540 45% Vol Cap",
+        "pit_trend_quarterly_fresh540_vol50_top5": "PIT Trend Quarterly Fresh 540 50% Vol Cap",
+        "pit_trend_quarterly_fresh540_vol55_top5": "PIT Trend Quarterly Fresh 540 55% Vol Cap",
+        "pit_trend_quarterly_fresh540_mar_vol45_top5": "PIT Trend Quarterly Fresh 540 Mar Cycle 45% Vol Cap",
+        "pit_trend_quarterly_fresh540_entry270_top5": "PIT Trend Quarterly Fresh 540 Entry 270",
+        "pit_trend_quarterly_fresh540_entry270_vol50_top5": "PIT Trend Quarterly Fresh 540 Entry 270 50% Vol Cap",
+        "pit_trend_quarterly_fresh540_entry270_mar_top5": "PIT Trend Quarterly Fresh 540 Entry 270 Mar Cycle",
+        "pit_trend_quarterly_fresh540_entry365_top5": "PIT Trend Quarterly Fresh 540 Entry 365",
+        "pit_trend_quarterly_fresh540_entry450_top5": "PIT Trend Quarterly Fresh 540 Entry 450",
+        "pit_trend_quarterly_fresh540_entry365_vol50_top5": "PIT Trend Quarterly Fresh 540 Entry 365 50% Vol Cap",
+        "pit_trend_quarterly_fresh540_rank15_top5": "PIT Trend Quarterly Fresh 540 Rank 15",
+        "pit_trend_quarterly_fresh540_rank25_top5": "PIT Trend Quarterly Fresh 540 Rank 25",
+        "pit_trend_quarterly_fresh540_runwinners_top5": "PIT Trend Quarterly Fresh 540 Run Winners",
+        "pit_trend_quarterly_fresh540_runwinners_vol50_top5": "PIT Trend Quarterly Fresh 540 Run Winners 50% Vol Cap",
+        "pit_trend_quarterly_fresh540_runwinners_top3": "PIT Trend Quarterly Fresh 540 Run Winners Top 3",
+        "pit_trend_quarterly_fresh540_runwinners_top7": "PIT Trend Quarterly Fresh 540 Run Winners Top 7",
+        "pit_trend_quarterly_fresh540_runwinners_feb_top5": "PIT Trend Quarterly Fresh 540 Run Winners Feb Cycle",
+        "pit_trend_quarterly_fresh540_runwinners_mar_top5": "PIT Trend Quarterly Fresh 540 Run Winners Mar Cycle",
+        "pit_trend_quarterly_fresh540_runwinners_slip25_top5": "PIT Trend Quarterly Fresh 540 Run Winners Slip 25",
+        "pit_trend_quarterly_fresh540_runwinners_slip50_top5": "PIT Trend Quarterly Fresh 540 Run Winners Slip 50",
+        "pit_trend_quarterly_fresh540_runwinners_cap40_top5": "PIT Trend Quarterly Fresh 540 Run Winners 40% Cap",
+        "pit_trend_quarterly_fresh540_runwinners_cap35_top5": "PIT Trend Quarterly Fresh 540 Run Winners 35% Cap",
+        "pit_trend_quarterly_fresh540_runwinners_soft45_top5": "PIT Trend Quarterly Fresh 540 Run Winners Soft 45% Cap",
+        "pit_trend_quarterly_fresh540_runwinners_vol50_cap40_top5": "PIT Trend Quarterly Fresh 540 Run Winners 50% Vol + 40% Cap",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_top5": "PIT Trend Quarterly Fresh 540 Run Winners Weekly 45% Cap",
+        "pit_trend_quarterly_fresh540_runwinners_dailycap45_top5": "PIT Trend Quarterly Fresh 540 Run Winners Daily 45% Cap",
+        "pit_trend_quarterly_fresh540_runwinners_vol50_weeklycap45_top5": "PIT Trend Quarterly Fresh 540 Run Winners 50% Vol + Weekly 45% Cap",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap50_top5": "PIT Trend Quarterly Fresh 540 Run Winners Weekly 50% Cap",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit10_top5": "PIT Trend Quarterly Fresh 540 Run Winners Weekly 45% Cap Profit 10%",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit25_top5": "PIT Trend Quarterly Fresh 540 Run Winners Weekly 45% Cap Profit 25%",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit40_top5": "PIT Trend Quarterly Fresh 540 Run Winners Weekly 45% Cap Profit 40%",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5": "PIT Trend Quarterly Fresh 540 Run Winners Weekly 45% Cap Profit 60%",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5": "PIT Trend Quarterly Fresh 540 Run Winners Profit 60% Candidate Score",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top3": "PIT Trend Quarterly Fresh 540 Run Winners Profit 60% Candidate Score Top 3",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top7": "PIT Trend Quarterly Fresh 540 Run Winners Profit 60% Candidate Score Top 7",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_slip25_top5": "PIT Trend Quarterly Fresh 540 Run Winners Profit 60% Candidate Score Slip 25",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_slip50_top5": "PIT Trend Quarterly Fresh 540 Run Winners Profit 60% Candidate Score Slip 50",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_midcontrib_top5": "PIT Trend Quarterly Fresh 540 Run Winners Profit 60% Candidate Score Mid-Month Contribution",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_lastcontrib_top5": "PIT Trend Quarterly Fresh 540 Run Winners Profit 60% Candidate Score Month-End Contribution",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_momentum_top5": "PIT Trend Quarterly Fresh 540 Run Winners Profit 60% Momentum Score",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_midcontrib_top5": "PIT Trend Quarterly Fresh 540 Run Winners Profit 60% Mid-Month Contribution",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_lastcontrib_top5": "PIT Trend Quarterly Fresh 540 Run Winners Profit 60% Month-End Contribution",
+        "pit_trend_quarterly_fresh540_runwinners_dailycap45_profit25_top5": "PIT Trend Quarterly Fresh 540 Run Winners Daily 45% Cap Profit 25%",
+        "pit_trend_quarterly_fresh540_confirm5_top5": "PIT Trend Quarterly Fresh 540 Confirm Top 5",
+        "pit_trend_quarterly_fresh540_confirm10_top5": "PIT Trend Quarterly Fresh 540 Confirm Top 10",
+        "pit_trend_quarterly_fresh540_confirm10_vol50_top5": "PIT Trend Quarterly Fresh 540 Confirm Top 10 50% Vol Cap",
+        "pit_trend_persist20_kodex50_top5": "PIT Trend Persist KODEX 50MA Gate",
+        "pit_trend_persist20_kodex200_top5": "PIT Trend Persist KODEX 200MA Gate",
     }
     return labels.get(account_id, default_label)
 
@@ -1976,10 +2661,106 @@ def _account_catalog_sort_key(row: dict[str, Any]) -> tuple[int, float, str]:
         "all_weather": 0,
         "smic_follower": 1,
         "smic_follower_v2": 2,
-        "benchmark_kodex200": 3,
-        "benchmark_qqq": 4,
-        "benchmark_spy": 5,
-        "benchmark_gld": 6,
+        "pit_score_top3": 3,
+        "pit_score_top5": 4,
+        "pit_score_top10": 5,
+        "pit_momentum_top5": 6,
+        "pit_trend_top5": 7,
+        "pit_fresh_top5": 8,
+        "pit_trend_top7": 9,
+        "pit_trend_stop_top5": 10,
+        "pit_trend_stop_top7": 11,
+        "pit_trend_rotate_top5": 12,
+        "pit_trend_rotate_fast_top5": 13,
+        "pit_trend_rotate_stop_top5": 14,
+        "pit_trend_persist20_top5": 15,
+        "pit_trend_persist30_top5": 16,
+        "pit_trend_persist20_hold90_top5": 17,
+        "pit_trend_persist20_top3": 18,
+        "pit_trend_persist20_top7": 19,
+        "pit_trend_persist20_52w10_top5": 20,
+        "pit_trend_persist20_domestic_top5": 21,
+        "pit_trend_persist20_score_top5": 22,
+        "pit_trend_persist20_scorecap_top5": 23,
+        "pit_trend_persist20_invvol_top5": 24,
+        "pit_trend_persist20_invvolcap_top5": 25,
+        "pit_trend_persist20_semimonthly_top5": 26,
+        "pit_trend_persist20_quarterly_top5": 27,
+        "pit_trend_persist30_quarterly_top5": 28,
+        "pit_trend_persist20_quarterly_risk_top5": 29,
+        "pit_trend_persist30_quarterly_risk_top5": 30,
+        "pit_trend_persist20_quarterly_hold120_top5": 31,
+        "pit_trend_quarterly_ret3_top5": 32,
+        "pit_trend_quarterly_ret6_top5": 33,
+        "pit_trend_quarterly_ret36_top5": 34,
+        "pit_trend_quarterly_fresh365_top5": 35,
+        "pit_trend_quarterly_fresh540_top5": 36,
+        "pit_trend_persist20_fresh540_top5": 37,
+        "pit_trend_persist20_fresh540_top3": 38,
+        "pit_trend_persist20_fresh540_top7": 39,
+        "pit_trend_quarterly_fresh540_top3": 40,
+        "pit_trend_quarterly_fresh540_top7": 41,
+        "pit_trend_quarterly_fresh540_gross_top5": 42,
+        "pit_trend_quarterly_fresh540_slip25_top5": 43,
+        "pit_trend_quarterly_fresh540_slip50_top5": 44,
+        "pit_trend_quarterly_fresh540_feb_top5": 45,
+        "pit_trend_quarterly_fresh540_mar_top5": 46,
+        "pit_trend_quarterly_fresh540_cash90_top5": 47,
+        "pit_trend_quarterly_fresh540_cash80_top5": 48,
+        "pit_trend_quarterly_fresh540_vol35_top5": 49,
+        "pit_trend_quarterly_fresh540_vol40_top5": 50,
+        "pit_trend_quarterly_fresh540_vol45_top5": 51,
+        "pit_trend_quarterly_fresh540_vol50_top5": 52,
+        "pit_trend_quarterly_fresh540_vol55_top5": 53,
+        "pit_trend_quarterly_fresh540_mar_vol45_top5": 54,
+        "pit_trend_quarterly_fresh540_entry270_top5": 55,
+        "pit_trend_quarterly_fresh540_entry270_vol50_top5": 56,
+        "pit_trend_quarterly_fresh540_entry270_mar_top5": 57,
+        "pit_trend_quarterly_fresh540_entry365_top5": 58,
+        "pit_trend_quarterly_fresh540_entry450_top5": 59,
+        "pit_trend_quarterly_fresh540_entry365_vol50_top5": 60,
+        "pit_trend_quarterly_fresh540_rank15_top5": 61,
+        "pit_trend_quarterly_fresh540_rank25_top5": 62,
+        "pit_trend_quarterly_fresh540_runwinners_top5": 63,
+        "pit_trend_quarterly_fresh540_runwinners_vol50_top5": 64,
+        "pit_trend_quarterly_fresh540_runwinners_top3": 65,
+        "pit_trend_quarterly_fresh540_runwinners_top7": 66,
+        "pit_trend_quarterly_fresh540_runwinners_feb_top5": 67,
+        "pit_trend_quarterly_fresh540_runwinners_mar_top5": 68,
+        "pit_trend_quarterly_fresh540_runwinners_slip25_top5": 69,
+        "pit_trend_quarterly_fresh540_runwinners_slip50_top5": 70,
+        "pit_trend_quarterly_fresh540_runwinners_cap40_top5": 71,
+        "pit_trend_quarterly_fresh540_runwinners_cap35_top5": 72,
+        "pit_trend_quarterly_fresh540_runwinners_soft45_top5": 73,
+        "pit_trend_quarterly_fresh540_runwinners_vol50_cap40_top5": 74,
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_top5": 75,
+        "pit_trend_quarterly_fresh540_runwinners_dailycap45_top5": 76,
+        "pit_trend_quarterly_fresh540_runwinners_vol50_weeklycap45_top5": 77,
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap50_top5": 78,
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit10_top5": 79,
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit25_top5": 80,
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit40_top5": 81,
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5": 82,
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5": 83,
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top3": 84,
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top7": 85,
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_slip25_top5": 86,
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_slip50_top5": 87,
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_midcontrib_top5": 88,
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_lastcontrib_top5": 89,
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_momentum_top5": 90,
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_midcontrib_top5": 91,
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_lastcontrib_top5": 92,
+        "pit_trend_quarterly_fresh540_runwinners_dailycap45_profit25_top5": 93,
+        "pit_trend_quarterly_fresh540_confirm5_top5": 94,
+        "pit_trend_quarterly_fresh540_confirm10_top5": 95,
+        "pit_trend_quarterly_fresh540_confirm10_vol50_top5": 96,
+        "pit_trend_persist20_kodex50_top5": 97,
+        "pit_trend_persist20_kodex200_top5": 98,
+        "benchmark_kodex200": 99,
+        "benchmark_qqq": 100,
+        "benchmark_spy": 101,
+        "benchmark_gld": 102,
     }
     if account_id in order:
         return (order[account_id], 0.0, account_id)

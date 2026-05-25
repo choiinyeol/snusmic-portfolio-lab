@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { ReportBoardRow } from '@/components/report-board/report-board-table';
 import { ReportsTable } from '@/components/reports/ReportsTable';
+import { compactTicker, stockDisplayName } from '@/components/trading/helpers';
 import { MetricStrip } from '@/components/shell/MetricStrip';
 import { PageHeader } from '@/components/shell/PageHeader';
 import { Button } from '@/components/ui/button';
@@ -48,15 +49,18 @@ export function ReportBoardScreen({ model }: { model: ReportBoardViewModel }) {
 
 function PriorityCandidateCard({ row }: { row: ReportBoardRow }) {
   const href = `/reports/${encodeURIComponent(row.symbol)}/${encodeURIComponent(row.latestReportId)}`;
+  const displayName = stockDisplayName(row.symbol, row.company);
+  const ticker = compactTicker(row.symbol);
   return (
     <Link
       className="grid min-w-0 gap-3 rounded-xl border border-slate-200 bg-white p-3 transition-colors hover:bg-slate-50"
       href={href}
     >
       <div className="min-w-0">
-        <div className="truncate text-sm font-semibold text-slate-950">{row.company || row.symbol}</div>
+        <div className="truncate text-sm font-semibold text-slate-950">{displayName}</div>
         <div className="mt-0.5 font-mono text-xs text-slate-500">
-          {row.symbol} · {formatDateKo(row.latestReportDate)}
+          {displayName !== ticker ? `${ticker} · ` : ''}
+          {formatDateKo(row.latestReportDate)}
         </div>
       </div>
       <div className="grid grid-cols-2 gap-2 text-xs">

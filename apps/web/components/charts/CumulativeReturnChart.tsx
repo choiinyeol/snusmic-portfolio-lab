@@ -35,9 +35,15 @@ export function CumulativeReturnChart({
   const ref = useRef<HTMLDivElement | null>(null);
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
   const visibleSeries = useMemo(() => series.filter((item) => item.points.length), [series]);
+  const availableIds = useMemo(() => visibleSeries.map((item) => item.id), [visibleSeries]);
+  const [enabledIds, setEnabledIds] = useState<Set<string>>(new Set());
+  const selectedSeries = useMemo(
+    () => (enabledIds.size ? visibleSeries.filter((item) => enabledIds.has(item.id)) : visibleSeries),
+    [enabledIds, visibleSeries],
+  );
   const normalizedSeries = useMemo(
     () =>
-      visibleSeries.map((item, index) => ({
+      selectedSeries.map((item, index) => ({
         ...item,
         primary: index === 0,
         points: item.points
@@ -45,8 +51,18 @@ export function CumulativeReturnChart({
           .sort((a, b) => a.time.localeCompare(b.time))
           .map((point) => ({ time: point.time as Time, value: point.value * 100 })),
       })),
-    [visibleSeries],
+    [selectedSeries],
   );
+
+  useEffect(() => {
+    setEnabledIds((current) => {
+      if (!current.size) return current;
+      const available = new Set(availableIds);
+      const next = new Set([...current].filter((id) => available.has(id)));
+      if (next.size === current.size) return current;
+      return next;
+    });
+  }, [availableIds]);
 
   useEffect(() => {
     const container = ref.current;
@@ -143,12 +159,35 @@ export function CumulativeReturnChart({
     <div className="relative grid gap-2">
       {showLegend ? (
         <div className="flex min-w-0 flex-wrap gap-x-3 gap-y-1 px-1 text-xs">
-          {normalizedSeries.slice(0, 14).map((item) => (
-            <span className="inline-flex items-center gap-1.5 whitespace-nowrap" key={item.id} title={item.label}>
-              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
-              <span className="font-medium text-slate-500">{item.shortLabel ?? item.label}</span>
-            </span>
-          ))}
+          {visibleSeries.slice(0, 14).map((item) => {
+            const active = !enabledIds.size || enabledIds.has(item.id);
+            const latest = item.points.at(-1)?.value ?? null;
+            return (
+              <button
+                aria-pressed={active}
+                className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2 py-1 transition-colors ${
+                  active ? 'bg-slate-100 text-slate-950' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-700'
+                }`}
+                key={item.id}
+                onClick={() => {
+                  setEnabledIds((current) => {
+                    const next = current.size ? new Set(current) : new Set(availableIds);
+                    if (next.has(item.id) && next.size > 1) next.delete(item.id);
+                    else next.add(item.id);
+                    return next;
+                  });
+                }}
+                title={item.label}
+                type="button"
+              >
+                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
+                <span className="font-medium">{item.shortLabel ?? item.label}</span>
+                {Number.isFinite(latest) ? (
+                  <span className="font-mono text-[11px] text-slate-500 tabular-nums">{formatPercent(latest)}</span>
+                ) : null}
+              </button>
+            );
+          })}
         </div>
       ) : null}
       <div

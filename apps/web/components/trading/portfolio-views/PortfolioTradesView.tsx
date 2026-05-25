@@ -24,7 +24,7 @@ export function PortfolioTradesView({ model }: { model: PortfolioViewModel }) {
             </p>
           </div>
           <span className="font-mono text-xs font-semibold text-slate-500">
-            {summary.latestDate || '—'} 기준 · {trades.length.toLocaleString('ko-KR')}건
+            {summary.latestDate || '-'} 기준 · {trades.length.toLocaleString('ko-KR')}건
           </span>
         </div>
 
@@ -70,7 +70,7 @@ export function PortfolioTradesView({ model }: { model: PortfolioViewModel }) {
 
         <article className="rounded-md border border-slate-200 bg-white p-4">
           <h3 className="text-lg font-semibold tracking-tight text-slate-950">사유별 체결</h3>
-          <p className="mt-1 text-sm leading-6 text-slate-500">매매가 어떤 규칙/리포트 사유로 반복됐는지 요약합니다.</p>
+          <p className="mt-1 text-sm leading-6 text-slate-500">어떤 규칙이나 리포트 사유가 반복됐는지 요약합니다.</p>
           <div className="mt-3 grid gap-2">
             {summary.reasonBuckets.map((bucket) => (
               <div className="rounded-md border border-slate-100 bg-slate-50 p-3" key={bucket.reason}>
@@ -184,8 +184,9 @@ function buildReasonBuckets(trades: TradeRow[]) {
 
 function normalizeReason(reason: string): string {
   const trimmed = reason.trim();
+  if (trimmed.includes('retained_cap_trim')) return '보유 비중 조절';
   if (!trimmed) return '기록된 사유 없음';
-  return trimmed.length > 44 ? `${trimmed.slice(0, 44)}…` : trimmed;
+  return trimmed.length > 44 ? `${trimmed.slice(0, 44)}...` : trimmed;
 }
 
 function sumGross(trades: TradeRow[]): number {

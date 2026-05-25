@@ -30,37 +30,37 @@
       {
         "threshold": 0.6,
         "horizonDays": 60,
-        "hitRate": 0.294416,
+        "hitRate": 0.299492,
         "sampleSize": 197,
-        "hitCount": 58,
-        "medianDaysToHit": 24.5,
+        "hitCount": 59,
+        "medianDaysToHit": 26,
         "ci95": [
-          0.235191,
-          0.361506
+          0.239864,
+          0.366791
         ]
       },
       {
         "threshold": 0.6,
         "horizonDays": 120,
-        "hitRate": 0.406091,
+        "hitRate": 0.411168,
         "sampleSize": 197,
-        "hitCount": 80,
-        "medianDaysToHit": 38,
+        "hitCount": 81,
+        "medianDaysToHit": 39,
         "ci95": [
-          0.339943,
-          0.475832
+          0.344794,
+          0.480939
         ]
       },
       {
         "threshold": 0.6,
         "horizonDays": 250,
-        "hitRate": 0.477157,
+        "hitRate": 0.482234,
         "sampleSize": 197,
-        "hitCount": 94,
-        "medianDaysToHit": 46,
+        "hitCount": 95,
+        "medianDaysToHit": 44,
         "ci95": [
-          0.408514,
-          0.546675
+          0.413465,
+          0.551682
         ]
       },
       {
@@ -838,90 +838,90 @@
       {
         "targetMultiple": 0.4,
         "horizonDays": 30,
-        "hitRate": 0.284264,
+        "hitRate": 0.28934,
         "sampleSize": 197,
         "medianReturn": 0.027426,
-        "meanReturn": 0.01569,
+        "meanReturn": 0.015503,
         "p25Return": -0.081928,
         "downsideRisk": 0.081928,
-        "rewardReliabilityScore": 0.059095
+        "rewardReliabilityScore": 0.06015
       },
       {
         "targetMultiple": 0.4,
         "horizonDays": 60,
-        "hitRate": 0.385787,
+        "hitRate": 0.390863,
         "sampleSize": 197,
         "medianReturn": 0.061457,
-        "meanReturn": 0.016694,
+        "meanReturn": 0.016553,
         "p25Return": -0.116784,
         "downsideRisk": 0.116784,
-        "rewardReliabilityScore": 0.142156
+        "rewardReliabilityScore": 0.144026
       },
       {
         "targetMultiple": 0.4,
         "horizonDays": 120,
-        "hitRate": 0.51269,
+        "hitRate": 0.517766,
         "sampleSize": 197,
-        "medianReturn": 0.106667,
-        "meanReturn": 0.033246,
+        "medianReturn": 0.111965,
+        "meanReturn": 0.03403,
         "p25Return": -0.120064,
         "downsideRisk": 0.120064,
-        "rewardReliabilityScore": 0.321568
+        "rewardReliabilityScore": 0.340881
       },
       {
         "targetMultiple": 0.4,
         "horizonDays": 250,
-        "hitRate": 0.609137,
+        "hitRate": 0.614213,
         "sampleSize": 197,
-        "medianReturn": 0.135841,
-        "meanReturn": 0.03237,
+        "medianReturn": 0.137748,
+        "meanReturn": 0.033852,
         "p25Return": -0.190558,
         "downsideRisk": 0.190558,
-        "rewardReliabilityScore": 0.343974
+        "rewardReliabilityScore": 0.35171
       },
       {
         "targetMultiple": 0.5,
         "horizonDays": 30,
-        "hitRate": 0.22335,
+        "hitRate": 0.228426,
         "sampleSize": 197,
         "medianReturn": 0.023214,
-        "meanReturn": 0.021909,
+        "meanReturn": 0.021969,
         "p25Return": -0.098376,
         "downsideRisk": 0.098376,
-        "rewardReliabilityScore": 0.034944
+        "rewardReliabilityScore": 0.035738
       },
       {
         "targetMultiple": 0.5,
         "horizonDays": 60,
-        "hitRate": 0.335025,
+        "hitRate": 0.340102,
         "sampleSize": 197,
         "medianReturn": 0.049538,
-        "meanReturn": 0.026655,
+        "meanReturn": 0.026762,
         "p25Return": -0.11859,
         "downsideRisk": 0.11859,
-        "rewardReliabilityScore": 0.098443
+        "rewardReliabilityScore": 0.099935
       },
       {
         "targetMultiple": 0.5,
         "horizonDays": 120,
-        "hitRate": 0.456853,
+        "hitRate": 0.461929,
         "sampleSize": 197,
-        "medianReturn": 0.1,
-        "meanReturn": 0.042621,
+        "medianReturn": 0.105085,
+        "meanReturn": 0.043652,
         "p25Return": -0.165357,
         "downsideRisk": 0.165357,
-        "rewardReliabilityScore": 0.212138
+        "rewardReliabilityScore": 0.225402
       },
       {
         "targetMultiple": 0.5,
         "horizonDays": 250,
-        "hitRate": 0.538071,
+        "hitRate": 0.543147,
         "sampleSize": 197,
-        "medianReturn": 0.133333,
-        "meanReturn": 0.043363,
+        "medianReturn": 0.139957,
+        "meanReturn": 0.045092,
         "p25Return": -0.206337,
         "downsideRisk": 0.206337,
-        "rewardReliabilityScore": 0.279876
+        "rewardReliabilityScore": 0.296552
       },
       {
         "targetMultiple": 0.6,
@@ -937,35 +937,35 @@
       {
         "targetMultiple": 0.6,
         "horizonDays": 60,
-        "hitRate": 0.294416,
+        "hitRate": 0.299492,
         "sampleSize": 197,
         "medianReturn": 0.049407,
-        "meanReturn": 0.035331,
+        "meanReturn": 0.035684,
         "p25Return": -0.11859,
         "downsideRisk": 0.11859,
-        "rewardReliabilityScore": 0.086282
+        "rewardReliabilityScore": 0.087769
       },
       {
         "targetMultiple": 0.6,
         "horizonDays": 120,
-        "hitRate": 0.406091,
+        "hitRate": 0.411168,
         "sampleSize": 197,
-        "medianReturn": 0.09296,
-        "meanReturn": 0.052844,
+        "medianReturn": 0.09393,
+        "meanReturn": 0.054123,
         "p25Return": -0.165517,
         "downsideRisk": 0.165517,
-        "rewardReliabilityScore": 0.175161
+        "rewardReliabilityScore": 0.179202
       },
       {
         "targetMultiple": 0.6,
         "horizonDays": 250,
-        "hitRate": 0.477157,
+        "hitRate": 0.482234,
         "sampleSize": 197,
-        "medianReturn": 0.138797,
-        "meanReturn": 0.036289,
+        "medianReturn": 0.139535,
+        "meanReturn": 0.038266,
         "p25Return": -0.240349,
         "downsideRisk": 0.240349,
-        "rewardReliabilityScore": 0.228098
+        "rewardReliabilityScore": 0.23175
       },
       {
         "targetMultiple": 0.7,
@@ -981,35 +981,35 @@
       {
         "targetMultiple": 0.7,
         "horizonDays": 60,
-        "hitRate": 0.243655,
+        "hitRate": 0.248731,
         "sampleSize": 197,
         "medianReturn": 0.033183,
-        "meanReturn": 0.037364,
+        "meanReturn": 0.037965,
         "p25Return": -0.121127,
         "downsideRisk": 0.121127,
-        "rewardReliabilityScore": 0.047247
+        "rewardReliabilityScore": 0.048231
       },
       {
         "targetMultiple": 0.7,
         "horizonDays": 120,
-        "hitRate": 0.360406,
+        "hitRate": 0.365482,
         "sampleSize": 197,
-        "medianReturn": 0.068091,
-        "meanReturn": 0.057587,
+        "medianReturn": 0.068327,
+        "meanReturn": 0.059113,
         "p25Return": -0.166372,
         "downsideRisk": 0.166372,
-        "rewardReliabilityScore": 0.113418
+        "rewardReliabilityScore": 0.115414
       },
       {
         "targetMultiple": 0.7,
         "horizonDays": 250,
-        "hitRate": 0.436548,
+        "hitRate": 0.441624,
         "sampleSize": 197,
-        "medianReturn": 0.107389,
-        "meanReturn": 0.044539,
+        "medianReturn": 0.111369,
+        "meanReturn": 0.046763,
         "p25Return": -0.2465,
         "downsideRisk": 0.2465,
-        "rewardReliabilityScore": 0.158113
+        "rewardReliabilityScore": 0.165879
       },
       {
         "targetMultiple": 0.8,
@@ -2024,10 +2024,10 @@
         "publicationDate": "2022-05-25",
         "maxFavorableExcursion": 0.355177,
         "maxAdverseExcursion": -0.482307,
-        "upsideCaptureRatio": 0.044322,
-        "targetReturn": 8.013591,
+        "upsideCaptureRatio": 0.728495,
+        "targetReturn": 0.487549,
         "currentReturn": 0.1659,
-        "hit06": false,
+        "hit06": true,
         "hit08": false,
         "hit10": false
       },

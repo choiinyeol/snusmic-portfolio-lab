@@ -1,0 +1,8 @@
+account_id,cash_gate,final_delta_vs_cap20_krw,positive_days_vs_cap20,min_daily_delta_vs_cap20_krw,max_daily_delta_vs_cap20_krw,rebalance_buy,rebalance_sell,trailing_profit_trim,retained_cap_trim
+research061_cashgate1_top5,0.1,-326879.8964140415,0.01925820256776034,-6457280.817155115,6929388.08064425,76,64,2,3
+research061_cashgate125_top5,0.125,17760713.924292207,0.2296718972895863,-455974.23170539737,18125273.282594442,72,60,3,3
+research061_cashgate15_top5,0.15,9294299.906361818,0.21469329529243938,-3069184.5659947395,9470174.179140568,74,61,4,3
+research061_cashgate175_top5,0.175,0.0,0.0,0.0,0.0,69,59,5,3
+research061_cashgate2_top5,0.2,0.0,0.0,0.0,0.0,69,59,5,3
+research061_cashgate225_top5,0.225,0.0,0.0,0.0,0.0,69,59,5,3
+research061_cashgate25_top5,0.25,0.0,0.0,0.0,0.0,69,59,5,3

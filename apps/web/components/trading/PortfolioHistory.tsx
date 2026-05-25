@@ -6,7 +6,7 @@ import { Money } from '@/components/ui/Money';
 import { formatDateKo, formatKrw, formatPercent } from '@/lib/format';
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import { CsvDownloadButton, DataPanel, downloadCsv } from '@/components/ui/data-panel';
-import { marketLabel, nativeFromKrw, reportTargetHref } from './helpers';
+import { compactTicker, marketLabel, nativeFromKrw, reportTargetHref, stockDisplayName } from './helpers';
 import { SortHeader, pageRows, sortRows, type SortState } from './TableControls';
 
 type Props = {
@@ -68,7 +68,7 @@ export function PortfolioHistory({ monthly, account_id, accountLabels, targetsBy
         month: (row) => row.monthEnd,
         account: (row) => accountLabels[row.account_id] ?? row.account_id,
         market: (row) => marketLabel(targetsBySymbol[row.symbol]?.marketRegion),
-        symbol: (row) => row.company || row.symbol,
+        symbol: (row) => stockDisplayName(row.symbol, row.company),
         target: (row) => targetsBySymbol[row.symbol]?.targetPriceNative ?? targetsBySymbol[row.symbol]?.targetPriceKrw,
         qty: (row) => row.qty,
         monthClose: (row) => row.monthCloseKrw,
@@ -113,7 +113,7 @@ export function PortfolioHistory({ monthly, account_id, accountLabels, targetsBy
                 <div className="truncate text-xs text-slate-950/55">
                   {stack.segments
                     .slice(0, 4)
-                    .map((segment) => segment.symbol)
+                    .map((segment) => stockDisplayName(segment.symbol, segment.company))
                     .join(' · ')}
                 </div>
               </div>
@@ -209,6 +209,8 @@ export function PortfolioHistory({ monthly, account_id, accountLabels, targetsBy
               const target = targetsBySymbol[row.symbol];
               const gap = targetGap(row, target);
               const pnlToTarget = targetPnl(row, target);
+              const displayName = stockDisplayName(row.symbol, row.company);
+              const ticker = compactTicker(row.symbol);
               const evalNative =
                 row.monthCloseNative !== null && row.qty !== null ? row.monthCloseNative * row.qty : null;
               return (
@@ -221,15 +223,15 @@ export function PortfolioHistory({ monthly, account_id, accountLabels, targetsBy
                     </span>
                   </td>
                   <td>
-                    {row.company || row.symbol}
+                    {displayName}
                     <div className="text-xs text-slate-950/55">
-                      {target ? (
+                      {target && displayName !== ticker ? (
                         <a className="text-slate-700 hover:underline" href={reportTargetHref(target)}>
-                          {row.symbol}
+                          {ticker}
                         </a>
-                      ) : (
-                        <span>{row.symbol}</span>
-                      )}
+                      ) : target ? null : displayName !== ticker ? (
+                        <span>{ticker}</span>
+                      ) : null}
                     </div>
                   </td>
                   <td>
@@ -296,13 +298,15 @@ function buildStacks(rows: MonthlyHoldingRow[], account_id: string) {
       const sorted = [...group].sort((a, b) => (b.weightInPortfolio ?? 0) - (a.weightInPortfolio ?? 0));
       const top = sorted
         .slice(0, 8)
-        .map((row) => ({ symbol: row.symbol, weight: Math.max(0, row.weightInPortfolio ?? 0) }));
+        .map((row) => ({ symbol: row.symbol, company: row.company, weight: Math.max(0, row.weightInPortfolio ?? 0) }));
       const other = sorted.slice(8).reduce((sum, row) => sum + Math.max(0, row.weightInPortfolio ?? 0), 0);
       const total = top.reduce((sum, row) => sum + row.weight, other) || 1;
-      const segments = [...top, ...(other > 0 ? [{ symbol: '기타', weight: other }] : [])].map((segment) => ({
-        ...segment,
-        weight: segment.weight / total,
-      }));
+      const segments = [...top, ...(other > 0 ? [{ symbol: '기타', company: null, weight: other }] : [])].map(
+        (segment) => ({
+          ...segment,
+          weight: segment.weight / total,
+        }),
+      );
       return { month, segments };
     });
 }

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
 import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
-import { reportTargetHref } from '@/components/trading/helpers';
+import { compactTicker, reportTargetHref, stockDisplayName } from '@/components/trading/helpers';
 import { PortfolioTables } from '@/components/trading/PortfolioTables';
 import type { HoldingRow, ReportTargetDigest } from '@/lib/artifacts';
 import { formatKrw, formatPercent } from '@/lib/format';
@@ -45,7 +45,7 @@ export function PortfolioHoldingsView({ model }: { model: PortfolioViewModel }) 
               </div>
               <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">현재 보유 비중</h2>
               <p className="mt-1 text-sm leading-6 text-slate-500">
-                연 2.5% RP이자까지 별도 자산으로 포함한 실제 계좌 비중입니다.
+                {accountLabel}의 보유 종목과 현금/RP를 하나의 실제 계좌 비중으로 봅니다.
               </p>
             </div>
             <span className="font-mono text-xs font-semibold text-slate-500">{formatKrw(totalValue)}</span>
@@ -55,7 +55,7 @@ export function PortfolioHoldingsView({ model }: { model: PortfolioViewModel }) 
             height={420}
             compact
             hrefBySymbol={hrefBySymbol}
-            caption="면적 = 평가액, 색 = 미실현 수익률. RP이자도 계좌 비중으로 포함합니다."
+            caption="면적은 평가액, 색은 미실현 수익률입니다. 현금/RP도 계좌 비중에 포함합니다."
           />
         </article>
 
@@ -66,8 +66,8 @@ export function PortfolioHoldingsView({ model }: { model: PortfolioViewModel }) 
             </div>
             <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">리스크 집중</h2>
             <p className="mt-1 text-sm leading-6 text-slate-500">
-              {accountLabel}의 현재 위험은 보유 비중 상위 종목이 결정합니다. 비중·미실현 수익률·보유일·최근 리포트
-              맥락을 한 번에 확인합니다.
+              현재 위험은 보유 비중 상위 종목이 결정합니다. 비중, 미실현 수익률, 보유일, 최근 리포트 맥락을 한 번에
+              확인합니다.
             </p>
           </div>
           <div className="grid gap-2">
@@ -109,6 +109,8 @@ function HoldingEvidenceCard({
 }) {
   const weight = totalValue > 0 ? (holding.marketValueKrw ?? 0) / totalValue : null;
   const href = target ? reportTargetHref(target) : `/portfolio/${encodeURIComponent(holding.account_id)}/holdings`;
+  const displayName = stockDisplayName(holding.symbol, holding.company);
+  const ticker = compactTicker(holding.symbol);
   return (
     <Link
       className="grid gap-2 rounded-md border border-slate-200 p-3 transition-colors hover:border-slate-400 hover:bg-slate-50"
@@ -120,10 +122,11 @@ function HoldingEvidenceCard({
             <span className="grid size-5 shrink-0 place-items-center rounded bg-slate-950 font-mono text-[10px] font-bold text-white">
               {index + 1}
             </span>
-            <span className="truncate font-semibold text-slate-950">{holding.company || holding.symbol}</span>
+            <span className="truncate font-semibold text-slate-950">{displayName}</span>
           </div>
           <div className="mt-1 font-mono text-[11px] text-slate-500">
-            {holding.symbol} · {target?.publicationDate ?? '리포트 날짜 없음'}
+            {displayName !== ticker ? `${ticker} · ` : ''}
+            {target?.publicationDate ?? '리포트 날짜 없음'}
           </div>
         </div>
         <div className="shrink-0 text-right">
@@ -155,7 +158,7 @@ function HoldingEvidenceCard({
 }
 
 function formatHoldingDays(value: number | null | undefined): string {
-  if (value === null || value === undefined || !Number.isFinite(value)) return '—';
+  if (value === null || value === undefined || !Number.isFinite(value)) return '-';
   return `${Math.round(value).toLocaleString('ko-KR')}일`;
 }
 
@@ -166,7 +169,7 @@ function withCashHolding(holdings: HoldingRow[], cashKrw: number, account_id: st
     {
       account_id,
       symbol: 'CASH',
-      company: 'RP이자',
+      company: '현금/RP',
       qty: null,
       avgCostKrw: null,
       lastCloseKrw: 1,

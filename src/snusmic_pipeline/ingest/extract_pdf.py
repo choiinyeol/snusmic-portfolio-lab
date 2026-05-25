@@ -316,8 +316,9 @@ def median_price(values: list[float]) -> float | None:
     return (ordered[midpoint - 1] + ordered[midpoint]) / 2
 
 
-def is_plausible_target_price(value: float, ticker: str) -> bool:
-    if ticker.isdigit() and len(ticker) == 6:
+def is_plausible_target_price(value: float, ticker: str, exchange: str = "") -> bool:
+    code = str(exchange or "").strip().upper()
+    if ticker.isdigit() and len(ticker) == 6 and code in {"", "KRX", "KOSPI", "KOSDAQ"}:
         return value >= 100
     return value >= 1
 
@@ -405,6 +406,7 @@ def infer_currency(text: str, ticker: str, exchange: str = "") -> str:
 
 def parse_report_text(text: str, company_hint: str = "") -> dict[str, object]:
     ticker = ticker_from_text(text, company_hint=company_hint)
+    exchange, exchange_note = infer_exchange(ticker, text)
     rating = rating_from_text(text)
     current_match = _CURRENT_PRICE_RE.search(text)
     single_target, target_raw = target_price_from_text(text)
@@ -416,7 +418,7 @@ def parse_report_text(text: str, company_hint: str = "") -> dict[str, object]:
                 single_target, target_raw = candidate, raw
                 notes.append("Initial target candidate equaled current price; selected next target candidate")
                 break
-    if single_target is not None and not is_plausible_target_price(single_target, ticker):
+    if single_target is not None and not is_plausible_target_price(single_target, ticker, exchange):
         single_target = None
     single_target = rescale_thousand_decimal_if_needed(single_target, target_raw, current_price, ticker)
 
@@ -435,7 +437,11 @@ def parse_report_text(text: str, company_hint: str = "") -> dict[str, object]:
                 and value <= 5
             )
             value = rescale_thousand_decimal_if_needed(value, raw_value, current_price, ticker)
-            if value is not None and not looks_like_case_number and is_plausible_target_price(value, ticker):
+            if (
+                value is not None
+                and not looks_like_case_number
+                and is_plausible_target_price(value, ticker, exchange)
+            ):
                 scenario_values[scenario] = value
 
     case_values = {
@@ -443,7 +449,7 @@ def parse_report_text(text: str, company_hint: str = "") -> dict[str, object]:
         for key, value in case_targets_from_text(text).items()
         if key.split("_", 1)[-1].isdigit()
         and 1 <= int(key.split("_", 1)[-1]) <= 5
-        and is_plausible_target_price(value, ticker)
+        and is_plausible_target_price(value, ticker, exchange)
     }
     base_target = scenario_values.get("base", single_target)
     if base_target is None and scenario_values:
@@ -461,7 +467,6 @@ def parse_report_text(text: str, company_hint: str = "") -> dict[str, object]:
         base_target = median_price(case_prices)
     if single_target is not None and ("base" in target_raw.lower() or base_target is None):
         base_target = single_target
-    exchange, exchange_note = infer_exchange(ticker, text)
     if exchange_note:
         notes.append(exchange_note)
     if base_target is None:

@@ -181,7 +181,9 @@ def test_extended_web_artifacts_support_insights_and_downloads(web_export_dir: P
     )
     rankings = json.loads((out / "report-rankings.json").read_text(encoding="utf-8"))
     page_rankings = json.loads((out / "reports" / "rankings.json").read_text(encoding="utf-8"))
-    report_board_candidates = json.loads((out / "report-board" / "candidates.json").read_text(encoding="utf-8"))
+    report_board_candidates = json.loads(
+        (out / "report-board" / "candidates.json").read_text(encoding="utf-8")
+    )
 
     assert len(insights) >= 6
     assert overview_insights == insights

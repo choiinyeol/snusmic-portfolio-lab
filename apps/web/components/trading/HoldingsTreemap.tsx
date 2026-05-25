@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, type PointerEvent } from 'react';
 import type { HoldingRow } from '@/lib/artifacts';
 import { formatKrw, formatNative, formatPercent } from '@/lib/format';
+import { compactTicker, stockDisplayName } from './helpers';
 
 type Props = {
   holdings: HoldingRow[];
@@ -184,9 +185,11 @@ export function HoldingsTreemap({
       <ul className="sr-only" aria-label={`보유 종목 ${sortedHoldings.length}개`}>
         {sortedHoldings.map((row) => {
           const href = holdingHref(row, hrefBySymbol);
+          const displayName = holdingDisplayName(row);
+          const ticker = compactTicker(row.symbol);
           const label = isCashHolding(row)
-            ? `${row.company || row.symbol}: 평가액 ${formatKrw(row.marketValueKrw)}, 비중 ${formatPercent((row.marketValueKrw ?? 0) / totalValue)}, 현금성 RP이자 잔고`
-            : `${row.company || row.symbol} (${row.symbol}): 평가액 ${formatKrw(row.marketValueKrw)}, 비중 ${formatPercent((row.marketValueKrw ?? 0) / totalValue)}, 미실현 ${formatPercent(row.unrealizedReturn)}`;
+            ? `${displayName}: 평가액 ${formatKrw(row.marketValueKrw)}, 비중 ${formatPercent((row.marketValueKrw ?? 0) / totalValue)}, 현금성 RP이자 잔고`
+            : `${displayName}${displayName !== ticker ? ` (${ticker})` : ''}: 평가액 ${formatKrw(row.marketValueKrw)}, 비중 ${formatPercent((row.marketValueKrw ?? 0) / totalValue)}, 미실현 ${formatPercent(row.unrealizedReturn)}`;
           return <li key={row.symbol}>{href ? <a href={href}>{label}</a> : <span>{label}</span>}</li>;
         })}
       </ul>
@@ -227,14 +230,18 @@ function TreemapTooltip({
   const left = Math.max(8, Math.min(tooltip.x, width - 260));
   const top = Math.max(8, Math.min(tooltip.y, height - 174));
   const href = holdingHref(row, hrefBySymbol);
+  const displayName = holdingDisplayName(row);
+  const ticker = compactTicker(row.symbol);
   return (
     <div
       className="pointer-events-none absolute z-10 w-[252px] rounded-2xl border border-slate-200 bg-white/95 px-3 py-2.5 text-xs shadow-lg backdrop-blur"
       style={{ left, top }}
     >
       <div className="min-w-0 font-bold">
-        <span className="block truncate">{row.company || row.symbol}</span>
-        <span className="font-mono text-slate-950/55">{row.symbol}</span>
+        <span className="block truncate">{displayName}</span>
+        {!isCashHolding(row) && displayName !== ticker ? (
+          <span className="font-mono text-slate-950/55">{ticker}</span>
+        ) : null}
       </div>
       <dl className="mt-2 grid gap-1.5 text-slate-500">
         <TooltipLine label="평가액" value={`${formatKrw(row.marketValueKrw)} · ${formatPercent(row.weight)}`} />
@@ -322,7 +329,7 @@ function drawHeatmap(
 function drawLabel(ctx: CanvasRenderingContext2D, leaf: LeafNode, w: number, h: number, compact: boolean): void {
   const x = leaf.x0;
   const y = leaf.y0;
-  const displayName = leaf.data.company || leaf.data.symbol;
+  const displayName = holdingDisplayName(leaf.data);
   const pad = compact ? 6 : 8;
   if (w < 42 || h < 24) return;
 
@@ -425,4 +432,8 @@ function holdingHref(row: HoldingRow, hrefBySymbol: Record<string, string> | und
 
 function isCashHolding(row: Pick<HoldingRow, 'symbol'>): boolean {
   return row.symbol === 'CASH';
+}
+
+function holdingDisplayName(row: Pick<HoldingRow, 'symbol' | 'company'>): string {
+  return stockDisplayName(row.symbol, row.company);
 }

@@ -1,6 +1,6 @@
 # SNUSMIC Portfolio Lab
 
-SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, fixed account simulations, and static web artifacts. The current repository does **not** search for trading rules or promote generated account candidates; report boards are exported so a human can inspect the data and design rules explicitly.
+SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, account simulations, and static web artifacts. The latest release closes the PIT strategy research sprint: generated candidates are documented in `docs/research`, while the web app exposes only a curated shortlist of representative account ledgers.
 
 [Live site](https://smic-portfolio.vercel.app) - [Changelog](./CHANGELOG.md) - [Design system](./DESIGN.md)
 
@@ -9,16 +9,17 @@ SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, f
 - Collects SMIC report PDFs and extracted report rows.
 - Normalizes reports, prices, FX, and benchmark data into `data/warehouse`.
 - Exports a point-in-time research board at `data/sim/pit-research-board.csv`.
-- Runs fixed benchmark/follower account simulations with real ledger constraints: cash, deposits, integer shares, fees, taxes, trades, holdings, and equity paths.
+- Runs benchmark, follower, and curated PIT account simulations with real ledger constraints: cash, deposits, integer shares, fees, taxes, trades, holdings, and equity paths.
 - Exports deterministic `data/web` JSON/CSV artifacts consumed by the static Next.js app.
 - Presents report verification, statistics, and account views through page-shaped frontend view models instead of raw artifact tables.
+- Shows curated PIT/follower account curves alongside benchmarks, with dense trade markers and benchmark lines controlled in the chart UI.
 
 ## What It Does Not Do
 
-- No broker rule search.
-- No stock-rule search or admission.
-- No PIT rule generation.
-- No generated account admission.
+- No live broker integration or order entry.
+- No live market-data fetches in the web app.
+- No future-looking signals in PIT account simulations.
+- No automatic admission of every generated research branch into the product UI.
 
 ## Core Commands
 
@@ -59,19 +60,20 @@ Web artifact export:
 python -m snusmic_pipeline export-web --warehouse data/warehouse --sim data/sim --out data/web
 ```
 
-## Default Simulation Set
+## Curated Portfolio Set
 
-The default simulation config contains fixed baselines only:
+The generated artifacts may contain many research branches. `/portfolio` intentionally shows only the representative shortlist:
 
-- All Weather
-- QQQ
-- SPY
-- KODEX 200
-- GLD
-- SMIC Report Follower
-- SMIC Report Follower with Stops
+| Display name | What it means |
+| --- | --- |
+| Partial 75 | Current local-return candidate. Quarterly Top5 PIT trend account; retains winners, trims large winners after a 25% pullback from observed holding-period high toward a 20% account weight, and redeploys only 75% of eligible cash when cash is at least 12.5% of equity. |
+| CashGate 12.5 | Robustness baseline for Partial 75. Same retained-winner/trailing-trim shell, but redeploys only when cash reaches the 12.5% gate. |
+| TrailTrim 20 | Simpler profit-protection baseline. Keeps the PIT trend shell and trims concentrated winners toward a 20% cap without the cash redeploy branch. |
+| Trend Top5 | Simple point-in-time trend-score Top5 account. Useful as the low-complexity reference. |
+| Score Top5 | Simple point-in-time score Top5 account. Useful for checking whether the trend construction adds value. |
+| SMIC Follower | Report-follower baseline that tracks actual report-driven account behavior. |
 
-Forward-looking oracle simulations remain testable diagnostics, but they are not default accounts and are not exported into the web account catalog.
+All Weather, KODEX 200, QQQ, SPY, and GLD remain comparison benchmarks. Forward-looking oracle simulations remain diagnostics, not product accounts.
 
 ## Data Flow
 
@@ -114,6 +116,7 @@ Main routes:
 - `/portfolio/[account]/trades`
 - `/reports`
 - `/reports/[symbol]/[reportId]`
+- `/calendar`
 - `/statistics`
 
 ## Validation
@@ -155,5 +158,6 @@ tests/                     Pytest suite
 This repo is now intentionally PIT-first:
 
 1. Build trustworthy point-in-time data.
-2. Keep fixed baseline simulations for context.
-3. Let future rule design happen explicitly, outside the pipeline, until buy/sell/sizing/rebalance rules are clearly declared.
+2. Keep benchmark/follower simulations for context.
+3. Record strategy ideas, results, and retrospectives in Markdown before promoting any account.
+4. Show only a curated shortlist in the product UI so parameter search output does not look like investable truth.

@@ -62,23 +62,24 @@ export function PaginationControls({
         총 {totalRows.toLocaleString('ko-KR')}행 · {pageCount ? safePage + 1 : 0}/{Math.max(1, pageCount)}쪽
       </span>
       <BlockPagination page={safePage} pageCount={Math.max(1, pageCount)} onPageChange={onPageChange} />
-      <label className="page-size-label justify-self-end">
-        <span>페이지당</span>
-        <select value={pageSize} onChange={(event) => onPageSizeChange(Number(event.target.value))}>
-          {pageSizeOptions.map((size) => (
-            <option key={size} value={size}>
-              {size}
-            </option>
-          ))}
-        </select>
-      </label>
+      <span className="page-size-label justify-self-end" role="group" aria-label="페이지 크기">
+        <span>행</span>
+        {pageSizeOptions.map((size) => (
+          <button
+            key={size}
+            type="button"
+            className={size === pageSize ? 'active' : undefined}
+            onClick={() => onPageSizeChange(size)}
+          >
+            {size}
+          </button>
+        ))}
+      </span>
     </nav>
   );
 }
 
-/** Numbered pagination with a sliding window of page numbers (block
- * pagination). Renders «« «  1 2 3 4 5  » »» with the visible block
- * shifting as the active page leaves the window. */
+/** Numbered pagination with a sliding window of page numbers. */
 export function BlockPagination({
   page,
   pageCount,
@@ -107,7 +108,7 @@ export function BlockPagination({
         onClick={() => onPageChange(Math.max(0, blockStart - windowSize))}
         disabled={!hasPrevBlock}
       >
-        ‹‹
+        «
       </button>
       <button
         type="button"
@@ -142,7 +143,7 @@ export function BlockPagination({
         onClick={() => onPageChange(Math.min(lastPage, blockStart + windowSize))}
         disabled={!hasNextBlock}
       >
-        ››
+        »
       </button>
     </span>
   );

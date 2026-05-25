@@ -83,6 +83,7 @@ export const RawTradeRowSchema = z
     qty: NullableNumber,
     fill_price_krw: NullableNumber,
     gross_krw: NullableNumber,
+    realized_pnl_krw: NullableNumber,
     cash_after_krw: NullableNumber,
     reason: z.string(),
     report_id: NullableString,
@@ -399,6 +400,56 @@ export const ReportStatisticsPageBundleSchema = z
     rankings: z.record(z.string(), z.unknown()),
     target_distribution: z.record(z.string(), z.unknown()),
     return_windows: z.array(z.record(z.string(), z.unknown())),
+  })
+  .passthrough();
+
+const ResearchCalendarDateSummarySchema = z
+  .object({
+    date: z.string(),
+    candidate_count: z.number(),
+    fresh_count: z.number(),
+    target_hit_count: z.number(),
+    momentum_count: z.number(),
+    near_high_count: z.number(),
+    forward_positive_63d_count: z.number(),
+    forward_positive_63d_sample: z.number(),
+    median_forward_return_63d: NullableNumber,
+    forward_positive_500d_count: z.number(),
+    forward_positive_500d_sample: z.number(),
+    median_forward_return_500d: NullableNumber,
+    forward_positive_latest_count: z.number(),
+    forward_positive_latest_sample: z.number(),
+    median_forward_return_latest: NullableNumber,
+    forward_observed_sample: z.number(),
+    max_forward_observed_days: z.number(),
+    top_symbols: z.array(
+      z
+        .object({
+          symbol: z.string(),
+          company: z.string(),
+          score: NullableNumber,
+        })
+        .passthrough(),
+    ),
+  })
+  .passthrough();
+
+export const ResearchCalendarArtifactSchema = z
+  .object({
+    schema_version: z.literal('1.0.0'),
+    generated_at: NullableString,
+    as_of: PageAsOfSchema,
+    date_range: z.object({ start: z.string(), end: z.string() }).passthrough(),
+    summary: z
+      .object({
+        date_count: z.number(),
+        row_count: z.number(),
+        symbol_count: z.number(),
+        latest_date: z.string(),
+      })
+      .passthrough(),
+    date_summaries: z.array(ResearchCalendarDateSummarySchema),
+    table: CompactTableArtifactSchema,
   })
   .passthrough();
 

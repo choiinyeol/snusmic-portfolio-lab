@@ -11,6 +11,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date
+from typing import Literal
 
 from .contracts import SavingsPlan
 
@@ -38,6 +39,29 @@ def first_trading_day_per_month(trading_dates: Iterable[date]) -> list[date]:
     return [seen[k] for k in sorted(seen)]
 
 
+def contribution_day_per_month(
+    trading_dates: Iterable[date],
+    timing: Literal["first", "middle", "last"] = "first",
+) -> list[date]:
+    """Pick the monthly deposit date for each calendar month."""
+    months: dict[tuple[int, int], list[date]] = {}
+    for d in sorted(set(trading_dates)):
+        months.setdefault((d.year, d.month), []).append(d)
+
+    out: list[date] = []
+    for key in sorted(months):
+        days = months[key]
+        if timing == "first":
+            out.append(days[0])
+        elif timing == "middle":
+            out.append(days[len(days) // 2])
+        elif timing == "last":
+            out.append(days[-1])
+        else:
+            raise ValueError(f"unknown contribution timing: {timing}")
+    return out
+
+
 def contribution_amount(
     deposit_index: int,
     plan: SavingsPlan,
@@ -61,6 +85,8 @@ def contribution_amount(
 def build_cash_flow_schedule(
     trading_dates: Iterable[date],
     plan: SavingsPlan,
+    *,
+    monthly_timing: Literal["first", "middle", "last"] = "first",
 ) -> list[CashFlowEvent]:
     """Materialise the full deposit stream over ``trading_dates``.
 
@@ -68,7 +94,8 @@ def build_cash_flow_schedule(
 
     1. Day 0 (the first trading date) gets ``initial_capital_krw`` of kind
        ``"initial"``.
-    2. Every later month's first trading day gets one ``"monthly"`` deposit
+    2. Every later month gets one ``"monthly"`` deposit on the configured
+       contribution timing date for that month
        sized by :func:`contribution_amount` indexed against the start month.
 
     The returned list is in chronological order. An empty input yields an
@@ -78,12 +105,12 @@ def build_cash_flow_schedule(
     if not sorted_dates:
         return []
 
-    monthly_firsts = first_trading_day_per_month(sorted_dates)
-    if not monthly_firsts:
+    monthly_deposit_days = contribution_day_per_month(sorted_dates, monthly_timing)
+    if not monthly_deposit_days:
         return []
 
     events: list[CashFlowEvent] = []
-    start_month = (monthly_firsts[0].year, monthly_firsts[0].month)
+    start_month = (monthly_deposit_days[0].year, monthly_deposit_days[0].month)
     if plan.initial_capital_krw > 0:
         events.append(
             CashFlowEvent(date=sorted_dates[0], amount_krw=plan.initial_capital_krw, kind="initial")
@@ -92,12 +119,12 @@ def build_cash_flow_schedule(
     # Skip the first month's monthly deposit because the initial capital
     # already covers month 0. Months 1..N each contribute one deposit using
     # the index ``deposit_index = month - 1``.
-    for first_day in monthly_firsts[1:]:
-        offset = (first_day.year - start_month[0]) * 12 + (first_day.month - start_month[1])
+    for deposit_day in monthly_deposit_days[1:]:
+        offset = (deposit_day.year - start_month[0]) * 12 + (deposit_day.month - start_month[1])
         deposit_index = offset - 1  # month 1's first deposit is index 0.
         amount = contribution_amount(deposit_index, plan)
         if amount > 0:
-            events.append(CashFlowEvent(date=first_day, amount_krw=amount, kind="monthly"))
+            events.append(CashFlowEvent(date=deposit_day, amount_krw=amount, kind="monthly"))
     return events
 
 

@@ -1,0 +1,30 @@
+# 038 Dual Rank Admission
+
+## Summary
+
+| account | MWR | TWR | CAGR | MDD | Sharpe | Sortino | final equity | trades |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_dualrank_top5` | 74.13% | 911.35% | 41.73% | 27.47% | 1.1516 | 1.7640 | 665.3M | 129 |
+| `pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5` | 76.66% | 982.30% | 43.30% | 27.47% | 1.1847 | 1.8393 | 705.8M | 131 |
+| `pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5` | 74.13% | 911.35% | 41.73% | 27.47% | 1.1516 | 1.7640 | 665.3M | 129 |
+| `benchmark_kodex200` | 44.62% | 203.93% | 23.95% | 19.90% | 1.0046 | 1.3062 | 323.7M | 65 |
+| `all_weather` | 32.30% | 215.48% | 16.91% | 9.46% | 1.1374 | 1.6634 | 236.3M | 186 |
+
+## Daily Delta vs `pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5`
+
+| account | final delta | positive days | min daily delta | max daily delta |
+| --- | ---: | ---: | ---: | ---: |
+| `pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_dualrank_top5` | -40.5M | 1.00% | -41.4M | 2.6M |
+| `pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5` | -40.5M | 1.00% | -41.4M | 2.6M |
+| `benchmark_kodex200` | -382.1M | 17.33% | -393.3M | 4.6M |
+| `all_weather` | -469.5M | 33.02% | -483.5M | 11.2M |
+
+## Trade Reasons
+
+| account | rebalance_buy | rebalance_sell | retained_cap_trim |
+| --- | ---: | ---: | ---: |
+| `pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_dualrank_top5` | 68 | 58 | 3 |
+| `pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5` | 69 | 59 | 3 |
+| `pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5` | 68 | 58 | 3 |
+| `benchmark_kodex200` | 65 | 0 | 0 |
+| `all_weather` | 160 | 26 | 0 |

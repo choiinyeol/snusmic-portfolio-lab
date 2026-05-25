@@ -15,6 +15,7 @@ import {
   ReportStatisticsPageBundleSchema,
   ReportVerificationPageBundleSchema,
   ReportBoardPageBundleSchema,
+  ResearchCalendarArtifactSchema,
   RawTradeRowSchema,
   AccountCatalogRowSchema,
   WebAccountSchema,
@@ -116,6 +117,7 @@ export type TradeRow = {
   fillPriceNative: number | null;
   grossNative: number | null;
   grossKrw: number | null;
+  realizedPnlKrw: number | null;
   cashAfterKrw: number | null;
   reason: string;
   reportId: string | null;
@@ -265,6 +267,92 @@ export type ReportBoardCandidateRow = {
   targetUpsideAtPub: number | null;
   currentReturn: number | null;
   targetGapPct: number | null;
+};
+
+export type ResearchCalendarDateSummary = {
+  date: string;
+  candidateCount: number;
+  freshCount: number;
+  targetHitCount: number;
+  momentumCount: number;
+  nearHighCount: number;
+  forwardPositive63dCount: number;
+  forwardPositive63dSample: number;
+  medianForwardReturn63d: number | null;
+  forwardPositive500dCount: number;
+  forwardPositive500dSample: number;
+  medianForwardReturn500d: number | null;
+  forwardPositiveLatestCount: number;
+  forwardPositiveLatestSample: number;
+  medianForwardReturnLatest: number | null;
+  forwardObservedSample: number;
+  maxForwardObservedDays: number;
+  topSymbols: Array<{ symbol: string; company: string; score: number | null }>;
+};
+
+export type ResearchCalendarRow = {
+  asOfDate: string;
+  priceDate: string;
+  reportId: string;
+  symbol: string;
+  company: string;
+  publicationDate: string;
+  reportAgeDays: number | null;
+  rank: number | null;
+  bucket: string;
+  rankBasis: string;
+  candidateScore: number | null;
+  boardScore: number | null;
+  taMomentumScore: number | null;
+  entryPriceKrw: number | null;
+  entryPriceSource: string | null;
+  entryPriceScaleFactor: number | null;
+  priceQualityFlag: string | null;
+  targetPriceKrw: number | null;
+  lastCloseKrw: number | null;
+  targetUpsideAtPub: number | null;
+  currentReturn: number | null;
+  targetGapPct: number | null;
+  ytdReturn: number | null;
+  return1m: number | null;
+  return3m: number | null;
+  return6m: number | null;
+  return1y: number | null;
+  distanceFrom52wHigh: number | null;
+  above20ma: boolean | null;
+  above50ma: boolean | null;
+  above200ma: boolean | null;
+  maStack: string | null;
+  macdBullish: boolean | null;
+  targetHit: boolean | null;
+  expired: boolean | null;
+  forwardReturn21d: number | null;
+  forwardReturn63d: number | null;
+  forwardReturn126d: number | null;
+  forwardReturn252d: number | null;
+  forwardReturn500d: number | null;
+  forwardReturnLatest: number | null;
+  forwardPeak252d: number | null;
+  forwardTrough252d: number | null;
+  forwardPeak500d: number | null;
+  forwardTrough500d: number | null;
+  forwardObservedDays: number | null;
+  href: string;
+};
+
+export type ResearchCalendarArtifact = {
+  schema_version: '1.0.0';
+  generated_at: string | null;
+  as_of: { report_date: string | null; price_date: string | null };
+  date_range: { start: string; end: string };
+  summary: {
+    date_count: number;
+    row_count: number;
+    symbol_count: number;
+    latest_date: string;
+  };
+  date_summaries: ResearchCalendarDateSummary[];
+  table: { rows: ResearchCalendarRow[] };
 };
 
 export type PageBundleMetric = {
@@ -540,6 +628,7 @@ function clearArtifactCaches() {
   reportCache = undefined;
   accountCatalogCache = undefined;
   reportBoardCandidateCache = undefined;
+  researchCalendarCache = undefined;
   holdingsCache = undefined;
   monthlyHoldingsCache = undefined;
   tradesCache = undefined;
@@ -941,6 +1030,7 @@ export function getInsights(): Insight[] {
 }
 
 let reportBoardCandidateCache: ReportBoardCandidateRow[] | undefined;
+let researchCalendarCache: ResearchCalendarArtifact | undefined;
 
 export function getReportBoardCandidates(): ReportBoardCandidateRow[] {
   if (artifactCacheValid() && reportBoardCandidateCache) return reportBoardCandidateCache;
@@ -986,6 +1076,143 @@ function fromRawReportBoardCandidate(row: {
     currentReturn: row.current_return,
     targetGapPct: row.target_gap_pct,
   };
+}
+
+export function getResearchCalendar(): ResearchCalendarArtifact {
+  if (artifactCacheValid() && researchCalendarCache) return researchCalendarCache;
+  const raw = readArtifact('research-calendar/calendar.json', ResearchCalendarArtifactSchema);
+  const rows = compactRowsToObjects('research-calendar/calendar.json.table', raw.table, [
+    'as_of_date',
+    'price_date',
+    'report_id',
+    'symbol',
+    'company',
+    'publication_date',
+    'report_age_days',
+    'rank',
+    'bucket',
+    'rank_basis',
+    'candidate_score',
+    'board_score',
+    'ta_momentum_score',
+    'entry_price_krw',
+    'entry_price_source',
+    'entry_price_scale_factor',
+    'price_quality_flag',
+    'target_price_krw',
+    'last_close_krw',
+    'target_upside_at_pub',
+    'current_return',
+    'target_gap_pct',
+    'ytd_return',
+    'return_1m',
+    'return_3m',
+    'return_6m',
+    'return_1y',
+    'distance_from_52w_high',
+    'above_20ma',
+    'above_50ma',
+    'above_200ma',
+    'ma_stack',
+    'macd_bullish',
+    'target_hit',
+    'expired',
+    'forward_return_21d',
+    'forward_return_63d',
+    'forward_return_126d',
+    'forward_return_252d',
+    'forward_return_500d',
+    'forward_return_latest',
+    'forward_peak_252d',
+    'forward_trough_252d',
+    'forward_peak_500d',
+    'forward_trough_500d',
+    'forward_observed_days',
+  ]);
+  researchCalendarCache = {
+    ...raw,
+    date_summaries: raw.date_summaries.map((summary) => ({
+      date: summary.date,
+      candidateCount: summary.candidate_count,
+      freshCount: summary.fresh_count,
+      targetHitCount: summary.target_hit_count,
+      momentumCount: summary.momentum_count,
+      nearHighCount: summary.near_high_count,
+      forwardPositive63dCount: summary.forward_positive_63d_count,
+      forwardPositive63dSample: summary.forward_positive_63d_sample,
+      medianForwardReturn63d: summary.median_forward_return_63d,
+      forwardPositive500dCount: summary.forward_positive_500d_count,
+      forwardPositive500dSample: summary.forward_positive_500d_sample,
+      medianForwardReturn500d: summary.median_forward_return_500d,
+      forwardPositiveLatestCount: summary.forward_positive_latest_count,
+      forwardPositiveLatestSample: summary.forward_positive_latest_sample,
+      medianForwardReturnLatest: summary.median_forward_return_latest,
+      forwardObservedSample: summary.forward_observed_sample,
+      maxForwardObservedDays: summary.max_forward_observed_days,
+      topSymbols: summary.top_symbols,
+    })),
+    table: { rows: rows.map(fromRawResearchCalendarRow) },
+  };
+  return researchCalendarCache;
+}
+
+function fromRawResearchCalendarRow(row: RawReport): ResearchCalendarRow {
+  const reportId = String(row.report_id ?? '');
+  const symbol = String(row.symbol ?? '');
+  return {
+    asOfDate: String(row.as_of_date ?? ''),
+    priceDate: String(row.price_date ?? ''),
+    reportId,
+    symbol,
+    company: String(row.company ?? symbol),
+    publicationDate: String(row.publication_date ?? ''),
+    reportAgeDays: num(row.report_age_days),
+    rank: num(row.rank),
+    bucket: String(row.bucket ?? ''),
+    rankBasis: String(row.rank_basis ?? ''),
+    candidateScore: num(row.candidate_score),
+    boardScore: num(row.board_score),
+    taMomentumScore: num(row.ta_momentum_score),
+    entryPriceKrw: num(row.entry_price_krw),
+    entryPriceSource: strOrNull(row.entry_price_source),
+    entryPriceScaleFactor: num(row.entry_price_scale_factor),
+    priceQualityFlag: strOrNull(row.price_quality_flag),
+    targetPriceKrw: num(row.target_price_krw),
+    lastCloseKrw: num(row.last_close_krw),
+    targetUpsideAtPub: num(row.target_upside_at_pub),
+    currentReturn: num(row.current_return),
+    targetGapPct: num(row.target_gap_pct),
+    ytdReturn: num(row.ytd_return),
+    return1m: num(row.return_1m),
+    return3m: num(row.return_3m),
+    return6m: num(row.return_6m),
+    return1y: num(row.return_1y),
+    distanceFrom52wHigh: num(row.distance_from_52w_high),
+    above20ma: nullableBool(row.above_20ma),
+    above50ma: nullableBool(row.above_50ma),
+    above200ma: nullableBool(row.above_200ma),
+    maStack: strOrNull(row.ma_stack),
+    macdBullish: nullableBool(row.macd_bullish),
+    targetHit: nullableBool(row.target_hit),
+    expired: nullableBool(row.expired),
+    forwardReturn21d: num(row.forward_return_21d),
+    forwardReturn63d: num(row.forward_return_63d),
+    forwardReturn126d: num(row.forward_return_126d),
+    forwardReturn252d: num(row.forward_return_252d),
+    forwardReturn500d: num(row.forward_return_500d),
+    forwardReturnLatest: num(row.forward_return_latest),
+    forwardPeak252d: num(row.forward_peak_252d),
+    forwardTrough252d: num(row.forward_trough_252d),
+    forwardPeak500d: num(row.forward_peak_500d),
+    forwardTrough500d: num(row.forward_trough_500d),
+    forwardObservedDays: num(row.forward_observed_days),
+    href: `/reports/${encodeURIComponent(symbol)}/${encodeURIComponent(reportId)}`,
+  };
+}
+
+function nullableBool(value: unknown): boolean | null {
+  if (value === undefined || value === null || value === '') return null;
+  return bool(value);
 }
 
 export function getDownloadHref(fileName: string): string {
@@ -1158,6 +1385,7 @@ export function getTrades(): TradeRow[] {
       'qty',
       'fill_price_krw',
       'gross_krw',
+      'realized_pnl_krw',
       'cash_after_krw',
       'reason',
       'report_id',
@@ -1181,6 +1409,7 @@ export function getTrades(): TradeRow[] {
         fillPriceNative,
         grossNative: fillPriceNative !== null && row.qty !== null ? fillPriceNative * row.qty : null,
         grossKrw: row.gross_krw,
+        realizedPnlKrw: row.realized_pnl_krw,
         cashAfterKrw: row.cash_after_krw,
         reason: row.reason,
         reportId: row.report_id,
@@ -1272,6 +1501,14 @@ function readCompactTable(filePath: string, expectedColumns: string[]): RawRepor
     CompactTableArtifactSchema,
     readRequiredJson<unknown>(filePath),
   );
+  return compactRowsToObjects(filePath, artifact, expectedColumns);
+}
+
+function compactRowsToObjects(
+  filePath: string,
+  artifact: CompactTableArtifact,
+  expectedColumns: string[],
+): RawReport[] {
   const missing = expectedColumns.filter((column) => !artifact.columns.includes(column));
   if (missing.length > 0) {
     throw new Error(`Schema mismatch in ${filePath}: missing compact columns ${missing.join(', ')}.`);

@@ -80,6 +80,7 @@ def test_all_weather_handles_partial_basket_when_one_symbol_missing():
     # Drop the GLD column entirely.
     board.close.drop(columns=["GLD"], inplace=True)
     board.open.drop(columns=["GLD"], inplace=True)
+    board.refresh()
     trading_dates = [d.date() for d in board.close.index]
     cashflows = build_cash_flow_schedule(trading_dates, plan)
     cfg = AllWeatherConfig(

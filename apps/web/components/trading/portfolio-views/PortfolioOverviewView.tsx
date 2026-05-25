@@ -1,258 +1,266 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo } from 'react';
-import { HoldingsTreemap } from '@/components/trading/HoldingsTreemap';
-import { Button } from '@/components/ui/button';
-import type { HoldingRow, ReportTargetDigest, TradeRow } from '@/lib/artifacts';
-import { formatKrw } from '@/lib/format';
-import { tradeDisplayName } from '../helpers';
+import { useMemo, useState } from 'react';
+import { SortHeader, sortRows, type SortState } from '@/components/trading/TableControls';
+import { Money } from '@/components/ui/Money';
+import { TradesTable } from '@/components/trading/TradesTable';
+import type { HoldingRow, ReportTargetDigest } from '@/lib/artifacts';
+import { formatDays, formatKrw, formatMultiple, formatPercent, signedTextClass } from '@/lib/format';
+import { compactTicker, nativeFromKrw, reportTargetHref, stockDisplayName } from '../helpers';
 import { PortfolioEquityTradeChart } from './PortfolioEquityTradeChart';
 import type { PortfolioViewModel } from './types';
 
 export function PortfolioOverviewView({ model }: { model: PortfolioViewModel }) {
-  const account_id = model.selectedAccount;
-  const accountHoldings = useMemo(
-    () => model.holdings.filter((row) => row.account_id === account_id),
-    [model.holdings, account_id],
-  );
-  const cashKrw = model.cashByAccount[account_id] ?? 0;
-  const treemapHoldings = useMemo(
-    () => withCashHolding(accountHoldings, cashKrw, account_id),
-    [cashKrw, accountHoldings, account_id],
-  );
-  const reportHrefBySymbol = useMemo(
+  const accountId = model.selectedAccount;
+  const accountLabel = model.accountLabels[accountId] ?? accountId;
+  const diagnostics = model.ledgerDiagnostics;
+
+  const holdings = useMemo(
     () =>
-      Object.fromEntries(
-        Object.values(model.targetsBySymbol).map((target) => [target.symbol, reportTargetHref(target)]),
-      ),
-    [model.targetsBySymbol],
+      model.holdings
+        .filter((row) => row.account_id === accountId)
+        .sort((a, b) => (b.marketValueKrw ?? 0) - (a.marketValueKrw ?? 0)),
+    [model.holdings, accountId],
   );
-  const recentTrades = useMemo(
-    () =>
-      [...model.trades]
-        .filter((row) => row.account_id === account_id)
-        .sort((a, b) => b.date.localeCompare(a.date))
-        .slice(0, 8),
-    [model.trades, account_id],
+  const accountTrades = useMemo(
+    () => model.trades.filter((row) => row.account_id === accountId),
+    [model.trades, accountId],
   );
-  const accountLabel = model.accountLabels[account_id] ?? account_id;
 
   return (
-    <div className="grid min-w-0 gap-5">
-      <section className="grid gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(360px,.75fr)]">
-        <article className="rounded-md border border-slate-200 bg-white p-3">
-          <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+    <div className="grid min-w-0 gap-4">
+      <section className="overflow-hidden rounded-md border border-slate-200 bg-white">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-4 py-3">
+          <nav className="flex min-h-10 items-center gap-1" aria-label="포트폴리오 요약 섹션">
+            <SectionLink href="#positions" label="종목" active />
+            <SectionLink href="#chart" label="차트" />
+            <SectionLink href="#history" label="내역" />
+          </nav>
+          <div className="font-mono text-xs text-slate-400">updated {model.latestEquityDate}</div>
+        </div>
+
+        <div id="positions" className="p-4">
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
             <div>
-              <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                pnl ledger
-              </div>
-              <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">손익 경로와 매매 시점</h2>
-              <p className="mt-1 text-sm leading-6 text-slate-500">
-                리포트 상세의 가격 경로처럼, 계좌 평가 곡선 위에 매수·매도 마커를 같이 표시합니다.
+              <h2 className="text-xl font-semibold tracking-tight text-slate-950">
+                보유 종목 <span className="text-sm font-medium text-slate-400">({holdings.length}개)</span>
+              </h2>
+              <p className="mt-1 text-sm text-slate-500">
+                현재 원장을 움직이는 종목, 매입가, 현재가, 보유일, 수익률만 봅니다.
               </p>
             </div>
-            <Button asChild size="sm" variant="outline">
-              <Link href={`/portfolio/${encodeURIComponent(account_id)}/equity`}>일별 평가</Link>
-            </Button>
           </div>
-          <PortfolioEquityTradeChart
-            equity={model.equity}
-            benchmarkAccounts={model.benchmarkAccounts}
-            trades={model.trades}
-            account_id={account_id}
-            label={accountLabel}
-            accountLabels={model.accountLabels}
-            height={460}
-          />
-          <TradeEventTimeline
-            trades={recentTrades.slice(0, 6)}
-            targetsByReportId={model.targetsByReportId}
-            targetsBySymbol={model.targetsBySymbol}
-          />
-        </article>
-
-        <article className="rounded-md border border-slate-200 bg-white p-3">
-          <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                allocation
-              </div>
-              <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">현재 보유 비중</h2>
-            </div>
-            <Button asChild size="sm" variant="outline">
-              <Link href={`/portfolio/${encodeURIComponent(account_id)}/holdings`}>보유 표</Link>
-            </Button>
-          </div>
-          <HoldingsTreemap
-            holdings={treemapHoldings}
-            height={460}
-            compact
-            hrefBySymbol={reportHrefBySymbol}
-            caption="면적 = 평가액, 색 = 미실현 수익률. RP이자도 계좌 비중으로 포함합니다."
-          />
-        </article>
+          <CompactHoldingsTable holdings={holdings} targetsBySymbol={model.targetsBySymbol} />
+        </div>
       </section>
 
-      <section className="grid gap-4 xl:grid-cols-[minmax(0,.95fr)_minmax(360px,1.05fr)]">
-        <article className="rounded-md border border-slate-200 bg-white p-4">
+      <section id="chart" className="rounded-md border border-slate-200 bg-white p-4">
+        <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="text-xl font-semibold tracking-tight text-slate-950">누적 성과</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              {accountLabel} 수익률을 벤치마크와 함께 보고, 필요한 매수·매도 마커를 켭니다.
+            </p>
+          </div>
+          <div className="font-mono text-xs text-slate-400">{model.equity.length.toLocaleString('ko-KR')}점</div>
+        </div>
+        <PortfolioEquityTradeChart
+          equity={model.equity}
+          benchmarkAccounts={model.benchmarkAccounts}
+          trades={model.trades}
+          account_id={accountId}
+          label={accountLabel}
+          accountLabels={model.accountLabels}
+          height={430}
+        />
+      </section>
+
+      <section id="history" className="grid gap-4">
+        <section className="rounded-md border border-slate-200 bg-white p-4">
           <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
             <div>
-              <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                latest fills
-              </div>
-              <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">최근 매매</h2>
+              <h2 className="text-xl font-semibold tracking-tight text-slate-950">매매 진단</h2>
+              <p className="mt-1 text-sm text-slate-500">승률보다 손익비와 손절 폭이 이 원장을 설명합니다.</p>
             </div>
-            <Button asChild size="sm" variant="outline">
-              <Link href={`/portfolio/${encodeURIComponent(account_id)}/trades`}>전체 ledger</Link>
-            </Button>
+            <div className="font-mono text-xs text-slate-400">
+              closed {diagnostics.closedEpisodeCount.toLocaleString('ko-KR')}
+            </div>
           </div>
-          <RecentTradeList trades={recentTrades} />
-        </article>
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-6">
+            <MetricCell label="승률" value={formatPercent(diagnostics.winRate)} />
+            <MetricCell label="손익비" value={formatMultiple(diagnostics.payoffRatio)} />
+            <MetricCell label="평균 R" value={formatRMultiple(diagnostics.avgRMultiple)} />
+            <MetricCell label="평균 이익" value={formatKrw(diagnostics.avgWinKrw)} tone={diagnostics.avgWinKrw} />
+            <MetricCell label="평균 손실" value={formatKrw(diagnostics.avgLossKrw)} tone={diagnostics.avgLossKrw} />
+            <MetricCell
+              label="최대 연속 손절"
+              value={`${diagnostics.maxConsecutiveLosses.toLocaleString('ko-KR')}회`}
+            />
+          </div>
+        </section>
 
-        <article className="rounded-md border border-slate-200 bg-white p-4">
-          <div className="mb-3">
-            <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-              audit focus
-            </div>
-            <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">직접 확인할 질문</h2>
-          </div>
-          <ul className="grid gap-3 text-sm leading-6 text-slate-600">
-            <li>매수 체결일 전후 리포트 근거와 가격 흐름이 납득되는가?</li>
-            <li>매도 체결이 손절, 익절, 리밸런싱 중 어떤 결과를 만들었는가?</li>
-            <li>동일 원금 경로에서 현금 비중과 보유 기간이 수익률을 어떻게 바꿨는가?</li>
-          </ul>
-        </article>
+        <TradesTable
+          account_id={accountId}
+          accountLabels={model.accountLabels}
+          reportSymbolsById={model.reportSymbolsById}
+          targetsByReportId={model.targetsByReportId}
+          targetsBySymbol={model.targetsBySymbol}
+          trades={accountTrades}
+        />
       </section>
     </div>
   );
 }
 
-function TradeEventTimeline({
-  trades,
-  targetsByReportId,
+function SectionLink({ href, label, active = false }: { href: string; label: string; active?: boolean }) {
+  return (
+    <a
+      className={`inline-flex min-h-9 items-center rounded-md px-4 text-sm font-semibold transition ${
+        active
+          ? 'bg-white text-slate-950 shadow-sm ring-1 ring-slate-200'
+          : 'text-slate-500 hover:bg-slate-50 hover:text-slate-950'
+      }`}
+      href={href}
+    >
+      {label}
+    </a>
+  );
+}
+
+function CompactHoldingsTable({
+  holdings,
   targetsBySymbol,
 }: {
-  trades: TradeRow[];
-  targetsByReportId: Record<string, ReportTargetDigest>;
+  holdings: HoldingRow[];
   targetsBySymbol: Record<string, ReportTargetDigest>;
 }) {
-  if (!trades.length) {
+  const [sort, setSort] = useState<SortState<HoldingSortKey>>({ key: 'marketValue', direction: 'desc' });
+  const sortedHoldings = useMemo(
+    () =>
+      sortRows(holdings, sort, {
+        symbol: (row) => stockDisplayName(row.symbol, row.company),
+        avgCost: (row) => row.avgCostKrw,
+        lastClose: (row) => row.lastCloseKrw,
+        holdingDays: (row) => row.holdingDays,
+        returnPct: (row) => row.unrealizedReturn,
+        marketValue: (row) => row.marketValueKrw,
+      }),
+    [holdings, sort],
+  );
+  const updateSort = (key: HoldingSortKey) => {
+    setSort((current) => ({
+      key,
+      direction: current.key === key && current.direction === 'desc' ? 'asc' : 'desc',
+    }));
+  };
+
+  if (!holdings.length) {
     return (
-      <div className="mt-4 rounded-md border border-dashed border-slate-200 bg-slate-50 px-4 py-5 text-sm text-slate-500">
-        거래 이벤트 타임라인에 표시할 최근 체결이 없습니다.
+      <div className="rounded-md border border-dashed border-slate-200 p-8 text-center text-sm text-slate-500">
+        현재 보유 종목이 없습니다.
       </div>
     );
   }
+
   return (
-    <div className="mt-4 rounded-md border border-slate-100 bg-slate-50/70 p-3">
-      <div className="flex flex-wrap items-end justify-between gap-2">
-        <div>
-          <h3 className="text-sm font-semibold text-slate-950">거래 이벤트 타임라인</h3>
-          <p className="mt-1 text-xs leading-5 text-slate-500">
-            차트 마커를 hover하지 않아도 최근 체결 사유와 리포트 근거를 바로 읽을 수 있습니다.
-          </p>
-        </div>
-        <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
-          latest {trades.length}
-        </span>
-      </div>
-      <ol className="mt-3 grid gap-2">
-        {trades.map((trade) => {
-          const target = (trade.reportId && targetsByReportId[trade.reportId]) || targetsBySymbol[trade.symbol];
-          const href = target
-            ? reportTargetHref(target)
-            : trade.reportId
-              ? `/reports/${encodeURIComponent(trade.symbol)}/${encodeURIComponent(trade.reportId)}`
-              : `/portfolio/${encodeURIComponent(trade.account_id)}/trades`;
-          const sideLabel = trade.side === 'sell' ? '매도' : '매수';
-          return (
-            <li
-              className="grid gap-2 rounded-md border border-slate-200 bg-white p-3 sm:grid-cols-[8rem_minmax(0,1fr)_auto]"
-              key={`${trade.date}-${trade.symbol}-${trade.side}-${trade.qty}-${trade.grossKrw}`}
-            >
-              <div className="font-mono text-xs font-semibold text-slate-500">{trade.date}</div>
-              <div className="min-w-0">
-                <div className="flex min-w-0 flex-wrap items-center gap-2">
-                  <span
-                    className={`rounded px-2 py-1 text-xs font-bold leading-normal ${
-                      trade.side === 'sell' ? 'bg-rose-50 text-rose-700' : 'bg-emerald-50 text-emerald-700'
-                    }`}
-                  >
-                    {sideLabel}
+    <div className="overflow-hidden rounded-md border border-slate-200">
+      <table className="w-full text-sm">
+        <thead className="bg-slate-50 text-slate-500">
+          <tr>
+            <th className="px-3 py-2 text-left font-medium">
+              <SortHeader label="종목" sortKey="symbol" sort={sort} onSort={updateSort} />
+            </th>
+            <th className="px-3 py-2 text-right font-medium">
+              <span className="flex justify-end">
+                <SortHeader label="매입가" sortKey="avgCost" sort={sort} onSort={updateSort} />
+              </span>
+            </th>
+            <th className="px-3 py-2 text-right font-medium">
+              <span className="flex justify-end">
+                <SortHeader label="현재가" sortKey="lastClose" sort={sort} onSort={updateSort} />
+              </span>
+            </th>
+            <th className="px-3 py-2 text-center font-medium">
+              <span className="flex justify-center">
+                <SortHeader label="보유일" sortKey="holdingDays" sort={sort} onSort={updateSort} />
+              </span>
+            </th>
+            <th className="px-3 py-2 text-right font-medium">
+              <span className="flex justify-end">
+                <SortHeader label="수익률" sortKey="returnPct" sort={sort} onSort={updateSort} />
+              </span>
+            </th>
+            <th className="px-3 py-2 text-right font-medium">
+              <span className="flex justify-end">
+                <SortHeader label="평가액" sortKey="marketValue" sort={sort} onSort={updateSort} />
+              </span>
+            </th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-100">
+          {sortedHoldings.map((holding) => {
+            const target = targetsBySymbol[holding.symbol];
+            const name = stockDisplayName(holding.symbol, holding.company);
+            const ticker = compactTicker(holding.symbol);
+            return (
+              <tr className="hover:bg-slate-50" key={`${holding.account_id}-${holding.symbol}`}>
+                <td className="px-3 py-2">
+                  {target ? (
+                    <Link className="font-semibold text-slate-950 hover:underline" href={reportTargetHref(target)}>
+                      {name}
+                    </Link>
+                  ) : (
+                    <span className="font-semibold text-slate-950">{name}</span>
+                  )}
+                  {name !== ticker ? <div className="mt-0.5 font-mono text-[11px] text-slate-400">{ticker}</div> : null}
+                </td>
+                <td className="px-3 py-2 text-right">
+                  <Money
+                    native={nativeFromKrw(holding.avgCostKrw, holding.lastCloseNative, holding.lastCloseKrw)}
+                    krw={holding.avgCostKrw}
+                    currency={holding.currency}
+                  />
+                </td>
+                <td className="px-3 py-2 text-right">
+                  <Money native={holding.lastCloseNative} krw={holding.lastCloseKrw} currency={holding.currency} />
+                </td>
+                <td className="px-3 py-2 text-center">
+                  <span className="rounded bg-emerald-50 px-2 py-1 font-mono text-xs font-semibold text-emerald-600">
+                    {formatDays(holding.holdingDays)}
                   </span>
-                  <strong className="truncate text-sm text-slate-950">
-                    {tradeDisplayName(trade.symbol, target?.company ?? trade.company)}
-                  </strong>
-                  <span className="font-mono text-xs text-slate-500">{formatKrw(Math.abs(trade.grossKrw ?? 0))}</span>
-                </div>
-                <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">
-                  {trade.reason || '기록된 체결 사유 없음'}
-                </p>
-              </div>
-              <Link
-                className="self-center text-sm font-semibold text-slate-700 underline-offset-4 hover:text-slate-950 hover:underline"
-                href={href}
-              >
-                근거 보기
-              </Link>
-            </li>
-          );
-        })}
-      </ol>
+                </td>
+                <td
+                  className={`px-3 py-2 text-right font-mono font-semibold tabular-nums ${signedTextClass(
+                    holding.unrealizedPnlKrw,
+                  )}`}
+                >
+                  {formatPercent(holding.unrealizedReturn)}
+                </td>
+                <td className="px-3 py-2 text-right font-mono font-semibold tabular-nums text-slate-950">
+                  {formatKrw(holding.marketValueKrw)}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }
 
-function RecentTradeList({ trades }: { trades: TradeRow[] }) {
-  if (!trades.length) return <p className="text-sm text-slate-500">최근 체결이 없습니다.</p>;
+type HoldingSortKey = 'symbol' | 'avgCost' | 'lastClose' | 'holdingDays' | 'returnPct' | 'marketValue';
+
+function MetricCell({ label, value, tone }: { label: string; value: string; tone?: number | null }) {
   return (
-    <ol className="divide-y divide-slate-100">
-      {trades.map((trade) => (
-        <li
-          className="grid grid-cols-[5rem_minmax(0,1fr)_auto] gap-3 py-2 text-sm"
-          key={`${trade.date}-${trade.symbol}-${trade.side}-${trade.qty}`}
-        >
-          <time className="font-mono text-xs text-slate-500">{trade.date}</time>
-          <div className="min-w-0">
-            <div className="truncate font-semibold text-slate-950">
-              {trade.side === 'sell' ? '매도' : '매수'} {tradeDisplayName(trade.symbol, trade.company)}
-            </div>
-            <div className="truncate text-xs text-slate-500">{trade.reason || '기록된 사유 없음'}</div>
-          </div>
-          <div
-            className={`font-mono text-xs font-semibold ${trade.side === 'sell' ? 'text-rose-600' : 'text-emerald-600'}`}
-          >
-            {formatKrw(trade.grossKrw)}
-          </div>
-        </li>
-      ))}
-    </ol>
+    <div className="rounded-md border border-slate-100 bg-slate-50 p-3">
+      <div className="text-xs font-medium text-slate-500">{label}</div>
+      <div className={`mt-2 font-mono text-lg font-semibold tabular-nums ${signedTextClass(tone)}`}>{value}</div>
+    </div>
   );
 }
 
-function reportTargetHref(target: ReportTargetDigest): string {
-  return `/reports/${encodeURIComponent(target.symbol)}/${encodeURIComponent(target.reportId)}`;
-}
-
-function withCashHolding(holdings: HoldingRow[], cashKrw: number, account_id: string): HoldingRow[] {
-  if (cashKrw <= 0) return holdings;
-  return [
-    ...holdings,
-    {
-      account_id,
-      symbol: 'CASH',
-      company: 'RP이자',
-      qty: null,
-      avgCostKrw: null,
-      lastCloseKrw: 1,
-      lastCloseNative: 1,
-      currency: 'KRW',
-      marketValueKrw: cashKrw,
-      unrealizedPnlKrw: 0,
-      unrealizedReturn: 0,
-      holdingDays: null,
-      firstBuyDate: null,
-    },
-  ];
+function formatRMultiple(value: number | null | undefined): string {
+  if (value === null || value === undefined || !Number.isFinite(value)) return '-';
+  return `${value.toFixed(2)}R`;
 }

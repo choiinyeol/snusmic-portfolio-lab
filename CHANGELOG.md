@@ -1,4 +1,23 @@
-# Changelog
+﻿# Changelog
+
+## v0.30.0 - PIT strategy research ledger and portfolio curation
+
+- Closes the PIT strategy research sprint with a durable idea/result/retrospective ledger under `docs/research`.
+- Adds generated account families for PIT score/trend portfolios, retained-winner construction, profit trims, cash-gated redeploy, Partial 75, and the related audit reports.
+- Curates `/portfolio` so the product shows representative account ledgers instead of every parameter branch.
+- Shortens product-facing account names to `Partial 75`, `CashGate 12.5`, `TrailTrim 20`, `Trend Top5`, `Score Top5`, and `SMIC Follower`.
+- Adds detailed strategy explanations to the portfolio catalogue and account ledger header so long generated IDs no longer carry product meaning.
+- Restores readable UTF-8 portfolio copy, KRW/foreign currency formatting, sortable holdings/trades tables, CSV downloads, realized PnL, and trade reason labels.
+- Updates README and product spec to reflect the current static artifact-backed research-ledger contract.
+
+Verification:
+
+- `pnpm --dir apps/web artifact:check`
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web build`
+- `pnpm exec biome check` on the touched portfolio/web files
+- `uv run ruff check src tests`
+- `uv run pytest tests/sim/test_research_report.py tests/sim/test_selection_audit.py tests/sim/test_account_path_audit.py tests/sim/test_pit_research_board.py -q`
 
 ## v0.29.4 - Report board and statistics product pass
 
