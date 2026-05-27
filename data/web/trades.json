@@ -36781,17 +36781,17 @@
   },
   {
     "account_id": "smic_follower",
-    "cash_after_krw": 628.9617,
-    "commission_krw": 0.9305,
+    "cash_after_krw": 1959.8263,
+    "commission_krw": 0.7309,
     "date": "2026-05-26",
-    "fill_price_krw": 3101.55,
-    "gross_krw": 6203.1,
+    "fill_price_krw": 2436.2175,
+    "gross_krw": 4872.435,
     "qty": 2,
     "realized_pnl_krw": null,
     "reason": "rebalance_buy",
     "report_id": "",
     "side": "buy",
-    "symbol": "234300.KQ",
+    "symbol": "310200.KQ",
     "tax_krw": 0.0
   },
   {
