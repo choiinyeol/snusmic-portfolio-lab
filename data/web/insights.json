@@ -24,7 +24,7 @@
   },
   {
     "id": "best-current-return",
-    "metric": 22.089,
+    "metric": 21.2513,
     "related_report_ids": [
       "fea27bf20d0f8d88"
     ],
@@ -33,7 +33,7 @@
   },
   {
     "id": "worst-current-return",
-    "metric": -0.9362,
+    "metric": -0.9326,
     "related_report_ids": [
       "cefde513c9366947"
     ],

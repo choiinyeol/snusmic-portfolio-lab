@@ -14044,9 +14044,19 @@
     "cash_krw": 8422853.9511,
     "contributed_capital_krw": 102000000.0,
     "date": "2026-05-27",
-    "equity_krw": 239600502.1285,
-    "holdings_value_krw": 231177648.1774,
-    "net_profit_krw": 137600502.1285,
+    "equity_krw": 240926811.0895,
+    "holdings_value_krw": 232503957.1384,
+    "net_profit_krw": 138926811.0895,
+    "open_positions": 4
+  },
+  {
+    "account_id": "all_weather",
+    "cash_krw": 8423430.464,
+    "contributed_capital_krw": 102000000.0,
+    "date": "2026-05-28",
+    "equity_krw": 239903348.9893,
+    "holdings_value_krw": 231479918.5253,
+    "net_profit_krw": 137903348.9893,
     "open_positions": 4
   },
   {
@@ -28094,9 +28104,19 @@
     "cash_krw": 734688.097,
     "contributed_capital_krw": 102000000.0,
     "date": "2026-05-27",
-    "equity_krw": 213827026.7985,
-    "holdings_value_krw": 213092338.7014,
-    "net_profit_krw": 111827026.7985,
+    "equity_krw": 215970752.0896,
+    "holdings_value_krw": 215236063.9926,
+    "net_profit_krw": 113970752.0896,
+    "open_positions": 1
+  },
+  {
+    "account_id": "benchmark_qqq",
+    "cash_krw": 734738.3837,
+    "contributed_capital_krw": 102000000.0,
+    "date": "2026-05-28",
+    "equity_krw": 215156083.6696,
+    "holdings_value_krw": 214421345.2859,
+    "net_profit_krw": 113156083.6696,
     "open_positions": 1
   },
   {
@@ -42144,9 +42164,19 @@
     "cash_krw": 446456.1424,
     "contributed_capital_krw": 102000000.0,
     "date": "2026-05-27",
-    "equity_krw": 183376295.646,
-    "holdings_value_krw": 182929839.5036,
-    "net_profit_krw": 81376295.646,
+    "equity_krw": 184599372.2579,
+    "holdings_value_krw": 184152916.1155,
+    "net_profit_krw": 82599372.2579,
+    "open_positions": 1
+  },
+  {
+    "account_id": "benchmark_spy",
+    "cash_krw": 446486.7006,
+    "contributed_capital_krw": 102000000.0,
+    "date": "2026-05-28",
+    "equity_krw": 183688424.089,
+    "holdings_value_krw": 183241937.3884,
+    "net_profit_krw": 81688424.089,
     "open_positions": 1
   },
   {
@@ -56200,6 +56230,16 @@
     "open_positions": 1
   },
   {
+    "account_id": "benchmark_kodex200",
+    "cash_krw": 104350.2838,
+    "contributed_capital_krw": 102000000.0,
+    "date": "2026-05-28",
+    "equity_krw": 341068120.2838,
+    "holdings_value_krw": 340963770.0,
+    "net_profit_krw": 239068120.2838,
+    "open_positions": 1
+  },
+  {
     "account_id": "benchmark_gld",
     "cash_krw": 104630.4804,
     "contributed_capital_krw": 10000000.0,
@@ -70244,9 +70284,19 @@
     "cash_krw": 265953.571,
     "contributed_capital_krw": 102000000.0,
     "date": "2026-05-27",
-    "equity_krw": 224920899.5602,
-    "holdings_value_krw": 224654945.9892,
-    "net_profit_krw": 122920899.5602,
+    "equity_krw": 226570183.6535,
+    "holdings_value_krw": 226304230.0826,
+    "net_profit_krw": 124570183.6535,
+    "open_positions": 1
+  },
+  {
+    "account_id": "benchmark_gld",
+    "cash_krw": 265971.7745,
+    "contributed_capital_krw": 102000000.0,
+    "date": "2026-05-28",
+    "equity_krw": 225626625.1323,
+    "holdings_value_krw": 225360653.3578,
+    "net_profit_krw": 123626625.1323,
     "open_positions": 1
   },
   {
@@ -84294,9 +84344,19 @@
     "cash_krw": 1959.9604,
     "contributed_capital_krw": 102000000.0,
     "date": "2026-05-27",
-    "equity_krw": 160083069.1057,
-    "holdings_value_krw": 160081109.1452,
-    "net_profit_krw": 58083069.1057,
+    "equity_krw": 158981249.1057,
+    "holdings_value_krw": 158979289.1452,
+    "net_profit_krw": 56981249.1057,
+    "open_positions": 37
+  },
+  {
+    "account_id": "smic_follower",
+    "cash_krw": 1960.0946,
+    "contributed_capital_krw": 102000000.0,
+    "date": "2026-05-28",
+    "equity_krw": 157279344.9632,
+    "holdings_value_krw": 157277384.8686,
+    "net_profit_krw": 55279344.9632,
     "open_positions": 37
   },
   {
@@ -98344,9 +98404,19 @@
     "cash_krw": 4270.3588,
     "contributed_capital_krw": 102000000.0,
     "date": "2026-05-27",
-    "equity_krw": 157082307.3983,
-    "holdings_value_krw": 157078037.0394,
-    "net_profit_krw": 55082307.3983,
+    "equity_krw": 157081607.3983,
+    "holdings_value_krw": 157077337.0394,
+    "net_profit_krw": 55081607.3983,
+    "open_positions": 10
+  },
+  {
+    "account_id": "smic_follower_v2",
+    "cash_krw": 4270.6511,
+    "contributed_capital_krw": 102000000.0,
+    "date": "2026-05-28",
+    "equity_krw": 154013650.505,
+    "holdings_value_krw": 154009379.8538,
+    "net_profit_krw": 52013650.505,
     "open_positions": 10
   }
 ]
