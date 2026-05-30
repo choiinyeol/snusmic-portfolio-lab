@@ -2630,7 +2630,7 @@
     "company": "브이티",
     "exit_reasons": "()",
     "holding_days": 563,
-    "last_close_krw": "13420.0",
+    "last_close_krw": "13310.0",
     "open_date": "2024-11-12",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -2638,7 +2638,7 @@
     "symbol": "018290.KS",
     "total_qty_bought": 292,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-2869149.7058"
+    "unrealized_pnl_krw": "-2901269.7058"
   },
   {
     "account_id": "smic_follower",
@@ -2687,7 +2687,7 @@
     "company": "크래프톤",
     "exit_reasons": "()",
     "holding_days": 550,
-    "last_close_krw": "255500.0",
+    "last_close_krw": "257500.0",
     "open_date": "2024-11-25",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -2695,7 +2695,7 @@
     "symbol": "259960.KQ",
     "total_qty_bought": 18,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-643906.068"
+    "unrealized_pnl_krw": "-607906.068"
   },
   {
     "account_id": "smic_follower",
@@ -2763,7 +2763,7 @@
     "company": "Cover Corp",
     "exit_reasons": "()",
     "holding_days": 550,
-    "last_close_krw": "15081.5994",
+    "last_close_krw": "15105.6",
     "open_date": "2024-11-25",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -2771,7 +2771,7 @@
     "symbol": "5253.T",
     "total_qty_bought": 327,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-1175994.2193"
+    "unrealized_pnl_krw": "-1168146.0396"
   },
   {
     "account_id": "smic_follower",
@@ -2801,7 +2801,7 @@
     "company": "Funko Inc.",
     "exit_reasons": "()",
     "holding_days": 543,
-    "last_close_krw": "8351.4739",
+    "last_close_krw": "8560.4982",
     "open_date": "2024-12-02",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -2809,7 +2809,7 @@
     "symbol": "FNKO",
     "total_qty_bought": 870,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "1829411.2912"
+    "unrealized_pnl_krw": "2011262.4092"
   },
   {
     "account_id": "smic_follower",
@@ -2953,7 +2953,7 @@
     "company": "Levi Strauss & Co",
     "exit_reasons": "()",
     "holding_days": 479,
-    "last_close_krw": "35256.762",
+    "last_close_krw": "34965.4173",
     "open_date": "2025-02-04",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -2961,7 +2961,7 @@
     "symbol": "LEVI",
     "total_qty_bought": 142,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "1298582.3092"
+    "unrealized_pnl_krw": "1257211.3542"
   },
   {
     "account_id": "smic_follower",
@@ -3124,7 +3124,7 @@
     "company": "Cellebrite DI",
     "exit_reasons": "()",
     "holding_days": 361,
-    "last_close_krw": "20818.4933",
+    "last_close_krw": "22200.0243",
     "open_date": "2025-06-02",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -3132,7 +3132,7 @@
     "symbol": "CLBT",
     "total_qty_bought": 237,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-169676.4395"
+    "unrealized_pnl_krw": "157746.4086"
   },
   {
     "account_id": "smic_follower",
@@ -3143,7 +3143,7 @@
     "company": "Doximity",
     "exit_reasons": "()",
     "holding_days": 359,
-    "last_close_krw": "31539.9782",
+    "last_close_krw": "32252.5815",
     "open_date": "2025-06-04",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -3151,7 +3151,7 @@
     "symbol": "DOCS",
     "total_qty_bought": 117,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-2835059.6252"
+    "unrealized_pnl_krw": "-2751685.0394"
   },
   {
     "account_id": "smic_follower",
@@ -3200,7 +3200,7 @@
     "company": "Sportradar",
     "exit_reasons": "()",
     "holding_days": 354,
-    "last_close_krw": "19441.6288",
+    "last_close_krw": "19909.1874",
     "open_date": "2025-06-09",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -3208,7 +3208,7 @@
     "symbol": "SRAD",
     "total_qty_bought": 164,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-1221569.6165"
+    "unrealized_pnl_krw": "-1144889.9971"
   },
   {
     "account_id": "smic_follower",
@@ -3466,7 +3466,7 @@
     "company": "JAC recruitment Co. Ltd",
     "exit_reasons": "()",
     "holding_days": 179,
-    "last_close_krw": "7983.8217",
+    "last_close_krw": "7996.527",
     "open_date": "2025-12-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -3474,7 +3474,7 @@
     "symbol": "2124.T",
     "total_qty_bought": 1443,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-904118.6518"
+    "unrealized_pnl_krw": "-885784.9172"
   },
   {
     "account_id": "smic_follower",
@@ -3485,7 +3485,7 @@
     "company": "Coreweave",
     "exit_reasons": "()",
     "holding_days": 175,
-    "last_close_krw": "159310.0061",
+    "last_close_krw": "165075.9476",
     "open_date": "2025-12-05",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -3493,7 +3493,7 @@
     "symbol": "CRWV",
     "total_qty_bought": 40,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "1523271.2051"
+    "unrealized_pnl_krw": "1753908.8648"
   },
   {
     "account_id": "smic_follower",
@@ -3504,7 +3504,7 @@
     "company": "Establishment Labs Holdings",
     "exit_reasons": "()",
     "holding_days": 175,
-    "last_close_krw": "109577.3524",
+    "last_close_krw": "106539.0237",
     "open_date": "2025-12-05",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -3512,7 +3512,7 @@
     "symbol": "ESTA",
     "total_qty_bought": 47,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "388479.2508"
+    "unrealized_pnl_krw": "245677.8048"
   },
   {
     "account_id": "smic_follower",
@@ -3542,7 +3542,7 @@
     "company": "IMAX Corp",
     "exit_reasons": "()",
     "holding_days": 175,
-    "last_close_krw": "59596.4159",
+    "last_close_krw": "59802.9191",
     "open_date": "2025-12-05",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -3550,7 +3550,7 @@
     "symbol": "IMAX",
     "total_qty_bought": 71,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "537527.2616"
+    "unrealized_pnl_krw": "552188.9831"
   },
   {
     "account_id": "smic_follower",
@@ -3637,7 +3637,7 @@
     "company": "Iradimed Corporation",
     "exit_reasons": "()",
     "holding_days": 140,
-    "last_close_krw": "139401.8937",
+    "last_close_krw": "136636.4118",
     "open_date": "2026-01-09",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -3645,7 +3645,7 @@
     "symbol": "IRMD",
     "total_qty_bought": 28,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-116489.9447"
+    "unrealized_pnl_krw": "-193923.4387"
   },
   {
     "account_id": "smic_follower",
@@ -3675,7 +3675,7 @@
     "company": "Sensient Technologies Corp",
     "exit_reasons": "()",
     "holding_days": 121,
-    "last_close_krw": "175117.611",
+    "last_close_krw": "171586.7488",
     "open_date": "2026-01-28",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -3683,7 +3683,7 @@
     "symbol": "SXT",
     "total_qty_bought": 24,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "938082.4456"
+    "unrealized_pnl_krw": "853341.7512"
   },
   {
     "account_id": "smic_follower",
@@ -3694,7 +3694,7 @@
     "company": "Tempus AI Inc",
     "exit_reasons": "()",
     "holding_days": 121,
-    "last_close_krw": "76030.31",
+    "last_close_krw": "76064.8532",
     "open_date": "2026-01-28",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -3702,7 +3702,7 @@
     "symbol": "TEM",
     "total_qty_bought": 3,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-43431.8017"
+    "unrealized_pnl_krw": "-43328.172"
   },
   {
     "account_id": "smic_follower",
@@ -3732,7 +3732,7 @@
     "company": "비츠로셀",
     "exit_reasons": "()",
     "holding_days": 42,
-    "last_close_krw": "52800.0",
+    "last_close_krw": "52600.0",
     "open_date": "2026-04-17",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -3740,7 +3740,7 @@
     "symbol": "082920.KS",
     "total_qty_bought": 73,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-258171.7432"
+    "unrealized_pnl_krw": "-272771.7432"
   },
   {
     "account_id": "smic_follower",
@@ -3770,7 +3770,7 @@
     "company": "나노",
     "exit_reasons": "()",
     "holding_days": 23,
-    "last_close_krw": "6730.0",
+    "last_close_krw": "6410.0",
     "open_date": "2026-05-06",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -3778,7 +3778,7 @@
     "symbol": "187790.KS",
     "total_qty_bought": 640,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "131687.367"
+    "unrealized_pnl_krw": "-73112.633"
   },
   {
     "account_id": "smic_follower",
@@ -3789,7 +3789,7 @@
     "company": "덕산네오룩스",
     "exit_reasons": "()",
     "holding_days": 23,
-    "last_close_krw": "40050.0",
+    "last_close_krw": "38850.0",
     "open_date": "2026-05-06",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -3797,7 +3797,7 @@
     "symbol": "213420.KS",
     "total_qty_bought": 80,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-830471.0049"
+    "unrealized_pnl_krw": "-926471.0049"
   },
   {
     "account_id": "smic_follower",
@@ -3808,7 +3808,7 @@
     "company": "샘씨엔에스",
     "exit_reasons": "()",
     "holding_days": 23,
-    "last_close_krw": "13580.0",
+    "last_close_krw": "12950.0",
     "open_date": "2026-05-06",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -3816,7 +3816,7 @@
     "symbol": "252990.KS",
     "total_qty_bought": 306,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "170331.0373"
+    "unrealized_pnl_krw": "-22448.9627"
   },
   {
     "account_id": "smic_follower",
@@ -3846,7 +3846,7 @@
     "company": "코스텍시스",
     "exit_reasons": "()",
     "holding_days": 18,
-    "last_close_krw": "41400.0",
+    "last_close_krw": "38350.0",
     "open_date": "2026-05-11",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -3854,7 +3854,7 @@
     "symbol": "355150.KS",
     "total_qty_bought": 2,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-35076.5788"
+    "unrealized_pnl_krw": "-41176.5788"
   },
   {
     "account_id": "smic_follower_v2",
@@ -7133,7 +7133,7 @@
     "company": "Cellebrite DI",
     "exit_reasons": "()",
     "holding_days": 317,
-    "last_close_krw": "20818.4933",
+    "last_close_krw": "22200.0243",
     "open_date": "2025-07-16",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -7141,7 +7141,7 @@
     "symbol": "CLBT",
     "total_qty_bought": 858,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "1201546.6835"
+    "unrealized_pnl_krw": "2386900.2853"
   },
   {
     "account_id": "smic_follower_v2",
@@ -7456,7 +7456,7 @@
     "company": "Establishment Labs Holdings",
     "exit_reasons": "()",
     "holding_days": 176,
-    "last_close_krw": "109577.3524",
+    "last_close_krw": "106539.0237",
     "open_date": "2025-12-04",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -7464,7 +7464,7 @@
     "symbol": "ESTA",
     "total_qty_bought": 196,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "2023418.3066"
+    "unrealized_pnl_krw": "1427905.8935"
   },
   {
     "account_id": "smic_follower_v2",
@@ -7551,7 +7551,7 @@
     "company": "IMAX Corp",
     "exit_reasons": "()",
     "holding_days": 142,
-    "last_close_krw": "59596.4159",
+    "last_close_krw": "59802.9191",
     "open_date": "2026-01-07",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -7559,7 +7559,7 @@
     "symbol": "IMAX",
     "total_qty_bought": 311,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "2197100.6937"
+    "unrealized_pnl_krw": "2261323.1637"
   },
   {
     "account_id": "smic_follower_v2",
@@ -7570,7 +7570,7 @@
     "company": "Iradimed Corporation",
     "exit_reasons": "()",
     "holding_days": 140,
-    "last_close_krw": "139401.8937",
+    "last_close_krw": "136636.4118",
     "open_date": "2026-01-09",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -7578,7 +7578,7 @@
     "symbol": "IRMD",
     "total_qty_bought": 119,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-621066.9378"
+    "unrealized_pnl_krw": "-950159.2873"
   },
   {
     "account_id": "smic_follower_v2",
@@ -7608,7 +7608,7 @@
     "company": "Sensient Technologies Corp",
     "exit_reasons": "()",
     "holding_days": 140,
-    "last_close_krw": "175117.611",
+    "last_close_krw": "171586.7488",
     "open_date": "2026-01-09",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -7616,7 +7616,7 @@
     "symbol": "SXT",
     "total_qty_bought": 135,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "5022545.9937"
+    "unrealized_pnl_krw": "4545879.5877"
   },
   {
     "account_id": "smic_follower_v2",
@@ -7627,7 +7627,7 @@
     "company": "Camtek",
     "exit_reasons": "()",
     "holding_days": 28,
-    "last_close_krw": "262973.6003",
+    "last_close_krw": "258713.9422",
     "open_date": "2026-05-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -7635,7 +7635,7 @@
     "symbol": "CAMT",
     "total_qty_bought": 7,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-85994.7406"
+    "unrealized_pnl_krw": "-115812.3479"
   },
   {
     "account_id": "smic_follower_v2",
@@ -7646,7 +7646,7 @@
     "company": "나노",
     "exit_reasons": "()",
     "holding_days": 25,
-    "last_close_krw": "6730.0",
+    "last_close_krw": "6410.0",
     "open_date": "2026-05-04",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -7654,7 +7654,7 @@
     "symbol": "187790.KS",
     "total_qty_bought": 2,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "731.731"
+    "unrealized_pnl_krw": "91.731"
   },
   {
     "account_id": "all_weather",
@@ -7684,7 +7684,7 @@
     "company": "Gold",
     "exit_reasons": "('rebalance_sell',)",
     "holding_days": 1971,
-    "last_close_krw": "628489.8153",
+    "last_close_krw": "628654.0603",
     "open_date": "2021-01-04",
     "realized_pnl_krw": 2977955.8274,
     "sell_fills": 11,
@@ -7692,7 +7692,7 @@
     "symbol": "GLD",
     "total_qty_bought": 97,
     "total_qty_sold": 19,
-    "unrealized_pnl_krw": "25998240.1375"
+    "unrealized_pnl_krw": "26011051.2451"
   },
   {
     "account_id": "all_weather",
@@ -7703,7 +7703,7 @@
     "company": "NASDAQ-100",
     "exit_reasons": "('rebalance_sell',)",
     "holding_days": 1971,
-    "last_close_krw": "1114528.2895",
+    "last_close_krw": "1112729.1502",
     "open_date": "2021-01-04",
     "realized_pnl_krw": 679072.8932,
     "sell_fills": 2,
@@ -7711,7 +7711,7 @@
     "symbol": "QQQ",
     "total_qty_bought": 57,
     "total_qty_sold": 2,
-    "unrealized_pnl_krw": "28616492.3147"
+    "unrealized_pnl_krw": "28517539.6565"
   },
   {
     "account_id": "all_weather",
@@ -7722,7 +7722,7 @@
     "company": "S&P 500",
     "exit_reasons": "()",
     "holding_days": 1971,
-    "last_close_krw": "1140065.9721",
+    "last_close_krw": "1140113.6767",
     "open_date": "2021-01-04",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -7730,7 +7730,7 @@
     "symbol": "SPY",
     "total_qty_bought": 50,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "21607378.2803"
+    "unrealized_pnl_krw": "21609763.5094"
   },
   {
     "account_id": "benchmark_gld",
@@ -7741,7 +7741,7 @@
     "company": "Gold",
     "exit_reasons": "()",
     "holding_days": 1971,
-    "last_close_krw": "628489.8153",
+    "last_close_krw": "628654.0603",
     "open_date": "2021-01-04",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -7749,7 +7749,7 @@
     "symbol": "GLD",
     "total_qty_bought": 368,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "129529652.3342"
+    "unrealized_pnl_krw": "129590094.483"
   },
   {
     "account_id": "benchmark_kodex200",
@@ -7779,7 +7779,7 @@
     "company": "NASDAQ-100",
     "exit_reasons": "()",
     "holding_days": 1971,
-    "last_close_krw": "1114528.2895",
+    "last_close_krw": "1112729.1502",
     "open_date": "2021-01-04",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -7787,7 +7787,7 @@
     "symbol": "QQQ",
     "total_qty_bought": 196,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "117144125.5566"
+    "unrealized_pnl_krw": "116791494.2658"
   },
   {
     "account_id": "benchmark_spy",
@@ -7798,7 +7798,7 @@
     "company": "S&P 500",
     "exit_reasons": "()",
     "holding_days": 1971,
-    "last_close_krw": "1140065.9721",
+    "last_close_krw": "1140113.6767",
     "open_date": "2021-01-04",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -7806,6 +7806,6 @@
     "symbol": "SPY",
     "total_qty_bought": 163,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "84232615.2171"
+    "unrealized_pnl_krw": "84240391.064"
   }
 ]

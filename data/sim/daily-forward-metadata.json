@@ -6,10 +6,10 @@
   "checkpoint_schema_version": "1.0.0",
   "full_replay_reason": "missing_checkpoint",
   "source_fingerprint": {
-    "reports.csv": "a337b7cb0151bfa487644cd5ee49c52b644f018b1ae3f4c5bc57855bb4ca31f2",
-    "daily_prices.csv": "9fadda8cc1ca1ac3b2ce220b3cf3f3f3c91f6b98024bc68e72c6e1f5e89b73a6",
-    "benchmark_prices.csv": "7884bb5151abc8fad1ef77b725056ba0ba8a06d3eeba378146709c598a81242d",
-    "fx_rates.csv": "bc5d73aacba4fb03a2d455d099dea113d6c25fe87fd5544bc9efe3ce803305e6"
+    "reports.csv": "0db01243313f435046905363853c6a863c5a6675b63ae95f62bf03134bc56d7a",
+    "daily_prices.csv": "b2605f214d4a475f797b6c62575fc04d6917207594799c6efa6a873e980c8ec6",
+    "benchmark_prices.csv": "5b6e17e0eaaead22ac140c65cc55e86dcdc8e8e21fe66bc8f76a2da4f9f6110f",
+    "fx_rates.csv": "c9d8cbff2b7947a93eb8693dae1593bef1c9df70010c5edb0f9eeb22dc5dcfc0"
   },
   "config_digest": "d41ffda8122026ae371b1a064a753137e3fd2fe4cc932c228bdb4423da70f6e6"
 }

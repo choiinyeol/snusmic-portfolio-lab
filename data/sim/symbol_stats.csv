@@ -1,12 +1,12 @@
 account_id,symbol,company,episodes,total_buy_fills,total_sell_fills,total_holding_days,total_realized_pnl_krw,is_currently_held,current_qty,current_unrealized_pnl_krw
 all_weather,069500.KS,KODEX 200,1,51,13,1971,13972814.7521,True,518,49593920.5518
-all_weather,GLD,Gold,1,40,11,1971,2977955.8274,True,78,25998240.1375
-all_weather,QQQ,NASDAQ-100,1,35,2,1971,679072.8932,True,55,28616492.3147
-all_weather,SPY,S&P 500,1,34,0,1971,0.0,True,50,21607378.2803
-benchmark_gld,GLD,Gold,1,65,0,1971,0.0,True,368,129529652.3342
+all_weather,GLD,Gold,1,40,11,1971,2977955.8274,True,78,26011051.2451
+all_weather,QQQ,NASDAQ-100,1,35,2,1971,679072.8932,True,55,28517539.6565
+all_weather,SPY,S&P 500,1,34,0,1971,0.0,True,50,21609763.5094
+benchmark_gld,GLD,Gold,1,65,0,1971,0.0,True,368,129590094.483
 benchmark_kodex200,069500.KS,KODEX 200,1,65,0,1971,0.0,True,2623,251718714.7229
-benchmark_qqq,QQQ,NASDAQ-100,1,65,0,1971,0.0,True,196,117144125.5566
-benchmark_spy,SPY,S&P 500,1,65,0,1971,0.0,True,163,84232615.2171
+benchmark_qqq,QQQ,NASDAQ-100,1,65,0,1971,0.0,True,196,116791494.2658
+benchmark_spy,SPY,S&P 500,1,65,0,1971,0.0,True,163,84240391.064
 smic_follower,FLNC,Fluence Energy Inc.,1,15,1,422,10889850.8997,False,0,
 smic_follower,ANET,Arista Networks,1,4,1,567,4328511.9133,False,0,
 smic_follower,475960.KQ,토모큐브,1,1,1,287,3817287.2198,False,0,
@@ -116,36 +116,36 @@ smic_follower,099430.KQ,바이오플러스,1,1,1,22,2425.9742,False,0,
 smic_follower,VRT,Vertiv Holdings Co.,1,1,1,1,1185.0931,False,0,
 smic_follower,016380.KS,KG스틸,1,30,0,721,0.0,True,792,-2277.6124
 smic_follower,112610.KS,씨에스윈드,1,25,0,574,0.0,True,92,427989.062
-smic_follower,018290.KS,브이티,1,25,0,563,0.0,True,292,-2869149.7058
+smic_follower,018290.KS,브이티,1,25,0,563,0.0,True,292,-2901269.7058
 smic_follower,234300.KQ,에스트래픽,1,35,0,563,0.0,True,1282,-1064318.33
-smic_follower,259960.KQ,크래프톤,1,14,0,550,0.0,True,18,-643906.068
+smic_follower,259960.KQ,크래프톤,1,14,0,550,0.0,True,18,-607906.068
 smic_follower,294870.KS,HDC현대산업개발,1,25,0,550,0.0,True,201,11143.8167
-smic_follower,5253.T,Cover Corp,1,13,0,550,0.0,True,327,-1175994.2193
-smic_follower,FNKO,Funko Inc.,1,14,0,543,0.0,True,870,1829411.2912
-smic_follower,LEVI,Levi Strauss & Co,1,10,0,479,0.0,True,142,1298582.3092
+smic_follower,5253.T,Cover Corp,1,13,0,550,0.0,True,327,-1168146.0396
+smic_follower,FNKO,Funko Inc.,1,14,0,543,0.0,True,870,2011262.4092
+smic_follower,LEVI,Levi Strauss & Co,1,10,0,479,0.0,True,142,1257211.3542
 smic_follower,489790.KS,한화비전,1,11,0,382,0.0,True,72,810988.2587
-smic_follower,CLBT,Cellebrite DI,1,12,0,361,0.0,True,237,-169676.4395
-smic_follower,DOCS,Doximity,1,14,0,359,0.0,True,117,-2835059.6252
-smic_follower,SRAD,Sportradar,1,9,0,354,0.0,True,164,-1221569.6165
+smic_follower,CLBT,Cellebrite DI,1,12,0,361,0.0,True,237,157746.4086
+smic_follower,DOCS,Doximity,1,14,0,359,0.0,True,117,-2751685.0394
+smic_follower,SRAD,Sportradar,1,9,0,354,0.0,True,164,-1144889.9971
 smic_follower,049720.KQ,고려신용정보,1,21,0,353,0.0,True,421,-316495.864
 smic_follower,472850.KQ,폰드그룹,1,11,0,317,0.0,True,828,-1127778.1307
 smic_follower,098120.KQ,마이크로컨텍솔,1,8,0,207,0.0,True,184,1595630.9871
 smic_follower,017960.KS,한국카본,1,5,0,199,0.0,True,110,76495.0523
 smic_follower,456160.KQ,지투지바이오,1,9,0,199,0.0,True,56,-1404329.6745
-smic_follower,2124.T,JAC recruitment Co. Ltd,1,13,0,179,0.0,True,1443,-904118.6518
-smic_follower,CRWV,Coreweave,1,5,0,175,0.0,True,40,1523271.2051
-smic_follower,ESTA,Establishment Labs Holdings,1,8,0,175,0.0,True,47,388479.2508
-smic_follower,IMAX,IMAX Corp,1,6,0,175,0.0,True,71,537527.2616
-smic_follower,IRMD,Iradimed Corporation,1,6,0,140,0.0,True,28,-116489.9447
-smic_follower,SXT,Sensient Technologies Corp,1,2,0,121,0.0,True,24,938082.4456
-smic_follower,TEM,Tempus AI Inc,1,2,0,121,0.0,True,3,-43431.8017
-smic_follower,082920.KS,비츠로셀,1,1,0,42,0.0,True,73,-258171.7432
+smic_follower,2124.T,JAC recruitment Co. Ltd,1,13,0,179,0.0,True,1443,-885784.9172
+smic_follower,CRWV,Coreweave,1,5,0,175,0.0,True,40,1753908.8648
+smic_follower,ESTA,Establishment Labs Holdings,1,8,0,175,0.0,True,47,245677.8048
+smic_follower,IMAX,IMAX Corp,1,6,0,175,0.0,True,71,552188.9831
+smic_follower,IRMD,Iradimed Corporation,1,6,0,140,0.0,True,28,-193923.4387
+smic_follower,SXT,Sensient Technologies Corp,1,2,0,121,0.0,True,24,853341.7512
+smic_follower,TEM,Tempus AI Inc,1,2,0,121,0.0,True,3,-43328.172
+smic_follower,082920.KS,비츠로셀,1,1,0,42,0.0,True,73,-272771.7432
 smic_follower,100090.KS,SK오션플랜트,1,3,0,42,0.0,True,189,-1136687.0137
-smic_follower,187790.KS,나노,1,1,0,23,0.0,True,640,131687.367
-smic_follower,213420.KS,덕산네오룩스,1,2,0,23,0.0,True,80,-830471.0049
-smic_follower,252990.KS,샘씨엔에스,1,3,0,23,0.0,True,306,170331.0373
+smic_follower,187790.KS,나노,1,1,0,23,0.0,True,640,-73112.633
+smic_follower,213420.KS,덕산네오룩스,1,2,0,23,0.0,True,80,-926471.0049
+smic_follower,252990.KS,샘씨엔에스,1,3,0,23,0.0,True,306,-22448.9627
 smic_follower,306200.KS,세아제강,1,1,0,18,0.0,True,6,-126036.1634
-smic_follower,355150.KS,코스텍시스,1,1,0,18,0.0,True,2,-35076.5788
+smic_follower,355150.KS,코스텍시스,1,1,0,18,0.0,True,2,-41176.5788
 smic_follower,WOLF,Wolfspeed,1,1,1,1,-638.5881,False,0,
 smic_follower,SBLK,Star Bulk Carriers,1,1,1,3,-1673.866,False,0,
 smic_follower,089860.KQ,롯데렌탈,1,22,1,455,-4671.6351,False,0,
@@ -263,14 +263,14 @@ smic_follower_v2,BESI.AS,BE Semiconductor Industries N.V.,1,1,1,4,9299.2551,Fals
 smic_follower_v2,099430.KQ,바이오플러스,1,1,1,22,2425.9742,False,0,
 smic_follower_v2,NE,Noble Corporation PLC,1,1,1,5,1484.8391,False,0,
 smic_follower_v2,049720.KQ,고려신용정보,1,28,0,338,0.0,True,1741,-1313012.8314
-smic_follower_v2,CLBT,Cellebrite DI,1,18,0,317,0.0,True,858,1201546.6835
+smic_follower_v2,CLBT,Cellebrite DI,1,18,0,317,0.0,True,858,2386900.2853
 smic_follower_v2,017960.KS,한국카본,1,17,0,199,0.0,True,434,-651816.3179
-smic_follower_v2,ESTA,Establishment Labs Holdings,1,9,0,176,0.0,True,196,2023418.3066
-smic_follower_v2,IMAX,IMAX Corp,1,9,0,142,0.0,True,311,2197100.6937
-smic_follower_v2,IRMD,Iradimed Corporation,1,8,0,140,0.0,True,119,-621066.9378
-smic_follower_v2,SXT,Sensient Technologies Corp,1,8,0,140,0.0,True,135,5022545.9937
-smic_follower_v2,CAMT,Camtek,1,1,0,28,0.0,True,7,-85994.7406
-smic_follower_v2,187790.KS,나노,1,1,0,25,0.0,True,2,731.731
+smic_follower_v2,ESTA,Establishment Labs Holdings,1,9,0,176,0.0,True,196,1427905.8935
+smic_follower_v2,IMAX,IMAX Corp,1,9,0,142,0.0,True,311,2261323.1637
+smic_follower_v2,IRMD,Iradimed Corporation,1,8,0,140,0.0,True,119,-950159.2873
+smic_follower_v2,SXT,Sensient Technologies Corp,1,8,0,140,0.0,True,135,4545879.5877
+smic_follower_v2,CAMT,Camtek,1,1,0,28,0.0,True,7,-115812.3479
+smic_follower_v2,187790.KS,나노,1,1,0,25,0.0,True,2,91.731
 smic_follower_v2,366030.KQ,공구우먼,1,1,1,1,-319.8497,False,0,
 smic_follower_v2,280360.KQ,롯데웰푸드,1,12,1,565,-7248.5568,False,0,
 smic_follower_v2,4751.T,Cyber Agent,1,2,1,148,-14028.5714,False,0,
