@@ -7,7 +7,7 @@
   "full_replay_reason": "missing_checkpoint",
   "source_fingerprint": {
     "reports.csv": "0db01243313f435046905363853c6a863c5a6675b63ae95f62bf03134bc56d7a",
-    "daily_prices.csv": "b2605f214d4a475f797b6c62575fc04d6917207594799c6efa6a873e980c8ec6",
+    "daily_prices.csv": "5196aceaaf9f401c8b03c61c3cea78a051506cee7a788b927158758dd3ee7bde",
     "benchmark_prices.csv": "5b6e17e0eaaead22ac140c65cc55e86dcdc8e8e21fe66bc8f76a2da4f9f6110f",
     "fx_rates.csv": "c9d8cbff2b7947a93eb8693dae1593bef1c9df70010c5edb0f9eeb22dc5dcfc0"
   },
