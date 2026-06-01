@@ -47,7 +47,8 @@ export function TradesTable({ trades, account_id, reportSymbolsById, targetsBySy
     () =>
       accountTrades.filter((trade) => {
         if (side !== 'all' && trade.side !== side) return false;
-        const haystack = `${trade.symbol} ${trade.company} ${trade.reason} ${trade.reportId ?? ''}`.toLowerCase();
+        const haystack =
+          `${trade.symbol} ${trade.company} ${trade.reason} ${trade.reasonDetail ?? ''} ${trade.reportId ?? ''}`.toLowerCase();
         return haystack.includes(normalizedQuery);
       }),
     [accountTrades, normalizedQuery, side],
@@ -63,7 +64,7 @@ export function TradesTable({ trades, account_id, reportSymbolsById, targetsBySy
         price: (row) => row.fillPriceKrw,
         gross: (row) => row.grossKrw,
         pnl: (row) => row.realizedPnlKrw,
-        reason: (row) => row.reason,
+        reason: (row) => row.reasonDetail ?? row.reason,
       }),
     [filteredTrades, tradeSort],
   );
@@ -172,7 +173,7 @@ export function TradesTable({ trades, account_id, reportSymbolsById, targetsBySy
             tradeRows.map((trade) => {
               const target =
                 (trade.reportId ? targetsByReportId[trade.reportId] : undefined) ?? targetsBySymbol[trade.symbol];
-              const displayName = tradeDisplayName(trade.symbol, target?.company ?? trade.company);
+              const displayName = tradeDisplayName(trade.symbol, trade.company);
               const reportSymbol = trade.reportId ? reportSymbolsById[trade.reportId] : null;
 
               return (
@@ -218,8 +219,11 @@ export function TradesTable({ trades, account_id, reportSymbolsById, targetsBySy
                   >
                     {trade.side === 'sell' ? formatSignedKrw(trade.realizedPnlKrw) : '-'}
                   </td>
-                  <td className="max-w-[18rem] truncate px-3 py-2 text-sm text-slate-700">
-                    {humanReason(trade.reason)}
+                  <td className="max-w-[24rem] px-3 py-2 text-sm leading-5 text-slate-700">
+                    {trade.reasonDetail || humanReason(trade.reason)}
+                    {trade.reasonDetail ? (
+                      <div className="mt-0.5 font-mono text-[11px] text-slate-400">{trade.reason}</div>
+                    ) : null}
                   </td>
                   <td className="px-3 py-2">
                     {trade.reportId && reportSymbol ? (
@@ -269,6 +273,7 @@ function downloadTrades(rows: TradeRow[]) {
     'realized_pnl_krw',
     'cash_after_krw',
     'reason',
+    'reason_detail',
     'report_id',
   ];
   const data = rows.map((row) => [
@@ -286,6 +291,7 @@ function downloadTrades(rows: TradeRow[]) {
     row.realizedPnlKrw ?? '',
     row.cashAfterKrw ?? '',
     row.reason,
+    row.reasonDetail ?? '',
     row.reportId ?? '',
   ]);
   downloadCsv('snusmic-trades-filtered.csv', headers, data);

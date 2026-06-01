@@ -35,7 +35,7 @@ This list is the current web product inventory. Route files outside this invento
 
 The web app remains a static reader over committed `data/web` artifacts. Route files should call page view models from `apps/web/lib/view-models/**`, then pass display-ready props into React components. Low-level file reads stay in server-only artifact readers; React components should not recompute target-hit, split adjustment, benchmark coverage, or report-window logic.
 
-Page bundles under `data/web/pages/**` are the preferred shape for screen-level metadata, metrics, views, warnings, and table/chart payloads. Canonical artifacts under `data/web/reports/**`, `data/web/portfolio/**`, and `data/web/prices/**` remain the source of truth for reusable data.
+Page bundles under `data/web/pages/**` are the preferred shape for screen-level metadata, metrics, views, warnings, and table/chart payloads. Canonical artifacts under `data/web/reports/**`, `data/web/portfolio/**`, and `data/web/prices/**` remain the source of truth for reusable data. Portfolio time series are account shards under `data/web/portfolio/equity/**` and `data/web/portfolio/daily-decisions/**`; the web app should read the selected account shards rather than aggregate all simulation branches.
 
 ## Cross-Platform Tooling
 

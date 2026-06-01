@@ -278,7 +278,7 @@ function TradeTooltipLine({ trade }: { trade: TradeRow }) {
         <span className="font-mono tabular-nums text-slate-950">{formatKrw(trade.grossKrw)}</span>
       </div>
       <div className="truncate text-[11px] text-slate-500">
-        {trade.qty?.toLocaleString('ko-KR') ?? '-'}주 · {trade.reason || '기록된 사유 없음'}
+        {trade.qty?.toLocaleString('ko-KR') ?? '-'}주 · {trade.reasonDetail || trade.reason || '기록된 사유 없음'}
       </div>
     </div>
   );

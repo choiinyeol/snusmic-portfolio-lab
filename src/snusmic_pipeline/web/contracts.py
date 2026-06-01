@@ -62,6 +62,7 @@ class WebTradeRow(_ArtifactModel):
     account_id: str
     date: str
     symbol: str
+    company: str
     side: str
     qty: float | None
     fill_price_krw: float | None
@@ -69,6 +70,7 @@ class WebTradeRow(_ArtifactModel):
     realized_pnl_krw: float | None = None
     cash_after_krw: float | None
     reason: str
+    reason_detail: str | None = None
     report_id: str | None = None
 
 

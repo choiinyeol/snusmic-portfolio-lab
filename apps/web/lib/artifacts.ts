@@ -7,6 +7,7 @@ import {
   AccountingReconciliationRowSchema,
   CompactEquityArtifactSchema,
   CompactTableArtifactSchema,
+  PortfolioShardIndexSchema,
   parseArtifact,
   parseRows,
   RawHoldingRowSchema,
@@ -29,6 +30,9 @@ type RawReport = Record<string, unknown>;
 type CompactTableArtifact = {
   columns: string[];
   rows: unknown[][];
+};
+type PortfolioShardIndex = {
+  accounts: Array<{ account_id: string; path: string; row_count?: number }>;
 };
 
 export type ReportRow = {
@@ -120,6 +124,7 @@ export type TradeRow = {
   realizedPnlKrw: number | null;
   cashAfterKrw: number | null;
   reason: string;
+  reasonDetail: string | null;
   reportId: string | null;
 };
 
@@ -634,6 +639,7 @@ function clearArtifactCaches() {
   tradesCache = undefined;
   positionEpisodesCache = undefined;
   equityDailyCache = undefined;
+  equityDailyAccountCache.clear();
   accountCurvesCache = undefined;
   priceSeriesCache.clear();
   nativePricePointCache.clear();
@@ -1381,6 +1387,7 @@ export function getTrades(): TradeRow[] {
       'account_id',
       'date',
       'symbol',
+      'company',
       'side',
       'qty',
       'fill_price_krw',
@@ -1388,20 +1395,18 @@ export function getTrades(): TradeRow[] {
       'realized_pnl_krw',
       'cash_after_krw',
       'reason',
+      'reason_detail',
       'report_id',
     ]),
   );
-  const targetsByReportId = getReportTargetsById();
-  const targetsBySymbol = getLatestReportTargetsBySymbol();
   tradesCache = raw
     .map((row) => {
       const fillPriceNative = nativeFromKrwAtSymbolDate(row.symbol, row.date, row.fill_price_krw);
-      const target = (row.report_id ? targetsByReportId[row.report_id] : undefined) ?? targetsBySymbol[row.symbol];
       return {
         account_id: row.account_id,
         date: row.date,
         symbol: row.symbol,
-        company: target?.company ?? row.symbol,
+        company: row.company,
         side: row.side,
         qty: row.qty,
         currency: currencyForPricePoint(row.symbol, row.date),
@@ -1412,6 +1417,7 @@ export function getTrades(): TradeRow[] {
         realizedPnlKrw: row.realized_pnl_krw,
         cashAfterKrw: row.cash_after_krw,
         reason: row.reason,
+        reasonDetail: row.reason_detail ?? null,
         reportId: row.report_id,
       };
     })
@@ -1482,10 +1488,20 @@ export function getAccountLabel(account_id: string): string {
 }
 
 let equityDailyCache: EquityPoint[] | undefined;
+const equityDailyAccountCache = new Map<string, EquityPoint[]>();
 export function getEquityDaily(): EquityPoint[] {
   if (artifactCacheValid() && equityDailyCache) return equityDailyCache;
-  equityDailyCache = readCompactEquityCurves('data/web/portfolio/equity-daily.json');
+  equityDailyCache = readPortfolioEquityShards('data/web/portfolio/equity/index.json');
   return equityDailyCache;
+}
+
+export function getEquityDailyForAccounts(accountIds: readonly string[]): EquityPoint[] {
+  const key = [...accountIds].sort().join('|');
+  const cached = equityDailyAccountCache.get(key);
+  if (artifactCacheValid() && cached) return cached;
+  const rows = readPortfolioEquityShards('data/web/portfolio/equity/index.json', accountIds);
+  equityDailyAccountCache.set(key, rows);
+  return rows;
 }
 
 let accountCurvesCache: EquityPoint[] | undefined;
@@ -1527,6 +1543,24 @@ function compactRowsToObjects(
     }
     return out;
   });
+}
+
+function readPortfolioEquityShards(indexPath: string, accountIds?: readonly string[]): EquityPoint[] {
+  const index = parseArtifact<PortfolioShardIndex>(
+    indexPath,
+    PortfolioShardIndexSchema,
+    readRequiredJson<unknown>(indexPath),
+  );
+  const wanted = accountIds ? new Set(accountIds) : null;
+  const selected = wanted ? index.accounts.filter((entry) => wanted.has(entry.account_id)) : index.accounts;
+  if (wanted) {
+    const available = new Set(index.accounts.map((entry) => entry.account_id));
+    const missing = [...wanted].filter((accountId) => !available.has(accountId));
+    if (missing.length > 0) {
+      throw new Error(`Missing portfolio equity shards for accounts: ${missing.join(', ')}`);
+    }
+  }
+  return selected.flatMap((entry) => readCompactEquityCurves(`data/web/${entry.path}`));
 }
 
 function readCompactEquityCurves(filePath: string): EquityPoint[] {

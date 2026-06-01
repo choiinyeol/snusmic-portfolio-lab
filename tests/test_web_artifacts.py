@@ -7,8 +7,6 @@ import pandas as pd
 import pytest
 
 import snusmic_pipeline.web.artifacts as web_artifacts
-from snusmic_pipeline.sim.contracts import SimulationConfig
-from snusmic_pipeline.sim.forward_runner import run_daily_forward
 from snusmic_pipeline.web.artifacts import (
     ExportInputs,
     _write_price_artifacts,
@@ -92,32 +90,19 @@ def test_check_web_artifacts_requires_deterministic_json(tmp_path: Path) -> None
 
 @pytest.mark.slow
 @pytest.mark.contract
-def test_daily_decision_artifacts_expose_checkpoint_metadata(tmp_path: Path) -> None:
-    sim = tmp_path / "sim"
-    out = tmp_path / "web"
-    config = SimulationConfig(
-        start_date=pd.Timestamp("2021-01-04").date(), end_date=pd.Timestamp("2021-02-10").date()
-    )
-    run_daily_forward(config, Path("data/warehouse"), sim)
+def test_daily_decision_artifacts_expose_checkpoint_metadata(web_export_dir: Path) -> None:
+    out = web_export_dir
+    index = json.loads((out / "portfolio" / "daily-decisions" / "index.json").read_text(encoding="utf-8"))
+    shard_path = out / index["accounts"][0]["path"]
+    shard = json.loads(shard_path.read_text(encoding="utf-8"))
+    source_metadata = json.loads(Path("data/sim/daily-forward-metadata.json").read_text(encoding="utf-8"))
 
-    export_web_artifacts(
-        ExportInputs(
-            warehouse=Path("data/warehouse"),
-            sim=sim,
-            out=out,
-            extraction_quality=Path("data/extraction_quality.json"),
-        )
-    )
-
-    raw = json.loads((out / "daily-decisions.json").read_text(encoding="utf-8"))
-    compact = json.loads((out / "portfolio" / "daily-decisions.json").read_text(encoding="utf-8"))
-
-    assert raw["metadata"]["run_mode"] == "full_replay"
-    assert raw["metadata"]["checkpoint_date"] == "2021-02-10"
-    assert raw["metadata"]["checkpoint_schema_version"] == "1.0.0"
-    assert raw["metadata"]["source_fingerprint"]
-    assert compact["metadata"] == raw["metadata"]
-    assert compact["rows"]
+    assert index["metadata"]["run_mode"] == "full_replay"
+    assert index["metadata"]["checkpoint_date"] == source_metadata["checkpoint_date"]
+    assert index["metadata"]["checkpoint_schema_version"] == "1.0.0"
+    assert index["metadata"]["source_fingerprint"]
+    assert shard["metadata"] == index["metadata"]
+    assert shard["rows"]
 
 
 def test_price_artifacts_preserve_split_diagnostics(tmp_path: Path) -> None:
@@ -284,13 +269,10 @@ def test_account_catalog_matches_committed_account_config(web_export_dir: Path) 
     assert set(actual_ids) == set(expected_ids)
     assert len(actual_ids) == len(expected_ids)
     assert actual_kind_by_id == {
-        "all_weather": "benchmark",
-        "benchmark_qqq": "benchmark",
-        "benchmark_spy": "benchmark",
-        "benchmark_kodex200": "benchmark",
-        "benchmark_gld": "benchmark",
-        "smic_follower": "account",
-        "smic_follower_v2": "account",
+        account_id: "benchmark"
+        if account_id == "all_weather" or account_id.startswith("benchmark_")
+        else "account"
+        for account_id in expected_ids
     }
 
     csv_rows = pd.read_csv(out / "table-download-accounts.csv")
@@ -310,6 +292,38 @@ def test_monthly_holdings_reference_current_account_artifact(web_export_dir: Pat
     account_index = columns.index("account_id")
     exported_accounts = {str(row[account_index]) for row in monthly["rows"]}
     assert exported_accounts <= valid_accounts
+
+
+@pytest.mark.slow
+@pytest.mark.contract
+def test_trade_artifacts_carry_company_names(web_export_dir: Path) -> None:
+    out = web_export_dir
+
+    warehouse_reports = pd.read_csv(Path("data/warehouse") / "reports.csv")
+    target_company = warehouse_reports.loc[
+        warehouse_reports["symbol"].astype(str).eq("278470.KS"), "company"
+    ].iloc[0]
+    assert target_company and target_company != "278470.KS"
+
+    raw_trades = json.loads((out / "trades.json").read_text(encoding="utf-8"))
+    assert any(row["company"] == target_company for row in raw_trades if row["symbol"] == "278470.KS")
+    assert all("reason_detail" in row for row in raw_trades)
+    assert any(
+        "후보" in row["reason_detail"]
+        for row in raw_trades
+        if row["reason"] == "rebalance_buy" and str(row["account_id"]).startswith("pit_trend_")
+    )
+
+    compact_trades = json.loads((out / "portfolio" / "trades.json").read_text(encoding="utf-8"))
+    columns = compact_trades["columns"]
+    symbol_index = columns.index("symbol")
+    company_index = columns.index("company")
+    assert "reason_detail" in columns
+    assert any(
+        row[company_index] == target_company
+        for row in compact_trades["rows"]
+        if row[symbol_index] == "278470.KS"
+    )
 
 
 @pytest.mark.slow

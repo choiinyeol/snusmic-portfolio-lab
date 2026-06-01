@@ -79,6 +79,7 @@ export const RawTradeRowSchema = z
     account_id: z.string(),
     date: z.string(),
     symbol: z.string(),
+    company: z.string(),
     side: z.string(),
     qty: NullableNumber,
     fill_price_krw: NullableNumber,
@@ -86,6 +87,7 @@ export const RawTradeRowSchema = z
     realized_pnl_krw: NullableNumber,
     cash_after_krw: NullableNumber,
     reason: z.string(),
+    reason_detail: z.string().optional().nullable(),
     report_id: NullableString,
   })
   .passthrough();
@@ -115,6 +117,22 @@ export const CompactEquityArtifactSchema = z
           account_id: z.string(),
           equity_krw: z.array(NullableNumber),
           cumulative_return: z.array(NullableNumber),
+        })
+        .passthrough(),
+    ),
+  })
+  .passthrough();
+
+export const PortfolioShardIndexSchema = z
+  .object({
+    schema_version: z.literal('1.0.0'),
+    metadata: z.record(z.string(), z.unknown()).optional(),
+    accounts: z.array(
+      z
+        .object({
+          account_id: z.string(),
+          path: z.string(),
+          row_count: z.number().optional(),
         })
         .passthrough(),
     ),

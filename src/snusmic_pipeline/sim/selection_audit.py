@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 from collections import Counter
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
+from typing import cast
 
 import pandas as pd
 
@@ -570,7 +572,7 @@ def _first_buy_by_symbol(frame: pd.DataFrame, account_id: str) -> dict[str, date
     ].copy()
     if selected.empty:
         return {}
-    return selected.groupby("symbol", sort=False)["date"].min().to_dict()
+    return cast(dict[str, date], selected.groupby("symbol", sort=False)["date"].min().to_dict())
 
 
 def _read_sim_trades(sim_dir: Path) -> pd.DataFrame:
@@ -713,7 +715,10 @@ def _rebalance_state_rows(
         lot = account_before.holdings.get(symbol)
         price = prices_today.get(symbol) or board.asof(audit_date, symbol)
         held_value = (lot.qty * price) if lot is not None and price is not None and price > 0 else 0.0
-        trade = trade_by_symbol.get(symbol, {"action": "-", "qty": 0, "gross_krw": 0.0})
+        trade = cast(
+            dict[str, object],
+            trade_by_symbol.get(symbol, {"action": "-", "qty": 0, "gross_krw": 0.0}),
+        )
         rows.append(
             RebalanceStateRow(
                 audit_date=audit_date,
@@ -728,8 +733,8 @@ def _rebalance_state_rows(
                 else None,
                 target_weight=target_weights.get(symbol),
                 trade_action=str(trade["action"]),
-                trade_qty=int(trade["qty"]),
-                trade_gross_krw=float(trade["gross_krw"]),
+                trade_qty=int(cast(float, trade["qty"])),
+                trade_gross_krw=float(cast(float, trade["gross_krw"])),
                 current_return=pit_row.current_return if pit_row is not None else None,
                 target_gap=pit_row.target_gap_pct if pit_row is not None else None,
             )
@@ -866,7 +871,7 @@ def _forward_return(board: PriceBoard, start_day: date, end_day: date, symbol: s
     return (end_price / start_price) - 1.0
 
 
-def _mean_defined(values: list[float | None]) -> float | None:
+def _mean_defined(values: Sequence[float | int | None]) -> float | None:
     defined = [value for value in values if value is not None]
     if not defined:
         return None

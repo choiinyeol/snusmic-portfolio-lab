@@ -55,13 +55,14 @@ export function getDashboardViewModel() {
   const equity = getAccountCurves();
   const benchmarkRows = getBenchmarkRows(accountRows);
   const selectableRows = getObjectivePassingRows(accountRows);
-  const selectedAccountRow = selectableRows.find((row) => row.id === selectedAccount);
+  const selectedAccountRow = accountRows.find((row) => row.id === selectedAccount);
   const chartSeries = buildDashboardSeries(equity, benchmarkRows, selectedAccountRow, selectableRows);
   const benchmarkToBeat = benchmarkRows.find((row) => row.id === TARGET_BENCHMARK_ID);
-  const recentBuys = trades
-    .filter((trade) => trade.account_id === selectedAccount && trade.side === 'buy')
+  const recentTrades = trades
+    .filter((trade) => trade.account_id === selectedAccount)
     .sort((a, b) => b.date.localeCompare(a.date))
-    .slice(0, 7);
+    .slice(0, 12);
+  const recentBuys = recentTrades.filter((trade) => trade.side === 'buy').slice(0, 7);
 
   return {
     accountRows,
@@ -79,6 +80,7 @@ export function getDashboardViewModel() {
     selectedAccountRow,
     chartSeries,
     benchmarkToBeat,
+    recentTrades,
     recentBuys,
   };
 }
@@ -149,7 +151,7 @@ function buildDashboardSeries(
     .map((row, index) => ({
       id: row.id,
       label: row.label,
-      shortLabel: row.shortLabel,
+      shortLabel: compactAccountLabel(row.id, row.shortLabel),
       color: SERIES_COLORS[index % SERIES_COLORS.length],
       points: equity
         .filter((point) => point.account_id === row.id && point.cumulativeReturn !== null)
@@ -167,6 +169,15 @@ function uniqueSeriesRows(rows: AccountLeaderboardRow[]): AccountLeaderboardRow[
     out.push(row);
   }
   return out;
+}
+
+function compactAccountLabel(id: string, fallback: string): string {
+  if (id.includes('redeploycash125_partial75')) return 'Partial 75';
+  if (id.includes('redeploycash125')) return 'CashGate 12.5';
+  if (id.includes('trailtrim25cap20')) return 'TrailTrim 20';
+  if (id === 'pit_trend_top5') return 'Trend Top5';
+  if (id === 'pit_score_top5') return 'Score Top5';
+  return fallback;
 }
 
 function latestReportBySymbol(reports: ReportRow[]): Map<string, ReportRow> {

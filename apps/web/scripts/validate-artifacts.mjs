@@ -11,8 +11,8 @@ const required = [
   'portfolio/accounts.json',
   'portfolio/holdings.json',
   'portfolio/trades.json',
-  'portfolio/daily-decisions.json',
-  'portfolio/equity-daily.json',
+  'portfolio/daily-decisions/index.json',
+  'portfolio/equity/index.json',
   'reports/table.json',
   'reports/rankings.json',
   'report-statistics-lab.json',
@@ -59,6 +59,26 @@ function rowCount(data) {
   return 1;
 }
 
+function countShardRows(indexPath) {
+  const index = readJson(indexPath);
+  if (!Array.isArray(index.accounts)) fail(`${indexPath} accounts must be an array`);
+  let total = 0;
+  for (const entry of index.accounts) {
+    if (!entry?.account_id) fail(`${indexPath} has a shard without account_id`);
+    if (!entry?.path) fail(`${indexPath} has a shard without path`);
+    const shard = readJson(entry.path);
+    const actual =
+      Array.isArray(shard?.dates) && Array.isArray(shard?.series)
+        ? shard.dates.length * shard.series.length
+        : rowCount(shard);
+    if (typeof entry.row_count === 'number' && entry.row_count !== actual) {
+      fail(`${entry.path} row_count=${entry.row_count}, actual ${actual}`);
+    }
+    total += actual;
+  }
+  return total;
+}
+
 for (const file of required) {
   if (!fs.existsSync(path.join(webRoot, file))) fail(`missing required artifact: data/web/${file}`);
 }
@@ -76,8 +96,6 @@ const countFiles = {
   reports: 'reports/table.json',
   current_holdings: 'portfolio/holdings.json',
   trades: 'portfolio/trades.json',
-  daily_decisions: 'portfolio/daily-decisions.json',
-  equity_daily: 'portfolio/equity-daily.json',
   accounts: 'portfolio/accounts.json',
   account_catalog: 'accounts/catalog.json',
   report_board_candidates: 'report-board/candidates.json',
@@ -90,13 +108,23 @@ for (const [key, file] of Object.entries(countFiles)) {
   if (actual !== expected) fail(`manifest row_counts.${key}=${expected}, actual ${actual} in ${file}`);
 }
 
-const dailyDecisions = readJson('portfolio/daily-decisions.json');
+const shardedCounts = {
+  daily_decisions: countShardRows('portfolio/daily-decisions/index.json'),
+  equity_daily: countShardRows('portfolio/equity/index.json'),
+};
+for (const [key, actual] of Object.entries(shardedCounts)) {
+  const expected = manifest.row_counts?.[key];
+  if (typeof expected !== 'number') fail(`manifest row_counts.${key} is missing`);
+  if (actual !== expected) fail(`manifest row_counts.${key}=${expected}, actual ${actual}`);
+}
+
+const dailyDecisions = readJson('portfolio/daily-decisions/index.json');
 if (dailyDecisions.metadata?.run_mode) {
   if (!dailyDecisions.metadata?.checkpoint_date) {
-    fail('portfolio/daily-decisions.json metadata.checkpoint_date is missing');
+    fail('portfolio/daily-decisions/index.json metadata.checkpoint_date is missing');
   }
   if (!dailyDecisions.metadata?.checkpoint_schema_version) {
-    fail('portfolio/daily-decisions.json metadata.checkpoint_schema_version is missing');
+    fail('portfolio/daily-decisions/index.json metadata.checkpoint_schema_version is missing');
   }
 }
 

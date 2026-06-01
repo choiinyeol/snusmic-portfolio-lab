@@ -1,5 +1,28 @@
 ﻿# Changelog
 
+## v0.30.1 - Sharded portfolio artifacts and CI recovery
+
+- Splits portfolio equity and daily-decision web payloads into curated account shards so the static app no longer commits or deploys the full aggregate simulation time series.
+- Updates artifact readers, schemas, validators, docs, and tests to treat `portfolio/equity/index.json` and `portfolio/daily-decisions/index.json` as the web contract.
+- Preserves curated portfolio routes, account charts, trades, and downloads while reducing the largest committed web artifact surface.
+- Fixes the GitHub Actions `web` failure by making the committed artifact validator understand sharded row counts.
+- Fixes the GitHub Actions `ci` type job by narrowing pandas typing in report/audit/export paths without changing runtime behavior.
+- Bumps Python and web package versions to `0.30.1`.
+
+Verification:
+
+- `uv run ruff check .`
+- `uv run ruff format --check .`
+- `uv run mypy src`
+- `uv run pytest -q -m "not slow" -x`
+- `uv run python scripts/export_schemas.py --check`
+- `uv run python scripts/check_schema_compat.py --base-ref origin/main`
+- `pnpm --dir apps/web artifact:check`
+- `pnpm --dir apps/web check`
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web build`
+- `pnpm --dir apps/web smoke:static`
+
 ## v0.30.0 - PIT strategy research ledger and portfolio curation
 
 - Closes the PIT strategy research sprint with a durable idea/result/retrospective ledger under `docs/research`.

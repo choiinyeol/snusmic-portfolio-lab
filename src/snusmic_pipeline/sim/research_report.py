@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
 import pandas as pd
 
@@ -80,14 +81,14 @@ def _summary_table(summary: pd.DataFrame, account_ids: list[str]) -> list[str]:
             + " | ".join(
                 [
                     f"`{row.account_id}`",
-                    _pct(row.money_weighted_return),
-                    _pct(row.time_weighted_return),
-                    _pct(row.cagr),
-                    _pct(row.max_drawdown),
-                    _num(row.sharpe),
-                    _num(row.sortino),
-                    _money_m(row.final_equity_krw),
-                    f"{int(row.trade_count):,}",
+                    _pct(cast(float, row.money_weighted_return)),
+                    _pct(cast(float, row.time_weighted_return)),
+                    _pct(cast(float, row.cagr)),
+                    _pct(cast(float, row.max_drawdown)),
+                    _num(cast(float, row.sharpe)),
+                    _num(cast(float, row.sortino)),
+                    _money_m(cast(float, row.final_equity_krw)),
+                    f"{int(cast(float, row.trade_count)):,}",
                 ]
             )
             + " |"

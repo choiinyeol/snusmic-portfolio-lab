@@ -1,6 +1,6 @@
 # SNUSMIC Portfolio Lab
 
-SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, account simulations, and static web artifacts. The latest release closes the PIT strategy research sprint: generated candidates are documented in `docs/research`, while the web app exposes only a curated shortlist of representative account ledgers.
+SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, account simulations, and static web artifacts. The latest release closes the PIT strategy research sprint and keeps the web payload deployable by sharding large portfolio time series by curated account.
 
 [Live site](https://smic-portfolio.vercel.app) - [Changelog](./CHANGELOG.md) - [Design system](./DESIGN.md)
 
@@ -10,7 +10,7 @@ SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, a
 - Normalizes reports, prices, FX, and benchmark data into `data/warehouse`.
 - Exports a point-in-time research board at `data/sim/pit-research-board.csv`.
 - Runs benchmark, follower, and curated PIT account simulations with real ledger constraints: cash, deposits, integer shares, fees, taxes, trades, holdings, and equity paths.
-- Exports deterministic `data/web` JSON/CSV artifacts consumed by the static Next.js app.
+- Exports deterministic `data/web` JSON/CSV artifacts consumed by the static Next.js app, with large portfolio equity and decision series split into account shards.
 - Presents report verification, statistics, and account views through page-shaped frontend view models instead of raw artifact tables.
 - Shows curated PIT/follower account curves alongside benchmarks, with dense trade markers and benchmark lines controlled in the chart UI.
 
@@ -146,7 +146,7 @@ node scripts/prepare_vercel_prebuilt.mjs
 apps/web/                  Static Next.js app
 data/warehouse/            Normalized report, price, FX, and benchmark inputs
 data/sim/                  Simulation outputs and PIT research board
-data/web/                  Canonical static web artifacts
+data/web/                  Canonical static web artifacts, with portfolio series sharded by curated account
 docs/                      Product, architecture, testing, and agent docs
 scripts/                   Operational rebuild/refresh helpers
 src/snusmic_pipeline/      Python package and CLI

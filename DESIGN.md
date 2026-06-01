@@ -102,7 +102,12 @@ data/web/
     monthly-holdings.json
     trades.json
     episodes.json
-    equity-daily.json
+    equity/
+      index.json
+      {ACCOUNT_ID}.json
+    daily-decisions/
+      index.json
+      {ACCOUNT_ID}.json
   accounts/
     catalog.json
     curves.json

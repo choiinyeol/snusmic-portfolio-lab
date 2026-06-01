@@ -132,7 +132,9 @@ function TradeHighlightCard({ trade, index }: { trade: TradeRow; index: number }
           <strong className="truncate text-sm text-slate-950">{tradeDisplayName(trade.symbol, trade.company)}</strong>
           <span className="font-mono text-xs text-slate-500">{trade.date}</span>
         </div>
-        <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">{trade.reason || '기록된 사유 없음'}</p>
+        <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">
+          {trade.reasonDetail || trade.reason || '기록된 사유 없음'}
+        </p>
       </div>
       <div className="self-center font-mono text-sm font-semibold tabular-nums text-slate-950">
         {formatKrw(Math.abs(trade.grossKrw ?? 0))}
@@ -170,7 +172,7 @@ function buildTradeNarrative(trades: TradeRow[]) {
 function buildReasonBuckets(trades: TradeRow[]) {
   const buckets = new Map<string, { reason: string; count: number; grossKrw: number }>();
   for (const trade of trades) {
-    const reason = normalizeReason(trade.reason);
+    const reason = normalizeReason(trade.reasonDetail || trade.reason);
     const current = buckets.get(reason) ?? { reason, count: 0, grossKrw: 0 };
     current.count += 1;
     current.grossKrw += Math.abs(trade.grossKrw ?? 0);

@@ -29,7 +29,7 @@ ROUND_NDIGITS = 4
 def write_simulation_artifacts(result: SimulationResult, out: Path) -> None:
     out.mkdir(parents=True, exist_ok=True)
     (out / "accounts.json").write_text(
-        json.dumps(_round_floats(result.model_dump(mode="json")), ensure_ascii=False, indent=2),
+        json.dumps(_round_floats(_accounts_manifest(result)), ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
     (out / "account-configs.json").write_text(
@@ -72,6 +72,23 @@ def _account_config_artifact(config: SimulationConfig) -> dict[str, object]:
     return {
         "schema_version": "1.0.0",
         "accounts": [_round_floats(account_id.model_dump(mode="json")) for account_id in config.accounts],
+    }
+
+
+def _accounts_manifest(result: SimulationResult) -> dict[str, object]:
+    return {
+        "schema_version": "1.0.0",
+        "artifact": "simulation-accounts-manifest",
+        "description": "Detailed simulation ledgers are stored in sibling CSV artifacts.",
+        "account_count": len(result.summaries),
+        "equity_point_count": len(result.equity_points),
+        "trade_count": len(result.trades),
+        "position_episode_count": len(result.position_episodes),
+        "current_holding_count": len(result.current_holdings),
+        "symbol_stat_count": len(result.symbol_stats),
+        "monthly_holding_count": len(result.monthly_holdings),
+        "report_performance_count": len(result.report_performance),
+        "accounts": [summary.model_dump(mode="json") for summary in result.summaries],
     }
 
 

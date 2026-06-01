@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import math
+import re
 import shutil
 import statistics
 import subprocess
@@ -26,9 +27,9 @@ REQUIRED_ARTIFACTS = [
     "portfolio/holdings.json",
     "portfolio/monthly-holdings.json",
     "portfolio/trades.json",
-    "portfolio/daily-decisions.json",
+    "portfolio/daily-decisions/index.json",
     "portfolio/episodes.json",
-    "portfolio/equity-daily.json",
+    "portfolio/equity/index.json",
     "portfolio/accounting-reconciliation.json",
     "reports/table.json",
     "reports/rankings.json",
@@ -59,14 +60,29 @@ REQUIRED_ARTIFACTS = [
     "missing-symbols.json",
     "data-quality.json",
     "trades.json",
-    "daily-decisions.json",
     "position-episodes.json",
-    "equity-daily.json",
     "accounting-reconciliation.json",
     "table-download-reports.csv",
     "table-download-accounts.csv",
     "data-quality-download.csv",
 ]
+
+WEB_PORTFOLIO_ACCOUNT_IDS = (
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5",
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5",
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5",
+    "pit_trend_top5",
+    "pit_score_top5",
+    "smic_follower",
+)
+WEB_PORTFOLIO_BENCHMARK_IDS = (
+    "all_weather",
+    "benchmark_kodex200",
+    "benchmark_qqq",
+    "benchmark_spy",
+    "benchmark_gld",
+)
+_ACCOUNT_ID_PATTERN = re.compile(r"^[A-Za-z0-9_]+$")
 
 
 def _frame_series(frame: pd.DataFrame, column: str, default: Any = pd.NA) -> pd.Series:
@@ -396,7 +412,15 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     enriched_monthly_holdings = _records(
         _enrich_holdings_with_native(monthly_holdings, prices, fx_rates, close_column="month_close_krw")
     )
-    trade_rows = _records(_require_trade_realized_pnl(trades))
+    trade_rows = _records(
+        _enrich_trades_with_company(
+            _require_trade_realized_pnl(trades),
+            reports=reports,
+            current_holdings=current_holdings,
+            monthly_holdings=monthly_holdings,
+            position_episodes=position_episodes,
+        )
+    )
     daily_decision_rows = _records(daily_decisions)
     episode_rows = _records(position_episodes)
     equity_rows = _records(equity_daily)
@@ -456,12 +480,7 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     _write_json(out / "missing-symbols.json", [{"symbol": symbol} for symbol in missing_symbols])
     _write_json(out / "data-quality.json", data_quality)
     _write_json(out / "trades.json", trade_rows)
-    _write_machine_json(
-        out / "daily-decisions.json",
-        {"metadata": _daily_forward_metadata(daily_forward_metadata), "rows": daily_decision_rows},
-    )
     _write_json(out / "position-episodes.json", episode_rows)
-    _write_json(out / "equity-daily.json", equity_rows)
     _write_json(out / "accounting-reconciliation.json", accounting_rows)
     _write_download_csvs(out, report_rows, data_quality, account_catalog)
     mark("write_tables")
@@ -867,13 +886,16 @@ def _write_page_bundles(
         out / "portfolio" / "monthly-holdings.json", _compact_monthly_holdings(monthly_holdings)
     )
     _write_product_json(out / "portfolio" / "trades.json", _compact_trades(trades))
-    _write_product_json(
-        out / "portfolio" / "daily-decisions.json",
-        _compact_daily_decisions(daily_decisions, daily_forward_metadata),
-    )
     _write_product_json(out / "portfolio" / "episodes.json", _compact_episodes(episodes))
-    _write_product_json(out / "portfolio" / "equity-daily.json", _compact_equity_curves(equity_daily))
     _write_product_json(out / "portfolio" / "accounting-reconciliation.json", accounting_reconciliation)
+    portfolio_account_ids = _web_portfolio_account_ids(account_catalog, accounts)
+    _write_portfolio_equity_shards(out, equity_daily, portfolio_account_ids)
+    _write_portfolio_daily_decision_shards(
+        out,
+        daily_decisions,
+        daily_forward_metadata,
+        portfolio_account_ids,
+    )
 
     _write_product_json(out / "reports" / "table.json", reports)
     _write_product_json(out / "reports" / "rankings.json", rankings)
@@ -1241,12 +1263,18 @@ def _research_calendar_date_summaries(frame: pd.DataFrame) -> list[dict[str, Any
         forward_63 = pd.to_numeric(group["forward_return_63d"], errors="coerce")
         forward_500 = pd.to_numeric(group["forward_return_500d"], errors="coerce")
         forward_latest = pd.to_numeric(group["forward_return_latest"], errors="coerce")
-        observed_days = pd.to_numeric(group.get("forward_observed_days"), errors="coerce")
+        observed_days = pd.to_numeric(
+            cast(pd.Series, group.get("forward_observed_days", pd.Series(pd.NA, index=group.index))),
+            errors="coerce",
+        )
         valid_forward_63 = forward_63.dropna()
         valid_forward_500 = forward_500.dropna()
         valid_forward_latest = forward_latest.dropna()
         valid_observed_days = observed_days.dropna()
-        report_age_days = pd.to_numeric(group.get("report_age_days"), errors="coerce")
+        report_age_days = pd.to_numeric(
+            cast(pd.Series, group.get("report_age_days", pd.Series(pd.NA, index=group.index))),
+            errors="coerce",
+        )
         recent_report_mask = report_age_days.ge(0) & report_age_days.le(365)
         top_rows = group.sort_values(["board_score", "rank"], ascending=[False, True]).head(3)
         summaries.append(
@@ -1263,7 +1291,15 @@ def _research_calendar_date_summaries(frame: pd.DataFrame) -> list[dict[str, Any
                     ).sum()
                 ),
                 "near_high_count": int(
-                    pd.to_numeric(group.get("distance_from_52w_high"), errors="coerce").ge(-0.1).sum()
+                    pd.to_numeric(
+                        cast(
+                            pd.Series,
+                            group.get("distance_from_52w_high", pd.Series(pd.NA, index=group.index)),
+                        ),
+                        errors="coerce",
+                    )
+                    .ge(-0.1)
+                    .sum()
                 ),
                 "forward_positive_63d_count": int(valid_forward_63.gt(0).sum()),
                 "forward_positive_63d_sample": int(valid_forward_63.count()),
@@ -1329,11 +1365,146 @@ def _require_trade_realized_pnl(trades: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
+def _enrich_trades_with_company(
+    trades: pd.DataFrame,
+    *,
+    reports: pd.DataFrame,
+    current_holdings: pd.DataFrame,
+    monthly_holdings: pd.DataFrame,
+    position_episodes: pd.DataFrame,
+) -> pd.DataFrame:
+    if trades.empty:
+        return trades
+    if "symbol" not in trades.columns:
+        raise RuntimeError("data/sim/trades.csv is missing symbol; rerun the account simulation first")
+
+    out = trades.copy()
+    out["symbol"] = out["symbol"].astype(str).str.strip()
+
+    company_by_report_id = _company_lookup_by_report_id(reports)
+    company_by_symbol = _company_lookup_by_symbol(
+        reports,
+        current_holdings,
+        position_episodes,
+        monthly_holdings,
+    )
+
+    report_company = (
+        out["report_id"].astype(str).str.strip().map(company_by_report_id)
+        if "report_id" in out.columns
+        else pd.Series([None] * len(out), index=out.index)
+    )
+    symbol_company = out["symbol"].map(company_by_symbol)
+
+    company = report_company.combine_first(symbol_company)
+    missing = company.isna() | company.astype(str).str.strip().eq("")
+    company.loc[missing] = out.loc[missing, "symbol"]
+    out["company"] = company.astype(str)
+    out["reason_detail"] = _trade_reason_details(out)
+    return out
+
+
+def _trade_reason_details(trades: pd.DataFrame) -> pd.Series:
+    if trades.empty:
+        return pd.Series(dtype=str)
+    required = {"account_id", "date", "reason"}
+    if not required.issubset(trades.columns):
+        return pd.Series([""] * len(trades), index=trades.index, dtype=str)
+
+    grouped_reasons = trades.groupby(["account_id", "date"], sort=False)["reason"].apply(
+        lambda values: tuple(str(value) for value in values if str(value))
+    )
+
+    def detail(row: pd.Series) -> str:
+        account_id = str(row.get("account_id") or "")
+        reason = str(row.get("reason") or "")
+        side = str(row.get("side") or "")
+        same_day_reasons = frozenset(grouped_reasons.get((row.get("account_id"), row.get("date")), ()))
+        return _trade_reason_detail(account_id, side, reason, same_day_reasons)
+
+    return trades.apply(detail, axis=1).astype(str)
+
+
+def _trade_reason_detail(
+    account_id: str,
+    side: str,
+    reason: str,
+    same_day_reasons: frozenset[str],
+) -> str:
+    if reason == "rebalance_buy":
+        if "trailing_profit_trim" in same_day_reasons:
+            fraction = "75%" if "partial75" in account_id else "100%"
+            return f"이익 보호 trim 이후 현금 게이트를 통과해 후보 목표비중의 {fraction}만 재투입"
+        if _is_pit_signal_account(account_id):
+            return "리밸런싱일 후보 조건 통과: 점수 상위 편입 또는 목표비중 증액"
+        return "목표 비중 대비 부족분 매수"
+    if reason == "rebalance_sell":
+        if _is_pit_signal_account(account_id):
+            return "보유 유지 조건 이탈: 점수권 이탈 또는 새 후보에서 제외되어 매도"
+        return "목표 비중 초과분 매도"
+    if reason == "retained_cap_trim":
+        return "수익률 +60% 이상 보유 종목이 계좌 45%를 초과해 40% 비중까지 축소"
+    if reason == "trailing_profit_trim":
+        return "수익률 +100% 이상 이후 보유 고점 대비 25% 이상 하락해 20% 비중까지 축소"
+    if reason == "target_hit":
+        return "리포트 목표가 도달로 포지션 청산"
+    if reason == "stop_loss_price":
+        return "가격 손절 조건 충족으로 포지션 청산"
+    if reason == "stop_loss_time":
+        return "보유 기간 손절 조건 충족으로 포지션 청산"
+    if reason == "stop_loss_average_down":
+        return "물타기 이후 손실 제한 조건 충족으로 포지션 청산"
+    if reason == "stop_loss_report_age":
+        return "리포트 발간 후 허용 기간 초과로 포지션 청산"
+    if reason == "stop_loss_max_hold":
+        return "최대 보유 기간 도달로 포지션 청산"
+    if side == "buy":
+        return "매수 조건 충족"
+    if side == "sell":
+        return "매도 조건 충족"
+    return reason
+
+
+def _is_pit_signal_account(account_id: str) -> bool:
+    return account_id.startswith("pit_trend_") or account_id.startswith("pit_score_")
+
+
+def _company_lookup_by_report_id(reports: pd.DataFrame) -> dict[str, str]:
+    if reports.empty or not {"report_id", "company"}.issubset(reports.columns):
+        return {}
+    frame = reports[["report_id", "company"]].copy()
+    frame["report_id"] = frame["report_id"].astype(str).str.strip()
+    frame["company"] = frame["company"].astype(str).str.strip()
+    valid_company = frame["company"].ne("") & ~frame["company"].str.casefold().isin({"nan", "none", "null"})
+    frame = frame[frame["report_id"].ne("") & valid_company]
+    return dict(zip(frame["report_id"], frame["company"], strict=True))
+
+
+def _company_lookup_by_symbol(*frames: pd.DataFrame) -> dict[str, str]:
+    pairs = []
+    for frame in frames:
+        if frame.empty or not {"symbol", "company"}.issubset(frame.columns):
+            continue
+        pair = frame[["symbol", "company"]].copy()
+        pair["symbol"] = pair["symbol"].astype(str).str.strip()
+        pair["company"] = pair["company"].astype(str).str.strip()
+        valid_company = pair["company"].ne("") & ~pair["company"].str.casefold().isin({"nan", "none", "null"})
+        pair = pair[pair["symbol"].ne("") & valid_company]
+        if not pair.empty:
+            pairs.append(pair)
+    if not pairs:
+        return {}
+
+    merged = pd.concat(pairs, ignore_index=True).drop_duplicates("symbol", keep="first")
+    return dict(zip(merged["symbol"], merged["company"], strict=True))
+
+
 def _compact_trades(rows: list[dict[str, Any]]) -> dict[str, Any]:
     columns = [
         "account_id",
         "date",
         "symbol",
+        "company",
         "side",
         "qty",
         "fill_price_krw",
@@ -1341,6 +1512,7 @@ def _compact_trades(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "realized_pnl_krw",
         "cash_after_krw",
         "reason",
+        "reason_detail",
         "report_id",
     ]
     return _compact_table(rows, columns)
@@ -1367,6 +1539,81 @@ def _compact_daily_decisions(
     table = _compact_table(rows, columns)
     table["metadata"] = _daily_forward_metadata(metadata or {})
     return table
+
+
+def _web_portfolio_account_ids(
+    account_catalog: list[dict[str, Any]], accounts: list[dict[str, Any]]
+) -> list[str]:
+    available = {str(row.get("account_id")) for row in [*account_catalog, *accounts] if row.get("account_id")}
+    wanted = [*WEB_PORTFOLIO_ACCOUNT_IDS, *WEB_PORTFOLIO_BENCHMARK_IDS]
+    return [account_id for account_id in dict.fromkeys(wanted) if account_id in available]
+
+
+def _account_shard_filename(account_id: str) -> str:
+    if not _ACCOUNT_ID_PATTERN.fullmatch(account_id):
+        raise RuntimeError(f"Unsupported account id for web shard filename: {account_id}")
+    return f"{account_id}.json"
+
+
+def _rows_by_account(rows: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
+    grouped: dict[str, list[dict[str, Any]]] = {}
+    for row in rows:
+        account_id = str(row.get("account_id", ""))
+        if account_id:
+            grouped.setdefault(account_id, []).append(row)
+    return grouped
+
+
+def _write_portfolio_equity_shards(out: Path, rows: list[dict[str, Any]], account_ids: list[str]) -> None:
+    shard_root = out / "portfolio" / "equity"
+    accounts: list[dict[str, Any]] = []
+    rows_by_account = _rows_by_account(rows)
+    for account_id in account_ids:
+        shard = _compact_equity_curves(rows_by_account.get(account_id, []))
+        relative_path = f"portfolio/equity/{_account_shard_filename(account_id)}"
+        _write_product_json(out / relative_path, shard)
+        accounts.append(
+            {
+                "account_id": account_id,
+                "path": relative_path,
+                "row_count": _compact_equity_row_count(shard),
+            }
+        )
+    _write_product_json(
+        shard_root / "index.json",
+        {"schema_version": "1.0.0", "accounts": accounts},
+    )
+
+
+def _write_portfolio_daily_decision_shards(
+    out: Path,
+    rows: list[dict[str, Any]],
+    metadata: dict[str, Any],
+    account_ids: list[str],
+) -> None:
+    shard_root = out / "portfolio" / "daily-decisions"
+    accounts: list[dict[str, Any]] = []
+    rows_by_account = _rows_by_account(rows)
+    for account_id in account_ids:
+        account_rows = rows_by_account.get(account_id, [])
+        shard = _compact_daily_decisions(account_rows, metadata)
+        relative_path = f"portfolio/daily-decisions/{_account_shard_filename(account_id)}"
+        _write_product_json(out / relative_path, shard)
+        accounts.append(
+            {
+                "account_id": account_id,
+                "path": relative_path,
+                "row_count": len(account_rows),
+            }
+        )
+    _write_product_json(
+        shard_root / "index.json",
+        {
+            "schema_version": "1.0.0",
+            "metadata": _daily_forward_metadata(metadata),
+            "accounts": accounts,
+        },
+    )
 
 
 def _daily_forward_metadata(metadata: dict[str, Any]) -> dict[str, Any]:
@@ -1443,6 +1690,14 @@ def _compact_equity_curves(rows: list[dict[str, Any]]) -> dict[str, Any]:
     return {"dates": dates, "series": series}
 
 
+def _compact_equity_row_count(artifact: dict[str, Any]) -> int:
+    dates = artifact.get("dates")
+    series = artifact.get("series")
+    if not isinstance(dates, list) or not isinstance(series, list):
+        return 0
+    return len(dates) * len(series)
+
+
 def _compact_cell(value: Any) -> Any:
     if value in {"", None}:
         return None
@@ -1510,9 +1765,9 @@ def _build_manifest(out: Path, overview: dict[str, Any]) -> dict[str, Any]:
         "current_holdings": _json_row_count(out / "portfolio" / "holdings.json"),
         "monthly_holdings": _json_row_count(out / "portfolio" / "monthly-holdings.json"),
         "trades": _json_row_count(out / "portfolio" / "trades.json"),
-        "daily_decisions": _json_row_count(out / "portfolio" / "daily-decisions.json"),
+        "daily_decisions": _json_shard_row_count(out, out / "portfolio" / "daily-decisions" / "index.json"),
         "position_episodes": _json_row_count(out / "portfolio" / "episodes.json"),
-        "equity_daily": _json_row_count(out / "portfolio" / "equity-daily.json"),
+        "equity_daily": _json_shard_row_count(out, out / "portfolio" / "equity" / "index.json"),
         "accounts": _json_row_count(out / "portfolio" / "accounts.json"),
         "account_catalog": _json_row_count(out / "accounts" / "catalog.json"),
         "report_board_candidates": _json_row_count(out / "report-board" / "candidates.json"),
@@ -1565,6 +1820,35 @@ def _json_row_count(path: Path) -> int:
         if isinstance(table, dict) and isinstance(table.get("rows"), list):
             return len(table["rows"])
     return 1
+
+
+def _json_shard_row_count(out: Path, index_path: Path) -> int:
+    if not index_path.exists():
+        return 0
+    index = _read_json(index_path)
+    accounts = index.get("accounts") if isinstance(index, dict) else None
+    if not isinstance(accounts, list):
+        return 0
+    total = 0
+    for account in accounts:
+        if not isinstance(account, dict):
+            continue
+        shard_path_text = account.get("path")
+        if not isinstance(shard_path_text, str):
+            continue
+        shard_path = out / shard_path_text
+        if not shard_path.exists():
+            continue
+        shard = _read_json(shard_path)
+        if (
+            isinstance(shard, dict)
+            and isinstance(shard.get("dates"), list)
+            and isinstance(shard.get("series"), list)
+        ):
+            total += len(shard["dates"]) * len(shard["series"])
+        else:
+            total += _json_row_count(shard_path)
+    return total
 
 
 def _records(df: pd.DataFrame) -> list[dict[str, Any]]:
@@ -1909,8 +2193,13 @@ def _enrich_report_row_with_price_series(
     if group.empty:
         return _with_report_target_metrics(report)
 
-    publication_ts = pd.to_datetime(report.get("date"), errors="coerce")
-    last_close_ts = pd.to_datetime(report.get("last_close_date"), errors="coerce")
+    publication_ts = pd.to_datetime(
+        cast(str | float | int | pd.Timestamp, report.get("date")), errors="coerce"
+    )
+    last_close_ts = pd.to_datetime(
+        cast(str | float | int | pd.Timestamp, report.get("last_close_date")),
+        errors="coerce",
+    )
     if pd.isna(last_close_ts):
         last_close_ts = group["date"].max()
 

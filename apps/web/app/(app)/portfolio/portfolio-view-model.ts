@@ -17,7 +17,7 @@ import {
   getAccountCatalog,
   getAccountingReconciliations,
   getCurrentHoldings,
-  getEquityDaily,
+  getEquityDailyForAccounts,
   getLatestReportTargetsBySymbol,
   getAccountLabel,
   getPositionEpisodes,
@@ -47,7 +47,6 @@ const PRIMARY_PORTFOLIO_ACCOUNT_IDS = [
 
 export function buildPortfolioLandingModel(): PortfolioLandingModel {
   const allHoldings = getCurrentHoldings();
-  const allEquity = getEquityDaily();
   const summaries = getSummaryRows();
   const allTrades = getTrades();
   const leaderboardRows = getAccountLeaderboard();
@@ -58,13 +57,13 @@ export function buildPortfolioLandingModel(): PortfolioLandingModel {
   const defaultAccount = defaultPortfolioAccount(portfolioRows);
   const portfolioIds = new Set(portfolioRows.map((row) => row.id));
   const frontierIds = new Set([...portfolioRows.map((row) => row.id), ...benchmarkRows.map((row) => row.id)]);
+  const equity = getEquityDailyForAccounts([...frontierIds]);
   const accountLabels = Object.fromEntries(
     portfolioRows.map((row) => [row.id, displayPortfolioName(row.id, row.label)]),
   );
   const summaryById = new Map(summaries.map((row) => [row.account_id, row]));
   const holdingsByAccount = groupByAccount(allHoldings.filter((row) => frontierIds.has(row.account_id)));
   const trades = allTrades.filter((row) => portfolioIds.has(row.account_id));
-  const equity = allEquity.filter((row) => frontierIds.has(row.account_id));
   const snapshotFromRow = (row: AccountLeaderboardRow): PortfolioAccountSnapshot => {
     const summary = summaryById.get(row.id);
     const holdings = holdingsByAccount.get(row.id) ?? [];
@@ -112,7 +111,6 @@ export function buildPortfolioLandingModel(): PortfolioLandingModel {
 export function buildPortfolioViewModel(selectedAccount?: string): PortfolioViewModel {
   const allHoldings = getCurrentHoldings();
   const allAccounting = getAccountingReconciliations();
-  const allEquity = getEquityDaily();
   const summaries = getSummaryRows();
   const allTrades = getTrades();
   const allEpisodes = getPositionEpisodes();
@@ -128,7 +126,6 @@ export function buildPortfolioViewModel(selectedAccount?: string): PortfolioView
     ...summaries.map((row) => row.account_id),
     ...allHoldings.map((row) => row.account_id),
     ...allTrades.map((row) => row.account_id),
-    ...allEquity.map((row) => row.account_id),
   ]);
   const accounts = Array.from(new Set([defaultAccount, ...portfolioRows.map((row) => row.id)])).filter((account_id) =>
     dataAccountIds.has(account_id),
@@ -165,7 +162,7 @@ export function buildPortfolioViewModel(selectedAccount?: string): PortfolioView
   const holdings = allHoldings.filter((row) => row.account_id === activeAccount);
   const accounting = allAccounting.filter((row) => row.account_id === activeAccount);
   const benchmarkIds = new Set(benchmarkRows.map((row) => row.id));
-  const equity = allEquity.filter((row) => row.account_id === activeAccount || benchmarkIds.has(row.account_id));
+  const equity = getEquityDailyForAccounts([activeAccount, ...benchmarkIds]);
   const trades = allTrades.filter((row) => row.account_id === activeAccount);
   const episodes = allEpisodes.filter((row) => row.account_id === activeAccount);
   const activeSummary = summaries.find((row) => row.account_id === activeAccount);
@@ -190,7 +187,7 @@ export function buildPortfolioViewModel(selectedAccount?: string): PortfolioView
       .map((reportId) => [reportId, getReportSymbolById(reportId)])
       .filter((entry): entry is [string, string] => Boolean(entry[1])),
   );
-  const latestEquityDate = allEquity
+  const latestEquityDate = equity
     .filter((row) => accounts.includes(row.account_id))
     .reduce((latest, row) => (row.date > latest ? row.date : latest), '');
   return {

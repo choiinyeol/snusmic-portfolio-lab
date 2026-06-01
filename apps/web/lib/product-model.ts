@@ -17,6 +17,14 @@ import {
 
 export const TARGET_BENCHMARK_ID = 'benchmark_kodex200';
 export const OBJECTIVE_MAX_DRAWDOWN = 0.15;
+const DEFAULT_PORTFOLIO_ACCOUNT_PRIORITY = [
+  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5',
+  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5',
+  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5',
+  'pit_trend_top5',
+  'pit_score_top5',
+  'smic_follower',
+] as const;
 export const FOLLOWER_ACCOUNT_IDS = [
   'smic_follower',
   'smic_follower_v2',
@@ -182,6 +190,7 @@ export function portfolioAccountHref(accountId: string): string {
 export type ResearchCandidate = {
   report: ReportRow;
   rankBasis: string;
+  score: number;
   bucket: 'fresh' | 'large-upside' | 'near-target' | 'active';
 };
 
@@ -198,9 +207,9 @@ export function getDefaultPortfolioAccount(): string {
   const summaries = getSummaryRows();
   const holdings = getCurrentHoldings();
   const summaryIds = new Set(summaries.map((row) => row.account_id));
-  const preferredFollower = FOLLOWER_ACCOUNT_IDS.find((accountId) => summaryIds.has(accountId));
-  if (preferredFollower) {
-    return preferredFollower;
+  const preferredAccount = DEFAULT_PORTFOLIO_ACCOUNT_PRIORITY.find((accountId) => summaryIds.has(accountId));
+  if (preferredAccount) {
+    return preferredAccount;
   }
   const accountsWithOpenHoldings = new Set(holdings.map((row) => row.account_id));
   const rankedAccounts = getObjectivePassingRows(getAccountLeaderboard()).filter((row) => summaryIds.has(row.id));
@@ -316,6 +325,7 @@ export function getResearchCandidates(): ResearchCandidate[] {
       report,
       bucket: candidate.bucket,
       rankBasis: candidate.rankBasis,
+      score: candidate.score,
     };
   });
 }

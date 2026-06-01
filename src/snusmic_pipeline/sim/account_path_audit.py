@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any, cast
 
 import pandas as pd
 
@@ -113,8 +114,8 @@ def _equity_delta_path_table(equity: pd.DataFrame, account_id: str, baseline_id:
         "",
         f"- Positive daily delta share: {_pct(positive_share)}",
         f"- Positive share after paths diverge: {_pct(nonzero_positive_share)}",
-        f"- First nonzero delta date: {first_nonzero.date().isoformat() if pd.notna(first_nonzero) else '-'}",
-        f"- First positive delta date: {first_positive.date().isoformat() if pd.notna(first_positive) else '-'}",
+        f"- First nonzero delta date: {_format_timestamp_date(first_nonzero)}",
+        f"- First positive delta date: {_format_timestamp_date(first_positive)}",
         "",
         "| year-end | candidate equity | baseline equity | delta |",
         "| --- | ---: | ---: | ---: |",
@@ -124,10 +125,10 @@ def _equity_delta_path_table(equity: pd.DataFrame, account_id: str, baseline_id:
             "| "
             + " | ".join(
                 [
-                    row.Index.date().isoformat(),
-                    _money_m(getattr(row, account_id)),
-                    _money_m(getattr(row, baseline_id)),
-                    _money_m(row.delta),
+                    _format_timestamp_date(row.Index),
+                    _money_m(cast(float, getattr(row, account_id))),
+                    _money_m(cast(float, getattr(row, baseline_id))),
+                    _money_m(cast(float, row.delta)),
                 ]
             )
             + " |"
@@ -168,9 +169,9 @@ def _symbol_pnl_delta_table(
                 [
                     f"`{row.symbol}`",
                     _escape_md_cell(row.company),
-                    _money_m(getattr(row, account_id)),
-                    _money_m(getattr(row, baseline_id)),
-                    _money_m(row.delta),
+                    _money_m(cast(float, getattr(row, account_id))),
+                    _money_m(cast(float, getattr(row, baseline_id))),
+                    _money_m(cast(float, row.delta)),
                 ]
             )
             + " |"
@@ -188,8 +189,8 @@ def _episode_symbol_pnl(episodes: pd.DataFrame, account_ids: list[str]) -> pd.Da
     )
     selected["pnl"] = selected["realized_pnl_krw"] + selected["unrealized_pnl_krw"]
     return (
-        selected.groupby(["account_id", "symbol", "company"], as_index=False)["pnl"]
-        .sum()
+        selected.groupby(["account_id", "symbol", "company"], as_index=False)
+        .agg(pnl=("pnl", "sum"))
         .sort_values(["account_id", "pnl"], ascending=[True, False])
     )
 
@@ -211,8 +212,16 @@ def _trade_reason_delta_table(trades: pd.DataFrame, account_id: str, baseline_id
     ]
     reasons = sorted(set(selected["reason"].astype(str)))
     for reason in reasons:
-        candidate = counts.loc[(account_id, reason)] if (account_id, reason) in counts.index else None
-        baseline = counts.loc[(baseline_id, reason)] if (baseline_id, reason) in counts.index else None
+        candidate = (
+            cast(pd.Series, counts.loc[(account_id, reason)])
+            if (account_id, reason) in counts.index
+            else None
+        )
+        baseline = (
+            cast(pd.Series, counts.loc[(baseline_id, reason)])
+            if (baseline_id, reason) in counts.index
+            else None
+        )
         candidate_trades = int(candidate["trades"]) if candidate is not None else 0
         baseline_trades = int(baseline["trades"]) if baseline is not None else 0
         candidate_pnl = float(candidate["realized_pnl"]) if candidate is not None else 0.0
@@ -288,6 +297,12 @@ def _pct(value: float) -> str:
     if pd.isna(value):
         return "-"
     return f"{float(value) * 100:.2f}%"
+
+
+def _format_timestamp_date(value: object) -> str:
+    if pd.isna(cast(Any, value)):
+        return "-"
+    return cast(pd.Timestamp, value).date().isoformat()
 
 
 def _summary_formatter(column: str):
