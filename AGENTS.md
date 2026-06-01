@@ -13,7 +13,8 @@ This repository defaults to a fast local engineering loop. Prefer direct reading
 - Work directly in this repo unless the user explicitly invokes a workflow such as `$ralph`, `$ralplan`, `$team`, or `$ultragoal`.
 - Do not create `.omx` plans, audits, session state, or continuation artifacts during ordinary coding tasks.
 - Do not spawn subagents for routine cleanup, small refactors, formatting, documentation edits, or targeted fixes.
-- Do not watch GitHub Actions, create releases, tag versions, commit, or push unless the user explicitly asks for those external actions.
+- The user has explicitly requested a standing release finish policy for this repo: after completing work, use the project-local `release-finish` skill to update docs/README and CHANGELOG or release notes, commit, tag, and push.
+- Do not watch GitHub Actions, create GitHub Release objects, or delete branches unless the user explicitly asks for those external actions.
 - Favor local evidence: file inspection, focused lint, focused tests, typecheck, and build smoke checks.
 
 ## Fast Local Verification
@@ -68,9 +69,12 @@ Tests should support human review, not replace judgment.
 
 ## Git And Release
 
-- Do not commit or push unless explicitly requested.
+- Use `.codex/skills/release-finish/SKILL.md` before every final completion report.
+- Commit, create an annotated tag, and push the branch plus tag after each completed task in this repository.
+- Keep README and active docs Korean-first by default, with English content included for user-facing docs.
+- Update `CHANGELOG.md` or equivalent release notes for every release-finish commit.
 - When committing, use the repository's lore-style commit message: intent first, then useful trailers such as `Tested:`, `Not-tested:`, `Rejected:`, `Confidence:`, and `Scope-risk:`.
-- Version bumps, tags, GitHub releases, branch deletion, and CI monitoring are external actions and require explicit user instruction.
+- Version bumps and tags are covered by the standing release-finish instruction. GitHub Release objects, branch deletion, and CI monitoring still require explicit user instruction.
 
 ## Completion Report
 

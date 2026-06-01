@@ -1,5 +1,19 @@
 ﻿# Changelog
 
+## v0.30.2 - Korean-first docs and release finish policy
+
+- Makes README and active docs Korean-first by default while keeping English sections for bilingual review.
+- Adds a docs index that states the Korean-first documentation policy and links the main product, data, architecture, and backtest contracts.
+- Adds the project-local `release-finish` Codex skill so future work ends with docs/README cleanup, CHANGELOG or release notes, a lore commit, an annotated tag, and branch/tag push.
+- Updates repository agent guidance so the release-finish workflow is the standing completion policy for this repo.
+- Bumps Python and web package versions to `0.30.2`.
+
+Verification:
+
+- `python C:\Users\FELAB\.codex\skills\.system\skill-creator\scripts\quick_validate.py .\.codex\skills\release-finish`
+- `git diff --check`
+- `uv run ruff check src\snusmic_pipeline\__init__.py`
+
 ## v0.30.1 - Sharded portfolio artifacts and CI recovery
 
 - Splits portfolio equity and daily-decision web payloads into curated account shards so the static app no longer commits or deploys the full aggregate simulation time series.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Release Finish"
+  short_description: "Docs, changelog, commit, tag, push."
+  default_prompt: "Use release-finish to close out repo work with documentation cleanup, release notes, verification, a lore commit, an annotated tag, and branch/tag push."

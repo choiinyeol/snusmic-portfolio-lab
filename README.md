@@ -1,81 +1,83 @@
 # SNUSMIC Portfolio Lab
 
-SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, account simulations, and static web artifacts. The latest release closes the PIT strategy research sprint and keeps the web payload deployable by sharding large portfolio time series by curated account.
+## 한국어
+
+SNUSMIC Portfolio Lab은 SMIC 리서치 리포트를 point-in-time(PIT) 데이터셋, 계좌 시뮬레이션, 정적 웹 아티팩트로 변환하는 프로젝트입니다. 현재 릴리스는 PIT 전략 리서치 스프린트를 마무리했고, 큰 포트폴리오 시계열은 선별 계좌별 shard로 나누어 웹 배포 payload를 작게 유지합니다.
 
 [Live site](https://smic-portfolio.vercel.app) - [Changelog](./CHANGELOG.md) - [Design system](./DESIGN.md)
 
-## What This Repo Does
+### 이 저장소가 하는 일
 
-- Collects SMIC report PDFs and extracted report rows.
-- Normalizes reports, prices, FX, and benchmark data into `data/warehouse`.
-- Exports a point-in-time research board at `data/sim/pit-research-board.csv`.
-- Runs benchmark, follower, and curated PIT account simulations with real ledger constraints: cash, deposits, integer shares, fees, taxes, trades, holdings, and equity paths.
-- Exports deterministic `data/web` JSON/CSV artifacts consumed by the static Next.js app, with large portfolio equity and decision series split into account shards.
-- Presents report verification, statistics, and account views through page-shaped frontend view models instead of raw artifact tables.
-- Shows curated PIT/follower account curves alongside benchmarks, with dense trade markers and benchmark lines controlled in the chart UI.
+- SMIC 리포트 PDF와 추출된 리포트 행을 수집합니다.
+- 리포트, 가격, FX, 벤치마크 데이터를 `data/warehouse`의 PIT warehouse로 정규화합니다.
+- `data/sim/pit-research-board.csv`에 point-in-time 리서치 보드를 내보냅니다.
+- 현금, 적립금, 정수 주식 수량, 수수료, 세금, 거래, 보유, equity path를 포함한 벤치마크/팔로워/선별 PIT 계좌 시뮬레이션을 실행합니다.
+- 정적 Next.js 앱이 읽는 결정론적 `data/web` JSON/CSV 아티팩트를 생성하고, 큰 portfolio equity 및 daily decision 시계열은 계좌별 shard로 나눕니다.
+- 원시 artifact table 대신 page-shaped frontend view model로 리포트 검증, 통계, 계좌 화면을 제공합니다.
+- 선별 PIT/follower 계좌 곡선을 벤치마크와 함께 보여주고, chart UI에서 trade marker와 benchmark line을 제어합니다.
 
-## What It Does Not Do
+### 하지 않는 일
 
-- No live broker integration or order entry.
-- No live market-data fetches in the web app.
-- No future-looking signals in PIT account simulations.
-- No automatic admission of every generated research branch into the product UI.
+- 실시간 브로커 연동이나 주문 제출을 하지 않습니다.
+- 웹 앱에서 실시간 market data를 가져오지 않습니다.
+- PIT 계좌 시뮬레이션에서 미래 정보를 쓰지 않습니다.
+- 생성된 모든 리서치 branch를 자동으로 product UI에 올리지 않습니다.
 
-## Core Commands
+### 핵심 명령
 
-The repo uses Python and Node entrypoints instead of shell scripts so the same commands work on macOS and Windows.
+이 저장소는 shell script 대신 Python/Node entrypoint를 사용해 macOS, Windows, CI에서 같은 명령을 실행합니다.
 
 ```bash
 uv sync --group dev
 pnpm --dir apps/web install
 ```
 
-Refresh data and static artifacts:
+데이터와 정적 artifact 갱신:
 
 ```bash
 python -m snusmic_pipeline refresh-web-artifacts
 ```
 
-Full rebuild:
+전체 재생성:
 
 ```bash
 python -m snusmic_pipeline rebuild-web-artifacts
 ```
 
-Manual PIT dataset export:
+수동 PIT dataset export:
 
 ```bash
 python -m snusmic_pipeline export-pit-board --warehouse data/warehouse --out data/sim/pit-research-board.csv --start 2021-01-04 --cadence M
 ```
 
-Fixed account simulation:
+고정 계좌 시뮬레이션:
 
 ```bash
 python -m snusmic_pipeline run-sim --warehouse data/warehouse --out data/sim
 ```
 
-Web artifact export:
+웹 artifact export:
 
 ```bash
 python -m snusmic_pipeline export-web --warehouse data/warehouse --sim data/sim --out data/web
 ```
 
-## Curated Portfolio Set
+### 선별 포트폴리오
 
-The generated artifacts may contain many research branches. `/portfolio` intentionally shows only the representative shortlist:
+생성된 artifact에는 많은 리서치 branch가 들어갈 수 있지만, `/portfolio`는 대표 shortlist만 보여줍니다.
 
-| Display name | What it means |
+| 표시 이름 | 의미 |
 | --- | --- |
-| Partial 75 | Current local-return candidate. Quarterly Top5 PIT trend account; retains winners, trims large winners after a 25% pullback from observed holding-period high toward a 20% account weight, and redeploys only 75% of eligible cash when cash is at least 12.5% of equity. |
-| CashGate 12.5 | Robustness baseline for Partial 75. Same retained-winner/trailing-trim shell, but redeploys only when cash reaches the 12.5% gate. |
-| TrailTrim 20 | Simpler profit-protection baseline. Keeps the PIT trend shell and trims concentrated winners toward a 20% cap without the cash redeploy branch. |
-| Trend Top5 | Simple point-in-time trend-score Top5 account. Useful as the low-complexity reference. |
-| Score Top5 | Simple point-in-time score Top5 account. Useful for checking whether the trend construction adds value. |
-| SMIC Follower | Report-follower baseline that tracks actual report-driven account behavior. |
+| Partial 75 | 현재 local-return 후보. Quarterly Top5 PIT trend 계좌이며 winner를 보유하고, 관측된 보유 기간 고점에서 25% 되돌림이 발생하면 20% account weight 쪽으로 trim하고, 현금이 equity의 12.5% 이상일 때 eligible cash의 75%만 재배치합니다. |
+| CashGate 12.5 | Partial 75의 robustness baseline. 같은 retained-winner/trailing-trim 구조를 쓰되, cash가 12.5% gate에 도달할 때만 재배치합니다. |
+| TrailTrim 20 | 더 단순한 profit-protection baseline. PIT trend shell을 유지하고 cash redeploy branch 없이 집중 winner를 20% cap 쪽으로 trim합니다. |
+| Trend Top5 | 단순 point-in-time trend-score Top5 계좌입니다. 낮은 복잡도의 기준점으로 씁니다. |
+| Score Top5 | 단순 point-in-time score Top5 계좌입니다. trend 구성이 실제로 가치를 더하는지 확인하는 기준입니다. |
+| SMIC Follower | 실제 리포트 기반 계좌 행동을 추적하는 report-follower baseline입니다. |
 
-All Weather, KODEX 200, QQQ, SPY, and GLD remain comparison benchmarks. Forward-looking oracle simulations remain diagnostics, not product accounts.
+All Weather, KODEX 200, QQQ, SPY, GLD는 비교 벤치마크로 유지합니다. Forward-looking oracle simulation은 진단용이며 product account가 아닙니다.
 
-## Data Flow
+### 데이터 흐름
 
 ```mermaid
 flowchart TB
@@ -92,21 +94,21 @@ flowchart TB
   WebData --> Next["apps/web static Next.js app"]
 ```
 
-## Documentation
+### 문서
 
-| Document | Purpose |
+| 문서 | 목적 |
 | --- | --- |
-| [docs/product-spec.md](./docs/product-spec.md) | Product intent and priorities |
-| [docs/data-artifact-policy.md](./docs/data-artifact-policy.md) | Committed data ownership and generated-cache policy |
-| [docs/backtest-contract.md](./docs/backtest-contract.md) | Account, PIT, and no-lookahead contract |
-| [docs/technical-architecture.md](./docs/technical-architecture.md) | Pipeline, artifact, and route map |
+| [docs/product-spec.md](./docs/product-spec.md) | 제품 의도와 우선순위 |
+| [docs/data-artifact-policy.md](./docs/data-artifact-policy.md) | 커밋되는 데이터의 소유권과 생성 캐시 정책 |
+| [docs/backtest-contract.md](./docs/backtest-contract.md) | 계좌, PIT, no-lookahead 계약 |
+| [docs/technical-architecture.md](./docs/technical-architecture.md) | pipeline, artifact, route map |
 | [DESIGN.md](./DESIGN.md) | UI design system |
 
-## Web App
+### 웹 앱
 
-The web app is a static reader over committed artifacts. It must not call live market APIs or reconstruct simulation logic in the browser.
+웹 앱은 커밋된 artifact를 읽는 정적 reader입니다. live market API를 호출하거나 browser에서 시뮬레이션 logic을 재구성하면 안 됩니다.
 
-Main routes:
+주요 route:
 
 - `/`
 - `/portfolio`
@@ -119,7 +121,7 @@ Main routes:
 - `/calendar`
 - `/statistics`
 
-## Validation
+### 검증
 
 ```bash
 uv run ruff check src tests scripts
@@ -131,33 +133,57 @@ pnpm --dir apps/web build
 pnpm --dir apps/web smoke:static
 ```
 
-`tests/test_web_artifacts.py` is a release-gate contract suite. It performs a full web export and should not be used as the default edit-test loop.
+`tests/test_web_artifacts.py`는 release-gate contract suite입니다. full web export를 수행하므로 기본 edit-test loop로 쓰지 않습니다.
 
-Deployment build, also cross-platform:
+배포 build도 cross-platform입니다.
 
 ```bash
 pnpm build
 node scripts/prepare_vercel_prebuilt.mjs
 ```
 
-## Project Layout
+### 프로젝트 구조
 
 ```text
-apps/web/                  Static Next.js app
-data/warehouse/            Normalized report, price, FX, and benchmark inputs
-data/sim/                  Simulation outputs and PIT research board
-data/web/                  Canonical static web artifacts, with portfolio series sharded by curated account
-docs/                      Product, architecture, testing, and agent docs
-scripts/                   Operational rebuild/refresh helpers
-src/snusmic_pipeline/      Python package and CLI
+apps/web/                  정적 Next.js 앱
+data/warehouse/            정규화된 report, price, FX, benchmark input
+data/sim/                  simulation output과 PIT research board
+data/web/                  canonical static web artifact, portfolio series는 선별 계좌별 shard
+docs/                      제품, 아키텍처, 테스트, agent 문서
+scripts/                   운영용 rebuild/refresh helper
+src/snusmic_pipeline/      Python package와 CLI
 tests/                     Pytest suite
 ```
 
-## Current Contract
+### 현재 계약
 
-This repo is now intentionally PIT-first:
+이 저장소는 PIT-first입니다.
+
+1. 신뢰할 수 있는 point-in-time data를 만듭니다.
+2. benchmark/follower simulation은 context로 유지합니다.
+3. 새 계좌를 promotion하기 전에 전략 idea, result, retrospective를 Markdown으로 기록합니다.
+4. parameter search output이 investable truth처럼 보이지 않도록 product UI에는 선별 shortlist만 보여줍니다.
+
+## English
+
+SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, account simulations, and static web artifacts. The current release closes the PIT strategy research sprint and keeps web payloads deployable by sharding large portfolio time series by curated account.
+
+### What This Repo Does
+
+- Collects SMIC report PDFs and extracted report rows.
+- Normalizes reports, prices, FX, and benchmark data into `data/warehouse`.
+- Exports a point-in-time research board at `data/sim/pit-research-board.csv`.
+- Runs benchmark, follower, and curated PIT account simulations with real ledger constraints: cash, deposits, integer shares, fees, taxes, trades, holdings, and equity paths.
+- Exports deterministic `data/web` JSON/CSV artifacts consumed by the static Next.js app, with large portfolio equity and decision series split into account shards.
+- Presents report verification, statistics, and account views through page-shaped frontend view models instead of raw artifact tables.
+
+### Current Contract
+
+This repo is intentionally PIT-first:
 
 1. Build trustworthy point-in-time data.
-2. Keep benchmark/follower simulations for context.
+2. Keep benchmark and follower simulations for context.
 3. Record strategy ideas, results, and retrospectives in Markdown before promoting any account.
 4. Show only a curated shortlist in the product UI so parameter search output does not look like investable truth.
+
+For commands, routes, validation, and artifact ownership, see the Korean sections above; command names and paths are language-neutral.
