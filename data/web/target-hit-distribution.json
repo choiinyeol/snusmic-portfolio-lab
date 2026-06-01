@@ -32,35 +32,35 @@
   },
   "target_upside_buckets": [
     {
-      "avg_current_return": 0.5822,
+      "avg_current_return": 0.574023,
       "bucket": "0-25%",
       "count": 13,
       "target_hit_count": 11,
       "target_hit_rate": 0.846154
     },
     {
-      "avg_current_return": 1.156606,
+      "avg_current_return": 1.177556,
       "bucket": "25-50%",
       "count": 70,
       "target_hit_count": 42,
       "target_hit_rate": 0.6
     },
     {
-      "avg_current_return": 0.497318,
+      "avg_current_return": 0.500783,
       "bucket": "50-100%",
       "count": 82,
       "target_hit_count": 23,
       "target_hit_rate": 0.280488
     },
     {
-      "avg_current_return": 1.067321,
+      "avg_current_return": 0.991579,
       "bucket": "100-200%",
       "count": 24,
       "target_hit_count": 5,
       "target_hit_rate": 0.208333
     },
     {
-      "avg_current_return": 0.688717,
+      "avg_current_return": 0.703583,
       "bucket": "200%+",
       "count": 12,
       "target_hit_count": 2,
