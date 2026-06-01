@@ -1,15 +1,19 @@
 {
   "coverage": {
-    "report_performance_rows": 221,
+    "report_performance_rows": 240,
     "reports_without_performance": 0,
-    "warehouse_reports": 221
+    "warehouse_reports": 240
   },
   "extraction_quality": {
     "currency_counts": {
+      "CHF": 1,
+      "CNY": 2,
+      "EUR": 4,
       "HKD": 2,
       "JPY": 7,
-      "KRW": 158,
-      "USD": 49
+      "KRW": 177,
+      "TWD": 1,
+      "USD": 46
     },
     "page_status_counts": {
       "1": {
@@ -42,8 +46,15 @@
       "18": {
         "ok": 12
       },
+      "19": {
+        "ok": 12
+      },
       "2": {
         "ok": 12
+      },
+      "20": {
+        "needs_review": 2,
+        "ok": 10
       },
       "3": {
         "ok": 12
@@ -69,27 +80,62 @@
     },
     "rating_counts": {
       "Attention": 1,
-      "Buy": 179,
-      "Hold": 2,
+      "Buy": 196,
+      "Hold": 3,
       "Sell": 3,
-      "Strong Buy": 19,
-      "missing": 12
+      "Strong Buy": 23,
+      "missing": 14
     },
     "reason_counts": {
-      "missing_rating": 12,
+      "missing_base_target": 2,
+      "missing_rating": 14,
       "non_buy_rating:Attention": 1,
-      "non_buy_rating:Hold": 2,
+      "non_buy_rating:Hold": 3,
       "non_buy_rating:Sell": 3,
-      "note_case_target_ambiguous": 3
+      "note_case_target_ambiguous": 3,
+      "note_target_not_found": 2,
+      "status:needs_review": 2
     },
     "review_rows": [
+      {
+        "base_target": 5326.0,
+        "company": "Comfort Systems USA, Inc.",
+        "date": "2026-05-29T07:36:21",
+        "note": "markdown reextract",
+        "ordinal": 2,
+        "page": 1,
+        "rating": "",
+        "reasons": [
+          "missing_rating"
+        ],
+        "status": "ok",
+        "target_detail": "base=5326",
+        "ticker": "FIX",
+        "title": "Equity Research, Comfort Systems USA, Inc."
+      },
+      {
+        "base_target": 482.35,
+        "company": "Soitec SA",
+        "date": "2026-05-29T07:35:27",
+        "note": "markdown reextract",
+        "ordinal": 3,
+        "page": 1,
+        "rating": "",
+        "reasons": [
+          "missing_rating"
+        ],
+        "status": "ok",
+        "target_detail": "base=482.35",
+        "ticker": "SOIT",
+        "title": "Equity Research, Soitec SA"
+      },
       {
         "base_target": 238.0,
         "company": "Sensient Technologies Corp",
         "date": "2025-12-01T02:52:50",
         "note": "markdown reextract",
-        "ordinal": 12,
-        "page": 1,
+        "ordinal": 10,
+        "page": 2,
         "rating": "",
         "reasons": [
           "missing_rating"
@@ -104,7 +150,7 @@
         "company": "IMAX Corp",
         "date": "2025-12-01T02:51:23",
         "note": "markdown reextract",
-        "ordinal": 1,
+        "ordinal": 11,
         "page": 2,
         "rating": "",
         "reasons": [
@@ -120,8 +166,8 @@
         "company": "풍산",
         "date": "2025-11-11T04:39:51",
         "note": "markdown reextract; Korean numeric ticker; exchange prefix inferred as KRX; Non-buy rating: Hold",
-        "ordinal": 8,
-        "page": 2,
+        "ordinal": 6,
+        "page": 3,
         "rating": "Hold",
         "reasons": [
           "non_buy_rating:Hold"
@@ -136,8 +182,8 @@
         "company": "Doximity",
         "date": "2025-05-25T07:47:14",
         "note": "markdown reextract; Case target prices parsed; base target uses median case value; review scenario semantics",
-        "ordinal": 8,
-        "page": 3,
+        "ordinal": 6,
+        "page": 4,
         "rating": "Buy",
         "reasons": [
           "note_case_target_ambiguous"
@@ -152,8 +198,8 @@
         "company": "Sportradar",
         "date": "2025-05-25T07:46:55",
         "note": "markdown reextract",
-        "ordinal": 9,
-        "page": 3,
+        "ordinal": 7,
+        "page": 4,
         "rating": "",
         "reasons": [
           "missing_rating"
@@ -168,8 +214,8 @@
         "company": "펄어비스",
         "date": "2025-05-11T10:26:05",
         "note": "markdown reextract; Korean numeric ticker; exchange prefix inferred as KRX; Non-buy rating: Sell",
-        "ordinal": 3,
-        "page": 4,
+        "ordinal": 1,
+        "page": 5,
         "rating": "Sell",
         "reasons": [
           "non_buy_rating:Sell"
@@ -184,8 +230,8 @@
         "company": "Grindr Inc.",
         "date": "2024-11-21T06:51:53",
         "note": "markdown reextract",
-        "ordinal": 5,
-        "page": 5,
+        "ordinal": 3,
+        "page": 6,
         "rating": "",
         "reasons": [
           "missing_rating"
@@ -200,8 +246,8 @@
         "company": "크래프톤",
         "date": "2024-10-17T07:28:56",
         "note": "markdown reextract; Korean numeric ticker; exchange prefix inferred as KRX",
-        "ordinal": 3,
-        "page": 6,
+        "ordinal": 1,
+        "page": 7,
         "rating": "",
         "reasons": [
           "missing_rating"
@@ -216,8 +262,8 @@
         "company": "Eli Lilly & Co.",
         "date": "2023-11-22T03:40:16",
         "note": "markdown reextract",
-        "ordinal": 8,
-        "page": 8,
+        "ordinal": 6,
+        "page": 9,
         "rating": "",
         "reasons": [
           "missing_rating"
@@ -232,8 +278,8 @@
         "company": "파두",
         "date": "2023-11-12T08:39:23",
         "note": "markdown reextract; Korean numeric ticker; exchange prefix inferred as KRX; Non-buy rating: Hold",
-        "ordinal": 12,
-        "page": 8,
+        "ordinal": 10,
+        "page": 9,
         "rating": "Hold",
         "reasons": [
           "non_buy_rating:Hold"
@@ -248,7 +294,7 @@
         "company": "LX인터내셔널",
         "date": "2023-11-12T08:38:32",
         "note": "markdown reextract; Korean numeric ticker; exchange prefix inferred as KRX; Case target prices parsed; base target uses median case value; review scenario semantics",
-        "ordinal": 1,
+        "ordinal": 11,
         "page": 9,
         "rating": "Strong Buy",
         "reasons": [
@@ -264,8 +310,8 @@
         "company": "루닛",
         "date": "2023-05-25T03:51:41",
         "note": "markdown reextract; Korean numeric ticker; exchange prefix inferred as KRX; Case target prices parsed; base target uses median case value; review scenario semantics",
-        "ordinal": 5,
-        "page": 10,
+        "ordinal": 3,
+        "page": 11,
         "rating": "Buy",
         "reasons": [
           "note_case_target_ambiguous"
@@ -280,8 +326,8 @@
         "company": "Scorpio Tankers Inc.",
         "date": "2022-05-25T18:42:47",
         "note": "markdown reextract",
-        "ordinal": 11,
-        "page": 13,
+        "ordinal": 9,
+        "page": 14,
         "rating": "",
         "reasons": [
           "missing_rating"
@@ -296,8 +342,8 @@
         "company": "공구우먼",
         "date": "2022-04-16T16:01:43",
         "note": "markdown reextract; Korean numeric ticker; exchange prefix inferred as KRX; Non-buy rating: Attention",
-        "ordinal": 8,
-        "page": 14,
+        "ordinal": 6,
+        "page": 15,
         "rating": "Attention",
         "reasons": [
           "non_buy_rating:Attention"
@@ -312,7 +358,7 @@
         "company": "엔켐",
         "date": "2021-12-13T02:49:28",
         "note": "markdown reextract; Korean numeric ticker; exchange prefix inferred as KRX",
-        "ordinal": 1,
+        "ordinal": 11,
         "page": 15,
         "rating": "",
         "reasons": [
@@ -328,7 +374,7 @@
         "company": "엔씨소프트",
         "date": "2021-11-03T13:53:53",
         "note": "markdown reextract; Korean numeric ticker; exchange prefix inferred as KRX; Non-buy rating: Sell",
-        "ordinal": 1,
+        "ordinal": 11,
         "page": 16,
         "rating": "Sell",
         "reasons": [
@@ -344,8 +390,8 @@
         "company": "시그넷이브이",
         "date": "2021-06-06T14:13:36",
         "note": "markdown reextract; Korean numeric ticker; exchange prefix inferred as KRX",
-        "ordinal": 8,
-        "page": 16,
+        "ordinal": 6,
+        "page": 17,
         "rating": "",
         "reasons": [
           "missing_rating"
@@ -360,7 +406,7 @@
         "company": "West Fraser Timber. Co. Ltd",
         "date": "2021-05-31T08:01:21",
         "note": "markdown reextract",
-        "ordinal": 1,
+        "ordinal": 11,
         "page": 17,
         "rating": "",
         "reasons": [
@@ -376,8 +422,8 @@
         "company": "케이씨씨글라스",
         "date": "2021-05-06T09:31:42",
         "note": "markdown reextract; Korean numeric ticker; exchange prefix inferred as KRX",
-        "ordinal": 8,
-        "page": 17,
+        "ordinal": 6,
+        "page": 18,
         "rating": "",
         "reasons": [
           "missing_rating"
@@ -392,8 +438,8 @@
         "company": "국도화학",
         "date": "2021-04-15T03:11:45",
         "note": "markdown reextract; Korean numeric ticker; exchange prefix inferred as KRX",
-        "ordinal": 10,
-        "page": 17,
+        "ordinal": 8,
+        "page": 18,
         "rating": "",
         "reasons": [
           "missing_rating"
@@ -408,8 +454,8 @@
         "company": "Chewy",
         "date": "2020-12-05T13:35:55",
         "note": "markdown reextract; No explicit Base target; base target uses median scenario value; Non-buy rating: Sell",
-        "ordinal": 11,
-        "page": 18,
+        "ordinal": 9,
+        "page": 19,
         "rating": "Sell",
         "reasons": [
           "non_buy_rating:Sell"
@@ -418,22 +464,75 @@
         "target_detail": "rating=Sell; bear=25.05; bull=51.6; base=38.325",
         "ticker": "CHWY",
         "title": "Equity Research, Chewy"
+      },
+      {
+        "base_target": null,
+        "company": "지트리비앤티",
+        "date": "2020-10-31T18:47:48",
+        "note": "markdown reextract; Korean numeric ticker; exchange prefix inferred as KRX; Target price not found",
+        "ordinal": 2,
+        "page": 20,
+        "rating": "Strong Buy",
+        "reasons": [
+          "missing_base_target",
+          "note_target_not_found",
+          "status:needs_review"
+        ],
+        "status": "needs_review",
+        "target_detail": "rating=Strong Buy",
+        "ticker": "115450",
+        "title": "Equity Research, 지트리비앤티"
+      },
+      {
+        "base_target": null,
+        "company": "교촌에프앤비",
+        "date": "2020-06-22T15:16:22",
+        "note": "markdown reextract; Korean numeric ticker; exchange prefix inferred as KRX; Target price not found",
+        "ordinal": 10,
+        "page": 20,
+        "rating": "Buy",
+        "reasons": [
+          "missing_base_target",
+          "note_target_not_found",
+          "status:needs_review"
+        ],
+        "status": "needs_review",
+        "target_detail": "rating=Buy",
+        "ticker": "075580",
+        "title": "Equity Research, 교촌에프앤비"
+      },
+      {
+        "base_target": 26876.0,
+        "company": "제이브이엠",
+        "date": "2020-06-22T15:15:35",
+        "note": "markdown reextract; Korean numeric ticker; exchange prefix inferred as KRX; Non-buy rating: Hold",
+        "ordinal": 11,
+        "page": 20,
+        "rating": "Hold",
+        "reasons": [
+          "non_buy_rating:Hold"
+        ],
+        "status": "ok",
+        "target_detail": "rating=Hold; base=26876",
+        "ticker": "054950",
+        "title": "Equity Research, 제이브이엠"
       }
     ],
     "status_counts": {
-      "ok": 216
+      "needs_review": 2,
+      "ok": 238
     },
     "summary": {
       "case_target_without_explicit_base": 0,
       "current_equals_base_target": 0,
-      "missing_base_target": 0,
-      "missing_rating": 12,
-      "non_buy_rating": 6,
-      "ok": 216,
-      "review_flagged_rows": 21,
-      "status_needs_review": 0
+      "missing_base_target": 2,
+      "missing_rating": 14,
+      "non_buy_rating": 7,
+      "ok": 238,
+      "review_flagged_rows": 26,
+      "status_needs_review": 2
     },
-    "total_reports": 216
+    "total_reports": 240
   },
   "missing_symbols": [
     {
@@ -449,18 +548,21 @@
       "symbol": "NETI"
     },
     {
+      "symbol": "SOIT.PA"
+    },
+    {
       "symbol": "VTNR"
     }
   ],
   "report_exclusions": {
-    "downside_target": 5,
-    "excluded_reports": 19,
-    "included_reports": 202,
+    "downside_target": 8,
+    "excluded_reports": 23,
+    "included_reports": 217,
     "instant_target_hit": 1,
     "missing_performance": 0,
-    "missing_price": 5,
+    "missing_price": 6,
     "non_positive_upside": 8,
     "sell_opinion": 0,
-    "source_reports": 221
+    "source_reports": 240
   }
 }

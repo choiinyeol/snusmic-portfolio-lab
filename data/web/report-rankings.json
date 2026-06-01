@@ -276,6 +276,27 @@
       "value": -0.9528
     },
     {
+      "company": "핌스",
+      "current_return": -0.7196,
+      "date": "2020-10-10",
+      "days_to_target": null,
+      "entry_price_krw": 5500.0,
+      "last_close_date": "2026-05-29",
+      "last_close_krw": 1542.0,
+      "metric": "target_gap_pct",
+      "peak_return": 1.1091,
+      "publication_date": "2020-10-10",
+      "report_id": "45e67ca4c216f03e",
+      "symbol": "347770.KS",
+      "target_gap_pct": -0.9466,
+      "target_hit": false,
+      "target_hit_date": null,
+      "target_price_krw": 28900.0,
+      "target_upside_at_pub": 4.2545,
+      "trough_return": -0.8356,
+      "value": -0.9466
+    },
+    {
       "company": "티와이홀딩스",
       "current_return": -0.9186,
       "date": "2022-06-08",
@@ -400,27 +421,6 @@
       "target_upside_at_pub": 0.5879,
       "trough_return": -0.9305,
       "value": -0.9128
-    },
-    {
-      "company": "Inmode",
-      "current_return": -0.7703,
-      "date": "2021-11-30",
-      "days_to_target": null,
-      "entry_price_krw": 90496.2393,
-      "last_close_date": "2026-06-01",
-      "last_close_krw": 20783.2192,
-      "metric": "target_gap_pct",
-      "peak_return": 0.0,
-      "publication_date": "2021-11-30",
-      "report_id": "e4f61fb5a56f7d82",
-      "symbol": "INMD",
-      "target_gap_pct": -0.8986,
-      "target_hit": false,
-      "target_hit_date": null,
-      "target_price_krw": 204938.2597,
-      "target_upside_at_pub": 1.2646,
-      "trough_return": -0.8007,
-      "value": -0.8986
     }
   ],
   "biggest_target_overshoots": [
@@ -679,6 +679,27 @@
       "value": 3.0
     },
     {
+      "company": "이지웰",
+      "current_return": -0.4619,
+      "date": "2020-10-31",
+      "days_to_target": 6.0,
+      "entry_price_krw": 10500.0,
+      "last_close_date": "2026-05-29",
+      "last_close_krw": 5650.0,
+      "metric": "days_to_target",
+      "peak_return": 0.2857,
+      "publication_date": "2020-10-31",
+      "report_id": "cd5c282c92640dd9",
+      "symbol": "090850.KS",
+      "target_gap_pct": -0.5112,
+      "target_hit": true,
+      "target_hit_date": "2020-11-06",
+      "target_price_krw": 11560.0,
+      "target_upside_at_pub": 0.101,
+      "trough_return": -0.541,
+      "value": 6.0
+    },
+    {
       "company": "Roku",
       "current_return": -0.3976,
       "date": "2020-12-05",
@@ -824,27 +845,6 @@
       "target_upside_at_pub": 0.2318,
       "trough_return": -0.0166,
       "value": 33.0
-    },
-    {
-      "company": "한화엔진",
-      "current_return": 3.0819,
-      "date": "2024-12-05",
-      "days_to_target": 40.0,
-      "entry_price_krw": 15140.0,
-      "last_close_date": "2026-06-01",
-      "last_close_krw": 61800.0,
-      "metric": "days_to_target",
-      "peak_return": 4.9115,
-      "publication_date": "2024-12-05",
-      "report_id": "a7d2436e22605d74",
-      "symbol": "082740.KS",
-      "target_gap_pct": 1.5378,
-      "target_hit": true,
-      "target_hit_date": "2025-01-14",
-      "target_price_krw": 24352.0,
-      "target_upside_at_pub": 0.6085,
-      "trough_return": -0.0614,
-      "value": 40.0
     }
   ],
   "most_aggressive_targets": [
@@ -868,6 +868,27 @@
       "target_upside_at_pub": 4.2854,
       "trough_return": -0.1241,
       "value": 4.2854
+    },
+    {
+      "company": "핌스",
+      "current_return": -0.7196,
+      "date": "2020-10-10",
+      "days_to_target": null,
+      "entry_price_krw": 5500.0,
+      "last_close_date": "2026-05-29",
+      "last_close_krw": 1542.0,
+      "metric": "target_upside_at_pub",
+      "peak_return": 1.1091,
+      "publication_date": "2020-10-10",
+      "report_id": "45e67ca4c216f03e",
+      "symbol": "347770.KS",
+      "target_gap_pct": -0.9466,
+      "target_hit": false,
+      "target_hit_date": null,
+      "target_price_krw": 28900.0,
+      "target_upside_at_pub": 4.2545,
+      "trough_return": -0.8356,
+      "value": 4.2545
     },
     {
       "company": "Arista Networks",
@@ -1036,27 +1057,6 @@
       "target_upside_at_pub": 2.4849,
       "trough_return": -0.4404,
       "value": 2.4849
-    },
-    {
-      "company": "아이씨에이치",
-      "current_return": -0.9149,
-      "date": "2022-10-13",
-      "days_to_target": null,
-      "entry_price_krw": 9050.0,
-      "last_close_date": "2026-06-01",
-      "last_close_krw": 770.0,
-      "metric": "target_upside_at_pub",
-      "peak_return": 0.0707,
-      "publication_date": "2022-10-13",
-      "report_id": "c36f87938dfe83da",
-      "symbol": "368600.KQ",
-      "target_gap_pct": -0.9752,
-      "target_hit": false,
-      "target_hit_date": null,
-      "target_price_krw": 31100.0,
-      "target_upside_at_pub": 2.4365,
-      "trough_return": -0.9305,
-      "value": 2.4365
     }
   ],
   "slowest_hits": [
@@ -1229,6 +1229,27 @@
       "value": 497.0
     },
     {
+      "company": "Gaztransport&technigaz",
+      "current_return": 2.2868,
+      "date": "2020-12-05",
+      "days_to_target": 489.0,
+      "entry_price_krw": 105191.1168,
+      "last_close_date": "2026-06-01",
+      "last_close_krw": 345741.75,
+      "metric": "days_to_target",
+      "peak_return": 2.4787,
+      "publication_date": "2020-12-05",
+      "report_id": "02f44f98e36b5ee9",
+      "symbol": "GTT.PA",
+      "target_gap_pct": 1.2799,
+      "target_hit": true,
+      "target_hit_date": "2022-04-08",
+      "target_price_krw": 151650.8325,
+      "target_upside_at_pub": 0.4417,
+      "trough_return": -0.1835,
+      "value": 489.0
+    },
+    {
       "company": "케이씨",
       "current_return": 0.4742,
       "date": "2024-06-07",
@@ -1248,27 +1269,6 @@
       "target_upside_at_pub": 0.3192,
       "trough_return": -0.2676,
       "value": 482.0
-    },
-    {
-      "company": "DI동일",
-      "current_return": 0.2945,
-      "date": "2023-06-09",
-      "days_to_target": 469.0,
-      "entry_price_krw": 18848.5156,
-      "last_close_date": "2026-06-01",
-      "last_close_krw": 24400.0,
-      "metric": "days_to_target",
-      "peak_return": 1.5365,
-      "publication_date": "2023-06-09",
-      "report_id": "07c7395490c32f67",
-      "symbol": "001530.KS",
-      "target_gap_pct": -0.2052,
-      "target_hit": true,
-      "target_hit_date": "2024-09-20",
-      "target_price_krw": 30700.0,
-      "target_upside_at_pub": 0.6288,
-      "trough_return": -0.1961,
-      "value": 469.0
     }
   ],
   "top_losers": [

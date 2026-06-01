@@ -7,6 +7,10 @@ from ..market_data.currency import EXCHANGE_CURRENCIES, infer_exchange_from_text
 from .models import DownloadedPdf, ExtractedReport
 
 _TICKER_RE = re.compile(r"\(([A-Z0-9]{1,10})\)")
+_EXCHANGE_TICKER_RE = re.compile(
+    r"\b(?:NASDAQ|NYSE|AMEX|NYSEAMERICAN|TYO|TSE|TWSE|TPE|EPA|XETRA|ETR|AMS|SIX|HKG|HKEX|SZSE|SSE|KRX|KOSDAQ|KOSPI)\s*:\s*([A-Z0-9]{1,10})",
+    re.IGNORECASE,
+)
 _TITLE_TICKER_RE = re.compile(r"([A-Z]{1,6})\s*(?:US\s*)?(?:Equity|NASDAQ|NYSE|TSE|TYO)", re.IGNORECASE)
 _CURRENT_PRICE_RE = re.compile(
     r"현재\s*주가\s*(?:\([^)]{0,20}\))?\s*[:：]?\s*([$₩¥]?\s*[0-9][0-9,]*(?:\.[0-9]+)?)",
@@ -21,7 +25,11 @@ _PRE_TARGET_PRICE_RE = re.compile(
     re.IGNORECASE,
 )
 _EN_TARGET_PRICE_RE = re.compile(
-    r"(?:target\s+price|price\s+target|fair\s+value|목표\s*주가)[^0-9$₩¥]{0,80}([$₩¥]?\s*[0-9][0-9,]*(?:\.[0-9]+)?)",
+    r"(?:target\s+price|price\s+target|fair\s+value|목표\s*주가)[^0-9$₩¥€]{0,80}((?:[$₩¥€]\s*|(?:USD|KRW|JPY|EUR|TWD|HKD|CNY|CHF)\s*)?[0-9][0-9,]*(?:\.[0-9]+)?)",
+    re.IGNORECASE,
+)
+_CURRENT_TARGET_PAIR_RE = re.compile(
+    r"현재\s*주가\s*[:：]\s*목표\s*주가\s*[:：]\s*((?:[$₩¥€]\s*|(?:USD|KRW|JPY|EUR|TWD|HKD|CNY|CHF)\s*)?[0-9][0-9,]*(?:\.[0-9]+)?)\s*((?:[$₩¥€]\s*|(?:USD|KRW|JPY|EUR|TWD|HKD|CNY|CHF)\s*)?[0-9][0-9,]*(?:\.[0-9]+)?)",
     re.IGNORECASE,
 )
 _SCENARIO_RE = re.compile(
@@ -102,6 +110,11 @@ KNOWN_EXCHANGES = {
     "GRND": "NYSE",
     "FNKO": "NASDAQ",
     "LEVI": "NYSE",
+    "AIXA": "ETR",
+    "FIX": "NYSE",
+    "SOIT": "EPA",
+    "STRL": "NASDAQ",
+    "3443": "TWSE",
 }
 
 KNOWN_COMPANY_TICKERS = {
@@ -165,13 +178,27 @@ KNOWN_COMPANY_TICKERS = {
     "Roku": "ROKU",
     "SEA ltd.": "SE",
     "Gaztransport&technigaz": "GTT",
+    "Aixtron SE": "AIXA",
+    "Comfort Systems USA, Inc.": "FIX",
+    "Soitec SA": "SOIT",
+    "Sterling Infrastructure Inc": "STRL",
+    "Global Unichip Corp.": "3443",
+    "샘씨엔에스": "252990",
 }
 
 
 def parse_money(value: str | None) -> float | None:
     if not value:
         return None
-    cleaned = value.replace("$", "").replace("₩", "").replace("¥", "").replace(",", "").strip()
+    cleaned = (
+        re.sub(r"\b(?:USD|KRW|JPY|EUR|TWD|HKD|CNY|CHF)\b", "", value, flags=re.IGNORECASE)
+        .replace("$", "")
+        .replace("₩", "")
+        .replace("¥", "")
+        .replace("€", "")
+        .replace(",", "")
+        .strip()
+    )
     try:
         return float(cleaned)
     except ValueError:
@@ -343,6 +370,9 @@ def ticker_from_text(text: str, company_hint: str = "") -> str:
     known = KNOWN_COMPANY_TICKERS.get(company_hint)
     if known:
         return known
+    exchange_match = _EXCHANGE_TICKER_RE.search(text[:3000])
+    if exchange_match:
+        return exchange_match.group(1).upper()
     title_match = _TITLE_TICKER_RE.search(text[:2000])
     if title_match:
         return title_match.group(1).upper()
@@ -362,13 +392,13 @@ def infer_exchange(ticker: str, text: str = "") -> tuple[str, str]:
     exchange = KNOWN_EXCHANGES.get(ticker.upper(), "")
     if exchange:
         return exchange, ""
-    text_exchange = infer_exchange_from_text(text)
-    if text_exchange:
-        return text_exchange, ""
     if ticker.isdigit() and len(ticker) == 6:
         return "KRX", "Korean numeric ticker; exchange prefix inferred as KRX"
     if ticker.isdigit() and len(ticker) == 4:
         return "TYO", "4-digit numeric ticker; exchange inferred as TYO"
+    text_exchange = infer_exchange_from_text(text)
+    if text_exchange:
+        return text_exchange, ""
     return "", "Exchange not mapped; verify ticker/exchange"
 
 
@@ -412,6 +442,11 @@ def parse_report_text(text: str, company_hint: str = "") -> dict[str, object]:
     single_target, target_raw = target_price_from_text(text)
     notes: list[str] = []
     current_price = parse_money(current_match.group(1)) if current_match else None
+    current_target_pair = _CURRENT_TARGET_PAIR_RE.search(text[:4000])
+    if current_target_pair:
+        current_price = parse_money(current_target_pair.group(1))
+        single_target = parse_money(current_target_pair.group(2))
+        target_raw = current_target_pair.group(2)
     if current_price is not None and single_target == current_price:
         for candidate, raw in target_price_candidates(text):
             if candidate != current_price:
@@ -451,12 +486,12 @@ def parse_report_text(text: str, company_hint: str = "") -> dict[str, object]:
         and 1 <= int(key.split("_", 1)[-1]) <= 5
         and is_plausible_target_price(value, ticker, exchange)
     }
-    base_target = scenario_values.get("base", single_target)
+    base_target = single_target if current_target_pair is not None else scenario_values.get("base", single_target)
     if base_target is None and scenario_values:
         base_target = median_price(list(scenario_values.values()))
         notes.append("No explicit Base target; base target uses median scenario value")
     case_prices = sorted(case_values.values())
-    if (
+    if current_target_pair is None and (
         base_target is None
         and case_prices
         or case_prices

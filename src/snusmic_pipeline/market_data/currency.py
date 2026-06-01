@@ -42,6 +42,8 @@ EXCHANGE_CURRENCIES = {
     "LON": "GBP",
     "TSX": "CAD",
     "ASX": "AUD",
+    "TWSE": "TWD",
+    "TPE": "TWD",
 }
 
 # Exchange identifiers that may appear inside a SMIC PDF report. The match is
@@ -62,6 +64,7 @@ EXCHANGE_KEYWORDS = {
     "LSE": ["LONDON STOCK EXCHANGE", "LSE LISTING"],
     "ASX": ["AUSTRALIAN SECURITIES EXCHANGE", "ASX:"],
     "TSX": ["TORONTO STOCK EXCHANGE", "TSX:"],
+    "TWSE": ["TWSE", "TAIWAN STOCK EXCHANGE"],
     "KRX": ["KOSPI", "KOSDAQ", "KRX:", "KOREA EXCHANGE"],
 }
 
@@ -89,6 +92,8 @@ EXCHANGE_TO_YFINANCE_SUFFIX = {
     "LON": ".L",
     "TSX": ".TO",
     "ASX": ".AX",
+    "TWSE": ".TW",
+    "TPE": ".TW",
 }
 
 Downloader = Callable[[str, datetime, datetime], pd.DataFrame]
@@ -125,6 +130,7 @@ def currency_for_symbol(symbol: str, exchange: str = "") -> str:
         ".L": "GBP",
         ".TO": "CAD",
         ".AX": "AUD",
+        ".TW": "TWD",
     }
     for suffix, currency in suffix_map.items():
         if symbol.endswith(suffix):

@@ -1,5 +1,26 @@
 ﻿# Changelog
 
+## v0.30.8 - Refresh reports and split docs languages
+
+- Syncs the SNUSMIC archive to 240 reports, including the 2026-05-07 and 2026-05-29 report batches, and regenerates PDF Markdown extracts.
+- Extends ticker/exchange parsing for Xetra, Taiwan, and the latest overseas reports so warehouse/web exports can resolve AIXA.DE, FIX, SOIT.PA, STRL, and 3443.TW.
+- Refreshes warehouse prices and web artifacts through the latest available close date, 2026-06-01.
+- Emits `docs/research/iterations/064-report-web-refresh-generated.md` from the refreshed simulation artifacts.
+- Splits README and active docs into Korean `*.md` and English `*.en.md` files.
+- Bumps Python and web package versions to `0.30.8`.
+
+Verification:
+
+- `uv run python -m snusmic_pipeline check-new`
+- `uv run python -m snusmic_pipeline sync --pages auto --markdown` (initial Markdown step required local portable JRE retry)
+- `uv run python -m snusmic_pipeline export-markdown --data-dir data`
+- `uv run python -m snusmic_pipeline ocr-reextract --data-dir data --audit`
+- `uv run python -m snusmic_pipeline build-warehouse`
+- `uv run python -m snusmic_pipeline refresh-prices`
+- `uv run python -m snusmic_pipeline refresh-web-artifacts`
+- `uv run python -m snusmic_pipeline export-web --check`
+- `uv run ruff check src tests scripts`
+
 ## v0.30.7 - Fix sync dependency install
 
 - Removes the stale `--extra ocr` flag from `sync.yml`; OCR support is already installed through the project dependencies.

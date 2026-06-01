@@ -1,25 +1,25 @@
 [
   {
     "id": "target-hit-rate",
-    "metric": 0.410891,
+    "metric": 0.400922,
     "related_report_ids": [],
-    "sentence": "가격 매칭 리포트 기준 목표가 도달률은 0.410891입니다.",
+    "sentence": "가격 매칭 리포트 기준 목표가 도달률은 0.400922입니다.",
     "title": "목표가 도달률"
   },
   {
     "id": "average-days-to-target",
-    "metric": 207.6987951807229,
+    "metric": 201.75862068965517,
     "related_report_ids": [
       "5d0752b834ca2cb9"
     ],
-    "sentence": "목표가에 도달한 리포트의 평균 소요 기간은 207.6987951807229일입니다.",
+    "sentence": "목표가에 도달한 리포트의 평균 소요 기간은 201.75862068965517일입니다.",
     "title": "목표가 도달 속도"
   },
   {
     "id": "average-90d-return",
-    "metric": 0.078642,
+    "metric": 0.08123,
     "related_report_ids": [],
-    "sentence": "90일 가격 데이터가 있는 리포트의 평균 90일 수익률은 0.078642입니다.",
+    "sentence": "90일 가격 데이터가 있는 리포트의 평균 90일 수익률은 0.08123입니다.",
     "title": "발간 후 90일 성과"
   },
   {
@@ -42,9 +42,9 @@
   },
   {
     "id": "missing-price-coverage",
-    "metric": 5,
+    "metric": 6,
     "related_report_ids": [],
-    "sentence": "전체 221개 리포트 중 가격 누락 심볼은 5개입니다.",
+    "sentence": "전체 240개 리포트 중 가격 누락 심볼은 6개입니다.",
     "title": "가격 데이터 커버리지"
   },
   {

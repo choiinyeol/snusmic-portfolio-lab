@@ -36,6 +36,12 @@ COMPANY_SYMBOL_OVERRIDES = {
     "CyberAgent Inc.": ("4751", "TYO", "4751.T", "JPY"),
     "쿠쿠홈시스": ("284740", "KRX", "284740.KS", "KRW"),
     "한화솔루션": ("009830", "KRX", "009830.KS", "KRW"),
+    "Aixtron SE": ("AIXA", "ETR", "AIXA.DE", "EUR"),
+    "Comfort Systems USA, Inc.": ("FIX", "NYSE", "FIX", "USD"),
+    "Soitec SA": ("SOIT", "EPA", "SOIT.PA", "EUR"),
+    "Sterling Infrastructure Inc": ("STRL", "NASDAQ", "STRL", "USD"),
+    "Global Unichip Corp.": ("3443", "TWSE", "3443.TW", "TWD"),
+    "샘씨엔에스": ("252990", "KRX", "252990.KQ", "KRW"),
 }
 
 KOSDAQ_TICKERS = {
@@ -680,6 +686,8 @@ def infer_yfinance_symbol(ticker: str, exchange: str) -> str:
         return f"{ticker}.AS"
     if exchange == "SIX":
         return f"{ticker}.SW"
+    if exchange in {"TWSE", "TPE"}:
+        return f"{ticker}.TW"
     return ticker
 
 

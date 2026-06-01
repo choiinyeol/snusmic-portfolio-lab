@@ -1,7 +1,5 @@
 # Data Artifact Policy
 
-## 한국어
-
 이 저장소는 PIT 데이터 제품이지, 계좌 생성 factory가 아닙니다. 커밋되는 artifact는 source evidence, 정규화된 PIT input, 고정 계좌 output, 정적 web deploy input 중 하나여야 합니다.
 
 | Path | Owner | Commit policy |
@@ -22,21 +20,3 @@
 큰 artifact를 줄일 때는 deploy input을 삭제하기 전에 producer와 consumer contract를 함께 갱신해야 합니다. Portfolio equity와 daily-decision data는 `data/web/portfolio/equity/{index,ACCOUNT_ID}.json` 및 `data/web/portfolio/daily-decisions/{index,ACCOUNT_ID}.json`로 export합니다. Aggregate `equity-daily.json`과 `daily-decisions.json`은 web deploy input이 아닙니다. Per-symbol `data/web/prices/*.json`은 frontend reader와 artifact validator가 compact price store를 받을 때까지 커밋 상태를 유지합니다.
 
 Frontend code는 가능한 한 page-shaped artifact 또는 view model을 소비해야 합니다. 화면에 새 metric이 필요하면 table/chart component 내부에서 product semantics를 다시 계산하지 말고 Python exporter 또는 typed page view model에 추가합니다.
-
-## English
-
-The repository is a PIT data product, not an account-generation factory. Committed artifacts must be source evidence, normalized PIT inputs, fixed account outputs, or static web deploy inputs.
-
-| Path | Owner | Commit policy |
-| --- | --- | --- |
-| `data/reports/**` | Report ingestion | Source evidence; keep while report extraction depends on it. |
-| `data/warehouse/*.csv` | PIT warehouse | Commit normalized report, price, FX, and benchmark inputs. |
-| `data/sim/account-configs.json` | Simulation contract | Commit the declared fixed accounts. |
-| `data/sim/accounts.json` | Simulation export manifest | Commit a compact manifest only; full ledger dumps belong in CSV artifacts, local cache, release assets, or LFS. |
-| `data/sim/pit-research-board.csv` | PIT research export | Commit the manual research board. |
-| `data/sim/*.csv` except checkpoint/cache paths | Simulation export | Commit current fixed-account outputs consumed by web exports. |
-| `data/web/**` | Web artifact exporter | Commit static deploy artifacts validated by the web app. Large account time series must be sharded by account and limited to curated web accounts. |
-| `data/sim/checkpoints/**` | Daily-forward runner | Do not commit. This is a replay cache. |
-| `data/sim/.cache/**` | Local tooling | Do not commit. |
-
-Large artifact reductions must update both producer and consumer contracts before deleting deploy inputs. Portfolio equity and daily-decision data are exported as account shards; aggregate `equity-daily.json` and `daily-decisions.json` files are not web deploy inputs.

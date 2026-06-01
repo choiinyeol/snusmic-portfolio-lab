@@ -1,7 +1,5 @@
 # Product Spec
 
-## 한국어
-
 SNUSMIC Portfolio Lab은 point-in-time SMIC 리포트 데이터와 정적 계좌/리포트 artifact를 만듭니다. 현재 릴리스에는 완료된 PIT 전략 리서치 스프린트가 포함되어 있지만, 생성된 branch는 먼저 연구 기록입니다. product UI에는 선별 shortlist만 portfolio ledger로 노출합니다.
 
 ### 현재 제품
@@ -57,25 +55,3 @@ SNUSMIC Portfolio Lab은 point-in-time SMIC 리포트 데이터와 정적 계좌
 - rebalance cadence.
 - fee와 slippage.
 - benchmark와 objective.
-
-## English
-
-SNUSMIC Portfolio Lab builds point-in-time SMIC report data and static account-report artifacts. The current release includes a completed PIT strategy research sprint, but generated branches are research records first; only a curated shortlist is surfaced as portfolio ledgers.
-
-### Current Product
-
-- Ingest SMIC report metadata, PDFs, extracted targets, ratings, and caveats.
-- Normalize the data into a PIT warehouse with report publication dates, price windows, target-hit evidence, and report-level outcome factors.
-- Export benchmark, follower, and curated PIT account paths so the web app can compare actual account ledgers.
-- Export a PIT research board and strategy-research notes for manual review of every promoted idea.
-- Provide report verification, statistics, and portfolio ledger screens through static artifacts.
-
-### Non Goals
-
-- No live broker integration or order entry.
-- No future-looking signals in PIT rules.
-- No automatic admission of every generated research account.
-
-### Objective
-
-The account objective is to compare final equity, money-weighted return, maximum drawdown, and trade quality against declared benchmark accounts in the static artifacts. Report-level factor views are diagnostic inputs for human research; they are not deployable rules by themselves.

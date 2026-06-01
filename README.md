@@ -1,10 +1,8 @@
 # SNUSMIC Portfolio Lab
 
-## 한국어
-
 SNUSMIC Portfolio Lab은 SMIC 리서치 리포트를 point-in-time(PIT) 데이터셋, 계좌 시뮬레이션, 정적 웹 아티팩트로 변환하는 프로젝트입니다. 현재 릴리스는 PIT 전략 리서치 스프린트를 마무리했고, 큰 포트폴리오 시계열은 선별 계좌별 shard로 나누어 웹 배포 payload를 작게 유지합니다.
 
-[Live site](https://smic-portfolio.vercel.app) - [Changelog](./CHANGELOG.md) - [Design system](./DESIGN.md)
+[English README](./README.en.md) - [Live site](https://smic-portfolio.vercel.app) - [Changelog](./CHANGELOG.md) - [Design system](./DESIGN.md)
 
 ### 이 저장소가 하는 일
 
@@ -98,10 +96,10 @@ flowchart TB
 
 | 문서 | 목적 |
 | --- | --- |
-| [docs/product-spec.md](./docs/product-spec.md) | 제품 의도와 우선순위 |
-| [docs/data-artifact-policy.md](./docs/data-artifact-policy.md) | 커밋되는 데이터의 소유권과 생성 캐시 정책 |
-| [docs/backtest-contract.md](./docs/backtest-contract.md) | 계좌, PIT, no-lookahead 계약 |
-| [docs/technical-architecture.md](./docs/technical-architecture.md) | pipeline, artifact, route map |
+| [docs/product-spec.md](./docs/product-spec.md) / [EN](./docs/product-spec.en.md) | 제품 의도와 우선순위 |
+| [docs/data-artifact-policy.md](./docs/data-artifact-policy.md) / [EN](./docs/data-artifact-policy.en.md) | 커밋되는 데이터의 소유권과 생성 캐시 정책 |
+| [docs/backtest-contract.md](./docs/backtest-contract.md) / [EN](./docs/backtest-contract.en.md) | 계좌, PIT, no-lookahead 계약 |
+| [docs/technical-architecture.md](./docs/technical-architecture.md) / [EN](./docs/technical-architecture.en.md) | pipeline, artifact, route map |
 | [DESIGN.md](./DESIGN.md) | UI design system |
 
 ### 웹 앱
@@ -167,27 +165,3 @@ tests/                     Pytest suite
 ### 데이터 아티팩트 주의
 
 이 저장소는 정적 웹 배포를 재현하기 위해 일부 데이터 아티팩트를 의도적으로 커밋합니다. 특히 `data/warehouse/daily_prices.csv`는 약 67MB로 clone 크기에 영향을 줍니다. 어떤 데이터가 source-of-truth이고 어떤 파일이 재생성 가능한 cache인지에 대한 기준은 [docs/data-artifact-policy.md](./docs/data-artifact-policy.md)를 따릅니다.
-
-## English
-
-SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, account simulations, and static web artifacts. The current release closes the PIT strategy research sprint and keeps web payloads deployable by sharding large portfolio time series by curated account.
-
-### What This Repo Does
-
-- Collects SMIC report PDFs and extracted report rows.
-- Normalizes reports, prices, FX, and benchmark data into `data/warehouse`.
-- Exports a point-in-time research board at `data/sim/pit-research-board.csv`.
-- Runs benchmark, follower, and curated PIT account simulations with real ledger constraints: cash, deposits, integer shares, fees, taxes, trades, holdings, and equity paths.
-- Exports deterministic `data/web` JSON/CSV artifacts consumed by the static Next.js app, with large portfolio equity and decision series split into account shards.
-- Presents report verification, statistics, and account views through page-shaped frontend view models instead of raw artifact tables.
-
-### Current Contract
-
-This repo is intentionally PIT-first:
-
-1. Build trustworthy point-in-time data.
-2. Keep benchmark and follower simulations for context.
-3. Record strategy ideas, results, and retrospectives in Markdown before promoting any account.
-4. Show only a curated shortlist in the product UI so parameter search output does not look like investable truth.
-
-For commands, routes, validation, and artifact ownership, see the Korean sections above; command names and paths are language-neutral.
