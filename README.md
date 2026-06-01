@@ -164,6 +164,10 @@ tests/                     Pytest suite
 3. 새 계좌를 promotion하기 전에 전략 idea, result, retrospective를 Markdown으로 기록합니다.
 4. parameter search output이 investable truth처럼 보이지 않도록 product UI에는 선별 shortlist만 보여줍니다.
 
+### 데이터 아티팩트 주의
+
+이 저장소는 정적 웹 배포를 재현하기 위해 일부 데이터 아티팩트를 의도적으로 커밋합니다. 특히 `data/warehouse/daily_prices.csv`는 약 67MB로 clone 크기에 영향을 줍니다. 어떤 데이터가 source-of-truth이고 어떤 파일이 재생성 가능한 cache인지에 대한 기준은 [docs/data-artifact-policy.md](./docs/data-artifact-policy.md)를 따릅니다.
+
 ## English
 
 SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, account simulations, and static web artifacts. The current release closes the PIT strategy research sprint and keeps web payloads deployable by sharding large portfolio time series by curated account.
