@@ -1,17 +1,21 @@
 import json
 
 from snusmic_pipeline.cli import build_parser, resolve_sync_pages
-from snusmic_pipeline.ingest.fetch_index import clean_html_text, fetch_reports, parse_pages
+from snusmic_pipeline.ingest import fetch_index
+from snusmic_pipeline.ingest.fetch_index import clean_html_text, fetch_page, fetch_reports, parse_pages
 
 
 class FakeResponse:
-    def __init__(self, payload):
+    def __init__(self, payload, *, json_error=False):
         self.payload = payload
+        self.json_error = json_error
 
     def raise_for_status(self):
         return None
 
     def json(self):
+        if self.json_error:
+            raise ValueError("not json")
         return self.payload
 
 
@@ -66,3 +70,16 @@ def test_fetch_reports_extracts_pdf_url_and_company():
     assert reports[0].pdf_url == "http://snusmic.com/file.pdf"
     assert reports[0].page == 1
     assert reports[0].ordinal == 1
+
+
+def test_fetch_page_uses_reader_fallback_when_direct_response_is_not_json(monkeypatch):
+    payload = [{"link": "http://snusmic.com/equity-research-demo/"}]
+
+    class DirectSession:
+        def get(self, *args, **kwargs):
+            return FakeResponse(None, json_error=True)
+
+    monkeypatch.setattr(fetch_index.requests, "Session", DirectSession)
+    monkeypatch.setattr(fetch_index, "fetch_json_via_reader", lambda *args, **kwargs: payload)
+
+    assert fetch_page(1) == payload

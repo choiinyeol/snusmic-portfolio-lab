@@ -1,5 +1,19 @@
 ﻿# Changelog
 
+## v0.30.6 - Add SNUSMIC REST reader fallback
+
+- Keeps the direct SNUSMIC WordPress REST request as the primary fetch path.
+- Falls back to a read-only Reader mirror only when hosted runners receive non-JSON or HTTP-error responses from the REST endpoint.
+- Applies the fallback to both page-one new-report detection and full report index fetching so scheduled sync can get past runner-specific REST blocking.
+- Bumps Python and web package versions to `0.30.6`.
+
+Verification:
+
+- `uv run pytest tests/test_change_detection.py tests/test_fetch_index.py -q`
+- `uv run python -m snusmic_pipeline check-new --manifest data/manifest.json`
+- `uv run ruff check src\snusmic_pipeline\ingest\change_detection.py src\snusmic_pipeline\ingest\fetch_index.py src\snusmic_pipeline\ingest\reader_fallback.py tests\test_change_detection.py tests\test_fetch_index.py`
+- `git diff --check`
+
 ## v0.30.5 - Harden SNUSMIC fetch headers
 
 - Sends browser-like `User-Agent` and `Accept` headers for SNUSMIC REST/PDF requests so hosted runners are less likely to receive an HTML fallback instead of JSON/PDF content.

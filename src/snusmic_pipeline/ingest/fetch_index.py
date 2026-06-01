@@ -7,6 +7,7 @@ from collections.abc import Iterable
 import requests
 
 from .models import ReportMeta
+from .reader_fallback import fetch_json_via_reader
 
 BASE_URL = "http://snusmic.com"
 POSTS_ENDPOINT = f"{BASE_URL}/wp-json/wp/v2/posts"
@@ -67,14 +68,24 @@ def fetch_page(page: int, session: requests.Session | None = None) -> list[dict]
         "page": page,
         "_fields": "date,link,title,slug,content",
     }
+    prepared = requests.Request("GET", POSTS_ENDPOINT, params=params).prepare()
+    url = prepared.url or POSTS_ENDPOINT
     response = client.get(
         POSTS_ENDPOINT,
         params=params,
         headers=DEFAULT_HEADERS,
         timeout=DEFAULT_TIMEOUT,
     )
-    response.raise_for_status()
-    return response.json()
+    try:
+        response.raise_for_status()
+        return response.json()
+    except (requests.HTTPError, ValueError):
+        if session is not None:
+            raise
+        payload = fetch_json_via_reader(url, headers=DEFAULT_HEADERS, timeout=DEFAULT_TIMEOUT)
+        if not isinstance(payload, list):
+            raise ValueError("Reader fallback returned an unexpected payload (not a JSON list).") from None
+        return payload
 
 
 def fetch_reports(pages: Iterable[int], session: requests.Session | None = None) -> list[ReportMeta]:

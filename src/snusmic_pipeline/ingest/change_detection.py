@@ -8,6 +8,8 @@ from pathlib import Path
 from typing import Any, Protocol
 from urllib.parse import urlparse
 
+from .reader_fallback import fetch_json_via_reader
+
 POSTS_ENDPOINT = "http://snusmic.com/wp-json/wp/v2/posts"
 RESEARCH_PAGE_URL = "http://snusmic.com/research/"
 PAGE_ONE_POST_LIMIT = 12
@@ -76,8 +78,9 @@ def _is_snusmic_url(url: str) -> bool:
 
 def _fetch_page_one_payload() -> tuple[list[Any], str, int]:
     query = urllib.parse.urlencode({"per_page": PAGE_ONE_POST_LIMIT, "page": 1, "_fields": "link"})
+    url = f"{POSTS_ENDPOINT}?{query}"
     request = urllib.request.Request(
-        f"{POSTS_ENDPOINT}?{query}",
+        url,
         headers=DEFAULT_HEADERS,
     )
     try:
@@ -85,10 +88,15 @@ def _fetch_page_one_payload() -> tuple[list[Any], str, int]:
             body = response.read().decode("utf-8", errors="replace")
             payload = json.loads(body)
             return payload, response.url, response.status
-    except json.JSONDecodeError as exc:
-        raise SnusmicSiteUnavailable(
-            "REST API did not return JSON; the site may be down or rate-limited."
-        ) from exc
+    except json.JSONDecodeError:
+        try:
+            payload = fetch_json_via_reader(url, headers=DEFAULT_HEADERS, timeout=DEFAULT_TIMEOUT)
+            return payload, POSTS_ENDPOINT, 200
+        except (OSError, json.JSONDecodeError) as fallback_exc:
+            raise SnusmicSiteUnavailable(
+                "REST API did not return JSON and the reader fallback failed; "
+                "the site may be down or rate-limited."
+            ) from fallback_exc
     except OSError as exc:
         raise SnusmicSiteUnavailable(f"REST API request failed: {exc}") from exc
 
