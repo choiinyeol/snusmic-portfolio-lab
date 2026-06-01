@@ -16,6 +16,10 @@ venv/
 example_*.png
 example_*.jpg
 example_*.jpeg
+.omx-home-check*.png
+.coverage*
+coverage/
+htmlcov/
 data/opendataloader/
 data/warehouse/*.duckdb
 data/warehouse/*.duckdb.wal

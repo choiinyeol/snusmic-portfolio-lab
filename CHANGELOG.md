@@ -1,5 +1,17 @@
 ﻿# Changelog
 
+## v0.30.3 - Local generated-file hygiene
+
+- Ignores local OMX home-check screenshots and common coverage artifacts so temporary diagnostics do not reappear in `git status`.
+- Cleans local regenerateable build/cache outputs from this workspace: Python caches, Vercel cache, Next `.next`, static `out`, TypeScript build info, and old OMX home-check screenshots.
+- Keeps `.venv` and `apps/web/node_modules` in place because they are already ignored and expensive to recreate during normal local work.
+- Bumps Python and web package versions to `0.30.3`.
+
+Verification:
+
+- `git diff --check`
+- `uv run ruff check src\snusmic_pipeline\__init__.py`
+
 ## v0.30.2 - Korean-first docs and release finish policy
 
 - Makes README and active docs Korean-first by default while keeping English sections for bilingual review.
