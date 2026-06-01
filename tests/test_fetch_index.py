@@ -1,8 +1,11 @@
 import json
 
+import pytest
+
 from snusmic_pipeline.cli import build_parser, resolve_sync_pages
 from snusmic_pipeline.ingest import fetch_index
 from snusmic_pipeline.ingest.fetch_index import clean_html_text, fetch_page, fetch_reports, parse_pages
+from snusmic_pipeline.ingest.reader_fallback import ReaderFallbackError
 
 
 class FakeResponse:
@@ -83,3 +86,19 @@ def test_fetch_page_uses_reader_fallback_when_direct_response_is_not_json(monkey
     monkeypatch.setattr(fetch_index, "fetch_json_via_reader", lambda *args, **kwargs: payload)
 
     assert fetch_page(1) == payload
+
+
+def test_fetch_page_reports_reader_fallback_failure(monkeypatch):
+    class DirectSession:
+        def get(self, *args, **kwargs):
+            return FakeResponse(None, json_error=True)
+
+    monkeypatch.setattr(fetch_index.requests, "Session", DirectSession)
+    monkeypatch.setattr(
+        fetch_index,
+        "fetch_json_via_reader",
+        lambda *args, **kwargs: (_ for _ in ()).throw(ReaderFallbackError("empty body")),
+    )
+
+    with pytest.raises(ValueError, match="reader fallback failed"):
+        fetch_page(1)

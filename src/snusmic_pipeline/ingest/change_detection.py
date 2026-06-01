@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Protocol
 from urllib.parse import urlparse
 
-from .reader_fallback import fetch_json_via_reader
+from .reader_fallback import ReaderFallbackError, fetch_json_via_reader
 
 POSTS_ENDPOINT = "http://snusmic.com/wp-json/wp/v2/posts"
 RESEARCH_PAGE_URL = "http://snusmic.com/research/"
@@ -92,7 +92,7 @@ def _fetch_page_one_payload() -> tuple[list[Any], str, int]:
         try:
             payload = fetch_json_via_reader(url, headers=DEFAULT_HEADERS, timeout=DEFAULT_TIMEOUT)
             return payload, POSTS_ENDPOINT, 200
-        except (OSError, json.JSONDecodeError) as fallback_exc:
+        except (OSError, ReaderFallbackError) as fallback_exc:
             raise SnusmicSiteUnavailable(
                 "REST API did not return JSON and the reader fallback failed; "
                 "the site may be down or rate-limited."

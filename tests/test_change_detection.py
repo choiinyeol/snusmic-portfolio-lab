@@ -8,7 +8,7 @@ from snusmic_pipeline.ingest.change_detection import (
     new_report_urls,
     parse_page_one_post_urls,
 )
-from snusmic_pipeline.ingest.reader_fallback import parse_reader_json, reader_url
+from snusmic_pipeline.ingest.reader_fallback import ReaderFallbackError, parse_reader_json, reader_url
 
 HTML = """
 <a href="http://snusmic.com/equity-research-new/">Read More</a>
@@ -36,7 +36,7 @@ def test_new_report_detector_compares_manifest(tmp_path):
 def test_reader_url_normalizes_snusmic_source_url():
     assert (
         reader_url("http://snusmic.com/wp-json/wp/v2/posts?per_page=12")
-        == "https://r.jina.ai/http://r.jina.ai/http://snusmic.com/wp-json/wp/v2/posts?per_page=12"
+        == "https://r.jina.ai/http://snusmic.com/wp-json/wp/v2/posts?per_page=12"
     )
 
 
@@ -50,6 +50,16 @@ def test_parse_reader_json_extracts_markdown_content_payload():
     [{"link": "http://snusmic.com/equity-research-new/"}]
     """
     assert parse_reader_json(body) == [{"link": "http://snusmic.com/equity-research-new/"}]
+
+
+def test_parse_reader_json_raises_clear_error_on_empty_body():
+    with pytest.raises(ReaderFallbackError, match="empty body"):
+        parse_reader_json("")
+
+
+def test_parse_reader_json_raises_clear_error_on_non_json_body():
+    with pytest.raises(ReaderFallbackError, match="did not return JSON"):
+        parse_reader_json("<html>temporarily unavailable</html>")
 
 
 class _FakeResponse:
