@@ -1,5 +1,18 @@
 ﻿# Changelog
 
+## v0.30.7 - Fix sync dependency install
+
+- Removes the stale `--extra ocr` flag from `sync.yml`; OCR support is already installed through the project dependencies.
+- Keeps the scheduled sync job aligned with the same locked dependency install used by CI, web, and price-refresh workflows.
+- Bumps Python and web package versions to `0.30.7`.
+
+Verification:
+
+- `uv run pytest tests/test_change_detection.py tests/test_fetch_index.py -q`
+- `uv run python -m snusmic_pipeline check-new --manifest data/manifest.json`
+- `uv run ruff check src\snusmic_pipeline\__init__.py src\snusmic_pipeline\ingest\change_detection.py src\snusmic_pipeline\ingest\fetch_index.py src\snusmic_pipeline\ingest\reader_fallback.py tests\test_change_detection.py tests\test_fetch_index.py`
+- `git diff --check`
+
 ## v0.30.6 - Add SNUSMIC REST reader fallback
 
 - Keeps the direct SNUSMIC WordPress REST request as the primary fetch path.
