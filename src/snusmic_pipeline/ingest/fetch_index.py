@@ -11,6 +11,14 @@ from .models import ReportMeta
 BASE_URL = "http://snusmic.com"
 POSTS_ENDPOINT = f"{BASE_URL}/wp-json/wp/v2/posts"
 DEFAULT_TIMEOUT = 30
+DEFAULT_USER_AGENT = (
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/126.0 Safari/537.36 snusmic-portfolio-lab/0.2"
+)
+DEFAULT_HEADERS = {
+    "User-Agent": DEFAULT_USER_AGENT,
+    "Accept": "application/json,text/html;q=0.9,*/*;q=0.8",
+}
 
 _PDF_RE = re.compile(r'href=["\']([^"\']+?\.pdf)["\']', re.IGNORECASE)
 _TAG_RE = re.compile(r"<[^>]+>")
@@ -62,7 +70,7 @@ def fetch_page(page: int, session: requests.Session | None = None) -> list[dict]
     response = client.get(
         POSTS_ENDPOINT,
         params=params,
-        headers={"User-Agent": "Mozilla/5.0 snusmic-portfolio-lab/0.1"},
+        headers=DEFAULT_HEADERS,
         timeout=DEFAULT_TIMEOUT,
     )
     response.raise_for_status()

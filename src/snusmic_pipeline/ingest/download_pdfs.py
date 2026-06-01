@@ -7,7 +7,7 @@ from urllib.parse import unquote
 
 import requests
 
-from .fetch_index import DEFAULT_TIMEOUT
+from .fetch_index import DEFAULT_HEADERS, DEFAULT_TIMEOUT
 from .models import DownloadedPdf, ReportMeta
 
 _SAFE_FILENAME_RE = re.compile(r"[\\/:*?\"<>|]+")
@@ -56,7 +56,7 @@ def download_pdf(
     try:
         response = client.get(
             meta.pdf_url,
-            headers={"User-Agent": "Mozilla/5.0 snusmic-portfolio-lab/0.1"},
+            headers=DEFAULT_HEADERS,
             timeout=DEFAULT_TIMEOUT,
         )
         response.raise_for_status()

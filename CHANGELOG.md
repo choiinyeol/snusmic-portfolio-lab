@@ -1,5 +1,18 @@
 ﻿# Changelog
 
+## v0.30.5 - Harden SNUSMIC fetch headers
+
+- Sends browser-like `User-Agent` and `Accept` headers for SNUSMIC REST/PDF requests so hosted runners are less likely to receive an HTML fallback instead of JSON/PDF content.
+- Keeps live new-report detection returning `has_new=true` for the current 2026-05-29 page-one reports.
+- Bumps Python and web package versions to `0.30.5`.
+
+Verification:
+
+- `uv run python -m snusmic_pipeline check-new --manifest data/manifest.json`
+- inline workflow detection script with `PYTHONPATH=src`
+- `git diff --check`
+- `uv run ruff check src\snusmic_pipeline\__init__.py src\snusmic_pipeline\ingest\change_detection.py src\snusmic_pipeline\ingest\fetch_index.py src\snusmic_pipeline\ingest\download_pdfs.py`
+
 ## v0.30.4 - Restore scheduled report sync
 
 - Restores the scheduled `sync.yml` trigger so new SNUSMIC page-one reports are checked every day again.

@@ -12,7 +12,14 @@ POSTS_ENDPOINT = "http://snusmic.com/wp-json/wp/v2/posts"
 RESEARCH_PAGE_URL = "http://snusmic.com/research/"
 PAGE_ONE_POST_LIMIT = 12
 DEFAULT_TIMEOUT = 30
-DEFAULT_USER_AGENT = "Mozilla/5.0 snusmic-portfolio-lab/0.2"
+DEFAULT_USER_AGENT = (
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/126.0 Safari/537.36 snusmic-portfolio-lab/0.2"
+)
+DEFAULT_HEADERS = {
+    "User-Agent": DEFAULT_USER_AGENT,
+    "Accept": "application/json,text/html;q=0.9,*/*;q=0.8",
+}
 
 _POST_LINK_RE = re.compile(r'href=["\'](http://snusmic\.com/equity-research-[^"\']+/)["\']')
 
@@ -39,7 +46,7 @@ class _SessionLike(Protocol):
 
 
 def fetch_research_page_html(url: str = RESEARCH_PAGE_URL) -> str:
-    request = urllib.request.Request(url, headers={"User-Agent": DEFAULT_USER_AGENT})
+    request = urllib.request.Request(url, headers=DEFAULT_HEADERS)
     with urllib.request.urlopen(request, timeout=DEFAULT_TIMEOUT) as response:
         return response.read().decode("utf-8", errors="replace")
 
@@ -71,7 +78,7 @@ def _fetch_page_one_payload() -> tuple[list[Any], str, int]:
     query = urllib.parse.urlencode({"per_page": PAGE_ONE_POST_LIMIT, "page": 1, "_fields": "link"})
     request = urllib.request.Request(
         f"{POSTS_ENDPOINT}?{query}",
-        headers={"User-Agent": DEFAULT_USER_AGENT},
+        headers=DEFAULT_HEADERS,
     )
     try:
         with urllib.request.urlopen(request, timeout=DEFAULT_TIMEOUT) as response:
@@ -99,7 +106,7 @@ def fetch_page_one_post_urls(session: _SessionLike | None = None) -> list[str]:
         response = session.get(
             POSTS_ENDPOINT,
             params={"per_page": PAGE_ONE_POST_LIMIT, "page": 1, "_fields": "link"},
-            headers={"User-Agent": DEFAULT_USER_AGENT},
+            headers=DEFAULT_HEADERS,
             timeout=DEFAULT_TIMEOUT,
             allow_redirects=True,
         )
