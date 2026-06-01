@@ -1,5 +1,19 @@
 ﻿# Changelog
 
+## v0.30.4 - Restore scheduled report sync
+
+- Restores the scheduled `sync.yml` trigger so new SNUSMIC page-one reports are checked every day again.
+- Fixes the GitHub Actions detection import to use the current `snusmic_pipeline.ingest.change_detection` module path.
+- Confirms the live SNUSMIC REST API currently reports new 2026-05-29 reports and local detection returns `has_new=true`.
+- Bumps Python and web package versions to `0.30.4`.
+
+Verification:
+
+- `uv run python -m snusmic_pipeline check-new --manifest data/manifest.json`
+- inline workflow detection script with `PYTHONPATH=src`
+- `git diff --check`
+- `uv run ruff check src\snusmic_pipeline\__init__.py src\snusmic_pipeline\ingest\change_detection.py`
+
 ## v0.30.3 - Local generated-file hygiene
 
 - Ignores local OMX home-check screenshots and common coverage artifacts so temporary diagnostics do not reappear in `git status`.

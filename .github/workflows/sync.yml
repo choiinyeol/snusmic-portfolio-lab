@@ -15,6 +15,8 @@ on:
         description: "Run even when no new report is detected"
         required: false
         default: "false"
+  schedule:
+    - cron: "30 23 * * *"
 
 permissions:
   contents: write
@@ -42,7 +44,7 @@ jobs:
         run: |
           PYTHONPATH=src python - <<'PY' >> "$GITHUB_OUTPUT"
           from pathlib import Path
-          from snusmic_pipeline.change_detection import new_report_urls
+          from snusmic_pipeline.ingest.change_detection import new_report_urls
           urls = new_report_urls(Path("data/manifest.json"))
           print(f"has_new={'true' if urls else 'false'}")
           print("new_urls<<EOF")
