@@ -8,11 +8,11 @@
       "id": "G001",
       "title": "Goal: Make SNUSMIC Portfolio a deterministic PIT research data product with t...",
       "objective": "Goal: Make SNUSMIC Portfolio a deterministic PIT research data product with trustworthy ingest, symbol resolution, artifact validation, and release gates.\n\nSuccess criteria:\n- 새 SNUSMIC report sync가 direct-origin 진단과 함께 성공/실패한다.\n- 모든 report symbol이 warehouse/web price artifact와 검증된다.\n- .KS/.KQ dual artifact가 발생하면 CI에서 실패한다.\n- export-web --check가 artifact determinism + cross-reference를 검증한다.\n- release마다 version/CHANGELOG/tag/push가 일관된다.\n- 대량 data refresh는 code changes와 분리된다.\n\nCurrent checkpoint:\n- v0.30.9: reader fallback 제거, direct fetch diagnostics 추가.\n- v0.30.10: symbol registry 단일화.\n- Next: web artifact invariant 강화.\n\nNext milestone: M1: Web artifact cross-reference gate\n- check_web_artifacts()에 symbol/price invariant 추가.\n- helper-level tests 추가.\n- docs에 artifact invariant 반영.",
-      "status": "active",
+      "status": "complete",
       "createdAt": "2026-06-03T17:37:34.553Z",
-      "updatedAt": "2026-06-03T17:46:36.460178Z"
+      "updatedAt": "2026-06-03T20:13:56.862749+00:00"
     }
   ],
   "createdAt": "2026-06-03T17:37:34.553Z",
-  "updatedAt": "2026-06-03T17:46:36.460178Z"
+  "updatedAt": "2026-06-03T20:13:56.862749+00:00"
 }

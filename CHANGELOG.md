@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.30.14 - Complete deterministic PIT ultragoal
+
+- Marks the durable ultragoal complete after auditing direct-origin ingest diagnostics, centralized symbol resolution, web artifact cross-reference gates, data-refresh pre-commit checks, and release evidence.
+- Records final completion evidence in `.gjc/ultragoal/ledger.jsonl` and updates `.gjc/ultragoal/goals.json` to `complete`.
+- Bumps Python and web package versions to `0.30.14`.
+
+Verification:
+
+- `uv run pytest tests/test_change_detection.py tests/test_fetch_index.py tests/test_symbol_registry.py tests/test_web_artifacts.py -q -k "price_cross_reference or ci_validator_rejects_dual_krx_segment_artifacts or refresh_web_artifacts_runs_checked_export or check_web_artifacts_requires_deterministic_json"`
+- `pnpm --dir apps/web artifact:check`
+- `uv run python -m snusmic_pipeline export-web --check`
+- `git restore data/web`
+- `git diff --check`
+- `gjc ultragoal status --json`
+
 ## v0.30.13 - Check refreshed web artifacts before commit
 
 - Runs `refresh-web-artifacts` and `rebuild-web-artifacts` through `check_web_artifacts()` so data-refresh workflows fail before committing invalid web artifacts.
