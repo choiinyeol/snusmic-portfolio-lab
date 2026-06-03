@@ -20,6 +20,7 @@ from .contracts import HOLDING_ROWS, REPORT_ROWS, TRADE_ROWS, ArtifactManifest, 
 
 REQUIRED_ARTIFACTS = [
     "manifest.json",
+    "health.json",
     "overview/snapshot.json",
     "overview/research-pulse.json",
     "overview/data-quality.json",
@@ -483,6 +484,7 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     _write_json(out / "trades.json", trade_rows)
     _write_json(out / "position-episodes.json", episode_rows)
     _write_json(out / "accounting-reconciliation.json", accounting_rows)
+    _write_artifact_health(out, overview, data_quality)
     _write_download_csvs(out, report_rows, data_quality, account_catalog)
     mark("write_tables")
 
@@ -1816,6 +1818,52 @@ def _snapshot_json_bytes(root: Path) -> dict[str, bytes]:
         for path in sorted(root.rglob("*"))
         if path.suffix in {".json", ".csv"}
     }
+
+
+def _write_artifact_health(out: Path, overview: dict[str, Any], data_quality: dict[str, Any]) -> None:
+    window = overview.get("simulation_window") if isinstance(overview.get("simulation_window"), dict) else {}
+    report_end = str(window.get("report_end") or "") if isinstance(window, dict) else ""
+    price_end = str(window.get("price_end") or "") if isinstance(window, dict) else ""
+    simulation_end = price_end
+    missing_symbols = data_quality.get("missing_symbols", []) if isinstance(data_quality, dict) else []
+    missing_count = len(missing_symbols) if isinstance(missing_symbols, list) else 0
+
+    checks = [
+        {
+            "id": "report_price_alignment",
+            "label": "Report and price dates",
+            "status": "ok" if report_end and price_end and price_end >= report_end else "review",
+            "detail": f"price_end={price_end or 'unknown'}, report_end={report_end or 'unknown'}",
+        },
+        {
+            "id": "simulation_price_alignment",
+            "label": "Simulation and price dates",
+            "status": "ok" if simulation_end and price_end and simulation_end == price_end else "review",
+            "detail": f"simulation_end={simulation_end or 'unknown'}, price_end={price_end or 'unknown'}",
+        },
+        {
+            "id": "missing_price_symbols",
+            "label": "Missing price symbols",
+            "status": "ok" if missing_count == 0 else "review",
+            "count": missing_count,
+            "detail": f"{missing_count} report symbols are tracked as missing price coverage.",
+        },
+    ]
+    overall = "ok" if all(check["status"] == "ok" for check in checks) else "review"
+    _write_product_json(
+        out / "health.json",
+        {
+            "schema_version": "1.0.0",
+            "generated_at": _page_generated_at(overview),
+            "status": overall,
+            "as_of": {
+                "report_date": report_end or None,
+                "price_date": price_end or None,
+                "simulation_date": simulation_end or None,
+            },
+            "checks": checks,
+        },
+    )
 
 
 def _relative_posix(path: Path, root: Path) -> str:

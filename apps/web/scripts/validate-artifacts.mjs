@@ -7,6 +7,7 @@ const webRoot = process.env.SNUSMIC_WEB_ARTIFACT_ROOT
   : path.join(repoRoot, 'data/web');
 const required = [
   'manifest.json',
+  'health.json',
   'overview/snapshot.json',
   'overview/research-pulse.json',
   'overview/data-quality.json',
@@ -92,6 +93,27 @@ if (!manifest.report_range?.start || !manifest.report_range?.end) fail('manifest
 if (!manifest.price_range?.start || !manifest.price_range?.end) fail('manifest price_range is incomplete');
 if (!manifest.simulation_range?.start || !manifest.simulation_range?.end) {
   fail('manifest simulation_range is incomplete');
+}
+const health = readJson('health.json');
+if (health.schema_version !== '1.0.0') fail(`health.json has invalid schema_version: ${health.schema_version}`);
+if (!['ok', 'review'].includes(health.status)) fail(`health.json has invalid status: ${health.status}`);
+if (health.as_of?.report_date !== manifest.report_range.end) {
+  fail(`health report_date=${health.as_of?.report_date}, manifest report_range.end=${manifest.report_range.end}`);
+}
+if (health.as_of?.price_date !== manifest.price_range.end) {
+  fail(`health price_date=${health.as_of?.price_date}, manifest price_range.end=${manifest.price_range.end}`);
+}
+if (health.as_of?.simulation_date !== manifest.simulation_range.end) {
+  fail(
+    `health simulation_date=${health.as_of?.simulation_date}, manifest simulation_range.end=${manifest.simulation_range.end}`,
+  );
+}
+if (!Array.isArray(health.checks) || health.checks.length === 0) {
+  fail('health.json checks must be a non-empty array');
+}
+for (const [index, check] of health.checks.entries()) {
+  if (!check?.id) fail(`health.json checks[${index}].id is missing`);
+  if (!['ok', 'review'].includes(check.status)) fail(`health.json checks[${index}].status is invalid`);
 }
 
 const countFiles = {

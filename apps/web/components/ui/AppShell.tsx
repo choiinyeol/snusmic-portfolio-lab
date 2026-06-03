@@ -26,6 +26,7 @@ type AppShellProps = {
   accountCount: number;
   reportRange: DateRange;
   priceRange: DateRange;
+  healthStatus: 'ok' | 'review';
   primaryBookLabel: string;
   commandTargets?: CommandTarget[];
 };
@@ -37,6 +38,7 @@ export function AppShell({
   accountCount,
   reportRange,
   priceRange,
+  healthStatus,
   primaryBookLabel,
   commandTargets,
 }: AppShellProps) {
@@ -68,8 +70,10 @@ export function AppShell({
       return next;
     });
   };
+  const healthLabel = healthStatus === 'ok' ? '정상' : '검토';
   const sidebarMetrics: ShellMetric[] = [
     { label: '기준일', value: snapshotDate || '—' },
+    { label: '상태', value: healthLabel, caption: healthStatus === 'ok' ? '기준일 정렬 완료' : '누락/정렬 검토 필요' },
     { label: '리포트', value: `${reportCount.toLocaleString('ko-KR')}기`, caption: reportRangeLabel(reportRange) },
     { label: '가격', value: priceRange.end ? '정상' : '확인 필요', caption: reportRangeLabel(priceRange) },
     {
@@ -146,7 +150,10 @@ export function AppShell({
           >
             <div className="mb-2 flex items-center justify-between gap-2">
               <span className="text-[11px] font-semibold uppercase text-slate-500">Data Status</span>
-              <span className="h-2 w-2 rounded-full bg-emerald-500" aria-label="정상" />
+              <span
+                className={cn('h-2 w-2 rounded-full', healthStatus === 'ok' ? 'bg-emerald-500' : 'bg-amber-500')}
+                aria-label={healthLabel}
+              />
             </div>
             <div className="grid gap-2">
               {sidebarMetrics.map((metric) => (

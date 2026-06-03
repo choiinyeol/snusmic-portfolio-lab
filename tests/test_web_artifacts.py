@@ -391,6 +391,21 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(web_export_dir: 
     assert len(manifest["checksums"]["prices/QQQ.json"]) == 64
     assert len(manifest["checksums"]["reports/table.json"]) == 64
     assert len(manifest["checksums"]["reports.json"]) == 64
+    health = json.loads((out / "health.json").read_text(encoding="utf-8"))
+    assert health["schema_version"] == "1.0.0"
+    assert health["status"] == "review"
+    assert health["as_of"] == {
+        "report_date": manifest["report_range"]["end"],
+        "price_date": manifest["price_range"]["end"],
+        "simulation_date": manifest["simulation_range"]["end"],
+    }
+    assert {check["id"] for check in health["checks"]} == {
+        "report_price_alignment",
+        "simulation_price_alignment",
+        "missing_price_symbols",
+    }
+    assert "health.json" in manifest["artifacts"]
+    assert len(manifest["checksums"]["health.json"]) == 64
 
 
 def test_export_web_artifacts_keeps_existing_output_when_staged_validation_fails(

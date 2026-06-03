@@ -1,6 +1,6 @@
 import { AppShell } from '@/components/ui/AppShell';
 import type { CommandTarget } from '@/components/ui/CommandPalette';
-import { getArtifactManifest, getOverview, getReportRows, getAccountCatalog } from '@/lib/artifacts';
+import { getArtifactHealth, getArtifactManifest, getOverview, getReportRows, getAccountCatalog } from '@/lib/artifacts';
 import { getObjectivePassingRows } from '@/lib/product-model';
 import { APP_NAV } from '@/components/ui/app-shell-nav';
 import './reports/report-detail.css';
@@ -8,6 +8,7 @@ import './reports/report-detail.css';
 export default function AppRouteLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const overview = getOverview();
   const manifest = getArtifactManifest();
+  const health = getArtifactHealth();
   const snapshotDate = overview.simulation_window?.price_end ?? overview.simulation_window?.report_end ?? '—';
   const admittedAccounts = getObjectivePassingRows();
   const primaryBookLabel = admittedAccounts[0]?.shortLabel ?? admittedAccounts[0]?.label ?? '승인 계좌 없음';
@@ -18,6 +19,7 @@ export default function AppRouteLayout({ children }: Readonly<{ children: React.
     <AppShell
       commandTargets={commandTargets}
       priceRange={manifest.price_range}
+      healthStatus={health.status}
       primaryBookLabel={primaryBookLabel}
       reportCount={manifest.row_counts.reports}
       reportRange={manifest.report_range}

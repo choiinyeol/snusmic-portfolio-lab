@@ -1,0 +1,31 @@
+{
+  "as_of": {
+    "price_date": "2026-06-01",
+    "report_date": "2026-05-29",
+    "simulation_date": "2026-06-01"
+  },
+  "checks": [
+    {
+      "detail": "price_end=2026-06-01, report_end=2026-05-29",
+      "id": "report_price_alignment",
+      "label": "Report and price dates",
+      "status": "ok"
+    },
+    {
+      "detail": "simulation_end=2026-06-01, price_end=2026-06-01",
+      "id": "simulation_price_alignment",
+      "label": "Simulation and price dates",
+      "status": "ok"
+    },
+    {
+      "count": 6,
+      "detail": "6 report symbols are tracked as missing price coverage.",
+      "id": "missing_price_symbols",
+      "label": "Missing price symbols",
+      "status": "review"
+    }
+  ],
+  "generated_at": "2026-06-01T00:00:00+09:00",
+  "schema_version": "1.0.0",
+  "status": "review"
+}

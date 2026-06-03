@@ -4,6 +4,7 @@ import path from 'node:path';
 import { readArtifact, WEB_DATA_ROOT } from '@/lib/data/artifact-reader';
 import {
   ArtifactManifestSchema,
+  ArtifactHealthSchema,
   AccountingReconciliationRowSchema,
   CompactEquityArtifactSchema,
   CompactTableArtifactSchema,
@@ -499,6 +500,23 @@ export type ArtifactManifest = {
   artifacts: string[];
   price_artifact_count: number;
   checksums: Record<string, string>;
+};
+export type ArtifactHealth = {
+  schema_version: string;
+  generated_at: string | null;
+  status: 'ok' | 'review';
+  as_of: {
+    report_date: string | null;
+    price_date: string | null;
+    simulation_date: string | null;
+  };
+  checks: Array<{
+    id: string;
+    label: string;
+    status: 'ok' | 'review';
+    detail: string;
+    count?: number;
+  }>;
 };
 
 export type Insight = {
@@ -1005,6 +1023,10 @@ export function getAccountCatalog(): AccountCatalogRow[] {
 
 export function getArtifactManifest(): ArtifactManifest {
   return parseArtifact('manifest.json', ArtifactManifestSchema, readRequiredJson<unknown>('data/web/manifest.json'));
+}
+
+export function getArtifactHealth(): ArtifactHealth {
+  return parseArtifact('health.json', ArtifactHealthSchema, readRequiredJson<unknown>('data/web/health.json'));
 }
 
 export function getReportRankings(): WebReportRankings {

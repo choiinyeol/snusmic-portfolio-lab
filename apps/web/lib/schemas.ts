@@ -494,6 +494,30 @@ export const ArtifactManifestSchema = z
   })
   .passthrough();
 
+export const ArtifactHealthSchema = z
+  .object({
+    schema_version: z.literal('1.0.0'),
+    generated_at: NullableString,
+    status: z.enum(['ok', 'review']),
+    as_of: z.object({
+      report_date: NullableString,
+      price_date: NullableString,
+      simulation_date: NullableString,
+    }),
+    checks: z.array(
+      z
+        .object({
+          id: z.string(),
+          label: z.string(),
+          status: z.enum(['ok', 'review']),
+          detail: z.string(),
+          count: z.number().optional(),
+        })
+        .passthrough(),
+    ),
+  })
+  .passthrough();
+
 /** Parse a JSON array against a zod schema and throw a build-time-friendly
  * error when validation fails. The error names the file and the row index +
  * field path so a Python-side schema drift is unambiguous in CI logs. */

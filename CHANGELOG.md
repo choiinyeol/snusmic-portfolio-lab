@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.30.15 - Add artifact health status
+
+- Adds deterministic `data/web/health.json` with report/price/simulation date alignment, missing-price coverage, and snapshot review status.
+- Validates the health artifact in `apps/web artifact:check` and includes it in manifest checksum coverage.
+- Shows the health status in the web shell Data Status panel instead of hard-coding a green state.
+- Documents the health artifact contract and bumps Python/web package versions to `0.30.15`.
+
+Verification:
+
+- `uv run pytest tests/test_web_artifacts.py -q -k "manifest_records_snapshot_lineage_counts_and_checksums or check_web_artifacts_requires_deterministic_json"`
+- `uv run ruff check src/snusmic_pipeline/web/artifacts.py tests/test_web_artifacts.py`
+- `uv run ruff format --check src/snusmic_pipeline/web/artifacts.py tests/test_web_artifacts.py`
+- `pnpm --dir apps/web artifact:check`
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web format:check`
+- `uv run python -m snusmic_pipeline export-web --check`
+- `git diff --check`
+
 ## v0.30.14 - Complete deterministic PIT ultragoal
 
 - Marks the durable ultragoal complete after auditing direct-origin ingest diagnostics, centralized symbol resolution, web artifact cross-reference gates, data-refresh pre-commit checks, and release evidence.
