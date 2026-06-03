@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.30.13 - Check refreshed web artifacts before commit
+
+- Runs `refresh-web-artifacts` and `rebuild-web-artifacts` through `check_web_artifacts()` so data-refresh workflows fail before committing invalid web artifacts.
+- Adds a focused CLI test proving `refresh-web-artifacts` uses the checked exporter rather than the unchecked export path.
+- Documents that bulk data refresh must pass deterministic/cross-reference validation before commit/push.
+- Bumps Python and web package versions to `0.30.13`.
+
+Verification:
+
+- `uv run pytest tests/test_web_artifacts.py -q -k "refresh_web_artifacts_runs_checked_export"`
+- `uv run ruff check src/snusmic_pipeline/cli.py tests/test_web_artifacts.py`
+- `uv run ruff format --check src/snusmic_pipeline/cli.py tests/test_web_artifacts.py`
+- `uv run python -m snusmic_pipeline export-web --check`
+- `git diff --check`
+
 ## v0.30.12 - Mirror price artifact gates in web CI
 
 - Extends `apps/web` artifact validation to reject missing-symbol price gaps, price artifact symbol mismatches, unlisted `missing_price=true` report artifacts, and `.KS/.KQ` dual artifacts.

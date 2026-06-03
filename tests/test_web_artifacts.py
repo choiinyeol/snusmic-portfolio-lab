@@ -4,12 +4,15 @@ import json
 import os
 import shutil
 import subprocess
+from datetime import date
 from pathlib import Path
+from types import SimpleNamespace
 
 import pandas as pd
 import pytest
 
 import snusmic_pipeline.web.artifacts as web_artifacts
+from snusmic_pipeline import cli
 from snusmic_pipeline.web.artifacts import (
     ExportInputs,
     _validate_price_artifact_cross_references,
@@ -247,6 +250,62 @@ def test_web_artifact_ci_validator_rejects_dual_krx_segment_artifacts(tmp_path: 
 
     assert result.returncode != 0
     assert "both KOSPI and KOSDAQ price artifacts" in result.stderr
+
+
+def test_refresh_web_artifacts_runs_checked_export(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    warehouse = tmp_path / "warehouse"
+    sim = tmp_path / "sim"
+    web = tmp_path / "web"
+    downloads = tmp_path / "downloads"
+    quality = tmp_path / "extraction_quality.json"
+    warehouse.mkdir()
+    sim.mkdir()
+    quality.write_text("{}", encoding="utf-8")
+    (warehouse / "daily_prices.csv").write_text("date,symbol,close\n2024-01-02,AAA,1\n", encoding="utf-8")
+
+    def fake_check(inputs: ExportInputs) -> dict[str, int]:
+        assert inputs.warehouse == warehouse
+        assert inputs.sim == sim
+        assert inputs.out == web
+        for name in (
+            "table-download-reports.csv",
+            "table-download-accounts.csv",
+            "data-quality-download.csv",
+        ):
+            (inputs.out / name).parent.mkdir(parents=True, exist_ok=True)
+            (inputs.out / name).write_text("id\n", encoding="utf-8")
+        return {"artifact_count": 3}
+
+    monkeypatch.setattr(
+        cli,
+        "run_daily_forward",
+        lambda *args, **kwargs: SimpleNamespace(
+            latest_date=date(2024, 1, 2),
+            full_replay_reason=None,
+        ),
+    )
+    monkeypatch.setattr(cli, "check_web_artifacts", fake_check)
+    monkeypatch.setattr(
+        cli,
+        "export_web_artifacts",
+        lambda inputs: pytest.fail("refresh-web-artifacts must run check_web_artifacts"),
+    )
+
+    result = cli.run_refresh_web_artifacts(
+        SimpleNamespace(
+            warehouse=warehouse,
+            sim=sim,
+            out=web,
+            downloads=downloads,
+            extraction_quality=quality,
+            start="2024-01-01",
+            refresh_benchmark=False,
+            ignore_account_artifact=False,
+        )
+    )
+
+    assert result == 0
+    assert (downloads / "snusmic-reports.csv").exists()
 
 
 @pytest.mark.slow

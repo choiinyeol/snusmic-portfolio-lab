@@ -14,7 +14,7 @@
 1. `sync`와 extraction command가 raw report row를 만듭니다.
 2. `build-warehouse`가 typed PIT CSV table을 씁니다.
 3. `refresh-prices`가 OHLCV price history를 씁니다.
-4. `refresh-web-artifacts`가 account artifact를 최신 warehouse price date까지 전진시키고 `data/web/**`를 씁니다.
+4. `refresh-web-artifacts`가 account artifact를 최신 warehouse price date까지 전진시키고, deterministic/cross-reference check를 통과한 뒤 `data/web/**`를 씁니다.
 5. `rebuild-web-artifacts`는 clean local regeneration이 필요할 때 fixed-account/PIT-board/web 전체를 다시 만듭니다.
 
 ### 웹 route

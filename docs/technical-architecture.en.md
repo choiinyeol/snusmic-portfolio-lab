@@ -14,7 +14,7 @@ The repository is layered by job:
 1. `sync` and extraction commands produce raw report rows.
 2. `build-warehouse` writes typed PIT CSV tables.
 3. `refresh-prices` writes OHLCV price history.
-4. `refresh-web-artifacts` advances account artifacts to the latest warehouse price date and writes `data/web/**`.
+4. `refresh-web-artifacts` advances account artifacts to the latest warehouse price date and writes `data/web/**` only through the deterministic/cross-reference checked exporter.
 5. `rebuild-web-artifacts` performs the full fixed-account/PIT-board/web rebuild when a clean local regeneration is needed.
 
 ### Frontend Data Bridge

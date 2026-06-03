@@ -511,7 +511,7 @@ def run_refresh_web_artifacts(args: argparse.Namespace) -> int:
         sim_dir,
         refresh_benchmark=args.refresh_benchmark,
     )
-    result = export_web_artifacts(
+    result = check_web_artifacts(
         ExportInputs(
             warehouse=warehouse_dir,
             sim=sim_dir,
@@ -569,7 +569,7 @@ def run_rebuild_web_artifacts(args: argparse.Namespace) -> int:
     )
     if pit_result != 0:
         return pit_result
-    result = export_web_artifacts(
+    result = check_web_artifacts(
         ExportInputs(
             warehouse=warehouse_dir,
             sim=sim_dir,
