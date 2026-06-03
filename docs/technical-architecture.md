@@ -44,5 +44,6 @@ Project script는 Bash wrapper 대신 Node 또는 Python entrypoint입니다. `p
 ### Contract
 
 Python exporter가 data shape를 소유합니다. TypeScript Zod schema는 build time에 생성 artifact를 검증합니다. Frontend는 account taxonomy를 위해 `data/web/accounts/catalog.json`를 읽어야 하며, account-id string에서 의미를 추론하면 안 됩니다.
+Symbol resolution은 `src/snusmic_pipeline/market_data/symbols.py`가 단일 source of truth입니다. Report extraction, warehouse normalization, yfinance suffix formatting은 이 registry의 company/ticker/exchange/yfinance/currency rule을 공유해야 하며, 신규 리포트 보정 rule을 `extract_pdf.py`나 `warehouse.py`에 별도 상수로 추가하지 않습니다.
 
 Daily-forward checkpoint는 local replay cache입니다. committed product artifact가 아니며, 삭제하면 다음 run이 warehouse에서 다시 replay할 뿐입니다.

@@ -308,6 +308,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
         bad_paths = [name for name in manifest.get("artifacts", []) if "\\" in str(name)]
         if bad_paths:
             raise RuntimeError(f"Manifest contains non-POSIX artifact paths: {bad_paths[:5]}")
+        _validate_price_artifact_cross_references(staged_out)
         _replace_directory(staged_out, out)
     result["out"] = str(out)
     return result
@@ -525,6 +526,7 @@ def check_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     missing = [name for name in REQUIRED_ARTIFACTS if not (inputs.out / name).exists()]
     if missing:
         raise RuntimeError(f"Missing required web artifacts: {', '.join(missing)}")
+    _validate_price_artifact_cross_references(inputs.out)
 
     first_bytes = _snapshot_json_bytes(inputs.out)
     with TemporaryDirectory() as tmpdir:
@@ -535,10 +537,96 @@ def check_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
             extraction_quality=inputs.extraction_quality,
         )
         export_web_artifacts(second_inputs)
+        _validate_price_artifact_cross_references(second_inputs.out)
         second_bytes = _snapshot_json_bytes(second_inputs.out)
     if first_bytes != second_bytes:
         raise RuntimeError("Web artifact export is not deterministic under repeated export")
     return first
+
+
+def _validate_price_artifact_cross_references(out: Path) -> None:
+    """Validate report/price artifact cross-references inside an exported web tree."""
+
+    manifest = _read_json(out / "manifest.json")
+    manifest_artifacts = {str(name) for name in manifest.get("artifacts", [])}
+    price_paths = sorted((out / "prices").glob("*.json"))
+    price_symbols = {path.stem for path in price_paths}
+
+    expected_price_count = manifest.get("price_artifact_count")
+    if expected_price_count != len(price_paths):
+        raise RuntimeError(
+            "Web artifact price count mismatch: "
+            f"manifest price_artifact_count={expected_price_count}, actual prices/*.json={len(price_paths)}"
+        )
+
+    manifest_price_paths = {name for name in manifest_artifacts if name.startswith("prices/")}
+    actual_price_paths = {_relative_posix(path, out) for path in price_paths}
+    if manifest_price_paths != actual_price_paths:
+        missing = sorted(actual_price_paths - manifest_price_paths)
+        stale = sorted(manifest_price_paths - actual_price_paths)
+        raise RuntimeError(
+            "Web artifact manifest price path mismatch: "
+            f"missing_in_manifest={missing[:5]}, stale_in_manifest={stale[:5]}"
+        )
+
+    reports = _read_json(out / "reports.json")
+    report_symbols = {
+        str(row.get("symbol", "")) for row in reports if isinstance(row, dict) and str(row.get("symbol", ""))
+    }
+    missing_rows = _read_json(out / "missing-symbols.json")
+    missing_symbols = {
+        str(row.get("symbol", ""))
+        for row in missing_rows
+        if isinstance(row, dict) and str(row.get("symbol", ""))
+    }
+
+    missing_report_prices = sorted(report_symbols - price_symbols)
+    if missing_report_prices:
+        raise RuntimeError(
+            f"Web artifact reports reference symbols without price artifacts: {missing_report_prices[:10]}"
+        )
+
+    missing_symbol_artifacts = sorted(missing_symbols - price_symbols)
+    if missing_symbol_artifacts:
+        raise RuntimeError(
+            f"Web artifact missing-symbols entries lack price artifacts: {missing_symbol_artifacts[:10]}"
+        )
+
+    manifest_missing = manifest.get("data_quality", {}).get("missing_price_symbols")
+    if manifest_missing != len(missing_symbols):
+        raise RuntimeError(
+            "Web artifact missing price count mismatch: "
+            f"manifest={manifest_missing}, missing-symbols.json={len(missing_symbols)}"
+        )
+
+    missing_price_flags: set[str] = set()
+    for path in price_paths:
+        payload = _read_json(path)
+        symbol = str(payload.get("symbol", "") if isinstance(payload, dict) else "")
+        if symbol != path.stem:
+            raise RuntimeError(f"Price artifact symbol mismatch in {_relative_posix(path, out)}: {symbol}")
+        if isinstance(payload, dict) and payload.get("missing_price") is True:
+            missing_price_flags.add(symbol)
+    unexpected_missing_flags = sorted((missing_price_flags & report_symbols) - missing_symbols)
+    if unexpected_missing_flags:
+        raise RuntimeError(
+            "Price artifacts are marked missing_price without missing-symbols entries: "
+            f"{unexpected_missing_flags[:10]}"
+        )
+
+    suffixes_by_raw: dict[str, set[str]] = {}
+    for symbol in price_symbols:
+        match = re.fullmatch(r"(\d{6})\.(KS|KQ)", symbol)
+        if match:
+            suffixes_by_raw.setdefault(match.group(1), set()).add(match.group(2))
+    dual_segment_symbols = sorted(
+        f"{raw}.KS/.KQ" for raw, suffixes in suffixes_by_raw.items() if {"KS", "KQ"} <= suffixes
+    )
+    if dual_segment_symbols:
+        raise RuntimeError(
+            "Web artifact contains both KOSPI and KOSDAQ price artifacts for the same raw ticker: "
+            f"{dual_segment_symbols[:10]}"
+        )
 
 
 def _guard_export_destination(inputs: ExportInputs) -> None:

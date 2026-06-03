@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.30.11 - Gate web price artifact references
+
+- Adds web artifact cross-reference validation for `reports.json`, `missing-symbols.json`, `manifest.json`, and `data/web/prices/*.json`.
+- Fails `export-web --check` when report or missing symbols lack price artifacts, manifest price counts drift, report symbols are marked missing without a missing-symbol entry, or one KRX raw ticker exports both `.KS` and `.KQ`.
+- Documents the symbol registry and web price artifact invariants in active architecture and data artifact policy docs.
+- Persists the ultragoal brief and M1 ledger entry under `.gjc/ultragoal/`.
+- Bumps Python and web package versions to `0.30.11`.
+
+Verification:
+
+- `uv run pytest tests/test_web_artifacts.py -q -k "price_cross_reference or check_web_artifacts_requires_deterministic_json"`
+- `uv run ruff check src/snusmic_pipeline/web/artifacts.py tests/test_web_artifacts.py`
+- `uv run ruff format --check src/snusmic_pipeline/web/artifacts.py tests/test_web_artifacts.py`
+- `uv run python -m snusmic_pipeline export-web --check`
+- `git diff --check`
+
 ## v0.30.10 - Centralize symbol resolution
 
 - Moves company ticker, exchange, yfinance symbol, currency, KOSDAQ segment, and yfinance suffix rules into `src/snusmic_pipeline/market_data/symbols.py`.

@@ -9,6 +9,7 @@ import pytest
 import snusmic_pipeline.web.artifacts as web_artifacts
 from snusmic_pipeline.web.artifacts import (
     ExportInputs,
+    _validate_price_artifact_cross_references,
     _write_price_artifacts,
     check_web_artifacts,
     export_web_artifacts,
@@ -22,6 +23,33 @@ def _baseline_export_inputs(out: Path) -> ExportInputs:
         out=out,
         extraction_quality=Path("data/extraction_quality.json"),
     )
+
+
+def _write_json(path: Path, value: object) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, ensure_ascii=False, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def _minimal_price_cross_reference_tree(out: Path) -> None:
+    artifacts = [
+        "manifest.json",
+        "reports.json",
+        "missing-symbols.json",
+        "prices/AAA.json",
+        "prices/MISS.json",
+    ]
+    _write_json(
+        out / "manifest.json",
+        {
+            "data_quality": {"missing_price_symbols": 1},
+            "artifacts": artifacts,
+            "price_artifact_count": 2,
+        },
+    )
+    _write_json(out / "reports.json", [{"symbol": "AAA"}])
+    _write_json(out / "missing-symbols.json", [{"symbol": "MISS"}])
+    _write_json(out / "prices" / "AAA.json", {"symbol": "AAA", "prices": [{"date": "2024-01-02"}]})
+    _write_json(out / "prices" / "MISS.json", {"symbol": "MISS", "missing_price": True, "prices": []})
 
 
 @pytest.fixture(scope="module")
@@ -147,6 +175,47 @@ def test_price_artifacts_preserve_split_diagnostics(tmp_path: Path) -> None:
     assert point["split_adjusted_close"] == 100.0
     assert point["split_adjusted_close_krw"] == 100.0
     assert point["split_adjusted_volume"] == 40.0
+
+
+def test_price_cross_reference_validator_accepts_consistent_tree(tmp_path: Path) -> None:
+    _minimal_price_cross_reference_tree(tmp_path)
+
+    _validate_price_artifact_cross_references(tmp_path)
+
+
+def test_price_cross_reference_validator_rejects_missing_report_price(tmp_path: Path) -> None:
+    _minimal_price_cross_reference_tree(tmp_path)
+    (tmp_path / "prices" / "AAA.json").unlink()
+    manifest = json.loads((tmp_path / "manifest.json").read_text(encoding="utf-8"))
+    manifest["artifacts"].remove("prices/AAA.json")
+    manifest["price_artifact_count"] = 1
+    _write_json(tmp_path / "manifest.json", manifest)
+
+    with pytest.raises(RuntimeError, match="reports reference symbols without price artifacts"):
+        _validate_price_artifact_cross_references(tmp_path)
+
+
+def test_price_cross_reference_validator_rejects_missing_count_mismatch(tmp_path: Path) -> None:
+    _minimal_price_cross_reference_tree(tmp_path)
+    manifest = json.loads((tmp_path / "manifest.json").read_text(encoding="utf-8"))
+    manifest["data_quality"]["missing_price_symbols"] = 0
+    _write_json(tmp_path / "manifest.json", manifest)
+
+    with pytest.raises(RuntimeError, match="missing price count mismatch"):
+        _validate_price_artifact_cross_references(tmp_path)
+
+
+def test_price_cross_reference_validator_rejects_dual_krx_segment_artifacts(tmp_path: Path) -> None:
+    _minimal_price_cross_reference_tree(tmp_path)
+    manifest = json.loads((tmp_path / "manifest.json").read_text(encoding="utf-8"))
+    manifest["artifacts"].extend(["prices/252990.KS.json", "prices/252990.KQ.json"])
+    manifest["price_artifact_count"] = 4
+    _write_json(tmp_path / "manifest.json", manifest)
+    _write_json(tmp_path / "prices" / "252990.KS.json", {"symbol": "252990.KS", "prices": []})
+    _write_json(tmp_path / "prices" / "252990.KQ.json", {"symbol": "252990.KQ", "prices": []})
+
+    with pytest.raises(RuntimeError, match="both KOSPI and KOSDAQ"):
+        _validate_price_artifact_cross_references(tmp_path)
 
 
 @pytest.mark.slow
