@@ -25,103 +25,10 @@ from ..market_data.currency import (
     download_fx_rates,
     normalize_currency,
 )
+from ..market_data.symbols import company_symbol_rule, infer_yfinance_symbol
 from .schemas import TABLE_DTYPES, TABLE_MODELS
 
 WAREHOUSE_TABLES = ["reports", "fx_rates", "daily_prices"]
-
-COMPANY_SYMBOL_OVERRIDES = {
-    "Bili bili": ("BILI", "NASDAQ", "BILI", "USD"),
-    "Bilibili": ("BILI", "NASDAQ", "BILI", "USD"),
-    "Cyber Agent": ("4751", "TYO", "4751.T", "JPY"),
-    "CyberAgent Inc.": ("4751", "TYO", "4751.T", "JPY"),
-    "쿠쿠홈시스": ("284740", "KRX", "284740.KS", "KRW"),
-    "한화솔루션": ("009830", "KRX", "009830.KS", "KRW"),
-    "Aixtron SE": ("AIXA", "ETR", "AIXA.DE", "EUR"),
-    "Comfort Systems USA, Inc.": ("FIX", "NYSE", "FIX", "USD"),
-    "Soitec SA": ("SOIT", "EPA", "SOIT.PA", "EUR"),
-    "Sterling Infrastructure Inc": ("STRL", "NASDAQ", "STRL", "USD"),
-    "Global Unichip Corp.": ("3443", "TWSE", "3443.TW", "TWD"),
-    "샘씨엔에스": ("252990", "KRX", "252990.KQ", "KRW"),
-}
-
-KOSDAQ_TICKERS = {
-    "033500",
-    "035900",
-    "036930",
-    "041830",
-    "043650",
-    "044490",
-    "049720",
-    "053030",
-    "054210",
-    "054780",
-    "060150",
-    "067160",
-    "089600",
-    "089860",
-    "089890",
-    "098120",
-    "099430",
-    "100840",
-    "101160",
-    "101490",
-    "108490",
-    "114810",
-    "119610",
-    "119850",
-    "122640",
-    "131970",
-    "148150",
-    "159010",
-    "166090",
-    "170790",
-    "182360",
-    "189300",
-    "192400",
-    "194480",
-    "196170",
-    "200710",
-    "204620",
-    "211050",
-    "214450",
-    "215000",
-    "218410",
-    "228670",
-    "234300",
-    "237690",
-    "259960",
-    "263750",
-    "280360",
-    "285490",
-    "287410",
-    "293490",
-    "294570",
-    "298020",
-    "310200",
-    "328130",
-    "344820",
-    "348210",
-    "348370",
-    "353810",
-    "356860",
-    "363250",
-    "366030",
-    "368600",
-    "376980",
-    "403870",
-    "408920",
-    "420770",
-    "440110",
-    "453340",
-    "456160",
-    "461300",
-    "472850",
-    "473980",
-    "475960",
-    "476830",
-    "950160",
-    "950170",
-}
 
 
 def build_warehouse(data_dir: Path, warehouse_dir: Path) -> dict[str, int]:
@@ -403,12 +310,15 @@ def read_reports(data_dir: Path) -> pd.DataFrame:
         for row in csv.DictReader(handle):
             metric = metrics.get(row.get("리포트명", ""), {})
             company = row.get("종목명", "") or metric.get("company", "")
-            override = COMPANY_SYMBOL_OVERRIDES.get(company)
+            override = company_symbol_rule(company)
             ticker = str(row.get("티커", ""))
             exchange = str(row.get("거래소", ""))
             target_currency = row.get("목표가 통화", "")
             if override:
-                ticker, exchange, symbol, target_currency = override
+                ticker = override.ticker
+                exchange = override.exchange
+                symbol = override.yfinance_symbol
+                target_currency = override.currency or target_currency
             else:
                 symbol = metric.get("yfinance_symbol") or infer_yfinance_symbol(ticker, exchange)
             if not symbol:
@@ -659,36 +569,6 @@ def sync_duckdb(warehouse_dir: Path) -> None:
                 )
     finally:
         con.close()
-
-
-def infer_yfinance_symbol(ticker: str, exchange: str) -> str:
-    ticker = str(ticker or "").strip().upper()
-    exchange = str(exchange or "").strip().upper()
-    if not ticker:
-        return ""
-    if exchange == "KRX" and ticker in KOSDAQ_TICKERS:
-        return f"{ticker}.KQ"
-    if exchange == "KRX" and ticker.isdigit():
-        return f"{ticker}.KS"
-    if exchange == "KOSDAQ" and ticker.isdigit():
-        return f"{ticker}.KQ"
-    if exchange == "TYO":
-        return f"{ticker}.T"
-    if exchange in {"HKG", "HKEX"}:
-        return f"{ticker}.HK"
-    if exchange == "SZSE":
-        return f"{ticker}.SZ"
-    if exchange == "SSE":
-        return f"{ticker}.SS"
-    if exchange == "EPA":
-        return f"{ticker}.PA"
-    if exchange == "AMS":
-        return f"{ticker}.AS"
-    if exchange == "SIX":
-        return f"{ticker}.SW"
-    if exchange in {"TWSE", "TPE"}:
-        return f"{ticker}.TW"
-    return ticker
 
 
 def stable_report_id(date: str, title: str, symbol: str) -> str:

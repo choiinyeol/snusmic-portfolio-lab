@@ -5,6 +5,8 @@ from datetime import datetime
 
 import pandas as pd
 
+from .symbols import KOSDAQ_TICKERS, YFINANCE_SUFFIXES
+
 FX_SYMBOLS = {
     "USD": "KRW=X",
     "JPY": "JPYKRW=X",
@@ -68,33 +70,6 @@ EXCHANGE_KEYWORDS = {
     "KRX": ["KOSPI", "KOSDAQ", "KRX:", "KOREA EXCHANGE"],
 }
 
-# yfinance ticker suffix per exchange. Used to lift a raw market identifier
-# (e.g. KRX "100090") to a yfinance symbol ("100090.KS") so callers can fetch
-# prices and FX consistently. KRX is a special case — the suffix depends on
-# which segment (KOSPI vs KOSDAQ) the listing belongs to, so the canonical
-# resolver lives below.
-EXCHANGE_TO_YFINANCE_SUFFIX = {
-    "TYO": ".T",
-    "TSE": ".T",
-    "HKG": ".HK",
-    "HKEX": ".HK",
-    "SZSE": ".SZ",
-    "SHE": ".SZ",
-    "SSE": ".SS",
-    "SHA": ".SS",
-    "EPA": ".PA",
-    "AMS": ".AS",
-    "FRA": ".F",
-    "ETR": ".DE",
-    "SIX": ".SW",
-    "SWX": ".SW",
-    "LSE": ".L",
-    "LON": ".L",
-    "TSX": ".TO",
-    "ASX": ".AX",
-    "TWSE": ".TW",
-    "TPE": ".TW",
-}
 
 Downloader = Callable[[str, datetime, datetime], pd.DataFrame]
 
@@ -156,7 +131,7 @@ def yfinance_symbol(ticker: str, exchange: str = "") -> str:
 
     KRX numeric listings are looked up against the KOSPI/KOSDAQ segment so the
     correct ``.KS`` / ``.KQ`` suffix is used. For every other supported venue
-    the suffix comes from ``EXCHANGE_TO_YFINANCE_SUFFIX``. If the ticker
+    the suffix comes from the shared symbol registry. If the ticker
     already carries a suffix or the exchange is not mapped, the input is
     returned unchanged.
     """
@@ -168,8 +143,10 @@ def yfinance_symbol(ticker: str, exchange: str = "") -> str:
         return raw  # already in yfinance shape
     code = str(exchange or "").strip().upper()
     if code in {"KRX", "KOSPI", "KOSDAQ"} and raw.isdigit() and len(raw) == 6:
-        return f"{raw}.{'KS' if code == 'KOSPI' else 'KQ' if code == 'KOSDAQ' else 'KS'}"
-    suffix = EXCHANGE_TO_YFINANCE_SUFFIX.get(code, "")
+        if code == "KOSDAQ" or (code == "KRX" and raw in KOSDAQ_TICKERS):
+            return f"{raw}.KQ"
+        return f"{raw}.KS"
+    suffix = YFINANCE_SUFFIXES.get(code, "")
     if suffix:
         return f"{raw}{suffix}"
     return raw

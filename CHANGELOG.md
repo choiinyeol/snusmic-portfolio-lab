@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.30.10 - Centralize symbol resolution
+
+- Moves company ticker, exchange, yfinance symbol, currency, KOSDAQ segment, and yfinance suffix rules into `src/snusmic_pipeline/market_data/symbols.py`.
+- Wires PDF extraction, warehouse report loading, and currency yfinance formatting to the shared symbol registry instead of duplicated constants.
+- Keeps PDF exchange evidence ahead of the generic 4-digit Tokyo fallback when a numeric ticker appears with explicit venue text.
+- Adds focused symbol-registry tests for recent overseas reports and the `샘씨엔에스 -> 252990.KQ` KOSDAQ case.
+- Bumps Python and web package versions to `0.30.10`.
+
+Verification:
+
+- `uv run pytest tests/test_symbol_registry.py tests/test_currency.py tests/test_leading_zero_preservation.py tests/test_extract_pdf.py -q`
+- `uv run ruff check src/snusmic_pipeline/market_data/symbols.py src/snusmic_pipeline/market_data/currency.py src/snusmic_pipeline/ingest/extract_pdf.py src/snusmic_pipeline/sim/warehouse.py tests/test_symbol_registry.py tests/test_currency.py tests/test_leading_zero_preservation.py tests/test_extract_pdf.py`
+- `uv run ruff format --check src/snusmic_pipeline/market_data/symbols.py src/snusmic_pipeline/market_data/currency.py src/snusmic_pipeline/ingest/extract_pdf.py src/snusmic_pipeline/sim/warehouse.py tests/test_symbol_registry.py tests/test_currency.py tests/test_leading_zero_preservation.py tests/test_extract_pdf.py`
+- `uv run python -m snusmic_pipeline build-warehouse --warehouse-dir .tmp-symbol-warehouse`
+- Python warehouse smoke for `샘씨엔에스`, `Aixtron SE`, `Soitec SA`, `Global Unichip Corp.`
+- `git diff --check`
+
 ## v0.30.9 - Remove hosted sync mirror fallback
 
 - Removes the `r.jina.ai` reader fallback from SNUSMIC report detection and index fetching so the pipeline only trusts the source WordPress REST API.

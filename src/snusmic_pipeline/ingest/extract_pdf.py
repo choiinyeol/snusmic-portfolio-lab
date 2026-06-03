@@ -4,6 +4,7 @@ import re
 from pathlib import Path
 
 from ..market_data.currency import EXCHANGE_CURRENCIES, infer_exchange_from_text
+from ..market_data.symbols import company_ticker, exchange_for_ticker
 from .models import DownloadedPdf, ExtractedReport
 
 _TICKER_RE = re.compile(r"\(([A-Z0-9]{1,10})\)")
@@ -51,140 +52,6 @@ _INVESTMENT_SECTION_RE = re.compile(
     r"(투자포인트|Investment\s+Point|Investment\s+points|Key\s+Points|Why\s+invest|Valuation)\s*[:：]?\s*(.{80,900})",
     re.IGNORECASE | re.DOTALL,
 )
-
-KNOWN_EXCHANGES = {
-    "BILI": "NASDAQ",
-    "GLNG": "NASDAQ",
-    "CAMT": "NASDAQ",
-    "LITE": "NASDAQ",
-    "IRMD": "NASDAQ",
-    "SXT": "NYSE",
-    "IMAX": "NYSE",
-    "ESTA": "NASDAQ",
-    "CRWV": "NASDAQ",
-    "GLW": "NYSE",
-    "LIF": "NASDAQ",
-    "DOCS": "NYSE",
-    "CHWY": "NYSE",
-    "SRAD": "NASDAQ",
-    "TEM": "NASDAQ",
-    "CLBT": "NASDAQ",
-    "ISRG": "NASDAQ",
-    "PLTR": "NASDAQ",
-    "FLNC": "NASDAQ",
-    "LEU": "NYSE",
-    "LLY": "NYSE",
-    "VRT": "NYSE",
-    "BAC": "NYSE",
-    "NE": "NYSE",
-    "MP": "NYSE",
-    "WOLF": "NYSE",
-    "TS": "NYSE",
-    "ANET": "NYSE",
-    "EAF": "NYSE",
-    "VTNR": "NASDAQ",
-    "TSM": "NYSE",
-    "STNG": "NYSE",
-    "INMD": "NASDAQ",
-    "OPEN": "NASDAQ",
-    "CHGG": "NYSE",
-    "WFG": "NYSE",
-    "SBLK": "NASDAQ",
-    "ROKU": "NASDAQ",
-    "SE": "NYSE",
-    "NETI": "NYSE",
-    "LONN": "SIX",
-    "BESI": "AMS",
-    "1211": "HKG",
-    "1833": "HKG",
-    "4689": "TYO",
-    "4751": "TYO",
-    "002340": "SZSE",
-    "002714": "SZSE",
-    "GTT": "EPA",
-    "6857": "TYO",
-    "4680": "TYO",
-    "5253": "TYO",
-    "2124": "TYO",
-    "5726": "TYO",
-    "GRND": "NYSE",
-    "FNKO": "NASDAQ",
-    "LEVI": "NYSE",
-    "AIXA": "ETR",
-    "FIX": "NYSE",
-    "SOIT": "EPA",
-    "STRL": "NASDAQ",
-    "3443": "TWSE",
-}
-
-KNOWN_COMPANY_TICKERS = {
-    "Bili bili": "BILI",
-    "Bilibili": "BILI",
-    "Cyber Agent": "4751",
-    "CyberAgent Inc.": "4751",
-    "쿠쿠홈시스": "284740",
-    "한화솔루션": "009830",
-    "Golar LNG": "GLNG",
-    "Camtek": "CAMT",
-    "Lumentum Holdings Inc": "LITE",
-    "Iradimed Corporation": "IRMD",
-    "Sensient Technologies Corp": "SXT",
-    "IMAX Corp": "IMAX",
-    "JAC recruitment Co. Ltd": "2124",
-    "Establishment Labs Holdings": "ESTA",
-    "Coreweave": "CRWV",
-    "Corning": "GLW",
-    "Life360 Inc": "LIF",
-    "Doximity": "DOCS",
-    "Sportradar": "SRAD",
-    "Tempus AI Inc": "TEM",
-    "Cellebrite DI": "CLBT",
-    "Advantest Corporation": "6857",
-    "Round One Corp": "4680",
-    "Cover Corp": "5253",
-    "Grindr Inc.": "GRND",
-    "Funko Inc.": "FNKO",
-    "Levi Strauss & Co": "LEVI",
-    "Intuitive Surgical": "ISRG",
-    "OSAKA Titanium Technologies Co.,Ltd.": "5726",
-    "Palantir Technologies Inc.": "PLTR",
-    "Fluence Energy Inc.": "FLNC",
-    "Centrus Energy Corp": "LEU",
-    "BYD": "1211",
-    "Eli Lilly & Co.": "LLY",
-    "Vertiv Holdings Co.": "VRT",
-    "Lonza Group AG": "LONN",
-    "BE Semiconductor Industries N.V.": "BESI",
-    "Bank of America Corp.": "BAC",
-    "Eneti Inc.": "NETI",
-    "Noble Corporation PLC": "NE",
-    "MP Materials": "MP",
-    "Wolfspeed": "WOLF",
-    "Tenaris S.A.": "TS",
-    "Arista Networks": "ANET",
-    "GrafTech International Ltd.": "EAF",
-    "Vertex Energy, Inc.": "VTNR",
-    "TSMC": "TSM",
-    "Scorpio Tankers Inc.": "STNG",
-    "GEM Co., Ltd.": "002340",
-    "Inmode": "INMD",
-    "Opendoor": "OPEN",
-    "Z-holdings": "4689",
-    "Muyuan foods co ltd": "002714",
-    "Chegg": "CHGG",
-    "Ping An Healthcare & Technology": "1833",
-    "West Fraser Timber. Co. Ltd": "WFG",
-    "Star Bulk Carriers": "SBLK",
-    "Roku": "ROKU",
-    "SEA ltd.": "SE",
-    "Gaztransport&technigaz": "GTT",
-    "Aixtron SE": "AIXA",
-    "Comfort Systems USA, Inc.": "FIX",
-    "Soitec SA": "SOIT",
-    "Sterling Infrastructure Inc": "STRL",
-    "Global Unichip Corp.": "3443",
-    "샘씨엔에스": "252990",
-}
 
 
 def parse_money(value: str | None) -> float | None:
@@ -367,7 +234,7 @@ def target_detail_text(
 
 
 def ticker_from_text(text: str, company_hint: str = "") -> str:
-    known = KNOWN_COMPANY_TICKERS.get(company_hint)
+    known = company_ticker(company_hint)
     if known:
         return known
     exchange_match = _EXCHANGE_TICKER_RE.search(text[:3000])
@@ -389,16 +256,16 @@ def ticker_from_text(text: str, company_hint: str = "") -> str:
 def infer_exchange(ticker: str, text: str = "") -> tuple[str, str]:
     if not ticker:
         return "", "Ticker not found"
-    exchange = KNOWN_EXCHANGES.get(ticker.upper(), "")
+    exchange = exchange_for_ticker(ticker)
     if exchange:
         return exchange, ""
     if ticker.isdigit() and len(ticker) == 6:
         return "KRX", "Korean numeric ticker; exchange prefix inferred as KRX"
-    if ticker.isdigit() and len(ticker) == 4:
-        return "TYO", "4-digit numeric ticker; exchange inferred as TYO"
     text_exchange = infer_exchange_from_text(text)
     if text_exchange:
         return text_exchange, ""
+    if ticker.isdigit() and len(ticker) == 4:
+        return "TYO", "4-digit numeric ticker; exchange inferred as TYO"
     return "", "Exchange not mapped; verify ticker/exchange"
 
 
@@ -486,7 +353,9 @@ def parse_report_text(text: str, company_hint: str = "") -> dict[str, object]:
         and 1 <= int(key.split("_", 1)[-1]) <= 5
         and is_plausible_target_price(value, ticker, exchange)
     }
-    base_target = single_target if current_target_pair is not None else scenario_values.get("base", single_target)
+    base_target = (
+        single_target if current_target_pair is not None else scenario_values.get("base", single_target)
+    )
     if base_target is None and scenario_values:
         base_target = median_price(list(scenario_values.values()))
         notes.append("No explicit Base target; base target uses median scenario value")
