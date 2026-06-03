@@ -2,7 +2,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const repoRoot = path.resolve(process.cwd(), '../..');
-const webRoot = path.join(repoRoot, 'data/web');
+const webRoot = process.env.SNUSMIC_WEB_ARTIFACT_ROOT
+  ? path.resolve(process.env.SNUSMIC_WEB_ARTIFACT_ROOT)
+  : path.join(repoRoot, 'data/web');
 const required = [
   'manifest.json',
   'overview/snapshot.json',
@@ -190,6 +192,42 @@ if (priceFiles.length !== manifest.price_artifact_count) {
 for (const symbol of reportSymbols) {
   if (!fs.existsSync(path.join(priceDir, `${symbol}.json`))) {
     fail(`missing price artifact for report symbol: ${symbol}`);
+  }
+}
+const missingSymbols = new Set();
+for (const [index, row] of readJson('missing-symbols.json').entries()) {
+  if (!row?.symbol) fail(`missing-symbols.json[${index}].symbol is missing`);
+  missingSymbols.add(row.symbol);
+  if (!fs.existsSync(path.join(priceDir, `${row.symbol}.json`))) {
+    fail(`missing-symbols entry lacks price artifact: ${row.symbol}`);
+  }
+}
+if (manifest.data_quality?.missing_price_symbols !== missingSymbols.size) {
+  fail(
+    `manifest data_quality.missing_price_symbols=${manifest.data_quality?.missing_price_symbols}, actual ${missingSymbols.size}`,
+  );
+}
+const krxSuffixesByRaw = new Map();
+for (const file of priceFiles) {
+  const artifact = readJson(`prices/${file}`);
+  const symbol = file.replace(/\.json$/, '');
+  if (artifact.symbol !== symbol) {
+    fail(`price artifact symbol mismatch in prices/${file}: ${artifact.symbol}`);
+  }
+  if (artifact.missing_price === true && reportSymbols.has(symbol) && !missingSymbols.has(symbol)) {
+    fail(`price artifact is marked missing_price without missing-symbols entry: ${symbol}`);
+  }
+  const match = /^(\d{6})\.(KS|KQ)$/.exec(symbol);
+  if (match) {
+    const raw = match[1];
+    const suffixes = krxSuffixesByRaw.get(raw) ?? new Set();
+    suffixes.add(match[2]);
+    krxSuffixesByRaw.set(raw, suffixes);
+  }
+}
+for (const [raw, suffixes] of krxSuffixesByRaw.entries()) {
+  if (suffixes.has('KS') && suffixes.has('KQ')) {
+    fail(`both KOSPI and KOSDAQ price artifacts exist for raw ticker: ${raw}.KS/.KQ`);
   }
 }
 for (const artifact of manifest.artifacts ?? []) {

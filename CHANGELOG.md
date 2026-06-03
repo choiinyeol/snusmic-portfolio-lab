@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.30.12 - Mirror price artifact gates in web CI
+
+- Extends `apps/web` artifact validation to reject missing-symbol price gaps, price artifact symbol mismatches, unlisted `missing_price=true` report artifacts, and `.KS/.KQ` dual artifacts.
+- Adds a focused test proving the web CI validator fails when a raw KRX ticker has both KOSPI and KOSDAQ price artifacts.
+- Documents that both `export-web --check` and web `artifact:check` enforce the price cross-reference contract.
+- Bumps Python and web package versions to `0.30.12`.
+
+Verification:
+
+- `pnpm --dir apps/web artifact:check`
+- `uv run pytest tests/test_web_artifacts.py -q -k "ci_validator_rejects_dual_krx_segment_artifacts or price_cross_reference_validator_rejects_dual_krx_segment_artifacts"`
+- `uv run ruff check tests/test_web_artifacts.py`
+- `uv run ruff format --check tests/test_web_artifacts.py`
+- `pnpm --dir apps/web format:check`
+
 ## v0.30.11 - Gate web price artifact references
 
 - Adds web artifact cross-reference validation for `reports.json`, `missing-symbols.json`, `manifest.json`, and `data/web/prices/*.json`.

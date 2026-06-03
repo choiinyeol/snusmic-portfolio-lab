@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import json
+import os
+import shutil
+import subprocess
 from pathlib import Path
 
 import pandas as pd
@@ -216,6 +219,34 @@ def test_price_cross_reference_validator_rejects_dual_krx_segment_artifacts(tmp_
 
     with pytest.raises(RuntimeError, match="both KOSPI and KOSDAQ"):
         _validate_price_artifact_cross_references(tmp_path)
+
+
+def test_web_artifact_ci_validator_rejects_dual_krx_segment_artifacts(tmp_path: Path) -> None:
+    web_root = tmp_path / "web"
+    shutil.copytree(Path("data/web"), web_root)
+
+    source = web_root / "prices" / "090460.KS.json"
+    dual = web_root / "prices" / "090460.KQ.json"
+    payload = json.loads(source.read_text(encoding="utf-8"))
+    payload["symbol"] = "090460.KQ"
+    _write_json(dual, payload)
+
+    manifest_path = web_root / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["price_artifact_count"] += 1
+    _write_json(manifest_path, manifest)
+
+    result = subprocess.run(
+        ["node", "scripts/validate-artifacts.mjs"],
+        cwd=Path("apps/web"),
+        env={**os.environ, "SNUSMIC_WEB_ARTIFACT_ROOT": str(web_root.resolve())},
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode != 0
+    assert "both KOSPI and KOSDAQ price artifacts" in result.stderr
 
 
 @pytest.mark.slow

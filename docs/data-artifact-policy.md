@@ -18,6 +18,6 @@
 | `data/sim/.cache/**` | Local tooling | 커밋하지 않습니다. |
 
 큰 artifact를 줄일 때는 deploy input을 삭제하기 전에 producer와 consumer contract를 함께 갱신해야 합니다. Portfolio equity와 daily-decision data는 `data/web/portfolio/equity/{index,ACCOUNT_ID}.json` 및 `data/web/portfolio/daily-decisions/{index,ACCOUNT_ID}.json`로 export합니다. Aggregate `equity-daily.json`과 `daily-decisions.json`은 web deploy input이 아닙니다. Per-symbol `data/web/prices/*.json`은 frontend reader와 artifact validator가 compact price store를 받을 때까지 커밋 상태를 유지합니다.
-`export-web --check`는 `reports.json`, `missing-symbols.json`, `manifest.json`, `data/web/prices/*.json`의 cross-reference를 검증해야 합니다. 모든 report/missing symbol은 대응 price artifact를 가져야 하고, report symbol의 `missing_price=true` artifact는 `missing-symbols.json`에 기록된 symbol에만 허용됩니다. 동일한 6자리 KRX ticker가 `.KS`와 `.KQ` 양쪽 price artifact로 동시에 export되면 segment resolver 오류로 보고 실패해야 합니다.
+`export-web --check`와 `apps/web`의 `artifact:check`는 `reports.json`, `missing-symbols.json`, `manifest.json`, `data/web/prices/*.json`의 cross-reference를 검증해야 합니다. 모든 report/missing symbol은 대응 price artifact를 가져야 하고, report symbol의 `missing_price=true` artifact는 `missing-symbols.json`에 기록된 symbol에만 허용됩니다. 동일한 6자리 KRX ticker가 `.KS`와 `.KQ` 양쪽 price artifact로 동시에 export되면 segment resolver 오류로 보고 실패해야 합니다.
 
 Frontend code는 가능한 한 page-shaped artifact 또는 view model을 소비해야 합니다. 화면에 새 metric이 필요하면 table/chart component 내부에서 product semantics를 다시 계산하지 말고 Python exporter 또는 typed page view model에 추가합니다.

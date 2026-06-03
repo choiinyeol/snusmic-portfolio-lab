@@ -15,3 +15,4 @@ The repository is a PIT data product, not an account-generation factory. Committ
 | `data/sim/.cache/**` | Local tooling | Do not commit. |
 
 Large artifact reductions must update both producer and consumer contracts before deleting deploy inputs. Portfolio equity and daily-decision data are exported as account shards; aggregate `equity-daily.json` and `daily-decisions.json` files are not web deploy inputs.
+`export-web --check` and the web app `artifact:check` must validate cross-references across `reports.json`, `missing-symbols.json`, `manifest.json`, and `data/web/prices/*.json`. Every report/missing symbol needs a matching price artifact. A report symbol may only have a `missing_price=true` artifact when it is also listed in `missing-symbols.json`. If one raw six-digit KRX ticker exports both `.KS` and `.KQ` price artifacts, treat it as a segment-resolution error and fail the gate.
