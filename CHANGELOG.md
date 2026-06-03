@@ -1,4 +1,22 @@
-﻿# Changelog
+# Changelog
+
+## v0.30.9 - Remove hosted sync mirror fallback
+
+- Removes the `r.jina.ai` reader fallback from SNUSMIC report detection and index fetching so the pipeline only trusts the source WordPress REST API.
+- Adds direct-origin HTTP diagnostics with status, final URL, content type, and body prefix for REST failures.
+- Shares ingest headers/timeouts through a direct HTTP helper and keeps PDF downloads on the same source policy.
+- Adds workflow timeouts, uv cache, pnpm cache, and `--prefer-offline` installs for sync, market refresh, and web deployment lanes.
+- Bumps Python and web package versions to `0.30.9`.
+
+Verification:
+
+- `uv run pytest tests/test_change_detection.py tests/test_fetch_index.py -q`
+- `uv run ruff check src/snusmic_pipeline/ingest/http_client.py src/snusmic_pipeline/ingest/change_detection.py src/snusmic_pipeline/ingest/download_pdfs.py src/snusmic_pipeline/ingest/fetch_index.py tests/test_change_detection.py tests/test_fetch_index.py`
+- `uv run ruff format --check src/snusmic_pipeline/ingest/http_client.py src/snusmic_pipeline/ingest/change_detection.py src/snusmic_pipeline/ingest/download_pdfs.py src/snusmic_pipeline/ingest/fetch_index.py tests/test_change_detection.py tests/test_fetch_index.py`
+- `uv sync --locked --group dev --dry-run`
+- `uv run python -m snusmic_pipeline check-new --manifest data/manifest.json`
+- `pnpm --dir apps/web typecheck`
+- `git diff --check`
 
 ## v0.30.8 - Refresh reports and split docs languages
 

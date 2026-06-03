@@ -3,15 +3,27 @@ import json
 import pytest
 
 from snusmic_pipeline.cli import build_parser, resolve_sync_pages
-from snusmic_pipeline.ingest import fetch_index
 from snusmic_pipeline.ingest.fetch_index import clean_html_text, fetch_page, fetch_reports, parse_pages
-from snusmic_pipeline.ingest.reader_fallback import ReaderFallbackError
+from snusmic_pipeline.ingest.http_client import SnusmicFetchError
 
 
 class FakeResponse:
-    def __init__(self, payload, *, json_error=False):
+    def __init__(
+        self,
+        payload,
+        *,
+        json_error: bool = False,
+        status_code: int = 200,
+        url: str = "http://snusmic.com/wp-json/wp/v2/posts",
+        text: str = "",
+        content_type: str = "application/json",
+    ):
         self.payload = payload
         self.json_error = json_error
+        self.status_code = status_code
+        self.url = url
+        self.text = text
+        self.headers = {"content-type": content_type}
 
     def raise_for_status(self):
         return None
@@ -23,13 +35,18 @@ class FakeResponse:
 
 
 class FakeSession:
-    def __init__(self, payload):
-        self.payload = payload
+    def __init__(self, response):
+        self.response = response
         self.calls = []
 
     def get(self, url, **kwargs):
         self.calls.append((url, kwargs))
-        return FakeResponse(self.payload)
+        return self.response
+
+
+class PayloadSession(FakeSession):
+    def __init__(self, payload):
+        super().__init__(FakeResponse(payload))
 
 
 def test_parse_pages_range_and_list():
@@ -64,7 +81,7 @@ def test_fetch_reports_extracts_pdf_url_and_company():
             "content": {"rendered": '<a href="http://snusmic.com/file.pdf">download</a>'},
         }
     ]
-    session = FakeSession(payload)
+    session = PayloadSession(payload)
 
     reports = fetch_reports([1], session=session)
 
@@ -75,30 +92,36 @@ def test_fetch_reports_extracts_pdf_url_and_company():
     assert reports[0].ordinal == 1
 
 
-def test_fetch_page_uses_reader_fallback_when_direct_response_is_not_json(monkeypatch):
-    payload = [{"link": "http://snusmic.com/equity-research-demo/"}]
-
-    class DirectSession:
-        def get(self, *args, **kwargs):
-            return FakeResponse(None, json_error=True)
-
-    monkeypatch.setattr(fetch_index.requests, "Session", DirectSession)
-    monkeypatch.setattr(fetch_index, "fetch_json_via_reader", lambda *args, **kwargs: payload)
-
-    assert fetch_page(1) == payload
-
-
-def test_fetch_page_reports_reader_fallback_failure(monkeypatch):
-    class DirectSession:
-        def get(self, *args, **kwargs):
-            return FakeResponse(None, json_error=True)
-
-    monkeypatch.setattr(fetch_index.requests, "Session", DirectSession)
-    monkeypatch.setattr(
-        fetch_index,
-        "fetch_json_via_reader",
-        lambda *args, **kwargs: (_ for _ in ()).throw(ReaderFallbackError("empty body")),
+def test_fetch_page_reports_non_json_direct_response_with_diagnostics():
+    session = FakeSession(
+        FakeResponse(
+            None,
+            json_error=True,
+            url="https://hostinfo.cafe24.com/overTraffic/503.html",
+            text="<html>temporarily unavailable</html>",
+            content_type="text/html",
+        )
     )
 
-    with pytest.raises(ValueError, match="reader fallback failed"):
-        fetch_page(1)
+    with pytest.raises(SnusmicFetchError) as exc_info:
+        fetch_page(1, session=session)
+
+    message = str(exc_info.value)
+    assert "did not return JSON" in message
+    assert "final_url=https://hostinfo.cafe24.com/overTraffic/503.html" in message
+    assert "content_type=text/html" in message
+    assert "body_prefix=<html>temporarily unavailable</html>" in message
+
+
+def test_fetch_page_reports_http_status_from_direct_response():
+    session = FakeSession(
+        FakeResponse(
+            {"error": "quota"},
+            status_code=503,
+            text="traffic exceeded",
+            content_type="text/html",
+        )
+    )
+
+    with pytest.raises(SnusmicFetchError, match="status=503"):
+        fetch_page(1, session=session)

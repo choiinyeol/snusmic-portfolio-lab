@@ -6,20 +6,11 @@ from collections.abc import Iterable
 
 import requests
 
+from .http_client import DEFAULT_TIMEOUT, fetch_json
 from .models import ReportMeta
-from .reader_fallback import ReaderFallbackError, fetch_json_via_reader
 
 BASE_URL = "http://snusmic.com"
 POSTS_ENDPOINT = f"{BASE_URL}/wp-json/wp/v2/posts"
-DEFAULT_TIMEOUT = 30
-DEFAULT_USER_AGENT = (
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-    "(KHTML, like Gecko) Chrome/126.0 Safari/537.36 snusmic-portfolio-lab/0.2"
-)
-DEFAULT_HEADERS = {
-    "User-Agent": DEFAULT_USER_AGENT,
-    "Accept": "application/json,text/html;q=0.9,*/*;q=0.8",
-}
 
 _PDF_RE = re.compile(r'href=["\']([^"\']+?\.pdf)["\']', re.IGNORECASE)
 _TAG_RE = re.compile(r"<[^>]+>")
@@ -62,33 +53,15 @@ def pdf_url_from_content(rendered_content: str) -> str:
 
 
 def fetch_page(page: int, session: requests.Session | None = None) -> list[dict]:
-    client = session or requests.Session()
     params: dict[str, str | int] = {
         "per_page": 12,
         "page": page,
         "_fields": "date,link,title,slug,content",
     }
-    prepared = requests.Request("GET", POSTS_ENDPOINT, params=params).prepare()
-    url = prepared.url or POSTS_ENDPOINT
-    response = client.get(
-        POSTS_ENDPOINT,
-        params=params,
-        headers=DEFAULT_HEADERS,
-        timeout=DEFAULT_TIMEOUT,
-    )
-    try:
-        response.raise_for_status()
-        return response.json()
-    except (requests.RequestException, ValueError):
-        if session is not None:
-            raise
-        try:
-            payload = fetch_json_via_reader(url, headers=DEFAULT_HEADERS, timeout=DEFAULT_TIMEOUT)
-        except ReaderFallbackError as exc:
-            raise ValueError("REST API did not return JSON and the reader fallback failed.") from exc
-        if not isinstance(payload, list):
-            raise ValueError("Reader fallback returned an unexpected payload (not a JSON list).") from None
-        return payload
+    payload = fetch_json(POSTS_ENDPOINT, params=params, session=session, timeout=DEFAULT_TIMEOUT)
+    if not isinstance(payload, list):
+        raise ValueError("SNUSMIC REST API returned an unexpected payload (not a JSON list).")
+    return payload
 
 
 def fetch_reports(pages: Iterable[int], session: requests.Session | None = None) -> list[ReportMeta]:

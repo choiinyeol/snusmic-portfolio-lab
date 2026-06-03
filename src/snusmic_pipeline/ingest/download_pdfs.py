@@ -7,7 +7,7 @@ from urllib.parse import unquote
 
 import requests
 
-from .fetch_index import DEFAULT_HEADERS, DEFAULT_TIMEOUT
+from .http_client import DEFAULT_HEADERS, DEFAULT_TIMEOUT
 from .models import DownloadedPdf, ReportMeta
 
 _SAFE_FILENAME_RE = re.compile(r"[\\/:*?\"<>|]+")

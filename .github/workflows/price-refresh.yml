@@ -19,6 +19,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -30,6 +31,8 @@ jobs:
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v8.1.0
+        with:
+          enable-cache: true
 
       - name: Install dependencies
         run: uv sync --locked --group dev

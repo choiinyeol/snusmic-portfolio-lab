@@ -2,26 +2,16 @@ from __future__ import annotations
 
 import json
 import re
-import urllib.parse
 import urllib.request
 from pathlib import Path
 from typing import Any, Protocol
 from urllib.parse import urlparse
 
-from .reader_fallback import ReaderFallbackError, fetch_json_via_reader
+from .http_client import DEFAULT_HEADERS, DEFAULT_TIMEOUT, SnusmicFetchError, fetch_json_with_diagnostics
 
 POSTS_ENDPOINT = "http://snusmic.com/wp-json/wp/v2/posts"
 RESEARCH_PAGE_URL = "http://snusmic.com/research/"
 PAGE_ONE_POST_LIMIT = 12
-DEFAULT_TIMEOUT = 30
-DEFAULT_USER_AGENT = (
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-    "(KHTML, like Gecko) Chrome/126.0 Safari/537.36 snusmic-portfolio-lab/0.2"
-)
-DEFAULT_HEADERS = {
-    "User-Agent": DEFAULT_USER_AGENT,
-    "Accept": "application/json,text/html;q=0.9,*/*;q=0.8",
-}
 
 _POST_LINK_RE = re.compile(r'href=["\'](http://snusmic\.com/equity-research-[^"\']+/)["\']')
 
@@ -77,28 +67,16 @@ def _is_snusmic_url(url: str) -> bool:
 
 
 def _fetch_page_one_payload() -> tuple[list[Any], str, int]:
-    query = urllib.parse.urlencode({"per_page": PAGE_ONE_POST_LIMIT, "page": 1, "_fields": "link"})
-    url = f"{POSTS_ENDPOINT}?{query}"
-    request = urllib.request.Request(
-        url,
-        headers=DEFAULT_HEADERS,
-    )
+    params = {"per_page": PAGE_ONE_POST_LIMIT, "page": 1, "_fields": "link"}
     try:
-        with urllib.request.urlopen(request, timeout=DEFAULT_TIMEOUT) as response:
-            body = response.read().decode("utf-8", errors="replace")
-            payload = json.loads(body)
-            return payload, response.url, response.status
-    except json.JSONDecodeError:
-        try:
-            payload = fetch_json_via_reader(url, headers=DEFAULT_HEADERS, timeout=DEFAULT_TIMEOUT)
-            return payload, POSTS_ENDPOINT, 200
-        except (OSError, ReaderFallbackError) as fallback_exc:
-            raise SnusmicSiteUnavailable(
-                "REST API did not return JSON and the reader fallback failed; "
-                "the site may be down or rate-limited."
-            ) from fallback_exc
-    except OSError as exc:
-        raise SnusmicSiteUnavailable(f"REST API request failed: {exc}") from exc
+        payload, diagnostics = fetch_json_with_diagnostics(
+            POSTS_ENDPOINT,
+            params=params,
+            timeout=DEFAULT_TIMEOUT,
+        )
+    except SnusmicFetchError as exc:
+        raise SnusmicSiteUnavailable(str(exc)) from exc
+    return payload, diagnostics.final_url, diagnostics.status_code or 0
 
 
 def fetch_page_one_post_urls(session: _SessionLike | None = None) -> list[str]:
@@ -108,24 +86,21 @@ def fetch_page_one_post_urls(session: _SessionLike | None = None) -> list[str]:
     returning live content (cafe24 503 redirect, non-JSON body, empty list,
     off-domain links).
     """
+    params = {"per_page": PAGE_ONE_POST_LIMIT, "page": 1, "_fields": "link"}
     if session is None:
         payload, final_url, status_code = _fetch_page_one_payload()
     else:
-        response = session.get(
-            POSTS_ENDPOINT,
-            params={"per_page": PAGE_ONE_POST_LIMIT, "page": 1, "_fields": "link"},
-            headers=DEFAULT_HEADERS,
-            timeout=DEFAULT_TIMEOUT,
-            allow_redirects=True,
-        )
-        final_url = getattr(response, "url", "") or ""
-        status_code = getattr(response, "status_code", 0)
         try:
-            payload = response.json()
-        except ValueError as exc:
-            raise SnusmicSiteUnavailable(
-                "REST API did not return JSON; the site may be down or rate-limited."
-            ) from exc
+            payload, diagnostics = fetch_json_with_diagnostics(
+                POSTS_ENDPOINT,
+                params=params,
+                session=session,
+                timeout=DEFAULT_TIMEOUT,
+            )
+        except SnusmicFetchError as exc:
+            raise SnusmicSiteUnavailable(str(exc)) from exc
+        final_url = diagnostics.final_url
+        status_code = diagnostics.status_code or 0
 
     if final_url and not _is_snusmic_url(final_url):
         raise SnusmicSiteUnavailable(

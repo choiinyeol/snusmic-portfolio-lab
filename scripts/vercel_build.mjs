@@ -84,7 +84,7 @@ function validateWebArtifacts() {
 
 validateWebArtifacts();
 
-pnpm(['install', '--frozen-lockfile'], { cwd: webDir });
+pnpm(['install', '--frozen-lockfile', '--prefer-offline'], { cwd: webDir });
 pnpm(['typecheck'], { cwd: webDir });
 pnpm(['build'], { cwd: webDir });
 pnpm(['smoke:static'], { cwd: webDir });
