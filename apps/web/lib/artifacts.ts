@@ -504,7 +504,7 @@ export type ArtifactManifest = {
 export type ArtifactHealth = {
   schema_version: string;
   generated_at: string | null;
-  status: 'ok' | 'review';
+  status: 'ok' | 'review' | 'stale' | 'fail';
   as_of: {
     report_date: string | null;
     price_date: string | null;
@@ -513,8 +513,12 @@ export type ArtifactHealth = {
   checks: Array<{
     id: string;
     label: string;
-    status: 'ok' | 'review';
+    status: 'ok' | 'review' | 'stale' | 'fail';
+    severity: 'ok' | 'review' | 'stale' | 'fail';
     detail: string;
+    observed?: Record<string, unknown>;
+    expected?: string;
+    action?: string;
     count?: number;
   }>;
 };

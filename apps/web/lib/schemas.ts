@@ -498,7 +498,7 @@ export const ArtifactHealthSchema = z
   .object({
     schema_version: z.literal('1.0.0'),
     generated_at: NullableString,
-    status: z.enum(['ok', 'review']),
+    status: z.enum(['ok', 'review', 'stale', 'fail']),
     as_of: z.object({
       report_date: NullableString,
       price_date: NullableString,
@@ -509,8 +509,12 @@ export const ArtifactHealthSchema = z
         .object({
           id: z.string(),
           label: z.string(),
-          status: z.enum(['ok', 'review']),
+          status: z.enum(['ok', 'review', 'stale', 'fail']),
+          severity: z.enum(['ok', 'review', 'stale', 'fail']),
           detail: z.string(),
+          observed: z.record(z.string(), z.unknown()).optional(),
+          expected: z.string().optional(),
+          action: z.string().optional(),
           count: z.number().optional(),
         })
         .passthrough(),

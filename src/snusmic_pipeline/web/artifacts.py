@@ -1825,31 +1825,53 @@ def _write_artifact_health(out: Path, overview: dict[str, Any], data_quality: di
     report_end = str(window.get("report_end") or "") if isinstance(window, dict) else ""
     price_end = str(window.get("price_end") or "") if isinstance(window, dict) else ""
     simulation_end = price_end
-    missing_symbols = data_quality.get("missing_symbols", []) if isinstance(data_quality, dict) else []
-    missing_count = len(missing_symbols) if isinstance(missing_symbols, list) else 0
+    raw_missing_symbols = data_quality.get("missing_symbols", []) if isinstance(data_quality, dict) else []
+    missing_symbols = raw_missing_symbols if isinstance(raw_missing_symbols, list) else []
+    missing_count = len(missing_symbols)
+    missing_preview = [
+        {
+            "symbol": str(row.get("symbol", "")),
+            "company": str(row.get("company", "")),
+        }
+        for row in missing_symbols[:5]
+        if isinstance(row, dict) and row.get("symbol")
+    ]
 
     checks = [
         {
             "id": "report_price_alignment",
             "label": "Report and price dates",
-            "status": "ok" if report_end and price_end and price_end >= report_end else "review",
+            "severity": "ok" if report_end and price_end and price_end >= report_end else "fail",
+            "status": "ok" if report_end and price_end and price_end >= report_end else "fail",
+            "observed": {"price_end": price_end or None, "report_end": report_end or None},
+            "expected": "price_end must be on or after report_end",
+            "action": "리포트 동기화 후 refresh-prices와 refresh-web-artifacts를 다시 실행하세요.",
             "detail": f"price_end={price_end or 'unknown'}, report_end={report_end or 'unknown'}",
         },
         {
             "id": "simulation_price_alignment",
             "label": "Simulation and price dates",
-            "status": "ok" if simulation_end and price_end and simulation_end == price_end else "review",
+            "severity": "ok" if simulation_end and price_end and simulation_end == price_end else "fail",
+            "status": "ok" if simulation_end and price_end and simulation_end == price_end else "fail",
+            "observed": {"simulation_end": simulation_end or None, "price_end": price_end or None},
+            "expected": "simulation_end must match price_end",
+            "action": "계좌 artifact를 최신 가격 기준일까지 전진시키도록 refresh-web-artifacts를 다시 실행하세요.",
             "detail": f"simulation_end={simulation_end or 'unknown'}, price_end={price_end or 'unknown'}",
         },
         {
             "id": "missing_price_symbols",
             "label": "Missing price symbols",
+            "severity": "ok" if missing_count == 0 else "review",
             "status": "ok" if missing_count == 0 else "review",
             "count": missing_count,
+            "observed": {"missing_price_symbols": missing_count, "preview": missing_preview},
+            "expected": "missing_price_symbols should be zero when every report symbol has reliable market data",
+            "action": "누락 symbol을 검토해 mapping 추가, 시장 데이터 없음 수용, 리포트 제외 중 하나를 결정하세요.",
             "detail": f"{missing_count} report symbols are tracked as missing price coverage.",
         },
     ]
-    overall = "ok" if all(check["status"] == "ok" for check in checks) else "review"
+    severity_rank = {"ok": 0, "review": 1, "stale": 2, "fail": 3}
+    overall = max((str(check["severity"]) for check in checks), key=lambda value: severity_rank[value])
     _write_product_json(
         out / "health.json",
         {

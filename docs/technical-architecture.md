@@ -36,7 +36,7 @@
 웹 앱은 커밋된 `data/web` artifact를 읽는 static reader입니다. Route file은 `apps/web/lib/view-models/**`의 page view model을 호출하고, display-ready props를 React component에 전달해야 합니다. Low-level file read는 server-only artifact reader에 머물러야 하며, React component는 target-hit, split adjustment, benchmark coverage, report-window logic을 다시 계산하지 않습니다.
 
 `data/web/pages/**`의 page bundle은 screen-level metadata, metric, view, warning, table/chart payload의 선호 shape입니다. `data/web/reports/**`, `data/web/portfolio/**`, `data/web/prices/**`의 canonical artifact는 재사용 가능한 데이터의 source of truth입니다. Portfolio time series는 `data/web/portfolio/equity/**` 및 `data/web/portfolio/daily-decisions/**`의 account shard이며, web app은 전체 simulation branch aggregate가 아니라 선택된 account shard를 읽어야 합니다.
-`data/web/health.json`은 shell-level Data Status가 읽는 운영 health artifact입니다. 기준일 정렬, 가격 누락 coverage, artifact 검토 상태를 Python exporter가 계산하고 frontend는 그 결과를 재계산하지 않습니다.
+`data/web/health.json`은 shell-level Data Status가 읽는 운영 health artifact입니다. 기준일 정렬, 가격 누락 coverage, artifact 검토 상태와 조치 문구를 Python exporter가 계산하고 frontend는 그 결과를 재계산하지 않습니다. `apps/web artifact:check`는 현재 날짜 기준 price/report freshness threshold도 적용해 오래된 snapshot 배포를 막습니다.
 
 ### Cross-Platform Tooling
 

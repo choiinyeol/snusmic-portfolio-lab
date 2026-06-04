@@ -5,6 +5,8 @@ const repoRoot = path.resolve(process.cwd(), '../..');
 const webRoot = process.env.SNUSMIC_WEB_ARTIFACT_ROOT
   ? path.resolve(process.env.SNUSMIC_WEB_ARTIFACT_ROOT)
   : path.join(repoRoot, 'data/web');
+const maxPriceAgeDays = Number(process.env.SNUSMIC_MAX_PRICE_AGE_DAYS ?? '7');
+const maxReportAgeDays = Number(process.env.SNUSMIC_MAX_REPORT_AGE_DAYS ?? '30');
 const required = [
   'manifest.json',
   'health.json',
@@ -62,6 +64,12 @@ function rowCount(data) {
   return 1;
 }
 
+function ageDays(dateText) {
+  const parsed = Date.parse(`${dateText}T00:00:00Z`);
+  if (!Number.isFinite(parsed)) return Number.POSITIVE_INFINITY;
+  return Math.floor((Date.now() - parsed) / 86_400_000);
+}
+
 function countShardRows(indexPath) {
   const index = readJson(indexPath);
   if (!Array.isArray(index.accounts)) fail(`${indexPath} accounts must be an array`);
@@ -96,7 +104,8 @@ if (!manifest.simulation_range?.start || !manifest.simulation_range?.end) {
 }
 const health = readJson('health.json');
 if (health.schema_version !== '1.0.0') fail(`health.json has invalid schema_version: ${health.schema_version}`);
-if (!['ok', 'review'].includes(health.status)) fail(`health.json has invalid status: ${health.status}`);
+const allowedHealthStatuses = ['ok', 'review', 'stale', 'fail'];
+if (!allowedHealthStatuses.includes(health.status)) fail(`health.json has invalid status: ${health.status}`);
 if (health.as_of?.report_date !== manifest.report_range.end) {
   fail(`health report_date=${health.as_of?.report_date}, manifest report_range.end=${manifest.report_range.end}`);
 }
@@ -113,7 +122,19 @@ if (!Array.isArray(health.checks) || health.checks.length === 0) {
 }
 for (const [index, check] of health.checks.entries()) {
   if (!check?.id) fail(`health.json checks[${index}].id is missing`);
-  if (!['ok', 'review'].includes(check.status)) fail(`health.json checks[${index}].status is invalid`);
+  if (!allowedHealthStatuses.includes(check.status)) fail(`health.json checks[${index}].status is invalid`);
+  if (!allowedHealthStatuses.includes(check.severity)) fail(`health.json checks[${index}].severity is invalid`);
+  if (check.severity === 'stale' || check.severity === 'fail') {
+    fail(`health.json check ${check.id} is ${check.severity}: ${check.action ?? check.detail ?? 'no action'}`);
+  }
+}
+const priceAgeDays = ageDays(manifest.price_range.end);
+if (priceAgeDays > maxPriceAgeDays) {
+  fail(`manifest price_range.end is stale: age_days=${priceAgeDays}, max=${maxPriceAgeDays}`);
+}
+const reportAgeDays = ageDays(manifest.report_range.end);
+if (reportAgeDays > maxReportAgeDays) {
+  fail(`manifest report_range.end is stale: age_days=${reportAgeDays}, max=${maxReportAgeDays}`);
 }
 
 const countFiles = {

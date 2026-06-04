@@ -252,6 +252,27 @@ def test_web_artifact_ci_validator_rejects_dual_krx_segment_artifacts(tmp_path: 
     assert "both KOSPI and KOSDAQ price artifacts" in result.stderr
 
 
+def test_web_artifact_ci_validator_rejects_stale_price_range(tmp_path: Path) -> None:
+    web_root = tmp_path / "web"
+    shutil.copytree(Path("data/web"), web_root)
+
+    result = subprocess.run(
+        ["node", "scripts/validate-artifacts.mjs"],
+        cwd=Path("apps/web"),
+        env={
+            **os.environ,
+            "SNUSMIC_WEB_ARTIFACT_ROOT": str(web_root.resolve()),
+            "SNUSMIC_MAX_PRICE_AGE_DAYS": "0",
+        },
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode != 0
+    assert "manifest price_range.end is stale" in result.stderr
+
+
 def test_refresh_web_artifacts_runs_checked_export(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     warehouse = tmp_path / "warehouse"
     sim = tmp_path / "sim"
@@ -404,6 +425,10 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(web_export_dir: 
         "simulation_price_alignment",
         "missing_price_symbols",
     }
+    checks_by_id = {check["id"]: check for check in health["checks"]}
+    assert checks_by_id["missing_price_symbols"]["severity"] == "review"
+    assert checks_by_id["missing_price_symbols"]["observed"]["missing_price_symbols"] == 6
+    assert checks_by_id["missing_price_symbols"]["action"]
     assert "health.json" in manifest["artifacts"]
     assert len(manifest["checksums"]["health.json"]) == 64
 

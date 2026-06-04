@@ -19,6 +19,8 @@ type ShellMetric = {
   caption?: string;
 };
 
+type HealthStatus = 'ok' | 'review' | 'stale' | 'fail';
+
 type AppShellProps = {
   children: React.ReactNode;
   snapshotDate: string;
@@ -26,7 +28,8 @@ type AppShellProps = {
   accountCount: number;
   reportRange: DateRange;
   priceRange: DateRange;
-  healthStatus: 'ok' | 'review';
+  healthStatus: HealthStatus;
+  healthCaption: string;
   primaryBookLabel: string;
   commandTargets?: CommandTarget[];
 };
@@ -39,6 +42,7 @@ export function AppShell({
   reportRange,
   priceRange,
   healthStatus,
+  healthCaption,
   primaryBookLabel,
   commandTargets,
 }: AppShellProps) {
@@ -70,10 +74,10 @@ export function AppShell({
       return next;
     });
   };
-  const healthLabel = healthStatus === 'ok' ? '정상' : '검토';
+  const healthLabel = healthStatusLabel(healthStatus);
   const sidebarMetrics: ShellMetric[] = [
     { label: '기준일', value: snapshotDate || '—' },
-    { label: '상태', value: healthLabel, caption: healthStatus === 'ok' ? '기준일 정렬 완료' : '누락/정렬 검토 필요' },
+    { label: '상태', value: healthLabel, caption: healthCaption },
     { label: '리포트', value: `${reportCount.toLocaleString('ko-KR')}기`, caption: reportRangeLabel(reportRange) },
     { label: '가격', value: priceRange.end ? '정상' : '확인 필요', caption: reportRangeLabel(priceRange) },
     {
@@ -151,7 +155,7 @@ export function AppShell({
             <div className="mb-2 flex items-center justify-between gap-2">
               <span className="text-[11px] font-semibold uppercase text-slate-500">Data Status</span>
               <span
-                className={cn('h-2 w-2 rounded-full', healthStatus === 'ok' ? 'bg-emerald-500' : 'bg-amber-500')}
+                className={cn('h-2 w-2 rounded-full', healthStatusDotClass(healthStatus))}
                 aria-label={healthLabel}
               />
             </div>
@@ -231,4 +235,17 @@ function reportRangeLabel(range: DateRange): string {
   if (!range.start && !range.end) return '범위 없음';
   if (range.start === range.end) return range.end ?? range.start ?? '—';
   return `${range.start || '—'} → ${range.end || '—'}`;
+}
+
+function healthStatusLabel(status: HealthStatus): string {
+  if (status === 'ok') return '정상';
+  if (status === 'review') return '검토';
+  if (status === 'stale') return '지연';
+  return '실패';
+}
+
+function healthStatusDotClass(status: HealthStatus): string {
+  if (status === 'ok') return 'bg-emerald-500';
+  if (status === 'review') return 'bg-amber-500';
+  return 'bg-red-600';
 }

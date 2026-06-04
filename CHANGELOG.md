@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.30.16 - Add actionable health severity
+
+- Extends `data/web/health.json` checks with `ok | review | stale | fail` severity, observed/expected/action fields, and missing-price previews.
+- Makes `apps/web artifact:check` allow `review` health warnings while blocking `stale`/`fail` checks and current-date stale report/price ranges.
+- Shows the primary health action in the shell Data Status panel and supports stale/fail visual states.
+- Documents the severity contract and bumps Python/web package versions to `0.30.16`.
+
+Verification:
+
+- `uv run pytest tests/test_web_artifacts.py -q -k "manifest_records_snapshot_lineage_counts_and_checksums or web_artifact_ci_validator_rejects_stale_price_range or check_web_artifacts_requires_deterministic_json"`
+- `uv run ruff check src/snusmic_pipeline/web/artifacts.py tests/test_web_artifacts.py`
+- `uv run ruff format --check src/snusmic_pipeline/web/artifacts.py tests/test_web_artifacts.py`
+- `pnpm --dir apps/web artifact:check`
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web format:check`
+- `uv run python -m snusmic_pipeline export-web --check`
+- `pnpm --dir apps/web build`
+- `pnpm --dir apps/web smoke:static`
+- `git diff --check`
+
 ## v0.30.15 - Add artifact health status
 
 - Adds deterministic `data/web/health.json` with report/price/simulation date alignment, missing-price coverage, and snapshot review status.
