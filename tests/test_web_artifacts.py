@@ -412,6 +412,22 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(web_export_dir: 
     assert len(manifest["checksums"]["prices/QQQ.json"]) == 64
     assert len(manifest["checksums"]["reports/table.json"]) == 64
     assert len(manifest["checksums"]["reports.json"]) == 64
+    report_health = json.loads((out / "report-health.json").read_text(encoding="utf-8"))
+    assert report_health["schema_version"] == "1.0.0"
+    assert report_health["summary"]["source_reports"] == 240
+    assert report_health["summary"]["web_visible"] == 217
+    assert report_health["summary"]["web_excluded"] == 23
+    assert report_health["summary"]["needs_review"] == 2
+    assert report_health["summary"]["exclusion_reasons"] == {
+        "downside_target": 8,
+        "instant_target_hit": 1,
+        "missing_price": 6,
+        "non_positive_upside": 8,
+    }
+    assert any(row["web_status"] == "excluded" and row["action"] for row in report_health["rows"])
+    assert "report-health.json" in manifest["artifacts"]
+    assert manifest["row_counts"]["report_health_rows"] == 240
+    assert len(manifest["checksums"]["report-health.json"]) == 64
     health = json.loads((out / "health.json").read_text(encoding="utf-8"))
     assert health["schema_version"] == "1.0.0"
     assert health["status"] == "review"

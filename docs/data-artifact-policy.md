@@ -21,5 +21,6 @@
 `export-web --check`와 `apps/web`의 `artifact:check`는 `reports.json`, `missing-symbols.json`, `manifest.json`, `data/web/prices/*.json`의 cross-reference를 검증해야 합니다. 모든 report/missing symbol은 대응 price artifact를 가져야 하고, report symbol의 `missing_price=true` artifact는 `missing-symbols.json`에 기록된 symbol에만 허용됩니다. 동일한 6자리 KRX ticker가 `.KS`와 `.KQ` 양쪽 price artifact로 동시에 export되면 segment resolver 오류로 보고 실패해야 합니다.
 대량 data refresh workflow는 `refresh-web-artifacts`/`rebuild-web-artifacts` 단계에서 checked exporter를 호출해야 하며, 이 검증이 실패한 artifact는 commit/push 단계로 넘어가면 안 됩니다.
 `data/web/health.json`은 현재 artifact snapshot의 report/price/simulation 기준일 정렬과 missing-price coverage 상태를 공개하는 운영 health artifact입니다. 각 check는 `ok | review | stale | fail` severity, observed/expected/action을 포함해야 합니다. `review`는 UI 경고로 통과하지만, `stale`/`fail`은 `artifact:check`에서 배포 차단으로 처리합니다. 이 파일은 `manifest.json`에 포함되어 checksum 검증을 받아야 하며, web shell의 Data Status는 이 값을 그대로 표시해야 합니다.
+`data/web/report-health.json`은 240개 원천 리포트 전체의 전사/추출 상태, 웹 노출 여부, 제외 사유, 다음 조치를 보존합니다. 리포트가 `reports.json`에 없을 때는 이 artifact에서 `web_exclusion_reason`을 먼저 확인해야 합니다.
 
 Frontend code는 가능한 한 page-shaped artifact 또는 view model을 소비해야 합니다. 화면에 새 metric이 필요하면 table/chart component 내부에서 product semantics를 다시 계산하지 말고 Python exporter 또는 typed page view model에 추가합니다.

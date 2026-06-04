@@ -283,6 +283,7 @@
     "prices/WOLF.json",
     "report-board/candidates.json",
     "report-detail-metrics.json",
+    "report-health.json",
     "report-rankings.json",
     "report-statistics-lab.json",
     "reports.json",
@@ -581,6 +582,7 @@
     "prices/WOLF.json": "eea1299c243624c6f020b2374bf9e9af163348e0152c68cd9476478015a404ec",
     "report-board/candidates.json": "13b422d352eb80a35dcd14b231f737e567708b68f66d1ea2940eb35428bdc358",
     "report-detail-metrics.json": "78020879aa194d54a0c2f76ebff1fb8df422d5eb17dc4f76b5a3bccc7755fdca",
+    "report-health.json": "74b5c6d48dbc87f0d4675a5c27cc4534470b62e91e19215c7f62e3f538449a9d",
     "report-rankings.json": "e1a96050ade944c699ec981fc2d73a76e2ccf7a39c5c4d09bdbeda1ef8381a2b",
     "report-statistics-lab.json": "6e9d979e98aea57fb348c0a5eb412c16d56877c4db900babf623224d65698cb7",
     "reports.json": "5ad8d5c1c67eba562ea8bcde4f63f7bed334e86c12ee66e2fb04e08938ab4f14",
@@ -621,6 +623,7 @@
     "monthly_holdings": 45287,
     "position_episodes": 13879,
     "report_board_candidates": 44,
+    "report_health_rows": 240,
     "reports": 217,
     "research_calendar_rows": 7525,
     "trades": 37538

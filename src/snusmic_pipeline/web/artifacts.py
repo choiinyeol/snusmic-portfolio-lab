@@ -59,6 +59,7 @@ REQUIRED_ARTIFACTS = [
     "current-holdings.json",
     "monthly-holdings.json",
     "missing-symbols.json",
+    "report-health.json",
     "data-quality.json",
     "trades.json",
     "position-episodes.json",
@@ -481,6 +482,10 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     )
     _write_json(out / "missing-symbols.json", [{"symbol": symbol} for symbol in missing_symbols])
     _write_json(out / "data-quality.json", data_quality)
+    report_health = _build_report_health(
+        reports, report_performance, extraction_quality, missing_symbols, report_rows
+    )
+    _write_json(out / "report-health.json", report_health)
     _write_json(out / "trades.json", trade_rows)
     _write_json(out / "position-episodes.json", episode_rows)
     _write_json(out / "accounting-reconciliation.json", accounting_rows)
@@ -1929,6 +1934,7 @@ def _build_manifest(out: Path, overview: dict[str, Any]) -> dict[str, Any]:
         "accounts": _json_row_count(out / "portfolio" / "accounts.json"),
         "account_catalog": _json_row_count(out / "accounts" / "catalog.json"),
         "report_board_candidates": _json_row_count(out / "report-board" / "candidates.json"),
+        "report_health_rows": _json_row_count(out / "report-health.json"),
         "research_calendar_rows": _json_row_count(out / "research-calendar" / "calendar.json"),
     }
     report_counts = overview.get("report_counts", {}) if isinstance(overview, dict) else {}
@@ -2495,6 +2501,142 @@ def _build_report_exclusion_counts(
         "excluded_reports": excluded_total,
         "source_reports": included + excluded_total,
     }
+
+
+def _build_report_health(
+    reports: pd.DataFrame,
+    report_performance: pd.DataFrame,
+    extraction_quality: dict[str, Any],
+    missing_symbols: list[str],
+    report_rows: list[dict[str, Any]],
+) -> dict[str, Any]:
+    visible_ids = {str(row.get("report_id", "")) for row in report_rows}
+    performance_by_id = {str(row["report_id"]): row for row in report_performance.to_dict(orient="records")}
+    missing = set(missing_symbols)
+    extraction_reviews = _extraction_review_details_by_report(reports, extraction_quality)
+    rows: list[dict[str, Any]] = []
+    summary = {
+        "source_reports": 0,
+        "web_visible": 0,
+        "web_excluded": 0,
+        "extraction_review": 0,
+        "needs_review": 0,
+    }
+    exclusion_counts: dict[str, int] = {}
+
+    for row in reports.sort_values(["publication_date", "page", "ordinal", "report_id"]).to_dict(
+        orient="records"
+    ):
+        report_id = str(row["report_id"])
+        review = extraction_reviews.get(report_id, {})
+        extraction_reasons = (
+            list(review.get("reasons", [])) if isinstance(review.get("reasons"), list) else []
+        )
+        extraction_status = str(review.get("status") or ("review" if extraction_reasons else "ok"))
+        perf = performance_by_id.get(report_id, {})
+        exclusion_reason = None if report_id in visible_ids else _report_exclusion_reason(row, perf, missing)
+        web_status = "visible" if report_id in visible_ids else "excluded"
+
+        summary["source_reports"] += 1
+        if web_status == "visible":
+            summary["web_visible"] += 1
+        else:
+            summary["web_excluded"] += 1
+            reason = exclusion_reason or "unknown"
+            exclusion_counts[reason] = exclusion_counts.get(reason, 0) + 1
+        if extraction_reasons:
+            summary["extraction_review"] += 1
+        if extraction_status == "needs_review":
+            summary["needs_review"] += 1
+
+        rows.append(
+            _clean(
+                {
+                    "report_id": report_id,
+                    "date": row.get("publication_date"),
+                    "page": row.get("page"),
+                    "ordinal": row.get("ordinal"),
+                    "company": row.get("company"),
+                    "ticker": row.get("ticker"),
+                    "symbol": row.get("symbol"),
+                    "title": row.get("title"),
+                    "markdown_filename": row.get("markdown_filename"),
+                    "pdf_url": row.get("pdf_url"),
+                    "extraction_status": extraction_status,
+                    "extraction_reasons": extraction_reasons,
+                    "web_status": web_status,
+                    "web_exclusion_reason": exclusion_reason,
+                    "action": _report_health_action(extraction_status, extraction_reasons, exclusion_reason),
+                }
+            )
+        )
+
+    return {
+        "schema_version": "1.0.0",
+        "summary": {**summary, "exclusion_reasons": dict(sorted(exclusion_counts.items()))},
+        "rows": rows,
+    }
+
+
+def _report_exclusion_reason(row: dict[str, Any], perf: dict[str, Any], missing: set[str]) -> str | None:
+    symbol = str(row.get("symbol", ""))
+    if symbol in missing:
+        return "missing_price"
+    if not perf:
+        return "missing_performance"
+    if _is_sell_opinion(row.get("rating")):
+        return "sell_opinion"
+    context = _report_price_context(cast(dict[str, Any], row), cast(dict[str, Any], perf), symbol)
+    target_upside_at_pub = context["target_upside_at_pub"]
+    if target_upside_at_pub is not None and target_upside_at_pub <= 0:
+        return "non_positive_upside"
+    if _target_direction(context["target_price_native"], context["entry_price_native"]) != "upside":
+        return "downside_target"
+    target_hit = _bool(perf.get("target_hit"))
+    days_to_target = _number(perf.get("days_to_target"))
+    if target_hit and days_to_target is not None and days_to_target <= 1:
+        return "instant_target_hit"
+    return None
+
+
+def _report_health_action(
+    extraction_status: str, extraction_reasons: list[str], exclusion_reason: str | None
+) -> str:
+    if extraction_status == "needs_review" or "missing_base_target" in extraction_reasons:
+        return "원문 Markdown/PDF에서 목표가 문장을 재확인하고 extraction rule을 보정하세요."
+    if "missing_rating" in extraction_reasons:
+        return "원문에서 투자의견 표기를 확인하고 rating 추출 rule 또는 수동 보정 여부를 결정하세요."
+    if exclusion_reason == "missing_price":
+        return "symbol mapping과 yfinance 가격 coverage를 확인하세요."
+    if exclusion_reason in {"non_positive_upside", "downside_target"}:
+        return "발간가와 목표가 방향을 확인하세요. 하락/무상승 리포트면 웹 검증 표본 제외가 정상입니다."
+    if exclusion_reason == "instant_target_hit":
+        return "발간 직후 목표가 도달 케이스입니다. 성과 표본 제외가 의도한 정책인지 확인하세요."
+    return "웹 검증 표본에 정상 포함됩니다."
+
+
+def _extraction_review_details_by_report(
+    reports: pd.DataFrame, extraction_quality: dict[str, Any]
+) -> dict[str, dict[str, Any]]:
+    if not extraction_quality.get("review_rows"):
+        return {}
+    ids_by_key = {
+        (str(row.get("publication_date", ""))[:10], str(row.get("company", ""))): str(
+            row.get("report_id", "")
+        )
+        for row in reports.to_dict(orient="records")
+    }
+    details: dict[str, dict[str, Any]] = {}
+    for review in extraction_quality.get("review_rows", []):
+        key = (str(review.get("date", ""))[:10], str(review.get("company", "")))
+        report_id = ids_by_key.get(key)
+        if not report_id:
+            continue
+        details[report_id] = {
+            "status": str(review.get("status") or "review"),
+            "reasons": [str(reason) for reason in review.get("reasons", [])],
+        }
+    return details
 
 
 def _review_reasons_by_report(

@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.30.17 - Expose report visibility diagnostics
+
+- Adds `data/web/report-health.json` to explain every source report's extraction status, web visibility, exclusion reason, and next action.
+- Validates report-health row counts and visible/excluded totals in `apps/web artifact:check`.
+- Surfaces extraction and web-exclusion diagnostics on the report board so missing transcriptions, missing prices, and intentional filters are visible in the UI.
+- Bumps Python and web package versions to `0.30.17`.
+
+Verification:
+
+- `uv run pytest tests/test_web_artifacts.py -q -k "manifest_records_snapshot_lineage_counts_and_checksums or check_web_artifacts_requires_deterministic_json"`
+- `uv run ruff check src/snusmic_pipeline/web/artifacts.py tests/test_web_artifacts.py`
+- `uv run ruff format --check src/snusmic_pipeline/web/artifacts.py tests/test_web_artifacts.py`
+- `pnpm --dir apps/web artifact:check`
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web format:check`
+- `uv run python -m snusmic_pipeline export-web --check`
+- `pnpm --dir apps/web build`
+- `pnpm --dir apps/web smoke:static`
+- `git diff --check`
+
 ## v0.30.16 - Add actionable health severity
 
 - Extends `data/web/health.json` checks with `ok | review | stale | fail` severity, observed/expected/action fields, and missing-price previews.

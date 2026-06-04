@@ -14,6 +14,7 @@ import {
   RawHoldingRowSchema,
   RawReportRowSchema,
   ReportBoardCandidateSchema,
+  ReportHealthSchema,
   ReportStatisticsPageBundleSchema,
   ReportVerificationPageBundleSchema,
   ReportBoardPageBundleSchema,
@@ -520,6 +521,32 @@ export type ArtifactHealth = {
     expected?: string;
     action?: string;
     count?: number;
+  }>;
+};
+export type ReportHealth = {
+  schema_version: string;
+  summary: {
+    source_reports: number;
+    web_visible: number;
+    web_excluded: number;
+    extraction_review: number;
+    needs_review: number;
+    exclusion_reasons: Record<string, number>;
+  };
+  rows: Array<{
+    report_id: string;
+    date: string | null;
+    page?: number | null;
+    ordinal?: number | null;
+    company: string | null;
+    ticker: string | null;
+    symbol: string | null;
+    markdown_filename: string | null;
+    extraction_status: string;
+    extraction_reasons: string[];
+    web_status: 'visible' | 'excluded';
+    web_exclusion_reason: string | null;
+    action: string;
   }>;
 };
 
@@ -1031,6 +1058,14 @@ export function getArtifactManifest(): ArtifactManifest {
 
 export function getArtifactHealth(): ArtifactHealth {
   return parseArtifact('health.json', ArtifactHealthSchema, readRequiredJson<unknown>('data/web/health.json'));
+}
+
+export function getReportHealth(): ReportHealth {
+  return parseArtifact(
+    'report-health.json',
+    ReportHealthSchema,
+    readRequiredJson<unknown>('data/web/report-health.json'),
+  );
 }
 
 export function getReportRankings(): WebReportRankings {

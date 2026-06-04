@@ -21,6 +21,16 @@ export function ReportBoardScreen({ model }: { model: ReportBoardViewModel }) {
         header={model.header}
         metrics={<MetricStrip metrics={model.metrics} />}
       />
+      {model.warnings.length ? (
+        <section className="grid gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+          <div className="font-semibold">데이터 진단</div>
+          <ul className="grid gap-1 text-xs leading-5">
+            {model.warnings.map((warning) => (
+              <li key={warning.id}>{warning.message}</li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <Section
         title="오늘 볼 후보"

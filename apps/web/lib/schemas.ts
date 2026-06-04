@@ -522,6 +522,41 @@ export const ArtifactHealthSchema = z
   })
   .passthrough();
 
+export const ReportHealthSchema = z
+  .object({
+    schema_version: z.literal('1.0.0'),
+    summary: z
+      .object({
+        source_reports: z.number(),
+        web_visible: z.number(),
+        web_excluded: z.number(),
+        extraction_review: z.number(),
+        needs_review: z.number(),
+        exclusion_reasons: z.record(z.string(), z.number()),
+      })
+      .passthrough(),
+    rows: z.array(
+      z
+        .object({
+          report_id: z.string(),
+          date: NullableString,
+          page: z.number().nullable().optional(),
+          ordinal: z.number().nullable().optional(),
+          company: NullableString,
+          ticker: NullableString,
+          symbol: NullableString,
+          markdown_filename: NullableString,
+          extraction_status: z.string(),
+          extraction_reasons: z.array(z.string()),
+          web_status: z.enum(['visible', 'excluded']),
+          web_exclusion_reason: NullableString,
+          action: z.string(),
+        })
+        .passthrough(),
+    ),
+  })
+  .passthrough();
+
 /** Parse a JSON array against a zod schema and throw a build-time-friendly
  * error when validation fails. The error names the file and the row index +
  * field path so a Python-side schema drift is unambiguous in CI logs. */

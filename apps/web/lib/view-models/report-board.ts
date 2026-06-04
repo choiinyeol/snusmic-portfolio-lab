@@ -30,7 +30,7 @@ export function getReportBoardViewModel(): ReportBoardViewModel {
       ['active', 'hit-rate', 'median-return', 'median-days'].includes(metric.id),
     ),
     candidateMetrics: candidates.metrics,
-    warnings: [],
+    warnings: verification.dataWarnings,
     priorityRows: candidates.priorityRows,
     candidateRows: candidates.rows,
     reportTable: verification.table,

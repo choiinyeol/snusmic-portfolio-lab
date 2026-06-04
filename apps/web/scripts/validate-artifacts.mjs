@@ -10,6 +10,7 @@ const maxReportAgeDays = Number(process.env.SNUSMIC_MAX_REPORT_AGE_DAYS ?? '30')
 const required = [
   'manifest.json',
   'health.json',
+  'report-health.json',
   'overview/snapshot.json',
   'overview/research-pulse.json',
   'overview/data-quality.json',
@@ -136,6 +137,16 @@ const reportAgeDays = ageDays(manifest.report_range.end);
 if (reportAgeDays > maxReportAgeDays) {
   fail(`manifest report_range.end is stale: age_days=${reportAgeDays}, max=${maxReportAgeDays}`);
 }
+const reportHealth = readJson('report-health.json');
+if (reportHealth.schema_version !== '1.0.0') {
+  fail(`report-health.json has invalid schema_version: ${reportHealth.schema_version}`);
+}
+if (!reportHealth.summary || typeof reportHealth.summary !== 'object') {
+  fail('report-health.json summary is missing');
+}
+if (!Array.isArray(reportHealth.rows) || reportHealth.rows.length !== reportHealth.summary.source_reports) {
+  fail(`report-health.json rows=${reportHealth.rows?.length}, source_reports=${reportHealth.summary?.source_reports}`);
+}
 
 const countFiles = {
   reports: 'reports/table.json',
@@ -144,6 +155,7 @@ const countFiles = {
   accounts: 'portfolio/accounts.json',
   account_catalog: 'accounts/catalog.json',
   report_board_candidates: 'report-board/candidates.json',
+  report_health_rows: 'report-health.json',
 };
 
 for (const [key, file] of Object.entries(countFiles)) {
@@ -151,6 +163,12 @@ for (const [key, file] of Object.entries(countFiles)) {
   if (typeof expected !== 'number') fail(`manifest row_counts.${key} is missing`);
   const actual = rowCount(readJson(file));
   if (actual !== expected) fail(`manifest row_counts.${key}=${expected}, actual ${actual} in ${file}`);
+}
+if (reportHealth.summary.web_visible !== manifest.row_counts.reports) {
+  fail(`report-health visible=${reportHealth.summary.web_visible}, manifest reports=${manifest.row_counts.reports}`);
+}
+if (reportHealth.summary.web_excluded !== manifest.row_counts.report_health_rows - manifest.row_counts.reports) {
+  fail('report-health web_excluded does not match source minus visible reports');
 }
 
 const shardedCounts = {

@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { getReportVerificationPageBundle, type ReportRow } from '@/lib/artifacts';
+import { getReportHealth, getReportVerificationPageBundle, type ReportRow } from '@/lib/artifacts';
 import { formatDateKo, formatDays, formatPercent } from '@/lib/format';
 import type {
   DataWarning,
@@ -21,6 +21,7 @@ export type ReportVerificationViewModel = {
 
 export function getReportVerificationViewModel(): ReportVerificationViewModel {
   const bundle = getReportVerificationPageBundle();
+  const reportHealth = getReportHealth();
   const reports = bundle.table.rows;
   const latestPublicationDate = bundle.as_of.report_date;
   const priceAsOf = bundle.as_of.price_date;
@@ -38,7 +39,7 @@ export function getReportVerificationViewModel(): ReportVerificationViewModel {
     },
     asOf: priceAsOf,
     metrics: buildMetrics(bundle.metrics, reports),
-    dataWarnings: [],
+    dataWarnings: buildDataWarnings(reportHealth),
     table: {
       rows: reports.map(toReportVerificationDisplayRow),
       sourceRows: reports,
@@ -46,6 +47,45 @@ export function getReportVerificationViewModel(): ReportVerificationViewModel {
       views: buildViewPresets(bundle.views, reports),
     },
   };
+}
+
+function buildDataWarnings(reportHealth: ReturnType<typeof getReportHealth>): DataWarning[] {
+  const warnings: DataWarning[] = [];
+  if (reportHealth.summary.needs_review > 0) {
+    warnings.push({
+      id: 'needs-review',
+      level: 'warning',
+      message: `전사/추출 재검토 ${reportHealth.summary.needs_review.toLocaleString('ko-KR')}건: 목표가 문장 또는 핵심 필드를 원문에서 확인해야 합니다.`,
+    });
+  }
+  if (reportHealth.summary.extraction_review > 0) {
+    warnings.push({
+      id: 'extraction-review',
+      level: 'info',
+      message: `추출 참고사항 ${reportHealth.summary.extraction_review.toLocaleString('ko-KR')}건: rating 누락, 모호한 목표가, non-buy 의견 등이 기록되어 있습니다.`,
+    });
+  }
+  if (reportHealth.summary.web_excluded > 0) {
+    const reasons = Object.entries(reportHealth.summary.exclusion_reasons)
+      .map(([reason, count]) => `${exclusionReasonLabel(reason)} ${count.toLocaleString('ko-KR')}건`)
+      .join(' · ');
+    warnings.push({
+      id: 'web-excluded',
+      level: 'info',
+      message: `웹 검증 표본 제외 ${reportHealth.summary.web_excluded.toLocaleString('ko-KR')}건: ${reasons}`,
+    });
+  }
+  return warnings;
+}
+
+function exclusionReasonLabel(reason: string): string {
+  if (reason === 'missing_price') return '가격누락';
+  if (reason === 'non_positive_upside') return '무상승';
+  if (reason === 'downside_target') return '하락목표';
+  if (reason === 'instant_target_hit') return '즉시도달';
+  if (reason === 'missing_performance') return '성과누락';
+  if (reason === 'sell_opinion') return '매도/비매수';
+  return reason;
 }
 
 function buildMetrics(
