@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.30.24 - Correct Bitrosell target parsing
+
+- Fixes Korean current/target pair parsing when `원` is attached to the first value, preventing `45,250원 78,450원` from being split as `45,25` and `0`.
+- Re-extracts report metadata so 비츠로셀 publication price is `45,250` and target price remains `78,450`.
+- Rebuilds warehouse, simulation, and web artifacts so public report/download rows no longer show the inflated `979,541` target price.
+- Bumps Python and web package versions to `0.30.24`.
+
+Verification:
+
+- `uv run pytest tests/test_extract_pdf.py tests/test_web_artifacts.py -q -k "current_target_pair_with_korean_suffix or single_target_for_korean_report or current_price_before_target_label or manifest_records_snapshot_lineage_counts_and_checksums or bitrosell_target or export_web_artifacts_matches_baseline_counts"`
+- `uv run ruff check src/snusmic_pipeline/ingest/extract_pdf.py tests/test_extract_pdf.py tests/test_web_artifacts.py`
+- `uv run ruff format --check src/snusmic_pipeline/ingest/extract_pdf.py tests/test_extract_pdf.py tests/test_web_artifacts.py`
+- `uv run python -m snusmic_pipeline ocr-reextract --data-dir data --audit --audit-output data/extraction_quality.json`
+- `uv run python -m snusmic_pipeline build-warehouse`
+- `uv run python -m snusmic_pipeline rebuild-web-artifacts`
+- `uv run python -m snusmic_pipeline export-web --check`
+- `pnpm --dir apps/web artifact:check`
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web format:check`
+- `pnpm --dir apps/web build`
+- `pnpm --dir apps/web smoke:static`
+- Browser inspection of static `/reports/082920.KS/fee8fb34906543bb`
+
 ## v0.30.23 - Hide internal diagnostics from public pages
 
 - Removes report-health warnings and exception queues from public `/reports`; users now see public candidates and the visible report table only.

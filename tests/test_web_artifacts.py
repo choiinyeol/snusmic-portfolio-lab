@@ -78,17 +78,17 @@ def test_export_web_artifacts_matches_baseline_counts(web_export_dir: Path) -> N
     overview = json.loads((web_export_dir / "overview.json").read_text(encoding="utf-8"))
     assert overview["report_counts"] == {
         "excluded_downside_target": 6,
-        "excluded_instant_target_hit": 2,
+        "excluded_instant_target_hit": 1,
         "excluded_missing_performance": 0,
         "excluded_missing_price": 6,
         "excluded_non_positive_upside": 8,
-        "excluded_reports": 22,
+        "excluded_reports": 21,
         "excluded_sell_opinion": 0,
         "extracted_reports": 240,
         "missing_price_symbols": 6,
-        "price_matched_reports": 218,
+        "price_matched_reports": 219,
         "report_stat_rows": 240,
-        "web_report_rows": 218,
+        "web_report_rows": 219,
     }
     manifest = json.loads((web_export_dir / "manifest.json").read_text(encoding="utf-8"))
     assert manifest["data_quality"]["missing_price_symbols"] == 6
@@ -102,6 +102,20 @@ def test_reports_artifact_contains_be_h_symbol_fix(web_export_dir: Path) -> None
     assert len(be_h) == 1
     assert be_h[0]["symbol"] == "090460.KS"
     assert be_h[0]["report_id"] == "6615fd1894ed9c54"
+
+
+@pytest.mark.slow
+@pytest.mark.contract
+def test_reports_artifact_keeps_bitrosell_target_on_report_scale(web_export_dir: Path) -> None:
+    reports = json.loads((web_export_dir / "reports.json").read_text(encoding="utf-8"))
+    bitrosell = next(row for row in reports if row["report_id"] == "fee8fb34906543bb")
+
+    assert bitrosell["company"] == "비츠로셀"
+    assert bitrosell["publication_price_krw"] == 56500.0
+    assert bitrosell["entry_price_krw"] == 56500.0
+    assert bitrosell["target_price_krw"] == 78450.0
+    assert bitrosell["target_price_native"] == 78450.0
+    assert "price_scale_adjusted_entry" not in bitrosell["caveat_flags"]
 
 
 @pytest.mark.slow
@@ -395,12 +409,12 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(web_export_dir: 
         "start": warehouse_prices["date"].astype(str).min(),
         "end": warehouse_prices["date"].astype(str).max(),
     }
-    assert manifest["row_counts"]["reports"] == 218
+    assert manifest["row_counts"]["reports"] == 219
     expected_accounts = len(pd.read_csv(Path("data/sim") / "summary.csv"))
     assert manifest["row_counts"]["accounts"] == expected_accounts
     assert manifest["row_counts"]["account_catalog"] == expected_accounts
     assert manifest["row_counts"]["report_board_candidates"] > 0
-    assert manifest["data_quality"]["reports_with_prices"] == 218
+    assert manifest["data_quality"]["reports_with_prices"] == 219
     assert manifest["data_quality"]["missing_price_symbols"] == 6
     assert "overview/snapshot.json" in manifest["artifacts"]
     assert "portfolio/holdings.json" in manifest["artifacts"]
@@ -415,12 +429,12 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(web_export_dir: 
     report_health = json.loads((out / "report-health.json").read_text(encoding="utf-8"))
     assert report_health["schema_version"] == "1.0.0"
     assert report_health["summary"]["source_reports"] == 240
-    assert report_health["summary"]["web_visible"] == 218
-    assert report_health["summary"]["web_excluded"] == 22
+    assert report_health["summary"]["web_visible"] == 219
+    assert report_health["summary"]["web_excluded"] == 21
     assert report_health["summary"]["needs_review"] == 0
     assert report_health["summary"]["exclusion_reasons"] == {
         "downside_target": 6,
-        "instant_target_hit": 2,
+        "instant_target_hit": 1,
         "missing_price": 6,
         "non_positive_upside": 8,
     }

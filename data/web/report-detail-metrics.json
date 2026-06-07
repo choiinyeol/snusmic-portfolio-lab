@@ -4763,6 +4763,78 @@
     "target_price_krw": 35600.0,
     "trough_return": -0.2812
   },
+  "4ec535601f3aae38": {
+    "company": "샘씨엔에스",
+    "current_return": -0.0823,
+    "days_to_target": null,
+    "entry_price_krw": 13980.0,
+    "markers": [
+      {
+        "date": "2026-05-07",
+        "label": "리포트 발간",
+        "price_krw": 13980.0,
+        "type": "publication"
+      },
+      {
+        "date": "2026-05-15",
+        "label": "발간 후 저점",
+        "price_krw": 11720.0,
+        "type": "trough"
+      },
+      {
+        "date": "2026-05-22",
+        "label": "발간 후 고점",
+        "price_krw": 14940.0,
+        "type": "peak"
+      },
+      {
+        "date": "2026-06-05",
+        "label": "최근 종가",
+        "price_krw": 12830.0,
+        "type": "latest"
+      }
+    ],
+    "peak_return": 0.0687,
+    "price_extremes": {
+      "peak": {
+        "date": "2026-05-22",
+        "label": "발간 후 고점",
+        "price_krw": 14940.0,
+        "type": "peak"
+      },
+      "trough": {
+        "date": "2026-05-15",
+        "label": "발간 후 저점",
+        "price_krw": 11720.0,
+        "type": "trough"
+      }
+    },
+    "report_id": "4ec535601f3aae38",
+    "return_windows": {
+      "company": "샘씨엔에스",
+      "date": "2026-05-07",
+      "date_180d": null,
+      "date_30d": null,
+      "date_60d": null,
+      "date_90d": null,
+      "entry_price_krw": 13980.0,
+      "price_180d_krw": null,
+      "price_30d_krw": null,
+      "price_60d_krw": null,
+      "price_90d_krw": null,
+      "report_id": "4ec535601f3aae38",
+      "return_180d": null,
+      "return_30d": null,
+      "return_60d": null,
+      "return_90d": null,
+      "symbol": "252990.KQ"
+    },
+    "symbol": "252990.KQ",
+    "target_gap_pct": -0.4231,
+    "target_hit": false,
+    "target_price_krw": 22240.0,
+    "trough_return": -0.1617
+  },
   "53c1821b2b5f4ebd": {
     "company": "세아제강지주",
     "current_return": 0.2643,
@@ -16071,12 +16143,12 @@
     "company": "비츠로셀",
     "current_return": -0.1389,
     "days_to_target": null,
-    "entry_price_krw": 705469.6133,
+    "entry_price_krw": 56500.0,
     "markers": [
       {
         "date": "2026-04-16",
         "label": "리포트 발간",
-        "price_krw": 705469.6133,
+        "price_krw": 56500.0,
         "type": "publication"
       },
       {
@@ -16121,14 +16193,14 @@
       "date_30d": "2026-05-18",
       "date_60d": null,
       "date_90d": null,
-      "entry_price_krw": 705469.6133,
+      "entry_price_krw": 56500.0,
       "price_180d_krw": null,
       "price_30d_krw": 53200.0,
       "price_60d_krw": null,
       "price_90d_krw": null,
       "report_id": "fee8fb34906543bb",
       "return_180d": null,
-      "return_30d": -0.924589,
+      "return_30d": -0.058407,
       "return_60d": null,
       "return_90d": null,
       "symbol": "082920.KS"
@@ -16136,7 +16208,7 @@
     "symbol": "082920.KS",
     "target_gap_pct": -0.3799,
     "target_hit": false,
-    "target_price_krw": 979541.4365,
+    "target_price_krw": 78450.0,
     "trough_return": -0.1389
   },
   "ff506c1298a97f9a": {

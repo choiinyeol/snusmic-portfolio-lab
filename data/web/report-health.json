@@ -4023,7 +4023,7 @@
       "web_status": "visible"
     },
     {
-      "action": "발간 직후 목표가 도달 케이스입니다. 성과 표본 제외가 의도한 정책인지 확인하세요.",
+      "action": "웹 검증 표본에 정상 포함됩니다.",
       "company": "샘씨엔에스",
       "date": "2026-05-07",
       "extraction_reasons": [],
@@ -4036,8 +4036,8 @@
       "symbol": "252990.KQ",
       "ticker": "252990",
       "title": "Equity Research, 샘씨엔에스",
-      "web_exclusion_reason": "instant_target_hit",
-      "web_status": "excluded"
+      "web_exclusion_reason": null,
+      "web_status": "visible"
     },
     {
       "action": "웹 검증 표본에 정상 포함됩니다.",
@@ -4133,14 +4133,14 @@
   "summary": {
     "exclusion_reasons": {
       "downside_target": 6,
-      "instant_target_hit": 2,
+      "instant_target_hit": 1,
       "missing_price": 6,
       "non_positive_upside": 8
     },
     "extraction_review": 24,
     "needs_review": 0,
     "source_reports": 240,
-    "web_excluded": 22,
-    "web_visible": 218
+    "web_excluded": 21,
+    "web_visible": 219
   }
 }

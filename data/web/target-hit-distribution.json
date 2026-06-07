@@ -27,8 +27,8 @@
   ],
   "summary": {
     "target_hit_count": 87,
-    "target_hit_rate": 0.399083,
-    "total_reports": 218
+    "target_hit_rate": 0.39726,
+    "total_reports": 219
   },
   "target_upside_buckets": [
     {
@@ -46,11 +46,11 @@
       "target_hit_rate": 0.611111
     },
     {
-      "avg_current_return": 0.36547,
+      "avg_current_return": 0.360549,
       "bucket": "50-100%",
-      "count": 90,
+      "count": 91,
       "target_hit_count": 25,
-      "target_hit_rate": 0.277778
+      "target_hit_rate": 0.274725
     },
     {
       "avg_current_return": 1.068011,

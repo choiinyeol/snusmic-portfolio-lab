@@ -38,7 +38,7 @@ _EN_TARGET_PRICE_RE = re.compile(
     re.IGNORECASE,
 )
 _CURRENT_TARGET_PAIR_RE = re.compile(
-    r"현재\s*주가\s*[:：]\s*목표\s*주가\s*[:：]\s*((?:[$₩¥€]\s*|(?:USD|KRW|JPY|EUR|TWD|HKD|CNY|CHF)\s*)?[0-9][0-9,]*(?:\.[0-9]+)?)\s*((?:[$₩¥€]\s*|(?:USD|KRW|JPY|EUR|TWD|HKD|CNY|CHF)\s*)?[0-9][0-9,]*(?:\.[0-9]+)?)",
+    r"현재\s*주가\s*[:：]\s*목표\s*주가\s*[:：]\s*((?:[$₩¥€]\s*|(?:USD|KRW|JPY|EUR|TWD|HKD|CNY|CHF)\s*)?[0-9][0-9,]*(?:\.[0-9]+)?)(?:\s*(?:원|엔|위안|달러))?\s+((?:[$₩¥€]\s*|(?:USD|KRW|JPY|EUR|TWD|HKD|CNY|CHF)\s*)?[0-9][0-9,]*(?:\.[0-9]+)?)(?:\s*(?:원|엔|위안|달러))?",
     re.IGNORECASE,
 )
 _SCENARIO_RE = re.compile(

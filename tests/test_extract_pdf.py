@@ -216,6 +216,24 @@ def test_current_price_before_target_label_does_not_become_target():
     assert parsed["base_target"] == 41600
 
 
+def test_current_target_pair_with_korean_suffix_keeps_full_current_price():
+    text = """
+    비츠로셀 (082920)
+    Rating
+
+    #### Buy
+
+    현재주가: 목표주가:
+
+    45,250원 78,450원 73.4%
+    """
+
+    parsed = parse_report_text(text, company_hint="비츠로셀")
+
+    assert parsed["report_current_price"] == 45250
+    assert parsed["base_target"] == 78450
+
+
 def test_szse_six_digit_ticker_allows_cny_decimal_target():
     text = """
     GEM Co., Ltd.GEM (格林美, 002340.SZ)
