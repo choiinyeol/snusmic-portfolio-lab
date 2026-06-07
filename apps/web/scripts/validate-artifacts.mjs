@@ -64,6 +64,83 @@ function rowCount(data) {
   if (Array.isArray(data?.rows)) return data.rows.length;
   return 1;
 }
+function reportIdentityMap(rows, source) {
+  if (!Array.isArray(rows)) fail(`${source} must be a report row array`);
+  const identities = new Map();
+  for (const [index, row] of rows.entries()) {
+    if (!row || typeof row !== 'object') fail(`${source}[${index}] must be an object`);
+    if (!row.report_id) fail(`${source}[${index}].report_id is missing`);
+    if (!row.symbol) fail(`${source}[${index}].symbol is missing`);
+    if (identities.has(row.report_id)) fail(`${source} contains duplicate report_id: ${row.report_id}`);
+    identities.set(row.report_id, row.symbol);
+  }
+  return identities;
+}
+
+function parseCsvLine(line) {
+  const cells = [];
+  let cell = '';
+  let quoted = false;
+  for (let index = 0; index < line.length; index += 1) {
+    const character = line[index];
+    const next = line[index + 1];
+    if (character === '"') {
+      if (quoted && next === '"') {
+        cell += '"';
+        index += 1;
+      } else {
+        quoted = !quoted;
+      }
+    } else if (character === ',' && !quoted) {
+      cells.push(cell);
+      cell = '';
+    } else {
+      cell += character;
+    }
+  }
+  cells.push(cell);
+  return cells;
+}
+
+function parseReportDownloadCsv(text) {
+  const [headerLine, ...lines] = text.trimEnd().split(/\r?\n/);
+  const headers = parseCsvLine(headerLine);
+  const reportIdIndex = headers.indexOf('report_id');
+  const symbolIndex = headers.indexOf('symbol');
+  if (reportIdIndex === -1) fail('table-download-reports.csv report_id column is missing');
+  if (symbolIndex === -1) fail('table-download-reports.csv symbol column is missing');
+  return lines
+    .filter((line) => line.length > 0)
+    .map((line) => {
+      const cells = parseCsvLine(line);
+      return {
+        report_id: cells[reportIdIndex],
+        symbol: cells[symbolIndex],
+      };
+    });
+}
+
+function assertReportIdentitiesMatch(source, expected, actual) {
+  const missing = [];
+  const stale = [];
+  const symbolMismatches = [];
+  for (const [reportId, symbol] of expected.entries()) {
+    if (!actual.has(reportId)) missing.push(reportId);
+    else if (actual.get(reportId) !== symbol) symbolMismatches.push(reportId);
+  }
+  for (const reportId of actual.keys()) {
+    if (!expected.has(reportId)) stale.push(reportId);
+  }
+  if (missing.length || stale.length || symbolMismatches.length) {
+    fail(
+      `${source} report cross-reference mismatch: missing_report_ids=${missing
+        .slice(0, 10)
+        .join(',')}, stale_report_ids=${stale.slice(0, 10).join(',')}, symbol_mismatches=${symbolMismatches
+        .slice(0, 10)
+        .join(',')}`,
+    );
+  }
+}
 
 function ageDays(dateText) {
   const parsed = Date.parse(`${dateText}T00:00:00Z`);
@@ -273,6 +350,41 @@ for (const [index, report] of reports.entries()) {
   if (!report.symbol) fail(`reports/table.json[${index}].symbol is missing`);
   reportSymbols.add(report.symbol);
 }
+const canonicalReportIdentities = reportIdentityMap(readJson('reports.json'), 'reports.json');
+const tableReportIdentities = reportIdentityMap(reports, 'reports/table.json');
+assertReportIdentitiesMatch('reports/table.json', canonicalReportIdentities, tableReportIdentities);
+
+const detailMetrics = readJson('report-detail-metrics.json');
+const detailMetricRows = Object.values(detailMetrics);
+const detailReportIdentities = reportIdentityMap(detailMetricRows, 'report-detail-metrics.json');
+const detailKeys = new Set(Object.keys(detailMetrics));
+for (const reportId of detailReportIdentities.keys()) {
+  if (!detailKeys.has(reportId)) fail(`report-detail-metrics.json key is missing for embedded report_id: ${reportId}`);
+}
+for (const reportId of detailKeys) {
+  if (!detailReportIdentities.has(reportId)) {
+    fail(`report-detail-metrics.json stale key without embedded report_id: ${reportId}`);
+  }
+}
+assertReportIdentitiesMatch('report-detail-metrics.json', canonicalReportIdentities, detailReportIdentities);
+const pageDetailMetrics = readJson('reports/detail-metrics.json');
+if (JSON.stringify(pageDetailMetrics) !== JSON.stringify(detailMetrics)) {
+  fail('reports/detail-metrics.json diverges from report-detail-metrics.json');
+}
+
+const returnWindows = readJson('return-windows.json');
+const returnWindowIdentities = reportIdentityMap(returnWindows, 'return-windows.json');
+assertReportIdentitiesMatch('return-windows.json', canonicalReportIdentities, returnWindowIdentities);
+const pageReturnWindows = readJson('reports/return-windows.json');
+if (JSON.stringify(pageReturnWindows) !== JSON.stringify(returnWindows)) {
+  fail('reports/return-windows.json diverges from return-windows.json');
+}
+
+const reportDownloadRows = parseReportDownloadCsv(
+  fs.readFileSync(path.join(webRoot, 'table-download-reports.csv'), 'utf8'),
+);
+const downloadReportIdentities = reportIdentityMap(reportDownloadRows, 'table-download-reports.csv');
+assertReportIdentitiesMatch('table-download-reports.csv', canonicalReportIdentities, downloadReportIdentities);
 
 const priceDir = path.join(webRoot, 'prices');
 const priceFiles = fs.existsSync(priceDir)

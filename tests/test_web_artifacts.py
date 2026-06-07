@@ -15,7 +15,9 @@ import snusmic_pipeline.web.artifacts as web_artifacts
 from snusmic_pipeline import cli
 from snusmic_pipeline.web.artifacts import (
     ExportInputs,
+    _build_report_board_candidates,
     _validate_price_artifact_cross_references,
+    _validate_report_artifact_cross_references,
     _write_price_artifacts,
     check_web_artifacts,
     export_web_artifacts,
@@ -52,10 +54,28 @@ def _minimal_price_cross_reference_tree(out: Path) -> None:
             "price_artifact_count": 2,
         },
     )
-    _write_json(out / "reports.json", [{"symbol": "AAA"}])
     _write_json(out / "missing-symbols.json", [{"symbol": "MISS"}])
     _write_json(out / "prices" / "AAA.json", {"symbol": "AAA", "prices": [{"date": "2024-01-02"}]})
     _write_json(out / "prices" / "MISS.json", {"symbol": "MISS", "missing_price": True, "prices": []})
+    detail = {
+        "AAA-1": {
+            "report_id": "AAA-1",
+            "symbol": "AAA",
+            "company": "Alpha",
+            "return_windows": {"report_id": "AAA-1", "symbol": "AAA"},
+        }
+    }
+    return_windows = [{"report_id": "AAA-1", "symbol": "AAA", "company": "Alpha"}]
+    _write_json(out / "reports.json", [{"report_id": "AAA-1", "symbol": "AAA", "company": "Alpha"}])
+    _write_json(out / "reports" / "table.json", [{"report_id": "AAA-1", "symbol": "AAA", "company": "Alpha"}])
+    _write_json(out / "report-detail-metrics.json", detail)
+    _write_json(out / "reports" / "detail-metrics.json", detail)
+    _write_json(out / "return-windows.json", return_windows)
+    _write_json(out / "reports" / "return-windows.json", return_windows)
+    (out / "table-download-reports.csv").write_text(
+        "report_id,symbol,company\nAAA-1,AAA,Alpha\n",
+        encoding="utf-8",
+    )
 
 
 @pytest.fixture(scope="module")
@@ -238,6 +258,82 @@ def test_price_cross_reference_validator_rejects_dual_krx_segment_artifacts(tmp_
         _validate_price_artifact_cross_references(tmp_path)
 
 
+def test_report_cross_reference_validator_accepts_consistent_tree(tmp_path: Path) -> None:
+    _minimal_price_cross_reference_tree(tmp_path)
+
+    _validate_report_artifact_cross_references(tmp_path)
+
+
+def test_report_cross_reference_validator_rejects_missing_detail_metric(tmp_path: Path) -> None:
+    _minimal_price_cross_reference_tree(tmp_path)
+    detail = json.loads((tmp_path / "report-detail-metrics.json").read_text(encoding="utf-8"))
+    detail.pop("AAA-1")
+    _write_json(tmp_path / "report-detail-metrics.json", detail)
+    _write_json(tmp_path / "reports" / "detail-metrics.json", detail)
+
+    with pytest.raises(RuntimeError, match="report-detail-metrics.json report cross-reference mismatch"):
+        _validate_report_artifact_cross_references(tmp_path)
+
+
+def test_report_cross_reference_validator_rejects_return_window_symbol_drift(tmp_path: Path) -> None:
+    _minimal_price_cross_reference_tree(tmp_path)
+    windows = json.loads((tmp_path / "return-windows.json").read_text(encoding="utf-8"))
+    windows[0]["symbol"] = "OTHER"
+    _write_json(tmp_path / "return-windows.json", windows)
+    _write_json(tmp_path / "reports" / "return-windows.json", windows)
+
+    with pytest.raises(RuntimeError, match="symbol_mismatches"):
+        _validate_report_artifact_cross_references(tmp_path)
+
+
+def test_report_cross_reference_validator_rejects_download_csv_stale_row(tmp_path: Path) -> None:
+    _minimal_price_cross_reference_tree(tmp_path)
+    (tmp_path / "table-download-reports.csv").write_text(
+        "report_id,symbol,company\nAAA-1,AAA,Alpha\nSTALE-1,STALE,Stale\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(RuntimeError, match="table-download-reports.csv report cross-reference mismatch"):
+        _validate_report_artifact_cross_references(tmp_path)
+
+
+def test_report_board_candidate_ranking_penalizes_review_flags() -> None:
+    base_row = {
+        "target_direction": "upside",
+        "target_hit": False,
+        "expired": False,
+        "target_upside_at_pub": 0.5,
+        "current_return": 0.1,
+        "target_gap_pct": 0.2,
+        "date": "2026-01-01",
+    }
+    candidates = _build_report_board_candidates(
+        [
+            {
+                **base_row,
+                "report_id": "review",
+                "symbol": "REVIEW",
+                "company": "Review",
+                "caveat_flags": ["extraction_review:missing_rating"],
+            },
+            {
+                **base_row,
+                "report_id": "verified",
+                "symbol": "VERIFIED",
+                "company": "Verified",
+                "caveat_flags": [],
+            },
+        ]
+    )
+
+    assert [row["report_id"] for row in candidates] == ["verified", "review"]
+    review = candidates[1]
+    assert review["quality_status"] == "review"
+    assert review["quality_basis"] == ["원문 확인 필요"]
+    assert review["quality_penalty"] == 0.35
+    assert review["score"] < review["raw_score"]
+
+
 def test_web_artifact_ci_validator_rejects_dual_krx_segment_artifacts(tmp_path: Path) -> None:
     web_root = tmp_path / "web"
     shutil.copytree(Path("data/web"), web_root)
@@ -264,6 +360,25 @@ def test_web_artifact_ci_validator_rejects_dual_krx_segment_artifacts(tmp_path: 
 
     assert result.returncode != 0
     assert "both KOSPI and KOSDAQ price artifacts" in result.stderr
+
+
+def test_web_artifact_ci_validator_rejects_report_download_stale_row(tmp_path: Path) -> None:
+    web_root = tmp_path / "web"
+    shutil.copytree(Path("data/web"), web_root)
+    with (web_root / "table-download-reports.csv").open("a", encoding="utf-8", newline="") as handle:
+        handle.write("STALE-1,2026-01-01,Stale,000000,KRX,000000.KS,Stale report,,,,,,,,,,,,,,,,,,,,\n")
+
+    result = subprocess.run(
+        ["node", "scripts/validate-artifacts.mjs"],
+        cwd=Path("apps/web"),
+        env={**os.environ, "SNUSMIC_WEB_ARTIFACT_ROOT": str(web_root.resolve())},
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode != 0
+    assert "table-download-reports.csv report cross-reference mismatch" in result.stderr
 
 
 def test_web_artifact_ci_validator_rejects_stale_price_range(tmp_path: Path) -> None:

@@ -239,6 +239,24 @@ def is_plausible_target_price(value: float, ticker: str, exchange: str = "") -> 
     return value >= 1
 
 
+def target_sanity_notes(
+    current_price: float | None, base_target: float | None, ticker: str, exchange: str
+) -> list[str]:
+    if current_price is None or base_target is None or current_price <= 0 or base_target <= 0:
+        return []
+    notes: list[str] = []
+    ratio = base_target / current_price
+    code = str(exchange or "").strip().upper()
+    is_krx = ticker.isdigit() and len(ticker) == 6 and code in {"", "KRX", "KOSPI", "KOSDAQ"}
+    high_ratio_limit = 10 if is_krx else 8
+    low_ratio_limit = 0.05
+    if ratio >= high_ratio_limit:
+        notes.append(f"Target/current ratio looks too high ({ratio:.2f}x); review target unit or OCR split")
+    if ratio <= low_ratio_limit:
+        notes.append(f"Target/current ratio looks too low ({ratio:.2f}x); review target unit or OCR split")
+    return notes
+
+
 def target_detail_text(
     scenario_values: dict[str, float], case_values: dict[str, float], rating: str, base_target: float | None
 ) -> str:
@@ -414,6 +432,8 @@ def parse_report_text(text: str, company_hint: str = "") -> dict[str, object]:
         )
     if rating and rating not in {"Buy", "Strong Buy"}:
         notes.append(f"Non-buy rating: {rating}")
+    sanity_notes = target_sanity_notes(current_price, base_target, ticker, exchange)
+    notes.extend(sanity_notes)
 
     return {
         "ticker": ticker,
@@ -426,7 +446,7 @@ def parse_report_text(text: str, company_hint: str = "") -> dict[str, object]:
         "target_currency": infer_currency(text, ticker, exchange),
         "target_price_detail": target_detail_text(scenario_values, case_values, rating, base_target),
         "investment_points": extract_investment_points(text),
-        "status": "ok" if ticker and base_target is not None else "needs_review",
+        "status": "ok" if ticker and base_target is not None and not sanity_notes else "needs_review",
         "note": "; ".join(notes),
         "raw_matches": {
             "company": company_hint,

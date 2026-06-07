@@ -9,7 +9,7 @@ import { formatAssetPrice, targetMoveLabel, targetStatus } from '@/lib/report-vi
 import type { ReportDetailViewModel } from '@/lib/view-models/report-detail';
 
 export function ReportDetailView({ model }: { model: ReportDetailViewModel }) {
-  const { report, priceSeries, entryPrice, captureRatio, stageLabel, sourceMetadata } = model;
+  const { report, priceSeries, entryPrice, captureRatio, stageLabel, sourceMetadata, trustStatus } = model;
   const status = targetStatus(report);
   const markdownHref = sourceMetadata.markdownRepositoryPath
     ? githubBlobUrl(sourceMetadata.markdownRepositoryPath)
@@ -71,6 +71,8 @@ export function ReportDetailView({ model }: { model: ReportDetailViewModel }) {
           </div>
         }
       />
+
+      <TrustStatusCard status={trustStatus} />
 
       <FactsTable
         rows={[
@@ -163,6 +165,41 @@ function FactsTable({ rows }: { rows: FactRow[] }) {
   );
 }
 
+type TrustStatus = ReportDetailViewModel['trustStatus'];
+
+function TrustStatusCard({ status }: { status: TrustStatus }) {
+  return (
+    <section className={`rounded-md border p-3 ${trustStatusClass(status.level)}`} aria-label="리포트 신뢰 상태">
+      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+        <div className="grid gap-1">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+              Trust status
+            </span>
+            <span className="rounded-md bg-white/80 px-2 py-0.5 text-xs font-semibold text-slate-800 ring-1 ring-inset ring-slate-200">
+              {status.label}
+            </span>
+          </div>
+          <p className="text-sm font-medium text-slate-950">{status.summary}</p>
+        </div>
+        <ul className="grid gap-1 text-xs text-slate-600 md:min-w-72">
+          {status.evidence.map((item) => (
+            <li className="flex gap-2" key={item}>
+              <span aria-hidden className="mt-1 h-1.5 w-1.5 rounded-full bg-current opacity-60" />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+function trustStatusClass(level: TrustStatus['level']): string {
+  if (level === 'verified') return 'border-emerald-200 bg-emerald-50/60';
+  if (level === 'review') return 'border-amber-200 bg-amber-50/70';
+  return 'border-slate-200 bg-slate-50';
+}
 type SourceMetadata = ReportDetailViewModel['sourceMetadata'];
 
 function SourceAuditSection({
@@ -186,10 +223,10 @@ function SourceAuditSection({
           className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500"
           id="source-audit-heading"
         >
-          출처 / 감사 메타데이터
+          출처 / 원문 확인
         </h2>
         <p className="mt-1 text-xs text-slate-500">
-          리포트 식별자, 원문 PDF, 추출 Markdown, 검증 주의 플래그를 원천 필드 기준으로 표시합니다.
+          리포트 식별자, 원문 PDF, 추출 Markdown 연결 상태를 표시합니다. 내부 진단 코드는 공개 화면에 노출하지 않습니다.
         </p>
       </div>
       <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 [&>div]:border-b [&>div]:border-r [&>div]:border-slate-100">
@@ -207,23 +244,10 @@ function SourceAuditSection({
           href={markdownHref}
         />
         <AuditItem
-          label="Caveat flags"
-          value={caveatLabel}
-          caption={metadata.caveatFlags.length ? undefined : '주의 플래그 없음'}
-        >
-          {metadata.caveatFlags.length ? (
-            <div className="mt-2 flex flex-wrap gap-1">
-              {metadata.caveatFlags.map((flag) => (
-                <span
-                  className="rounded-md bg-amber-50 px-1.5 py-0.5 text-[11px] font-medium text-amber-700"
-                  key={flag}
-                >
-                  {flag}
-                </span>
-              ))}
-            </div>
-          ) : null}
-        </AuditItem>
+          label="추출 주의"
+          value={metadata.caveatFlags.length ? '원문 확인 필요' : '없음'}
+          caption={metadata.caveatFlags.length ? `${caveatLabel} 항목` : '주의 항목 없음'}
+        />
       </dl>
     </section>
   );

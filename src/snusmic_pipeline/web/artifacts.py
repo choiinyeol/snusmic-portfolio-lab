@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import json
 import math
 import re
@@ -355,6 +356,7 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
         if bad_paths:
             raise RuntimeError(f"Manifest contains non-POSIX artifact paths: {bad_paths[:5]}")
         _validate_price_artifact_cross_references(staged_out)
+        _validate_report_artifact_cross_references(staged_out)
         _replace_directory(staged_out, out)
     result["out"] = str(out)
     return result
@@ -579,6 +581,7 @@ def check_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     if missing:
         raise RuntimeError(f"Missing required web artifacts: {', '.join(missing)}")
     _validate_price_artifact_cross_references(inputs.out)
+    _validate_report_artifact_cross_references(inputs.out)
 
     first_bytes = _snapshot_json_bytes(inputs.out)
     with TemporaryDirectory() as tmpdir:
@@ -590,6 +593,7 @@ def check_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
         )
         export_web_artifacts(second_inputs)
         _validate_price_artifact_cross_references(second_inputs.out)
+        _validate_report_artifact_cross_references(second_inputs.out)
         second_bytes = _snapshot_json_bytes(second_inputs.out)
     if first_bytes != second_bytes:
         raise RuntimeError("Web artifact export is not deterministic under repeated export")
@@ -679,6 +683,101 @@ def _validate_price_artifact_cross_references(out: Path) -> None:
             "Web artifact contains both KOSPI and KOSDAQ price artifacts for the same raw ticker: "
             f"{dual_segment_symbols[:10]}"
         )
+
+
+def _validate_report_artifact_cross_references(out: Path) -> None:
+    """Validate visible report rows share one report universe across artifacts."""
+
+    canonical = _report_identity_map(_read_json(out / "reports.json"), "reports.json")
+    table = _report_identity_map(_read_json(out / "reports" / "table.json"), "reports/table.json")
+    if table != canonical:
+        _raise_report_identity_mismatch("reports/table.json", canonical, table)
+
+    detail_metrics = _read_json(out / "report-detail-metrics.json")
+    if not isinstance(detail_metrics, dict):
+        raise RuntimeError("Web artifact report-detail-metrics.json must be an object keyed by report_id")
+    detail = _report_identity_map(detail_metrics.values(), "report-detail-metrics.json")
+    detail_keys = {str(key) for key in detail_metrics}
+    if detail_keys != set(detail):
+        raise RuntimeError(
+            "Web artifact report-detail-metrics.json keys do not match embedded report_id values: "
+            f"missing_keys={sorted(set(detail) - detail_keys)[:10]}, stale_keys={sorted(detail_keys - set(detail))[:10]}"
+        )
+    if detail != canonical:
+        _raise_report_identity_mismatch("report-detail-metrics.json", canonical, detail)
+
+    page_detail_metrics = _read_json(out / "reports" / "detail-metrics.json")
+    if page_detail_metrics != detail_metrics:
+        raise RuntimeError(
+            "Web artifact reports/detail-metrics.json diverges from report-detail-metrics.json"
+        )
+
+    return_windows = _report_identity_map(_read_json(out / "return-windows.json"), "return-windows.json")
+    if return_windows != canonical:
+        _raise_report_identity_mismatch("return-windows.json", canonical, return_windows)
+    page_return_windows = _read_json(out / "reports" / "return-windows.json")
+    if page_return_windows != _read_json(out / "return-windows.json"):
+        raise RuntimeError("Web artifact reports/return-windows.json diverges from return-windows.json")
+
+    csv_rows = _read_report_download_identities(out / "table-download-reports.csv")
+    if csv_rows != canonical:
+        _raise_report_identity_mismatch("table-download-reports.csv", canonical, csv_rows)
+
+
+def _report_identity_map(rows: Any, source: str) -> dict[str, str]:
+    if not isinstance(rows, list):
+        rows = list(rows) if not isinstance(rows, (str, bytes, dict)) else None
+    if not isinstance(rows, list):
+        raise RuntimeError(f"Web artifact {source} must be a report row array")
+    identities: dict[str, str] = {}
+    for index, row in enumerate(rows):
+        if not isinstance(row, dict):
+            raise RuntimeError(f"Web artifact {source}[{index}] must be an object")
+        report_id = str(row.get("report_id") or "")
+        symbol = str(row.get("symbol") or "")
+        if not report_id:
+            raise RuntimeError(f"Web artifact {source}[{index}].report_id is missing")
+        if not symbol:
+            raise RuntimeError(f"Web artifact {source}[{index}].symbol is missing")
+        previous = identities.get(report_id)
+        if previous is not None:
+            raise RuntimeError(f"Web artifact {source} contains duplicate report_id: {report_id}")
+        identities[report_id] = symbol
+    return identities
+
+
+def _read_report_download_identities(path: Path) -> dict[str, str]:
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        rows = list(csv.DictReader(handle))
+    identities: dict[str, str] = {}
+    for index, row in enumerate(rows):
+        report_id = str(row.get("report_id") or "")
+        symbol = str(row.get("symbol") or "")
+        if not report_id:
+            raise RuntimeError(f"Web artifact table-download-reports.csv[{index}].report_id is missing")
+        if not symbol:
+            raise RuntimeError(f"Web artifact table-download-reports.csv[{index}].symbol is missing")
+        if report_id in identities:
+            raise RuntimeError(
+                f"Web artifact table-download-reports.csv contains duplicate report_id: {report_id}"
+            )
+        identities[report_id] = symbol
+    return identities
+
+
+def _raise_report_identity_mismatch(source: str, expected: dict[str, str], actual: dict[str, str]) -> None:
+    expected_ids = set(expected)
+    actual_ids = set(actual)
+    missing = sorted(expected_ids - actual_ids)
+    stale = sorted(actual_ids - expected_ids)
+    symbol_mismatches = sorted(
+        report_id for report_id in expected_ids & actual_ids if expected[report_id] != actual[report_id]
+    )
+    raise RuntimeError(
+        f"Web artifact {source} report cross-reference mismatch: "
+        f"missing_report_ids={missing[:10]}, stale_report_ids={stale[:10]}, "
+        f"symbol_mismatches={symbol_mismatches[:10]}"
+    )
 
 
 def _guard_export_destination(inputs: ExportInputs) -> None:
@@ -3820,7 +3919,9 @@ def _build_report_board_candidates(report_rows: list[dict[str, Any]]) -> list[di
         else:
             bucket = "active"
             rank_basis = "미도달·미만료 활성 리포트"
-        score = (target_upside * 1.4) + max(0.0, current_return) - max(0.0, target_gap * 0.25)
+        raw_score = (target_upside * 1.4) + max(0.0, current_return) - max(0.0, target_gap * 0.25)
+        quality = _report_candidate_quality(row)
+        score = raw_score - quality["penalty"]
         candidates.append(
             {
                 "report_id": row.get("report_id"),
@@ -3830,6 +3931,10 @@ def _build_report_board_candidates(report_rows: list[dict[str, Any]]) -> list[di
                 "bucket": bucket,
                 "rank_basis": rank_basis,
                 "score": round(score, 6),
+                "raw_score": round(raw_score, 6),
+                "quality_status": quality["status"],
+                "quality_basis": quality["basis"],
+                "quality_penalty": quality["penalty"],
                 "target_upside_at_pub": target_upside,
                 "current_return": current_return,
                 "target_gap_pct": target_gap,
@@ -3843,6 +3948,28 @@ def _build_report_board_candidates(report_rows: list[dict[str, Any]]) -> list[di
             str(item.get("symbol") or ""),
         ),
     )
+
+
+def _report_candidate_quality(row: dict[str, Any]) -> dict[str, Any]:
+    raw_flags = row.get("caveat_flags")
+    flags = [str(flag) for flag in raw_flags if flag] if isinstance(raw_flags, list) else []
+    penalty = 0.0
+    basis: list[str] = []
+    if any(flag.startswith("extraction_review:") for flag in flags):
+        penalty += 0.35
+        basis.append("원문 확인 필요")
+    if any(flag.startswith("price_scale_adjusted") for flag in flags):
+        penalty += 0.25
+        basis.append("가격 스케일 보정")
+    if "entry_price_native_inferred" in flags:
+        penalty += 0.15
+        basis.append("발간가 추정")
+    status = "review" if penalty else "verified"
+    return {
+        "status": status,
+        "basis": basis or ["검증됨"],
+        "penalty": round(penalty, 6),
+    }
 
 
 def _date_diff_days(start: str, end: str) -> int | None:

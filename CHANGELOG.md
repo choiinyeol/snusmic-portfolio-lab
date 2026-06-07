@@ -1,5 +1,28 @@
 # Changelog
 
+## v0.31.0 - Strengthen report artifact trust gates
+
+- Adds visible-report cross-reference gates across report table, detail metrics, return windows, downloads, and price artifacts.
+- Adds public report-detail trust status copy while keeping raw extraction diagnostics out of the SaaS UI.
+- Marks extreme target/current extraction ratios for review before they reach web artifacts.
+- Penalizes report-board candidates with extraction review, price-scale adjustment, or inferred-entry caveats so lower-quality rows do not rank above clean evidence.
+- Bumps Python and web package versions to `0.31.0`.
+
+Verification:
+
+- `uv run pytest tests/test_web_artifacts.py -q -k "report_cross_reference or report_download_stale_row or price_cross_reference_validator_accepts_consistent_tree"`
+- `uv run pytest tests/test_extract_pdf.py -q -k "current_target_pair_with_korean_suffix or extreme_target_current_ratio or single_target_for_korean_report or szse_six_digit"`
+- `uv run ruff check src/snusmic_pipeline/web/artifacts.py tests/test_web_artifacts.py src/snusmic_pipeline/ingest/extract_pdf.py tests/test_extract_pdf.py`
+- `uv run ruff format --check src/snusmic_pipeline/web/artifacts.py tests/test_web_artifacts.py src/snusmic_pipeline/ingest/extract_pdf.py tests/test_extract_pdf.py`
+- `uv run python -m snusmic_pipeline export-web --check`
+- `pnpm --dir apps/web artifact:check`
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web format:check`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web build`
+- `pnpm --dir apps/web smoke:static`
+- Static browser inspection of `/reports/082920.KS/fee8fb34906543bb`
+
 ## v0.30.24 - Correct Bitrosell target parsing
 
 - Fixes Korean current/target pair parsing when `원` is attached to the first value, preventing `45,250원 78,450원` from being split as `45,25` and `0`.
