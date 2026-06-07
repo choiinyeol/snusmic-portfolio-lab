@@ -31,59 +31,52 @@ export function ReportBoardScreen({ model }: { model: ReportBoardViewModel }) {
           </ul>
         </section>
       ) : null}
-      {model.diagnostics.length ? (
-        <Section title="진단 우선순위" caption="웹에서 빠졌거나 전사 품질 확인이 필요한 리포트만 압축했습니다.">
-          <div className="mt-3 overflow-hidden rounded-md border border-slate-200 bg-white">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500">
-                <tr>
-                  <th className="px-3 py-2 font-medium">상태</th>
-                  <th className="px-3 py-2 font-medium">리포트</th>
-                  <th className="px-3 py-2 font-medium">원인</th>
-                  <th className="px-3 py-2 font-medium">조치</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {model.diagnostics.map((item) => {
-                  const content = (
-                    <>
-                      <div className="font-medium text-slate-950">{stockDisplayName(item.symbol, item.company)}</div>
-                      <div className="font-mono text-slate-500">
-                        {compactTicker(item.symbol)} · {item.date ? formatDateKo(item.date) : '-'}
-                      </div>
-                    </>
-                  );
-                  return (
-                    <tr key={item.id} className="align-top">
-                      <td className="whitespace-nowrap px-3 py-2 text-amber-700">{item.status}</td>
-                      <td className="px-3 py-2">
-                        {item.href ? (
-                          <Link className="block hover:text-blue-600" href={item.href}>
-                            {content}
-                          </Link>
-                        ) : (
-                          content
-                        )}
-                      </td>
-                      <td className="px-3 py-2 font-mono text-slate-600">{item.reason}</td>
-                      <td className="px-3 py-2 leading-5 text-slate-600">{item.action}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </Section>
-      ) : null}
-
       <Section
-        title="오늘 볼 후보"
-        caption="지금 먼저 볼 종목만 압축해서 보여줍니다. 전체 표본은 아래 테이블에서 정렬과 컬럼 모드로 확인합니다."
+        title="검토 큐"
+        caption="후보를 먼저 열고, 웹에서 빠졌거나 전사 품질 확인이 필요한 리포트는 오른쪽 진단 큐에서 확인합니다."
       >
-        <div className="mt-3 grid gap-3 xl:grid-cols-5">
-          {model.priorityRows.map((row) => (
-            <PriorityCandidateCard key={row.symbol} row={row} />
-          ))}
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_24rem]">
+          <div className="grid gap-3">
+            <div className="flex items-end justify-between gap-3">
+              <div>
+                <h2 className="text-base font-semibold text-slate-950">오늘 볼 후보</h2>
+                <p className="mt-1 text-xs text-slate-500">
+                  정렬 기준 상위 후보입니다. 전체 표본은 아래 테이블에서 봅니다.
+                </p>
+              </div>
+              <span className="font-mono text-xs tabular-nums text-slate-500">
+                {model.priorityRows.length.toLocaleString('ko-KR')}개
+              </span>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-4">
+              {model.priorityRows.map((row) => (
+                <PriorityCandidateCard key={row.symbol} row={row} />
+              ))}
+            </div>
+          </div>
+
+          <aside className="grid content-start gap-3 rounded-md border border-slate-200 bg-white p-3">
+            <div className="flex items-end justify-between gap-3">
+              <div>
+                <h2 className="text-base font-semibold text-slate-950">진단 우선순위</h2>
+                <p className="mt-1 text-xs text-slate-500">표본 밖 리포트와 전사 재검토 항목입니다.</p>
+              </div>
+              <span className="font-mono text-xs tabular-nums text-slate-500">
+                {model.diagnostics.length.toLocaleString('ko-KR')}개
+              </span>
+            </div>
+            {model.diagnostics.length ? (
+              <div className="grid gap-2">
+                {model.diagnostics.map((item) => (
+                  <DiagnosticCard item={item} key={item.id} />
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-md border border-dashed border-slate-200 bg-slate-50 p-3 text-sm text-slate-500">
+                추가 진단 항목이 없습니다.
+              </div>
+            )}
+          </aside>
         </div>
       </Section>
 
@@ -101,6 +94,41 @@ export function ReportBoardScreen({ model }: { model: ReportBoardViewModel }) {
   );
 }
 
+function DiagnosticCard({ item }: { item: ReportBoardViewModel['diagnostics'][number] }) {
+  const content = (
+    <>
+      <div className="font-medium text-slate-950">{stockDisplayName(item.symbol, item.company)}</div>
+      <div className="mt-0.5 font-mono text-xs text-slate-500">
+        {compactTicker(item.symbol)} · {item.date ? formatDateKo(item.date) : '-'}
+      </div>
+    </>
+  );
+
+  return (
+    <div className="grid gap-2 rounded-md border border-slate-100 bg-slate-50/60 p-2.5 text-xs">
+      <div className="flex items-start justify-between gap-3">
+        {item.href ? (
+          <Link className="min-w-0 hover:text-blue-600" href={item.href}>
+            {content}
+          </Link>
+        ) : (
+          <div className="min-w-0">{content}</div>
+        )}
+        <span className="shrink-0 whitespace-nowrap text-amber-700">{item.status}</span>
+      </div>
+      <div className="grid gap-1 leading-5 text-slate-600">
+        <div>
+          <span className="font-medium text-slate-500">원인 </span>
+          <span className="font-mono">{item.reason}</span>
+        </div>
+        <div>
+          <span className="font-medium text-slate-500">조치 </span>
+          {item.action}
+        </div>
+      </div>
+    </div>
+  );
+}
 function PriorityCandidateCard({ row }: { row: ReportBoardRow }) {
   const href = `/reports/${encodeURIComponent(row.symbol)}/${encodeURIComponent(row.latestReportId)}`;
   const displayName = stockDisplayName(row.symbol, row.company);

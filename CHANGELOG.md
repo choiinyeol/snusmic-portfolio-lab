@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.30.22 - Rebalance the report board review queue
+
+- Moves `/reports` into a clearer review queue: priority candidates stay on the left, report-health diagnostics move into a compact side queue.
+- Replaces the wide diagnostics table with per-report diagnostic cards so excluded/transcription-review rows do not dominate the main workflow.
+- Keeps the full report table as the canonical detailed comparison below the triage queue.
+- Bumps Python and web package versions to `0.30.22`.
+
+Verification:
+
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web format:check`
+- `pnpm --dir apps/web build`
+- `pnpm --dir apps/web smoke:static`
+- Browser inspection of `/reports` on `http://127.0.0.1:3000`
+
 ## v0.30.21 - Reset the home route hierarchy
 
 - Reframes `/` as a compact operating hub for data status, representative account state, and route-level next actions instead of a duplicate signal-ledger detail page.
