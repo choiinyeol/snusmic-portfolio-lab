@@ -65,6 +65,18 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
                 </div>
                 <h2 className="mt-1 text-xl font-semibold">{displayPortfolioName(leader.id, leader.shortLabel)}</h2>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">{strategyMeta(leader.id).description}</p>
+                <div className="mt-3 grid gap-2 text-sm leading-6 text-slate-300 md:grid-cols-2">
+                  <p>
+                    <span className="font-semibold text-white">선정 이유</span>
+                    <br />
+                    {leader.shortlistReason}
+                  </p>
+                  <p>
+                    <span className="font-semibold text-white">비교 포인트</span>
+                    <br />
+                    {leader.comparisonPrompt}
+                  </p>
+                </div>
               </div>
               <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-950">원장 보기</span>
             </div>
@@ -135,12 +147,20 @@ function StrategyCard({ account }: { account: PortfolioAccountSnapshot }) {
       <div className="flex min-w-0 items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
-            {meta.role}
+            {account.shortlistRole} · {meta.role}
           </div>
           <h2 className="mt-1 truncate text-lg font-semibold tracking-tight text-slate-950">
             {displayPortfolioName(account.id, account.shortLabel)}
           </h2>
           <p className="mt-1 text-sm text-slate-500">{meta.subtitle}</p>
+          <div className="mt-3 grid gap-2 text-sm leading-6 text-slate-600">
+            <p>
+              <span className="font-semibold text-slate-950">선정 이유</span> · {account.shortlistReason}
+            </p>
+            <p>
+              <span className="font-semibold text-slate-950">비교 질문</span> · {account.comparisonPrompt}
+            </p>
+          </div>
         </div>
         <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-500">
           열기

@@ -290,10 +290,26 @@ for (const symbol of reportSymbols) {
   }
 }
 const missingSymbols = new Set();
+const allowedMissingReleaseStatuses = new Set(['accepted', 'action_required', 'fixed']);
+const allowedMissingDecisions = new Set([
+  'accepted_exclusion',
+  'source_gap',
+  'refresh_pending',
+  'mapping_replaced',
+  'manual_review',
+]);
 for (const [index, row] of readJson('missing-symbols.json').entries()) {
   if (!row?.symbol) fail(`missing-symbols.json[${index}].symbol is missing`);
   if (!row?.category) fail(`missing-symbols.json[${index}].category is missing`);
   if (!row?.action) fail(`missing-symbols.json[${index}].action is missing`);
+  if (!row?.decision) fail(`missing-symbols.json[${index}].decision is missing`);
+  if (!row?.release_status) fail(`missing-symbols.json[${index}].release_status is missing`);
+  if (!allowedMissingDecisions.has(row.decision)) {
+    fail(`missing-symbols.json[${index}].decision is invalid: ${row.decision}`);
+  }
+  if (!allowedMissingReleaseStatuses.has(row.release_status)) {
+    fail(`missing-symbols.json[${index}].release_status is invalid: ${row.release_status}`);
+  }
   missingSymbols.add(row.symbol);
   if (!fs.existsSync(path.join(priceDir, `${row.symbol}.json`))) {
     fail(`missing-symbols entry lacks price artifact: ${row.symbol}`);

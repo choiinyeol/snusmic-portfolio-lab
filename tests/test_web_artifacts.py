@@ -445,6 +445,15 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(web_export_dir: 
     assert checks_by_id["missing_price_symbols"]["severity"] == "review"
     assert checks_by_id["missing_price_symbols"]["observed"]["missing_price_symbols"] == 6
     assert checks_by_id["missing_price_symbols"]["action"]
+    assert checks_by_id["missing_price_symbols"]["observed"]["release_status_counts"] == {
+        "accepted": 4,
+        "action_required": 2,
+    }
+    assert checks_by_id["missing_price_symbols"]["observed"]["category_counts"] == {
+        "delisted": 4,
+        "mapping_fixed_pending_refresh": 1,
+        "provider_gap": 1,
+    }
     missing_symbols = json.loads((out / "missing-symbols.json").read_text(encoding="utf-8"))
     assert {row["symbol"] for row in missing_symbols} == {
         "003410.KS",
@@ -454,7 +463,10 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(web_export_dir: 
         "SOI.PA",
         "VTNR",
     }
-    assert all(row["category"] and row["action"] for row in missing_symbols)
+    assert all(
+        row["category"] and row["action"] and row["decision"] and row["release_status"]
+        for row in missing_symbols
+    )
     assert "health.json" in manifest["artifacts"]
     assert len(manifest["checksums"]["health.json"]) == 64
 

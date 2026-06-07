@@ -89,30 +89,44 @@ MISSING_PRICE_CLASSIFICATIONS = {
     "003410.KS": {
         "category": "delisted",
         "action": "상장폐지 이력이 있는 KRX 종목입니다. 리포트 표본 제외를 유지하거나 별도 과거 가격 소스를 연결하세요.",
+        "decision": "accepted_exclusion",
+        "release_status": "accepted",
     },
     "010620.KS": {
         "category": "provider_gap",
         "action": "현재 Yahoo Finance에서 quote가 잡히지 않습니다. 대체 가격 소스 또는 provider mapping을 확인하세요.",
+        "decision": "source_gap",
+        "release_status": "action_required",
     },
     "287410.KQ": {
         "category": "delisted",
         "action": "상장폐지 이력이 있는 KOSDAQ 종목입니다. 리포트 표본 제외를 유지하거나 별도 과거 가격 소스를 연결하세요.",
+        "decision": "accepted_exclusion",
+        "release_status": "accepted",
     },
     "NETI": {
         "category": "delisted",
         "action": "상장폐지/거래중단된 해외 종목입니다. 리포트 표본 제외를 유지하거나 별도 과거 가격 소스를 연결하세요.",
+        "decision": "accepted_exclusion",
+        "release_status": "accepted",
     },
     "SOI.PA": {
         "category": "mapping_fixed_pending_refresh",
         "action": "Soitec Yahoo ticker는 SOI.PA입니다. 다음 가격 refresh 뒤 가격 artifact 편입 여부를 확인하세요.",
+        "decision": "refresh_pending",
+        "release_status": "action_required",
     },
     "SOIT.PA": {
         "category": "bad_yfinance_symbol",
         "action": "Soitec Yahoo ticker가 SOI.PA로 보정되었습니다. warehouse/web artifact를 재생성하세요.",
+        "decision": "mapping_replaced",
+        "release_status": "fixed",
     },
     "VTNR": {
         "category": "delisted",
         "action": "상장폐지/거래중단된 해외 종목입니다. 리포트 표본 제외를 유지하거나 별도 과거 가격 소스를 연결하세요.",
+        "decision": "accepted_exclusion",
+        "release_status": "accepted",
     },
 }
 
@@ -1864,11 +1878,16 @@ def _write_artifact_health(out: Path, overview: dict[str, Any], data_quality: di
     raw_missing_symbols = data_quality.get("missing_symbols", []) if isinstance(data_quality, dict) else []
     missing_symbols = raw_missing_symbols if isinstance(raw_missing_symbols, list) else []
     missing_count = len(missing_symbols)
+    missing_status_counts = _counts_by_key(missing_symbols, "release_status")
+    missing_category_counts = _counts_by_key(missing_symbols, "category")
+    action_required_count = missing_status_counts.get("action_required", 0)
     missing_preview = [
         {
             "symbol": str(row.get("symbol", "")),
             "company": str(row.get("company", "")),
             "category": str(row.get("category", "")),
+            "release_status": str(row.get("release_status", "")),
+            "decision": str(row.get("decision", "")),
             "action": str(row.get("action", "")),
         }
         for row in missing_symbols[:5]
@@ -1899,13 +1918,18 @@ def _write_artifact_health(out: Path, overview: dict[str, Any], data_quality: di
         {
             "id": "missing_price_symbols",
             "label": "Missing price symbols",
-            "severity": "ok" if missing_count == 0 else "review",
-            "status": "ok" if missing_count == 0 else "review",
+            "severity": "ok" if missing_count == 0 else ("review" if action_required_count else "ok"),
+            "status": "ok" if missing_count == 0 else ("review" if action_required_count else "ok"),
             "count": missing_count,
-            "observed": {"missing_price_symbols": missing_count, "preview": missing_preview},
-            "expected": "missing_price_symbols should be zero when every report symbol has reliable market data",
-            "action": "누락 symbol을 검토해 mapping 추가, 시장 데이터 없음 수용, 리포트 제외 중 하나를 결정하세요.",
-            "detail": f"{missing_count} report symbols are tracked as missing price coverage.",
+            "observed": {
+                "missing_price_symbols": missing_count,
+                "release_status_counts": missing_status_counts,
+                "category_counts": missing_category_counts,
+                "preview": missing_preview,
+            },
+            "expected": "each missing-price symbol must have an explicit release_status and action",
+            "action": "action_required symbol은 가격 소스 또는 mapping을 보정하고, accepted symbol은 리포트 표본 제외를 유지하세요.",
+            "detail": f"{missing_count} report symbols are tracked as missing price coverage; {action_required_count} require action.",
         },
     ]
     severity_rank = {"ok": 0, "review": 1, "stale": 2, "fail": 3}
@@ -3830,6 +3854,16 @@ def _date_diff_days(start: str, end: str) -> int | None:
         return None
 
 
+def _counts_by_key(rows: list[Any], key: str) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        value = str(row.get(key) or "unclassified")
+        counts[value] = counts.get(value, 0) + 1
+    return dict(sorted(counts.items()))
+
+
 def _missing_symbol_rows(missing_symbols: list[str], reports: pd.DataFrame) -> list[dict[str, Any]]:
     if reports.empty or "symbol" not in reports.columns:
         report_lookup: dict[str, dict[str, Any]] = {}
@@ -3846,6 +3880,8 @@ def _missing_symbol_rows(missing_symbols: list[str], reports: pd.DataFrame) -> l
             {
                 "category": "unclassified",
                 "action": "가격 소스, symbol mapping, 리포트 제외 여부를 수동 검토하세요.",
+                "decision": "manual_review",
+                "release_status": "action_required",
             },
         )
         rows.append(
@@ -3854,6 +3890,8 @@ def _missing_symbol_rows(missing_symbols: list[str], reports: pd.DataFrame) -> l
                 "company": _clean(report.get("company")) if report else "",
                 "report_id": _clean(report.get("report_id")) if report else "",
                 "category": classification["category"],
+                "decision": classification["decision"],
+                "release_status": classification["release_status"],
                 "action": classification["action"],
             }
         )
@@ -3955,7 +3993,11 @@ def _write_download_csvs(
         for metric, value in data_quality.get("coverage", {}).items()
     ]
     quality_rows.extend(
-        {"section": "missing_symbol", "metric": row.get("symbol"), "value": row.get("symbol")}
+        {
+            "section": "missing_symbol",
+            "metric": row.get("symbol"),
+            "value": f"{row.get('release_status')}:{row.get('decision')}:{row.get('category')}",
+        }
         for row in data_quality.get("missing_symbols", [])
     )
     _write_csv(out / "data-quality-download.csv", quality_rows, ["section", "metric", "value"])

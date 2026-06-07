@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { PriceEvidenceChart } from '@/components/charts/PriceEvidenceChart';
 import { Button } from '@/components/ui/button';
@@ -8,10 +9,14 @@ import { formatAssetPrice, targetMoveLabel, targetStatus } from '@/lib/report-vi
 import type { ReportDetailViewModel } from '@/lib/view-models/report-detail';
 
 export function ReportDetailView({ model }: { model: ReportDetailViewModel }) {
-  const { report, priceSeries, entryPrice, captureRatio, stageLabel } = model;
+  const { report, priceSeries, entryPrice, captureRatio, stageLabel, sourceMetadata } = model;
   const status = targetStatus(report);
-  const markdownHref = githubBlobUrl(`data/markdown/${report.markdownFilename}`);
-  const pdfHref = pdfHrefFor(report);
+  const markdownHref = sourceMetadata.markdownRepositoryPath
+    ? githubBlobUrl(sourceMetadata.markdownRepositoryPath)
+    : null;
+  const pdfHref = sourceMetadata.pdfRepositoryPath
+    ? githubBlobUrl(sourceMetadata.pdfRepositoryPath)
+    : sourceMetadata.pdfUrl;
 
   return (
     <div className="grid gap-5">
@@ -35,9 +40,11 @@ export function ReportDetailView({ model }: { model: ReportDetailViewModel }) {
                 <a href={pdfHref}>PDF</a>
               </Button>
             ) : null}
-            <Button asChild size="sm" variant="outline">
-              <a href={markdownHref}>Markdown</a>
-            </Button>
+            {markdownHref ? (
+              <Button asChild size="sm" variant="outline">
+                <a href={markdownHref}>Markdown</a>
+              </Button>
+            ) : null}
           </>
         }
         kpis={
@@ -105,6 +112,8 @@ export function ReportDetailView({ model }: { model: ReportDetailViewModel }) {
         ]}
       />
 
+      <SourceAuditSection metadata={sourceMetadata} markdownHref={markdownHref} pdfHref={pdfHref} />
+
       <section className="grid gap-2" aria-labelledby="price-chart-heading">
         <h2
           className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500"
@@ -154,16 +163,110 @@ function FactsTable({ rows }: { rows: FactRow[] }) {
   );
 }
 
+type SourceMetadata = ReportDetailViewModel['sourceMetadata'];
+
+function SourceAuditSection({
+  metadata,
+  markdownHref,
+  pdfHref,
+}: {
+  metadata: SourceMetadata;
+  markdownHref: string | null;
+  pdfHref: string | null;
+}) {
+  const caveatLabel = metadata.caveatFlags.length ? `${metadata.caveatFlags.length}개` : '없음';
+
+  return (
+    <section
+      className="overflow-hidden rounded-md border border-slate-200 bg-white"
+      aria-labelledby="source-audit-heading"
+    >
+      <div className="border-b border-slate-100 p-3">
+        <h2
+          className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500"
+          id="source-audit-heading"
+        >
+          출처 / 감사 메타데이터
+        </h2>
+        <p className="mt-1 text-xs text-slate-500">
+          리포트 식별자, 원문 PDF, 추출 Markdown, 검증 주의 플래그를 원천 필드 기준으로 표시합니다.
+        </p>
+      </div>
+      <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 [&>div]:border-b [&>div]:border-r [&>div]:border-slate-100">
+        <AuditItem label="Report ID" value={metadata.reportId} caption={metadata.title || '제목 미기록'} />
+        <AuditItem
+          label="PDF"
+          value={metadata.pdfFilename ? '저장 PDF' : metadata.pdfUrl ? '원문 URL' : '없음'}
+          caption={metadata.pdfRepositoryPath ?? metadata.pdfUrl ?? 'pdf_filename / pdf_url 미기록'}
+          href={pdfHref}
+        />
+        <AuditItem
+          label="Markdown"
+          value={metadata.markdownFilename ? '추출 완료' : '없음'}
+          caption={metadata.markdownRepositoryPath ?? 'markdown_filename 미기록'}
+          href={markdownHref}
+        />
+        <AuditItem
+          label="Caveat flags"
+          value={caveatLabel}
+          caption={metadata.caveatFlags.length ? undefined : '주의 플래그 없음'}
+        >
+          {metadata.caveatFlags.length ? (
+            <div className="mt-2 flex flex-wrap gap-1">
+              {metadata.caveatFlags.map((flag) => (
+                <span
+                  className="rounded-md bg-amber-50 px-1.5 py-0.5 text-[11px] font-medium text-amber-700"
+                  key={flag}
+                >
+                  {flag}
+                </span>
+              ))}
+            </div>
+          ) : null}
+        </AuditItem>
+      </dl>
+    </section>
+  );
+}
+
+function AuditItem({
+  label,
+  value,
+  caption,
+  href,
+  children,
+}: {
+  label: string;
+  value: string;
+  caption?: string;
+  href?: string | null;
+  children?: ReactNode;
+}) {
+  return (
+    <div className="grid min-w-0 gap-0.5 p-3">
+      <dt className="text-xs font-medium text-slate-500">{label}</dt>
+      <dd className="truncate font-mono text-sm font-semibold tabular-nums text-slate-950">
+        {href ? (
+          <a className="underline decoration-slate-300 underline-offset-2 hover:text-slate-700" href={href}>
+            {value}
+          </a>
+        ) : (
+          value
+        )}
+      </dd>
+      {caption ? (
+        <dd className="truncate text-xs text-slate-500" title={caption}>
+          {caption}
+        </dd>
+      ) : null}
+      {children}
+    </div>
+  );
+}
+
 function githubBlobUrl(path: string): string {
   return `https://github.com/ChoiInYeol/snusmic-portfolio-lab/blob/main/${encodeURI(path)}`;
 }
-
-function pdfHrefFor(report: { pdfFilename: string; pdfUrl: string }): string | null {
-  if (report.pdfFilename) return githubBlobUrl(`data/pdfs/${report.pdfFilename}`);
-  if (report.pdfUrl) return report.pdfUrl;
-  return null;
-}
-
 function krwCaption(krw: number | null | undefined, currency: string | null | undefined): string | undefined {
   if (!krw || !Number.isFinite(krw)) return undefined;
   if ((currency ?? 'KRW').toUpperCase() === 'KRW') return undefined;

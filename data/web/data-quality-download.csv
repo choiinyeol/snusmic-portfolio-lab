@@ -2,9 +2,9 @@ section,metric,value
 coverage,warehouse_reports,240
 coverage,report_performance_rows,240
 coverage,reports_without_performance,0
-missing_symbol,003410.KS,003410.KS
-missing_symbol,010620.KS,010620.KS
-missing_symbol,287410.KQ,287410.KQ
-missing_symbol,NETI,NETI
-missing_symbol,SOI.PA,SOI.PA
-missing_symbol,VTNR,VTNR
+missing_symbol,003410.KS,accepted:accepted_exclusion:delisted
+missing_symbol,010620.KS,action_required:source_gap:provider_gap
+missing_symbol,287410.KQ,accepted:accepted_exclusion:delisted
+missing_symbol,NETI,accepted:accepted_exclusion:delisted
+missing_symbol,SOI.PA,action_required:refresh_pending:mapping_fixed_pending_refresh
+missing_symbol,VTNR,accepted:accepted_exclusion:delisted

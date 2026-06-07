@@ -26,6 +26,7 @@ import {
   getTrades,
 } from '@/lib/artifacts';
 import { displayPortfolioName } from '@/lib/portfolio-labels';
+import { strategyMeta } from '@/components/trading/portfolio-views/strategy-display';
 import {
   getDefaultPortfolioAccount,
   getAccountLeaderboard,
@@ -72,6 +73,7 @@ export function buildPortfolioLandingModel(): PortfolioLandingModel {
     const cashKrw = summary?.finalCashKrw ?? 0;
     const finalEquity = summary?.finalEquityKrw ?? (holdingsValue || cashKrw ? holdingsValue + cashKrw : null);
     const topHolding = [...holdings].sort((a, b) => (b.marketValueKrw ?? 0) - (a.marketValueKrw ?? 0))[0];
+    const shortlist = shortlistMetadata(row.id);
     return {
       id: row.id,
       label: displayPortfolioName(row.id, row.label),
@@ -89,6 +91,7 @@ export function buildPortfolioLandingModel(): PortfolioLandingModel {
       topHoldingLabel: topHolding?.company || topHolding?.symbol || '-',
       topHoldingWeight:
         finalEquity && finalEquity > 0 && topHolding?.marketValueKrw ? topHolding.marketValueKrw / finalEquity : null,
+      ...shortlist,
     };
   };
   const accounts = portfolioRows.map(snapshotFromRow);
@@ -105,6 +108,42 @@ export function buildPortfolioLandingModel(): PortfolioLandingModel {
     equity,
     trades,
     accountLabels,
+  };
+}
+
+function shortlistMetadata(
+  accountId: string,
+): Pick<PortfolioAccountSnapshot, 'shortlistRole' | 'shortlistReason' | 'comparisonPrompt'> {
+  const meta = strategyMeta(accountId);
+
+  if (meta.role === 'candidate') {
+    return {
+      shortlistRole: 'candidate',
+      shortlistReason: '현재 검토 후보라서 다른 대표 원장보다 먼저 봅니다.',
+      comparisonPrompt: '부분 재투입 후보가 수익률, 낙폭, 체결 수를 함께 개선했는지 확인합니다.',
+    };
+  }
+
+  if (meta.role === 'robustness') {
+    return {
+      shortlistRole: 'robustness',
+      shortlistReason: '후보와 같은 trim 구조에서 현금 재투입 강도만 비교하는 견고성 점검입니다.',
+      comparisonPrompt: '현금 전액 재투입 대비 부분 재투입이 과열 재진입과 낙폭을 줄였는지 봅니다.',
+    };
+  }
+
+  if (accountId === 'smic_follower') {
+    return {
+      shortlistRole: 'follower',
+      shortlistReason: '점수 전략 없이 리포트 추종만 했을 때의 현실적인 기준선입니다.',
+      comparisonPrompt: 'TopN 점수 전략이 단순 리포트 추종보다 충분한 초과성과를 냈는지 봅니다.',
+    };
+  }
+
+  return {
+    shortlistRole: 'baseline',
+    shortlistReason: `${meta.subtitle}으로 후보 전략의 추가 규칙을 떼어 비교합니다.`,
+    comparisonPrompt: '후보의 보유 유지, trim, 현금 재투입 규칙이 기준선 대비 무엇을 더했는지 봅니다.',
   };
 }
 

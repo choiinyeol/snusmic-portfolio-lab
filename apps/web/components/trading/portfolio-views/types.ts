@@ -106,6 +106,9 @@ export type PortfolioAccountSnapshot = {
   holdingCount: number;
   topHoldingLabel: string;
   topHoldingWeight: number | null;
+  shortlistRole: 'candidate' | 'baseline' | 'robustness' | 'follower';
+  shortlistReason: string;
+  comparisonPrompt: string;
 };
 
 export type PortfolioLandingModel = {

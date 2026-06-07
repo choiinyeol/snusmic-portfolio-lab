@@ -28,6 +28,14 @@ Use the smallest check that proves the change.
 - Treat full `uv run pytest -q`, `uv run pre-commit run --all-files`, `uv run pytest tests/test_web_artifacts.py -q -x`, `uv run python -m snusmic_pipeline export-web --check`, release builds, and CI watching as release-gate checks, not the default inner loop.
 - If a check takes too long for the scope, stop using it as a default and replace it with a narrower smoke check.
 
+## Discord Execution Slicing
+
+- Discord-run agent sessions should assume the harness may time out before a large release finishes.
+- Split broad requests into small release slices: code/validation logic, generated data artifacts, frontend UI, and final release metadata should be separate commits when the combined work would require long rebuilds or rebase-prone generated artifacts.
+- Do not bundle `data/warehouse/daily_prices.csv`, `data/sim/**`, and broad `data/web/**` regeneration with unrelated code changes unless the user explicitly asks for one large release.
+- Before a data-heavy push from Discord, fetch/rebase first, then regenerate artifacts against the rebased `main` to avoid resolving generated JSON conflicts by hand.
+- Prefer checks that fit the slice. Run full `rebuild-web-artifacts`, `build`, and static smoke only on the data/UI slice that actually needs them.
+
 ## Test Policy
 
 Tests should support human review, not replace judgment.

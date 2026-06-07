@@ -216,6 +216,10 @@ export const WebDataQualitySchema = z
             symbol: z.string(),
             company: z.string().optional(),
             reason: z.string().optional(),
+            category: z.string().optional(),
+            decision: z.string().optional(),
+            release_status: z.string().optional(),
+            action: z.string().optional(),
           })
           .passthrough(),
       )

@@ -498,6 +498,8 @@
       "action": "상장폐지 이력이 있는 KRX 종목입니다. 리포트 표본 제외를 유지하거나 별도 과거 가격 소스를 연결하세요.",
       "category": "delisted",
       "company": "쌍용C&E",
+      "decision": "accepted_exclusion",
+      "release_status": "accepted",
       "report_id": "98ab527e6ec4bf16",
       "symbol": "003410.KS"
     },
@@ -505,6 +507,8 @@
       "action": "현재 Yahoo Finance에서 quote가 잡히지 않습니다. 대체 가격 소스 또는 provider mapping을 확인하세요.",
       "category": "provider_gap",
       "company": "HD현대미포",
+      "decision": "source_gap",
+      "release_status": "action_required",
       "report_id": "1f8d82763b000479",
       "symbol": "010620.KS"
     },
@@ -512,6 +516,8 @@
       "action": "상장폐지 이력이 있는 KOSDAQ 종목입니다. 리포트 표본 제외를 유지하거나 별도 과거 가격 소스를 연결하세요.",
       "category": "delisted",
       "company": "제이시스메디칼",
+      "decision": "accepted_exclusion",
+      "release_status": "accepted",
       "report_id": "b9143e5e11be8dd3",
       "symbol": "287410.KQ"
     },
@@ -519,6 +525,8 @@
       "action": "상장폐지/거래중단된 해외 종목입니다. 리포트 표본 제외를 유지하거나 별도 과거 가격 소스를 연결하세요.",
       "category": "delisted",
       "company": "Eneti Inc.",
+      "decision": "accepted_exclusion",
+      "release_status": "accepted",
       "report_id": "69e082beafe7c93a",
       "symbol": "NETI"
     },
@@ -526,6 +534,8 @@
       "action": "Soitec Yahoo ticker는 SOI.PA입니다. 다음 가격 refresh 뒤 가격 artifact 편입 여부를 확인하세요.",
       "category": "mapping_fixed_pending_refresh",
       "company": "Soitec SA",
+      "decision": "refresh_pending",
+      "release_status": "action_required",
       "report_id": "21f8685022e2f44f",
       "symbol": "SOI.PA"
     },
@@ -533,6 +543,8 @@
       "action": "상장폐지/거래중단된 해외 종목입니다. 리포트 표본 제외를 유지하거나 별도 과거 가격 소스를 연결하세요.",
       "category": "delisted",
       "company": "Vertex Energy, Inc.",
+      "decision": "accepted_exclusion",
+      "release_status": "accepted",
       "report_id": "3cb65668846f456b",
       "symbol": "VTNR"
     }

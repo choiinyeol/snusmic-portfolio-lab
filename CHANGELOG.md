@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.30.19 - Clarify audit and shortlist decisions
+
+- Adds explicit `decision` and `release_status` policy fields for missing-price symbols, including accepted exclusions versus action-required price/mapping work.
+- Surfaces missing-price status/category counts in `health.json`, `data-quality-download.csv`, and artifact validation.
+- Adds report detail source/audit metadata so PDF, Markdown, report id, title, and caveat flags are visible on each report detail page.
+- Makes the portfolio shortlist explain why each curated account is shown and what comparison question it answers.
+- Records Discord execution slicing in `AGENTS.md` and bumps Python/web package versions to `0.30.19`.
+
+Verification:
+
+- `uv run --locked python -m snusmic_pipeline export-web --check`
+- `uv run --locked ruff check src/snusmic_pipeline/web/artifacts.py`
+- `uv run --locked ruff format --check src/snusmic_pipeline/web/artifacts.py`
+- `pnpm --dir apps/web artifact:check`
+- `pnpm --dir apps/web typecheck`
+- `uv run --locked pytest tests/test_web_artifacts.py -q -k "manifest_records_snapshot_lineage_counts_and_checksums"`
+- `uv run --locked ruff check src/snusmic_pipeline/web/artifacts.py tests/test_web_artifacts.py`
+- `uv run --locked ruff format --check src/snusmic_pipeline/web/artifacts.py tests/test_web_artifacts.py`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web format:check`
+- `pnpm --dir apps/web build`
+- `pnpm --dir apps/web smoke:static`
+- `git diff --check`
+
 ## v0.30.18 - Tighten diagnostics and release gates
 
 - Fixes extraction of fair-value ranges and approval-price targets, removing the remaining `needs_review` report rows from the committed extraction audit.

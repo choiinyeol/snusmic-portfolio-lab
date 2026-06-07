@@ -481,7 +481,15 @@ export type WebDataQuality = {
   coverage?: Record<string, number>;
   extraction_quality?: Record<string, unknown>;
   report_exclusions?: Record<string, number>;
-  missing_symbols?: { symbol: string; company?: string; reason?: string }[];
+  missing_symbols?: {
+    symbol: string;
+    company?: string;
+    reason?: string;
+    category?: string;
+    decision?: string;
+    release_status?: string;
+    action?: string;
+  }[];
 };
 
 export type ArtifactManifest = {
