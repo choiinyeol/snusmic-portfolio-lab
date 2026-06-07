@@ -7,7 +7,7 @@ strategies, rebalance accounts, or run admission gates.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import date, datetime
 from typing import Literal
 
@@ -44,8 +44,13 @@ class PitResearchBoardRow:
     return_6m: float | None
     return_1y: float | None
     distance_from_52w_high: float | None
+    distance_from_52w_low: float | None
     above_20ma: bool | None
     above_50ma: bool | None
+    above_150ma: bool | None
+    sma200_return_1m: float | None
+    sma200_return_120d: float | None
+    sma200_return_150d: float | None
     above_200ma: bool | None
     ma_stack: bool | None
     ema_stack: bool | None
@@ -60,6 +65,9 @@ class PitResearchBoardRow:
     candidate_score: float
     board_score: float
     ta_momentum_score: float
+    relative_strength_score: float | None
+    relative_strength_percentile: float | None
+    mtt_template: bool | None = None
 
     def to_record(self, *, rank: int | None = None) -> dict[str, object]:
         return {
@@ -86,8 +94,13 @@ class PitResearchBoardRow:
             "return_6m": self.return_6m,
             "return_1y": self.return_1y,
             "distance_from_52w_high": self.distance_from_52w_high,
+            "distance_from_52w_low": self.distance_from_52w_low,
             "above_20ma": self.above_20ma,
             "above_50ma": self.above_50ma,
+            "above_150ma": self.above_150ma,
+            "sma200_return_1m": self.sma200_return_1m,
+            "sma200_return_120d": self.sma200_return_120d,
+            "sma200_return_150d": self.sma200_return_150d,
             "above_200ma": self.above_200ma,
             "ma_stack": self.ma_stack,
             "ema_stack": self.ema_stack,
@@ -102,6 +115,9 @@ class PitResearchBoardRow:
             "candidate_score": self.candidate_score,
             "board_score": self.board_score,
             "ta_momentum_score": self.ta_momentum_score,
+            "relative_strength_score": self.relative_strength_score,
+            "relative_strength_percentile": self.relative_strength_percentile,
+            "mtt_template": self.mtt_template,
         }
 
 
@@ -192,12 +208,29 @@ class _PitTechnicalIndicatorCache:
         ret_6m = _return_since_position(series, ts - pd.Timedelta(days=180), current, end_pos)
         ret_1y = _return_since_position(series, ts - pd.Timedelta(days=365), current, end_pos)
         high52 = _float_or_none(row.get("high52"))
+        low52 = _float_or_none(row.get("low52"))
         sma20 = _float_or_none(row.get("sma20"))
         sma50 = _float_or_none(row.get("sma50"))
+        sma150 = _float_or_none(row.get("sma150"))
         sma200 = _float_or_none(row.get("sma200"))
         ema20 = _float_or_none(row.get("ema20"))
         ema50 = _float_or_none(row.get("ema50"))
         ema200 = _float_or_none(row.get("ema200"))
+        sma200_ret_1m = (
+            _return_since_position(indicators["sma200"], ts - pd.Timedelta(days=30), sma200, end_pos)
+            if sma200 is not None
+            else None
+        )
+        sma200_ret_120d = (
+            _return_since_position(indicators["sma200"], ts - pd.Timedelta(days=120), sma200, end_pos)
+            if sma200 is not None
+            else None
+        )
+        sma200_ret_150d = (
+            _return_since_position(indicators["sma200"], ts - pd.Timedelta(days=150), sma200, end_pos)
+            if sma200 is not None
+            else None
+        )
         macd_line = _float_or_none(row.get("macd_line"))
         macd_signal = _float_or_none(row.get("macd_signal"))
         macd_hist = _float_or_none(row.get("macd_hist"))
@@ -208,10 +241,16 @@ class _PitTechnicalIndicatorCache:
             "return_6m": ret_6m,
             "return_1y": ret_1y,
             "distance_from_52w_high": (current / high52 - 1.0) if high52 and high52 > 0 else None,
+            "distance_from_52w_low": (current / low52 - 1.0) if low52 and low52 > 0 else None,
             "above_20ma": _above(current, sma20),
             "above_50ma": _above(current, sma50),
+            "above_150ma": _above(current, sma150),
+            "sma200_return_1m": sma200_ret_1m,
+            "sma200_return_120d": sma200_ret_120d,
+            "sma200_return_150d": sma200_ret_150d,
             "above_200ma": _above(current, sma200),
-            "ma_stack": _stacked(current, sma20, sma50, sma200),
+            "ma_stack": _stacked(current, sma20, sma50, sma150, sma200),
+            "mtt_template": _stacked(current, sma50, sma150, sma200),
             "ema_stack": _stacked(current, ema20, ema50, ema200),
             "macd_line": macd_line,
             "macd_signal": macd_signal,
@@ -239,8 +278,10 @@ class _PitTechnicalIndicatorCache:
             return cached
         frame = pd.DataFrame(index=series.index)
         frame["high52"] = series.rolling("365D", min_periods=1).max()
+        frame["low52"] = series.rolling("365D", min_periods=1).min()
         frame["sma20"] = series.rolling(20, min_periods=20).mean()
         frame["sma50"] = series.rolling(50, min_periods=50).mean()
+        frame["sma150"] = series.rolling(150, min_periods=150).mean()
         frame["sma200"] = series.rolling(200, min_periods=200).mean()
         frame["ema20"] = series.ewm(span=20, adjust=False, min_periods=20).mean()
         frame["ema50"] = series.ewm(span=50, adjust=False, min_periods=50).mean()
@@ -350,6 +391,7 @@ def _build_pit_research_board_from_prepared(
         )
         is not None
     ]
+    rows = _with_relative_strength_percentiles(rows)
     return sorted(
         rows, key=lambda row: (-row.board_score, -row.candidate_score, row.publication_date, row.symbol)
     )
@@ -403,6 +445,7 @@ def _row_from_report(
     candidate_score = (target_upside * 1.4) + max(0.0, current_return) - max(0.0, target_gap * 0.25)
     board_score = _board_score(candidate_score, tech)
     ta_momentum_score = _ta_momentum_score(target_upside, current_return, target_gap, tech)
+    relative_strength_score = _relative_strength_score(tech)
     return PitResearchBoardRow(
         as_of_date=as_of,
         price_date=price_date,
@@ -426,10 +469,16 @@ def _row_from_report(
         return_6m=_float_or_none(tech.get("return_6m")),
         return_1y=_float_or_none(tech.get("return_1y")),
         distance_from_52w_high=_float_or_none(tech.get("distance_from_52w_high")),
+        distance_from_52w_low=_float_or_none(tech.get("distance_from_52w_low")),
         above_20ma=_bool_or_none(tech.get("above_20ma")),
         above_50ma=_bool_or_none(tech.get("above_50ma")),
+        above_150ma=_bool_or_none(tech.get("above_150ma")),
+        sma200_return_1m=_float_or_none(tech.get("sma200_return_1m")),
+        sma200_return_120d=_float_or_none(tech.get("sma200_return_120d")),
+        sma200_return_150d=_float_or_none(tech.get("sma200_return_150d")),
         above_200ma=_bool_or_none(tech.get("above_200ma")),
         ma_stack=_bool_or_none(tech.get("ma_stack")),
+        mtt_template=_bool_or_none(tech.get("mtt_template")),
         ema_stack=_bool_or_none(tech.get("ema_stack")),
         macd_line=_float_or_none(tech.get("macd_line")),
         macd_signal=_float_or_none(tech.get("macd_signal")),
@@ -442,6 +491,8 @@ def _row_from_report(
         candidate_score=round(float(candidate_score), 6),
         board_score=round(float(board_score), 6),
         ta_momentum_score=round(float(ta_momentum_score), 6),
+        relative_strength_score=_float_or_none(relative_strength_score),
+        relative_strength_percentile=None,
     )
 
 
@@ -599,6 +650,46 @@ def _ta_momentum_score(
     return score
 
 
+def _relative_strength_score(tech: dict[str, float | bool | None]) -> float | None:
+    components = [
+        ("return_1m", 0.20),
+        ("return_3m", 0.35),
+        ("return_6m", 0.30),
+        ("return_1y", 0.15),
+    ]
+    score = 0.0
+    weight_sum = 0.0
+    for return_field, weight in components:
+        value = _number(tech.get(return_field))
+        if value is None:
+            continue
+        score += value * weight
+        weight_sum += weight
+    if weight_sum == 0.0:
+        return None
+    return score / weight_sum
+
+
+def _with_relative_strength_percentiles(rows: list[PitResearchBoardRow]) -> list[PitResearchBoardRow]:
+    scores = sorted(
+        row.relative_strength_score
+        for row in rows
+        if row.relative_strength_score is not None and math.isfinite(row.relative_strength_score)
+    )
+    if not scores:
+        return rows
+
+    scored: list[PitResearchBoardRow] = []
+    for row in rows:
+        score = row.relative_strength_score
+        if score is None or not math.isfinite(score):
+            scored.append(row)
+            continue
+        rank = int(np.searchsorted(scores, score, side="right"))
+        scored.append(replace(row, relative_strength_percentile=round(rank / len(scores), 6)))
+    return scored
+
+
 def _compressed_positive_return(value: object) -> float:
     number = _number(value)
     return 0.0 if number is None else min(max(number, 0.0), 2.0)
@@ -649,9 +740,17 @@ def _empty_technicals() -> dict[str, float | bool | None]:
         "return_6m": None,
         "return_1y": None,
         "distance_from_52w_high": None,
+        "distance_from_52w_low": None,
         "above_20ma": None,
         "above_50ma": None,
+        "above_150ma": None,
+        "sma200_return_1m": None,
+        "sma200_return_120d": None,
+        "sma200_return_150d": None,
         "above_200ma": None,
+        "relative_strength_score": None,
+        "relative_strength_percentile": None,
+        "mtt_template": None,
         "ma_stack": None,
         "ema_stack": None,
         "macd_line": None,
@@ -661,10 +760,11 @@ def _empty_technicals() -> dict[str, float | bool | None]:
     }
 
 
-def _stacked(current: float, fast: float | None, mid: float | None, slow: float | None) -> bool | None:
-    if fast is None or mid is None or slow is None:
+def _stacked(current: float, *averages: float | None) -> bool | None:
+    if any(avg is None for avg in averages):
         return None
-    return bool(current >= fast >= mid >= slow)
+    ordered = [current, *(float(avg) for avg in averages if avg is not None)]
+    return bool(all(left >= right for left, right in zip(ordered, ordered[1:], strict=False)))
 
 
 def _above(current: float, avg: float | None) -> bool | None:

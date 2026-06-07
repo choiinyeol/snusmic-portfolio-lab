@@ -16,7 +16,11 @@ from snusmic_pipeline.sim.accounts import (
     simulate_weak_prophet,
 )
 from snusmic_pipeline.sim.accounts.base import sharpe_ratio, sortino_ratio
-from snusmic_pipeline.sim.accounts.pit_score import _signal_rule_weights, _sort_signal_rows
+from snusmic_pipeline.sim.accounts.pit_score import (
+    _passes_signal_rule,
+    _signal_rule_weights,
+    _sort_signal_rows,
+)
 from snusmic_pipeline.sim.brokerage import Account
 from snusmic_pipeline.sim.contracts import (
     BrokerageFees,
@@ -31,6 +35,60 @@ from snusmic_pipeline.sim.contracts import (
 )
 from snusmic_pipeline.sim.market import PriceBoard
 from snusmic_pipeline.sim.savings import build_cash_flow_schedule
+
+
+def test_pit_signal_rule_filters_one_month_and_one_year_momentum() -> None:
+    cfg = PitSignalRuleConfig(
+        account_id="pit_momentum_strict_top5",
+        label="Strict momentum",
+        min_return_1m=0.0,
+        min_return_3m=0.0,
+        min_return_6m=0.0,
+        min_return_1y=0.0,
+        min_sma200_return_150d=0.0,
+        min_distance_from_52w_low=0.30,
+        min_relative_strength_percentile=0.90,
+        require_above_50ma=True,
+        require_ma_stack=True,
+        require_above_150ma=True,
+        require_mtt_template=True,
+        require_macd_bullish=True,
+    )
+    passing = SimpleNamespace(
+        report_age_days=30,
+        above_50ma=True,
+        above_200ma=True,
+        above_150ma=True,
+        ma_stack=True,
+        mtt_template=True,
+        macd_bullish=True,
+        return_1m=0.01,
+        return_3m=0.02,
+        return_6m=0.03,
+        return_1y=0.04,
+        sma200_return_1m=0.01,
+        sma200_return_120d=0.02,
+        sma200_return_150d=0.03,
+        distance_from_52w_high=-0.05,
+        distance_from_52w_low=0.35,
+        relative_strength_percentile=0.92,
+    )
+    failing = SimpleNamespace(**{**passing.__dict__, "return_1y": -0.01})
+    below_150ma = SimpleNamespace(**{**passing.__dict__, "above_150ma": False})
+    below_50ma = SimpleNamespace(**{**passing.__dict__, "above_50ma": False})
+    broken_mtt_template = SimpleNamespace(**{**passing.__dict__, "mtt_template": False})
+    falling_sma200 = SimpleNamespace(**{**passing.__dict__, "sma200_return_150d": -0.01})
+    below_52w_low = SimpleNamespace(**{**passing.__dict__, "distance_from_52w_low": 0.25})
+    weak_relative_strength = SimpleNamespace(**{**passing.__dict__, "relative_strength_percentile": 0.89})
+
+    assert _passes_signal_rule(cfg, passing)
+    assert not _passes_signal_rule(cfg, failing)
+    assert not _passes_signal_rule(cfg, below_150ma)
+    assert not _passes_signal_rule(cfg, below_50ma)
+    assert not _passes_signal_rule(cfg, broken_mtt_template)
+    assert not _passes_signal_rule(cfg, falling_sma200)
+    assert not _passes_signal_rule(cfg, below_52w_low)
+    assert not _passes_signal_rule(cfg, weak_relative_strength)
 
 
 def _common_inputs(synthetic_dates):

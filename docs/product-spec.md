@@ -42,6 +42,7 @@ SNUSMIC Portfolio Lab은 point-in-time SMIC 리포트 데이터와 정적 계좌
 | Trend Top5 | 단순 PIT trend-score Top5 기준. |
 | Score Top5 | 단순 PIT score Top5 기준. |
 | SMIC Follower | report-follower baseline. |
+| Momentum/MTT variants | 1M/3M, 3M/6M, 6M/12M momentum plus explicit MTT RS70/80/90 and 52주 최저가 +100%/+300% 계좌군. 기본 생성 대상은 선별 shortlist로 제한하고, 대량 실험 후보는 연구 기록에만 남겨 웹 데이터 속도 비용을 만들지 않습니다. |
 
 ### 향후 rule 작업
 

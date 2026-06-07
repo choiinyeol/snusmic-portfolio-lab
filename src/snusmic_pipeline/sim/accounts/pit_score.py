@@ -809,15 +809,46 @@ def _passes_signal_rule(config: PitSignalRuleConfig, row) -> bool:
         return False
     if row.report_age_days > config.max_report_age_days:
         return False
+    if config.require_above_50ma and row.above_50ma is not True:
+        return False
+    if config.require_above_150ma and row.above_150ma is not True:
+        return False
     if config.require_above_200ma and row.above_200ma is not True:
         return False
     if config.require_ma_stack and row.ma_stack is not True:
         return False
+    if config.require_mtt_template and row.mtt_template is not True:
+        return False
     if config.require_macd_bullish and row.macd_bullish is not True:
+        return False
+    if config.min_return_1m is not None and (row.return_1m is None or row.return_1m < config.min_return_1m):
         return False
     if config.min_return_3m is not None and (row.return_3m is None or row.return_3m < config.min_return_3m):
         return False
     if config.min_return_6m is not None and (row.return_6m is None or row.return_6m < config.min_return_6m):
+        return False
+    if config.min_return_1y is not None and (row.return_1y is None or row.return_1y < config.min_return_1y):
+        return False
+    if config.min_sma200_return_1m is not None and (
+        row.sma200_return_1m is None or row.sma200_return_1m < config.min_sma200_return_1m
+    ):
+        return False
+    if config.min_sma200_return_120d is not None and (
+        row.sma200_return_120d is None or row.sma200_return_120d < config.min_sma200_return_120d
+    ):
+        return False
+    if config.min_sma200_return_150d is not None and (
+        row.sma200_return_150d is None or row.sma200_return_150d < config.min_sma200_return_150d
+    ):
+        return False
+    if config.min_distance_from_52w_low is not None and (
+        row.distance_from_52w_low is None or row.distance_from_52w_low < config.min_distance_from_52w_low
+    ):
+        return False
+    if config.min_relative_strength_percentile is not None and (
+        row.relative_strength_percentile is None
+        or row.relative_strength_percentile < config.min_relative_strength_percentile
+    ):
         return False
     if config.min_distance_from_52w_high is not None:
         return (

@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.31.3 - Reconcile momentum strategy source with exported shortlist
+
+- Commits the PIT momentum/MTT signal-rule source and tests that already underpin the regenerated shortlist artifacts, including 1M/3M, 3M/6M, 6M/12M, MTT RS70/80/90, and 52-week-low +100%/+300% gates.
+- Keeps the restored shortlist account set (`Partial 75`, `CashGate 12.5`, `TrailTrim 20`, `Candidate Profit60`, `Profit60`, and momentum/MTT variants) aligned between simulation defaults, product spec, and generated web artifacts.
+- Bumps Python and web package versions to `0.31.3`.
+
+Verification:
+
+- `uv run ruff check src/snusmic_pipeline/sim/accounts/pit_score.py src/snusmic_pipeline/sim/pit_research_board.py tests/sim/test_accounts.py tests/sim/test_contracts.py tests/sim/test_selection_audit.py`
+- `uv run pytest tests/sim/test_accounts.py tests/sim/test_contracts.py tests/sim/test_selection_audit.py -q -k "one_month_and_one_year_momentum or default_accounts_are_benchmarks_plus_pit_baselines or candidate_score_components or new_momentum_accounts_use_market_200ma_gate"`
 ## v0.31.2 - Restore shortlist strategy artifacts and add external shard offload
 
 - Restores the `Partial 75` and `CashGate 12.5` PIT shortlist strategies to the default simulation/export set and regenerates `data/sim/**` plus `data/web/**` so those routes and artifacts exist again alongside the current baseline shortlist.

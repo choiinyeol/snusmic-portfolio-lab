@@ -43,8 +43,13 @@ def test_candidate_score_components_match_pit_formula():
         return_6m=None,
         return_1y=None,
         distance_from_52w_high=None,
+        distance_from_52w_low=None,
         above_20ma=None,
         above_50ma=None,
+        above_150ma=None,
+        sma200_return_1m=None,
+        sma200_return_120d=None,
+        sma200_return_150d=None,
         above_200ma=None,
         ma_stack=None,
         ema_stack=None,
@@ -59,6 +64,8 @@ def test_candidate_score_components_match_pit_formula():
         candidate_score=2.575,
         board_score=2.575,
         ta_momentum_score=0.0,
+        relative_strength_score=None,
+        relative_strength_percentile=None,
     )
 
     assert candidate_score_components(row) == {
