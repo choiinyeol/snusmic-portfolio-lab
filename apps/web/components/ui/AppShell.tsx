@@ -29,7 +29,6 @@ type AppShellProps = {
   reportRange: DateRange;
   priceRange: DateRange;
   healthStatus: HealthStatus;
-  healthCaption: string;
   primaryBookLabel: string;
   commandTargets?: CommandTarget[];
 };
@@ -42,7 +41,6 @@ export function AppShell({
   reportRange,
   priceRange,
   healthStatus,
-  healthCaption,
   primaryBookLabel,
   commandTargets,
 }: AppShellProps) {
@@ -77,12 +75,12 @@ export function AppShell({
   const healthLabel = healthStatusLabel(healthStatus);
   const sidebarMetrics: ShellMetric[] = [
     { label: '기준일', value: snapshotDate || '—' },
-    { label: '상태', value: healthLabel, caption: healthCaption },
+    { label: '상태', value: healthLabel },
     { label: '리포트', value: `${reportCount.toLocaleString('ko-KR')}기`, caption: reportRangeLabel(reportRange) },
     { label: '가격', value: priceRange.end ? '정상' : '확인 필요', caption: reportRangeLabel(priceRange) },
     {
       label: '계좌',
-      value: accountCount > 0 ? `${accountCount.toLocaleString('ko-KR')}개` : '연결 안 됨',
+      value: accountCount > 0 ? `${accountCount.toLocaleString('ko-KR')}개` : '준비 중',
       caption: primaryBookLabel,
     },
   ];
@@ -238,10 +236,9 @@ function reportRangeLabel(range: DateRange): string {
 }
 
 function healthStatusLabel(status: HealthStatus): string {
-  if (status === 'ok') return '정상';
-  if (status === 'review') return '검토';
-  if (status === 'stale') return '지연';
-  return '실패';
+  if (status === 'stale') return '업데이트 필요';
+  if (status === 'fail') return '점검 중';
+  return '사용 가능';
 }
 
 function healthStatusDotClass(status: HealthStatus): string {

@@ -22,7 +22,6 @@ import { formatDateKo, formatKrw, formatPercent } from '@/lib/format';
 type Report = DashboardViewModel['reports'][number];
 type Trade = DashboardViewModel['recentTrades'][number];
 type Candidate = DashboardViewModel['overview']['researchCandidates'][number];
-type HealthCheck = ReturnType<typeof getArtifactHealth>['checks'][number];
 
 export default function OverviewPage() {
   const view = getDashboardViewModel();
@@ -44,7 +43,6 @@ export default function OverviewPage() {
         : null);
   const watchCandidates = overview.researchCandidates.slice(0, 4);
   const recentSignals = view.recentTrades.slice(0, 4);
-  const priorityChecks = [...health.checks].sort((a, b) => healthRank(b.severity) - healthRank(a.severity)).slice(0, 4);
 
   return (
     <div className="grid gap-5">
@@ -84,9 +82,9 @@ export default function OverviewPage() {
             <KpiTile
               compact
               icon={<FileSearch className="size-4" />}
-              label="가격 매칭 리포트"
-              value={`${view.priceMatchedReports.toLocaleString('ko-KR')} / ${view.sourceReports.toLocaleString('ko-KR')}`}
-              delta={`${formatPercent(reportStats.targetHitRate)} · target hit`}
+              label="공개 리포트"
+              value={view.priceMatchedReports.toLocaleString('ko-KR')}
+              delta={`${formatPercent(reportStats.targetHitRate)} · 목표 도달`}
               tone="accent"
             />
             <KpiTile
@@ -120,15 +118,15 @@ export default function OverviewPage() {
           <RouteCard
             icon={<FileSearch />}
             title="리포트 검증"
-            description="전사된 리포트, 가격 매칭, target-hit evidence, 재검토 우선순위를 한 테이블에서 봅니다."
-            metric={`${view.reports.length.toLocaleString('ko-KR')}개 visible report`}
+            description="공개 리포트의 현재 수익률, 목표가 진행률, 가격 경로를 한 테이블에서 비교합니다."
+            metric={`${view.reports.length.toLocaleString('ko-KR')}개 리포트`}
             href="/reports"
           />
           <RouteCard
             icon={<WalletCards />}
             title="계좌 리포트"
-            description="승인된 shortlist 계좌의 수익률, MDD, 보유·매매 원장을 비교합니다."
-            metric={`${view.selectableRows.length.toLocaleString('ko-KR')}개 shortlist`}
+            description="공개 계좌의 수익률, MDD, 보유·매매 원장을 비교합니다."
+            metric={`${view.selectableRows.length.toLocaleString('ko-KR')}개 계좌`}
             href="/portfolio"
           />
           <RouteCard
@@ -148,12 +146,7 @@ export default function OverviewPage() {
         </nav>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-3" aria-label="운영 점검 큐">
-        <DiagnosticPanel title="데이터 점검" caption="배포 전 먼저 볼 health check">
-          {priorityChecks.map((check) => (
-            <HealthLine check={check} key={check.id} />
-          ))}
-        </DiagnosticPanel>
+      <section className="grid gap-4 lg:grid-cols-2" aria-label="운영 요약 큐">
         <DiagnosticPanel title="최근 매매 신호" caption="선택 계좌에 실제 기록된 체결">
           {recentSignals.length ? (
             recentSignals.map((trade) => (
@@ -219,18 +212,6 @@ function DiagnosticPanel({ title, caption, children }: { title: string; caption:
       </div>
       <div className="grid gap-2">{children}</div>
     </article>
-  );
-}
-
-function HealthLine({ check }: { check: HealthCheck }) {
-  return (
-    <Link className="grid gap-1 rounded-md border border-slate-100 bg-slate-50/60 p-2.5 hover:bg-white" href="/reports">
-      <div className="flex items-center justify-between gap-3">
-        <span className="truncate text-sm font-medium text-slate-950">{check.label}</span>
-        <Badge variant={healthBadgeVariant(check.severity)}>{healthStatusLabel(check.severity)}</Badge>
-      </div>
-      <p className="line-clamp-2 text-xs leading-5 text-slate-500">{check.action ?? check.detail}</p>
-    </Link>
   );
 }
 
@@ -319,13 +300,6 @@ function formatNullablePercent(value: number | null | undefined): string {
   return formatPercent(value);
 }
 
-function healthRank(status: 'ok' | 'review' | 'stale' | 'fail') {
-  if (status === 'fail') return 4;
-  if (status === 'stale') return 3;
-  if (status === 'review') return 2;
-  return 1;
-}
-
 function healthTone(status: 'ok' | 'review' | 'stale' | 'fail'): 'good' | 'warn' | 'bad' {
   if (status === 'ok') return 'good';
   if (status === 'fail') return 'bad';
@@ -333,15 +307,7 @@ function healthTone(status: 'ok' | 'review' | 'stale' | 'fail'): 'good' | 'warn'
 }
 
 function healthStatusLabel(status: 'ok' | 'review' | 'stale' | 'fail') {
-  if (status === 'ok') return '정상';
-  if (status === 'review') return '검토';
-  if (status === 'stale') return '오래됨';
-  return '실패';
-}
-
-function healthBadgeVariant(status: 'ok' | 'review' | 'stale' | 'fail') {
-  if (status === 'ok') return 'success';
-  if (status === 'fail') return 'destructive';
-  if (status === 'stale') return 'warning';
-  return 'secondary';
+  if (status === 'stale') return '업데이트 필요';
+  if (status === 'fail') return '점검 중';
+  return '사용 가능';
 }

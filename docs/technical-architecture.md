@@ -36,8 +36,8 @@
 웹 앱은 커밋된 `data/web` artifact를 읽는 static reader입니다. Route file은 `apps/web/lib/view-models/**`의 page view model을 호출하고, display-ready props를 React component에 전달해야 합니다. Low-level file read는 server-only artifact reader에 머물러야 하며, React component는 target-hit, split adjustment, benchmark coverage, report-window logic을 다시 계산하지 않습니다.
 
 `data/web/pages/**`의 page bundle은 screen-level metadata, metric, view, warning, table/chart payload의 선호 shape입니다. `data/web/reports/**`, `data/web/portfolio/**`, `data/web/prices/**`의 canonical artifact는 재사용 가능한 데이터의 source of truth입니다. Portfolio time series는 `data/web/portfolio/equity/**` 및 `data/web/portfolio/daily-decisions/**`의 account shard이며, web app은 전체 simulation branch aggregate가 아니라 선택된 account shard를 읽어야 합니다.
-`data/web/health.json`은 shell-level Data Status가 읽는 운영 health artifact입니다. 기준일 정렬, 가격 누락 coverage, artifact 검토 상태와 조치 문구를 Python exporter가 계산하고 frontend는 그 결과를 재계산하지 않습니다. `apps/web artifact:check`는 현재 날짜 기준 price/report freshness threshold도 적용해 오래된 snapshot 배포를 막습니다.
-`data/web/report-health.json`은 source report 240개 전체를 대상으로 "전사됨 / 추출 재검토 / 가격 누락 / 정책상 웹 제외"를 설명하는 리포트별 진단 artifact입니다. Report Board는 이 요약과 우선순위 진단 행을 표시해 사용자가 웹 표본 밖의 리포트가 왜 빠졌는지 확인할 수 있어야 합니다. `missing-symbols.json`은 가격 누락 symbol의 category/action까지 포함해 상장폐지와 provider gap을 구분합니다.
+`data/web/health.json`은 shell-level 서비스 상태와 내부 운영 점검을 함께 담는 health artifact입니다. Public UI는 사용 가능 여부와 기준일만 노출하고, missing-price coverage/action 같은 상세 조치 문구는 admin/release gate에서만 확인합니다. `apps/web artifact:check`는 현재 날짜 기준 price/report freshness threshold도 적용해 오래된 snapshot 배포를 막습니다.
+`data/web/report-health.json`은 source report 240개 전체를 대상으로 "전사됨 / 추출 재검토 / 가격 누락 / 정책상 웹 제외"를 설명하는 리포트별 내부 진단 artifact입니다. Public Report Board는 이 artifact의 제외·오류 행을 직접 보여주지 않고, 검증 가능한 공개 후보와 전체 visible report table만 표시합니다. `missing-symbols.json`은 가격 누락 symbol의 category/action까지 포함해 상장폐지와 provider gap을 구분합니다.
 
 ### Cross-Platform Tooling
 

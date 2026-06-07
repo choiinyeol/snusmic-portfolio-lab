@@ -9,10 +9,9 @@ export default function AppRouteLayout({ children }: Readonly<{ children: React.
   const overview = getOverview();
   const manifest = getArtifactManifest();
   const health = getArtifactHealth();
-  const healthCheck = health.checks.find((check) => check.severity !== 'ok') ?? health.checks[0];
   const snapshotDate = overview.simulation_window?.price_end ?? overview.simulation_window?.report_end ?? '—';
   const admittedAccounts = getObjectivePassingRows();
-  const primaryBookLabel = admittedAccounts[0]?.shortLabel ?? admittedAccounts[0]?.label ?? '승인 계좌 없음';
+  const primaryBookLabel = admittedAccounts[0]?.shortLabel ?? admittedAccounts[0]?.label ?? '공개 계좌 준비 중';
 
   const commandTargets = buildCommandTargets();
 
@@ -21,7 +20,6 @@ export default function AppRouteLayout({ children }: Readonly<{ children: React.
       commandTargets={commandTargets}
       priceRange={manifest.price_range}
       healthStatus={health.status}
-      healthCaption={healthCheck?.action ?? healthCheck?.detail ?? '기준일 정렬 완료'}
       primaryBookLabel={primaryBookLabel}
       reportCount={manifest.row_counts.reports}
       reportRange={manifest.report_range}

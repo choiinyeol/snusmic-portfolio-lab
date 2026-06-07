@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.30.23 - Hide internal diagnostics from public pages
+
+- Removes report-health warnings and exception queues from public `/reports`; users now see public candidates and the visible report table only.
+- Simplifies shell/home health language so public UI shows service availability and dates, not internal missing-price repair actions.
+- Keeps `health.json` and `report-health.json` as release-gate/admin diagnostics artifacts in the active docs instead of public page content.
+- Bumps Python and web package versions to `0.30.23`.
+
+Verification:
+
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web format:check`
+- `pnpm --dir apps/web build`
+- `pnpm --dir apps/web smoke:static`
+- Browser inspection of `/` and `/reports` on `http://127.0.0.1:3000`
+
 ## v0.30.22 - Rebalance the report board review queue
 
 - Moves `/reports` into a clearer review queue: priority candidates stay on the left, report-health diagnostics move into a compact side queue.
