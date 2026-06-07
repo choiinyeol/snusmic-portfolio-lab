@@ -16,6 +16,7 @@ export type ReportVerificationViewModel = {
   asOf: string | null;
   metrics: PageMetric[];
   dataWarnings: DataWarning[];
+  reportHealth: ReturnType<typeof getReportHealth>;
   table: ReportVerificationTableModel;
 };
 
@@ -40,6 +41,7 @@ export function getReportVerificationViewModel(): ReportVerificationViewModel {
     asOf: priceAsOf,
     metrics: buildMetrics(bundle.metrics, reports),
     dataWarnings: buildDataWarnings(reportHealth),
+    reportHealth,
     table: {
       rows: reports.map(toReportVerificationDisplayRow),
       sourceRows: reports,

@@ -16,26 +16,26 @@ SNUSMIC Portfolio Lab turns SMIC research reports into point-in-time datasets, a
 ### Core Commands
 
 ```bash
-uv sync --group dev
-pnpm --dir apps/web install
+uv sync --locked --group dev
+pnpm --dir apps/web install --frozen-lockfile --prefer-offline
 ```
 
 Refresh data and static artifacts:
 
 ```bash
-python -m snusmic_pipeline refresh-web-artifacts
+uv run --locked python -m snusmic_pipeline refresh-web-artifacts
 ```
 
 Full rebuild:
 
 ```bash
-python -m snusmic_pipeline rebuild-web-artifacts
+uv run --locked python -m snusmic_pipeline rebuild-web-artifacts
 ```
 
 Export web artifacts only:
 
 ```bash
-python -m snusmic_pipeline export-web --warehouse data/warehouse --sim data/sim --out data/web
+uv run --locked python -m snusmic_pipeline export-web --warehouse data/warehouse --sim data/sim --out data/web
 ```
 
 ### Web Routes
@@ -63,8 +63,8 @@ python -m snusmic_pipeline export-web --warehouse data/warehouse --sim data/sim 
 ### Validation
 
 ```bash
-uv run ruff check src tests scripts
-uv run pytest -q -m "not slow" -x
+uv run --locked ruff check src tests scripts
+uv run --locked pytest -q -m "not slow" -x
 pnpm --dir apps/web artifact:check
 pnpm --dir apps/web typecheck
 pnpm --dir apps/web exec biome check .

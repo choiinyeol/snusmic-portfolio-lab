@@ -10,9 +10,16 @@ export const WEB_DATA_ROOT = process.env.SNUSMIC_WEB_DATA_ROOT
   ? path.resolve(process.env.SNUSMIC_WEB_DATA_ROOT)
   : defaultDataRoot;
 
+const artifactCache = new Map<string, unknown>();
+
 export function readArtifact<T>(relativePath: string, schema: z.ZodType<T>): T {
   if (relativePath.includes('..') || path.isAbsolute(relativePath)) {
     throw new Error(`Invalid artifact path: ${relativePath}`);
+  }
+
+  const cached = artifactCache.get(relativePath);
+  if (cached !== undefined) {
+    return cached as T;
   }
 
   const fullPath = path.join(WEB_DATA_ROOT, relativePath);
@@ -26,6 +33,8 @@ export function readArtifact<T>(relativePath: string, schema: z.ZodType<T>): T {
       `Artifact schema mismatch in ${relativePath}.${issuePath}: ${issue?.message ?? 'unknown schema error'}`,
     );
   }
+
+  artifactCache.set(relativePath, parsed.data);
 
   return parsed.data;
 }

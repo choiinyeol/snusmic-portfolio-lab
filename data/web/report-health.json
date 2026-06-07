@@ -35,15 +35,11 @@
       "web_status": "visible"
     },
     {
-      "action": "원문 Markdown/PDF에서 목표가 문장을 재확인하고 extraction rule을 보정하세요.",
+      "action": "웹 검증 표본에 정상 포함됩니다.",
       "company": "교촌에프앤비",
       "date": "2020-06-22",
-      "extraction_reasons": [
-        "missing_base_target",
-        "note_target_not_found",
-        "status:needs_review"
-      ],
-      "extraction_status": "needs_review",
+      "extraction_reasons": [],
+      "extraction_status": "ok",
       "markdown_filename": "2020-06-22_equity-research-교촌에프앤비.md",
       "ordinal": 10,
       "page": 20,
@@ -52,8 +48,8 @@
       "symbol": "075580.KS",
       "ticker": "075580",
       "title": "Equity Research, 교촌에프앤비",
-      "web_exclusion_reason": "downside_target",
-      "web_status": "excluded"
+      "web_exclusion_reason": null,
+      "web_status": "visible"
     },
     {
       "action": "발간가와 목표가 방향을 확인하세요. 하락/무상승 리포트면 웹 검증 표본 제외가 정상입니다.",
@@ -245,15 +241,11 @@
       "web_status": "visible"
     },
     {
-      "action": "원문 Markdown/PDF에서 목표가 문장을 재확인하고 extraction rule을 보정하세요.",
+      "action": "웹 검증 표본에 정상 포함됩니다.",
       "company": "지트리비앤티",
       "date": "2020-10-31",
-      "extraction_reasons": [
-        "missing_base_target",
-        "note_target_not_found",
-        "status:needs_review"
-      ],
-      "extraction_status": "needs_review",
+      "extraction_reasons": [],
+      "extraction_status": "ok",
       "markdown_filename": "2020-10-31_equity-research-지트리비앤티.md",
       "ordinal": 2,
       "page": 20,
@@ -262,8 +254,8 @@
       "symbol": "115450.KS",
       "ticker": "115450",
       "title": "Equity Research, 지트리비앤티",
-      "web_exclusion_reason": "downside_target",
-      "web_status": "excluded"
+      "web_exclusion_reason": null,
+      "web_status": "visible"
     },
     {
       "action": "웹 검증 표본에 정상 포함됩니다.",
@@ -4031,7 +4023,7 @@
       "web_status": "visible"
     },
     {
-      "action": "웹 검증 표본에 정상 포함됩니다.",
+      "action": "발간 직후 목표가 도달 케이스입니다. 성과 표본 제외가 의도한 정책인지 확인하세요.",
       "company": "샘씨엔에스",
       "date": "2026-05-07",
       "extraction_reasons": [],
@@ -4044,8 +4036,8 @@
       "symbol": "252990.KQ",
       "ticker": "252990",
       "title": "Equity Research, 샘씨엔에스",
-      "web_exclusion_reason": null,
-      "web_status": "visible"
+      "web_exclusion_reason": "instant_target_hit",
+      "web_status": "excluded"
     },
     {
       "action": "웹 검증 표본에 정상 포함됩니다.",
@@ -4096,8 +4088,8 @@
       "page": 1,
       "pdf_url": "https://raw.githubusercontent.com/ChoiInYeol/snusmic-portfolio-lab/main/data/pdfs/2026-05-29_equity-research-soitec-sa.pdf",
       "report_id": "21f8685022e2f44f",
-      "symbol": "SOIT.PA",
-      "ticker": "SOIT",
+      "symbol": "SOI.PA",
+      "ticker": "SOI",
       "title": "Equity Research, Soitec SA",
       "web_exclusion_reason": "missing_price",
       "web_status": "excluded"
@@ -4140,15 +4132,15 @@
   "schema_version": "1.0.0",
   "summary": {
     "exclusion_reasons": {
-      "downside_target": 8,
-      "instant_target_hit": 1,
+      "downside_target": 6,
+      "instant_target_hit": 2,
       "missing_price": 6,
       "non_positive_upside": 8
     },
-    "extraction_review": 26,
-    "needs_review": 2,
+    "extraction_review": 24,
+    "needs_review": 0,
     "source_reports": 240,
-    "web_excluded": 23,
-    "web_visible": 217
+    "web_excluded": 22,
+    "web_visible": 218
   }
 }

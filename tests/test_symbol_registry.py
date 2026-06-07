@@ -6,7 +6,7 @@ from snusmic_pipeline.market_data.symbols import company_symbol_rule, infer_yfin
 def test_company_symbol_rules_cover_recent_overseas_reports() -> None:
     expected = {
         "Aixtron SE": ("AIXA", "ETR", "AIXA.DE", "EUR"),
-        "Soitec SA": ("SOIT", "EPA", "SOIT.PA", "EUR"),
+        "Soitec SA": ("SOI", "EPA", "SOI.PA", "EUR"),
         "Global Unichip Corp.": ("3443", "TWSE", "3443.TW", "TWD"),
     }
 

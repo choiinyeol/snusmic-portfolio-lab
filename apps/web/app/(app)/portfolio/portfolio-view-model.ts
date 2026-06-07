@@ -5,7 +5,6 @@ import type {
   PositionOutcome,
   PortfolioViewModel,
 } from '@/components/trading/portfolio-views/types';
-import { displayPortfolioName } from '@/components/trading/portfolio-views/strategy-display';
 import type {
   AccountingReconciliationRow,
   EquityPoint,
@@ -26,6 +25,7 @@ import {
   getSummaryRows,
   getTrades,
 } from '@/lib/artifacts';
+import { displayPortfolioName } from '@/lib/portfolio-labels';
 import {
   getDefaultPortfolioAccount,
   getAccountLeaderboard,

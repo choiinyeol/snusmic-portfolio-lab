@@ -1,5 +1,32 @@
 # Changelog
 
+## v0.30.18 - Tighten diagnostics and release gates
+
+- Fixes extraction of fair-value ranges and approval-price targets, removing the remaining `needs_review` report rows from the committed extraction audit.
+- Corrects Soitec's Yahoo symbol mapping to `SOI.PA` and classifies every missing-price symbol with company, report id, category, and action.
+- Adds a compact Report Board diagnostics table, artifact reader caching, shared portfolio label helper, stricter report-health/missing-symbol validation, CI job timeouts, and aligned mypy invocation.
+- Updates README command examples to the locked local/CI commands and bumps Python/web package versions to `0.30.18`.
+
+Verification:
+
+- `uv run pytest tests/test_extract_pdf.py tests/test_symbol_registry.py -q`
+- `uv run --locked python -m snusmic_pipeline ocr-reextract --data-dir data --audit --audit-output data/extraction_quality.json`
+- `uv run --locked python -m snusmic_pipeline build-warehouse`
+- `uv run --locked python -m snusmic_pipeline export-web --check`
+- `uv run --locked python -m snusmic_pipeline rebuild-web-artifacts`
+- `uv run --locked pytest tests/test_extract_pdf.py tests/test_symbol_registry.py tests/test_web_artifacts.py -q -k "not export_web_artifacts_matches_baseline_counts and not daily_decision_artifacts_expose_checkpoint_metadata"`
+- `uv run --locked ruff check src/snusmic_pipeline/ingest/extract_pdf.py src/snusmic_pipeline/market_data/symbols.py src/snusmic_pipeline/web/artifacts.py tests/test_extract_pdf.py tests/test_symbol_registry.py tests/test_web_artifacts.py`
+- `uv run --locked ruff format --check src/snusmic_pipeline/ingest/extract_pdf.py src/snusmic_pipeline/market_data/symbols.py src/snusmic_pipeline/web/artifacts.py tests/test_extract_pdf.py tests/test_symbol_registry.py tests/test_web_artifacts.py`
+- `uv run --locked mypy`
+- `pnpm --dir apps/web artifact:check`
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web format:check`
+- `pnpm --dir apps/web build`
+- `pnpm --dir apps/web smoke:static`
+- Browser inspection of `http://127.0.0.1:3000/reports/`
+- `git diff --check`
+
 ## v0.30.17 - Expose report visibility diagnostics
 
 - Adds `data/web/report-health.json` to explain every source report's extraction status, web visibility, exclusion reason, and next action.

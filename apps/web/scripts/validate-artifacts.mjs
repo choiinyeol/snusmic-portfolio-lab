@@ -147,6 +147,40 @@ if (!reportHealth.summary || typeof reportHealth.summary !== 'object') {
 if (!Array.isArray(reportHealth.rows) || reportHealth.rows.length !== reportHealth.summary.source_reports) {
   fail(`report-health.json rows=${reportHealth.rows?.length}, source_reports=${reportHealth.summary?.source_reports}`);
 }
+const validReportWebStatuses = new Set(['visible', 'excluded']);
+const validReportExtractionStatuses = new Set([
+  'ok',
+  'needs_review',
+  'text_extract_failed',
+  'missing_pdf_url',
+  'download_failed',
+  'not_pdf',
+]);
+const validReportExclusionReasons = new Set([
+  'downside_target',
+  'instant_target_hit',
+  'missing_performance',
+  'missing_price',
+  'non_positive_upside',
+  'sell_opinion',
+]);
+for (const [index, row] of reportHealth.rows.entries()) {
+  if (!row?.report_id) fail(`report-health.json rows[${index}].report_id is missing`);
+  if (!validReportWebStatuses.has(row.web_status)) {
+    fail(`report-health.json rows[${index}].web_status is invalid: ${row.web_status}`);
+  }
+  if (!validReportExtractionStatuses.has(row.extraction_status)) {
+    fail(`report-health.json rows[${index}].extraction_status is invalid: ${row.extraction_status}`);
+  }
+  if (row.web_exclusion_reason !== null && row.web_exclusion_reason !== undefined) {
+    if (!validReportExclusionReasons.has(row.web_exclusion_reason)) {
+      fail(`report-health.json rows[${index}].web_exclusion_reason is invalid: ${row.web_exclusion_reason}`);
+    }
+    if (row.web_status !== 'excluded') {
+      fail(`report-health.json rows[${index}] has exclusion reason but web_status=${row.web_status}`);
+    }
+  }
+}
 
 const countFiles = {
   reports: 'reports/table.json',
@@ -258,6 +292,8 @@ for (const symbol of reportSymbols) {
 const missingSymbols = new Set();
 for (const [index, row] of readJson('missing-symbols.json').entries()) {
   if (!row?.symbol) fail(`missing-symbols.json[${index}].symbol is missing`);
+  if (!row?.category) fail(`missing-symbols.json[${index}].category is missing`);
+  if (!row?.action) fail(`missing-symbols.json[${index}].action is missing`);
   missingSymbols.add(row.symbol);
   if (!fs.existsSync(path.join(priceDir, `${row.symbol}.json`))) {
     fail(`missing-symbols entry lacks price artifact: ${row.symbol}`);

@@ -77,18 +77,18 @@ def web_export_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
 def test_export_web_artifacts_matches_baseline_counts(web_export_dir: Path) -> None:
     overview = json.loads((web_export_dir / "overview.json").read_text(encoding="utf-8"))
     assert overview["report_counts"] == {
-        "excluded_downside_target": 8,
-        "excluded_instant_target_hit": 1,
+        "excluded_downside_target": 6,
+        "excluded_instant_target_hit": 2,
         "excluded_missing_performance": 0,
         "excluded_missing_price": 6,
         "excluded_non_positive_upside": 8,
-        "excluded_reports": 23,
+        "excluded_reports": 22,
         "excluded_sell_opinion": 0,
         "extracted_reports": 240,
         "missing_price_symbols": 6,
-        "price_matched_reports": 217,
+        "price_matched_reports": 218,
         "report_stat_rows": 240,
-        "web_report_rows": 217,
+        "web_report_rows": 218,
     }
     manifest = json.loads((web_export_dir / "manifest.json").read_text(encoding="utf-8"))
     assert manifest["data_quality"]["missing_price_symbols"] == 6
@@ -355,17 +355,17 @@ def test_extended_web_artifacts_support_insights_and_downloads(web_export_dir: P
     assert "6615fd1894ed9c54" in detail_metrics
     assert detail_metrics["6615fd1894ed9c54"]["markers"]
     assert page_detail_metrics == detail_metrics
-    assert len(return_windows) == 217
+    assert len(return_windows) == 218
     assert page_return_windows == return_windows
     assert {"return_30d", "return_60d", "return_90d", "return_180d"} <= set(return_windows[0])
-    assert target_distribution["summary"]["total_reports"] == 217
+    assert target_distribution["summary"]["total_reports"] == 218
     assert page_target_distribution == target_distribution
     data_quality = json.loads((out / "overview" / "data-quality.json").read_text(encoding="utf-8"))
     assert data_quality["report_exclusions"] == {
-        "downside_target": 8,
-        "excluded_reports": 23,
-        "included_reports": 217,
-        "instant_target_hit": 1,
+        "downside_target": 6,
+        "excluded_reports": 22,
+        "included_reports": 218,
+        "instant_target_hit": 2,
         "missing_performance": 0,
         "missing_price": 6,
         "non_positive_upside": 8,
@@ -395,12 +395,12 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(web_export_dir: 
         "start": warehouse_prices["date"].astype(str).min(),
         "end": warehouse_prices["date"].astype(str).max(),
     }
-    assert manifest["row_counts"]["reports"] == 217
+    assert manifest["row_counts"]["reports"] == 218
     expected_accounts = len(pd.read_csv(Path("data/sim") / "summary.csv"))
     assert manifest["row_counts"]["accounts"] == expected_accounts
     assert manifest["row_counts"]["account_catalog"] == expected_accounts
     assert manifest["row_counts"]["report_board_candidates"] > 0
-    assert manifest["data_quality"]["reports_with_prices"] == 217
+    assert manifest["data_quality"]["reports_with_prices"] == 218
     assert manifest["data_quality"]["missing_price_symbols"] == 6
     assert "overview/snapshot.json" in manifest["artifacts"]
     assert "portfolio/holdings.json" in manifest["artifacts"]
@@ -415,12 +415,12 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(web_export_dir: 
     report_health = json.loads((out / "report-health.json").read_text(encoding="utf-8"))
     assert report_health["schema_version"] == "1.0.0"
     assert report_health["summary"]["source_reports"] == 240
-    assert report_health["summary"]["web_visible"] == 217
-    assert report_health["summary"]["web_excluded"] == 23
-    assert report_health["summary"]["needs_review"] == 2
+    assert report_health["summary"]["web_visible"] == 218
+    assert report_health["summary"]["web_excluded"] == 22
+    assert report_health["summary"]["needs_review"] == 0
     assert report_health["summary"]["exclusion_reasons"] == {
-        "downside_target": 8,
-        "instant_target_hit": 1,
+        "downside_target": 6,
+        "instant_target_hit": 2,
         "missing_price": 6,
         "non_positive_upside": 8,
     }
@@ -445,6 +445,16 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(web_export_dir: 
     assert checks_by_id["missing_price_symbols"]["severity"] == "review"
     assert checks_by_id["missing_price_symbols"]["observed"]["missing_price_symbols"] == 6
     assert checks_by_id["missing_price_symbols"]["action"]
+    missing_symbols = json.loads((out / "missing-symbols.json").read_text(encoding="utf-8"))
+    assert {row["symbol"] for row in missing_symbols} == {
+        "003410.KS",
+        "010620.KS",
+        "287410.KQ",
+        "NETI",
+        "SOI.PA",
+        "VTNR",
+    }
+    assert all(row["category"] and row["action"] for row in missing_symbols)
     assert "health.json" in manifest["artifacts"]
     assert len(manifest["checksums"]["health.json"]) == 64
 

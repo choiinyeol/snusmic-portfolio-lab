@@ -1,8 +1,7 @@
 {
   "total_reports": 240,
   "status_counts": {
-    "needs_review": 2,
-    "ok": 238
+    "ok": 240
   },
   "rating_counts": {
     "Attention": 1,
@@ -23,14 +22,11 @@
     "USD": 46
   },
   "reason_counts": {
-    "missing_base_target": 2,
     "missing_rating": 14,
     "non_buy_rating:Attention": 1,
     "non_buy_rating:Hold": 3,
     "non_buy_rating:Sell": 3,
-    "note_case_target_ambiguous": 3,
-    "note_target_not_found": 2,
-    "status:needs_review": 2
+    "note_case_target_ambiguous": 3
   },
   "review_rows": [
     {
@@ -55,7 +51,7 @@
       "date": "2026-05-29T07:35:27",
       "company": "Soitec SA",
       "title": "Equity Research, Soitec SA",
-      "ticker": "SOIT",
+      "ticker": "SOI",
       "rating": "",
       "base_target": 482.35,
       "target_detail": "base=482.35",
@@ -403,42 +399,6 @@
     },
     {
       "page": 20,
-      "ordinal": 2,
-      "date": "2020-10-31T18:47:48",
-      "company": "지트리비앤티",
-      "title": "Equity Research, 지트리비앤티",
-      "ticker": "115450",
-      "rating": "Strong Buy",
-      "base_target": null,
-      "target_detail": "rating=Strong Buy",
-      "status": "needs_review",
-      "note": "markdown reextract; Korean numeric ticker; exchange prefix inferred as KRX; Target price not found",
-      "reasons": [
-        "missing_base_target",
-        "note_target_not_found",
-        "status:needs_review"
-      ]
-    },
-    {
-      "page": 20,
-      "ordinal": 10,
-      "date": "2020-06-22T15:16:22",
-      "company": "교촌에프앤비",
-      "title": "Equity Research, 교촌에프앤비",
-      "ticker": "075580",
-      "rating": "Buy",
-      "base_target": null,
-      "target_detail": "rating=Buy",
-      "status": "needs_review",
-      "note": "markdown reextract; Korean numeric ticker; exchange prefix inferred as KRX; Target price not found",
-      "reasons": [
-        "missing_base_target",
-        "note_target_not_found",
-        "status:needs_review"
-      ]
-    },
-    {
-      "page": 20,
       "ordinal": 11,
       "date": "2020-06-22T15:15:35",
       "company": "제이브이엠",
@@ -513,15 +473,14 @@
       "ok": 12
     },
     "20": {
-      "needs_review": 2,
-      "ok": 10
+      "ok": 12
     }
   },
   "summary": {
-    "ok": 238,
-    "status_needs_review": 2,
-    "review_flagged_rows": 26,
-    "missing_base_target": 2,
+    "ok": 240,
+    "status_needs_review": 0,
+    "review_flagged_rows": 24,
+    "missing_base_target": 0,
     "current_equals_base_target": 0,
     "missing_rating": 14,
     "non_buy_rating": 7,

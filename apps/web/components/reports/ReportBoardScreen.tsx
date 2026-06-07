@@ -31,6 +31,50 @@ export function ReportBoardScreen({ model }: { model: ReportBoardViewModel }) {
           </ul>
         </section>
       ) : null}
+      {model.diagnostics.length ? (
+        <Section title="진단 우선순위" caption="웹에서 빠졌거나 전사 품질 확인이 필요한 리포트만 압축했습니다.">
+          <div className="mt-3 overflow-hidden rounded-md border border-slate-200 bg-white">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-50 text-slate-500">
+                <tr>
+                  <th className="px-3 py-2 font-medium">상태</th>
+                  <th className="px-3 py-2 font-medium">리포트</th>
+                  <th className="px-3 py-2 font-medium">원인</th>
+                  <th className="px-3 py-2 font-medium">조치</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {model.diagnostics.map((item) => {
+                  const content = (
+                    <>
+                      <div className="font-medium text-slate-950">{stockDisplayName(item.symbol, item.company)}</div>
+                      <div className="font-mono text-slate-500">
+                        {compactTicker(item.symbol)} · {item.date ? formatDateKo(item.date) : '-'}
+                      </div>
+                    </>
+                  );
+                  return (
+                    <tr key={item.id} className="align-top">
+                      <td className="whitespace-nowrap px-3 py-2 text-amber-700">{item.status}</td>
+                      <td className="px-3 py-2">
+                        {item.href ? (
+                          <Link className="block hover:text-blue-600" href={item.href}>
+                            {content}
+                          </Link>
+                        ) : (
+                          content
+                        )}
+                      </td>
+                      <td className="px-3 py-2 font-mono text-slate-600">{item.reason}</td>
+                      <td className="px-3 py-2 leading-5 text-slate-600">{item.action}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </Section>
+      ) : null}
 
       <Section
         title="오늘 볼 후보"

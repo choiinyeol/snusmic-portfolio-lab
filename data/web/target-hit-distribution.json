@@ -27,8 +27,8 @@
   ],
   "summary": {
     "target_hit_count": 87,
-    "target_hit_rate": 0.400922,
-    "total_reports": 217
+    "target_hit_rate": 0.399083,
+    "total_reports": 218
   },
   "target_upside_buckets": [
     {
@@ -46,11 +46,11 @@
       "target_hit_rate": 0.611111
     },
     {
-      "avg_current_return": 0.360549,
+      "avg_current_return": 0.36547,
       "bucket": "50-100%",
-      "count": 91,
+      "count": 90,
       "target_hit_count": 25,
-      "target_hit_rate": 0.274725
+      "target_hit_rate": 0.277778
     },
     {
       "avg_current_return": 1.068011,
@@ -60,11 +60,11 @@
       "target_hit_rate": 0.185185
     },
     {
-      "avg_current_return": 0.464215,
+      "avg_current_return": 0.52468,
       "bucket": "200%+",
-      "count": 13,
+      "count": 15,
       "target_hit_count": 2,
-      "target_hit_rate": 0.153846
+      "target_hit_rate": 0.133333
     }
   ]
 }

@@ -21,6 +21,14 @@ _TARGET_PRICE_RE = re.compile(
     r"목표\s*주가\s*(?:\([^)]{0,20}\))?\s*[:：]?\s*([$₩¥]?\s*[0-9][0-9,]*(?:\.[0-9]+)?)",
     re.IGNORECASE,
 )
+_FAIR_VALUE_RANGE_RE = re.compile(
+    r"(?:적정\s*주가|승인시\s*주가)\s*[:：]?\s*([$₩¥]?\s*[0-9][0-9,]*(?:\.[0-9]+)?)\s*(?:~|-|–|—|에서|부터)\s*([$₩¥]?\s*[0-9][0-9,]*(?:\.[0-9]+)?)",
+    re.IGNORECASE,
+)
+_FAIR_VALUE_RE = re.compile(
+    r"(?:적정\s*주가|승인시\s*주가)\s*[:：]?\s*([$₩¥]?\s*[0-9][0-9,]*(?:\.[0-9]+)?)",
+    re.IGNORECASE,
+)
 _PRE_TARGET_PRICE_RE = re.compile(
     r"([$₩¥]?\s*[0-9][0-9,]*(?:\.[0-9]+)?)[ \t]*원?[을를]?[ \t]*(?:[A-Za-z]+[ \t]+case[ \t]+)?목표[ \t]*주가",
     re.IGNORECASE,
@@ -167,6 +175,20 @@ def target_price_candidates(text: str) -> list[tuple[float, str]]:
             value = parse_money(match.group(1))
             if value is not None:
                 candidates.append((value, match.group(0)))
+
+    range_match = _FAIR_VALUE_RANGE_RE.search(text[:4000])
+    if range_match:
+        low = parse_money(range_match.group(1))
+        high = parse_money(range_match.group(2))
+        if low is not None and high is not None:
+            candidates.append(((low + high) / 2, range_match.group(0)))
+
+    fair_value_match = _FAIR_VALUE_RE.search(text[:4000])
+    if fair_value_match:
+        value = parse_money(fair_value_match.group(1))
+        if value is not None:
+            candidates.append((value, fair_value_match.group(0)))
+
     return candidates
 
 
@@ -321,7 +343,16 @@ def parse_report_text(text: str, company_hint: str = "") -> dict[str, object]:
                 notes.append("Initial target candidate equaled current price; selected next target candidate")
                 break
     if single_target is not None and not is_plausible_target_price(single_target, ticker, exchange):
-        single_target = None
+        for candidate, raw in target_price_candidates(text):
+            candidate = rescale_thousand_decimal_if_needed(candidate, raw, current_price, ticker)
+            if is_plausible_target_price(candidate, ticker, exchange):
+                single_target, target_raw = candidate, raw
+                notes.append(
+                    "Initial target candidate was implausible; selected next plausible target candidate"
+                )
+                break
+        else:
+            single_target = None
     single_target = rescale_thousand_decimal_if_needed(single_target, target_raw, current_price, ticker)
 
     scenario_values: dict[str, float] = {}

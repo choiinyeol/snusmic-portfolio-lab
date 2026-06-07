@@ -85,6 +85,36 @@ WEB_PORTFOLIO_BENCHMARK_IDS = (
     "benchmark_gld",
 )
 _ACCOUNT_ID_PATTERN = re.compile(r"^[A-Za-z0-9_]+$")
+MISSING_PRICE_CLASSIFICATIONS = {
+    "003410.KS": {
+        "category": "delisted",
+        "action": "상장폐지 이력이 있는 KRX 종목입니다. 리포트 표본 제외를 유지하거나 별도 과거 가격 소스를 연결하세요.",
+    },
+    "010620.KS": {
+        "category": "provider_gap",
+        "action": "현재 Yahoo Finance에서 quote가 잡히지 않습니다. 대체 가격 소스 또는 provider mapping을 확인하세요.",
+    },
+    "287410.KQ": {
+        "category": "delisted",
+        "action": "상장폐지 이력이 있는 KOSDAQ 종목입니다. 리포트 표본 제외를 유지하거나 별도 과거 가격 소스를 연결하세요.",
+    },
+    "NETI": {
+        "category": "delisted",
+        "action": "상장폐지/거래중단된 해외 종목입니다. 리포트 표본 제외를 유지하거나 별도 과거 가격 소스를 연결하세요.",
+    },
+    "SOI.PA": {
+        "category": "mapping_fixed_pending_refresh",
+        "action": "Soitec Yahoo ticker는 SOI.PA입니다. 다음 가격 refresh 뒤 가격 artifact 편입 여부를 확인하세요.",
+    },
+    "SOIT.PA": {
+        "category": "bad_yfinance_symbol",
+        "action": "Soitec Yahoo ticker가 SOI.PA로 보정되었습니다. warehouse/web artifact를 재생성하세요.",
+    },
+    "VTNR": {
+        "category": "delisted",
+        "action": "상장폐지/거래중단된 해외 종목입니다. 리포트 표본 제외를 유지하거나 별도 과거 가격 소스를 연결하세요.",
+    },
+}
 
 
 def _frame_series(frame: pd.DataFrame, column: str, default: Any = pd.NA) -> pd.Series:
@@ -376,6 +406,7 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
                 str(symbol) for symbol in frame["symbol"].dropna().astype(str) if str(symbol)
             )
     missing_symbols = sorted(report_symbols - price_symbols)
+    missing_symbol_rows = _missing_symbol_rows(missing_symbols, reports)
 
     priced_prices = _price_frame_with_native(prices)
     price_groups = _price_groups_by_symbol(priced_prices, prices_are_native=True)
@@ -402,7 +433,7 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     target_distribution = _build_target_hit_distribution(report_rows)
     rankings = _build_rankings(report_stats, report_rows)
     data_quality = _build_data_quality(
-        extraction_quality, missing_symbols, reports, report_performance, report_exclusions
+        extraction_quality, missing_symbol_rows, reports, report_performance, report_exclusions
     )
     insights = _build_insights(overview, rankings, target_distribution, return_windows, data_quality)
     research_calendar = _build_research_calendar(pit_research_board, price_groups, overview)
@@ -480,7 +511,7 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
         out / "monthly-holdings.json",
         enriched_monthly_holdings,
     )
-    _write_json(out / "missing-symbols.json", [{"symbol": symbol} for symbol in missing_symbols])
+    _write_json(out / "missing-symbols.json", missing_symbol_rows)
     _write_json(out / "data-quality.json", data_quality)
     report_health = _build_report_health(
         reports, report_performance, extraction_quality, missing_symbols, report_rows
@@ -1837,6 +1868,8 @@ def _write_artifact_health(out: Path, overview: dict[str, Any], data_quality: di
         {
             "symbol": str(row.get("symbol", "")),
             "company": str(row.get("company", "")),
+            "category": str(row.get("category", "")),
+            "action": str(row.get("action", "")),
         }
         for row in missing_symbols[:5]
         if isinstance(row, dict) and row.get("symbol")
@@ -3797,9 +3830,39 @@ def _date_diff_days(start: str, end: str) -> int | None:
         return None
 
 
+def _missing_symbol_rows(missing_symbols: list[str], reports: pd.DataFrame) -> list[dict[str, Any]]:
+    if reports.empty or "symbol" not in reports.columns:
+        report_lookup: dict[str, dict[str, Any]] = {}
+    else:
+        report_lookup = {
+            str(row.get("symbol", "")): row for row in reports.to_dict(orient="records") if row.get("symbol")
+        }
+
+    rows: list[dict[str, Any]] = []
+    for symbol in missing_symbols:
+        report = report_lookup.get(symbol, {})
+        classification = MISSING_PRICE_CLASSIFICATIONS.get(
+            symbol,
+            {
+                "category": "unclassified",
+                "action": "가격 소스, symbol mapping, 리포트 제외 여부를 수동 검토하세요.",
+            },
+        )
+        rows.append(
+            {
+                "symbol": symbol,
+                "company": _clean(report.get("company")) if report else "",
+                "report_id": _clean(report.get("report_id")) if report else "",
+                "category": classification["category"],
+                "action": classification["action"],
+            }
+        )
+    return rows
+
+
 def _build_data_quality(
     extraction_quality: dict[str, Any],
-    missing_symbols: list[str],
+    missing_symbols: list[dict[str, Any]],
     reports: pd.DataFrame,
     report_performance: pd.DataFrame,
     report_exclusions: dict[str, int],
@@ -3811,7 +3874,7 @@ def _build_data_quality(
     return {
         "extraction_quality": extraction_quality,
         "report_exclusions": report_exclusions,
-        "missing_symbols": [{"symbol": symbol} for symbol in missing_symbols],
+        "missing_symbols": missing_symbols,
         "coverage": {
             "warehouse_reports": len(report_ids),
             "report_performance_rows": len(performance_ids),

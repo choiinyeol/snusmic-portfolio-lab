@@ -53,8 +53,7 @@
         "ok": 12
       },
       "20": {
-        "needs_review": 2,
-        "ok": 10
+        "ok": 12
       },
       "3": {
         "ok": 12
@@ -87,14 +86,11 @@
       "missing": 14
     },
     "reason_counts": {
-      "missing_base_target": 2,
       "missing_rating": 14,
       "non_buy_rating:Attention": 1,
       "non_buy_rating:Hold": 3,
       "non_buy_rating:Sell": 3,
-      "note_case_target_ambiguous": 3,
-      "note_target_not_found": 2,
-      "status:needs_review": 2
+      "note_case_target_ambiguous": 3
     },
     "review_rows": [
       {
@@ -126,7 +122,7 @@
         ],
         "status": "ok",
         "target_detail": "base=482.35",
-        "ticker": "SOIT",
+        "ticker": "SOI",
         "title": "Equity Research, Soitec SA"
       },
       {
@@ -466,42 +462,6 @@
         "title": "Equity Research, Chewy"
       },
       {
-        "base_target": null,
-        "company": "지트리비앤티",
-        "date": "2020-10-31T18:47:48",
-        "note": "markdown reextract; Korean numeric ticker; exchange prefix inferred as KRX; Target price not found",
-        "ordinal": 2,
-        "page": 20,
-        "rating": "Strong Buy",
-        "reasons": [
-          "missing_base_target",
-          "note_target_not_found",
-          "status:needs_review"
-        ],
-        "status": "needs_review",
-        "target_detail": "rating=Strong Buy",
-        "ticker": "115450",
-        "title": "Equity Research, 지트리비앤티"
-      },
-      {
-        "base_target": null,
-        "company": "교촌에프앤비",
-        "date": "2020-06-22T15:16:22",
-        "note": "markdown reextract; Korean numeric ticker; exchange prefix inferred as KRX; Target price not found",
-        "ordinal": 10,
-        "page": 20,
-        "rating": "Buy",
-        "reasons": [
-          "missing_base_target",
-          "note_target_not_found",
-          "status:needs_review"
-        ],
-        "status": "needs_review",
-        "target_detail": "rating=Buy",
-        "ticker": "075580",
-        "title": "Equity Research, 교촌에프앤비"
-      },
-      {
         "base_target": 26876.0,
         "company": "제이브이엠",
         "date": "2020-06-22T15:15:35",
@@ -519,46 +479,69 @@
       }
     ],
     "status_counts": {
-      "needs_review": 2,
-      "ok": 238
+      "ok": 240
     },
     "summary": {
       "case_target_without_explicit_base": 0,
       "current_equals_base_target": 0,
-      "missing_base_target": 2,
+      "missing_base_target": 0,
       "missing_rating": 14,
       "non_buy_rating": 7,
-      "ok": 238,
-      "review_flagged_rows": 26,
-      "status_needs_review": 2
+      "ok": 240,
+      "review_flagged_rows": 24,
+      "status_needs_review": 0
     },
     "total_reports": 240
   },
   "missing_symbols": [
     {
+      "action": "상장폐지 이력이 있는 KRX 종목입니다. 리포트 표본 제외를 유지하거나 별도 과거 가격 소스를 연결하세요.",
+      "category": "delisted",
+      "company": "쌍용C&E",
+      "report_id": "98ab527e6ec4bf16",
       "symbol": "003410.KS"
     },
     {
+      "action": "현재 Yahoo Finance에서 quote가 잡히지 않습니다. 대체 가격 소스 또는 provider mapping을 확인하세요.",
+      "category": "provider_gap",
+      "company": "HD현대미포",
+      "report_id": "1f8d82763b000479",
       "symbol": "010620.KS"
     },
     {
+      "action": "상장폐지 이력이 있는 KOSDAQ 종목입니다. 리포트 표본 제외를 유지하거나 별도 과거 가격 소스를 연결하세요.",
+      "category": "delisted",
+      "company": "제이시스메디칼",
+      "report_id": "b9143e5e11be8dd3",
       "symbol": "287410.KQ"
     },
     {
+      "action": "상장폐지/거래중단된 해외 종목입니다. 리포트 표본 제외를 유지하거나 별도 과거 가격 소스를 연결하세요.",
+      "category": "delisted",
+      "company": "Eneti Inc.",
+      "report_id": "69e082beafe7c93a",
       "symbol": "NETI"
     },
     {
-      "symbol": "SOIT.PA"
+      "action": "Soitec Yahoo ticker는 SOI.PA입니다. 다음 가격 refresh 뒤 가격 artifact 편입 여부를 확인하세요.",
+      "category": "mapping_fixed_pending_refresh",
+      "company": "Soitec SA",
+      "report_id": "21f8685022e2f44f",
+      "symbol": "SOI.PA"
     },
     {
+      "action": "상장폐지/거래중단된 해외 종목입니다. 리포트 표본 제외를 유지하거나 별도 과거 가격 소스를 연결하세요.",
+      "category": "delisted",
+      "company": "Vertex Energy, Inc.",
+      "report_id": "3cb65668846f456b",
       "symbol": "VTNR"
     }
   ],
   "report_exclusions": {
-    "downside_target": 8,
-    "excluded_reports": 23,
-    "included_reports": 217,
-    "instant_target_hit": 1,
+    "downside_target": 6,
+    "excluded_reports": 22,
+    "included_reports": 218,
+    "instant_target_hit": 2,
     "missing_performance": 0,
     "missing_price": 6,
     "non_positive_upside": 8,

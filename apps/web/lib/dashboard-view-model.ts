@@ -19,6 +19,7 @@ import {
   TARGET_BENCHMARK_ID,
   type AccountLeaderboardRow,
 } from '@/lib/product-model';
+import { displayPortfolioName } from '@/lib/portfolio-labels';
 
 const SERIES_COLORS = [
   '#64748b',
@@ -151,7 +152,7 @@ function buildDashboardSeries(
     .map((row, index) => ({
       id: row.id,
       label: row.label,
-      shortLabel: compactAccountLabel(row.id, row.shortLabel),
+      shortLabel: displayPortfolioName(row.id, row.shortLabel),
       color: SERIES_COLORS[index % SERIES_COLORS.length],
       points: equity
         .filter((point) => point.account_id === row.id && point.cumulativeReturn !== null)
@@ -169,15 +170,6 @@ function uniqueSeriesRows(rows: AccountLeaderboardRow[]): AccountLeaderboardRow[
     out.push(row);
   }
   return out;
-}
-
-function compactAccountLabel(id: string, fallback: string): string {
-  if (id.includes('redeploycash125_partial75')) return 'Partial 75';
-  if (id.includes('redeploycash125')) return 'CashGate 12.5';
-  if (id.includes('trailtrim25cap20')) return 'TrailTrim 20';
-  if (id === 'pit_trend_top5') return 'Trend Top5';
-  if (id === 'pit_score_top5') return 'Score Top5';
-  return fallback;
 }
 
 function latestReportBySymbol(reports: ReportRow[]): Map<string, ReportRow> {

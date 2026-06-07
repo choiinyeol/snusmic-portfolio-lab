@@ -25,6 +25,50 @@ def test_parse_report_text_extracts_single_target_for_korean_report():
     assert parsed["status"] == "ok"
 
 
+def test_parse_report_text_uses_fair_value_range_midpoint():
+    text = """
+    교촌에프앤비
+    ## (075580)
+    Rating
+    Buy
+    적정주가: 27,500 ~ 36,300원 현재주가: 상승여력: -
+    """
+
+    parsed = parse_report_text(text, company_hint="교촌에프앤비")
+
+    assert parsed["ticker"] == "075580"
+    assert parsed["base_target"] == 31900
+    assert parsed["status"] == "ok"
+
+
+def test_parse_report_text_uses_approval_price_as_target():
+    text = """
+    지트리비앤티 (115450)
+    승인시주가: 82,550 원 현재주가: 27,450 원 상승여력: 200.7%
+    """
+
+    parsed = parse_report_text(text, company_hint="지트리비앤티")
+
+    assert parsed["ticker"] == "115450"
+    assert parsed["report_current_price"] == 27450
+    assert parsed["base_target"] == 82550
+    assert parsed["status"] == "ok"
+
+
+def test_parse_report_text_skips_implausible_target_heading_noise():
+    text = """
+    교촌에프앤비 (075580)
+    본문에서는 목표주가 band를 제시하겠다.
+    - 5.1. Earning Table
+    적정주가: 27,500 ~ 36,300원 현재주가: 상승여력: -
+    """
+
+    parsed = parse_report_text(text, company_hint="교촌에프앤비")
+
+    assert parsed["base_target"] == 31900
+    assert "implausible" in parsed["note"]
+
+
 def test_parse_report_text_extracts_non_buy_rating_without_failing_target_parse():
     text = """
     Chewy (CHWY)
