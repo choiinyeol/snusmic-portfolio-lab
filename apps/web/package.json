@@ -1,6 +1,6 @@
 {
   "name": "snusmic-portfolio-lab-web",
-  "version": "0.31.0",
+  "version": "0.31.2",
   "private": true,
   "packageManager": "pnpm@10.33.2",
   "scripts": {
@@ -14,6 +14,7 @@
     "check:fix": "biome check --write .",
     "check:report-ui": "node scripts/check-report-ui.mjs",
     "artifact:check": "node scripts/validate-artifacts.mjs",
+    "hydrate:external-artifacts": "node scripts/hydrate-external-artifacts.mjs",
     "smoke:static": "node scripts/smoke-static-export.mjs"
   },
   "dependencies": {

@@ -37,3 +37,4 @@ apps/web/tsconfig.tsbuildinfo
 data/optuna/
 /public/
 .vercel/
+.cache/external-web-artifacts/

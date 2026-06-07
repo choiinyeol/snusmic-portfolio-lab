@@ -98,6 +98,7 @@ pnpm --dir apps/web build
 | [061 Cash Gate Threshold Sweep](iterations/061-cash-gate-threshold-sweep.md) | accepted as new branch best; robustness required | The 12.5% cash gate beats the 15% gate and Cap20 baseline, reaching 78.27% MWR and 732.8M KRW final equity with unchanged 27.47% MDD. |
 | [062 CashGate 12.5 Robustness](iterations/062-cashgate125-robustness.md) | accepted as robustness boundary | The 12.5% gate remains the base-cost leader and beats benchmarks, but 25/50 bps slippage variants trail Cap20 and Top3/Top7 are much weaker, so the edge is cost-sensitive rather than final. |
 | [063 Partial Redeploy](iterations/063-partial-redeploy.md) | accepted as local candidate; overfit warning | Partial75 reaches 78.43% MWR and 735.5M KRW final equity, but the +2.7M edge over CashGate 12.5 is narrow, path-specific, and still cost-sensitive. |
+| [065 AlphaMemo-style Strategy Process Memory MVP](iterations/065-strategy-process-memory.md) | accepted as research tooling MVP | Added research-only config-diff process memory over historical strategy mutations so repeated failure motifs can veto future search branches without touching PIT/product contracts. |
 
 ## Current Best
 

@@ -494,6 +494,16 @@ export const ArtifactManifestSchema = z
       .passthrough(),
     artifacts: z.array(z.string()),
     price_artifact_count: z.number(),
+    external_artifacts: z.record(
+      z.string(),
+      z.object({
+        storage_key: z.string(),
+        checksum: z.string(),
+        size_bytes: z.number(),
+        row_count: z.number().nullable().optional(),
+        public_url: z.string(),
+      }),
+    ),
     checksums: z.record(z.string(), z.string()),
   })
   .passthrough();

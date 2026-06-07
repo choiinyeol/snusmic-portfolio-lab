@@ -13,11 +13,19 @@ from hashlib import sha256
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, cast
+from urllib.parse import urljoin
 
 import pandas as pd
 
 from ..market_data.currency import currency_for_symbol, normalize_currency
-from .contracts import HOLDING_ROWS, REPORT_ROWS, TRADE_ROWS, ArtifactManifest, WebOverview
+from .contracts import (
+    HOLDING_ROWS,
+    REPORT_ROWS,
+    TRADE_ROWS,
+    ArtifactManifest,
+    ExternalArtifactPointer,
+    WebOverview,
+)
 
 REQUIRED_ARTIFACTS = [
     "manifest.json",
@@ -74,6 +82,16 @@ WEB_PORTFOLIO_ACCOUNT_IDS = (
     "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5",
     "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5",
     "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5",
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5",
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5",
+    "pit_mtt_rs90_top5",
+    "pit_mtt_rs80_top5",
+    "pit_mtt_rs70_top5",
+    "pit_mtt_low100_top5",
+    "pit_mtt_low300_top5",
+    "pit_momentum_6m12m_top5",
+    "pit_momentum_3m6m_top5",
+    "pit_momentum_1m3m_top5",
     "pit_trend_top5",
     "pit_score_top5",
     "smic_follower",
@@ -323,14 +341,84 @@ def _infer_native_from_krw(
         native.loc[mask] = converted.to_numpy()
     return native
 
-
 @dataclass(frozen=True)
 class ExportInputs:
     warehouse: Path = Path("data/warehouse")
     sim: Path = Path("data/sim")
     out: Path = Path("data/web")
     extraction_quality: Path = Path("data/extraction_quality.json")
+    external_artifact_dir: Path | None = None
+    external_artifact_url_root: str | None = None
 
+EXTERNAL_ELIGIBLE_PREFIXES = (
+    "portfolio/equity/",
+    "portfolio/daily-decisions/",
+)
+
+
+@dataclass
+class ExternalArtifactManager:
+    out_root: Path
+    external_dir: Path | None
+    public_root: str | None
+    pointers: dict[str, ExternalArtifactPointer]
+
+    @classmethod
+    def from_inputs(cls, inputs: ExportInputs) -> ExternalArtifactManager:
+        if inputs.external_artifact_dir is not None and not inputs.external_artifact_url_root:
+            raise ValueError("external_artifact_url_root is required when external_artifact_dir is set")
+        return cls(
+            out_root=inputs.out,
+            external_dir=inputs.external_artifact_dir.resolve() if inputs.external_artifact_dir else None,
+            public_root=inputs.external_artifact_url_root.rstrip("/") + "/" if inputs.external_artifact_url_root else None,
+            pointers={},
+        )
+
+    def enabled_for(self, relative_path: str) -> bool:
+        if self.external_dir is None:
+            return False
+        return any(relative_path.startswith(prefix) and not relative_path.endswith("/index.json") for prefix in EXTERNAL_ELIGIBLE_PREFIXES)
+
+    def write_json(self, relative_path: str, data: Any, *, compact: bool) -> None:
+        target = self.out_root / relative_path
+        if not self.enabled_for(relative_path):
+            if compact:
+                _write_product_json(target, data)
+            else:
+                _write_json(target, data)
+            return
+
+        payload = (
+            json.dumps(_clean(data), ensure_ascii=False, separators=(",", ":"), sort_keys=True) + "\n"
+            if compact
+            else json.dumps(_clean(data), ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+        ).encode("utf-8")
+        external_path = self.external_dir / relative_path
+        external_path.parent.mkdir(parents=True, exist_ok=True)
+        external_path.write_bytes(payload)
+        pointer = ExternalArtifactPointer(
+            storage_key=relative_path,
+            checksum=sha256(payload).hexdigest(),
+            size_bytes=len(payload),
+            row_count=_external_row_count(data),
+            public_url=urljoin(self.public_root, relative_path) if self.public_root else None,
+        )
+        self.pointers[relative_path] = pointer
+        if target.exists():
+            target.unlink()
+
+
+def _external_row_count(data: Any) -> int | None:
+    if isinstance(data, dict):
+        if isinstance(data.get("accounts"), list):
+            return len(data["accounts"])
+        if isinstance(data.get("rows"), list):
+            return len(data["rows"])
+        if isinstance(data.get("dates"), list) and isinstance(data.get("series"), list):
+            return len(data["dates"]) * len(data["series"])
+    if isinstance(data, list):
+        return len(data)
+    return None
 
 def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
     """Export deterministic JSON artifacts through a guarded atomic swap."""
@@ -346,6 +434,8 @@ def export_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
             sim=inputs.sim,
             out=staged_out,
             extraction_quality=inputs.extraction_quality,
+            external_artifact_dir=inputs.external_artifact_dir,
+            external_artifact_url_root=inputs.external_artifact_url_root,
         )
         result = _export_web_artifacts_unchecked(staged_inputs)
         missing = [name for name in REQUIRED_ARTIFACTS if not (staged_out / name).exists()]
@@ -374,6 +464,7 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
         stage_seconds[stage] = round(now - stage_started, 4)
         stage_started = now
 
+    external = ExternalArtifactManager.from_inputs(inputs)
     reports = _read_csv(inputs.warehouse / "reports.csv")
     prices = _read_csv(inputs.warehouse / "daily_prices.csv")
     fx_rates = _read_optional_csv(inputs.warehouse / "fx_rates.csv")
@@ -508,6 +599,7 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
         account_catalog=account_catalog,
         report_board_candidates=report_board_candidates,
         research_calendar=research_calendar,
+        external=external,
     )
     mark("write_page_bundles")
 
@@ -557,7 +649,7 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     )
     mark("write_report_statistics_lab")
 
-    write_web_manifest(out)
+    write_web_manifest(out, external)
     mark("write_manifest")
 
     written = sorted(
@@ -590,6 +682,8 @@ def check_web_artifacts(inputs: ExportInputs) -> dict[str, Any]:
             sim=inputs.sim,
             out=Path(tmpdir) / "web",
             extraction_quality=inputs.extraction_quality,
+            external_artifact_dir=inputs.external_artifact_dir,
+            external_artifact_url_root=inputs.external_artifact_url_root,
         )
         export_web_artifacts(second_inputs)
         _validate_price_artifact_cross_references(second_inputs.out)
@@ -789,6 +883,12 @@ def _guard_export_destination(inputs: ExportInputs) -> None:
         raise ValueError(f"Refusing to export web artifacts into protected path: {resolved}")
     if resolved.parent == Path(resolved.anchor).resolve():
         raise ValueError(f"Refusing to export web artifacts into drive/root child: {resolved}")
+    if inputs.external_artifact_dir is not None:
+        external_resolved = inputs.external_artifact_dir.resolve()
+        if resolved == external_resolved or resolved in external_resolved.parents or external_resolved in resolved.parents:
+            raise ValueError(
+                f"Refusing to overlap web artifact out and external artifact dir: out={resolved}, external={external_resolved}"
+            )
     for label, source in {
         "warehouse": inputs.warehouse,
         "simulation": inputs.sim,
@@ -1107,6 +1207,7 @@ def _write_page_bundles(
     account_catalog: list[dict[str, Any]],
     report_board_candidates: list[dict[str, Any]],
     research_calendar: dict[str, Any],
+    external: ExternalArtifactManager,
 ) -> None:
     """Write page-owned product bundles.
 
@@ -1128,12 +1229,13 @@ def _write_page_bundles(
     _write_product_json(out / "portfolio" / "episodes.json", _compact_episodes(episodes))
     _write_product_json(out / "portfolio" / "accounting-reconciliation.json", accounting_reconciliation)
     portfolio_account_ids = _web_portfolio_account_ids(account_catalog, accounts)
-    _write_portfolio_equity_shards(out, equity_daily, portfolio_account_ids)
+    _write_portfolio_equity_shards(out, equity_daily, portfolio_account_ids, external)
     _write_portfolio_daily_decision_shards(
         out,
         daily_decisions,
         daily_forward_metadata,
         portfolio_account_ids,
+        external,
     )
 
     _write_product_json(out / "reports" / "table.json", reports)
@@ -1803,14 +1905,16 @@ def _rows_by_account(rows: list[dict[str, Any]]) -> dict[str, list[dict[str, Any
     return grouped
 
 
-def _write_portfolio_equity_shards(out: Path, rows: list[dict[str, Any]], account_ids: list[str]) -> None:
+def _write_portfolio_equity_shards(
+    out: Path, rows: list[dict[str, Any]], account_ids: list[str], external: ExternalArtifactManager
+) -> None:
     shard_root = out / "portfolio" / "equity"
     accounts: list[dict[str, Any]] = []
     rows_by_account = _rows_by_account(rows)
     for account_id in account_ids:
         shard = _compact_equity_curves(rows_by_account.get(account_id, []))
         relative_path = f"portfolio/equity/{_account_shard_filename(account_id)}"
-        _write_product_json(out / relative_path, shard)
+        external.write_json(relative_path, shard, compact=True)
         accounts.append(
             {
                 "account_id": account_id,
@@ -1818,10 +1922,7 @@ def _write_portfolio_equity_shards(out: Path, rows: list[dict[str, Any]], accoun
                 "row_count": _compact_equity_row_count(shard),
             }
         )
-    _write_product_json(
-        shard_root / "index.json",
-        {"schema_version": "1.0.0", "accounts": accounts},
-    )
+    _write_product_json(shard_root / "index.json", {"schema_version": "1.0.0", "accounts": accounts})
 
 
 def _write_portfolio_daily_decision_shards(
@@ -1829,6 +1930,7 @@ def _write_portfolio_daily_decision_shards(
     rows: list[dict[str, Any]],
     metadata: dict[str, Any],
     account_ids: list[str],
+    external: ExternalArtifactManager,
 ) -> None:
     shard_root = out / "portfolio" / "daily-decisions"
     accounts: list[dict[str, Any]] = []
@@ -1837,7 +1939,7 @@ def _write_portfolio_daily_decision_shards(
         account_rows = rows_by_account.get(account_id, [])
         shard = _compact_daily_decisions(account_rows, metadata)
         relative_path = f"portfolio/daily-decisions/{_account_shard_filename(account_id)}"
-        _write_product_json(out / relative_path, shard)
+        external.write_json(relative_path, shard, compact=True)
         accounts.append(
             {
                 "account_id": account_id,
@@ -2053,11 +2155,11 @@ def _relative_posix(path: Path, root: Path) -> str:
     return path.relative_to(root).as_posix()
 
 
-def write_web_manifest(out: Path) -> Path:
+def write_web_manifest(out: Path, external: ExternalArtifactManager) -> Path:
     """Write the deterministic web artifact manifest after all exports finish."""
 
     overview = _read_json(out / "overview.json")
-    _write_json(out / "manifest.json", _build_manifest(out, overview))
+    _write_json(out / "manifest.json", _build_manifest(out, overview, external))
     return out / "manifest.json"
 
 
@@ -2070,7 +2172,7 @@ def _write_report_statistics_lab(out: Path) -> None:
     subprocess.run(["node", str(script), "--web-root", str(out)], check=True)
 
 
-def _build_manifest(out: Path, overview: dict[str, Any]) -> dict[str, Any]:
+def _build_manifest(out: Path, overview: dict[str, Any], external: ExternalArtifactManager) -> dict[str, Any]:
     simulation_window = overview.get("simulation_window", {}) if isinstance(overview, dict) else {}
     price_end = simulation_window.get("price_end") if isinstance(simulation_window, dict) else None
     generated_at = f"{price_end}T00:00:00+09:00" if price_end else None
@@ -2084,9 +2186,9 @@ def _build_manifest(out: Path, overview: dict[str, Any]) -> dict[str, Any]:
         "current_holdings": _json_row_count(out / "portfolio" / "holdings.json"),
         "monthly_holdings": _json_row_count(out / "portfolio" / "monthly-holdings.json"),
         "trades": _json_row_count(out / "portfolio" / "trades.json"),
-        "daily_decisions": _json_shard_row_count(out, out / "portfolio" / "daily-decisions" / "index.json"),
+        "daily_decisions": _json_shard_row_count(out, out / "portfolio" / "daily-decisions" / "index.json", external),
         "position_episodes": _json_row_count(out / "portfolio" / "episodes.json"),
-        "equity_daily": _json_shard_row_count(out, out / "portfolio" / "equity" / "index.json"),
+        "equity_daily": _json_shard_row_count(out, out / "portfolio" / "equity" / "index.json", external),
         "accounts": _json_row_count(out / "portfolio" / "accounts.json"),
         "account_catalog": _json_row_count(out / "accounts" / "catalog.json"),
         "report_board_candidates": _json_row_count(out / "report-board" / "candidates.json"),
@@ -2110,6 +2212,9 @@ def _build_manifest(out: Path, overview: dict[str, Any]) -> dict[str, Any]:
             "target_hit_count": target_stats.get("target_hit_count"),
         },
         "artifacts": artifacts,
+        "external_artifacts": {
+            name: pointer.model_dump(mode="json") for name, pointer in sorted(external.pointers.items())
+        },
         "price_artifact_count": sum(1 for name in artifacts if name.startswith("prices/")),
         "checksums": {
             name: sha256((out / name).read_bytes()).hexdigest()
@@ -2142,13 +2247,14 @@ def _json_row_count(path: Path) -> int:
     return 1
 
 
-def _json_shard_row_count(out: Path, index_path: Path) -> int:
+def _json_shard_row_count(out: Path, index_path: Path, external: ExternalArtifactManager | None = None) -> int:
     if not index_path.exists():
         return 0
     index = _read_json(index_path)
     accounts = index.get("accounts") if isinstance(index, dict) else None
     if not isinstance(accounts, list):
         return 0
+    external_pointers = external.pointers if external is not None else {}
     total = 0
     for account in accounts:
         if not isinstance(account, dict):
@@ -2157,17 +2263,20 @@ def _json_shard_row_count(out: Path, index_path: Path) -> int:
         if not isinstance(shard_path_text, str):
             continue
         shard_path = out / shard_path_text
-        if not shard_path.exists():
+        if shard_path.exists():
+            shard = _read_json(shard_path)
+            if (
+                isinstance(shard, dict)
+                and isinstance(shard.get("dates"), list)
+                and isinstance(shard.get("series"), list)
+            ):
+                total += len(shard["dates"]) * len(shard["series"])
+            else:
+                total += _json_row_count(shard_path)
             continue
-        shard = _read_json(shard_path)
-        if (
-            isinstance(shard, dict)
-            and isinstance(shard.get("dates"), list)
-            and isinstance(shard.get("series"), list)
-        ):
-            total += len(shard["dates"]) * len(shard["series"])
-        else:
-            total += _json_row_count(shard_path)
+        pointer = external_pointers.get(shard_path_text)
+        if pointer is not None and pointer.row_count is not None:
+            total += pointer.row_count
     return total
 
 
@@ -3272,6 +3381,9 @@ def _account_short_label(account_id: str, label: str) -> str:
         "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit40_top5": "PIT Quarterly Fresh540 Run Winners WeeklyCap45 Profit40",
         "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5": "PIT Quarterly Fresh540 Run Winners WeeklyCap45 Profit60",
         "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5": "PIT Quarterly Fresh540 Run Winners Profit60 Candidate Score",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5": "TrailTrim 20",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5": "CashGate 12.5",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5": "Partial 75",
         "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top3": "PIT Quarterly Fresh540 Run Winners Profit60 Candidate Top3",
         "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top7": "PIT Quarterly Fresh540 Run Winners Profit60 Candidate Top7",
         "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_slip25_top5": "PIT Quarterly Fresh540 Run Winners Profit60 Candidate Slip25",
@@ -3381,6 +3493,9 @@ def _account_display_label(account_id: str, config: dict[str, Any], default_labe
         "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit40_top5": "PIT Trend Quarterly Fresh 540 Run Winners Weekly 45% Cap Profit 40%",
         "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5": "PIT Trend Quarterly Fresh 540 Run Winners Weekly 45% Cap Profit 60%",
         "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5": "PIT Trend Quarterly Fresh 540 Run Winners Profit 60% Candidate Score",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5": "PIT Trend Quarterly Fresh 540 Run Winners Mixed Entry TrailTrim 20",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5": "PIT Trend Quarterly Fresh 540 Run Winners CashGate 12.5",
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5": "PIT Trend Quarterly Fresh 540 Run Winners Partial 75",
         "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top3": "PIT Trend Quarterly Fresh 540 Run Winners Profit 60% Candidate Score Top 3",
         "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top7": "PIT Trend Quarterly Fresh 540 Run Winners Profit 60% Candidate Score Top 7",
         "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_slip25_top5": "PIT Trend Quarterly Fresh 540 Run Winners Profit 60% Candidate Score Slip 25",

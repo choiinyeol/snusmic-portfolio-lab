@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pathlib import PurePosixPath
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_validator
@@ -102,6 +103,27 @@ class ArtifactRange(BaseModel):
     end: str | None
 
 
+class ExternalArtifactPointer(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    storage_key: str
+    checksum: str
+    size_bytes: int
+    row_count: int | None = None
+    public_url: str
+
+    @model_validator(mode="after")
+    def _check_storage_key(self) -> ExternalArtifactPointer:
+        if "\\" in self.storage_key or self.storage_key.startswith("//") or (
+            len(self.storage_key) >= 2 and self.storage_key[1] == ":"
+        ):
+            raise ValueError(f"external storage_key must use safe POSIX separators: {self.storage_key}")
+        key = PurePosixPath(self.storage_key)
+        if key.is_absolute() or ".." in key.parts:
+            raise ValueError(f"external storage_key must be a safe POSIX-relative path: {self.storage_key}")
+        return self
+
+
 class ArtifactManifest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -114,6 +136,7 @@ class ArtifactManifest(BaseModel):
     row_counts: dict[str, int]
     data_quality: dict[str, int | float | None]
     artifacts: list[str]
+    external_artifacts: dict[str, ExternalArtifactPointer] = {}
     price_artifact_count: int
     checksums: dict[str, str]
 
@@ -125,6 +148,22 @@ class ArtifactManifest(BaseModel):
         missing_checksums = [name for name in self.artifacts if name not in self.checksums]
         if missing_checksums:
             raise ValueError(f"every manifest artifact must have a checksum; missing {missing_checksums[:5]}")
+        bad_external = [name for name in self.external_artifacts if "\\" in name]
+        if bad_external:
+            raise ValueError(f"external artifact paths must be POSIX-relative; got {bad_external[:5]}")
+        unsafe_external = [
+            name
+            for name in self.external_artifacts
+            if name.startswith("//")
+            or (len(name) >= 2 and name[1] == ":")
+            or PurePosixPath(name).is_absolute()
+            or ".." in PurePosixPath(name).parts
+        ]
+        if unsafe_external:
+            raise ValueError(f"external artifact paths must stay under artifact_root; got {unsafe_external[:5]}")
+        overlap = sorted(set(self.artifacts) & set(self.external_artifacts))
+        if overlap:
+            raise ValueError(f"artifact path cannot be both local and external; overlap {overlap[:5]}")
         price_count = sum(1 for name in self.artifacts if name.startswith("prices/"))
         if price_count != self.price_artifact_count:
             raise ValueError(

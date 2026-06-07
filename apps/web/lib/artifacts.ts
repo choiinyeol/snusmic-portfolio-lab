@@ -492,6 +492,14 @@ export type WebDataQuality = {
   }[];
 };
 
+export type ExternalArtifactPointer = {
+  storage_key: string;
+  checksum: string;
+  size_bytes: number;
+  row_count?: number | null;
+  public_url: string;
+};
+
 export type ArtifactManifest = {
   schema_version: string;
   generated_at: string | null;
@@ -507,6 +515,7 @@ export type ArtifactManifest = {
     target_hit_count?: number | null;
   };
   artifacts: string[];
+  external_artifacts: Record<string, ExternalArtifactPointer>;
   price_artifact_count: number;
   checksums: Record<string, string>;
 };
@@ -665,6 +674,8 @@ function fullPath(relativePath: string): string {
   return path.join(/* turbopackIgnore: true */ repoRoot, relativePath);
 }
 
+const externalArtifactCacheRoot =
+  process.env.SNUSMIC_EXTERNAL_ARTIFACT_CACHE_DIR ?? '.cache/external-web-artifacts';
 let artifactCacheStamp: number | undefined;
 
 function artifactCacheValid(): boolean {
@@ -680,7 +691,10 @@ function artifactCacheValid(): boolean {
 
 function currentArtifactStamp(): number {
   try {
-    return fs.statSync(fullPath('data/web/manifest.json')).mtimeMs;
+    const manifestStamp = fs.statSync(fullPath('data/web/manifest.json')).mtimeMs;
+    const cacheDir = fullPath(externalArtifactCacheRoot);
+    const cacheStamp = fs.existsSync(cacheDir) ? fs.statSync(cacheDir).mtimeMs : 0;
+    return Math.max(manifestStamp, cacheStamp);
   } catch {
     return Date.now();
   }
@@ -702,8 +716,32 @@ function clearArtifactCaches() {
   nativePricePointCache.clear();
 }
 
+function manifestRelativePath(relativePath: string): string {
+  return relativePath.startsWith('data/web/') ? relativePath.slice('data/web/'.length) : relativePath;
+}
+
+function externalCachePath(relativePath: string): string {
+  return fullPath(path.join(externalArtifactCacheRoot, manifestRelativePath(relativePath)));
+}
+
+function resolveTextPath(relativePath: string): string {
+  const localPath = fullPath(relativePath);
+  if (fs.existsSync(localPath)) return localPath;
+  if (relativePath === 'data/web/manifest.json') return localPath;
+  const manifest = getArtifactManifest();
+  const key = manifestRelativePath(relativePath);
+  if (manifest.external_artifacts[key]) {
+    const cachedPath = externalCachePath(relativePath);
+    if (fs.existsSync(cachedPath)) return cachedPath;
+    throw new Error(
+      `External artifact cache is missing for ${key}. Run the external artifact hydrate step before building the web app.`,
+    );
+  }
+  return localPath;
+}
+
 function readText(relativePath: string): string {
-  return fs.readFileSync(fullPath(relativePath), 'utf8');
+  return fs.readFileSync(resolveTextPath(relativePath), 'utf8');
 }
 
 function readRequiredJson<T>(relativePath: string): T {

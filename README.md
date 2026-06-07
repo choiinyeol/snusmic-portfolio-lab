@@ -59,20 +59,28 @@ uv run --locked python -m snusmic_pipeline run-sim --warehouse data/warehouse --
 ```bash
 uv run --locked python -m snusmic_pipeline export-web --warehouse data/warehouse --sim data/sim --out data/web
 ```
+외부 object storage나 별도 artifact mirror로 큰 portfolio shard를 내보내려면 아래 옵션을 같이 쓸 수 있습니다.
+
+```bash
+uv run --locked python -m snusmic_pipeline export-web --warehouse data/warehouse --sim data/sim --out data/web --external-artifact-dir data/external-web-artifacts --external-artifact-url-root https://static.example.com/snusmic/
+```
+
+`--external-artifact-dir`를 쓰면 `--external-artifact-url-root`도 같이 필요합니다. Product summary/page artifact는 계속 `data/web`에 남고, 큰 `portfolio/equity/*.json`·`portfolio/daily-decisions/*.json` shard는 manifest pointer와 함께 외부 저장소로 분리할 수 있습니다.
 
 ### 선별 포트폴리오
 
-생성된 artifact에는 많은 리서치 branch가 들어갈 수 있지만, `/portfolio`는 대표 shortlist만 보여줍니다.
+생성된 artifact는 기본적으로 대표 shortlist만 포함합니다. 대량 parameter-search branch는 연구 기록에는 남기지만, 웹 데이터에는 재생성하지 않아 payload와 계좌 화면을 작게 유지합니다.
 
 | 표시 이름 | 의미 |
 | --- | --- |
-| Partial 75 | 현재 local-return 후보. Quarterly Top5 PIT trend 계좌이며 winner를 보유하고, 관측된 보유 기간 고점에서 25% 되돌림이 발생하면 20% account weight 쪽으로 trim하고, 현금이 equity의 12.5% 이상일 때 eligible cash의 75%만 재배치합니다. |
-| CashGate 12.5 | Partial 75의 robustness baseline. 같은 retained-winner/trailing-trim 구조를 쓰되, cash가 12.5% gate에 도달할 때만 재배치합니다. |
-| TrailTrim 20 | 더 단순한 profit-protection baseline. PIT trend shell을 유지하고 cash redeploy branch 없이 집중 winner를 20% cap 쪽으로 trim합니다. |
-| Trend Top5 | 단순 point-in-time trend-score Top5 계좌입니다. 낮은 복잡도의 기준점으로 씁니다. |
-| Score Top5 | 단순 point-in-time score Top5 계좌입니다. trend 구성이 실제로 가치를 더하는지 확인하는 기준입니다. |
-| SMIC Follower | 실제 리포트 기반 계좌 행동을 추적하는 report-follower baseline입니다. |
-
+| Partial 75 | 현재 local-return 후보. Quarterly Top5, retained winners, trailing trim, 12.5% cash gate, trim cash의 75% redeploy를 쓰는 실험 후보입니다. |
+| CashGate 12.5 | Partial 75 직전의 redeploy gate robustness 기준 계좌입니다. |
+| Mixed Entry TrailTrim 20 | candidate entry와 board retention을 섞고, 25% trailing drawdown 시 20% weight 쪽으로 trim하는 실전 기준선입니다. |
+| Candidate Profit60 | Profit60의 candidate-score admission 비교 계좌입니다. |
+| Profit60 | Quarterly Top5, 540일 fresh window, winner retention, weekly cap, +60% profit cushion을 쓰는 PIT trend 비교 계좌입니다. |
+| MTT RS70/80/90 | Minervini Trend Template 조건과 상대강도 percentile 70/80/90을 비교하는 momentum 계좌입니다. |
+| MTT Low +100/+300 | 52주 최저가 대비 +100%/+300% 이상인 강한 추세 종목만 비교하는 momentum 계좌입니다. |
+| Trend Top5 / Score Top5 / SMIC Follower | 단순 PIT trend, PIT score, report-follower 기준선입니다. |
 All Weather, KODEX 200, QQQ, SPY, GLD는 비교 벤치마크로 유지합니다. Forward-looking oracle simulation은 진단용이며 product account가 아닙니다.
 
 ### 데이터 흐름

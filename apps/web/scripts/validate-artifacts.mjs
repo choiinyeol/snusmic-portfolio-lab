@@ -7,6 +7,7 @@ const webRoot = process.env.SNUSMIC_WEB_ARTIFACT_ROOT
   : path.join(repoRoot, 'data/web');
 const maxPriceAgeDays = Number(process.env.SNUSMIC_MAX_PRICE_AGE_DAYS ?? '7');
 const maxReportAgeDays = Number(process.env.SNUSMIC_MAX_REPORT_AGE_DAYS ?? '30');
+const externalCacheRoot = path.resolve(repoRoot, process.env.SNUSMIC_EXTERNAL_ARTIFACT_CACHE_DIR ?? '.cache/external-web-artifacts');
 const required = [
   'manifest.json',
   'health.json',
@@ -35,9 +36,33 @@ function fail(message) {
   throw new Error(`[artifact-check] ${message}`);
 }
 
-function readJson(relativePath) {
+let manifestCache = null;
+
+function manifestRelativePath(relativePath) {
+  return relativePath.startsWith('data/web/') ? relativePath.slice('data/web/'.length) : relativePath;
+}
+
+function getManifest() {
+  if (manifestCache) return manifestCache;
+  const manifestPath = path.join(webRoot, 'manifest.json');
+  const text = fs.readFileSync(manifestPath, 'utf8');
+  manifestCache = JSON.parse(text);
+  return manifestCache;
+}
+
+function resolveJsonPath(relativePath) {
   const full = path.join(webRoot, relativePath);
-  if (!fs.existsSync(full)) fail(`missing required artifact: data/web/${relativePath}`);
+  if (fs.existsSync(full)) return full;
+  const manifest = getManifest();
+  const entry = manifest.external_artifacts?.[manifestRelativePath(relativePath)];
+  if (!entry) fail(`missing required artifact: data/web/${relativePath}`);
+  const cached = path.join(externalCacheRoot, manifestRelativePath(relativePath));
+  if (!fs.existsSync(cached)) fail(`external artifact cache missing for ${relativePath}; run hydrate:external-artifacts first`);
+  return cached;
+}
+
+function readJson(relativePath) {
+  const full = resolveJsonPath(relativePath);
   const text = fs.readFileSync(full, 'utf8');
   if (/\bNaN\b|\bInfinity\b|-Infinity\b/.test(text)) {
     fail(`non-JSON numeric sentinel found in data/web/${relativePath}`);
@@ -174,6 +199,14 @@ for (const file of required) {
 
 const manifest = readJson('manifest.json');
 if (manifest.schema_version !== '1.0.0') fail(`unsupported manifest schema_version: ${manifest.schema_version}`);
+const externalArtifacts = manifest.external_artifacts ?? {};
+for (const [artifact, pointer] of Object.entries(externalArtifacts)) {
+  if (artifact.includes('\\')) fail(`external artifact path is not POSIX: ${artifact}`);
+  if (!pointer || typeof pointer !== 'object') fail(`external artifact pointer is invalid: ${artifact}`);
+  if (!pointer.checksum || typeof pointer.checksum !== 'string') fail(`external artifact checksum missing: ${artifact}`);
+  if (!Number.isFinite(pointer.size_bytes) || pointer.size_bytes <= 0) fail(`external artifact size is invalid: ${artifact}`);
+  if (!pointer.public_url || typeof pointer.public_url !== 'string') fail(`external artifact public_url missing: ${artifact}`);
+}
 if (manifest.artifact_root !== 'data/web') fail(`unexpected artifact_root: ${manifest.artifact_root}`);
 if (!manifest.report_range?.start || !manifest.report_range?.end) fail('manifest report_range is incomplete');
 if (!manifest.price_range?.start || !manifest.price_range?.end) fail('manifest price_range is incomplete');
@@ -464,245 +497,15 @@ for (const artifact of manifest.artifacts ?? []) {
 const accounts = readJson('portfolio/accounts.json');
 const accountConfig = readRepoJson('data/sim/account-configs.json');
 const configuredAccountIds = (accountConfig.accounts ?? []).map((row) => row.account_id);
-const expectedAccountIds = [
-  'all_weather',
-  'smic_follower',
-  'smic_follower_v2',
-  'pit_score_top3',
-  'pit_score_top5',
-  'pit_score_top10',
-  'pit_momentum_top5',
-  'pit_trend_top5',
-  'pit_fresh_top5',
-  'pit_trend_top7',
-  'pit_trend_stop_top5',
-  'pit_trend_stop_top7',
-  'pit_trend_rotate_top5',
-  'pit_trend_rotate_fast_top5',
-  'pit_trend_rotate_stop_top5',
-  'pit_trend_persist20_top5',
-  'pit_trend_persist30_top5',
-  'pit_trend_persist20_hold90_top5',
-  'pit_trend_persist20_top3',
-  'pit_trend_persist20_top7',
-  'pit_trend_persist20_52w10_top5',
-  'pit_trend_persist20_domestic_top5',
-  'pit_trend_persist20_score_top5',
-  'pit_trend_persist20_scorecap_top5',
-  'pit_trend_persist20_invvol_top5',
-  'pit_trend_persist20_invvolcap_top5',
-  'pit_trend_persist20_semimonthly_top5',
-  'pit_trend_persist20_quarterly_top5',
-  'pit_trend_persist30_quarterly_top5',
-  'pit_trend_persist20_quarterly_risk_top5',
-  'pit_trend_persist30_quarterly_risk_top5',
-  'pit_trend_persist20_quarterly_hold120_top5',
-  'pit_trend_quarterly_ret3_top5',
-  'pit_trend_quarterly_ret6_top5',
-  'pit_trend_quarterly_ret36_top5',
-  'pit_trend_quarterly_fresh365_top5',
-  'pit_trend_quarterly_fresh540_top5',
-  'pit_trend_persist20_fresh540_top5',
-  'pit_trend_persist20_fresh540_top3',
-  'pit_trend_persist20_fresh540_top7',
-  'pit_trend_quarterly_fresh540_top3',
-  'pit_trend_quarterly_fresh540_top7',
-  'pit_trend_quarterly_fresh540_gross_top5',
-  'pit_trend_quarterly_fresh540_slip25_top5',
-  'pit_trend_quarterly_fresh540_slip50_top5',
-  'pit_trend_quarterly_fresh540_feb_top5',
-  'pit_trend_quarterly_fresh540_mar_top5',
-  'pit_trend_quarterly_fresh540_cash90_top5',
-  'pit_trend_quarterly_fresh540_cash80_top5',
-  'pit_trend_quarterly_fresh540_vol35_top5',
-  'pit_trend_quarterly_fresh540_vol40_top5',
-  'pit_trend_quarterly_fresh540_vol45_top5',
-  'pit_trend_quarterly_fresh540_vol50_top5',
-  'pit_trend_quarterly_fresh540_vol55_top5',
-  'pit_trend_quarterly_fresh540_mar_vol45_top5',
-  'pit_trend_quarterly_fresh540_entry270_top5',
-  'pit_trend_quarterly_fresh540_entry270_vol50_top5',
-  'pit_trend_quarterly_fresh540_entry270_mar_top5',
-  'pit_trend_quarterly_fresh540_entry365_top5',
-  'pit_trend_quarterly_fresh540_entry450_top5',
-  'pit_trend_quarterly_fresh540_entry365_vol50_top5',
-  'pit_trend_quarterly_fresh540_rank15_top5',
-  'pit_trend_quarterly_fresh540_rank25_top5',
-  'pit_trend_quarterly_fresh540_runwinners_top5',
-  'pit_trend_quarterly_fresh540_runwinners_vol50_top5',
-  'pit_trend_quarterly_fresh540_runwinners_top3',
-  'pit_trend_quarterly_fresh540_runwinners_top7',
-  'pit_trend_quarterly_fresh540_runwinners_feb_top5',
-  'pit_trend_quarterly_fresh540_runwinners_mar_top5',
-  'pit_trend_quarterly_fresh540_runwinners_slip25_top5',
-  'pit_trend_quarterly_fresh540_runwinners_slip50_top5',
-  'pit_trend_quarterly_fresh540_runwinners_cap40_top5',
-  'pit_trend_quarterly_fresh540_runwinners_cap35_top5',
-  'pit_trend_quarterly_fresh540_runwinners_soft45_top5',
-  'pit_trend_quarterly_fresh540_runwinners_vol50_cap40_top5',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_top5',
-  'pit_trend_quarterly_fresh540_runwinners_dailycap45_top5',
-  'pit_trend_quarterly_fresh540_runwinners_vol50_weeklycap45_top5',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap50_top5',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit10_top5',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit25_top5',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit40_top5',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit50_top5',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit50_slip25_top5',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit50_slip50_top5',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top3',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top7',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_slip25_top5',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_slip50_top5',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_midcontrib_top5',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_lastcontrib_top5',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_momentum_top5',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_midcontrib_top5',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_lastcontrib_top5',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_slip25_top5',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_slip50_top5',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top3',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top7',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit75_top5',
-  'pit_trend_quarterly_fresh540_runwinners_dailycap45_profit25_top5',
-  'pit_trend_quarterly_fresh540_confirm5_top5',
-  'pit_trend_quarterly_fresh540_confirm10_top5',
-  'pit_trend_quarterly_fresh540_confirm10_vol50_top5',
-  'pit_trend_persist20_kodex50_top5',
-  'pit_trend_persist20_kodex200_top5',
-  'benchmark_kodex200',
-  'benchmark_qqq',
-  'benchmark_spy',
-  'benchmark_gld',
-];
-for (const id of configuredAccountIds) {
-  if (!expectedAccountIds.includes(id)) expectedAccountIds.push(id);
-}
+const expectedAccountIds = [...new Set(configuredAccountIds)];
 const accountIds = accounts.map((row) => row.account_id);
 const unexpectedAccountIds = accountIds.filter((id) => !expectedAccountIds.includes(id));
 const missingAccountIds = expectedAccountIds.filter((id) => !accountIds.includes(id));
 if (unexpectedAccountIds.length) fail(`unexpected account rows: ${unexpectedAccountIds.join(', ')}`);
 if (missingAccountIds.length) fail(`missing account rows: ${missingAccountIds.join(', ')}`);
-const expectedAccountKinds = new Map([
-  ['all_weather', 'benchmark'],
-  ['smic_follower', 'account'],
-  ['smic_follower_v2', 'account'],
-  ['pit_score_top3', 'account'],
-  ['pit_score_top5', 'account'],
-  ['pit_score_top10', 'account'],
-  ['pit_momentum_top5', 'account'],
-  ['pit_trend_top5', 'account'],
-  ['pit_fresh_top5', 'account'],
-  ['pit_trend_top7', 'account'],
-  ['pit_trend_stop_top5', 'account'],
-  ['pit_trend_stop_top7', 'account'],
-  ['pit_trend_rotate_top5', 'account'],
-  ['pit_trend_rotate_fast_top5', 'account'],
-  ['pit_trend_rotate_stop_top5', 'account'],
-  ['pit_trend_persist20_top5', 'account'],
-  ['pit_trend_persist30_top5', 'account'],
-  ['pit_trend_persist20_hold90_top5', 'account'],
-  ['pit_trend_persist20_top3', 'account'],
-  ['pit_trend_persist20_top7', 'account'],
-  ['pit_trend_persist20_52w10_top5', 'account'],
-  ['pit_trend_persist20_domestic_top5', 'account'],
-  ['pit_trend_persist20_score_top5', 'account'],
-  ['pit_trend_persist20_scorecap_top5', 'account'],
-  ['pit_trend_persist20_invvol_top5', 'account'],
-  ['pit_trend_persist20_invvolcap_top5', 'account'],
-  ['pit_trend_persist20_semimonthly_top5', 'account'],
-  ['pit_trend_persist20_quarterly_top5', 'account'],
-  ['pit_trend_persist30_quarterly_top5', 'account'],
-  ['pit_trend_persist20_quarterly_risk_top5', 'account'],
-  ['pit_trend_persist30_quarterly_risk_top5', 'account'],
-  ['pit_trend_persist20_quarterly_hold120_top5', 'account'],
-  ['pit_trend_quarterly_ret3_top5', 'account'],
-  ['pit_trend_quarterly_ret6_top5', 'account'],
-  ['pit_trend_quarterly_ret36_top5', 'account'],
-  ['pit_trend_quarterly_fresh365_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_top5', 'account'],
-  ['pit_trend_persist20_fresh540_top5', 'account'],
-  ['pit_trend_persist20_fresh540_top3', 'account'],
-  ['pit_trend_persist20_fresh540_top7', 'account'],
-  ['pit_trend_quarterly_fresh540_top3', 'account'],
-  ['pit_trend_quarterly_fresh540_top7', 'account'],
-  ['pit_trend_quarterly_fresh540_gross_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_slip25_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_slip50_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_feb_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_mar_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_cash90_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_cash80_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_vol35_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_vol40_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_vol45_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_vol50_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_vol55_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_mar_vol45_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_entry270_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_entry270_vol50_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_entry270_mar_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_entry365_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_entry450_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_entry365_vol50_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_rank15_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_rank25_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_vol50_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_top3', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_top7', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_feb_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_mar_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_slip25_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_slip50_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_cap40_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_cap35_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_soft45_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_vol50_cap40_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_dailycap45_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_vol50_weeklycap45_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap50_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit10_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit25_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit40_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit50_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit50_slip25_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit50_slip50_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top3', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top7', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_slip25_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_slip50_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_midcontrib_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_lastcontrib_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_momentum_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_midcontrib_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_lastcontrib_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_slip25_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_slip50_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top3', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top7', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit75_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_runwinners_dailycap45_profit25_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_confirm5_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_confirm10_top5', 'account'],
-  ['pit_trend_quarterly_fresh540_confirm10_vol50_top5', 'account'],
-  ['pit_trend_persist20_kodex50_top5', 'account'],
-  ['pit_trend_persist20_kodex200_top5', 'account'],
-  ['benchmark_kodex200', 'benchmark'],
-  ['benchmark_qqq', 'benchmark'],
-  ['benchmark_spy', 'benchmark'],
-  ['benchmark_gld', 'benchmark'],
-]);
-for (const id of configuredAccountIds) {
-  if (!expectedAccountKinds.has(id)) {
-    expectedAccountKinds.set(id, id === 'all_weather' || id.startsWith('benchmark_') ? 'benchmark' : 'account');
-  }
-}
+const expectedAccountKinds = new Map(
+  configuredAccountIds.map((id) => [id, id === 'all_weather' || id.startsWith('benchmark_') ? 'benchmark' : 'account']),
+);
 for (const row of accounts) {
   const expectedKind = expectedAccountKinds.get(row.account_id);
   if (row.kind !== expectedKind) {

@@ -76,6 +76,12 @@ jobs:
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.refresh_artifacts == 'true'
         run: uv run --locked python -m snusmic_pipeline refresh-web-artifacts
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+          run_install: false
+
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
@@ -83,14 +89,14 @@ jobs:
           cache: "pnpm"
           cache-dependency-path: "apps/web/pnpm-lock.yaml"
 
-      - name: Enable pnpm
-        run: |
-          corepack enable
-          corepack prepare pnpm@10.33.2 --activate
-
+      - name: Verify pnpm version
+        run: pnpm --version
       - name: Install web dependencies
         working-directory: apps/web
         run: pnpm install --frozen-lockfile --prefer-offline
+      - name: Hydrate external web artifacts
+        working-directory: apps/web
+        run: pnpm hydrate:external-artifacts
 
       - name: Validate committed web artifacts
         working-directory: apps/web

@@ -1,5 +1,43 @@
 # Changelog
 
+## v0.31.2 - Restore shortlist strategy artifacts and add external shard offload
+
+- Restores the `Partial 75` and `CashGate 12.5` PIT shortlist strategies to the default simulation/export set and regenerates `data/sim/**` plus `data/web/**` so those routes and artifacts exist again alongside the current baseline shortlist.
+- Adds a research-only AlphaMemo-style `strategy-memory` CLI/report that summarizes config-diff motifs, residual guidance, skipped coverage, and failure-veto evidence from current strategy artifacts without auto-promoting branches into product UI.
+- Adds hybrid static/external artifact support for large portfolio shard files through `manifest.json` `external_artifacts`, a hydrate script, cache-aware web readers, validator support, and CI hydration so Vercel static builds can keep summary artifacts local while offloading heavy equity/daily-decision shards.
+- Fixes the web GitHub Actions pipeline so pnpm is installed before `actions/setup-node` cache probing.
+
+Verification:
+
+- `uv run --locked ruff check src/snusmic_pipeline/sim/strategy_memory.py src/snusmic_pipeline/cli.py tests/test_strategy_memory.py`
+- `uv run --locked pytest tests/test_strategy_memory.py -q`
+- `uv run --locked ruff check src/snusmic_pipeline/web/artifacts.py src/snusmic_pipeline/web/contracts.py src/snusmic_pipeline/cli.py tests/test_external_artifacts.py`
+- `uv run --locked pytest tests/test_external_artifacts.py -q`
+- `uv run --locked python -m snusmic_pipeline run-sim --warehouse data/warehouse --out data/sim --end 2026-06-01`
+- `uv run --locked python -m snusmic_pipeline export-web --warehouse data/warehouse --sim data/sim --out data/web`
+- `uv run --locked python -m snusmic_pipeline export-web --warehouse data/warehouse --sim data/sim --out data/tmp-web --external-artifact-dir data/tmp-external --external-artifact-url-root https://example.invalid/artifacts/`
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web artifact:check`
+- `pnpm --dir apps/web hydrate:external-artifacts`
+## v0.31.1 - Add momentum account research reports
+
+- Adds PIT momentum account variants for 1M/3M, 3M/6M, 6M/12M, explicit MTT RS70/80/90, and MTT 52-week-low +100%/+300% selection.
+- Adds relative-strength score and percentile gates to the PIT research board so momentum strategies can require 70/80/90 percentile strength without future-looking data.
+- Adds an explicit MTT template gate for price > 50/150/200-day averages, 50MA > 150MA > 200MA, rising SMA200 checks, 52-week high/low distance, and MTT market gating.
+- Prunes generated default account reports from 161 candidates to a curated active set; retired experimental candidates remain in source/history instead of regenerated web data.
+- Regenerates `data/sim/**` and `data/web/**` account artifacts so the MTT momentum reports are visible and stale experimental account data is removed.
+- Bumps Python and web package versions to `0.31.1`.
+
+Verification:
+
+- `uv run pytest tests/sim/test_accounts.py tests/sim/test_contracts.py tests/sim/test_selection_audit.py -q -k "one_month_and_one_year_momentum or default_accounts_are_benchmarks_plus_pit_baselines or candidate_score_components or new_momentum_accounts_use_market_200ma_gate"`
+- `uv run ruff check src/snusmic_pipeline/sim/contracts.py src/snusmic_pipeline/sim/accounts/pit_score.py src/snusmic_pipeline/sim/pit_research_board.py tests/sim/test_accounts.py tests/sim/test_contracts.py tests/sim/test_selection_audit.py`
+- `uv run ruff format --check src/snusmic_pipeline/sim/contracts.py src/snusmic_pipeline/sim/accounts/pit_score.py src/snusmic_pipeline/sim/pit_research_board.py tests/sim/test_accounts.py tests/sim/test_contracts.py tests/sim/test_selection_audit.py`
+- `uv run python -m snusmic_pipeline run-sim --warehouse data/warehouse --out data/sim --end 2026-06-05`
+- `uv run python -m snusmic_pipeline export-web --warehouse data/warehouse --sim data/sim --out data/web`
+- `uv run python -m snusmic_pipeline export-web --check`
+- `pnpm --dir apps/web artifact:check`
+
 ## v0.31.0 - Strengthen report artifact trust gates
 
 - Adds visible-report cross-reference gates across report table, detail metrics, return windows, downloads, and price artifacts.

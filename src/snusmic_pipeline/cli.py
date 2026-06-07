@@ -34,6 +34,7 @@ from .sim.selection_audit import (
     build_selection_audit_report,
     build_selection_diff_audit_report,
 )
+from .sim.strategy_memory import build_strategy_memory, render_strategy_memory_report
 from .sim.warehouse import build_warehouse, refresh_price_history
 from .web.artifacts import ExportInputs, check_web_artifacts, export_web_artifacts
 
@@ -416,6 +417,8 @@ def run_export_web(args: argparse.Namespace) -> int:
         sim=Path(args.sim),
         out=Path(args.out),
         extraction_quality=Path(args.extraction_quality),
+        external_artifact_dir=Path(args.external_artifact_dir) if args.external_artifact_dir else None,
+        external_artifact_url_root=args.external_artifact_url_root or None,
     )
     result = check_web_artifacts(inputs) if args.check else export_web_artifacts(inputs)
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
@@ -437,6 +440,18 @@ def daily_forward_config(
     if config is None:
         config = SimulationConfig(start_date=start, end_date=end)
     return config
+def run_strategy_memory(args: argparse.Namespace) -> int:
+    sim_dir = Path(args.sim)
+    records, stats, skipped = build_strategy_memory(sim_dir)
+    report = render_strategy_memory_report(records, stats, skipped)
+    if args.out:
+        out_path = Path(args.out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(report, encoding="utf-8")
+    else:
+        print(report, end="")
+    return 0
+
 
 
 def run_daily_forward_cli(args: argparse.Namespace) -> int:
@@ -517,6 +532,8 @@ def run_refresh_web_artifacts(args: argparse.Namespace) -> int:
             sim=sim_dir,
             out=web_dir,
             extraction_quality=Path(args.extraction_quality),
+            external_artifact_dir=Path(args.external_artifact_dir) if args.external_artifact_dir else None,
+            external_artifact_url_root=args.external_artifact_url_root or None,
         )
     )
     copy_web_downloads(web_dir, Path(args.downloads))
@@ -575,6 +592,8 @@ def run_rebuild_web_artifacts(args: argparse.Namespace) -> int:
             sim=sim_dir,
             out=web_dir,
             extraction_quality=Path(args.extraction_quality),
+            external_artifact_dir=Path(args.external_artifact_dir) if args.external_artifact_dir else None,
+            external_artifact_url_root=args.external_artifact_url_root or None,
         )
     )
     copy_web_downloads(web_dir, Path(args.downloads))
@@ -885,6 +904,16 @@ def build_parser() -> argparse.ArgumentParser:
         "--extraction-quality", default=str(REPO_ROOT / "data" / "extraction_quality.json")
     )
     export_web.add_argument("--check", action="store_true", help="Verify deterministic artifact output.")
+    export_web.add_argument(
+        "--external-artifact-dir",
+        default="",
+        help="Optional directory that receives offloaded large portfolio shards instead of committing them under data/web.",
+    )
+    export_web.add_argument(
+        "--external-artifact-url-root",
+        default="",
+        help="Optional public URL root recorded in manifest external_artifacts for offloaded blobs.",
+    )
     export_web.set_defaults(func=run_export_web)
 
     pit_board = subparsers.add_parser(
@@ -934,6 +963,13 @@ def build_parser() -> argparse.ArgumentParser:
     selection_audit.add_argument("--recent-rebalances", type=int, default=8)
     selection_audit.add_argument("--out", default="", help="Optional Markdown output path.")
     selection_audit.set_defaults(func=run_selection_audit)
+    strategy_memory = subparsers.add_parser(
+        "strategy-memory",
+        help="Emit AlphaMemo-style config-diff process memory for research-only strategy search.",
+    )
+    strategy_memory.add_argument("--sim", default=str(REPO_ROOT / "data" / "sim"))
+    strategy_memory.add_argument("--out", default="", help="Optional Markdown output path.")
+    strategy_memory.set_defaults(func=run_strategy_memory)
 
     selection_diff_audit = subparsers.add_parser(
         "selection-diff-audit",
@@ -1076,6 +1112,16 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Ignore data/sim/account-configs.json and use the built-in benchmark/follower set.",
     )
+    refresh_web.add_argument(
+        "--external-artifact-dir",
+        default="",
+        help="Optional directory that receives offloaded large portfolio shards instead of committing them under data/web.",
+    )
+    refresh_web.add_argument(
+        "--external-artifact-url-root",
+        default="",
+        help="Optional public URL root recorded in manifest external_artifacts for offloaded blobs.",
+    )
     refresh_web.set_defaults(func=run_refresh_web_artifacts)
 
     rebuild_web = subparsers.add_parser(
@@ -1092,6 +1138,16 @@ def build_parser() -> argparse.ArgumentParser:
     )
     rebuild_web.add_argument("--cadence", choices=("D", "W", "M"), default="M")
     rebuild_web.set_defaults(func=run_rebuild_web_artifacts)
+    rebuild_web.add_argument(
+        "--external-artifact-dir",
+        default="",
+        help="Optional directory that receives offloaded large portfolio shards instead of committing them under data/web.",
+    )
+    rebuild_web.add_argument(
+        "--external-artifact-url-root",
+        default="",
+        help="Optional public URL root recorded in manifest external_artifacts for offloaded blobs.",
+    )
 
     sim = subparsers.add_parser("run-sim", help="Run the package-owned benchmark/follower simulation.")
     sim.add_argument("--start", default="2021-01-04")
