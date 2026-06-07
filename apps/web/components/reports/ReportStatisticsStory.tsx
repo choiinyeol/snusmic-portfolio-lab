@@ -316,6 +316,29 @@ function ExecutiveSummary({
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
           이 화면은 “어떤 리포트가 좋았나”보다 “어떤 가격 경로를 먼저 의심해야 하나”를 보게 만드는 통계 보드입니다.
         </p>
+        <div className="mt-3 grid gap-2 rounded-md border border-slate-200 bg-slate-50 p-3 text-xs leading-5 md:grid-cols-3">
+          <div>
+            <div className="font-semibold text-slate-700">1. 표본과 목표가</div>
+            <p className="mt-1 text-slate-600">
+              {sampleSize.toLocaleString('ko-KR')}건 중 {hitTargetCount.toLocaleString('ko-KR')}건
+              {`(${formatPercent(targetRate)})`}만 1.0x 목표가를 찍었습니다.
+            </p>
+          </div>
+          <div>
+            <div className="font-semibold text-slate-700">2. 중앙값과 무반응</div>
+            <p className="mt-1 text-slate-600">
+              중앙 고점은 {formatPercent(medianReturn)}, +5% 미만은 {flatCount.toLocaleString('ko-KR')}건
+              {`(${formatPercent(flatShare)})`}입니다.
+            </p>
+          </div>
+          <div>
+            <div className="font-semibold text-slate-700">3. 집중도와 만료</div>
+            <p className="mt-1 text-slate-600">
+              상위 10건 집중도 {formatPercent(top10Concentration)}, 만료 중앙 {formatPercent(expiryMedian)}를 보고 평균
+              착시를 걸러냅니다.
+            </p>
+          </div>
+        </div>
         <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-5">
           <SummaryMetric
             label="목표가 도달률"

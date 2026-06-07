@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.30.20 - Polish frontend decision surfaces
+
+- Adds a report-table scan bar that shows visible range, filtered total, active page, current sort, and applied filters.
+- Adds a statistics reading guide near the top of `/statistics` using existing sample, target-hit, median, flat-share, concentration, and expiry metrics.
+- Keeps the new report detail source/audit section and portfolio shortlist explanations in the release surface.
+- Bumps Python and web package versions to `0.30.20`.
+
+Verification:
+
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web format:check`
+- `pnpm --dir apps/web build`
+- `pnpm --dir apps/web smoke:static`
+- `pnpm --dir apps/web artifact:check`
+- `uv run --locked pytest tests/test_web_artifacts.py -q -k "manifest_records_snapshot_lineage_counts_and_checksums"`
+- `uv run --locked ruff check src/snusmic_pipeline/web/artifacts.py tests/test_web_artifacts.py`
+- `uv run --locked ruff format --check src/snusmic_pipeline/web/artifacts.py tests/test_web_artifacts.py`
+- Browser text inspection of `/reports`, `/statistics`, `/portfolio`, and one report detail page on `http://127.0.0.1:3000`
+- `git diff --check`
+
 ## v0.30.19 - Clarify audit and shortlist decisions
 
 - Adds explicit `decision` and `release_status` policy fields for missing-price symbols, including accepted exclusions versus action-required price/mapping work.

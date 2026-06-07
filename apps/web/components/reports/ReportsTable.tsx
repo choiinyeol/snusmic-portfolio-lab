@@ -70,6 +70,25 @@ const COLUMN_OPTIONS: Array<{ value: ColumnMode; label: string }> = [
   { value: 'all', label: '전체' },
 ];
 
+const COLUMN_SORT_LABELS: Record<ColumnSortKey, string> = {
+  company: '종목',
+  publicationDate: '발간일',
+  entryPriceNative: '진입가',
+  lastCloseNative: '현재가',
+  targetPriceNative: '목표가',
+  targetUpsideAtPub: '업사이드',
+  currentReturn: '현재 수익률',
+  ytdReturn: 'YTD',
+  return1y: '1년',
+  distanceFrom52wHigh: '52주 고점',
+  maTrend: '이평선',
+  targetProgressPct: '진행률',
+  peakReturn: '고점',
+  troughReturn: '저점',
+  daysToTarget: '도달일',
+  status: '상태',
+};
+
 export function ReportsTable({ reports, marketRows = [], viewRows = [] }: ReportsTableProps) {
   const router = useRouter();
   const [sort, setSort] = useState<SortId>('recent');
@@ -112,6 +131,22 @@ export function ReportsTable({ reports, marketRows = [], viewRows = [] }: Report
   );
   const activeFilterCount = Number(hitFilter !== 'all') + Number(returnFilter !== 'all');
   const colSpan = columnMode === 'core' ? 11 : columnMode === 'price' ? 14 : 17;
+  const visibleStart = sortedRows.length === 0 ? 0 : safePage * PAGE_SIZE + 1;
+  const visibleEnd = Math.min(sortedRows.length, (safePage + 1) * PAGE_SIZE);
+  const filteredTotalLabel =
+    sortedRows.length === reports.length
+      ? `${sortedRows.length.toLocaleString('ko-KR')}건`
+      : `${sortedRows.length.toLocaleString('ko-KR')}건 · 전체 ${reports.length.toLocaleString('ko-KR')}건`;
+  const activeSortLabel = columnSort
+    ? `${COLUMN_SORT_LABELS[columnSort.key]} ${columnSort.direction === 'asc' ? '오름차순' : '내림차순'}`
+    : (SORT_OPTIONS.find((option) => option.value === sort)?.label ?? '최근 발간');
+  const appliedFilters = [
+    query.trim() ? `검색 “${query.trim()}”` : null,
+    hitFilter !== 'all' ? `목표 ${HIT_FILTER_OPTIONS.find((option) => option.value === hitFilter)?.label}` : null,
+    returnFilter !== 'all'
+      ? `수익률 ${RETURN_FILTER_OPTIONS.find((option) => option.value === returnFilter)?.label}`
+      : null,
+  ].filter((filter): filter is string => Boolean(filter));
   const handleColumnSort = (key: ColumnSortKey) => {
     setColumnSort((current) => {
       if (current?.key === key) {
@@ -210,6 +245,15 @@ export function ReportsTable({ reports, marketRows = [], viewRows = [] }: Report
         onPageChange: setPage,
       }}
     >
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-slate-100 bg-slate-50/70 px-3 py-2 text-[11px] text-slate-500">
+        <span className="font-semibold text-slate-700">현재 보기</span>
+        <span className="font-mono tabular-nums">
+          {visibleStart.toLocaleString('ko-KR')}-{visibleEnd.toLocaleString('ko-KR')} / {filteredTotalLabel}
+        </span>
+        <span>페이지 {`${safePage + 1}/${pageCount}`}</span>
+        <span>정렬 {activeSortLabel}</span>
+        <span>{appliedFilters.length > 0 ? appliedFilters.join(' · ') : '필터 없음'}</span>
+      </div>
       {focusedReport ? (
         <FocusedReportSummary report={focusedReport} market={marketRowsBySymbol.get(focusedReport.symbol)} />
       ) : null}
