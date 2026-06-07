@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.30.21 - Reset the home route hierarchy
+
+- Reframes `/` as a compact operating hub for data status, representative account state, and route-level next actions instead of a duplicate signal-ledger detail page.
+- Renames the sidebar home entry to `운영 허브` and keeps report verification, portfolio, statistics, and calendar responsibilities separated.
+- Updates active product and architecture docs so the route inventory matches the current page tree.
+- Bumps Python and web package versions to `0.30.21`.
+
+Verification:
+
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web lint`
+- `pnpm --dir apps/web format:check`
+- `pnpm --dir apps/web build`
+- `pnpm --dir apps/web smoke:static`
+- Browser inspection of `/` on `http://127.0.0.1:3000`
+
 ## v0.30.20 - Polish frontend decision surfaces
 
 - Adds a report-table scan bar that shows visible range, filtered total, active page, current sort, and applied filters.

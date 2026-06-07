@@ -14,7 +14,7 @@ SNUSMIC Portfolio Lab은 point-in-time SMIC 리포트 데이터와 정적 계좌
 
 ### 웹 제품 표면
 
-- `/`: 현재 report verification 및 report board.
+- `/`: 데이터 상태, 대표 계좌, 리포트/계좌/통계/캘린더 진입점을 정리하는 운영 허브.
 - `/reports`: sorting, filtering, 개별 report drilldown용 report table.
 - `/reports/[symbol]/[reportId]`: report evidence detail.
 - `/calendar`: 각 historical observation date에 어떤 report candidate가 보였고 이후 어떻게 audit됐는지 보는 research calendar.

@@ -19,7 +19,7 @@
 
 ### 웹 route
 
-- `/`: report verification 및 report board.
+- `/`: 데이터 상태, 대표 계좌, 리포트/계좌/통계/캘린더 진입점을 정리하는 운영 허브.
 - `/reports`: canonical report verification table.
 - `/reports/[symbol]/[reportId]`: report evidence detail.
 - `/statistics`: report-level outcome, concentration, price-path diagnostics.
