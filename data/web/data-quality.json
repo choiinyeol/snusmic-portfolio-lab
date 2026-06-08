@@ -541,9 +541,9 @@
     }
   ],
   "report_exclusions": {
-    "downside_target": 6,
-    "excluded_reports": 20,
-    "included_reports": 220,
+    "downside_target": 7,
+    "excluded_reports": 21,
+    "included_reports": 219,
     "instant_target_hit": 1,
     "missing_performance": 0,
     "missing_price": 5,

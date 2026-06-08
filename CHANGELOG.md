@@ -1,11 +1,12 @@
 # Changelog
 
-## v1.0.2 - Collapse the web app into a cleaner research workstation
+## v1.0.3 - Restore appended strategy artifacts under the completed ultragoal
 
 - Rebuilds the web information architecture around operator jobs: Board, Reports, Portfolio, Calendar, and Statistics now read as a smaller audit workstation instead of a generic dashboard.
 - Unifies Board and Reports on one canonical `ReportLedgerRow` contract, removes duplicate report-table shaping, and keeps `/reports` as the only full report ledger.
 - Moves account taxonomy/context onto the exported account catalog contract, removes web-local `account_id` heuristics, and retires the dedicated `/portfolio/[account]/equity` route in favor of one canonical overview chart.
 - Compresses calendar and statistics into denser evidence-first surfaces, removes dead shared wrappers/components, and trims the trades route back to a ledger-first page.
+- Restores the ledger-appended momentum/MTT and Profit60 shortlist artifacts to the committed static export, keeping the 27-account catalog and generated portfolio shards aligned with the completed ultragoal audit.
 
 Verification:
 

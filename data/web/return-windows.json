@@ -456,25 +456,6 @@
     "symbol": "LONN.SW"
   },
   {
-    "company": "Soitec SA",
-    "date": "2026-05-29",
-    "date_180d": null,
-    "date_30d": null,
-    "date_60d": null,
-    "date_90d": null,
-    "entry_price_krw": 308784.3149,
-    "price_180d_krw": null,
-    "price_30d_krw": null,
-    "price_60d_krw": null,
-    "price_90d_krw": null,
-    "report_id": "21f8685022e2f44f",
-    "return_180d": null,
-    "return_30d": null,
-    "return_60d": null,
-    "return_90d": null,
-    "symbol": "SOI.PA"
-  },
-  {
     "company": "Z-holdings",
     "date": "2021-11-30",
     "date_180d": "2022-05-30",
