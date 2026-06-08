@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.0.5 - Record ultragoal completion receipt
+
+- Records the final `.gjc/ultragoal` completion checkpoint and ledger receipt for the durable verification-first plan after the v1.0.4 release gates passed.
+- Keeps the shipped product code and generated artifacts unchanged from v1.0.4; this release only synchronizes the repository audit trail and version metadata.
+
+Verification:
+
+- `gjc ultragoal status --json`
+- `goal complete`
+- `git diff --check`
+
 ## v1.0.4 - Enforce alpha promotion gates
 
 - Promotes `AlphaHypothesis` only after minimum support, distinct-symbol coverage, regime spread, and positive median quality pass; single-report or unstable distributions now emit explicit rejection reasons.
