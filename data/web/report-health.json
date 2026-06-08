@@ -4091,8 +4091,8 @@
       "symbol": "SOI.PA",
       "ticker": "SOI",
       "title": "Equity Research, Soitec SA",
-      "web_exclusion_reason": "missing_price",
-      "web_status": "excluded"
+      "web_exclusion_reason": null,
+      "web_status": "visible"
     },
     {
       "action": "웹 검증 표본에 정상 포함됩니다.",
@@ -4134,13 +4134,13 @@
     "exclusion_reasons": {
       "downside_target": 6,
       "instant_target_hit": 1,
-      "missing_price": 6,
+      "missing_price": 5,
       "non_positive_upside": 8
     },
     "extraction_review": 24,
     "needs_review": 0,
     "source_reports": 240,
-    "web_excluded": 21,
-    "web_visible": 219
+    "web_excluded": 20,
+    "web_visible": 220
   }
 }

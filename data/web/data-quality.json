@@ -531,15 +531,6 @@
       "symbol": "NETI"
     },
     {
-      "action": "Soitec Yahoo ticker는 SOI.PA입니다. 다음 가격 refresh 뒤 가격 artifact 편입 여부를 확인하세요.",
-      "category": "mapping_fixed_pending_refresh",
-      "company": "Soitec SA",
-      "decision": "refresh_pending",
-      "release_status": "action_required",
-      "report_id": "21f8685022e2f44f",
-      "symbol": "SOI.PA"
-    },
-    {
       "action": "상장폐지/거래중단된 해외 종목입니다. 리포트 표본 제외를 유지하거나 별도 과거 가격 소스를 연결하세요.",
       "category": "delisted",
       "company": "Vertex Energy, Inc.",
@@ -551,11 +542,11 @@
   ],
   "report_exclusions": {
     "downside_target": 6,
-    "excluded_reports": 21,
-    "included_reports": 219,
+    "excluded_reports": 20,
+    "included_reports": 220,
     "instant_target_hit": 1,
     "missing_performance": 0,
-    "missing_price": 6,
+    "missing_price": 5,
     "non_positive_upside": 8,
     "sell_opinion": 0,
     "source_reports": 240
