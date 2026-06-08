@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.0.1 - Collapse the web app into a cleaner research workstation
+## v1.0.2 - Collapse the web app into a cleaner research workstation
 
 - Rebuilds the web information architecture around operator jobs: Board, Reports, Portfolio, Calendar, and Statistics now read as a smaller audit workstation instead of a generic dashboard.
 - Unifies Board and Reports on one canonical `ReportLedgerRow` contract, removes duplicate report-table shaping, and keeps `/reports` as the only full report ledger.

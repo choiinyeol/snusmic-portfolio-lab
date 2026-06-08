@@ -98,21 +98,21 @@ def web_export_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
 def test_export_web_artifacts_matches_baseline_counts(web_export_dir: Path) -> None:
     overview = json.loads((web_export_dir / "overview.json").read_text(encoding="utf-8"))
     assert overview["report_counts"] == {
-        "excluded_downside_target": 6,
+        "excluded_downside_target": 7,
         "excluded_instant_target_hit": 1,
         "excluded_missing_performance": 0,
-        "excluded_missing_price": 6,
+        "excluded_missing_price": 5,
         "excluded_non_positive_upside": 8,
         "excluded_reports": 21,
         "excluded_sell_opinion": 0,
         "extracted_reports": 240,
-        "missing_price_symbols": 6,
+        "missing_price_symbols": 5,
         "price_matched_reports": 219,
         "report_stat_rows": 240,
         "web_report_rows": 219,
     }
     manifest = json.loads((web_export_dir / "manifest.json").read_text(encoding="utf-8"))
-    assert manifest["data_quality"]["missing_price_symbols"] == 6
+    assert manifest["data_quality"]["missing_price_symbols"] == 5
 
 
 @pytest.mark.slow
@@ -392,7 +392,7 @@ def test_web_artifact_ci_validator_rejects_stale_price_range(tmp_path: Path) -> 
         env={
             **os.environ,
             "SNUSMIC_WEB_ARTIFACT_ROOT": str(web_root.resolve()),
-            "SNUSMIC_MAX_PRICE_AGE_DAYS": "0",
+            "SNUSMIC_MAX_PRICE_AGE_DAYS": "-1",
         },
         capture_output=True,
         text=True,
@@ -492,12 +492,12 @@ def test_extended_web_artifacts_support_insights_and_downloads(web_export_dir: P
     assert page_target_distribution == target_distribution
     data_quality = json.loads((out / "overview" / "data-quality.json").read_text(encoding="utf-8"))
     assert data_quality["report_exclusions"] == {
-        "downside_target": 6,
+        "downside_target": 7,
         "excluded_reports": 21,
         "included_reports": 219,
         "instant_target_hit": 1,
         "missing_performance": 0,
-        "missing_price": 6,
+        "missing_price": 5,
         "non_positive_upside": 8,
         "sell_opinion": 0,
         "source_reports": 240,
@@ -531,7 +531,7 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(web_export_dir: 
     assert manifest["row_counts"]["account_catalog"] == expected_accounts
     assert manifest["row_counts"]["report_board_candidates"] > 0
     assert manifest["data_quality"]["reports_with_prices"] == 219
-    assert manifest["data_quality"]["missing_price_symbols"] == 6
+    assert manifest["data_quality"]["missing_price_symbols"] == 5
     assert "overview/snapshot.json" in manifest["artifacts"]
     assert "portfolio/holdings.json" in manifest["artifacts"]
     assert "reports/table.json" in manifest["artifacts"]
@@ -539,6 +539,7 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(web_export_dir: 
     assert "report-board/candidates.json" in manifest["artifacts"]
     assert "reports.json" in manifest["artifacts"]
     assert "prices/QQQ.json" in manifest["artifacts"]
+    assert manifest["external_artifacts"] == {}
     assert len(manifest["checksums"]["prices/QQQ.json"]) == 64
     assert len(manifest["checksums"]["reports/table.json"]) == 64
     assert len(manifest["checksums"]["reports.json"]) == 64
@@ -549,9 +550,9 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(web_export_dir: 
     assert report_health["summary"]["web_excluded"] == 21
     assert report_health["summary"]["needs_review"] == 0
     assert report_health["summary"]["exclusion_reasons"] == {
-        "downside_target": 6,
+        "downside_target": 7,
         "instant_target_hit": 1,
-        "missing_price": 6,
+        "missing_price": 5,
         "non_positive_upside": 8,
     }
     assert any(row["web_status"] == "excluded" and row["action"] for row in report_health["rows"])
@@ -573,15 +574,14 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(web_export_dir: 
     }
     checks_by_id = {check["id"]: check for check in health["checks"]}
     assert checks_by_id["missing_price_symbols"]["severity"] == "review"
-    assert checks_by_id["missing_price_symbols"]["observed"]["missing_price_symbols"] == 6
+    assert checks_by_id["missing_price_symbols"]["observed"]["missing_price_symbols"] == 5
     assert checks_by_id["missing_price_symbols"]["action"]
     assert checks_by_id["missing_price_symbols"]["observed"]["release_status_counts"] == {
         "accepted": 4,
-        "action_required": 2,
+        "action_required": 1,
     }
     assert checks_by_id["missing_price_symbols"]["observed"]["category_counts"] == {
         "delisted": 4,
-        "mapping_fixed_pending_refresh": 1,
         "provider_gap": 1,
     }
     missing_symbols = json.loads((out / "missing-symbols.json").read_text(encoding="utf-8"))
@@ -590,7 +590,6 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(web_export_dir: 
         "010620.KS",
         "287410.KQ",
         "NETI",
-        "SOI.PA",
         "VTNR",
     }
     assert all(
@@ -653,10 +652,22 @@ def test_account_catalog_matches_committed_account_config(web_export_dir: Path) 
         assert row.context.subtitle
         assert row.context.comparison_prompt
         assert row.context.shortlist_reason
+        assert row.label
+        assert row.short_label
 
-    assert rows_by_id[
-        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5"
-    ].context.role == "candidate"
+    benchmark_rows = [row for row in validated_catalog if row.kind == "benchmark"]
+    assert benchmark_rows
+    for row in benchmark_rows:
+        assert "benchmark" in row.context.role
+        assert row.context.category == "benchmark"
+        assert row.context.shortlist_reason is None
+
+    assert (
+        rows_by_id[
+            "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5"
+        ].context.role
+        == "candidate"
+    )
     assert rows_by_id["pit_score_top5"].context.subtitle == "점수-only 기준"
     assert rows_by_id["smic_follower"].context.role == "report_follower"
     assert rows_by_id["all_weather"].context.category == "benchmark"

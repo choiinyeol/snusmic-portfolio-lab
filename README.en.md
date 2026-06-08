@@ -33,6 +33,7 @@ uv run --locked python -m snusmic_pipeline rebuild-web-artifacts
 ```
 
 Export web artifacts only:
+The default serving mode is **local committed shards**. `external_artifacts` remains an optional path and does not become the default deploy path until hydrate / validate / build proof passes again.
 
 ```bash
 uv run --locked python -m snusmic_pipeline export-web --warehouse data/warehouse --sim data/sim --out data/web

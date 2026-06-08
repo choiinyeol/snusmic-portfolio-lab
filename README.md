@@ -112,6 +112,7 @@ flowchart TB
 ### 웹 앱
 
 웹 앱은 커밋된 artifact를 읽는 정적 reader입니다. live market API를 호출하거나 browser에서 시뮬레이션 logic을 재구성하면 안 됩니다.
+기본 serving mode는 **local committed shards**입니다. `external_artifacts` pointer는 optional path이며, hydrate / validate / build proof를 다시 통과하기 전에는 기본 배포 경로로 취급하지 않습니다.
 
 주요 route:
 

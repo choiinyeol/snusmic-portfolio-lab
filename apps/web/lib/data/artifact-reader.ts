@@ -2,9 +2,11 @@ import 'server-only';
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { z } from 'zod';
 
-const defaultDataRoot = path.resolve(process.cwd(), '../..', 'data', 'web');
+const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+const defaultDataRoot = path.resolve(appRoot, '..', '..', 'data', 'web');
 
 export const WEB_DATA_ROOT = process.env.SNUSMIC_WEB_DATA_ROOT
   ? path.resolve(process.env.SNUSMIC_WEB_DATA_ROOT)

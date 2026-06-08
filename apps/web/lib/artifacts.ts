@@ -1,6 +1,7 @@
 import 'server-only';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { readArtifact, WEB_DATA_ROOT } from '@/lib/data/artifact-reader';
 import {
   ArtifactManifestSchema,
@@ -26,7 +27,11 @@ import {
   WebOverviewSchema,
 } from '@/lib/schemas';
 
-const repoRoot = path.resolve(/* turbopackIgnore: true */ WEB_DATA_ROOT, '../..');
+const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const markdownRoot = path.resolve(appRoot, '..', '..', 'data', 'markdown');
+const externalArtifactCacheRoot = process.env.SNUSMIC_EXTERNAL_ARTIFACT_CACHE_DIR
+  ? path.resolve(process.env.SNUSMIC_EXTERNAL_ARTIFACT_CACHE_DIR)
+  : path.resolve(appRoot, '..', '..', '.cache', 'external-web-artifacts');
 
 type RawReport = Record<string, unknown>;
 type CompactTableArtifact = {
@@ -682,10 +687,9 @@ export type ReportStatisticsLabSummary = {
 };
 
 function fullPath(relativePath: string): string {
-  return path.join(/* turbopackIgnore: true */ repoRoot, relativePath);
+  return path.join(WEB_DATA_ROOT, relativePath.replace(/^data\/web\//, ''));
 }
 
-const externalArtifactCacheRoot = process.env.SNUSMIC_EXTERNAL_ARTIFACT_CACHE_DIR ?? '.cache/external-web-artifacts';
 let artifactCacheStamp: number | undefined;
 
 function artifactCacheValid(): boolean {
@@ -702,7 +706,7 @@ function artifactCacheValid(): boolean {
 function currentArtifactStamp(): number {
   try {
     const manifestStamp = fs.statSync(fullPath('data/web/manifest.json')).mtimeMs;
-    const cacheDir = fullPath(externalArtifactCacheRoot);
+    const cacheDir = externalArtifactCacheRoot;
     const cacheStamp = fs.existsSync(cacheDir) ? fs.statSync(cacheDir).mtimeMs : 0;
     return Math.max(manifestStamp, cacheStamp);
   } catch {
@@ -731,7 +735,7 @@ function manifestRelativePath(relativePath: string): string {
 }
 
 function externalCachePath(relativePath: string): string {
-  return fullPath(path.join(externalArtifactCacheRoot, manifestRelativePath(relativePath)));
+  return path.join(externalArtifactCacheRoot, manifestRelativePath(relativePath));
 }
 
 function resolveTextPath(relativePath: string): string {
@@ -990,7 +994,7 @@ function currencyForPricePoint(symbol: string, date: string | null | undefined):
 
 export function getMarkdownSnippet(report: ReportRow): string {
   if (!report.markdownFilename) return '??由ы룷?몄뿉??markdown 異붿텧 ?뚯씪??湲곕줉?섏뼱 ?덉? ?딆뒿?덈떎.';
-  const markdownPath = fullPath(`data/markdown/${report.markdownFilename}`);
+  const markdownPath = path.join(markdownRoot, report.markdownFilename);
   if (!fs.existsSync(markdownPath)) return `markdown 異붿텧 ?뚯씪??李얠쓣 ???놁뒿?덈떎: ${report.markdownFilename}`;
   return fs.readFileSync(markdownPath, 'utf8').slice(0, 5000);
 }
