@@ -323,9 +323,9 @@ def render_strategy_memory_report(records: list[MemoryRecord], stats: list[Motif
         "| context | motif | n | mean residual | confidence | failure p | veto |",
         "| --- | --- | ---: | ---: | ---: | ---: | --- |",
     ]
-    for item in stats:
+    for stat in stats:
         lines.append(
-            f"| `{item.context_key}` | `{item.motif}` | {item.n} | {item.mean_residual:.4f} | {item.confidence:.3f} | {item.failure_probability:.3f} | {'yes' if item.veto else 'no'} |"
+            f"| `{stat.context_key}` | `{stat.motif}` | {stat.n} | {stat.mean_residual:.4f} | {stat.confidence:.3f} | {stat.failure_probability:.3f} | {'yes' if stat.veto else 'no'} |"
         )
     if not stats:
         lines.append("| _none_ | _none_ | 0 | 0.0000 | 0.000 | 0.000 | no |")
@@ -353,8 +353,8 @@ def render_strategy_memory_report(records: list[MemoryRecord], stats: list[Motif
             "| --- | --- | --- |",
         ]
     )
-    for item in skipped:
-        lines.append(f"| `{item.parent_account_id}` | `{item.child_account_id}` | {item.reason} |")
+    for skipped_edge in skipped:
+        lines.append(f"| `{skipped_edge.parent_account_id}` | `{skipped_edge.child_account_id}` | {skipped_edge.reason} |")
     if not skipped:
         lines.append("| _none_ | _none_ | all curated edges had supporting sim artifacts |")
     return "\n".join(lines) + "\n"

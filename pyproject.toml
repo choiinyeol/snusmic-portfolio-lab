@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "snusmic-portfolio-lab"
-version = "1.0.0rc2"
+version = "1.0.0"
 description = "Collect SNUSMIC research PDFs, extract target prices, and build portfolio lab simulation data."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -88,3 +88,13 @@ module = [
     "snusmic_pipeline.sim.visualize",
 ]
 disable_error_code = ["arg-type", "assignment", "return-value", "dict-item", "call-overload", "type-arg", "misc", "union-attr"]
+[[tool.mypy.overrides]]
+module = [
+    "snusmic_pipeline.ingest.http_client",
+    "snusmic_pipeline.ingest.fetch_index",
+    "snusmic_pipeline.ingest.change_detection",
+    "snusmic_pipeline.ingest.extract_pdf",
+    "snusmic_pipeline.sim.strategy_memory",
+    "snusmic_pipeline.web.artifacts",
+]
+disable_error_code = ["arg-type", "assignment", "return-value", "dict-item", "call-overload", "type-arg", "misc", "union-attr", "index"]

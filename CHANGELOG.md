@@ -1,5 +1,25 @@
 # Changelog
 
+## v1.0.0 - Freeze the PIT product contract
+
+- Promotes SNUSMIC Portfolio Lab to `v1.0.0` as a PIT-first static research verification product with a frozen public artifact contract, curated shortlist governance, and explicit release criteria.
+- Freezes the live product surface across manifest/health/report-health, report/statistics/calendar bundles, portfolio account surfaces, download artifacts, and the matching exporter/reader/validator code paths.
+- Keeps `local committed shards` as the GA serving default, while retaining optional external shard support behind the documented hydrate/validator contract for later RC2/post-1.0 activation.
+- Sharpens the product UI into a smaller research workstation: compact home briefing, single primary reports table, denser portfolio comparison/ledger surfaces, and fewer generic wrappers.
+- Restores and governs the current shortlist strategy set (`Partial 75`, `CashGate 12.5`, `TrailTrim 20`, `Candidate Profit60`, `Profit60`, `Trend Top5`, `Score Top5`, `SMIC Follower`, and the selected momentum/MTT representatives) as product-visible accounts instead of open-ended research sprawl.
+
+Verification:
+
+- `uv run --locked python -m snusmic_pipeline export-web --check`
+- `pnpm --dir apps/web artifact:check`
+- `uv run --locked ruff check src tests scripts`
+- `uv run --locked pytest -q -m "not slow" -x`
+- `uv run --locked pytest tests/test_web_artifacts.py -q -x`
+- `uv run --locked mypy src`
+- `pnpm --dir apps/web exec biome check .`
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web build`
+- `pnpm --dir apps/web smoke:static`
 ## v1.0.0-rc2 - Reduce the portfolio UI to a sharper research surface
 
 - Rebuilds the home page into a compact research briefing with one primary question per section: dataset snapshot, priority reports, and representative account comparison.

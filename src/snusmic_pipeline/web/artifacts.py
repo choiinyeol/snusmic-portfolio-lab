@@ -394,7 +394,10 @@ class ExternalArtifactManager:
             if compact
             else json.dumps(_clean(data), ensure_ascii=False, indent=2, sort_keys=True) + "\n"
         ).encode("utf-8")
-        external_path = self.external_dir / relative_path
+        external_dir = self.external_dir
+        if external_dir is None:
+            raise ValueError("external_dir is required when writing external artifacts")
+        external_path = external_dir / relative_path
         external_path.parent.mkdir(parents=True, exist_ok=True)
         external_path.write_bytes(payload)
         pointer = ExternalArtifactPointer(
