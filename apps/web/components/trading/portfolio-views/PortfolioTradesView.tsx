@@ -11,8 +11,10 @@ export function PortfolioTradesView({ model }: { model: PortfolioTradesModel }) 
       <section className="rounded-md border border-slate-200 bg-white p-4">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="text-2xl font-semibold tracking-tight text-slate-950">거래 전체 원장</h2>
-            <p className="mt-1 text-sm text-slate-500">언제 무엇을 사고팔았는지 한 원장에서 바로 확인합니다.</p>
+            <h2 className="text-2xl font-semibold tracking-tight text-slate-950">체결 trace</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              언제 무엇을 사고팔았는지, 왜 그런 결정이 나왔는지 한 표에서 확인합니다.
+            </p>
           </div>
           <span className="font-mono text-xs font-semibold text-slate-500">
             {trades.length.toLocaleString('ko-KR')}건

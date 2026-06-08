@@ -6,6 +6,7 @@ const outDir = join(cwd(), 'out');
 
 const expected = [
   ['/', 'index.html'],
+  ['/alpha', 'alpha/index.html'],
   ['/portfolio', 'portfolio/index.html'],
   ['/reports', 'reports/index.html'],
   ['/statistics', 'statistics/index.html'],

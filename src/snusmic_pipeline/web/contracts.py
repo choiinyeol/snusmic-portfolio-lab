@@ -123,6 +123,36 @@ class AccountCatalogRow(_ArtifactModel):
     context: AccountCatalogContext
     metrics: AccountCatalogMetrics
 
+class WebVerificationCaseRow(_ArtifactModel):
+    case_id: str
+    report_id: str
+    symbol: str
+    company: str
+    claim_type: Literal["target_price", "thesis"]
+    publication_date: str
+    target_hit: bool
+    current_return: float | None
+    peak_return: float | None
+    trough_return: float | None
+    max_drawdown: float | None
+    failure_tail_return: float | None
+    quality_score: float | None
+    veto_reasons: list[str] = Field(default_factory=list)
+    eligible_for_alpha: bool
+
+
+class WebAlphaHypothesisRow(_ArtifactModel):
+    hypothesis_id: str
+    selection_rule: str
+    evidence_case_ids: list[str]
+    distinct_symbol_count: int
+    support_count: int
+    support_start_date: str | None = None
+    support_end_date: str | None = None
+    regime_count: int = 0
+    promotion_status: Literal["candidate", "promoted", "rejected"]
+    rejection_reasons: list[str] = Field(default_factory=list)
+
 
 class WebOverview(_ArtifactModel):
     generated_from: dict[str, str] | None = None
@@ -213,3 +243,5 @@ REPORT_ROWS = TypeAdapter(list[WebReportRow])
 HOLDING_ROWS = TypeAdapter(list[WebHoldingRow])
 TRADE_ROWS = TypeAdapter(list[WebTradeRow])
 ACCOUNT_CATALOG_ROWS = TypeAdapter(list[AccountCatalogRow])
+VERIFICATION_CASE_ROWS = TypeAdapter(list[WebVerificationCaseRow])
+ALPHA_HYPOTHESIS_ROWS = TypeAdapter(list[WebAlphaHypothesisRow])

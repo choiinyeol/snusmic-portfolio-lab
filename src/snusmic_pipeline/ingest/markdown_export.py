@@ -42,5 +42,6 @@ def export_markdown(
         if "해당 .md 을 ChatGPT, Claude에게 입력하여 인사이트를 얻으세요." not in body:
             body = "> 해당 .md 을 ChatGPT, Claude에게 입력하여 인사이트를 얻으세요.\n\n" + body
         target.write_text(body, encoding="utf-8")
+        report.markdown_path = target
     logs.append(f"Markdown files available: {len(list(output_dir.glob('*.md')))}")
     return logs

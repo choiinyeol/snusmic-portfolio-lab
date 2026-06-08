@@ -1,4 +1,7 @@
+from pathlib import Path
+
 from snusmic_pipeline.ingest.extract_pdf import parse_money, parse_report_text
+from snusmic_pipeline.ingest.models import ExtractedReport, ReportMeta
 
 
 def test_parse_money_handles_commas_and_currency():
@@ -215,6 +218,37 @@ def test_current_price_before_target_label_does_not_become_target():
     assert parsed["report_current_price"] == 23300
     assert parsed["base_target"] == 41600
 
+def test_extracted_report_builds_dual_output_report_artifact():
+    report = ExtractedReport(
+        meta=ReportMeta(
+            page=1,
+            ordinal=1,
+            date="2026-01-02",
+            title="Demo",
+            company="Demo Corp",
+            slug="demo",
+            post_url="https://example.com/post",
+            pdf_url="https://example.com/file.pdf",
+        ),
+        pdf_path=Path("data/pdfs/demo.pdf"),
+        markdown_path=Path("data/markdown/demo.md"),
+        ticker="DEMO",
+        exchange="NASDAQ",
+        rating="Buy",
+        base_target=123.0,
+        target_currency="USD",
+        investment_points="quality, margin",
+        extraction_status="ok",
+    )
+
+    artifact = report.to_report_artifact(pdf_sha256="abc123")
+
+    assert artifact.pdf_path == Path("data/pdfs/demo.pdf")
+    assert artifact.markdown_path == Path("data/markdown/demo.md")
+    assert artifact.pdf_sha256 == "abc123"
+    assert artifact.structured_fields.ticker == "DEMO"
+    assert artifact.structured_fields.base_target == 123.0
+    assert artifact.structured_fields.investment_points == "quality, margin"
 
 def test_current_target_pair_with_korean_suffix_keeps_full_current_price():
     text = """

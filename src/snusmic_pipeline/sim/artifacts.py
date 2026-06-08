@@ -54,6 +54,14 @@ def write_simulation_artifacts(result: SimulationResult, out: Path) -> None:
     _to_csv_rounded(
         pd.DataFrame([p.model_dump() for p in result.report_performance]), out / "report_performance.csv"
     )
+    (out / "verification_cases.json").write_text(
+        json.dumps(_round_floats([case.model_dump(mode="json") for case in result.verification_cases]), ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    (out / "alpha_hypotheses.json").write_text(
+        json.dumps(_round_floats([alpha.model_dump(mode="json") for alpha in result.alpha_hypotheses]), ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
     if result.report_stats is not None:
         (out / "report_stats.json").write_text(
             json.dumps(
@@ -88,6 +96,8 @@ def _accounts_manifest(result: SimulationResult) -> dict[str, object]:
         "symbol_stat_count": len(result.symbol_stats),
         "monthly_holding_count": len(result.monthly_holdings),
         "report_performance_count": len(result.report_performance),
+        "verification_case_count": len(result.verification_cases),
+        "alpha_hypothesis_count": len(result.alpha_hypotheses),
         "accounts": [summary.model_dump(mode="json") for summary in result.summaries],
     }
 

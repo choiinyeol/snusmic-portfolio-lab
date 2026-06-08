@@ -46,7 +46,12 @@ from .holdings import (
 )
 from .market import PriceBoard, load_benchmark_prices
 from .pit_research_board import PitResearchBoardCache
-from .report_stats import aggregate_report_stats, compute_report_performance
+from .report_stats import (
+    aggregate_report_stats,
+    build_verification_cases,
+    compute_report_performance,
+    promote_alpha_hypotheses,
+)
 from .savings import CashFlowEvent, build_cash_flow_schedule
 from .target_adjustment import align_report_targets_to_market_scale
 from .warehouse import read_table
@@ -162,18 +167,22 @@ def finalize_simulation_outputs(
     report_perf = tuple(
         compute_report_performance(reports, board, last_day, expiry_days=config.report_expiry_days)
     )
+    verification_cases = tuple(build_verification_cases(report_perf))
+    alpha_hypotheses = tuple(promote_alpha_hypotheses(verification_cases))
     report_stats_obj = aggregate_report_stats(report_perf) if report_perf else None
 
     return SimulationResult(
         config=config,
-        summaries=summaries,
-        equity_points=equity_points,
-        trades=trades,
+        summaries=tuple(summaries),
+        equity_points=tuple(equity_points),
+        trades=tuple(trades),
         position_episodes=episodes_tuple,
         current_holdings=current_holdings,
         symbol_stats=symbol_stats,
         monthly_holdings=monthly_holdings,
         report_performance=report_perf,
+        verification_cases=verification_cases,
+        alpha_hypotheses=alpha_hypotheses,
         report_stats=report_stats_obj,
     )
 

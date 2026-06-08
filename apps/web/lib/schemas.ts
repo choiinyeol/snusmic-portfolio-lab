@@ -264,6 +264,40 @@ export const AccountCatalogRowSchema = z
       .passthrough(),
   })
   .passthrough();
+export const VerificationCaseRowSchema = z
+  .object({
+    case_id: z.string(),
+    report_id: z.string(),
+    symbol: z.string(),
+    company: z.string(),
+    claim_type: z.enum(['target_price', 'thesis']),
+    publication_date: z.string(),
+    target_hit: z.boolean(),
+    current_return: NullableNumber,
+    peak_return: NullableNumber,
+    trough_return: NullableNumber,
+    max_drawdown: NullableNumber,
+    failure_tail_return: NullableNumber,
+    quality_score: NullableNumber,
+    veto_reasons: z.array(z.string()),
+    eligible_for_alpha: z.boolean(),
+  })
+  .passthrough();
+
+export const AlphaHypothesisRowSchema = z
+  .object({
+    hypothesis_id: z.string(),
+    selection_rule: z.string(),
+    evidence_case_ids: z.array(z.string()),
+    distinct_symbol_count: z.number(),
+    support_count: z.number(),
+    support_start_date: NullableString,
+    support_end_date: NullableString,
+    regime_count: z.number(),
+    promotion_status: z.enum(['candidate', 'promoted', 'rejected']),
+    rejection_reasons: z.array(z.string()),
+  })
+  .passthrough();
 
 export const ReportBoardCandidateSchema = z
   .object({

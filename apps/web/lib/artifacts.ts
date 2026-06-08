@@ -22,6 +22,8 @@ import {
   ResearchCalendarArtifactSchema,
   RawTradeRowSchema,
   AccountCatalogRowSchema,
+  AlphaHypothesisRowSchema,
+  VerificationCaseRowSchema,
   WebAccountSchema,
   WebDataQualitySchema,
   WebOverviewSchema,
@@ -277,6 +279,36 @@ export type AccountCatalogRow = {
     tradeCount: number | null;
     openPositions: number | null;
   };
+};
+export type VerificationCaseRow = {
+  caseId: string;
+  reportId: string;
+  symbol: string;
+  company: string;
+  claimType: 'target_price' | 'thesis';
+  publicationDate: string;
+  targetHit: boolean;
+  currentReturn: number | null;
+  peakReturn: number | null;
+  troughReturn: number | null;
+  maxDrawdown: number | null;
+  failureTailReturn: number | null;
+  qualityScore: number | null;
+  vetoReasons: string[];
+  eligibleForAlpha: boolean;
+};
+
+export type AlphaHypothesisRow = {
+  hypothesisId: string;
+  selectionRule: string;
+  evidenceCaseIds: string[];
+  distinctSymbolCount: number;
+  supportCount: number;
+  supportStartDate: string | null;
+  supportEndDate: string | null;
+  regimeCount: number;
+  promotionStatus: 'candidate' | 'promoted' | 'rejected';
+  rejectionReasons: string[];
 };
 
 export type ReportBoardCandidateRow = {
@@ -1121,6 +1153,56 @@ export function getAccountCatalog(): AccountCatalogRow[] {
   return accountCatalogCache;
 }
 
+let verificationCaseCache: VerificationCaseRow[] | undefined;
+export function getVerificationCases(): VerificationCaseRow[] {
+  if (artifactCacheValid() && verificationCaseCache) return verificationCaseCache;
+  const raw = parseRows(
+    'verification/cases.json',
+    VerificationCaseRowSchema,
+    readRequiredJson<unknown>('data/web/verification/cases.json'),
+  );
+  verificationCaseCache = raw.map((row) => ({
+    caseId: row.case_id,
+    reportId: row.report_id,
+    symbol: row.symbol,
+    company: row.company,
+    claimType: row.claim_type,
+    publicationDate: row.publication_date,
+    targetHit: row.target_hit,
+    currentReturn: row.current_return,
+    peakReturn: row.peak_return,
+    troughReturn: row.trough_return,
+    maxDrawdown: row.max_drawdown,
+    failureTailReturn: row.failure_tail_return,
+    qualityScore: row.quality_score,
+    vetoReasons: row.veto_reasons,
+    eligibleForAlpha: row.eligible_for_alpha,
+  }));
+  return verificationCaseCache;
+}
+
+let alphaHypothesisCache: AlphaHypothesisRow[] | undefined;
+export function getAlphaHypotheses(): AlphaHypothesisRow[] {
+  if (artifactCacheValid() && alphaHypothesisCache) return alphaHypothesisCache;
+  const raw = parseRows(
+    'alpha/hypotheses.json',
+    AlphaHypothesisRowSchema,
+    readRequiredJson<unknown>('data/web/alpha/hypotheses.json'),
+  );
+  alphaHypothesisCache = raw.map((row) => ({
+    hypothesisId: row.hypothesis_id,
+    selectionRule: row.selection_rule,
+    evidenceCaseIds: row.evidence_case_ids,
+    distinctSymbolCount: row.distinct_symbol_count,
+    supportCount: row.support_count,
+    supportStartDate: row.support_start_date,
+    supportEndDate: row.support_end_date,
+    regimeCount: row.regime_count,
+    promotionStatus: row.promotion_status,
+    rejectionReasons: row.rejection_reasons,
+  }));
+  return alphaHypothesisCache;
+}
 export function getArtifactManifest(): ArtifactManifest {
   return parseArtifact('manifest.json', ArtifactManifestSchema, readRequiredJson<unknown>('data/web/manifest.json'));
 }

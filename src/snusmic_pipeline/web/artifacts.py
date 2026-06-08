@@ -53,11 +53,15 @@ REQUIRED_ARTIFACTS = [
     "accounts/curves.json",
     "report-board/candidates.json",
     "research-calendar/calendar.json",
+    "verification/cases.json",
+    "alpha/hypotheses.json",
     "pages/report-verification.json",
     "pages/report-board.json",
     "pages/report-statistics.json",
     "pages/portfolio-dashboard.json",
     "pages/research-calendar.json",
+    "pages/verification-board.json",
+    "pages/alpha-board.json",
     "overview.json",
     "accounts.json",
     "reports.json",
@@ -488,6 +492,16 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
     position_episodes = _read_csv(inputs.sim / "position_episodes.csv")
     equity_daily = _read_csv(inputs.sim / "equity_daily.csv")
     pit_research_board = _read_csv(inputs.sim / "pit-research-board.csv")
+    verification_cases = (
+        _read_json(inputs.sim / "verification_cases.json")
+        if (inputs.sim / "verification_cases.json").exists()
+        else []
+    )
+    alpha_hypotheses = (
+        _read_json(inputs.sim / "alpha_hypotheses.json")
+        if (inputs.sim / "alpha_hypotheses.json").exists()
+        else []
+    )
     extraction_quality = _read_json(inputs.extraction_quality) if inputs.extraction_quality.exists() else {}
     mark("read_inputs")
 
@@ -602,6 +616,8 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
         detail_metrics=detail_metrics,
         return_windows=return_windows,
         target_distribution=target_distribution,
+        verification_cases=verification_cases,
+        alpha_hypotheses=alpha_hypotheses,
         account_catalog=account_catalog,
         report_board_candidates=report_board_candidates,
         research_calendar=research_calendar,
@@ -626,6 +642,8 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
         enriched_monthly_holdings,
     )
     _write_json(out / "missing-symbols.json", missing_symbol_rows)
+    _write_json(out / "verification-cases.json", verification_cases)
+    _write_json(out / "alpha-hypotheses.json", alpha_hypotheses)
     _write_json(out / "data-quality.json", data_quality)
     report_health = _build_report_health(
         reports, report_performance, extraction_quality, missing_symbols, report_rows
@@ -919,7 +937,12 @@ def _replace_directory(staged: Path, destination: Path) -> None:
         shutil.rmtree(backup)
     destination.parent.mkdir(parents=True, exist_ok=True)
     if destination.exists():
-        destination.rename(backup)
+        try:
+            destination.rename(backup)
+        except PermissionError:
+            _sync_directory_contents(staged, destination)
+            shutil.rmtree(staged)
+            return
     try:
         shutil.move(str(staged), str(destination))
     except Exception:
@@ -930,6 +953,27 @@ def _replace_directory(staged: Path, destination: Path) -> None:
         raise
     if backup.exists():
         shutil.rmtree(backup)
+
+
+def _sync_directory_contents(source: Path, destination: Path) -> None:
+    destination.mkdir(parents=True, exist_ok=True)
+    source_paths = {path.relative_to(source) for path in source.rglob("*")}
+    for existing in sorted(destination.rglob("*"), reverse=True):
+        rel = existing.relative_to(destination)
+        if rel in source_paths:
+            continue
+        if existing.is_dir():
+            shutil.rmtree(existing)
+        else:
+            existing.unlink()
+    for path in sorted(source.rglob("*")):
+        rel = path.relative_to(source)
+        target = destination / rel
+        if path.is_dir():
+            target.mkdir(parents=True, exist_ok=True)
+        else:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(path, target)
 
 
 def _summary_accounts(summary: pd.DataFrame) -> set[str]:
@@ -1213,6 +1257,8 @@ def _write_page_bundles(
     detail_metrics: dict[str, Any],
     return_windows: list[dict[str, Any]],
     target_distribution: dict[str, Any],
+    verification_cases: list[dict[str, Any]],
+    alpha_hypotheses: list[dict[str, Any]],
     account_catalog: list[dict[str, Any]],
     report_board_candidates: list[dict[str, Any]],
     research_calendar: dict[str, Any],
@@ -1259,6 +1305,8 @@ def _write_page_bundles(
 
     _write_product_json(out / "report-board" / "candidates.json", report_board_candidates)
     _write_product_json(out / "research-calendar" / "calendar.json", research_calendar)
+    _write_product_json(out / "verification" / "cases.json", verification_cases)
+    _write_product_json(out / "alpha" / "hypotheses.json", alpha_hypotheses)
 
     _write_product_json(
         out / "pages" / "report-verification.json",
@@ -1277,8 +1325,53 @@ def _write_page_bundles(
         _portfolio_dashboard_page_bundle(overview, accounts, holdings, trades),
     )
     _write_product_json(out / "pages" / "research-calendar.json", research_calendar)
+    _write_product_json(
+        out / "pages" / "verification-board.json",
+        _verification_board_page_bundle(overview, verification_cases, report_board_candidates),
+    )
+    _write_product_json(
+        out / "pages" / "alpha-board.json",
+        _alpha_board_page_bundle(overview, alpha_hypotheses),
+    )
 
 
+def _verification_board_page_bundle(
+    overview: dict[str, Any],
+    verification_cases: list[dict[str, Any]],
+    report_board_candidates: list[dict[str, Any]],
+) -> dict[str, Any]:
+    return {
+        "generated_at": _page_generated_at(overview),
+        "as_of": _page_as_of(overview),
+        "title": "verification-board",
+        "metrics": [
+            _metric("verification_cases", "verification_cases", len(verification_cases)),
+            _metric("report_candidates", "report_candidates", len(report_board_candidates)),
+        ],
+        "views": [
+            {
+                "id": "verification-case-board",
+                "label": "VerificationCase board",
+                "description": "검증 케이스를 기준으로 리포트 주장 quality를 검토하는 첫 진입 화면",
+            }
+        ],
+    }
+
+
+def _alpha_board_page_bundle(overview: dict[str, Any], alpha_hypotheses: list[dict[str, Any]]) -> dict[str, Any]:
+    return {
+        "generated_at": _page_generated_at(overview),
+        "as_of": _page_as_of(overview),
+        "title": "alpha-board",
+        "metrics": [_metric("alpha_hypotheses", "alpha_hypotheses", len(alpha_hypotheses))],
+        "views": [
+            {
+                "id": "alpha-hypothesis-board",
+                "label": "Alpha board",
+                "description": "반복 규칙이 어떻게 승격 또는 탈락하는지 보는 화면",
+            }
+        ],
+    }
 def _page_generated_at(overview: dict[str, Any]) -> str | None:
     window = overview.get("simulation_window") if isinstance(overview.get("simulation_window"), dict) else {}
     price_end = window.get("price_end") if isinstance(window, dict) else None

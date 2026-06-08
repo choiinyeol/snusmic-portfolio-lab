@@ -27,7 +27,7 @@ export function PortfolioHoldingsView({ model }: { model: PortfolioHoldingsModel
       <section className="rounded-md border border-slate-200 bg-white p-4">
         <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold tracking-tight text-slate-950">보유 전체 원장</h2>
+            <h2 className="text-lg font-semibold tracking-tight text-slate-950">포지션 전체 보기</h2>
             <p className="mt-1 text-sm text-slate-500">현재 포지션과 비중을 전부 확인하는 화면입니다.</p>
           </div>
           <div className="font-mono text-xs text-slate-500">{holdings.length.toLocaleString('ko-KR')}개 종목</div>

@@ -87,7 +87,11 @@ const COLUMN_SORT_LABELS: Record<ColumnSortKey, string> = {
   status: '상태',
 };
 
-export function ReportsTable({ rows, title = '리포트 원장', subtitle = '전체 리포트 기준' }: ReportsTableProps) {
+export function ReportsTable({
+  rows,
+  title = '리포트 evidence table',
+  subtitle = '전체 리포트 기준',
+}: ReportsTableProps) {
   const router = useRouter();
   const [sort, setSort] = useState<SortId>('recent');
   const [query, setQuery] = useState('');

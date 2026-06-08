@@ -39,7 +39,7 @@ export function PortfolioOverviewView({ model }: { model: PortfolioOverviewModel
                 </div>
                 <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">누적 성과와 벤치마크</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  이 계좌의 기준 차트입니다. 전체 보유·거래 원장은 아래 링크에서 엽니다.
+                  이 전략 proof의 기준 차트입니다. 전체 포지션·체결 trace는 아래 링크에서 엽니다.
                 </p>
               </div>
               <div className="font-mono text-xs text-slate-400">updated {model.chart.latestEquityDate || '-'}</div>
@@ -89,13 +89,13 @@ export function PortfolioOverviewView({ model }: { model: PortfolioOverviewModel
             <section className="grid gap-2">
               <RouteCard
                 href={`/portfolio/${accountId}/holdings`}
-                label="보유 전체 원장"
+                label="포지션 전체 보기"
                 value={`${holdings.length.toLocaleString('ko-KR')}개 종목`}
                 caption="전체 보유 비중과 손익은 holdings에서 확인합니다."
               />
               <RouteCard
                 href={`/portfolio/${accountId}/trades`}
-                label="거래 전체 원장"
+                label="체결 trace 전체 보기"
                 value={`${model.tradeTable.trades.length.toLocaleString('ko-KR')}건 체결`}
                 caption="체결 로그와 사유별 흐름은 trades에서 확인합니다."
               />

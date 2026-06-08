@@ -41,7 +41,7 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
   if (!model.accounts.length) {
     return (
       <div className="rounded-md border border-slate-200 bg-white p-5 text-sm leading-6 text-slate-600">
-        표시할 포트폴리오 원장이 없습니다. 데이터 아티팩트와 계좌 catalog를 먼저 확인해야 합니다.
+        표시할 portfolio proof가 없습니다. 데이터 아티팩트와 전략 catalog를 먼저 확인해야 합니다.
       </div>
     );
   }
@@ -54,9 +54,9 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
             <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
               portfolio frontier
             </div>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">포트폴리오 비교</h1>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">포트폴리오 proof 비교</h1>
             <p className="mt-1 text-sm text-slate-500">
-              대표 원장의 수익률, 낙폭, 평가액을 먼저 비교한 뒤 상세 원장으로 들어갑니다.
+              대표 전략 proof의 수익률, 낙폭, 평가액을 먼저 비교한 뒤 상세 화면으로 들어갑니다.
             </p>
           </div>
           <div className="font-mono text-xs text-slate-500">updated {model.latestEquityDate || '-'}</div>
@@ -64,7 +64,7 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
 
         <dl className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
           <MetricTile
-            label="공개 원장"
+            label="공개 proof"
             value={`${model.accounts.length.toLocaleString('ko-KR')}개`}
             caption={`숨김 ${model.hiddenResearchAccountCount.toLocaleString('ko-KR')}개`}
           />
@@ -82,7 +82,7 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
             }
           />
           <MetricTile
-            label="후보 원장"
+            label="후보 proof"
             value={`${candidateCount.toLocaleString('ko-KR')}개`}
             caption="현재 우선 검토 대상"
           />
@@ -93,7 +93,7 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
             <h2 className="text-sm font-semibold text-slate-950">누적 경로 비교</h2>
-            <p className="mt-1 text-xs text-slate-500">대표 원장과 벤치마크를 같은 축에 올립니다.</p>
+            <p className="mt-1 text-xs text-slate-500">대표 proof와 벤치마크를 같은 축에 올립니다.</p>
           </div>
           <div className="font-mono text-xs text-slate-400">{chartSeries.length.toLocaleString('ko-KR')} series</div>
         </div>
@@ -103,7 +103,7 @@ export function PortfolioLandingView({ model }: { model: PortfolioLandingModel }
       <section className="rounded-md border border-slate-200 bg-white p-4">
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
-            <h2 className="text-sm font-semibold text-slate-950">대표 원장</h2>
+            <h2 className="text-sm font-semibold text-slate-950">대표 proof</h2>
             <p className="mt-1 text-xs text-slate-500">설명보다 숫자를 먼저 보고, 필요한 계좌만 엽니다.</p>
           </div>
           <div className="text-xs text-slate-500">

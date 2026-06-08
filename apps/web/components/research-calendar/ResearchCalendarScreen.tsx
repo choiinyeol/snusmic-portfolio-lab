@@ -157,7 +157,7 @@ export function ResearchCalendarScreen({ model }: { model: ResearchCalendarViewM
       <section className="overflow-hidden rounded-md border border-slate-200 bg-white">
         <div className="flex flex-wrap items-end justify-between gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2">
           <div>
-            <h3 className="text-sm font-semibold text-slate-950">감사 원장</h3>
+            <h3 className="text-sm font-semibold text-slate-950">감사 테이블</h3>
             <p className="mt-0.5 text-xs text-slate-500">선택일 기준 후보와 사후 수익 기록을 한 표로 확인합니다.</p>
           </div>
           <div className="font-mono text-[11px] text-slate-500">

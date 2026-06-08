@@ -300,7 +300,7 @@ function accountRowFromSummary(
     objectiveMddSlack: catalog?.objectiveMddSlack ?? objective.mddSlack,
     objectiveReturnExcess: catalog?.objectiveReturnExcess ?? objective.returnExcess,
     isSelectable: kind === 'account' && (catalog?.isSelectable ?? false),
-    sourceLabel: kind === 'account' ? '계좌 원장' : kind === 'oracle' ? '오라클 기준선' : '벤치마크',
+    sourceLabel: kind === 'account' ? '전략 proof' : kind === 'oracle' ? '오라클 기준선' : '벤치마크',
     href:
       kind === 'account' && (catalog?.isSelectable ?? false) ? portfolioAccountHref(summary.account_id) : '/portfolio',
   };

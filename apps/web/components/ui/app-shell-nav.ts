@@ -1,11 +1,11 @@
 import type { SidebarNavItem } from '@/components/ui/SidebarNav';
 
 export const APP_NAV: SidebarNavItem[] = [
-  { href: '/', label: 'Board', description: '오늘 볼 리포트·대표 계좌', icon: 'dashboard', activePath: '/' },
-  { href: '/reports', label: 'Reports', description: '리포트 원장·후속 확인', icon: 'review' },
-  { href: '/portfolio', label: 'Portfolio', description: '대표 계좌·보유 기록', icon: 'portfolio' },
-  { href: '/calendar', label: 'Calendar', description: '발간일별 후보 추적', icon: 'accounts' },
-  { href: '/statistics', label: 'Statistics', description: '성과 분포·가격 경로', icon: 'reports' },
+  { href: '/', label: 'Verification', description: '검증 케이스 보드', icon: 'dashboard', activePath: '/' },
+  { href: '/alpha', label: 'Alpha', description: '승격 규칙과 근거', icon: 'review' },
+  { href: '/portfolio', label: 'Portfolio Proof', description: '전략 증명과 실행 trace', icon: 'portfolio' },
+  { href: '/calendar', label: 'Calendar', description: '발간일별 검증 후보', icon: 'accounts' },
+  { href: '/statistics', label: 'Statistics', description: '검증 분포와 실패 꼬리', icon: 'reports' },
 ];
 
 export const GITHUB_NAV_ITEM: SidebarNavItem = {

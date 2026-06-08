@@ -2591,8 +2591,8 @@
     "close_date": "",
     "company": "Lumentum Holdings Inc",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 91,
-    "last_close_krw": "1344995.9815",
+    "holding_days": 95,
+    "last_close_krw": "1324051.1486",
     "open_date": "2026-03-02",
     "realized_pnl_krw": 1992221.9184,
     "sell_fills": 3,
@@ -2600,7 +2600,7 @@
     "symbol": "LITE",
     "total_qty_bought": 50,
     "total_qty_sold": 11,
-    "unrealized_pnl_krw": "8484778.1334"
+    "unrealized_pnl_krw": "7667929.6515"
   },
   {
     "account_id": "pit_fresh_top5",
@@ -2667,8 +2667,8 @@
     "close_date": "",
     "company": "로보티즈",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 31,
-    "last_close_krw": "402500.0",
+    "holding_days": 35,
+    "last_close_krw": "320500.0",
     "open_date": "2026-05-01",
     "realized_pnl_krw": 4834085.5659,
     "sell_fills": 1,
@@ -2676,7 +2676,7 @@
     "symbol": "108490.KQ",
     "total_qty_bought": 186,
     "total_qty_sold": 57,
-    "unrealized_pnl_krw": "11067458.4129"
+    "unrealized_pnl_krw": "489458.4129"
   },
   {
     "account_id": "pit_fresh_top5",
@@ -2705,8 +2705,8 @@
     "close_date": "",
     "company": "두산",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "2203000.0",
+    "holding_days": 4,
+    "last_close_krw": "1740000.0",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -2714,26 +2714,7 @@
     "symbol": "000150.KS",
     "total_qty_bought": 23,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-32938.6502"
-  },
-  {
-    "account_id": "pit_fresh_top5",
-    "avg_entry_price_krw": 38274.8654,
-    "avg_exit_price_krw": "",
-    "buy_fills": 1,
-    "close_date": "",
-    "company": "코스텍시스",
-    "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "38250.0",
-    "open_date": "2026-06-01",
-    "realized_pnl_krw": 0.0,
-    "sell_fills": 0,
-    "status": "open",
-    "symbol": "355150.KS",
-    "total_qty_bought": 1354,
-    "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-33667.7093"
+    "unrealized_pnl_krw": "-10681938.6502"
   },
   {
     "account_id": "pit_fresh_top5",
@@ -2743,8 +2724,8 @@
     "close_date": "",
     "company": "Comfort Systems USA, Inc.",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "2737020.098",
+    "holding_days": 4,
+    "last_close_krw": "2826888.9069",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -2752,7 +2733,26 @@
     "symbol": "FIX",
     "total_qty_bought": 18,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-32026.8301"
+    "unrealized_pnl_krw": "1585611.7298"
+  },
+  {
+    "account_id": "pit_fresh_top5",
+    "avg_entry_price_krw": 258636.5021,
+    "avg_exit_price_krw": "",
+    "buy_fills": 1,
+    "close_date": "",
+    "company": "Soitec SA",
+    "exit_reasons": "()",
+    "holding_days": 4,
+    "last_close_krw": "260761.2864",
+    "open_date": "2026-06-01",
+    "realized_pnl_krw": 0.0,
+    "sell_fills": 0,
+    "status": "open",
+    "symbol": "SOI.PA",
+    "total_qty_bought": 200,
+    "total_qty_sold": 0,
+    "unrealized_pnl_krw": "424956.86"
   },
   {
     "account_id": "pit_momentum_1m3m_top5",
@@ -4586,8 +4586,8 @@
     "close_date": "",
     "company": "두산",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 31,
-    "last_close_krw": "2203000.0",
+    "holding_days": 35,
+    "last_close_krw": "1740000.0",
     "open_date": "2026-05-01",
     "realized_pnl_krw": 4203970.9476,
     "sell_fills": 1,
@@ -4595,7 +4595,7 @@
     "symbol": "000150.KS",
     "total_qty_bought": 27,
     "total_qty_sold": 7,
-    "unrealized_pnl_krw": "12119249.606"
+    "unrealized_pnl_krw": "2859249.606"
   },
   {
     "account_id": "pit_momentum_1m3m_top5",
@@ -4643,8 +4643,8 @@
     "close_date": "",
     "company": "현대모비스",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "761000.0",
+    "holding_days": 4,
+    "last_close_krw": "697000.0",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -4652,7 +4652,7 @@
     "symbol": "012330.KS",
     "total_qty_bought": 56,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-27703.5962"
+    "unrealized_pnl_krw": "-3611703.5962"
   },
   {
     "account_id": "pit_momentum_1m3m_top5",
@@ -4662,8 +4662,8 @@
     "close_date": "",
     "company": "로보티즈",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "402500.0",
+    "holding_days": 4,
+    "last_close_krw": "320500.0",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -4671,7 +4671,7 @@
     "symbol": "108490.KQ",
     "total_qty_bought": 107,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-27997.1051"
+    "unrealized_pnl_krw": "-8801997.1051"
   },
   {
     "account_id": "pit_momentum_1m3m_top5",
@@ -4681,8 +4681,8 @@
     "close_date": "",
     "company": "Aixtron SE",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "97813.3288",
+    "holding_days": 4,
+    "last_close_krw": "98084.2616",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -4690,7 +4690,7 @@
     "symbol": "AIXA.DE",
     "total_qty_bought": 441,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-28041.4259"
+    "unrealized_pnl_krw": "91439.9419"
   },
   {
     "account_id": "pit_momentum_1m3m_top5",
@@ -4700,8 +4700,8 @@
     "close_date": "",
     "company": "Sterling Infrastructure Inc",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "1287756.8221",
+    "holding_days": 4,
+    "last_close_krw": "1352826.9015",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -4709,7 +4709,7 @@
     "symbol": "STRL",
     "total_qty_bought": 33,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-27625.571"
+    "unrealized_pnl_krw": "2119687.0486"
   },
   {
     "account_id": "pit_momentum_3m6m_top5",
@@ -6258,8 +6258,8 @@
     "close_date": "",
     "company": "두산",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 31,
-    "last_close_krw": "2203000.0",
+    "holding_days": 35,
+    "last_close_krw": "1740000.0",
     "open_date": "2026-05-01",
     "realized_pnl_krw": 4203970.9476,
     "sell_fills": 1,
@@ -6267,7 +6267,7 @@
     "symbol": "000150.KS",
     "total_qty_bought": 28,
     "total_qty_sold": 7,
-    "unrealized_pnl_krw": "12725212.0863"
+    "unrealized_pnl_krw": "3002212.0863"
   },
   {
     "account_id": "pit_momentum_3m6m_top5",
@@ -6290,22 +6290,22 @@
   },
   {
     "account_id": "pit_momentum_3m6m_top5",
-    "avg_entry_price_krw": 56678.0247,
-    "avg_exit_price_krw": "",
-    "buy_fills": 2,
-    "close_date": "",
+    "avg_entry_price_krw": 57037.0543,
+    "avg_exit_price_krw": "51872.6507",
+    "buy_fills": 1,
+    "close_date": "2026-06-01",
     "company": "비츠로셀",
-    "exit_reasons": "()",
+    "exit_reasons": "('rebalance_sell',)",
     "holding_days": 31,
-    "last_close_krw": "52000.0",
+    "last_close_krw": "",
     "open_date": "2026-05-01",
-    "realized_pnl_krw": 0.0,
-    "sell_fills": 0,
-    "status": "open",
+    "realized_pnl_krw": -4141851.6671,
+    "sell_fills": 1,
+    "status": "closed",
     "symbol": "082920.KS",
-    "total_qty_bought": 864,
-    "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-4041813.3703"
+    "total_qty_bought": 802,
+    "total_qty_sold": 802,
+    "unrealized_pnl_krw": ""
   },
   {
     "account_id": "pit_momentum_3m6m_top5",
@@ -6315,8 +6315,8 @@
     "close_date": "",
     "company": "현대모비스",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "761000.0",
+    "holding_days": 4,
+    "last_close_krw": "697000.0",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -6324,7 +6324,7 @@
     "symbol": "012330.KS",
     "total_qty_bought": 59,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-29187.7174"
+    "unrealized_pnl_krw": "-3805187.7174"
   },
   {
     "account_id": "pit_momentum_3m6m_top5",
@@ -6334,8 +6334,8 @@
     "close_date": "",
     "company": "Aixtron SE",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "97813.3288",
+    "holding_days": 4,
+    "last_close_krw": "98084.2616",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -6343,7 +6343,26 @@
     "symbol": "AIXA.DE",
     "total_qty_bought": 459,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-29185.9739"
+    "unrealized_pnl_krw": "95172.1844"
+  },
+  {
+    "account_id": "pit_momentum_3m6m_top5",
+    "avg_entry_price_krw": 258636.5021,
+    "avg_exit_price_krw": "",
+    "buy_fills": 1,
+    "close_date": "",
+    "company": "Soitec SA",
+    "exit_reasons": "()",
+    "holding_days": 4,
+    "last_close_krw": "260761.2864",
+    "open_date": "2026-06-01",
+    "realized_pnl_krw": 0.0,
+    "sell_fills": 0,
+    "status": "open",
+    "symbol": "SOI.PA",
+    "total_qty_bought": 173,
+    "total_qty_sold": 0,
+    "unrealized_pnl_krw": "367587.6839"
   },
   {
     "account_id": "pit_momentum_3m6m_top5",
@@ -6353,8 +6372,8 @@
     "close_date": "",
     "company": "Sterling Infrastructure Inc",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "1287756.8221",
+    "holding_days": 4,
+    "last_close_krw": "1352826.9015",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -6362,7 +6381,7 @@
     "symbol": "STRL",
     "total_qty_bought": 33,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-27625.571"
+    "unrealized_pnl_krw": "2119687.0486"
   },
   {
     "account_id": "pit_momentum_6m12m_top5",
@@ -8196,8 +8215,8 @@
     "close_date": "",
     "company": "두산",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 31,
-    "last_close_krw": "2203000.0",
+    "holding_days": 35,
+    "last_close_krw": "1740000.0",
     "open_date": "2026-05-01",
     "realized_pnl_krw": 4804538.2258,
     "sell_fills": 1,
@@ -8205,7 +8224,7 @@
     "symbol": "000150.KS",
     "total_qty_bought": 30,
     "total_qty_sold": 8,
-    "unrealized_pnl_krw": "13331174.5666"
+    "unrealized_pnl_krw": "3145174.5666"
   },
   {
     "account_id": "pit_momentum_6m12m_top5",
@@ -8253,8 +8272,8 @@
     "close_date": "",
     "company": "현대모비스",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "761000.0",
+    "holding_days": 4,
+    "last_close_krw": "697000.0",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -8262,7 +8281,7 @@
     "symbol": "012330.KS",
     "total_qty_bought": 62,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-30671.8387"
+    "unrealized_pnl_krw": "-3998671.8387"
   },
   {
     "account_id": "pit_momentum_6m12m_top5",
@@ -8272,8 +8291,8 @@
     "close_date": "",
     "company": "로보티즈",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "402500.0",
+    "holding_days": 4,
+    "last_close_krw": "320500.0",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -8281,7 +8300,7 @@
     "symbol": "108490.KQ",
     "total_qty_bought": 117,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-30613.6569"
+    "unrealized_pnl_krw": "-9624613.6569"
   },
   {
     "account_id": "pit_momentum_6m12m_top5",
@@ -8291,8 +8310,8 @@
     "close_date": "",
     "company": "Aixtron SE",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "97813.3288",
+    "holding_days": 4,
+    "last_close_krw": "98084.2616",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -8300,7 +8319,7 @@
     "symbol": "AIXA.DE",
     "total_qty_bought": 482,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-30648.4519"
+    "unrealized_pnl_krw": "99941.161"
   },
   {
     "account_id": "pit_momentum_6m12m_top5",
@@ -8310,8 +8329,8 @@
     "close_date": "",
     "company": "Sterling Infrastructure Inc",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "1287756.8221",
+    "holding_days": 4,
+    "last_close_krw": "1352826.9015",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -8319,7 +8338,7 @@
     "symbol": "STRL",
     "total_qty_bought": 35,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-29299.8481"
+    "unrealized_pnl_krw": "2248152.9304"
   },
   {
     "account_id": "pit_momentum_top5",
@@ -11673,8 +11692,8 @@
     "close_date": "",
     "company": "두산",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 31,
-    "last_close_krw": "2203000.0",
+    "holding_days": 35,
+    "last_close_krw": "1740000.0",
     "open_date": "2026-05-01",
     "realized_pnl_krw": 6606240.0605,
     "sell_fills": 1,
@@ -11682,7 +11701,7 @@
     "symbol": "000150.KS",
     "total_qty_bought": 42,
     "total_qty_sold": 11,
-    "unrealized_pnl_krw": "18784836.8893"
+    "unrealized_pnl_krw": "4431836.8893"
   },
   {
     "account_id": "pit_momentum_top5",
@@ -11705,22 +11724,22 @@
   },
   {
     "account_id": "pit_momentum_top5",
-    "avg_entry_price_krw": 56688.9,
-    "avg_exit_price_krw": "",
-    "buy_fills": 2,
-    "close_date": "",
+    "avg_entry_price_krw": 57037.0543,
+    "avg_exit_price_krw": "51872.6507",
+    "buy_fills": 1,
+    "close_date": "2026-06-01",
     "company": "비츠로셀",
-    "exit_reasons": "()",
+    "exit_reasons": "('rebalance_sell',)",
     "holding_days": 31,
-    "last_close_krw": "52000.0",
+    "last_close_krw": "",
     "open_date": "2026-05-01",
-    "realized_pnl_krw": 0.0,
-    "sell_fills": 0,
-    "status": "open",
+    "realized_pnl_krw": -6145640.2542,
+    "sell_fills": 1,
+    "status": "closed",
     "symbol": "082920.KS",
-    "total_qty_bought": 1279,
-    "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-5997103.1344"
+    "total_qty_bought": 1190,
+    "total_qty_sold": 1190,
+    "unrealized_pnl_krw": ""
   },
   {
     "account_id": "pit_momentum_top5",
@@ -11730,8 +11749,8 @@
     "close_date": "",
     "company": "현대모비스",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "761000.0",
+    "holding_days": 4,
+    "last_close_krw": "697000.0",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -11739,7 +11758,7 @@
     "symbol": "012330.KS",
     "total_qty_bought": 87,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-43039.5155"
+    "unrealized_pnl_krw": "-5611039.5155"
   },
   {
     "account_id": "pit_momentum_top5",
@@ -11749,8 +11768,8 @@
     "close_date": "",
     "company": "Aixtron SE",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "97813.3288",
+    "holding_days": 4,
+    "last_close_krw": "98084.2616",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -11758,7 +11777,26 @@
     "symbol": "AIXA.DE",
     "total_qty_bought": 679,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-43174.8938"
+    "unrealized_pnl_krw": "140788.4819"
+  },
+  {
+    "account_id": "pit_momentum_top5",
+    "avg_entry_price_krw": 258636.5021,
+    "avg_exit_price_krw": "",
+    "buy_fills": 1,
+    "close_date": "",
+    "company": "Soitec SA",
+    "exit_reasons": "()",
+    "holding_days": 4,
+    "last_close_krw": "260761.2864",
+    "open_date": "2026-06-01",
+    "realized_pnl_krw": 0.0,
+    "sell_fills": 0,
+    "status": "open",
+    "symbol": "SOI.PA",
+    "total_qty_bought": 257,
+    "total_qty_sold": 0,
+    "unrealized_pnl_krw": "546069.5651"
   },
   {
     "account_id": "pit_momentum_top5",
@@ -11768,8 +11806,8 @@
     "close_date": "",
     "company": "Sterling Infrastructure Inc",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "1287756.8221",
+    "holding_days": 4,
+    "last_close_krw": "1352826.9015",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -11777,7 +11815,7 @@
     "symbol": "STRL",
     "total_qty_bought": 50,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-41856.9258"
+    "unrealized_pnl_krw": "3211647.0434"
   },
   {
     "account_id": "pit_mtt_low100_top5",
@@ -13041,8 +13079,8 @@
     "close_date": "",
     "company": "두산",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 31,
-    "last_close_krw": "2203000.0",
+    "holding_days": 35,
+    "last_close_krw": "1740000.0",
     "open_date": "2026-05-01",
     "realized_pnl_krw": 4203970.9476,
     "sell_fills": 1,
@@ -13050,7 +13088,7 @@
     "symbol": "000150.KS",
     "total_qty_bought": 29,
     "total_qty_sold": 7,
-    "unrealized_pnl_krw": "13331174.5666"
+    "unrealized_pnl_krw": "3145174.5666"
   },
   {
     "account_id": "pit_mtt_low100_top5",
@@ -13073,22 +13111,22 @@
   },
   {
     "account_id": "pit_mtt_low100_top5",
-    "avg_entry_price_krw": 56682.4496,
-    "avg_exit_price_krw": "",
-    "buy_fills": 2,
-    "close_date": "",
+    "avg_entry_price_krw": 57037.0543,
+    "avg_exit_price_krw": "51872.6507",
+    "buy_fills": 1,
+    "close_date": "2026-06-01",
     "company": "비츠로셀",
-    "exit_reasons": "()",
+    "exit_reasons": "('rebalance_sell',)",
     "holding_days": 31,
-    "last_close_krw": "52000.0",
+    "last_close_krw": "",
     "open_date": "2026-05-01",
-    "realized_pnl_krw": 0.0,
-    "sell_fills": 0,
-    "status": "open",
+    "realized_pnl_krw": -4332934.5994,
+    "sell_fills": 1,
+    "status": "closed",
     "symbol": "082920.KS",
-    "total_qty_bought": 903,
-    "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-4228251.9863"
+    "total_qty_bought": 839,
+    "total_qty_sold": 839,
+    "unrealized_pnl_krw": ""
   },
   {
     "account_id": "pit_mtt_low100_top5",
@@ -13098,8 +13136,8 @@
     "close_date": "",
     "company": "현대모비스",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "761000.0",
+    "holding_days": 4,
+    "last_close_krw": "697000.0",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -13107,7 +13145,7 @@
     "symbol": "012330.KS",
     "total_qty_bought": 61,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-30177.1316"
+    "unrealized_pnl_krw": "-3934177.1316"
   },
   {
     "account_id": "pit_mtt_low100_top5",
@@ -13117,8 +13155,8 @@
     "close_date": "",
     "company": "Aixtron SE",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "97813.3288",
+    "holding_days": 4,
+    "last_close_krw": "98084.2616",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -13126,7 +13164,26 @@
     "symbol": "AIXA.DE",
     "total_qty_bought": 480,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-30521.2799"
+    "unrealized_pnl_krw": "99526.4673"
+  },
+  {
+    "account_id": "pit_mtt_low100_top5",
+    "avg_entry_price_krw": 258636.5021,
+    "avg_exit_price_krw": "",
+    "buy_fills": 1,
+    "close_date": "",
+    "company": "Soitec SA",
+    "exit_reasons": "()",
+    "holding_days": 4,
+    "last_close_krw": "260761.2864",
+    "open_date": "2026-06-01",
+    "realized_pnl_krw": 0.0,
+    "sell_fills": 0,
+    "status": "open",
+    "symbol": "SOI.PA",
+    "total_qty_bought": 181,
+    "total_qty_sold": 0,
+    "unrealized_pnl_krw": "384585.9583"
   },
   {
     "account_id": "pit_mtt_low100_top5",
@@ -13136,8 +13193,8 @@
     "close_date": "",
     "company": "Sterling Infrastructure Inc",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "1287756.8221",
+    "holding_days": 4,
+    "last_close_krw": "1352826.9015",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -13145,7 +13202,7 @@
     "symbol": "STRL",
     "total_qty_bought": 35,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-29299.8481"
+    "unrealized_pnl_krw": "2248152.9304"
   },
   {
     "account_id": "pit_mtt_low300_top5",
@@ -13649,8 +13706,8 @@
     "close_date": "",
     "company": "두산",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 31,
-    "last_close_krw": "2203000.0",
+    "holding_days": 35,
+    "last_close_krw": "1740000.0",
     "open_date": "2026-05-01",
     "realized_pnl_krw": 4804538.2258,
     "sell_fills": 1,
@@ -13658,7 +13715,7 @@
     "symbol": "000150.KS",
     "total_qty_bought": 36,
     "total_qty_sold": 8,
-    "unrealized_pnl_krw": "16966949.4484"
+    "unrealized_pnl_krw": "4002949.4484"
   },
   {
     "account_id": "pit_mtt_low300_top5",
@@ -13668,8 +13725,8 @@
     "close_date": "",
     "company": "비츠로셀",
     "exit_reasons": "()",
-    "holding_days": 31,
-    "last_close_krw": "52000.0",
+    "holding_days": 35,
+    "last_close_krw": "48650.0",
     "open_date": "2026-05-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -13677,26 +13734,7 @@
     "symbol": "082920.KS",
     "total_qty_bought": 1158,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-5107437.5461"
-  },
-  {
-    "account_id": "pit_mtt_low300_top5",
-    "avg_entry_price_krw": 402761.6552,
-    "avg_exit_price_krw": "",
-    "buy_fills": 1,
-    "close_date": "",
-    "company": "로보티즈",
-    "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "402500.0",
-    "open_date": "2026-06-01",
-    "realized_pnl_krw": 0.0,
-    "sell_fills": 0,
-    "status": "open",
-    "symbol": "108490.KQ",
-    "total_qty_bought": 149,
-    "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-38986.6229"
+    "unrealized_pnl_krw": "-8986737.5461"
   },
   {
     "account_id": "pit_mtt_low300_top5",
@@ -13706,8 +13744,8 @@
     "close_date": "",
     "company": "Aixtron SE",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "97813.3288",
+    "holding_days": 4,
+    "last_close_krw": "98084.2616",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -13715,7 +13753,26 @@
     "symbol": "AIXA.DE",
     "total_qty_bought": 615,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-39105.3898"
+    "unrealized_pnl_krw": "127518.2863"
+  },
+  {
+    "account_id": "pit_mtt_low300_top5",
+    "avg_entry_price_krw": 258636.5021,
+    "avg_exit_price_krw": "",
+    "buy_fills": 1,
+    "close_date": "",
+    "company": "Soitec SA",
+    "exit_reasons": "()",
+    "holding_days": 4,
+    "last_close_krw": "260761.2864",
+    "open_date": "2026-06-01",
+    "realized_pnl_krw": 0.0,
+    "sell_fills": 0,
+    "status": "open",
+    "symbol": "SOI.PA",
+    "total_qty_bought": 233,
+    "total_qty_sold": 0,
+    "unrealized_pnl_krw": "495074.7419"
   },
   {
     "account_id": "pit_mtt_low300_top5",
@@ -13725,8 +13782,8 @@
     "close_date": "",
     "company": "Sterling Infrastructure Inc",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "1287756.8221",
+    "holding_days": 4,
+    "last_close_krw": "1352826.9015",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -13734,7 +13791,7 @@
     "symbol": "STRL",
     "total_qty_bought": 45,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-37671.2332"
+    "unrealized_pnl_krw": "2890482.339"
   },
   {
     "account_id": "pit_mtt_rs70_top5",
@@ -15568,8 +15625,8 @@
     "close_date": "",
     "company": "두산",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 31,
-    "last_close_krw": "2203000.0",
+    "holding_days": 35,
+    "last_close_krw": "1740000.0",
     "open_date": "2026-05-01",
     "realized_pnl_krw": 3603403.6694,
     "sell_fills": 1,
@@ -15577,7 +15634,7 @@
     "symbol": "000150.KS",
     "total_qty_bought": 26,
     "total_qty_sold": 6,
-    "unrealized_pnl_krw": "12119249.606"
+    "unrealized_pnl_krw": "2859249.606"
   },
   {
     "account_id": "pit_mtt_rs70_top5",
@@ -15625,8 +15682,8 @@
     "close_date": "",
     "company": "현대모비스",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "761000.0",
+    "holding_days": 4,
+    "last_close_krw": "697000.0",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -15634,7 +15691,7 @@
     "symbol": "012330.KS",
     "total_qty_bought": 55,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-27208.8891"
+    "unrealized_pnl_krw": "-3547208.8891"
   },
   {
     "account_id": "pit_mtt_rs70_top5",
@@ -15644,8 +15701,8 @@
     "close_date": "",
     "company": "로보티즈",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "402500.0",
+    "holding_days": 4,
+    "last_close_krw": "320500.0",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -15653,7 +15710,7 @@
     "symbol": "108490.KQ",
     "total_qty_bought": 104,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-27212.1395"
+    "unrealized_pnl_krw": "-8555212.1395"
   },
   {
     "account_id": "pit_mtt_rs70_top5",
@@ -15663,8 +15720,8 @@
     "close_date": "",
     "company": "Aixtron SE",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "97813.3288",
+    "holding_days": 4,
+    "last_close_krw": "98084.2616",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -15672,7 +15729,7 @@
     "symbol": "AIXA.DE",
     "total_qty_bought": 428,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-27214.8079"
+    "unrealized_pnl_krw": "88744.4334"
   },
   {
     "account_id": "pit_mtt_rs70_top5",
@@ -15682,8 +15739,8 @@
     "close_date": "",
     "company": "Sterling Infrastructure Inc",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "1287756.8221",
+    "holding_days": 4,
+    "last_close_krw": "1352826.9015",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -15691,7 +15748,7 @@
     "symbol": "STRL",
     "total_qty_bought": 30,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-25114.1555"
+    "unrealized_pnl_krw": "1926988.226"
   },
   {
     "account_id": "pit_mtt_rs80_top5",
@@ -17221,8 +17278,8 @@
     "close_date": "",
     "company": "두산",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 31,
-    "last_close_krw": "2203000.0",
+    "holding_days": 35,
+    "last_close_krw": "1740000.0",
     "open_date": "2026-05-01",
     "realized_pnl_krw": 4804538.2258,
     "sell_fills": 1,
@@ -17230,7 +17287,7 @@
     "symbol": "000150.KS",
     "total_qty_bought": 30,
     "total_qty_sold": 8,
-    "unrealized_pnl_krw": "13331174.5666"
+    "unrealized_pnl_krw": "3145174.5666"
   },
   {
     "account_id": "pit_mtt_rs80_top5",
@@ -17253,22 +17310,22 @@
   },
   {
     "account_id": "pit_mtt_rs80_top5",
-    "avg_entry_price_krw": 56675.3735,
-    "avg_exit_price_krw": "",
-    "buy_fills": 2,
-    "close_date": "",
+    "avg_entry_price_krw": 57037.0543,
+    "avg_exit_price_krw": "51872.6507",
+    "buy_fills": 1,
+    "close_date": "2026-06-01",
     "company": "비츠로셀",
-    "exit_reasons": "()",
+    "exit_reasons": "('rebalance_sell',)",
     "holding_days": 31,
-    "last_close_krw": "52000.0",
+    "last_close_krw": "",
     "open_date": "2026-05-01",
-    "realized_pnl_krw": 0.0,
-    "sell_fills": 0,
-    "status": "open",
+    "realized_pnl_krw": -4374249.828,
+    "sell_fills": 1,
+    "status": "closed",
     "symbol": "082920.KS",
-    "total_qty_bought": 913,
-    "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-4268616.0283"
+    "total_qty_bought": 847,
+    "total_qty_sold": 847,
+    "unrealized_pnl_krw": ""
   },
   {
     "account_id": "pit_mtt_rs80_top5",
@@ -17278,8 +17335,8 @@
     "close_date": "",
     "company": "현대모비스",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "761000.0",
+    "holding_days": 4,
+    "last_close_krw": "697000.0",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -17287,7 +17344,7 @@
     "symbol": "012330.KS",
     "total_qty_bought": 62,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-30671.8387"
+    "unrealized_pnl_krw": "-3998671.8387"
   },
   {
     "account_id": "pit_mtt_rs80_top5",
@@ -17297,8 +17354,8 @@
     "close_date": "",
     "company": "Aixtron SE",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "97813.3288",
+    "holding_days": 4,
+    "last_close_krw": "98084.2616",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -17306,7 +17363,26 @@
     "symbol": "AIXA.DE",
     "total_qty_bought": 485,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-30839.2099"
+    "unrealized_pnl_krw": "100563.2014"
+  },
+  {
+    "account_id": "pit_mtt_rs80_top5",
+    "avg_entry_price_krw": 258636.5021,
+    "avg_exit_price_krw": "",
+    "buy_fills": 1,
+    "close_date": "",
+    "company": "Soitec SA",
+    "exit_reasons": "()",
+    "holding_days": 4,
+    "last_close_krw": "260761.2864",
+    "open_date": "2026-06-01",
+    "realized_pnl_krw": 0.0,
+    "sell_fills": 0,
+    "status": "open",
+    "symbol": "SOI.PA",
+    "total_qty_bought": 183,
+    "total_qty_sold": 0,
+    "unrealized_pnl_krw": "388835.5269"
   },
   {
     "account_id": "pit_mtt_rs80_top5",
@@ -17316,8 +17392,8 @@
     "close_date": "",
     "company": "Sterling Infrastructure Inc",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "1287756.8221",
+    "holding_days": 4,
+    "last_close_krw": "1352826.9015",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -17325,7 +17401,7 @@
     "symbol": "STRL",
     "total_qty_bought": 36,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-30136.9866"
+    "unrealized_pnl_krw": "2312385.8712"
   },
   {
     "account_id": "pit_mtt_rs90_top5",
@@ -18874,8 +18950,8 @@
     "close_date": "",
     "company": "두산",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 31,
-    "last_close_krw": "2203000.0",
+    "holding_days": 35,
+    "last_close_krw": "1740000.0",
     "open_date": "2026-05-01",
     "realized_pnl_krw": 3603403.6694,
     "sell_fills": 1,
@@ -18883,7 +18959,7 @@
     "symbol": "000150.KS",
     "total_qty_bought": 29,
     "total_qty_sold": 6,
-    "unrealized_pnl_krw": "13937137.0469"
+    "unrealized_pnl_krw": "3288137.0469"
   },
   {
     "account_id": "pit_mtt_rs90_top5",
@@ -18912,8 +18988,8 @@
     "close_date": "",
     "company": "로보티즈",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "402500.0",
+    "holding_days": 4,
+    "last_close_krw": "320500.0",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -18921,7 +18997,7 @@
     "symbol": "108490.KQ",
     "total_qty_bought": 120,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-31398.6225"
+    "unrealized_pnl_krw": "-9871398.6225"
   },
   {
     "account_id": "pit_mtt_rs90_top5",
@@ -18931,8 +19007,8 @@
     "close_date": "",
     "company": "티엘비",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "106300.0",
+    "holding_days": 4,
+    "last_close_krw": "106700.0",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -18940,7 +19016,7 @@
     "symbol": "356860.KQ",
     "total_qty_bought": 456,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-31510.9555"
+    "unrealized_pnl_krw": "150889.0445"
   },
   {
     "account_id": "pit_mtt_rs90_top5",
@@ -18950,8 +19026,8 @@
     "close_date": "",
     "company": "Aixtron SE",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "97813.3288",
+    "holding_days": 4,
+    "last_close_krw": "98084.2616",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -18959,7 +19035,7 @@
     "symbol": "AIXA.DE",
     "total_qty_bought": 496,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-31538.6558"
+    "unrealized_pnl_krw": "102844.0163"
   },
   {
     "account_id": "pit_mtt_rs90_top5",
@@ -18969,8 +19045,8 @@
     "close_date": "",
     "company": "Sterling Infrastructure Inc",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "1287756.8221",
+    "holding_days": 4,
+    "last_close_krw": "1352826.9015",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -18978,7 +19054,7 @@
     "symbol": "STRL",
     "total_qty_bought": 36,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-30136.9866"
+    "unrealized_pnl_krw": "2312385.8712"
   },
   {
     "account_id": "pit_score_top10",
@@ -19083,8 +19159,8 @@
     "close_date": "",
     "company": "지트리비앤티",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 1974,
-    "last_close_krw": "2600.0",
+    "holding_days": 1978,
+    "last_close_krw": "2655.0",
     "open_date": "2021-01-04",
     "realized_pnl_krw": 2160184.4578,
     "sell_fills": 18,
@@ -19092,7 +19168,7 @@
     "symbol": "115450.KS",
     "total_qty_bought": 12622,
     "total_qty_sold": 3896,
-    "unrealized_pnl_krw": "-9061577.6252"
+    "unrealized_pnl_krw": "-8581647.6252"
   },
   {
     "account_id": "pit_score_top10",
@@ -19900,8 +19976,8 @@
     "close_date": "",
     "company": "Arista Networks",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 1278,
-    "last_close_krw": "256795.7939",
+    "holding_days": 1282,
+    "last_close_krw": "236506.7072",
     "open_date": "2022-12-01",
     "realized_pnl_krw": 5730702.6482,
     "sell_fills": 20,
@@ -19909,7 +19985,7 @@
     "symbol": "ANET",
     "total_qty_bought": 192,
     "total_qty_sold": 104,
-    "unrealized_pnl_krw": "12278213.5757"
+    "unrealized_pnl_krw": "10492773.9409"
   },
   {
     "account_id": "pit_score_top10",
@@ -19938,8 +20014,8 @@
     "close_date": "",
     "company": "SNT에너지",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 1246,
-    "last_close_krw": "36800.0",
+    "holding_days": 1250,
+    "last_close_krw": "33900.0",
     "open_date": "2023-01-02",
     "realized_pnl_krw": 12461489.5485,
     "sell_fills": 20,
@@ -19947,7 +20023,7 @@
     "symbol": "100840.KQ",
     "total_qty_bought": 1603,
     "total_qty_sold": 987,
-    "unrealized_pnl_krw": "2914183.6946"
+    "unrealized_pnl_krw": "1127783.6946"
   },
   {
     "account_id": "pit_score_top10",
@@ -20223,8 +20299,8 @@
     "close_date": "",
     "company": "HD현대일렉트릭",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 791,
-    "last_close_krw": "1066000.0",
+    "holding_days": 795,
+    "last_close_krw": "956000.0",
     "open_date": "2024-04-01",
     "realized_pnl_krw": 12067235.922,
     "sell_fills": 11,
@@ -20232,7 +20308,7 @@
     "symbol": "267260.KS",
     "total_qty_bought": 64,
     "total_qty_sold": 43,
-    "unrealized_pnl_krw": "13339374.2613"
+    "unrealized_pnl_krw": "11029374.2613"
   },
   {
     "account_id": "pit_score_top10",
@@ -20413,8 +20489,8 @@
     "close_date": "",
     "company": "이수페타시스",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 515,
-    "last_close_krw": "139400.0",
+    "holding_days": 519,
+    "last_close_krw": "120900.0",
     "open_date": "2025-01-02",
     "realized_pnl_krw": 14163524.3487,
     "sell_fills": 10,
@@ -20422,7 +20498,7 @@
     "symbol": "007660.KS",
     "total_qty_bought": 484,
     "total_qty_sold": 322,
-    "unrealized_pnl_krw": "12411052.3076"
+    "unrealized_pnl_krw": "9414052.3076"
   },
   {
     "account_id": "pit_score_top10",
@@ -20717,8 +20793,8 @@
     "close_date": "",
     "company": "주성엔지니어링",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 91,
-    "last_close_krw": "185500.0",
+    "holding_days": 95,
+    "last_close_krw": "210000.0",
     "open_date": "2026-03-02",
     "realized_pnl_krw": 12789552.4872,
     "sell_fills": 3,
@@ -20726,7 +20802,7 @@
     "symbol": "036930.KQ",
     "total_qty_bought": 300,
     "total_qty_sold": 177,
-    "unrealized_pnl_krw": "15911714.2875"
+    "unrealized_pnl_krw": "18925214.2875"
   },
   {
     "account_id": "pit_score_top10",
@@ -20812,8 +20888,8 @@
     "close_date": "",
     "company": "SK하이닉스",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 31,
-    "last_close_krw": "2363000.0",
+    "holding_days": 35,
+    "last_close_krw": "2070000.0",
     "open_date": "2026-05-01",
     "realized_pnl_krw": 6422261.7449,
     "sell_fills": 1,
@@ -20821,7 +20897,7 @@
     "symbol": "000660.KS",
     "total_qty_bought": 16,
     "total_qty_sold": 6,
-    "unrealized_pnl_krw": "10761640.0355"
+    "unrealized_pnl_krw": "7831640.0355"
   },
   {
     "account_id": "pit_score_top10",
@@ -20850,8 +20926,8 @@
     "close_date": "",
     "company": "티엘비",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "106300.0",
+    "holding_days": 4,
+    "last_close_krw": "106700.0",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -20859,7 +20935,7 @@
     "symbol": "356860.KQ",
     "total_qty_bought": 213,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-14718.9331"
+    "unrealized_pnl_krw": "70481.0669"
   },
   {
     "account_id": "pit_score_top10",
@@ -20869,8 +20945,8 @@
     "close_date": "",
     "company": "파두",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "111100.0",
+    "holding_days": 4,
+    "last_close_krw": "109800.0",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -20878,7 +20954,7 @@
     "symbol": "440110.KQ",
     "total_qty_bought": 204,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-14733.5598"
+    "unrealized_pnl_krw": "-279933.5598"
   },
   {
     "account_id": "pit_score_top10",
@@ -20888,8 +20964,8 @@
     "close_date": "",
     "company": "Palantir Technologies Inc.",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "244817.9917",
+    "holding_days": 4,
+    "last_close_krw": "207776.9679",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -20897,7 +20973,7 @@
     "symbol": "PLTR",
     "total_qty_bought": 89,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-14164.355"
+    "unrealized_pnl_krw": "-3310815.4688"
   },
   {
     "account_id": "pit_score_top3",
@@ -21382,8 +21458,8 @@
     "close_date": "",
     "company": "이수페타시스",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 304,
-    "last_close_krw": "139400.0",
+    "holding_days": 308,
+    "last_close_krw": "120900.0",
     "open_date": "2025-08-01",
     "realized_pnl_krw": 18432579.0927,
     "sell_fills": 5,
@@ -21391,7 +21467,7 @@
     "symbol": "007660.KS",
     "total_qty_bought": 725,
     "total_qty_sold": 317,
-    "unrealized_pnl_krw": "25262784.1329"
+    "unrealized_pnl_krw": "17714784.1329"
   },
   {
     "account_id": "pit_score_top3",
@@ -21458,8 +21534,8 @@
     "close_date": "",
     "company": "SK하이닉스",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "2363000.0",
+    "holding_days": 4,
+    "last_close_krw": "2070000.0",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -21467,7 +21543,7 @@
     "symbol": "000660.KS",
     "total_qty_bought": 24,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-36867.0534"
+    "unrealized_pnl_krw": "-7068867.0534"
   },
   {
     "account_id": "pit_score_top3",
@@ -21477,8 +21553,8 @@
     "close_date": "",
     "company": "주성엔지니어링",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "185500.0",
+    "holding_days": 4,
+    "last_close_krw": "210000.0",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -21486,7 +21562,7 @@
     "symbol": "036930.KQ",
     "total_qty_bought": 305,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-36779.6183"
+    "unrealized_pnl_krw": "7435720.3817"
   },
   {
     "account_id": "pit_score_top5",
@@ -21857,8 +21933,8 @@
     "close_date": "",
     "company": "Arista Networks",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 1278,
-    "last_close_krw": "256795.7939",
+    "holding_days": 1282,
+    "last_close_krw": "236506.7072",
     "open_date": "2022-12-01",
     "realized_pnl_krw": 9483747.836,
     "sell_fills": 19,
@@ -21866,7 +21942,7 @@
     "symbol": "ANET",
     "total_qty_bought": 331,
     "total_qty_sold": 174,
-    "unrealized_pnl_krw": "22374368.2241"
+    "unrealized_pnl_krw": "19188981.603"
   },
   {
     "account_id": "pit_score_top5",
@@ -22123,8 +22199,8 @@
     "close_date": "",
     "company": "이수페타시스",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 335,
-    "last_close_krw": "139400.0",
+    "holding_days": 339,
+    "last_close_krw": "120900.0",
     "open_date": "2025-07-01",
     "realized_pnl_krw": 14554239.0558,
     "sell_fills": 6,
@@ -22132,7 +22208,7 @@
     "symbol": "007660.KS",
     "total_qty_bought": 536,
     "total_qty_sold": 248,
-    "unrealized_pnl_krw": "18610106.0289"
+    "unrealized_pnl_krw": "13282106.0289"
   },
   {
     "account_id": "pit_score_top5",
@@ -22180,8 +22256,8 @@
     "close_date": "",
     "company": "HD현대일렉트릭",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 210,
-    "last_close_krw": "1066000.0",
+    "holding_days": 214,
+    "last_close_krw": "956000.0",
     "open_date": "2025-11-03",
     "realized_pnl_krw": 515189.5974,
     "sell_fills": 3,
@@ -22189,7 +22265,7 @@
     "symbol": "267260.KS",
     "total_qty_bought": 45,
     "total_qty_sold": 8,
-    "unrealized_pnl_krw": "4839170.4176"
+    "unrealized_pnl_krw": "769170.4176"
   },
   {
     "account_id": "pit_score_top5",
@@ -22218,8 +22294,8 @@
     "close_date": "",
     "company": "주성엔지니어링",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 31,
-    "last_close_krw": "185500.0",
+    "holding_days": 35,
+    "last_close_krw": "210000.0",
     "open_date": "2026-05-01",
     "realized_pnl_krw": 6073271.0305,
     "sell_fills": 1,
@@ -22227,7 +22303,7 @@
     "symbol": "036930.KQ",
     "total_qty_bought": 320,
     "total_qty_sold": 103,
-    "unrealized_pnl_krw": "12893725.6494"
+    "unrealized_pnl_krw": "18210225.6494"
   },
   {
     "account_id": "pit_score_top5",
@@ -22237,8 +22313,8 @@
     "close_date": "",
     "company": "SK하이닉스",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "2363000.0",
+    "holding_days": 4,
+    "last_close_krw": "2070000.0",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -22246,7 +22322,7 @@
     "symbol": "000660.KS",
     "total_qty_bought": 16,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-24578.0356"
+    "unrealized_pnl_krw": "-4712578.0356"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5",
@@ -22826,8 +22902,8 @@
     "close_date": "",
     "company": "RFHIC",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 150,
-    "last_close_krw": "87600.0",
+    "holding_days": 154,
+    "last_close_krw": "82800.0",
     "open_date": "2026-01-02",
     "realized_pnl_krw": 13899577.945,
     "sell_fills": 1,
@@ -22835,7 +22911,7 @@
     "symbol": "218410.KQ",
     "total_qty_bought": 650,
     "total_qty_sold": 236,
-    "unrealized_pnl_krw": "21746266.9567"
+    "unrealized_pnl_krw": "19759066.9567"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5",
@@ -22864,8 +22940,8 @@
     "close_date": "",
     "company": "Corning",
     "exit_reasons": "()",
-    "holding_days": 150,
-    "last_close_krw": "265025.7934",
+    "holding_days": 154,
+    "last_close_krw": "272242.5639",
     "open_date": "2026-01-02",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -22873,7 +22949,7 @@
     "symbol": "GLW",
     "total_qty_bought": 181,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "23679878.0664"
+    "unrealized_pnl_krw": "24986113.5251"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5",
@@ -22883,8 +22959,8 @@
     "close_date": "",
     "company": "Lumentum Holdings Inc",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 150,
-    "last_close_krw": "1344995.9815",
+    "holding_days": 154,
+    "last_close_krw": "1324051.1486",
     "open_date": "2026-01-02",
     "realized_pnl_krw": 3533639.4122,
     "sell_fills": 1,
@@ -22892,7 +22968,7 @@
     "symbol": "LITE",
     "total_qty_bought": 40,
     "total_qty_sold": 6,
-    "unrealized_pnl_krw": "26765813.2786"
+    "unrealized_pnl_krw": "26053688.961"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5",
@@ -22902,8 +22978,8 @@
     "close_date": "",
     "company": "티엘비",
     "exit_reasons": "()",
-    "holding_days": 61,
-    "last_close_krw": "106300.0",
+    "holding_days": 65,
+    "last_close_krw": "106700.0",
     "open_date": "2026-04-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -22911,7 +22987,7 @@
     "symbol": "356860.KQ",
     "total_qty_bought": 540,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "18442689.98"
+    "unrealized_pnl_krw": "18658689.98"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5",
@@ -22921,8 +22997,8 @@
     "close_date": "",
     "company": "토모큐브",
     "exit_reasons": "()",
-    "holding_days": 61,
-    "last_close_krw": "42150.0",
+    "holding_days": 65,
+    "last_close_krw": "39850.0",
     "open_date": "2026-04-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -22930,7 +23006,7 @@
     "symbol": "475960.KQ",
     "total_qty_bought": 675,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-10521568.7961"
+    "unrealized_pnl_krw": "-12074068.7961"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5",
@@ -23510,8 +23586,8 @@
     "close_date": "",
     "company": "RFHIC",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 150,
-    "last_close_krw": "87600.0",
+    "holding_days": 154,
+    "last_close_krw": "82800.0",
     "open_date": "2026-01-02",
     "realized_pnl_krw": 13899577.945,
     "sell_fills": 1,
@@ -23519,7 +23595,7 @@
     "symbol": "218410.KQ",
     "total_qty_bought": 650,
     "total_qty_sold": 236,
-    "unrealized_pnl_krw": "21746266.9567"
+    "unrealized_pnl_krw": "19759066.9567"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5",
@@ -23548,8 +23624,8 @@
     "close_date": "",
     "company": "Corning",
     "exit_reasons": "()",
-    "holding_days": 150,
-    "last_close_krw": "265025.7934",
+    "holding_days": 154,
+    "last_close_krw": "272242.5639",
     "open_date": "2026-01-02",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -23557,7 +23633,7 @@
     "symbol": "GLW",
     "total_qty_bought": 181,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "23679878.0664"
+    "unrealized_pnl_krw": "24986113.5251"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5",
@@ -23567,8 +23643,8 @@
     "close_date": "",
     "company": "Lumentum Holdings Inc",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 150,
-    "last_close_krw": "1344995.9815",
+    "holding_days": 154,
+    "last_close_krw": "1324051.1486",
     "open_date": "2026-01-02",
     "realized_pnl_krw": 3533639.4122,
     "sell_fills": 1,
@@ -23576,7 +23652,7 @@
     "symbol": "LITE",
     "total_qty_bought": 40,
     "total_qty_sold": 6,
-    "unrealized_pnl_krw": "26765813.2786"
+    "unrealized_pnl_krw": "26053688.961"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5",
@@ -23586,8 +23662,8 @@
     "close_date": "",
     "company": "티엘비",
     "exit_reasons": "()",
-    "holding_days": 61,
-    "last_close_krw": "106300.0",
+    "holding_days": 65,
+    "last_close_krw": "106700.0",
     "open_date": "2026-04-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -23595,7 +23671,7 @@
     "symbol": "356860.KQ",
     "total_qty_bought": 540,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "18442689.98"
+    "unrealized_pnl_krw": "18658689.98"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5",
@@ -23605,8 +23681,8 @@
     "close_date": "",
     "company": "토모큐브",
     "exit_reasons": "()",
-    "holding_days": 61,
-    "last_close_krw": "42150.0",
+    "holding_days": 65,
+    "last_close_krw": "39850.0",
     "open_date": "2026-04-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -23614,7 +23690,7 @@
     "symbol": "475960.KQ",
     "total_qty_bought": 675,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-10521568.7961"
+    "unrealized_pnl_krw": "-12074068.7961"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5",
@@ -24194,8 +24270,8 @@
     "close_date": "",
     "company": "RFHIC",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 150,
-    "last_close_krw": "87600.0",
+    "holding_days": 154,
+    "last_close_krw": "82800.0",
     "open_date": "2026-01-02",
     "realized_pnl_krw": 13781784.9116,
     "sell_fills": 1,
@@ -24203,7 +24279,7 @@
     "symbol": "218410.KQ",
     "total_qty_bought": 647,
     "total_qty_sold": 234,
-    "unrealized_pnl_krw": "21693739.7418"
+    "unrealized_pnl_krw": "19711339.7418"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5",
@@ -24232,8 +24308,8 @@
     "close_date": "",
     "company": "Corning",
     "exit_reasons": "()",
-    "holding_days": 150,
-    "last_close_krw": "265025.7934",
+    "holding_days": 154,
+    "last_close_krw": "272242.5639",
     "open_date": "2026-01-02",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -24241,7 +24317,7 @@
     "symbol": "GLW",
     "total_qty_bought": 179,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "23494989.6798"
+    "unrealized_pnl_krw": "24786791.5976"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5",
@@ -24251,8 +24327,8 @@
     "close_date": "",
     "company": "Lumentum Holdings Inc",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 150,
-    "last_close_krw": "1344995.9815",
+    "holding_days": 154,
+    "last_close_krw": "1324051.1486",
     "open_date": "2026-01-02",
     "realized_pnl_krw": 3533639.4122,
     "sell_fills": 1,
@@ -24260,7 +24336,7 @@
     "symbol": "LITE",
     "total_qty_bought": 40,
     "total_qty_sold": 6,
-    "unrealized_pnl_krw": "26765813.2786"
+    "unrealized_pnl_krw": "26053688.961"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5",
@@ -24270,8 +24346,8 @@
     "close_date": "",
     "company": "티엘비",
     "exit_reasons": "()",
-    "holding_days": 61,
-    "last_close_krw": "106300.0",
+    "holding_days": 65,
+    "last_close_krw": "106700.0",
     "open_date": "2026-04-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -24279,7 +24355,7 @@
     "symbol": "356860.KQ",
     "total_qty_bought": 538,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "18374383.7208"
+    "unrealized_pnl_krw": "18589583.7208"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5",
@@ -24289,8 +24365,8 @@
     "close_date": "",
     "company": "토모큐브",
     "exit_reasons": "()",
-    "holding_days": 61,
-    "last_close_krw": "42150.0",
+    "holding_days": 65,
+    "last_close_krw": "39850.0",
     "open_date": "2026-04-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -24298,7 +24374,7 @@
     "symbol": "475960.KQ",
     "total_qty_bought": 672,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-10474806.2681"
+    "unrealized_pnl_krw": "-12020406.2681"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5",
@@ -24878,8 +24954,8 @@
     "close_date": "",
     "company": "RFHIC",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 150,
-    "last_close_krw": "87600.0",
+    "holding_days": 154,
+    "last_close_krw": "82800.0",
     "open_date": "2026-01-02",
     "realized_pnl_krw": 13781784.9116,
     "sell_fills": 1,
@@ -24887,7 +24963,7 @@
     "symbol": "218410.KQ",
     "total_qty_bought": 647,
     "total_qty_sold": 234,
-    "unrealized_pnl_krw": "21693739.7418"
+    "unrealized_pnl_krw": "19711339.7418"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5",
@@ -24916,8 +24992,8 @@
     "close_date": "",
     "company": "Corning",
     "exit_reasons": "()",
-    "holding_days": 150,
-    "last_close_krw": "265025.7934",
+    "holding_days": 154,
+    "last_close_krw": "272242.5639",
     "open_date": "2026-01-02",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -24925,7 +25001,7 @@
     "symbol": "GLW",
     "total_qty_bought": 179,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "23494989.6798"
+    "unrealized_pnl_krw": "24786791.5976"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5",
@@ -24935,8 +25011,8 @@
     "close_date": "",
     "company": "Lumentum Holdings Inc",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 150,
-    "last_close_krw": "1344995.9815",
+    "holding_days": 154,
+    "last_close_krw": "1324051.1486",
     "open_date": "2026-01-02",
     "realized_pnl_krw": 3533639.4122,
     "sell_fills": 1,
@@ -24944,7 +25020,7 @@
     "symbol": "LITE",
     "total_qty_bought": 40,
     "total_qty_sold": 6,
-    "unrealized_pnl_krw": "26765813.2786"
+    "unrealized_pnl_krw": "26053688.961"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5",
@@ -24954,8 +25030,8 @@
     "close_date": "",
     "company": "티엘비",
     "exit_reasons": "()",
-    "holding_days": 61,
-    "last_close_krw": "106300.0",
+    "holding_days": 65,
+    "last_close_krw": "106700.0",
     "open_date": "2026-04-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -24963,7 +25039,7 @@
     "symbol": "356860.KQ",
     "total_qty_bought": 538,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "18374383.7208"
+    "unrealized_pnl_krw": "18589583.7208"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5",
@@ -24973,8 +25049,8 @@
     "close_date": "",
     "company": "토모큐브",
     "exit_reasons": "()",
-    "holding_days": 61,
-    "last_close_krw": "42150.0",
+    "holding_days": 65,
+    "last_close_krw": "39850.0",
     "open_date": "2026-04-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -24982,7 +25058,7 @@
     "symbol": "475960.KQ",
     "total_qty_bought": 672,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-10474806.2681"
+    "unrealized_pnl_krw": "-12020406.2681"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5",
@@ -25562,8 +25638,8 @@
     "close_date": "",
     "company": "RFHIC",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 150,
-    "last_close_krw": "87600.0",
+    "holding_days": 154,
+    "last_close_krw": "82800.0",
     "open_date": "2026-01-02",
     "realized_pnl_krw": 13781784.9116,
     "sell_fills": 1,
@@ -25571,7 +25647,7 @@
     "symbol": "218410.KQ",
     "total_qty_bought": 647,
     "total_qty_sold": 234,
-    "unrealized_pnl_krw": "21693739.7418"
+    "unrealized_pnl_krw": "19711339.7418"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5",
@@ -25600,8 +25676,8 @@
     "close_date": "",
     "company": "Corning",
     "exit_reasons": "()",
-    "holding_days": 150,
-    "last_close_krw": "265025.7934",
+    "holding_days": 154,
+    "last_close_krw": "272242.5639",
     "open_date": "2026-01-02",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -25609,7 +25685,7 @@
     "symbol": "GLW",
     "total_qty_bought": 179,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "23494989.6798"
+    "unrealized_pnl_krw": "24786791.5976"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5",
@@ -25619,8 +25695,8 @@
     "close_date": "",
     "company": "Lumentum Holdings Inc",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 150,
-    "last_close_krw": "1344995.9815",
+    "holding_days": 154,
+    "last_close_krw": "1324051.1486",
     "open_date": "2026-01-02",
     "realized_pnl_krw": 3533639.4122,
     "sell_fills": 1,
@@ -25628,7 +25704,7 @@
     "symbol": "LITE",
     "total_qty_bought": 40,
     "total_qty_sold": 6,
-    "unrealized_pnl_krw": "26765813.2786"
+    "unrealized_pnl_krw": "26053688.961"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5",
@@ -25638,8 +25714,8 @@
     "close_date": "",
     "company": "티엘비",
     "exit_reasons": "()",
-    "holding_days": 61,
-    "last_close_krw": "106300.0",
+    "holding_days": 65,
+    "last_close_krw": "106700.0",
     "open_date": "2026-04-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -25647,7 +25723,7 @@
     "symbol": "356860.KQ",
     "total_qty_bought": 538,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "18374383.7208"
+    "unrealized_pnl_krw": "18589583.7208"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5",
@@ -25657,8 +25733,8 @@
     "close_date": "",
     "company": "토모큐브",
     "exit_reasons": "()",
-    "holding_days": 61,
-    "last_close_krw": "42150.0",
+    "holding_days": 65,
+    "last_close_krw": "39850.0",
     "open_date": "2026-04-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -25666,7 +25742,7 @@
     "symbol": "475960.KQ",
     "total_qty_bought": 672,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-10474806.2681"
+    "unrealized_pnl_krw": "-12020406.2681"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5",
@@ -26227,8 +26303,8 @@
     "close_date": "",
     "company": "RFHIC",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 150,
-    "last_close_krw": "87600.0",
+    "holding_days": 154,
+    "last_close_krw": "82800.0",
     "open_date": "2026-01-02",
     "realized_pnl_krw": 15784266.48,
     "sell_fills": 1,
@@ -26236,7 +26312,7 @@
     "symbol": "218410.KQ",
     "total_qty_bought": 737,
     "total_qty_sold": 268,
-    "unrealized_pnl_krw": "24635263.7746"
+    "unrealized_pnl_krw": "22384063.7746"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5",
@@ -26265,8 +26341,8 @@
     "close_date": "",
     "company": "Corning",
     "exit_reasons": "()",
-    "holding_days": 150,
-    "last_close_krw": "265025.7934",
+    "holding_days": 154,
+    "last_close_krw": "272242.5639",
     "open_date": "2026-01-02",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -26274,7 +26350,7 @@
     "symbol": "GLW",
     "total_qty_bought": 202,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "26661247.904"
+    "unrealized_pnl_krw": "28119035.5431"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5",
@@ -26284,8 +26360,8 @@
     "close_date": "",
     "company": "Lumentum Holdings Inc",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 150,
-    "last_close_krw": "1344995.9815",
+    "holding_days": 154,
+    "last_close_krw": "1324051.1486",
     "open_date": "2026-01-02",
     "realized_pnl_krw": 4122579.3142,
     "sell_fills": 1,
@@ -26293,7 +26369,7 @@
     "symbol": "LITE",
     "total_qty_bought": 46,
     "total_qty_sold": 7,
-    "unrealized_pnl_krw": "30701962.2901"
+    "unrealized_pnl_krw": "29885113.8082"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5",
@@ -26303,8 +26379,8 @@
     "close_date": "",
     "company": "티엘비",
     "exit_reasons": "()",
-    "holding_days": 61,
-    "last_close_krw": "106300.0",
+    "holding_days": 65,
+    "last_close_krw": "106700.0",
     "open_date": "2026-04-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -26312,7 +26388,7 @@
     "symbol": "356860.KQ",
     "total_qty_bought": 611,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "20867562.181"
+    "unrealized_pnl_krw": "21111962.181"
   },
   {
     "account_id": "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5",
@@ -26322,8 +26398,8 @@
     "close_date": "",
     "company": "토모큐브",
     "exit_reasons": "()",
-    "holding_days": 61,
-    "last_close_krw": "42150.0",
+    "holding_days": 65,
+    "last_close_krw": "39850.0",
     "open_date": "2026-04-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -26331,7 +26407,7 @@
     "symbol": "475960.KQ",
     "total_qty_bought": 764,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-11908857.1262"
+    "unrealized_pnl_krw": "-13666057.1262"
   },
   {
     "account_id": "pit_trend_top5",
@@ -29685,8 +29761,8 @@
     "close_date": "",
     "company": "티엘비",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 91,
-    "last_close_krw": "106300.0",
+    "holding_days": 95,
+    "last_close_krw": "106700.0",
     "open_date": "2026-03-02",
     "realized_pnl_krw": 8447712.3143,
     "sell_fills": 3,
@@ -29694,7 +29770,7 @@
     "symbol": "356860.KQ",
     "total_qty_bought": 812,
     "total_qty_sold": 226,
-    "unrealized_pnl_krw": "26757114.7966"
+    "unrealized_pnl_krw": "26991514.7966"
   },
   {
     "account_id": "pit_trend_top5",
@@ -29761,8 +29837,8 @@
     "close_date": "",
     "company": "두산",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "2203000.0",
+    "holding_days": 4,
+    "last_close_krw": "1740000.0",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -29770,7 +29846,7 @@
     "symbol": "000150.KS",
     "total_qty_bought": 28,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-40099.2263"
+    "unrealized_pnl_krw": "-13004099.2263"
   },
   {
     "account_id": "pit_trend_top5",
@@ -29780,8 +29856,8 @@
     "close_date": "",
     "company": "현대모비스",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "761000.0",
+    "holding_days": 4,
+    "last_close_krw": "697000.0",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -29789,7 +29865,7 @@
     "symbol": "012330.KS",
     "total_qty_bought": 81,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-40071.2731"
+    "unrealized_pnl_krw": "-5224071.2731"
   },
   {
     "account_id": "pit_trend_top5",
@@ -29799,8 +29875,8 @@
     "close_date": "",
     "company": "로보티즈",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "402500.0",
+    "holding_days": 4,
+    "last_close_krw": "320500.0",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -29808,7 +29884,7 @@
     "symbol": "108490.KQ",
     "total_qty_bought": 154,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-40294.8989"
+    "unrealized_pnl_krw": "-12668294.8989"
   },
   {
     "account_id": "pit_trend_top5",
@@ -29818,8 +29894,8 @@
     "close_date": "",
     "company": "Aixtron SE",
     "exit_reasons": "()",
-    "holding_days": 0,
-    "last_close_krw": "97813.3288",
+    "holding_days": 4,
+    "last_close_krw": "98084.2616",
     "open_date": "2026-06-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -29827,7 +29903,7 @@
     "symbol": "AIXA.DE",
     "total_qty_bought": 635,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-40377.1098"
+    "unrealized_pnl_krw": "131665.2224"
   },
   {
     "account_id": "smic_follower",
@@ -32535,8 +32611,8 @@
     "close_date": "",
     "company": "KG스틸",
     "exit_reasons": "()",
-    "holding_days": 724,
-    "last_close_krw": "5610.0",
+    "holding_days": 728,
+    "last_close_krw": "5340.0",
     "open_date": "2024-06-07",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -32544,7 +32620,7 @@
     "symbol": "016380.KS",
     "total_qty_bought": 755,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-236455.2502"
+    "unrealized_pnl_krw": "-440305.2502"
   },
   {
     "account_id": "smic_follower",
@@ -32611,8 +32687,8 @@
     "close_date": "",
     "company": "아프리카TV",
     "exit_reasons": "()",
-    "holding_days": 577,
-    "last_close_krw": "49550.0",
+    "holding_days": 581,
+    "last_close_krw": "48250.0",
     "open_date": "2024-11-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -32620,7 +32696,7 @@
     "symbol": "067160.KQ",
     "total_qty_bought": 83,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-1948487.6343"
+    "unrealized_pnl_krw": "-2056387.6343"
   },
   {
     "account_id": "smic_follower",
@@ -32630,8 +32706,8 @@
     "close_date": "",
     "company": "씨에스윈드",
     "exit_reasons": "()",
-    "holding_days": 577,
-    "last_close_krw": "46750.0",
+    "holding_days": 581,
+    "last_close_krw": "43850.0",
     "open_date": "2024-11-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -32639,7 +32715,7 @@
     "symbol": "112610.KS",
     "total_qty_bought": 88,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "336545.9669"
+    "unrealized_pnl_krw": "81345.9669"
   },
   {
     "account_id": "smic_follower",
@@ -32687,8 +32763,8 @@
     "close_date": "",
     "company": "브이티",
     "exit_reasons": "()",
-    "holding_days": 566,
-    "last_close_krw": "13000.0",
+    "holding_days": 570,
+    "last_close_krw": "12320.0",
     "open_date": "2024-11-12",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -32696,7 +32772,7 @@
     "symbol": "018290.KS",
     "total_qty_bought": 278,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-2840233.0098"
+    "unrealized_pnl_krw": "-3029273.0098"
   },
   {
     "account_id": "smic_follower",
@@ -32725,8 +32801,8 @@
     "close_date": "",
     "company": "에스트래픽",
     "exit_reasons": "()",
-    "holding_days": 553,
-    "last_close_krw": "2980.0",
+    "holding_days": 557,
+    "last_close_krw": "2965.0",
     "open_date": "2024-11-25",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -32734,7 +32810,7 @@
     "symbol": "234300.KQ",
     "total_qty_bought": 1248,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-1063952.2837"
+    "unrealized_pnl_krw": "-1082672.2837"
   },
   {
     "account_id": "smic_follower",
@@ -32744,8 +32820,8 @@
     "close_date": "",
     "company": "크래프톤",
     "exit_reasons": "()",
-    "holding_days": 553,
-    "last_close_krw": "249500.0",
+    "holding_days": 557,
+    "last_close_krw": "257500.0",
     "open_date": "2024-11-25",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -32753,7 +32829,7 @@
     "symbol": "259960.KQ",
     "total_qty_bought": 17,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-747240.9489"
+    "unrealized_pnl_krw": "-611240.9489"
   },
   {
     "account_id": "smic_follower",
@@ -32763,8 +32839,8 @@
     "close_date": "",
     "company": "HDC현대산업개발",
     "exit_reasons": "()",
-    "holding_days": 553,
-    "last_close_krw": "19920.0",
+    "holding_days": 557,
+    "last_close_krw": "19510.0",
     "open_date": "2024-11-25",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -32772,7 +32848,7 @@
     "symbol": "294870.KS",
     "total_qty_bought": 192,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-106033.5726"
+    "unrealized_pnl_krw": "-184753.5726"
   },
   {
     "account_id": "smic_follower",
@@ -32820,8 +32896,8 @@
     "close_date": "",
     "company": "Cover Corp",
     "exit_reasons": "()",
-    "holding_days": 553,
-    "last_close_krw": "15453.0795",
+    "holding_days": 557,
+    "last_close_krw": "15814.2595",
     "open_date": "2024-11-25",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -32829,7 +32905,7 @@
     "symbol": "5253.T",
     "total_qty_bought": 312,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-1018695.2439"
+    "unrealized_pnl_krw": "-906007.0942"
   },
   {
     "account_id": "smic_follower",
@@ -32839,8 +32915,8 @@
     "close_date": "",
     "company": "Funko Inc.",
     "exit_reasons": "()",
-    "holding_days": 553,
-    "last_close_krw": "8434.4285",
+    "holding_days": 557,
+    "last_close_krw": "7818.6566",
     "open_date": "2024-11-25",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -32848,7 +32924,7 @@
     "symbol": "FNKO",
     "total_qty_bought": 777,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "1925351.4462"
+    "unrealized_pnl_krw": "1446896.6531"
   },
   {
     "account_id": "smic_follower",
@@ -32877,8 +32953,8 @@
     "close_date": "",
     "company": "JYP Ent.",
     "exit_reasons": "()",
-    "holding_days": 539,
-    "last_close_krw": "56500.0",
+    "holding_days": 543,
+    "last_close_krw": "53200.0",
     "open_date": "2024-12-09",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -32886,7 +32962,7 @@
     "symbol": "035900.KQ",
     "total_qty_bought": 74,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-865478.4582"
+    "unrealized_pnl_krw": "-1109678.4582"
   },
   {
     "account_id": "smic_follower",
@@ -32991,8 +33067,8 @@
     "close_date": "",
     "company": "Levi Strauss & Co",
     "exit_reasons": "()",
-    "holding_days": 502,
-    "last_close_krw": "34926.4079",
+    "holding_days": 506,
+    "last_close_krw": "34540.0669",
     "open_date": "2025-01-15",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -33000,7 +33076,7 @@
     "symbol": "LEVI",
     "total_qty_bought": 131,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "1032561.428"
+    "unrealized_pnl_krw": "981950.7582"
   },
   {
     "account_id": "smic_follower",
@@ -33181,8 +33257,8 @@
     "close_date": "",
     "company": "한화비전",
     "exit_reasons": "()",
-    "holding_days": 385,
-    "last_close_krw": "70800.0",
+    "holding_days": 389,
+    "last_close_krw": "71500.0",
     "open_date": "2025-05-12",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -33190,7 +33266,7 @@
     "symbol": "489790.KS",
     "total_qty_bought": 69,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "1025242.3682"
+    "unrealized_pnl_krw": "1073542.3682"
   },
   {
     "account_id": "smic_follower",
@@ -33200,8 +33276,8 @@
     "close_date": "",
     "company": "Cellebrite DI",
     "exit_reasons": "()",
-    "holding_days": 364,
-    "last_close_krw": "24091.8765",
+    "holding_days": 368,
+    "last_close_krw": "21171.6966",
     "open_date": "2025-06-02",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -33209,7 +33285,7 @@
     "symbol": "CLBT",
     "total_qty_bought": 205,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "440652.825"
+    "unrealized_pnl_krw": "-157984.0591"
   },
   {
     "account_id": "smic_follower",
@@ -33219,8 +33295,8 @@
     "close_date": "",
     "company": "Doximity",
     "exit_reasons": "()",
-    "holding_days": 362,
-    "last_close_krw": "33813.4259",
+    "holding_days": 366,
+    "last_close_krw": "31565.9104",
     "open_date": "2025-06-04",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -33228,7 +33304,7 @@
     "symbol": "DOCS",
     "total_qty_bought": 112,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-2334818.1853"
+    "unrealized_pnl_krw": "-2586539.9184"
   },
   {
     "account_id": "smic_follower",
@@ -33257,8 +33333,8 @@
     "close_date": "",
     "company": "Sportradar",
     "exit_reasons": "()",
-    "holding_days": 357,
-    "last_close_krw": "20442.5101",
+    "holding_days": 361,
+    "last_close_krw": "21309.6717",
     "open_date": "2025-06-09",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -33266,7 +33342,7 @@
     "symbol": "SRAD",
     "total_qty_bought": 123,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-1332317.6937"
+    "unrealized_pnl_krw": "-1225656.8247"
   },
   {
     "account_id": "smic_follower",
@@ -33276,8 +33352,8 @@
     "close_date": "",
     "company": "애니플러스",
     "exit_reasons": "()",
-    "holding_days": 356,
-    "last_close_krw": "2145.0",
+    "holding_days": 360,
+    "last_close_krw": "2245.0",
     "open_date": "2025-06-10",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -33285,7 +33361,7 @@
     "symbol": "310200.KQ",
     "total_qty_bought": 1523,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-2858294.2066"
+    "unrealized_pnl_krw": "-2705994.2066"
   },
   {
     "account_id": "smic_follower",
@@ -33295,8 +33371,8 @@
     "close_date": "",
     "company": "고려신용정보",
     "exit_reasons": "()",
-    "holding_days": 341,
-    "last_close_krw": "9500.0",
+    "holding_days": 345,
+    "last_close_krw": "9760.0",
     "open_date": "2025-06-25",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -33304,7 +33380,7 @@
     "symbol": "049720.KQ",
     "total_qty_bought": 452,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-418651.5867"
+    "unrealized_pnl_krw": "-301131.5867"
   },
   {
     "account_id": "smic_follower",
@@ -33352,8 +33428,8 @@
     "close_date": "",
     "company": "폰드그룹",
     "exit_reasons": "()",
-    "holding_days": 320,
-    "last_close_krw": "4215.0",
+    "holding_days": 324,
+    "last_close_krw": "4230.0",
     "open_date": "2025-07-16",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -33361,7 +33437,7 @@
     "symbol": "472850.KQ",
     "total_qty_bought": 789,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-1149333.1399"
+    "unrealized_pnl_krw": "-1137498.1399"
   },
   {
     "account_id": "smic_follower",
@@ -33371,8 +33447,8 @@
     "close_date": "",
     "company": "마이크로컨텍솔",
     "exit_reasons": "()",
-    "holding_days": 210,
-    "last_close_krw": "29700.0",
+    "holding_days": 214,
+    "last_close_krw": "27500.0",
     "open_date": "2025-11-03",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -33380,7 +33456,7 @@
     "symbol": "098120.KQ",
     "total_qty_bought": 173,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "1278942.8883"
+    "unrealized_pnl_krw": "898342.8883"
   },
   {
     "account_id": "smic_follower",
@@ -33409,8 +33485,8 @@
     "close_date": "",
     "company": "한국카본",
     "exit_reasons": "()",
-    "holding_days": 202,
-    "last_close_krw": "32150.0",
+    "holding_days": 206,
+    "last_close_krw": "32250.0",
     "open_date": "2025-11-11",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -33418,7 +33494,7 @@
     "symbol": "017960.KS",
     "total_qty_bought": 105,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "59595.6514"
+    "unrealized_pnl_krw": "70095.6514"
   },
   {
     "account_id": "smic_follower",
@@ -33485,8 +33561,8 @@
     "close_date": "",
     "company": "지투지바이오",
     "exit_reasons": "()",
-    "holding_days": 202,
-    "last_close_krw": "56400.0",
+    "holding_days": 206,
+    "last_close_krw": "53000.0",
     "open_date": "2025-11-11",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -33494,7 +33570,7 @@
     "symbol": "456160.KQ",
     "total_qty_bought": 54,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-1486344.1897"
+    "unrealized_pnl_krw": "-1669944.1897"
   },
   {
     "account_id": "smic_follower",
@@ -33523,8 +33599,8 @@
     "close_date": "",
     "company": "JAC recruitment Co. Ltd",
     "exit_reasons": "()",
-    "holding_days": 182,
-    "last_close_krw": "8176.0323",
+    "holding_days": 186,
+    "last_close_krw": "8343.7197",
     "open_date": "2025-12-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -33532,7 +33608,7 @@
     "symbol": "2124.T",
     "total_qty_bought": 1406,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-596576.7887"
+    "unrealized_pnl_krw": "-360808.228"
   },
   {
     "account_id": "smic_follower",
@@ -33542,8 +33618,8 @@
     "close_date": "",
     "company": "Coreweave",
     "exit_reasons": "()",
-    "holding_days": 178,
-    "last_close_krw": "188555.6513",
+    "holding_days": 182,
+    "last_close_krw": "153904.891",
     "open_date": "2025-12-05",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -33551,7 +33627,7 @@
     "symbol": "CRWV",
     "total_qty_bought": 38,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "2477006.0175"
+    "unrealized_pnl_krw": "1160277.1238"
   },
   {
     "account_id": "smic_follower",
@@ -33561,8 +33637,8 @@
     "close_date": "",
     "company": "Establishment Labs Holdings",
     "exit_reasons": "()",
-    "holding_days": 178,
-    "last_close_krw": "106316.1939",
+    "holding_days": 182,
+    "last_close_krw": "113922.424",
     "open_date": "2025-12-05",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -33570,7 +33646,7 @@
     "symbol": "ESTA",
     "total_qty_bought": 45,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "219946.5176"
+    "unrealized_pnl_krw": "562226.8706"
   },
   {
     "account_id": "smic_follower",
@@ -33599,8 +33675,8 @@
     "close_date": "",
     "company": "IMAX Corp",
     "exit_reasons": "()",
-    "holding_days": 178,
-    "last_close_krw": "60933.9755",
+    "holding_days": 182,
+    "last_close_krw": "59743.7377",
     "open_date": "2025-12-05",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -33608,7 +33684,7 @@
     "symbol": "IMAX",
     "total_qty_bought": 68,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "590456.4434"
+    "unrealized_pnl_krw": "509520.27"
   },
   {
     "account_id": "smic_follower",
@@ -33618,8 +33694,8 @@
     "close_date": "",
     "company": "Iradimed Corporation",
     "exit_reasons": "()",
-    "holding_days": 178,
-    "last_close_krw": "138251.9435",
+    "holding_days": 182,
+    "last_close_krw": "142682.8194",
     "open_date": "2025-12-05",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -33627,7 +33703,7 @@
     "symbol": "IRMD",
     "total_qty_bought": 27,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-159814.5885"
+    "unrealized_pnl_krw": "-40180.9387"
   },
   {
     "account_id": "smic_follower",
@@ -33656,8 +33732,8 @@
     "close_date": "",
     "company": "예스티",
     "exit_reasons": "()",
-    "holding_days": 146,
-    "last_close_krw": "26400.0",
+    "holding_days": 150,
+    "last_close_krw": "25550.0",
     "open_date": "2026-01-06",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -33665,7 +33741,7 @@
     "symbol": "122640.KQ",
     "total_qty_bought": 201,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "1413210.7792"
+    "unrealized_pnl_krw": "1242360.7792"
   },
   {
     "account_id": "smic_follower",
@@ -33675,8 +33751,8 @@
     "close_date": "",
     "company": "파마리서치",
     "exit_reasons": "()",
-    "holding_days": 143,
-    "last_close_krw": "298000.0",
+    "holding_days": 147,
+    "last_close_krw": "286500.0",
     "open_date": "2026-01-09",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -33684,7 +33760,7 @@
     "symbol": "214450.KQ",
     "total_qty_bought": 13,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-1487983.4269"
+    "unrealized_pnl_krw": "-1637483.4269"
   },
   {
     "account_id": "smic_follower",
@@ -33732,8 +33808,8 @@
     "close_date": "",
     "company": "Sensient Technologies Corp",
     "exit_reasons": "()",
-    "holding_days": 124,
-    "last_close_krw": "167212.1662",
+    "holding_days": 128,
+    "last_close_krw": "171995.121",
     "open_date": "2026-01-28",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -33741,7 +33817,7 @@
     "symbol": "SXT",
     "total_qty_bought": 23,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "712961.3657"
+    "unrealized_pnl_krw": "822969.3265"
   },
   {
     "account_id": "smic_follower",
@@ -33751,8 +33827,8 @@
     "close_date": "",
     "company": "Tempus AI Inc",
     "exit_reasons": "()",
-    "holding_days": 124,
-    "last_close_krw": "80149.7828",
+    "holding_days": 128,
+    "last_close_krw": "71180.4381",
     "open_date": "2026-01-28",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -33760,7 +33836,7 @@
     "symbol": "TEM",
     "total_qty_bought": 37,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-395778.323"
+    "unrealized_pnl_krw": "-727644.0771"
   },
   {
     "account_id": "smic_follower",
@@ -33808,8 +33884,8 @@
     "close_date": "",
     "company": "비츠로셀",
     "exit_reasons": "()",
-    "holding_days": 45,
-    "last_close_krw": "52000.0",
+    "holding_days": 49,
+    "last_close_krw": "48650.0",
     "open_date": "2026-04-17",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -33817,83 +33893,102 @@
     "symbol": "082920.KS",
     "total_qty_bought": 79,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-348895.434"
+    "unrealized_pnl_krw": "-613545.434"
   },
   {
     "account_id": "smic_follower",
-    "avg_entry_price_krw": 23069.4821,
+    "avg_entry_price_krw": 23133.1408,
     "avg_exit_price_krw": "",
-    "buy_fills": 3,
+    "buy_fills": 2,
     "close_date": "",
     "company": "SK오션플랜트",
     "exit_reasons": "()",
-    "holding_days": 45,
-    "last_close_krw": "16820.0",
+    "holding_days": 49,
+    "last_close_krw": "15780.0",
     "open_date": "2026-04-17",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
     "status": "open",
     "symbol": "100090.KS",
-    "total_qty_bought": 198,
+    "total_qty_bought": 196,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-1237397.4559"
+    "unrealized_pnl_krw": "-1441215.5873"
   },
   {
     "account_id": "smic_follower",
-    "avg_entry_price_krw": 6277.6426,
+    "avg_entry_price_krw": 6284.0825,
     "avg_exit_price_krw": "",
-    "buy_fills": 2,
+    "buy_fills": 1,
     "close_date": "",
     "company": "나노",
     "exit_reasons": "()",
-    "holding_days": 21,
-    "last_close_krw": "5500.0",
+    "holding_days": 25,
+    "last_close_krw": "5590.0",
     "open_date": "2026-05-11",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
     "status": "open",
     "symbol": "187790.KS",
-    "total_qty_bought": 606,
+    "total_qty_bought": 601,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-471251.4421"
+    "unrealized_pnl_krw": "-417143.5651"
   },
   {
     "account_id": "smic_follower",
-    "avg_entry_price_krw": 47636.5027,
+    "avg_entry_price_krw": 47876.5577,
     "avg_exit_price_krw": "",
     "buy_fills": 2,
     "close_date": "",
     "company": "덕산네오룩스",
     "exit_reasons": "()",
-    "holding_days": 21,
-    "last_close_krw": "37050.0",
+    "holding_days": 25,
+    "last_close_krw": "34700.0",
     "open_date": "2026-05-11",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
     "status": "open",
     "symbol": "213420.KS",
-    "total_qty_bought": 90,
+    "total_qty_bought": 88,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-952785.2463"
+    "unrealized_pnl_krw": "-1159537.0758"
   },
   {
     "account_id": "smic_follower",
-    "avg_entry_price_krw": 12801.9532,
+    "avg_entry_price_krw": 12795.3017,
     "avg_exit_price_krw": "",
     "buy_fills": 2,
     "close_date": "",
     "company": "샘씨엔에스",
     "exit_reasons": "()",
-    "holding_days": 21,
-    "last_close_krw": "12670.0",
+    "holding_days": 25,
+    "last_close_krw": "12830.0",
     "open_date": "2026-05-11",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
     "status": "open",
     "symbol": "252990.KQ",
-    "total_qty_bought": 176,
+    "total_qty_bought": 186,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-23223.7609"
+    "unrealized_pnl_krw": "6453.8746"
+  },
+  {
+    "account_id": "smic_follower",
+    "avg_entry_price_krw": 4658.0261,
+    "avg_exit_price_krw": "",
+    "buy_fills": 1,
+    "close_date": "",
+    "company": "Global Unichip Corp.",
+    "exit_reasons": "()",
+    "holding_days": 4,
+    "last_close_krw": "4410.0",
+    "open_date": "2026-06-01",
+    "realized_pnl_krw": 0.0,
+    "sell_fills": 0,
+    "status": "open",
+    "symbol": "3443.TW",
+    "total_qty_bought": 2,
+    "total_qty_sold": 0,
+    "unrealized_pnl_krw": "-496.0522"
   },
   {
     "account_id": "smic_follower_v2",
@@ -37323,8 +37418,8 @@
     "close_date": "",
     "company": "Cellebrite DI",
     "exit_reasons": "()",
-    "holding_days": 362,
-    "last_close_krw": "24091.8765",
+    "holding_days": 366,
+    "last_close_krw": "21171.6966",
     "open_date": "2025-06-04",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -37332,7 +37427,7 @@
     "symbol": "CLBT",
     "total_qty_bought": 877,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "4064374.558"
+    "unrealized_pnl_krw": "1503376.7658"
   },
   {
     "account_id": "smic_follower_v2",
@@ -37342,8 +37437,8 @@
     "close_date": "",
     "company": "고려신용정보",
     "exit_reasons": "()",
-    "holding_days": 341,
-    "last_close_krw": "9500.0",
+    "holding_days": 345,
+    "last_close_krw": "9760.0",
     "open_date": "2025-06-25",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -37351,7 +37446,7 @@
     "symbol": "049720.KQ",
     "total_qty_bought": 1676,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-1666846.6413"
+    "unrealized_pnl_krw": "-1231086.6413"
   },
   {
     "account_id": "smic_follower_v2",
@@ -37627,8 +37722,8 @@
     "close_date": "",
     "company": "한국카본",
     "exit_reasons": "()",
-    "holding_days": 202,
-    "last_close_krw": "32150.0",
+    "holding_days": 206,
+    "last_close_krw": "32250.0",
     "open_date": "2025-11-11",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -37636,7 +37731,7 @@
     "symbol": "017960.KS",
     "total_qty_bought": 417,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-81212.3609"
+    "unrealized_pnl_krw": "-39512.3609"
   },
   {
     "account_id": "smic_follower_v2",
@@ -37741,8 +37836,8 @@
     "close_date": "",
     "company": "Establishment Labs Holdings",
     "exit_reasons": "()",
-    "holding_days": 181,
-    "last_close_krw": "106316.1939",
+    "holding_days": 185,
+    "last_close_krw": "113922.424",
     "open_date": "2025-12-02",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -37750,7 +37845,7 @@
     "symbol": "ESTA",
     "total_qty_bought": 193,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "1404126.5836"
+    "unrealized_pnl_krw": "2872128.9865"
   },
   {
     "account_id": "smic_follower_v2",
@@ -37779,8 +37874,8 @@
     "close_date": "",
     "company": "예스티",
     "exit_reasons": "()",
-    "holding_days": 166,
-    "last_close_krw": "26400.0",
+    "holding_days": 170,
+    "last_close_krw": "25550.0",
     "open_date": "2025-12-17",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -37788,7 +37883,7 @@
     "symbol": "122640.KQ",
     "total_qty_bought": 832,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "5324479.5713"
+    "unrealized_pnl_krw": "4617279.5713"
   },
   {
     "account_id": "smic_follower_v2",
@@ -37836,8 +37931,8 @@
     "close_date": "",
     "company": "IMAX Corp",
     "exit_reasons": "()",
-    "holding_days": 146,
-    "last_close_krw": "60933.9755",
+    "holding_days": 150,
+    "last_close_krw": "59743.7377",
     "open_date": "2026-01-06",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -37845,7 +37940,7 @@
     "symbol": "IMAX",
     "total_qty_bought": 304,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "2719416.4778"
+    "unrealized_pnl_krw": "2357584.1733"
   },
   {
     "account_id": "smic_follower_v2",
@@ -37855,8 +37950,8 @@
     "close_date": "",
     "company": "Iradimed Corporation",
     "exit_reasons": "()",
-    "holding_days": 143,
-    "last_close_krw": "138251.9435",
+    "holding_days": 147,
+    "last_close_krw": "142682.8194",
     "open_date": "2026-01-09",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -37864,7 +37959,7 @@
     "symbol": "IRMD",
     "total_qty_bought": 116,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-714274.5328"
+    "unrealized_pnl_krw": "-200292.926"
   },
   {
     "account_id": "smic_follower_v2",
@@ -37893,8 +37988,8 @@
     "close_date": "",
     "company": "Sensient Technologies Corp",
     "exit_reasons": "()",
-    "holding_days": 143,
-    "last_close_krw": "167212.1662",
+    "holding_days": 147,
+    "last_close_krw": "171995.121",
     "open_date": "2026-01-09",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -37902,7 +37997,7 @@
     "symbol": "SXT",
     "total_qty_bought": 131,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "3860566.8652"
+    "unrealized_pnl_krw": "4487133.9463"
   },
   {
     "account_id": "smic_follower_v2",
@@ -37912,8 +38007,8 @@
     "close_date": "",
     "company": "Camtek",
     "exit_reasons": "()",
-    "holding_days": 31,
-    "last_close_krw": "250962.0943",
+    "holding_days": 35,
+    "last_close_krw": "251745.4262",
     "open_date": "2026-05-01",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -37921,7 +38016,7 @@
     "symbol": "CAMT",
     "total_qty_bought": 7,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-170075.2829"
+    "unrealized_pnl_krw": "-164591.9598"
   },
   {
     "account_id": "smic_follower_v2",
@@ -37931,8 +38026,8 @@
     "close_date": "",
     "company": "비츠로셀",
     "exit_reasons": "()",
-    "holding_days": 26,
-    "last_close_krw": "52000.0",
+    "holding_days": 30,
+    "last_close_krw": "48650.0",
     "open_date": "2026-05-06",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -37940,7 +38035,7 @@
     "symbol": "082920.KS",
     "total_qty_bought": 242,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-1218967.1345"
+    "unrealized_pnl_krw": "-2029667.1345"
   },
   {
     "account_id": "smic_follower_v2",
@@ -37950,8 +38045,8 @@
     "close_date": "",
     "company": "SK오션플랜트",
     "exit_reasons": "()",
-    "holding_days": 26,
-    "last_close_krw": "16820.0",
+    "holding_days": 30,
+    "last_close_krw": "15780.0",
     "open_date": "2026-05-06",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -37959,7 +38054,7 @@
     "symbol": "100090.KS",
     "total_qty_bought": 533,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-3381911.2429"
+    "unrealized_pnl_krw": "-3936231.2429"
   },
   {
     "account_id": "smic_follower_v2",
@@ -37969,8 +38064,8 @@
     "close_date": "",
     "company": "나노",
     "exit_reasons": "()",
-    "holding_days": 25,
-    "last_close_krw": "5500.0",
+    "holding_days": 29,
+    "last_close_krw": "5590.0",
     "open_date": "2026-05-07",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -37978,7 +38073,7 @@
     "symbol": "187790.KS",
     "total_qty_bought": 366,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "-5271.1753"
+    "unrealized_pnl_krw": "27668.8247"
   },
   {
     "account_id": "all_weather",
@@ -37988,8 +38083,8 @@
     "close_date": "",
     "company": "KODEX 200",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 1974,
-    "last_close_krw": "141395.0",
+    "holding_days": 1978,
+    "last_close_krw": "131030.0",
     "open_date": "2021-01-04",
     "realized_pnl_krw": 21518955.8334,
     "sell_fills": 14,
@@ -37997,7 +38092,7 @@
     "symbol": "069500.KS",
     "total_qty_bought": 978,
     "total_qty_sold": 534,
-    "unrealized_pnl_krw": "45430594.7587"
+    "unrealized_pnl_krw": "40828534.7587"
   },
   {
     "account_id": "all_weather",
@@ -38007,8 +38102,8 @@
     "close_date": "",
     "company": "Gold",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 1974,
-    "last_close_krw": "619703.0191",
+    "holding_days": 1978,
+    "last_close_krw": "607463.6205",
     "open_date": "2021-01-04",
     "realized_pnl_krw": 2977955.8274,
     "sell_fills": 11,
@@ -38016,7 +38111,7 @@
     "symbol": "GLD",
     "total_qty_bought": 113,
     "total_qty_sold": 19,
-    "unrealized_pnl_krw": "25306424.375"
+    "unrealized_pnl_krw": "24155920.9148"
   },
   {
     "account_id": "all_weather",
@@ -38026,8 +38121,8 @@
     "close_date": "",
     "company": "NASDAQ-100",
     "exit_reasons": "('rebalance_sell',)",
-    "holding_days": 1974,
-    "last_close_krw": "1119190.3015",
+    "holding_days": 1978,
+    "last_close_krw": "1080906.2926",
     "open_date": "2021-01-04",
     "realized_pnl_krw": 679072.8932,
     "sell_fills": 2,
@@ -38035,7 +38130,7 @@
     "symbol": "QQQ",
     "total_qty_bought": 57,
     "total_qty_sold": 2,
-    "unrealized_pnl_krw": "28872902.9765"
+    "unrealized_pnl_krw": "26767282.4864"
   },
   {
     "account_id": "all_weather",
@@ -38045,8 +38140,8 @@
     "close_date": "",
     "company": "S&P 500",
     "exit_reasons": "()",
-    "holding_days": 1974,
-    "last_close_krw": "1142998.3546",
+    "holding_days": 1978,
+    "last_close_krw": "1130715.7202",
     "open_date": "2021-01-04",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -38054,7 +38149,7 @@
     "symbol": "SPY",
     "total_qty_bought": 50,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "21753997.4048"
+    "unrealized_pnl_krw": "21139865.6851"
   },
   {
     "account_id": "benchmark_gld",
@@ -38064,8 +38159,8 @@
     "close_date": "",
     "company": "Gold",
     "exit_reasons": "()",
-    "holding_days": 1974,
-    "last_close_krw": "619703.0191",
+    "holding_days": 1978,
+    "last_close_krw": "607463.6205",
     "open_date": "2021-01-04",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -38073,7 +38168,7 @@
     "symbol": "GLD",
     "total_qty_bought": 371,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "126294902.754"
+    "unrealized_pnl_krw": "121754085.9059"
   },
   {
     "account_id": "benchmark_kodex200",
@@ -38083,8 +38178,8 @@
     "close_date": "",
     "company": "KODEX 200",
     "exit_reasons": "()",
-    "holding_days": 1974,
-    "last_close_krw": "141395.0",
+    "holding_days": 1978,
+    "last_close_krw": "131030.0",
     "open_date": "2021-01-04",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -38092,7 +38187,7 @@
     "symbol": "069500.KS",
     "total_qty_bought": 2637,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "268976767.8799"
+    "unrealized_pnl_krw": "241644262.8799"
   },
   {
     "account_id": "benchmark_qqq",
@@ -38102,8 +38197,8 @@
     "close_date": "",
     "company": "NASDAQ-100",
     "exit_reasons": "()",
-    "holding_days": 1974,
-    "last_close_krw": "1119190.3015",
+    "holding_days": 1978,
+    "last_close_krw": "1080906.2926",
     "open_date": "2021-01-04",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -38111,7 +38206,7 @@
     "symbol": "QQQ",
     "total_qty_bought": 198,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "118056424.7999"
+    "unrealized_pnl_krw": "110476191.0357"
   },
   {
     "account_id": "benchmark_spy",
@@ -38121,8 +38216,8 @@
     "close_date": "",
     "company": "S&P 500",
     "exit_reasons": "()",
-    "holding_days": 1974,
-    "last_close_krw": "1142998.3546",
+    "holding_days": 1978,
+    "last_close_krw": "1130715.7202",
     "open_date": "2021-01-04",
     "realized_pnl_krw": 0.0,
     "sell_fills": 0,
@@ -38130,6 +38225,6 @@
     "symbol": "SPY",
     "total_qty_bought": 165,
     "total_qty_sold": 0,
-    "unrealized_pnl_krw": "84709107.4934"
+    "unrealized_pnl_krw": "82682472.8186"
   }
 ]

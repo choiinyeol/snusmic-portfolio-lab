@@ -1118,6 +1118,41 @@ class CurrentHolding(_FrozenModel):
     first_buy_date: date
 
 
+class VerificationCase(_FrozenModel):
+    """One PIT validation case for a report claim.
+
+    This is the verification-first downstream object. It may wrap the same
+    market path as :class:`ReportPerformance`, but adds downside-aware quality
+    and explicit alpha-eligibility semantics.
+    """
+
+    case_id: str
+    report_id: str
+    symbol: str
+    company: str
+    claim_type: Literal["target_price", "thesis"]
+    publication_date: date
+    entry_price_krw: float | None
+    target_price_krw: float | None
+    target_upside_at_pub: float | None
+    target_hit: bool
+    target_hit_date: date | None
+    days_to_target: int | None
+    last_close_krw: float | None
+    last_close_date: date | None
+    current_return: float | None
+    peak_return: float | None
+    trough_return: float | None
+    max_drawdown: float | None
+    failure_tail_return: float | None
+    target_gap_pct: float | None
+    expiry_date: date | None = None
+    expired: bool = False
+    quality_score: float | None = None
+    veto_reasons: tuple[str, ...] = ()
+    eligible_for_alpha: bool = True
+
+
 class ReportPerformance(_FrozenModel):
     """One SMIC report's realised outcome between publication and ``as_of_date``.
 
@@ -1147,8 +1182,6 @@ class ReportPerformance(_FrozenModel):
     evaluation_return: float | None = None  # evaluation_close / entry − 1
     expiry_date: date | None = None  # publication_date + config.report_expiry_days
     expired: bool = False  # True once today >= expiry_date and target was not hit in-window
-
-
 class ReportStats(_FrozenModel):
     """Aggregate statistics across the entire SMIC report universe."""
 
@@ -1170,6 +1203,28 @@ class ReportStats(_FrozenModel):
     slowest_target_hits: tuple[ReportPerformance, ...]
     most_aggressive_targets: tuple[ReportPerformance, ...]  # highest target_upside_at_pub
 
+class AlphaQualityDistribution(_FrozenModel):
+    sample_size: int
+    mean_quality_score: float | None = None
+    median_quality_score: float | None = None
+    worst_quality_score: float | None = None
+    veto_case_count: int = 0
+
+
+class AlphaHypothesis(_FrozenModel):
+    """Repeated selection rule promoted from many non-vetoed verification cases."""
+
+    hypothesis_id: str
+    selection_rule: str
+    evidence_case_ids: tuple[str, ...]
+    distinct_symbol_count: int
+    support_count: int
+    support_start_date: date | None = None
+    support_end_date: date | None = None
+    regime_count: int = 0
+    quality_distribution: AlphaQualityDistribution
+    promotion_status: Literal["candidate", "promoted", "rejected"]
+    rejection_reasons: tuple[str, ...] = ()
 
 class MonthlyHolding(_FrozenModel):
     """Month-end snapshot of one (account_id, symbol) pair.
@@ -1237,6 +1292,8 @@ class SimulationResult(_FrozenModel):
     symbol_stats: tuple[SymbolStat, ...] = ()
     monthly_holdings: tuple[MonthlyHolding, ...] = ()
     report_performance: tuple[ReportPerformance, ...] = ()
+    verification_cases: tuple[VerificationCase, ...] = ()
+    alpha_hypotheses: tuple[AlphaHypothesis, ...] = ()
     report_stats: ReportStats | None = None
 
 

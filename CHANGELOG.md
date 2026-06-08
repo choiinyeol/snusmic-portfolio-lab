@@ -1,5 +1,25 @@
 # Changelog
 
+## v1.0.4 - Enforce alpha promotion gates
+
+- Promotes `AlphaHypothesis` only after minimum support, distinct-symbol coverage, regime spread, and positive median quality pass; single-report or unstable distributions now emit explicit rejection reasons.
+- Regenerates simulation and web artifacts so the live alpha board carries the promoted repeated-rule candidate, 240 verification cases, 119 alpha-eligible cases, and 121 downside/failure-tail vetoed cases.
+- Makes web artifact replacement resilient to Windows directory rename locks by falling back to an in-place directory sync, preserving `export-web --check` as a usable release gate.
+
+Verification:
+
+- `uv run pytest tests/sim/test_report_stats.py -q`
+- `uv run ruff check src/snusmic_pipeline/sim/report_stats.py src/snusmic_pipeline/web/artifacts.py tests/sim/test_report_stats.py`
+- `uv run python -m snusmic_pipeline run-sim --warehouse data/warehouse --out data/sim --end 2026-06-05`
+- `uv run python -m snusmic_pipeline export-web --warehouse data/warehouse --sim data/sim --out data/web`
+- `uv run python -m snusmic_pipeline export-web --check`
+- `pnpm --dir apps/web artifact:check`
+- `pnpm --dir apps/web check`
+- `pnpm --dir apps/web typecheck`
+- `uv run pytest tests/test_web_artifacts.py tests/sim/test_report_stats.py -q -x`
+- `pnpm --dir apps/web build`
+- `pnpm --dir apps/web smoke:static`
+
 ## v1.0.3 - Restore appended strategy artifacts under the completed ultragoal
 
 - Rebuilds the web information architecture around operator jobs: Board, Reports, Portfolio, Calendar, and Statistics now read as a smaller audit workstation instead of a generic dashboard.

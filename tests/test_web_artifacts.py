@@ -22,7 +22,7 @@ from snusmic_pipeline.web.artifacts import (
     check_web_artifacts,
     export_web_artifacts,
 )
-from snusmic_pipeline.web.contracts import ACCOUNT_CATALOG_ROWS
+from snusmic_pipeline.web.contracts import ACCOUNT_CATALOG_ROWS, ALPHA_HYPOTHESIS_ROWS, VERIFICATION_CASE_ROWS
 
 
 def _baseline_export_inputs(out: Path) -> ExportInputs:
@@ -98,18 +98,18 @@ def web_export_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
 def test_export_web_artifacts_matches_baseline_counts(web_export_dir: Path) -> None:
     overview = json.loads((web_export_dir / "overview.json").read_text(encoding="utf-8"))
     assert overview["report_counts"] == {
-        "excluded_downside_target": 7,
+        "excluded_downside_target": 6,
         "excluded_instant_target_hit": 1,
         "excluded_missing_performance": 0,
         "excluded_missing_price": 5,
         "excluded_non_positive_upside": 8,
-        "excluded_reports": 21,
+        "excluded_reports": 20,
         "excluded_sell_opinion": 0,
         "extracted_reports": 240,
         "missing_price_symbols": 5,
-        "price_matched_reports": 219,
+        "price_matched_reports": 220,
         "report_stat_rows": 240,
-        "web_report_rows": 219,
+        "web_report_rows": 220,
     }
     manifest = json.loads((web_export_dir / "manifest.json").read_text(encoding="utf-8"))
     assert manifest["data_quality"]["missing_price_symbols"] == 5
@@ -485,16 +485,16 @@ def test_extended_web_artifacts_support_insights_and_downloads(web_export_dir: P
     assert "6615fd1894ed9c54" in detail_metrics
     assert detail_metrics["6615fd1894ed9c54"]["markers"]
     assert page_detail_metrics == detail_metrics
-    assert len(return_windows) == 219
+    assert len(return_windows) == 220
     assert page_return_windows == return_windows
     assert {"return_30d", "return_60d", "return_90d", "return_180d"} <= set(return_windows[0])
-    assert target_distribution["summary"]["total_reports"] == 219
+    assert target_distribution["summary"]["total_reports"] == 220
     assert page_target_distribution == target_distribution
     data_quality = json.loads((out / "overview" / "data-quality.json").read_text(encoding="utf-8"))
     assert data_quality["report_exclusions"] == {
-        "downside_target": 7,
-        "excluded_reports": 21,
-        "included_reports": 219,
+        "downside_target": 6,
+        "excluded_reports": 20,
+        "included_reports": 220,
         "instant_target_hit": 1,
         "missing_performance": 0,
         "missing_price": 5,
@@ -525,12 +525,12 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(web_export_dir: 
         "start": warehouse_prices["date"].astype(str).min(),
         "end": warehouse_prices["date"].astype(str).max(),
     }
-    assert manifest["row_counts"]["reports"] == 219
+    assert manifest["row_counts"]["reports"] == 220
     expected_accounts = len(pd.read_csv(Path("data/sim") / "summary.csv"))
     assert manifest["row_counts"]["accounts"] == expected_accounts
     assert manifest["row_counts"]["account_catalog"] == expected_accounts
     assert manifest["row_counts"]["report_board_candidates"] > 0
-    assert manifest["data_quality"]["reports_with_prices"] == 219
+    assert manifest["data_quality"]["reports_with_prices"] == 220
     assert manifest["data_quality"]["missing_price_symbols"] == 5
     assert "overview/snapshot.json" in manifest["artifacts"]
     assert "portfolio/holdings.json" in manifest["artifacts"]
@@ -546,11 +546,11 @@ def test_manifest_records_snapshot_lineage_counts_and_checksums(web_export_dir: 
     report_health = json.loads((out / "report-health.json").read_text(encoding="utf-8"))
     assert report_health["schema_version"] == "1.0.0"
     assert report_health["summary"]["source_reports"] == 240
-    assert report_health["summary"]["web_visible"] == 219
-    assert report_health["summary"]["web_excluded"] == 21
+    assert report_health["summary"]["web_visible"] == 220
+    assert report_health["summary"]["web_excluded"] == 20
     assert report_health["summary"]["needs_review"] == 0
     assert report_health["summary"]["exclusion_reasons"] == {
-        "downside_target": 7,
+        "downside_target": 6,
         "instant_target_hit": 1,
         "missing_price": 5,
         "non_positive_upside": 8,
@@ -678,6 +678,47 @@ def test_account_catalog_matches_committed_account_config(web_export_dir: Path) 
     assert set(csv_ids) == set(expected_ids)
     assert len(csv_ids) == len(expected_ids)
 
+def test_verification_case_and_alpha_contract_rows_validate() -> None:
+    cases = VERIFICATION_CASE_ROWS.validate_python(
+        [
+            {
+                "case_id": "r1:target_price",
+                "report_id": "r1",
+                "symbol": "AAA",
+                "company": "Alpha",
+                "claim_type": "target_price",
+                "publication_date": "2026-01-02",
+                "target_hit": False,
+                "current_return": 0.12,
+                "peak_return": 0.3,
+                "trough_return": -0.08,
+                "max_drawdown": -0.08,
+                "failure_tail_return": -0.04,
+                "quality_score": 0.04,
+                "veto_reasons": [],
+                "eligible_for_alpha": True,
+            }
+        ]
+    )
+    assert cases[0].case_id == "r1:target_price"
+
+    hypotheses = ALPHA_HYPOTHESIS_ROWS.validate_python(
+        [
+            {
+                "hypothesis_id": "rule-1",
+                "selection_rule": "unspecified_repeated_rule",
+                "evidence_case_ids": ["r1:target_price"],
+                "distinct_symbol_count": 1,
+                "support_count": 1,
+                "support_start_date": "2026-01-02",
+                "support_end_date": "2026-01-02",
+                "regime_count": 1,
+                "promotion_status": "candidate",
+                "rejection_reasons": [],
+            }
+        ]
+    )
+    assert hypotheses[0].hypothesis_id == "rule-1"
 
 @pytest.mark.slow
 @pytest.mark.contract

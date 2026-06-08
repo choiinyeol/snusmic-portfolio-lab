@@ -1,107 +1,131 @@
-# Enfusion-style SNUSMIC UX cleanup
+# Verification-First SNUSMIC Reboot Plan
+
+## RALPLAN-DR
+### Principles
+1. VerificationCase is the core product object.
+2. PIT/no-lookahead guarantees are non-negotiable.
+3. PDF extraction must preserve dual outputs: markdown evidence plus structured machine artifact.
+4. Downside-aware quality with drawdown/failure-tail hard veto precedes alpha promotion.
+5. Product flow is Verification board → Alpha board → Portfolio proof; execution trace is proof, not broker infrastructure.
+
+### Decision Drivers
+1. Correct the object model away from ledger/account framing.
+2. Promote only evidence-backed alpha with downside quality, support, and stability.
+3. Reuse the brownfield PIT/export pipeline instead of risking a greenfield rewrite.
+
+### Options
+- **Option A — Contract-first migration in the current pipeline (Chosen)**
+  - Pros: lowest PIT regression risk; preserves existing extract/warehouse/sim/export machinery; allows rollback slice by slice.
+  - Cons: temporary contract duplication during migration.
+- **Option B — Parallel namespace transition**
+  - Pros: safest UI cutover if migration proves noisy.
+  - Cons: increases the chance of two competing product truths and should only be temporary.
+- **Option C — Full greenfield rewrite**
+  - Pros: clean names and surfaces from day one.
+  - Cons: unacceptable risk to working PIT, symbol, benchmark, and static export machinery.
 
 ## ADR
-- Decision: Execute Option A. Keep the five-job route map (Board, Reports, Portfolio, Calendar, Statistics) and rebuild each route around one operator question while deleting wrapper sprawl and heuristic account-taxonomy logic.
-- Drivers: faster audit flow; lower UI/view-model entropy; preserve static-export reliability with exporter-owned contracts.
-- Alternatives considered:
-  - Option B: demote Statistics from top nav. Rejected because it conflicts with the required five-job nav spine.
-  - Option C: cosmetic refresh on current shapes. Rejected because it leaves duplicate report flows, wrapper sprawl, and heuristic portfolio taxonomy handling alive.
-- Why chosen: lowest route-risk path that still materially shrinks the product into a denser research workstation.
-- Consequences: requires coordinated slice-zero contract work across report ledgers, portfolio route models, and exported account taxonomy metadata before route JSX cleanup.
-- Follow-ups: remove every remaining direct `strategyMeta` taxonomy caller during execution and keep the taxonomy payload compact and producer-owned.
+- **Decision**: Reboot SNUSMIC with a contract-first brownfield migration centered on `ReportArtifact -> VerificationCase -> AlphaHypothesis -> PortfolioStrategy`, while demoting execution trace to a proof surface and removing ledger-first framing from the product.
+- **Why chosen**: It captures the clarified product intent without discarding the deterministic PIT pipeline that already works.
+- **Alternatives considered**: Temporary parallel namespaces are acceptable only as a migration tactic. A greenfield rewrite is rejected.
+- **Consequences**: Contracts, artifacts, and UI copy will change materially; generated outputs must be migrated in lockstep; old report/ledger-first surfaces must be actively removed, not merely hidden.
+- **Follow-ups**: Keep report-row compatibility transitional only; keep execution trace subordinate to portfolio proof; place diagnostics routes behind the main verification→alpha→proof spine.
 
 ## Scope
-- In: `apps/web/**` routes, components, view-models, nav labels, artifact/schema/reader touchpoints needed for the UX cleanup, verified-unused web wrappers, route docs/spec text affected by route retirement.
-- Out: simulation logic changes, live data, design-system rewrite, dark mode, AI-summary fluff, landing-page marketing.
+In scope:
+- Rebuild the domain model around `VerificationCase`, `AlphaHypothesis`, and `PortfolioStrategy`
+- Add explicit `ReportArtifact` and execution-trace proof contracts
+- Migrate data/web artifacts and static UI to the verification→alpha→proof pipeline
+- Preserve markdown + structured extraction dual artifacts
+- Preserve downside-aware validation and support/stability-gated alpha promotion
 
-## Route contract
-| Route | Operator question | Retained surface | Delete or merge | Acceptance | Verification |
-| --- | --- | --- | --- | --- | --- |
-| Board | What needs attention today across reports and the primary book? | One compact shell: health row, top-of-queue report-ledger subset, primary-book risk monitor. | Delete the current briefing stack and any second report-table implementation. | Board uses the canonical report-ledger subset only and no route-local report row mapping remains. | `pnpm --dir apps/web check`; `pnpm --dir apps/web typecheck`; `pnpm --dir apps/web build`; `pnpm --dir apps/web smoke:static`; visual review of `/`. |
-| Reports | Which report should I audit next, and why? | Full canonical report ledger with sorting, filtering, drilldown. | Delete wrapper stacking around the same ledger and remove `PageHeader`, `MetricStrip`, `Section` chrome. | Reports is the only full-report ledger page and shares the same contract and renderer as Board. | same as Board plus verify sort/filter/drilldown. |
-| Report detail | Can I verify this report from source to outcome quickly? | One `PageHero`, one KPI grid, one audit rail, one price-path surface. | Merge trust/source layers; replace reusable-looking `FactsTable` with the chosen KPI/fact approach. | User sees source links, stage, key prices, and price path without duplicate status panels. | web check/typecheck/build + focused report-detail review. |
-| Portfolio | Which books deserve attention or drilldown? | Table-first roster ranked by objective status and benchmark excess, with optional comparison chart secondary. | Delete row-level `comparisonPrompt` prose and repetitive role storytelling. | Roster rows are numeric and comparative; objective status and benchmark excess are visible without prose. | web check/typecheck/build + visual review of `/portfolio`. |
-| Account overview | What is the current state of this book right now? | One `PageHero`, one compact KPI grid, one benchmark/equity chart, one top-holdings preview, one recent-trades preview, one compact artifact-fed rule/taxonomy block. | Delete embedded full holdings/trades ledgers, anchor-nav chrome, repeated prose, and heuristic taxonomy helper usage. | Overview keeps exactly one compact taxonomy block sourced from exported account catalog metadata, not account-id heuristics. | web check/typecheck/build + artifact contract verification for taxonomy fields + visual review. |
-| Holdings | Where is risk and capital allocated? | Full holdings ledger in `DataPanel` with weights and risk-relevant columns. | Delete narrative summary when it only repeats table totals. | Holdings is the authoritative full holdings ledger and includes per-position weight. | web check/typecheck/build + verify weight and linked-target columns. |
-| Trades | What changed in the book, when, and why? | Full trade ledger in `DataPanel` with sorting and filtering. | Delete big-trade cards and reason-bucket storytelling. | Trades is the authoritative full trade ledger and no secondary storytelling remains above the ledger. | web check/typecheck/build + verify sort/filter/drill links. |
-| Equity | Retired and folded into account overview because overview already owns the benchmark/equity state question. | Retain the benchmark and equity chart on account overview. | Delete `app/(app)/portfolio/[account]/equity/page.tsx` and remove any nav/link/doc entry treating equity as a separate page. | No dedicated equity route file, link, or route-doc entry remains. Account overview contains the canonical equity chart. | web check/typecheck/build + static smoke and route-doc update. |
-| Calendar | What was knowable on a selected date, and how did those candidates resolve? | One compact date selector plus one selected-date audit ledger. | Replace month-card sprawl with a compact selector/list and reduce default visible analytical columns. | Default calendar view uses one compact date-control block and a ledger with at most 8 analytical columns beyond identity and notes. | web check/typecheck/build + visual review that default layout fits desktop without sprawl. |
-| Statistics | What does the sample say about opportunity, concentration, and failure shape? | One compact header, one executive summary, one concentration block, one whole-sample map, one winners/losers block, and up to two representative path sections. | Delete long explanatory duplication and remove empty `featureBuckets` / `confirmationSignals` surfaces. | Statistics renders only the retained section set and no empty `featureBuckets` or `confirmationSignals` blocks. | web check/typecheck/build + visual review of section count and empty-surface removal. |
-| Navigation | Which job am I doing? | Board, Reports, Portfolio, Calendar, Statistics as plain job labels. | Delete inward-facing operational labels. | Top nav labels/descriptions are job-based and map directly to route questions. | web check/typecheck + command-palette + visual review. |
+Out of scope:
+- Live broker execution APIs or order submission
+- Realtime market dependencies
+- Treating account/ledger views as the primary product again
+- One-off single report recommendations masquerading as alpha
 
-## Mandatory slice zero
-No route redesign starts before all three contract moves land:
-1. one canonical report-ledger contract for Board and Reports
-2. portfolio base and supplement route-model split instead of the monolithic `PortfolioViewModel`
-3. artifact-fed account taxonomy contract exported through account catalog and consumed by account overview
+## Execution Slices
+### Slice 1 — Vocabulary and documentation reset
+- Update README, product spec, architecture docs, and active design notes.
+- Replace ledger-first product vocabulary with verification→alpha→proof vocabulary.
+- Acceptance: active docs no longer describe portfolio/account ledger as the product nucleus.
 
-## Taxonomy contract
-- Source of truth: exported account metadata in the account catalog contract.
-- Explicitly forbidden as taxonomy source: `strategyMeta(accountId)` and any other web-local account-id prefix/substring inference.
-- Exporter and schema touchpoints:
-  - `src/snusmic_pipeline/web/artifacts.py`
-  - `src/snusmic_pipeline/web/contracts.py`
-  - `data/web/accounts/catalog.json`
-  - `apps/web/lib/schemas.ts`
-  - `apps/web/lib/artifacts.ts`
-  - `apps/web/app/(app)/portfolio/portfolio-view-model.ts`
-  - `apps/web/components/trading/portfolio-views/types.ts`
-  - `tests/test_web_artifacts.py`
-- Required payload shape: compact role/category, compact title, compact subtitle or one-line intent, compact comparison prompt/review question, optional benchmark or peer framing when already known at export time.
+### Slice 2 — ReportArtifact contract
+- Define explicit `ReportArtifact` contract with PDF/source metadata, markdown path, and structured extracted fields.
+- Preserve markdown as audit evidence and structured fields as engine input.
+- Acceptance: one PDF deterministically yields both artifacts.
 
-## Primitive decisions
-- Keep `PageHero` for route headers only; delete `PageHeader`.
-- Keep `KpiTile` for summary metrics only; delete `MetricStrip` and rebuild summary strips on KpiTile grids.
-- Keep `DataPanel` for ledger panels only; do not wrap it in extra `Section`/header chrome. Delete `ui/Panel.tsx` if unused.
+### Slice 3 — VerificationCase builder and quality engine
+- Create deterministic `VerificationCase` generation from structured artifacts + PIT price data.
+- Add downside-aware quality, drawdown, failure-tail, and hard-veto rules.
+- Target hit remains a submetric, not the sole quality gate.
+- Acceptance: hard-veto cases cannot support alpha.
 
-## Cleanup targets
-Delete after migration or verification:
-- `apps/web/components/ui/PageHeader.tsx`
-- `apps/web/components/ui/MetricStrip.tsx`
-- `apps/web/components/trading/portfolio-views/PortfolioAccountFrame.tsx`
-- `apps/web/app/(app)/portfolio/[account]/equity/page.tsx`
-- `apps/web/components/trading/portfolio-views/strategy-display.ts` as taxonomy source of truth
-- heuristic `shortlistMetadata` logic in `apps/web/app/(app)/portfolio/portfolio-view-model.ts`
-- verified-unused if caller search stays empty: `components/ui/Panel.tsx`, `components/ui/DataTable.tsx`, `components/ui/Tabs.tsx`, `components/charts/PerformanceChartPanel.tsx`, `components/report-board/report-board-table.tsx` `ReviewTable`
+### Slice 4 — AlphaHypothesis promotion engine
+- Represent alpha as repeated selection rules backed by many VerificationCases.
+- Gate promotion on minimum support plus quality/regime stability.
+- Support must include more than raw count: distinct symbols and time/regime spread.
+- Acceptance: single-report or unstable rules are rejected with explicit rejection reasons.
 
-## Release slices
-0. Contract and model consolidation hard gate
-1. Shared primitives and nav rename
-2. Board and Reports workstation pass
-3. Report-detail audit pass
-4. Portfolio IA pass including equity-route retirement and route-doc/static-smoke updates
-5. Holdings and Trades cleanup
-6. Calendar compression
-7. Statistics compression and dead-code purge
+### Slice 5 — PortfolioStrategy proof and execution trace
+- Recast current product accounts as strategy proof outputs consuming `AlphaHypothesis` IDs.
+- Keep benchmark comparisons (all-weather and index families).
+- Build daily historical execution trace views from trades + decisions with when/why/what/how much/price/PnL.
+- Acceptance: users can follow historical buy/sell logic without broker integration.
 
-## Acceptance criteria
-1. Exactly one shared report-ledger contract and one shared renderer back Board and Reports.
-2. Board contains only a filtered/ranked subset of the canonical report ledger and no second full report-table implementation.
-3. Reports is the only full-report ledger page.
-4. Overview, Holdings, and Trades no longer depend on one monolithic `PortfolioViewModel` carrying unrelated payloads.
-5. Account overview retains exactly one compact taxonomy block.
-6. That taxonomy block is sourced from exported account catalog metadata and not from `strategyMeta(accountId)` or any other web-local account-id heuristic.
-7. Account catalog exporter, Python contract, web schema, artifact reader, and portfolio view-model all expose matching taxonomy fields.
-8. No dedicated equity route file, link, or route-doc entry remains.
-9. Holdings is the only full holdings ledger for an account.
-10. Trades is the only full trades ledger for an account.
-11. Default calendar view uses one compact date selector block and a ledger with at most 8 analytical columns beyond identity and notes.
-12. Statistics renders only the retained section set and no empty `featureBuckets` or `confirmationSignals` blocks.
-13. `PageHeader` and `MetricStrip` are removed; `PageHero`, `KpiTile`, and `DataPanel` remain with single roles.
-14. Every new field is traceable to existing artifacts or deterministic derivation only.
-15. Each listed cleanup candidate is either deleted or referenced by a remaining caller verified by import search and typecheck.
+### Slice 6 — Web artifact and schema migration
+- Add verification/alpha/proof web artifacts and page bundles.
+- Add row counts, checksums, and cross-reference validation for report→case→alpha→strategy→trace.
+- Acceptance: validators fail any broken chain.
 
-## Verification
-- Per slice: `pnpm --dir apps/web check`; `pnpm --dir apps/web typecheck`
-- When route rendering or export changes: `pnpm --dir apps/web build`; `pnpm --dir apps/web smoke:static`
-- When artifact/view-model contracts change: `pnpm --dir apps/web artifact:check`; `uv run pytest tests/test_web_artifacts.py -q -x`
-- Focused taxonomy-contract verification:
-  - `data/web/accounts/catalog.json` contains compact taxonomy fields for selectable portfolio accounts
-  - `src/snusmic_pipeline/web/contracts.py` and `apps/web/lib/schemas.ts` define matching fields
-  - `apps/web/lib/artifacts.ts` exposes those fields without fallback heuristics
-  - `apps/web/app/(app)/portfolio/portfolio-view-model.ts` builds the overview taxonomy block from catalog data only
-  - no remaining caller uses `strategyMeta(accountId)` or account-id substring decoding for taxonomy meaning
-- UI review: screenshot/browser review for `/`, `/reports`, report detail, `/portfolio`, account overview, holdings, trades, calendar, statistics; confirm command-palette targets still match the final route map.
+### Slice 7 — ProductSurface migration
+- Make `/` the verification board.
+- Add alpha board and portfolio proof board.
+- Demote diagnostics (`Reports/Sources`, `Calendar`, `Statistics`) behind the main pipeline.
+- Acceptance: product IA clearly reads VerificationCase → Alpha → Portfolio proof.
+
+### Slice 8 — Cleanup and legacy removal
+- Remove old ledger-first copy, labels, compatibility surfaces, and stale tests once replacements are live.
+- Keep only transitional compatibility required for safe migration.
+- Acceptance: no first-class ledger framing remains in product navigation or primary contracts.
+
+## Acceptance Criteria
+- [ ] PDF extraction produces markdown evidence plus structured engine input.
+- [ ] VerificationCase is the first-class downstream object, not raw report rows or account ledgers.
+- [ ] Downside-aware validation computes drawdown/failure-tail quality and supports hard veto.
+- [ ] Alpha promotion requires repeated rule support plus quality/regime stability.
+- [ ] At least one strategy family can be tested against all-weather or index benchmarks.
+- [ ] Product first screen is the VerificationCase board.
+- [ ] Product surface exposes verification→alpha→portfolio proof in that order.
+- [ ] Historical daily buy/sell trace explains why, what, how much, price, and PnL.
+- [ ] Execution trace is present as proof but does not become the new core object.
+- [ ] Legacy ledger-first framing is removed from primary contracts and UI.
+
+## Verification Plan
+Implementation slices should use focused checks first:
+- Python/data slices: targeted `uv run --locked pytest ... -q`, `uv run --locked ruff check ...`
+- Web slices: `pnpm --dir apps/web typecheck`, `pnpm --dir apps/web exec biome check .`
+
+Release-grade gates for producer/data or routing changes:
+- `uv run --locked python -m snusmic_pipeline export-web --check`
+- `uv run --locked pytest tests/test_web_artifacts.py -q -x`
+- `uv run --locked pytest -q -m "not slow" -x`
+- `pnpm --dir apps/web artifact:check`
+- `pnpm --dir apps/web build`
+- `pnpm --dir apps/web smoke:static`
+
+Manual proof checks:
+- `/` starts at verification board
+- alpha board rejects unsupported/unstable rules
+- portfolio proof shows benchmark comparison plus historical execution trace
+- no primary ledger framing remains
+
+## Risks and Rollback
+- **Temporary dual contracts**: allowed only during migration; old report-row truth must not persist as equal first-class product truth.
+- **No-lookahead regressions**: enforce as-of tests before promoting cases or alpha.
+- **Trace overreach**: execution trace must remain subordinate to PortfolioStrategy proof, not become OMS scope.
+- **Generated artifact churn**: split contract/code commits from regeneration where practical; rollback generated outputs with their producer slice.
 
 ## Status
-Completed and verified for release.
+Pending approval.

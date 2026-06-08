@@ -1,0 +1,1 @@
+{"as_of":{"price_date":"2026-06-08","report_date":"2026-05-29"},"generated_at":"2026-06-08T00:00:00+09:00","metrics":[{"helper":null,"id":"alpha_hypotheses","label":"alpha_hypotheses","tone":"neutral","value":1}],"title":"alpha-board","views":[{"description":"반복 규칙이 어떻게 승격 또는 탈락하는지 보는 화면","id":"alpha-hypothesis-board","label":"Alpha board"}]}

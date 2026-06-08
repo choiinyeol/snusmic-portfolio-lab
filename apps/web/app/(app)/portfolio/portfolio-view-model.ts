@@ -130,7 +130,7 @@ function defaultPortfolioContext(
   return {
     role: 'portfolio',
     category: 'strategy',
-    title: '포트폴리오 원장',
+    title: '포트폴리오 proof',
     subtitle: '비교 기준 미분류',
     comparisonPrompt: '수익률, 낙폭, 체결 강도를 기준선과 함께 비교합니다.',
     shortlistReason: null,

@@ -1,12 +1,12 @@
 account_id,symbol,company,episodes,total_buy_fills,total_sell_fills,total_holding_days,total_realized_pnl_krw,is_currently_held,current_qty,current_unrealized_pnl_krw
-all_weather,069500.KS,KODEX 200,1,51,14,1974,21518955.8334,True,444,45430594.7587
-all_weather,GLD,Gold,1,41,11,1974,2977955.8274,True,94,25306424.375
-all_weather,QQQ,NASDAQ-100,1,35,2,1974,679072.8932,True,55,28872902.9765
-all_weather,SPY,S&P 500,1,34,0,1974,0.0,True,50,21753997.4048
-benchmark_gld,GLD,Gold,1,66,0,1974,0.0,True,371,126294902.754
-benchmark_kodex200,069500.KS,KODEX 200,1,66,0,1974,0.0,True,2637,268976767.8799
-benchmark_qqq,QQQ,NASDAQ-100,1,66,0,1974,0.0,True,198,118056424.7999
-benchmark_spy,SPY,S&P 500,1,66,0,1974,0.0,True,165,84709107.4934
+all_weather,069500.KS,KODEX 200,1,51,14,1978,21518955.8334,True,444,40828534.7587
+all_weather,GLD,Gold,1,41,11,1978,2977955.8274,True,94,24155920.9148
+all_weather,QQQ,NASDAQ-100,1,35,2,1978,679072.8932,True,55,26767282.4864
+all_weather,SPY,S&P 500,1,34,0,1978,0.0,True,50,21139865.6851
+benchmark_gld,GLD,Gold,1,66,0,1978,0.0,True,371,121754085.9059
+benchmark_kodex200,069500.KS,KODEX 200,1,66,0,1978,0.0,True,2637,241644262.8799
+benchmark_qqq,QQQ,NASDAQ-100,1,66,0,1978,0.0,True,198,110476191.0357
+benchmark_spy,SPY,S&P 500,1,66,0,1978,0.0,True,165,82682472.8186
 pit_fresh_top5,356860.KQ,티엘비,2,2,5,152,43713157.9787,False,0,
 pit_fresh_top5,PLTR,Palantir Technologies Inc.,1,3,8,305,39952680.4877,False,0,
 pit_fresh_top5,042660.KS,한화오션,2,3,4,148,19898800.6805,False,0,
@@ -18,10 +18,10 @@ pit_fresh_top5,950160.KQ,코오롱티슈진,1,3,3,151,10140753.5991,False,0,
 pit_fresh_top5,GRND,Grindr Inc.,2,2,3,95,7262088.9273,False,0,
 pit_fresh_top5,VRT,Vertiv Holdings Co.,2,4,5,244,6286668.2932,False,0,
 pit_fresh_top5,007660.KS,이수페타시스,2,3,5,184,6043698.1161,False,0,
-pit_fresh_top5,LITE,Lumentum Holdings Inc,2,2,4,122,5947537.1367,True,39,8484778.1334
+pit_fresh_top5,LITE,Lumentum Holdings Inc,2,2,4,126,5947537.1367,True,39,7667929.6515
 pit_fresh_top5,033500.KQ,동성화인텍,1,4,2,148,5901190.7972,False,0,
 pit_fresh_top5,196170.KQ,알테오젠,2,3,5,241,5251002.9086,False,0,
-pit_fresh_top5,108490.KQ,로보티즈,2,5,3,180,2954748.2109,True,129,11067458.4129
+pit_fresh_top5,108490.KQ,로보티즈,2,5,3,184,2954748.2109,True,129,489458.4129
 pit_fresh_top5,200710.KQ,에이디테크놀로지,1,4,3,185,2441073.8751,False,0,
 pit_fresh_top5,006060.KS,화승인더,1,3,1,93,2288990.5269,False,0,
 pit_fresh_top5,280360.KQ,롯데웰푸드,3,3,3,89,2076594.0868,False,0,
@@ -42,9 +42,9 @@ pit_fresh_top5,003030.KS,세아제강지주,2,5,3,214,162058.29,False,0,
 pit_fresh_top5,007690.KS,국도화학,1,3,2,182,101978.3399,False,0,
 pit_fresh_top5,006260.KS,LS,3,4,5,213,88628.878,False,0,
 pit_fresh_top5,036890.KS,진성티이씨,1,1,1,32,38195.7379,False,0,
-pit_fresh_top5,000150.KS,두산,1,1,0,0,0.0,True,23,-32938.6502
-pit_fresh_top5,355150.KS,코스텍시스,1,1,0,0,0.0,True,1354,-33667.7093
-pit_fresh_top5,FIX,"Comfort Systems USA, Inc.",1,1,0,0,0.0,True,18,-32026.8301
+pit_fresh_top5,000150.KS,두산,1,1,0,4,0.0,True,23,-10681938.6502
+pit_fresh_top5,FIX,"Comfort Systems USA, Inc.",1,1,0,4,0.0,True,18,1585611.7298
+pit_fresh_top5,SOI.PA,Soitec SA,1,1,0,4,0.0,True,200,424956.86
 pit_fresh_top5,352820.KS,하이브,1,1,1,33,-32087.0281,False,0,
 pit_fresh_top5,310200.KQ,애니플러스,1,2,1,58,-48472.5063,False,0,
 pit_fresh_top5,028050.KS,삼성엔지니어링,1,1,1,28,-53199.9827,False,0,
@@ -112,7 +112,7 @@ pit_momentum_1m3m_top5,PLTR,Palantir Technologies Inc.,4,4,4,122,6581409.73,Fals
 pit_momentum_1m3m_top5,VRT,Vertiv Holdings Co.,2,3,5,183,5456934.5287,False,0,
 pit_momentum_1m3m_top5,036930.KQ,주성엔지니어링,1,2,2,91,4957599.253,False,0,
 pit_momentum_1m3m_top5,119850.KQ,지엔씨에너지,1,1,2,60,4621507.3417,False,0,
-pit_momentum_1m3m_top5,000150.KS,두산,1,1,1,31,4203970.9476,True,20,12119249.606
+pit_momentum_1m3m_top5,000150.KS,두산,1,1,1,35,4203970.9476,True,20,2859249.606
 pit_momentum_1m3m_top5,035900.KQ,JYP Ent.,2,3,3,153,3845190.2701,False,0,
 pit_momentum_1m3m_top5,052690.KS,한전기술,1,1,2,60,3032766.5605,False,0,
 pit_momentum_1m3m_top5,032350.KS,롯데관광개발,2,2,2,62,2851960.8396,False,0,
@@ -127,9 +127,9 @@ pit_momentum_1m3m_top5,001530.KS,DI동일,1,1,1,30,226068.3056,False,0,
 pit_momentum_1m3m_top5,352820.KS,하이브,1,1,1,31,192701.3841,False,0,
 pit_momentum_1m3m_top5,100840.KQ,SNT에너지,3,4,3,122,43279.1133,False,0,
 pit_momentum_1m3m_top5,005490.KS,포스코홀딩스,2,2,2,56,17189.7702,False,0,
-pit_momentum_1m3m_top5,012330.KS,현대모비스,1,1,0,0,0.0,True,56,-27703.5962
-pit_momentum_1m3m_top5,AIXA.DE,Aixtron SE,1,1,0,0,0.0,True,441,-28041.4259
-pit_momentum_1m3m_top5,STRL,Sterling Infrastructure Inc,1,1,0,0,0.0,True,33,-27625.571
+pit_momentum_1m3m_top5,012330.KS,현대모비스,1,1,0,4,0.0,True,56,-3611703.5962
+pit_momentum_1m3m_top5,AIXA.DE,Aixtron SE,1,1,0,4,0.0,True,441,91439.9419
+pit_momentum_1m3m_top5,STRL,Sterling Infrastructure Inc,1,1,0,4,0.0,True,33,2119687.0486
 pit_momentum_1m3m_top5,006260.KS,LS,2,2,4,120,-28168.5332,False,0,
 pit_momentum_1m3m_top5,ESTA,Establishment Labs Holdings,1,1,1,32,-108639.2296,False,0,
 pit_momentum_1m3m_top5,099430.KQ,바이오플러스,1,1,1,28,-412354.8553,False,0,
@@ -156,7 +156,7 @@ pit_momentum_1m3m_top5,122640.KQ,예스티,2,2,3,90,-3160569.7088,False,0,
 pit_momentum_1m3m_top5,131970.KQ,테스나,1,2,1,62,-3422720.0263,False,0,
 pit_momentum_1m3m_top5,082920.KS,비츠로셀,1,1,1,31,-3981755.1563,False,0,
 pit_momentum_1m3m_top5,000660.KS,SK하이닉스,2,2,2,61,-4147514.397,False,0,
-pit_momentum_1m3m_top5,108490.KQ,로보티즈,3,4,2,87,-4609157.3981,True,107,-27997.1051
+pit_momentum_1m3m_top5,108490.KQ,로보티즈,3,4,2,91,-4609157.3981,True,107,-8801997.1051
 pit_momentum_1m3m_top5,472850.KQ,폰드그룹,1,1,1,31,-4962269.4817,False,0,
 pit_momentum_1m3m_top5,6857.T,Advantest Corporation,1,1,1,28,-5835928.4972,False,0,
 pit_momentum_1m3m_top5,211050.KQ,인카금융서비스,2,2,3,92,-6264376.7602,False,0,
@@ -179,7 +179,7 @@ pit_momentum_3m6m_top5,PLTR,Palantir Technologies Inc.,4,4,4,122,6244057.7292,Fa
 pit_momentum_3m6m_top5,VRT,Vertiv Holdings Co.,2,3,5,183,5668935.6859,False,0,
 pit_momentum_3m6m_top5,ANET,Arista Networks,4,9,7,366,4784692.2887,False,0,
 pit_momentum_3m6m_top5,035900.KQ,JYP Ent.,2,3,4,153,4494079.498,False,0,
-pit_momentum_3m6m_top5,000150.KS,두산,1,1,1,31,4203970.9476,True,21,12725212.0863
+pit_momentum_3m6m_top5,000150.KS,두산,1,1,1,35,4203970.9476,True,21,3002212.0863
 pit_momentum_3m6m_top5,122640.KQ,예스티,1,1,3,91,3719368.4723,False,0,
 pit_momentum_3m6m_top5,052690.KS,한전기술,1,1,2,60,3088765.1739,False,0,
 pit_momentum_3m6m_top5,LIF,Life360 Inc,1,2,1,63,3044400.6742,False,0,
@@ -193,10 +193,10 @@ pit_momentum_3m6m_top5,200710.KQ,에이디테크놀로지,2,2,3,93,695817.0091,F
 pit_momentum_3m6m_top5,100840.KQ,SNT에너지,2,3,2,91,633919.0681,False,0,
 pit_momentum_3m6m_top5,044490.KQ,태웅,1,1,1,29,272712.7234,False,0,
 pit_momentum_3m6m_top5,001530.KS,DI동일,1,1,1,30,221528.7814,False,0,
-pit_momentum_3m6m_top5,082920.KS,비츠로셀,1,2,0,31,0.0,True,864,-4041813.3703
-pit_momentum_3m6m_top5,012330.KS,현대모비스,1,1,0,0,0.0,True,59,-29187.7174
-pit_momentum_3m6m_top5,AIXA.DE,Aixtron SE,1,1,0,0,0.0,True,459,-29185.9739
-pit_momentum_3m6m_top5,STRL,Sterling Infrastructure Inc,1,1,0,0,0.0,True,33,-27625.571
+pit_momentum_3m6m_top5,012330.KS,현대모비스,1,1,0,4,0.0,True,59,-3805187.7174
+pit_momentum_3m6m_top5,AIXA.DE,Aixtron SE,1,1,0,4,0.0,True,459,95172.1844
+pit_momentum_3m6m_top5,SOI.PA,Soitec SA,1,1,0,4,0.0,True,173,367587.6839
+pit_momentum_3m6m_top5,STRL,Sterling Infrastructure Inc,1,1,0,4,0.0,True,33,2119687.0486
 pit_momentum_3m6m_top5,211050.KQ,인카금융서비스,1,1,2,60,-33641.8233,False,0,
 pit_momentum_3m6m_top5,119610.KQ,인터로조,1,1,1,31,-157496.4581,False,0,
 pit_momentum_3m6m_top5,403870.KQ,HPSP,1,2,1,62,-592226.0188,False,0,
@@ -220,6 +220,7 @@ pit_momentum_3m6m_top5,328130.KQ,루닛,1,1,1,32,-2093160.6865,False,0,
 pit_momentum_3m6m_top5,036930.KQ,주성엔지니어링,1,2,2,92,-2185035.647,False,0,
 pit_momentum_3m6m_top5,007210.KS,벽산,1,1,1,30,-2555302.0958,False,0,
 pit_momentum_3m6m_top5,131970.KQ,테스나,1,2,1,62,-3370023.7247,False,0,
+pit_momentum_3m6m_top5,082920.KS,비츠로셀,1,1,1,31,-4141851.6671,False,0,
 pit_momentum_3m6m_top5,000660.KS,SK하이닉스,2,2,2,61,-4223049.8191,False,0,
 pit_momentum_3m6m_top5,472850.KQ,폰드그룹,1,1,1,31,-4810336.9963,False,0,
 pit_momentum_3m6m_top5,078350.KS,한양디지텍,3,3,4,121,-4823838.4111,False,0,
@@ -254,9 +255,9 @@ pit_momentum_6m12m_top5,200710.KQ,에이디테크놀로지,2,2,3,93,713916.8533,
 pit_momentum_6m12m_top5,363250.KQ,진시스템,1,2,1,61,588527.9951,False,0,
 pit_momentum_6m12m_top5,316140.KS,우리금융지주,1,1,1,32,469647.641,False,0,
 pit_momentum_6m12m_top5,001530.KS,DI동일,1,1,1,30,243318.4976,False,0,
-pit_momentum_6m12m_top5,012330.KS,현대모비스,1,1,0,0,0.0,True,62,-30671.8387
-pit_momentum_6m12m_top5,AIXA.DE,Aixtron SE,1,1,0,0,0.0,True,482,-30648.4519
-pit_momentum_6m12m_top5,STRL,Sterling Infrastructure Inc,1,1,0,0,0.0,True,35,-29299.8481
+pit_momentum_6m12m_top5,012330.KS,현대모비스,1,1,0,4,0.0,True,62,-3998671.8387
+pit_momentum_6m12m_top5,AIXA.DE,Aixtron SE,1,1,0,4,0.0,True,482,99941.161
+pit_momentum_6m12m_top5,STRL,Sterling Infrastructure Inc,1,1,0,4,0.0,True,35,2248152.9304
 pit_momentum_6m12m_top5,005490.KS,포스코홀딩스,2,3,2,92,-18161.8888,False,0,
 pit_momentum_6m12m_top5,033500.KQ,동성화인텍,1,1,1,29,-25898.2181,False,0,
 pit_momentum_6m12m_top5,ESTA,Establishment Labs Holdings,1,1,1,32,-110050.1287,False,0,
@@ -272,7 +273,7 @@ pit_momentum_6m12m_top5,003030.KS,세아제강지주,1,1,1,30,-1225626.7863,Fals
 pit_momentum_6m12m_top5,403870.KQ,HPSP,1,1,1,32,-1238177.9404,False,0,
 pit_momentum_6m12m_top5,036930.KQ,주성엔지니어링,1,2,1,62,-1526880.2878,False,0,
 pit_momentum_6m12m_top5,100840.KQ,SNT에너지,2,2,2,65,-1586057.6225,False,0,
-pit_momentum_6m12m_top5,000150.KS,두산,2,2,2,61,-1600611.0798,True,22,13331174.5666
+pit_momentum_6m12m_top5,000150.KS,두산,2,2,2,65,-1600611.0798,True,22,3145174.5666
 pit_momentum_6m12m_top5,237690.KQ,에스티팜,1,1,1,29,-1706492.0238,False,0,
 pit_momentum_6m12m_top5,042660.KS,한화오션,1,2,1,61,-1718492.995,False,0,
 pit_momentum_6m12m_top5,950170.KQ,JTC,1,1,1,33,-1853081.3469,False,0,
@@ -283,7 +284,7 @@ pit_momentum_6m12m_top5,044490.KQ,태웅,2,2,2,60,-2509814.2491,False,0,
 pit_momentum_6m12m_top5,204620.KQ,글로벌텍스프리,2,2,3,92,-2751414.229,False,0,
 pit_momentum_6m12m_top5,007210.KS,벽산,1,1,1,30,-2791625.7863,False,0,
 pit_momentum_6m12m_top5,015760.KS,한국전력,1,1,1,32,-2918483.3192,False,0,
-pit_momentum_6m12m_top5,108490.KQ,로보티즈,3,4,2,88,-3386891.5795,True,117,-30613.6569
+pit_momentum_6m12m_top5,108490.KQ,로보티즈,3,4,2,92,-3386891.5795,True,117,-9624613.6569
 pit_momentum_6m12m_top5,131970.KQ,테스나,1,2,1,62,-3647601.7467,False,0,
 pit_momentum_6m12m_top5,082920.KS,비츠로셀,1,1,1,31,-4348427.8102,False,0,
 pit_momentum_6m12m_top5,082740.KS,한화엔진,2,2,3,92,-4797532.571,False,0,
@@ -310,7 +311,7 @@ pit_momentum_top5,119850.KQ,지엔씨에너지,1,2,3,123,8562892.6142,False,0,
 pit_momentum_top5,196170.KQ,알테오젠,1,1,4,182,8148799.1252,False,0,
 pit_momentum_top5,007660.KS,이수페타시스,4,5,9,301,7395111.2756,False,0,
 pit_momentum_top5,042660.KS,한화오션,2,4,4,180,7132490.6634,False,0,
-pit_momentum_top5,000150.KS,두산,1,1,1,31,6606240.0605,True,31,18784836.8893
+pit_momentum_top5,000150.KS,두산,1,1,1,35,6606240.0605,True,31,4431836.8893
 pit_momentum_top5,036930.KQ,주성엔지니어링,3,4,7,242,5507597.4651,False,0,
 pit_momentum_top5,GRND,Grindr Inc.,1,1,3,91,5360779.1464,False,0,
 pit_momentum_top5,328130.KQ,루닛,2,3,3,155,5299909.5718,False,0,
@@ -343,10 +344,10 @@ pit_momentum_top5,036890.KS,진성티이씨,1,1,1,32,47871.9915,False,0,
 pit_momentum_top5,033640.KS,네패스,1,1,1,28,42016.0526,False,0,
 pit_momentum_top5,101360.KS,이엔드디,1,1,1,28,22438.3669,False,0,
 pit_momentum_top5,006650.KS,대한유화,2,3,2,121,16266.214,False,0,
-pit_momentum_top5,082920.KS,비츠로셀,1,2,0,31,0.0,True,1279,-5997103.1344
-pit_momentum_top5,012330.KS,현대모비스,1,1,0,0,0.0,True,87,-43039.5155
-pit_momentum_top5,AIXA.DE,Aixtron SE,1,1,0,0,0.0,True,679,-43174.8938
-pit_momentum_top5,STRL,Sterling Infrastructure Inc,1,1,0,0,0.0,True,50,-41856.9258
+pit_momentum_top5,012330.KS,현대모비스,1,1,0,4,0.0,True,87,-5611039.5155
+pit_momentum_top5,AIXA.DE,Aixtron SE,1,1,0,4,0.0,True,679,140788.4819
+pit_momentum_top5,SOI.PA,Soitec SA,1,1,0,4,0.0,True,257,546069.5651
+pit_momentum_top5,STRL,Sterling Infrastructure Inc,1,1,0,4,0.0,True,50,3211647.0434
 pit_momentum_top5,005490.KS,포스코홀딩스,2,2,2,56,-4549.6553,False,0,
 pit_momentum_top5,285490.KQ,노바텍,2,3,2,88,-10860.3896,False,0,
 pit_momentum_top5,036420.KS,제이콘텐트리,1,1,2,61,-11720.675,False,0,
@@ -387,6 +388,7 @@ pit_momentum_top5,122640.KQ,예스티,2,2,3,90,-3073832.5647,False,0,
 pit_momentum_top5,131970.KQ,테스나,2,3,2,90,-3554889.5564,False,0,
 pit_momentum_top5,000660.KS,SK하이닉스,2,2,2,61,-4094570.3515,False,0,
 pit_momentum_top5,204620.KQ,글로벌텍스프리,1,2,2,91,-4828532.7182,False,0,
+pit_momentum_top5,082920.KS,비츠로셀,1,1,1,31,-6145640.2542,False,0,
 pit_momentum_top5,FLNC,Fluence Energy Inc.,1,1,3,91,-7005561.2765,False,0,
 pit_momentum_top5,475960.KQ,토모큐브,2,2,2,65,-7756942.3386,False,0,
 pit_momentum_top5,472850.KQ,폰드그룹,1,1,1,31,-7882463.3542,False,0,
@@ -420,10 +422,10 @@ pit_mtt_low100_top5,214450.KQ,파마리서치,1,1,1,32,793565.0525,False,0,
 pit_mtt_low100_top5,159010.KQ,아스플로,2,2,2,60,736467.7859,False,0,
 pit_mtt_low100_top5,001530.KS,DI동일,1,1,1,30,248311.9742,False,0,
 pit_mtt_low100_top5,035900.KQ,JYP Ent.,1,2,1,61,103938.9216,False,0,
-pit_mtt_low100_top5,082920.KS,비츠로셀,1,2,0,31,0.0,True,903,-4228251.9863
-pit_mtt_low100_top5,012330.KS,현대모비스,1,1,0,0,0.0,True,61,-30177.1316
-pit_mtt_low100_top5,AIXA.DE,Aixtron SE,1,1,0,0,0.0,True,480,-30521.2799
-pit_mtt_low100_top5,STRL,Sterling Infrastructure Inc,1,1,0,0,0.0,True,35,-29299.8481
+pit_mtt_low100_top5,012330.KS,현대모비스,1,1,0,4,0.0,True,61,-3934177.1316
+pit_mtt_low100_top5,AIXA.DE,Aixtron SE,1,1,0,4,0.0,True,480,99526.4673
+pit_mtt_low100_top5,SOI.PA,Soitec SA,1,1,0,4,0.0,True,181,384585.9583
+pit_mtt_low100_top5,STRL,Sterling Infrastructure Inc,1,1,0,4,0.0,True,35,2248152.9304
 pit_mtt_low100_top5,211050.KQ,인카금융서비스,1,1,2,60,-30615.8393,False,0,
 pit_mtt_low100_top5,228670.KQ,레이,1,1,1,32,-403851.8582,False,0,
 pit_mtt_low100_top5,100840.KQ,SNT에너지,1,1,1,32,-469296.9864,False,0,
@@ -437,13 +439,14 @@ pit_mtt_low100_top5,042660.KS,한화오션,1,2,1,61,-1583224.832,False,0,
 pit_mtt_low100_top5,182360.KQ,큐브엔터,1,1,1,31,-1656004.9539,False,0,
 pit_mtt_low100_top5,200710.KQ,에이디테크놀로지,2,4,3,156,-1784625.7343,False,0,
 pit_mtt_low100_top5,328130.KQ,루닛,1,1,1,32,-1801490.7548,False,0,
-pit_mtt_low100_top5,000150.KS,두산,2,2,2,61,-2032621.7974,True,22,13331174.5666
+pit_mtt_low100_top5,000150.KS,두산,2,2,2,65,-2032621.7974,True,22,3145174.5666
 pit_mtt_low100_top5,036930.KQ,주성엔지니어링,1,3,1,92,-2080563.8334,False,0,
 pit_mtt_low100_top5,204620.KQ,글로벌텍스프리,1,2,1,61,-2280530.5674,False,0,
 pit_mtt_low100_top5,000660.KS,SK하이닉스,2,3,2,94,-2311336.8234,False,0,
 pit_mtt_low100_top5,007210.KS,벽산,1,1,1,30,-2861771.3341,False,0,
 pit_mtt_low100_top5,131970.KQ,테스나,1,2,1,62,-2902961.6901,False,0,
 pit_mtt_low100_top5,006260.KS,LS,1,1,1,28,-3922866.0874,False,0,
+pit_mtt_low100_top5,082920.KS,비츠로셀,1,1,1,31,-4332934.5994,False,0,
 pit_mtt_low100_top5,STNG,Scorpio Tankers Inc.,1,1,1,33,-4577181.8158,False,0,
 pit_mtt_low100_top5,078350.KS,한양디지텍,3,3,4,121,-4785722.644,False,0,
 pit_mtt_low100_top5,472850.KQ,폰드그룹,1,1,1,31,-4859264.4069,False,0,
@@ -460,15 +463,16 @@ pit_mtt_low300_top5,VRT,Vertiv Holdings Co.,1,3,3,151,19319859.7253,False,0,
 pit_mtt_low300_top5,267260.KS,HD현대일렉트릭,1,3,3,154,16951051.3203,False,0,
 pit_mtt_low300_top5,356860.KQ,티엘비,2,2,4,123,12954312.8502,False,0,
 pit_mtt_low300_top5,042660.KS,한화오션,1,2,2,94,8555491.1111,False,0,
-pit_mtt_low300_top5,108490.KQ,로보티즈,2,4,2,119,4352868.3799,True,149,-38986.6229
+pit_mtt_low300_top5,108490.KQ,로보티즈,1,3,2,119,4352868.3799,False,0,
 pit_mtt_low300_top5,363250.KQ,진시스템,2,2,3,92,1270509.3942,False,0,
-pit_mtt_low300_top5,082920.KS,비츠로셀,1,2,0,31,0.0,True,1158,-5107437.5461
-pit_mtt_low300_top5,AIXA.DE,Aixtron SE,1,1,0,0,0.0,True,615,-39105.3898
-pit_mtt_low300_top5,STRL,Sterling Infrastructure Inc,1,1,0,0,0.0,True,45,-37671.2332
+pit_mtt_low300_top5,082920.KS,비츠로셀,1,2,0,35,0.0,True,1158,-8986737.5461
+pit_mtt_low300_top5,AIXA.DE,Aixtron SE,1,1,0,4,0.0,True,615,127518.2863
+pit_mtt_low300_top5,SOI.PA,Soitec SA,1,1,0,4,0.0,True,233,495074.7419
+pit_mtt_low300_top5,STRL,Sterling Infrastructure Inc,1,1,0,4,0.0,True,45,2890482.339
 pit_mtt_low300_top5,119850.KQ,지엔씨에너지,2,2,4,119,-2622710.24,False,0,
 pit_mtt_low300_top5,GLW,Corning,1,1,1,30,-2837825.9051,False,0,
 pit_mtt_low300_top5,6857.T,Advantest Corporation,2,2,2,56,-3703473.2677,False,0,
-pit_mtt_low300_top5,000150.KS,두산,3,3,3,93,-4521953.2932,True,28,16966949.4484
+pit_mtt_low300_top5,000150.KS,두산,3,3,3,97,-4521953.2932,True,28,4002949.4484
 pit_mtt_low300_top5,007660.KS,이수페타시스,1,2,2,91,-6780197.4672,False,0,
 pit_mtt_low300_top5,950160.KQ,코오롱티슈진,1,1,1,32,-6957825.8664,False,0,
 pit_mtt_low300_top5,FLNC,Fluence Energy Inc.,1,1,2,59,-7250598.2883,False,0,
@@ -499,9 +503,9 @@ pit_mtt_rs70_top5,200710.KQ,에이디테크놀로지,2,2,3,93,647441.1785,False,
 pit_mtt_rs70_top5,316140.KS,우리금융지주,1,1,1,32,415142.2865,False,0,
 pit_mtt_rs70_top5,001530.KS,DI동일,1,1,1,30,217443.2096,False,0,
 pit_mtt_rs70_top5,352820.KS,하이브,1,1,1,31,186056.5088,False,0,
-pit_mtt_rs70_top5,012330.KS,현대모비스,1,1,0,0,0.0,True,55,-27208.8891
-pit_mtt_rs70_top5,AIXA.DE,Aixtron SE,1,1,0,0,0.0,True,428,-27214.8079
-pit_mtt_rs70_top5,STRL,Sterling Infrastructure Inc,1,1,0,0,0.0,True,30,-25114.1555
+pit_mtt_rs70_top5,012330.KS,현대모비스,1,1,0,4,0.0,True,55,-3547208.8891
+pit_mtt_rs70_top5,AIXA.DE,Aixtron SE,1,1,0,4,0.0,True,428,88744.4334
+pit_mtt_rs70_top5,STRL,Sterling Infrastructure Inc,1,1,0,4,0.0,True,30,1926988.226
 pit_mtt_rs70_top5,ESTA,Establishment Labs Holdings,1,1,1,32,-101584.7342,False,0,
 pit_mtt_rs70_top5,005490.KS,포스코홀딩스,1,1,1,28,-307384.1247,False,0,
 pit_mtt_rs70_top5,210980.KS,SK디앤디,1,1,1,30,-468873.9476,False,0,
@@ -520,7 +524,7 @@ pit_mtt_rs70_top5,950170.KQ,JTC,1,1,1,33,-1695484.0672,False,0,
 pit_mtt_rs70_top5,114810.KQ,아이원스,2,2,2,60,-1743254.9775,False,0,
 pit_mtt_rs70_top5,204620.KQ,글로벌텍스프리,1,1,2,61,-1989319.0795,False,0,
 pit_mtt_rs70_top5,189300.KQ,인텔리안테크,1,1,1,28,-2010914.8824,False,0,
-pit_mtt_rs70_top5,000150.KS,두산,2,2,2,61,-2127519.3936,True,20,12119249.606
+pit_mtt_rs70_top5,000150.KS,두산,2,2,2,65,-2127519.3936,True,20,2859249.606
 pit_mtt_rs70_top5,403870.KQ,HPSP,2,2,2,63,-2371760.4357,False,0,
 pit_mtt_rs70_top5,100840.KQ,SNT에너지,3,4,3,125,-2449520.2922,False,0,
 pit_mtt_rs70_top5,044490.KQ,태웅,1,1,1,31,-2566572.9279,False,0,
@@ -530,7 +534,7 @@ pit_mtt_rs70_top5,122640.KQ,예스티,2,2,3,90,-3058863.0819,False,0,
 pit_mtt_rs70_top5,006260.KS,LS,2,2,3,87,-3266853.4514,False,0,
 pit_mtt_rs70_top5,131970.KQ,테스나,1,2,1,62,-3301629.8692,False,0,
 pit_mtt_rs70_top5,082920.KS,비츠로셀,1,1,1,31,-3857809.4705,False,0,
-pit_mtt_rs70_top5,108490.KQ,로보티즈,3,4,2,87,-4285535.8738,True,104,-27212.1395
+pit_mtt_rs70_top5,108490.KQ,로보티즈,3,4,2,91,-4285535.8738,True,104,-8555212.1395
 pit_mtt_rs70_top5,472850.KQ,폰드그룹,1,1,1,31,-4624927.8616,False,0,
 pit_mtt_rs70_top5,000660.KS,SK하이닉스,3,3,3,91,-4729611.4019,False,0,
 pit_mtt_rs70_top5,6857.T,Advantest Corporation,1,1,1,28,-5452761.4747,False,0,
@@ -566,10 +570,10 @@ pit_mtt_rs80_top5,214450.KQ,파마리서치,1,1,1,32,1020297.9247,False,0,
 pit_mtt_rs80_top5,200710.KQ,에이디테크놀로지,2,2,3,93,811578.3359,False,0,
 pit_mtt_rs80_top5,044490.KQ,태웅,1,1,1,29,292827.7044,False,0,
 pit_mtt_rs80_top5,001530.KS,DI동일,1,1,1,30,236509.2113,False,0,
-pit_mtt_rs80_top5,082920.KS,비츠로셀,1,2,0,31,0.0,True,913,-4268616.0283
-pit_mtt_rs80_top5,012330.KS,현대모비스,1,1,0,0,0.0,True,62,-30671.8387
-pit_mtt_rs80_top5,AIXA.DE,Aixtron SE,1,1,0,0,0.0,True,485,-30839.2099
-pit_mtt_rs80_top5,STRL,Sterling Infrastructure Inc,1,1,0,0,0.0,True,36,-30136.9866
+pit_mtt_rs80_top5,012330.KS,현대모비스,1,1,0,4,0.0,True,62,-3998671.8387
+pit_mtt_rs80_top5,AIXA.DE,Aixtron SE,1,1,0,4,0.0,True,485,100563.2014
+pit_mtt_rs80_top5,SOI.PA,Soitec SA,1,1,0,4,0.0,True,183,388835.5269
+pit_mtt_rs80_top5,STRL,Sterling Infrastructure Inc,1,1,0,4,0.0,True,36,2312385.8712
 pit_mtt_rs80_top5,005490.KS,포스코홀딩스,2,3,2,92,-18161.8888,False,0,
 pit_mtt_rs80_top5,211050.KQ,인카금융서비스,1,1,2,60,-32428.8219,False,0,
 pit_mtt_rs80_top5,119610.KQ,인터로조,1,1,1,31,-166063.2111,False,0,
@@ -583,7 +587,7 @@ pit_mtt_rs80_top5,028050.KS,삼성엔지니어링,1,1,1,28,-727836.4181,False,0,
 pit_mtt_rs80_top5,STNG,Scorpio Tankers Inc.,1,1,1,33,-1010794.3177,False,0,
 pit_mtt_rs80_top5,LONN.SW,Lonza Group AG,1,1,1,32,-1173631.9357,False,0,
 pit_mtt_rs80_top5,363250.KQ,진시스템,2,3,2,92,-1401606.6927,False,0,
-pit_mtt_rs80_top5,000150.KS,두산,2,2,2,61,-1600611.0798,True,22,13331174.5666
+pit_mtt_rs80_top5,000150.KS,두산,2,2,2,65,-1600611.0798,True,22,3145174.5666
 pit_mtt_rs80_top5,042660.KS,한화오션,1,2,1,61,-1605264.9055,False,0,
 pit_mtt_rs80_top5,237690.KQ,에스티팜,1,1,1,29,-1696273.5087,False,0,
 pit_mtt_rs80_top5,950170.KQ,JTC,1,1,1,33,-1973905.928,False,0,
@@ -593,6 +597,7 @@ pit_mtt_rs80_top5,036930.KQ,주성엔지니어링,1,2,2,92,-2336782.1196,False,0
 pit_mtt_rs80_top5,204620.KQ,글로벌텍스프리,2,2,3,92,-2575656.0905,False,0,
 pit_mtt_rs80_top5,007210.KS,벽산,1,1,1,30,-2728995.833,False,0,
 pit_mtt_rs80_top5,131970.KQ,테스나,1,2,1,62,-3577606.8511,False,0,
+pit_mtt_rs80_top5,082920.KS,비츠로셀,1,1,1,31,-4374249.828,False,0,
 pit_mtt_rs80_top5,472850.KQ,폰드그룹,1,1,1,31,-4914629.6346,False,0,
 pit_mtt_rs80_top5,006260.KS,LS,3,3,4,118,-5040074.3991,False,0,
 pit_mtt_rs80_top5,078350.KS,한양디지텍,3,3,4,121,-5088716.1018,False,0,
@@ -602,7 +607,7 @@ pit_mtt_rs80_top5,FLNC,Fluence Energy Inc.,1,1,2,59,-11376001.5017,False,0,
 pit_mtt_rs80_top5,082740.KS,한화엔진,2,2,2,61,-12458556.8105,False,0,
 pit_mtt_rs80_top5,005380.KS,현대차,1,1,1,30,-13545507.6171,False,0,
 pit_mtt_rs90_top5,LITE,Lumentum Holdings Inc,1,2,4,150,47497152.8212,False,0,
-pit_mtt_rs90_top5,356860.KQ,티엘비,2,3,3,122,35149879.0044,True,456,-31510.9555
+pit_mtt_rs90_top5,356860.KQ,티엘비,2,3,3,126,35149879.0044,True,456,150889.0445
 pit_mtt_rs90_top5,278470.KS,에이피알,2,4,5,243,28651293.5831,False,0,
 pit_mtt_rs90_top5,089890.KQ,코세스,2,2,2,62,21038740.5575,False,0,
 pit_mtt_rs90_top5,267260.KS,HD현대일렉트릭,1,2,6,214,18938523.3826,False,0,
@@ -624,8 +629,8 @@ pit_mtt_rs90_top5,159010.KQ,아스플로,1,1,1,31,1180373.3811,False,0,
 pit_mtt_rs90_top5,214450.KQ,파마리서치,1,2,1,61,1054919.4565,False,0,
 pit_mtt_rs90_top5,192400.KQ,쿠쿠홀딩스,1,1,1,32,851800.6305,False,0,
 pit_mtt_rs90_top5,001530.KS,DI동일,1,1,1,30,601486.9577,False,0,
-pit_mtt_rs90_top5,AIXA.DE,Aixtron SE,1,1,0,0,0.0,True,496,-31538.6558
-pit_mtt_rs90_top5,STRL,Sterling Infrastructure Inc,1,1,0,0,0.0,True,36,-30136.9866
+pit_mtt_rs90_top5,AIXA.DE,Aixtron SE,1,1,0,4,0.0,True,496,102844.0163
+pit_mtt_rs90_top5,STRL,Sterling Infrastructure Inc,1,1,0,4,0.0,True,36,2312385.8712
 pit_mtt_rs90_top5,ANET,Arista Networks,3,5,3,150,-97469.9801,False,0,
 pit_mtt_rs90_top5,ESTA,Establishment Labs Holdings,1,1,1,32,-272021.3438,False,0,
 pit_mtt_rs90_top5,211050.KQ,인카금융서비스,1,1,2,60,-345157.0689,False,0,
@@ -645,7 +650,7 @@ pit_mtt_rs90_top5,237690.KQ,에스티팜,1,1,1,29,-1614525.3878,False,0,
 pit_mtt_rs90_top5,042660.KS,한화오션,1,2,1,61,-1696110.7809,False,0,
 pit_mtt_rs90_top5,950170.KQ,JTC,1,1,1,33,-1899047.2201,False,0,
 pit_mtt_rs90_top5,328130.KQ,루닛,1,1,1,32,-2213260.0702,False,0,
-pit_mtt_rs90_top5,000150.KS,두산,2,2,2,61,-2296075.9543,True,23,13937137.0469
+pit_mtt_rs90_top5,000150.KS,두산,2,2,2,65,-2296075.9543,True,23,3288137.0469
 pit_mtt_rs90_top5,GLW,Corning,1,1,1,30,-2769279.3857,False,0,
 pit_mtt_rs90_top5,044490.KQ,태웅,1,1,1,31,-2844155.6905,False,0,
 pit_mtt_rs90_top5,005490.KS,포스코홀딩스,2,2,2,59,-3015042.607,False,0,
@@ -653,7 +658,7 @@ pit_mtt_rs90_top5,200710.KQ,에이디테크놀로지,2,4,2,125,-3938975.9568,Fal
 pit_mtt_rs90_top5,082920.KS,비츠로셀,1,1,1,31,-4208988.9136,False,0,
 pit_mtt_rs90_top5,000660.KS,SK하이닉스,2,2,2,61,-4316499.6478,False,0,
 pit_mtt_rs90_top5,131970.KQ,테스나,1,2,1,62,-4435506.6893,False,0,
-pit_mtt_rs90_top5,108490.KQ,로보티즈,3,4,2,87,-4619268.011,True,120,-31398.6225
+pit_mtt_rs90_top5,108490.KQ,로보티즈,3,4,2,91,-4619268.011,True,120,-9871398.6225
 pit_mtt_rs90_top5,472850.KQ,폰드그룹,1,1,1,31,-5002183.9483,False,0,
 pit_mtt_rs90_top5,006260.KS,LS,2,2,2,59,-5254648.9875,False,0,
 pit_mtt_rs90_top5,204620.KQ,글로벌텍스프리,1,2,1,61,-5665945.4937,False,0,
@@ -662,16 +667,16 @@ pit_mtt_rs90_top5,078350.KS,한양디지텍,3,3,3,89,-6829610.4236,False,0,
 pit_mtt_rs90_top5,FLNC,Fluence Energy Inc.,1,1,2,59,-9998349.9609,False,0,
 pit_mtt_rs90_top5,005380.KS,현대차,1,1,1,30,-12792979.4162,False,0,
 pit_mtt_rs90_top5,950160.KQ,코오롱티슈진,3,3,3,90,-18648427.613,False,0,
-pit_score_top10,007660.KS,이수페타시스,2,19,17,1065,16914075.2886,True,162,12411052.3076
-pit_score_top10,100840.KQ,SNT에너지,1,20,20,1246,12461489.5485,True,616,2914183.6946
-pit_score_top10,267260.KS,HD현대일렉트릭,1,12,11,791,12067235.922,True,21,13339374.2613
-pit_score_top10,000660.KS,SK하이닉스,2,2,4,120,11494537.8022,True,10,10761640.0355
-pit_score_top10,036930.KQ,주성엔지니어링,8,17,18,910,10840236.9107,True,123,15911714.2875
-pit_score_top10,PLTR,Palantir Technologies Inc.,2,8,7,515,9440490.0951,True,89,-14164.355
-pit_score_top10,ANET,Arista Networks,1,18,20,1278,5730702.6482,True,88,12278213.5757
+pit_score_top10,007660.KS,이수페타시스,2,19,17,1069,16914075.2886,True,162,9414052.3076
+pit_score_top10,100840.KQ,SNT에너지,1,20,20,1250,12461489.5485,True,616,1127783.6946
+pit_score_top10,267260.KS,HD현대일렉트릭,1,12,11,795,12067235.922,True,21,11029374.2613
+pit_score_top10,000660.KS,SK하이닉스,2,2,4,124,11494537.8022,True,10,7831640.0355
+pit_score_top10,036930.KQ,주성엔지니어링,8,17,18,914,10840236.9107,True,123,18925214.2875
+pit_score_top10,PLTR,Palantir Technologies Inc.,2,8,7,519,9440490.0951,True,89,-3310815.4688
+pit_score_top10,ANET,Arista Networks,1,18,20,1282,5730702.6482,True,88,10492773.9409
 pit_score_top10,1211.HK,BYD,1,13,8,638,5519491.6157,False,0,
 pit_score_top10,VRT,Vertiv Holdings Co.,1,2,1,91,5189606.2029,False,0,
-pit_score_top10,115450.KS,지트리비앤티,1,47,18,1974,2160184.4578,True,8726,-9061577.6252
+pit_score_top10,115450.KS,지트리비앤티,1,47,18,1978,2160184.4578,True,8726,-8581647.6252
 pit_score_top10,328130.KQ,루닛,2,4,6,276,1944169.3456,False,0,
 pit_score_top10,WOLF,Wolfspeed,1,2,1,59,1876563.9251,False,0,
 pit_score_top10,200710.KQ,에이디테크놀로지,2,7,4,275,1818660.9992,False,0,
@@ -682,9 +687,9 @@ pit_score_top10,STNG,Scorpio Tankers Inc.,3,4,6,217,270632.3296,False,0,
 pit_score_top10,075580.KS,교촌에프앤비,1,4,3,178,229451.347,False,0,
 pit_score_top10,306040.KS,에스제이그룹,2,4,3,154,183484.5126,False,0,
 pit_score_top10,166090.KQ,하나머티리얼즈,2,2,2,63,146695.5178,False,0,
-pit_score_top10,356860.KQ,티엘비,2,3,2,93,87652.4862,True,213,-14718.9331
+pit_score_top10,356860.KQ,티엘비,2,3,2,97,87652.4862,True,213,70481.0669
 pit_score_top10,196170.KQ,알테오젠,1,1,1,32,50101.0006,False,0,
-pit_score_top10,440110.KQ,파두,1,1,0,0,0.0,True,204,-14733.5598
+pit_score_top10,440110.KQ,파두,1,1,0,4,0.0,True,204,-279933.5598
 pit_score_top10,317400.KS,자이에스앤디,1,1,1,28,-3077.0263,False,0,
 pit_score_top10,033640.KS,네패스,3,5,4,242,-25325.6778,False,0,
 pit_score_top10,004020.KS,현대제철,1,1,1,29,-30426.1577,False,0,
@@ -720,12 +725,12 @@ pit_score_top10,042660.KS,한화오션,2,2,2,59,-4382665.8757,False,0,
 pit_score_top10,347770.KS,핌스,2,42,21,1913,-10456005.5138,False,0,
 pit_score_top3,100840.KQ,SNT에너지,5,19,18,973,36626989.9408,False,0,
 pit_score_top3,ANET,Arista Networks,5,19,11,793,17843300.7979,False,0,
-pit_score_top3,007660.KS,이수페타시스,3,9,9,454,16321126.2121,True,408,25262784.1329
+pit_score_top3,007660.KS,이수페타시스,3,9,9,458,16321126.2121,True,408,17714784.1329
 pit_score_top3,267260.KS,HD현대일렉트릭,1,3,4,210,8538721.9614,False,0,
 pit_score_top3,PLTR,Palantir Technologies Inc.,2,2,2,62,3989541.4836,False,0,
 pit_score_top3,075580.KS,교촌에프앤비,1,5,2,178,615360.5118,False,0,
-pit_score_top3,000660.KS,SK하이닉스,1,1,0,0,0.0,True,24,-36867.0534
-pit_score_top3,036930.KQ,주성엔지니어링,1,1,0,0,0.0,True,305,-36779.6183
+pit_score_top3,000660.KS,SK하이닉스,1,1,0,4,0.0,True,24,-7068867.0534
+pit_score_top3,036930.KQ,주성엔지니어링,1,1,0,4,0.0,True,305,7435720.3817
 pit_score_top3,285490.KQ,노바텍,1,3,1,92,-1205607.6917,False,0,
 pit_score_top3,194480.KQ,데브시스터즈,1,2,1,61,-2841466.5762,False,0,
 pit_score_top3,366030.KQ,공구우먼,1,1,1,31,-3322748.8826,False,0,
@@ -734,16 +739,16 @@ pit_score_top3,328130.KQ,루닛,2,2,2,62,-3812742.2153,False,0,
 pit_score_top3,148150.KQ,세경하이테크,2,8,5,334,-4003207.7125,False,0,
 pit_score_top3,115450.KS,지트리비앤티,1,40,17,1701,-24361920.0059,False,0,
 pit_score_top5,100840.KQ,SNT에너지,2,19,23,1215,31293935.1786,False,0,
-pit_score_top5,007660.KS,이수페타시스,3,12,11,609,12472179.7198,True,288,18610106.0289
-pit_score_top5,ANET,Arista Networks,1,23,19,1278,9483747.836,True,157,22374368.2241
-pit_score_top5,036930.KQ,주성엔지니어링,2,3,5,180,6222074.6891,True,217,12893725.6494
+pit_score_top5,007660.KS,이수페타시스,3,12,11,613,12472179.7198,True,288,13282106.0289
+pit_score_top5,ANET,Arista Networks,1,23,19,1282,9483747.836,True,157,19188981.603
+pit_score_top5,036930.KQ,주성엔지니어링,2,3,5,184,6222074.6891,True,217,18210225.6494
 pit_score_top5,PLTR,Palantir Technologies Inc.,2,5,4,215,4284041.2357,False,0,
 pit_score_top5,194480.KQ,데브시스터즈,1,6,2,216,887672.8567,False,0,
 pit_score_top5,STNG,Scorpio Tankers Inc.,1,1,1,29,851734.9804,False,0,
 pit_score_top5,075580.KS,교촌에프앤비,1,5,2,178,422482.6078,False,0,
 pit_score_top5,1211.HK,BYD,1,1,2,59,55557.2845,False,0,
 pit_score_top5,101360.KS,이엔드디,1,1,1,28,22438.3669,False,0,
-pit_score_top5,000660.KS,SK하이닉스,1,1,0,0,0.0,True,16,-24578.0356
+pit_score_top5,000660.KS,SK하이닉스,1,1,0,4,0.0,True,16,-4712578.0356
 pit_score_top5,368600.KQ,아이씨에이치,1,1,1,30,-83042.5879,False,0,
 pit_score_top5,298020.KQ,효성티앤씨,1,1,1,32,-86102.1676,False,0,
 pit_score_top5,007690.KS,국도화학,1,1,1,29,-272106.9121,False,0,
@@ -753,17 +758,17 @@ pit_score_top5,131970.KQ,테스나,3,7,3,209,-733934.0374,False,0,
 pit_score_top5,328130.KQ,루닛,2,3,3,123,-809282.2738,False,0,
 pit_score_top5,115450.KS,지트리비앤티,2,42,22,1883,-1879125.8193,False,0,
 pit_score_top5,285490.KQ,노바텍,1,15,8,700,-1934805.3377,False,0,
-pit_score_top5,267260.KS,HD현대일렉트릭,4,9,7,426,-2155990.1366,True,37,4839170.4176
+pit_score_top5,267260.KS,HD현대일렉트릭,4,9,7,430,-2155990.1366,True,37,769170.4176
 pit_score_top5,SBLK,Star Bulk Carriers,2,2,2,61,-2178423.9737,False,0,
 pit_score_top5,366030.KQ,공구우먼,1,2,1,62,-3238702.2329,False,0,
 pit_score_top5,347770.KS,핌스,2,33,20,1548,-13735874.5576,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,218410.KQ,RFHIC,2,2,2,242,14639128.1991,True,414,21746266.9567
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,218410.KQ,RFHIC,2,2,2,246,14639128.1991,True,414,19759066.9567
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,267260.KS,HD현대일렉트릭,1,1,2,183,11452211.1192,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,ANET,Arista Networks,1,2,4,455,11375843.7866,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,032350.KS,롯데관광개발,1,1,2,185,6533300.35,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,035900.KQ,JYP Ent.,1,1,1,91,5462182.8313,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,PLTR,Palantir Technologies Inc.,2,2,2,185,4993502.0137,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,LITE,Lumentum Holdings Inc,1,1,1,150,3533639.4122,True,34,26765813.2786
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,LITE,Lumentum Holdings Inc,1,1,1,154,3533639.4122,True,34,26053688.961
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,000660.KS,SK하이닉스,1,2,2,273,2520156.8278,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,006260.KS,LS,1,2,1,182,2390825.5017,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,200710.KQ,에이디테크놀로지,1,1,1,90,2341303.8563,False,0,
@@ -774,12 +779,12 @@ pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,1226
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,VRT,Vertiv Holdings Co.,1,1,1,91,1508206.3579,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,001530.KS,DI동일,1,1,1,92,656343.0106,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,210980.KS,SK디앤디,1,1,1,92,149830.9583,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,356860.KQ,티엘비,2,2,1,154,6632.5704,True,540,18442689.98
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,GLW,Corning,1,2,0,150,0.0,True,181,23679878.0664
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,356860.KQ,티엘비,2,2,1,158,6632.5704,True,540,18658689.98
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,GLW,Corning,1,2,0,154,0.0,True,181,24986113.5251
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,028050.KS,삼성엔지니어링,1,1,1,91,-431578.2104,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,007660.KS,이수페타시스,1,1,1,91,-1191461.7306,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,100840.KQ,SNT에너지,1,1,1,91,-1276328.3523,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,475960.KQ,토모큐브,2,2,1,154,-1436801.7227,True,675,-10521568.7961
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,475960.KQ,토모큐브,2,2,1,158,-1436801.7227,True,675,-12074068.7961
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,131970.KQ,테스나,1,1,1,90,-2336313.9702,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,119850.KQ,지엔씨에너지,1,1,1,92,-2659370.1632,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,211050.KQ,인카금융서비스,1,1,1,92,-2697433.5689,False,0,
@@ -789,13 +794,13 @@ pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,0072
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,472850.KQ,폰드그룹,1,1,1,92,-5043064.3103,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,TEM,Tempus AI Inc,1,1,1,93,-6039193.3278,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5,089890.KQ,코세스,1,1,1,92,-9194975.4442,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,218410.KQ,RFHIC,2,2,2,242,14639128.1991,True,414,21746266.9567
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,218410.KQ,RFHIC,2,2,2,246,14639128.1991,True,414,19759066.9567
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,267260.KS,HD현대일렉트릭,1,1,2,183,11452211.1192,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,ANET,Arista Networks,1,2,4,455,11375843.7866,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,032350.KS,롯데관광개발,1,1,2,185,6533300.35,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,035900.KQ,JYP Ent.,1,1,1,91,5462182.8313,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,PLTR,Palantir Technologies Inc.,2,2,2,185,4993502.0137,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,LITE,Lumentum Holdings Inc,1,1,1,150,3533639.4122,True,34,26765813.2786
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,LITE,Lumentum Holdings Inc,1,1,1,154,3533639.4122,True,34,26053688.961
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,000660.KS,SK하이닉스,1,2,2,273,2520156.8278,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,006260.KS,LS,1,2,1,182,2390825.5017,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,200710.KQ,에이디테크놀로지,1,1,1,90,2341303.8563,False,0,
@@ -806,12 +811,12 @@ pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,122
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,VRT,Vertiv Holdings Co.,1,1,1,91,1508206.3579,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,001530.KS,DI동일,1,1,1,92,656343.0106,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,210980.KS,SK디앤디,1,1,1,92,149830.9583,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,356860.KQ,티엘비,2,2,1,154,6632.5704,True,540,18442689.98
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,GLW,Corning,1,2,0,150,0.0,True,181,23679878.0664
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,356860.KQ,티엘비,2,2,1,158,6632.5704,True,540,18658689.98
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,GLW,Corning,1,2,0,154,0.0,True,181,24986113.5251
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,028050.KS,삼성엔지니어링,1,1,1,91,-431578.2104,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,007660.KS,이수페타시스,1,1,1,91,-1191461.7306,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,100840.KQ,SNT에너지,1,1,1,91,-1276328.3523,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,475960.KQ,토모큐브,2,2,1,154,-1436801.7227,True,675,-10521568.7961
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,475960.KQ,토모큐브,2,2,1,158,-1436801.7227,True,675,-12074068.7961
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,131970.KQ,테스나,1,1,1,90,-2336313.9702,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,119850.KQ,지엔씨에너지,1,1,1,92,-2659370.1632,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,211050.KQ,인카금융서비스,1,1,1,92,-2697433.5689,False,0,
@@ -821,13 +826,13 @@ pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,007
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,472850.KQ,폰드그룹,1,1,1,92,-5043064.3103,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,TEM,Tempus AI Inc,1,1,1,93,-6039193.3278,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_top5,089890.KQ,코세스,1,1,1,92,-9194975.4442,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,218410.KQ,RFHIC,2,2,2,242,14518602.8372,True,413,21693739.7418
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,218410.KQ,RFHIC,2,2,2,246,14518602.8372,True,413,19711339.7418
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,ANET,Arista Networks,1,2,4,455,11375843.7866,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,267260.KS,HD현대일렉트릭,1,1,3,183,10933484.6122,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,032350.KS,롯데관광개발,1,1,2,185,6506818.2138,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,035900.KQ,JYP Ent.,1,1,1,91,5462182.8313,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,PLTR,Palantir Technologies Inc.,2,2,2,185,5005596.3681,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,LITE,Lumentum Holdings Inc,1,1,1,150,3533639.4122,True,34,26765813.2786
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,LITE,Lumentum Holdings Inc,1,1,1,154,3533639.4122,True,34,26053688.961
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,000660.KS,SK하이닉스,1,2,2,273,2520156.8278,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,006260.KS,LS,1,2,1,182,2390825.5017,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,200710.KQ,에이디테크놀로지,1,1,1,90,2341303.8563,False,0,
@@ -838,12 +843,12 @@ pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtri
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,VRT,Vertiv Holdings Co.,1,1,1,91,1508206.3579,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,001530.KS,DI동일,1,1,1,92,656343.0106,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,210980.KS,SK디앤디,1,1,1,92,149830.9583,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,356860.KQ,티엘비,2,2,1,154,6614.9774,True,538,18374383.7208
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,GLW,Corning,1,2,0,150,0.0,True,179,23494989.6798
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,356860.KQ,티엘비,2,2,1,158,6614.9774,True,538,18589583.7208
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,GLW,Corning,1,2,0,154,0.0,True,179,24786791.5976
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,028050.KS,삼성엔지니어링,1,1,1,91,-431578.2104,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,007660.KS,이수페타시스,1,1,1,91,-1191461.7306,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,100840.KQ,SNT에너지,1,1,1,91,-1276328.3523,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,475960.KQ,토모큐브,2,2,1,154,-1429992.2359,True,672,-10474806.2681
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,475960.KQ,토모큐브,2,2,1,158,-1429992.2359,True,672,-12020406.2681
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,131970.KQ,테스나,1,1,1,90,-2336313.9702,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,119850.KQ,지엔씨에너지,1,1,1,92,-2650967.7298,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,211050.KQ,인카금융서비스,1,1,1,92,-2685602.7199,False,0,
@@ -853,13 +858,13 @@ pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtri
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,472850.KQ,폰드그룹,1,1,1,92,-5020388.6615,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,TEM,Tempus AI Inc,1,1,1,93,-6005454.8176,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5,089890.KQ,코세스,1,1,1,92,-9203380.3578,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,218410.KQ,RFHIC,2,2,2,242,14518602.8372,True,413,21693739.7418
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,218410.KQ,RFHIC,2,2,2,246,14518602.8372,True,413,19711339.7418
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,ANET,Arista Networks,1,2,4,455,11375843.7866,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,267260.KS,HD현대일렉트릭,1,1,3,183,10933484.6122,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,032350.KS,롯데관광개발,1,1,2,185,6506818.2138,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,035900.KQ,JYP Ent.,1,1,1,91,5462182.8313,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,PLTR,Palantir Technologies Inc.,2,2,2,185,5005596.3681,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,LITE,Lumentum Holdings Inc,1,1,1,150,3533639.4122,True,34,26765813.2786
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,LITE,Lumentum Holdings Inc,1,1,1,154,3533639.4122,True,34,26053688.961
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,000660.KS,SK하이닉스,1,2,2,273,2520156.8278,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,006260.KS,LS,1,2,1,182,2390825.5017,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,200710.KQ,에이디테크놀로지,1,1,1,90,2341303.8563,False,0,
@@ -870,12 +875,12 @@ pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtri
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,VRT,Vertiv Holdings Co.,1,1,1,91,1508206.3579,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,001530.KS,DI동일,1,1,1,92,656343.0106,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,210980.KS,SK디앤디,1,1,1,92,149830.9583,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,356860.KQ,티엘비,2,2,1,154,6614.9774,True,538,18374383.7208
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,GLW,Corning,1,2,0,150,0.0,True,179,23494989.6798
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,356860.KQ,티엘비,2,2,1,158,6614.9774,True,538,18589583.7208
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,GLW,Corning,1,2,0,154,0.0,True,179,24786791.5976
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,028050.KS,삼성엔지니어링,1,1,1,91,-431578.2104,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,007660.KS,이수페타시스,1,1,1,91,-1191461.7306,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,100840.KQ,SNT에너지,1,1,1,91,-1276328.3523,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,475960.KQ,토모큐브,2,2,1,154,-1429992.2359,True,672,-10474806.2681
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,475960.KQ,토모큐브,2,2,1,158,-1429992.2359,True,672,-12020406.2681
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,131970.KQ,테스나,1,1,1,90,-2336313.9702,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,119850.KQ,지엔씨에너지,1,1,1,92,-2650967.7298,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,211050.KQ,인카금융서비스,1,1,1,92,-2685602.7199,False,0,
@@ -885,13 +890,13 @@ pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtri
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,472850.KQ,폰드그룹,1,1,1,92,-5020388.6615,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,TEM,Tempus AI Inc,1,1,1,93,-6005454.8176,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5,089890.KQ,코세스,1,1,1,92,-9203380.3578,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,218410.KQ,RFHIC,2,2,2,242,14518602.8372,True,413,21693739.7418
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,218410.KQ,RFHIC,2,2,2,246,14518602.8372,True,413,19711339.7418
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,ANET,Arista Networks,1,2,4,455,11375843.7866,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,267260.KS,HD현대일렉트릭,1,1,3,183,10933484.6122,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,032350.KS,롯데관광개발,1,1,2,185,6506818.2138,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,035900.KQ,JYP Ent.,1,1,1,91,5462182.8313,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,PLTR,Palantir Technologies Inc.,2,2,2,185,5005596.3681,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,LITE,Lumentum Holdings Inc,1,1,1,150,3533639.4122,True,34,26765813.2786
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,LITE,Lumentum Holdings Inc,1,1,1,154,3533639.4122,True,34,26053688.961
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,000660.KS,SK하이닉스,1,2,2,273,2520156.8278,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,006260.KS,LS,1,2,1,182,2390825.5017,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,200710.KQ,에이디테크놀로지,1,1,1,90,2341303.8563,False,0,
@@ -902,12 +907,12 @@ pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtri
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,VRT,Vertiv Holdings Co.,1,1,1,91,1508206.3579,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,001530.KS,DI동일,1,1,1,92,656343.0106,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,210980.KS,SK디앤디,1,1,1,92,149830.9583,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,356860.KQ,티엘비,2,2,1,154,6614.9774,True,538,18374383.7208
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,GLW,Corning,1,2,0,150,0.0,True,179,23494989.6798
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,356860.KQ,티엘비,2,2,1,158,6614.9774,True,538,18589583.7208
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,GLW,Corning,1,2,0,154,0.0,True,179,24786791.5976
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,028050.KS,삼성엔지니어링,1,1,1,91,-431578.2104,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,007660.KS,이수페타시스,1,1,1,91,-1191461.7306,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,100840.KQ,SNT에너지,1,1,1,91,-1276328.3523,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,475960.KQ,토모큐브,2,2,1,154,-1429992.2359,True,672,-10474806.2681
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,475960.KQ,토모큐브,2,2,1,158,-1429992.2359,True,672,-12020406.2681
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,131970.KQ,테스나,1,1,1,90,-2336313.9702,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,119850.KQ,지엔씨에너지,1,1,1,92,-2650967.7298,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,211050.KQ,인카금융서비스,1,1,1,92,-2685602.7199,False,0,
@@ -917,13 +922,13 @@ pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtri
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,472850.KQ,폰드그룹,1,1,1,92,-5020388.6615,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,TEM,Tempus AI Inc,1,1,1,93,-6005454.8176,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5,089890.KQ,코세스,1,1,1,92,-9203380.3578,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,218410.KQ,RFHIC,1,1,1,150,15784266.48,True,469,24635263.7746
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,218410.KQ,RFHIC,1,1,1,154,15784266.48,True,469,22384063.7746
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,278470.KS,에이피알,1,1,2,185,12541106.3299,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,267260.KS,HD현대일렉트릭,1,1,2,183,11452211.1192,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,ANET,Arista Networks,1,2,4,455,11375843.7866,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,032350.KS,롯데관광개발,1,2,1,185,7131340.9384,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,035900.KQ,JYP Ent.,1,1,1,91,5462182.8313,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,LITE,Lumentum Holdings Inc,1,1,1,150,4122579.3142,True,39,30701962.2901
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,LITE,Lumentum Holdings Inc,1,1,1,154,4122579.3142,True,39,29885113.8082
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,196170.KQ,알테오젠,1,1,1,92,3396314.1109,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,012330.KS,현대모비스,1,1,1,89,2608350.1246,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,000660.KS,SK하이닉스,1,2,2,273,2520156.8278,False,0,
@@ -935,12 +940,12 @@ pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,122640.KQ,예�
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,VRT,Vertiv Holdings Co.,1,1,1,91,1508206.3579,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,001530.KS,DI동일,1,1,1,92,656343.0106,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,210980.KS,SK디앤디,1,1,1,92,149830.9583,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,356860.KQ,티엘비,2,2,1,154,7336.2914,True,611,20867562.181
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,GLW,Corning,1,2,0,150,0.0,True,202,26661247.904
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,356860.KQ,티엘비,2,2,1,158,7336.2914,True,611,21111962.181
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,GLW,Corning,1,2,0,154,0.0,True,202,28119035.5431
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,028050.KS,삼성엔지니어링,1,1,1,91,-431578.2104,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,007660.KS,이수페타시스,1,1,1,91,-1191461.7306,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,100840.KQ,SNT에너지,1,1,1,91,-1276328.3523,False,0,
-pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,475960.KQ,토모큐브,2,2,1,154,-1586610.4331,True,764,-11908857.1262
+pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,475960.KQ,토모큐브,2,2,1,158,-1586610.4331,True,764,-13666057.1262
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,PLTR,Palantir Technologies Inc.,1,1,1,93,-1668917.7764,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,131970.KQ,테스나,1,1,1,90,-2336313.9702,False,0,
 pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,119850.KQ,지엔씨에너지,1,1,1,92,-2587949.4795,False,0,
@@ -953,7 +958,7 @@ pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5,089890.KQ,코�
 pit_trend_top5,278470.KS,에이피알,2,4,8,301,51049453.1816,False,0,
 pit_trend_top5,218410.KQ,RFHIC,1,2,4,150,50492179.9441,False,0,
 pit_trend_top5,267260.KS,HD현대일렉트릭,4,7,10,429,41570611.7721,False,0,
-pit_trend_top5,356860.KQ,티엘비,2,2,5,152,13578115.6109,True,586,26757114.7966
+pit_trend_top5,356860.KQ,티엘비,2,2,5,156,13578115.6109,True,586,26991514.7966
 pit_trend_top5,LITE,Lumentum Holdings Inc,2,2,3,92,13229869.6051,False,0,
 pit_trend_top5,PLTR,Palantir Technologies Inc.,5,6,9,304,11476241.1751,False,0,
 pit_trend_top5,214450.KQ,파마리서치,3,3,5,152,10384470.3206,False,0,
@@ -961,7 +966,7 @@ pit_trend_top5,GLW,Corning,1,1,1,31,8441349.2416,False,0,
 pit_trend_top5,1211.HK,BYD,2,2,4,118,8213568.8112,False,0,
 pit_trend_top5,001530.KS,DI동일,2,3,6,217,7737448.5995,False,0,
 pit_trend_top5,100840.KQ,SNT에너지,5,5,6,187,7418602.1258,False,0,
-pit_trend_top5,012330.KS,현대모비스,2,2,1,31,6897696.4796,True,81,-40071.2731
+pit_trend_top5,012330.KS,현대모비스,2,2,1,35,6897696.4796,True,81,-5224071.2731
 pit_trend_top5,007660.KS,이수페타시스,2,2,5,151,6363060.8911,False,0,
 pit_trend_top5,TEM,Tempus AI Inc,1,1,1,30,5999633.5784,False,0,
 pit_trend_top5,032350.KS,롯데관광개발,1,1,1,32,5702936.7337,False,0,
@@ -996,8 +1001,8 @@ pit_trend_top5,036890.KS,진성티이씨,1,1,1,32,42779.2264,False,0,
 pit_trend_top5,033640.KS,네패스,1,1,1,28,42016.0526,False,0,
 pit_trend_top5,ROKU,Roku,1,1,1,28,22522.2564,False,0,
 pit_trend_top5,101360.KS,이엔드디,1,1,1,28,22438.3669,False,0,
-pit_trend_top5,000150.KS,두산,1,1,0,0,0.0,True,28,-40099.2263
-pit_trend_top5,AIXA.DE,Aixtron SE,1,1,0,0,0.0,True,635,-40377.1098
+pit_trend_top5,000150.KS,두산,1,1,0,4,0.0,True,28,-13004099.2263
+pit_trend_top5,AIXA.DE,Aixtron SE,1,1,0,4,0.0,True,635,131665.2224
 pit_trend_top5,004020.KS,현대제철,1,1,1,29,-60852.3155,False,0,
 pit_trend_top5,298020.KQ,효성티앤씨,1,1,1,32,-86102.1676,False,0,
 pit_trend_top5,131970.KQ,테스나,1,1,1,28,-166766.7178,False,0,
@@ -1040,7 +1045,7 @@ pit_trend_top5,078350.KS,한양디지텍,1,1,1,33,-2271034.3729,False,0,
 pit_trend_top5,STNG,Scorpio Tankers Inc.,6,6,7,215,-2887402.3735,False,0,
 pit_trend_top5,211050.KQ,인카금융서비스,4,4,5,153,-3415855.6431,False,0,
 pit_trend_top5,200710.KQ,에이디테크놀로지,3,3,4,124,-3439177.3329,False,0,
-pit_trend_top5,108490.KQ,로보티즈,3,4,2,88,-3752633.1791,True,154,-40294.8989
+pit_trend_top5,108490.KQ,로보티즈,3,4,2,92,-3752633.1791,True,154,-12668294.8989
 pit_trend_top5,006260.KS,LS,4,4,5,151,-4079340.0705,False,0,
 pit_trend_top5,122640.KQ,예스티,2,2,2,59,-5492989.7279,False,0,
 pit_trend_top5,950160.KQ,코오롱티슈진,2,2,2,60,-5632404.3014,False,0,
@@ -1074,7 +1079,7 @@ smic_follower,006260.KS,LS,1,6,1,695,1034218.8066,False,0,
 smic_follower,101490.KQ,에스앤에스텍,1,2,1,94,983059.8835,False,0,
 smic_follower,352820.KS,하이브,2,3,2,365,972580.5143,False,0,
 smic_follower,012450.KS,한화에어로스페이스,1,3,1,246,947419.5254,False,0,
-smic_follower,122640.KQ,예스티,2,16,1,784,918913.8158,True,201,1413210.7792
+smic_follower,122640.KQ,예스티,2,16,1,788,918913.8158,True,201,1242360.7792
 smic_follower,LITE,Lumentum Holdings Inc,1,1,1,8,903817.9735,False,0,
 smic_follower,GTT.PA,Gaztransport&technigaz,1,4,1,459,874535.841,False,0,
 smic_follower,029460.KS,케이씨,1,16,1,482,846862.2121,False,0,
@@ -1097,7 +1102,7 @@ smic_follower,GRND,Grindr Inc.,1,4,1,114,476365.8088,False,0,
 smic_follower,103140.KS,풍산,1,2,1,59,471086.7654,False,0,
 smic_follower,192400.KQ,쿠쿠홀딩스,1,9,1,347,467398.7347,False,0,
 smic_follower,047810.KS,한국항공우주,1,11,1,665,457151.865,False,0,
-smic_follower,310200.KQ,애니플러스,2,34,1,571,452328.7799,True,1523,-2858294.2066
+smic_follower,310200.KQ,애니플러스,2,34,1,575,452328.7799,True,1523,-2705994.2066
 smic_follower,114810.KQ,아이원스,1,14,1,682,436316.1528,False,0,
 smic_follower,025980.KS,아난티,1,24,1,723,429947.027,False,0,
 smic_follower,101160.KQ,월덱스,1,2,1,16,411919.4388,False,0,
@@ -1107,7 +1112,7 @@ smic_follower,306040.KS,에스제이그룹,1,4,1,45,357611.5911,False,0,
 smic_follower,036420.KS,제이콘텐트리,1,2,1,144,352079.2008,False,0,
 smic_follower,131970.KQ,테스나,2,30,2,1256,341139.9751,False,0,
 smic_follower,MP,MP Materials,1,7,1,451,337189.1705,False,0,
-smic_follower,035900.KQ,JYP Ent.,2,27,1,917,334527.9605,True,74,-865478.4582
+smic_follower,035900.KQ,JYP Ent.,2,27,1,921,334527.9605,True,74,-1109678.4582
 smic_follower,001060.KS,JW중외제약,1,3,1,48,332115.7703,False,0,
 smic_follower,090460.KS,비에이치,1,29,1,723,326928.3888,False,0,
 smic_follower,023160.KS,태광,1,20,1,727,326084.0952,False,0,
@@ -1115,7 +1120,7 @@ smic_follower,079810.KS,디이엔티,1,9,1,644,323507.7037,False,0,
 smic_follower,SE,SEA ltd.,1,2,1,164,303463.9294,False,0,
 smic_follower,271560.KS,오리온,1,4,1,244,298115.2122,False,0,
 smic_follower,036930.KQ,주성엔지니어링,1,1,1,100,286853.6655,False,0,
-smic_follower,067160.KQ,아프리카TV,2,31,1,1011,277022.0709,True,83,-1948487.6343
+smic_follower,067160.KQ,아프리카TV,2,31,1,1015,277022.0709,True,83,-2056387.6343
 smic_follower,000660.KS,SK하이닉스,1,3,1,114,276411.108,False,0,
 smic_follower,166090.KQ,하나머티리얼즈,1,2,1,56,276051.5247,False,0,
 smic_follower,204620.KQ,글로벌텍스프리,1,7,1,121,274563.2415,False,0,
@@ -1143,7 +1148,7 @@ smic_follower,007660.KS,이수페타시스,1,3,1,68,146002.906,False,0,
 smic_follower,000210.KS,DL,1,16,1,716,139945.2925,False,0,
 smic_follower,BAC,Bank of America Corp.,1,4,1,196,119008.783,False,0,
 smic_follower,090850.KS,이지웰,1,3,1,22,72791.1264,False,0,
-smic_follower,214450.KQ,파마리서치,2,8,1,172,72273.1432,True,13,-1487983.4269
+smic_follower,214450.KQ,파마리서치,2,8,1,176,72273.1432,True,13,-1637483.4269
 smic_follower,420770.KQ,기가비스,1,1,1,22,69606.7896,False,0,
 smic_follower,068270.KS,셀트리온,1,5,1,679,68454.6436,False,0,
 smic_follower,101360.KS,이엔드디,1,1,1,1,32441.4179,False,0,
@@ -1161,36 +1166,37 @@ smic_follower,348370.KQ,엔켐,1,6,1,407,5791.0599,False,0,
 smic_follower,348210.KQ,넥스틴,1,1,1,11,5179.1356,False,0,
 smic_follower,WFG,West Fraser Timber. Co. Ltd,1,1,1,3,1627.5402,False,0,
 smic_follower,363250.KQ,진시스템,1,15,1,712,285.456,False,0,
-smic_follower,016380.KS,KG스틸,1,33,0,724,0.0,True,755,-236455.2502
-smic_follower,112610.KS,씨에스윈드,1,25,0,577,0.0,True,88,336545.9669
-smic_follower,018290.KS,브이티,1,27,0,566,0.0,True,278,-2840233.0098
-smic_follower,234300.KQ,에스트래픽,1,40,0,553,0.0,True,1248,-1063952.2837
-smic_follower,259960.KQ,크래프톤,1,13,0,553,0.0,True,17,-747240.9489
-smic_follower,294870.KS,HDC현대산업개발,1,26,0,553,0.0,True,192,-106033.5726
-smic_follower,5253.T,Cover Corp,1,13,0,553,0.0,True,312,-1018695.2439
-smic_follower,FNKO,Funko Inc.,1,11,0,553,0.0,True,777,1925351.4462
-smic_follower,LEVI,Levi Strauss & Co,1,12,0,502,0.0,True,131,1032561.428
-smic_follower,489790.KS,한화비전,1,10,0,385,0.0,True,69,1025242.3682
-smic_follower,CLBT,Cellebrite DI,1,13,0,364,0.0,True,205,440652.825
-smic_follower,DOCS,Doximity,1,13,0,362,0.0,True,112,-2334818.1853
-smic_follower,SRAD,Sportradar,1,10,0,357,0.0,True,123,-1332317.6937
-smic_follower,049720.KQ,고려신용정보,1,21,0,341,0.0,True,452,-418651.5867
-smic_follower,472850.KQ,폰드그룹,1,10,0,320,0.0,True,789,-1149333.1399
-smic_follower,098120.KQ,마이크로컨텍솔,1,6,0,210,0.0,True,173,1278942.8883
-smic_follower,017960.KS,한국카본,1,5,0,202,0.0,True,105,59595.6514
-smic_follower,456160.KQ,지투지바이오,1,10,0,202,0.0,True,54,-1486344.1897
-smic_follower,2124.T,JAC recruitment Co. Ltd,1,12,0,182,0.0,True,1406,-596576.7887
-smic_follower,CRWV,Coreweave,1,5,0,178,0.0,True,38,2477006.0175
-smic_follower,ESTA,Establishment Labs Holdings,1,7,0,178,0.0,True,45,219946.5176
-smic_follower,IMAX,IMAX Corp,1,6,0,178,0.0,True,68,590456.4434
-smic_follower,IRMD,Iradimed Corporation,1,7,0,178,0.0,True,27,-159814.5885
-smic_follower,SXT,Sensient Technologies Corp,1,2,0,124,0.0,True,23,712961.3657
-smic_follower,TEM,Tempus AI Inc,1,2,0,124,0.0,True,37,-395778.323
-smic_follower,082920.KS,비츠로셀,1,2,0,45,0.0,True,79,-348895.434
-smic_follower,100090.KS,SK오션플랜트,1,3,0,45,0.0,True,198,-1237397.4559
-smic_follower,187790.KS,나노,1,2,0,21,0.0,True,606,-471251.4421
-smic_follower,213420.KS,덕산네오룩스,1,2,0,21,0.0,True,90,-952785.2463
-smic_follower,252990.KQ,샘씨엔에스,1,2,0,21,0.0,True,176,-23223.7609
+smic_follower,016380.KS,KG스틸,1,33,0,728,0.0,True,755,-440305.2502
+smic_follower,112610.KS,씨에스윈드,1,25,0,581,0.0,True,88,81345.9669
+smic_follower,018290.KS,브이티,1,27,0,570,0.0,True,278,-3029273.0098
+smic_follower,234300.KQ,에스트래픽,1,40,0,557,0.0,True,1248,-1082672.2837
+smic_follower,259960.KQ,크래프톤,1,13,0,557,0.0,True,17,-611240.9489
+smic_follower,294870.KS,HDC현대산업개발,1,26,0,557,0.0,True,192,-184753.5726
+smic_follower,5253.T,Cover Corp,1,13,0,557,0.0,True,312,-906007.0942
+smic_follower,FNKO,Funko Inc.,1,11,0,557,0.0,True,777,1446896.6531
+smic_follower,LEVI,Levi Strauss & Co,1,12,0,506,0.0,True,131,981950.7582
+smic_follower,489790.KS,한화비전,1,10,0,389,0.0,True,69,1073542.3682
+smic_follower,CLBT,Cellebrite DI,1,13,0,368,0.0,True,205,-157984.0591
+smic_follower,DOCS,Doximity,1,13,0,366,0.0,True,112,-2586539.9184
+smic_follower,SRAD,Sportradar,1,10,0,361,0.0,True,123,-1225656.8247
+smic_follower,049720.KQ,고려신용정보,1,21,0,345,0.0,True,452,-301131.5867
+smic_follower,472850.KQ,폰드그룹,1,10,0,324,0.0,True,789,-1137498.1399
+smic_follower,098120.KQ,마이크로컨텍솔,1,6,0,214,0.0,True,173,898342.8883
+smic_follower,017960.KS,한국카본,1,5,0,206,0.0,True,105,70095.6514
+smic_follower,456160.KQ,지투지바이오,1,10,0,206,0.0,True,54,-1669944.1897
+smic_follower,2124.T,JAC recruitment Co. Ltd,1,12,0,186,0.0,True,1406,-360808.228
+smic_follower,CRWV,Coreweave,1,5,0,182,0.0,True,38,1160277.1238
+smic_follower,ESTA,Establishment Labs Holdings,1,7,0,182,0.0,True,45,562226.8706
+smic_follower,IMAX,IMAX Corp,1,6,0,182,0.0,True,68,509520.27
+smic_follower,IRMD,Iradimed Corporation,1,7,0,182,0.0,True,27,-40180.9387
+smic_follower,SXT,Sensient Technologies Corp,1,2,0,128,0.0,True,23,822969.3265
+smic_follower,TEM,Tempus AI Inc,1,2,0,128,0.0,True,37,-727644.0771
+smic_follower,082920.KS,비츠로셀,1,2,0,49,0.0,True,79,-613545.434
+smic_follower,100090.KS,SK오션플랜트,1,2,0,49,0.0,True,196,-1441215.5873
+smic_follower,187790.KS,나노,1,1,0,25,0.0,True,601,-417143.5651
+smic_follower,213420.KS,덕산네오룩스,1,2,0,25,0.0,True,88,-1159537.0758
+smic_follower,252990.KQ,샘씨엔에스,1,2,0,25,0.0,True,186,6453.8746
+smic_follower,3443.TW,Global Unichip Corp.,1,1,0,4,0.0,True,2,-496.0522
 smic_follower,WOLF,Wolfspeed,1,1,1,1,-319.2941,False,0,
 smic_follower,SBLK,Star Bulk Carriers,1,1,1,1,-1239.2665,False,0,
 smic_follower,366030.KQ,공구우먼,1,1,1,1,-4304.2837,False,0,
@@ -1322,17 +1328,17 @@ smic_follower_v2,NE,Noble Corporation PLC,1,2,1,81,10460.9222,False,0,
 smic_follower_v2,420770.KQ,기가비스,1,1,1,1,9592.0031,False,0,
 smic_follower_v2,BAC,Bank of America Corp.,1,1,1,73,7507.9371,False,0,
 smic_follower_v2,099430.KQ,바이오플러스,1,1,1,22,7277.9226,False,0,
-smic_follower_v2,CLBT,Cellebrite DI,1,15,0,362,0.0,True,877,4064374.558
-smic_follower_v2,049720.KQ,고려신용정보,1,20,0,341,0.0,True,1676,-1666846.6413
-smic_follower_v2,017960.KS,한국카본,1,14,0,202,0.0,True,417,-81212.3609
-smic_follower_v2,ESTA,Establishment Labs Holdings,1,10,0,181,0.0,True,193,1404126.5836
-smic_follower_v2,IMAX,IMAX Corp,1,8,0,146,0.0,True,304,2719416.4778
-smic_follower_v2,IRMD,Iradimed Corporation,1,7,0,143,0.0,True,116,-714274.5328
-smic_follower_v2,SXT,Sensient Technologies Corp,1,7,0,143,0.0,True,131,3860566.8652
-smic_follower_v2,CAMT,Camtek,1,1,0,31,0.0,True,7,-170075.2829
-smic_follower_v2,082920.KS,비츠로셀,1,1,0,26,0.0,True,242,-1218967.1345
-smic_follower_v2,100090.KS,SK오션플랜트,1,1,0,26,0.0,True,533,-3381911.2429
-smic_follower_v2,187790.KS,나노,1,2,0,25,0.0,True,366,-5271.1753
+smic_follower_v2,CLBT,Cellebrite DI,1,15,0,366,0.0,True,877,1503376.7658
+smic_follower_v2,049720.KQ,고려신용정보,1,20,0,345,0.0,True,1676,-1231086.6413
+smic_follower_v2,017960.KS,한국카본,1,14,0,206,0.0,True,417,-39512.3609
+smic_follower_v2,ESTA,Establishment Labs Holdings,1,10,0,185,0.0,True,193,2872128.9865
+smic_follower_v2,IMAX,IMAX Corp,1,8,0,150,0.0,True,304,2357584.1733
+smic_follower_v2,IRMD,Iradimed Corporation,1,7,0,147,0.0,True,116,-200292.926
+smic_follower_v2,SXT,Sensient Technologies Corp,1,7,0,147,0.0,True,131,4487133.9463
+smic_follower_v2,CAMT,Camtek,1,1,0,35,0.0,True,7,-164591.9598
+smic_follower_v2,082920.KS,비츠로셀,1,1,0,30,0.0,True,242,-2029667.1345
+smic_follower_v2,100090.KS,SK오션플랜트,1,1,0,30,0.0,True,533,-3936231.2429
+smic_follower_v2,187790.KS,나노,1,2,0,29,0.0,True,366,27668.8247
 smic_follower_v2,366030.KQ,공구우먼,1,1,1,1,-118.2308,False,0,
 smic_follower_v2,285490.KQ,노바텍,1,7,1,379,-3720.0889,False,0,
 smic_follower_v2,170790.KQ,파이오링크,1,14,1,476,-6491.4784,False,0,
@@ -1412,7 +1418,7 @@ smic_follower_v2,000210.KS,DL,1,12,1,276,-534531.7965,False,0,
 smic_follower_v2,008730.KS,율촌화학,1,2,1,77,-555884.721,False,0,
 smic_follower_v2,002340.SZ,"GEM Co., Ltd.",1,4,1,365,-571293.6526,False,0,
 smic_follower_v2,403870.KQ,HPSP,1,1,1,1,-579966.5236,False,0,
-smic_follower_v2,122640.KQ,예스티,2,29,1,318,-596263.5455,True,832,5324479.5713
+smic_follower_v2,122640.KQ,예스티,2,29,1,322,-596263.5455,True,832,4617279.5713
 smic_follower_v2,159010.KQ,아스플로,1,11,1,169,-599021.2087,False,0,
 smic_follower_v2,032350.KS,롯데관광개발,1,7,1,230,-604504.7063,False,0,
 smic_follower_v2,375500.KS,DL이앤씨,1,9,1,186,-606782.3902,False,0,

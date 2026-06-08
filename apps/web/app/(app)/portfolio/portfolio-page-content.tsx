@@ -42,7 +42,7 @@ export function PortfolioPageShell({ children, model }: { children: ReactNode; m
             </div>
             <h1 className="mt-1 text-3xl font-semibold tracking-tight text-slate-950">{shortLabel}</h1>
             <p className="mt-1 text-sm text-slate-500">
-              개요에서 성과 경로를 보고, 보유·거래 원장은 각 상세 화면에서 전부 확인합니다.
+              개요에서 성과 경로를 보고, 보유·거래 trace는 각 상세 화면에서 전부 확인합니다.
             </p>
           </div>
           <Button asChild size="sm" variant="outline">
