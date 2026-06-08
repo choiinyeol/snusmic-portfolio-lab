@@ -13,4 +13,5 @@ Korean docs live in the default `*.md` files, and English docs live beside them 
 | [data-artifact-policy.md](./data-artifact-policy.md) | [data-artifact-policy.en.md](./data-artifact-policy.en.md) | Boundary between committed data and local/generated cache |
 | [backtest-contract.md](./backtest-contract.md) | [backtest-contract.en.md](./backtest-contract.en.md) | PIT boundary, account rule declaration, and verification contract |
 | [frontend/](./frontend/) | - | Frontend design, chart, table, and page rules |
+| [release-criteria.md](./release-criteria.md) / [EN](./release-criteria.en.md) | `v1.0.0` release criteria, freeze scope, shortlist governance, RC gate |
 | [research/](./research/) | - | Strategy research records and generated audit output |

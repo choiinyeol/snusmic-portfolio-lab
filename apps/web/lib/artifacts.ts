@@ -247,6 +247,7 @@ export type AccountCatalogRow = {
   kind: 'benchmark' | 'account' | 'oracle';
   benchmarkGroup: string | null;
   isSelectable: boolean;
+  shortlistPriority: number | null;
   isDefaultCandidate: boolean;
   objectivePassed: boolean;
   objectiveReturnExcess: number | null;
@@ -1080,6 +1081,7 @@ export function getAccountCatalog(): AccountCatalogRow[] {
     kind: row.kind,
     benchmarkGroup: row.benchmark_group,
     isSelectable: row.is_selectable,
+    shortlistPriority: row.shortlist_priority,
     isDefaultCandidate: row.is_default_candidate,
     objectivePassed: row.objective_passed,
     objectiveReturnExcess: row.objective_return_excess,

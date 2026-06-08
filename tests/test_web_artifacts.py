@@ -484,17 +484,17 @@ def test_extended_web_artifacts_support_insights_and_downloads(web_export_dir: P
     assert "6615fd1894ed9c54" in detail_metrics
     assert detail_metrics["6615fd1894ed9c54"]["markers"]
     assert page_detail_metrics == detail_metrics
-    assert len(return_windows) == 218
+    assert len(return_windows) == 219
     assert page_return_windows == return_windows
     assert {"return_30d", "return_60d", "return_90d", "return_180d"} <= set(return_windows[0])
-    assert target_distribution["summary"]["total_reports"] == 218
+    assert target_distribution["summary"]["total_reports"] == 219
     assert page_target_distribution == target_distribution
     data_quality = json.loads((out / "overview" / "data-quality.json").read_text(encoding="utf-8"))
     assert data_quality["report_exclusions"] == {
         "downside_target": 6,
-        "excluded_reports": 22,
-        "included_reports": 218,
-        "instant_target_hit": 2,
+        "excluded_reports": 21,
+        "included_reports": 219,
+        "instant_target_hit": 1,
         "missing_performance": 0,
         "missing_price": 6,
         "non_positive_upside": 8,

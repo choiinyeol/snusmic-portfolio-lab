@@ -13,4 +13,5 @@
 | [data-artifact-policy.md](./data-artifact-policy.md) | [data-artifact-policy.en.md](./data-artifact-policy.en.md) | 커밋되는 데이터와 local/generated cache의 경계 |
 | [backtest-contract.md](./backtest-contract.md) | [backtest-contract.en.md](./backtest-contract.en.md) | PIT boundary, account rule declaration, verification contract |
 | [frontend/](./frontend/) | - | frontend design, chart, table, page 작성 규칙 |
+| [release-criteria.md](./release-criteria.md) / [EN](./release-criteria.en.md) | `v1.0.0` release criteria, freeze scope, shortlist governance, RC gate |
 | [research/](./research/) | - | strategy research 기록과 generated audit output |

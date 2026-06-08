@@ -103,6 +103,7 @@ WEB_PORTFOLIO_BENCHMARK_IDS = (
     "benchmark_spy",
     "benchmark_gld",
 )
+WEB_PORTFOLIO_ACCOUNT_ORDER = {account_id: index for index, account_id in enumerate(WEB_PORTFOLIO_ACCOUNT_IDS)}
 _ACCOUNT_ID_PATTERN = re.compile(r"^[A-Za-z0-9_]+$")
 MISSING_PRICE_CLASSIFICATIONS = {
     "003410.KS": {
@@ -1123,6 +1124,7 @@ def _enrich_account_rows_with_catalog(
                 "kind",
                 "benchmark_group",
                 "is_selectable",
+                "shortlist_priority",
                 "is_default_candidate",
                 "objective_passed",
                 "objective_return_excess",
@@ -3147,13 +3149,15 @@ def _build_account_catalog(summary: pd.DataFrame, sim_config_path: Path) -> list
             else None
         )
         mdd_slack = OBJECTIVE_MAX_DRAWDOWN - max_drawdown if max_drawdown is not None else None
+        selectable = kind == "account" and account_id in WEB_PORTFOLIO_ACCOUNT_ORDER
         objective_passed = (
-            kind == "account"
+            selectable
             and return_excess is not None
             and return_excess > 0
             and mdd_slack is not None
             and mdd_slack >= 0
         )
+        shortlist_priority = WEB_PORTFOLIO_ACCOUNT_ORDER.get(account_id)
         raw_label = str(row.get("label") or config.get("label") or account_id)
         label = _account_display_label(account_id, config, raw_label)
         rows.append(
@@ -3163,7 +3167,8 @@ def _build_account_catalog(summary: pd.DataFrame, sim_config_path: Path) -> list
                 "short_label": _account_short_label(account_id, label),
                 "kind": kind,
                 "benchmark_group": _benchmark_group(account_id),
-                "is_selectable": kind == "account",
+                "is_selectable": selectable,
+                "shortlist_priority": shortlist_priority,
                 "is_default_candidate": objective_passed,
                 "objective_passed": objective_passed,
                 "objective_return_excess": return_excess,

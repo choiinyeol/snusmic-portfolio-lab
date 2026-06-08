@@ -71,16 +71,15 @@ uv run --locked python -m snusmic_pipeline export-web --warehouse data/warehouse
 
 생성된 artifact는 기본적으로 대표 shortlist만 포함합니다. 대량 parameter-search branch는 연구 기록에는 남기지만, 웹 데이터에는 재생성하지 않아 payload와 계좌 화면을 작게 유지합니다.
 
-| 표시 이름 | 의미 |
-| --- | --- |
-| Partial 75 | 현재 local-return 후보. Quarterly Top5, retained winners, trailing trim, 12.5% cash gate, trim cash의 75% redeploy를 쓰는 실험 후보입니다. |
-| CashGate 12.5 | Partial 75 직전의 redeploy gate robustness 기준 계좌입니다. |
-| Mixed Entry TrailTrim 20 | candidate entry와 board retention을 섞고, 25% trailing drawdown 시 20% weight 쪽으로 trim하는 실전 기준선입니다. |
-| Candidate Profit60 | Profit60의 candidate-score admission 비교 계좌입니다. |
-| Profit60 | Quarterly Top5, 540일 fresh window, winner retention, weekly cap, +60% profit cushion을 쓰는 PIT trend 비교 계좌입니다. |
-| MTT RS70/80/90 | Minervini Trend Template 조건과 상대강도 percentile 70/80/90을 비교하는 momentum 계좌입니다. |
-| MTT Low +100/+300 | 52주 최저가 대비 +100%/+300% 이상인 강한 추세 종목만 비교하는 momentum 계좌입니다. |
-| Trend Top5 / Score Top5 / SMIC Follower | 단순 PIT trend, PIT score, report-follower 기준선입니다. |
+| account_id | 표시 이름 | 의미 |
+| --- | --- | --- |
+| `pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5` | Partial 75 | 현재 local-return 후보. Quarterly Top5, retained winners, trailing trim, 12.5% cash gate, trim cash의 75% redeploy를 쓰는 실험 후보입니다. |
+| `pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5` | CashGate 12.5 | Partial 75 직전의 redeploy gate robustness 기준 계좌입니다. |
+| `pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5` | Mixed Entry TrailTrim 20 | candidate entry와 board retention을 섞고, 25% trailing drawdown 시 20% weight 쪽으로 trim하는 실전 기준선입니다. |
+| `pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5` | Candidate Profit60 | Profit60의 candidate-score admission 비교 계좌입니다. |
+| `pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5` | Profit60 | Quarterly Top5, 540일 fresh window, winner retention, weekly cap, +60% profit cushion을 쓰는 PIT trend 비교 계좌입니다. |
+| `pit_mtt_rs70_top5`, `pit_mtt_rs80_top5`, `pit_mtt_rs90_top5`, `pit_mtt_low100_top5`, `pit_mtt_low300_top5`, `pit_momentum_1m3m_top5`, `pit_momentum_3m6m_top5`, `pit_momentum_6m12m_top5` | Momentum/MTT variants | Minervini Trend Template, relative strength, 52주 최저가 기반 비교용 계좌군입니다. |
+| `pit_trend_top5`, `pit_score_top5`, `smic_follower` | Trend / Score / Follower baselines | 단순 PIT trend, PIT score, report-follower 기준선입니다. |
 All Weather, KODEX 200, QQQ, SPY, GLD는 비교 벤치마크로 유지합니다. Forward-looking oracle simulation은 진단용이며 product account가 아닙니다.
 
 ### 데이터 흐름

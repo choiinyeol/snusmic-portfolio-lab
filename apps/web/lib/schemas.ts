@@ -235,6 +235,7 @@ export const AccountCatalogRowSchema = z
     kind: z.enum(['benchmark', 'account', 'oracle']),
     benchmark_group: z.string().nullable(),
     is_selectable: z.boolean(),
+    shortlist_priority: z.number().nullable(),
     is_default_candidate: z.boolean(),
     objective_passed: z.boolean(),
     objective_return_excess: NullableNumber,

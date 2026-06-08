@@ -34,15 +34,17 @@ SNUSMIC Portfolio Lab은 point-in-time SMIC 리포트 데이터와 정적 계좌
 
 ### 현재 선별 계좌
 
-| 표시 이름 | 역할 |
-| --- | --- |
-| Partial 75 | 현재 local-return 후보. Quarterly PIT Trend Top5, retained winners, trailing trim, 12.5% cash gate, 75% redeploy. |
-| CashGate 12.5 | redeploy gate robustness baseline. |
-| TrailTrim 20 | cash redeploy 이전의 단순 trailing-trim baseline. |
-| Trend Top5 | 단순 PIT trend-score Top5 기준. |
-| Score Top5 | 단순 PIT score Top5 기준. |
-| SMIC Follower | report-follower baseline. |
-| Momentum/MTT variants | 1M/3M, 3M/6M, 6M/12M momentum plus explicit MTT RS70/80/90 and 52주 최저가 +100%/+300% 계좌군. 기본 생성 대상은 선별 shortlist로 제한하고, 대량 실험 후보는 연구 기록에만 남겨 웹 데이터 속도 비용을 만들지 않습니다. |
+| account_id | 표시 이름 | 역할 |
+| --- | --- | --- |
+| `pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5` | Partial 75 | 현재 local-return candidate. trailing trim + 12.5% cash gate + 75% redeploy를 쓰는 실험 후보입니다. |
+| `pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5` | CashGate 12.5 | Partial 75 직전의 robustness baseline입니다. |
+| `pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5` | TrailTrim 20 | cash redeploy 이전의 단순 trailing-trim baseline입니다. |
+| `pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5` | Candidate Profit60 | candidate-score entry ordering 비교 계좌입니다. |
+| `pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5` | Profit60 | board-score / weekly-cap / profit-cushion baseline입니다. |
+| `pit_trend_top5` | Trend Top5 | 단순 PIT trend-score baseline입니다. |
+| `pit_score_top5` | Score Top5 | 단순 PIT score baseline입니다. |
+| `smic_follower` | SMIC Follower | report-follower baseline입니다. |
+| `pit_momentum_1m3m_top5`, `pit_momentum_3m6m_top5`, `pit_momentum_6m12m_top5`, `pit_mtt_rs70_top5`, `pit_mtt_rs80_top5`, `pit_mtt_rs90_top5`, `pit_mtt_low100_top5`, `pit_mtt_low300_top5` | Momentum/MTT variants | 현재 product에서 비교용으로 노출하는 momentum/MTT representative 계좌군입니다. 기본 생성 대상은 선별 shortlist로 제한하고, 대량 실험 후보는 연구 기록에만 남겨 웹 데이터 속도 비용을 만들지 않습니다. |
 
 ### 향후 rule 작업
 

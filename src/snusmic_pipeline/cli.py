@@ -412,13 +412,15 @@ def run_refresh_prices(args: argparse.Namespace) -> int:
 
 
 def run_export_web(args: argparse.Namespace) -> int:
+    external_artifact_dir = getattr(args, "external_artifact_dir", "") or ""
+    external_artifact_url_root = getattr(args, "external_artifact_url_root", "") or ""
     inputs = ExportInputs(
         warehouse=Path(args.warehouse),
         sim=Path(args.sim),
         out=Path(args.out),
         extraction_quality=Path(args.extraction_quality),
-        external_artifact_dir=Path(args.external_artifact_dir) if args.external_artifact_dir else None,
-        external_artifact_url_root=args.external_artifact_url_root or None,
+        external_artifact_dir=Path(external_artifact_dir) if external_artifact_dir else None,
+        external_artifact_url_root=external_artifact_url_root or None,
     )
     result = check_web_artifacts(inputs) if args.check else export_web_artifacts(inputs)
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
@@ -526,14 +528,16 @@ def run_refresh_web_artifacts(args: argparse.Namespace) -> int:
         sim_dir,
         refresh_benchmark=args.refresh_benchmark,
     )
+    external_artifact_dir = getattr(args, "external_artifact_dir", "") or ""
+    external_artifact_url_root = getattr(args, "external_artifact_url_root", "") or ""
     result = check_web_artifacts(
         ExportInputs(
             warehouse=warehouse_dir,
             sim=sim_dir,
             out=web_dir,
             extraction_quality=Path(args.extraction_quality),
-            external_artifact_dir=Path(args.external_artifact_dir) if args.external_artifact_dir else None,
-            external_artifact_url_root=args.external_artifact_url_root or None,
+            external_artifact_dir=Path(external_artifact_dir) if external_artifact_dir else None,
+            external_artifact_url_root=external_artifact_url_root or None,
         )
     )
     copy_web_downloads(web_dir, Path(args.downloads))
@@ -586,14 +590,16 @@ def run_rebuild_web_artifacts(args: argparse.Namespace) -> int:
     )
     if pit_result != 0:
         return pit_result
+    external_artifact_dir = getattr(args, "external_artifact_dir", "") or ""
+    external_artifact_url_root = getattr(args, "external_artifact_url_root", "") or ""
     result = check_web_artifacts(
         ExportInputs(
             warehouse=warehouse_dir,
             sim=sim_dir,
             out=web_dir,
             extraction_quality=Path(args.extraction_quality),
-            external_artifact_dir=Path(args.external_artifact_dir) if args.external_artifact_dir else None,
-            external_artifact_url_root=args.external_artifact_url_root or None,
+            external_artifact_dir=Path(external_artifact_dir) if external_artifact_dir else None,
+            external_artifact_url_root=external_artifact_url_root or None,
         )
     )
     copy_web_downloads(web_dir, Path(args.downloads))

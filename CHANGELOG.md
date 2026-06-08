@@ -1,5 +1,21 @@
 # Changelog
 
+## v1.0.0-rc1 - Freeze RC1 release contract and shortlist admission
+
+- Adds explicit `v1.0.0` release criteria docs in Korean and English, including the full live artifact freeze surface, shortlist governance, external shard operating path, and release-gate contract.
+- Converges shortlist admission on exporter-owned `is_selectable` / `shortlist_priority` fields instead of parallel UI fallback gates, and aligns product-facing docs with exact shortlisted `account_id` rosters.
+- Updates the slow artifact contract suite expectations to the current 219-report export snapshot and regenerates the affected web account/catalog/dashboard artifacts for the RC1 local static path.
+- Marks Python and web package versions as release candidate builds: `1.0.0rc1` and `1.0.0-rc.1`.
+
+Verification:
+
+- `uv run --locked ruff check src/snusmic_pipeline/web/artifacts.py tests/test_shortlist_governance.py`
+- `uv run --locked pytest tests/test_shortlist_governance.py -q`
+- `pnpm --dir apps/web typecheck`
+- `uv run --locked python -m snusmic_pipeline export-web --warehouse data/warehouse --sim data/sim --out data/web`
+- `pnpm --dir apps/web artifact:check`
+- `git diff --check -- README.md docs/product-spec.md docs/product-spec.en.md`
+- `uv run --locked pytest tests/test_web_artifacts.py -q -x`
 ## v0.31.3 - Reconcile momentum strategy source with exported shortlist
 
 - Commits the PIT momentum/MTT signal-rule source and tests that already underpin the regenerated shortlist artifacts, including 1M/3M, 3M/6M, 6M/12M, MTT RS70/80/90, and 52-week-low +100%/+300% gates.

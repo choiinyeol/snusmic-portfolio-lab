@@ -37,14 +37,7 @@ import {
 const ALL_WEATHER_ACCOUNT = 'all_weather';
 export const NO_ADMITTED_ACCOUNT_PARAM = 'no-admitted-account';
 
-const PRIMARY_PORTFOLIO_ACCOUNT_IDS = [
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5',
-  'pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5',
-  'pit_trend_top5',
-  'pit_score_top5',
-  'smic_follower',
-] as const;
+
 
 export function buildPortfolioLandingModel(): PortfolioLandingModel {
   const allHoldings = getCurrentHoldings();
@@ -487,12 +480,10 @@ export function getPortfolioStaticParams() {
 }
 
 function getPortfolioRows(rows: AccountLeaderboardRow[] = getAccountLeaderboard()) {
-  const followerOrder = new Map<string, number>(
-    PRIMARY_PORTFOLIO_ACCOUNT_IDS.map((accountId, index) => [accountId, index]),
-  );
+  const order = new Map(getAccountCatalog().map((row) => [row.accountId, row.shortlistPriority ?? 999]));
   return rows
-    .filter((row) => row.kind === 'account' && followerOrder.has(row.id))
-    .sort((a, b) => (followerOrder.get(a.id) ?? 999) - (followerOrder.get(b.id) ?? 999));
+    .filter((row) => row.kind === 'account' && row.isSelectable)
+    .sort((a, b) => (order.get(a.id) ?? 999) - (order.get(b.id) ?? 999));
 }
 
 function defaultPortfolioAccount(rows: AccountLeaderboardRow[]): string {
