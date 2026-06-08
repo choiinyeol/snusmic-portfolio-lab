@@ -4,7 +4,10 @@ import { createHash } from 'node:crypto';
 
 const repoRoot = path.resolve(import.meta.dirname, '..', '..', '..');
 const manifestPath = path.join(repoRoot, 'data', 'web', 'manifest.json');
-const cacheRoot = path.resolve(repoRoot, process.env.SNUSMIC_EXTERNAL_ARTIFACT_CACHE_DIR || '.cache/external-web-artifacts');
+const cacheRoot = path.resolve(
+  repoRoot,
+  process.env.SNUSMIC_EXTERNAL_ARTIFACT_CACHE_DIR || '.cache/external-web-artifacts',
+);
 const sourceRoot = process.env.SNUSMIC_EXTERNAL_ARTIFACT_SOURCE_DIR
   ? path.resolve(repoRoot, process.env.SNUSMIC_EXTERNAL_ARTIFACT_SOURCE_DIR)
   : null;

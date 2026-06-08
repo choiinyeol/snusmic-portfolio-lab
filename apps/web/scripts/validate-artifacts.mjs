@@ -7,7 +7,10 @@ const webRoot = process.env.SNUSMIC_WEB_ARTIFACT_ROOT
   : path.join(repoRoot, 'data/web');
 const maxPriceAgeDays = Number(process.env.SNUSMIC_MAX_PRICE_AGE_DAYS ?? '7');
 const maxReportAgeDays = Number(process.env.SNUSMIC_MAX_REPORT_AGE_DAYS ?? '30');
-const externalCacheRoot = path.resolve(repoRoot, process.env.SNUSMIC_EXTERNAL_ARTIFACT_CACHE_DIR ?? '.cache/external-web-artifacts');
+const externalCacheRoot = path.resolve(
+  repoRoot,
+  process.env.SNUSMIC_EXTERNAL_ARTIFACT_CACHE_DIR ?? '.cache/external-web-artifacts',
+);
 const required = [
   'manifest.json',
   'health.json',
@@ -57,7 +60,8 @@ function resolveJsonPath(relativePath) {
   const entry = manifest.external_artifacts?.[manifestRelativePath(relativePath)];
   if (!entry) fail(`missing required artifact: data/web/${relativePath}`);
   const cached = path.join(externalCacheRoot, manifestRelativePath(relativePath));
-  if (!fs.existsSync(cached)) fail(`external artifact cache missing for ${relativePath}; run hydrate:external-artifacts first`);
+  if (!fs.existsSync(cached))
+    fail(`external artifact cache missing for ${relativePath}; run hydrate:external-artifacts first`);
   return cached;
 }
 
@@ -203,9 +207,12 @@ const externalArtifacts = manifest.external_artifacts ?? {};
 for (const [artifact, pointer] of Object.entries(externalArtifacts)) {
   if (artifact.includes('\\')) fail(`external artifact path is not POSIX: ${artifact}`);
   if (!pointer || typeof pointer !== 'object') fail(`external artifact pointer is invalid: ${artifact}`);
-  if (!pointer.checksum || typeof pointer.checksum !== 'string') fail(`external artifact checksum missing: ${artifact}`);
-  if (!Number.isFinite(pointer.size_bytes) || pointer.size_bytes <= 0) fail(`external artifact size is invalid: ${artifact}`);
-  if (!pointer.public_url || typeof pointer.public_url !== 'string') fail(`external artifact public_url missing: ${artifact}`);
+  if (!pointer.checksum || typeof pointer.checksum !== 'string')
+    fail(`external artifact checksum missing: ${artifact}`);
+  if (!Number.isFinite(pointer.size_bytes) || pointer.size_bytes <= 0)
+    fail(`external artifact size is invalid: ${artifact}`);
+  if (!pointer.public_url || typeof pointer.public_url !== 'string')
+    fail(`external artifact public_url missing: ${artifact}`);
 }
 if (manifest.artifact_root !== 'data/web') fail(`unexpected artifact_root: ${manifest.artifact_root}`);
 if (!manifest.report_range?.start || !manifest.report_range?.end) fail('manifest report_range is incomplete');
