@@ -1,4 +1,3 @@
-import type { AccountSelectorOption } from '@/components/trading/AccountSelector';
 import type {
   AccountingReconciliationRow,
   EquityPoint,
@@ -7,6 +6,15 @@ import type {
   ReportTargetDigest,
   TradeRow,
 } from '@/lib/artifacts';
+
+export type AccountOption = {
+  id: string;
+  label: string;
+  shortLabel: string;
+  kind: 'account' | 'benchmark';
+  href: string;
+  isDefault: boolean;
+};
 
 export type PortfolioViewModel = {
   holdings: HoldingRow[];
@@ -18,7 +26,7 @@ export type PortfolioViewModel = {
   accounts: string[];
   benchmarkAccounts: string[];
   accountLabels: Record<string, string>;
-  accountOptions: AccountSelectorOption[];
+  accountOptions: AccountOption[];
   defaultAccount: string;
   selectedAccount: string;
   invalidAccountId: string | null;

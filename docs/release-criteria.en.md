@@ -112,6 +112,10 @@ The shortlist must be both human-readable and machine-enforced.
 ### Machine-enforced source
 - `data/sim/account-configs.json`
 - `data/web/accounts/catalog.json`
+Current decision:
+- `v1.0.0` GA defaults to **local committed shards**.
+- External shard mode stays implemented and tested, but it is not part of the default GA serving path unless RC2 or a later post-1.0 review re-approves it.
+- Turning external mode on requires passing the optional GA contract below again.
 - exporter-side shortlist and admission logic
 - UI-side priority, selectability, follower exceptions, and objective-passing logic
 

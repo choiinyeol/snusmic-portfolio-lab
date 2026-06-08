@@ -114,8 +114,6 @@ export function ReportDetailView({ model }: { model: ReportDetailViewModel }) {
         ]}
       />
 
-      <SourceAuditSection metadata={sourceMetadata} markdownHref={markdownHref} pdfHref={pdfHref} />
-
       <section className="grid gap-2" aria-labelledby="price-chart-heading">
         <h2
           className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500"
@@ -136,6 +134,8 @@ export function ReportDetailView({ model }: { model: ReportDetailViewModel }) {
           />
         </div>
       </section>
+
+      <SourceAuditSection metadata={sourceMetadata} markdownHref={markdownHref} pdfHref={pdfHref} />
     </div>
   );
 }

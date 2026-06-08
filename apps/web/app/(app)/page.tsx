@@ -1,313 +1,239 @@
-import {
-  ArrowUpRight,
-  BarChart3,
-  CalendarClock,
-  FileSearch,
-  Gauge,
-  ShieldCheck,
-  TrendingUp,
-  WalletCards,
-} from 'lucide-react';
 import Link from 'next/link';
-import { PerformanceChartPanel } from '@/components/charts/PerformanceChartPanel';
-import { Badge } from '@/components/ui/badge';
+import { ArrowUpRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { KpiTile } from '@/components/ui/KpiTile';
-import { PageHero } from '@/components/ui/PageHero';
-import { displayPortfolioName, strategyMeta } from '@/components/trading/portfolio-views/strategy-display';
-import { getArtifactHealth } from '@/lib/artifacts';
+import { displayPortfolioName } from '@/components/trading/portfolio-views/strategy-display';
+import { getArtifactHealth, getCurrentHoldings, getSummaryRows } from '@/lib/artifacts';
 import { getDashboardViewModel, type DashboardViewModel } from '@/lib/dashboard-view-model';
 import { formatDateKo, formatKrw, formatPercent } from '@/lib/format';
-
-type Report = DashboardViewModel['reports'][number];
-type Trade = DashboardViewModel['recentTrades'][number];
 type Candidate = DashboardViewModel['overview']['researchCandidates'][number];
 
 export default function OverviewPage() {
   const view = getDashboardViewModel();
   const health = getArtifactHealth();
-  const { overview, selectedAccountRow, benchmarkToBeat } = view;
+  const { overview, benchmarkToBeat } = view;
   const reportStats = overview.reportStats;
-  const selectedLeaderboardRow = view.accountRows.find((row) => row.id === view.selectedAccount) ?? selectedAccountRow;
-  const strategyName = displayPortfolioName(
-    view.selectedAccount,
-    selectedLeaderboardRow?.shortLabel || overview.portfolio.label,
-  );
-  const strategy = strategyMeta(view.selectedAccount);
+  const selected = view.selectedAccountRow;
   const benchmarkExcess =
-    selectedLeaderboardRow?.benchmarkExcess ??
-    (selectedLeaderboardRow?.id === benchmarkToBeat?.id
+    selected?.benchmarkExcess ??
+    (selected?.id === benchmarkToBeat?.id
       ? 0
-      : selectedLeaderboardRow?.returnPct != null && benchmarkToBeat?.returnPct != null
-        ? selectedLeaderboardRow.returnPct - benchmarkToBeat.returnPct
+      : selected?.returnPct != null && benchmarkToBeat?.returnPct != null
+        ? selected.returnPct - benchmarkToBeat.returnPct
         : null);
-  const watchCandidates = overview.researchCandidates.slice(0, 4);
-  const recentSignals = view.recentTrades.slice(0, 4);
+  const priorityReports = overview.researchCandidates.slice(0, 8);
+  const summaries = new Map(getSummaryRows().map((row) => [row.account_id, row]));
+  const holdingsCount = getCurrentHoldings().reduce(
+    (acc, row) => acc.set(row.account_id, (acc.get(row.account_id) ?? 0) + 1),
+    new Map<string, number>(),
+  );
+  const accountRows = [...view.selectableRows]
+    .sort((a, b) => {
+      const left = Number(a.objectivePassed) - Number(b.objectivePassed);
+      const right = (b.returnPct ?? Number.NEGATIVE_INFINITY) - (a.returnPct ?? Number.NEGATIVE_INFINITY);
+      return left !== 0 ? -left : right;
+    })
+    .slice(0, 8);
 
   return (
     <div className="grid gap-5">
-      <PageHero
-        title="SNUSMIC 운영 허브"
-        subtitle="오늘 확인할 데이터 상태와 다음으로 열 화면을 정하는 출발점입니다."
-        badges={[
-          { label: '상태', value: healthStatusLabel(health.status) },
-          { label: '가격', value: health.as_of.price_date ?? '기준일 없음' },
-          { label: '대표 계좌', value: strategyName },
-          { label: '역할', value: strategy.subtitle },
-        ]}
-        actions={
-          <>
+      <section className="rounded-md border border-slate-200 bg-white p-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-950">오늘 먼저 볼 항목</h1>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              최신 기준일에 맞춘 리포트 결과와 선별 계좌만 빠르게 확인합니다.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
             <Button asChild size="sm" variant="default">
               <Link href="/reports">
-                리포트 검증 열기 <ArrowUpRight />
+                리포트 보기 <ArrowUpRight className="size-4" />
               </Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link href="/portfolio">계좌 비교</Link>
+              <Link href="/portfolio">포트폴리오 보기</Link>
             </Button>
-          </>
-        }
-        kpis={
-          <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-            <KpiTile
-              compact
-              icon={<ShieldCheck className="size-4" />}
-              label="데이터 상태"
-              value={healthStatusLabel(health.status)}
-              delta={
-                health.as_of.report_date ? `리포트 ${formatDateKo(health.as_of.report_date)}` : 'health artifact 기준'
-              }
-              tone={healthTone(health.status)}
-            />
-            <KpiTile
-              compact
-              icon={<FileSearch className="size-4" />}
-              label="공개 리포트"
-              value={view.priceMatchedReports.toLocaleString('ko-KR')}
-              delta={`${formatPercent(reportStats.targetHitRate)} · 목표 도달`}
-              tone="accent"
-            />
-            <KpiTile
-              compact
-              icon={<TrendingUp className="size-4" />}
-              label="대표 계좌 수익률"
-              value={formatPercent(selectedLeaderboardRow?.returnPct)}
-              delta={strategyName}
-              tone={(selectedLeaderboardRow?.returnPct ?? 0) >= 0 ? 'good' : 'warn'}
-            />
-            <KpiTile
-              compact
-              icon={<Gauge className="size-4" />}
-              label="KODEX 대비"
-              value={formatNullablePercent(benchmarkExcess)}
-              delta={benchmarkToBeat?.shortLabel ? `${benchmarkToBeat.shortLabel} 기준` : '기준선 없음'}
-              tone={(benchmarkExcess ?? 0) >= 0 ? 'good' : 'warn'}
-            />
           </div>
-        }
-      />
-
-      <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]" aria-label="성과 경로와 이동 경로">
-        <PerformanceChartPanel
-          series={view.chartSeries}
-          benchmarkCount={view.benchmarkRows.length}
-          accountCount={view.accountRows.filter((row) => row.kind === 'account').length}
-          objectiveLabel={`${strategyName}와 벤치마크 경로 비교`}
-        />
-        <nav className="grid content-start gap-3" aria-label="주요 작업 경로">
-          <RouteCard
-            icon={<FileSearch />}
-            title="리포트 검증"
-            description="공개 리포트의 현재 수익률, 목표가 진행률, 가격 경로를 한 테이블에서 비교합니다."
-            metric={`${view.reports.length.toLocaleString('ko-KR')}개 리포트`}
-            href="/reports"
-          />
-          <RouteCard
-            icon={<WalletCards />}
-            title="계좌 리포트"
-            description="공개 계좌의 수익률, MDD, 보유·매매 원장을 비교합니다."
-            metric={`${view.selectableRows.length.toLocaleString('ko-KR')}개 계좌`}
-            href="/portfolio"
-          />
-          <RouteCard
-            icon={<BarChart3 />}
-            title="성과 통계"
-            description="표본 전체의 목표가 적중, 무반응, 집중도, 대표 가격 경로를 해석합니다."
-            metric={reportStats.total ? `${reportStats.total.toLocaleString('ko-KR')}개 표본` : '표본 없음'}
-            href="/statistics"
-          />
-          <RouteCard
-            icon={<CalendarClock />}
-            title="리포트 캘린더"
-            description="특정 관찰일에 어떤 후보가 보였고 이후 어떤 가격 경로를 만들었는지 봅니다."
-            metric={`${watchCandidates.length.toLocaleString('ko-KR')}개 현재 후보`}
-            href="/calendar"
-          />
-        </nav>
+        </div>
+        <p className="mt-3 font-mono text-xs text-slate-500">
+          static snapshot · report {health.as_of.report_date ? formatDateKo(health.as_of.report_date) : '-'} · price{' '}
+          {health.as_of.price_date ? formatDateKo(health.as_of.price_date) : '-'}
+        </p>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-2" aria-label="운영 요약 큐">
-        <DiagnosticPanel title="최근 매매 신호" caption="선택 계좌에 실제 기록된 체결">
-          {recentSignals.length ? (
-            recentSignals.map((trade) => (
-              <SignalLine key={`${trade.date}-${trade.symbol}-${trade.side}`} trade={trade} />
-            ))
-          ) : (
-            <EmptyState label="최근 체결 신호가 없습니다." />
-          )}
-        </DiagnosticPanel>
-        <DiagnosticPanel title="현재 리포트 후보" caption="다음 검토 우선순위">
-          {watchCandidates.length ? (
-            watchCandidates.map((candidate) => <CandidateLine candidate={candidate} key={candidate.report.reportId} />)
-          ) : (
-            <EmptyState label="현재 후보가 없습니다." />
-          )}
-        </DiagnosticPanel>
+      <section className="rounded-md border border-slate-200 bg-white p-4">
+        <div className="mb-3">
+          <h2 className="text-sm font-semibold text-slate-950">데이터 스냅샷</h2>
+          <p className="mt-1 text-xs text-slate-500">지금 snapshot이 어느 정도 신뢰할 만한지 먼저 확인합니다.</p>
+        </div>
+        <dl className="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-3 xl:grid-cols-6">
+          <SnapshotStat label="공개 리포트" value={view.priceMatchedReports.toLocaleString('ko-KR')} />
+          <SnapshotStat label="목표 도달률" value={formatPercent(reportStats.targetHitRate)} />
+          <SnapshotStat label="평균 현재 수익률" value={formatPercent(reportStats.averageCurrentReturn)} />
+          <SnapshotStat label="중간 현재 수익률" value={formatPercent(reportStats.medianCurrentReturn)} />
+          <SnapshotStat label="대표 계좌 수익률" value={formatPercent(selected?.returnPct)} />
+          <SnapshotStat label="KODEX 대비" value={formatNullablePercent(benchmarkExcess)} />
+        </dl>
       </section>
+
+      <section className="rounded-md border border-slate-200 bg-white p-4">
+        <div className="mb-3 flex items-end justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-semibold text-slate-950">우선 확인할 리포트</h2>
+            <p className="mt-1 text-xs text-slate-500">
+              현재 후보와 최근 리포트 중 먼저 열어볼 만한 항목만 앞에 둡니다.
+            </p>
+          </div>
+          <Button asChild size="sm" variant="outline">
+            <Link href="/reports">전체 테이블</Link>
+          </Button>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm">
+            <thead>
+              <tr className="border-b border-slate-200 text-left text-xs uppercase tracking-[0.08em] text-slate-500">
+                <th className="px-0 py-2">리포트</th>
+                <th className="px-3 py-2">발간일</th>
+                <th className="px-3 py-2 text-right">현재 수익률</th>
+                <th className="px-3 py-2 text-right">목표 도달률</th>
+                <th className="px-3 py-2">상태</th>
+              </tr>
+            </thead>
+            <tbody>
+              {priorityReports.length ? (
+                priorityReports.map((candidate) => {
+                  const report = candidate.report;
+                  return (
+                    <tr className="border-b border-slate-100 last:border-b-0" key={report.reportId}>
+                      <td className="px-0 py-2.5">
+                        <Link
+                          className="block min-w-0 hover:text-slate-950"
+                          href={`/reports/${encodeURIComponent(report.symbol)}/${encodeURIComponent(report.reportId)}`}
+                        >
+                          <div className="truncate font-medium text-slate-900">{report.company}</div>
+                          <div className="truncate font-mono text-xs text-slate-500">{report.symbol}</div>
+                        </Link>
+                      </td>
+                      <td className="px-3 py-2.5 font-mono text-xs text-slate-500">
+                        {formatDateKo(report.publicationDate)}
+                      </td>
+                      <td
+                        className={`px-3 py-2.5 text-right font-mono tabular-nums ${signedToneClass(report.currentReturn)}`}
+                      >
+                        {formatPercent(report.currentReturn)}
+                      </td>
+                      <td className="px-3 py-2.5 text-right font-mono tabular-nums text-slate-700">
+                        {formatPercent(report.targetProgressPct)}
+                      </td>
+                      <td className="px-3 py-2.5 text-xs text-slate-600">{bucketLabel(candidate.bucket)}</td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td className="px-0 py-6 text-sm text-slate-500" colSpan={5}>
+                    우선순위 리포트가 없습니다.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="rounded-md border border-slate-200 bg-white p-4">
+        <div className="mb-3 flex items-end justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-semibold text-slate-950">대표 계좌 비교</h2>
+            <p className="mt-1 text-xs text-slate-500">
+              지금 product shortlist에서 무엇이 살아남았는지 한 줄씩 비교합니다.
+            </p>
+          </div>
+          <Button asChild size="sm" variant="outline">
+            <Link href="/portfolio">계좌 원장</Link>
+          </Button>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm">
+            <thead>
+              <tr className="border-b border-slate-200 text-left text-xs uppercase tracking-[0.08em] text-slate-500">
+                <th className="px-0 py-2">계좌</th>
+                <th className="px-3 py-2 text-right">수익률</th>
+                <th className="px-3 py-2 text-right">KODEX 대비</th>
+                <th className="px-3 py-2 text-right">MDD</th>
+                <th className="px-3 py-2 text-right">평가액</th>
+                <th className="px-3 py-2 text-right">보유</th>
+              </tr>
+            </thead>
+            <tbody>
+              {accountRows.map((row) => (
+                <tr className="border-b border-slate-100 last:border-b-0" key={row.id}>
+                  <td className="px-0 py-2.5">
+                    <Link className="block min-w-0 hover:text-slate-950" href={row.href}>
+                      <div className="truncate font-medium text-slate-900">
+                        {displayPortfolioName(row.id, row.shortLabel)}
+                      </div>
+                      <div className="truncate text-xs text-slate-500">
+                        {row.objectivePassed ? '현재 통과' : '비교용'} ·{' '}
+                        {row.tradeCount?.toLocaleString('ko-KR') ?? '-'}건
+                      </div>
+                    </Link>
+                  </td>
+                  <td className={`px-3 py-2.5 text-right font-mono tabular-nums ${signedToneClass(row.returnPct)}`}>
+                    {formatPercent(row.returnPct)}
+                  </td>
+                  <td
+                    className={`px-3 py-2.5 text-right font-mono tabular-nums ${signedToneClass(row.benchmarkExcess)}`}
+                  >
+                    {formatNullablePercent(row.benchmarkExcess)}
+                  </td>
+                  <td className="px-3 py-2.5 text-right font-mono tabular-nums text-slate-700">
+                    {formatPercent(row.maxDrawdown)}
+                  </td>
+                  <td className="px-3 py-2.5 text-right font-mono tabular-nums text-slate-900">
+                    {formatKrw(summaries.get(row.id)?.finalEquityKrw)}
+                  </td>
+                  <td className="px-3 py-2.5 text-right font-mono tabular-nums text-slate-700">
+                    {(holdingsCount.get(row.id) ?? 0).toLocaleString('ko-KR')}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <p className="text-xs text-slate-500">
+        정적 artifact 기준 화면입니다. 리포트와 가격, 계좌 기록은 최신 기준일로 맞춰 export되지만 실시간 데이터는
+        아닙니다.
+      </p>
     </div>
   );
 }
 
-function RouteCard({
-  icon,
-  title,
-  description,
-  metric,
-  href,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  metric: string;
-  href: string;
-}) {
+function SnapshotStat({ label, value }: { label: string; value: string }) {
   return (
-    <Link
-      className="group grid gap-3 rounded-md border border-slate-200 bg-white p-3 transition hover:border-slate-300 hover:bg-slate-50"
-      href={href}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2">
-          <span className="grid size-8 shrink-0 place-items-center rounded-md bg-slate-100 text-slate-700 [&_svg]:size-4">
-            {icon}
-          </span>
-          <div className="min-w-0">
-            <h2 className="truncate text-sm font-semibold text-slate-950">{title}</h2>
-            <p className="mt-0.5 truncate font-mono text-xs tabular-nums text-slate-500">{metric}</p>
-          </div>
-        </div>
-        <ArrowUpRight className="size-4 shrink-0 text-slate-400 transition group-hover:text-slate-700" />
-      </div>
-      <p className="text-xs leading-5 text-slate-600">{description}</p>
-    </Link>
-  );
-}
-
-function DiagnosticPanel({ title, caption, children }: { title: string; caption: string; children: React.ReactNode }) {
-  return (
-    <article className="rounded-md border border-slate-200 bg-white p-3">
-      <div className="mb-3">
-        <h2 className="text-sm font-semibold text-slate-950">{title}</h2>
-        <p className="mt-0.5 text-xs text-slate-500">{caption}</p>
-      </div>
-      <div className="grid gap-2">{children}</div>
-    </article>
-  );
-}
-
-function SignalLine({ trade }: { trade: Trade }) {
-  const sell = trade.side === 'sell';
-  return (
-    <Link
-      className="grid gap-1 rounded-md border border-slate-100 bg-slate-50/60 p-2.5 hover:bg-white"
-      href={tradeHref(trade)}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <Badge variant={sell ? 'warning' : 'success'}>{sell ? '매도' : '매수'}</Badge>
-            <span className="font-mono text-xs text-slate-500">{formatDateKo(trade.date)}</span>
-          </div>
-          <div className="mt-1 truncate text-sm font-semibold text-slate-950">{companyLabel(trade)}</div>
-        </div>
-        <span
-          className={`font-mono text-sm font-semibold tabular-nums ${sell ? 'text-amber-600' : 'text-emerald-600'}`}
-        >
-          {formatKrw(trade.grossKrw)}
-        </span>
-      </div>
-      <p className="line-clamp-1 text-xs text-slate-500">{compactReason(trade)}</p>
-    </Link>
-  );
-}
-
-function CandidateLine({ candidate }: { candidate: Candidate }) {
-  const report = candidate.report;
-  return (
-    <Link
-      className="grid gap-1 rounded-md border border-slate-100 bg-slate-50/60 p-2.5 hover:bg-white"
-      href={reportHref(report)}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="truncate text-sm font-semibold text-slate-950">{report.company || report.symbol}</div>
-          <div className="mt-0.5 font-mono text-xs text-slate-500">
-            {formatDateKo(report.publicationDate)} · {report.symbol}
-          </div>
-        </div>
-        <span className="font-mono text-sm font-semibold tabular-nums text-blue-600">{candidate.score.toFixed(2)}</span>
-      </div>
-      <div className="grid grid-cols-2 gap-2 text-xs text-slate-500">
-        <span>현재 {formatPercent(report.currentReturn)}</span>
-        <span className="text-right">목표까지 {formatPercent(report.targetRemainingPct)}</span>
-      </div>
-    </Link>
-  );
-}
-
-function EmptyState({ label }: { label: string }) {
-  return (
-    <div className="grid min-h-24 place-items-center rounded-md border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-500">
-      {label}
+    <div className="grid gap-1">
+      <dt className="text-xs text-slate-500">{label}</dt>
+      <dd className="font-mono text-sm font-semibold tabular-nums text-slate-950">{value}</dd>
     </div>
   );
-}
-
-function reportHref(report: Report): string {
-  return `/reports/${encodeURIComponent(report.symbol)}/${encodeURIComponent(report.reportId)}`;
-}
-
-function tradeHref(trade: Trade): string {
-  if (trade.reportId) return `/reports/${encodeURIComponent(trade.symbol)}/${encodeURIComponent(trade.reportId)}`;
-  return `/portfolio/${encodeURIComponent(trade.account_id)}/trades`;
-}
-
-function companyLabel(row: { company?: string | null; symbol: string }): string {
-  return row.company?.trim() ? row.company : row.symbol;
-}
-
-function compactReason(trade: Trade): string {
-  if (trade.reasonDetail) return trade.reasonDetail;
-  if (trade.reason === 'rebalance_buy') return '후보 조건 통과로 목표 비중까지 매수';
-  if (trade.reason === 'rebalance_sell') return '후보 유지 조건 이탈 또는 목표 비중 축소';
-  if (trade.reason === 'trailing_profit_trim') return '큰 수익 이후 고점 대비 하락해 이익 보호';
-  if (trade.reason === 'retained_cap_trim') return '수익 종목 비중이 커져 일부 축소';
-  return trade.reason || '기록된 조건 없음';
 }
 
 function formatNullablePercent(value: number | null | undefined): string {
-  if (value == null || !Number.isFinite(value)) return '—';
+  if (value === null || value === undefined || !Number.isFinite(value)) return '-';
   return formatPercent(value);
 }
 
-function healthTone(status: 'ok' | 'review' | 'stale' | 'fail'): 'good' | 'warn' | 'bad' {
-  if (status === 'ok') return 'good';
-  if (status === 'fail') return 'bad';
-  return 'warn';
+function signedToneClass(value: number | null | undefined): string {
+  if (value === null || value === undefined || !Number.isFinite(value)) return 'text-slate-700';
+  if (value > 0) return 'text-emerald-600';
+  if (value < 0) return 'text-rose-600';
+  return 'text-slate-700';
 }
-
-function healthStatusLabel(status: 'ok' | 'review' | 'stale' | 'fail') {
-  if (status === 'stale') return '업데이트 필요';
-  if (status === 'fail') return '점검 중';
-  return '사용 가능';
+function bucketLabel(bucket: Candidate['bucket']): string {
+  if (bucket === 'fresh') return '최근 리포트';
+  if (bucket === 'large-upside') return '상승여력 큼';
+  if (bucket === 'near-target') return '목표 근접';
+  return '열린 케이스';
 }

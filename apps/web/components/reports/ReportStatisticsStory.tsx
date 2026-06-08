@@ -89,12 +89,12 @@ export function ReportStatisticsStory({
     max: quantileFromSorted(sortedReturns, 1),
   };
   const eligiblePathCount = peakReturns.length;
-  const pathBuckets = buildPathBuckets(summary.riskScatter);
-  const exampleMetaById = buildExampleMetaById(summary.topExamples);
+  const _pathBuckets = buildPathBuckets(summary.riskScatter);
+  const _exampleMetaById = buildExampleMetaById(summary.topExamples);
 
   const trimmedMean10 = trimmedMean(peakReturns, 0.1);
   const uniqueSymbolCount = new Set(summary.riskScatter.map((row) => row.symbol).filter(Boolean)).size;
-  const vintageCohorts = buildVintageCohorts(summary.riskScatter);
+  const _vintageCohorts = buildVintageCohorts(summary.riskScatter);
   const concentration = buildConcentration(summary.riskScatter);
   const top10Concentration = concentration.find((row) => row.topN === 10)?.share ?? null;
 
@@ -152,13 +152,7 @@ export function ReportStatisticsStory({
         tone="bad"
       />
 
-      <ConfirmationSignalsTable signals={confirmationSignals} />
-
       <FeatureBucketsTable buckets={featureBuckets} />
-
-      <PathBucketPanel buckets={pathBuckets} exampleMetaById={exampleMetaById} total={eligiblePathCount} />
-
-      <VintageCohortTable cohorts={vintageCohorts} />
 
       <DataNoteFooter
         sampleSize={eligiblePathCount}
@@ -788,7 +782,7 @@ type PathBucket = {
   examples: RiskScatterRow[];
 };
 
-function PathBucketPanel({
+function _PathBucketPanel({
   buckets,
   exampleMetaById,
   total,
@@ -1371,7 +1365,7 @@ function DataNoteFooter({
   );
 }
 
-function VintageCohortTable({ cohorts }: { cohorts: VintageCohort[] }) {
+function _VintageCohortTable({ cohorts }: { cohorts: VintageCohort[] }) {
   if (cohorts.length === 0) return null;
   return (
     <section className="overflow-hidden rounded-md border border-slate-200 bg-white" aria-label="발간 연도별">
@@ -1419,7 +1413,7 @@ function VintageCohortTable({ cohorts }: { cohorts: VintageCohort[] }) {
   );
 }
 
-function ConfirmationSignalsTable({ signals }: { signals: ConfirmationSignal[] }) {
+function _ConfirmationSignalsTable({ signals }: { signals: ConfirmationSignal[] }) {
   if (signals.length === 0) return null;
   const baselineSuccess = signals[0].baselineSuccess;
   const baselineDevastating = signals[0].baselineDevastating;

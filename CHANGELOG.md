@@ -1,5 +1,20 @@
 # Changelog
 
+## v1.0.0-rc2 - Reduce the portfolio UI to a sharper research surface
+
+- Rebuilds the home page into a compact research briefing with one primary question per section: dataset snapshot, priority reports, and representative account comparison.
+- Collapses the report board to a single primary table and removes the competing “today’s candidate” card gallery.
+- Simplifies the portfolio landing and holdings surfaces by removing decorative candidate/guard cards, treemap-heavy allocation presentation, and several dead wrapper components in favor of denser tables and direct evidence.
+- Converges shortlist admission/order onto exporter-owned `is_selectable` and `shortlist_priority` metadata instead of parallel UI fallback gates, and trims unused UI components.
+- Keeps the release-criteria docs aligned with the RC1 local-shard decision while leaving the remaining Turbopack trace warning documented as a non-blocking watch item.
+
+Verification:
+
+- `pnpm --dir apps/web exec biome check .`
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web build`
+- `pnpm --dir apps/web smoke:static`
+- `git diff --check -- README.md docs/release-criteria.md docs/release-criteria.en.md apps/web/app/(app)/page.tsx apps/web/components/reports/ReportBoardScreen.tsx apps/web/components/reports/ReportDetailView.tsx apps/web/components/reports/ReportStatisticsStory.tsx apps/web/components/trading/portfolio-views/PortfolioHoldingsView.tsx apps/web/components/trading/portfolio-views/PortfolioLandingView.tsx apps/web/components/trading/portfolio-views/types.ts apps/web/lib/artifacts.ts apps/web/lib/product-model.ts apps/web/next.config.ts src/snusmic_pipeline/web/artifacts.py tests/test_shortlist_governance.py`
 ## v1.0.0-rc1 - Freeze RC1 release contract and shortlist admission
 
 - Adds explicit `v1.0.0` release criteria docs in Korean and English, including the full live artifact freeze surface, shortlist governance, external shard operating path, and release-gate contract.

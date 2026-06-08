@@ -37,8 +37,6 @@ import {
 const ALL_WEATHER_ACCOUNT = 'all_weather';
 export const NO_ADMITTED_ACCOUNT_PARAM = 'no-admitted-account';
 
-
-
 export function buildPortfolioLandingModel(): PortfolioLandingModel {
   const allHoldings = getCurrentHoldings();
   const summaries = getSummaryRows();

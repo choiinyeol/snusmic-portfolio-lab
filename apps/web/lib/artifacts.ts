@@ -675,8 +675,7 @@ function fullPath(relativePath: string): string {
   return path.join(/* turbopackIgnore: true */ repoRoot, relativePath);
 }
 
-const externalArtifactCacheRoot =
-  process.env.SNUSMIC_EXTERNAL_ARTIFACT_CACHE_DIR ?? '.cache/external-web-artifacts';
+const externalArtifactCacheRoot = process.env.SNUSMIC_EXTERNAL_ARTIFACT_CACHE_DIR ?? '.cache/external-web-artifacts';
 let artifactCacheStamp: number | undefined;
 
 function artifactCacheValid(): boolean {

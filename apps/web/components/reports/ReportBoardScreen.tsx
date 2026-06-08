@@ -1,12 +1,9 @@
 import Link from 'next/link';
-import type { ReportBoardRow } from '@/components/report-board/report-board-table';
 import { ReportsTable } from '@/components/reports/ReportsTable';
-import { compactTicker, stockDisplayName } from '@/components/trading/helpers';
-import { MetricStrip } from '@/components/shell/MetricStrip';
-import { PageHeader } from '@/components/shell/PageHeader';
 import { Button } from '@/components/ui/button';
+import { MetricStrip } from '@/components/ui/MetricStrip';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { Section } from '@/components/ui/Section';
-import { formatDateKo, formatPercent } from '@/lib/format';
 import type { ReportBoardViewModel } from '@/lib/view-models/report-board';
 
 export function ReportBoardScreen({ model }: { model: ReportBoardViewModel }) {
@@ -14,27 +11,23 @@ export function ReportBoardScreen({ model }: { model: ReportBoardViewModel }) {
     <div className="grid gap-5">
       <PageHeader
         actions={
-          <Button asChild size="sm" variant="secondary">
+          <Button asChild size="sm" variant="outline">
             <Link href="/statistics">성과 통계</Link>
           </Button>
         }
         header={model.header}
         metrics={<MetricStrip metrics={model.metrics} />}
       />
-      <Section
-        title="오늘 볼 후보"
-        caption="검토 우선순위가 높은 공개 후보만 먼저 보여줍니다. 전체 표본은 아래 테이블에서 정렬해 비교합니다."
-      >
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {model.priorityRows.map((row) => (
-            <PriorityCandidateCard key={row.symbol} row={row} />
-          ))}
-        </div>
-      </Section>
 
       <Section
         title="리포트 테이블"
-        caption="전체 리포트를 한 기준으로 두고, 현재 수익률·진행률·가격 경로를 같은 줄에서 비교합니다."
+        caption="공개 리포트를 한 기준으로 비교합니다. 먼저 볼 후보는 같은 표 안에서 정렬과 필터로 좁힙니다."
+        actions={
+          <div className="font-mono text-xs text-slate-400">
+            후보 {model.priorityRows.length.toLocaleString('ko-KR')}건 · 전체{' '}
+            {model.reportTable.rows.length.toLocaleString('ko-KR')}건
+          </div>
+        }
       >
         <ReportsTable
           marketRows={model.candidateRows}
@@ -42,47 +35,6 @@ export function ReportBoardScreen({ model }: { model: ReportBoardViewModel }) {
           viewRows={model.reportTable.rows}
         />
       </Section>
-    </div>
-  );
-}
-
-function PriorityCandidateCard({ row }: { row: ReportBoardRow }) {
-  const href = `/reports/${encodeURIComponent(row.symbol)}/${encodeURIComponent(row.latestReportId)}`;
-  const displayName = stockDisplayName(row.symbol, row.company);
-  const ticker = compactTicker(row.symbol);
-  return (
-    <Link
-      className="grid min-w-0 gap-3 rounded-xl border border-slate-200 bg-white p-3 transition-colors hover:bg-slate-50"
-      href={href}
-    >
-      <div className="min-w-0">
-        <div className="truncate text-sm font-semibold text-slate-950">{displayName}</div>
-        <div className="mt-0.5 font-mono text-xs text-slate-500">
-          {displayName !== ticker ? `${ticker} · ` : ''}
-          {formatDateKo(row.latestReportDate)}
-        </div>
-      </div>
-      <div className="grid grid-cols-2 gap-2 text-xs">
-        <SignalValue
-          label="현재 수익률"
-          tone={(row.currentReturn ?? 0) >= 0 ? 'good' : 'bad'}
-          value={formatPercent(row.currentReturn)}
-        />
-        <SignalValue label="목표 근접" tone="neutral" value={formatPercent(row.targetRemainingPct)} />
-      </div>
-      <p className="line-clamp-2 text-xs leading-5 text-slate-500">
-        {row.rankBasis || '후보 점수 기준 상위 종목입니다.'}
-      </p>
-    </Link>
-  );
-}
-
-function SignalValue({ label, value, tone }: { label: string; value: string; tone: 'good' | 'bad' | 'neutral' }) {
-  const toneClass = tone === 'good' ? 'text-emerald-600' : tone === 'bad' ? 'text-red-600' : 'text-slate-950';
-  return (
-    <div className="min-w-0">
-      <div className="truncate text-slate-500">{label}</div>
-      <div className={`truncate font-mono font-semibold tabular-nums ${toneClass}`}>{value}</div>
     </div>
   );
 }

@@ -1,8 +1,7 @@
 import type { NextConfig } from 'next';
 import path from 'node:path';
 
-const repoRoot = path.resolve(process.cwd(), '../..');
-
+const repoRoot = path.resolve(import.meta.dirname, '../..');
 const nextConfig: NextConfig = {
   output: 'export',
   trailingSlash: true,

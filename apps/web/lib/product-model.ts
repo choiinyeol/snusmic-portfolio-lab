@@ -18,7 +18,6 @@ import {
 export const TARGET_BENCHMARK_ID = 'benchmark_kodex200';
 export const OBJECTIVE_MAX_DRAWDOWN = 0.15;
 
-
 export const BENCHMARK_IDS = getAccountCatalog()
   .filter((row) => row.kind !== 'account')
   .map((row) => row.accountId);
@@ -302,7 +301,8 @@ function accountRowFromSummary(
     objectiveReturnExcess: catalog?.objectiveReturnExcess ?? objective.returnExcess,
     isSelectable: kind === 'account' && (catalog?.isSelectable ?? false),
     sourceLabel: kind === 'account' ? '계좌 원장' : kind === 'oracle' ? '오라클 기준선' : '벤치마크',
-    href: kind === 'account' && (catalog?.isSelectable ?? false) ? portfolioAccountHref(summary.account_id) : '/portfolio',
+    href:
+      kind === 'account' && (catalog?.isSelectable ?? false) ? portfolioAccountHref(summary.account_id) : '/portfolio',
   };
 }
 
