@@ -1,5 +1,21 @@
 # Changelog
 
+## v1.0.1 - Collapse the web app into a cleaner research workstation
+
+- Rebuilds the web information architecture around operator jobs: Board, Reports, Portfolio, Calendar, and Statistics now read as a smaller audit workstation instead of a generic dashboard.
+- Unifies Board and Reports on one canonical `ReportLedgerRow` contract, removes duplicate report-table shaping, and keeps `/reports` as the only full report ledger.
+- Moves account taxonomy/context onto the exported account catalog contract, removes web-local `account_id` heuristics, and retires the dedicated `/portfolio/[account]/equity` route in favor of one canonical overview chart.
+- Compresses calendar and statistics into denser evidence-first surfaces, removes dead shared wrappers/components, and trims the trades route back to a ledger-first page.
+
+Verification:
+
+- `pnpm --dir apps/web typecheck`
+- `pnpm --dir apps/web exec biome check .`
+- `uv run --locked python -m snusmic_pipeline export-web --warehouse data/warehouse --sim data/sim --out data/web`
+- `pnpm --dir apps/web artifact:check`
+- `pnpm --dir apps/web build`
+- `pnpm --dir apps/web smoke:static`
+- `uv run --locked pytest tests/test_web_artifacts.py -q -x`
 ## v1.0.0 - Freeze the PIT product contract
 
 - Promotes SNUSMIC Portfolio Lab to `v1.0.0` as a PIT-first static research verification product with a frozen public artifact contract, curated shortlist governance, and explicit release criteria.

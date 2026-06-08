@@ -118,7 +118,6 @@ flowchart TB
 - `/`
 - `/portfolio`
 - `/portfolio/[account]`
-- `/portfolio/[account]/equity`
 - `/portfolio/[account]/holdings`
 - `/portfolio/[account]/trades`
 - `/reports`

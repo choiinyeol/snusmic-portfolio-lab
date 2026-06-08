@@ -43,7 +43,6 @@ uv run --locked python -m snusmic_pipeline export-web --warehouse data/warehouse
 - `/`
 - `/portfolio`
 - `/portfolio/[account]`
-- `/portfolio/[account]/equity`
 - `/portfolio/[account]/holdings`
 - `/portfolio/[account]/trades`
 - `/reports`

@@ -3,13 +3,5 @@ import { getReportStatisticsViewModel } from '@/lib/view-models/report-statistic
 
 export default function ReportStatisticsPage() {
   const model = getReportStatisticsViewModel();
-  return (
-    <ReportStatisticsStory
-      confirmationSignals={model.confirmationSignals}
-      featureBuckets={model.featureBuckets}
-      pricePaths={model.pricePaths}
-      summary={model.summary}
-      windowDays={model.windowDays}
-    />
-  );
+  return <ReportStatisticsStory pricePaths={model.pricePaths} summary={model.summary} windowDays={model.windowDays} />;
 }

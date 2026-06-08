@@ -23,50 +23,13 @@ import {
 } from '@/lib/report-statistics';
 import type { PricePathSeries } from '@/lib/view-models/report-statistics';
 
-export type FeatureBucket = {
-  group: 'alignment' | 'high52w';
-  label: string;
-  count: number;
-  medianReturn: number | null;
-  hitRate10: number;
-  medianDaysToHit10: number | null;
-  /** Two-sided Mann-Whitney U p-value vs the rest of the dimension's
-   * qualifying universe. `null` when either side has too few samples. */
-  pValue: number | null;
-};
-
-export type ConfirmationSignal = {
-  id:
-    | 'risk_no_5pct_60d'
-    | 'risk_deep_drop_20d'
-    | 'risk_first_5_negative'
-    | 'pass_first_5pct_5d'
-    | 'pass_first_5pct_21_60'
-    | 'pass_dip_recover';
-  kind: 'risk' | 'pass';
-  label: string;
-  description: string;
-  cohortSize: number;
-  cohortShare: number;
-  successRate: number;
-  devastatingRate: number;
-  targetRate: number;
-  baselineSuccess: number;
-  baselineDevastating: number;
-  baselineTarget: number;
-};
-
 export function ReportStatisticsStory({
   summary,
   pricePaths,
-  featureBuckets,
-  confirmationSignals,
   windowDays,
 }: {
   summary: ReportStatisticsLabSummary;
   pricePaths: { winners: PricePathSeries[]; losers: PricePathSeries[] };
-  featureBuckets: FeatureBucket[];
-  confirmationSignals: ConfirmationSignal[];
   windowDays: number;
 }) {
   const peakReturns = summary.riskScatter.map((row) => row.maxFavorableExcursion).filter(isNumber);
@@ -113,7 +76,6 @@ export function ReportStatisticsStory({
         hitTargetCount={hitTargetCount}
         medianReturn={medianReturn}
         sampleSize={eligiblePathCount}
-        signals={confirmationSignals}
         top10Concentration={top10Concentration}
       />
 
@@ -140,19 +102,17 @@ export function ReportStatisticsStory({
 
       <PricePathOverlay
         title="고점 수익 상위 10 가격 경로"
-        caption={`발간일을 0%로 정규화한 ${windowDays}거래일 경로입니다. 종목을 선택하면 단일 OHLCV 차트로 전환됩니다.`}
+        caption={`발간일을 0%로 정규화한 ${windowDays}거래일 경로입니다. 종목을 고르면 단일 OHLCV 차트로 전환됩니다.`}
         paths={pricePaths.winners}
         tone="good"
       />
 
       <PricePathOverlay
         title="고점 수익 하위 10 가격 경로"
-        caption={`발간일을 0%로 정규화한 ${windowDays}거래일 경로입니다. 상승 기회가 거의 없었던 리포트를 빠르게 확인합니다.`}
+        caption={`발간일을 0%로 정규화한 ${windowDays}거래일 경로입니다. 상승 기회가 거의 없던 표본을 빠르게 확인합니다.`}
         paths={pricePaths.losers}
         tone="bad"
       />
-
-      <FeatureBucketsTable buckets={featureBuckets} />
 
       <DataNoteFooter
         sampleSize={eligiblePathCount}
@@ -181,8 +141,7 @@ function StatisticsHeader({
           <div className="font-mono text-[11px] font-semibold uppercase text-slate-500">Performance statistics</div>
           <h1 className="mt-1 text-2xl font-semibold text-slate-950">리포트 성과 통계</h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            발간 리포트가 실제 가격 경로에서 어느 정도 기회와 손실을 만들었는지, 목표 도달·고점·만료 종가를 같은
-            기준으로 비교합니다.
+            같은 기준일로 목표 도달, 고점, 만료 종가를 맞춰 보고 어떤 표본이 실제 수익 기회를 만들었는지 정리합니다.
           </p>
         </div>
         <div className="flex flex-wrap gap-1.5 md:max-w-md md:justify-end">
@@ -227,7 +186,7 @@ function DistributionSignature({
         <div>
           <h2 className="text-sm font-semibold text-slate-950">수익 분포의 중심</h2>
           <p className="mt-1 text-xs leading-5 text-slate-500">
-            평균보다 중앙값과 절단 평균을 먼저 봅니다. 몇 개의 대형 성공 사례가 전체 평균을 크게 당깁니다.
+            평균은 큰 승자 몇 건에 끌려갑니다. 중앙값과 절단 평균을 같이 봅니다.
           </p>
         </div>
         <span className="font-mono text-[11px] text-slate-500">peak return</span>
@@ -262,10 +221,10 @@ function DistributionSignature({
         </div>
       </dl>
       <div className="mt-3 rounded-md bg-slate-50 px-3 py-2 text-[11px] leading-5 text-slate-600">
-        <span className="font-semibold text-slate-700">만료 종가 기준</span> (500거래일 경과 표본 {expirySample}건):
-        중앙 <span className="font-mono font-semibold tabular-nums text-slate-950">{formatPercent(expiryMedian)}</span>{' '}
-        · 평균 <span className="font-mono font-semibold tabular-nums text-slate-950">{formatPercent(expiryMean)}</span>.
-        고점은 보유 중 한 번이라도 도달한 폭, 만료는 끝까지 들고 갔을 때의 종가 수익률입니다.
+        만료 종가 중앙{' '}
+        <span className="font-mono font-semibold tabular-nums text-slate-950">{formatPercent(expiryMedian)}</span> ·
+        평균 <span className="font-mono font-semibold tabular-nums text-slate-950">{formatPercent(expiryMean)}</span>
+        <span className="text-slate-500"> ({expirySample}건)</span>
       </div>
     </div>
   );
@@ -277,7 +236,6 @@ function ExecutiveSummary({
   medianReturn,
   flatCount,
   expiryMedian,
-  signals,
   top10Concentration,
 }: {
   sampleSize: number;
@@ -285,90 +243,42 @@ function ExecutiveSummary({
   medianReturn: number | null;
   flatCount: number;
   expiryMedian: number | null;
-  signals: ConfirmationSignal[];
   top10Concentration: number | null;
 }) {
   const targetRate = sampleSize ? hitTargetCount / sampleSize : null;
   const flatShare = sampleSize ? flatCount / sampleSize : null;
-  const riskSignal = signals
-    .filter((signal) => signal.kind === 'risk')
-    .sort((a, b) => b.devastatingRate - a.devastatingRate)[0];
-  const passSignal = signals
-    .filter((signal) => signal.kind === 'pass')
-    .sort((a, b) => b.successRate - a.successRate)[0];
   return (
-    <section
-      className={`grid gap-4 rounded-md border border-slate-200 bg-white p-4 ${
-        signals.length > 0 ? 'xl:grid-cols-[minmax(0,1fr)_24rem]' : ''
-      }`}
-    >
+    <section className="grid gap-3 rounded-md border border-slate-200 bg-white p-4">
       <div className="min-w-0">
         <div className="text-xs font-semibold text-slate-500">핵심 판독</div>
         <h2 className="mt-1 text-lg font-semibold text-slate-950">
-          목표가를 맞힌 리포트는 많지 않지만, 큰 수익 기회는 소수 종목에 강하게 집중됩니다.
+          목표 도달은 드물고, 큰 상승 구간은 소수 종목에 강하게 집중됩니다.
         </h2>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-          이 화면은 “어떤 리포트가 좋았나”보다 “어떤 가격 경로를 먼저 의심해야 하나”를 보게 만드는 통계 보드입니다.
+          먼저 도달률·중앙값·집중도를 보고, 아래 표본 지도와 가격 경로로 예외 사례를 확인합니다.
         </p>
-        <div className="mt-3 grid gap-2 rounded-md border border-slate-200 bg-slate-50 p-3 text-xs leading-5 md:grid-cols-3">
-          <div>
-            <div className="font-semibold text-slate-700">1. 표본과 목표가</div>
-            <p className="mt-1 text-slate-600">
-              {sampleSize.toLocaleString('ko-KR')}건 중 {hitTargetCount.toLocaleString('ko-KR')}건
-              {`(${formatPercent(targetRate)})`}만 1.0x 목표가를 찍었습니다.
-            </p>
-          </div>
-          <div>
-            <div className="font-semibold text-slate-700">2. 중앙값과 무반응</div>
-            <p className="mt-1 text-slate-600">
-              중앙 고점은 {formatPercent(medianReturn)}, +5% 미만은 {flatCount.toLocaleString('ko-KR')}건
-              {`(${formatPercent(flatShare)})`}입니다.
-            </p>
-          </div>
-          <div>
-            <div className="font-semibold text-slate-700">3. 집중도와 만료</div>
-            <p className="mt-1 text-slate-600">
-              상위 10건 집중도 {formatPercent(top10Concentration)}, 만료 중앙 {formatPercent(expiryMedian)}를 보고 평균
-              착시를 걸러냅니다.
-            </p>
-          </div>
-        </div>
-        <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-5">
-          <SummaryMetric
-            label="목표가 도달률"
-            value={formatPercent(targetRate)}
-            caption={`${hitTargetCount.toLocaleString('ko-KR')}건`}
-            tone="good"
-          />
-          <SummaryMetric label="중앙 고점 수익" value={formatPercent(medianReturn)} tone="good" />
-          <SummaryMetric
-            label="고점 +5% 미만"
-            value={formatPercent(flatShare)}
-            caption={`${flatCount.toLocaleString('ko-KR')}건`}
-            tone="warn"
-          />
-          <SummaryMetric
-            label="만료 중앙 수익"
-            value={formatPercent(expiryMedian)}
-            tone={(expiryMedian ?? 0) >= 0 ? 'good' : 'bad'}
-          />
-          <SummaryMetric label="상위 10 집중도" value={formatPercent(top10Concentration)} tone="warn" />
-        </div>
       </div>
-      {signals.length > 0 ? (
-        <div className="grid content-start gap-2 rounded-md bg-slate-50 p-3">
-          <InsightLine
-            label="강한 확인 신호"
-            value={passSignal?.label ?? '표본 없음'}
-            caption={passSignal ? `성공률 ${formatPercent(passSignal.successRate)}` : undefined}
-          />
-          <InsightLine
-            label="주의 신호"
-            value={riskSignal?.label ?? '표본 없음'}
-            caption={riskSignal ? `큰 손실 ${formatPercent(riskSignal.devastatingRate)}` : undefined}
-          />
-        </div>
-      ) : null}
+      <div className="grid grid-cols-2 gap-2 md:grid-cols-5">
+        <SummaryMetric
+          label="목표가 도달률"
+          value={formatPercent(targetRate)}
+          caption={`${hitTargetCount.toLocaleString('ko-KR')}건`}
+          tone="good"
+        />
+        <SummaryMetric label="중앙 고점 수익" value={formatPercent(medianReturn)} tone="good" />
+        <SummaryMetric
+          label="고점 +5% 미만"
+          value={formatPercent(flatShare)}
+          caption={`${flatCount.toLocaleString('ko-KR')}건`}
+          tone="warn"
+        />
+        <SummaryMetric
+          label="만료 중앙 수익"
+          value={formatPercent(expiryMedian)}
+          tone={(expiryMedian ?? 0) >= 0 ? 'good' : 'bad'}
+        />
+        <SummaryMetric label="상위 10 집중도" value={formatPercent(top10Concentration)} tone="warn" />
+      </div>
     </section>
   );
 }
@@ -394,15 +304,15 @@ function SummaryMetric({
   );
 }
 
-function InsightLine({ label, value, caption }: { label: string; value: string; caption?: string }) {
-  return (
-    <div className="min-w-0 rounded-md border border-slate-200 bg-white p-3">
-      <div className="text-xs font-semibold text-slate-500">{label}</div>
-      <div className="mt-1 line-clamp-2 text-sm font-semibold text-slate-950">{value}</div>
-      {caption ? <div className="mt-1 text-xs text-slate-500">{caption}</div> : null}
-    </div>
-  );
-}
+type ReturnQuantiles = {
+  min: number | null;
+  p10: number | null;
+  p25: number | null;
+  median: number | null;
+  p75: number | null;
+  p90: number | null;
+  max: number | null;
+};
 
 function Marker({
   x,
@@ -426,17 +336,6 @@ function Marker({
     </div>
   );
 }
-
-type ReturnQuantiles = {
-  min: number | null;
-  p10: number | null;
-  p25: number | null;
-  median: number | null;
-  p75: number | null;
-  p90: number | null;
-  max: number | null;
-};
-
 /** Signed-log compression for the y-axis. Linear within ±50%, log10 beyond.
  * Lets one +1800% winner (HD현대일렉트릭) and many ±20% middle reports
  * share a single readable chart without the top getting clipped. */
@@ -494,8 +393,7 @@ function WholeSampleMap({
           <div>
             <h3 className="text-sm font-semibold text-slate-950">전체 표본 고점 지도</h3>
             <p className="mt-1 text-xs text-slate-500">
-              점 하나가 리포트 한 건입니다. 왼쪽부터 고점 수익률이 낮은 순서로 정렬했고, 점을 누르면 리포트 상세로
-              이동합니다.
+              점 하나가 리포트 한 건입니다. 왼쪽에서 오른쪽으로 고점 수익률이 커집니다.
             </p>
           </div>
           <span className="rounded-md bg-slate-100 px-2 py-1 font-mono text-[11px] text-slate-500">
@@ -503,8 +401,8 @@ function WholeSampleMap({
           </span>
         </div>
         <div className="mb-3 rounded-md bg-slate-50 px-3 py-2 text-[11px] leading-5 text-slate-600">
-          <span className="font-semibold text-slate-700">읽는 법</span>: 0% 부근에 몰린 점은 기회가 거의 없던 리포트,
-          위쪽으로 튀는 점은 큰 상승 경로가 있었던 리포트입니다. 극단값 때문에 y축은 압축했습니다.
+          0% 부근에 몰리면 기회가 적었던 표본, 위로 튀면 예외적으로 큰 상승이 있었던 표본입니다. 극단값 때문에 y축은
+          압축했습니다.
         </div>
         <div className="relative h-[22rem] rounded-md border border-slate-100 bg-white px-12 py-4">
           {yTicks.map((tick) => {
@@ -564,9 +462,7 @@ function WholeSampleMap({
 
       <div className="rounded-md border border-slate-200 bg-white p-4">
         <h3 className="text-sm font-semibold text-slate-950">분위수 요약</h3>
-        <p className="mt-1 text-xs text-slate-500">
-          평균은 오른쪽 꼬리 몇 건이 끌어올릴 수 있습니다. 중앙값과 P75/P90을 같이 봐야 일반적인 기회를 놓치지 않습니다.
-        </p>
+        <p className="mt-1 text-xs text-slate-500">평균 대신 중앙값·P75·P90으로 일반적인 기회와 꼬리를 같이 봅니다.</p>
         <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-7">
           {[
             ['최저', quantiles.min],
@@ -1413,171 +1309,6 @@ function _VintageCohortTable({ cohorts }: { cohorts: VintageCohort[] }) {
   );
 }
 
-function _ConfirmationSignalsTable({ signals }: { signals: ConfirmationSignal[] }) {
-  if (signals.length === 0) return null;
-  const baselineSuccess = signals[0].baselineSuccess;
-  const baselineDevastating = signals[0].baselineDevastating;
-  const baselineTarget = signals[0].baselineTarget;
-  const groups: Array<{ kind: ConfirmationSignal['kind']; label: string; tone: 'risk' | 'pass' }> = [
-    { kind: 'risk', label: '위험 신호 (이 코호트에 들면 결과가 평균보다 나쁘다)', tone: 'risk' },
-    { kind: 'pass', label: '확인 신호 (이 코호트에 들면 결과가 평균보다 좋다)', tone: 'pass' },
-  ];
-  return (
-    <section
-      aria-label="발간 후 가격 동작 코호트별 결과"
-      className="overflow-hidden rounded-md border border-slate-200 bg-white"
-    >
-      <header className="border-b border-slate-200 px-4 py-2">
-        <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-          발간 후 가격 동작 신호
-        </div>
-        <h3 className="mt-1 text-sm font-semibold text-slate-950">어떤 신호가 어떤 결과로 이어졌나</h3>
-        <p className="mt-1 text-xs leading-5 text-slate-500">
-          손절 규칙은 누구나 만들 수 있고 그것만으론 무책임합니다. 대신 발간 직후 며칠간의 가격 동작이 이후 결과에
-          어떻게 연결되는지를 코호트로 봅니다. 각 신호는 베이스라인(전체 평균 성공{' '}
-          <span className="font-mono">{formatPercent(baselineSuccess)}</span> · 치명적{' '}
-          <span className="font-mono">{formatPercent(baselineDevastating)}</span> · 목표{' '}
-          <span className="font-mono">{formatPercent(baselineTarget)}</span>) 대비 어떻게 다른지를 표시합니다.
-        </p>
-      </header>
-      <table className="w-full text-sm">
-        <thead className="bg-slate-50">
-          <tr>
-            <th className="px-3 py-2 text-left text-xs font-medium text-slate-500">신호</th>
-            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">코호트</th>
-            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">성공률</th>
-            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">치명적률</th>
-            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">목표 도달</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-100">
-          {groups.flatMap((group) => {
-            const groupSignals = signals.filter((signal) => signal.kind === group.kind);
-            if (groupSignals.length === 0) return [];
-            return [
-              <tr className="bg-slate-50/60" key={`group-${group.kind}`}>
-                <td
-                  className={`px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] ${
-                    group.tone === 'risk' ? 'text-rose-700' : 'text-emerald-700'
-                  }`}
-                  colSpan={5}
-                >
-                  {group.label}
-                </td>
-              </tr>,
-              ...groupSignals.map((signal) => {
-                const successDelta = signal.successRate - signal.baselineSuccess;
-                const devDelta = signal.devastatingRate - signal.baselineDevastating;
-                const targetDelta = signal.targetRate - signal.baselineTarget;
-                return (
-                  <tr key={signal.id}>
-                    <td className="px-3 py-2">
-                      <div className="text-sm text-slate-950">{signal.label}</div>
-                      <div className="mt-0.5 text-[11px] leading-4 text-slate-500">{signal.description}</div>
-                    </td>
-                    <td className="px-3 py-2 text-right font-mono tabular-nums">
-                      {signal.cohortSize}건
-                      <span className="ml-1 text-[10px] text-slate-400">({formatPercent(signal.cohortShare)})</span>
-                    </td>
-                    <td className="px-3 py-2 text-right font-mono tabular-nums">
-                      {formatPercent(signal.successRate)}
-                      <span className={`ml-1 text-[10px] ${successDelta >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                        ({successDelta >= 0 ? '+' : ''}
-                        {formatPercent(successDelta)})
-                      </span>
-                    </td>
-                    <td className="px-3 py-2 text-right font-mono tabular-nums">
-                      {formatPercent(signal.devastatingRate)}
-                      <span className={`ml-1 text-[10px] ${devDelta <= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                        ({devDelta >= 0 ? '+' : ''}
-                        {formatPercent(devDelta)})
-                      </span>
-                    </td>
-                    <td className="px-3 py-2 text-right font-mono tabular-nums">
-                      {formatPercent(signal.targetRate)}
-                      <span className={`ml-1 text-[10px] ${targetDelta >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                        ({targetDelta >= 0 ? '+' : ''}
-                        {formatPercent(targetDelta)})
-                      </span>
-                    </td>
-                  </tr>
-                );
-              }),
-            ];
-          })}
-        </tbody>
-      </table>
-    </section>
-  );
-}
-
-function FeatureBucketsTable({ buckets }: { buckets: FeatureBucket[] }) {
-  if (buckets.length === 0) return null;
-  const groups: Array<{ id: FeatureBucket['group']; label: string }> = [
-    { id: 'alignment', label: '추세 정배열' },
-    { id: 'high52w', label: '52주 고가 근접도' },
-  ];
-  return (
-    <section
-      className="overflow-hidden rounded-md border border-slate-200 bg-white"
-      aria-label="발간 시점 기술적 특성별"
-    >
-      <header className="border-b border-slate-200 px-4 py-2">
-        <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-          발간 시점 기술적 특성별
-        </div>
-        <h3 className="mt-1 text-sm font-semibold text-slate-950">정배열·신고가 근접·갭이 결과를 가른 폭</h3>
-      </header>
-      <table className="w-full text-sm">
-        <thead className="bg-slate-50">
-          <tr>
-            <th className="px-3 py-2 text-left text-xs font-medium text-slate-500">특성</th>
-            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">표본</th>
-            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">중앙 수익률</th>
-            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">1.0x 도달</th>
-            <th className="px-3 py-2 text-right text-xs font-medium text-slate-500">도달 중앙 일수</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-100">
-          {groups.flatMap((group) => {
-            const groupBuckets = buckets.filter((bucket) => bucket.group === group.id);
-            if (groupBuckets.length === 0) return [];
-            return [
-              <tr className="bg-slate-50/60" key={`group-${group.id}`}>
-                <td
-                  className="px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500"
-                  colSpan={5}
-                >
-                  {group.label}
-                </td>
-              </tr>,
-              ...groupBuckets.map((bucket) => (
-                <tr key={`${bucket.group}-${bucket.label}`}>
-                  <td className="px-3 py-2 text-sm text-slate-950">{bucket.label}</td>
-                  <td className="px-3 py-2 text-right font-mono tabular-nums">{bucket.count}</td>
-                  <td
-                    className={`px-3 py-2 text-right font-mono tabular-nums ${
-                      (bucket.medianReturn ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'
-                    }`}
-                  >
-                    {formatPercent(bucket.medianReturn)}
-                  </td>
-                  <td className="px-3 py-2 text-right font-mono tabular-nums text-slate-950">
-                    {formatPercent(bucket.hitRate10)}
-                  </td>
-                  <td className="px-3 py-2 text-right font-mono tabular-nums text-slate-500">
-                    {bucket.medianDaysToHit10 !== null ? `${bucket.medianDaysToHit10.toLocaleString('ko-KR')}일` : '—'}
-                  </td>
-                </tr>
-              )),
-            ];
-          })}
-        </tbody>
-      </table>
-    </section>
-  );
-}
-
 type ConcentrationRow = {
   topN: number;
   share: number;
@@ -1608,9 +1339,7 @@ function ConcentrationInsight({ rows }: { rows: ConcentrationRow[] }) {
   return (
     <div className="rounded-md border border-slate-200 bg-white p-4">
       <h3 className="text-sm font-semibold text-slate-950">상승 기회 집중도</h3>
-      <p className="mt-1 text-xs leading-5 text-slate-500">
-        모든 리포트의 발간 후 고점 수익률을 더한 값을 100%로 두고, 상위 몇 건이 그중 얼마를 차지하는지 봅니다.
-      </p>
+      <p className="mt-1 text-xs leading-5 text-slate-500">전체 고점 수익 중 상위 몇 건이 차지한 비중입니다.</p>
       <div className="mt-5 grid gap-4">
         {rows.map((row) => (
           <div className="grid grid-cols-[3.5rem_minmax(0,1fr)_5rem] items-center gap-3" key={row.topN}>

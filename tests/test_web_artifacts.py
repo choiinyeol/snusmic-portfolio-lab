@@ -22,6 +22,7 @@ from snusmic_pipeline.web.artifacts import (
     check_web_artifacts,
     export_web_artifacts,
 )
+from snusmic_pipeline.web.contracts import ACCOUNT_CATALOG_ROWS
 
 
 def _baseline_export_inputs(out: Path) -> ExportInputs:
@@ -628,8 +629,10 @@ def test_account_catalog_matches_committed_account_config(web_export_dir: Path) 
     out = web_export_dir
 
     catalog = json.loads((out / "accounts" / "catalog.json").read_text(encoding="utf-8"))
-    actual_ids = [str(row.get("account_id") or "") for row in catalog]
-    actual_kind_by_id = {str(row.get("account_id") or ""): str(row.get("kind") or "") for row in catalog}
+    validated_catalog = ACCOUNT_CATALOG_ROWS.validate_python(catalog)
+    rows_by_id = {row.account_id: row for row in validated_catalog}
+    actual_ids = [row.account_id for row in validated_catalog]
+    actual_kind_by_id = {row.account_id: row.kind for row in validated_catalog}
     config = json.loads((Path("data/sim") / "account-configs.json").read_text(encoding="utf-8"))
     expected_ids = [str(row["account_id"]) for row in config["accounts"]]
     assert set(actual_ids) == set(expected_ids)
@@ -640,6 +643,24 @@ def test_account_catalog_matches_committed_account_config(web_export_dir: Path) 
         else "account"
         for account_id in expected_ids
     }
+
+    selectable_rows = [row for row in validated_catalog if row.is_selectable]
+    assert selectable_rows
+    for row in selectable_rows:
+        assert row.context.role
+        assert row.context.category
+        assert row.context.title
+        assert row.context.subtitle
+        assert row.context.comparison_prompt
+        assert row.context.shortlist_reason
+
+    assert rows_by_id[
+        "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5"
+    ].context.role == "candidate"
+    assert rows_by_id["pit_score_top5"].context.subtitle == "점수-only 기준"
+    assert rows_by_id["smic_follower"].context.role == "report_follower"
+    assert rows_by_id["all_weather"].context.category == "benchmark"
+    assert rows_by_id["all_weather"].context.shortlist_reason is None
 
     csv_rows = pd.read_csv(out / "table-download-accounts.csv")
     csv_ids = list(csv_rows["account_id"].astype(str))

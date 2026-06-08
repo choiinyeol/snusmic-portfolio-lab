@@ -19,6 +19,7 @@ import pandas as pd
 
 from ..market_data.currency import currency_for_symbol, normalize_currency
 from .contracts import (
+    ACCOUNT_CATALOG_ROWS,
     HOLDING_ROWS,
     REPORT_ROWS,
     TRADE_ROWS,
@@ -578,6 +579,7 @@ def _export_web_artifacts_unchecked(inputs: ExportInputs) -> dict[str, Any]:
         reports=report_rows,
         holdings=enriched_current_holdings,
         trades=trade_rows,
+        account_catalog=account_catalog,
     )
     mark("validate_boundary_artifacts")
 
@@ -1152,11 +1154,13 @@ def _validate_boundary_artifacts(
     reports: list[dict[str, Any]],
     holdings: list[dict[str, Any]],
     trades: list[dict[str, Any]],
+    account_catalog: list[dict[str, Any]],
 ) -> None:
     WebOverview.model_validate(overview)
     REPORT_ROWS.validate_python(reports)
     HOLDING_ROWS.validate_python(holdings)
     TRADE_ROWS.validate_python(trades)
+    ACCOUNT_CATALOG_ROWS.validate_python(account_catalog)
 
 
 def _write_product_json(path: Path, data: Any) -> None:
@@ -3122,6 +3126,175 @@ def _account_kind(account_id: str) -> str:
         return "account"
     return "account"
 
+_PORTFOLIO_ACCOUNT_CONTEXT: dict[str, dict[str, str]] = {
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_partial75_top5": {
+        "role": "candidate",
+        "category": "experimental",
+        "title": "Partial 75",
+        "subtitle": "현재 연구 후보",
+        "comparison_prompt": "부분 재투입 후보가 수익률, 낙폭, 체결 수를 함께 개선했는지 봅니다.",
+        "shortlist_reason": "현재 검토 후보라서 다른 대표 원장보다 먼저 봅니다.",
+    },
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_redeploycash125_top5": {
+        "role": "robustness",
+        "category": "control",
+        "title": "Cash Gate 12.5",
+        "subtitle": "현금 게이트 기준선",
+        "comparison_prompt": "현금 전액 재투입 대비 부분 재투입이 과열 재진입과 낙폭을 줄였는지 봅니다.",
+        "shortlist_reason": "후보와 같은 trim 구조에서 현금 재투입 강도만 비교하는 견고성 점검입니다.",
+    },
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_mixedentry_trailtrim25cap20_top5": {
+        "role": "baseline",
+        "category": "control",
+        "title": "Trail Trim 20",
+        "subtitle": "이익 보호 기준선",
+        "comparison_prompt": "후보의 보유 유지, trim, 현금 재투입 규칙이 기준선 대비 무엇을 더했는지 봅니다.",
+        "shortlist_reason": "후보 전략에서 현금 재투입만 뺀 기준선이라 먼저 비교합니다.",
+    },
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_candidate_top5": {
+        "role": "entry_gate",
+        "category": "ladder",
+        "title": "Candidate Gate",
+        "subtitle": "신규 진입 점수 기준선",
+        "comparison_prompt": "candidate_score 신규 진입만으로도 후보 전략의 초과성과가 유지되는지 봅니다.",
+        "shortlist_reason": "보유 승자 유지와 trim 규칙 없이 진입 점수만 남긴 비교군입니다.",
+    },
+    "pit_trend_quarterly_fresh540_runwinners_weeklycap45_profit60_top5": {
+        "role": "hold_winner",
+        "category": "ladder",
+        "title": "Profit 60 Hold",
+        "subtitle": "보유 승자 유지 기준선",
+        "comparison_prompt": "trim과 현금 재투입 없이 보유 유지 규칙만으로 성과가 남는지 봅니다.",
+        "shortlist_reason": "후보 전략에서 trim·재투입을 떼고 보유 유지까지 남긴 비교군입니다.",
+    },
+    "pit_mtt_rs90_top5": {
+        "role": "mtt_filter",
+        "category": "template",
+        "title": "MTT RS90",
+        "subtitle": "민네르비니 상대강도 상위 10%",
+        "comparison_prompt": "강한 템플릿 필터가 분기 Top5보다 더 안정적인지 봅니다.",
+        "shortlist_reason": "민네르비니 필터 강도를 높였을 때 후보 전략 대안이 되는지 보는 비교군입니다.",
+    },
+    "pit_mtt_rs80_top5": {
+        "role": "mtt_filter",
+        "category": "template",
+        "title": "MTT RS80",
+        "subtitle": "민네르비니 상대강도 상위 20%",
+        "comparison_prompt": "강한 템플릿 필터가 분기 Top5보다 더 안정적인지 봅니다.",
+        "shortlist_reason": "민네르비니 필터 강도를 높였을 때 후보 전략 대안이 되는지 보는 비교군입니다.",
+    },
+    "pit_mtt_rs70_top5": {
+        "role": "mtt_filter",
+        "category": "template",
+        "title": "MTT RS70",
+        "subtitle": "민네르비니 상대강도 상위 30%",
+        "comparison_prompt": "강한 템플릿 필터가 분기 Top5보다 더 안정적인지 봅니다.",
+        "shortlist_reason": "민네르비니 필터 강도를 높였을 때 후보 전략 대안이 되는지 보는 비교군입니다.",
+    },
+    "pit_mtt_low100_top5": {
+        "role": "mtt_filter",
+        "category": "template",
+        "title": "MTT Low100",
+        "subtitle": "민네르비니 저점 거리 100%",
+        "comparison_prompt": "저점 이격도 필터만으로 손익비가 개선되는지 봅니다.",
+        "shortlist_reason": "저점 이격도 필터가 후보 전략의 진입 규칙을 대체할 수 있는지 보는 비교군입니다.",
+    },
+    "pit_mtt_low300_top5": {
+        "role": "mtt_filter",
+        "category": "template",
+        "title": "MTT Low300",
+        "subtitle": "민네르비니 저점 거리 300%",
+        "comparison_prompt": "저점 이격도 필터만으로 손익비가 개선되는지 봅니다.",
+        "shortlist_reason": "저점 이격도 필터가 후보 전략의 진입 규칙을 대체할 수 있는지 보는 비교군입니다.",
+    },
+    "pit_momentum_6m12m_top5": {
+        "role": "momentum",
+        "category": "factor",
+        "title": "Momentum 6M/12M",
+        "subtitle": "장기 모멘텀 기준선",
+        "comparison_prompt": "긴 모멘텀 창이 분기 리포트 기반 후보보다 더 단단한지 봅니다.",
+        "shortlist_reason": "가격 모멘텀만으로도 후보 전략을 대체할 수 있는지 보는 비교군입니다.",
+    },
+    "pit_momentum_3m6m_top5": {
+        "role": "momentum",
+        "category": "factor",
+        "title": "Momentum 3M/6M",
+        "subtitle": "중기 모멘텀 기준선",
+        "comparison_prompt": "중기 모멘텀 창이 분기 리포트 기반 후보보다 더 단단한지 봅니다.",
+        "shortlist_reason": "가격 모멘텀만으로도 후보 전략을 대체할 수 있는지 보는 비교군입니다.",
+    },
+    "pit_momentum_1m3m_top5": {
+        "role": "momentum",
+        "category": "factor",
+        "title": "Momentum 1M/3M",
+        "subtitle": "단기 모멘텀 기준선",
+        "comparison_prompt": "짧은 모멘텀 창이 분기 리포트 기반 후보보다 더 단단한지 봅니다.",
+        "shortlist_reason": "가격 모멘텀만으로도 후보 전략을 대체할 수 있는지 보는 비교군입니다.",
+    },
+    "pit_trend_top5": {
+        "role": "simple_pit",
+        "category": "baseline",
+        "title": "Trend Top5",
+        "subtitle": "단순 추세 기준",
+        "comparison_prompt": "보유 승자 유지·부분 trim·현금 재투입 규칙이 성과에 얼마나 더해졌는지 봅니다.",
+        "shortlist_reason": "보유 승자 유지와 trim 없이 단순 추세 점수만 남긴 출발점입니다.",
+    },
+    "pit_score_top5": {
+        "role": "score_baseline",
+        "category": "baseline",
+        "title": "Score Top5",
+        "subtitle": "점수-only 기준",
+        "comparison_prompt": "추세·보유 유지·trailing trim 규칙 없이 점수 정렬만으로도 성과가 유지되는지 봅니다.",
+        "shortlist_reason": "추세·보유 유지·trim 없이 점수 정렬만 남긴 가장 단순한 비교군입니다.",
+    },
+    "smic_follower": {
+        "role": "report_follower",
+        "category": "baseline",
+        "title": "SMIC Follower",
+        "subtitle": "리포트 추종 기준선",
+        "comparison_prompt": "TopN 점수 전략이 단순 리포트 추종보다 충분한 초과성과를 냈는지 봅니다.",
+        "shortlist_reason": "점수 전략 없이 리포트 추종만 했을 때의 현실적인 기준선입니다.",
+    },
+}
+
+
+def _account_catalog_context(
+    account_id: str,
+    *,
+    kind: str,
+    short_label: str,
+    selectable: bool,
+) -> dict[str, Any]:
+    context = _PORTFOLIO_ACCOUNT_CONTEXT.get(account_id)
+    if context:
+        return dict(context)
+    if kind == "benchmark":
+        subtitle = "올웨더 배분 기준선" if account_id == "all_weather" else "시장 보유 기준선"
+        comparison_prompt = (
+            "대표 계좌가 정적 자산배분보다 얼마나 나은지 봅니다."
+            if account_id == "all_weather"
+            else "선택 계좌가 이 시장 기준선 대비 얼마나 초과성과를 냈는지 봅니다."
+        )
+        return {
+            "role": "allocation_benchmark" if account_id == "all_weather" else "market_benchmark",
+            "category": "benchmark",
+            "title": short_label,
+            "subtitle": subtitle,
+            "comparison_prompt": comparison_prompt,
+            "shortlist_reason": None,
+        }
+    return {
+        "role": "portfolio" if selectable else "research",
+        "category": "portfolio" if selectable else "archive",
+        "title": short_label,
+        "subtitle": "대표 비교 계좌" if selectable else "연구 보관 계좌",
+        "comparison_prompt": (
+            "후보 전략과 이 대표 계좌의 수익률, 낙폭, 체결 수를 함께 비교합니다."
+            if selectable
+            else "대표 계좌 편입 전 참고용 실험 결과입니다."
+        ),
+        "shortlist_reason": "현재 대표 비교 계좌입니다." if selectable else None,
+    }
 
 def _build_account_catalog(summary: pd.DataFrame, sim_config_path: Path) -> list[dict[str, Any]]:
     """Build the frontend account taxonomy contract.
@@ -3163,11 +3336,12 @@ def _build_account_catalog(summary: pd.DataFrame, sim_config_path: Path) -> list
         shortlist_priority = WEB_PORTFOLIO_ACCOUNT_ORDER.get(account_id)
         raw_label = str(row.get("label") or config.get("label") or account_id)
         label = _account_display_label(account_id, config, raw_label)
+        short_label = _account_short_label(account_id, label)
         rows.append(
             {
                 "account_id": account_id,
                 "label": label,
-                "short_label": _account_short_label(account_id, label),
+                "short_label": short_label,
                 "kind": kind,
                 "benchmark_group": _benchmark_group(account_id),
                 "is_selectable": selectable,
@@ -3176,6 +3350,12 @@ def _build_account_catalog(summary: pd.DataFrame, sim_config_path: Path) -> list
                 "objective_passed": objective_passed,
                 "objective_return_excess": return_excess,
                 "objective_mdd_slack": mdd_slack,
+                "context": _account_catalog_context(
+                    account_id,
+                    kind=kind,
+                    short_label=short_label,
+                    selectable=selectable,
+                ),
                 "metrics": {
                     "final_equity_krw": _number(row.get("final_equity_krw")),
                     "final_cash_krw": _number(row.get("final_cash_krw")),

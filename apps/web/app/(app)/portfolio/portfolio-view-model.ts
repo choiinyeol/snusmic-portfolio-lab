@@ -1,9 +1,10 @@
 import type {
   AccountLedgerDiagnostics,
-  PortfolioLandingModel,
   PortfolioAccountSnapshot,
+  PortfolioLandingModel,
+  PortfolioRouteModels,
+  PortfolioTradeTableModel,
   PositionOutcome,
-  PortfolioViewModel,
 } from '@/components/trading/portfolio-views/types';
 import type {
   AccountingReconciliationRow,
@@ -26,7 +27,6 @@ import {
   getTrades,
 } from '@/lib/artifacts';
 import { displayPortfolioName } from '@/lib/portfolio-labels';
-import { strategyMeta } from '@/components/trading/portfolio-views/strategy-display';
 import {
   getDefaultPortfolioAccount,
   getAccountLeaderboard,
@@ -46,6 +46,7 @@ export function buildPortfolioLandingModel(): PortfolioLandingModel {
   const portfolioRows = getPortfolioRows(leaderboardRows);
   const totalResearchAccountCount = leaderboardRows.filter((row) => row.kind === 'account').length;
   const benchmarkRows = leaderboardRows.filter((row) => row.kind === 'benchmark');
+  const catalogById = new Map(getAccountCatalog().map((row) => [row.accountId, row]));
   const defaultAccount = defaultPortfolioAccount(portfolioRows);
   const portfolioIds = new Set(portfolioRows.map((row) => row.id));
   const frontierIds = new Set([...portfolioRows.map((row) => row.id), ...benchmarkRows.map((row) => row.id)]);
@@ -64,7 +65,8 @@ export function buildPortfolioLandingModel(): PortfolioLandingModel {
     const cashKrw = summary?.finalCashKrw ?? 0;
     const finalEquity = summary?.finalEquityKrw ?? (holdingsValue || cashKrw ? holdingsValue + cashKrw : null);
     const topHolding = [...holdings].sort((a, b) => (b.marketValueKrw ?? 0) - (a.marketValueKrw ?? 0))[0];
-    const shortlist = shortlistMetadata(row.id);
+    const catalog = catalogById.get(row.id);
+    const context = portfolioContextForRow(row, catalog);
     return {
       id: row.id,
       label: displayPortfolioName(row.id, row.label),
@@ -82,7 +84,10 @@ export function buildPortfolioLandingModel(): PortfolioLandingModel {
       topHoldingLabel: topHolding?.company || topHolding?.symbol || '-',
       topHoldingWeight:
         finalEquity && finalEquity > 0 && topHolding?.marketValueKrw ? topHolding.marketValueKrw / finalEquity : null,
-      ...shortlist,
+      shortlistRole: normalizeShortlistRole(context.role),
+      shortlistReason: context.shortlistReason ?? context.subtitle,
+      comparisonPrompt: context.comparisonPrompt,
+      context,
     };
   };
   const accounts = portfolioRows.map(snapshotFromRow);
@@ -102,43 +107,45 @@ export function buildPortfolioLandingModel(): PortfolioLandingModel {
   };
 }
 
-function shortlistMetadata(
-  accountId: string,
-): Pick<PortfolioAccountSnapshot, 'shortlistRole' | 'shortlistReason' | 'comparisonPrompt'> {
-  const meta = strategyMeta(accountId);
-
-  if (meta.role === 'candidate') {
-    return {
-      shortlistRole: 'candidate',
-      shortlistReason: '현재 검토 후보라서 다른 대표 원장보다 먼저 봅니다.',
-      comparisonPrompt: '부분 재투입 후보가 수익률, 낙폭, 체결 수를 함께 개선했는지 확인합니다.',
-    };
-  }
-
-  if (meta.role === 'robustness') {
-    return {
-      shortlistRole: 'robustness',
-      shortlistReason: '후보와 같은 trim 구조에서 현금 재투입 강도만 비교하는 견고성 점검입니다.',
-      comparisonPrompt: '현금 전액 재투입 대비 부분 재투입이 과열 재진입과 낙폭을 줄였는지 봅니다.',
-    };
-  }
-
-  if (accountId === 'smic_follower') {
-    return {
-      shortlistRole: 'follower',
-      shortlistReason: '점수 전략 없이 리포트 추종만 했을 때의 현실적인 기준선입니다.',
-      comparisonPrompt: 'TopN 점수 전략이 단순 리포트 추종보다 충분한 초과성과를 냈는지 봅니다.',
-    };
-  }
-
-  return {
-    shortlistRole: 'baseline',
-    shortlistReason: `${meta.subtitle}으로 후보 전략의 추가 규칙을 떼어 비교합니다.`,
-    comparisonPrompt: '후보의 보유 유지, trim, 현금 재투입 규칙이 기준선 대비 무엇을 더했는지 봅니다.',
-  };
+function normalizeShortlistRole(role: string): PortfolioAccountSnapshot['shortlistRole'] {
+  if (role === 'candidate') return 'candidate';
+  if (role === 'robustness') return 'robustness';
+  if (role === 'follower' || role === 'report_follower') return 'follower';
+  return 'baseline';
 }
 
-export function buildPortfolioViewModel(selectedAccount?: string): PortfolioViewModel {
+function defaultPortfolioContext(
+  kind: 'account' | 'benchmark' | 'oracle' = 'account',
+): ReturnType<typeof getAccountCatalog>[number]['context'] {
+  if (kind === 'benchmark') {
+    return {
+      role: 'benchmark',
+      category: 'benchmark',
+      title: '벤치마크',
+      subtitle: '비교 기준',
+      comparisonPrompt: '대표 계좌와 수익률, 낙폭, 현금 비중을 같은 축에서 비교합니다.',
+      shortlistReason: null,
+    };
+  }
+  return {
+    role: 'portfolio',
+    category: 'strategy',
+    title: '포트폴리오 원장',
+    subtitle: '비교 기준 미분류',
+    comparisonPrompt: '수익률, 낙폭, 체결 강도를 기준선과 함께 비교합니다.',
+    shortlistReason: null,
+  };
+}
+function portfolioContextForRow(
+  row: Pick<AccountLeaderboardRow, 'id' | 'kind'>,
+  catalog: ReturnType<typeof getAccountCatalog>[number] | undefined,
+): ReturnType<typeof getAccountCatalog>[number]['context'] {
+  if (catalog?.context) return catalog.context;
+  if (row.kind === 'benchmark' || row.kind === 'oracle') return defaultPortfolioContext(row.kind);
+  throw new Error(`Missing exported account context for selectable account: ${row.id}`);
+}
+
+export function buildPortfolioRouteModels(selectedAccount?: string): PortfolioRouteModels {
   const allHoldings = getCurrentHoldings();
   const allAccounting = getAccountingReconciliations();
   const summaries = getSummaryRows();
@@ -157,28 +164,27 @@ export function buildPortfolioViewModel(selectedAccount?: string): PortfolioView
     ...allHoldings.map((row) => row.account_id),
     ...allTrades.map((row) => row.account_id),
   ]);
-  const accounts = Array.from(new Set([defaultAccount, ...portfolioRows.map((row) => row.id)])).filter((account_id) =>
-    dataAccountIds.has(account_id),
+  const accounts = Array.from(new Set([defaultAccount, ...portfolioRows.map((row) => row.id)])).filter((accountId) =>
+    dataAccountIds.has(accountId),
   );
   const activeAccount = selectedAccount && accounts.includes(selectedAccount) ? selectedAccount : defaultAccount;
-  const invalidAccountId = selectedAccount && !accounts.includes(selectedAccount) ? selectedAccount : null;
   const accountLabels = Object.fromEntries([
-    ...accounts.map((account_id) => {
-      const row = portfolioRowById.get(account_id);
-      const fallback = row?.label ?? getAccountLabel(account_id);
-      return [account_id, displayPortfolioName(account_id, fallback)];
+    ...accounts.map((accountId) => {
+      const row = portfolioRowById.get(accountId);
+      const fallback = row?.label ?? getAccountLabel(accountId);
+      return [accountId, displayPortfolioName(accountId, fallback)];
     }),
     ...benchmarkRows.map((row) => [row.id, row.shortLabel || row.label]),
   ]);
-  const accountOptions = accounts.map((account_id) => {
-    const row = portfolioRowById.get(account_id);
+  const accountOptions = accounts.map((accountId) => {
+    const row = portfolioRowById.get(accountId);
     return {
-      id: account_id,
-      label: displayPortfolioName(account_id, row?.label ?? getAccountLabel(account_id)),
-      shortLabel: displayPortfolioName(account_id, row?.shortLabel ?? getAccountLabel(account_id)),
+      id: accountId,
+      label: displayPortfolioName(accountId, row?.label ?? getAccountLabel(accountId)),
+      shortLabel: displayPortfolioName(accountId, row?.shortLabel ?? getAccountLabel(accountId)),
       kind: 'account' as const,
-      href: portfolioAccountHref(account_id),
-      isDefault: account_id === defaultAccount,
+      href: portfolioAccountHref(accountId),
+      isDefault: accountId === defaultAccount,
     };
   });
   const capitalByAccount = Object.fromEntries(
@@ -191,8 +197,8 @@ export function buildPortfolioViewModel(selectedAccount?: string): PortfolioView
   );
   const holdings = allHoldings.filter((row) => row.account_id === activeAccount);
   const accounting = allAccounting.filter((row) => row.account_id === activeAccount);
-  const benchmarkIds = new Set(benchmarkRows.map((row) => row.id));
-  const equity = getEquityDailyForAccounts([activeAccount, ...benchmarkIds]);
+  const benchmarkAccounts = benchmarkRows.map((row) => row.id);
+  const equity = getEquityDailyForAccounts([activeAccount, ...benchmarkAccounts]);
   const trades = allTrades.filter((row) => row.account_id === activeAccount);
   const episodes = allEpisodes.filter((row) => row.account_id === activeAccount);
   const activeSummary = summaries.find((row) => row.account_id === activeAccount);
@@ -217,38 +223,63 @@ export function buildPortfolioViewModel(selectedAccount?: string): PortfolioView
       .map((reportId) => [reportId, getReportSymbolById(reportId)])
       .filter((entry): entry is [string, string] => Boolean(entry[1])),
   );
-  const latestEquityDate = equity
-    .filter((row) => accounts.includes(row.account_id))
-    .reduce((latest, row) => (row.date > latest ? row.date : latest), '');
-  return {
-    holdings,
-    accounting,
-    equity,
-    trades,
+  const latestEquityDate = equity.reduce((latest, row) => (row.date > latest ? row.date : latest), '');
+  const activeCatalog = catalogById.get(activeAccount);
+  const activeContext = portfolioContextForRow(
+    { id: activeAccount, kind: portfolioRowById.get(activeAccount)?.kind ?? 'account' },
+    activeCatalog,
+  );
+  const ledgerDiagnostics = buildAccountLedgerDiagnostics({
+    accounting: accounting[0],
     episodes,
-    ledgerDiagnostics: buildAccountLedgerDiagnostics({
-      accounting: accounting[0],
-      episodes,
-      equity: equity.filter((row) => row.account_id === activeAccount),
-      holdings,
-      catalog: catalogById.get(activeAccount),
-      leaderboardRow: portfolioRowById.get(activeAccount),
-      summary: activeSummary,
-    }),
-    accounts,
-    benchmarkAccounts: benchmarkRows.map((row) => row.id),
-    accountLabels,
-    accountOptions,
-    defaultAccount,
-    selectedAccount: activeAccount,
-    invalidAccountId,
-    capitalByAccount,
-    cashByAccount,
+    equity: equity.filter((row) => row.account_id === activeAccount),
+    holdings,
+    catalog: activeCatalog,
+    leaderboardRow: portfolioRowById.get(activeAccount),
+    summary: activeSummary,
+  });
+  const tradeTable: PortfolioTradeTableModel = {
+    accountId: activeAccount,
+    trades,
+    accountLabels: pickAccountLabels(accountLabels, [activeAccount]),
     reportSymbolsById,
     targetsBySymbol,
     targetsByReportId,
-    portfolioAccountCount: accounts.length,
+  };
+  const chart = {
+    accountId: activeAccount,
+    accountLabel: accountLabels[activeAccount] ?? activeAccount,
+    accountLabels: pickAccountLabels(accountLabels, [activeAccount, ...benchmarkAccounts]),
+    benchmarkAccounts,
+    equity,
+    trades,
     latestEquityDate,
+  };
+
+  return {
+    shell: {
+      selectedAccount: activeAccount,
+      accountOptions,
+      ledgerDiagnostics,
+    },
+    overview: {
+      accountId: activeAccount,
+      diagnostics: ledgerDiagnostics,
+      holdings,
+      targetsBySymbol,
+      chart,
+      tradeTable,
+      context: activeContext,
+    },
+    holdings: {
+      accountId: activeAccount,
+      holdings,
+      cashKrw: cashByAccount[activeAccount] ?? 0,
+      capitalByAccount: { [activeAccount]: capitalByAccount[activeAccount] ?? 0 },
+      accountLabels: pickAccountLabels(accountLabels, [activeAccount]),
+      targetsBySymbol,
+    },
+    trades: tradeTable,
   };
 }
 
@@ -300,22 +331,22 @@ function buildAccountLedgerDiagnostics({
     summary?.netProfitKrw ??
     addNullable([realizedPnlKrw, unrealizedPnlKrw, accounting?.cashYieldKrw]);
   const bestClosed = closed
-    .filter((episode) => Number.isFinite(episode.realizedPnlKrw ?? NaN))
+    .filter((episode) => Number.isFinite(episode.realizedPnlKrw ?? Number.NaN))
     .sort((a, b) => (b.realizedPnlKrw ?? 0) - (a.realizedPnlKrw ?? 0))
     .slice(0, 3)
     .map((episode) => toPositionOutcome(episode, episode.realizedPnlKrw, lossUnitKrw));
   const worstClosed = closed
-    .filter((episode) => Number.isFinite(episode.realizedPnlKrw ?? NaN))
+    .filter((episode) => Number.isFinite(episode.realizedPnlKrw ?? Number.NaN))
     .sort((a, b) => (a.realizedPnlKrw ?? 0) - (b.realizedPnlKrw ?? 0))
     .slice(0, 3)
     .map((episode) => toPositionOutcome(episode, episode.realizedPnlKrw, lossUnitKrw));
   const bestOpen = open
-    .filter((episode) => Number.isFinite(episode.unrealizedPnlKrw ?? NaN))
+    .filter((episode) => Number.isFinite(episode.unrealizedPnlKrw ?? Number.NaN))
     .sort((a, b) => (b.unrealizedPnlKrw ?? 0) - (a.unrealizedPnlKrw ?? 0))
     .slice(0, 3)
     .map((episode) => toPositionOutcome(episode, episode.unrealizedPnlKrw, lossUnitKrw));
   const worstOpen = open
-    .filter((episode) => Number.isFinite(episode.unrealizedPnlKrw ?? NaN))
+    .filter((episode) => Number.isFinite(episode.unrealizedPnlKrw ?? Number.NaN))
     .sort((a, b) => (a.unrealizedPnlKrw ?? 0) - (b.unrealizedPnlKrw ?? 0))
     .slice(0, 3)
     .map((episode) => toPositionOutcome(episode, episode.unrealizedPnlKrw, lossUnitKrw));
@@ -502,4 +533,8 @@ function groupByAccount<T extends { account_id: string }>(rows: T[]): Map<string
     map.set(row.account_id, group);
   }
   return map;
+}
+
+function pickAccountLabels(accountLabels: Record<string, string>, accountIds: string[]) {
+  return Object.fromEntries(accountIds.map((accountId) => [accountId, accountLabels[accountId] ?? accountId]));
 }

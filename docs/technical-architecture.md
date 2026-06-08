@@ -24,8 +24,7 @@
 - `/reports/[symbol]/[reportId]`: report evidence detail.
 - `/statistics`: report-level outcome, concentration, price-path diagnostics.
 - `/portfolio`: account chooser.
-- `/portfolio/[account]`: account overview.
-- `/portfolio/[account]/equity`: account equity와 trade path.
+- `/portfolio/[account]`: account overview with canonical equity/benchmark evidence and compact taxonomy context.
 - `/portfolio/[account]/holdings`: current holdings.
 - `/portfolio/[account]/trades`: trade ledger.
 

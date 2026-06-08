@@ -1,8 +1,8 @@
 import { AppShell } from '@/components/ui/AppShell';
 import type { CommandTarget } from '@/components/ui/CommandPalette';
-import { getArtifactHealth, getArtifactManifest, getOverview, getReportRows, getAccountCatalog } from '@/lib/artifacts';
-import { getObjectivePassingRows } from '@/lib/product-model';
 import { APP_NAV } from '@/components/ui/app-shell-nav';
+import { getAccountCatalog, getArtifactHealth, getArtifactManifest, getOverview, getReportRows } from '@/lib/artifacts';
+import { getObjectivePassingRows } from '@/lib/product-model';
 import './reports/report-detail.css';
 
 export default function AppRouteLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -33,7 +33,7 @@ export default function AppRouteLayout({ children }: Readonly<{ children: React.
 
 /** Build the cmd-K command palette index. APP_NAV is the spine; symbols and
  * accounts are appended so power users can jump straight to a ticker or a
- * account_id without going through the review board first. */
+ * account_id without drilling through Board or Reports first. */
 function buildCommandTargets(): CommandTarget[] {
   const navTargets: CommandTarget[] = APP_NAV.map((item) => ({
     kind: 'nav',

@@ -88,6 +88,42 @@ class WebReportCounts(_ArtifactModel):
     excluded_instant_target_hit: int | None = None
 
 
+class AccountCatalogContext(_ArtifactModel):
+    role: str
+    category: str
+    title: str
+    subtitle: str
+    comparison_prompt: str
+    shortlist_reason: str | None = None
+
+
+class AccountCatalogMetrics(_ArtifactModel):
+    final_equity_krw: float | None
+    final_cash_krw: float | None
+    final_holdings_value_krw: float | None
+    money_weighted_return: float | None
+    cagr: float | None
+    max_drawdown: float | None
+    trade_count: float | None
+    open_positions: float | None
+
+
+class AccountCatalogRow(_ArtifactModel):
+    account_id: str
+    label: str
+    short_label: str
+    kind: Literal["benchmark", "account", "oracle"]
+    benchmark_group: str | None
+    is_selectable: bool
+    shortlist_priority: int | None
+    is_default_candidate: bool
+    objective_passed: bool
+    objective_return_excess: float | None
+    objective_mdd_slack: float | None
+    context: AccountCatalogContext
+    metrics: AccountCatalogMetrics
+
+
 class WebOverview(_ArtifactModel):
     generated_from: dict[str, str] | None = None
     report_counts: WebReportCounts | None = None
@@ -176,3 +212,4 @@ class ArtifactManifest(BaseModel):
 REPORT_ROWS = TypeAdapter(list[WebReportRow])
 HOLDING_ROWS = TypeAdapter(list[WebHoldingRow])
 TRADE_ROWS = TypeAdapter(list[WebTradeRow])
+ACCOUNT_CATALOG_ROWS = TypeAdapter(list[AccountCatalogRow])

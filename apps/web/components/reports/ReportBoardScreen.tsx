@@ -1,40 +1,41 @@
 import Link from 'next/link';
 import { ReportsTable } from '@/components/reports/ReportsTable';
 import { Button } from '@/components/ui/button';
-import { MetricStrip } from '@/components/ui/MetricStrip';
-import { PageHeader } from '@/components/ui/PageHeader';
-import { Section } from '@/components/ui/Section';
 import type { ReportBoardViewModel } from '@/lib/view-models/report-board';
 
 export function ReportBoardScreen({ model }: { model: ReportBoardViewModel }) {
-  return (
-    <div className="grid gap-5">
-      <PageHeader
-        actions={
-          <Button asChild size="sm" variant="outline">
-            <Link href="/statistics">성과 통계</Link>
-          </Button>
-        }
-        header={model.header}
-        metrics={<MetricStrip metrics={model.metrics} />}
-      />
+  const latestPublication = model.header.badges?.find((badge) => badge.label === '최신 발간')?.value;
+  const priceAsOf = model.header.badges?.find((badge) => badge.label === '가격 기준')?.value;
 
-      <Section
-        title="리포트 테이블"
-        caption="공개 리포트를 한 기준으로 비교합니다. 먼저 볼 후보는 같은 표 안에서 정렬과 필터로 좁힙니다."
-        actions={
-          <div className="font-mono text-xs text-slate-400">
-            후보 {model.priorityRows.length.toLocaleString('ko-KR')}건 · 전체{' '}
-            {model.reportTable.rows.length.toLocaleString('ko-KR')}건
+  return (
+    <div className="grid gap-4">
+      <section className="grid gap-2">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Reports</p>
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-950">리포트 원장</h1>
+            <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">
+              발간 리포트를 같은 가격 기준으로 놓고 현재 수익률, 목표 진행률, 상태를 한 표에서 바로 비교합니다.
+            </p>
           </div>
-        }
-      >
-        <ReportsTable
-          marketRows={model.candidateRows}
-          reports={model.reportTable.sourceRows}
-          viewRows={model.reportTable.rows}
-        />
-      </Section>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild size="sm" variant="outline">
+              <Link href="/">Board</Link>
+            </Button>
+            <Button asChild size="sm" variant="outline">
+              <Link href="/statistics">Statistics</Link>
+            </Button>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-slate-500">
+          <span>{priceAsOf ? `price ${priceAsOf}` : 'price -'}</span>
+          <span>{latestPublication ? `report ${latestPublication}` : 'report -'}</span>
+          <span>후보 {model.candidateRows.length.toLocaleString('ko-KR')}건</span>
+          <span>전체 {model.reportTable.rows.length.toLocaleString('ko-KR')}건</span>
+        </div>
+      </section>
+
+      <ReportsTable rows={model.reportTable.rows} subtitle="현재 가격 기준 전체 리포트 원장" title="리포트 원장" />
     </div>
   );
 }

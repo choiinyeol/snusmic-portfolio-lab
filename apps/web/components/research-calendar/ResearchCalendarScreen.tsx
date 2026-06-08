@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
+import { NativeSelect, NativeSelectOptGroup, NativeSelectOption } from '@/components/ui/native-select';
 import { SegmentedControl } from '@/components/ui/segmented-control';
-import type { ResearchCalendarViewModel } from '@/lib/view-models/research-calendar';
 import type { ResearchCalendarRow } from '@/lib/artifacts';
 import { formatDateKo, formatPercent, signedTextClass } from '@/lib/format';
+import type { ResearchCalendarViewModel } from '@/lib/view-models/research-calendar';
 import { cn } from '@/lib/utils';
 
 type CalendarFilter = 'all' | 'fresh' | 'momentum' | 'near-high' | 'positive-latest';
@@ -16,11 +17,9 @@ type SortKey =
   | 'boardScore'
   | 'currentReturn'
   | 'forwardReturnLatest'
-  | 'targetGapPct'
   | 'distanceFrom52wHigh'
   | 'forwardReturn63d'
-  | 'forwardReturn252d'
-  | 'forwardReturn500d';
+  | 'forwardReturn252d';
 type SortDirection = 'asc' | 'desc';
 
 const filterLabels: Record<CalendarFilter, string> = {
@@ -46,6 +45,8 @@ export function ResearchCalendarScreen({ model }: { model: ResearchCalendarViewM
   }, [model.rows, selectedDate, filter, sortKey, sortDirection]);
 
   const months = useMemo(() => buildMonthGroups(model.dates), [model.dates]);
+  const recentDates = useMemo(() => [...model.dates].slice(-6).reverse(), [model.dates]);
+  const selectedSortLabel = sortLabels[sortKey];
 
   const updateSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -57,66 +58,72 @@ export function ResearchCalendarScreen({ model }: { model: ResearchCalendarViewM
   };
 
   return (
-    <div className="grid gap-4">
-      <section className="grid gap-3 rounded-md border border-slate-200 bg-white p-4">
-        <div className="grid gap-4">
-          <aside className="grid gap-3 rounded-md border border-slate-200 bg-slate-50 p-3">
+    <div className="grid gap-3">
+      <section className="grid gap-3 rounded-md border border-slate-200 bg-white p-3">
+        <div className="grid gap-3 xl:grid-cols-[18rem_minmax(0,1fr)]">
+          <div className="grid gap-2">
             <div className="flex flex-wrap items-end justify-between gap-2">
               <div>
-                <h2 className="text-sm font-semibold text-slate-950">관측월</h2>
-                <p className="mt-1 text-xs leading-5 text-slate-500">
-                  월별 스냅샷을 고르면 당시 후보와 발간 후 수익률을 한 번에 확인합니다.
-                </p>
+                <h2 className="text-sm font-semibold text-slate-950">관측일 선택</h2>
+                <p className="mt-1 text-xs text-slate-500">한 날짜씩 당시 후보와 사후 기록을 바로 비교합니다.</p>
               </div>
-              <div className="font-mono text-xs text-slate-500">
+              <div className="font-mono text-[11px] text-slate-500">
                 {model.dates.length.toLocaleString('ko-KR')}개 스냅샷
               </div>
             </div>
-            <div className="overflow-x-auto pb-1">
-              <div className="flex min-w-max gap-3">
+            <div className="grid gap-1">
+              <label className="text-[11px] font-medium text-slate-500" htmlFor="calendar-date-select">
+                전체 관측일
+              </label>
+              <NativeSelect
+                id="calendar-date-select"
+                aria-label="관측일 선택"
+                className="font-mono tabular-nums"
+                value={selectedDate}
+                onChange={(event) => setSelectedDate(event.target.value)}
+              >
                 {months.map((month) => (
-                  <div className="grid min-w-[17rem] gap-1.5" key={month.id}>
-                    <div className="font-mono text-[11px] font-semibold text-slate-400">{month.label}</div>
-                    <div className="grid grid-cols-2 gap-1.5">
-                      {month.dates.map((date) => {
-                        const selected = date.date === selectedDate;
-                        return (
-                          <button
-                            key={date.date}
-                            type="button"
-                            onClick={() => setSelectedDate(date.date)}
-                            className={cn(
-                              'min-h-14 rounded-md border px-2.5 py-2 text-left transition-colors',
-                              selected
-                                ? 'border-slate-950 bg-slate-950 text-white'
-                                : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50',
-                            )}
-                          >
-                            <span className="block font-mono text-xs tabular-nums">{formatDateKo(date.date)}</span>
-                            <span
-                              className={cn('mt-0.5 block text-[11px]', selected ? 'text-slate-300' : 'text-slate-500')}
-                            >
-                              {date.candidateCount}개 · {dateVerificationLabel(date)}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
+                  <NativeSelectOptGroup key={month.id} label={month.label}>
+                    {month.dates.map((date) => (
+                      <NativeSelectOption key={date.date} value={date.date}>
+                        {formatDateKo(date.date)} · {date.candidateCount}개 · {dateVerificationLabel(date)}
+                      </NativeSelectOption>
+                    ))}
+                  </NativeSelectOptGroup>
                 ))}
-              </div>
+              </NativeSelect>
             </div>
-          </aside>
+            <div className="flex flex-wrap gap-1.5">
+              {recentDates.map((date) => {
+                const selected = date.date === selectedDate;
+                return (
+                  <button
+                    key={date.date}
+                    type="button"
+                    onClick={() => setSelectedDate(date.date)}
+                    className={cn(
+                      'rounded-md border px-2 py-1 font-mono text-[11px] tabular-nums transition-colors',
+                      selected
+                        ? 'border-slate-950 bg-slate-950 text-white'
+                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-white',
+                    )}
+                  >
+                    {formatDateKo(date.date)}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
-          <section className="grid min-w-0 gap-3">
-            <div className="grid gap-3 rounded-md border border-slate-200 bg-slate-50 p-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+          <div className="grid gap-3 rounded-md border border-slate-200 bg-slate-50 p-3">
+            <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
               <div className="min-w-0">
                 <p className="font-mono text-xs font-semibold tabular-nums text-slate-500">
                   {formatDateKo(selectedDate)}
                 </p>
                 <h2 className="mt-1 text-lg font-semibold text-slate-950">그날 기준 후보</h2>
                 <p className="mt-1 text-xs leading-5 text-slate-500">
-                  선택일 기준 열과 PIT 점수는 당시 이미 알 수 있던 값이고, 현재까지·3M·1Y·2Y는 발간일 이후 수익률입니다.
+                  당시 점수와 가격은 선택일 기준, 현재까지·3M·1Y·2Y는 발간 후 검증 기록입니다.
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
@@ -143,159 +150,159 @@ export function ResearchCalendarScreen({ model }: { model: ResearchCalendarViewM
                 {(selectedSummary?.candidateCount ?? 0).toLocaleString('ko-KR')}
               </div>
             </div>
+          </div>
+        </div>
+      </section>
 
-            <div className="overflow-hidden rounded-md border border-slate-200 bg-white">
-              <div className="max-h-[65vh] overflow-y-auto overflow-x-hidden">
-                <table className="w-full table-fixed text-sm">
-                  <colgroup>
-                    <col className="w-[15%]" />
-                    <col className="w-[6%]" />
-                    <col className="w-[6%]" />
-                    <col className="w-[8%]" />
-                    <col className="w-[8%]" />
-                    <col className="w-[7%]" />
-                    <col className="w-[7%]" />
-                    <col className="w-[7%]" />
-                    <col className="w-[7%]" />
-                    <col className="w-[7%]" />
-                    <col className="w-[7%]" />
-                    <col className="w-[15%]" />
-                  </colgroup>
-                  <thead className="sticky top-0 z-10 bg-slate-50 text-xs text-slate-500">
-                    <tr className="border-b border-slate-200">
-                      <SortHead
-                        label="종목/발간일"
-                        sortKey="publicationDate"
-                        active={sortKey}
-                        direction={sortDirection}
-                        onSort={updateSort}
-                      />
-                      <SortHead
-                        label="순위"
-                        sortKey="rank"
-                        active={sortKey}
-                        direction={sortDirection}
-                        onSort={updateSort}
-                        align="right"
-                      />
-                      <SortHead
-                        label="PIT 점수"
-                        sortKey="boardScore"
-                        active={sortKey}
-                        direction={sortDirection}
-                        onSort={updateSort}
-                        align="right"
-                      />
-                      <SortHead
-                        label="선택일"
-                        sortKey="currentReturn"
-                        active={sortKey}
-                        direction={sortDirection}
-                        onSort={updateSort}
-                        align="right"
-                      />
-                      <SortHead
-                        label="목표까지"
-                        sortKey="targetGapPct"
-                        active={sortKey}
-                        direction={sortDirection}
-                        onSort={updateSort}
-                        align="right"
-                      />
-                      <SortHead
-                        label="52주"
-                        sortKey="distanceFrom52wHigh"
-                        active={sortKey}
-                        direction={sortDirection}
-                        onSort={updateSort}
-                        align="right"
-                      />
-                      <th className="px-3 py-2 text-center font-medium">추세</th>
-                      <SortHead
-                        label="현재까지"
-                        sortKey="forwardReturnLatest"
-                        active={sortKey}
-                        direction={sortDirection}
-                        onSort={updateSort}
-                        align="right"
-                      />
-                      <SortHead
-                        label="사후 3M"
-                        sortKey="forwardReturn63d"
-                        active={sortKey}
-                        direction={sortDirection}
-                        onSort={updateSort}
-                        align="right"
-                      />
-                      <SortHead
-                        label="사후 1Y"
-                        sortKey="forwardReturn252d"
-                        active={sortKey}
-                        direction={sortDirection}
-                        onSort={updateSort}
-                        align="right"
-                      />
-                      <SortHead
-                        label="사후 2Y"
-                        sortKey="forwardReturn500d"
-                        active={sortKey}
-                        direction={sortDirection}
-                        onSort={updateSort}
-                        align="right"
-                      />
-                      <th className="px-3 py-2 text-left font-medium">기록</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {visibleRows.map((row) => (
-                      <tr className="transition-colors hover:bg-slate-50" key={`${row.asOfDate}-${row.reportId}`}>
-                        <td className="px-3 py-2">
-                          <Link className="block min-w-0" href={row.href}>
-                            <span className="block truncate font-semibold text-slate-950">{displayName(row)}</span>
-                            <span className="block truncate font-mono text-[11px] text-slate-400">
-                              {formatDateKo(row.publicationDate)}
-                            </span>
-                          </Link>
-                        </td>
-                        <td className="px-3 py-2 text-right font-mono tabular-nums text-slate-600">{dash(row.rank)}</td>
-                        <td className="px-3 py-2 text-right font-mono tabular-nums text-slate-950">
-                          {numberText(row.boardScore, 2)}
-                        </td>
-                        <SignedCell value={row.currentReturn} />
-                        <SignedCell value={row.targetGapPct} />
-                        <SignedCell value={row.distanceFrom52wHigh} />
-                        <td className="px-3 py-2 text-center">
-                          <TrendDots row={row} />
-                        </td>
-                        <SignedCell value={row.forwardReturnLatest} mutedNull />
-                        <HorizonCell value={row.forwardReturn63d} />
-                        <HorizonCell value={row.forwardReturn252d} />
-                        <HorizonCell value={row.forwardReturn500d} />
-                        <td className="px-3 py-2 text-xs text-slate-500">
-                          <span className="line-clamp-2">{basisLabel(row)}</span>
-                          {row.forwardObservedDays !== null && row.forwardObservedDays > 0 ? (
-                            <span className="mt-0.5 block font-mono text-[10px] text-slate-400">
-                              발간 후 {row.forwardObservedDays.toLocaleString('ko-KR')}일 추적
-                            </span>
-                          ) : null}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                {visibleRows.length === 0 ? (
-                  <div className="px-6 py-10 text-center text-sm text-slate-500">
-                    선택한 조건에 맞는 후보가 없습니다.
-                  </div>
-                ) : null}
-              </div>
-            </div>
-          </section>
+      <section className="overflow-hidden rounded-md border border-slate-200 bg-white">
+        <div className="flex flex-wrap items-end justify-between gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2">
+          <div>
+            <h3 className="text-sm font-semibold text-slate-950">감사 원장</h3>
+            <p className="mt-0.5 text-xs text-slate-500">선택일 기준 후보와 사후 수익 기록을 한 표로 확인합니다.</p>
+          </div>
+          <div className="font-mono text-[11px] text-slate-500">
+            {visibleRows.length.toLocaleString('ko-KR')}건 · {selectedSortLabel}{' '}
+            {sortDirection === 'asc' ? '오름차순' : '내림차순'}
+          </div>
+        </div>
+        <div className="max-h-[72vh] overflow-y-auto overflow-x-hidden">
+          <table className="w-full table-fixed text-sm">
+            <colgroup>
+              <col className="w-[18%]" />
+              <col className="w-[7%]" />
+              <col className="w-[8%]" />
+              <col className="w-[9%]" />
+              <col className="w-[8%]" />
+              <col className="w-[8%]" />
+              <col className="w-[9%]" />
+              <col className="w-[9%]" />
+              <col className="w-[9%]" />
+              <col className="w-[15%]" />
+            </colgroup>
+            <thead className="sticky top-0 z-10 bg-slate-50 text-xs text-slate-500">
+              <tr className="border-b border-slate-200">
+                <SortHead
+                  label="종목/발간일"
+                  sortKey="publicationDate"
+                  active={sortKey}
+                  direction={sortDirection}
+                  onSort={updateSort}
+                />
+                <SortHead
+                  label="순위"
+                  sortKey="rank"
+                  active={sortKey}
+                  direction={sortDirection}
+                  onSort={updateSort}
+                  align="right"
+                />
+                <SortHead
+                  label="PIT 점수"
+                  sortKey="boardScore"
+                  active={sortKey}
+                  direction={sortDirection}
+                  onSort={updateSort}
+                  align="right"
+                />
+                <SortHead
+                  label="선택일"
+                  sortKey="currentReturn"
+                  active={sortKey}
+                  direction={sortDirection}
+                  onSort={updateSort}
+                  align="right"
+                />
+                <SortHead
+                  label="52주"
+                  sortKey="distanceFrom52wHigh"
+                  active={sortKey}
+                  direction={sortDirection}
+                  onSort={updateSort}
+                  align="right"
+                />
+                <th className="px-3 py-2 text-center font-medium">추세</th>
+                <SortHead
+                  label="현재까지"
+                  sortKey="forwardReturnLatest"
+                  active={sortKey}
+                  direction={sortDirection}
+                  onSort={updateSort}
+                  align="right"
+                />
+                <SortHead
+                  label="사후 3M"
+                  sortKey="forwardReturn63d"
+                  active={sortKey}
+                  direction={sortDirection}
+                  onSort={updateSort}
+                  align="right"
+                />
+                <SortHead
+                  label="사후 1Y"
+                  sortKey="forwardReturn252d"
+                  active={sortKey}
+                  direction={sortDirection}
+                  onSort={updateSort}
+                  align="right"
+                />
+                <th className="px-3 py-2 text-left font-medium">기록</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {visibleRows.map((row) => (
+                <tr className="transition-colors hover:bg-slate-50" key={`${row.asOfDate}-${row.reportId}`}>
+                  <td className="px-3 py-2">
+                    <Link className="block min-w-0" href={row.href}>
+                      <span className="block truncate font-semibold text-slate-950">{displayName(row)}</span>
+                      <span className="block truncate font-mono text-[11px] text-slate-400">
+                        {formatDateKo(row.publicationDate)}
+                      </span>
+                    </Link>
+                  </td>
+                  <td className="px-3 py-2 text-right font-mono tabular-nums text-slate-600">{dash(row.rank)}</td>
+                  <td className="px-3 py-2 text-right font-mono tabular-nums text-slate-950">
+                    {numberText(row.boardScore, 2)}
+                  </td>
+                  <SignedCell value={row.currentReturn} />
+                  <SignedCell value={row.distanceFrom52wHigh} />
+                  <td className="px-3 py-2 text-center">
+                    <TrendDots row={row} />
+                  </td>
+                  <SignedCell value={row.forwardReturnLatest} mutedNull />
+                  <HorizonCell value={row.forwardReturn63d} />
+                  <HorizonCell value={row.forwardReturn252d} />
+                  <td className="px-3 py-2 text-xs text-slate-500">
+                    <span className="line-clamp-2">{basisLabel(row)}</span>
+                    {row.forwardObservedDays !== null && row.forwardObservedDays > 0 ? (
+                      <span className="mt-0.5 block font-mono text-[10px] text-slate-400">
+                        발간 후 {row.forwardObservedDays.toLocaleString('ko-KR')}일 추적
+                      </span>
+                    ) : null}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {visibleRows.length === 0 ? (
+            <div className="px-6 py-10 text-center text-sm text-slate-500">선택한 조건에 맞는 후보가 없습니다.</div>
+          ) : null}
         </div>
       </section>
     </div>
   );
 }
+
+const sortLabels: Record<SortKey, string> = {
+  rank: '순위',
+  company: '종목명',
+  publicationDate: '발간일',
+  boardScore: 'PIT 점수',
+  currentReturn: '선택일 수익',
+  forwardReturnLatest: '현재까지',
+  distanceFrom52wHigh: '52주 위치',
+  forwardReturn63d: '사후 3M',
+  forwardReturn252d: '사후 1Y',
+};
 
 function SummaryPill({ label, value }: { label: string; value: number }) {
   return (

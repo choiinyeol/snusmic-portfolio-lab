@@ -90,8 +90,6 @@ function buildPricePaths(
 export type ReportStatisticsViewModel = {
   summary: ReportStatisticsLabSummary;
   pricePaths: { winners: PricePathSeries[]; losers: PricePathSeries[] };
-  featureBuckets: [];
-  confirmationSignals: [];
   windowDays: number;
 };
 
@@ -99,8 +97,6 @@ export function getReportStatisticsViewModel(): ReportStatisticsViewModel {
   const bundle = getReportStatisticsPageBundle();
   const summary = bundle.summary;
   return {
-    confirmationSignals: [],
-    featureBuckets: [],
     pricePaths: buildPricePaths(summary, {
       winnerCount: 10,
       loserCount: 10,

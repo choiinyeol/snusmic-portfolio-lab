@@ -240,6 +240,16 @@ export const AccountCatalogRowSchema = z
     objective_passed: z.boolean(),
     objective_return_excess: NullableNumber,
     objective_mdd_slack: NullableNumber,
+    context: z
+      .object({
+        role: z.string(),
+        category: z.string(),
+        title: z.string(),
+        subtitle: z.string(),
+        comparison_prompt: z.string(),
+        shortlist_reason: z.string().nullable().optional(),
+      })
+      .passthrough(),
     metrics: z
       .object({
         final_equity_krw: NullableNumber,

@@ -3,19 +3,17 @@
 import { useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
-import type { ReportBoardRow } from '@/components/report-board/report-board-table';
 import { CsvDownloadButton, DataPanel, EmptyTableState, downloadCsv } from '@/components/ui/data-panel';
 import { Money } from '@/components/ui/Money';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { SelectMenu } from '@/components/ui/select-menu';
-import type { ReportRow } from '@/lib/artifacts';
 import { formatDateKo, formatDays, formatPercent, signedTextClass } from '@/lib/format';
-import type { ReportVerificationDisplayRow } from '@/lib/view-models/shared';
+import type { ReportLedgerRow } from '@/lib/view-models/report-verification';
 
 type ReportsTableProps = {
-  reports: ReportRow[];
-  marketRows?: ReportBoardRow[];
-  viewRows?: ReportVerificationDisplayRow[];
+  rows: ReportLedgerRow[];
+  title?: string;
+  subtitle?: string;
 };
 
 type SortId = 'recent' | 'top-return' | 'target-progress' | 'near-target';
@@ -89,7 +87,7 @@ const COLUMN_SORT_LABELS: Record<ColumnSortKey, string> = {
   status: '상태',
 };
 
-export function ReportsTable({ reports, marketRows = [], viewRows = [] }: ReportsTableProps) {
+export function ReportsTable({ rows, title = '리포트 원장', subtitle = '전체 리포트 기준' }: ReportsTableProps) {
   const router = useRouter();
   const [sort, setSort] = useState<SortId>('recent');
   const [query, setQuery] = useState('');
@@ -98,15 +96,11 @@ export function ReportsTable({ reports, marketRows = [], viewRows = [] }: Report
   const [columnMode, setColumnMode] = useState<ColumnMode>('core');
   const [columnSort, setColumnSort] = useState<ColumnSortState | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [focusedReportId, setFocusedReportId] = useState<string | null>(null);
   const [page, setPage] = useState(0);
-
-  const displayRowsById = useMemo(() => new Map(viewRows.map((row) => [row.id, row])), [viewRows]);
-  const marketRowsBySymbol = useMemo(() => new Map(marketRows.map((row) => [row.symbol, row])), [marketRows]);
 
   const filteredRows = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
-    return reports.filter((report) => {
+    return rows.filter((report) => {
       if (hitFilter === 'hit' && !report.targetHit) return false;
       if (hitFilter === 'open' && (report.targetHit || report.expired)) return false;
       if (hitFilter === 'expired' && !report.expired) return false;
@@ -116,27 +110,20 @@ export function ReportsTable({ reports, marketRows = [], viewRows = [] }: Report
       const haystack = `${report.symbol} ${report.company} ${report.title}`.toLowerCase();
       return haystack.includes(normalizedQuery);
     });
-  }, [hitFilter, query, reports, returnFilter]);
+  }, [hitFilter, query, returnFilter, rows]);
 
-  const sortedRows = useMemo(
-    () => sortReports(filteredRows, sort, columnSort, marketRowsBySymbol),
-    [columnSort, filteredRows, marketRowsBySymbol, sort],
-  );
+  const sortedRows = useMemo(() => sortReports(filteredRows, sort, columnSort), [columnSort, filteredRows, sort]);
   const pageCount = Math.max(1, Math.ceil(sortedRows.length / PAGE_SIZE));
   const safePage = Math.min(page, pageCount - 1);
   const visibleRows = sortedRows.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
-  const focusedReport = useMemo(
-    () => sortedRows.find((report) => report.reportId === focusedReportId) ?? visibleRows[0] ?? sortedRows[0] ?? null,
-    [focusedReportId, sortedRows, visibleRows],
-  );
   const activeFilterCount = Number(hitFilter !== 'all') + Number(returnFilter !== 'all');
   const colSpan = columnMode === 'core' ? 11 : columnMode === 'price' ? 14 : 17;
   const visibleStart = sortedRows.length === 0 ? 0 : safePage * PAGE_SIZE + 1;
   const visibleEnd = Math.min(sortedRows.length, (safePage + 1) * PAGE_SIZE);
   const filteredTotalLabel =
-    sortedRows.length === reports.length
+    sortedRows.length === rows.length
       ? `${sortedRows.length.toLocaleString('ko-KR')}건`
-      : `${sortedRows.length.toLocaleString('ko-KR')}건 · 전체 ${reports.length.toLocaleString('ko-KR')}건`;
+      : `${sortedRows.length.toLocaleString('ko-KR')}건 · 전체 ${rows.length.toLocaleString('ko-KR')}건`;
   const activeSortLabel = columnSort
     ? `${COLUMN_SORT_LABELS[columnSort.key]} ${columnSort.direction === 'asc' ? '오름차순' : '내림차순'}`
     : (SORT_OPTIONS.find((option) => option.value === sort)?.label ?? '최근 발간');
@@ -147,6 +134,7 @@ export function ReportsTable({ reports, marketRows = [], viewRows = [] }: Report
       ? `수익률 ${RETURN_FILTER_OPTIONS.find((option) => option.value === returnFilter)?.label}`
       : null,
   ].filter((filter): filter is string => Boolean(filter));
+
   const handleColumnSort = (key: ColumnSortKey) => {
     setColumnSort((current) => {
       if (current?.key === key) {
@@ -159,8 +147,8 @@ export function ReportsTable({ reports, marketRows = [], viewRows = [] }: Report
 
   return (
     <DataPanel
-      title="리포트 테이블"
-      subtitle={`전체 리포트 기준 · ${sortedRows.length.toLocaleString('ko-KR')}건`}
+      title={title}
+      subtitle={`${subtitle} · ${sortedRows.length.toLocaleString('ko-KR')}건`}
       search={{
         value: query,
         onChange: (value) => {
@@ -254,9 +242,6 @@ export function ReportsTable({ reports, marketRows = [], viewRows = [] }: Report
         <span>정렬 {activeSortLabel}</span>
         <span>{appliedFilters.length > 0 ? appliedFilters.join(' · ') : '필터 없음'}</span>
       </div>
-      {focusedReport ? (
-        <FocusedReportSummary report={focusedReport} market={marketRowsBySymbol.get(focusedReport.symbol)} />
-      ) : null}
       <table className="w-full table-fixed border-collapse text-xs">
         <ReportTableColGroup columnMode={columnMode} />
         <thead>
@@ -326,94 +311,84 @@ export function ReportsTable({ reports, marketRows = [], viewRows = [] }: Report
         </thead>
         <tbody className="divide-y divide-slate-100">
           {visibleRows.length > 0 ? (
-            visibleRows.map((report) => {
-              const market = marketRowsBySymbol.get(report.symbol);
-              const href = `/reports/${encodeURIComponent(report.symbol)}/${encodeURIComponent(report.reportId)}`;
-              return (
-                <tr
-                  key={report.reportId}
-                  aria-label={`${report.company || report.symbol} 리포트 보기`}
-                  className={`cursor-pointer bg-white transition-colors hover:bg-slate-50 focus-within:bg-slate-50 ${
-                    focusedReport?.reportId === report.reportId ? 'bg-slate-50' : ''
-                  }`}
-                  onFocus={() => setFocusedReportId(report.reportId)}
-                  onClick={() => router.push(href)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                      event.preventDefault();
-                      router.push(href);
-                    }
-                  }}
-                  onMouseEnter={() => setFocusedReportId(report.reportId)}
-                  role="link"
-                  tabIndex={0}
-                >
-                  <Td>
-                    <div className="truncate font-semibold text-slate-950">{reportIdentity(report)}</div>
-                  </Td>
-                  <Td className="font-mono text-[11px] text-slate-600">{formatDateKo(report.publicationDate)}</Td>
-                  {columnMode !== 'core' ? (
-                    <Td className="text-right">
-                      <Money
-                        bold
-                        currency={report.currency}
-                        krw={report.entryPriceKrw}
-                        native={report.entryPriceNative}
-                        showSecondary={columnMode === 'all'}
-                      />
-                    </Td>
-                  ) : null}
+            visibleRows.map((report) => (
+              <tr
+                key={report.reportId}
+                aria-label={`${report.company || report.symbol} 리포트 보기`}
+                className="cursor-pointer bg-white transition-colors hover:bg-slate-50 focus-within:bg-slate-50"
+                onClick={() => router.push(report.href)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    router.push(report.href);
+                  }
+                }}
+                role="link"
+                tabIndex={0}
+              >
+                <Td>
+                  <div className="truncate font-semibold text-slate-950">{reportIdentity(report)}</div>
+                </Td>
+                <Td className="font-mono text-[11px] text-slate-600">{formatDateKo(report.publicationDate)}</Td>
+                {columnMode !== 'core' ? (
                   <Td className="text-right">
                     <Money
+                      bold
                       currency={report.currency}
-                      krw={report.lastCloseKrw}
-                      native={report.lastCloseNative}
+                      krw={report.entryPriceKrw}
+                      native={report.entryPriceNative}
                       showSecondary={columnMode === 'all'}
                     />
                   </Td>
-                  {columnMode !== 'core' ? (
-                    <Td className="text-right">
-                      <Money
-                        currency={report.currency}
-                        krw={report.targetPriceKrw}
-                        native={report.targetPriceNative}
-                        showSecondary={columnMode === 'all'}
-                      />
-                    </Td>
-                  ) : null}
-                  {columnMode !== 'core' ? <PercentCell heat value={report.targetUpsideAtPub} /> : null}
-                  <PercentCell heat value={report.currentReturn} />
-                  <PercentCell heat value={market?.ytdReturn ?? null} />
-                  <PercentCell heat value={market?.return1y ?? null} />
-                  <Td>
-                    <Sparkline values={market?.sparkline ?? []} />
-                  </Td>
-                  <Td>
-                    <HighGapCell value={market?.distanceFrom52wHigh ?? null} />
-                  </Td>
-                  <Td>
-                    <MovingAverageCell
-                      above20ma={market?.above20ma ?? null}
-                      above50ma={market?.above50ma ?? null}
-                      above200ma={market?.above200ma ?? null}
+                ) : null}
+                <Td className="text-right">
+                  <Money
+                    currency={report.currency}
+                    krw={report.lastCloseKrw}
+                    native={report.lastCloseNative}
+                    showSecondary={columnMode === 'all'}
+                  />
+                </Td>
+                {columnMode !== 'core' ? (
+                  <Td className="text-right">
+                    <Money
+                      currency={report.currency}
+                      krw={report.targetPriceKrw}
+                      native={report.targetPriceNative}
+                      showSecondary={columnMode === 'all'}
                     />
                   </Td>
-                  <Td>
-                    <ProgressCell value={report.targetProgressPct} />
-                  </Td>
-                  {columnMode === 'all' ? <PercentCell heat value={report.peakReturn} /> : null}
-                  {columnMode === 'all' ? <PercentCell heat value={report.troughReturn} /> : null}
-                  {columnMode === 'all' ? (
-                    <Td className="text-right font-mono text-[11px] text-slate-600">
-                      {formatDays(report.daysToTarget)}
-                    </Td>
-                  ) : null}
-                  <Td>
-                    <StatusBadge report={report} label={displayRowsById.get(report.reportId)?.statusLabel} />
-                  </Td>
-                </tr>
-              );
-            })
+                ) : null}
+                {columnMode !== 'core' ? <PercentCell heat value={report.targetUpsideAtPub} /> : null}
+                <PercentCell heat value={report.currentReturn} />
+                <PercentCell heat value={report.ytdReturn} />
+                <PercentCell heat value={report.return1y} />
+                <Td>
+                  <Sparkline values={report.sparkline} />
+                </Td>
+                <Td>
+                  <HighGapCell value={report.distanceFrom52wHigh} />
+                </Td>
+                <Td>
+                  <MovingAverageCell
+                    above20ma={report.above20ma}
+                    above50ma={report.above50ma}
+                    above200ma={report.above200ma}
+                  />
+                </Td>
+                <Td>
+                  <ProgressCell value={report.targetProgressPct} />
+                </Td>
+                {columnMode === 'all' ? <PercentCell heat value={report.peakReturn} /> : null}
+                {columnMode === 'all' ? <PercentCell heat value={report.troughReturn} /> : null}
+                {columnMode === 'all' ? (
+                  <Td className="text-right font-mono text-[11px] text-slate-600">{formatDays(report.daysToTarget)}</Td>
+                ) : null}
+                <Td>
+                  <StatusBadge report={report} />
+                </Td>
+              </tr>
+            ))
           ) : (
             <tr>
               <td colSpan={colSpan}>
@@ -523,41 +498,7 @@ function Th({
 function Td({ children, className = '' }: { children: ReactNode; className?: string }) {
   return <td className={`min-w-0 overflow-hidden px-1.5 py-2 align-middle ${className}`}>{children}</td>;
 }
-
-function FocusedReportSummary({ report, market }: { report: ReportRow; market?: ReportBoardRow }) {
-  return (
-    <div className="grid gap-2 border-b border-slate-100 bg-white px-3 py-2 md:grid-cols-[minmax(0,1.3fr)_repeat(3,minmax(0,.7fr))] md:items-center">
-      <div className="min-w-0">
-        <div className="truncate text-sm font-semibold text-slate-950">{reportIdentity(report)}</div>
-        <div className="mt-0.5 truncate text-xs text-slate-500">
-          {formatDateKo(report.publicationDate)} 발간 · row 클릭 시 원천 리포트로 이동
-        </div>
-      </div>
-      <SummaryMetric label="현재 수익률" tone={report.currentReturn ?? 0} value={formatPercent(report.currentReturn)} />
-      <SummaryMetric
-        label="진행률"
-        tone={report.targetProgressPct ?? 0}
-        value={formatPercent(report.targetProgressPct)}
-      />
-      <SummaryMetric
-        label="52주 고점"
-        tone={market?.distanceFrom52wHigh ?? 0}
-        value={formatPercent(market?.distanceFrom52wHigh)}
-      />
-    </div>
-  );
-}
-
-function SummaryMetric({ label, value, tone }: { label: string; value: string; tone: number }) {
-  return (
-    <div className="min-w-0 text-right">
-      <div className="text-[11px] font-medium text-slate-500">{label}</div>
-      <div className={`truncate font-mono text-xs font-semibold tabular-nums ${signedTextClass(tone)}`}>{value}</div>
-    </div>
-  );
-}
-
-function reportIdentity(report: ReportRow): string {
+function reportIdentity(report: Pick<ReportLedgerRow, 'company' | 'exchange' | 'symbol'>): string {
   const symbol = stripMarketSuffix(report.symbol);
   const exchange = report.exchange.toUpperCase();
   const isKorea =
@@ -637,8 +578,7 @@ function EmptyNumeric() {
   return <div className="text-right font-mono text-[11px] text-slate-400">—</div>;
 }
 
-function StatusBadge({ report, label }: { report: ReportRow; label?: string }) {
-  const text = label ?? (report.targetHit ? '도달' : report.expired ? '만료' : '진행 중');
+function StatusBadge({ report }: { report: ReportLedgerRow }) {
   const className = report.targetHit
     ? 'bg-emerald-50 text-emerald-700 ring-emerald-200'
     : report.expired
@@ -648,7 +588,7 @@ function StatusBadge({ report, label }: { report: ReportRow; label?: string }) {
     <span
       className={`inline-flex whitespace-nowrap rounded-full px-2 py-1 text-[11px] font-medium ring-1 ${className}`}
     >
-      {text}
+      {report.statusLabel}
     </span>
   );
 }
@@ -737,17 +677,12 @@ function defaultDirectionForColumn(key: ColumnSortKey): SortDirection {
   return 'desc';
 }
 
-function sortReports(
-  rows: ReportRow[],
-  sort: SortId,
-  columnSort: ColumnSortState | null,
-  marketRowsBySymbol: Map<string, ReportBoardRow>,
-): ReportRow[] {
+function sortReports(rows: ReportLedgerRow[], sort: SortId, columnSort: ColumnSortState | null): ReportLedgerRow[] {
   return [...rows].sort((a, b) => {
     if (columnSort) {
       const result = compareSortValues(
-        getColumnSortValue(a, columnSort.key, marketRowsBySymbol),
-        getColumnSortValue(b, columnSort.key, marketRowsBySymbol),
+        getColumnSortValue(a, columnSort.key),
+        getColumnSortValue(b, columnSort.key),
         columnSort.direction,
       );
       if (result !== 0) return result;
@@ -760,12 +695,7 @@ function sortReports(
   });
 }
 
-function getColumnSortValue(
-  report: ReportRow,
-  key: ColumnSortKey,
-  marketRowsBySymbol: Map<string, ReportBoardRow>,
-): string | number | boolean | null {
-  const market = marketRowsBySymbol.get(report.symbol);
+function getColumnSortValue(report: ReportLedgerRow, key: ColumnSortKey): string | number | boolean | null {
   if (key === 'company') return report.company || report.symbol;
   if (key === 'publicationDate') return report.publicationDate;
   if (key === 'entryPriceNative') return report.entryPriceNative;
@@ -773,10 +703,10 @@ function getColumnSortValue(
   if (key === 'targetPriceNative') return report.targetPriceNative;
   if (key === 'targetUpsideAtPub') return report.targetUpsideAtPub;
   if (key === 'currentReturn') return report.currentReturn;
-  if (key === 'ytdReturn') return market?.ytdReturn ?? null;
-  if (key === 'return1y') return market?.return1y ?? null;
-  if (key === 'distanceFrom52wHigh') return market?.distanceFrom52wHigh ?? null;
-  if (key === 'maTrend') return movingAverageScore(market);
+  if (key === 'ytdReturn') return report.ytdReturn;
+  if (key === 'return1y') return report.return1y;
+  if (key === 'distanceFrom52wHigh') return report.distanceFrom52wHigh;
+  if (key === 'maTrend') return movingAverageScore(report);
   if (key === 'targetProgressPct') return report.targetProgressPct;
   if (key === 'peakReturn') return report.peakReturn;
   if (key === 'troughReturn') return report.troughReturn;
@@ -816,7 +746,7 @@ function compareNullable(a: number | null | undefined, b: number | null | undefi
   return a - b;
 }
 
-function downloadReports(rows: ReportRow[]) {
+function downloadReports(rows: ReportLedgerRow[]) {
   downloadCsv(
     'reports.csv',
     ['symbol', 'company', 'publication_date', 'exchange', 'current_return', 'target_progress'],
@@ -831,9 +761,8 @@ function downloadReports(rows: ReportRow[]) {
   );
 }
 
-function movingAverageScore(market: ReportBoardRow | undefined): number | null {
-  if (!market) return null;
-  const values = [market.above20ma, market.above50ma, market.above200ma].filter((value) => value !== null);
+function movingAverageScore(report: ReportLedgerRow): number | null {
+  const values = [report.above20ma, report.above50ma, report.above200ma].filter((value) => value !== null);
   if (values.length === 0) return null;
   return values.reduce((sum, value) => sum + (value ? 1 : 0), 0);
 }

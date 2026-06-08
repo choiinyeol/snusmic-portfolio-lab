@@ -1,22 +1,20 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { PortfolioEquityView } from '@/components/trading/portfolio-views/PortfolioEquityView';
 import { PortfolioHoldingsView } from '@/components/trading/portfolio-views/PortfolioHoldingsView';
-import { displayPortfolioName, strategyMeta } from '@/components/trading/portfolio-views/strategy-display';
+import { displayPortfolioName } from '@/lib/portfolio-labels';
 import { PortfolioLandingView } from '@/components/trading/portfolio-views/PortfolioLandingView';
 import { PortfolioOverviewView } from '@/components/trading/portfolio-views/PortfolioOverviewView';
-import { PortfolioAccountFrame } from '@/components/trading/portfolio-views/PortfolioAccountFrame';
 import { PortfolioTradesView } from '@/components/trading/portfolio-views/PortfolioTradesView';
-import type { PortfolioViewModel } from '@/components/trading/portfolio-views/types';
+import type { PortfolioAccountShellModel, PortfolioRouteModels } from '@/components/trading/portfolio-views/types';
 import { Button } from '@/components/ui/button';
 import { formatKrw, formatMultiple, formatPercent } from '@/lib/format';
 import {
   buildPortfolioLandingModel,
-  buildPortfolioViewModel,
+  buildPortfolioRouteModels,
   getPortfolioStaticParams as getStaticParams,
 } from './portfolio-view-model';
 
-export type PortfolioRouteView = 'ledger' | 'holdings' | 'equity' | 'trades';
+export type PortfolioRouteView = 'ledger' | 'holdings' | 'trades';
 
 export function PortfolioPageContent() {
   return <PortfolioLandingView model={buildPortfolioLandingModel()} />;
@@ -26,38 +24,30 @@ export function EmptyPortfolioRouteContent() {
   return <PortfolioPageContent />;
 }
 
-export function PortfolioPageShell({ children, model }: { children: ReactNode; model: PortfolioViewModel }) {
+export function PortfolioPageShell({ children, model }: { children: ReactNode; model: PortfolioAccountShellModel }) {
   const accountId = model.selectedAccount;
-  const label = model.accountLabels[accountId] ?? accountId;
-  const fallback = model.accountOptions.find((row) => row.id === accountId)?.shortLabel ?? label;
+  const selectedOption = model.accountOptions.find((row) => row.id === accountId);
+  const label = selectedOption?.label ?? accountId;
+  const fallback = selectedOption?.shortLabel ?? label;
   const shortLabel = displayPortfolioName(accountId, fallback);
   const diagnostics = model.ledgerDiagnostics;
-  const meta = strategyMeta(accountId);
 
   return (
-    <div className="grid gap-5">
+    <div className="grid gap-4">
       <section className="rounded-md border border-slate-200 bg-white p-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-              account ledger
+              portfolio account
             </div>
-            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-slate-950">{shortLabel} 원장</h1>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
-              현재 보유, 실현손익, 미실현손익, 승률과 손익비를 한 화면에서 확인합니다.
+            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-slate-950">{shortLabel}</h1>
+            <p className="mt-1 text-sm text-slate-500">
+              개요에서 성과 경로를 보고, 보유·거래 원장은 각 상세 화면에서 전부 확인합니다.
             </p>
           </div>
           <Button asChild size="sm" variant="outline">
             <Link href="/portfolio">포트폴리오 홈</Link>
           </Button>
-        </div>
-
-        <div className="mt-4 rounded-md border border-slate-200 bg-slate-50 p-3">
-          <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
-            {meta.role}
-          </div>
-          <div className="mt-1 text-sm font-semibold text-slate-950">{meta.subtitle}</div>
-          <p className="mt-1 max-w-5xl text-sm leading-6 text-slate-600">{meta.description}</p>
         </div>
 
         <FactsTable
@@ -87,7 +77,7 @@ export function PortfolioPageShell({ children, model }: { children: ReactNode; m
           ]}
         />
       </section>
-      <PortfolioAccountFrame model={model}>{children}</PortfolioAccountFrame>
+      <div className="min-w-0">{children}</div>
     </div>
   );
 }
@@ -99,10 +89,10 @@ export function PortfolioRouteContent({
   selectedAccount: string;
   view: PortfolioRouteView;
 }) {
-  const model = buildPortfolioViewModel(selectedAccount);
+  const models = buildPortfolioRouteModels(selectedAccount);
   return (
-    <PortfolioPageShell model={model}>
-      <PortfolioRouteContentFromModel model={model} view={view} />
+    <PortfolioPageShell model={models.shell}>
+      <PortfolioRouteContentFromModel model={models} view={view} />
     </PortfolioPageShell>
   );
 }
@@ -111,13 +101,12 @@ export function PortfolioRouteContentFromModel({
   model,
   view,
 }: {
-  model: PortfolioViewModel;
+  model: PortfolioRouteModels;
   view: PortfolioRouteView;
 }) {
-  if (view === 'holdings') return <PortfolioHoldingsView model={model} />;
-  if (view === 'equity') return <PortfolioEquityView model={model} />;
-  if (view === 'trades') return <PortfolioTradesView model={model} />;
-  return <PortfolioOverviewView model={model} />;
+  if (view === 'holdings') return <PortfolioHoldingsView model={model.holdings} />;
+  if (view === 'trades') return <PortfolioTradesView model={model.trades} />;
+  return <PortfolioOverviewView model={model.overview} />;
 }
 
 export const getPortfolioStaticParams = getStaticParams;

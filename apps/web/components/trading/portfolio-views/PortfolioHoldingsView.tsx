@@ -2,35 +2,35 @@
 
 import { PortfolioTables } from '@/components/trading/PortfolioTables';
 import { formatKrw, formatPercent } from '@/lib/format';
-import type { PortfolioViewModel } from './types';
+import type { PortfolioHoldingsModel } from './types';
 
-export function PortfolioHoldingsView({ model }: { model: PortfolioViewModel }) {
-  const accountId = model.selectedAccount;
-  const holdings = model.holdings.filter((row) => row.account_id === accountId);
-  const cashKrw = model.cashByAccount[accountId] ?? 0;
+export function PortfolioHoldingsView({ model }: { model: PortfolioHoldingsModel }) {
+  const holdings = model.holdings;
+  const cashKrw = model.cashKrw;
   const totalValue = holdings.reduce((sum, row) => sum + (row.marketValueKrw ?? 0), 0) + cashKrw;
   const topFive = holdings
     .slice()
     .sort((a, b) => (b.marketValueKrw ?? 0) - (a.marketValueKrw ?? 0))
     .slice(0, 5)
     .reduce((sum, row) => sum + (row.marketValueKrw ?? 0), 0);
-  const largestWinner = holdings.reduce(
-    (best, row) => ((row.unrealizedReturn ?? -999) > (best.unrealizedReturn ?? -999) ? row : best),
-    holdings[0],
+  const largestWinner = holdings.reduce<(typeof holdings)[number] | null>(
+    (best, row) => ((row.unrealizedReturn ?? -999) > (best?.unrealizedReturn ?? -999) ? row : best),
+    null,
   );
-  const largestLoser = holdings.reduce(
-    (worst, row) => ((row.unrealizedReturn ?? 999) < (worst.unrealizedReturn ?? 999) ? row : worst),
-    holdings[0],
+  const largestLoser = holdings.reduce<(typeof holdings)[number] | null>(
+    (worst, row) => ((row.unrealizedReturn ?? 999) < (worst?.unrealizedReturn ?? 999) ? row : worst),
+    null,
   );
 
   return (
     <div className="grid gap-4">
       <section className="rounded-md border border-slate-200 bg-white p-4">
-        <div className="mb-3">
-          <h2 className="text-sm font-semibold text-slate-950">보유 요약</h2>
-          <p className="mt-1 text-xs text-slate-500">
-            리스크는 보유 상위 종목과 현금 비중이 결정합니다. 아래 표에서 전부 확인합니다.
-          </p>
+        <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold tracking-tight text-slate-950">보유 전체 원장</h2>
+            <p className="mt-1 text-sm text-slate-500">현재 포지션과 비중을 전부 확인하는 화면입니다.</p>
+          </div>
+          <div className="font-mono text-xs text-slate-500">{holdings.length.toLocaleString('ko-KR')}개 종목</div>
         </div>
         <dl className="grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-5">
           <Stat label="총 평가액" value={formatKrw(totalValue)} />
@@ -43,8 +43,8 @@ export function PortfolioHoldingsView({ model }: { model: PortfolioViewModel }) 
 
       <PortfolioTables
         capitalByAccount={model.capitalByAccount}
-        holdings={model.holdings}
-        account_id={model.selectedAccount}
+        holdings={holdings}
+        account_id={model.accountId}
         accountLabels={model.accountLabels}
         targetsBySymbol={model.targetsBySymbol}
       />

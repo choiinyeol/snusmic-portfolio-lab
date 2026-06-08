@@ -1,11 +1,4 @@
-import type {
-  AccountingReconciliationRow,
-  EquityPoint,
-  HoldingRow,
-  PositionEpisodeRow,
-  ReportTargetDigest,
-  TradeRow,
-} from '@/lib/artifacts';
+import type { AccountCatalogContext, EquityPoint, HoldingRow, ReportTargetDigest, TradeRow } from '@/lib/artifacts';
 
 export type AccountOption = {
   id: string;
@@ -16,27 +9,57 @@ export type AccountOption = {
   isDefault: boolean;
 };
 
-export type PortfolioViewModel = {
-  holdings: HoldingRow[];
-  accounting: AccountingReconciliationRow[];
-  equity: EquityPoint[];
-  trades: TradeRow[];
-  episodes: PositionEpisodeRow[];
-  ledgerDiagnostics: AccountLedgerDiagnostics;
-  accounts: string[];
-  benchmarkAccounts: string[];
-  accountLabels: Record<string, string>;
-  accountOptions: AccountOption[];
-  defaultAccount: string;
+export type PortfolioAccountShellModel = {
   selectedAccount: string;
-  invalidAccountId: string | null;
-  capitalByAccount: Record<string, number>;
-  cashByAccount: Record<string, number>;
+  accountOptions: AccountOption[];
+  ledgerDiagnostics: AccountLedgerDiagnostics;
+};
+
+export type PortfolioTradeTableModel = {
+  accountId: string;
+  trades: TradeRow[];
+  accountLabels: Record<string, string>;
   reportSymbolsById: Record<string, string>;
   targetsBySymbol: Record<string, ReportTargetDigest>;
   targetsByReportId: Record<string, ReportTargetDigest>;
-  portfolioAccountCount: number;
+};
+
+export type PortfolioEquityChartModel = {
+  accountId: string;
+  accountLabel: string;
+  accountLabels: Record<string, string>;
+  benchmarkAccounts: string[];
+  equity: EquityPoint[];
+  trades: TradeRow[];
   latestEquityDate: string;
+};
+
+export type PortfolioOverviewModel = {
+  accountId: string;
+  diagnostics: AccountLedgerDiagnostics;
+  holdings: HoldingRow[];
+  targetsBySymbol: Record<string, ReportTargetDigest>;
+  chart: PortfolioEquityChartModel;
+  tradeTable: PortfolioTradeTableModel;
+  context: AccountCatalogContext;
+};
+
+export type PortfolioHoldingsModel = {
+  accountId: string;
+  holdings: HoldingRow[];
+  cashKrw: number;
+  capitalByAccount: Record<string, number>;
+  accountLabels: Record<string, string>;
+  targetsBySymbol: Record<string, ReportTargetDigest>;
+};
+
+export type PortfolioTradesModel = PortfolioTradeTableModel;
+
+export type PortfolioRouteModels = {
+  shell: PortfolioAccountShellModel;
+  overview: PortfolioOverviewModel;
+  holdings: PortfolioHoldingsModel;
+  trades: PortfolioTradesModel;
 };
 
 export type PositionOutcome = {
@@ -117,6 +140,7 @@ export type PortfolioAccountSnapshot = {
   shortlistRole: 'candidate' | 'baseline' | 'robustness' | 'follower';
   shortlistReason: string;
   comparisonPrompt: string;
+  context: AccountCatalogContext;
 };
 
 export type PortfolioLandingModel = {

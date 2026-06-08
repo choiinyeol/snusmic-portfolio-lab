@@ -240,6 +240,15 @@ export type DataQuality = {
   extractionQuality: Record<string, unknown>;
 };
 
+export type AccountCatalogContext = {
+  role: string;
+  category: string;
+  title: string;
+  subtitle: string;
+  comparisonPrompt: string;
+  shortlistReason: string | null;
+};
+
 export type AccountCatalogRow = {
   accountId: string;
   label: string;
@@ -252,6 +261,7 @@ export type AccountCatalogRow = {
   objectivePassed: boolean;
   objectiveReturnExcess: number | null;
   objectiveMddSlack: number | null;
+  context: AccountCatalogContext;
   metrics: {
     finalEquityKrw: number | null;
     finalCashKrw: number | null;
@@ -1085,6 +1095,14 @@ export function getAccountCatalog(): AccountCatalogRow[] {
     objectivePassed: row.objective_passed,
     objectiveReturnExcess: row.objective_return_excess,
     objectiveMddSlack: row.objective_mdd_slack,
+    context: {
+      role: row.context.role,
+      category: row.context.category,
+      title: row.context.title,
+      subtitle: row.context.subtitle,
+      comparisonPrompt: row.context.comparison_prompt,
+      shortlistReason: row.context.shortlist_reason ?? null,
+    },
     metrics: {
       finalEquityKrw: row.metrics.final_equity_krw,
       finalCashKrw: row.metrics.final_cash_krw,

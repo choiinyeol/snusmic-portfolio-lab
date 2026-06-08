@@ -1,16 +1,19 @@
 import 'server-only';
 
-import type { ReportBoardRow } from '@/components/report-board/report-board-table';
-import { getReportVerificationViewModel } from '@/lib/view-models/report-verification';
 import { getReportCandidateViewModel } from '@/lib/view-models/report-candidates';
-import type { PageHeaderModel, PageMetric, ReportVerificationTableModel } from '@/lib/view-models/shared';
+import {
+  getReportVerificationViewModel,
+  type ReportLedgerRow,
+  type ReportLedgerTableModel,
+} from '@/lib/view-models/report-verification';
+import type { PageHeaderModel, PageMetric } from '@/lib/view-models/shared';
 
 export type ReportBoardViewModel = {
   header: PageHeaderModel;
   metrics: PageMetric[];
-  priorityRows: ReportBoardRow[];
-  candidateRows: ReportBoardRow[];
-  reportTable: ReportVerificationTableModel;
+  priorityRows: ReportLedgerRow[];
+  candidateRows: ReportLedgerRow[];
+  reportTable: ReportLedgerTableModel;
 };
 
 export function getReportBoardViewModel(): ReportBoardViewModel {

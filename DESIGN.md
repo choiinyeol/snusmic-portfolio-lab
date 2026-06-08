@@ -34,9 +34,8 @@ Only these web routes are active product surfaces:
 | `/reports/[symbol]/[reportId]` | Report detail | 발간일 이후 이 리포트는 어떻게 끝났나? |
 | `/calendar` | Report calendar | 과거 특정 날짜에 어떤 후보를 볼 수 있었고 이후 어떻게 검증됐나? |
 | `/statistics` | Report statistics | 전체 표본의 수익/실패 분포와 반복 패턴은 무엇인가? |
-| `/portfolio` | Account chooser/dashboard | SMIC follower 계좌와 benchmark는 어떻게 비교되나? |
-| `/portfolio/[account]` | Account overview | 선택 계좌의 현재 보유와 리스크는 무엇인가? |
-| `/portfolio/[account]/equity` | Account equity | 누적 성과, benchmark, 매수/매도 시점은 어떻게 겹치나? |
+| `/portfolio` | Account chooser/dashboard | 어떤 계좌를 다음으로 열어봐야 하나? |
+| `/portfolio/[account]` | Account overview | 선택 계좌의 현재 상태와 기준 차트는 무엇인가? |
 | `/portfolio/[account]/holdings` | Account holdings | 현재 보유 종목과 기여도는 무엇인가? |
 | `/portfolio/[account]/trades` | Trade ledger | 어떤 이유로 언제 사고팔았나? |
 
@@ -330,13 +329,11 @@ When statistics show a distribution, the UI should let users inspect which stock
 
 Preferred shared components:
 
-- `PageHeader`
-- `MetricStrip`
+- `PageHero`
 - `DataQualityNotice`
 - `SeriesToggleChart`
 - `CumulativeReturnChart`
 - `ReportsTable`
-- `HoldingsTreemap`
 - `PortfolioEquityTradeChart`
 
 Do not create page-specific duplicates when a shared component already fits the job.

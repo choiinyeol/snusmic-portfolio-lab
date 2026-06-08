@@ -1,9 +1,16 @@
-export function displayPortfolioName(accountId: string, fallback: string): string {
-  if (accountId.includes('redeploycash125_partial75')) return 'Partial 75';
-  if (accountId.includes('redeploycash125')) return 'CashGate 12.5';
-  if (accountId.includes('trailtrim25cap20')) return 'TrailTrim 20';
-  if (accountId === 'pit_trend_top5') return 'Trend Top5';
-  if (accountId === 'pit_score_top5') return 'Score Top5';
-  if (accountId === 'smic_follower') return 'SMIC Follower';
+export function displayPortfolioName(_accountId: string, fallback: string): string {
   return fallback;
+}
+
+export function portfolioRoleLabel(role: string) {
+  if (role === 'candidate') return '후보';
+  if (role === 'robustness') return '견고성';
+  if (role === 'follower' || role === 'report_follower') return '추종';
+  if (role === 'baseline') return '기준선';
+  if (role === 'benchmark') return '벤치마크';
+  if (role === 'momentum') return '모멘텀';
+  if (role === 'mtt_filter') return '필터';
+  if (role === 'entry_gate') return '진입 규칙';
+  if (role === 'hold_winner') return '보유 유지';
+  return role.replace(/_/g, ' ');
 }
