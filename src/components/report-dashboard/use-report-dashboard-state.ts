@@ -1,10 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { getDisplayName, reportDataset, type Market, type ReportRecord } from "@/lib/report-model";
+import { getDisplayName, reportDataset, type Market, type ReportRecord, type School } from "@/lib/report-model";
 
 type MarketFilter = "ALL" | Market;
 type BucketFilter = "ALL" | ReportRecord["performance_bucket"];
+type SchoolFilter = "ALL" | School;
 
 export type ChartPoint = ReportRecord & {
   x: number;
@@ -17,6 +18,7 @@ export const bucketFilters: BucketFilter[] = ["ALL", "Moonshot", "Winner", "Posi
 export function useReportDashboardState() {
   const [market, setMarket] = useState<MarketFilter>("ALL");
   const [bucket, setBucket] = useState<BucketFilter>("ALL");
+  const [school, setSchool] = useState<SchoolFilter>("ALL");
   const [query, setQuery] = useState("");
   const [selectedName, setSelectedName] = useState<string | null>(null);
 
@@ -25,6 +27,7 @@ export function useReportDashboardState() {
     return reportDataset.records.filter((report) => {
       if (market !== "ALL" && report.market !== market) return false;
       if (bucket !== "ALL" && report.performance_bucket !== bucket) return false;
+      if (school !== "ALL" && report.school !== school) return false;
       if (!q) return true;
       return [report.company, report.ticker, report.source_name, report.rating]
         .filter(Boolean)
@@ -32,7 +35,7 @@ export function useReportDashboardState() {
         .toLowerCase()
         .includes(q);
     });
-  }, [bucket, market, query]);
+  }, [bucket, market, school, query]);
 
   const sorted = useMemo(
     () => [...filtered].sort((a, b) => String(a.report_date).localeCompare(String(b.report_date))),
@@ -76,6 +79,8 @@ export function useReportDashboardState() {
     setMarket,
     bucket,
     setBucket,
+    school,
+    setSchool,
     query,
     setQuery,
     selected,
@@ -88,4 +93,4 @@ export function useReportDashboardState() {
 }
 
 export type ReportDashboardState = ReturnType<typeof useReportDashboardState>;
-export type { BucketFilter, MarketFilter };
+export type { BucketFilter, MarketFilter, SchoolFilter };

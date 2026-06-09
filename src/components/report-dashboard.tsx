@@ -4,12 +4,15 @@ import { Fragment, useCallback, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { bucketFilters, type BucketFilter, type MarketFilter, useReportDashboardState } from "@/components/report-dashboard/use-report-dashboard-state";
-import { dateLabel, getDisplayName, reportDataQuality, reportDataset, type ReportRecord } from "@/lib/report-model";
+import { bucketFilters, type BucketFilter, type MarketFilter, type SchoolFilter, useReportDashboardState } from "@/components/report-dashboard/use-report-dashboard-state";
+import { dateLabel, getDisplayName, reportDataQuality, reportDataset, SCHOOL_LABELS, type ReportRecord } from "@/lib/report-model";
 import { cn, formatPct, formatPrice } from "@/lib/utils";
 
 const marketFilters: MarketFilter[] = ["ALL", "KR", "US"];
-const marketLabels: Record<MarketFilter, string> = { ALL: "전체", KR: "국내", US: "미국" };
+const marketLabels: Record<MarketFilter, string> = { ALL: "시장 전체", KR: "국내", US: "미국" };
+const schoolFilters: SchoolFilter[] = ["ALL", "smic", "yig", "star", "kuvic"];
+const schoolLabels: Record<SchoolFilter, string> = { ALL: "전체 아카이브", ...SCHOOL_LABELS };
+const schoolShort: Record<ReportRecord["school"], string> = { smic: "SMIC", yig: "YIG", star: "STAR", kuvic: "KUVIC" };
 const bucketLabels: Record<BucketFilter, string> = {
   ALL: "전체",
   Moonshot: "문샷",
@@ -173,7 +176,7 @@ function Masthead({ total, priced, hits, hitRate, medianReturn }: { total: numbe
   return (
     <header>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b-4 border-double border-foreground/70 pb-3">
-        <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.3em]">SNU SMIC · Research Verdict Archive</p>
+        <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.3em]">SMIC · YIG · STAR · KUVIC — Research Verdict Archive</p>
         <div className="flex items-center gap-3">
           <p className="hidden font-mono text-[11px] text-muted-foreground sm:block">기준일 {dateLabel(reportDataset.as_of)}</p>
           <ThemeToggle />
@@ -186,8 +189,8 @@ function Masthead({ total, priced, hits, hitRate, medianReturn }: { total: numbe
         <span className="text-stamp">시장의 판결</span>을 받는다.
       </h1>
       <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground">
-        서울대학교 투자동아리 SMIC의 리포트 PDF {total}건을 전사·파싱해 목표가와 투자의견을 추출하고, point-in-time 시세로 발간 이후의 실제 주가
-        경로를 추적했습니다. 그날의 주장과 시간의 판정을 같은 페이지에 둡니다.
+        서울대·연세대·성균관대·고려대 투자동아리(SMIC·YIG·STAR·KUVIC)의 리포트 PDF {total}건을 전사·파싱해 목표가와 투자의견을 추출하고,
+        point-in-time 시세로 발간 이후의 실제 주가 경로를 추적했습니다. 그날의 주장과 시간의 판정을 같은 페이지에 둡니다.
       </p>
 
       <dl className="mt-9 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border lg:grid-cols-4">
@@ -225,7 +228,7 @@ function VerdictTape() {
           <div key={copy} className="flex shrink-0 items-center">
             {items.map((report) => (
               <span key={`${copy}-${report.source_name}`} className="mr-8 flex items-center gap-2 whitespace-nowrap font-mono text-xs">
-                <span className="text-muted-foreground">{dateLabel(report.report_date).slice(2, 7)}</span>
+                <span className="text-muted-foreground">{schoolShort[report.school]} {dateLabel(report.report_date).slice(2, 7)}</span>
                 <span className="font-semibold text-foreground/85">{getDisplayName(report)}</span>
                 <span className={cn("tnum font-bold", signColor(report.return_latest_pct))}>{formatPct(report.return_latest_pct)}</span>
                 {report.target_hit_until_latest && <span className="text-[10px] font-black tracking-tight text-stamp">[적중]</span>}
@@ -240,57 +243,80 @@ function VerdictTape() {
 
 function FilterBar({ state }: { state: ReturnType<typeof useReportDashboardState> }) {
   return (
-    <section className="flex flex-col gap-4 border-b border-border pb-5 lg:flex-row lg:items-end lg:justify-between" aria-label="아카이브 필터">
-      <div className="flex items-end gap-5">
-        {marketFilters.map((item) => {
-          const active = state.market === item;
+    <section className="space-y-4 border-b border-border pb-5" aria-label="아카이브 필터">
+      <div className="flex flex-wrap items-end gap-x-6 gap-y-2" role="group" aria-label="학교 필터">
+        {schoolFilters.map((item) => {
+          const active = state.school === item;
           return (
             <button
               key={item}
               type="button"
-              onClick={() => state.setMarket(item)}
+              onClick={() => state.setSchool(item)}
               aria-pressed={active}
               className={cn(
                 "border-b-[3px] pb-1 font-display text-xl font-black tracking-tight transition",
                 active ? "border-stamp text-foreground" : "border-transparent text-muted-foreground hover:text-foreground",
               )}
             >
-              {marketLabels[item]}
+              {schoolLabels[item]}
             </button>
           );
         })}
       </div>
 
-      <div className="flex flex-wrap gap-1.5" role="group" aria-label="성과 등급 필터">
-        {bucketFilters.map((item) => {
-          const active = state.bucket === item;
-          return (
-            <button
-              key={item}
-              type="button"
-              onClick={() => state.setBucket(item)}
-              aria-pressed={active}
-              className={cn(
-                "rounded-full border px-3 py-1 text-xs font-bold transition",
-                active ? "border-foreground bg-foreground text-background" : "border-border bg-transparent text-muted-foreground hover:border-foreground/50 hover:text-foreground",
-              )}
-            >
-              {bucketLabels[item]}
-            </button>
-          );
-        })}
-      </div>
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span role="group" aria-label="시장 필터" className="mr-2 flex gap-1.5">
+            {marketFilters.map((item) => {
+              const active = state.market === item;
+              return (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => state.setMarket(item)}
+                  aria-pressed={active}
+                  className={cn(
+                    "rounded-full border px-3 py-1 text-xs font-bold transition",
+                    active ? "border-stamp bg-stamp text-background" : "border-border bg-transparent text-muted-foreground hover:border-foreground/50 hover:text-foreground",
+                  )}
+                >
+                  {marketLabels[item]}
+                </button>
+              );
+            })}
+          </span>
+          <span role="group" aria-label="성과 등급 필터" className="flex flex-wrap gap-1.5">
+            {bucketFilters.map((item) => {
+              const active = state.bucket === item;
+              return (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => state.setBucket(item)}
+                  aria-pressed={active}
+                  className={cn(
+                    "rounded-full border px-3 py-1 text-xs font-bold transition",
+                    active ? "border-foreground bg-foreground text-background" : "border-border bg-transparent text-muted-foreground hover:border-foreground/50 hover:text-foreground",
+                  )}
+                >
+                  {bucketLabels[item]}
+                </button>
+              );
+            })}
+          </span>
+        </div>
 
-      <label className="relative block w-full lg:max-w-xs">
-        <span className="sr-only">회사명, 티커, 파일명 검색</span>
-        <Search className="pointer-events-none absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-        <input
-          value={state.query}
-          onChange={(event) => state.setQuery(event.target.value)}
-          className="w-full border-0 border-b border-border bg-transparent py-1.5 pl-7 pr-2 text-sm outline-none transition placeholder:text-muted-foreground focus:border-stamp"
-          placeholder="회사명 · 티커 · 파일명 검색"
-        />
-      </label>
+        <label className="relative block w-full lg:max-w-xs">
+          <span className="sr-only">회사명, 티커, 파일명 검색</span>
+          <Search className="pointer-events-none absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+          <input
+            value={state.query}
+            onChange={(event) => state.setQuery(event.target.value)}
+            className="w-full border-0 border-b border-border bg-transparent py-1.5 pl-7 pr-2 text-sm outline-none transition placeholder:text-muted-foreground focus:border-stamp"
+            placeholder="회사명 · 티커 · 파일명 검색"
+          />
+        </label>
+      </div>
     </section>
   );
 }
@@ -327,7 +353,7 @@ function VerdictPaper({
       <header className="flex flex-wrap items-center justify-between gap-2 border-b border-dashed border-border px-6 py-3 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground sm:px-8">
         <span>판결 기록 제 {index < 0 ? "—" : String(index + 1).padStart(3, "0")} 호</span>
         <span>
-          {dateLabel(report.report_date)} 발간 · {report.market ?? "—"} · {report.ticker ?? "—"}
+          {SCHOOL_LABELS[report.school]} · {dateLabel(report.report_date)} 발간 · {report.market ?? "—"} · {report.ticker ?? "—"}
         </span>
       </header>
 
@@ -556,7 +582,7 @@ function Chronicle({ reports, selected, onSelect }: { reports: ReportRecord[]; s
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-bold">{getDisplayName(report)}</span>
                   <span className={cn("block text-[11px]", active ? "opacity-70" : "text-muted-foreground")}>
-                    {dateLabel(report.report_date)} · {report.ticker ?? "—"}
+                    {schoolShort[report.school]} · {dateLabel(report.report_date)} · {report.ticker ?? "—"}
                     {report.target_hit_until_latest ? " · 적중" : ""}
                   </span>
                 </span>
