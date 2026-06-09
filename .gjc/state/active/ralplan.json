@@ -1,0 +1,31 @@
+{
+  "skill": "ralplan",
+  "phase": "handoff",
+  "active": true,
+  "activated_at": "2026-06-09T08:54:10.666Z",
+  "updated_at": "2026-06-09T08:54:10.666Z",
+  "session_id": "019eab64-b182-7000-8b0d-6eb3d7d96261",
+  "hud": {
+    "version": 1,
+    "chips": [
+      {
+        "label": "stage",
+        "value": "handoff",
+        "priority": 10
+      }
+    ],
+    "updated_at": "2026-06-09T08:54:10.665Z"
+  },
+  "receipt": {
+    "version": 1,
+    "skill": "ralplan",
+    "owner": "gjc-state-cli",
+    "command": "gjc state ralplan write",
+    "state_path": "C:\\Users\\FELAB\\Desktop\\projects\\active\\smic-portfolio\\.gjc\\state\\sessions\\019eab64-b182-7000-8b0d-6eb3d7d96261\\skill-active-state.json",
+    "storage_path": "C:\\Users\\FELAB\\Desktop\\projects\\active\\smic-portfolio\\.gjc\\state\\sessions\\019eab64-b182-7000-8b0d-6eb3d7d96261\\ralplan-state.json",
+    "mutated_at": "2026-06-09T08:54:10.654Z",
+    "fresh_until": "2026-06-09T09:24:10.654Z",
+    "status": "fresh",
+    "mutation_id": "ralplan:2026-06-09T08:54:10.654Z"
+  }
+}

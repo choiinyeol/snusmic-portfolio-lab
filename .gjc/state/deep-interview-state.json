@@ -1,0 +1,30 @@
+{
+  "active": true,
+  "current_phase": "handoff",
+  "skill": "deep-interview",
+  "version": 2,
+  "spec_slug": "snusmic-action-queue-workstation",
+  "spec_path": "C:\\Users\\FELAB\\Desktop\\projects\\active\\smic-portfolio\\.gjc\\specs\\deep-interview-snusmic-action-queue-workstation.md",
+  "spec_sha256": "a6d7202f7cebe5cf54737aeffefd6bd2b7ba49fef4d2ca14188f9d6742fadf52",
+  "spec_stage": "final",
+  "spec_persisted_at": "2026-06-09T08:40:01.205Z",
+  "updated_at": "2026-06-09T08:40:01.205Z",
+  "receipt": {
+    "version": 1,
+    "skill": "deep-interview",
+    "owner": "gjc-runtime",
+    "command": "gjc deep-interview persist-spec-state",
+    "state_path": "C:\\Users\\FELAB\\Desktop\\projects\\active\\smic-portfolio\\.gjc\\state\\skill-active-state.json",
+    "storage_path": "C:\\Users\\FELAB\\Desktop\\projects\\active\\smic-portfolio\\.gjc\\state\\deep-interview-state.json",
+    "mutated_at": "2026-06-09T08:40:01.205Z",
+    "fresh_until": "2026-06-09T09:10:01.205Z",
+    "status": "fresh",
+    "mutation_id": "deep-interview:2026-06-09T08:40:01.205Z",
+    "content_sha256": {
+      "algorithm": "sha256",
+      "value": "02510cdc7557934862f21ffaabc3c8a883a1e0cb03e1d4ea3465e8339456f478",
+      "covered_path": "C:\\Users\\FELAB\\Desktop\\projects\\active\\smic-portfolio\\.gjc\\state\\deep-interview-state.json",
+      "computed_at": "2026-06-09T08:40:01.209Z"
+    }
+  }
+}

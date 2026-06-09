@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "active": true,
+  "skill": "deep-interview",
+  "phase": "interviewing",
+  "updated_at": "2026-06-09T07:55:22.387Z",
+  "session_id": "019eab4b-3153-7000-9b80-75094c907c5f",
+  "active_skills": [
+    {
+      "skill": "deep-interview",
+      "phase": "interviewing",
+      "active": true,
+      "activated_at": "2026-06-09T07:55:22.387Z",
+      "updated_at": "2026-06-09T07:55:22.387Z",
+      "session_id": "019eab4b-3153-7000-9b80-75094c907c5f",
+      "hud": {
+        "version": 1,
+        "chips": [
+          {
+            "label": "phase",
+            "value": "interviewing",
+            "priority": 10
+          },
+          {
+            "label": "ambiguity",
+            "value": "100%/5%",
+            "priority": 20
+          },
+          {
+            "label": "round",
+            "value": "0",
+            "priority": 30
+          }
+        ],
+        "updated_at": "2026-06-09T07:55:22.386Z"
+      },
+      "receipt": {
+        "version": 1,
+        "skill": "deep-interview",
+        "owner": "gjc-state-cli",
+        "command": "gjc state deep-interview write",
+        "state_path": "C:\\Users\\FELAB\\Desktop\\projects\\active\\smic-portfolio\\.gjc\\state\\sessions\\019eab4b-3153-7000-9b80-75094c907c5f\\skill-active-state.json",
+        "storage_path": "C:\\Users\\FELAB\\Desktop\\projects\\active\\smic-portfolio\\.gjc\\state\\sessions\\019eab4b-3153-7000-9b80-75094c907c5f\\deep-interview-state.json",
+        "mutated_at": "2026-06-09T07:55:22.373Z",
+        "fresh_until": "2026-06-09T08:25:22.373Z",
+        "status": "fresh",
+        "mutation_id": "deep-interview:2026-06-09T07:55:22.373Z"
+      }
+    }
+  ],
+  "active_subskills": []
+}

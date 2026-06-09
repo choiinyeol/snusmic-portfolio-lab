@@ -12,30 +12,30 @@ export default function AlphaPage() {
       <section className="rounded-md border border-slate-200 bg-white p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Alpha</p>
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-950">승격 규칙 보드</h1>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Strategy</p>
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-950">전략 근거 보드</h1>
             <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">
-              어떤 반복 규칙이 검증 케이스 집합을 근거로 승격되거나 탈락하는지 먼저 봅니다.
+              Action Queue에 들어오는 반복 규칙과 근거 케이스를 먼저 확인합니다.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button asChild size="sm" variant="outline">
-              <Link href="/">Verification</Link>
+              <Link href="/">Action Queue</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link href="/portfolio">Portfolio Proof</Link>
+              <Link href="/portfolio">Portfolio</Link>
             </Button>
           </div>
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-slate-500">
-          <span>alpha 후보 {hypotheses.length.toLocaleString('ko-KR')}건</span>
+          <span>전략 후보 {hypotheses.length.toLocaleString('ko-KR')}건</span>
           <span>검증 케이스 {verificationCases.length.toLocaleString('ko-KR')}건</span>
         </div>
       </section>
 
       <section className="overflow-hidden rounded-md border border-slate-200 bg-white">
         <div className="border-b border-slate-200 px-4 py-3">
-          <h2 className="text-sm font-semibold text-slate-950">AlphaHypothesis board</h2>
+          <h2 className="text-sm font-semibold text-slate-950">Strategy evidence board</h2>
           <p className="mt-1 text-xs text-slate-500">반복 규칙의 근거 케이스 수, 종목 수, 기간 범위를 함께 봅니다.</p>
         </div>
         <div className="overflow-x-auto px-4 py-2">
@@ -71,7 +71,7 @@ export default function AlphaPage() {
               ) : (
                 <tr>
                   <td className="px-0 py-6 text-sm text-slate-500" colSpan={5}>
-                    alpha artifact가 아직 없습니다.
+                    strategy artifact가 아직 없습니다.
                   </td>
                 </tr>
               )}

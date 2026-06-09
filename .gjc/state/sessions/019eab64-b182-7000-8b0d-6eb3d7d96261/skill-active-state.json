@@ -1,0 +1,136 @@
+{
+  "version": 1,
+  "active": true,
+  "skill": "ralplan",
+  "phase": "handoff",
+  "updated_at": "2026-06-09T08:54:10.666Z",
+  "session_id": "019eab64-b182-7000-8b0d-6eb3d7d96261",
+  "active_skills": [
+    {
+      "skill": "deep-interview",
+      "phase": "handoff",
+      "active": false,
+      "activated_at": "2026-06-09T08:42:34.440Z",
+      "updated_at": "2026-06-09T08:42:34.440Z",
+      "session_id": "019eab64-b182-7000-8b0d-6eb3d7d96261",
+      "handoff_to": "ralplan",
+      "handoff_at": "2026-06-09T08:42:34.440Z",
+      "hud": {
+        "version": 1,
+        "chips": [
+          {
+            "label": "phase",
+            "value": "handoff",
+            "priority": 10
+          },
+          {
+            "label": "ambiguity",
+            "value": "4%/5%",
+            "priority": 20
+          },
+          {
+            "label": "round",
+            "value": "1",
+            "priority": 30
+          }
+        ],
+        "updated_at": "2026-06-09T08:42:34.567Z"
+      },
+      "receipt": {
+        "version": 1,
+        "skill": "deep-interview",
+        "owner": "gjc-state-cli",
+        "command": "gjc state deep-interview handoff --to ralplan",
+        "state_path": "C:\\Users\\FELAB\\Desktop\\projects\\active\\smic-portfolio\\.gjc\\state\\sessions\\019eab64-b182-7000-8b0d-6eb3d7d96261\\skill-active-state.json",
+        "storage_path": "C:\\Users\\FELAB\\Desktop\\projects\\active\\smic-portfolio\\.gjc\\state\\sessions\\019eab64-b182-7000-8b0d-6eb3d7d96261\\deep-interview-state.json",
+        "mutated_at": "2026-06-09T08:42:34.440Z",
+        "fresh_until": "2026-06-09T09:12:34.440Z",
+        "status": "fresh",
+        "mutation_id": "deep-interview:handoff:ralplan:2026-06-09T08:42:34.440Z"
+      }
+    },
+    {
+      "skill": "ralplan",
+      "phase": "handoff",
+      "active": true,
+      "activated_at": "2026-06-09T08:54:10.666Z",
+      "updated_at": "2026-06-09T08:54:10.666Z",
+      "session_id": "019eab64-b182-7000-8b0d-6eb3d7d96261",
+      "hud": {
+        "version": 1,
+        "chips": [
+          {
+            "label": "stage",
+            "value": "handoff",
+            "priority": 10
+          }
+        ],
+        "updated_at": "2026-06-09T08:54:10.665Z"
+      },
+      "receipt": {
+        "version": 1,
+        "skill": "ralplan",
+        "owner": "gjc-state-cli",
+        "command": "gjc state ralplan write",
+        "state_path": "C:\\Users\\FELAB\\Desktop\\projects\\active\\smic-portfolio\\.gjc\\state\\sessions\\019eab64-b182-7000-8b0d-6eb3d7d96261\\skill-active-state.json",
+        "storage_path": "C:\\Users\\FELAB\\Desktop\\projects\\active\\smic-portfolio\\.gjc\\state\\sessions\\019eab64-b182-7000-8b0d-6eb3d7d96261\\ralplan-state.json",
+        "mutated_at": "2026-06-09T08:54:10.654Z",
+        "fresh_until": "2026-06-09T09:24:10.654Z",
+        "status": "fresh",
+        "mutation_id": "ralplan:2026-06-09T08:54:10.654Z"
+      }
+    },
+    {
+      "skill": "ultragoal",
+      "phase": "failed",
+      "active": true,
+      "activated_at": "2026-06-09T09:46:16.539Z",
+      "updated_at": "2026-06-09T09:46:16.539Z",
+      "session_id": "019eab64-b182-7000-8b0d-6eb3d7d96261",
+      "hud": {
+        "version": 1,
+        "chips": [
+          {
+            "label": "blocked",
+            "value": "1",
+            "priority": 5,
+            "severity": "blocked"
+          },
+          {
+            "label": "goals",
+            "value": "0/1",
+            "priority": 10
+          },
+          {
+            "label": "current",
+            "value": "failed",
+            "priority": 20
+          },
+          {
+            "label": "status",
+            "value": "failed",
+            "priority": 30
+          }
+        ],
+        "updated_at": "2026-06-09T09:46:16.538Z"
+      },
+      "receipt": {
+        "version": 1,
+        "skill": "ultragoal",
+        "owner": "gjc-runtime",
+        "command": "gjc ultragoal (reconcile)",
+        "state_path": "C:\\Users\\FELAB\\Desktop\\projects\\active\\smic-portfolio\\.gjc\\state\\sessions\\019eab64-b182-7000-8b0d-6eb3d7d96261\\skill-active-state.json",
+        "storage_path": "C:\\Users\\FELAB\\Desktop\\projects\\active\\smic-portfolio\\.gjc\\state\\sessions\\019eab64-b182-7000-8b0d-6eb3d7d96261\\ultragoal-state.json",
+        "mutated_at": "2026-06-09T09:46:16.527Z",
+        "fresh_until": "2026-06-09T10:16:16.527Z",
+        "status": "fresh",
+        "mutation_id": "ultragoal:reconcile:2026-06-09T09:46:16.527Z",
+        "verb": "reconcile",
+        "forced": true,
+        "from_phase": "active",
+        "to_phase": "failed"
+      }
+    }
+  ],
+  "active_subskills": []
+}

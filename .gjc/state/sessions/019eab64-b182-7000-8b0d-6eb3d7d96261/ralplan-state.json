@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "skill": "ralplan",
+  "current_phase": "handoff",
+  "active": true,
+  "handoff_from": "deep-interview",
+  "handoff_at": "2026-06-09T08:42:34.440Z",
+  "updated_at": "2026-06-09T08:54:10.654Z",
+  "receipt": {
+    "version": 1,
+    "skill": "ralplan",
+    "owner": "gjc-state-cli",
+    "command": "gjc state ralplan write",
+    "state_path": "C:\\Users\\FELAB\\Desktop\\projects\\active\\smic-portfolio\\.gjc\\state\\sessions\\019eab64-b182-7000-8b0d-6eb3d7d96261\\skill-active-state.json",
+    "storage_path": "C:\\Users\\FELAB\\Desktop\\projects\\active\\smic-portfolio\\.gjc\\state\\sessions\\019eab64-b182-7000-8b0d-6eb3d7d96261\\ralplan-state.json",
+    "mutated_at": "2026-06-09T08:54:10.654Z",
+    "fresh_until": "2026-06-09T09:24:10.654Z",
+    "status": "fresh",
+    "mutation_id": "ralplan:2026-06-09T08:54:10.654Z",
+    "content_sha256": {
+      "algorithm": "sha256",
+      "value": "bd26557af13a90303641add2755b304dc120f54bc2d2b3f7de859a530cead264",
+      "covered_path": "C:\\Users\\FELAB\\Desktop\\projects\\active\\smic-portfolio\\.gjc\\state\\sessions\\019eab64-b182-7000-8b0d-6eb3d7d96261\\ralplan-state.json",
+      "computed_at": "2026-06-09T08:54:10.656Z"
+    }
+  },
+  "session_id": "019eab64-b182-7000-8b0d-6eb3d7d96261"
+}

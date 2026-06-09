@@ -1,0 +1,43 @@
+{
+  "skill": "deep-interview",
+  "phase": "handoff",
+  "active": false,
+  "activated_at": "2026-06-09T08:42:34.440Z",
+  "updated_at": "2026-06-09T08:42:34.440Z",
+  "session_id": "019eab64-b182-7000-8b0d-6eb3d7d96261",
+  "handoff_to": "ralplan",
+  "handoff_at": "2026-06-09T08:42:34.440Z",
+  "hud": {
+    "version": 1,
+    "chips": [
+      {
+        "label": "phase",
+        "value": "handoff",
+        "priority": 10
+      },
+      {
+        "label": "ambiguity",
+        "value": "4%/5%",
+        "priority": 20
+      },
+      {
+        "label": "round",
+        "value": "1",
+        "priority": 30
+      }
+    ],
+    "updated_at": "2026-06-09T08:42:34.567Z"
+  },
+  "receipt": {
+    "version": 1,
+    "skill": "deep-interview",
+    "owner": "gjc-state-cli",
+    "command": "gjc state deep-interview handoff --to ralplan",
+    "state_path": "C:\\Users\\FELAB\\Desktop\\projects\\active\\smic-portfolio\\.gjc\\state\\sessions\\019eab64-b182-7000-8b0d-6eb3d7d96261\\skill-active-state.json",
+    "storage_path": "C:\\Users\\FELAB\\Desktop\\projects\\active\\smic-portfolio\\.gjc\\state\\sessions\\019eab64-b182-7000-8b0d-6eb3d7d96261\\deep-interview-state.json",
+    "mutated_at": "2026-06-09T08:42:34.440Z",
+    "fresh_until": "2026-06-09T09:12:34.440Z",
+    "status": "fresh",
+    "mutation_id": "deep-interview:handoff:ralplan:2026-06-09T08:42:34.440Z"
+  }
+}

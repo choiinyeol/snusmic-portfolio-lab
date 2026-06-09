@@ -4,8 +4,8 @@ import { GeistSans } from 'geist/font/sans';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'SNUSMIC Signal Research Board',
-  description: '발간 리포트, 가격 이력, 계좌 흐름을 같은 기준일로 묶어 사람이 직접 판단할 증거를 보여주는 리서치 보드.',
+  title: 'SNUSMIC Action Queue Workstation',
+  description: '거래, 보유, 리포트 근거에서 오늘 확인할 매수·매도·관찰 후보를 만드는 액션 큐 워크스테이션.',
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
