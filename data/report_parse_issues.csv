@@ -1,0 +1,40 @@
+﻿source_file,report_date,filename_date,market,company,ticker,exchange,rating,target_price,target_price_raw,report_current_price,report_current_price_raw,stated_upside_pct,parse_issue
+data\markdown\2020-10-31_equity-research-지트리비앤티.md,2020-10-31,2020-10-31,KR,지트리비앤티,115450,KRX,Buy,,,27450.0,"27,450 원",200.7,missing_target_price
+data\markdown\2020-12-05_equity-research-chewy.md,2020-11-14,2020-12-05,,,,,Sell,51.6,51.60 USD,63.36,63.36 USD,,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2020-12-05_equity-research-gaztransporttechnigaz-2.md,2020-11-14,2020-12-05,,,,,Buy,114.45,114.45,80.7,80.70,41.38,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2020-12-05_equity-research-roku.md,2020-11-14,2020-12-05,,,,,Buy,327.62,$327.62,230.0,$230.00,42.0,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2020-12-05_equity-research-sea-ltd.md,2020-11-21,2020-12-05,,,,,Buy,,,,,,non_us_kr_or_unparsed_market;missing_ticker;missing_target_price
+data\markdown\2021-05-31_equity-research-corning.md,2021-05-15,2021-05-31,KR,"170 년 근본 기업, 5G 투자 대장 기업",075580,KRX,Buy,,,,,31.0,missing_target_price
+data\markdown\2021-05-31_equity-research-cyber-agent.md,2021-05-15,2021-05-31,KR,CyberAgent Inc. (4751.T),075580,KRX,Buy,,,,,,missing_target_price
+data\markdown\2021-05-31_equity-research-ping-an-healthcare-technology.md,2021-05-31,2021-05-31,,,,,Buy,,,,,,non_us_kr_or_unparsed_market;missing_ticker;missing_target_price
+data\markdown\2021-05-31_equity-research-star-bulk-carriers.md,2021-05-31,2021-05-31,,,,,Buy,37.8,$ 37.8,21.5,$ 21.5,75.9,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2021-11-03_equity-research-키이스트.md,2021-10-16,2021-11-03,,,,,Buy,20800.0,"20,800 원",15000.0,"15,000 원",39.0,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2021-11-19_equity-research-예스티.md,2021-11-06,2021-11-19,,,,,Buy,25300.0,"25,300 원",13600.0,"13,600 원",86.0,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2021-11-30_equity-research-inmode.md,2021-11-30,2021-11-30,,,,,Buy,172.11,$ 172.11,92.62,$ 92.62,,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2021-11-30_equity-research-muyuan-foods-co-ltd.md,2021-11-20,2021-11-30,,,,,Buy,84.0,84,56.0,56,45.0,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2021-11-30_equity-research-opendoor.md,2021-11-20,2021-11-30,US,"Opendoor Technologies, Inc.",OPEN,NASDAQ,Buy,,,,,,missing_target_price
+data\markdown\2021-11-30_equity-research-z-holdings.md,2021-11-20,2021-11-30,,,,,Buy,1210.0,"1,210",825.5,825.5,46.0,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2022-05-25_equity-research-gem-co-ltd.md,2022-05-21,2022-05-25,,,,,Buy,11.35,11.35,7.63,7.63,49.0,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2022-05-25_equity-research-tsmc.md,2022-05-21,2022-05-25,,,,,Buy,764.0,764,530.0,530,44.0,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2022-06-08_equity-research-영원무역홀딩스.md,2022-06-02,2022-06-08,KR,영원무역홀딩스,009970,KRX,Buy,,,,,47.0,missing_target_price
+data\markdown\2022-11-25_equity-research-tenaris-s-a.md,2022-11-19,2022-11-25,,,,,Buy,24.44,$24.44,17.22,$17.22,42.0,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2023-11-12_equity-research-파두.md,2023-11-03,2023-11-12,KR,파두,440110,KRX,Neutral,,,33550.0,"33,550 원",90.0,missing_target_price
+data\markdown\2023-11-22_equity-research-be-semiconductor-industries-n-v.md,2023-11-17,2023-11-22,,,,,Buy,,,118.4,118.4,94.0,non_us_kr_or_unparsed_market;missing_ticker;missing_target_price
+data\markdown\2023-11-22_equity-research-byd.md,2023-11-16,2023-11-22,,,,,Buy,238.3,238.30,238.3,238.30,39.0,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2023-11-22_equity-research-lonza-group-ag.md,2023-11-18,2023-11-22,,,,,Buy,465.4,465.4,353.3,353.3,32.0,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2024-04-17_equity-research-한화오션.md,2024-04-13,2024-04-17,KR,한화오션,042660,KRX,Buy,,,28500.0,"28,500 원",91.0,missing_target_price
+data\markdown\2024-05-24_equity-research-centrus-energy-corp.md,2024-05-17,2024-05-24,,,,,Buy,832.82,$832.82,43.64,$43.64,,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2024-05-24_equity-research-osaka-titanium-technologies-co-ltd.md,2024-05-17,2024-05-24,,,,,Buy,4300.0,"4,300 엔",2490.0,"2,490 엔",72.62,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2024-11-21_equity-research-cover-corp.md,2024-11-20,2024-11-21,,,,,Buy,6800.0,"6,800 엔",2584.0,"2,584 엔",163.2,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2024-11-21_equity-research-round-one-corp.md,2024-11-16,2024-11-21,,,,,Buy,1400.0,"1,400 엔",1063.0,"1,063 엔",32.0,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2024-12-05_equity-research-advantest-corporation.md,2024-11-29,2024-12-05,,,,,Buy,14463.0,"14,463",,,76.0,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2025-05-11_equity-research-펄어비스-2.md,2025-05-02,2025-05-11,KR,펄어비스,263750,KRX,Sell,,,35400.0,"35,400 원",,missing_target_price
+data\markdown\2025-05-11_equity-research-한화솔루션-2.md,2025-05-03,2025-05-11,KR,한화솔루션,009830,KRX,Buy,,,30300.0,"30,300 원",201.0,missing_target_price
+data\markdown\2025-10-23_equity-research-coreweave.md,2025-10-17,2025-10-23,US,"CoreWeave, Inc.",CRWV,NASDAQ,Buy,,,,,,missing_target_price
+data\markdown\2025-12-01_equity-research-jac-recruitment-co-ltd.md,2025-11-22,2025-12-01,,,,,Buy,1686.0,"1,686",1108.0,"1,108",52.0,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2025-12-15_equity-research-알지노믹스.md,2025-12-05,2025-12-15,KR,알지노믹스,476830,KRX,Buy,,,,,367.0,missing_target_price
+data\markdown\2026-04-16_equity-research-golar-lng.md,2026-04-10,2026-04-16,US,Golar LNG Limited,GLNG,NASDAQ,Buy,,,,,,missing_target_price
+data\markdown\2026-04-16_equity-research-비츠로셀-3.md,2026-04-11,2026-04-16,,,,,Buy,45250.0,"45,250원",45250.0,"45,250원",73.4,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2026-05-29_equity-research-aixtron-se.md,2026-05-27,2026-05-29,,,,,Buy,94.79,94.79,,,79.7,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2026-05-29_equity-research-global-unichip-corp.md,2026-05-23,2026-05-29,,,,,Buy,5140.0,"5,140",5140.0,"5,140",,non_us_kr_or_unparsed_market;missing_ticker
+data\markdown\2026-05-29_equity-research-soitec-sa.md,2026-05-22,2026-05-29,,,,,Buy,482.35,482.35,166.6,166.6,,non_us_kr_or_unparsed_market;missing_ticker

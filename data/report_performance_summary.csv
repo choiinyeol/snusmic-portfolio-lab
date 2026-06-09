@@ -1,0 +1,9 @@
+﻿group,reports,priced_reports,with_target,up_latest,down_latest,target_hit,avg_return_latest_pct,median_return_latest_pct
+ALL,216,216,204,110,106,109,62.369591,5.112526
+market=KR,181,181,172,91,90,93,64.927374,4.333333
+market=US,35,35,32,19,16,16,49.142203,6.120959
+rating=Buy,208,208,198,105,103,104,63.201318,4.256882
+rating=Hold,2,2,2,1,1,2,-10.15481,-10.15481
+rating=Neutral,1,1,0,1,0,0,207.600596,207.600596
+rating=Sell,2,2,1,1,1,1,-23.290628,-23.290628
+rating=nan,3,3,3,2,1,2,61.749264,95.945329

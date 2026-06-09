@@ -1,0 +1,32 @@
+# dependencies
+node_modules
+.venv/
+
+# build output
+.next
+out
+.vercel
+
+# python
+__pycache__/
+*.pyc
+
+# env & local
+.env*.local
+.DS_Store
+*.tsbuildinfo
+
+# large binary source data (재수집 가능, manifest로 관리)
+data/pdfs/
+
+# local caches & session artifacts
+cache/
+artifacts/
+.omc/
+
+# session/orchestration state
+.gjc/
+.claude/settings.local.json
+
+# local toolchains
+.tools/
