@@ -211,7 +211,8 @@ def collect_star(limit: int | None) -> list[dict]:
     post_ids: list[int] = []
     seen: set[int] = set()
     for page in range(1, STAR_MAX_PAGES + 1):
-        url = f"{STAR_BASE}/board/board_list?code=research&page={page}"
+        # CodeIgniter 게시판: 페이지 번호 파라미터 이름이 per_page다
+        url = f"{STAR_BASE}/board/board_list?code=research&per_page={page}"
         try:
             resp = polite_get(url)
         except requests.RequestException as exc:
@@ -335,9 +336,19 @@ def collect_kuvic(limit: int | None) -> list[dict]:
     return entries[:limit] if limit else entries
 
 
+def collect_kuvic_items(limit: int | None) -> list[dict]:
+    """collect_kuvic_browser.py가 수확한 전체 목록(JSON)을 읽는다."""
+    path = ROOT / "data" / "sources" / "kuvic_items.json"
+    if not path.exists():
+        print("  ! kuvic_items.json 없음 — scripts/collect_kuvic_browser.py 먼저 실행", flush=True)
+        return []
+    items = json.loads(path.read_text(encoding="utf-8"))
+    return items[:limit] if limit else items
+
+
 # ---------------------------------------------------------------- main
 
-COLLECTORS = {"yig": collect_yig, "star": collect_star, "kuvic": collect_kuvic}
+COLLECTORS = {"yig": collect_yig, "star": collect_star, "kuvic": collect_kuvic, "kuvic-items": collect_kuvic_items}
 
 
 def main() -> int:
