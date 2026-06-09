@@ -37,34 +37,37 @@ def ensure_java() -> None:
     raise SystemExit("java를 찾을 수 없습니다 (.tools/jdk-21 또는 PATH 확인)")
 
 
-def find_markdown(output_dir: Path, pdf_path: Path) -> Path | None:
-    exact = list(output_dir.rglob(f"{pdf_path.stem}.md"))
-    if exact:
-        return exact[0]
-    loose = [p for p in output_dir.rglob("*.md") if pdf_path.stem in p.stem]
-    return loose[0] if loose else None
-
-
 def transcribe_batch(pdfs: list[Path], target_dir: Path) -> int:
+    """한글/특수문자 파일명이 Java CLI 인자 인코딩(cp949)에서 깨지는 문제를 피하려고
+    임시 ASCII 이름으로 복사한 뒤 변환하고, 결과를 원래 이름의 .md로 되돌린다."""
     import opendataloader_pdf
 
     done = 0
-    with tempfile.TemporaryDirectory(prefix="odl_") as tmp:
-        tmp_dir = Path(tmp)
-        opendataloader_pdf.convert(
-            input_path=[str(p) for p in pdfs],
-            output_dir=str(tmp_dir),
-            format="markdown",
-            image_output="off",
-            quiet=True,
-        )
-        for pdf in pdfs:
-            produced = find_markdown(tmp_dir, pdf)
-            if produced is None:
+    with tempfile.TemporaryDirectory(prefix="odl_in_") as tmp_in, tempfile.TemporaryDirectory(prefix="odl_out_") as tmp_out:
+        in_dir, out_dir = Path(tmp_in), Path(tmp_out)
+        alias_map: dict[str, Path] = {}
+        for i, pdf in enumerate(pdfs):
+            alias = f"r{i:04d}"
+            shutil.copyfile(pdf, in_dir / f"{alias}.pdf")
+            alias_map[alias] = pdf
+        try:
+            opendataloader_pdf.convert(
+                input_path=[str(in_dir / f"{alias}.pdf") for alias in alias_map],
+                output_dir=str(out_dir),
+                format="markdown",
+                image_output="off",
+                quiet=True,
+            )
+        except Exception as exc:  # noqa: BLE001 - 배치 실패는 기록하고 다음 배치 진행
+            print(f"  ! batch failed ({len(pdfs)} pdfs): {exc}", flush=True)
+            return 0
+        for alias, pdf in alias_map.items():
+            produced = list(out_dir.rglob(f"{alias}.md"))
+            if not produced:
                 print(f"  ! no markdown produced: {pdf.name}", flush=True)
                 continue
             target = target_dir / f"{pdf.stem}.md"
-            shutil.move(str(produced), target)
+            shutil.move(str(produced[0]), target)
             done += 1
             print(f"  + {target.relative_to(ROOT).as_posix()}", flush=True)
     return done

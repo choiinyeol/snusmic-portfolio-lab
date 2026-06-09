@@ -493,6 +493,13 @@ def parse_prices(lines: list[str], market: str | None) -> tuple[float | None, st
     # (분리형 레이아웃은 위의 pair 처리가 이미 해결하므로, 남는 충돌은 현재가 라벨 오매칭이 대부분)
     if target is not None and current is not None and upside is not None and target == current and abs(upside) > 1:
         current = current_raw = None
+
+    # OCR 오인식('28기000원'→'000원'=0.0) 등 비현실 가격 차단
+    minimum = 100 if market == "KR" else 0.2
+    if target is not None and target < minimum:
+        target = target_raw = None
+    if current is not None and current < minimum:
+        current = current_raw = None
     return target, target_raw, current, current_raw, upside
 
 
@@ -504,19 +511,17 @@ def parse_report(path: Path, school: str = "smic", hint: dict | None = None) -> 
     rating = parse_rating(lines)
     target, target_raw, current, current_raw, upside = parse_prices(lines, market)
 
+    if company and len(company) > 40:
+        company = None  # OCR 덩어리 등 비정상 회사명 → 파일명/힌트 폴백으로
+    if not company:
+        # STAR 등: 표지가 전사에서 소실돼도 파일명에 회사명이 남는다
+        sm = re.search(r"_(?:STAR|SMIC|YIG|KUVIC)_(.+)$", path.stem, re.I)
+        if sm:
+            company = clean_name(sm.group(1))
     if not company and hint:
         company = clean_name(hint.get("company_hint") or None)
 
-    issues: list[str] = []
-    if market not in {"KR", "US"}:
-        issues.append("non_us_kr_or_unparsed_market")
-    if not ticker:
-        issues.append("missing_ticker")
-    if not report_date:
-        issues.append("missing_report_date")
-    if target is None:
-        issues.append("missing_target_price")
-    return ParsedReport(
+    parsed = ParsedReport(
         source_file=str(path),
         school=school,
         report_date=report_date,
@@ -531,8 +536,68 @@ def parse_report(path: Path, school: str = "smic", hint: dict | None = None) -> 
         report_current_price=current,
         report_current_price_raw=current_raw,
         stated_upside_pct=upside,
-        parse_issue=";".join(issues) if issues else None,
+        parse_issue=None,
     )
+    compute_issues(parsed)
+    return parsed
+
+
+def compute_issues(r: ParsedReport) -> None:
+    issues: list[str] = []
+    if r.market not in {"KR", "US"}:
+        issues.append("non_us_kr_or_unparsed_market")
+    if not r.ticker:
+        issues.append("missing_ticker")
+    if not r.report_date:
+        issues.append("missing_report_date")
+    if r.target_price is None:
+        issues.append("missing_target_price")
+    r.parse_issue = ";".join(issues) if issues else None
+
+
+def resolve_missing_tickers(parsed: list[ParsedReport]) -> None:
+    """티커 미식별 + 회사명 보유 레코드를 네이버 증권 자동완성으로 복구한다.
+
+    결과는 data/sources/kr_name_ticker.json에 캐시되어 조회는 이름당 1회만 발생한다.
+    이름이 정확히 일치할 때만 채택한다.
+    """
+    cache_path = ROOT / "data" / "sources" / "kr_name_ticker.json"
+    cache: dict[str, dict | None] = json.loads(cache_path.read_text(encoding="utf-8")) if cache_path.exists() else {}
+    session = None
+    changed = False
+    for r in parsed:
+        if r.ticker or not r.company or r.market == "US":
+            continue
+        name = re.sub(r"\s+", "", r.company)
+        if not (2 <= len(name) <= 20):
+            continue
+        if name not in cache:
+            import requests
+
+            session = session or requests.Session()
+            session.headers.setdefault("User-Agent", "Mozilla/5.0")
+            items: list[dict] = []
+            try:
+                resp = session.get("https://ac.stock.naver.com/ac", params={"q": name, "target": "stock"}, timeout=15)
+                items = resp.json().get("items", [])
+            except Exception as exc:  # noqa: BLE001 - 조회 실패는 건너뛴다
+                print(f"  ticker lookup failed for {name}: {exc}", file=sys.stderr)
+            hit = next(
+                (i for i in items if i.get("name", "").replace(" ", "") == name and re.fullmatch(r"\d{6}", i.get("code", ""))),
+                None,
+            )
+            cache[name] = {"code": hit["code"], "market": hit.get("typeCode")} if hit else None
+            changed = True
+            time.sleep(1.0)
+        info = cache.get(name)
+        if info:
+            r.ticker = info["code"]
+            r.market = "KR"
+            r.exchange = info.get("market") or "KRX"
+            compute_issues(r)
+    if changed:
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        cache_path.write_text(json.dumps(cache, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
 def safe_pct(new: float | None, old: float | None) -> float | None:
@@ -852,6 +917,7 @@ def main() -> int:
     hints = load_hints()
     parsed_all_raw = [parse_report(path, school, hints.get(path.stem)) for path, school in md_paths]
     apply_corrections(parsed_all_raw, load_corrections())
+    resolve_missing_tickers(parsed_all_raw)
     parsed_all = [r for r in parsed_all_raw if (r.ticker or "").upper() not in EXCLUDED_DELISTED_TICKERS]
     deduped = dedup_reports(parsed_all)
     dropped = len(parsed_all) - len(deduped)
