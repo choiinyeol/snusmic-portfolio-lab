@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import csv
 import datetime as dt
+import json
 import math
 import re
 import sys
@@ -15,8 +16,16 @@ import pandas as pd
 import yfinance as yf
 from pykrx import stock
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
+ROOT = Path(__file__).resolve().parents[1]
+SCHOOLS = ("smic", "yig", "star", "kuvic")
+
 KOREAN_DATE_RE = re.compile(r"(20\d{2})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일")
 FILENAME_DATE_RE = re.compile(r"(20\d{2})-(\d{2})-(\d{2})")
+DOTTED_DATE_RE = re.compile(r"(?<![\d,.])(20\d{2})\s*[./]\s*(\d{1,2})\s*[./]\s*(\d{1,2})(?![\d.])")
+SHORT_DOTTED_DATE_RE = re.compile(r"(?<![\d,.])(2\d)\s*\.\s*(\d{1,2})\s*\.\s*(\d{1,2})(?![\d.])")
 MONTHS = {
     "jan": 1,
     "feb": 2,
@@ -45,18 +54,39 @@ KR_CODE_RE = re.compile(r"\b\d{6}\b")
 EXCLUDED_DELISTED_TICKERS = {"VTNR", "NETI"}
 
 TARGET_LABEL_RE = re.compile(r"(?:\d{2,4}E?\s*)?(목표\s*주가|목표주가|적정\s*주가|적정주가|Target\s+Price)", re.I)
-CURRENT_LABEL_RE = re.compile(r"(현재\s*주가|현재주가|현재가|Current\s+Price)", re.I)
-UPSIDE_RE = re.compile(r"(상승여력|하락여력)\s*[:：]?\s*([+\-]?\d+(?:\.\d+)?)\s*%", re.I)
-RATING_RE = re.compile(r"\b(Buy|Sell|Hold|Neutral|Outperform|Underperform)\b", re.I)
+CURRENT_LABEL_RE = re.compile(r"(현재\s*주가|현재주가|현재가(?!치)|Current\s+Price)", re.I)
+UPSIDE_RE = re.compile(r"(상승\s*여력|하락\s*여력|Upside)\s*[:：]?\s*([+\-]?\d+(?:\.\d+)?)\s*%", re.I)
+RATING_RE = re.compile(r"\b(Strong\s+Buy|Buy|Sell|Hold|Neutral|Outperform|Underperform)\b|(강력\s*매수|적극\s*매수|매수|매도|중립|보유)", re.I)
+KOREAN_RATINGS = {"강력매수": "Buy", "적극매수": "Buy", "매수": "Buy", "매도": "Sell", "중립": "Neutral", "보유": "Hold"}
 PRICE_TOKEN_RE = re.compile(
-    r"(?P<prefix>[$₩])?\s*(?P<a>\d[\d,]*(?:\.\d+)?)\s*(?:[~\-–]\s*(?P<prefix2>[$₩])?\s*(?P<b>\d[\d,]*(?:\.\d+)?))?\s*(?P<suffix>원|엔|달러|USD|KRW|[$])?",
+    r"(?P<prefix>[$₩])?\s*(?P<a>\d[\d,]*(?:\.\d+)?)\s*(?:[~\-–]\s*(?P<prefix2>[$₩])?\s*(?P<b>\d[\d,]*(?:\.\d+)?))?\s*(?P<suffix>원|엔|달러|USD|KRW|[$₩])?",
     re.I,
 )
+# 라벨 두 개가 먼저 나오고 값 두 개가 뒤따르는 분리형 레이아웃
+#   "현재주가: 목표주가:  14,260원 22,240원 56.0%"        (샘씨엔에스)
+#   "목표주가(원) 현재주가(원) |46,000 30,200"             (KUVIC 표)
+_LABEL_TAIL = r"\s*(?:\([^)]{0,12}\))?\s*[:：]?\s*"
+_PAIR_VALUE = r"[$₩]?\s*\d[\d,]*(?:\.\d+)?\s*(?:원|엔|달러|USD|KRW|[$₩])?"
+CURRENT_THEN_TARGET_PAIR_RE = re.compile(
+    rf"현재\s*주가{_LABEL_TAIL}목표\s*주가{_LABEL_TAIL}\|?\s*(?P<v1>{_PAIR_VALUE})\s+(?P<v2>{_PAIR_VALUE})",
+    re.I,
+)
+TARGET_THEN_CURRENT_PAIR_RE = re.compile(
+    rf"목표\s*주가{_LABEL_TAIL}현재\s*주가{_LABEL_TAIL}\|?\s*(?P<v1>{_PAIR_VALUE})\s+(?P<v2>{_PAIR_VALUE})",
+    re.I,
+)
+# 국내 코드 + 거래소 표기: (089970,KQ) (007810, KOSPI) (047050.KS) (187790) (KQ.237690)
+KR_CODE_EXCHANGE_RE = re.compile(r"^(\d{6})\s*[,.]?\s*(KS|KQ|KOSPI|KOSDAQ|코스피|코스닥|KRX)?$", re.I)
+KR_EXCHANGE_CODE_RE = re.compile(r"^(KS|KQ|KOSPI|KOSDAQ|코스피|코스닥|KRX)\s*[.,]?\s*(\d{6})$", re.I)
+# 괄호 안 단독 미국 티커: (GLW) (TSLA)
+BARE_US_TICKER_RE = re.compile(r"^([A-Z]{1,5})$")
+YIG_PUBLISHED_RE = re.compile(r"발간일\s*(\d{6})")
 
 
 @dataclass
 class ParsedReport:
     source_file: str
+    school: str
     report_date: str | None
     filename_date: str | None
     market: str | None
@@ -75,6 +105,7 @@ class ParsedReport:
 @dataclass
 class PerformanceRow:
     source_file: str
+    school: str
     report_date: str | None
     filename_date: str | None
     market: str | None
@@ -124,6 +155,7 @@ def clean_name(value: str | None) -> str | None:
 
 
 def parse_date(path: Path, lines: list[str]) -> tuple[str | None, str | None]:
+    """(본문에서 찾은 발간일 | None, 파일명 날짜 | None)을 반환한다."""
     filename_date = None
     fm = FILENAME_DATE_RE.search(path.name)
     if fm:
@@ -137,13 +169,71 @@ def parse_date(path: Path, lines: list[str]) -> tuple[str | None, str | None]:
     if em:
         month = MONTHS[em.group(1)[:3].lower()]
         return f"{int(em.group(3)):04d}-{month:02d}-{int(em.group(2)):02d}", filename_date
+
+    def valid(y: int, m: int, d: int) -> str | None:
+        try:
+            return dt.date(y, m, d).isoformat()
+        except ValueError:
+            return None
+
+    dm = DOTTED_DATE_RE.search(head)
+    if dm:
+        iso = valid(int(dm.group(1)), int(dm.group(2)), int(dm.group(3)))
+        if iso:
+            return iso, filename_date
+    sm = SHORT_DOTTED_DATE_RE.search(head)
+    if sm:
+        iso = valid(2000 + int(sm.group(1)), int(sm.group(2)), int(sm.group(3)))
+        if iso:
+            return iso, filename_date
+    return None, filename_date
+
+
+def yig_published_from_stem(stem: str) -> str | None:
+    """YIG 파일명/제목의 '발간일 230916' 표기 → 2023-09-16."""
+    m = YIG_PUBLISHED_RE.search(stem)
+    if not m:
+        return None
+    raw = m.group(1)
+    yy, mm, dd = int(raw[:2]), int(raw[2:4]), int(raw[4:6])
+    if not (1 <= mm <= 12 and 1 <= dd <= 31):
+        return None
+    return f"20{yy:02d}-{mm:02d}-{dd:02d}"
+
+
+def resolve_report_date(path: Path, lines: list[str], school: str, hint: dict | None) -> tuple[str | None, str | None]:
+    """발간일 우선순위: 본문 날짜 > YIG 발간일 표기 > 수집 힌트 > 파일명 날짜.
+
+    (YIG 파일명 앞의 날짜는 업로드일이라 발간일로 쓰면 안 된다.)
+    """
+    content_date, filename_date = parse_date(path, lines)
+    if content_date:
+        return content_date, filename_date
+    published = yig_published_from_stem(path.stem)
+    if published:
+        return published, filename_date
+    hint_date = (hint or {}).get("published_hint")
+    if hint_date:
+        return hint_date, filename_date
+    if school == "yig":
+        # 파일명 날짜 = 업로드일 → 발간일 대용으로 쓰지 않는다
+        return None, filename_date
     return filename_date, filename_date
+
+
+KR_EXCHANGE_NAMES = {"KQ": "KOSDAQ", "KOSDAQ": "KOSDAQ", "코스닥": "KOSDAQ", "KS": "KOSPI", "KOSPI": "KOSPI", "코스피": "KOSPI"}
 
 
 def parse_market_from_inside(inside: str) -> tuple[str | None, str | None, str | None]:
     inside = inside.strip()
-    if re.fullmatch(r"\d{6}", inside):
-        return "KR", inside, "KRX"
+    km = KR_CODE_EXCHANGE_RE.match(inside)
+    if km:
+        exchange = KR_EXCHANGE_NAMES.get((km.group(2) or "").upper(), "KRX")
+        return "KR", km.group(1), exchange
+    km = KR_EXCHANGE_CODE_RE.match(inside)
+    if km:
+        exchange = KR_EXCHANGE_NAMES.get(km.group(1).upper(), "KRX")
+        return "KR", km.group(2), exchange
 
     if US_EXCHANGE_RE.search(inside):
         exchange_match = US_EXCHANGE_RE.search(inside)
@@ -151,7 +241,38 @@ def parse_market_from_inside(inside: str) -> tuple[str | None, str | None, str |
         m = US_TICKER_AFTER_EXCHANGE_RE.search(inside) or US_TICKER_BEFORE_EXCHANGE_RE.search(inside)
         if m:
             return "US", m.group(1).upper().replace(".", "-"), exchange
+
     return None, None, None
+
+
+# 흔한 약어가 미국 티커로 오인되는 것 방지 (bare ticker 2차 패스에서만 사용)
+NON_TICKER_ACRONYMS = {
+    "AI", "IT", "IR", "PR", "PER", "PBR", "ROE", "ROA", "EPS", "DPS", "BPS", "EV", "EBIT", "CAGR",
+    "CEO", "CFO", "CTO", "OLED", "LCD", "CPU", "GPU", "HBM", "DRAM", "NAND", "ETF", "LNG", "LPG",
+    "US", "USA", "KR", "QoQ", "YOY", "YoY", "MOM", "DC", "RND", "ESG", "IPO", "MOU", "B2B", "B2C",
+    "FDA", "EU", "UN", "GDP", "CPI", "PMI", "M&A", "REIT", "SCR", "STF", "EDS", "LTA", "AM", "TP",
+}
+
+
+def parse_bare_us_ticker(lines: list[str], full_text: str) -> tuple[str | None, str | None, str | None, str | None]:
+    """명시적 식별이 실패했을 때만: '회사명 (GLW)' 형태의 단독 영문 티커를 시도.
+
+    달러/미국 거래소 표기가 본문에 있어야 하고, 흔한 약어는 제외한다.
+    """
+    if not re.search(r"[$]|USD|NASDAQ|NYSE|AMEX", full_text[:4000], re.I):
+        return None, None, None, None
+    for idx, line in enumerate(lines[:140]):
+        cl = compact_line(line)
+        m = TITLE_WITH_CODE_RE.search(cl)
+        if not m:
+            continue
+        inside = m.group("inside").strip()
+        um = BARE_US_TICKER_RE.match(inside)
+        if not um or um.group(1).upper() in NON_TICKER_ACRONYMS:
+            continue
+        name = clean_name(m.group("name"))
+        return "US", um.group(1).upper(), "US", name
+    return None, None, None, None
 
 
 def infer_company_before(lines: list[str], idx: int, path: Path) -> str | None:
@@ -173,6 +294,9 @@ def infer_company_before(lines: list[str], idx: int, path: Path) -> str | None:
 
 
 def parse_identity(path: Path, lines: list[str]) -> tuple[str | None, str | None, str | None, str | None]:
+    head_text = "\n".join(lines[:200])[:4000]
+    has_usd_marks = bool(re.search(r"[$]|USD|NASDAQ|NYSE|AMEX", head_text, re.I))
+
     # Prefer explicit header/table identity near the front page.
     for idx, line in enumerate(lines[:140]):
         cl = compact_line(line)
@@ -181,6 +305,11 @@ def parse_identity(path: Path, lines: list[str]) -> tuple[str | None, str | None
             continue
         inside = m.group("inside").strip()
         market, ticker, exchange = parse_market_from_inside(inside)
+        if not market and has_usd_marks:
+            # "|Corning (GLW) ...|" 같은 단독 영문 티커 — 달러 표기가 있는 문서에서만 인정
+            um = BARE_US_TICKER_RE.match(inside)
+            if um and um.group(1).upper() not in NON_TICKER_ACRONYMS and clean_name(m.group("name")):
+                market, ticker, exchange = "US", um.group(1).upper(), "US"
         if not market:
             continue
         name = clean_name(m.group("name"))
@@ -203,19 +332,35 @@ def parse_identity(path: Path, lines: list[str]) -> tuple[str | None, str | None
         exchange = m.group(2).upper().replace("NSDQ", "NASDAQ")
         return "US", m.group(3).upper().replace(".", "-"), exchange, clean_name(m.group(1))
 
+    # 파일명(수집된 게시물 제목) fallback — YIG처럼 제목에 "회사명 (089970,KQ)"가 있는 경우
+    stem = compact_line(path.stem)
+    sm = TITLE_WITH_CODE_RE.search(stem)
+    if sm:
+        market, ticker, exchange = parse_market_from_inside(sm.group("inside").strip())
+        if market:
+            raw_name = re.sub(r"^(?:undated|\d{4}-\d{2}-\d{2})_", "", sm.group("name") or "")
+            return market, ticker, exchange, clean_name(raw_name)
+
     return None, None, None, None
+
+
+def normalize_rating(m: re.Match[str]) -> str:
+    if m.group(1):
+        return m.group(1).title()
+    korean = re.sub(r"\s+", "", m.group(2))
+    return KOREAN_RATINGS.get(korean, korean)
 
 
 def parse_rating(lines: list[str]) -> str | None:
     for idx, line in enumerate(lines[:160]):
-        if "Rating" in line:
+        if "Rating" in line or "투자의견" in line.replace(" ", ""):
             window = " ".join(compact_line(x) for x in lines[idx : idx + 8])
             m = RATING_RE.search(window)
             if m:
-                return m.group(1).title()
+                return normalize_rating(m)
     head = " ".join(compact_line(x) for x in lines[:120])
     m = RATING_RE.search(head)
-    return m.group(1).title() if m else None
+    return normalize_rating(m) if m else None
 
 
 def number_to_float(value: str, market: str | None = None) -> float:
@@ -231,7 +376,7 @@ def token_has_expected_currency(window: str, token: re.Match[str], market: str |
     prefix = token.group("prefix") or token.group("prefix2") or ""
     post = window[token.end() : token.end() + 10].upper()
     if market == "KR":
-        return suffix == "원" or prefix == "₩"
+        return suffix in {"원", "₩", "KRW"} or prefix == "₩"
     if market == "US":
         return prefix == "$" or suffix in {"$", "USD", "달러"} or "USD" in post
     return True
@@ -244,16 +389,44 @@ def value_from_price_token(token: re.Match[str], market: str | None = None) -> t
     return ((a + b) / 2 if b is not None else a), raw
 
 
-def choose_price_after_label(text: str, label_re: re.Pattern[str], market: str | None) -> tuple[float | None, str | None]:
+BAD_UNIT_AFTER_RE = re.compile(r"^\s*(%|배|x\b|X\b|억|조|만|천\b|bn|mn|조원|억원)")
+
+
+def token_followed_by_pct(window: str, token: re.Match[str]) -> bool:
+    return bool(BAD_UNIT_AFTER_RE.match(window[token.end() : token.end() + 4]))
+
+
+def token_is_plausible_bare_price(token: re.Match[str], market: str | None) -> bool:
+    """통화 표기가 아예 없는 KR 보고서(예: '목표주가 46,000 현재주가 30,200')용 완화 판정.
+
+    미국 리포트는 거의 항상 $ 표기가 있으므로 무통화 완화를 적용하지 않는다
+    (1.0x, 4.0배 같은 멀티플 오인 방지).
+    """
+    if market != "KR":
+        return False
+    raw_number = token.group("a")
+    try:
+        value = number_to_float(raw_number, market)
+    except ValueError:
+        return False
+    if "," not in raw_number and value == int(value) and 1900 <= value <= 2100:
+        return False  # 연도(2026E 등) 오인 방지
+    return "," in raw_number or value >= 500
+
+
+def choose_price_after_label(text: str, label_re: re.Pattern[str], market: str | None, lenient: bool = False) -> tuple[float | None, str | None]:
+    """라벨 등장 순서대로 창을 보되, 같은 창 안에서 통화 표기 토큰 → 무통화(완화) 토큰 순으로 고른다.
+
+    뒤쪽 라벨 창의 통화 토큰이 앞쪽 라벨 창의 무통화 정답을 가로채는 것 방지 (STAR 사례).
+    """
     matches = list(label_re.finditer(text))
     for lm in matches:
         window = text[lm.end() : lm.end() + 120]
-        tokens = list(PRICE_TOKEN_RE.finditer(window))
-        for tm in tokens[:5]:
-            if not token_has_expected_currency(window, tm, market):
-                continue
-            value, raw = value_from_price_token(tm, market)
-            return value, raw
+        tokens = [tm for tm in PRICE_TOKEN_RE.finditer(window) if not token_followed_by_pct(window, tm)][:5]
+        for tm in tokens:
+            # 라벨에서 가까운 순서대로: 통화 표기 토큰 또는 (완화 시) 그럴듯한 무통화 숫자
+            if token_has_expected_currency(window, tm, market) or (lenient and token_is_plausible_bare_price(tm, market)):
+                return value_from_price_token(tm, market)
     return None, None
 
 
@@ -269,6 +442,14 @@ def choose_price_before_label(text: str, label_re: re.Pattern[str], market: str 
     return None, None
 
 
+def parse_price_value(raw: str, market: str | None) -> float | None:
+    tm = PRICE_TOKEN_RE.search(raw)
+    if not tm:
+        return None
+    value, _ = value_from_price_token(tm, market)
+    return value
+
+
 def parse_prices(lines: list[str], market: str | None) -> tuple[float | None, str | None, float | None, str | None, float | None]:
     # Rating box is usually the cleanest source; prepend first-page prose for reports that state target before Rating.
     first_page = " ".join(compact_line(x) for x in lines[:180])
@@ -278,10 +459,26 @@ def parse_prices(lines: list[str], market: str | None) -> tuple[float | None, st
     else:
         text = first_page
 
-    target, target_raw = choose_price_after_label(text, TARGET_LABEL_RE, market)
-    current, current_raw = choose_price_after_label(text, CURRENT_LABEL_RE, market)
+    target = target_raw = current = current_raw = None
 
-    # Valuation prose often puts the price before "목표 주가/Target Price".
+    # 0) 라벨 두 개 + 값 두 개 분리형 레이아웃을 최우선 처리 (라벨-창 방식이 값을 엇갈려 잡는 사례 방지)
+    pm = CURRENT_THEN_TARGET_PAIR_RE.search(text)
+    if pm:
+        current, current_raw = parse_price_value(pm.group("v1"), market), pm.group("v1").strip()
+        target, target_raw = parse_price_value(pm.group("v2"), market), pm.group("v2").strip()
+    else:
+        pm = TARGET_THEN_CURRENT_PAIR_RE.search(text)
+        if pm:
+            target, target_raw = parse_price_value(pm.group("v1"), market), pm.group("v1").strip()
+            current, current_raw = parse_price_value(pm.group("v2"), market), pm.group("v2").strip()
+
+    # 1) 라벨 뒤 토큰 — 창 안에서 통화 표기 우선, 없으면 그럴듯한 무통화 숫자 (KUVIC/STAR 레이아웃)
+    if target is None:
+        target, target_raw = choose_price_after_label(text, TARGET_LABEL_RE, market, lenient=True)
+    if current is None:
+        current, current_raw = choose_price_after_label(text, CURRENT_LABEL_RE, market, lenient=True)
+
+    # 2) Valuation prose often puts the price before "목표 주가/Target Price".
     if target is None:
         target, target_raw = choose_price_before_label(text, TARGET_LABEL_RE, market)
 
@@ -289,18 +486,26 @@ def parse_prices(lines: list[str], market: str | None) -> tuple[float | None, st
     um = UPSIDE_RE.search(text)
     if um:
         upside = float(um.group(2))
-        if um.group(1).startswith("하락") and upside > 0:
+        if um.group(1).replace(" ", "").startswith("하락") and upside > 0:
             upside = -upside
+
+    # 정합성 가드: 목표가==현재가인데 상승여력이 0이 아니면 현재가 쪽 오파싱 의심 → 현재가 폐기
+    # (분리형 레이아웃은 위의 pair 처리가 이미 해결하므로, 남는 충돌은 현재가 라벨 오매칭이 대부분)
+    if target is not None and current is not None and upside is not None and target == current and abs(upside) > 1:
+        current = current_raw = None
     return target, target_raw, current, current_raw, upside
 
 
-def parse_report(path: Path) -> ParsedReport:
+def parse_report(path: Path, school: str = "smic", hint: dict | None = None) -> ParsedReport:
     text = path.read_text(encoding="utf-8", errors="ignore")
     lines = [line.rstrip("\n") for line in text.splitlines()]
-    report_date, filename_date = parse_date(path, lines)
+    report_date, filename_date = resolve_report_date(path, lines, school, hint)
     market, ticker, exchange, company = parse_identity(path, lines)
     rating = parse_rating(lines)
     target, target_raw, current, current_raw, upside = parse_prices(lines, market)
+
+    if not company and hint:
+        company = clean_name(hint.get("company_hint") or None)
 
     issues: list[str] = []
     if market not in {"KR", "US"}:
@@ -313,6 +518,7 @@ def parse_report(path: Path) -> ParsedReport:
         issues.append("missing_target_price")
     return ParsedReport(
         source_file=str(path),
+        school=school,
         report_date=report_date,
         filename_date=filename_date,
         market=market,
@@ -418,6 +624,7 @@ def evaluate_report(parsed: ParsedReport, prices: pd.DataFrame, as_of: dt.date) 
 
     return PerformanceRow(
         source_file=parsed.source_file,
+        school=parsed.school,
         report_date=parsed.report_date,
         filename_date=parsed.filename_date,
         market=parsed.market,
@@ -453,6 +660,7 @@ def evaluate_report(parsed: ParsedReport, prices: pd.DataFrame, as_of: dt.date) 
 def empty_performance(parsed: ParsedReport, data_issue: str) -> PerformanceRow:
     return PerformanceRow(
         source_file=parsed.source_file,
+        school=parsed.school,
         report_date=parsed.report_date,
         filename_date=parsed.filename_date,
         market=parsed.market,
@@ -510,22 +718,159 @@ def write_csv(path: Path, rows: Iterable[object]) -> None:
         writer.writerows(dict_rows)
 
 
+def load_hints() -> dict[str, dict]:
+    """수집 매니페스트의 메타데이터를 (파일 stem → 항목)으로 인덱싱."""
+    manifest_path = ROOT / "data" / "sources" / "manifest.json"
+    hints: dict[str, dict] = {}
+    if manifest_path.exists():
+        for entry in json.loads(manifest_path.read_text(encoding="utf-8")):
+            if entry.get("file"):
+                hints[Path(entry["file"]).stem] = entry
+    return hints
+
+
+def load_corrections() -> dict[str, dict]:
+    """사람이 검증한 교정값 (source_name → 필드 오버라이드). 재파싱해도 유지된다."""
+    path = ROOT / "data" / "sources" / "corrections.json"
+    if path.exists():
+        return json.loads(path.read_text(encoding="utf-8"))
+    return {}
+
+
+def apply_corrections(parsed: list[ParsedReport], corrections: dict[str, dict]) -> None:
+    for r in parsed:
+        fix = corrections.get(Path(r.source_file).name)
+        if not fix:
+            continue
+        for field, value in fix.items():
+            if field.startswith("_") or not hasattr(r, field):
+                continue
+            setattr(r, field, value)
+        r.parse_issue = None if not fix.get("_keep_issue") else r.parse_issue
+
+
+def quality_score(r: ParsedReport) -> int:
+    return sum((r.target_price is not None, r.parse_issue is None, r.company is not None, r.report_current_price is not None))
+
+
+def dedup_reports(parsed: list[ParsedReport]) -> list[ParsedReport]:
+    """같은 학교·종목·발간일 중복(재업로드 등)은 품질 점수가 높은 한 건만 남긴다."""
+    best: dict[tuple[str, str, str], ParsedReport] = {}
+    unkeyed: list[ParsedReport] = []
+    order: list[tuple[str, str, str]] = []
+    for r in parsed:
+        if not r.ticker or not r.report_date:
+            unkeyed.append(r)
+            continue
+        key = (r.school, r.ticker, r.report_date)
+        if key not in best:
+            best[key] = r
+            order.append(key)
+        elif quality_score(r) > quality_score(best[key]):
+            best[key] = r
+    return [best[k] for k in order] + unkeyed
+
+
+def performance_bucket(ret: float | None) -> str:
+    if ret is None:
+        return "No quote"
+    if ret >= 100:
+        return "Moonshot"
+    if ret >= 30:
+        return "Winner"
+    if ret >= 0:
+        return "Positive"
+    if ret > -50:
+        return "Negative"
+    return "Wrecked"
+
+
+def summarize(rows: list[dict], group: str) -> dict:
+    priced = [r for r in rows if r["return_latest_pct"] is not None]
+    returns = sorted(r["return_latest_pct"] for r in priced)
+    mid = len(returns) // 2
+    median = None if not returns else returns[mid] if len(returns) % 2 else (returns[mid - 1] + returns[mid]) / 2
+    return {
+        "group": group,
+        "reports": len(rows),
+        "priced_reports": len(priced),
+        "with_target": sum(1 for r in rows if r["target_price"] is not None),
+        "up_latest": sum(1 for r in priced if r["return_latest_pct"] > 0),
+        "down_latest": sum(1 for r in priced if r["return_latest_pct"] < 0),
+        "target_hit": sum(1 for r in rows if r["target_hit_until_latest"]),
+        "avg_return_latest_pct": round(sum(returns) / len(returns), 6) if returns else None,
+        "median_return_latest_pct": round(median, 6) if median is not None else None,
+    }
+
+
+def write_web_json(path: Path, rows: list[PerformanceRow], as_of: dt.date) -> None:
+    records = []
+    for row in rows:
+        record = round_floats(asdict(row))
+        record["source_name"] = Path(str(record["source_file"])).name
+        record["performance_bucket"] = performance_bucket(record["return_latest_pct"])  # type: ignore[arg-type]
+        records.append(record)
+
+    groups: list[tuple[str, list[dict]]] = [("ALL", records)]
+    for field in ("school", "market", "rating"):
+        values = sorted({str(r[field]) for r in records})
+        groups += [(f"{field}={v}", [r for r in records if str(r[field]) == v]) for v in values]
+
+    payload = {
+        "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "as_of": as_of.isoformat(),
+        "records": records,
+        "summary": [summarize(rows_, group) for group, rows_ in groups],
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build point-in-time report target and price-performance dataset from converted Markdown equity reports.")
     parser.add_argument("--markdown-dir", default="data/markdown")
     parser.add_argument("--output", default="data/report_performance.csv")
     parser.add_argument("--parsed-output", default="data/report_parsed.csv")
     parser.add_argument("--issues-output", default="data/report_parse_issues.csv")
+    parser.add_argument("--web-output", default="src/data/report-performance.json")
     parser.add_argument("--as-of", default=dt.date.today().isoformat())
     parser.add_argument("--markets", nargs="+", default=["KR", "US"], choices=["KR", "US"])
+    parser.add_argument("--schools", nargs="+", default=list(SCHOOLS), choices=list(SCHOOLS))
+    parser.add_argument("--parse-only", action="store_true", help="시세 조회 없이 파싱 결과만 출력 (검증용)")
     parser.add_argument("--sleep", type=float, default=0.05, help="Seconds to sleep between market-data calls.")
     args = parser.parse_args()
 
     as_of = dt.date.fromisoformat(args.as_of)
-    md_paths = sorted(Path(args.markdown_dir).glob("*.md"))
-    parsed_all_raw = [parse_report(path) for path in md_paths]
+    md_root = Path(args.markdown_dir)
+    md_paths: list[tuple[Path, str]] = [(p, "smic") for p in sorted(md_root.glob("*.md"))]
+    for school in ("yig", "star", "kuvic"):
+        sub = md_root / school
+        if sub.exists():
+            md_paths += [(p, school) for p in sorted(sub.glob("*.md"))]
+    md_paths = [(p, s) for p, s in md_paths if s in set(args.schools)]
+
+    hints = load_hints()
+    parsed_all_raw = [parse_report(path, school, hints.get(path.stem)) for path, school in md_paths]
+    apply_corrections(parsed_all_raw, load_corrections())
     parsed_all = [r for r in parsed_all_raw if (r.ticker or "").upper() not in EXCLUDED_DELISTED_TICKERS]
-    parsed = [r for r in parsed_all if r.market in set(args.markets)]
+    deduped = dedup_reports(parsed_all)
+    dropped = len(parsed_all) - len(deduped)
+    if dropped:
+        print(f"deduped {dropped} duplicate reports")
+    parsed = [r for r in deduped if r.market in set(args.markets)]
+
+    if args.parse_only:
+        write_csv(Path(args.parsed_output), parsed_all)
+        write_csv(Path(args.issues_output), [r for r in parsed_all if r.parse_issue])
+        by_school: dict[str, list[ParsedReport]] = {}
+        for r in deduped:
+            by_school.setdefault(r.school, []).append(r)
+        for school, items in sorted(by_school.items()):
+            with_target = sum(1 for r in items if r.target_price is not None)
+            with_ticker = sum(1 for r in items if r.ticker)
+            with_date = sum(1 for r in items if r.report_date)
+            print(f"{school}: {len(items)} reports · ticker {with_ticker} · date {with_date} · target {with_target}")
+        return 0
 
     write_csv(Path(args.parsed_output), parsed_all)
     write_csv(Path(args.issues_output), [r for r in parsed_all if r.parse_issue])
@@ -557,12 +902,14 @@ def main() -> int:
 
     rows.sort(key=lambda x: (x.report_date or "9999-99-99", x.market or "", x.ticker or "", x.source_file))
     write_csv(Path(args.output), rows)
+    write_web_json(Path(args.web_output), rows, as_of)
 
     ok = sum(1 for row in rows if not row.data_issue)
     print(f"parsed_reports={len(parsed_all)} included_us_kr={len(parsed)} performance_rows={len(rows)} priced_rows={ok} as_of={as_of}")
     print(f"wrote {args.output}")
     print(f"wrote {args.parsed_output}")
     print(f"wrote {args.issues_output}")
+    print(f"wrote {args.web_output}")
     return 0
 
 
