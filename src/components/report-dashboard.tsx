@@ -4,24 +4,17 @@ import { Fragment, useCallback, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import Link from "next/link";
 import { bucketFilters, type BucketFilter, type MarketFilter, type SchoolFilter, useReportDashboardState } from "@/components/report-dashboard/use-report-dashboard-state";
 import { dateLabel, getDisplayName, reportDataQuality, reportDataset, SCHOOL_LABELS, type ReportRecord } from "@/lib/report-model";
+import { bucketLabels, median, schoolShort, signColor, stampTone, tickerSlug, verdictOf, type Verdict } from "@/lib/verdict";
 import { cn, formatPct, formatPrice } from "@/lib/utils";
 
 const marketFilters: MarketFilter[] = ["ALL", "KR", "US"];
 const marketLabels: Record<MarketFilter, string> = { ALL: "시장 전체", KR: "국내", US: "미국" };
 const schoolFilters: SchoolFilter[] = ["ALL", "smic", "yig", "star", "kuvic"];
 const schoolLabels: Record<SchoolFilter, string> = { ALL: "전체 아카이브", ...SCHOOL_LABELS };
-const schoolShort: Record<ReportRecord["school"], string> = { smic: "SMIC", yig: "YIG", star: "STAR", kuvic: "KUVIC" };
-const bucketLabels: Record<BucketFilter, string> = {
-  ALL: "전체",
-  Moonshot: "문샷",
-  Winner: "위너",
-  Positive: "상승",
-  Negative: "하락",
-  Wrecked: "붕괴",
-  "No quote": "시세없음",
-};
+const bucketFilterLabels: Record<BucketFilter, string> = { ALL: "전체", ...bucketLabels };
 
 const bucketTile: Record<ReportRecord["performance_bucket"], string> = {
   Moonshot: "bg-[#9c0f27] dark:bg-[#ff6177]",
@@ -32,31 +25,6 @@ const bucketTile: Record<ReportRecord["performance_bucket"], string> = {
   "No quote": "bg-[#c9c2b4] dark:bg-[#4a4a45]",
 };
 
-type Tone = "hit" | "up" | "down" | "warn" | "muted";
-type Verdict = { stamp: string; label: string; tone: Tone; detail: string };
-
-const stampTone: Record<Tone, string> = {
-  hit: "text-stamp",
-  up: "text-warn",
-  down: "text-down",
-  warn: "text-muted-foreground",
-  muted: "text-muted-foreground",
-};
-
-function verdictOf(report: ReportRecord): Verdict {
-  if (report.data_issue) return { stamp: "불명", label: "시세 확인 불가", tone: "muted", detail: report.data_issue };
-  if (report.target_hit_until_latest)
-    return { stamp: "적중", label: "목표가 도달", tone: "hit", detail: `${dateLabel(report.first_target_hit_date)} · ${report.days_to_target ?? "?"}일 만에 도달` };
-  if (report.target_price === null) return { stamp: "무효", label: "목표가 추출 실패", tone: "warn", detail: report.parse_issue ?? "목표가 미기재" };
-  if ((report.return_latest_pct ?? 0) >= 0) return { stamp: "미달", label: "상승 중 · 목표 미도달", tone: "up", detail: `현재 ${formatPct(report.return_latest_pct)}` };
-  return { stamp: "하락", label: "하락 · 목표 미도달", tone: "down", detail: `현재 ${formatPct(report.return_latest_pct)}` };
-}
-
-function signColor(value: number | null | undefined) {
-  if (value === null || value === undefined) return "text-muted-foreground";
-  return value >= 0 ? "text-up" : "text-down";
-}
-
 function yearOf(report: ReportRecord) {
   return report.report_date?.slice(0, 4) ?? "????";
 }
@@ -65,13 +33,6 @@ function diffDays(from: string | null, to: string | null) {
   if (!from || !to) return null;
   const ms = new Date(to).getTime() - new Date(from).getTime();
   return Number.isFinite(ms) ? Math.round(ms / 86_400_000) : null;
-}
-
-function median(values: number[]) {
-  if (!values.length) return null;
-  const sorted = [...values].sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
 }
 
 export function ReportDashboard() {
@@ -177,7 +138,15 @@ function Masthead({ total, priced, hits, hitRate, medianReturn }: { total: numbe
     <header>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b-4 border-double border-foreground/70 pb-3">
         <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.3em]">SMIC · YIG · STAR · KUVIC — Research Verdict Archive</p>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
+          <nav className="flex items-center gap-4 font-mono text-[11px] font-semibold uppercase tracking-[0.18em]" aria-label="사이트 내비게이션">
+            <Link href="/clubs" className="text-muted-foreground transition hover:text-stamp">
+              학회별 성적표
+            </Link>
+            <Link href="/strategy" className="text-muted-foreground transition hover:text-stamp">
+              모멘텀 전략
+            </Link>
+          </nav>
           <p className="hidden font-mono text-[11px] text-muted-foreground sm:block">기준일 {dateLabel(reportDataset.as_of)}</p>
           <ThemeToggle />
         </div>
@@ -299,7 +268,7 @@ function FilterBar({ state }: { state: ReturnType<typeof useReportDashboardState
                     active ? "border-foreground bg-foreground text-background" : "border-border bg-transparent text-muted-foreground hover:border-foreground/50 hover:text-foreground",
                   )}
                 >
-                  {bucketLabels[item]}
+                  {bucketFilterLabels[item]}
                 </button>
               );
             })}
@@ -338,10 +307,11 @@ function VerdictPaper({
 }) {
   const targetReturn = report.target_price && report.start_close ? (report.target_price / report.start_close - 1) * 100 : null;
   const horizons = [
-    { label: "30일", value: report.return_30d_pct },
-    { label: "90일", value: report.return_90d_pct },
-    { label: "180일", value: report.return_180d_pct },
-    { label: "1년", value: report.return_365d_pct },
+    { label: "1M", value: report.return_30d_pct },
+    { label: "3M", value: report.return_90d_pct },
+    { label: "6M", value: report.return_180d_pct },
+    { label: "1Y", value: report.return_365d_pct },
+    { label: "YTD", value: report.return_ytd_pct },
     { label: "최고", value: report.max_high_return_pct },
   ];
 
@@ -375,7 +345,15 @@ function VerdictPaper({
           {verdict.stamp}
         </motion.div>
 
-        <h2 className="max-w-[78%] font-display text-4xl font-black tracking-tight sm:text-5xl">{getDisplayName(report)}</h2>
+        <h2 className="max-w-[78%] font-display text-4xl font-black tracking-tight sm:text-5xl">
+          {tickerSlug(report) ? (
+            <Link href={`/stocks/${tickerSlug(report)}`} className="transition hover:text-stamp" title="이 종목을 다룬 모든 학회 리포트 보기">
+              {getDisplayName(report)}
+            </Link>
+          ) : (
+            getDisplayName(report)
+          )}
+        </h2>
         <p className="mt-2 text-sm text-muted-foreground">
           <span className={cn("font-bold", stampTone[verdict.tone])}>{verdict.label}</span> · {verdict.detail}
         </p>
@@ -399,7 +377,7 @@ function VerdictPaper({
             <p className="mt-1.5 text-[11px] text-muted-foreground">
               발간 후 현재까지 수익률 · 최신 종가 {formatPrice(report.latest_close, report.market)}
             </p>
-            <div className="mt-4 grid grid-cols-5 divide-x divide-dashed divide-border border-y border-dashed border-border">
+            <div className="mt-4 grid grid-cols-6 divide-x divide-dashed divide-border border-y border-dashed border-border">
               {horizons.map((item) => (
                 <div key={item.label} className="px-2 py-2 text-center first:pl-0 last:pr-0">
                   <p className="font-mono text-[10px] text-muted-foreground">{item.label}</p>
@@ -554,16 +532,18 @@ function Trajectory({ report, targetReturn, className }: { report: ReportRecord;
 }
 
 function Chronicle({ reports, selected, onSelect }: { reports: ReportRecord[]; selected: ReportRecord; onSelect: (sourceName: string) => void }) {
+  // 발간 번호는 연대순을 유지하되, 목록은 최신 리포트부터 보여준다
+  const rows = reports.map((report, index) => ({ report, no: index + 1 })).reverse();
   return (
     <aside className="flex max-h-[920px] flex-col overflow-hidden rounded-lg border border-border bg-card" aria-label="발간 연대기">
       <header className="flex items-baseline justify-between border-b-4 border-double border-border px-4 py-3">
         <h2 className="font-display text-xl font-black tracking-tight">연대기</h2>
-        <p className="font-mono text-[11px] text-muted-foreground">{reports.length}건 · 발간순</p>
+        <p className="font-mono text-[11px] text-muted-foreground">{reports.length}건 · 최신순</p>
       </header>
       <div className="min-h-0 flex-1 overflow-y-auto">
-        {reports.map((report, index) => {
+        {rows.map(({ report, no }, index) => {
           const active = report.source_name === selected.source_name;
-          const divider = index === 0 || yearOf(report) !== yearOf(reports[index - 1]);
+          const divider = index === 0 || yearOf(report) !== yearOf(rows[index - 1].report);
           return (
             <Fragment key={report.source_name}>
               {divider && (
@@ -578,7 +558,7 @@ function Chronicle({ reports, selected, onSelect }: { reports: ReportRecord[]; s
                   active ? "bg-foreground text-background" : "hover:bg-secondary",
                 )}
               >
-                <span className={cn("font-mono text-[11px]", active ? "opacity-70" : "text-muted-foreground")}>{String(index + 1).padStart(3, "0")}</span>
+                <span className={cn("font-mono text-[11px]", active ? "opacity-70" : "text-muted-foreground")}>{String(no).padStart(3, "0")}</span>
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-bold">{getDisplayName(report)}</span>
                   <span className={cn("block text-[11px]", active ? "opacity-70" : "text-muted-foreground")}>

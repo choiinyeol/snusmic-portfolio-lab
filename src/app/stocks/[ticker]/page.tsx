@@ -1,0 +1,88 @@
+import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { SiteHeader } from "@/components/site-header";
+import { ReportLedger, StatStrip } from "@/components/report-ledger";
+import { dateLabel, getDisplayName, reportDataset, SCHOOL_LABELS, type ReportRecord } from "@/lib/report-model";
+import { signColor, tickerSlug } from "@/lib/verdict";
+import { formatPct, formatPrice } from "@/lib/utils";
+
+function groupBySlug() {
+  const groups = new Map<string, ReportRecord[]>();
+  for (const record of reportDataset.records) {
+    const slug = tickerSlug(record);
+    if (!slug) continue;
+    groups.set(slug, [...(groups.get(slug) ?? []), record]);
+  }
+  return groups;
+}
+
+export function generateStaticParams() {
+  return [...groupBySlug().keys()].map((ticker) => ({ ticker }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ ticker: string }> }): Promise<Metadata> {
+  const { ticker } = await params;
+  const records = groupBySlug().get(ticker.toLowerCase());
+  const name = records?.length ? getDisplayName(records[0]) : "종목";
+  return { title: `${name} — 학회 컨센서스 · 판결 아카이브` };
+}
+
+export default async function StockPage({ params }: { params: Promise<{ ticker: string }> }) {
+  const { ticker } = await params;
+  const records = groupBySlug().get(ticker.toLowerCase());
+  if (!records?.length) notFound();
+
+  const sorted = [...records].sort((a, b) => String(b.report_date ?? "").localeCompare(String(a.report_date ?? "")));
+  const latest = sorted[0];
+  const name = getDisplayName(latest);
+  const schools = [...new Set(sorted.map((r) => r.school))];
+  const hits = sorted.filter((r) => r.target_hit_until_latest).length;
+  const targets = sorted.filter((r) => r.target_price !== null).map((r) => r.target_price as number);
+  const upsides = sorted.filter((r) => r.stated_upside_pct !== null).map((r) => r.stated_upside_pct as number);
+
+  return (
+    <main className="mx-auto max-w-[1500px] space-y-8 px-4 py-6 sm:px-8">
+      <SiteHeader eyebrow="Stock Consensus" />
+
+      <header>
+        <p className="mt-3 font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">
+          {latest.market ?? "—"} · {latest.ticker} · {latest.exchange ?? ""}
+        </p>
+        <h1 className="mt-2 font-display text-4xl font-black tracking-tight sm:text-6xl">{name}</h1>
+        <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground">
+          {schools.length > 1
+            ? `${schools.map((s) => SCHOOL_LABELS[s]).join(" · ")} — ${schools.length}개 학회가 이 종목을 다뤘습니다. 같은 종목에 대한 서로 다른(또는 같은) 판단을 시간 순으로 비교해 보세요.`
+            : `${SCHOOL_LABELS[latest.school]}가 이 종목을 ${sorted.length}회 다뤘습니다.`}
+        </p>
+      </header>
+
+      <StatStrip
+        items={[
+          { label: "리포트", value: `${sorted.length}건` },
+          { label: "커버 학회", value: `${schools.length}곳` },
+          { label: "목표가 적중", value: `${hits}건`, tone: "text-stamp" },
+          {
+            label: "목표가 범위",
+            value: targets.length
+              ? `${formatPrice(Math.min(...targets), latest.market)}~${formatPrice(Math.max(...targets), latest.market)}`
+              : "—",
+          },
+          {
+            label: "평균 제시 상승여력",
+            value: formatPct(upsides.length ? upsides.reduce((a, b) => a + b, 0) / upsides.length : null, 0),
+          },
+          {
+            label: `최신 종가 (${dateLabel(latest.latest_trade_date)})`,
+            value: formatPrice(latest.latest_close, latest.market),
+            tone: signColor(latest.return_latest_pct),
+          },
+        ]}
+      />
+
+      <section aria-label="학회별 주장 비교">
+        <h2 className="mb-3 font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">학회별 판결 기록 — 최신순</h2>
+        <ReportLedger reports={sorted} showSchool linkStocks={false} />
+      </section>
+    </main>
+  );
+}

@@ -42,6 +42,7 @@ export const ReportRecordSchema = z.object({
   return_90d_pct: NullableNumber,
   return_180d_pct: NullableNumber,
   return_365d_pct: NullableNumber,
+  return_ytd_pct: NullableNumber.optional().default(null),
   max_high_until_latest: NullableNumber,
   max_high_return_pct: NullableNumber,
   target_hit_until_latest: z.boolean().nullable(),

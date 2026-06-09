@@ -30,3 +30,6 @@ artifacts/
 
 # local toolchains
 .tools/
+
+# price warehouse (derived, incrementally refreshed)
+data/prices/

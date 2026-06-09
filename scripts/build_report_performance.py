@@ -14,13 +14,18 @@ from typing import Iterable
 
 import pandas as pd
 import yfinance as yf
-from pykrx import stock
+from dotenv import load_dotenv
+
+ROOT = Path(__file__).resolve().parents[1]
+load_dotenv(ROOT / ".env")  # pykrx가 import 시점에 KRX_ID/KRX_PW를 읽으므로 먼저 로드
+
+from pykrx import stock  # noqa: E402
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-ROOT = Path(__file__).resolve().parents[1]
 SCHOOLS = ("smic", "yig", "star", "kuvic")
+PRICE_CACHE_DIR = ROOT / "data" / "prices"
 
 KOREAN_DATE_RE = re.compile(r"(20\d{2})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일")
 FILENAME_DATE_RE = re.compile(r"(20\d{2})-(\d{2})-(\d{2})")
@@ -128,6 +133,7 @@ class PerformanceRow:
     return_90d_pct: float | None
     return_180d_pct: float | None
     return_365d_pct: float | None
+    return_ytd_pct: float | None
     max_high_until_latest: float | None
     max_high_return_pct: float | None
     target_hit_until_latest: bool | None
@@ -625,6 +631,42 @@ def fetch_kr_prices(ticker: str, start: dt.date, end: dt.date) -> pd.DataFrame:
     return out.dropna(subset=["close"])
 
 
+def fetch_prices(market: str, ticker: str, start: dt.date, end: dt.date) -> pd.DataFrame:
+    if market == "KR":
+        return fetch_kr_prices(ticker, start, end)
+    return fetch_us_prices(ticker, start, end)
+
+
+def fetch_prices_cached(market: str, ticker: str, start: dt.date, as_of: dt.date, sleep: float) -> pd.DataFrame:
+    """일별 시세를 data/prices/에 캐시하고 누락 구간만 증분 조회한다."""
+    cache_path = PRICE_CACHE_DIR / f"{market}_{ticker}.csv"
+    cached: pd.DataFrame | None = None
+    if cache_path.exists():
+        try:
+            cached = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+        except Exception:  # noqa: BLE001 - 손상 캐시는 새로 받는다
+            cached = None
+
+    if cached is not None and not cached.empty and cached.index[0].date() <= start + dt.timedelta(days=12):
+        last = cached.index[-1].date()
+        if last >= as_of:
+            return cached
+        tail = fetch_prices(market, ticker, last + dt.timedelta(days=1), as_of)
+        time.sleep(sleep)
+        if not tail.empty:
+            cached = pd.concat([cached, tail[tail.index > cached.index[-1]]])
+            PRICE_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+            cached.to_csv(cache_path, encoding="utf-8")
+        return cached
+
+    df = fetch_prices(market, ticker, start, as_of)
+    time.sleep(sleep)
+    if not df.empty:
+        PRICE_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        df.to_csv(cache_path, encoding="utf-8")
+    return df
+
+
 def fetch_us_prices(ticker: str, start: dt.date, end: dt.date) -> pd.DataFrame:
     # yfinance end is exclusive; add one day at call site if an inclusive as-of is desired.
     df = yf.download(ticker, start=start.isoformat(), end=(end + dt.timedelta(days=1)).isoformat(), progress=False, auto_adjust=True, threads=False)
@@ -667,6 +709,10 @@ def evaluate_report(parsed: ParsedReport, prices: pd.DataFrame, as_of: dt.date) 
     for days in (30, 90, 180, 365):
         horizon = prices[(prices.index >= pd.Timestamp(start_date)) & (prices.index <= pd.Timestamp(report_dt + dt.timedelta(days=days)))]
         returns[days] = safe_pct(float(horizon.iloc[-1]["close"]), start_close) if not horizon.empty else None
+
+    # YTD: 전년도 마지막 종가 → 최신 종가 (종목 자체의 연초 이후 수익률)
+    prior_year = prices[prices.index < pd.Timestamp(dt.date(as_of.year, 1, 1))]
+    return_ytd = safe_pct(latest_close, float(prior_year.iloc[-1]["close"])) if not prior_year.empty else None
 
     until_latest = prices[(prices.index >= pd.Timestamp(start_date)) & (prices.index <= pd.Timestamp(as_of))]
     max_high = float(until_latest["high"].max()) if not until_latest.empty and "high" in until_latest else None
@@ -712,6 +758,7 @@ def evaluate_report(parsed: ParsedReport, prices: pd.DataFrame, as_of: dt.date) 
         return_90d_pct=returns[90],
         return_180d_pct=returns[180],
         return_365d_pct=returns[365],
+        return_ytd_pct=return_ytd,
         max_high_until_latest=max_high,
         max_high_return_pct=max_high_return,
         target_hit_until_latest=hit,
@@ -748,6 +795,7 @@ def empty_performance(parsed: ParsedReport, data_issue: str) -> PerformanceRow:
         return_90d_pct=None,
         return_180d_pct=None,
         return_365d_pct=None,
+        return_ytd_pct=None,
         max_high_until_latest=None,
         max_high_return_pct=None,
         target_hit_until_latest=None,
@@ -946,20 +994,20 @@ def main() -> int:
         if r.ticker and r.report_date:
             groups.setdefault((r.market or "", r.ticker), []).append(r)
 
+    year_start = dt.date(as_of.year, 1, 1)
     price_cache: dict[tuple[str, str], pd.DataFrame] = {}
-    for (market, ticker), reports in groups.items():
+    for i, ((market, ticker), reports) in enumerate(groups.items()):
         min_date = min(date_from_string(r.report_date) for r in reports if date_from_string(r.report_date))
         assert min_date is not None
-        start = min_date - dt.timedelta(days=10)
+        # YTD 계산을 위해 최소한 전년도 말 이전부터 확보
+        start = min(min_date, year_start) - dt.timedelta(days=10)
         try:
-            if market == "KR":
-                price_cache[(market, ticker)] = fetch_kr_prices(ticker, start, as_of)
-            else:
-                price_cache[(market, ticker)] = fetch_us_prices(ticker, start, as_of)
+            price_cache[(market, ticker)] = fetch_prices_cached(market, ticker, start, as_of, args.sleep)
         except Exception as exc:  # keep batch generation usable even when a single quote source fails
             print(f"market-data error {market} {ticker}: {exc}", file=sys.stderr)
             price_cache[(market, ticker)] = pd.DataFrame()
-        time.sleep(args.sleep)
+        if (i + 1) % 50 == 0:
+            print(f"  prices {i + 1}/{len(groups)}", flush=True)
 
     rows: list[PerformanceRow] = []
     for r in parsed:
