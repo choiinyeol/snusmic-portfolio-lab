@@ -7,6 +7,8 @@ import { cn, formatPct } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "모멘텀 전략 — 판결 아카이브" };
 
+const ATR_MULT = backtest.params.atr_mult;
+
 const RULES = [
   {
     title: "유니버스",
@@ -17,14 +19,28 @@ const RULES = [
     body: "발간 10거래일 이후, 종가가 '발간 후 최고 종가'를 경신하면 다음 거래일 시가에 매수. 리포트의 주장(펀더멘털)과 시장의 동의(모멘텀)가 만나는 지점만 삽니다. 발간 후 180일 내 신호가 없으면 소멸.",
   },
   {
-    title: "청산 — 42일 ATR 트레일링 스탑",
-    body: "진입 후 최고 종가에서 3×ATR(42)을 뺀 라인을 따라 올리고, 종가가 이탈하면 다음 거래일 시가에 매도. 익절·손절을 따로 두지 않고 추세가 꺾이는 순간만 봅니다.",
+    title: `청산 — 42일 ATR×${ATR_MULT} 트레일링 스탑`,
+    body: `진입 후 최고 종가에서 ${ATR_MULT}×ATR(42)을 뺀 라인을 따라 올리고, 종가가 이탈하면 다음 거래일 시가에 매도. 익절·손절을 따로 두지 않고 추세가 꺾이는 순간만 봅니다. 아래 민감도 표가 보여주듯, 변동성 큰 중소형주에서 좁은 스탑은 휩쏘로 비용만 냅니다.`,
   },
   {
     title: "선별 — 샤프비율 필터",
-    body: "동일비중 5%, 최대 20종목. 같은 날 신호가 슬롯보다 많으면 90일 샤프비율이 높은 종목부터 편입합니다. 거래비용은 편도 0.3% 가정.",
+    body: "동일비중 5%, 최대 20종목. 같은 날 신호가 슬롯보다 많으면 신호일 기준 90일 샤프비율이 높은 종목부터 편입합니다. 거래비용은 편도 0.3% 가정.",
+  },
+  {
+    title: "시장 국면 오버레이",
+    body: "KOSPI 종가가 200일 이동평균 아래면 신규 진입을 멈춥니다 (보유 종목 청산 규칙은 항상 동작). 모멘텀의 약점인 대세 하락장 노출을 구조적으로 줄이는 장치로, 모든 ATR 배수에서 MDD를 일관되게 낮췄습니다.",
   },
 ];
+
+type SensitivityRow = {
+  atr_mult: number;
+  regime_filter: boolean;
+  total_return_pct: number;
+  sharpe: number | null;
+  mdd_pct: number;
+  trades: number;
+  win_rate_pct: number | null;
+};
 
 export default function StrategyPage() {
   const m = backtest.metrics;
@@ -100,6 +116,51 @@ export default function StrategyPage() {
         ))}
       </section>
 
+      <section className="rounded-lg border border-border bg-card p-6" aria-label="파라미터 민감도">
+        <h2 className="font-display text-2xl font-black tracking-tight">파라미터 민감도 — 체리피킹 방지 장치</h2>
+        <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
+          스탑 폭(ATR 배수)과 국면 필터의 모든 조합을 공개합니다. 헤드라인(ATR×{ATR_MULT} + 국면 필터)은 이 표에서 샤프와 MDD가 동시에
+          가장 양호한 조합을 <strong>사후 선택</strong>한 것이므로 그만큼 할인해서 읽어야 합니다. 다만 &lsquo;스탑이 넓을수록 좋다&rsquo;는
+          단조 패턴과 &lsquo;국면 필터가 MDD를 깎는다&rsquo;는 패턴 자체는 전 구간에서 일관됩니다.
+        </p>
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full min-w-[560px] border-collapse text-sm">
+            <thead>
+              <tr className="border-b-4 border-double border-border font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                <th className="px-3 py-2 text-left font-semibold">ATR 배수</th>
+                <th className="px-3 py-2 text-left font-semibold">국면 필터</th>
+                <th className="px-3 py-2 text-right font-semibold">누적 수익률</th>
+                <th className="px-3 py-2 text-right font-semibold">샤프</th>
+                <th className="px-3 py-2 text-right font-semibold">MDD</th>
+                <th className="px-3 py-2 text-right font-semibold">거래</th>
+                <th className="px-3 py-2 text-right font-semibold">승률</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(backtest.sensitivity as SensitivityRow[]).map((row) => {
+                const isHeadline = row.atr_mult === ATR_MULT && row.regime_filter === backtest.params.regime_filter;
+                return (
+                  <tr
+                    key={`${row.atr_mult}-${row.regime_filter}`}
+                    className={cn("border-b border-dashed border-border last:border-b-0", isHeadline && "bg-secondary font-bold")}
+                  >
+                    <td className="tnum px-3 py-2 font-mono text-xs">×{row.atr_mult}{isHeadline ? " ◀ 헤드라인" : ""}</td>
+                    <td className="px-3 py-2 font-mono text-xs">{row.regime_filter ? "ON" : "off"}</td>
+                    <td className={cn("tnum px-3 py-2 text-right font-mono text-xs font-bold", signColor(row.total_return_pct))}>
+                      {formatPct(row.total_return_pct, 1)}
+                    </td>
+                    <td className="tnum px-3 py-2 text-right font-mono text-xs">{row.sharpe ?? "—"}</td>
+                    <td className="tnum px-3 py-2 text-right font-mono text-xs text-down">{formatPct(row.mdd_pct, 1)}</td>
+                    <td className="tnum px-3 py-2 text-right font-mono text-xs">{row.trades}</td>
+                    <td className="tnum px-3 py-2 text-right font-mono text-xs">{row.win_rate_pct ?? "—"}%</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       <section className="rounded-lg border border-border bg-card p-6" aria-label="현재 보유 포지션">
         <h2 className="font-display text-2xl font-black tracking-tight">전략이 지금 들고 있는 종목 ({m.open_positions})</h2>
         <p className="mt-1 text-sm text-muted-foreground">백테스트 마지막 날 기준 미청산 포지션 — 트레일링 스탑이 아직 이탈되지 않은 종목들입니다.</p>
@@ -144,7 +205,10 @@ export default function StrategyPage() {
           <li>· 소수 종목(최대 20개) 집중 운용이라 논문(평균 600종목+)보다 변동성과 낙폭이 큽니다. 하이 리스크, 하이 리턴 프로파일입니다.</li>
           <li>· 가격 이력이 리포트 발간 시점부터만 있어 &lsquo;역사상 신고가(ATH)&rsquo;가 아닌 &lsquo;발간 후 신고가&rsquo;를 씁니다. 학회 커버 + 모멘텀 확인이라는 의도에는 부합하지만 원 논문과는 다른 정의입니다.</li>
           <li>· 생존 편향: 아카이브에 수집된 리포트 자체가 학회가 공개를 유지한 표본입니다. 상장폐지 종목 시세는 일부 누락될 수 있습니다.</li>
-          <li>· 백테스트는 파라미터(ATR 배수, 슬롯 수)를 튜닝하지 않은 1차 결과이며, 투자 권유가 아닙니다.</li>
+          <li>
+            · 헤드라인 구성(ATR×{ATR_MULT} + 국면 필터)은 위 민감도 표에서 사후 선택된 것입니다. 표본 외 기간에서는 표의 어느 행이 될지 알 수
+            없습니다. 투자 권유가 아닙니다.
+          </li>
         </ul>
       </section>
     </main>

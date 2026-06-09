@@ -13,6 +13,8 @@ export const stampTone: Record<Tone, string> = {
 };
 
 export function verdictOf(report: ReportRecord): Verdict {
+  if (report.report_type === "sector")
+    return { stamp: "산업", label: "산업/전략 리포트", tone: "muted", detail: "개별 종목 목표가 채점 대상이 아닙니다" };
   if (report.data_issue) return { stamp: "불명", label: "시세 확인 불가", tone: "muted", detail: report.data_issue };
   if (report.target_hit_until_latest)
     return { stamp: "적중", label: "목표가 도달", tone: "hit", detail: `${dateLabel(report.first_target_hit_date)} · ${report.days_to_target ?? "?"}일 만에 도달` };

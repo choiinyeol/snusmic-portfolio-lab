@@ -29,9 +29,19 @@ npm install && npm run dev          # http://localhost:3000
 # 3) 파싱 + 시세 결합 (.env의 KRX_ID/KRX_PW 사용, data/prices/ 증분 캐시)
 .venv/Scripts/python scripts/build_report_performance.py
 
-# 4) 전략 백테스트 → src/data/strategy-backtest.json
+# 4) 종목 차트 데이터 → public/prices/{slug}.json
+.venv/Scripts/python scripts/export_stock_charts.py
+
+# 5) 전략 백테스트 (민감도 그리드 포함) → src/data/strategy-backtest.json
 .venv/Scripts/python scripts/backtest_momentum.py
 ```
+
+## 배포 / 자동 갱신
+
+- `.github/workflows/refresh-data.yml` — 매주 월요일 시세 갱신 → 데이터셋·차트·백테스트 재생성 → 커밋.
+  레포 Settings → Secrets에 `KRX_ID`, `KRX_PW` 등록 필요.
+- Vercel: 대시보드에서 이 레포를 연결하면 끝 (Next.js 자동 감지, 추가 설정 불필요).
+  주간 갱신 커밋이 푸시될 때마다 자동 재배포됩니다.
 
 데이터 복구 체인: 일반 전사 → 파일명/수집 메타데이터 힌트 → 네이버 자동완성 티커 복구
 → Windows OCR 표지 폴백. 사람이 검증한 교정값은 `data/sources/corrections.json`으로 유지됩니다.

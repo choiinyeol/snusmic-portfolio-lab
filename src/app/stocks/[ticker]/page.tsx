@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/site-header";
 import { ReportLedger, StatStrip } from "@/components/report-ledger";
+import { StockChart } from "@/components/stock-chart";
 import { dateLabel, getDisplayName, reportDataset, SCHOOL_LABELS, type ReportRecord } from "@/lib/report-model";
 import { signColor, tickerSlug } from "@/lib/verdict";
 import { formatPct, formatPrice } from "@/lib/utils";
@@ -78,6 +79,8 @@ export default async function StockPage({ params }: { params: Promise<{ ticker: 
           },
         ]}
       />
+
+      <StockChart slug={ticker.toLowerCase()} reports={sorted} />
 
       <section aria-label="학회별 주장 비교">
         <h2 className="mb-3 font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">학회별 판결 기록 — 최신순</h2>

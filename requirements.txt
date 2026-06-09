@@ -1,0 +1,7 @@
+# 데이터 파이프라인 의존성 (수집/전사 제외 — CI는 커밋된 markdown에서 재빌드만 수행)
+pandas>=2.2
+yfinance>=0.2.40
+pykrx>=1.0.51
+python-dotenv>=1.0
+requests>=2.31
+beautifulsoup4>=4.12

@@ -92,6 +92,8 @@ YIG_PUBLISHED_RE = re.compile(r"발간일\s*(\d{6})")
 class ParsedReport:
     source_file: str
     school: str
+    report_type: str  # company | sector
+    ocr_recovered: bool
     report_date: str | None
     filename_date: str | None
     market: str | None
@@ -105,12 +107,14 @@ class ParsedReport:
     report_current_price_raw: str | None
     stated_upside_pct: float | None
     parse_issue: str | None = None
+    qa_flags: str | None = None
 
 
 @dataclass
 class PerformanceRow:
     source_file: str
     school: str
+    report_type: str
     report_date: str | None
     filename_date: str | None
     market: str | None
@@ -134,6 +138,8 @@ class PerformanceRow:
     return_180d_pct: float | None
     return_365d_pct: float | None
     return_ytd_pct: float | None
+    benchmark_return_pct: float | None
+    alpha_latest_pct: float | None
     max_high_until_latest: float | None
     max_high_return_pct: float | None
     target_hit_until_latest: bool | None
@@ -141,6 +147,7 @@ class PerformanceRow:
     days_to_target: int | None
     data_issue: str | None
     parse_issue: str | None
+    qa_flags: str | None
 
 
 def compact_line(line: str) -> str:
@@ -512,10 +519,21 @@ def parse_prices(lines: list[str], market: str | None) -> tuple[float | None, st
 def parse_report(path: Path, school: str = "smic", hint: dict | None = None) -> ParsedReport:
     text = path.read_text(encoding="utf-8", errors="ignore")
     lines = [line.rstrip("\n") for line in text.splitlines()]
+    ocr_recovered = "<!-- ocr_fallback -->" in text[:200]
     report_date, filename_date = resolve_report_date(path, lines, school, hint)
     market, ticker, exchange, company = parse_identity(path, lines)
     rating = parse_rating(lines)
     target, target_raw, current, current_raw, upside = parse_prices(lines, market)
+
+    qa_flags: list[str] = []
+    if ocr_recovered:
+        qa_flags.append("ocr_fallback")
+        # OCR 숫자 오인식 가드: 명시된 상승여력과 (목표/현재-1)이 크게 어긋나면 가격을 신뢰하지 않는다
+        if target is not None and current is not None and upside is not None:
+            implied = (target / current - 1) * 100
+            if abs(implied - upside) > 15:
+                qa_flags.append("ocr_inconsistent_prices")
+                target = target_raw = current = current_raw = None
 
     if company and len(company) > 40:
         company = None  # OCR 덩어리 등 비정상 회사명 → 파일명/힌트 폴백으로
@@ -530,6 +548,8 @@ def parse_report(path: Path, school: str = "smic", hint: dict | None = None) -> 
     parsed = ParsedReport(
         source_file=str(path),
         school=school,
+        report_type="company",  # 티커 복구 이후 main()에서 확정
+        ocr_recovered=ocr_recovered,
         report_date=report_date,
         filename_date=filename_date,
         market=market,
@@ -543,9 +563,16 @@ def parse_report(path: Path, school: str = "smic", hint: dict | None = None) -> 
         report_current_price_raw=current_raw,
         stated_upside_pct=upside,
         parse_issue=None,
+        qa_flags=";".join(qa_flags) if qa_flags else None,
     )
     compute_issues(parsed)
     return parsed
+
+
+def add_qa_flag(r: ParsedReport, flag: str) -> None:
+    flags = set((r.qa_flags or "").split(";")) - {""}
+    flags.add(flag)
+    r.qa_flags = ";".join(sorted(flags))
 
 
 def compute_issues(r: ParsedReport) -> None:
@@ -631,6 +658,44 @@ def fetch_kr_prices(ticker: str, start: dt.date, end: dt.date) -> pd.DataFrame:
     return out.dropna(subset=["close"])
 
 
+INDEX_CODES = {"KOSPI": "1001", "KOSDAQ": "2001"}
+
+
+def fetch_index(name: str, start: dt.date, end: dt.date) -> pd.DataFrame:
+    if name == "US":
+        return fetch_us_prices("^GSPC", start, end)
+    df = stock.get_index_ohlcv(start.strftime("%Y%m%d"), end.strftime("%Y%m%d"), INDEX_CODES[name])
+    if df.empty:
+        return pd.DataFrame(columns=["close"])
+    out = pd.DataFrame(index=pd.to_datetime(df.index))
+    out["close"] = pd.to_numeric(df.iloc[:, 3], errors="coerce")
+    return out.dropna(subset=["close"])
+
+
+def fetch_index_cached(name: str, start: dt.date, as_of: dt.date) -> pd.DataFrame:
+    cache_path = PRICE_CACHE_DIR / f"IDX_{name}.csv"
+    cached: pd.DataFrame | None = None
+    if cache_path.exists():
+        try:
+            cached = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+        except Exception:  # noqa: BLE001
+            cached = None
+    if cached is not None and not cached.empty and cached.index[0].date() <= start + dt.timedelta(days=12):
+        last = cached.index[-1].date()
+        if last >= as_of:
+            return cached
+        tail = fetch_index(name, last + dt.timedelta(days=1), as_of)
+        if not tail.empty:
+            cached = pd.concat([cached, tail[tail.index > cached.index[-1]]])
+            cached.to_csv(cache_path, encoding="utf-8")
+        return cached
+    df = fetch_index(name, start, as_of)
+    if not df.empty:
+        PRICE_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        df.to_csv(cache_path, encoding="utf-8")
+    return df
+
+
 def fetch_prices(market: str, ticker: str, start: dt.date, end: dt.date) -> pd.DataFrame:
     if market == "KR":
         return fetch_kr_prices(ticker, start, end)
@@ -683,7 +748,15 @@ def fetch_us_prices(ticker: str, start: dt.date, end: dt.date) -> pd.DataFrame:
     return out.dropna(subset=["close"])
 
 
-def evaluate_report(parsed: ParsedReport, prices: pd.DataFrame, as_of: dt.date) -> PerformanceRow:
+def benchmark_for(parsed: ParsedReport, benchmarks: dict[str, pd.DataFrame]) -> pd.DataFrame | None:
+    if parsed.market == "US":
+        return benchmarks.get("US")
+    if (parsed.exchange or "").upper() == "KOSDAQ":
+        return benchmarks.get("KOSDAQ")
+    return benchmarks.get("KOSPI")
+
+
+def evaluate_report(parsed: ParsedReport, prices: pd.DataFrame, as_of: dt.date, benchmarks: dict[str, pd.DataFrame] | None = None) -> PerformanceRow:
     data_issue = None
     report_dt = date_from_string(parsed.report_date)
     if report_dt is None:
@@ -733,9 +806,19 @@ def evaluate_report(parsed: ParsedReport, prices: pd.DataFrame, as_of: dt.date) 
     if latest_ret is not None:
         direction = "up" if latest_ret > 0 else "down" if latest_ret < 0 else "flat"
 
+    # 같은 보유기간의 시장지수 수익률 → 초과수익(알파)
+    bench_ret = None
+    bench = benchmark_for(parsed, benchmarks or {})
+    if bench is not None and not bench.empty:
+        b_start = bench["close"].asof(pd.Timestamp(start_date))
+        b_end = bench["close"].asof(pd.Timestamp(latest_date))
+        bench_ret = safe_pct(b_end, b_start)
+    alpha = latest_ret - bench_ret if latest_ret is not None and bench_ret is not None else None
+
     return PerformanceRow(
         source_file=parsed.source_file,
         school=parsed.school,
+        report_type=parsed.report_type,
         report_date=parsed.report_date,
         filename_date=parsed.filename_date,
         market=parsed.market,
@@ -759,6 +842,8 @@ def evaluate_report(parsed: ParsedReport, prices: pd.DataFrame, as_of: dt.date) 
         return_180d_pct=returns[180],
         return_365d_pct=returns[365],
         return_ytd_pct=return_ytd,
+        benchmark_return_pct=bench_ret,
+        alpha_latest_pct=alpha,
         max_high_until_latest=max_high,
         max_high_return_pct=max_high_return,
         target_hit_until_latest=hit,
@@ -766,6 +851,7 @@ def evaluate_report(parsed: ParsedReport, prices: pd.DataFrame, as_of: dt.date) 
         days_to_target=days_to_target,
         data_issue=data_issue,
         parse_issue=parsed.parse_issue,
+        qa_flags=parsed.qa_flags,
     )
 
 
@@ -773,6 +859,7 @@ def empty_performance(parsed: ParsedReport, data_issue: str) -> PerformanceRow:
     return PerformanceRow(
         source_file=parsed.source_file,
         school=parsed.school,
+        report_type=parsed.report_type,
         report_date=parsed.report_date,
         filename_date=parsed.filename_date,
         market=parsed.market,
@@ -796,6 +883,8 @@ def empty_performance(parsed: ParsedReport, data_issue: str) -> PerformanceRow:
         return_180d_pct=None,
         return_365d_pct=None,
         return_ytd_pct=None,
+        benchmark_return_pct=None,
+        alpha_latest_pct=None,
         max_high_until_latest=None,
         max_high_return_pct=None,
         target_hit_until_latest=None,
@@ -803,6 +892,7 @@ def empty_performance(parsed: ParsedReport, data_issue: str) -> PerformanceRow:
         days_to_target=None,
         data_issue=data_issue,
         parse_issue=parsed.parse_issue,
+        qa_flags=parsed.qa_flags,
     )
 
 
@@ -966,12 +1056,24 @@ def main() -> int:
     parsed_all_raw = [parse_report(path, school, hints.get(path.stem)) for path, school in md_paths]
     apply_corrections(parsed_all_raw, load_corrections())
     resolve_missing_tickers(parsed_all_raw)
+
+    for r in parsed_all_raw:
+        # 티커가 끝내 없으면 산업/전략 리포트로 분류 (목표가 채점 대상 아님)
+        r.report_type = "company" if r.ticker else "sector"
+        # STAR: 표지 날짜와 업로드일이 크게 어긋나면 발간일 신뢰도 플래그
+        if r.school == "star" and r.report_date:
+            hint_date = (hints.get(Path(r.source_file).stem) or {}).get("published_hint")
+            parsed_date = date_from_string(r.report_date)
+            uploaded = date_from_string(hint_date) if hint_date else None
+            if parsed_date and uploaded and abs((parsed_date - uploaded).days) > 90:
+                add_qa_flag(r, "report_date_far_from_upload")
     parsed_all = [r for r in parsed_all_raw if (r.ticker or "").upper() not in EXCLUDED_DELISTED_TICKERS]
     deduped = dedup_reports(parsed_all)
     dropped = len(parsed_all) - len(deduped)
     if dropped:
         print(f"deduped {dropped} duplicate reports")
-    parsed = [r for r in deduped if r.market in set(args.markets)]
+    # 산업/전략 리포트는 시장 미식별이어도 아카이브에 포함한다 (채점 대상은 아님)
+    parsed = [r for r in deduped if r.market in set(args.markets) or r.report_type == "sector"]
 
     if args.parse_only:
         write_csv(Path(args.parsed_output), parsed_all)
@@ -1009,10 +1111,20 @@ def main() -> int:
         if (i + 1) % 50 == 0:
             print(f"  prices {i + 1}/{len(groups)}", flush=True)
 
+    min_report = min((d for r in parsed if (d := date_from_string(r.report_date))), default=year_start)
+    idx_start = min(min_report, year_start) - dt.timedelta(days=10)
+    benchmarks: dict[str, pd.DataFrame] = {}
+    for name in ("KOSPI", "KOSDAQ", "US"):
+        try:
+            benchmarks[name] = fetch_index_cached(name, idx_start, as_of)
+        except Exception as exc:  # noqa: BLE001 - 지수 조회 실패 시 알파 없이 진행
+            print(f"index error {name}: {exc}", file=sys.stderr)
+            benchmarks[name] = pd.DataFrame()
+
     rows: list[PerformanceRow] = []
     for r in parsed:
         prices = price_cache.get((r.market or "", r.ticker or ""), pd.DataFrame())
-        rows.append(evaluate_report(r, prices, as_of))
+        rows.append(evaluate_report(r, prices, as_of, benchmarks))
 
     rows.sort(key=lambda x: (x.report_date or "9999-99-99", x.market or "", x.ticker or "", x.source_file))
     write_csv(Path(args.output), rows)

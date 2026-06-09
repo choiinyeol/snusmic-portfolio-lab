@@ -105,6 +105,16 @@ export function ReportDashboard() {
       </div>
 
       <main className="mx-auto max-w-[1500px] space-y-8 px-4 pb-6 pt-8 sm:px-8">
+        <FreshVerdicts
+          onPick={(name) => {
+            state.setMarket("ALL");
+            state.setBucket("ALL");
+            state.setSchool("ALL");
+            state.setQuery("");
+            state.setSelectedName(name);
+          }}
+        />
+
         <FilterBar state={state} />
 
         <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_370px]" aria-label="판결문과 연대기">
@@ -207,6 +217,46 @@ function VerdictTape() {
         ))}
       </div>
     </div>
+  );
+}
+
+function FreshVerdicts({ onPick }: { onPick: (sourceName: string) => void }) {
+  const latest = useMemo(
+    () =>
+      [...reportDataset.records]
+        .filter((report) => report.report_date)
+        .sort((a, b) => String(b.report_date).localeCompare(String(a.report_date)))
+        .slice(0, 6),
+    [],
+  );
+  if (!latest.length) return null;
+  return (
+    <section aria-label="최근 발간 리포트">
+      <h2 className="mb-3 font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">새로 도착한 판결</h2>
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        {latest.map((report) => {
+          const info = verdictOf(report);
+          return (
+            <button
+              key={report.source_name}
+              type="button"
+              onClick={() => onPick(report.source_name)}
+              className="rounded-lg border border-border bg-card p-3 text-left transition hover:-translate-y-0.5 hover:border-stamp"
+              title="판결문 열기 (필터가 초기화됩니다)"
+            >
+              <p className="font-mono text-[10px] text-muted-foreground">
+                {schoolShort[report.school]} · {dateLabel(report.report_date)}
+              </p>
+              <p className="mt-1 truncate text-sm font-bold">{getDisplayName(report)}</p>
+              <p className="mt-1.5 flex items-center justify-between font-mono text-xs">
+                <span className={cn("font-black", stampTone[info.tone])}>{info.stamp}</span>
+                <span className={cn("tnum font-bold", signColor(report.return_latest_pct))}>{formatPct(report.return_latest_pct)}</span>
+              </p>
+            </button>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 
@@ -376,6 +426,13 @@ function VerdictPaper({
             </p>
             <p className="mt-1.5 text-[11px] text-muted-foreground">
               발간 후 현재까지 수익률 · 최신 종가 {formatPrice(report.latest_close, report.market)}
+              {report.alpha_latest_pct !== null && (
+                <>
+                  {" · "}
+                  지수 대비 <span className={cn("font-bold", signColor(report.alpha_latest_pct))}>{formatPct(report.alpha_latest_pct, 1)}</span>
+                  <span className="opacity-75"> (동기간 지수 {formatPct(report.benchmark_return_pct, 1)})</span>
+                </>
+              )}
             </p>
             <div className="mt-4 grid grid-cols-6 divide-x divide-dashed divide-border border-y border-dashed border-border">
               {horizons.map((item) => (

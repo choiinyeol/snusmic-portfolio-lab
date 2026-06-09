@@ -28,6 +28,9 @@ export function ReportLedger({
                 {col.label}
               </th>
             ))}
+            <th className="px-2 py-2.5 text-right font-semibold" title="같은 기간 시장지수 대비 초과수익">
+              알파
+            </th>
             <th className="px-3 py-2.5 text-right font-semibold">판정</th>
           </tr>
         </thead>
@@ -59,13 +62,19 @@ export function ReportLedger({
                     </td>
                   );
                 })}
+                <td
+                  className={cn("tnum whitespace-nowrap px-2 py-2.5 text-right font-mono text-xs font-bold", signColor(report.alpha_latest_pct))}
+                  title={`지수 동기간 ${formatPct(report.benchmark_return_pct, 0)}`}
+                >
+                  {formatPct(report.alpha_latest_pct, 0)}
+                </td>
                 <td className={cn("whitespace-nowrap px-3 py-2.5 text-right text-xs font-black", stampTone[verdict.tone])}>{verdict.stamp}</td>
               </tr>
             );
           })}
           {reports.length === 0 && (
             <tr>
-              <td colSpan={showSchool ? 12 : 11} className="px-4 py-10 text-center text-sm text-muted-foreground">
+              <td colSpan={showSchool ? 13 : 12} className="px-4 py-10 text-center text-sm text-muted-foreground">
                 리포트가 없습니다.
               </td>
             </tr>
