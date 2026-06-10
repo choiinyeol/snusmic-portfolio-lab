@@ -358,7 +358,7 @@ table {
 .wall-cell {
   position: relative;
   border-radius: 2px;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.3s ease, filter 0.3s ease;
 }
 
 .wall-cell:hover,
@@ -366,6 +366,94 @@ table {
   transform: scale(1.45);
   z-index: 3;
   box-shadow: 0 1px 6px hsl(var(--foreground) / 0.45);
+}
+
+/* 범례 필터 — 선택 등급 외에는 잉크가 마른 듯 바랜다. 호버하면 잠깐 되살아난다 */
+.wall-dim {
+  opacity: 0.13;
+  filter: saturate(0.15);
+}
+
+.wall-dim:hover,
+.wall-dim:focus-visible {
+  opacity: 1;
+  filter: saturate(1);
+}
+
+/* 바랜 금장·다이아몬드는 광택과 분광도 멈춘다 (animation의 filter가 dim을 덮지 않도록) */
+.wall-prism.wall-dim {
+  animation: none;
+}
+
+.wall-dim::after {
+  animation: none;
+  opacity: 0;
+}
+
+/* 셀 요약 카드 — 모바일에선 엄지가 닿는 바닥 시트, 데스크톱에선 셀 옆에 핀으로 꽂힌다 */
+.wall-pop {
+  position: fixed;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+}
+
+@media (min-width: 640px) {
+  .wall-pop {
+    position: absolute;
+    left: var(--pop-x);
+    top: var(--pop-y);
+    right: auto;
+    bottom: auto;
+    width: 312px;
+    z-index: 30;
+  }
+
+  .wall-pop[data-side="above"] {
+    transform: translate(-50%, -100%);
+  }
+
+  .wall-pop[data-side="below"] {
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes wall-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.wall-pop-in {
+  animation: wall-pop-in 0.16s ease-out;
+}
+
+/* 색약 대비 질감 — 상승 계열은 점·가로결, 하락 계열은 사선. 색이 아니어도 등급이 읽힌다 */
+.wall-pattern .wall-b-positive {
+  background-image: radial-gradient(hsl(var(--foreground) / 0.5) 0.6px, transparent 0.7px);
+  background-size: 3.5px 3.5px;
+}
+
+.wall-pattern .wall-b-winner {
+  background-image: repeating-linear-gradient(0deg, hsl(var(--card) / 0.65) 0 1px, transparent 1px 3.5px);
+}
+
+.wall-pattern .wall-b-double {
+  background-image: repeating-linear-gradient(90deg, hsl(var(--card) / 0.7) 0 1px, transparent 1px 3px);
+}
+
+.wall-pattern .wall-b-drawdown {
+  background-image: repeating-linear-gradient(135deg, hsl(var(--foreground) / 0.45) 0 1px, transparent 1px 4.5px);
+}
+
+.wall-pattern .wall-b-wrecked {
+  background-image: repeating-linear-gradient(135deg, hsl(var(--card) / 0.7) 0 1px, transparent 1px 2.8px);
 }
 
 /* 터치 기기 — 보이는 크기는 그대로, 누르는 영역만 넓힌다 */
@@ -455,5 +543,46 @@ table {
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* 인쇄 — 판결문은 실제 판결문처럼 A4 한 장에 흰 종이·검은 잉크로 찍힌다.
+   화면 요소(서가·테이프·연대기·필터)는 print:hidden 유틸리티로 가려지고 판결문만 남는다 */
+@media print {
+  @page {
+    size: A4;
+    margin: 13mm;
+  }
+
+  :root,
+  .dark {
+    --background: 0 0% 100%;
+    --foreground: 24 12% 8%;
+    --card: 0 0% 100%;
+    --card-foreground: 24 12% 8%;
+    --secondary: 0 0% 95%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 32%;
+    --border: 0 0% 60%;
+    --stamp: 354 70% 34%;
+    --up: 354 70% 36%;
+    --down: 219 62% 36%;
+    --warn: 33 85% 28%;
+    --gold: 40 78% 26%;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .stamp,
+  .tier-gold,
+  .tier-prism {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  #verdict-paper {
+    break-inside: avoid;
   }
 }

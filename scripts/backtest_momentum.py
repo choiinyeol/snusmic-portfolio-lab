@@ -1,10 +1,18 @@
-"""학회 리포트 × 전략 연구 백테스트 v5.
+"""학회 리포트 × 전략 연구 백테스트 v6.
 
-변경사항 (v5):
-- Task 1: 모든 시리즈 2019-07-01 시작 통일 (캘린더, 부의 시뮬, 벤치마크 모두)
-- Task 2: 전체 거래 로그 + CSV 내보내기 (트리거 리포트 포함)
-- Task 3: 추가 전략 변형 연구 (컨센서스 윈도우, 보유 기간, 목표가 청산, 업사이드 가중)
-- Task 4: 오늘의 신호 (보유 중, 매도 임박, 매수 대기, 신규 신호)
+변경사항 (v6):
+- Task 1: US 종목 유니버스 추가 (US_{TICKER}.csv 로드, yfinance 캐시 패턴)
+- Task 2: 종목 링크용 market 필드 trades에 포함
+- Task 3: 5가지 신규 전략 (A~E + optional F):
+    A. 12개월 보유 (헤드라인 기준선)
+    B. 36개월 보유 (장기 호라이즌)
+    C. 내러티브 홀드 (200MA 하방 + 진입가 하방 시 청산, Faber 2007)
+    D. 샹들리에 래칫 (ATR(42)×5 트레일링)
+    E. 목표가 절반 익절 + 러너 (C 규칙 트레일)
+    F. 모멘텀 필터 진입 (200MA 위에서만 진입, C 청산)
+  파라미터: 문헌 표준값 고정, 그리드 서치 없음
+- Task 4: 전략별 CSV (strategy-trades-{key}.csv)
+- 오늘의 신호: 헤드라인 전략 기준 유지
 """
 
 from __future__ import annotations
@@ -23,6 +31,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PRICE_DIR = ROOT / "data" / "prices"
 OUT_PATH = ROOT / "src" / "data" / "strategy-backtest.json"
 CSV_PATH = ROOT / "public" / "strategy-trades.csv"
+PUBLIC_DIR = ROOT / "public"
 
 # Universe filter — also the sim start date
 UNIVERSE_START = dt.date(2019, 7, 1)
@@ -35,6 +44,10 @@ POSITION_WEIGHT = 0.05
 COST_PER_SIDE = 0.003
 REGIME_MA = 200
 
+# Literature-grounded, fixed parameters (no grid search)
+CHANDELIER_ATR_MULT = 5.0   # Chandelier Exit: ATR(42)×5 — wide, lets multibaggers breathe
+MA200_MONTHLY_CHECK = True  # Faber (2007): check 200-day MA monthly
+
 # DCA params
 DCA_INITIAL = 10_000_000
 DCA_BASE_MONTHLY = 1_000_000
@@ -45,16 +58,13 @@ DCA_STEP_MONTHS = 24
 IS_END = dt.date(2023, 12, 31)
 OOS_START = dt.date(2024, 1, 1)
 
-# v3 headline params
+# v3 headline params (kept for breakout sensitivity)
 HEADLINE_ATR_MULT = 4.0
 HEADLINE_REGIME = False
 MIN_DAYS_BEFORE_SIGNAL = 10
 SIGNAL_WINDOW_DAYS = 180
 RATCHET_THRESHOLD_1 = 0.30
 RATCHET_THRESHOLD_2 = 1.00
-
-# Consensus window variants (days; None = all-time)
-CONSENSUS_WINDOWS = [90, 180, 365, None]
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -107,6 +117,32 @@ def _fetch_index_yf(ticker: str, cache_name: str) -> pd.Series:
     return out["close"].sort_index()
 
 
+def _fetch_us_stock_yf(ticker: str) -> bool:
+    """US 주식 가격 yfinance로 다운로드 → data/prices/US_{ticker}.csv 저장."""
+    import yfinance as yf  # type: ignore
+    cache_path = PRICE_DIR / f"US_{ticker}.csv"
+    print(f"  Fetching US/{ticker} via yfinance...", flush=True)
+    try:
+        raw = yf.download(ticker, start="2007-01-01", progress=False, auto_adjust=True, threads=False)
+        if raw.empty:
+            print(f"    WARNING: empty data for {ticker}", flush=True)
+            return False
+        raw.index = pd.to_datetime(raw.index)
+        if isinstance(raw.columns, pd.MultiIndex):
+            raw.columns = [c[0].lower() for c in raw.columns]
+        else:
+            raw.columns = [c.lower() for c in raw.columns]
+        needed = [c for c in ["open", "high", "low", "close", "volume"] if c in raw.columns]
+        out = raw[needed].copy()
+        out.index.name = "Date"
+        out.to_csv(cache_path)
+        print(f"    Saved {cache_path.name} ({len(out)} rows)", flush=True)
+        return True
+    except Exception as e:
+        print(f"    ERROR fetching {ticker}: {e}", flush=True)
+        return False
+
+
 def load_kospi() -> pd.Series:
     path = PRICE_DIR / "IDX_KOSPI.csv"
     df = pd.read_csv(path, index_col=0, parse_dates=True).sort_index()
@@ -137,15 +173,29 @@ def load_gld() -> pd.Series:
     return _fetch_index_yf("GLD", "GLD")
 
 
-def load_prices(ticker: str) -> pd.DataFrame | None:
-    path = PRICE_DIR / f"KR_{ticker}.csv"
+def load_prices(ticker: str, market: str = "KR") -> pd.DataFrame | None:
+    """주가 데이터 로드. market='KR' → KR_{ticker}.csv, market='US' → US_{ticker}.csv"""
+    if market == "US":
+        path = PRICE_DIR / f"US_{ticker}.csv"
+    else:
+        path = PRICE_DIR / f"KR_{ticker}.csv"
+
     if not path.exists():
         return None
-    df = pd.read_csv(path, index_col=0, parse_dates=True).sort_index()
+    try:
+        df = pd.read_csv(path, index_col=0, parse_dates=True).sort_index()
+    except Exception:
+        return None
     if df.empty or "close" not in df:
         return None
+    # KR CSVs may use Korean 날짜 header — already handled by index_col=0
     df = df[~df.index.duplicated(keep="last")]
-    # Only keep rows from SIM_START onward (still need earlier rows for ATR warmup)
+
+    # Ensure required columns exist
+    for col in ["open", "high", "low", "close"]:
+        if col not in df.columns:
+            return None
+
     prev_close = df["close"].shift(1)
     tr = pd.concat(
         [df["high"] - df["low"], (df["high"] - prev_close).abs(), (df["low"] - prev_close).abs()],
@@ -154,6 +204,8 @@ def load_prices(ticker: str) -> pd.DataFrame | None:
     df["atr"] = tr.rolling(ATR_PERIOD, min_periods=ATR_PERIOD // 2).mean()
     ret = df["close"].pct_change()
     df["sharpe90"] = ret.rolling(90, min_periods=45).mean() / ret.rolling(90, min_periods=45).std() * math.sqrt(252)
+    # 200-day MA for narrative hold and momentum filter
+    df["ma200"] = df["close"].rolling(200, min_periods=100).mean()
     return df
 
 
@@ -164,29 +216,33 @@ def asof_value(series: pd.Series, day: dt.date) -> float:
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Consensus trigger resolution
-# Build: ticker -> list of (report_date, school, source_file, target_price, display_name)
-# For each trade entry, find the trigger reports that created the consensus.
 # ──────────────────────────────────────────────────────────────────────────────
 
 def build_ticker_reports(perf: pd.DataFrame) -> dict[str, list[dict]]:
     """
-    Returns ticker -> sorted list of report dicts with keys:
-      report_date, school, source_file, target_price, display_name, stated_upside_pct
+    Returns ticker_key -> sorted list of report dicts.
+    ticker_key = "KR_{6-digit}" or "US_{TICKER}"
     """
     result: dict[str, list[dict]] = {}
     for _, row in perf.iterrows():
-        ticker = str(row["ticker"]).zfill(6)
+        market = str(row.get("market", "KR"))
+        raw_ticker = str(row["ticker"])
+        if market == "KR":
+            ticker_key = raw_ticker.zfill(6)
+        else:
+            ticker_key = raw_ticker  # US tickers as-is
         try:
             rdate = dt.date.fromisoformat(str(row["report_date"]))
         except ValueError:
             continue
-        result.setdefault(ticker, []).append({
+        result.setdefault(ticker_key, []).append({
             "report_date": rdate,
             "school": str(row.get("school", "")),
             "source_file": str(row.get("source_file", "")),
             "target_price": float(row["target_price"]) if pd.notna(row.get("target_price")) else None,
-            "display_name": str(row.get("display_name", ticker)),
+            "display_name": str(row.get("display_name", ticker_key)),
             "stated_upside_pct": float(row["stated_upside_pct"]) if pd.notna(row.get("stated_upside_pct")) else None,
+            "market": market,
         })
     for t in result:
         result[t].sort(key=lambda x: x["report_date"])
@@ -194,24 +250,18 @@ def build_ticker_reports(perf: pd.DataFrame) -> dict[str, list[dict]]:
 
 
 def find_trigger_reports(
-    ticker: str,
+    ticker_key: str,
     entry_date: dt.date,
     ticker_reports: dict[str, list[dict]],
     consensus_window: int | None,
 ) -> list[dict]:
-    """
-    Returns the set of reports that formed the consensus at entry_date.
-    consensus_window: if not None, only reports within window days before entry_date count.
-    """
-    reports = ticker_reports.get(ticker, [])
-    # Reports that were published before entry_date
+    reports = ticker_reports.get(ticker_key, [])
     past = [r for r in reports if r["report_date"] < entry_date]
     if not past:
         return []
     if consensus_window is not None:
         cutoff = entry_date - dt.timedelta(days=consensus_window)
         past = [r for r in past if r["report_date"] >= cutoff]
-    # Group by school, keep latest report per school
     by_school: dict[str, dict] = {}
     for r in past:
         school = r["school"]
@@ -221,7 +271,569 @@ def find_trigger_reports(
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Strategy A/D: Immediate entry, fixed hold period
+# Shared helpers
+# ──────────────────────────────────────────────────────────────────────────────
+
+def first_trading_day_after(target: dt.date, calendar: list[dt.date]) -> dt.date | None:
+    for d in calendar:
+        if d > target:
+            return d
+    return None
+
+
+def first_trading_day_on_or_after(target: dt.date, calendar: list[dt.date]) -> dt.date | None:
+    for d in calendar:
+        if d >= target:
+            return d
+    return None
+
+
+def months_later(base: dt.date, n: int) -> dt.date:
+    m = base.month - 1 + n
+    return dt.date(base.year + m // 12, m % 12 + 1, min(base.day, 28))
+
+
+def _get_quote(prices: dict[str, pd.DataFrame], ticker: str, day: dt.date) -> pd.Series | None:
+    df = prices.get(ticker)
+    if df is None:
+        return None
+    ts = pd.Timestamp(day)
+    return df.loc[ts] if ts in df.index else None
+
+
+def _last_month_open(day: dt.date, calendar: list[dt.date]) -> dt.date | None:
+    """Return the first trading day of the current month (for monthly MA check)."""
+    target = dt.date(day.year, day.month, 1)
+    return first_trading_day_on_or_after(target, calendar)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Common entry-queue builder for consensus strategies
+# ──────────────────────────────────────────────────────────────────────────────
+
+def build_pending_entries(
+    reports: list[tuple[dt.date, str, str, int]],
+    calendar: list[dt.date],
+    consensus_only: bool,
+) -> dict[dt.date, list[tuple[str, str, int]]]:
+    """Returns entry_day -> [(ticker_key, source, n_clubs)]"""
+    by_report_date: dict[dt.date, list[tuple[str, str, int]]] = {}
+    for rdate, ticker, source, n_clubs in reports:
+        if consensus_only and n_clubs < 2:
+            continue
+        by_report_date.setdefault(rdate, []).append((ticker, source, n_clubs))
+
+    pending: dict[dt.date, list[tuple[str, str, int]]] = {}
+    for rdate, items in by_report_date.items():
+        entry_day = first_trading_day_after(rdate, calendar)
+        if entry_day:
+            pending.setdefault(entry_day, []).extend(items)
+    return pending
+
+
+def _try_enter(
+    ticker: str,
+    source: str,
+    n_clubs: int,
+    day: dt.date,
+    prices: dict[str, pd.DataFrame],
+    positions: dict[str, dict],
+    cash: float,
+    nav_now: float,
+    ticker_reports: dict[str, list[dict]] | None,
+    weight: float = POSITION_WEIGHT,
+    momentum_filter: bool = False,
+) -> tuple[dict | None, float]:
+    """
+    Try to enter a position. Returns (position_dict, new_cash) or (None, cash).
+    momentum_filter=True: only enter if close > 200MA.
+    """
+    if ticker in positions:
+        return None, cash
+    df = prices.get(ticker)
+    if df is None:
+        return None, cash
+    day_ts = pd.Timestamp(day)
+    if day_ts not in df.index:
+        return None, cash
+    q = df.loc[day_ts]
+    entry_price = float(q["open"])
+    if entry_price <= 0:
+        return None, cash
+
+    # Momentum filter: price > 200MA at entry
+    if momentum_filter:
+        ma200_val = asof_value(df["ma200"], day)
+        if ma200_val <= 0 or entry_price < ma200_val:
+            return None, cash
+
+    budget = min(nav_now * weight, cash)
+    if budget < nav_now * POSITION_WEIGHT * 0.5:
+        return None, cash
+
+    shares = budget * (1 - COST_PER_SIDE) / entry_price
+    cash -= budget
+
+    display_name = ticker
+    tp = None
+    if ticker_reports is not None:
+        tr_list = ticker_reports.get(ticker, [])
+        past_tr = [x for x in tr_list if x["report_date"] < day]
+        if past_tr:
+            latest = max(past_tr, key=lambda x: x["report_date"])
+            display_name = latest["display_name"]
+            tps = [x["target_price"] for x in past_tr if x["target_price"]]
+            tp = max(tps) if tps else None
+    # market from ticker_reports
+    market = "KR"
+    if ticker_reports is not None:
+        tr_list = ticker_reports.get(ticker, [])
+        if tr_list:
+            market = tr_list[0].get("market", "KR")
+
+    pos = {
+        "shares": shares,
+        "entry_price": entry_price,
+        "entry_date": day,
+        "cost": budget,
+        "last_close": entry_price,
+        "highest": entry_price,
+        "source": source,
+        "n_clubs": n_clubs,
+        "display_name": display_name,
+        "market": market,
+        "target_price": tp,
+        # For chandelier
+        "stop": None,
+        # For narrative hold (C rule): track if below_ma200_and_entry last month
+        "ma200_exit_triggered": False,
+        # For half-exit (E): whether half already sold
+        "half_sold": False,
+        "half_sell_price": None,
+    }
+    return pos, cash
+
+
+def _close_trade(
+    ticker: str,
+    pos: dict,
+    exit_date: dt.date,
+    exit_price: float,
+    exit_reason: str,
+    ticker_reports: dict[str, list[dict]] | None,
+    record_full_trades: bool,
+    consensus_window: int | None,
+    shares_override: float | None = None,
+    cost_override: float | None = None,
+) -> dict:
+    shares = shares_override if shares_override is not None else pos["shares"]
+    cost = cost_override if cost_override is not None else pos["cost"]
+    proceeds = shares * exit_price * (1 - COST_PER_SIDE)
+    trade: dict = {
+        "ticker": ticker,
+        "market": pos.get("market", "KR"),
+        "display_name": pos.get("display_name", ticker),
+        "source": pos["source"],
+        "n_clubs": pos["n_clubs"],
+        "entry_date": pos["entry_date"].isoformat(),
+        "exit_date": exit_date.isoformat(),
+        "entry": round(pos["entry_price"], 4),
+        "exit": round(exit_price, 4),
+        "return_pct": round((proceeds / cost - 1) * 100, 2),
+        "days": (exit_date - pos["entry_date"]).days,
+        "exit_reason": exit_reason,
+    }
+    if record_full_trades and ticker_reports is not None:
+        triggers = find_trigger_reports(ticker, pos["entry_date"], ticker_reports, consensus_window)
+        trade["trigger_reports"] = [
+            {
+                "school": tr["school"],
+                "report_date": tr["report_date"].isoformat(),
+                "source_file": Path(tr["source_file"]).name,
+                "target_price": tr["target_price"],
+                "stated_upside_pct": tr["stated_upside_pct"],
+            }
+            for tr in triggers
+        ]
+        trade["trigger_schools"] = sorted({tr["school"] for tr in triggers})
+        trade["trigger_target_prices"] = [tr["target_price"] for tr in triggers if tr["target_price"]]
+    return trade
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Strategy A/B: Immediate entry, fixed hold period
+# ──────────────────────────────────────────────────────────────────────────────
+
+def run_fixed_hold(
+    prices: dict[str, pd.DataFrame],
+    reports: list[tuple[dt.date, str, str, int]],
+    calendar: list[dt.date],
+    hold_months: int,
+    label: str,
+    ticker_reports: dict[str, list[dict]] | None = None,
+    record_full_trades: bool = False,
+) -> dict:
+    """Immediate entry, sell after hold_months. Consensus ≥2 only."""
+    START_CAPITAL = 100_000_000
+    cash = float(START_CAPITAL)
+    positions: dict[str, dict] = {}
+    nav_series: list[tuple[str, float]] = []
+    trades: list[dict] = []
+    scheduled_exits: dict[str, dt.date] = {}
+
+    pending_entries = build_pending_entries(reports, calendar, consensus_only=True)
+
+    for day in calendar:
+        day_ts = pd.Timestamp(day)
+
+        # Execute scheduled exits
+        to_exit = [t for t, d in list(scheduled_exits.items()) if d <= day and t in positions]
+        for ticker in to_exit:
+            pos = positions[ticker]
+            q = _get_quote(prices, ticker, day)
+            if q is None or float(q["open"]) <= 0:
+                continue
+            exit_price = float(q["open"])
+            cash += pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            trades.append(_close_trade(ticker, pos, day, exit_price, f"{hold_months}개월_만기",
+                                       ticker_reports, record_full_trades, None))
+            del positions[ticker]
+            del scheduled_exits[ticker]
+
+        # Execute pending entries
+        if day in pending_entries:
+            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            slots = MAX_POSITIONS - len(positions)
+            candidates = list({t: (t, s, nc) for t, s, nc in pending_entries[day] if t not in positions}.values())
+            for ticker, source, n_clubs in candidates[:slots]:
+                pos, cash = _try_enter(ticker, source, n_clubs, day, prices, positions, cash, nav_now, ticker_reports)
+                if pos is not None:
+                    positions[ticker] = pos
+                    exit_target = months_later(day, hold_months)
+                    exit_day = first_trading_day_on_or_after(exit_target, calendar)
+                    if exit_day:
+                        scheduled_exits[ticker] = exit_day
+
+        # Update last_close
+        for ticker, pos in positions.items():
+            df = prices.get(ticker)
+            if df is not None and day_ts in df.index:
+                pos["last_close"] = float(df.loc[day_ts]["close"])
+
+        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav_series.append((day.isoformat(), nav))
+
+    # Force-close remaining
+    last_day = calendar[-1]
+    for ticker, pos in list(positions.items()):
+        trades.append(_close_trade(ticker, pos, last_day, pos["last_close"], "데이터_종료_미청산",
+                                   ticker_reports, record_full_trades, None))
+
+    return _compute_result(nav_series, trades, START_CAPITAL, label, open_positions=positions)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Strategy C: Narrative Hold — exit on 200MA + below entry (Faber 2007)
+# Checked monthly. Hold indefinitely if thesis intact.
+# ──────────────────────────────────────────────────────────────────────────────
+
+def run_narrative_hold(
+    prices: dict[str, pd.DataFrame],
+    reports: list[tuple[dt.date, str, str, int]],
+    calendar: list[dt.date],
+    label: str,
+    ticker_reports: dict[str, list[dict]] | None = None,
+    record_full_trades: bool = False,
+    momentum_filter_entry: bool = False,
+) -> dict:
+    """
+    진입: consensus ≥2, 발간 다음 거래일 시가
+    청산: 월말 체크 — close < 200MA AND close < entry_price → 다음 거래일 시가 청산
+    (Faber 2007 10-month SMA rule 정신: 추세 아래로 돌아오면 EXIT)
+    momentum_filter_entry=True: 진입 시 close > 200MA 조건 추가 (Strategy F)
+    """
+    START_CAPITAL = 100_000_000
+    cash = float(START_CAPITAL)
+    positions: dict[str, dict] = {}
+    nav_series: list[tuple[str, float]] = []
+    trades: list[dict] = []
+    pending_exits: set[str] = set()  # flagged at month-end, executed next open
+
+    pending_entries = build_pending_entries(reports, calendar, consensus_only=True)
+
+    # Build set of month-end dates
+    cal_s = pd.Series(calendar)
+    month_ends: set[dt.date] = set(
+        cal_s.groupby(cal_s.apply(lambda d: (d.year, d.month))).last().values
+    )
+
+    for day in calendar:
+        day_ts = pd.Timestamp(day)
+
+        # Execute pending exits (flagged previous month-end)
+        to_exit = [t for t in list(pending_exits) if t in positions]
+        for ticker in to_exit:
+            pos = positions[ticker]
+            q = _get_quote(prices, ticker, day)
+            if q is None or float(q["open"]) <= 0:
+                continue
+            exit_price = float(q["open"])
+            cash += pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            trades.append(_close_trade(ticker, pos, day, exit_price, "thesis_break_200MA",
+                                       ticker_reports, record_full_trades, None))
+            del positions[ticker]
+            pending_exits.discard(ticker)
+
+        # Execute pending entries
+        if day in pending_entries:
+            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            slots = MAX_POSITIONS - len(positions)
+            candidates = list({t: (t, s, nc) for t, s, nc in pending_entries[day] if t not in positions}.values())
+            for ticker, source, n_clubs in candidates[:slots]:
+                pos, cash = _try_enter(ticker, source, n_clubs, day, prices, positions, cash, nav_now,
+                                       ticker_reports, momentum_filter=momentum_filter_entry)
+                if pos is not None:
+                    positions[ticker] = pos
+
+        # Update last_close and MA
+        for ticker, pos in positions.items():
+            df = prices.get(ticker)
+            if df is not None and day_ts in df.index:
+                pos["last_close"] = float(df.loc[day_ts]["close"])
+
+        # Month-end thesis-break check (Faber rule: monthly check)
+        if day in month_ends:
+            for ticker, pos in list(positions.items()):
+                df = prices.get(ticker)
+                if df is None:
+                    continue
+                close = pos["last_close"]
+                entry_p = pos["entry_price"]
+                ma200_val = asof_value(df["ma200"], day)
+                # Thesis break: close below 200MA AND below entry price
+                if ma200_val > 0 and close < ma200_val and close < entry_p:
+                    pending_exits.add(ticker)
+
+        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav_series.append((day.isoformat(), nav))
+
+    # Force-close remaining
+    last_day = calendar[-1]
+    for ticker, pos in list(positions.items()):
+        trades.append(_close_trade(ticker, pos, last_day, pos["last_close"], "데이터_종료_미청산",
+                                   ticker_reports, record_full_trades, None))
+
+    return _compute_result(nav_series, trades, START_CAPITAL, label, open_positions=positions)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Strategy D: Chandelier Ratchet — ATR(42)×5 trailing from highest-high
+# Wide enough to let multibaggers breathe.
+# ──────────────────────────────────────────────────────────────────────────────
+
+def run_chandelier(
+    prices: dict[str, pd.DataFrame],
+    reports: list[tuple[dt.date, str, str, int]],
+    calendar: list[dt.date],
+    label: str,
+    ticker_reports: dict[str, list[dict]] | None = None,
+    record_full_trades: bool = False,
+) -> dict:
+    """
+    진입: consensus ≥2, immediate entry
+    청산: close < (highest_high_since_entry - ATR(42) × 5)
+    Chandelier Exit (Le Beau) — 문헌 표준값 ATR×5
+    """
+    START_CAPITAL = 100_000_000
+    cash = float(START_CAPITAL)
+    positions: dict[str, dict] = {}
+    nav_series: list[tuple[str, float]] = []
+    trades: list[dict] = []
+    pending_exits: set[str] = set()
+
+    pending_entries = build_pending_entries(reports, calendar, consensus_only=True)
+
+    for day in calendar:
+        day_ts = pd.Timestamp(day)
+
+        # Execute pending exits
+        to_exit = [t for t in list(pending_exits) if t in positions]
+        for ticker in to_exit:
+            pos = positions[ticker]
+            q = _get_quote(prices, ticker, day)
+            if q is None or float(q["open"]) <= 0:
+                continue
+            exit_price = float(q["open"])
+            cash += pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            trades.append(_close_trade(ticker, pos, day, exit_price, "chandelier_ATR5",
+                                       ticker_reports, record_full_trades, None))
+            del positions[ticker]
+            pending_exits.discard(ticker)
+
+        # Execute pending entries
+        if day in pending_entries:
+            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            slots = MAX_POSITIONS - len(positions)
+            candidates = list({t: (t, s, nc) for t, s, nc in pending_entries[day] if t not in positions}.values())
+            for ticker, source, n_clubs in candidates[:slots]:
+                pos, cash = _try_enter(ticker, source, n_clubs, day, prices, positions, cash, nav_now, ticker_reports)
+                if pos is not None:
+                    atr_val = asof_value(prices[ticker]["atr"], day)
+                    stop = pos["entry_price"] - CHANDELIER_ATR_MULT * atr_val if atr_val else pos["entry_price"] * 0.75
+                    pos["stop"] = stop
+                    positions[ticker] = pos
+
+        # Update positions and check chandelier stop
+        for ticker, pos in list(positions.items()):
+            df = prices.get(ticker)
+            if df is None or day_ts not in df.index:
+                continue
+            close = float(df.loc[day_ts]["close"])
+            pos["last_close"] = close
+            pos["highest"] = max(pos.get("highest", close), close)
+            atr_val = asof_value(df["atr"], day)
+            if atr_val:
+                new_stop = pos["highest"] - CHANDELIER_ATR_MULT * atr_val
+                pos["stop"] = max(pos.get("stop", 0.0), new_stop)
+            if pos.get("stop") and close < pos["stop"] and ticker not in pending_exits:
+                pending_exits.add(ticker)
+
+        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav_series.append((day.isoformat(), nav))
+
+    last_day = calendar[-1]
+    for ticker, pos in list(positions.items()):
+        trades.append(_close_trade(ticker, pos, last_day, pos["last_close"], "데이터_종료_미청산",
+                                   ticker_reports, record_full_trades, None))
+
+    return _compute_result(nav_series, trades, START_CAPITAL, label, open_positions=positions)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Strategy E: Half-exit at target + runner with C rule
+# Sell half at club target price; trail rest with 200MA+entry thesis break (monthly)
+# ──────────────────────────────────────────────────────────────────────────────
+
+def run_half_exit_runner(
+    prices: dict[str, pd.DataFrame],
+    reports: list[tuple[dt.date, str, str, int]],
+    calendar: list[dt.date],
+    label: str,
+    ticker_reports: dict[str, list[dict]] | None = None,
+    record_full_trades: bool = False,
+) -> dict:
+    """
+    진입: consensus ≥2, immediate entry
+    절반 청산: 목표가(클럽 최고 목표가) 도달 시 → 보유 주수 50% 매도 (당일 종가)
+    나머지 러너: C 규칙 (200MA + 진입가 하방, 월 1회 체크)
+    목표가 없으면 전량 C 규칙만.
+    """
+    START_CAPITAL = 100_000_000
+    cash = float(START_CAPITAL)
+    positions: dict[str, dict] = {}
+    nav_series: list[tuple[str, float]] = []
+    trades: list[dict] = []
+    runner_exits: set[str] = set()  # flagged for C-rule exit next open
+
+    pending_entries = build_pending_entries(reports, calendar, consensus_only=True)
+
+    cal_s = pd.Series(calendar)
+    month_ends: set[dt.date] = set(
+        cal_s.groupby(cal_s.apply(lambda d: (d.year, d.month))).last().values
+    )
+
+    for day in calendar:
+        day_ts = pd.Timestamp(day)
+
+        # Execute runner exits (C-rule triggered previous month-end)
+        to_exit = [t for t in list(runner_exits) if t in positions]
+        for ticker in to_exit:
+            pos = positions[ticker]
+            q = _get_quote(prices, ticker, day)
+            if q is None or float(q["open"]) <= 0:
+                continue
+            exit_price = float(q["open"])
+            # Only the runner shares remain
+            runner_shares = pos["shares"]
+            runner_cost = pos.get("runner_cost", pos["cost"] * 0.5)
+            cash += runner_shares * exit_price * (1 - COST_PER_SIDE)
+            trade = _close_trade(ticker, pos, day, exit_price, "runner_thesis_break_200MA",
+                                 ticker_reports, record_full_trades, None,
+                                 shares_override=runner_shares, cost_override=runner_cost)
+            trades.append(trade)
+            del positions[ticker]
+            runner_exits.discard(ticker)
+
+        # Execute pending entries
+        if day in pending_entries:
+            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            slots = MAX_POSITIONS - len(positions)
+            candidates = list({t: (t, s, nc) for t, s, nc in pending_entries[day] if t not in positions}.values())
+            for ticker, source, n_clubs in candidates[:slots]:
+                pos, cash = _try_enter(ticker, source, n_clubs, day, prices, positions, cash, nav_now, ticker_reports)
+                if pos is not None:
+                    positions[ticker] = pos
+
+        # Check target-price half exits (intraday high)
+        for ticker, pos in list(positions.items()):
+            if pos.get("half_sold"):
+                continue
+            tp = pos.get("target_price")
+            if tp is None:
+                continue
+            df = prices.get(ticker)
+            if df is None or day_ts not in df.index:
+                continue
+            high_today = float(df.loc[day_ts].get("high", df.loc[day_ts]["close"]))
+            close_today = float(df.loc[day_ts]["close"])
+            if high_today >= tp:
+                # Sell half at target price (capped by close if needed)
+                half_exit_price = min(tp, close_today) if close_today < tp else tp
+                half_shares = pos["shares"] * 0.5
+                half_cost = pos["cost"] * 0.5
+                cash += half_shares * half_exit_price * (1 - COST_PER_SIDE)
+                trade = _close_trade(ticker, pos, day, half_exit_price, "목표가_절반익절",
+                                     ticker_reports, record_full_trades, None,
+                                     shares_override=half_shares, cost_override=half_cost)
+                trades.append(trade)
+                # Update position to runner only
+                pos["shares"] = pos["shares"] * 0.5
+                pos["runner_cost"] = half_cost
+                pos["half_sold"] = True
+                pos["half_sell_price"] = half_exit_price
+
+        # Update last_close
+        for ticker, pos in positions.items():
+            df = prices.get(ticker)
+            if df is not None and day_ts in df.index:
+                pos["last_close"] = float(df.loc[day_ts]["close"])
+
+        # Month-end C-rule check for runners
+        if day in month_ends:
+            for ticker, pos in list(positions.items()):
+                df = prices.get(ticker)
+                if df is None:
+                    continue
+                close = pos["last_close"]
+                entry_p = pos["entry_price"]
+                ma200_val = asof_value(df["ma200"], day)
+                if ma200_val > 0 and close < ma200_val and close < entry_p:
+                    runner_exits.add(ticker)
+
+        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav_series.append((day.isoformat(), nav))
+
+    last_day = calendar[-1]
+    for ticker, pos in list(positions.items()):
+        trades.append(_close_trade(ticker, pos, last_day, pos["last_close"], "데이터_종료_미청산",
+                                   ticker_reports, record_full_trades, None))
+
+    return _compute_result(nav_series, trades, START_CAPITAL, label, open_positions=positions)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Legacy Strategy (kept for sensitivity table): Immediate entry, fixed hold
+# (supports all v5 flags for variant research)
 # ──────────────────────────────────────────────────────────────────────────────
 
 def run_immediate_hold(
@@ -237,37 +849,20 @@ def run_immediate_hold(
     target_exit: bool = False,
     record_full_trades: bool = False,
 ) -> dict:
-    """
-    진입: report_date 이후 첫 거래일 시가
-    청산: 진입 후 hold_months개월 후 첫 거래일 시가 (또는 목표가 도달 시 조기 청산)
-    포지션: 동일비중 5%, 최대 20종목
-    consensus_only: True면 n_clubs >= 2만 진입
-    consensus_window: None=all-time, else only reports within N days
-    upside_weighted: stated_upside_pct 기반 비중 조정 (capped at 2x)
-    target_exit: True면 목표가 도달 시 청산
-    record_full_trades: True면 trigger_reports 포함 상세 거래 기록
-    """
+    """v5 compatible fixed-hold runner (consensus window variants, upside weighting, target exit)."""
     START_CAPITAL = 100_000_000
     cash = float(START_CAPITAL)
     positions: dict[str, dict] = {}
     nav_series: list[tuple[str, float]] = []
     trades: list[dict] = []
 
-    # Build entry queue with consensus window filter
     by_report_date: dict[dt.date, list[tuple[str, str, int]]] = {}
     if consensus_window is not None and ticker_reports is not None:
-        # Re-derive n_clubs using the window
-        ticker_schools_in_window: dict[str, set[str]] = {}
-        for _, row_ticker, row_source, _ in reports:
-            pass  # we'll compute below per entry date
-        # Build: report_date -> list of (ticker, source, schools_in_window)
-        # We need to compute at the time of each report
         all_report_dates = sorted({r[0] for r in reports})
         for rdate in all_report_dates:
             for r_rdate, r_ticker, r_source, _ in reports:
                 if r_rdate != rdate:
                     continue
-                # count schools within window up to rdate
                 tr = ticker_reports.get(r_ticker, [])
                 past = [x for x in tr if x["report_date"] <= rdate]
                 window_start = rdate - dt.timedelta(days=consensus_window)
@@ -283,68 +878,56 @@ def run_immediate_hold(
                 continue
             by_report_date.setdefault(rdate, []).append((ticker, source, n_clubs))
 
-    def first_trading_day_after(target: dt.date) -> dt.date | None:
-        for d in calendar:
-            if d > target:
-                return d
-        return None
-
-    def first_trading_day_on_or_after(target: dt.date) -> dt.date | None:
-        for d in calendar:
-            if d >= target:
-                return d
-        return None
-
     pending_entries: dict[dt.date, list[tuple[str, str, int]]] = {}
     scheduled_exits: dict[str, dt.date] = {}
     target_prices: dict[str, float] = {}
 
     for rdate, items in by_report_date.items():
-        entry_day = first_trading_day_after(rdate)
+        entry_day = first_trading_day_after(rdate, calendar)
         if entry_day:
             pending_entries.setdefault(entry_day, []).extend(items)
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
 
-        # Check target-price exits
         if target_exit:
             for ticker, pos in list(positions.items()):
                 tp = target_prices.get(ticker)
                 if tp is None:
                     continue
-                df = prices[ticker]
+                df = prices.get(ticker)
+                if df is None:
+                    continue
                 if day_ts in df.index:
                     high_today = float(df.loc[day_ts].get("high", df.loc[day_ts]["close"]))
                     if high_today >= tp and ticker not in scheduled_exits:
-                        # Schedule for today's close
                         scheduled_exits[ticker] = day
 
-        # Execute scheduled exits
         to_exit = [t for t, exit_d in list(scheduled_exits.items()) if exit_d <= day and t in positions]
         for ticker in to_exit:
-            pos = positions.get(ticker)
-            if pos is None:
+            pos = positions[ticker]
+            df = prices.get(ticker)
+            if df is None:
                 continue
-            df = prices[ticker]
             q = df.loc[day_ts] if day_ts in df.index else None
             if q is None or float(q["open"]) <= 0:
                 continue
             price = float(q["open"])
             proceeds = pos["shares"] * price * (1 - COST_PER_SIDE)
             cash += proceeds
-            exit_reason = "목표가_도달" if target_exit and price >= (target_prices.get(ticker, 0)) else "12개월_만기"
+            exit_reason = "목표가_도달" if target_exit and price >= (target_prices.get(ticker, 0)) else f"{hold_months}개월_만기"
             if day == calendar[-1]:
                 exit_reason = "데이터_종료"
             trade: dict = {
                 "ticker": ticker,
+                "market": pos.get("market", "KR"),
                 "display_name": pos.get("display_name", ticker),
                 "source": pos["source"],
                 "n_clubs": pos["n_clubs"],
                 "entry_date": pos["entry_date"].isoformat(),
                 "exit_date": day.isoformat(),
-                "entry": round(pos["entry_price"], 2),
-                "exit": round(price, 2),
+                "entry": round(pos["entry_price"], 4),
+                "exit": round(price, 4),
                 "return_pct": round((proceeds / pos["cost"] - 1) * 100, 2),
                 "days": (day - pos["entry_date"]).days,
                 "exit_reason": exit_reason,
@@ -370,7 +953,6 @@ def run_immediate_hold(
             if ticker in target_prices:
                 del target_prices[ticker]
 
-        # Execute pending entries
         if day in pending_entries:
             nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
             slots = MAX_POSITIONS - len(positions)
@@ -392,14 +974,12 @@ def run_immediate_hold(
                 if float(q["open"]) <= 0:
                     continue
 
-                # Upside-weighted sizing
                 weight = POSITION_WEIGHT
                 if upside_weighted and ticker_reports is not None:
                     tr_list = ticker_reports.get(ticker, [])
                     past = [x for x in tr_list if x["report_date"] < day and x["stated_upside_pct"] is not None]
                     if past:
                         avg_upside = sum(x["stated_upside_pct"] for x in past) / len(past)
-                        # Scale: base 30% upside = 1x, cap at 2x, floor at 0.5x
                         scale = max(0.5, min(2.0, avg_upside / 30.0))
                         weight = POSITION_WEIGHT * scale
 
@@ -410,18 +990,18 @@ def run_immediate_hold(
                 shares = budget * (1 - COST_PER_SIDE) / price
                 cash -= budget
 
-                # Get display_name and target_price from ticker_reports
                 display_name = ticker
                 tp = None
+                market = "KR"
                 if ticker_reports is not None:
                     tr_list = ticker_reports.get(ticker, [])
                     past_tr = [x for x in tr_list if x["report_date"] < day]
                     if past_tr:
                         latest = max(past_tr, key=lambda x: x["report_date"])
                         display_name = latest["display_name"]
-                        # Use max target price among triggering reports
                         tps = [x["target_price"] for x in past_tr if x["target_price"]]
                         tp = max(tps) if tps else None
+                        market = past_tr[0].get("market", "KR")
 
                 positions[ticker] = {
                     "shares": shares,
@@ -432,40 +1012,36 @@ def run_immediate_hold(
                     "source": source,
                     "n_clubs": n_clubs,
                     "display_name": display_name,
+                    "market": market,
                 }
                 if tp:
                     target_prices[ticker] = tp
 
-                exit_target = dt.date(
-                    day.year + (day.month - 1 + hold_months) // 12,
-                    (day.month - 1 + hold_months) % 12 + 1,
-                    min(day.day, 28),
-                )
-                exit_day = first_trading_day_on_or_after(exit_target)
+                exit_target = months_later(day, hold_months)
+                exit_day = first_trading_day_on_or_after(exit_target, calendar)
                 if exit_day:
                     scheduled_exits[ticker] = exit_day
 
-        # Update last_close
         for ticker, pos in positions.items():
-            df = prices[ticker]
-            if day_ts in df.index:
+            df = prices.get(ticker)
+            if df is not None and day_ts in df.index:
                 pos["last_close"] = float(df.loc[day_ts]["close"])
 
         nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
-    # Force-close remaining open positions at last price (data end)
     last_day = calendar[-1]
     for ticker, pos in list(positions.items()):
-        trade: dict = {
+        trade = {
             "ticker": ticker,
+            "market": pos.get("market", "KR"),
             "display_name": pos.get("display_name", ticker),
             "source": pos["source"],
             "n_clubs": pos["n_clubs"],
-            "entry_date": pos["entry_date"].isoformat(),
+            "entry_date": pos["entry_date"].isoformat() if hasattr(pos["entry_date"], "isoformat") else str(pos["entry_date"]),
             "exit_date": last_day.isoformat(),
-            "entry": round(pos["entry_price"], 2),
-            "exit": round(pos["last_close"], 2),
+            "entry": round(pos["entry_price"], 4),
+            "exit": round(pos["last_close"], 4),
             "return_pct": round((pos["shares"] * pos["last_close"] / pos["cost"] - 1) * 100, 2),
             "days": (last_day - pos["entry_date"]).days,
             "exit_reason": "데이터_종료_미청산",
@@ -490,113 +1066,7 @@ def run_immediate_hold(
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Strategy C: Equal-weight monthly rebalanced portfolio
-# ──────────────────────────────────────────────────────────────────────────────
-
-def run_equal_weight_monthly(
-    prices: dict[str, pd.DataFrame],
-    reports: list[tuple[dt.date, str, str, int]],
-    calendar: list[dt.date],
-    label: str = "ew_monthly",
-) -> dict:
-    START_CAPITAL = 100_000_000
-    cash = float(START_CAPITAL)
-    nav_series: list[tuple[str, float]] = []
-    trades: list[dict] = []
-
-    ticker_rdates: dict[str, list[dt.date]] = {}
-    for rdate, ticker, source, n_clubs in reports:
-        ticker_rdates.setdefault(ticker, []).append(rdate)
-    for t in ticker_rdates:
-        ticker_rdates[t].sort()
-
-    cal_series = pd.Series(calendar)
-    month_ends: set[dt.date] = set(
-        cal_series.groupby(cal_series.apply(lambda d: (d.year, d.month))).last().values
-    )
-
-    positions: dict[str, dict] = {}
-
-    def active_tickers(as_of: dt.date) -> list[str]:
-        result = []
-        for t, rdates in ticker_rdates.items():
-            past = [r for r in rdates if r <= as_of]
-            if not past:
-                continue
-            latest = max(past)
-            if (as_of - latest).days <= 365:
-                result.append(t)
-        return result
-
-    for day in calendar:
-        day_ts = pd.Timestamp(day)
-
-        for ticker, pos in positions.items():
-            df = prices.get(ticker)
-            if df is not None and day_ts in df.index:
-                pos["last_close"] = float(df.loc[day_ts]["close"])
-
-        is_month_end = day in month_ends
-
-        if is_month_end:
-            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
-
-            for ticker, pos in list(positions.items()):
-                df = prices.get(ticker)
-                if df is None or day_ts not in df.index:
-                    continue
-                q = df.loc[day_ts]
-                price = float(q["open"]) if float(q["open"]) > 0 else float(q["close"])
-                proceeds = pos["shares"] * price * (1 - COST_PER_SIDE)
-                cash += proceeds
-                trades.append({
-                    "ticker": ticker,
-                    "display_name": ticker,
-                    "source": "ew_monthly",
-                    "n_clubs": 1,
-                    "entry_date": pos["entry_date"].isoformat(),
-                    "exit_date": day.isoformat(),
-                    "entry": round(pos["entry_price"], 2),
-                    "exit": round(price, 2),
-                    "return_pct": round((proceeds / pos["cost"] - 1) * 100, 2),
-                    "days": (day - pos["entry_date"]).days,
-                    "exit_reason": "월말_리밸런싱",
-                })
-            positions = {}
-
-            universe = [t for t in active_tickers(day) if t in prices]
-            if universe:
-                n = min(len(universe), MAX_POSITIONS * 4)
-                per_position = nav_now / n
-                for ticker in universe[:n]:
-                    df = prices[ticker]
-                    if day_ts not in df.index:
-                        continue
-                    q = df.loc[day_ts]
-                    price = float(q["open"]) if float(q["open"]) > 0 else float(q["close"])
-                    if price <= 0:
-                        continue
-                    budget = min(per_position, cash)
-                    if budget <= 0:
-                        continue
-                    shares = budget * (1 - COST_PER_SIDE) / price
-                    cash -= budget
-                    positions[ticker] = {
-                        "shares": shares,
-                        "entry_price": price,
-                        "entry_date": day,
-                        "cost": budget,
-                        "last_close": price,
-                    }
-
-        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
-        nav_series.append((day.isoformat(), nav))
-
-    return _compute_result(nav_series, trades, START_CAPITAL, label)
-
-
-# ──────────────────────────────────────────────────────────────────────────────
-# Strategy E: v3 breakout + ATR ratchet
+# Legacy Strategy E: v3 breakout + ATR ratchet (kept for sensitivity table)
 # ──────────────────────────────────────────────────────────────────────────────
 
 def find_signal(df: pd.DataFrame, report_date: dt.date) -> dt.date | None:
@@ -643,7 +1113,9 @@ def run_breakout_backtest(
     pending_sells: list[str] = []
 
     def quote(ticker: str, day: dt.date) -> pd.Series | None:
-        df = prices[ticker]
+        df = prices.get(ticker)
+        if df is None:
+            return None
         ts = pd.Timestamp(day)
         return df.loc[ts] if ts in df.index else None
 
@@ -673,13 +1145,14 @@ def run_breakout_backtest(
             cash += proceeds
             trades.append({
                 "ticker": ticker,
+                "market": pos.get("market", "KR"),
                 "display_name": ticker,
                 "source": pos["source"],
                 "n_clubs": pos["n_clubs"],
                 "entry_date": pos["entry_date"].isoformat(),
                 "exit_date": day.isoformat(),
-                "entry": round(pos["entry_price"], 2),
-                "exit": round(price, 2),
+                "entry": round(pos["entry_price"], 4),
+                "exit": round(price, 4),
                 "return_pct": round((proceeds / pos["cost"] - 1) * 100, 2),
                 "days": (day - pos["entry_date"]).days,
                 "exit_reason": "ATR_트레일링_스탑",
@@ -725,6 +1198,7 @@ def run_breakout_backtest(
                         "last_close": price,
                         "source": source,
                         "n_clubs": n_clubs,
+                        "market": "KR",
                     }
         pending_buys = []
 
@@ -768,7 +1242,6 @@ def _compute_result(
     cagr = (nav_df.iloc[-1] / nav_df.iloc[0]) ** (1 / years) - 1 if years > 0 else None
     sharpe = float(daily_ret.mean() / daily_ret.std() * math.sqrt(252)) if daily_ret.std() else None
     mdd = float((nav_df / nav_df.cummax() - 1).min())
-    # Only count fully-closed trades for win rate (exclude data_end open ones)
     closed_trades = [t for t in trades if not t.get("exit_reason", "").endswith("미청산")]
     wins = [t for t in closed_trades if t["return_pct"] > 0]
 
@@ -805,6 +1278,10 @@ def _compute_result(
         for ts, v in nav_df.resample("W-FRI").last().dropna().items()
     ]
 
+    # Max single trade return
+    max_trade = max((t["return_pct"] for t in closed_trades), default=None)
+    max_trade_info = max(closed_trades, key=lambda t: t["return_pct"], default=None)
+
     result: dict = {
         "label": label,
         "metrics": {
@@ -817,6 +1294,8 @@ def _compute_result(
             "trades": len(closed_trades),
             "win_rate_pct": round(len(wins) / len(closed_trades) * 100, 1) if closed_trades else None,
             "avg_hold_days": round(sum(t["days"] for t in closed_trades) / len(closed_trades), 1) if closed_trades else None,
+            "max_single_return_pct": round(max_trade, 2) if max_trade is not None else None,
+            "best_trade_ticker": max_trade_info.get("display_name", max_trade_info.get("ticker")) if max_trade_info else None,
         },
         "in_sample": period_metrics(is_mask),
         "out_of_sample": period_metrics(oos_mask),
@@ -946,7 +1425,7 @@ def compute_wealth_simulation_multi(
 
     return {
         "fx_assumption": (
-            "미국 지수(NASDAQ, S&P500)와 GLD는 달러 기준 포인트 수익률을 원화 환산 없이 그대로 사용. "
+            "미국 지수(NASDAQ, S&P500)와 GLD, 미국 종목은 달러 기준 포인트 수익률을 원화 환산 없이 그대로 사용. "
             "실제 KRW/USD 환율 변동은 반영되지 않으므로 달러 강세 기간의 원화 환산 수익은 과소평가될 수 있습니다."
         ),
         "schedule_desc": (
@@ -986,8 +1465,14 @@ def compute_tail_stats(trades: list[dict]) -> dict:
         "doubler_count": len(doublers),
         "top_decile_avg_hold_days": avg_hold_top,
         "top10_trades": [
-            {"ticker": t["ticker"], "display_name": t.get("display_name", t["ticker"]),
-             "return_pct": t["return_pct"], "days": t["days"], "n_clubs": t.get("n_clubs", 1)}
+            {
+                "ticker": t["ticker"],
+                "market": t.get("market", "KR"),
+                "display_name": t.get("display_name", t["ticker"]),
+                "return_pct": t["return_pct"],
+                "days": t["days"],
+                "n_clubs": t.get("n_clubs", 1),
+            }
             for t in sorted(closed, key=lambda t: t["return_pct"], reverse=True)[:10]
         ],
     }
@@ -1026,7 +1511,7 @@ def compute_consensus_stats(trades: list[dict]) -> dict:
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Today's signals
+# Today's signals (headline = A. 12개월 보유 consensus)
 # ──────────────────────────────────────────────────────────────────────────────
 
 def compute_today_signals(
@@ -1037,25 +1522,15 @@ def compute_today_signals(
     headline_trades: list[dict],
     headline_label: str,
 ) -> dict:
-    """
-    as_of = 데이터 기준일 (마지막 거래일).
-    헤드라인 전략(D) 규칙 기반:
-    - 보유 중: 진입 후 12개월 이내
-    - 매도 임박: 30일 이내 만기
-    - 매수 대기: 1개 학회만 커버 (추가 학회 발간 시 매수 신호)
-    - 신규 매수 신호: 컨센서스 형성 + 진입 시점이 최근 30일 이내
-    """
     as_of = calendar[-1] if calendar else dt.date.today()
     as_of_ts = pd.Timestamp(as_of)
 
-    # Open positions from headline trades
     open_positions: list[dict] = []
     expiring_soon: list[dict] = []
     new_signals: list[dict] = []
     watching: list[dict] = []
 
-    # Track which tickers are "in position" per strategy rules
-    # Re-derive from trade log: entry dates within last 12 months
+    # For headline A (12mo fixed hold): positions still within 12mo hold
     entry_map: dict[str, dict] = {}
     for t in headline_trades:
         if t.get("exit_reason", "").endswith("미청산"):
@@ -1070,15 +1545,10 @@ def compute_today_signals(
 
     for ticker, trade in entry_map.items():
         entry_date = dt.date.fromisoformat(trade["entry_date"])
-        exit_due = dt.date(
-            entry_date.year + (entry_date.month - 1 + 12) // 12,
-            (entry_date.month - 1 + 12) % 12 + 1,
-            min(entry_date.day, 28),
-        )
+        exit_due = months_later(entry_date, 12)
         days_elapsed = (as_of - entry_date).days
         days_remaining = (exit_due - as_of).days
 
-        # Current price
         current_price = None
         if ticker in prices:
             df = prices[ticker]
@@ -1091,6 +1561,7 @@ def compute_today_signals(
 
         pos_info = {
             "ticker": ticker,
+            "market": trade.get("market", "KR"),
             "display_name": trade.get("display_name", ticker),
             "entry_date": trade["entry_date"],
             "entry_price": entry_price,
@@ -1108,13 +1579,11 @@ def compute_today_signals(
 
     open_positions.sort(key=lambda x: x["days_remaining"])
 
-    # Scan all tickers for new signals / watching
     all_tickers = set(ticker_reports.keys()) & set(prices.keys())
     already_in = set(entry_map.keys())
 
     for ticker in all_tickers:
         tr_list = ticker_reports.get(ticker, [])
-        # Only reports with dates <= as_of
         past = [r for r in tr_list if r["report_date"] <= as_of]
         if not past:
             continue
@@ -1131,15 +1600,9 @@ def compute_today_signals(
 
         latest_report_date = max(r["report_date"] for r in past)
         latest_report = max(past, key=lambda x: x["report_date"])
+        market = past[0].get("market", "KR")
 
-        # Entry price basis = next open after latest_report_date
-        def first_trading_day_after(target: dt.date) -> dt.date | None:
-            for d in calendar:
-                if d > target:
-                    return d
-            return None
-
-        entry_basis_date = first_trading_day_after(latest_report_date)
+        entry_basis_date = first_trading_day_after(latest_report_date, calendar)
         entry_basis_price = None
         if entry_basis_date and ticker in prices:
             df = prices[ticker]
@@ -1148,31 +1611,31 @@ def compute_today_signals(
                 entry_basis_price = float(df.loc[ts]["open"])
 
         if n_schools == 1 and ticker not in already_in:
-            # Single-club watching
             school_name = list(by_school.keys())[0]
             r = by_school[school_name]
             watching.append({
                 "ticker": ticker,
+                "market": market,
                 "display_name": r["display_name"],
                 "covering_school": school_name,
                 "latest_report_date": r["report_date"].isoformat(),
                 "target_price": r["target_price"],
                 "stated_upside_pct": r["stated_upside_pct"],
                 "entry_basis_date": entry_basis_date.isoformat() if entry_basis_date else None,
-                "entry_basis_price": round(entry_basis_price, 2) if entry_basis_price else None,
+                "entry_basis_price": round(entry_basis_price, 4) if entry_basis_price else None,
                 "note": "추가 학회 발간 시 매수 신호",
             })
 
         elif n_schools >= 2 and ticker not in already_in:
-            # Consensus formed — check if entry would have been within last 30 days
             if entry_basis_date and (as_of - entry_basis_date).days <= 30:
                 trigger_list = list(by_school.values())
                 new_signals.append({
                     "ticker": ticker,
+                    "market": market,
                     "display_name": latest_report["display_name"],
                     "n_schools": n_schools,
                     "entry_basis_date": entry_basis_date.isoformat() if entry_basis_date else None,
-                    "entry_basis_price": round(entry_basis_price, 2) if entry_basis_price else None,
+                    "entry_basis_price": round(entry_basis_price, 4) if entry_basis_price else None,
                     "trigger_schools": sorted(by_school.keys()),
                     "trigger_reports": [
                         {
@@ -1185,7 +1648,6 @@ def compute_today_signals(
                     ],
                 })
 
-    # Sort
     watching.sort(key=lambda x: x["latest_report_date"], reverse=True)
     new_signals.sort(key=lambda x: x["entry_basis_date"] or "", reverse=True)
 
@@ -1196,7 +1658,7 @@ def compute_today_signals(
         "open_positions": open_positions,
         "expiring_soon": expiring_soon,
         "new_buy_signals": new_signals,
-        "watching_single_club": watching[:30],  # cap at 30
+        "watching_single_club": watching[:30],
         "counts": {
             "open": len(open_positions),
             "expiring_soon_30d": len(expiring_soon),
@@ -1216,8 +1678,8 @@ def export_trades_csv(trades: list[dict], path: Path) -> None:
     closed_sorted = sorted(closed, key=lambda t: t["exit_date"], reverse=True)
 
     headers = [
-        "매수일", "매수가(시가)", "종목명", "티커", "비중(%)", "커버학회수",
-        "트리거학회", "리포트날짜들", "목표가들(원)", "매도일", "매도가", "보유일수",
+        "매수일", "매수가(시가)", "종목명", "티커", "시장", "비중(%)", "커버학회수",
+        "트리거학회", "리포트날짜들", "목표가들", "매도일", "매도가", "보유일수",
         "수익률(%)", "매도사유",
     ]
 
@@ -1230,19 +1692,20 @@ def export_trades_csv(trades: list[dict], path: Path) -> None:
             trigger_rdates = "|".join(
                 r["report_date"] for r in t.get("trigger_reports", [])
             )
-            target_prices = "|".join(
-                str(int(tp)) for tp in t.get("trigger_target_prices", []) if tp
+            target_prices_str = "|".join(
+                str(round(float(tp), 2)) for tp in t.get("trigger_target_prices", []) if tp
             )
             writer.writerow([
                 t.get("entry_date", ""),
                 t.get("entry", ""),
                 t.get("display_name", t.get("ticker", "")),
                 t.get("ticker", ""),
+                t.get("market", "KR"),
                 round(POSITION_WEIGHT * 100, 1),
                 t.get("n_clubs", 1),
                 trigger_schools,
                 trigger_rdates,
-                target_prices,
+                target_prices_str,
                 t.get("exit_date", ""),
                 t.get("exit", ""),
                 t.get("days", ""),
@@ -1253,59 +1716,131 @@ def export_trades_csv(trades: list[dict], path: Path) -> None:
 
 
 # ──────────────────────────────────────────────────────────────────────────────
+# Multi-strategy comparison helpers
+# ──────────────────────────────────────────────────────────────────────────────
+
+def build_multi_strategy_summary(strategies: dict[str, dict]) -> list[dict]:
+    """Build comparison table rows for all v6 strategies."""
+    rows = []
+    for key, r in strategies.items():
+        closed = [t for t in r.get("trades", []) if not t.get("exit_reason", "").endswith("미청산")]
+        max_trade = max((t["return_pct"] for t in closed), default=None)
+        max_trade_info = max(closed, key=lambda t: t["return_pct"], default=None)
+        # Tail stat: % P&L from top decile
+        n = len(closed)
+        top10_n = max(1, math.ceil(n * 0.1)) if n > 0 else 0
+        top_decile = sorted([t["return_pct"] for t in closed], reverse=True)[:top10_n]
+        total_pos = sum(t["return_pct"] for t in closed if t["return_pct"] > 0)
+        top_decile_pos = sum(x for x in top_decile if x > 0)
+        top_decile_pnl_share = round(top_decile_pos / total_pos * 100, 1) if total_pos > 0 else 0.0
+
+        is_m = r.get("in_sample", {})
+        oos_m = r.get("out_of_sample", {})
+        rows.append({
+            "key": key,
+            "label": r["label"],
+            "metrics": r["metrics"],
+            "in_sample": is_m,
+            "out_of_sample": oos_m,
+            "max_single_return_pct": round(max_trade, 2) if max_trade is not None else None,
+            "best_trade_name": max_trade_info.get("display_name", max_trade_info.get("ticker")) if max_trade_info else None,
+            "best_trade_ticker": max_trade_info.get("ticker") if max_trade_info else None,
+            "top_decile_pnl_share_pct": top_decile_pnl_share,
+            "trade_count": n,
+        })
+    return rows
+
+
+# ──────────────────────────────────────────────────────────────────────────────
 # main
 # ──────────────────────────────────────────────────────────────────────────────
 
 def main() -> int:
     print("Loading report data...", flush=True)
-    perf = pd.read_csv(ROOT / "data" / "report_performance.csv", encoding="utf-8-sig")
-    perf = perf[
-        (perf["market"] == "KR")
-        & perf["ticker"].notna()
-        & perf["report_date"].notna()
-        & (perf["rating_class"] == "buy")
-        & (perf["report_date"] >= UNIVERSE_START.isoformat())
-    ]
-    perf["ticker"] = perf["ticker"].astype(str).str.zfill(6)
-    print(f"  {len(perf)} buy reports from {perf.report_date.min()} to {perf.report_date.max()}", flush=True)
+    perf_all = pd.read_csv(ROOT / "data" / "report_performance.csv", encoding="utf-8-sig")
 
-    # Build per-ticker report metadata (for trigger resolution and signals)
+    # ── Load both KR and US buy reports
+    perf = perf_all[
+        perf_all["ticker"].notna()
+        & perf_all["report_date"].notna()
+        & (perf_all["rating_class"] == "buy")
+        & (perf_all["report_date"] >= UNIVERSE_START.isoformat())
+    ].copy()
+
+    # Normalise ticker keys
+    def normalise_ticker(row: pd.Series) -> str:
+        market = str(row.get("market", "KR"))
+        t = str(row["ticker"])
+        return t.zfill(6) if market == "KR" else t
+
+    perf["ticker_key"] = perf.apply(normalise_ticker, axis=1)
+
+    kr_count = (perf["market"] == "KR").sum()
+    us_count = (perf["market"] == "US").sum()
+    print(f"  {len(perf)} buy reports: {kr_count} KR + {us_count} US  "
+          f"({perf.report_date.min()} to {perf.report_date.max()})", flush=True)
+
+    # Build per-ticker report metadata
     ticker_reports = build_ticker_reports(perf)
 
-    ticker_club_count: dict[str, int] = perf.groupby("ticker")["school"].nunique().to_dict()
+    # Club count per ticker_key
+    ticker_club_count: dict[str, int] = (
+        perf.groupby("ticker_key")["school"].nunique().to_dict()
+    )
 
+    # ── Fetch missing US price files
+    print("Checking US price files...", flush=True)
+    us_tickers = perf[perf["market"] == "US"]["ticker"].unique()
+    for t in us_tickers:
+        path = PRICE_DIR / f"US_{t}.csv"
+        if not path.exists():
+            _fetch_us_stock_yf(t)
+
+    # ── Load prices (KR + US)
     print("Loading stock prices...", flush=True)
     prices: dict[str, pd.DataFrame] = {}
     for _, row in perf.iterrows():
-        ticker = row["ticker"]
-        if ticker not in prices:
-            df = load_prices(ticker)
+        tk = row["ticker_key"]
+        market = str(row.get("market", "KR"))
+        if tk not in prices:
+            df = load_prices(str(row["ticker"]), market)
             if df is not None:
-                prices[ticker] = df
+                prices[tk] = df
 
+    # ── Build reports list using ticker_key
     reports: list[tuple[dt.date, str, str, int]] = []
     for _, row in perf.iterrows():
-        ticker = row["ticker"]
-        if ticker not in prices:
+        tk = row["ticker_key"]
+        if tk not in prices:
             continue
         try:
             rdate = dt.date.fromisoformat(str(row["report_date"]))
         except ValueError:
             continue
-        n_clubs = ticker_club_count.get(ticker, 1)
+        n_clubs = ticker_club_count.get(tk, 1)
         source = Path(str(row["source_file"])).name
-        reports.append((rdate, ticker, source, n_clubs))
+        reports.append((rdate, tk, source, n_clubs))
     reports.sort()
-    print(f"  {len(reports)} reports with price data, {len({r[1] for r in reports})} unique tickers", flush=True)
 
-    # ── TASK 1: Calendar clipped to SIM_START ────────────────────────────────
+    kr_with_prices = len({r[1] for r in reports if r[1][0].isdigit()})
+    us_with_prices = len({r[1] for r in reports if not r[1][0].isdigit()})
+    print(f"  {len(reports)} reports with price data, "
+          f"{kr_with_prices} KR tickers + {us_with_prices} US tickers", flush=True)
+
+    # Consensus-only reports
+    consensus_reports = [(d, t, s, n) for d, t, s, n in reports if n >= 2]
+    print(f"  {len(consensus_reports)} consensus (≥2 clubs) reports, "
+          f"{len({r[1] for r in consensus_reports})} tickers", flush=True)
+
+    # ── Calendar (merged KR + US trading days)
     raw_calendar = sorted({ts.date() for df in prices.values() for ts in df.index})
     calendar = [d for d in raw_calendar if d >= SIM_START]
     if not calendar:
         print("ERROR: no calendar dates after SIM_START", flush=True)
         return 1
-    print(f"  Calendar (clipped): {calendar[0]} to {calendar[-1]}  (was {raw_calendar[0]})", flush=True)
+    print(f"  Calendar (clipped): {calendar[0]} to {calendar[-1]}", flush=True)
 
+    # ── Load benchmarks
     print("Loading benchmarks...", flush=True)
     kospi = load_kospi()
     sp500 = load_sp500()
@@ -1325,57 +1860,199 @@ def main() -> int:
     strat_start = calendar[0]
     strat_end = calendar[-1]
     all_weather = compute_all_weather(kospi, sp500, nasdaq, gld, strat_start, strat_end)
-    print(f"  All-weather: {all_weather.index[0].date()} to {all_weather.index[-1].date()}", flush=True)
 
-    # ── Strategy A: Immediate entry + 12mo hold (baseline)
-    print("\nRunning Strategy A: Immediate 12mo hold (baseline)...", flush=True)
-    result_a = run_immediate_hold(prices, reports, calendar, hold_months=12, consensus_only=False, label="A_immediate_12mo")
-    print(f"  IS sharpe={result_a['in_sample'].get('sharpe')}  OOS sharpe={result_a['out_of_sample'].get('sharpe')}", flush=True)
+    # ══════════════════════════════════════════════════════════════════════════
+    # v6 MULTI-STRATEGY COMPARISON
+    # All strategies: consensus ≥2, immediate entry, same costs/position sizing
+    # Parameters are literature-grounded fixed values — no grid search
+    # ══════════════════════════════════════════════════════════════════════════
 
-    # ── Strategy B: Immediate entry + 18mo hold
-    print("\nRunning Strategy B: Immediate 18mo hold...", flush=True)
-    result_b = run_immediate_hold(prices, reports, calendar, hold_months=18, consensus_only=False, label="B_immediate_18mo")
-    print(f"  IS sharpe={result_b['in_sample'].get('sharpe')}  OOS sharpe={result_b['out_of_sample'].get('sharpe')}", flush=True)
+    print("\n── Running 6 strategies ──────────────────────────────────────────", flush=True)
 
-    # ── Strategy C: Equal-weight monthly rebalanced
-    print("\nRunning Strategy C: Equal-weight monthly rebalanced...", flush=True)
-    result_c = run_equal_weight_monthly(prices, reports, calendar, label="C_ew_monthly")
-    print(f"  IS sharpe={result_c['in_sample'].get('sharpe')}  OOS sharpe={result_c['out_of_sample'].get('sharpe')}", flush=True)
-
-    # ── Strategy D: Consensus only (≥2 clubs, all-time), 12mo hold  ← HEADLINE CANDIDATE
-    print("\nRunning Strategy D: Consensus-only 12mo hold (all-time window)...", flush=True)
-    result_d = run_immediate_hold(
-        prices, reports, calendar,
-        hold_months=12, consensus_only=True,
-        label="D_consensus_12mo",
-        ticker_reports=ticker_reports,
-        consensus_window=None,
-        record_full_trades=True,
+    # A. 12개월 보유 (baseline headline)
+    print("A. 12개월 보유...", flush=True)
+    result_A = run_fixed_hold(
+        prices, reports, calendar, hold_months=12,
+        label="A_12mo", ticker_reports=ticker_reports, record_full_trades=True,
     )
-    print(f"  IS sharpe={result_d['in_sample'].get('sharpe')}  OOS sharpe={result_d['out_of_sample'].get('sharpe')}", flush=True)
+    print(f"   IS sharpe={result_A['in_sample'].get('sharpe')}  OOS sharpe={result_A['out_of_sample'].get('sharpe')}", flush=True)
 
-    # ── Strategy E: v3 breakout + ATR ratchet
-    print("\nBuilding breakout signals (Strategy E)...", flush=True)
-    signals: list[tuple[dt.date, str, str, int]] = []
-    for rdate, ticker, source, n_clubs in reports:
+    # B. 36개월 보유 (long horizon)
+    print("B. 36개월 보유...", flush=True)
+    result_B = run_fixed_hold(
+        prices, reports, calendar, hold_months=36,
+        label="B_36mo", ticker_reports=ticker_reports, record_full_trades=True,
+    )
+    print(f"   IS sharpe={result_B['in_sample'].get('sharpe')}  OOS sharpe={result_B['out_of_sample'].get('sharpe')}", flush=True)
+
+    # C. 내러티브 홀드 (Faber 2007 thesis-break exit)
+    print("C. 내러티브 홀드 (200MA thesis-break)...", flush=True)
+    result_C = run_narrative_hold(
+        prices, reports, calendar,
+        label="C_narrative", ticker_reports=ticker_reports, record_full_trades=True,
+    )
+    print(f"   IS sharpe={result_C['in_sample'].get('sharpe')}  OOS sharpe={result_C['out_of_sample'].get('sharpe')}", flush=True)
+
+    # D. 샹들리에 래칫 (ATR42×5 trailing)
+    print("D. 샹들리에 래칫 (ATR×5)...", flush=True)
+    result_D = run_chandelier(
+        prices, reports, calendar,
+        label="D_chandelier", ticker_reports=ticker_reports, record_full_trades=True,
+    )
+    print(f"   IS sharpe={result_D['in_sample'].get('sharpe')}  OOS sharpe={result_D['out_of_sample'].get('sharpe')}", flush=True)
+
+    # E. 목표가 절반익절 + 러너 (C rule trail)
+    print("E. 절반익절 + 러너...", flush=True)
+    result_E = run_half_exit_runner(
+        prices, reports, calendar,
+        label="E_half_runner", ticker_reports=ticker_reports, record_full_trades=True,
+    )
+    print(f"   IS sharpe={result_E['in_sample'].get('sharpe')}  OOS sharpe={result_E['out_of_sample'].get('sharpe')}", flush=True)
+
+    # F. 모멘텀 필터 진입 (진입 시 200MA 위) + C 청산
+    print("F. 모멘텀 필터 + 내러티브 홀드...", flush=True)
+    result_F = run_narrative_hold(
+        prices, reports, calendar,
+        label="F_momentum_narrative", ticker_reports=ticker_reports, record_full_trades=True,
+        momentum_filter_entry=True,
+    )
+    print(f"   IS sharpe={result_F['in_sample'].get('sharpe')}  OOS sharpe={result_F['out_of_sample'].get('sharpe')}", flush=True)
+
+    v6_strategies = {
+        "A_12mo": result_A,
+        "B_36mo": result_B,
+        "C_narrative": result_C,
+        "D_chandelier": result_D,
+        "E_half_runner": result_E,
+        "F_momentum_narrative": result_F,
+    }
+
+    # ── Summary table
+    print("\n── Strategy summary (v6) ─────────────────────────────────────────", flush=True)
+    print(f"{'Strategy':<28} {'IS CAGR':>9} {'IS Shp':>8} {'OOS CAGR':>10} {'OOS Shp':>9} {'MaxRet%':>8} {'Trades':>7}", flush=True)
+    for key, r in v6_strategies.items():
+        is_m = r.get("in_sample", {})
+        oos_m = r.get("out_of_sample", {})
+        max_r = r["metrics"].get("max_single_return_pct")
+        print(
+            f"  {key:<26} {str(is_m.get('cagr_pct','—')):>9} {str(is_m.get('sharpe','—')):>8} "
+            f"{str(oos_m.get('cagr_pct','—')):>10} {str(oos_m.get('sharpe','—')):>9} "
+            f"{str(round(max_r,1) if max_r else '—'):>8} {r['metrics']['trades']:>7}",
+            flush=True,
+        )
+
+    # ── Headline selection: best risk-adjusted (IS sharpe primary, OOS sharpe tiebreak)
+    # With tenbagger-narrative: C (내러티브) is favoured for its tail-capture property
+    # Final headline = best IS sharpe (automatic, anti-overfit)
+    def is_sharpe(r: dict) -> float:
+        v = r.get("in_sample", {}).get("sharpe")
+        return v if v is not None else -999.0
+
+    headline = max(v6_strategies.values(), key=is_sharpe)
+    headline_label = headline["label"]
+    headline_key = next(k for k, v in v6_strategies.items() if v is headline)
+    print(f"\nHeadline (best IS sharpe): {headline_label} [{headline_key}]", flush=True)
+
+    # ── Tail stats and consensus stats on headline
+    tail_stats = compute_tail_stats(headline.get("trades", []))
+    consensus_stats = compute_consensus_stats(headline.get("trades", []))
+
+    # ── Also compute legacy variant research on A_12mo (for backwards compat section)
+    print("\nRunning legacy variant research...", flush=True)
+    # Use A (12mo, consensus) as D_consensus_12mo equivalent
+    legacy_d = result_A  # same logic
+    variants: list[dict] = []
+
+    for hold in [6, 9, 18]:
+        lbl = f"variant_{hold}mo"
+        rv = run_fixed_hold(prices, reports, calendar, hold_months=hold, label=lbl, ticker_reports=ticker_reports)
+        variants.append({"label": lbl, "metrics": rv["metrics"], "in_sample": rv.get("in_sample", {}), "out_of_sample": rv.get("out_of_sample", {})})
+
+    # ── Wealth simulation on headline
+    print("\nComputing wealth simulations...", flush=True)
+    headline_nav: pd.Series = headline["nav_df"]
+    assert headline_nav.index[0].date() >= SIM_START
+
+    benchmarks_for_sim: dict[str, pd.Series] = {
+        "KOSPI": kospi, "SP500": sp500, "NASDAQ": nasdaq, "AllWeather": all_weather,
+    }
+    wealth_sim = compute_wealth_simulation_multi(headline_nav, benchmarks_for_sim, strat_start, strat_end)
+    print(f"  Strategy final: {wealth_sim['final_strategy_value']:,}원", flush=True)
+
+    # Per-strategy wealth sims (for UI switcher)
+    strat_wealth_sims: dict[str, dict] = {}
+    for key, r in v6_strategies.items():
+        ws = compute_wealth_simulation_multi(r["nav_df"], benchmarks_for_sim, strat_start, strat_end)
+        strat_wealth_sims[key] = {
+            "final_strategy_value": ws["final_strategy_value"],
+            "strategy_gain_on_contributed_pct": ws["strategy_gain_on_contributed_pct"],
+            "strategy_mdd_pct": ws["strategy_mdd_pct"],
+            "series": ws["series"],
+        }
+
+    # ── Today's signals (based on headline A rules: 12mo hold, consensus)
+    print("\nComputing today's signals...", flush=True)
+    today_signals = compute_today_signals(
+        perf, prices, ticker_reports, calendar,
+        result_A.get("trades", []),  # always use A for signals (12mo horizon)
+        "A_12mo",
+    )
+    print(f"  Open: {today_signals['counts']['open']}, "
+          f"Expiring ≤30d: {today_signals['counts']['expiring_soon_30d']}, "
+          f"New buy signals: {today_signals['counts']['new_buy_signals']}, "
+          f"Watching (1-club): {today_signals['counts']['watching_single_club']}",
+          flush=True)
+
+    # ── Export CSVs per strategy
+    print("\nExporting trade CSVs...", flush=True)
+    export_trades_csv(result_A.get("trades", []), CSV_PATH)  # default headline CSV
+    for key, r in v6_strategies.items():
+        export_trades_csv(r.get("trades", []), PUBLIC_DIR / f"strategy-trades-{key}.csv")
+
+    # ── Multi-strategy comparison rows
+    multi_strategy_summary = build_multi_strategy_summary(v6_strategies)
+
+    # ── Open positions from headline
+    open_positions_list = []
+    if "open_positions" in headline and isinstance(headline["open_positions"], dict):
+        for t, p in headline["open_positions"].items():
+            open_positions_list.append({
+                "ticker": t,
+                "market": p.get("market", "KR"),
+                "display_name": p.get("display_name", t),
+                "entry_date": p["entry_date"].isoformat() if hasattr(p.get("entry_date"), "isoformat") else str(p.get("entry_date", "")),
+                "entry": round(p["entry_price"], 4),
+                "last_close": round(p["last_close"], 4),
+                "stop": round(p.get("stop", 0) or 0, 4),
+                "return_pct": round((p["shares"] * p["last_close"] / p["cost"] - 1) * 100, 2),
+                "source": p.get("source", ""),
+                "n_clubs": p.get("n_clubs", 1),
+            })
+
+    # ── Legacy breakout sensitivity (kept for legacy page section)
+    print("\nBuilding breakout sensitivity (legacy E)...", flush=True)
+    # Use KR-only prices for breakout to keep signals consistent with v5
+    kr_prices = {k: v for k, v in prices.items() if k[0].isdigit()}
+    kr_reports = [(d, t, s, n) for d, t, s, n in reports if t[0].isdigit()]
+
+    signals_list: list[tuple[dt.date, str, str, int]] = []
+    for rdate, ticker, source, n_clubs in kr_reports:
         signal = find_signal(prices[ticker], rdate)
         if signal:
-            signals.append((signal, ticker, source, n_clubs))
-    signals.sort()
+            signals_list.append((signal, ticker, source, n_clubs))
+    signals_list.sort()
     by_signal_date: dict[dt.date, list[tuple[str, str, int]]] = {}
-    for date, ticker, source, n_clubs in signals:
+    for date, ticker, source, n_clubs in signals_list:
         by_signal_date.setdefault(date, []).append((ticker, source, n_clubs))
 
-    breakout_cal = [d for d in calendar if d >= min(s[0] for s in signals)] if signals else calendar
+    breakout_cal = [d for d in calendar if d >= min(s[0] for s in signals_list)] if signals_list else calendar
     regime = load_regime()
-    print(f"  {len(signals)} signals ({len({s[1] for s in signals})} unique tickers)", flush=True)
 
     sensitivity: list[dict] = []
-    headline_result_e: dict | None = None
     for atr_mult in (2.0, 3.0, 4.0, 5.0):
         for use_regime in (False, True):
             r = run_breakout_backtest(
-                prices, by_signal_date, breakout_cal, atr_mult,
+                kr_prices, by_signal_date, breakout_cal, atr_mult,
                 regime if use_regime else None, use_ratchet=True,
                 label=f"E_atr{atr_mult}_regime{'on' if use_regime else 'off'}"
             )
@@ -1387,176 +2064,8 @@ def main() -> int:
             }
             sensitivity.append(entry)
             print(f"  E ATRx{atr_mult} regime={'on' if use_regime else 'off'}: IS-sharpe={entry['is_sharpe']} OOS-sharpe={entry['oos_sharpe']}", flush=True)
-            if atr_mult == HEADLINE_ATR_MULT and use_regime == HEADLINE_REGIME:
-                headline_result_e = r
 
-    assert headline_result_e is not None
-    result_e = headline_result_e
-    result_e["label"] = "E_breakout_atr4"
-
-    # ── TASK 3: Strategy variants (consensus window + hold + target exit + upside sizing)
-    print("\nRunning strategy variants research (Task 3)...", flush=True)
-    variants: list[dict] = []
-
-    # D variants: consensus window
-    for window in [90, 180, 365]:
-        lbl = f"D_consensus_window{window}d"
-        rv = run_immediate_hold(
-            prices, reports, calendar,
-            hold_months=12, consensus_only=True,
-            label=lbl, ticker_reports=ticker_reports,
-            consensus_window=window,
-        )
-        print(f"  {lbl}: IS sharpe={rv['in_sample'].get('sharpe')} OOS sharpe={rv['out_of_sample'].get('sharpe')}", flush=True)
-        variants.append({"label": lbl, "metrics": rv["metrics"], "in_sample": rv.get("in_sample", {}), "out_of_sample": rv.get("out_of_sample", {})})
-
-    # Hold period variants on D
-    for hold in [6, 9, 18]:
-        lbl = f"D_consensus_{hold}mo"
-        rv = run_immediate_hold(
-            prices, reports, calendar,
-            hold_months=hold, consensus_only=True,
-            label=lbl, ticker_reports=ticker_reports,
-        )
-        print(f"  {lbl}: IS sharpe={rv['in_sample'].get('sharpe')} OOS sharpe={rv['out_of_sample'].get('sharpe')}", flush=True)
-        variants.append({"label": lbl, "metrics": rv["metrics"], "in_sample": rv.get("in_sample", {}), "out_of_sample": rv.get("out_of_sample", {})})
-
-    # Target-price exit (12mo hold, sell on target hit)
-    rv_target = run_immediate_hold(
-        prices, reports, calendar,
-        hold_months=12, consensus_only=True,
-        label="D_consensus_target_exit", ticker_reports=ticker_reports,
-        target_exit=True,
-    )
-    print(f"  D_consensus_target_exit: IS sharpe={rv_target['in_sample'].get('sharpe')} OOS sharpe={rv_target['out_of_sample'].get('sharpe')}", flush=True)
-    variants.append({"label": "D_consensus_target_exit", "metrics": rv_target["metrics"], "in_sample": rv_target.get("in_sample", {}), "out_of_sample": rv_target.get("out_of_sample", {})})
-
-    # Upside-weighted sizing
-    rv_upside = run_immediate_hold(
-        prices, reports, calendar,
-        hold_months=12, consensus_only=True,
-        label="D_consensus_upside_weighted", ticker_reports=ticker_reports,
-        upside_weighted=True,
-    )
-    print(f"  D_consensus_upside_weighted: IS sharpe={rv_upside['in_sample'].get('sharpe')} OOS sharpe={rv_upside['out_of_sample'].get('sharpe')}", flush=True)
-    variants.append({"label": "D_consensus_upside_weighted", "metrics": rv_upside["metrics"], "in_sample": rv_upside.get("in_sample", {}), "out_of_sample": rv_upside.get("out_of_sample", {})})
-
-    # Determine if any variant beats D on both IS Sharpe AND OOS Sharpe
-    d_is_sharpe = result_d.get("in_sample", {}).get("sharpe") or -999.0
-    d_oos_sharpe = result_d.get("out_of_sample", {}).get("sharpe") or -999.0
-    best_variant = None
-    best_variant_reason = ""
-    for v in variants:
-        v_is = v.get("in_sample", {}).get("sharpe") or -999.0
-        v_oos = v.get("out_of_sample", {}).get("sharpe") or -999.0
-        if v_is > d_is_sharpe and v_oos > d_oos_sharpe:
-            if best_variant is None or v_is > (best_variant.get("in_sample", {}).get("sharpe") or -999.0):
-                best_variant = v
-                best_variant_reason = f"IS sharpe {v_is:.2f} > D {d_is_sharpe:.2f}; OOS sharpe {v_oos:.2f} > D {d_oos_sharpe:.2f}"
-
-    if best_variant:
-        print(f"\n  NEW HEADLINE candidate: {best_variant['label']} — {best_variant_reason}", flush=True)
-        variant_conclusion = f"변형 전략 {best_variant['label']}이 IS/OOS 모두에서 D를 상회함: {best_variant_reason}"
-    else:
-        print(f"\n  No variant beats D on both IS+OOS Sharpe. Keeping D as headline.", flush=True)
-        variant_conclusion = (
-            f"테스트한 모든 변형 전략이 인샘플과 아웃오브샘플 샤프 동시 초과에 실패. "
-            f"D_consensus_12mo(all-time window) 유지. "
-            f"IS sharpe={d_is_sharpe:.2f}, OOS sharpe={d_oos_sharpe:.2f}."
-        )
-
-    # ── Select headline strategy
-    base_candidates = [result_a, result_b, result_c, result_d, result_e]
-
-    def is_sharpe(r: dict) -> float:
-        v = r.get("in_sample", {}).get("sharpe")
-        return v if v is not None else -999.0
-
-    headline = max(base_candidates, key=is_sharpe)
-    headline_label = headline["label"]
-    print(f"\nHeadline strategy (best IS sharpe): {headline_label}", flush=True)
-
-    print("\n── Strategy summary ──────────────────────────────────────────────", flush=True)
-    print(f"{'Strategy':<30} {'IS CAGR':>9} {'IS Sharpe':>10} {'OOS CAGR':>10} {'OOS Sharpe':>11}", flush=True)
-    for r in base_candidates:
-        is_m = r.get("in_sample", {})
-        oos_m = r.get("out_of_sample", {})
-        print(
-            f"  {r['label']:<28} {str(is_m.get('cagr_pct', '—')):>9} {str(is_m.get('sharpe', '—')):>10} "
-            f"{str(oos_m.get('cagr_pct', '—')):>10} {str(oos_m.get('sharpe', '—')):>11}",
-            flush=True,
-        )
-
-    tail_stats = compute_tail_stats(headline.get("trades", []))
-    consensus_stats = compute_consensus_stats(headline.get("trades", []))
-
-    # ── Wealth simulation — uses headline nav
-    print("\nComputing wealth simulations...", flush=True)
-    headline_nav: pd.Series = headline["nav_df"]
-
-    # Verify wealth sim starts at SIM_START
-    sim_first_date = headline_nav.index[0].date()
-    print(f"  Strategy nav starts: {sim_first_date} (expected >= {SIM_START})", flush=True)
-    assert sim_first_date >= SIM_START, f"Wealth sim starts before SIM_START: {sim_first_date}"
-
-    benchmarks_for_sim: dict[str, pd.Series] = {
-        "KOSPI": kospi,
-        "SP500": sp500,
-        "NASDAQ": nasdaq,
-        "AllWeather": all_weather,
-    }
-    wealth_sim = compute_wealth_simulation_multi(headline_nav, benchmarks_for_sim, strat_start, strat_end)
-
-    print(f"  Wealth sim first date: {wealth_sim['series'][0]['date']} (must be >= {SIM_START})", flush=True)
-    print(f"  Strategy final: {wealth_sim['final_strategy_value']:,}원", flush=True)
-    for name, val in wealth_sim["final_benchmark_values"].items():
-        gain = wealth_sim["benchmark_gain_on_contributed_pct"].get(name)
-        print(f"  {name} final: {val:,}원 ({gain}%)", flush=True)
-
-    # ── TASK 4: Today's signals
-    print("\nComputing today's signals...", flush=True)
-    today_signals = compute_today_signals(
-        perf, prices, ticker_reports, calendar,
-        headline.get("trades", []),
-        headline_label,
-    )
-    print(f"  Open: {today_signals['counts']['open']}, "
-          f"Expiring ≤30d: {today_signals['counts']['expiring_soon_30d']}, "
-          f"New buy signals: {today_signals['counts']['new_buy_signals']}, "
-          f"Watching (1-club): {today_signals['counts']['watching_single_club']}",
-          flush=True)
-
-    # ── TASK 2: Export CSV
-    print("\nExporting trade CSV...", flush=True)
-    export_trades_csv(headline.get("trades", []), CSV_PATH)
-
-    # ── Research families
-    research_families: list[dict] = []
-    for r in base_candidates:
-        research_families.append({
-            "label": r["label"],
-            "metrics": r["metrics"],
-            "in_sample": r.get("in_sample", {}),
-            "out_of_sample": r.get("out_of_sample", {}),
-        })
-
-    # ── Open positions list for display
-    open_positions_list = []
-    if "open_positions" in headline and isinstance(headline["open_positions"], dict):
-        for t, p in headline["open_positions"].items():
-            open_positions_list.append({
-                "ticker": t,
-                "display_name": p.get("display_name", t),
-                "entry_date": p["entry_date"].isoformat() if hasattr(p.get("entry_date"), "isoformat") else str(p.get("entry_date", "")),
-                "entry": round(p["entry_price"], 2),
-                "last_close": round(p["last_close"], 2),
-                "stop": round(p.get("stop", 0), 2),
-                "return_pct": round((p["shares"] * p["last_close"] / p["cost"] - 1) * 100, 2),
-                "source": p.get("source", ""),
-                "n_clubs": p.get("n_clubs", 1),
-            })
-
-    # Headline trades: include only closed trades in JSON (open pos tracked separately)
+    # ── Headline closed trades for JSON
     headline_trades_for_json = [
         t for t in headline.get("trades", [])
         if not t.get("exit_reason", "").endswith("미청산")
@@ -1564,7 +2073,14 @@ def main() -> int:
 
     payload = {
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
-        "universe_filter": f"rating_class == buy AND report_date >= {UNIVERSE_START.isoformat()}",
+        "universe_filter": f"rating_class == buy AND report_date >= {UNIVERSE_START.isoformat()} (KR + US)",
+        "universe_stats": {
+            "kr_reports": int(kr_count),
+            "us_reports": int(us_count),
+            "total_reports": int(len(perf)),
+            "kr_tickers": kr_with_prices,
+            "us_tickers": us_with_prices,
+        },
         "params": {
             "universe_start": UNIVERSE_START.isoformat(),
             "sim_start": SIM_START.isoformat(),
@@ -1575,13 +2091,10 @@ def main() -> int:
             "position_weight": POSITION_WEIGHT,
             "cost_per_side": COST_PER_SIDE,
             "headline_strategy": headline_label,
-            "breakout": {
-                "min_days_before_signal": MIN_DAYS_BEFORE_SIGNAL,
-                "signal_window_days": SIGNAL_WINDOW_DAYS,
-                "atr_mult": HEADLINE_ATR_MULT,
-                "regime_filter": HEADLINE_REGIME,
-                "ratchet_thresholds": [RATCHET_THRESHOLD_1, RATCHET_THRESHOLD_2],
-            },
+            "headline_key": headline_key,
+            "chandelier_atr_mult": CHANDELIER_ATR_MULT,
+            "faber_ma_period": 200,
+            "anti_overfit_note": "파라미터는 문헌 표준값 고정 (200MA, ATR×5). 그리드 서치 없음.",
         },
         "metrics": headline["metrics"],
         "in_sample": headline.get("in_sample", {}),
@@ -1589,10 +2102,29 @@ def main() -> int:
         "yearly": headline["yearly"],
         "equity": headline["equity"],
         "sensitivity": sensitivity,
-        "research_families": research_families,
+        # v6: per-strategy comparison
+        "multi_strategy": {
+            "strategies": multi_strategy_summary,
+            "headline_key": headline_key,
+            "strategy_wealth_sims": strat_wealth_sims,
+            # per-strategy equity curves
+            "equity_by_strategy": {
+                key: r["equity"] for key, r in v6_strategies.items()
+            },
+            # per-strategy yearly returns
+            "yearly_by_strategy": {
+                key: r["yearly"] for key, r in v6_strategies.items()
+            },
+        },
+        # legacy fields for backwards compat
+        "research_families": [
+            {"label": r["label"], "metrics": r["metrics"],
+             "in_sample": r.get("in_sample", {}), "out_of_sample": r.get("out_of_sample", {})}
+            for r in v6_strategies.values()
+        ],
         "variant_research": {
             "variants": variants,
-            "conclusion": variant_conclusion,
+            "conclusion": "v6: 전략 패밀리 재구성 — 고정 홀드 vs 동적 청산 비교. 상세 내용은 multi_strategy 참조.",
         },
         "tail_stats": tail_stats,
         "consensus_stats": consensus_stats,
@@ -1606,7 +2138,6 @@ def main() -> int:
 
     OUT_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"\nWrote {OUT_PATH.relative_to(ROOT).as_posix()}", flush=True)
-    print(f"  Wealth sim first date: {wealth_sim['series'][0]['date']}", flush=True)
     print(f"  Trades in JSON: {len(headline_trades_for_json)}", flush=True)
     return 0
 

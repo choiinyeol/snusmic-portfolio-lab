@@ -1,8 +1,8 @@
 "use client";
 
-import { Fragment, useCallback, useEffect, useMemo } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Link2, Printer, Search } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SiteNav } from "@/components/site-nav";
 import { VerdictWall } from "@/components/verdict-wall";
@@ -83,6 +83,33 @@ export function ReportDashboard() {
     return () => window.removeEventListener("keydown", onKey);
   }, [move]);
 
+  // 판결문 딥링크 — /#r={source_name} 해시로 특정 기록에 바로 닿는다 (공유 버튼·커맨드 팔레트와 한 쌍)
+  const { setMarket, setBucket, setSchool, setQuery, setIncludeReference } = state;
+  useEffect(() => {
+    const apply = () => {
+      const match = window.location.hash.match(/^#r=(.+)$/);
+      if (!match) return;
+      let name = "";
+      try {
+        name = decodeURIComponent(match[1]);
+      } catch {
+        return;
+      }
+      const record = reportDataset.records.find((r) => r.source_name === name && r.era === "modern" && r.report_date);
+      if (!record) return;
+      setMarket("ALL");
+      setBucket("ALL");
+      setSchool("ALL");
+      setQuery("");
+      if (!isBuy(record)) setIncludeReference(true);
+      setSelectedName(name);
+      requestAnimationFrame(() => document.getElementById("verdict-paper")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    };
+    apply();
+    window.addEventListener("hashchange", apply);
+    return () => window.removeEventListener("hashchange", apply);
+  }, [setMarket, setBucket, setSchool, setQuery, setIncludeReference, setSelectedName]);
+
   if (!selected) {
     return (
       <main className="flex min-h-screen items-center justify-center px-8 text-center">
@@ -110,12 +137,12 @@ export function ReportDashboard() {
     <div className="min-h-screen bg-background text-foreground">
       <main className="mx-auto max-w-[1500px] px-4 pt-6 sm:px-8">
         <Masthead />
-        <div className="mt-10">
+        <div className="mt-10 print:hidden">
           <VerdictWall reports={wallReports} selectedName={selected.source_name} onSelect={pickFromWall} />
         </div>
       </main>
 
-      <div className="mt-10">
+      <div className="mt-10 print:hidden">
         <VerdictTape />
       </div>
 
@@ -136,7 +163,7 @@ export function ReportDashboard() {
           <Chronicle reports={state.sorted} selected={selected} onSelect={state.setSelectedName} />
         </section>
 
-        <footer className="flex flex-col gap-2 border-t-4 border-double border-foreground/50 pb-10 pt-4 font-mono text-[11px] leading-5 text-muted-foreground sm:flex-row sm:items-baseline sm:justify-between">
+        <footer className="flex flex-col gap-2 border-t-4 border-double border-foreground/50 pb-10 pt-4 font-mono text-[11px] leading-5 text-muted-foreground sm:flex-row sm:items-baseline sm:justify-between print:hidden">
           <p>
             데이터 생성 {reportDataQuality.generatedAt?.slice(0, 10) ?? "—"} · 시세 이슈 {reportDataQuality.dataIssueCount}건 · 파싱 이슈{" "}
             {reportDataQuality.parseIssueCount}건
@@ -153,7 +180,7 @@ function Masthead() {
   const stats = useMemo(() => clubStats(reportDataset.records), []);
   const archiveCount = useMemo(() => reportDataset.records.filter((report) => report.era === "archive").length, []);
   return (
-    <header>
+    <header className="print:hidden">
       <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b-4 border-double border-foreground/70 pb-2">
         <p className="font-mono text-[11px] font-bold uppercase tracking-[0.3em]">SMIC · YIG · STAR · KUVIC · EIA · VOERA — Research Verdict Archive</p>
         <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
@@ -246,7 +273,7 @@ function FreshVerdicts({ onPick }: { onPick: (sourceName: string) => void }) {
   );
   if (!latest.length) return null;
   return (
-    <section aria-label="최근 발간 리포트와 판결 소요 시간">
+    <section aria-label="최근 발간 리포트와 판결 소요 시간" className="print:hidden">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">새로 접수된 사건</h2>
         <p className="font-mono text-[10px] text-muted-foreground">
@@ -337,7 +364,7 @@ function VerdictTimeStrip() {
 function FilterBar({ state }: { state: ReturnType<typeof useReportDashboardState> }) {
   const referenceTotal = state.referenceCounts.softBuy + state.referenceCounts.sell;
   return (
-    <section className="space-y-4 border-b border-border pb-5" aria-label="아카이브 필터">
+    <section className="space-y-4 border-b border-border pb-5 print:hidden" aria-label="아카이브 필터">
       <div className="flex flex-wrap items-end gap-x-6 gap-y-2" role="group" aria-label="학교 필터">
         {schoolFilters.map((item) => {
           const active = state.school === item;
@@ -462,16 +489,32 @@ function VerdictPaper({
   return (
     <article
       id="verdict-paper"
-      className="relative scroll-mt-4 overflow-hidden rounded-lg border-2 border-foreground/80 bg-card shadow-[7px_7px_0_0_hsl(var(--foreground)/0.85)]"
+      className="relative scroll-mt-4 overflow-hidden rounded-lg border-2 border-foreground/80 bg-card shadow-[7px_7px_0_0_hsl(var(--foreground)/0.85)] print:rounded-none print:border print:border-foreground print:shadow-none"
       aria-label="선택된 리포트 판결문"
     >
+      {/* 인쇄 전용 레터헤드 — A4 판결문의 머리띠 */}
+      <div className="hidden items-baseline justify-between border-b-2 border-foreground px-6 pb-2 pt-4 font-mono text-[10px] uppercase tracking-[0.3em] sm:px-8 print:flex">
+        <span>판결 아카이브 — Research Verdict Archive</span>
+        <span className="tracking-[0.1em]">기준일 {dateLabel(reportDataset.as_of)}</span>
+      </div>
       <header className="flex flex-wrap items-center justify-between gap-2 border-b border-dashed border-border px-6 py-3 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground sm:px-8">
         <span>판결 기록 제 {index < 0 ? "—" : String(index + 1).padStart(3, "0")} 호</span>
         <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <span>
             {SCHOOL_LABELS[report.school]} · {dateLabel(report.report_date)} 발간 · {report.market ?? "—"} · {report.ticker ?? "—"}
           </span>
-          <SourceLinks report={report} />
+          <SourceLinks report={report} className="print:hidden" />
+          <span className="flex items-center gap-1.5 print:hidden">
+            <ShareButton report={report} />
+            <button
+              type="button"
+              onClick={() => window.print()}
+              title="A4 판결문 양식으로 인쇄 — 화면 요소 없이 판결문만 찍힙니다"
+              className="inline-flex items-center gap-1 rounded-sm border border-border px-1.5 py-0.5 font-mono text-[10px] font-semibold tracking-normal text-muted-foreground transition hover:border-foreground hover:text-foreground"
+            >
+              <Printer className="h-2.5 w-2.5" aria-hidden="true" /> 인쇄
+            </button>
+          </span>
         </span>
       </header>
 
@@ -598,7 +641,7 @@ function VerdictPaper({
           <Trajectory report={report} targetReturn={targetReturn} className="mt-7" />
         )}
 
-        <div className="mt-7 flex items-center justify-between gap-3 border-t border-dashed border-border pt-4">
+        <div className="mt-7 flex items-center justify-between gap-3 border-t border-dashed border-border pt-4 print:hidden">
           <button
             type="button"
             onClick={onPrev}
@@ -620,6 +663,41 @@ function VerdictPaper({
         </div>
       </motion.div>
     </article>
+  );
+}
+
+/** 판결문 공유 — /#r= 딥링크를 클립보드로. 누구에게 보내도 같은 판결문이 펼쳐진다 */
+function ShareButton({ report }: { report: ReportRecord }) {
+  const [copied, setCopied] = useState(false);
+  useEffect(() => {
+    if (!copied) return;
+    const timer = window.setTimeout(() => setCopied(false), 1600);
+    return () => window.clearTimeout(timer);
+  }, [copied]);
+  const copy = async () => {
+    const url = `${window.location.origin}/#r=${encodeURIComponent(report.source_name)}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+    } catch {
+      // 클립보드 권한이 없으면 주소창 해시로라도 남긴다
+      window.history.replaceState(null, "", `#r=${encodeURIComponent(report.source_name)}`);
+      setCopied(true);
+    }
+  };
+  return (
+    <button
+      type="button"
+      onClick={copy}
+      title="이 판결문으로 바로 오는 링크 복사"
+      className={cn(
+        "inline-flex items-center gap-1 rounded-sm border px-1.5 py-0.5 font-mono text-[10px] font-semibold tracking-normal transition",
+        copied ? "border-stamp/60 text-stamp" : "border-border text-muted-foreground hover:border-foreground hover:text-foreground",
+      )}
+    >
+      {copied ? <Check className="h-2.5 w-2.5" aria-hidden="true" /> : <Link2 className="h-2.5 w-2.5" aria-hidden="true" />}
+      {copied ? "복사됨" : "공유"}
+    </button>
   );
 }
 
@@ -743,7 +821,7 @@ function Chronicle({ reports, selected, onSelect }: { reports: ReportRecord[]; s
   // 발간 번호는 연대순을 유지하되, 목록은 최신 리포트부터 보여준다
   const rows = reports.map((report, index) => ({ report, no: index + 1 })).reverse();
   return (
-    <aside className="flex max-h-[920px] flex-col overflow-hidden rounded-lg border border-border bg-card" aria-label="발간 연대기">
+    <aside className="flex max-h-[920px] flex-col overflow-hidden rounded-lg border border-border bg-card print:hidden" aria-label="발간 연대기">
       <header className="flex items-baseline justify-between border-b-4 border-double border-border px-4 py-3">
         <h2 className="font-display text-xl font-black tracking-tight">연대기</h2>
         <p className="font-mono text-[11px] text-muted-foreground">{reports.length}건 · 최신순</p>
