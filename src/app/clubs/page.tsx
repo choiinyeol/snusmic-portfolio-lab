@@ -7,12 +7,14 @@ import { cn, formatPct } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "학회별 성적표 — 판결 아카이브" };
 
-const SCHOOL_ORDER: School[] = ["smic", "yig", "star", "kuvic"];
+const SCHOOL_ORDER: School[] = ["smic", "yig", "star", "kuvic", "ewha", "voera"];
 const SCHOOL_DESC: Record<School, string> = {
   smic: "서울대학교 투자연구회 · 2020년부터의 리포트가 수집되어 있습니다",
   yig: "연세대학교 투자동아리 Yonsei Investment Group",
   star: "성균관대학교 금융투자학회 S.T.A.R",
   kuvic: "고려대학교 가치투자연구회 KUVIC",
+  ewha: "이화여자대학교 가치투자학회 EIA",
+  voera: "홍익대학교 중앙 금융동아리 Voera",
 };
 
 export default function ClubsPage() {
@@ -21,7 +23,7 @@ export default function ClubsPage() {
       <SiteHeader eyebrow="Club Scorecards" />
       <h1 className="mt-9 font-display text-4xl font-black tracking-tight sm:text-5xl">학회별 성적표</h1>
       <p className="mt-3 max-w-2xl text-base leading-7 text-foreground/75">
-        네 학회의 리포트를 같은 잣대(point-in-time 시세)로 채점했습니다. 성적은 네 학회가 나란히 비교되는{" "}
+        여섯 학회의 리포트를 같은 잣대(point-in-time 시세)로 채점했습니다. 성적은 여섯 학회가 나란히 비교되는{" "}
         <strong className="font-bold">2019년 7월 이후 매수 의견</strong>만으로 매기고, 발간 90일 미만의 신생 리포트는 판결을 보류합니다. 학회를
         누르면 전체 기록을 볼 수 있습니다.
       </p>

@@ -31,6 +31,8 @@ const SCHOOL_VARS: Record<School, string> = {
   yig: "--down",
   star: "--warn",
   kuvic: "--quality",
+  ewha: "--ewha",
+  voera: "--voera",
 };
 
 /** 리포트 발간일을 실제 캔들 시간축에 맞춘다 (주봉 구간 대응) */

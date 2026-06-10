@@ -1,0 +1,51 @@
+== smic: 0 pdfs to transcribe ==
+== yig: 0 pdfs to transcribe ==
+== star: 0 pdfs to transcribe ==
+== kuvic: 0 pdfs to transcribe ==
+== ewha: 34 pdfs to transcribe ==
+  + data/markdown/ewha/2020-08-21_[200821] CJ ENM(035760).md
+  + data/markdown/ewha/2020-08-22_[200822] 프로텍(053610).md
+  + data/markdown/ewha/2020-10-10_[201010] 오스템임플란트(048260).md
+  + data/markdown/ewha/2020-11-21_[201121] 진성티이씨(036890).md
+  + data/markdown/ewha/2021-02-20_[210220] 엠씨넥스(097520).md
+  + data/markdown/ewha/2021-03-13_[210313] KT&G(033780).md
+  + data/markdown/ewha/2021-04-10_[210410] 에프에스티(036810).md
+  + data/markdown/ewha/2021-05-22_[210522] 테스나(131970).md
+  + data/markdown/ewha/2021-08-21_[210821] 코오롱인더(120110).md
+  + data/markdown/ewha/2021-10-09_[211009] LS전선아시아(229640).md
+  + data/markdown/ewha/2022-02-12_[220212] 디오(039840).md
+  + data/markdown/ewha/2022-02-12_[220212] 효성화학(298000).md
+  + data/markdown/ewha/2022-04-09_[220409] 일진머티리얼즈(020150).md
+  + data/markdown/ewha/2022-08-12_[220812] 키다리스튜디오(020120).md
+  + data/markdown/ewha/2022-08-13_[220813] 한미약품(128940).md
+  + data/markdown/ewha/2022-10-07_[221007] 한국타이어앤테크놀로지(161390).md
+  + data/markdown/ewha/2023-02-08_[230208] 에스엠(041510).md
+  + data/markdown/ewha/2023-02-11_[230211] 케이엔제이(272110).md
+  + data/markdown/ewha/2023-04-08_[230408] 아비코전자(036010).md
+  + data/markdown/ewha/2023-05-27_[230527] 씨에스윈드(112610).md
+  + data/markdown/ewha/2023-08-26_[230826] 에스엘(005850).md
+  + data/markdown/ewha/2023-11-22_[231122] 롯데웰푸드(280360).md
+  + data/markdown/ewha/2024-02-16_[240216] 두산퓨얼셀(336260).md
+  + data/markdown/ewha/2024-06-01_[240601] 비나텍(126340).md
+Error running opendataloader-pdf CLI.
+Return code: 1
+Stdout: Error: 'r0009.pdf' is not a valid PDF file (missing %PDF- header).
+
+  ! batch failed (10 pdfs): Command '['java', '-Djava.awt.headless=true', '-Dapple.awt.UIElement=true', '-jar', 'C:\\Users\\FELAB\\Desktop\\projects\\active\\smic-easy\\.venv\\Lib\\site-packages\\opendataloader_pdf\\jar\\opendataloader-pdf-cli.jar', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_033s8518\\r0000.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_033s8518\\r0001.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_033s8518\\r0002.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_033s8518\\r0003.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_033s8518\\r0004.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_033s8518\\r0005.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_033s8518\\r0006.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_033s8518\\r0007.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_033s8518\\r0008.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_033s8518\\r0009.pdf', '--output-dir', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_out_54ievcqo', '--format', 'markdown', '--quiet', '--image-output', 'off']' returned non-zero exit status 1.
+== voera: 15 pdfs to transcribe ==
+  + data/markdown/voera/undated_[2025.11] Fixed Income REPORT.md
+  + data/markdown/voera/undated_[BUY] Create the Legend, 크래프톤.md
+  + data/markdown/voera/undated_[BUY] LG생활건강.md
+  + data/markdown/voera/undated_[Buy] See and See 보면 볼수록 매력있는, 씨앤씨인터내셔널.md
+  + data/markdown/voera/undated_[BUY] 강(鋼)하게 버틴다, 세아제강.md
+  + data/markdown/voera/undated_[Buy] 로켓처럼 날아오르는 테스트소켓, ISC.md
+  + data/markdown/voera/undated_[BUY] 브이티, 아자 아자 브이팅 !.md
+  + data/markdown/voera/undated_[BUY] 아프리카TV 논란이 아닌 실적에 주목하라!.md
+  + data/markdown/voera/undated_[BUY] 오리온, 지금 올인하세요!.md
+  + data/markdown/voera/undated_[BUY] 전설의 GS건설.md
+  + data/markdown/voera/undated_[BUY] 진인현대천명, 현대건설.md
+  + data/markdown/voera/undated_[BUY] 한국조선해양, 안 사고.md
+  + data/markdown/voera/undated_[BUY] 현대차그룹의 현모양처, 현대모비스.md
+  + data/markdown/voera/undated_[BUY]국내 최초 이족보행로봇 &quot;휴보&quot;를 탄생시킨 그 기업, 맞습니다.md
+  + data/markdown/voera/undated_[SELL] SK바이오팜_ 버블 버블 팜(pharm)!.md
+== done: 39 transcribed ==

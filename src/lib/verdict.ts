@@ -44,16 +44,16 @@ export function signColor(value: number | null | undefined) {
   return value >= 0 ? "text-up" : "text-down";
 }
 
-/* 성과 사다리 — 위로 갈수록 드물고, 금장이 찍힌다 */
+/* 성과 사다리 — 시장의 말로 읽힌다. 위로 갈수록 드물고, 꼭대기엔 다이아몬드가 박힌다 */
 export const bucketLabels: Record<ReportRecord["performance_bucket"], string> = {
   Tenbagger: "텐배거",
   Multibagger: "멀티배거",
   Double: "더블",
-  Winner: "승소",
+  Winner: "순항",
   Positive: "상승",
   Drawdown: "조정",
-  Wrecked: "패소",
-  "No quote": "시세없음",
+  Wrecked: "급락",
+  "No quote": "시세 없음",
 };
 
 export const bucketThresholds: Record<ReportRecord["performance_bucket"], string> = {
@@ -67,9 +67,9 @@ export const bucketThresholds: Record<ReportRecord["performance_bucket"], string
   "No quote": "시세 확인 불가",
 };
 
-/** 등급 배지 — 상위 등급일수록 강한 인장. 표·카드 공용 */
+/** 등급 배지 — 상위 등급일수록 강한 인장. 텐배거는 다이아몬드, 멀티배거는 금장. 표·카드 공용 */
 export const bucketBadgeClass: Record<ReportRecord["performance_bucket"], string> = {
-  Tenbagger: "tier-gold font-black",
+  Tenbagger: "tier-prism font-black",
   Multibagger: "tier-gold font-black",
   Double: "border-up/70 bg-[hsl(var(--up-bg))] text-up font-black",
   Winner: "border-up/60 bg-[hsl(var(--up-bg))] text-up font-bold",
@@ -91,7 +91,7 @@ export function isFresh(report: ReportRecord) {
   return report.maturity === "fresh";
 }
 
-export const schoolShort: Record<ReportRecord["school"], string> = { smic: "SMIC", yig: "YIG", star: "STAR", kuvic: "KUVIC" };
+export const schoolShort: Record<ReportRecord["school"], string> = { smic: "SMIC", yig: "YIG", star: "STAR", kuvic: "KUVIC", ewha: "EIA", voera: "VOERA" };
 
 export const horizonColumns = [
   { key: "return_30d_pct", label: "1M" },

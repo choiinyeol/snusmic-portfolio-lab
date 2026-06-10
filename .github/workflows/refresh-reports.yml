@@ -39,6 +39,12 @@ jobs:
           restore-keys: |
             prices-${{ runner.os }}-
 
+      # Install Playwright browsers (needed for KUVIC and Voera collectors).
+      - name: Install Playwright + browsers
+        run: |
+          pip install playwright beautifulsoup4
+          python -m playwright install chromium --with-deps
+
       # Collectors are incremental: they check their manifests and skip
       # already-downloaded reports, so this is a fast no-op when nothing is new.
       - name: Collect new reports (incremental, no-op when nothing new)
@@ -46,6 +52,8 @@ jobs:
           python scripts/collect_reports.py --source all
           python scripts/collect_kuvic_browser.py
           python scripts/collect_smic.py --source all
+          python scripts/collect_ewha.py
+          python scripts/collect_voera.py
 
       # Transcription is also incremental: already-transcribed .md files are skipped.
       # JDK is available on ubuntu-latest via PATH (openjdk pre-installed).

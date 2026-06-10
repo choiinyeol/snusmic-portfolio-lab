@@ -11,6 +11,7 @@ import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable
+from urllib.parse import quote
 
 import pandas as pd
 import yfinance as yf
@@ -24,7 +25,7 @@ from pykrx import stock  # noqa: E402
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-SCHOOLS = ("smic", "yig", "star", "kuvic")
+SCHOOLS = ("smic", "yig", "star", "kuvic", "ewha", "voera")
 PRICE_CACHE_DIR = ROOT / "data" / "prices"
 
 KOREAN_DATE_RE = re.compile(r"(20\d{2})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일")
@@ -57,6 +58,9 @@ US_TICKER_AFTER_EXCHANGE_RE = re.compile(r"\b(?:NASDAQ|NYSE|AMEX|NSDQ)\s*:?\s*([
 US_TICKER_BEFORE_EXCHANGE_RE = re.compile(r"\b([A-Z][A-Z0-9.\-]{0,7})\s*:?\s*(?:NASDAQ|NYSE|AMEX|NSDQ)\b", re.I)
 KR_CODE_RE = re.compile(r"\b\d{6}\b")
 EXCLUDED_DELISTED_TICKERS = {"VTNR", "NETI"}
+
+# Non-KR/US exchange suffixes in ticker strings — e.g. 4751.T (Tokyo), 00700.HK, 600519.SS
+FOREIGN_EXCHANGE_SUFFIX_RE = re.compile(r"\.(T|HK|SS|SZ|TYO|L|PA|F|AX|TO|V)$", re.I)
 
 TARGET_LABEL_RE = re.compile(r"(?:\d{2,4}E?\s*)?(목표\s*주가|목표주가|적정\s*주가|적정주가|Target\s+Price)", re.I)
 CURRENT_LABEL_RE = re.compile(r"(현재\s*주가|현재주가|현재가(?!치)|Current\s+Price)", re.I)
@@ -229,6 +233,8 @@ class PerformanceRow:
     data_issue: str | None
     parse_issue: str | None
     qa_flags: str | None
+    source_md_url: str | None = None
+    source_pdf_url: str | None = None
 
 
 def compact_line(line: str) -> str:
@@ -340,6 +346,12 @@ def parse_market_from_inside(inside: str) -> tuple[str | None, str | None, str |
         if m:
             return "US", m.group(1).upper().replace(".", "-"), exchange
 
+    # Non-KR/US foreign exchange suffix: 4751.T, 00700.HK, 600519.SS etc.
+    # Return sentinel "FOREIGN" so callers can skip further fallback matching.
+    fm = FOREIGN_EXCHANGE_SUFFIX_RE.search(inside)
+    if fm:
+        return "FOREIGN", None, None
+
     return None, None, None
 
 
@@ -349,6 +361,8 @@ NON_TICKER_ACRONYMS = {
     "CEO", "CFO", "CTO", "OLED", "LCD", "CPU", "GPU", "HBM", "DRAM", "NAND", "ETF", "LNG", "LPG",
     "US", "USA", "KR", "QoQ", "YOY", "YoY", "MOM", "DC", "RND", "ESG", "IPO", "MOU", "B2B", "B2C",
     "FDA", "EU", "UN", "GDP", "CPI", "PMI", "M&A", "REIT", "SCR", "STF", "EDS", "LTA", "AM", "TP",
+    # 재무 약어 — 리포트 표/섹션 헤더에서 티커로 오인식되는 케이스
+    "TTM", "MRQ", "DCF", "LCOE", "MRO", "ROIC", "EBITDA", "OPM", "ATH", "NPM", "GPM",
 }
 
 
@@ -409,6 +423,13 @@ def parse_identity(path: Path, lines: list[str]) -> tuple[str | None, str | None
             continue
         inside = m.group("inside").strip()
         market, ticker, exchange = parse_market_from_inside(inside)
+        if market == "FOREIGN":
+            # Foreign listing (e.g. 4751.T Tokyo) — not KR/US coverage; return with null ticker
+            name = clean_name(m.group("name"))
+            if name:
+                name = _strip_company_prefixes(name)
+                name = clean_name(name)
+            return "FOREIGN", None, None, name
         if not market and has_usd_marks:
             # "|Corning (GLW) ...|" 같은 단독 영문 티커 — 달러 표기가 있는 문서에서만 인정
             um = BARE_US_TICKER_RE.match(inside)
@@ -625,7 +646,11 @@ def parse_report(path: Path, school: str = "smic", hint: dict | None = None) -> 
     report_date, filename_date = resolve_report_date(path, lines, school, hint)
     market, ticker, exchange, company = parse_identity(path, lines)
     rating = parse_rating(lines)
-    target, target_raw, current, current_raw, upside = parse_prices(lines, market)
+    # For foreign-exchange listings prices are in non-KRW/USD units — don't parse them
+    if market == "FOREIGN":
+        target = target_raw = current = current_raw = upside = None
+    else:
+        target, target_raw, current, current_raw, upside = parse_prices(lines, market)
 
     qa_flags: list[str] = []
     if ocr_recovered:
@@ -641,11 +666,35 @@ def parse_report(path: Path, school: str = "smic", hint: dict | None = None) -> 
         company = None  # OCR 덩어리 등 비정상 회사명 → 파일명/힌트 폴백으로
     if not company:
         # STAR 등: 표지가 전사에서 소실돼도 파일명에 회사명이 남는다
-        sm = re.search(r"_(?:STAR|SMIC|YIG|KUVIC)_(.+)$", path.stem, re.I)
+        sm = re.search(r"_(?:STAR|SMIC|YIG|KUVIC|EWHA|VOERA)_(.+)$", path.stem, re.I)
         if sm:
             company = clean_name(sm.group(1))
     if not company and hint:
         company = clean_name(hint.get("company_hint") or None)
+
+    # ── Ewha: ticker hint from title "(010950)" ───────────────────────────────
+    if school == "ewha" and hint:
+        if not ticker:
+            ticker_hint = hint.get("ticker_hint")
+            if ticker_hint and re.fullmatch(r"\d{6}", ticker_hint):
+                ticker = ticker_hint
+                market = market or "KR"
+                exchange = exchange or "KRX"
+
+    # ── Voera: rating + TP hints from title bracket ───────────────────────────
+    if school == "voera" and hint:
+        if not rating:
+            rating_hint = hint.get("rating_hint")
+            if rating_hint:
+                rating = rating_hint.capitalize()
+        if target is None:
+            tp_raw = hint.get("tp_hint")
+            if tp_raw:
+                try:
+                    target = float(tp_raw.replace(",", ""))
+                    target_raw = f"{tp_raw}원"
+                except ValueError:
+                    pass
 
     parsed = ParsedReport(
         source_file=str(path),
@@ -957,11 +1006,15 @@ def evaluate_report(parsed: ParsedReport, prices: pd.DataFrame, as_of: dt.date, 
     first_hit_date = None
     days_to_target = None
     if parsed.target_price is not None and max_high is not None:
-        hit_frame = until_latest[until_latest["high"] >= parsed.target_price]
+        # Target hit measured from D+1 (first trading day AFTER publication date).
+        # This eliminates spurious 적중 D+0: a target cannot be "hit" on the same day
+        # the report is published, since the investor could not act on it yet.
+        after_publication = until_latest[until_latest.index > pd.Timestamp(report_dt)]
+        hit_frame = after_publication[after_publication["high"] >= parsed.target_price]
         hit = not hit_frame.empty
         if hit:
             first_hit_date = hit_frame.index[0].date().isoformat()
-            days_to_target = (hit_frame.index[0].date() - start_date).days
+            days_to_target = (hit_frame.index[0].date() - report_dt).days
 
     latest_ret = safe_pct(latest_close, start_close)
     direction = None
@@ -1172,12 +1225,118 @@ def summarize(rows: list[dict], group: str) -> dict:
     }
 
 
-def write_web_json(path: Path, rows: list[PerformanceRow], as_of: dt.date, excluded_sector_count: int) -> None:
+def apply_market_prices_to_parsed(parsed: list[ParsedReport], price_cache: dict[tuple[str, str], pd.DataFrame]) -> None:
+    """발간가를 시세 창고 기반으로 재계산한다.
+
+    report_current_price = 발간 유효일 당일 또는 그 이전의 마지막 종가.
+    텍스트 파싱값은 report_current_price_raw에 보존.
+    stated_upside_pct도 시세 기반 발간가로 재계산한다.
+    """
+    for r in parsed:
+        if not r.ticker or not r.market or r.market not in {"KR", "US"}:
+            continue
+        effective_date = date_from_string(r.report_date) or date_from_string(r.filename_date)
+        if effective_date is None:
+            continue
+        prices = price_cache.get((r.market, r.ticker))
+        if prices is None or prices.empty:
+            continue
+        prices_sorted = prices.sort_index()
+        # Last available close ON OR BEFORE effective date
+        on_or_before = prices_sorted[prices_sorted.index <= pd.Timestamp(effective_date)]
+        if on_or_before.empty:
+            continue
+        market_price = float(on_or_before.iloc[-1]["close"])
+        r.report_current_price = market_price
+        # Recompute stated_upside_pct from market-based 발간가
+        if r.target_price is not None and market_price > 0:
+            r.stated_upside_pct = round((r.target_price / market_price - 1) * 100, 4)
+
+
+def apply_target_sanity(parsed: list[ParsedReport]) -> None:
+    """Buy 등급 레코드의 목표가 정합성을 검증하고 의심 레코드를 플래그한다.
+
+    1. target_price <= report_current_price (시세 기반): 상승 여력 없음 → 스왑 시도
+       - report_current_price_raw 값이 target_price보다 크고
+         그 raw 값이 market 발간가의 ±15% 이내이면 → 파싱 스왑 오류: 값 교환
+       - 그렇지 않으면 → target_price를 null, qa_flag 'target_price_suspect' 추가
+    2. 스왑/null 처리 후 compute_issues 재계산
+    """
+    for r in parsed:
+        if classify_rating(r.rating) != "buy":
+            continue
+        if r.target_price is None or r.report_current_price is None:
+            continue
+        market_price = r.report_current_price  # 시세 기반 발간가
+        if r.target_price > market_price:
+            continue  # 정상: 목표가 > 발간가
+        # Suspicious: target <= market price on a Buy
+        raw_current_val: float | None = None
+        if r.report_current_price_raw:
+            try:
+                tm = PRICE_TOKEN_RE.search(r.report_current_price_raw)
+                if tm:
+                    raw_current_val, _ = value_from_price_token(tm, r.market)
+            except Exception:  # noqa: BLE001
+                pass
+        swapped = False
+        if raw_current_val is not None and raw_current_val > r.target_price:
+            # Swap heuristic: swapped "current" must be within ±15% of market price
+            if market_price > 0 and abs(raw_current_val / market_price - 1) <= 0.15:
+                # Swap: the text "current" was actually the target, and vice versa.
+                # Capture originals before mutation.
+                old_target_raw = r.target_price_raw
+                old_current_raw = r.report_current_price_raw
+                r.target_price = raw_current_val
+                r.target_price_raw = old_current_raw  # old parsed-current string becomes target raw
+                r.report_current_price_raw = old_target_raw or ""  # old target string becomes current raw
+                # report_current_price stays as market-derived value (already set)
+                r.stated_upside_pct = round((r.target_price / market_price - 1) * 100, 4) if market_price > 0 else None
+                add_qa_flag(r, "target_swapped_from_raw")
+                swapped = True
+        if not swapped:
+            r.target_price = None
+            r.target_price_raw = None
+            r.stated_upside_pct = None
+            add_qa_flag(r, "target_price_suspect")
+        compute_issues(r)
+
+
+GITHUB_RAW_BASE = "https://github.com/ChoiInYeol/SNUSMIC-Portfolio/blob/main"
+
+
+def _url_encode_path(path_str: str) -> str:
+    """URL-encode each path segment (preserves /, handles Korean chars, spaces, parens, commas)."""
+    return "/".join(quote(seg, safe="") for seg in path_str.replace("\\", "/").split("/"))
+
+
+def build_source_urls(source_file: str, hints: dict[str, dict]) -> tuple[str | None, str | None]:
+    """(source_md_url, source_pdf_url) for a given source_file path string.
+
+    source_md_url  — GitHub blob URL to the markdown file.
+    source_pdf_url — original download URL from manifest (pdf_url field); None if not present.
+    """
+    # Normalise to forward-slash relative path from repo root
+    rel = source_file.replace("\\", "/").lstrip("./")  # e.g. "data/markdown/yig/2025-11-10_피에스케이.md"
+    md_url = f"{GITHUB_RAW_BASE}/{_url_encode_path(rel)}"
+
+    stem = Path(source_file).stem
+    hint = hints.get(stem)
+    pdf_url: str | None = hint.get("pdf_url") if hint else None
+
+    return md_url, pdf_url
+
+
+def write_web_json(path: Path, rows: list[PerformanceRow], as_of: dt.date, excluded_sector_count: int, hints: dict[str, dict] | None = None) -> None:
+    _hints = hints or {}
     records = []
     for row in rows:
         record = round_floats(asdict(row))
         record["source_name"] = Path(str(record["source_file"])).name
         record["performance_bucket"] = performance_bucket(record["return_latest_pct"])  # type: ignore[arg-type]
+        md_url, pdf_url = build_source_urls(str(record["source_file"]), _hints)
+        record["source_md_url"] = md_url
+        record["source_pdf_url"] = pdf_url
         records.append(record)
 
     groups: list[tuple[str, list[dict]]] = [("ALL", records)]
@@ -1213,7 +1372,7 @@ def main() -> int:
     as_of = dt.date.fromisoformat(args.as_of)
     md_root = Path(args.markdown_dir)
     md_paths: list[tuple[Path, str]] = [(p, "smic") for p in sorted(md_root.glob("*.md"))]
-    for school in ("smic", "yig", "star", "kuvic"):
+    for school in SCHOOLS:
         sub = md_root / school
         if sub.exists():
             md_paths += [(p, school) for p in sorted(sub.glob("*.md"))]
@@ -1289,6 +1448,10 @@ def main() -> int:
         if (i + 1) % 50 == 0:
             print(f"  prices {i + 1}/{len(groups)}", flush=True)
 
+    # ── 시세 기반 발간가 적용 및 목표가 정합성 검증 ──────────────────────────────
+    apply_market_prices_to_parsed(company_reports, price_cache)
+    apply_target_sanity(company_reports)
+
     min_report = min((d for r in company_reports if (d := date_from_string(r.report_date))), default=year_start)
     idx_start = min(min_report, year_start) - dt.timedelta(days=10)
     benchmarks: dict[str, pd.DataFrame] = {}
@@ -1306,7 +1469,7 @@ def main() -> int:
 
     rows.sort(key=lambda x: (x.report_date or "9999-99-99", x.market or "", x.ticker or "", x.source_file))
     write_csv(Path(args.output), rows)
-    write_web_json(Path(args.web_output), rows, as_of, excluded_sector_count)
+    write_web_json(Path(args.web_output), rows, as_of, excluded_sector_count, hints)
 
     ok = sum(1 for row in rows if not row.data_issue)
     # rating_class distribution
@@ -1316,6 +1479,11 @@ def main() -> int:
     print(f"parsed_reports={len(parsed_all)} included_us_kr={len(parsed)} company_rows={len(rows)} priced_rows={ok} as_of={as_of}")
     print(f"rating_class distribution: buy={rc_dist.get('buy', 0)} soft_buy={rc_dist.get('soft_buy', 0)} sell={rc_dist.get('sell', 0)}")
     print(f"excluded_sector_count={excluded_sector_count}")
+    # Target sanity summary
+    suspect_count = sum(1 for r in company_reports if r.qa_flags and "target_price_suspect" in r.qa_flags)
+    swap_count = sum(1 for r in company_reports if r.qa_flags and "target_swapped_from_raw" in r.qa_flags)
+    d0_count = sum(1 for row in rows if row.days_to_target == 0)
+    print(f"target_sanity: suspect={suspect_count} swapped={swap_count} days_to_target_zero={d0_count}")
     print(f"wrote {args.output}")
     print(f"wrote {args.parsed_output}")
     print(f"wrote {args.issues_output}")

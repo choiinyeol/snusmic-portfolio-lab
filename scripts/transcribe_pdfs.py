@@ -19,7 +19,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PDF_ROOT = ROOT / "data" / "pdfs"
 MD_ROOT = ROOT / "data" / "markdown"
-SCHOOLS = ("smic", "yig", "star", "kuvic")
+SCHOOLS = ("smic", "yig", "star", "kuvic", "ewha", "voera")
 BATCH_SIZE = 24
 
 if hasattr(sys.stdout, "reconfigure"):

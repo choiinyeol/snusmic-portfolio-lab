@@ -1,0 +1,121 @@
+KRX �α��� �õ�...
+  �α��� ID: chldlsel1
+KRX �α��� �Ϸ�.
+  �α��� �ð�: 2026-06-10 17:51:36
+  ���� �ð�: 2026-06-10 18:51:36
+deduped 7 duplicate reports
+excluded sector/thematic reports: 163
+  prices 50/773
+  prices 100/773
+  prices 150/773
+  prices 200/773
+  prices 250/773
+  prices 300/773
+  prices 350/773
+  prices 400/773
+$CTRP: possibly delisted; no timezone found
+
+1 Failed download:
+['CTRP']: possibly delisted; no timezone found
+  prices 450/773
+$ATVI: possibly delisted; no timezone found
+
+1 Failed download:
+['ATVI']: possibly delisted; no timezone found
+  prices 500/773
+  prices 550/773
+  prices 600/773
+  prices 650/773
+  prices 700/773
+$TAM: possibly delisted; no price data found  (1d 2025-12-22 -> 2026-06-11)
+
+1 Failed download:
+['TAM']: possibly delisted; no price data found  (1d 2025-12-22 -> 2026-06-11)
+$KOSPI: possibly delisted; no timezone found
+
+1 Failed download:
+['KOSPI']: possibly delisted; no timezone found
+  prices 750/773
+parsed_reports=1566 included_us_kr=1559 company_rows=1396 priced_rows=1366 as_of=2026-06-10
+rating_class distribution: buy=1311 soft_buy=62 sell=23
+excluded_sector_count=163
+target_sanity: suspect=47 swapped=3 days_to_target_zero=0
+wrote data/report_performance.csv
+wrote data/report_parsed.csv
+wrote data/report_parse_issues.csv
+wrote src/data/report-performance.json
+wrote 759 chart files -> public/prices/
+Loading report data...
+  858 buy reports from 2019-08-05 to 2026-06-05
+Loading stock prices...
+  858 reports with price data, 459 unique tickers
+  Calendar (clipped): 2019-07-01 to 2026-06-10  (was 2011-06-15)
+Loading benchmarks...
+  NASDAQ: 2007-01-03 to 2026-06-09
+  GLD: 2007-01-03 to 2026-06-09
+  All-weather: 2019-07-01 to 2026-06-10
+
+Running Strategy A: Immediate 12mo hold (baseline)...
+  IS sharpe=0.47  OOS sharpe=1.13
+
+Running Strategy B: Immediate 18mo hold...
+  IS sharpe=0.48  OOS sharpe=1.28
+
+Running Strategy C: Equal-weight monthly rebalanced...
+  IS sharpe=0.2  OOS sharpe=0.81
+
+Running Strategy D: Consensus-only 12mo hold (all-time window)...
+  IS sharpe=0.77  OOS sharpe=1.54
+
+Building breakout signals (Strategy E)...
+  680 signals (395 unique tickers)
+  E ATRx2.0 regime=off: IS-sharpe=-0.4 OOS-sharpe=-0.27
+  E ATRx2.0 regime=on: IS-sharpe=0.05 OOS-sharpe=-0.87
+  E ATRx3.0 regime=off: IS-sharpe=0.11 OOS-sharpe=0.59
+  E ATRx3.0 regime=on: IS-sharpe=0.53 OOS-sharpe=0.48
+  E ATRx4.0 regime=off: IS-sharpe=0.35 OOS-sharpe=0.91
+  E ATRx4.0 regime=on: IS-sharpe=0.85 OOS-sharpe=0.84
+  E ATRx5.0 regime=off: IS-sharpe=0.4 OOS-sharpe=1.39
+  E ATRx5.0 regime=on: IS-sharpe=0.62 OOS-sharpe=1.02
+
+Running strategy variants research (Task 3)...
+  D_consensus_window90d: IS sharpe=0.06 OOS sharpe=1.55
+  D_consensus_window180d: IS sharpe=0.16 OOS sharpe=1.11
+  D_consensus_window365d: IS sharpe=0.22 OOS sharpe=1.14
+  D_consensus_6mo: IS sharpe=0.55 OOS sharpe=1.08
+  D_consensus_9mo: IS sharpe=0.67 OOS sharpe=1.08
+  D_consensus_18mo: IS sharpe=0.72 OOS sharpe=0.9
+  D_consensus_target_exit: IS sharpe=0.77 OOS sharpe=1.21
+  D_consensus_upside_weighted: IS sharpe=0.77 OOS sharpe=1.21
+
+  No variant beats D on both IS+OOS Sharpe. Keeping D as headline.
+
+Headline strategy (best IS sharpe): D_consensus_12mo
+
+── Strategy summary ──────────────────────────────────────────────
+Strategy                         IS CAGR  IS Sharpe   OOS CAGR  OOS Sharpe
+  A_immediate_12mo                  8.39       0.47      34.87        1.13
+  B_immediate_18mo                  8.49       0.48      42.72        1.28
+  C_ew_monthly                      1.92        0.2       20.1        0.81
+  D_consensus_12mo                 14.48       0.77      55.05        1.54
+  E_breakout_atr4                   4.16       0.35      25.33        0.91
+
+Computing wealth simulations...
+  Strategy nav starts: 2019-07-01 (expected >= 2019-07-01)
+  Wealth sim first date: 2019-07-01 (must be >= 2019-07-01)
+  Strategy final: 652,437,454원
+  KOSPI final: 633,120,247원 (215.0%)
+  SP500 final: 325,067,164원 (61.7%)
+  NASDAQ final: 372,966,321원 (85.6%)
+  AllWeather final: 433,991,960원 (115.9%)
+
+Computing today's signals...
+  Open: 18, Expiring ≤30d: 1, New buy signals: 8, Watching (1-club): 262
+
+Exporting trade CSV...
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades.csv (113 rows)
+
+Wrote src/data/strategy-backtest.json
+  Wealth sim first date: 2019-07-01
+  Trades in JSON: 113
+ALL_OK

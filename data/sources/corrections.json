@@ -15,5 +15,53 @@
   "2013-09-18_Equity Research, 동화약품공업.md": {
     "company": "동화약품공업",
     "_comment": "OCR heading split: '# 공업(' → 정상 회사명으로 교정."
+  },
+  "2025-11-11_슈어소프트테크 (298840, KQ), 필승! Sure Can Do (발간일 250802) YIG Research.md": {
+    "ticker": "298830",
+    "_comment": "OCR/파일명 오인식: 298840 → 올바른 티커 298830 (슈어소프트테크, KOSDAQ). 사용자 확인값."
+  },
+  "2025-11-10_피에스케이 (319660, KQ), Perfect Stock in Korea (발간일 240913) YIG Research.md": {
+    "ticker": "319660",
+    "company": "피에스케이",
+    "market": "KR",
+    "exchange": "KOSDAQ",
+    "_comment": "OCR 숫자 오인식: 파서가 349660으로 추출. 파일명/manifest 명시 티커 319660 (피에스케이 Inc, KOSDAQ)으로 교정."
+  },
+  "2019-12-24_Equity Research, Align Technology.md": {
+    "ticker": "ALGN",
+    "company": "Align Technology",
+    "market": "US",
+    "exchange": "NASDAQ",
+    "_comment": "파서가 B/S 표 헤더 'MRQ'를 티커로 오인식. 실제 종목: Align Technology (NASDAQ: ALGN)."
+  },
+  "2024-05-24_equity-research-centrus-energy-corp.md": {
+    "ticker": "LEU",
+    "company": "Centrus Energy Corp",
+    "market": "US",
+    "exchange": "NYSE",
+    "_comment": "파서가 Valuation 섹션 'DCF'를 티커로 오인식. 실제 종목: Centrus Energy Corp (NYSE American: LEU)."
+  },
+  "2023-11-22_equity-research-byd.md": {
+    "ticker": null,
+    "company": "BYD",
+    "market": null,
+    "exchange": null,
+    "_comment": "파서가 B/S 표 헤더 'TTM'을 미국 티커로 오인식. BYD는 중국 A주(002594.SZ)/홍콩 H주(01211.HK) — KR/US 미커버리지. 티커 null → sector 분류."
+  },
+  "2021-05-31_equity-research-cyber-agent.md": {
+    "ticker": null,
+    "company": "CyberAgent Inc.",
+    "market": null,
+    "exchange": null,
+    "_comment": "CyberAgent Inc. (4751.T) — 도쿄증권거래소 상장. 본문 # (075580) 은 국내 무관 코드. KR/US 미커버리지 → ticker null, sector 분류. 엔화 시세 KRW 오인식 방지."
+  },
+  "undated_kuvic-5ec6f7_7302d46cd033470899f067eb2d01c2e2.md": {
+    "target_price": 159000.0,
+    "target_price_raw": "159,000원",
+    "report_date": "2026-05-18",
+    "ticker": "355150",
+    "market": "KR",
+    "exchange": "KRX",
+    "_comment": "코스텍시스(KOSDAQ 355150) 2026-05-18 KUVIC 보고서. OCR 표 레이아웃 오류: '목표주가(원) 현재주가(원)|159,0 57,60' 셀이 쉼표 이후 자릿수 누락으로 1590/5760으로 파싱됨. 본문 13행 '목표주가 159,000원', 상승여력+176%로 실제 목표가 확인. 발간가 57,600원은 시세 기반으로 별도 복원됨."
   }
 }

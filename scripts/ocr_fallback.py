@@ -24,7 +24,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 MD_ROOT = ROOT / "data" / "markdown"
 PDF_ROOT = ROOT / "data" / "pdfs"
-SCHOOLS = ("smic", "yig", "star", "kuvic")
+SCHOOLS = ("smic", "yig", "star", "kuvic", "ewha", "voera")
 NEAR_EMPTY_THRESHOLD = 300
 OCR_MARKER = "<!-- ocr_fallback -->"
 

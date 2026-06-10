@@ -6,11 +6,11 @@ import { bucketLabels, bucketThresholds, schoolShort, signColor } from "@/lib/ve
 import { cn, formatPct } from "@/lib/utils";
 
 /**
- * 성과 사다리 색 — 패소의 짙은 청색에서 종이색을 지나 승소의 적색으로.
- * 텐배거·멀티배거는 금장(.wall-gold)이 따로 찍힌다.
+ * 성과 사다리 색 — 급락의 짙은 청색에서 종이색을 지나 상승의 적색으로.
+ * 멀티배거는 금장(.wall-gold), 텐배거는 다이아몬드 광채(.wall-prism)가 따로 찍힌다.
  */
 const squareClass: Record<ReportRecord["performance_bucket"], string> = {
-  Tenbagger: "wall-gold",
+  Tenbagger: "wall-prism",
   Multibagger: "wall-gold",
   Double: "bg-[#8f0c22] dark:bg-[#ff4a63]",
   Winner: "bg-[#c42848] dark:bg-[#ef6479]",
@@ -87,8 +87,8 @@ export function VerdictWall({
           <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">The Evidence Wall</p>
           <h2 className="mt-1 font-display text-2xl font-black tracking-tight sm:text-3xl">증거의 서가</h2>
           <p className="mt-1.5 max-w-2xl text-sm leading-6 text-muted-foreground">
-            사각형 하나가 매수 리포트 한 건 — {reports.length}건이 발간 순서 그대로 깔려 있습니다. 청색은 패소, 적색은 승소, 금장은
-            멀티배거 이상. 눌러서 판결문을 펼치세요.
+            사각형 하나가 매수 리포트 한 건 — {reports.length}건이 발간 순서 그대로 깔려 있습니다. 짙은 청색일수록 깊은 급락, 짙은
+            적색일수록 큰 상승. 금장은 멀티배거, 다이아몬드 광채는 텐배거입니다. 눌러서 판결문을 펼치세요.
           </p>
         </div>
         <ul className="flex flex-wrap items-center gap-x-3 gap-y-1.5" aria-label="등급 범례">

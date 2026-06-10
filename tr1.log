@@ -1,0 +1,37 @@
+== smic: 0 pdfs to transcribe ==
+== yig: 0 pdfs to transcribe ==
+== star: 0 pdfs to transcribe ==
+== kuvic: 0 pdfs to transcribe ==
+== ewha: 34 pdfs to transcribe ==
+Error running opendataloader-pdf CLI.
+Return code: 1
+Stdout: Error: 'r0002.pdf' is not a valid PDF file (missing %PDF- header).
+
+  ! batch failed (24 pdfs): Command '['java', '-Djava.awt.headless=true', '-Dapple.awt.UIElement=true', '-jar', 'C:\\Users\\FELAB\\Desktop\\projects\\active\\smic-easy\\.venv\\Lib\\site-packages\\opendataloader_pdf\\jar\\opendataloader-pdf-cli.jar', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0000.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0001.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0002.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0003.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0004.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0005.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0006.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0007.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0008.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0009.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0010.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0011.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0012.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0013.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0014.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0015.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0016.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0017.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0018.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0019.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0020.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0021.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0022.pdf', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_in_e9vj3wog\\r0023.pdf', '--output-dir', 'C:\\Users\\FELAB\\AppData\\Local\\Temp\\odl_out_ei8w62_9', '--format', 'markdown', '--quiet', '--image-output', 'off']' returned non-zero exit status 1.
+  + data/markdown/ewha/2024-07-25_[240725] 오로스테크놀로지(322310).md
+  + data/markdown/ewha/2024-08-23_[240823] 슈프리마(236200).md
+  + data/markdown/ewha/2024-10-04_[241004] 코스메카코리아(241710).md
+  + data/markdown/ewha/2025-01-24_[250124] 넥스틴(348210).md
+  + data/markdown/ewha/2025-02-21_[250221] 쎄트렉아이(099320).md
+  + data/markdown/ewha/2025-04-04_[250404] 에이피알(278470).md
+  + data/markdown/ewha/2025-07-25_[250725] 삼성중공업(010140).md
+  + data/markdown/ewha/2025-10-03_[251003] 인텔리안테크(189300).md
+  + data/markdown/ewha/2026-02-20_[260220] 비나텍(126340).md
+  + data/markdown/ewha/2026-05-26_[260526] (KEYSS 대회 우수상) 엘앤에프(066970).md
+== voera: 15 pdfs to transcribe ==
+  + data/markdown/voera/undated_[2025.10] Market Condition REPORT.md
+  + data/markdown/voera/undated_[BUY] CJ제일제당_사재기는 거들뿐.md
+  + data/markdown/voera/undated_[BUY] League of No.1 LIG 넥스원.md
+  + data/markdown/voera/undated_[BUY] Robot is... 로보티즈!.md
+  + data/markdown/voera/undated_[BUY] 가전계의 에르메스, LG전자.md
+  + data/markdown/voera/undated_[BUY] 디어유, 팬 플랫폼 성장 열기에 디어유~.md
+  + data/markdown/voera/undated_[BUY] 불닭의 질주는 계속된다! 삼양식품.md
+  + data/markdown/voera/undated_[Buy] 씨에스윈드, 영광의 순간은 바로 지금부터.md
+  + data/markdown/voera/undated_[BUY] 엠씨넥스, 넘쳐흘러.md
+  + data/markdown/voera/undated_[BUY] 전력 슈퍼싸이클에 올라타라! 효성중공업.md
+  + data/markdown/voera/undated_[BUY] 중국 손님 제주행, 드림타워 실적행! 롯데관광개발.md
+  + data/markdown/voera/undated_[Buy] 하이비젼시스템,애플아 나 지금 되게 신나.md
+  + data/markdown/voera/undated_[BUY] 현대백화점 The More 현대, 더 모여 현대.md
+  + data/markdown/voera/undated_[BUY].md
+  + data/markdown/voera/undated_[Hold]대한항공_Neither Good nor Bad.md
+== done: 25 transcribed ==

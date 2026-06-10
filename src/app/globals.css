@@ -72,8 +72,13 @@
   --finance-selected-bg: 354 64% 93%;
   --quality: 262 50% 45%;
   --quality-bg: 262 60% 94%;
+  --ewha: 168 60% 34%;
+  --voera: 24 80% 42%;
   --gold: 40 78% 34%;
   --gold-bg: 44 72% 88%;
+  /* 다이아몬드 — 텐배거 전용 프리즘. ink는 글자, edge는 테두리·광륜 */
+  --prism-ink: 250 55% 34%;
+  --prism-edge: 222 70% 52%;
   --chart-positive: 354 70% 46%;
   --chart-negative: 219 62% 50%;
   --chart-target: 33 85% 40%;
@@ -117,8 +122,12 @@
   --finance-warning-bg: 40 50% 14%;
   --quality: 262 70% 74%;
   --quality-bg: 262 40% 16%;
+  --ewha: 168 70% 54%;
+  --voera: 24 90% 62%;
   --gold: 44 88% 60%;
   --gold-bg: 42 45% 16%;
+  --prism-ink: 218 95% 85%;
+  --prism-edge: 210 90% 68%;
   --chart-positive: 354 85% 64%;
   --chart-negative: 217 90% 70%;
   --chart-target: 40 90% 60%;
@@ -271,11 +280,32 @@ table {
   color: hsl(var(--stamp));
 }
 
-/* 금장 인장 — 텐배거·멀티배거 전용 박(箔) 처리 */
+/* 금장 인장 — 멀티배거 전용 박(箔) 처리 */
 .tier-gold {
   color: hsl(var(--gold));
   border-color: hsl(var(--gold) / 0.6);
   background: linear-gradient(118deg, hsl(var(--gold) / 0.22), hsl(var(--gold) / 0.06) 42%, hsl(var(--gold) / 0.24));
+}
+
+/* 다이아몬드 인장 — 텐배거 전용. 깎인 면처럼 도는 프리즘 테두리, 얼음빛 속살, 흰 광택 */
+.tier-prism {
+  position: relative;
+  overflow: hidden;
+  color: hsl(var(--prism-ink));
+  border-color: transparent;
+  background:
+    linear-gradient(120deg, hsl(192 90% 62% / 0.2), hsl(258 88% 66% / 0.1) 45%, hsl(322 86% 68% / 0.2)) padding-box,
+    linear-gradient(hsl(var(--card)), hsl(var(--card))) padding-box,
+    conic-gradient(from 140deg, hsl(192 85% 55%), hsl(258 82% 62%) 30%, hsl(322 80% 64%) 55%, hsl(48 90% 58%) 76%, hsl(192 85% 55%)) border-box;
+  box-shadow: 0 0 6px hsl(258 85% 66% / 0.35);
+}
+
+.tier-prism::after {
+  content: "";
+  position: absolute;
+  inset: -30% 42%;
+  background: linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.55), transparent);
+  animation: glint-sweep 4.6s ease-in-out infinite;
 }
 
 /* 정렬 가능한 표 머리글 */
@@ -347,7 +377,7 @@ table {
   }
 }
 
-/* 금장 — 텐배거·멀티배거에만 박이 반짝인다 */
+/* 금장 — 멀티배거에만 박이 반짝인다 */
 @keyframes glint-sweep {
   0%, 86% {
     transform: translateX(-130%) skewX(-18deg);
@@ -371,8 +401,47 @@ table {
   animation: glint-sweep 5.2s ease-in-out infinite;
 }
 
+/* 다이아몬드 — 텐배거에만 프리즘이 숨쉬듯 분광하고, 흰 광택이 더 잦게 스친다 */
+@keyframes prism-breathe {
+  0%, 100% {
+    filter: hue-rotate(0deg) saturate(1);
+  }
+  50% {
+    filter: hue-rotate(-50deg) saturate(1.35);
+  }
+}
+
+.wall-prism {
+  background: conic-gradient(
+    from 230deg at 32% 28%,
+    hsl(192 95% 78%),
+    hsl(258 92% 80%) 28%,
+    hsl(322 90% 82%) 52%,
+    hsl(48 96% 80%) 72%,
+    hsl(178 92% 76%) 88%,
+    hsl(192 95% 78%)
+  );
+  box-shadow: 0 0 0 1px hsl(var(--prism-edge) / 0.9), 0 0 7px hsl(258 85% 70% / 0.7);
+  overflow: hidden;
+  animation: prism-breathe 6.4s ease-in-out infinite;
+}
+
+.wall-prism::after {
+  content: "";
+  position: absolute;
+  inset: -12% 26%;
+  background: linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.95), transparent);
+  animation: glint-sweep 3.6s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .wall-gold::after {
+  .wall-prism {
+    animation: none;
+  }
+
+  .wall-gold::after,
+  .wall-prism::after,
+  .tier-prism::after {
     animation: none;
     opacity: 0;
   }

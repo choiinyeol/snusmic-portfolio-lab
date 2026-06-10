@@ -4,6 +4,7 @@ import { Fragment, useMemo, useState } from "react";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { ReportPathChart } from "@/components/report-path-chart";
+import { SourceLinks } from "@/components/source-links";
 import { dateLabel, getDisplayName, SCHOOL_LABELS, type ReportRecord } from "@/lib/report-model";
 import {
   bucketBadgeClass,
@@ -103,7 +104,9 @@ export function ReportLedger({
               const verdict = verdictOf(report);
               const slug = tickerSlug(report);
               const reference = !isBuy(report);
-              const expandable = Boolean(slug && report.report_date);
+              const hasChart = Boolean(slug && report.report_date);
+              // 차트가 없어도 원문 링크가 있으면 펼친다 — 파싱이 어긋난 기록일수록 원문 추적이 절실하다
+              const expandable = hasChart || Boolean(report.source_md_url || report.source_pdf_url);
               const open = expandedName === report.source_name;
               return (
                 <Fragment key={report.source_name}>
@@ -120,7 +123,7 @@ export function ReportLedger({
                         type="button"
                         onClick={() => setExpandedName(open ? null : report.source_name)}
                         aria-expanded={open}
-                        title={open ? "가격 경로 접기" : "발간 이후 가격 경로 펼치기"}
+                        title={open ? "접기" : hasChart ? "발간 이후 가격 경로 펼치기" : "원문 링크 펼치기"}
                         className="flex min-h-[2.25rem] w-full items-center gap-1 rounded px-1.5 text-left transition hover:text-foreground"
                       >
                         <ChevronRight className={cn("h-3 w-3 shrink-0 transition-transform", open && "rotate-90 text-stamp")} aria-hidden="true" />
@@ -190,21 +193,26 @@ export function ReportLedger({
                     )}
                   </td>
                 </tr>
-                {open && slug && report.report_date && (
+                {open && (
                   <tr className="border-b border-dashed border-border">
                     <td colSpan={showSchool ? 14 : 13} className="bg-secondary/30 px-3 py-3 sm:px-4">
-                      <p className="mb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                        {getDisplayName(report)} — 발간 이후 가격 경로 · 기준선은 발간가
-                      </p>
-                      <ReportPathChart
-                        slug={slug}
-                        market={report.market}
-                        reportDate={report.report_date}
-                        targetPrice={report.target_price}
-                        hitDate={report.first_target_hit_date}
-                        eager
-                        className="h-[180px] sm:h-[220px]"
-                      />
+                      <div className={cn("flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1", hasChart && "mb-2")}>
+                        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                          {getDisplayName(report)} — {hasChart ? "발간 이후 가격 경로 · 기준선은 발간가" : "가격 경로 없음 · 원문으로 확인"}
+                        </p>
+                        <SourceLinks report={report} />
+                      </div>
+                      {hasChart && slug && report.report_date && (
+                        <ReportPathChart
+                          slug={slug}
+                          market={report.market}
+                          reportDate={report.report_date}
+                          targetPrice={report.target_price}
+                          hitDate={report.first_target_hit_date}
+                          eager
+                          className="h-[180px] sm:h-[220px]"
+                        />
+                      )}
                     </td>
                   </tr>
                 )}

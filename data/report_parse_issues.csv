@@ -1,6 +1,6 @@
 ﻿source_file,school,report_type,ocr_recovered,report_date,filename_date,market,company,ticker,exchange,rating,target_price,target_price_raw,report_current_price,report_current_price_raw,stated_upside_pct,parse_issue,qa_flags
 data\markdown\2020-10-31_equity-research-지트리비앤티.md,smic,company,False,2020-10-31,2020-10-31,KR,지트리비앤티,115450,KRX,Strong Buy,,,27450.0,"27,450 원",200.7,missing_target_price,
-data\markdown\2020-12-05_equity-research-gaztransporttechnigaz-2.md,smic,sector,False,2020-11-14,2020-12-05,,,,,Buy,114.45,114.45,80.7,80.70,41.38,non_us_kr_or_unparsed_market;missing_ticker,
+data\markdown\2020-12-05_equity-research-gaztransporttechnigaz-2.md,smic,sector,False,2020-11-14,2020-12-05,FOREIGN,Gaztransport & Technigaz SA,,,Buy,,,,,,non_us_kr_or_unparsed_market;missing_ticker;missing_target_price,
 data\markdown\2020-12-05_equity-research-sea-ltd.md,smic,sector,False,2020-11-21,2020-12-05,,,,,Buy,,,,,,non_us_kr_or_unparsed_market;missing_ticker;missing_target_price,
 data\markdown\2021-05-31_equity-research-ping-an-healthcare-technology.md,smic,sector,False,2021-05-31,2021-05-31,,,,,Buy,,,,,,non_us_kr_or_unparsed_market;missing_ticker;missing_target_price,
 data\markdown\2021-11-03_equity-research-키이스트.md,smic,sector,False,2021-10-16,2021-11-03,,,,,Buy,20800.0,"20,800 원",15000.0,"15,000 원",39.0,non_us_kr_or_unparsed_market;missing_ticker,
@@ -8,11 +8,10 @@ data\markdown\2021-11-19_equity-research-예스티.md,smic,sector,False,2021-11-
 data\markdown\2021-11-30_equity-research-muyuan-foods-co-ltd.md,smic,sector,False,2021-11-20,2021-11-30,,,,,Strong Buy,84.0,84,56.0,56,45.0,non_us_kr_or_unparsed_market;missing_ticker,
 data\markdown\2021-11-30_equity-research-opendoor.md,smic,company,False,2021-11-20,2021-11-30,US,"Opendoor Technologies, Inc.",OPEN,NASDAQ,Buy,,,,,,missing_target_price,
 data\markdown\2021-11-30_equity-research-z-holdings.md,smic,sector,False,2021-11-20,2021-11-30,,,,,Buy,1210.0,"1,210",825.5,825.5,46.0,non_us_kr_or_unparsed_market;missing_ticker,
-data\markdown\2022-05-25_equity-research-gem-co-ltd.md,smic,sector,False,2022-05-21,2022-05-25,,,,,Buy,11.35,11.35,7.63,7.63,49.0,non_us_kr_or_unparsed_market;missing_ticker,
+data\markdown\2022-05-25_equity-research-gem-co-ltd.md,smic,sector,False,2022-05-21,2022-05-25,FOREIGN,GEM,,,Buy,,,,,,non_us_kr_or_unparsed_market;missing_ticker;missing_target_price,
 data\markdown\2022-05-25_equity-research-tsmc.md,smic,sector,False,2022-05-21,2022-05-25,,,,,Buy,764.0,764,530.0,530,44.0,non_us_kr_or_unparsed_market;missing_ticker,
 data\markdown\2022-11-25_equity-research-tenaris-s-a.md,smic,sector,False,2022-11-19,2022-11-25,,,,,Buy,24.44,$24.44,17.22,$17.22,42.0,non_us_kr_or_unparsed_market;missing_ticker,
 data\markdown\2023-11-22_equity-research-be-semiconductor-industries-n-v.md,smic,sector,False,2023-11-17,2023-11-22,,,,,Buy,,,118.4,118.4,94.0,non_us_kr_or_unparsed_market;missing_ticker;missing_target_price,
-data\markdown\2023-11-22_equity-research-byd.md,smic,company,False,2023-11-16,2023-11-22,US,B/S data,TTM,US,Buy,,,,,39.0,missing_target_price,
 data\markdown\2023-11-22_equity-research-lonza-group-ag.md,smic,sector,False,2023-11-18,2023-11-22,,,,,Buy,465.4,465.4,353.3,353.3,32.0,non_us_kr_or_unparsed_market;missing_ticker,
 data\markdown\2024-04-17_equity-research-한화오션.md,smic,company,False,2024-04-13,2024-04-17,KR,한화오션,042660,KRX,Buy,,,28500.0,"28,500 원",91.0,missing_target_price,
 data\markdown\2024-05-24_equity-research-osaka-titanium-technologies-co-ltd.md,smic,sector,False,2024-05-17,2024-05-24,,,,,Buy,4300.0,"4,300 엔",2490.0,"2,490 엔",72.62,non_us_kr_or_unparsed_market;missing_ticker,
@@ -155,6 +154,75 @@ data\markdown\kuvic\2025-09-30_반도체 소재 일본 - 일본은 진짜 유명
 "data\markdown\kuvic\2025-09-30_식음료 말차 - like Jennie, I like Matcha.md",kuvic,sector,False,2025-09-30,2025-09-30,,식음료/말차,,,,,,,,,non_us_kr_or_unparsed_market;missing_ticker,
 data\markdown\kuvic\2025-09-30_핀테크 스테이블코인 - Stablecoin gonna be Golden.md,kuvic,sector,False,2024-01-07,2025-09-30,,핀테크/스테이블코인,,,Hold,,,,,,non_us_kr_or_unparsed_market;missing_ticker,
 data\markdown\kuvic\2026-01-27_반도체 - 이번 사이클 운동 많이 될 거야.md,kuvic,sector,False,2026-01-26,2026-01-27,,반도체,,,,,,,,,non_us_kr_or_unparsed_market;missing_ticker,
+data\markdown\kuvic\2026-01-27_유틸리티 - I got the POWER POWER POWER.md,kuvic,sector,False,2026-01-27,2026-01-27,,유틸리티,,,,,,,,,non_us_kr_or_unparsed_market;missing_ticker,
 data\markdown\kuvic\2026-03-16_우주 - 우주를 줄게.md,kuvic,sector,False,2026-03-16,2026-03-16,,우주,,,,,,,,,non_us_kr_or_unparsed_market;missing_ticker,
 data\markdown\kuvic\2026-04-07_게임 - 한 판만 더 할게요.md,kuvic,sector,False,2026-04-07,2026-04-07,,게임,,,Hold,,,,,,non_us_kr_or_unparsed_market;missing_ticker,
 data\markdown\kuvic\2026-04-07_호텔 레저 - 여기 20층에 사람 있어요~.md,kuvic,sector,False,2026-04-07,2026-04-07,,호텔/레저,,,,,,,,,non_us_kr_or_unparsed_market;missing_ticker,
+data\markdown\ewha\2020-08-22_[200822] 천보(278280).md,ewha,company,True,2019-08-05,2020-08-22,KR,278280,278280,KRX,Buy,,,,,30.16,missing_target_price,ocr_fallback;ocr_inconsistent_prices
+data\markdown\ewha\2020-09-12_[200912] 노바렉스(1947000).md,ewha,sector,False,2020-09-12,2020-09-12,,,,,Hold,51200.0,"51,200원",9.0,9,22.17,non_us_kr_or_unparsed_market;missing_ticker,
+data\markdown\ewha\2020-10-10_ewha-14218835.md,ewha,sector,False,2020-10-10,2020-10-10,,187870,,,Buy,31700.0,"31,700원",10.0,10,26.51,non_us_kr_or_unparsed_market;missing_ticker,
+data\markdown\ewha\2021-02-20_[210220] 대한유화(006650).md,ewha,company,False,2021-02-20,2021-02-20,US,006650,KOSPI,US,Buy,,,,,15.83,missing_target_price,
+data\markdown\ewha\2021-02-20_[210220] 센트랄모텍(308170).md,ewha,company,True,2021-02-20,2021-02-20,KR,2021 /02/20 2021 Winter Session 센트랄모텍,308170,KRX,Buy,,,,,69.34,missing_target_price,ocr_fallback;ocr_inconsistent_prices
+data\markdown\ewha\2021-08-21_[210821] 롯데정밀화학(004000).md,ewha,company,False,2021-08-21,2021-08-21,US,004000,KOSPI,US,Buy,,,,,64.7,missing_target_price,
+data\markdown\ewha\2021-08-21_[210821] 스튜디오드래곤(253450).md,ewha,company,True,2021-08-21,2021-08-21,KR,2021/8/21 2021 Summer Session 스튜디오드래곤,253450,KRX,Buy,,,,,40.83,missing_target_price,ocr_fallback;ocr_inconsistent_prices
+data\markdown\ewha\2021-10-09_[211009] DI동일(001530).md,ewha,company,True,2021-04-08,2021-10-09,KR,001530,001530,KRX,Buy,,,,,39.1,missing_target_price,ocr_fallback;ocr_inconsistent_prices
+data\markdown\ewha\2022-02-12_[220212] 현대오토에버(307950).md,ewha,company,True,2021-02-12,2022-02-12,KR,2021 /02/12 Session 현대오토에버,307950,KRX,Buy,,,,,42.13,missing_target_price,ocr_fallback;ocr_inconsistent_prices
+data\markdown\ewha\2022-10-07_[221007] 코엔텍(029960).md,ewha,company,True,2021-09-30,2022-10-07,KR,2022/1%8 Fall Session 코엔텍,029960,KRX,Buy,,,,,40.32,missing_target_price,ocr_fallback;ocr_inconsistent_prices
+data\markdown\ewha\2023-07-22_[230722] 효성첨단소재(298050).md,ewha,company,True,2023-07-19,2023-07-22,KR,2023/07/19 Session 효성점단소재,298050,KRX,Buy,,,,,38.51,missing_target_price,ocr_fallback;ocr_inconsistent_prices
+data\markdown\ewha\2024-01-20_[240120] 해성디에스(195870).md,ewha,company,True,2024-01-19,2024-01-20,KR,2024/01/19 Session 해성디에스,195870,KRX,Buy,,,,,56.35,missing_target_price,ocr_fallback;ocr_inconsistent_prices
+data\markdown\ewha\2024-11-22_[241122] 삼영(003720).md,ewha,company,True,2024-11-22,2024-11-22,KR,2024/11/22 Fall Session 삼영,003720,KRX,Buy,,,,,42.4,missing_target_price,ocr_fallback;ocr_inconsistent_prices
+data\markdown\ewha\2025-01-24_[250124] 대웅제약(069620).md,ewha,company,True,2025-01-24,2025-01-24,KR,2025/01 /24 Session 대웅제약,069620,KRX,Buy,,,,,39.04,missing_target_price,ocr_fallback;ocr_inconsistent_prices
+data\markdown\ewha\2025-07-25_[250725] 티엘비(356860).md,ewha,company,True,2025-07-25,2025-07-25,KR,2025/07/25 SlJmmer Session 티엘비,356860,KRX,Buy,,,,,38.27,missing_target_price,ocr_fallback;ocr_inconsistent_prices
+data\markdown\ewha\2025-10-03_[251003] 한국카본(017960).md,ewha,company,True,2024-10-11,2025-10-03,KR,한국카본,017960,KRX,Buy,,,,,41.8,missing_target_price,ocr_fallback;ocr_inconsistent_prices
+data\markdown\ewha\2026-02-20_[260220] 파크시스템스(140860).md,ewha,company,True,2026-02-21,2026-02-20,KR,2026/02/21 Session 파크시스템스,140860,KRX,Buy,,,6998.0,"6,998",38.29,missing_target_price,ocr_fallback
+data\markdown\ewha\2026-05-29_ewha-171589643.md,ewha,sector,False,2026-05-30,2026-05-29,,078600,,,Buy,231400.0,"231,400원",5.0,05,51.16,non_us_kr_or_unparsed_market;missing_ticker,
+data\markdown\voera\undated_[2025.10] Fixed Income REPORT.md,voera,sector,True,,,,,,,Hold,,,,,,non_us_kr_or_unparsed_market;missing_ticker;missing_report_date,ocr_fallback
+data\markdown\voera\undated_[2025.10] Market Condition REPORT.md,voera,sector,True,,,,,,,Hold,,,,,,non_us_kr_or_unparsed_market;missing_ticker;missing_report_date,ocr_fallback
+data\markdown\voera\undated_[2025.11] Fixed Income REPORT.md,voera,sector,True,,,,,,,,,,,,,non_us_kr_or_unparsed_market;missing_ticker;missing_report_date,ocr_fallback
+data\markdown\voera\undated_[2026] Office Market REPORT.md,voera,sector,True,,,,,,,Hold,,,,,,non_us_kr_or_unparsed_market;missing_ticker;missing_report_date,ocr_fallback
+"data\markdown\voera\undated_[BUY] AI·EV Boom On! 플러그인, 삼성전기.md",voera,sector,False,2015-01-02,,,,,,Buy,,,,,,non_us_kr_or_unparsed_market;missing_ticker;missing_target_price,
+data\markdown\voera\undated_[BUY] DB하이텍_반도체 나라의 미운오리새끼 이야기.md,voera,sector,False,,,,,,,Buy,30200.0,"30,200원",23800.0,"23,800원",,non_us_kr_or_unparsed_market;missing_ticker;missing_report_date,
+"data\markdown\voera\undated_[BUY] HD현대일렉트릭 반전 없는 상승세, 방전 없는 변압기 !.md",voera,sector,False,,,,,,,Buy,102300.0,"102,300원",,,,non_us_kr_or_unparsed_market;missing_ticker;missing_report_date,
+data\markdown\voera\undated_[BUY] Just.md,voera,sector,False,,,,,,,Buy,141700.0,"141,700원",141700.0,"141,700원",,non_us_kr_or_unparsed_market;missing_ticker;missing_report_date,
+"data\markdown\voera\undated_[Buy] LG디스플레이, 디스는 이제 그만!.md",voera,sector,False,2023-05-23,,,,,,Buy,,,,,,non_us_kr_or_unparsed_market;missing_ticker;missing_target_price,
+data\markdown\voera\undated_[BUY] LG생활건강.md,voera,company,False,2020-02-28,,KR,LG생활건강,051900,KRX,Buy,,,,,,missing_target_price,
+"data\markdown\voera\undated_[Buy] LG에너지솔루션, 가장 에너제틱한 솔루션.md",voera,sector,False,2022-11-14,,,,,,Buy,,,,,,non_us_kr_or_unparsed_market;missing_ticker;missing_target_price,
+"data\markdown\voera\undated_[BUY] No ALTEnertive, ALTEOGEN.md",voera,sector,False,2018-01-02,,,,,,Buy,,,,,,non_us_kr_or_unparsed_market;missing_ticker;missing_target_price,
+"data\markdown\voera\undated_[BUY] Pointer to the world, 포스코인터내셔널.md",voera,sector,False,2025-05-15,,,,,,Buy,68500.0,"68,500원",,,45.1,non_us_kr_or_unparsed_market;missing_ticker,
+"data\markdown\voera\undated_[Buy] See and See 보면 볼수록 매력있는, 씨앤씨인터내셔널.md",voera,company,True,,,KR,C&C INTERNATIO AL 國에라 씨앤씨인터내셔널,352480,KOSDAQ,Buy,700.0,700원,,,46.84,missing_report_date,ocr_fallback
+data\markdown\voera\undated_[BUY] SK텔레콤.md,voera,sector,False,2020-04-30,,,,,,Buy,,,,,,non_us_kr_or_unparsed_market;missing_ticker;missing_target_price,
+"data\markdown\voera\undated_[Buy] SK하이닉스, 메모하세요. 메모리 붐은 옵니다.md",voera,sector,True,2023-03-03,,,,,,Buy,101400.0,"101,400원",,,16.2,non_us_kr_or_unparsed_market;missing_ticker,ocr_fallback
+"data\markdown\voera\undated_[BUY] Super Momentum, 에스엠.md",voera,sector,False,2025-05-10,,,,,,Buy,150000.0,"150,000원",126300.0,"126,300원",18.8,non_us_kr_or_unparsed_market;missing_ticker,
+"data\markdown\voera\undated_[BUY] 가전계의 에르메스, LG전자.md",voera,company,False,,,KR,LG전자,066570,KRX,Buy,,,,,,missing_report_date;missing_target_price,
+"data\markdown\voera\undated_[BUY] 강원랜드, 베팅에 베팅하라.md",voera,company,True,,,KR,금융분석연구회 VOERA 강원 랜드,035250,KRX,Buy,31500.0,"31,500원",,,,missing_report_date,ocr_fallback
+"data\markdown\voera\undated_[Buy] 고려아연, 너무 싸서 아연실색!.md",voera,sector,True,2023-03-03,,,,,,Buy,684000.0,"684,000원",,,,non_us_kr_or_unparsed_market;missing_ticker,ocr_fallback
+data\markdown\voera\undated_[Buy] 국가권력급 플랫폼 네이버.md,voera,company,False,,,KR,금융분석연구회 VOERA,035420,KRX,Buy,,,,,,missing_report_date;missing_target_price,
+"data\markdown\voera\undated_[BUY] 모두가 플러팅 할 기업, 피엔티.md",voera,sector,True,2024-11-14,,,,,,Buy,10.0,10,,,105.7,non_us_kr_or_unparsed_market;missing_ticker,ocr_fallback
+"data\markdown\voera\undated_[BUY] 모든 사업부는 커머스로 통한다, NAVER.md",voera,sector,False,2026-05-22,,,,,,Buy,28.0,28,28.0,28,,non_us_kr_or_unparsed_market;missing_ticker,
+data\markdown\voera\undated_[BUY] 불닭의 질주는 계속된다! 삼양식품.md,voera,company,False,,,KR,삼양식품,003230,KRX,Buy,1426000.0,"1,426,000원",,,43.9,missing_report_date,
+"data\markdown\voera\undated_[BUY] 브이티, 아자 아자 브이팅 !.md",voera,company,True,,,KR,브이티,018290,KRX,Buy,50050.0,"50,050원",,,36.0,missing_report_date,ocr_fallback
+data\markdown\voera\undated_[BUY] 비집고 들어갈 틈은 있다! BGF리테일.md,voera,sector,False,,,,,,,Buy,,,,,,non_us_kr_or_unparsed_market;missing_ticker;missing_report_date;missing_target_price,
+"data\markdown\voera\undated_[BUY] 실적이 넘쳐흘러, 이수페타시스.md",voera,sector,False,2025-11-26,,,,,,Buy,162300.0,"162,300원",141600.0,"141,600원",14.6,non_us_kr_or_unparsed_market;missing_ticker,
+"data\markdown\voera\undated_[Buy] 씨에스윈드, 영광의 순간은 바로 지금부터.md",voera,sector,True,2023-03-07,,,,,,Buy,90900.0,"90,900원",,,31.0,non_us_kr_or_unparsed_market;missing_ticker,ocr_fallback
+"data\markdown\voera\undated_[BUY] 에이스토리, 올해는 닉값할 시기.md",voera,company,False,2022-03-29,,KR,금융분석연구회 VOERA,241840,KRX,Buy,,,,,,missing_target_price,
+"data\markdown\voera\undated_[Buy] 엘앤에프, 양극재요 엘앤에프의 하이니켈이요!.md",voera,sector,False,,,,,,,Buy,,,,,,non_us_kr_or_unparsed_market;missing_ticker;missing_report_date;missing_target_price,
+"data\markdown\voera\undated_[BUY] 엠씨넥스, 넘쳐흘러.md",voera,sector,False,,,,,,,Buy,,,,,,non_us_kr_or_unparsed_market;missing_ticker;missing_report_date;missing_target_price,
+data\markdown\voera\undated_[BUY] 오스템임플란트 _ 임플란트를 심고 실적을 수확하다.md,voera,sector,True,,,,,,,Buy,115.0,115.000 원,115.0,115.000 원,,non_us_kr_or_unparsed_market;missing_ticker;missing_report_date,ocr_fallback
+"data\markdown\voera\undated_[BUY] 웹케시_환상의 나라, 경리나라로!.md",voera,sector,False,2020-05-15,,,,,,Buy,74000.0,"74,000 원",60100.0,"60,100원",23.0,non_us_kr_or_unparsed_market;missing_ticker,
+"data\markdown\voera\undated_[Buy] 제우스, 이 기업은 신인가.md",voera,company,True,,,KR,제우스,079370,KOSDAQ,Buy,97400.0,"97,400원",,,74.6,missing_report_date,ocr_fallback
+data\markdown\voera\undated_[Buy] 제이시스메디칼 제 1 선두 주자를 향하여.md,voera,sector,False,,,,,,,Hold,18360.0,"18,360원",,,,non_us_kr_or_unparsed_market;missing_ticker;missing_report_date,
+data\markdown\voera\undated_[BUY] 찐 반등 지금이야! 하나머티REAL즈.md,voera,company,True,,,KR,금융분석연구회 VOERA 하나머티리일즈,166090,KRX,Buy,71300.0,"71,300원",,,,missing_report_date,ocr_fallback
+"data\markdown\voera\undated_[Buy] 클라쓰가 달라서, 클래시스.md",voera,company,True,,,KR,,214150,KOSDAQ,Buy,30000.0,"30,000원",,,13.9,missing_report_date,ocr_fallback
+"data\markdown\voera\undated_[BUY] 한섬, HANDSOME!.md",voera,company,False,2021-09-17,,KR,한섬,020000,KRX,Buy,,,,,,missing_target_price,
+data\markdown\voera\undated_[BUY] 한올바이오파마 함 파보마.md,voera,sector,False,2024-11-08,,,,,,Buy,64000.0,"64,000원",44950.0,"44,950원",,non_us_kr_or_unparsed_market;missing_ticker,
+"data\markdown\voera\undated_[BUY] 한화솔루션, 가장 환한 솔루션.md",voera,company,False,,,KR,한화솔루션,009830,KRX,Buy,62300.0,"62,300원",,,,missing_report_date,
+"data\markdown\voera\undated_[Buy] 현대건설, 가장 현대적인 건설.md",voera,sector,False,2022-11-13,,,,,,Buy,55000.0,"55,000 원",43050.0,"43,050원",36.0,non_us_kr_or_unparsed_market;missing_ticker,
+"data\markdown\voera\undated_[buy] 현대건설기계_ 건설기계, 바쁘다 바빠.md",voera,sector,False,2021-05-14,,,,,,Buy,72900.0,"72,900 원",60100.0,"60,100",21.0,non_us_kr_or_unparsed_market;missing_ticker,
+data\markdown\voera\undated_[BUY] 현대백화점 믿으세요. 현대백화점.md,voera,sector,False,2021-09-16,,,,,,Buy,108500.0,"108,500원",82000.0,"82,000원",31.5,non_us_kr_or_unparsed_market;missing_ticker,
+"data\markdown\voera\undated_[BUY] 현대차그룹의 현모양처, 현대모비스.md",voera,sector,False,,,,,,,Buy,,,,,,non_us_kr_or_unparsed_market;missing_ticker;missing_report_date;missing_target_price,
+"data\markdown\voera\undated_[BUY] 휠라 이즈 굿, Fil Good!.md",voera,sector,False,2021-09-17,,,,,,Buy,66300.0,"66,300 원",46300.0,"46,300원",43.0,non_us_kr_or_unparsed_market;missing_ticker,
+"data\markdown\voera\undated_[BUY]국내 최초 이족보행로봇 &quot;휴보&quot;를 탄생시킨 그 기업, 맞습니다.md",voera,sector,False,,,,,,,Buy,,,,,,non_us_kr_or_unparsed_market;missing_ticker;missing_report_date;missing_target_price,
+data\markdown\voera\undated_[BUY]농심_신(辛)라면의 신(新)항로.md,voera,sector,False,2020-08-22,,,,,,Buy,2020.08,2020.08,361000.0,"361,000원",38.5,non_us_kr_or_unparsed_market;missing_ticker,
+"data\markdown\voera\undated_[Buy]마음이 [텍]하는 반도체 기판, 心텍.md",voera,company,True,,,KR,심데,222800,KRX,Buy,47550.0,"47,550원",,,32.3,missing_report_date,ocr_fallback
+"data\markdown\voera\undated_[HOLD] S-Oil, 오르막이 있으면 내리막도 있는 법.md",voera,company,True,,,KR,S-Oil,010950,KRX,Hold,96600.0,"96,600원",,,,missing_report_date,ocr_fallback
+data\markdown\voera\undated_[Hold]대한항공_Neither Good nor Bad.md,voera,sector,False,2020-11-13,,,,,,Hold,2020.11,2020.11,23950.0,"23,950원",0.0,non_us_kr_or_unparsed_market;missing_ticker,

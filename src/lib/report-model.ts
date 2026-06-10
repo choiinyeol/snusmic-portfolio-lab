@@ -6,13 +6,15 @@ const DirectionSchema = z.enum(["up", "down", "flat"]);
 const BucketSchema = z.enum(["Tenbagger", "Multibagger", "Double", "Winner", "Positive", "Drawdown", "Wrecked", "No quote"]);
 const RatingClassSchema = z.enum(["buy", "soft_buy", "sell"]);
 const MaturitySchema = z.enum(["fresh", "developing", "seasoned", "veteran"]);
-const SchoolSchema = z.enum(["smic", "yig", "star", "kuvic"]);
+const SchoolSchema = z.enum(["smic", "yig", "star", "kuvic", "ewha", "voera"]);
 
 export const SCHOOL_LABELS: Record<z.infer<typeof SchoolSchema>, string> = {
   smic: "서울대 SMIC",
   yig: "연세대 YIG",
   star: "성균관대 STAR",
   kuvic: "고려대 KUVIC",
+  ewha: "이화여대 EIA",
+  voera: "홍익대 Voera",
 };
 
 const NullableNumber = z.number().finite().nullable();
@@ -63,6 +65,8 @@ export const ReportRecordSchema = z.object({
   data_issue: NullableString,
   parse_issue: NullableString,
   performance_bucket: BucketSchema,
+  source_md_url: NullableString.optional().default(null),
+  source_pdf_url: NullableString.optional().default(null),
 });
 
 export const SummaryRecordSchema = z.object({

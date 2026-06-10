@@ -6,7 +6,7 @@ import { reportDataset, SCHOOL_LABELS, type School } from "@/lib/report-model";
 import { clubStats, isBuy, median, signColor } from "@/lib/verdict";
 import { formatPct } from "@/lib/utils";
 
-const SCHOOLS: School[] = ["smic", "yig", "star", "kuvic"];
+const SCHOOLS: School[] = ["smic", "yig", "star", "kuvic", "ewha", "voera"];
 
 export function generateStaticParams() {
   return SCHOOLS.map((school) => ({ school }));

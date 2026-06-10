@@ -21,6 +21,17 @@ const STRATEGY_LABEL_KO: Record<string, string> = {
   E_breakout_atr4:   "E. 신고가 돌파+ATR 래칫 (v3)",
 };
 
+const VARIANT_LABEL_KO: Record<string, string> = {
+  D_consensus_window90d:       "D′. 컨센서스 90일 윈도우",
+  D_consensus_window180d:      "D′. 컨센서스 180일 윈도우",
+  D_consensus_window365d:      "D′. 컨센서스 365일 윈도우",
+  D_consensus_6mo:             "D′. 컨센서스 6개월 보유",
+  D_consensus_9mo:             "D′. 컨센서스 9개월 보유",
+  D_consensus_18mo:            "D′. 컨센서스 18개월 보유",
+  D_consensus_target_exit:     "D′. 목표가 도달 시 조기 청산",
+  D_consensus_upside_weighted: "D′. 업사이드 비중 가중",
+};
+
 const BENCHMARK_KO: Record<string, string> = {
   KOSPI:      "KOSPI",
   SP500:      "S&P500",
@@ -62,6 +73,82 @@ type WealthPoint = {
   AllWeather_value?: number;
 };
 
+type TriggerReport = {
+  school: string;
+  report_date: string;
+  source_file?: string;
+  target_price?: number | null;
+  stated_upside_pct?: number | null;
+};
+
+type Trade = {
+  ticker: string;
+  display_name?: string;
+  source?: string;
+  entry_date: string;
+  exit_date: string;
+  entry: number;
+  exit: number;
+  return_pct: number;
+  days: number;
+  n_clubs?: number;
+  exit_reason?: string;
+  trigger_schools?: string[];
+  trigger_reports?: TriggerReport[];
+  trigger_target_prices?: number[];
+};
+
+type SignalPosition = {
+  ticker: string;
+  display_name?: string;
+  entry_date: string;
+  entry_price: number;
+  current_price?: number | null;
+  unrealized_pct?: number | null;
+  days_elapsed: number;
+  exit_due: string;
+  days_remaining: number;
+  trigger_schools?: string[];
+  trigger_reports?: TriggerReport[];
+};
+
+type NewSignal = {
+  ticker: string;
+  display_name?: string;
+  n_schools: number;
+  entry_basis_date?: string | null;
+  entry_basis_price?: number | null;
+  trigger_schools?: string[];
+  trigger_reports?: TriggerReport[];
+};
+
+type WatchingEntry = {
+  ticker: string;
+  display_name?: string;
+  covering_school: string;
+  latest_report_date: string;
+  target_price?: number | null;
+  stated_upside_pct?: number | null;
+  entry_basis_price?: number | null;
+  note: string;
+};
+
+type SignalsData = {
+  as_of: string;
+  headline_strategy: string;
+  disclaimer: string;
+  open_positions: SignalPosition[];
+  expiring_soon: SignalPosition[];
+  new_buy_signals: NewSignal[];
+  watching_single_club: WatchingEntry[];
+  counts: {
+    open: number;
+    expiring_soon_30d: number;
+    new_buy_signals: number;
+    watching_single_club: number;
+  };
+};
+
 export default function StrategyPage() {
   const m = backtest.metrics;
   const equity = backtest.equity as { date: string; nav: number }[];
@@ -84,7 +171,7 @@ export default function StrategyPage() {
     multibagger_count: number;
     doubler_count: number;
     top_decile_avg_hold_days: number | null;
-    top10_trades: { ticker: string; return_pct: number; days: number; n_clubs: number }[];
+    top10_trades: { ticker: string; display_name?: string; return_pct: number; days: number; n_clubs: number }[];
   };
   const consensus = backtest.consensus_stats as {
     single_club: { count: number; avg_return_pct: number | null; win_rate_pct: number | null };
@@ -104,6 +191,12 @@ export default function StrategyPage() {
     position_weight: number;
     max_positions: number;
   };
+  const trades = (backtest.trades ?? []) as Trade[];
+  const signals = backtest.signals as SignalsData | undefined;
+  const variantResearch = (backtest as Record<string, unknown>).variant_research as {
+    variants: ResearchFamily[];
+    conclusion: string;
+  } | undefined;
 
   // Equity chart
   const maxNav = Math.max(...equity.map((p) => p.nav));
@@ -113,13 +206,165 @@ export default function StrategyPage() {
   const x = (i: number) => 8 + (i / (equity.length - 1)) * (W - 16);
   const y = (nav: number) => 12 + ((maxNav - nav) / (maxNav - minNav || 1)) * (H - 36);
   const path = equity.map((p, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(p.nav).toFixed(1)}`).join(" ");
-
-  // Year annotations: mark IS/OOS boundary
   const oosBoundaryYear = 2024;
+
+  // Trades sorted recent-first
+  const tradesSorted = [...trades].sort((a, b) => b.exit_date.localeCompare(a.exit_date));
 
   return (
     <main className="mx-auto max-w-[1500px] space-y-9 px-4 py-6 sm:px-8">
       <SiteHeader eyebrow="Strategy Lab" />
+
+      {/* ── 오늘의 신호 ────────────────────────────────────────────── */}
+      {signals && (
+        <section className="rounded-lg border-2 border-stamp bg-stamp/5 p-6" aria-label="오늘의 신호">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="font-display text-2xl font-black tracking-tight text-stamp">
+              오늘의 신호
+            </h2>
+            <p className="font-mono text-[11px] text-muted-foreground">
+              기준일: {signals.as_of} · 전략: {STRATEGY_LABEL_KO[signals.headline_strategy] ?? signals.headline_strategy}
+            </p>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground italic">{signals.disclaimer}</p>
+
+          {/* Signal counts */}
+          <div className="mt-3 flex flex-wrap gap-2">
+            {[
+              { label: "보유 중", count: signals.counts.open, tone: "bg-card border-border" },
+              { label: "30일 내 만기", count: signals.counts.expiring_soon_30d, tone: signals.counts.expiring_soon_30d > 0 ? "bg-down/10 border-down/40" : "bg-card border-border" },
+              { label: "신규 매수 신호", count: signals.counts.new_buy_signals, tone: signals.counts.new_buy_signals > 0 ? "bg-up/10 border-up/40" : "bg-card border-border" },
+              { label: "매수 대기 (1개교)", count: signals.counts.watching_single_club, tone: "bg-card border-border" },
+            ].map((item) => (
+              <div key={item.label} className={cn("rounded-lg border px-4 py-2", item.tone)}>
+                <p className="font-mono text-[10px] text-muted-foreground">{item.label}</p>
+                <p className="tnum font-display text-2xl font-black">{item.count}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* New buy signals */}
+          {signals.new_buy_signals.length > 0 && (
+            <div className="mt-4">
+              <p className="mb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-up">신규 매수 신호 — 컨센서스 형성, 진입 기준가 확인</p>
+              <div className="space-y-2">
+                {signals.new_buy_signals.map((sig, i) => (
+                  <div key={`${sig.ticker}-${i}`} className="rounded-md border border-up/40 bg-up/5 px-4 py-3">
+                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                      <span className="font-mono text-sm font-bold">{sig.display_name ?? sig.ticker}</span>
+                      <span className="font-mono text-xs text-muted-foreground">({sig.ticker})</span>
+                      <span className="rounded-sm bg-up/20 px-1.5 py-0.5 font-mono text-[10px] text-up font-bold">{sig.n_schools}개교 컨센서스</span>
+                    </div>
+                    <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-muted-foreground">
+                      <span>진입 기준일: <strong className="text-foreground">{sig.entry_basis_date ?? "—"}</strong></span>
+                      <span>진입 기준가(시가): <strong className="text-foreground">{sig.entry_basis_price?.toLocaleString() ?? "—"}원</strong></span>
+                    </div>
+                    {sig.trigger_reports && sig.trigger_reports.length > 0 && (
+                      <div className="mt-1.5 flex flex-wrap gap-1">
+                        {sig.trigger_reports.map((r, ri) => (
+                          <span key={ri} className="rounded border border-border bg-card px-1.5 py-0.5 font-mono text-[10px]">
+                            [{r.school}] {r.report_date}
+                            {r.target_price ? ` 목표가 ${r.target_price.toLocaleString()}원` : ""}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Open positions */}
+          {signals.open_positions.length > 0 && (
+            <div className="mt-4">
+              <p className="mb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                보유 중 ({signals.open_positions.length}종목)
+              </p>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[700px] border-collapse text-sm">
+                  <thead>
+                    <tr className="border-b-2 border-border font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+                      <th className="px-3 py-1.5 text-left">종목</th>
+                      <th className="px-3 py-1.5 text-right">진입일</th>
+                      <th className="px-3 py-1.5 text-right">진입가</th>
+                      <th className="px-3 py-1.5 text-right">현재가</th>
+                      <th className="px-3 py-1.5 text-right">미실현손익</th>
+                      <th className="px-3 py-1.5 text-right">경과일</th>
+                      <th className="px-3 py-1.5 text-right">매도 예정일</th>
+                      <th className="px-3 py-1.5 text-right">잔여일</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {signals.open_positions.map((pos) => (
+                      <tr
+                        key={pos.ticker}
+                        className={cn(
+                          "border-b border-dashed border-border last:border-b-0",
+                          pos.days_remaining <= 30 && pos.days_remaining >= 0 && "bg-down/5"
+                        )}
+                      >
+                        <td className="px-3 py-1.5">
+                          <p className="font-mono text-xs font-bold">{pos.display_name ?? pos.ticker}</p>
+                          <p className="font-mono text-[10px] text-muted-foreground">{pos.ticker}</p>
+                        </td>
+                        <td className="tnum px-3 py-1.5 text-right font-mono text-xs text-muted-foreground">{pos.entry_date}</td>
+                        <td className="tnum px-3 py-1.5 text-right font-mono text-xs">{pos.entry_price?.toLocaleString()}원</td>
+                        <td className="tnum px-3 py-1.5 text-right font-mono text-xs">{pos.current_price ? `${pos.current_price.toLocaleString()}원` : "—"}</td>
+                        <td className={cn("tnum px-3 py-1.5 text-right font-mono text-xs font-bold", signColor(pos.unrealized_pct))}>
+                          {pos.unrealized_pct != null ? formatPct(pos.unrealized_pct, 1) : "—"}
+                        </td>
+                        <td className="tnum px-3 py-1.5 text-right font-mono text-xs text-muted-foreground">{pos.days_elapsed}일</td>
+                        <td className="tnum px-3 py-1.5 text-right font-mono text-xs">{pos.exit_due}</td>
+                        <td className={cn("tnum px-3 py-1.5 text-right font-mono text-xs font-bold",
+                          pos.days_remaining <= 30 ? "text-down" : "text-muted-foreground")}>
+                          {pos.days_remaining}일
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Watching: single club */}
+          {signals.watching_single_club.length > 0 && (
+            <details className="mt-4">
+              <summary className="cursor-pointer font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground">
+                매수 대기 — 1개교 단독 커버 ({signals.watching_single_club.length}종목, 클릭해서 펼치기)
+              </summary>
+              <div className="mt-2 overflow-x-auto">
+                <table className="w-full min-w-[600px] border-collapse text-sm">
+                  <thead>
+                    <tr className="border-b-2 border-border font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+                      <th className="px-3 py-1.5 text-left">종목</th>
+                      <th className="px-3 py-1.5 text-left">커버 학회</th>
+                      <th className="px-3 py-1.5 text-right">리포트일</th>
+                      <th className="px-3 py-1.5 text-right">목표가</th>
+                      <th className="px-3 py-1.5 text-right">현재 시가 기준</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {signals.watching_single_club.map((w, i) => (
+                      <tr key={`${w.ticker}-${i}`} className="border-b border-dashed border-border last:border-b-0">
+                        <td className="px-3 py-1.5">
+                          <p className="font-mono text-xs font-bold">{w.display_name ?? w.ticker}</p>
+                          <p className="font-mono text-[10px] text-muted-foreground">{w.ticker}</p>
+                        </td>
+                        <td className="px-3 py-1.5 font-mono text-xs">{w.covering_school}</td>
+                        <td className="tnum px-3 py-1.5 text-right font-mono text-xs text-muted-foreground">{w.latest_report_date}</td>
+                        <td className="tnum px-3 py-1.5 text-right font-mono text-xs">{w.target_price ? `${w.target_price.toLocaleString()}원` : "—"}</td>
+                        <td className="tnum px-3 py-1.5 text-right font-mono text-xs text-muted-foreground">{w.entry_basis_price ? `${w.entry_basis_price.toLocaleString()}원` : "—"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </details>
+          )}
+        </section>
+      )}
 
       <header>
         <h1 className="mt-3 font-display text-4xl font-black leading-[1.15] tracking-tight sm:text-6xl">
@@ -184,18 +429,14 @@ export default function StrategyPage() {
                     <td className={cn("tnum px-3 py-2 text-right font-mono text-xs", signColor(is.cagr_pct))}>
                       {is.cagr_pct != null ? formatPct(is.cagr_pct, 1) : "—"}
                     </td>
-                    <td className="tnum px-3 py-2 text-right font-mono text-xs">
-                      {is.sharpe ?? "—"}
-                    </td>
+                    <td className="tnum px-3 py-2 text-right font-mono text-xs">{is.sharpe ?? "—"}</td>
                     <td className="tnum px-3 py-2 text-right font-mono text-xs text-down">
                       {is.mdd_pct != null ? formatPct(is.mdd_pct, 1) : "—"}
                     </td>
                     <td className={cn("tnum px-3 py-2 text-right font-mono text-xs", signColor(oos.cagr_pct))}>
                       {oos.cagr_pct != null ? formatPct(oos.cagr_pct, 1) : "—"}
                     </td>
-                    <td className="tnum px-3 py-2 text-right font-mono text-xs">
-                      {oos.sharpe ?? "—"}
-                    </td>
+                    <td className="tnum px-3 py-2 text-right font-mono text-xs">{oos.sharpe ?? "—"}</td>
                     <td className="tnum px-3 py-2 text-right font-mono text-xs text-down">
                       {oos.mdd_pct != null ? formatPct(oos.mdd_pct, 1) : "—"}
                     </td>
@@ -208,9 +449,56 @@ export default function StrategyPage() {
         <p className="mt-3 text-xs text-muted-foreground">
           * IS = In-Sample (2019-07 ~ 2023-12) | OOS = Out-of-Sample (2024-01 ~ 현재).
           헤드라인(★)은 인샘플 샤프비율 기준 자동 선정됩니다.
-          아웃오브샘플에서도 D가 선두를 유지해 결과가 우연이 아님을 시사합니다.
         </p>
       </section>
+
+      {/* ── 변형 전략 연구 결과 ──────────────────────────────────── */}
+      {variantResearch && variantResearch.variants.length > 0 && (
+        <section className="rounded-lg border border-border bg-card p-6" aria-label="변형 전략 연구">
+          <h2 className="font-display text-2xl font-black tracking-tight">변형 전략 연구 — 더 나은 규칙이 있는가</h2>
+          <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
+            컨센서스 윈도우(90/180/365일), 보유 기간(6/9/18개월), 목표가 조기 청산, 업사이드 가중 비중을 실험했습니다.
+            <span className="ml-1 text-foreground font-medium">판정: {variantResearch.conclusion}</span>
+          </p>
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full min-w-[700px] border-collapse text-sm">
+              <thead>
+                <tr className="border-b-4 border-double border-border font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                  <th className="px-3 py-2 text-left font-semibold">변형 전략</th>
+                  <th className="px-3 py-2 text-right font-semibold">IS CAGR</th>
+                  <th className="px-3 py-2 text-right font-semibold">IS 샤프</th>
+                  <th className="px-3 py-2 text-right font-semibold">OOS CAGR</th>
+                  <th className="px-3 py-2 text-right font-semibold">OOS 샤프</th>
+                  <th className="px-3 py-2 text-right font-semibold">거래수</th>
+                </tr>
+              </thead>
+              <tbody>
+                {variantResearch.variants.map((v) => {
+                  const is = v.in_sample;
+                  const oos = v.out_of_sample;
+                  return (
+                    <tr key={v.label} className="border-b border-dashed border-border last:border-b-0">
+                      <td className="px-3 py-2 font-mono text-xs">{VARIANT_LABEL_KO[v.label] ?? v.label}</td>
+                      <td className={cn("tnum px-3 py-2 text-right font-mono text-xs", signColor(is.cagr_pct))}>
+                        {is.cagr_pct != null ? formatPct(is.cagr_pct, 1) : "—"}
+                      </td>
+                      <td className="tnum px-3 py-2 text-right font-mono text-xs">{is.sharpe ?? "—"}</td>
+                      <td className={cn("tnum px-3 py-2 text-right font-mono text-xs", signColor(oos.cagr_pct))}>
+                        {oos.cagr_pct != null ? formatPct(oos.cagr_pct, 1) : "—"}
+                      </td>
+                      <td className="tnum px-3 py-2 text-right font-mono text-xs">{oos.sharpe ?? "—"}</td>
+                      <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">{v.metrics.trades}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            과최적화 기준: IS와 OOS 샤프 모두에서 D_consensus_12mo(all-time)를 초과해야 헤드라인 교체. 현재 교체 없음.
+          </p>
+        </section>
+      )}
 
       {/* ── 헤드라인 전략 규칙 ──────────────────────────────────── */}
       <section className="grid gap-6 lg:grid-cols-2" aria-label="헤드라인 전략 규칙">
@@ -256,9 +544,7 @@ export default function StrategyPage() {
         </div>
         <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="전략 자산 곡선">
           <line x1="8" x2={W - 8} y1={y(1)} y2={y(1)} className="stroke-border" strokeDasharray="4 4" strokeWidth="1" />
-          <text x={W - 10} y={y(1) - 5} textAnchor="end" fontSize="10" className="fill-muted-foreground font-mono">
-            1.0
-          </text>
+          <text x={W - 10} y={y(1) - 5} textAnchor="end" fontSize="10" className="fill-muted-foreground font-mono">1.0</text>
           <path d={path} fill="none" className={m.total_return_pct >= 0 ? "stroke-up" : "stroke-down"} strokeWidth="2" strokeLinejoin="round" />
           <text
             x={x(equity.length - 1)}
@@ -270,7 +556,6 @@ export default function StrategyPage() {
           >
             {equity[equity.length - 1].nav.toFixed(2)}
           </text>
-          {/* IS/OOS boundary annotation */}
           {(() => {
             const oosIdx = equity.findIndex((p) => parseInt(p.date.slice(0, 4)) >= oosBoundaryYear);
             if (oosIdx < 0) return null;
@@ -303,7 +588,7 @@ export default function StrategyPage() {
         </div>
       </section>
 
-      {/* ── 월 적립 부의 시뮬레이션 (4 벤치마크) ───────────────── */}
+      {/* ── 월 적립 부의 시뮬레이션 ───────────────────────────────── */}
       <section className="rounded-lg border border-border bg-card p-6" aria-label="월 적립 부의 시뮬레이션">
         <div className="mb-1 flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="font-display text-2xl font-black tracking-tight">월 적립 부의 시뮬레이션</h2>
@@ -314,7 +599,6 @@ export default function StrategyPage() {
         <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">{ws.schedule_desc}</p>
         <p className="mt-1 text-xs text-muted-foreground">{ws.fx_assumption}</p>
 
-        {/* Final wealth table */}
         <dl className="mt-4 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3 lg:grid-cols-6">
           {[
             { label: "총 납입금", value: fmt만(ws.final_contributed), tone: "" },
@@ -332,7 +616,6 @@ export default function StrategyPage() {
           ))}
         </dl>
 
-        {/* Gain rates table */}
         <div className="mt-3 flex flex-wrap gap-3">
           <div className="rounded-lg border border-stamp/60 bg-stamp/5 px-4 py-2">
             <p className="font-mono text-[10px] text-muted-foreground">전략 수익률 (납입 대비)</p>
@@ -356,6 +639,75 @@ export default function StrategyPage() {
           시뮬레이션 MDD: {formatPct(ws.strategy_mdd_pct, 1)}
         </p>
       </section>
+
+      {/* ── 전체 거래 로그 ────────────────────────────────────────── */}
+      {tradesSorted.length > 0 && (
+        <section className="rounded-lg border border-border bg-card p-6" aria-label="전체 거래 로그">
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <h2 className="font-display text-2xl font-black tracking-tight">
+              전체 거래 로그 ({tradesSorted.length}건)
+            </h2>
+            <a
+              href="/strategy-trades.csv"
+              download="strategy-trades.csv"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-secondary px-3 py-1.5 font-mono text-xs font-semibold hover:bg-secondary/70 transition-colors"
+            >
+              ↓ CSV 다운로드
+            </a>
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            헤드라인 전략(D) 전체 청산 거래. 최신 매도순 정렬. 트리거 리포트 = 컨센서스를 형성한 각 학회 발간 정보.
+          </p>
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full min-w-[860px] border-collapse text-sm">
+              <thead>
+                <tr className="border-b-4 border-double border-border font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+                  <th className="px-3 py-2 text-left font-semibold">종목</th>
+                  <th className="px-3 py-2 text-right font-semibold">매수일</th>
+                  <th className="px-3 py-2 text-right font-semibold">매수가</th>
+                  <th className="px-3 py-2 text-right font-semibold">매도일</th>
+                  <th className="px-3 py-2 text-right font-semibold">매도가</th>
+                  <th className="px-3 py-2 text-right font-semibold">수익률</th>
+                  <th className="px-3 py-2 text-right font-semibold">보유일</th>
+                  <th className="px-3 py-2 text-left font-semibold">트리거 리포트</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tradesSorted.map((t, i) => (
+                  <tr key={`${t.ticker}-${t.entry_date}-${i}`} className="border-b border-dashed border-border last:border-b-0">
+                    <td className="px-3 py-2">
+                      <p className="font-mono text-xs font-bold">{t.display_name ?? t.ticker}</p>
+                      <p className="font-mono text-[10px] text-muted-foreground">{t.ticker}</p>
+                    </td>
+                    <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">{t.entry_date}</td>
+                    <td className="tnum px-3 py-2 text-right font-mono text-xs">{t.entry.toLocaleString()}</td>
+                    <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">{t.exit_date}</td>
+                    <td className="tnum px-3 py-2 text-right font-mono text-xs">{t.exit.toLocaleString()}</td>
+                    <td className={cn("tnum px-3 py-2 text-right font-mono text-xs font-bold", signColor(t.return_pct))}>
+                      {formatPct(t.return_pct, 1)}
+                    </td>
+                    <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">{t.days}일</td>
+                    <td className="px-3 py-2">
+                      {t.trigger_reports && t.trigger_reports.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {t.trigger_reports.map((r, ri) => (
+                            <span key={ri} className="rounded border border-border bg-secondary/40 px-1.5 py-0.5 font-mono text-[10px]">
+                              [{r.school}] {r.report_date}
+                              {r.target_price ? ` TP:${r.target_price.toLocaleString()}` : ""}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="font-mono text-[10px] text-muted-foreground">{t.source}</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
 
       {/* ── 테일 캡처 통계 ────────────────────────────────────────── */}
       <section className="rounded-lg border border-border bg-card p-6" aria-label="테일 캡처 통계">
@@ -384,7 +736,7 @@ export default function StrategyPage() {
             <table className="w-full min-w-[480px] border-collapse text-sm">
               <thead>
                 <tr className="border-b-2 border-border font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  <th className="px-3 py-1.5 text-left font-semibold">티커</th>
+                  <th className="px-3 py-1.5 text-left font-semibold">종목</th>
                   <th className="px-3 py-1.5 text-right font-semibold">수익률</th>
                   <th className="px-3 py-1.5 text-right font-semibold">보유일</th>
                   <th className="px-3 py-1.5 text-right font-semibold">커버 학회</th>
@@ -393,7 +745,10 @@ export default function StrategyPage() {
               <tbody>
                 {tail.top10_trades.map((t, i) => (
                   <tr key={`${t.ticker}-${i}`} className="border-b border-dashed border-border last:border-b-0">
-                    <td className="px-3 py-1.5 font-mono text-xs font-bold">{t.ticker}</td>
+                    <td className="px-3 py-1.5">
+                      <p className="font-mono text-xs font-bold">{t.display_name ?? t.ticker}</p>
+                      <p className="font-mono text-[10px] text-muted-foreground">{t.ticker}</p>
+                    </td>
                     <td className={cn("tnum px-3 py-1.5 text-right font-mono text-xs font-bold", signColor(t.return_pct))}>{formatPct(t.return_pct, 1)}</td>
                     <td className="tnum px-3 py-1.5 text-right font-mono text-xs">{t.days}일</td>
                     <td className="tnum px-3 py-1.5 text-right font-mono text-xs">{t.n_clubs}개</td>
@@ -450,9 +805,8 @@ export default function StrategyPage() {
       <section className="rounded-lg border border-border bg-card p-6" aria-label="신고가 돌파 전략 민감도">
         <h2 className="font-display text-2xl font-black tracking-tight">참고: 신고가 돌파 전략(E) 파라미터 민감도</h2>
         <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
-          v3 헤드라인이었던 신고가 돌파 + ATR 래칫 전략의 전체 그리드. 인샘플 샤프가 일관되게 낮고,
-          아웃오브샘플에서는 일부 조합이 양호하나 컨센서스 즉시진입(IS 샤프 0.58)보다 떨어집니다.
-          돌파 필터가 알파를 소모한다는 결론을 뒷받침합니다.
+          v3 헤드라인이었던 신고가 돌파 + ATR 래칫 전략의 전체 그리드. 인샘플 샤프가 일관되게 낮아
+          컨센서스 즉시진입보다 떨어집니다.
         </p>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full min-w-[680px] border-collapse text-sm">
@@ -486,7 +840,7 @@ export default function StrategyPage() {
         </div>
       </section>
 
-      {/* ── 현재 보유 포지션 ─────────────────────────────────────── */}
+      {/* ── 현재 보유 포지션 (백테스트 미청산) ───────────────────── */}
       {backtest.open_positions.length > 0 && (
         <section className="rounded-lg border border-border bg-card p-6" aria-label="현재 보유 포지션">
           <h2 className="font-display text-2xl font-black tracking-tight">
@@ -497,7 +851,7 @@ export default function StrategyPage() {
             <table className="w-full min-w-[560px] border-collapse text-sm">
               <thead>
                 <tr className="border-b-4 border-double border-border font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  <th className="px-3 py-2 text-left font-semibold">티커</th>
+                  <th className="px-3 py-2 text-left font-semibold">종목</th>
                   <th className="px-3 py-2 text-left font-semibold">진입일</th>
                   <th className="px-3 py-2 text-right font-semibold">진입가</th>
                   <th className="px-3 py-2 text-right font-semibold">현재가</th>
@@ -506,11 +860,14 @@ export default function StrategyPage() {
                 </tr>
               </thead>
               <tbody>
-                {(backtest.open_positions as { ticker: string; entry_date: string; entry: number; last_close: number; return_pct: number; n_clubs?: number }[])
+                {(backtest.open_positions as { ticker: string; display_name?: string; entry_date: string; entry: number; last_close: number; return_pct: number; n_clubs?: number }[])
                   .sort((a, b) => b.return_pct - a.return_pct)
                   .map((pos) => (
                     <tr key={pos.ticker} className="border-b border-dashed border-border last:border-b-0">
-                      <td className="px-3 py-2 font-mono text-xs font-bold">{pos.ticker}</td>
+                      <td className="px-3 py-2">
+                        <p className="font-mono text-xs font-bold">{pos.display_name ?? pos.ticker}</p>
+                        <p className="font-mono text-[10px] text-muted-foreground">{pos.ticker}</p>
+                      </td>
                       <td className="tnum px-3 py-2 font-mono text-xs text-muted-foreground">{pos.entry_date}</td>
                       <td className="tnum px-3 py-2 text-right font-mono text-xs">{pos.entry.toLocaleString()}</td>
                       <td className="tnum px-3 py-2 text-right font-mono text-xs">{pos.last_close.toLocaleString()}</td>
@@ -548,7 +905,6 @@ export default function StrategyPage() {
           </li>
           <li>
             · 부의 시뮬레이션의 미국 지수(NASDAQ, S&P500, GLD)는 달러 기준 포인트 수익률을 원화 환산 없이 적용했습니다.
-            실제 KRW/USD 환율 변동은 미반영입니다.
           </li>
           <li>
             · 올웨더 포트폴리오는 25% GLD/NASDAQ/S&P500/KOSPI 분기 리밸런싱으로 단순화했습니다. 실제 올웨더 전략(채권 포함)과 다릅니다.

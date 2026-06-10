@@ -1,6 +1,6 @@
 # 판결 아카이브 — 시간이 매긴 성적표
 
-대학 투자동아리(서울대 SMIC · 연세대 YIG · 성균관대 STAR · 고려대 KUVIC)의 리서치 리포트
+대학 투자동아리(서울대 SMIC · 연세대 YIG · 성균관대 STAR · 고려대 KUVIC · 이화여대 EIA · 홍익대 VOERA)의 리서치 리포트
 PDF를 markdown으로 전사하고, 목표가·투자의견을 파싱한 뒤 point-in-time 시세로 발간 이후의
 실제 주가 경로를 검증하는 아카이브입니다.
 
@@ -23,6 +23,8 @@ npm install && npm run dev          # http://localhost:3000
 .venv/Scripts/python scripts/collect_smic.py --full       # SMIC 전체 789건 순회
 .venv/Scripts/python scripts/collect_reports.py --source all
 .venv/Scripts/python scripts/collect_kuvic_browser.py     # KUVIC 전체 목록(브라우저)
+.venv/Scripts/python scripts/collect_ewha.py              # EIA (이화여대, plain requests)
+.venv/Scripts/python scripts/collect_voera.py             # Voera (홍익대, Playwright)
 
 # 2) 전사 (opendataloader-pdf, 로컬 JDK) + OCR 폴백 (텍스트 없는 PDF 표지)
 .venv/Scripts/python scripts/transcribe_pdfs.py
@@ -56,6 +58,8 @@ npm install && npm run dev          # http://localhost:3000
 | YIG | 연세대학교 | 104건 — https://yig.yonsei.ac.kr/research |
 | STAR | 성균관대학교 | 281건 — http://starskku.com/board/board_list?code=research |
 | KUVIC | 고려대학교 | 104건 — https://www.kuvic.com/research |
+| EIA | 이화여자대학교 | 수집 진행 (~200건) — https://ewhainvest.com/research |
+| Voera | 홍익대학교 | 수집 진행 (~100건) — https://www.voera.co.kr/Research |
 
 수집 원칙: 각 PDF는 **1회만 다운로드**하고 SHA256 manifest로 관리하며, 요청 간 지연을 두어
 원 서버에 부하를 주지 않습니다.

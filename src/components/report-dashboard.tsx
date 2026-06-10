@@ -8,10 +8,12 @@ import { SiteNav } from "@/components/site-nav";
 import { VerdictWall } from "@/components/verdict-wall";
 import { ReportPathChart } from "@/components/report-path-chart";
 import { CountUp } from "@/components/react-bits-lite";
+import { SourceLinks } from "@/components/source-links";
 import Link from "next/link";
 import { bucketFilters, type BucketFilter, type MarketFilter, type SchoolFilter, useReportDashboardState } from "@/components/report-dashboard/use-report-dashboard-state";
 import { dateLabel, getDisplayName, reportDataQuality, reportDataset, SCHOOL_LABELS, type ReportRecord } from "@/lib/report-model";
 import {
+  bucketBadgeClass,
   bucketLabels,
   bucketThresholds,
   clubStats,
@@ -29,7 +31,7 @@ import { cn, formatPct, formatPrice } from "@/lib/utils";
 
 const marketFilters: MarketFilter[] = ["ALL", "KR", "US"];
 const marketLabels: Record<MarketFilter, string> = { ALL: "시장 전체", KR: "국내", US: "미국" };
-const schoolFilters: SchoolFilter[] = ["ALL", "smic", "yig", "star", "kuvic"];
+const schoolFilters: SchoolFilter[] = ["ALL", "smic", "yig", "star", "kuvic", "ewha", "voera"];
 const schoolLabels: Record<SchoolFilter, string> = { ALL: "전체 아카이브", ...SCHOOL_LABELS };
 const bucketFilterLabels: Record<BucketFilter, string> = { ALL: "전체", ...bucketLabels };
 
@@ -153,7 +155,7 @@ function Masthead() {
   return (
     <header>
       <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b-4 border-double border-foreground/70 pb-2">
-        <p className="font-mono text-[11px] font-bold uppercase tracking-[0.3em]">SMIC · YIG · STAR · KUVIC — Research Verdict Archive</p>
+        <p className="font-mono text-[11px] font-bold uppercase tracking-[0.3em]">SMIC · YIG · STAR · KUVIC · EIA · VOERA — Research Verdict Archive</p>
         <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
           <SiteNav />
           <p className="hidden font-mono text-[11px] text-muted-foreground lg:block">기준일 {dateLabel(reportDataset.as_of)}</p>
@@ -167,8 +169,8 @@ function Masthead() {
         <span className="text-stamp">시장의 판결</span>을 받는다.
       </h1>
       <p className="mt-5 max-w-2xl text-base leading-7 text-foreground/75">
-        서울대·연세대·성균관대·고려대 투자동아리(SMIC·YIG·STAR·KUVIC)의 리포트 PDF {reportDataset.records.length}건을 전사·파싱해 목표가와
-        투자의견을 추출하고, point-in-time 시세로 발간 이후의 실제 주가 경로를 추적했습니다. 성적은 네 학회가 나란히 비교되는{" "}
+        서울대·연세대·성균관대·고려대·이화여대·홍익대 투자동아리(SMIC·YIG·STAR·KUVIC·EIA·VOERA)의 리포트 PDF {reportDataset.records.length}건을 전사·파싱해 목표가와
+        투자의견을 추출하고, point-in-time 시세로 발간 이후의 실제 주가 경로를 추적했습니다. 성적은 여섯 학회가 나란히 비교되는{" "}
         <strong className="font-bold">2019년 7월 이후 매수 의견 {stats.total}건</strong>으로 매기고, 발간 90일이 지나지 않은 신생 {stats.fresh}건은
         판결을 보류합니다. 그 이전 SMIC 단독 수집분 {archiveCount}건은 채점 없이 아카이브로 보관합니다.
       </p>
@@ -207,12 +209,14 @@ function VerdictTape() {
     () =>
       [...reportDataset.records]
         .filter((report) => report.era === "modern" && report.report_date && isBuy(report))
-        .sort((a, b) => String(a.report_date).localeCompare(String(b.report_date))),
+        .sort((a, b) => String(b.report_date).localeCompare(String(a.report_date)))
+        .slice(0, 48),
     [],
   );
   return (
     <div className="tape overflow-hidden border-y border-border bg-card/70 py-2" aria-hidden="true">
-      <div className="tape-track">
+      {/* 항목당 12초 — 트랙 폭과 무관하게 일정한 저속 유지 */}
+      <div className="tape-track" style={{ animationDuration: `${items.length * 12}s` }}>
         {[0, 1].map((copy) => (
           <div key={copy} className="flex shrink-0 items-center">
             {items.map((report) => (
@@ -463,8 +467,11 @@ function VerdictPaper({
     >
       <header className="flex flex-wrap items-center justify-between gap-2 border-b border-dashed border-border px-6 py-3 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground sm:px-8">
         <span>판결 기록 제 {index < 0 ? "—" : String(index + 1).padStart(3, "0")} 호</span>
-        <span>
-          {SCHOOL_LABELS[report.school]} · {dateLabel(report.report_date)} 발간 · {report.market ?? "—"} · {report.ticker ?? "—"}
+        <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span>
+            {SCHOOL_LABELS[report.school]} · {dateLabel(report.report_date)} 발간 · {report.market ?? "—"} · {report.ticker ?? "—"}
+          </span>
+          <SourceLinks report={report} />
         </span>
       </header>
 
@@ -525,9 +532,22 @@ function VerdictPaper({
 
           <section aria-label="시간이 내린 판정">
             <h3 className="font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">시간의 판정 — {dateLabel(report.latest_trade_date)}</h3>
-            <p className={cn("tnum mt-3 font-display text-5xl font-black leading-none tracking-tight sm:text-6xl", signColor(report.return_latest_pct))}>
-              {formatPct(report.return_latest_pct)}
-            </p>
+            <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+              <p className={cn("tnum font-display text-5xl font-black leading-none tracking-tight sm:text-6xl", signColor(report.return_latest_pct))}>
+                {formatPct(report.return_latest_pct)}
+              </p>
+              {(report.performance_bucket === "Tenbagger" || report.performance_bucket === "Multibagger") && (
+                <span
+                  className={cn(
+                    "inline-block -rotate-3 rounded-md border-2 px-2.5 py-1 font-display text-base tracking-tight",
+                    bucketBadgeClass[report.performance_bucket],
+                  )}
+                  title={`${bucketLabels[report.performance_bucket]} — ${bucketThresholds[report.performance_bucket]}`}
+                >
+                  {bucketLabels[report.performance_bucket]}
+                </span>
+              )}
+            </div>
             <p className="mt-1.5 text-[11px] text-muted-foreground">
               발간 후 현재까지 수익률 · 최신 종가 {formatPrice(report.latest_close, report.market)}
               {report.alpha_latest_pct !== null && (
