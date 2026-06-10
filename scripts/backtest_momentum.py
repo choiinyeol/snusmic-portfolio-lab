@@ -251,6 +251,8 @@ def load_prices(ticker: str, market: str = "KR") -> pd.DataFrame | None:
     df["atr"] = tr.rolling(ATR_PERIOD, min_periods=ATR_PERIOD // 2).mean()
     # ATR(20) for K R:R strategy
     df["atr20"] = tr.rolling(20, min_periods=10).mean()
+    # ATR(14) for extension gauge (U 과열 스케일아웃)
+    df["atr14"] = tr.rolling(14, min_periods=7).mean()
     ret = df["close"].pct_change()
     df["sharpe90"] = ret.rolling(90, min_periods=45).mean() / ret.rolling(90, min_periods=45).std() * math.sqrt(252)
     # Moving averages for various strategies
@@ -3536,6 +3538,9 @@ def compute_today_signals(
             for r in sorted(past_tr, key=lambda x: x["report_date"], reverse=True)[:5]
         ]
 
+        # Extension gauge (visible regardless of strategy family)
+        ext_val = compute_extension(df, as_of) if df is not None else None
+
         pos_info: dict = {
             "ticker": ticker,
             "market": pos.get("market", "KR"),
@@ -3546,6 +3551,7 @@ def compute_today_signals(
             "unrealized_pct": unrealized_pct,
             "days_elapsed": days_elapsed,
             "highest_since_entry": round(float(highest), 4) if highest else None,
+            "extension": ext_val,   # ATR% multiple from 50-MA (과열 게이지)
             "trigger_schools": trigger_schools,
             "trigger_reports": trigger_reports,
         }
@@ -4929,6 +4935,269 @@ def run_kospi_core_chandelier(
 
 
 # ──────────────────────────────────────────────────────────────────────────────
+# Extension gauge helper
+# ATR% Multiple from 50-MA (Minervini 커뮤니티 관행, TradingView Fred6724)
+#   A = ATR(14) / price   (ATR%)
+#   B = (price - 50SMA) / 50SMA  (% gain from 50-SMA)
+#   extension = B / A
+# Returns None if insufficient data.
+# ──────────────────────────────────────────────────────────────────────────────
+
+def compute_extension(df: pd.DataFrame, day: dt.date) -> float | None:
+    """
+    과열 게이지: ATR% Multiple from 50-MA.
+    A = ATR(14)/price,  B = (price-50SMA)/50SMA
+    extension = B / A.
+    양수 = 50SMA 위 과열; 음수 = 50SMA 아래.
+    None = 데이터 불충분.
+    """
+    price = asof_value(df["close"], day)
+    if price <= 0:
+        return None
+    atr14 = asof_value(df["atr14"], day)
+    if not atr14 or atr14 <= 0:
+        return None
+    ma50 = asof_value(df["ma50"], day)
+    if not ma50 or ma50 <= 0:
+        return None
+    A = atr14 / price          # ATR%
+    B = (price - ma50) / ma50  # % from 50SMA
+    return round(B / A, 2)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Strategy U: 코어-KOSPI 샹들리에 + 과열 스케일아웃
+#
+# 설계: T- (regime-aware KOSPI 파킹) 와 완전 동일, 추가 규칙:
+#   - 과열 게이지: extension = B/A  (ATR(14)%, 50SMA, Minervini circle)
+#   - extension > 8× 시 → 보유 주수의 절반 매도 (1차 스케일아웃)
+#     - 나머지 절반은 샹들리에 트레일 계속
+#   - extension 나중에 > 12× 시 → 남은 포지션의 절반 다시 매도 (2차 스케일아웃)
+#   - 스케일아웃은 포지션당 1회: 1차 완료 후 재발동 없음
+#     (단, 진입 때 초기화 — 완전 청산 후 재진입 시 리셋)
+#   - 스케일아웃 수익금 → KOSPI 파킹 (T- 규칙과 동일)
+# ──────────────────────────────────────────────────────────────────────────────
+
+U_SCALEOUT_EXT_1 = 8.0    # 1차 스케일아웃: extension > 8×
+U_SCALEOUT_EXT_2 = 12.0   # 2차 스케일아웃: extension > 12×
+
+
+def run_kospi_core_chandelier_scaleout(
+    prices: dict[str, pd.DataFrame],
+    reports: list[tuple[dt.date, str, str, int]],
+    calendar: list[dt.date],
+    label: str,
+    kospi: pd.Series,
+    atr_period: int,
+    atr_mult: float,
+    max_positions: int,
+    ticker_reports: dict[str, list[dict]] | None = None,
+    record_full_trades: bool = False,
+) -> dict:
+    """
+    U 코어-KOSPI 샹들리에 + 과열 스케일아웃.
+
+    T- (regime-aware) 규칙 완전 동일 +
+    extension(ATR%×50SMA) > 8× → 절반 익절 → KOSPI 파킹.
+    extension > 12× → 남은 절반 다시 익절 → KOSPI 파킹.
+    트리거는 포지션당 1회씩만 발동 (오실레이션 재발동 없음).
+    새 포지션 진입 시 카운터 초기화.
+    """
+    START_CAPITAL = 100_000_000
+    cash = 0.0
+    kospi_parked = START_CAPITAL * (1 - KOSPI_PARK_COST)
+    positions: dict[str, dict] = {}
+    nav_series: list[tuple[str, float]] = []
+    trades: list[dict] = []
+    pending_exits: set[str] = set()
+
+    # Precompute KOSPI 200MA for regime filter
+    kospi_ma200 = kospi.rolling(200, min_periods=100).mean()
+
+    pending_entries = build_pending_entries(reports, calendar, consensus_only=False)
+    prev_kospi_close: float | None = None
+
+    for day in calendar:
+        day_ts = pd.Timestamp(day)
+
+        # ── Daily KOSPI return on parked balance ──────────────────────────────
+        kospi_close_today = asof_value(kospi, day)
+        if kospi_close_today > 0:
+            if prev_kospi_close is not None and prev_kospi_close > 0:
+                ma200_val = asof_value(kospi_ma200, day)
+                use_kospi_return = (ma200_val <= 0 or kospi_close_today >= ma200_val)
+                if use_kospi_return and kospi_parked > 0:
+                    daily_kospi_ret = kospi_close_today / prev_kospi_close - 1
+                    kospi_parked *= (1 + daily_kospi_ret)
+            prev_kospi_close = kospi_close_today
+        else:
+            if prev_kospi_close is None:
+                prev_kospi_close = asof_value(kospi, day) or None
+
+        # ── Execute pending exits (chandelier stop — next open) ───────────────
+        to_exit = [t for t in list(pending_exits) if t in positions]
+        for ticker in to_exit:
+            pos = positions[ticker]
+            q = _get_quote(prices, ticker, day)
+            if q is None or float(q["open"]) <= 0:
+                continue
+            exit_price = float(q["open"])
+            stock_proceeds = pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            kospi_parked += stock_proceeds * (1 - KOSPI_PARK_COST)
+            trades.append(_close_trade(ticker, pos, day, exit_price,
+                                       f"u_chandelier_ATR{atr_mult}",
+                                       ticker_reports, record_full_trades, None))
+            del positions[ticker]
+            pending_exits.discard(ticker)
+
+        # ── Execute pending entries ───────────────────────────────────────────
+        if day in pending_entries:
+            nav_now = (
+                kospi_parked
+                + sum(p["shares"] * p["last_close"] for p in positions.values())
+            )
+            slots = max_positions - len(positions)
+            candidates = list(
+                {t: (t, s, nc) for t, s, nc in pending_entries[day]
+                 if t not in positions}.values()
+            )
+            for ticker, source, n_clubs in candidates[:slots]:
+                df = prices.get(ticker)
+                if df is None or day_ts not in df.index:
+                    continue
+                entry_price = float(df.loc[day_ts]["open"])
+                if entry_price <= 0:
+                    continue
+
+                budget = nav_now * POSITION_WEIGHT
+                if budget > kospi_parked:
+                    budget = kospi_parked
+                if budget < nav_now * POSITION_WEIGHT * 0.5:
+                    continue
+
+                kospi_parked -= budget
+                stock_budget = budget * (1 - KOSPI_PARK_COST)
+                shares = stock_budget * (1 - COST_PER_SIDE) / entry_price
+                total_spent = budget
+
+                display_name = ticker
+                tp = None
+                market = "KR"
+                if ticker_reports is not None:
+                    tr_list = ticker_reports.get(ticker, [])
+                    past_tr = [x for x in tr_list if x["report_date"] < day]
+                    if past_tr:
+                        latest = max(past_tr, key=lambda x: x["report_date"])
+                        display_name = latest["display_name"]
+                        tps = [x["target_price"] for x in past_tr if x["target_price"]]
+                        tp = max(tps) if tps else None
+                        market = past_tr[0].get("market", "KR")
+
+                atr_col = "atr20" if atr_period == 20 else "atr"
+                atr_val = asof_value(df[atr_col] if atr_col in df.columns else df["atr"], day)
+                stop = entry_price - atr_mult * atr_val if atr_val else entry_price * 0.75
+
+                pos = {
+                    "shares": shares,
+                    "entry_price": entry_price,
+                    "entry_date": day,
+                    "cost": total_spent,
+                    "last_close": entry_price,
+                    "highest": entry_price,
+                    "stop": stop,
+                    "source": source,
+                    "n_clubs": n_clubs,
+                    "display_name": display_name,
+                    "market": market,
+                    "target_price": tp,
+                    # U-specific: scale-out state (one-time triggers)
+                    "scaleout1_done": False,   # extension > 8× triggered
+                    "scaleout2_done": False,   # extension > 12× triggered
+                }
+                positions[ticker] = pos
+
+        # ── Update positions + check chandelier stop + extension scale-out ────
+        for ticker, pos in list(positions.items()):
+            df = prices.get(ticker)
+            if df is None or day_ts not in df.index:
+                continue
+            close = float(df.loc[day_ts]["close"])
+            pos["last_close"] = close
+            pos["highest"] = max(pos.get("highest", close), close)
+
+            atr_col = "atr20" if atr_period == 20 else "atr"
+            atr_val = asof_value(df[atr_col] if atr_col in df.columns else df["atr"], day)
+            if atr_val:
+                new_stop = pos["highest"] - atr_mult * atr_val
+                pos["stop"] = max(pos.get("stop", 0.0), new_stop)
+
+            # Chandelier stop check
+            if pos.get("stop") and close < pos["stop"] and ticker not in pending_exits:
+                pending_exits.add(ticker)
+                continue  # don't check scale-out on same day as stop trigger
+
+            # Extension-based scale-out (one-time, FIFO check: 1st then 2nd tier)
+            ext = compute_extension(df, day)
+            if ext is not None:
+                # 1차 스케일아웃: extension > 8×, only if not yet done
+                if not pos["scaleout1_done"] and ext > U_SCALEOUT_EXT_1:
+                    half_shares = pos["shares"] * 0.5
+                    half_cost = pos["cost"] * 0.5
+                    proceeds = half_shares * close * (1 - COST_PER_SIDE)
+                    kospi_parked += proceeds * (1 - KOSPI_PARK_COST)
+                    trade = _close_trade(
+                        ticker, pos, day, close,
+                        f"u_scaleout1_ext{ext:.1f}x",
+                        ticker_reports, record_full_trades, None,
+                        shares_override=half_shares,
+                        cost_override=half_cost,
+                    )
+                    trades.append(trade)
+                    pos["shares"] -= half_shares
+                    pos["cost"] -= half_cost
+                    pos["scaleout1_done"] = True
+
+                # 2차 스케일아웃: extension > 12×, only if 1st done and not yet 2nd
+                elif pos["scaleout1_done"] and not pos["scaleout2_done"] and ext > U_SCALEOUT_EXT_2:
+                    quarter_shares = pos["shares"] * 0.5
+                    quarter_cost = pos["cost"] * 0.5
+                    proceeds = quarter_shares * close * (1 - COST_PER_SIDE)
+                    kospi_parked += proceeds * (1 - KOSPI_PARK_COST)
+                    trade = _close_trade(
+                        ticker, pos, day, close,
+                        f"u_scaleout2_ext{ext:.1f}x",
+                        ticker_reports, record_full_trades, None,
+                        shares_override=quarter_shares,
+                        cost_override=quarter_cost,
+                    )
+                    trades.append(trade)
+                    pos["shares"] -= quarter_shares
+                    pos["cost"] -= quarter_cost
+                    pos["scaleout2_done"] = True
+
+        nav = kospi_parked + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav_series.append((day.isoformat(), nav))
+
+    # Force-close remaining positions at end
+    last_day = calendar[-1]
+    for ticker, pos in list(positions.items()):
+        trades.append(_close_trade(ticker, pos, last_day, pos["last_close"],
+                                   "데이터_종료_미청산",
+                                   ticker_reports, record_full_trades, None))
+
+    result = _compute_result(nav_series, trades, START_CAPITAL, label,
+                             open_positions=positions)
+    result["kospi_parking_note"] = (
+        "U 코어-KOSPI 샹들리에 + 과열 스케일아웃: T- 레짐 필터 동일 + "
+        "ATR% Multiple from 50-MA (extension = B/A, A=ATR14/price, B=(price-50SMA)/50SMA). "
+        "extension > 8× → 절반 익절 → KOSPI 파킹; extension > 12× → 나머지 절반 다시 익절. "
+        "트리거는 포지션당 1회 (재발동 없음; 재진입 시 초기화). "
+        "출처: Minervini 커뮤니티 관행, TradingView Fred6724."
+    )
+    return result
+
+
+# ──────────────────────────────────────────────────────────────────────────────
 # main
 # ──────────────────────────────────────────────────────────────────────────────
 
@@ -5280,7 +5549,7 @@ def main() -> int:
     # S sub-variants: only best_s_key is eligible; the other two are excluded from selector
     # T-: regime variant — not directly in selector (best of T/T- wins as "T. 코어-KOSPI 샹들리에")
     s_non_best = {k for k in s_variants if k != best_s_key}
-    EXCLUDED_FROM_SELECTOR = {"L_rsi2_reversion", "M_short_reversal", "T-_kospi_core_regime"} | s_non_best
+    EXCLUDED_FROM_SELECTOR = {"L_rsi2_reversion", "M_short_reversal", "T-_kospi_core_regime", "U_chandelier_scaleout"} | s_non_best
 
     # ── D+ Optuna optimization ─────────────────────────────────────────────────
     print("\n── Optuna robust optimization (D+ chandelier) ───────────────────", flush=True)
@@ -5353,6 +5622,26 @@ def main() -> int:
     # Add T / T- to all_strategies (after they are computed)
     all_strategies["T_kospi_core_chandelier"] = result_T
     all_strategies["T-_kospi_core_regime"] = result_Tminus
+
+    # ── U: 코어-KOSPI 샹들리에 + 과열 스케일아웃 (T- identical + extension 8×/12×) ──
+    print(f"\nU. 코어-KOSPI 샹들리에 + 과열 스케일아웃 (T- + ATR% extension 8×/12×)...", flush=True)
+    result_U = run_kospi_core_chandelier_scaleout(
+        prices, reports, calendar,
+        label="U_chandelier_scaleout",
+        kospi=kospi,
+        atr_period=t_atr_period,
+        atr_mult=t_atr_mult,
+        max_positions=t_max_pos,
+        ticker_reports=ticker_reports,
+        record_full_trades=True,
+    )
+    print(f"   IS sharpe={result_U['in_sample'].get('sharpe')}  OOS sharpe={result_U['out_of_sample'].get('sharpe')}", flush=True)
+    # U tenbagger metrics
+    _u_max_single = result_U["metrics"].get("max_single_return_pct")
+    _tm_max_single = result_Tminus["metrics"].get("max_single_return_pct")
+    print(f"   U max single trade: {_u_max_single}%  vs T- max: {_tm_max_single}%", flush=True)
+    all_strategies["U_chandelier_scaleout"] = result_U
+    # U is NOT automatically in the selector — evaluated vs T- below
 
     # ── Re-run P and R with Optuna ATR params if D+ was adopted ────────────
     result_P = result_P_default
@@ -5452,8 +5741,87 @@ def main() -> int:
     )
     print(f"\nT promotion verdict: {t_promotion_verdict}", flush=True)
 
+    # ── U vs T- comparison (KOSPI DCA ratio + OOS sharpe) ──────────────────
+    # U is promoted to headline ONLY if it beats T- on full-period wealth ratio AND OOS sharpe.
+    # Otherwise T- stays headline candidate and U is presented as an honest side note.
+    _u_ratio  = (_kospi_dca_ratios.get("U_chandelier_scaleout",  {}).get("full_ratio") or 0.0)
+    _tm_ratio_cmp = (_kospi_dca_ratios.get(_t_best_key, {}).get("full_ratio") or 0.0)
+    _u_oos    = (result_U.get("out_of_sample", {}).get("sharpe") or -999.0)
+    _tm_oos_cmp = (_t_best.get("out_of_sample", {}).get("sharpe") or -999.0)
+    _u_is     = (result_U.get("in_sample", {}).get("sharpe") or -999.0)
+    _u_max_trade = result_U["metrics"].get("max_single_return_pct")
+    _tm_max_trade = result_Tminus["metrics"].get("max_single_return_pct")
+
+    # Tenbagger metrics: top-decile P&L share and avg winner hold days
+    def _tenbagger_metrics(strat_result: dict) -> dict:
+        closed = [t for t in strat_result.get("trades", []) if not t.get("exit_reason", "").endswith("미청산")]
+        returns = sorted([t["return_pct"] for t in closed], reverse=True)
+        n = len(returns)
+        if not n:
+            return {"top_decile_pnl_share_pct": None, "avg_winner_hold_days": None}
+        top10_n = max(1, math.ceil(n * 0.1))
+        top_decile = returns[:top10_n]
+        total_positive = sum(r for r in returns if r > 0)
+        td_share = (sum(r for r in top_decile if r > 0) / total_positive * 100) if total_positive > 0 else 0.0
+        winners = [t for t in closed if t["return_pct"] > 0]
+        avg_hold = round(sum(t["days"] for t in winners) / len(winners), 1) if winners else None
+        return {
+            "top_decile_pnl_share_pct": round(td_share, 1),
+            "avg_winner_hold_days": avg_hold,
+            "max_single_return_pct": max((t["return_pct"] for t in closed), default=None),
+        }
+
+    _u_tb  = _tenbagger_metrics(result_U)
+    _tm_tb = _tenbagger_metrics(result_Tminus)
+
+    _u_beats_tminus = (_u_ratio > _tm_ratio_cmp and _u_oos >= _tm_oos_cmp)
+    if _u_beats_tminus:
+        # U promoted: remove from exclusions so it competes in headline selection
+        EXCLUDED_FROM_SELECTOR.discard("U_chandelier_scaleout")
+        u_verdict_str = "PROMOTED — 과열 스케일아웃이 T- 대비 부의 비율과 OOS 샤프 모두 개선"
+    else:
+        u_verdict_str = (
+            "NOT PROMOTED — "
+            + ("과열 스케일아웃은 상승 여력을 깎았다" if _u_ratio <= _tm_ratio_cmp else "부의 비율은 앞서나 OOS 샤프 미달")
+        )
+
+    u_vs_tminus_verdict = {
+        "U_wealth_ratio": _u_ratio,
+        "Tminus_wealth_ratio": _tm_ratio_cmp,
+        "U_oos_sharpe": _u_oos,
+        "Tminus_oos_sharpe": _tm_oos_cmp,
+        "U_is_sharpe": _u_is,
+        "U_max_single_return_pct": _u_max_trade,
+        "Tminus_max_single_return_pct": _tm_max_trade,
+        "U_top_decile_pnl_share_pct": _u_tb.get("top_decile_pnl_share_pct"),
+        "Tminus_top_decile_pnl_share_pct": _tm_tb.get("top_decile_pnl_share_pct"),
+        "U_avg_winner_hold_days": _u_tb.get("avg_winner_hold_days"),
+        "Tminus_avg_winner_hold_days": _tm_tb.get("avg_winner_hold_days"),
+        "promoted": _u_beats_tminus,
+        "verdict": u_verdict_str,
+        "extension_formula": "extension = B/A, A=ATR(14)/price (ATR%), B=(price-50SMA)/50SMA. 출처: Minervini 커뮤니티 관행, TradingView Fred6724.",
+        "scaleout_thresholds": {"first": U_SCALEOUT_EXT_1, "second": U_SCALEOUT_EXT_2},
+        "editorial": (
+            "가격-전용(price-only) 데이터로 텐배거를 끝까지 들고 갈 수 있는가? "
+            "샹들리에 ATR×5 트레일은 고점이 어디인지 모른다는 사실을 설계로 인정하고 "
+            "단지 '가격이 최고점에서 충분히 떨어질 때까지' 기다린다. "
+            "이 접근은 삼성전기(+1,400% 구간)처럼 오랜 상승추세를 '끝까지' 타는 것을 허용하는 반면, "
+            "PLTR·TSLA·NVDA 유형처럼 extension 10×를 넘어 과열 후 급락하는 패턴에서는 "
+            "일부 수익을 고점 근처에서 실현하는 것이 유리하다. "
+            "스케일아웃 전략(U)이 T-와 비교해 "
+            + ("더 높은 부의 비율을 달성했다 — 과열 구간의 부분 익절이 체계적으로 효과적임을 시사한다." if _u_beats_tminus else
+               "더 낮은 부의 비율을 보였다 — 이 유니버스에서는 과열 스케일아웃이 남은 포지션의 상승을 놓치는 비용이 더 컸다. "
+               "가격-전용 데이터만으로는 정확한 '과열 고점'을 식별하기 어렵고, "
+               "조기 익절은 텐배거의 복리 효과를 희석시킨다.")
+        ),
+    }
+    print(f"\nU vs T- verdict: {u_verdict_str}", flush=True)
+    print(f"  U ratio={_u_ratio}x  T- ratio={_tm_ratio_cmp}x  U OOS={_u_oos}  T- OOS={_tm_oos_cmp}", flush=True)
+    print(f"  U max_trade={_u_max_trade}%  T- max_trade={_tm_max_trade}%", flush=True)
+    print(f"  U top-decile PnL share={_u_tb.get('top_decile_pnl_share_pct')}%  T- {_tm_tb.get('top_decile_pnl_share_pct')}%", flush=True)
+
     # ── Summary table (all strategies including L/M for transparency)
-    print(f"\n── Strategy summary (v13, {len(all_strategies)} strategies; L/M/S-non-best/T-loser excluded from selector) ──", flush=True)
+    print(f"\n── Strategy summary (v14, {len(all_strategies)} strategies; L/M/S-non-best/T-loser/U(if not promoted) excluded from selector) ──", flush=True)
     print(f"{'Strategy':<32} {'IS Shp':>8} {'OOS Shp':>9} {'WinRate':>8} {'vs KOSPI DCA':>13} {'Trades':>7} {'Note':>12}", flush=True)
     for key, r in all_strategies.items():
         is_m  = r.get("in_sample", {})
@@ -5563,6 +5931,10 @@ def main() -> int:
             stop_val = p.get("stop", 0) or 0
             last_close_val = p.get("last_close", p.get("entry_price", 0))
             cost_val = p.get("cost", 1)
+            # Compute extension gauge for this position (uses last available data)
+            df_pos = prices.get(t)
+            last_cal_day = calendar[-1]
+            ext_val = compute_extension(df_pos, last_cal_day) if df_pos is not None else None
             result_list.append({
                 "ticker": t,
                 "market": p.get("market", "KR"),
@@ -5574,6 +5946,7 @@ def main() -> int:
                 "return_pct": round((p["shares"] * float(last_close_val) / float(cost_val) - 1) * 100, 2),
                 "source": p.get("source", ""),
                 "n_clubs": p.get("n_clubs", 1),
+                "extension": ext_val,   # ATR% multiple from 50-MA (과열 게이지)
             })
         return result_list
 
@@ -5793,6 +6166,23 @@ def main() -> int:
                 ),
                 "csv_note": (
                     "CSV는 주식 거래만 기록. KOSPI 파킹 전환(ETF 매수/매도)은 별도 미기록."
+                ),
+            },
+            "U_chandelier_scaleout": {
+                "is_sharpe": result_U["in_sample"].get("sharpe"),
+                "oos_sharpe": result_U["out_of_sample"].get("sharpe"),
+                "trades": result_U["metrics"]["trades"],
+                "kospi_dca_ratio": _kospi_dca_ratios.get("U_chandelier_scaleout", {}).get("full_ratio"),
+                "max_single_return_pct": result_U["metrics"].get("max_single_return_pct"),
+                "top_decile_pnl_share_pct": _u_tb.get("top_decile_pnl_share_pct"),
+                "avg_winner_hold_days": _u_tb.get("avg_winner_hold_days"),
+                "vs_tminus": u_vs_tminus_verdict,
+                "description": (
+                    "U 코어-KOSPI 샹들리에 + 과열 스케일아웃. T- 레짐 필터 완전 동일 + "
+                    f"ATR% Multiple from 50-MA extension 게이지 (ATR14, 50SMA). "
+                    f"extension > {U_SCALEOUT_EXT_1}× → 절반 익절 → KOSPI 파킹 (1차). "
+                    f"extension > {U_SCALEOUT_EXT_2}× → 남은 절반 다시 익절 (2차). "
+                    "트리거 포지션당 1회. 출처: Minervini 커뮤니티 관행, TradingView Fred6724."
                 ),
             },
             "beats_kospi_dca": beats_kospi_both,

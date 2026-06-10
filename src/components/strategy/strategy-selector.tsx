@@ -90,6 +90,7 @@ type OpenPosition = {
   return_pct: number;
   source?: string;
   n_clubs?: number;
+  extension?: number | null;  // ATR% multiple from 50-MA (과열 게이지)
 };
 
 type MultiStrategyData = {
@@ -134,6 +135,14 @@ const STRATEGY_LABEL_KO: Record<string, string> = {
   N_52w_high:             "N. 52주 고가 근접",
   O_mtt_alpha16:          "O. MTT (alpha16) ★",
   P_deepbuy_chandelier:   "P. 딥바이 샹들리에 ★",
+  Q_kangto_trend:         "Q. 깡토 추세추종",
+  R_kelly_chandelier:     "R. Kelly 샹들리에",
+  S_hrp:                  "S-a. HRP (배분형)",
+  S_msharpe:              "S-b. max-Sharpe (배분형)",
+  S_mincvar:              "S-c. min-CVaR (배분형)",
+  T_kospi_core_chandelier:"T. 코어-KOSPI 샹들리에",
+  "T-_kospi_core_regime": "T-. 코어-KOSPI 레짐 ★",
+  U_chandelier_scaleout:  "U. 과열 스케일아웃 ★",
 };
 
 const STRATEGY_DESC_KO: Record<string, string> = {
@@ -154,15 +163,25 @@ const STRATEGY_DESC_KO: Record<string, string> = {
   N_52w_high:             "리포트 당일 close ≥ 52w high × 85% 진입. 월말 close < 52w high × 70% 청산. George & Hwang (2004).",
   O_mtt_alpha16:          "v11 룩어헤드 수정. alpha16 MTT 이식. RS 퍼센타일(3m×0.5/6m×0.3/12m×0.2) + Minervini 5-조건 필터. 진입 RS≥79, -8%/BE/6%트레일/+3.5R/RS<82/115일 청산. 시그널 종가→익일 시가 체결. [alpha16 KRX 파라미터, OUR 데이터 미튜닝]",
   P_deepbuy_chandelier:   "딥바이 진입(≥20% 하락, 6개월 내) + 추가 10% 하락 시 스케일인(1회) + ATR 트레일링 스탑 청산(타겟 캡 없음). 딥바이 좋은 진입을 샹들리에로 멀티배거 포착.",
+  Q_kangto_trend:         "시장신호등(KOSPI 200MA+50MA상승→2유닛). 진입: RS퍼센타일≥KOSPI RS AND 60d고가돌파 AND 거래량≥20d평균×1.5. 스탑 -8%(1R), BE +1R, 트레일 고점-8% +1.5R, 절반익절 +3R.",
+  R_kelly_chandelier:     "D+ 샹들리에 규칙 + Kelly 포지션 사이징. Rolling 40거래 win/payoff 기준 fractional Kelly (cap 25%, safety 0.5, floor 1%).",
+  S_hrp:                  "HRP 배분형. 상관거리 단일연결 클러스터링 → 준대각 재정렬 → 역분산 재귀분할. 월간 리밸런스.",
+  S_msharpe:              "max-Sharpe 배분형. LedoitWolf 공분산 수축, 개별 비중 ≤15%. 월간 리밸런스.",
+  S_mincvar:              "min-CVaR 95% 배분형. scipy linprog LP, 개별 비중 ≤15%. 월간 리밸런스.",
+  T_kospi_core_chandelier:"D+ 샹들리에 규칙 + 유휴 현금을 KOSPI 익스포저(KODEX200)로 주차. 베이스라인 = KOSPI DCA.",
+  "T-_kospi_core_regime": "T와 동일 + KOSPI < 200MA 구간에서는 파킹 수익률 0%(현금 보유). Faber (2007) 레짐 필터.",
+  U_chandelier_scaleout:  "T-와 동일 + 과열 스케일아웃. extension(=ATR14% Multiple from 50SMA) > 8× → 절반 익절, > 12× → 나머지 절반 익절. Minervini circle / Fred6724.",
 };
 
 // Strategy grouping for tab sections
 const STRATEGY_GROUPS: { label: string; keys: string[] }[] = [
   { label: "보유형",    keys: ["A_12mo", "B_36mo", "C_narrative", "E_half_runner"] },
-  { label: "추세형",    keys: ["D_chandelier", "D+_chandelier_optuna", "F_momentum_narrative", "H_minervini", "I_supertrend", "K_rr_trend", "N_52w_high", "O_mtt_alpha16"] },
+  { label: "추세형",    keys: ["D_chandelier", "D+_chandelier_optuna", "F_momentum_narrative", "H_minervini", "I_supertrend", "K_rr_trend", "N_52w_high", "O_mtt_alpha16", "Q_kangto_trend"] },
   { label: "딥바이형",  keys: ["G_dip_buy", "P_deepbuy_chandelier"] },
   { label: "회귀형 ⚠", keys: ["L_rsi2_reversion", "M_short_reversal"] },
-  { label: "오버레이",  keys: ["J_core_satellite"] },
+  { label: "오버레이",  keys: ["J_core_satellite", "R_kelly_chandelier"] },
+  { label: "KOSPI파킹", keys: ["T_kospi_core_chandelier", "T-_kospi_core_regime", "U_chandelier_scaleout"] },
+  { label: "배분형",    keys: ["S_hrp", "S_msharpe", "S_mincvar"] },
 ];
 
 const BENCHMARK_KO: Record<string, string> = {
@@ -227,7 +246,7 @@ function OpenPositionsTable({ positions, stratKey }: { positions: OpenPosition[]
         백테스트 마지막 날 기준 미청산 포지션. 동시 보유 20종목 한도로 신호 일부는 미체결.
       </p>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[560px] border-collapse text-sm">
+        <table className="w-full min-w-[640px] border-collapse text-sm">
           <thead>
             <tr className="border-b-4 border-double border-border font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
               <th className="px-3 py-2 text-left">종목</th>
@@ -236,6 +255,7 @@ function OpenPositionsTable({ positions, stratKey }: { positions: OpenPosition[]
               <th className="px-3 py-2 text-right">현재가</th>
               <th className="px-3 py-2 text-right">평가손익</th>
               <th className="px-3 py-2 text-right">스탑</th>
+              <th className="px-3 py-2 text-right" title="ATR% Multiple from 50-MA — 8× 이상이면 과열 구간 (Minervini circle)">과열계수</th>
               <th className="px-3 py-2 text-right">커버</th>
             </tr>
           </thead>
@@ -243,6 +263,8 @@ function OpenPositionsTable({ positions, stratKey }: { positions: OpenPosition[]
             {[...positions].sort((a, b) => b.return_pct - a.return_pct).map((pos) => {
               const market = pos.market ?? "KR";
               const slug = pos.ticker ? `${market}-${pos.ticker}`.toLowerCase() : null;
+              const ext = pos.extension;
+              const extColor = ext == null ? "" : ext >= 12 ? "text-down font-bold" : ext >= 8 ? "text-amber-500 font-bold" : ext >= 4 ? "text-foreground" : "text-muted-foreground";
               return (
                 <tr key={pos.ticker} className="border-b border-dashed border-border last:border-b-0">
                   <td className="px-3 py-2">
@@ -264,6 +286,9 @@ function OpenPositionsTable({ positions, stratKey }: { positions: OpenPosition[]
                   <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">
                     {pos.stop && pos.stop > 0 ? pos.stop.toLocaleString() : "—"}
                   </td>
+                  <td className={cn("tnum px-3 py-2 text-right font-mono text-xs", extColor)}>
+                    {ext != null ? `${ext.toFixed(1)}×` : "—"}
+                  </td>
                   <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">
                     {pos.n_clubs ?? 1}개교
                   </td>
@@ -273,6 +298,9 @@ function OpenPositionsTable({ positions, stratKey }: { positions: OpenPosition[]
           </tbody>
         </table>
       </div>
+      <p className="mt-2 text-[10px] text-muted-foreground">
+        과열계수 = ATR% Multiple from 50-MA (B/A, A=ATR14/가격, B=(가격−50SMA)/50SMA). 8× 이상 황색, 12× 이상 적색 경보 — Minervini 커뮤니티 관행.
+      </p>
     </section>
   );
 }

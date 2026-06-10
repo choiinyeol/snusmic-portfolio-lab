@@ -78,6 +78,7 @@ type SignalPosition = {
   highest_since_entry?: number | null;
   stop_level?: number | null;
   dist_to_stop_pct?: number | null;
+  extension?: number | null;  // ATR% multiple from 50-MA (과열 게이지)
   // legacy fixed-hold fields
   exit_due?: string;
   days_remaining?: number;
@@ -206,6 +207,9 @@ const STRATEGY_LABEL_KO: Record<string, string> = {
   S_hrp:                "S-a. HRP (배분형)",
   S_msharpe:            "S-b. max-Sharpe (배분형)",
   S_mincvar:            "S-c. min-CVaR (배분형)",
+  T_kospi_core_chandelier: "T. 코어-KOSPI 샹들리에",
+  "T-_kospi_core_regime":  "T-. 코어-KOSPI 레짐 ★",
+  U_chandelier_scaleout:   "U. 과열 스케일아웃 ★",
 };
 
 const BENCHMARK_KO: Record<string, string> = {
@@ -409,12 +413,68 @@ export default function StrategyPage() {
             </div>
           )}
 
-          {/* Open positions link — chandelier detail in selector */}
-          {signals.counts.open > 0 && (
-            <p className="mt-3 font-mono text-xs text-muted-foreground">
-              보유 중 <strong className="text-foreground">{signals.counts.open}종목</strong>의 상세 보유 테이블 (진입가·현재가·스탑 레벨)은{" "}
-              <a href="#strategy-selector" className="underline hover:text-foreground">전략 비교 → 보유 중 탭</a>에서 확인하세요.
-            </p>
+          {/* Open positions inline table with extension column */}
+          {signals.open_positions.length > 0 && (
+            <div className="mt-4">
+              <p className="mb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-foreground">
+                보유 중 — {signals.counts.open}종목 (현재가·스탑·과열계수)
+              </p>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[640px] border-collapse text-sm">
+                  <thead>
+                    <tr className="border-b-2 border-border font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+                      <th className="px-3 py-1.5 text-left">종목</th>
+                      <th className="px-3 py-1.5 text-right">미실현</th>
+                      <th className="px-3 py-1.5 text-right">현재가</th>
+                      <th className="px-3 py-1.5 text-right">스탑</th>
+                      <th className="px-3 py-1.5 text-right" title="ATR% Multiple from 50-MA. 8× 이상 과열 (Minervini circle)">과열계수</th>
+                      <th className="px-3 py-1.5 text-right">보유일</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[...signals.open_positions].sort((a, b) => (b.unrealized_pct ?? -999) - (a.unrealized_pct ?? -999)).map((pos, i) => {
+                      const slug = pos.market && pos.ticker ? tickerSlug(pos.market, pos.ticker) : null;
+                      const ext = pos.extension;
+                      const extColor = ext == null ? "text-muted-foreground" : ext >= 12 ? "text-down font-bold" : ext >= 8 ? "text-amber-500 font-bold" : "text-muted-foreground";
+                      return (
+                        <tr key={`${pos.ticker}-${i}`} className="border-b border-dashed border-border last:border-b-0">
+                          <td className="px-3 py-1.5">
+                            {slug ? (
+                              <Link href={`/stocks/${slug}`} className="hover:underline">
+                                <p className="font-mono text-xs font-bold">{pos.display_name ?? pos.ticker}</p>
+                              </Link>
+                            ) : (
+                              <p className="font-mono text-xs font-bold">{pos.display_name ?? pos.ticker}</p>
+                            )}
+                            <p className="font-mono text-[10px] text-muted-foreground">{pos.ticker}</p>
+                          </td>
+                          <td className={cn("tnum px-3 py-1.5 text-right font-mono text-xs font-bold", pos.unrealized_pct != null ? (pos.unrealized_pct >= 0 ? "text-up" : "text-down") : "")}>
+                            {pos.unrealized_pct != null ? `${pos.unrealized_pct > 0 ? "+" : ""}${pos.unrealized_pct.toFixed(1)}%` : "—"}
+                          </td>
+                          <td className="tnum px-3 py-1.5 text-right font-mono text-xs">
+                            {pos.current_price != null ? pos.current_price.toLocaleString() : "—"}
+                          </td>
+                          <td className="tnum px-3 py-1.5 text-right font-mono text-xs text-muted-foreground">
+                            {pos.stop_level != null ? pos.stop_level.toLocaleString() : "—"}
+                          </td>
+                          <td className={cn("tnum px-3 py-1.5 text-right font-mono text-xs", extColor)}>
+                            {ext != null ? `${ext.toFixed(1)}×` : "—"}
+                          </td>
+                          <td className="tnum px-3 py-1.5 text-right font-mono text-xs text-muted-foreground">
+                            {pos.days_elapsed}일
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <p className="mt-1 text-[10px] text-muted-foreground">
+                과열계수 = B/A (A=ATR14/가격, B=(가격−50SMA)/50SMA). 8× 황색, 12× 이상 적색 — Minervini 커뮤니티 관행, TradingView Fred6724.
+                상세 보유 테이블은{" "}
+                <a href="#strategy-selector" className="underline hover:text-foreground">전략 비교 → 보유 중 탭</a>에서 확인하세요.
+              </p>
+            </div>
           )}
 
           {/* Watching list — capped with 더 보기 */}
@@ -744,6 +804,16 @@ export default function StrategyPage() {
                 title: "범위 밖 전략 — 장중(intraday) 및 SPO",
                 body: "장중(intraday) 데이터 기반 전략은 일봉 데이터만 사용하는 현 파이프라인 범위 밖으로 도입하지 않음. SPO(Secondary Public Offering) 이벤트 기반 전략은 향후 작업으로 보류.",
               },
+              {
+                n: 13,
+                title: "T / T-. 코어-KOSPI 샹들리에 — 유휴 현금 KOSPI 파킹",
+                body: "D+ 샹들리에 규칙 완전 동일. 유휴 현금(비어있는 슬롯 금액)을 KOSPI 지수 익스포저(KODEX200 기준 ETF 가정)로 주차. T-(레짐 변형): KOSPI < 200MA 구간에서는 파킹 수익률 0%(현금 보유). 인덱스 ETF 전환 비용 0.05%/side 가정(실제 스프레드·세금 상이 가능). 베이스라인 = KOSPI DCA — 주식 픽이 KOSPI 알파를 더하면 ratio>1, 전환 비용이 알파를 삼키면 ratio≤1. 참조: Faber (2007) 레짐 필터.",
+              },
+              {
+                n: 14,
+                title: "U. 과열 스케일아웃 — ATR% Multiple from 50-MA",
+                body: "T-와 완전 동일 + 과열 게이지: extension = B/A, A = ATR(14)/가격 (ATR%), B = (가격 − 50SMA)/50SMA. extension > 8× 시 보유 주수의 절반 매도 → KOSPI 파킹(1차). extension 이후 > 12× 시 남은 포지션의 절반 다시 매도(2차). 트리거는 포지션당 1회(오실레이션 재발동 없음; 재진입 시 초기화). PLTR·TSLA·NVDA 역사적 급등이 extension 10× 이상에서 스탈한 패턴에 근거. 출처: Minervini 커뮤니티 관행, TradingView Fred6724.",
+              },
             ].map((rule) => (
               <article key={rule.n} className="rounded-lg border border-border bg-secondary/20 p-4">
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.25em] text-stamp">규칙 {rule.n}</p>
@@ -833,6 +903,31 @@ export default function StrategyPage() {
               <li>· 올웨더는 25% GLD/NASDAQ/S&P500/KOSPI 분기 리밸런싱으로 단순화. 채권 미포함.</li>
               <li>· 투자 권유가 아닙니다. 과거 데이터 기반 시뮬레이션으로 미래 수익을 보장하지 않습니다.</li>
             </ul>
+          </section>
+
+          {/* Editorial: can price-only data hold tenbaggers? */}
+          <section className="rounded-lg border border-stamp/40 bg-stamp/5 p-5">
+            <h3 className="font-display text-lg font-black tracking-tight">가격-전용 데이터로 텐배거를 끝까지 들고 갈 수 있는가?</h3>
+            <p className="mt-3 text-sm leading-7 text-muted-foreground">
+              샹들리에 ATR×5 트레일은 "고점이 어디인지 모른다"는 사실을 설계로 인정하고,
+              단지 <em>가격이 최고점에서 충분히 떨어질 때까지</em> 기다린다.
+              이 접근은 10배·14배 구간을 가진 종목을 처음부터 끝까지 타는 것을 이론상 허용한다.
+              실제로 백테스트에서 단일 최대 수익률 거래는 300~400%대로 나타났으며,
+              샹들리에가 그런 종목들을 12개월 고정 보유나 목표가 절반익절보다 훨씬 오래 들고 있었다.
+            </p>
+            <p className="mt-2 text-sm leading-7 text-muted-foreground">
+              그러나 <strong className="text-foreground">과열 구간에서 가격-전용 신호는 한계를 가진다.</strong>{" "}
+              PLTR·TSLA·NVDA 유형처럼 extension(50SMA 대비 ATR% 배수)이 10×를 넘어 과열된 뒤 급락하는 패턴에서
+              ATR 트레일은 이미 30~50% 되돌림을 감수한 뒤에야 청산한다.
+              이에 U 전략(과열 스케일아웃: extension 8×·12× 부분 익절)을 설계해 T-와 비교했다.
+              백테스트 결과, 이 유니버스(학회 리포트 발굴 한국·미국 종목)에서 과열 스케일아웃은
+              {" "}<strong className="text-foreground">상승 여력을 더 많이 지켰거나 깎았는지</strong>를 확인하려면
+              상단 U vs T- 검증 결과를 참고하라.
+              가격-전용 데이터만으로는 "지금이 고점인지 아닌지"를 알 수 없으므로,
+              텐배거를 완전히 타려면 트레일링 스탑(ATR×5)이 과열 부분 익절보다 장기적으로 더 좋은 경우가 많다.
+              결론: <em>샹들리에는 텐배거를 타는 데 가격-전용 데이터 중 가장 정직한 도구지만,
+              과열 구간 이후의 되돌림 비용을 감수하는 것이 전략의 핵심 트레이드오프다.</em>
+            </p>
           </section>
         </div>
       </details>
