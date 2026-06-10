@@ -22,21 +22,39 @@ import {
 import { SortableTh, useSortable, type SortColumn } from "@/components/sortable";
 import { cn, formatPct, formatPrice } from "@/lib/utils";
 
+/** 수익률(%) → 25%p 구간 정수 (null 허용) */
+function pctBand(v: number | null | undefined): number | null {
+  if (v === null || v === undefined || !Number.isFinite(v)) return null;
+  return Math.floor(v / 25);
+}
+
+/** 날짜 ISO 문자열 → 연-월 (YYYY-MM) 구간 */
+function monthBand(v: string | null | undefined): string | null {
+  if (!v) return null;
+  return v.slice(0, 7);
+}
+
+/** 보유일 → 30일 구간 정수 */
+function dayBand(v: number | null | undefined): number | null {
+  if (v === null || v === undefined) return null;
+  return Math.floor(v / 30);
+}
+
 const sortColumns: SortColumn<ReportRecord>[] = [
-  { key: "date", value: (r) => r.report_date },
+  { key: "date",   value: (r) => r.report_date,              groupValue: (r) => monthBand(r.report_date) },
   { key: "school", value: (r) => schoolShort[r.school] },
-  { key: "name", value: (r) => getDisplayName(r) },
+  { key: "name",   value: (r) => getDisplayName(r) },
   { key: "rating", value: (r) => r.rating },
-  { key: "price", value: (r) => r.report_current_price, firstDir: "desc" },
-  { key: "target", value: (r) => r.target_price, firstDir: "desc" },
-  { key: "upside", value: (r) => r.stated_upside_pct, firstDir: "desc" },
-  { key: "r90", value: (r) => r.return_90d_pct, firstDir: "desc" },
-  { key: "r365", value: (r) => r.return_365d_pct, firstDir: "desc" },
-  { key: "latest", value: (r) => r.return_latest_pct, firstDir: "desc" },
-  { key: "alpha", value: (r) => r.alpha_latest_pct, firstDir: "desc" },
-  { key: "peak", value: (r) => r.peak_return_24m_pct, firstDir: "desc" },
-  { key: "bucket", value: (r) => r.return_latest_pct, firstDir: "desc" },
-  { key: "days", value: (r) => r.days_to_target },
+  { key: "price",  value: (r) => r.report_current_price,     firstDir: "desc" },
+  { key: "target", value: (r) => r.target_price,             firstDir: "desc" },
+  { key: "upside", value: (r) => r.stated_upside_pct,        firstDir: "desc", groupValue: (r) => pctBand(r.stated_upside_pct) },
+  { key: "r90",    value: (r) => r.return_90d_pct,           firstDir: "desc", groupValue: (r) => pctBand(r.return_90d_pct) },
+  { key: "r365",   value: (r) => r.return_365d_pct,          firstDir: "desc", groupValue: (r) => pctBand(r.return_365d_pct) },
+  { key: "latest", value: (r) => r.return_latest_pct,        firstDir: "desc", groupValue: (r) => pctBand(r.return_latest_pct) },
+  { key: "alpha",  value: (r) => r.alpha_latest_pct,         firstDir: "desc", groupValue: (r) => pctBand(r.alpha_latest_pct) },
+  { key: "peak",   value: (r) => r.peak_return_24m_pct,      firstDir: "desc", groupValue: (r) => pctBand(r.peak_return_24m_pct) },
+  { key: "bucket", value: (r) => r.return_latest_pct,        firstDir: "desc", groupValue: (r) => pctBand(r.return_latest_pct) },
+  { key: "days",   value: (r) => r.days_to_target,                              groupValue: (r) => dayBand(r.days_to_target) },
 ];
 
 /** 학회/종목 페이지 공용 리포트 장부 — 정렬 가능, 기본은 매수 의견만. */

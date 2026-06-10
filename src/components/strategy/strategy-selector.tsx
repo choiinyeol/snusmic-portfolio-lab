@@ -157,12 +157,12 @@ function MiniEquity({ equity, color }: { equity: EquityPoint[]; color: string })
 
 const TRADE_COLS: SortColumn<Trade>[] = [
   { key: "display_name", value: (t) => t.display_name ?? t.ticker },
-  { key: "entry_date",   value: (t) => t.entry_date },
-  { key: "entry",        value: (t) => t.entry,       firstDir: "desc" },
-  { key: "exit_date",    value: (t) => t.exit_date },
+  { key: "entry_date",   value: (t) => t.entry_date,   groupValue: (t) => t.entry_date?.slice(0, 7) ?? null },
+  { key: "entry",        value: (t) => t.entry,        firstDir: "desc" },
+  { key: "exit_date",    value: (t) => t.exit_date,    groupValue: (t) => t.exit_date?.slice(0, 7) ?? null },
   { key: "exit",         value: (t) => t.exit,         firstDir: "desc" },
-  { key: "return_pct",   value: (t) => t.return_pct,   firstDir: "desc" },
-  { key: "days",         value: (t) => t.days,         firstDir: "desc" },
+  { key: "return_pct",   value: (t) => t.return_pct,   firstDir: "desc", groupValue: (t) => Math.floor(t.return_pct / 25) },
+  { key: "days",         value: (t) => t.days,         firstDir: "desc", groupValue: (t) => Math.floor(t.days / 30) },
   { key: "exit_reason",  value: (t) => t.exit_reason ?? "" },
 ];
 

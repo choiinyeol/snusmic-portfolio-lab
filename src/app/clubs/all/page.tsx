@@ -1,0 +1,110 @@
+import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { SiteHeader } from "@/components/site-header";
+import { ReportLedger, StatStrip } from "@/components/report-ledger";
+import { reportDataset, SCHOOL_LABELS, type School } from "@/lib/report-model";
+import { clubStats, isBuy, median, signColor } from "@/lib/verdict";
+import { formatPct } from "@/lib/utils";
+
+export const metadata: Metadata = { title: "여섯 학회 종합 성적표 — 판결 아카이브" };
+
+const SCHOOLS: School[] = ["smic", "yig", "star", "kuvic", "ewha", "voera"];
+
+export default async function AllClubsPage() {
+  const all = reportDataset.records
+    .sort((a, b) => String(b.report_date ?? "").localeCompare(String(a.report_date ?? "")));
+
+  const records = all.filter((r) => r.era === "modern");
+  const archive = all.filter((r) => r.era === "archive");
+  const stats = clubStats(all);
+
+  const buys = records.filter(isBuy);
+  const yearGroups = new Map<string, typeof records>();
+  for (const record of buys) {
+    const year = record.report_date?.slice(0, 4) ?? "????";
+    yearGroups.set(year, [...(yearGroups.get(year) ?? []), record]);
+  }
+  const years = [...yearGroups.entries()].sort(([a], [b]) => b.localeCompare(a));
+
+  return (
+    <main className="mx-auto max-w-[1500px] space-y-8 px-4 py-6 sm:px-8">
+      <SiteHeader eyebrow="Club Scorecard — All Clubs" />
+
+      <header>
+        <h1 className="mt-3 font-display text-4xl font-black tracking-tight sm:text-6xl">여섯 학회 종합 성적표</h1>
+        <p className="mt-3 max-w-2xl text-base leading-7 text-foreground/75">
+          {SCHOOLS.map((s) => SCHOOL_LABELS[s]).join(" · ")}의 2019년 7월 이후 매수 의견 리포트{" "}
+          {stats.total}건을 point-in-time 시세로 채점한 종합 성적표입니다. 발간 90일 미만의 신생{" "}
+          {stats.fresh}건은 판결 보류, 약한 매수·매도 등 참고 기록 {stats.reference}건은 집계에서 제외했습니다.
+          {archive.length > 0 &&
+            ` 2019년 7월 이전 수집분 ${archive.length}건은 페이지 하단에 채점 없이 보관되어 있습니다.`}
+        </p>
+      </header>
+
+      <StatStrip
+        items={[
+          { label: "매수 리포트", value: `${stats.total}건` },
+          { label: "가격 검증", value: `${stats.priced}건` },
+          { label: "목표가 적중", value: `${stats.hits}건`, tone: "text-stamp" },
+          { label: "적중률", value: formatPct(stats.hitRate, 1).replace("+", "") },
+          { label: "수익률 중앙값", value: formatPct(stats.medianReturn), tone: signColor(stats.medianReturn) },
+          {
+            label: "판결까지 걸린 시간",
+            value: stats.medianDaysToTarget !== null ? `${Math.round(stats.medianDaysToTarget)}일` : "—",
+          },
+        ]}
+      />
+
+      <section aria-label="연도별 요약">
+        <h2 className="mb-3 font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">연도별 요약</h2>
+        <div className="flex flex-wrap gap-2">
+          {years.map(([year, list]) => {
+            const returns = list
+              .filter((r) => r.return_latest_pct !== null)
+              .map((r) => r.return_latest_pct as number);
+            const med = median(returns);
+            const hits = list.filter((r) => r.target_hit_until_latest).length;
+            return (
+              <div key={year} className="rounded-md border border-border bg-card px-3 py-2">
+                <p className="font-display text-base font-black leading-none">{year}</p>
+                <p className="tnum mt-1 font-mono text-[10px] text-muted-foreground">
+                  {list.length}건 · 적중 {hits} · <span className={signColor(med)}>{formatPct(med, 0)}</span>
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <section aria-label="리포트 전체 목록">
+        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">
+            전체 기록 — 2019-07 이후 · 전 학회
+          </h2>
+          <p className="font-mono text-[10px] text-muted-foreground">
+            머리글 클릭으로 정렬 · Shift+클릭으로 다중 정렬 · ▸ 발간일로 가격 경로 펼침
+          </p>
+        </div>
+        <ReportLedger reports={records} showSchool={true} />
+      </section>
+
+      {archive.length > 0 && (
+        <section aria-label="아카이브 시대 기록 — 채점 제외">
+          <details className="group rounded-lg border border-dashed border-border bg-card/60">
+            <summary className="flex min-h-[2.75rem] cursor-pointer list-none flex-wrap items-center gap-x-3 gap-y-1 px-4 py-3 sm:px-5 [&::-webkit-details-marker]:hidden">
+              <span className="font-mono text-[11px] font-bold transition-transform group-open:rotate-90" aria-hidden="true">▸</span>
+              <h2 className="font-display text-lg font-black tracking-tight">아카이브 (2019-07 이전)</h2>
+              <span className="rounded-sm border border-dashed border-warn px-1.5 py-0.5 font-mono text-[10px] font-bold text-warn">채점 제외</span>
+              <span className="font-mono text-[11px] text-muted-foreground">
+                {archive.length}건 — 학회별 수집 범위 밖의 기록으로 성적 비교에서 빠집니다
+              </span>
+            </summary>
+            <div className="border-t border-dashed border-border px-4 py-4 sm:px-5">
+              <ReportLedger reports={archive} showSchool={true} />
+            </div>
+          </details>
+        </section>
+      )}
+    </main>
+  );
+}

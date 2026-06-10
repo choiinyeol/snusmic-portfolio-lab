@@ -17,6 +17,13 @@ export type SortColumn<T> = {
   value: (row: T) => SortValue;
   /** 첫 클릭 시 방향 (수치형은 desc가 자연스럽다) */
   firstDir?: SortDir;
+  /**
+   * 다중 정렬에서 이 열이 마지막 우선순위가 아닐 때 사용하는 거친 구간값.
+   * 예: 발간일 → 월 단위(`report_date?.slice(0,7)`), 수익률 → 25%p 구간.
+   * 지정 시 상위 우선순위 열은 구간으로 묶이고, 최하위 우선순위 열만 정확값으로 비교한다.
+   * 단일 정렬이거나 이 속성이 없으면 항상 정확값 비교.
+   */
+  groupValue?: (row: T) => SortValue;
 };
 
 function compareValues(a: SortValue, b: SortValue, dir: SortDir) {
@@ -62,9 +69,14 @@ export function useSortable<T>(rows: T[], columns: SortColumn<T>[], initial: Sor
     if (!specs.length) return rows;
     const active = specs.map((spec) => ({ spec, col: byKey.get(spec.key) })).filter((item) => item.col);
     if (!active.length) return rows;
+    const lastIdx = active.length - 1;
     return [...rows].sort((a, b) => {
-      for (const { spec, col } of active) {
-        const result = compareValues(col!.value(a), col!.value(b), spec.dir);
+      for (let i = 0; i < active.length; i++) {
+        const { spec, col } = active[i];
+        // 다중 정렬에서 마지막이 아닌 열에 groupValue가 있으면 구간 비교; 마지막은 항상 정확값
+        const isLast = i === lastIdx;
+        const getValue = (!isLast && active.length > 1 && col!.groupValue) ? col!.groupValue : col!.value;
+        const result = compareValues(getValue(a), getValue(b), spec.dir);
         if (result !== 0) return result;
       }
       return 0;
@@ -100,7 +112,7 @@ export function SortableTh({
       scope="col"
       aria-sort={active ? (active.dir === "asc" ? "ascending" : "descending") : "none"}
       className={cn("sortable-th px-0 py-0 font-semibold", className)}
-      title={title ?? "클릭: 정렬 · Shift+클릭: 다중 정렬"}
+      title={title ?? "클릭: 정렬 · Shift+클릭: 다중 정렬 — 상위 기준은 구간(월/25%p)으로 묶입니다"}
     >
       <button
         type="button"
@@ -122,6 +134,11 @@ export function SortableTh({
         {active && multi && (
           <span
             aria-hidden="true"
+            title={
+              index < sort.specs.length - 1
+                ? `${index + 1}순위 — 구간 기준으로 묶음`
+                : `${index + 1}순위 — 정확값 기준`
+            }
             className="tnum inline-flex h-3.5 w-3.5 items-center justify-center rounded-full bg-stamp text-[8px] font-black leading-none text-background"
           >
             {index + 1}

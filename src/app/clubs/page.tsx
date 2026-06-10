@@ -18,6 +18,9 @@ const SCHOOL_DESC: Record<School, string> = {
 };
 
 export default function ClubsPage() {
+  const allRecords = reportDataset.records;
+  const allStats = clubStats(allRecords);
+
   return (
     <main className="mx-auto max-w-[1500px] px-4 py-6 sm:px-8">
       <SiteHeader eyebrow="Club Scorecards" />
@@ -28,7 +31,30 @@ export default function ClubsPage() {
         누르면 전체 기록을 볼 수 있습니다.
       </p>
 
-      <div className="mt-9 grid gap-5 md:grid-cols-2">
+      {/* 전체 종합 카드 */}
+      <div className="mt-9">
+        <Link
+          href="/clubs/all"
+          className="group flex items-center justify-between rounded-lg border-2 border-stamp bg-stamp/5 px-6 py-5 shadow-[5px_5px_0_0_hsl(var(--stamp)/0.4)] transition hover:-translate-y-0.5 hover:shadow-[7px_7px_0_0_hsl(var(--stamp)/0.7)]"
+        >
+          <div>
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.25em] text-stamp">
+              전체 종합 · 6개 학회 합산
+            </p>
+            <h2 className="mt-1 font-display text-2xl font-black tracking-tight transition group-hover:text-stamp">
+              여섯 학회 종합 성적표 →
+            </h2>
+            <dl className="mt-4 grid grid-cols-4 gap-3 border-t border-dashed border-stamp/30 pt-3">
+              <Stat label="매수 리포트" value={`${allStats.total}건`} />
+              <Stat label="적중" value={`${allStats.hits}건`} tone="text-stamp" />
+              <Stat label="적중률" value={formatPct(allStats.hitRate, 0).replace("+", "")} />
+              <Stat label="중앙값" value={formatPct(allStats.medianReturn, 1)} tone={signColor(allStats.medianReturn)} />
+            </dl>
+          </div>
+        </Link>
+      </div>
+
+      <div className="mt-6 grid gap-5 md:grid-cols-2">
         {SCHOOL_ORDER.map((school) => {
           const records = reportDataset.records.filter((r) => r.school === school);
           const stats = clubStats(records);
