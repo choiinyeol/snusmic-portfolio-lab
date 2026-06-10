@@ -62,9 +62,23 @@ EXCLUDED_DELISTED_TICKERS = {"VTNR", "NETI"}
 # Non-KR/US exchange suffixes in ticker strings — e.g. 4751.T (Tokyo), 00700.HK, 600519.SS
 FOREIGN_EXCHANGE_SUFFIX_RE = re.compile(r"\.(T|HK|SS|SZ|TYO|L|PA|F|AX|TO|V)$", re.I)
 
-TARGET_LABEL_RE = re.compile(r"(?:\d{2,4}E?\s*)?(목표\s*주가|목표주가|적정\s*주가|적정주가|Target\s+Price)", re.I)
+TARGET_LABEL_RE = re.compile(r"(?:\d{2,4}E?\s*)?(목표\s*주가|목표주가|적정\s*주가|적정주가|Target\s+Price|목표주7[Hh]|목표주7h)", re.I)
 CURRENT_LABEL_RE = re.compile(r"(현재\s*주가|현재주가|현재가(?!치)|Current\s+Price)", re.I)
 UPSIDE_RE = re.compile(r"(상승\s*여력|하락\s*여력|Upside)\s*[:：]?\s*([+\-]?\d+(?:\.\d+)?)\s*%", re.I)
+# SMIC prose layout: "Base Case: 53,000원" / "Bull Case: 54,500원" / "현재주가: X 목표주가: Y 상승여력: Z%"
+BASE_BULL_CASE_RE = re.compile(
+    r"(?:Base|Bull)\s+Case\s*[:：]\s*(?P<prefix>[$₩])?\s*(?P<val>\d[\d,]*(?:\.\d+)?)\s*(?P<suffix>원|엔|달러|USD|KRW|[$₩])?",
+    re.I,
+)
+# KUVIC OCR header: "목표주가 현재주가 상승여력 ... {N,NNN} {N,NNN} {P}%"
+# Matches the floating value block that appears after the header labels on the same merged OCR line.
+# The two values immediately precede an optional percent (upside) — we capture them.
+KUVIC_PRICE_BLOCK_RE = re.compile(
+    r"목표주가\s+현재주가.*?(?P<tp>(?:[$₩])?\s*\d{1,3}(?:[,]\d{3})+(?:\.\d+)?(?:\s*원)?)"
+    r"\s+(?P<cp>(?:[$₩])?\s*\d{1,3}(?:[,]\d{3})+(?:\.\d+)?(?:\s*원)?)"
+    r"(?:\s+\d+(?:\.\d+)?\s*%)?",
+    re.I | re.S,
+)
 RATING_RE = re.compile(r"\b(Strong\s+Buy|Buy|Sell|Hold|Neutral|Outperform|Underperform|Overweight|Underweight)\b|(강력\s*매수|적극\s*매수|매수|매도|중립|보유)", re.I)
 KOREAN_RATINGS = {"강력매수": "Buy", "적극매수": "Buy", "매수": "Buy", "매도": "Sell", "중립": "Neutral", "보유": "Hold"}
 PRICE_TOKEN_RE = re.compile(
@@ -90,6 +104,10 @@ KR_EXCHANGE_CODE_RE = re.compile(r"^(KS|KQ|KOSPI|KOSDAQ|코스피|코스닥|KRX)
 # 괄호 안 단독 미국 티커: (GLW) (TSLA)
 BARE_US_TICKER_RE = re.compile(r"^([A-Z]{1,5})$")
 YIG_PUBLISHED_RE = re.compile(r"발간일\s*(\d{6})")
+# Voera 파일명 브라켓 날짜: "[2025.10]" → 2025-10 / "[2026]" → 2026-01
+VOERA_BRACKET_DATE_RE = re.compile(r"^\[(\d{4})[. ]?(\d{2})?\]")
+# SMIC bulk-import 날짜 복구: pdf_url 내 YYMMDD 접두사 (e.g. "070525_")
+SMIC_PDF_DATE_PREFIX_RE = re.compile(r"/(\d{6})_")
 
 # ── 회사명 정제 패턴 ──────────────────────────────────────────────────────────
 # 목록 마커 / 숫자 TOC 접두사: "- 2.1.3 OCI홀딩스"  "1. 삼성전자"
@@ -173,6 +191,7 @@ class ParsedReport:
     stated_upside_pct: float | None
     parse_issue: str | None = None
     qa_flags: str | None = None
+    data_issue: str | None = None
 
 
 ERA_CUTOFF = dt.date(2019, 7, 1)  # YIG/STAR/KUVIC archives start here; earlier SMIC reports are archive-only
@@ -240,6 +259,8 @@ class PerformanceRow:
 def compact_line(line: str) -> str:
     line = line.replace("<br>", " ").replace("<br/>", " ").replace("<br />", " ")
     line = re.sub(r"\s+", " ", line)
+    # OCR artifact: "161 ,500" → "161,500" (space inserted before thousands comma)
+    line = re.sub(r"(\d)\s+,(\d)", r"\1,\2", line)
     return line.strip()
 
 
@@ -305,10 +326,56 @@ def yig_published_from_stem(stem: str) -> str | None:
     return f"20{yy:02d}-{mm:02d}-{dd:02d}"
 
 
+def _voera_bracket_date(stem: str) -> str | None:
+    """Voera 파일명 브라켓 '[2025.10]' → 2025-10-01 (추정일, qa_flag 필요).
+
+    undated_ 접두사를 제거한 뒤 적용한다.
+    """
+    clean = stem.removeprefix("undated_").strip()
+    m = VOERA_BRACKET_DATE_RE.match(clean)
+    if not m:
+        return None
+    yr = int(m.group(1))
+    mo = int(m.group(2)) if m.group(2) else 1
+    if not (2010 <= yr <= 2050 and 1 <= mo <= 12):
+        return None
+    try:
+        return dt.date(yr, mo, 1).isoformat()
+    except ValueError:
+        return None
+
+
+def _smic_pdf_prefix_date(hint: dict | None) -> str | None:
+    """SMIC bulk-import 레코드: pdf_url 내 YYMMDD 접두사로 실제 발간일 복구.
+
+    예: ".../070525_..." → 2007-05-25
+    반환값이 None이면 복구 불가.
+    """
+    if not hint:
+        return None
+    pdf_url = hint.get("pdf_url") or ""
+    m = SMIC_PDF_DATE_PREFIX_RE.search(pdf_url)
+    if not m:
+        return None
+    raw = m.group(1)  # YYMMDD
+    yy, mm, dd = int(raw[:2]), int(raw[2:4]), int(raw[4:6])
+    if not (1 <= mm <= 12 and 1 <= dd <= 31):
+        return None
+    # 두 자리 연도: 00-29 → 2000s, 30-99 → 1900s (but we expect 07-11 = 2007-2011)
+    year = 2000 + yy if yy < 30 else 1900 + yy
+    try:
+        return dt.date(year, mm, dd).isoformat()
+    except ValueError:
+        return None
+
+
 def resolve_report_date(path: Path, lines: list[str], school: str, hint: dict | None) -> tuple[str | None, str | None]:
     """발간일 우선순위: 본문 날짜 > YIG 발간일 표기 > 수집 힌트 > 파일명 날짜.
 
     (YIG 파일명 앞의 날짜는 업로드일이라 발간일로 쓰면 안 된다.)
+    추가:
+    - voera: 수집 힌트 없으면 파일명 브라켓 날짜 시도 (추정일)
+    - smic: filename_date가 bulk-import 아티팩트(2013-09-18)면 pdf_url 접두사로 복구
     """
     content_date, filename_date = parse_date(path, lines)
     if content_date:
@@ -316,11 +383,24 @@ def resolve_report_date(path: Path, lines: list[str], school: str, hint: dict | 
     published = yig_published_from_stem(path.stem)
     if published:
         return published, filename_date
+    # SMIC bulk-import 아티팩트 복구: published_hint가 "2013-09-18"이거나
+    # filename_date가 "2013-09-18"인 경우, pdf_url 접두사에서 실제 발간일을 복구한다.
+    # hint_date 체크보다 먼저 수행해야 "2013-09-18" hint를 무시하고 실제 날짜를 쓸 수 있다.
+    if school == "smic" and filename_date == "2013-09-18":
+        recovered = _smic_pdf_prefix_date(hint)
+        if recovered:
+            return recovered, filename_date
     hint_date = (hint or {}).get("published_hint")
     if hint_date:
         return hint_date, filename_date
     if school == "yig":
         # 파일명 날짜 = 업로드일 → 발간일 대용으로 쓰지 않는다
+        return None, filename_date
+    if school == "voera":
+        # 수집 힌트가 없고 본문 날짜도 없는 voera: 파일명 브라켓 날짜 시도
+        bracket = _voera_bracket_date(path.stem)
+        if bracket:
+            return bracket, filename_date
         return None, filename_date
     return filename_date, filename_date
 
@@ -608,6 +688,27 @@ def parse_prices(lines: list[str], market: str | None) -> tuple[float | None, st
             target, target_raw = parse_price_value(pm.group("v1"), market), pm.group("v1").strip()
             current, current_raw = parse_price_value(pm.group("v2"), market), pm.group("v2").strip()
 
+    # 0b) KUVIC OCR header layout fallback: "목표주가 현재주가 상승여력 ... {TP} {CP} {upside}%"
+    #     Values appear much later on the merged line — the pair regex can't bridge the gap.
+    #     Only fires when pair matching above found nothing AND values are magnitude-plausible.
+    if target is None:
+        kb = KUVIC_PRICE_BLOCK_RE.search(first_page)
+        if kb:
+            tp_raw = kb.group("tp").strip()
+            cp_raw = kb.group("cp").strip()
+            tp_val = parse_price_value(tp_raw, market)
+            cp_val = parse_price_value(cp_raw, market)
+            # Sanity: tp > cp, ratio in [1.01, 10], and both values >= 1000 for KR (≥ 1¢ for US)
+            min_plausible = 1000.0 if market == "KR" else 1.0
+            if (
+                tp_val is not None and cp_val is not None
+                and tp_val > cp_val
+                and 1.01 <= tp_val / cp_val <= 10.0
+                and tp_val >= min_plausible and cp_val >= min_plausible
+            ):
+                target, target_raw = tp_val, tp_raw
+                current, current_raw = cp_val, cp_raw
+
     # 1) 라벨 뒤 토큰 — 창 안에서 통화 표기 우선, 없으면 그럴듯한 무통화 숫자 (KUVIC/STAR 레이아웃)
     if target is None:
         target, target_raw = choose_price_after_label(text, TARGET_LABEL_RE, market, lenient=True)
@@ -617,6 +718,26 @@ def parse_prices(lines: list[str], market: str | None) -> tuple[float | None, st
     # 2) Valuation prose often puts the price before "목표 주가/Target Price".
     if target is None:
         target, target_raw = choose_price_before_label(text, TARGET_LABEL_RE, market)
+
+    # 3) SMIC-style prose layout: "Base Case: 53,000원" or "Bull Case: 54,500원"
+    #    Used as last-resort when no standard label found — take the first (Base) case as the target.
+    if target is None:
+        bm = BASE_BULL_CASE_RE.search(first_page)
+        if bm:
+            raw_str = bm.group(0).strip()
+            val = parse_price_value(raw_str, market)
+            if val is not None:
+                target, target_raw = val, raw_str
+
+    # 4) Extended prose search in the full document (beyond first 180 lines) for documents where
+    #    the target price is stated clearly in a later section (e.g. "목표 주가 X원으로 매수").
+    if target is None:
+        full_text_rest = " ".join(compact_line(x) for x in lines[180:360])
+        t2, t2r = choose_price_after_label(full_text_rest, TARGET_LABEL_RE, market, lenient=True)
+        if t2 is None:
+            t2, t2r = choose_price_before_label(full_text_rest, TARGET_LABEL_RE, market)
+        if t2 is not None:
+            target, target_raw = t2, t2r
 
     upside = None
     um = UPSIDE_RE.search(text)
@@ -661,6 +782,16 @@ def parse_report(path: Path, school: str = "smic", hint: dict | None = None) -> 
             if abs(implied - upside) > 15:
                 qa_flags.append("ocr_inconsistent_prices")
                 target = target_raw = current = current_raw = None
+    # voera 파일명 브라켓 날짜 추정 → qa_flag
+    if school == "voera" and report_date and not (hint or {}).get("published_hint"):
+        _, content_only_date = parse_date(path, lines)
+        if not content_only_date:  # content_date가 없었을 때만 bracket으로 들어온 것
+            bracket = _voera_bracket_date(path.stem)
+            if bracket and bracket == report_date:
+                qa_flags.append("report_date_estimated")
+    # smic bulk-date 복구 → qa_flag
+    if school == "smic" and filename_date == "2013-09-18" and report_date and report_date != "2013-09-18":
+        qa_flags.append("report_date_from_filename")
 
     if company and len(company) > 40:
         company = None  # OCR 덩어리 등 비정상 회사명 → 파일명/힌트 폴백으로
@@ -780,6 +911,39 @@ def resolve_missing_tickers(parsed: list[ParsedReport]) -> None:
             r.ticker = info["code"]
             r.market = "KR"
             r.exchange = info.get("market") or "KRX"
+            compute_issues(r)
+    if changed:
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        cache_path.write_text(json.dumps(cache, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
+def canonicalize_kr_names(parsed: list[ParsedReport]) -> None:
+    """KR 6자리 티커 보유 레코드의 회사명을 pykrx 공식명으로 교정한다.
+
+    결과는 data/sources/krx_names.json에 캐시 (없는 티커만 조회).
+    상장폐지 등으로 pykrx가 빈 문자열을 반환하면 기존 이름을 유지한다.
+    US 레코드는 건드리지 않는다.
+    """
+    cache_path = ROOT / "data" / "sources" / "krx_names.json"
+    cache: dict[str, str] = json.loads(cache_path.read_text(encoding="utf-8")) if cache_path.exists() else {}
+    changed = False
+    for r in parsed:
+        if r.market != "KR" or not r.ticker or not re.fullmatch(r"\d{6}", r.ticker):
+            continue
+        if r.ticker not in cache:
+            try:
+                official = stock.get_market_ticker_name(r.ticker)
+                # pykrx returns a plain str for a valid ticker; may return None or an
+                # unexpected object for delisted/unknown tickers — normalise to str.
+                if not isinstance(official, str):
+                    official = ""
+            except Exception:  # noqa: BLE001
+                official = ""
+            cache[r.ticker] = official
+            changed = True
+        official_name = cache.get(r.ticker, "")
+        if official_name:
+            r.company = official_name
             compute_issues(r)
     if changed:
         cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -969,6 +1133,9 @@ def evaluate_report(parsed: ParsedReport, prices: pd.DataFrame, as_of: dt.date, 
     rating_class = classify_rating(parsed.rating)
 
     data_issue = None
+    # Preserve correction-supplied data_issue (e.g. "delisted") — skip price fetch entirely.
+    if parsed.data_issue:
+        return empty_performance(parsed, parsed.data_issue, age_days, maturity, display_name, rating_class)
     report_dt = date_from_string(parsed.report_date)
     if report_dt is None:
         data_issue = "missing_report_date"
@@ -1181,6 +1348,9 @@ def apply_corrections(parsed: list[ParsedReport], corrections: dict[str, dict]) 
                 continue
             setattr(r, field, value)
         r.parse_issue = None if not fix.get("_keep_issue") else r.parse_issue
+        # Mark records whose target_price was manually set so unit-correction pass skips them.
+        if "target_price" in fix:
+            add_qa_flag(r, "target_manually_corrected")
 
 
 def quality_score(r: ParsedReport) -> int:
@@ -1261,6 +1431,14 @@ def apply_target_sanity(parsed: list[ParsedReport]) -> None:
          그 raw 값이 market 발간가의 ±15% 이내이면 → 파싱 스왑 오류: 값 교환
        - 그렇지 않으면 → target_price를 null, qa_flag 'target_price_suspect' 추가
     2. 스왑/null 처리 후 compute_issues 재계산
+    3. Split-adjustment pass: price warehouse is split-adjusted but report targets are nominal.
+       When the document's own nominal upside (target/doc_current) is plausible for a Buy
+       [0.7–4.0] but the market price differs from the doc price by more than ±33%
+       (adjustment factor f = market/doc_current outside [0.67, 1.5]), the target is in
+       nominal (pre-split) space and must be rescaled: target_price ← target_price × f.
+       The nominal value is preserved in target_price_raw.
+    4. If doc current is missing/implausible (nominal upside outside [0.7, 4.0]) AND the
+       market-based upside > 300% → flag target_price_suspect, null hit fields.
     """
     for r in parsed:
         if classify_rating(r.rating) != "buy":
@@ -1301,6 +1479,125 @@ def apply_target_sanity(parsed: list[ParsedReport]) -> None:
             add_qa_flag(r, "target_price_suspect")
         compute_issues(r)
 
+    # ── Split-adjustment pass ────────────────────────────────────────────────
+    # Price warehouse (pykrx / yfinance) delivers split-adjusted closes, but report
+    # target prices and current prices are printed as nominal (pre-split) values.
+    # For stocks that split after publication the market 발간가 will be much lower than
+    # the doc-stated current price, making the market-based upside look enormous.
+    #
+    # Approach (US prices are already split-adjusted by yfinance with auto_adjust=True,
+    # so the same logic applies to both markets):
+    #   1. Parse doc_price from report_current_price_raw.
+    #   2. f = market_price / doc_price  (adjustment factor; <1 means splits occurred)
+    #   3. Nominal upside = target / doc_price.  Plausible for a Buy if in [0.7, 4.0].
+    #   4a. Plausible nominal upside AND f outside [0.67, 1.5]:
+    #       → rescale target_price *= f (now comparable to adjusted price series)
+    #       → stated_upside_pct = target/market_price - 1  (≈ nominal upside, scale-invariant)
+    #       → preserve original target string in target_price_raw
+    #       → add qa_flag "target_split_adjusted"
+    #   4b. Implausible nominal upside AND market-based upside > 300%:
+    #       → add qa_flag "target_price_suspect", null target so hit fields will be null
+    #   In both cases: skip manually-corrected targets.
+    for r in parsed:
+        if classify_rating(r.rating) != "buy":
+            continue
+        if r.target_price is None or r.report_current_price is None:
+            continue
+        if "target_manually_corrected" in (r.qa_flags or ""):
+            continue
+        # Only act when market-based upside is suspiciously large (>300%) — avoids
+        # touching records that are already sensible after the swap pass.
+        market_price = r.report_current_price
+        if market_price <= 0:
+            continue
+        market_upside = r.target_price / market_price - 1.0  # fractional
+        if market_upside <= 3.0:
+            continue  # market-based upside <= 300%: nothing to do
+
+        # Try to parse the doc-stated current price
+        doc_price: float | None = None
+        raw = r.report_current_price_raw
+        # After the swap pass the raw field may have been reassigned; use it regardless.
+        if raw:
+            try:
+                tm = PRICE_TOKEN_RE.search(raw)
+                if tm:
+                    doc_price, _ = value_from_price_token(tm, r.market)
+            except Exception:  # noqa: BLE001
+                pass
+
+        if doc_price is not None and doc_price > 0:
+            nominal_upside = r.target_price / doc_price - 1.0  # fractional
+            nominal_plausible = 0.7 <= (r.target_price / doc_price) <= 4.0  # −30% to +300%
+            f = market_price / doc_price  # adjustment factor (<1 → splits reduced the price)
+            scales_agree = 0.67 < f < 1.5
+            if nominal_plausible and not scales_agree:
+                # Nominal target is credible but lives in a different price scale than the
+                # warehouse series.  Rescale into adjusted space.
+                nominal_raw = r.target_price_raw  # preserve for audit
+                r.target_price = round(r.target_price * f, 4)
+                r.target_price_raw = nominal_raw  # keep nominal string for reference
+                r.stated_upside_pct = round((r.target_price / market_price - 1) * 100, 4)
+                add_qa_flag(r, "target_split_adjusted")
+                compute_issues(r)
+                continue
+            # nominal upside plausible but scales already agree → leave as-is
+            if nominal_plausible and scales_agree:
+                continue
+
+        # Reach here when doc_price is missing or nominal upside is implausible,
+        # yet market-based upside > 300% → cannot trust this target.
+        if "target_price_suspect" not in (r.qa_flags or ""):
+            add_qa_flag(r, "target_price_suspect")
+        r.target_price = None
+        r.target_price_raw = None
+        r.stated_upside_pct = None
+        compute_issues(r)
+
+    # ── Unit-magnitude correction pass ──────────────────────────────────────
+    # Buy records where target/발간가 > 6 — try ÷10 / ÷100 / ×1000 unit hypotheses.
+    # Apply only when exactly one correction lands in the sane ratio window [1.05, 3.0].
+    # IMPORTANT: use the document-stated current price (from raw text), not the yfinance
+    # split-adjusted market price, to avoid false corrections on old split-heavy stocks (e.g. TSLA).
+    for r in parsed:
+        if classify_rating(r.rating) != "buy":
+            continue
+        if r.target_price is None:
+            continue
+        # Never touch records whose target_price was set by a manual correction.
+        if "target_manually_corrected" in (r.qa_flags or ""):
+            continue
+        # Only apply unit correction when there is evidence of a parsing/OCR issue.
+        # Without this guard, extreme-bull-case targets (e.g. 1400% upside) are wrongly halved.
+        qa = r.qa_flags or ""
+        has_issue_signal = "target_price_suspect" in qa or "ocr_fallback" in qa or "ocr_inconsistent" in qa
+        if not has_issue_signal:
+            continue
+        # Prefer the raw document price over the yfinance-overwritten report_current_price.
+        doc_price: float | None = None
+        if r.report_current_price_raw:
+            doc_price = parse_price_value(r.report_current_price_raw, r.market)
+        if doc_price is None or doc_price <= 0:
+            continue
+        market_price = doc_price
+        ratio = r.target_price / market_price
+        if ratio <= 6:
+            continue  # already sane
+        candidates: list[tuple[float, str]] = []
+        for factor, label in ((0.1, "div10"), (0.01, "div100"), (1000.0, "mul1000")):
+            adjusted = r.target_price * factor
+            adj_ratio = adjusted / market_price
+            if 1.05 <= adj_ratio <= 3.0:
+                candidates.append((adjusted, label))
+        if len(candidates) == 1:
+            r.target_price = round(candidates[0][0], 2)
+            r.stated_upside_pct = round((r.target_price / market_price - 1) * 100, 4)
+            add_qa_flag(r, "target_unit_corrected")
+            # Remove suspect flag if it was set
+            flags = set((r.qa_flags or "").split(";")) - {"", "target_price_suspect"}
+            r.qa_flags = ";".join(sorted(flags)) or None
+            compute_issues(r)
+
 
 GITHUB_RAW_BASE = "https://github.com/ChoiInYeol/SNUSMIC-Portfolio/blob/main"
 
@@ -1310,11 +1607,55 @@ def _url_encode_path(path_str: str) -> str:
     return "/".join(quote(seg, safe="") for seg in path_str.replace("\\", "/").split("/"))
 
 
-def build_source_urls(source_file: str, hints: dict[str, dict]) -> tuple[str | None, str | None]:
+def _build_sha_url_index(hints: dict[str, dict]) -> dict[str, str]:
+    """manifest 항목의 sha256 → pdf_url 역인덱스를 한 번만 구성한다."""
+    index: dict[str, str] = {}
+    for entry in hints.values():
+        sha = entry.get("sha256")
+        url = entry.get("pdf_url")
+        if sha and url:
+            index[sha] = url
+    return index
+
+
+def _sha256_of_pdf(md_path: str) -> str | None:
+    """마크다운 경로에서 대응 PDF 경로를 유추하고 SHA256을 계산한다.
+
+    data/markdown/{school}/stem.md → data/pdfs/{school}/stem.pdf (또는 data/pdfs/stem.pdf)
+    파일이 없거나 0바이트면 None을 반환한다.
+    """
+    import hashlib
+
+    p = Path(md_path)
+    # 마크다운 경로에서 school 추론
+    parts = p.parts
+    # "data", "markdown", [school,] "stem.md"
+    try:
+        md_idx = parts.index("markdown")
+    except ValueError:
+        return None
+    pdf_root = ROOT / "data" / "pdfs"
+    stem = p.stem
+    # school subdir 경로 먼저
+    if md_idx + 2 < len(parts) - 1:
+        school = parts[md_idx + 1]
+        candidate = pdf_root / school / f"{stem}.pdf"
+        if candidate.exists() and candidate.stat().st_size > 0:
+            return hashlib.sha256(candidate.read_bytes()).hexdigest()
+    # root-level pdfs/
+    candidate_root = pdf_root / f"{stem}.pdf"
+    if candidate_root.exists() and candidate_root.stat().st_size > 0:
+        return hashlib.sha256(candidate_root.read_bytes()).hexdigest()
+    return None
+
+
+def build_source_urls(source_file: str, hints: dict[str, dict], sha_url_index: dict[str, str] | None = None) -> tuple[str | None, str | None]:
     """(source_md_url, source_pdf_url) for a given source_file path string.
 
     source_md_url  — GitHub blob URL to the markdown file.
     source_pdf_url — original download URL from manifest (pdf_url field); None if not present.
+
+    sha_url_index: 미리 구성한 sha256→pdf_url 역인덱스 (fix #5: stem 미일치 sha256_dedup 케이스).
     """
     # Normalise to forward-slash relative path from repo root
     rel = source_file.replace("\\", "/").lstrip("./")  # e.g. "data/markdown/yig/2025-11-10_피에스케이.md"
@@ -1324,17 +1665,24 @@ def build_source_urls(source_file: str, hints: dict[str, dict]) -> tuple[str | N
     hint = hints.get(stem)
     pdf_url: str | None = hint.get("pdf_url") if hint else None
 
+    # Fallback: SHA-based lookup for sha256_dedup entries whose stem differs from MD stem
+    if pdf_url is None and sha_url_index:
+        sha = _sha256_of_pdf(source_file)
+        if sha:
+            pdf_url = sha_url_index.get(sha)
+
     return md_url, pdf_url
 
 
 def write_web_json(path: Path, rows: list[PerformanceRow], as_of: dt.date, excluded_sector_count: int, hints: dict[str, dict] | None = None) -> None:
     _hints = hints or {}
+    sha_url_index = _build_sha_url_index(_hints)
     records = []
     for row in rows:
         record = round_floats(asdict(row))
         record["source_name"] = Path(str(record["source_file"])).name
         record["performance_bucket"] = performance_bucket(record["return_latest_pct"])  # type: ignore[arg-type]
-        md_url, pdf_url = build_source_urls(str(record["source_file"]), _hints)
+        md_url, pdf_url = build_source_urls(str(record["source_file"]), _hints, sha_url_index)
         record["source_md_url"] = md_url
         record["source_pdf_url"] = pdf_url
         records.append(record)
@@ -1382,6 +1730,7 @@ def main() -> int:
     parsed_all_raw = [parse_report(path, school, hints.get(path.stem)) for path, school in md_paths]
     apply_corrections(parsed_all_raw, load_corrections())
     resolve_missing_tickers(parsed_all_raw)
+    canonicalize_kr_names(parsed_all_raw)
 
     # 다운스트림(백테스트·프론트엔드)이 ISO 날짜를 신뢰할 수 있도록 표지 날짜를 정규화한다
     for r in parsed_all_raw:
@@ -1482,8 +1831,9 @@ def main() -> int:
     # Target sanity summary
     suspect_count = sum(1 for r in company_reports if r.qa_flags and "target_price_suspect" in r.qa_flags)
     swap_count = sum(1 for r in company_reports if r.qa_flags and "target_swapped_from_raw" in r.qa_flags)
+    split_adj_count = sum(1 for r in company_reports if r.qa_flags and "target_split_adjusted" in r.qa_flags)
     d0_count = sum(1 for row in rows if row.days_to_target == 0)
-    print(f"target_sanity: suspect={suspect_count} swapped={swap_count} days_to_target_zero={d0_count}")
+    print(f"target_sanity: suspect={suspect_count} swapped={swap_count} split_adjusted={split_adj_count} days_to_target_zero={d0_count}")
     print(f"wrote {args.output}")
     print(f"wrote {args.parsed_output}")
     print(f"wrote {args.issues_output}")

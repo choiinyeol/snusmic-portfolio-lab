@@ -63,5 +63,105 @@
     "market": "KR",
     "exchange": "KRX",
     "_comment": "코스텍시스(KOSDAQ 355150) 2026-05-18 KUVIC 보고서. OCR 표 레이아웃 오류: '목표주가(원) 현재주가(원)|159,0 57,60' 셀이 쉼표 이후 자릿수 누락으로 1590/5760으로 파싱됨. 본문 13행 '목표주가 159,000원', 상승여력+176%로 실제 목표가 확인. 발간가 57,600원은 시세 기반으로 별도 복원됨."
+  },
+  "2021-02-20_[210220] 대한유화(006650).md": {
+    "ticker": "006650",
+    "market": "KR",
+    "exchange": "KOSPI",
+    "company": "대한유화",
+    "_comment": "파서가 KOSPI를 US 티커로 오인식. 실제: 대한유화(KOSPI 006650)."
+  },
+  "2021-08-21_[210821] 롯데정밀화학(004000).md": {
+    "ticker": "004000",
+    "market": "KR",
+    "exchange": "KOSPI",
+    "company": "롯데정밀화학",
+    "_comment": "파서가 KOSPI를 US 티커로 오인식. 실제: 롯데정밀화학(KOSPI 004000)."
+  },
+  "2025-11-10_케이에스피 (073010, KQ), 선박의 심장 (발간일 240503) YIG Research.md": {
+    "ticker": "073010",
+    "market": "KR",
+    "exchange": "KOSDAQ",
+    "company": "케이에스피",
+    "_comment": "파서가 041840으로 오추출. 파일명 명시 티커 073010(케이에스피, KOSDAQ) 사용."
+  },
+  "2026-03-16_이차전지 - 전고체 내가 왕이 될 상인가.md": {
+    "ticker": null,
+    "market": null,
+    "report_type": "sector",
+    "_comment": "이차전지 섹터 리포트. 파서가 TAM(Total Addressable Market 약어)을 US 티커로 오인식. 종목 없음 → sector 분류."
+  },
+  "2013-09-18_smic-4657.md": {
+    "data_issue": "delisted",
+    "_comment": "코텍: 012345는 KRX에 존재하지 않는 더미 티커 — 상장폐지 또는 파서 오인식."
+  },
+  "2013-09-18_smic-4654.md": {
+    "data_issue": "delisted",
+    "_comment": "강원랜드: 012345는 KRX에 존재하지 않는 더미 티커."
+  },
+  "2013-09-18_smic-4647.md": {
+    "data_issue": "delisted",
+    "_comment": "새론오토모티브 075189: KRX 조회 불가 — 상장폐지."
+  },
+  "2013-09-18_Equity Research, 유니드.md": {
+    "data_issue": "delisted",
+    "_comment": "유니드 012345: KRX에 존재하지 않는 더미 티커."
+  },
+  "2013-09-18_Industry Report, IPTV.md": {
+    "ticker": null,
+    "market": null,
+    "report_type": "sector",
+    "_comment": "IPTV 산업 리포트 — 120000은 실제 티커가 아님. sector 분류."
+  },
+  "2013-09-18_Equity Research, 와토스코리아.md": {
+    "data_issue": "delisted",
+    "_comment": "와토스코리아 012345: KRX에 존재하지 않는 더미 티커."
+  },
+  "2013-09-18_Equity Research, 나우콤.md": {
+    "data_issue": "delisted",
+    "_comment": "나우콤(구 나우콤): 012300은 신한인터내쇼날 티커 → 오인식. 나우콤 실제 티커 확인 불가 — 상장폐지."
+  },
+  "2013-09-18_Equity Research, 청담러닝.md": {
+    "data_issue": "delisted",
+    "_comment": "청담러닝 096235: KRX 조회 불가 — 상장폐지."
+  },
+  "2013-09-18_Equity Research, CJ오쇼핑.md": {
+    "ticker": "035760",
+    "market": "KR",
+    "exchange": "KOSDAQ",
+    "company": "CJ ENM",
+    "_comment": "CJ오쇼핑(039944)은 2019년 CJ ENM(035760)으로 합병·재상장. 실제 거래 가능 티커로 교정."
+  },
+  "2013-09-18_Equity Research, 하이트맥주.md": {
+    "data_issue": "delisted",
+    "_comment": "하이트맥주(103150): KRX 조회는 이름 반환하나 실제 시세 없음 — 하이트진로홀딩스 등으로 합병 후 상장폐지 처리."
+  },
+  "2017-06-08_Equity Research, 코엔텍.md": {
+    "data_issue": "delisted",
+    "_comment": "코엔텍 009960: KRX 조회 불가 — 상장폐지."
+  },
+  "2018-12-31_Equity Research, SK디앤디.md": {
+    "data_issue": "delisted",
+    "_comment": "SK디앤디 210960: KRX 조회 불가 — 상장폐지."
+  },
+  "2015-11-19_Equity Research, CTRP(중국).md": {
+    "data_issue": "delisted",
+    "_comment": "CTRIP.COM (CTRP): 나스닥에서 2021년 상장폐지 (중국 ADR 자진 철수). 시세 없음."
+  },
+  "2016-12-05_Equity Research, Activision Blizzard.md": {
+    "data_issue": "delisted",
+    "_comment": "Activision Blizzard (ATVI): 2023년 Microsoft 인수 후 상장폐지. 시세 없음."
+  },
+  "2025-11-10_휴젤 (145020, KQ), 휴~젤 좋다! (발간일 241004) YIG Research.md": {
+    "target_price": 318000.0,
+    "target_price_raw": "318,000원",
+    "report_current_price_raw": "257,000원",
+    "_comment": "OCR 레이아웃 오류: 현재주가 레이블 근처에서 파서가 목표가 318,000원을 현재가로 오인식. 본문 명시 '목표 주가 318,000원 제시', 상승여력 23.7% → 현재가 ≈ 257,000원 역산."
+  },
+  "2024-08-16_HD현대미포 - 응답하라 2007 미포의 미친 (Positive) 포텐셜.md": {
+    "target_price": 193000.0,
+    "target_price_raw": "193,000원",
+    "report_current_price_raw": "110,000원",
+    "_comment": "OCR inconsistent: KUVIC 헤더에서 파싱된 가격이 정합성 검사 실패. 본문 다수 '목표주가 193,000원' 확인. 상승여력 75.5% → 현재가 ≈ 110,000원 역산."
   }
 }

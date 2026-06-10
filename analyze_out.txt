@@ -1,0 +1,238 @@
+Total records: 1396
+target_price_suspect count: 47
+
+=== SUSPECT RECORDS ===
+  smic   063280     raw=None                      start_close=6900.0 file=data\markdown\smic\2013-09-18_Equity Research, 레인콤.md
+  smic   052970     raw=None                      start_close=21241.0 file=data\markdown\smic\2013-09-18_Equity Research, 올리브나인.md
+  smic   114120     raw=None                      start_close=637007.0 file=data\markdown\smic\2013-09-18_Equity Research, 크루셜텍.md
+  smic   085810     raw=None                      start_close=60280.0 file=data\markdown\smic\2014-06-24_Equity Research, 알티캐스트.md
+  smic   048260     raw=None                      start_close=306100.0 file=data\markdown\smic\2014-12-28_Equity Research_오스템 임플란트.md
+  smic   033180     raw=None                      start_close=30478.0 file=data\markdown\smic\2015-05-11_Equity Research, 필룩스.md
+  smic   900120     raw=None                      start_close=43052.0 file=data\markdown\smic\2015-06-06_Equity Research, CKH.md
+  smic   009310     raw=None                      start_close=14300.0 file=data\markdown\smic\2015-12-16_Equity Research, 참엔지니어링.md
+  smic   095720     raw=None                      start_close=15895.0 file=data\markdown\smic\2015-12-16_Equity Research, 웅진씽크빅.md
+  smic   214330     raw=None                      start_close=30760.0 file=data\markdown\smic\2016-04-18_Equity Research, 금호에이치티.md
+  smic   192250     raw=None                      start_close=27050.0 file=data\markdown\smic\2016-05-09_Equity Research, 케이사인.md
+  smic   214330     raw=None                      start_close=23450.0 file=data\markdown\smic\2017-04-23_Equity Research, 포스코ICT.md
+  smic   214330     raw=None                      start_close=16030.0 file=data\markdown\smic\2017-10-28_Equity Research, 하나마이크론.md
+  smic   214330     raw=None                      start_close=17340.0 file=data\markdown\smic\2017-11-17_Equity Research, 웅진에너지.md
+  ewha   131390     raw=None                      start_close=12950.0 file=data\markdown\ewha\2020-05-30_[200530] 피엔이솔루션(131390).md
+  ewha   048260     raw=None                      start_close=355280.0 file=data\markdown\ewha\2020-10-10_[201010] 오스템임플란트(048260).md
+  ewha   060150     raw=None                      start_close=9960.0 file=data\markdown\ewha\2020-11-21_[201121] 인선이엔티(060150).md
+  ewha   005850     raw=None                      start_close=24850.0 file=data\markdown\ewha\2021-04-10_[210410] 에스엘(005850).md
+  ewha   074600     raw=None                      start_close=26800.0 file=data\markdown\ewha\2021-05-22_[210522] 원익QnC(074600).md
+  voera  207940     raw=None                      start_close=1471974.0 file=data\markdown\voera\undated_[Buy]이마트, 이맡에 산다.md
+  star   272550     raw=None                      start_close=31700.0 file=data\markdown\star\2022-10-31_STAR_삼양패키징.md
+  ewha   009150     raw=None                      start_close=156000.0 file=data\markdown\ewha\2022-04-09_[220409] 삼성전기(009150).md
+  smic   EAF        raw=None                      start_close=81.186607 file=data\markdown\2022-05-25_equity-research-graftech-international-ltd.md
+  ewha   006890     raw=None                      start_close=16400.0 file=data\markdown\ewha\2022-05-28_[220528] 태경케미컬(006890).md
+  star   048260     raw=None                      start_close=1871000.0 file=data\markdown\star\2023-03-01_STAR 오스템임플란트.md
+  voera  010950     raw=None                      start_close=82300.0 file=data\markdown\voera\undated_[Buy] 하이비젼시스템,애플아 나 지금 되게 신나.md
+  kuvic  083310     raw=None                      start_close=30700.0 file=data\markdown\kuvic\2023-09-20_엘오티베큠 - 추석은 종합 진공 선물세트로 챙기세요!.md
+  kuvic  251970     raw=None                      start_close=25000.0 file=data\markdown\kuvic\2023-10-12_펌텍코리아 - '용기' 있는 자가 세상을 얻는다.md
+  smic   001120     raw=None                      start_close=26300.0 file=data\markdown\2023-11-12_equity-research-lx인터내셔널.md
+  kuvic  340570     raw=None                      start_close=42100.0 file=ata\markdown\kuvic\2023-11-20_티앤엘 - Mighty Patch is getting Mighter.md
+  kuvic  000120     raw=None                      start_close=124800.0 file=data\markdown\kuvic\2024-02-28_CJ대한통운 - [Web발신] [CJ대한통운_상한가 배송완료].md
+  star   330860     raw=None                      start_close=39100.0 file=data\markdown\star\2024-03-11_STAR_네패스아크.md
+  kuvic  126700     raw=None                      start_close=21800.0 file=data\markdown\kuvic\2024-04-05_하이비젼시스템 - 이 기업의 고점은 어디인가.md
+  ewha   126700     raw=None                      start_close=21750.0 file=data\markdown\ewha\2024-04-06_[240406] 하이비젼시스템(126700).md
+  kuvic  039130     raw=None                      start_close=60200.0 file=data\markdown\kuvic\2024-05-13_하나투어 - 나에게로 떠나는 여행.md
+  kuvic  338220     raw=None                      start_close=27450.0 file=data\markdown\kuvic\2024-05-13_뷰노 - You know 뷰노 Why no.md
+  kuvic  172670     raw=None                      start_close=21400.0 file=data\markdown\kuvic\2024-05-14_에이엘티 - ALT로 웨이퍼테스트 Alt+Tab.md
+  kuvic  196170     raw=None                      start_close=301000.0 file=data\markdown\kuvic\2024-08-15_알테오젠 - 낫고 싶지만 링겔은 맞기 싫어.md
+  kuvic  012510     raw=None                      start_close=57400.0 file=data\markdown\kuvic\2024-08-16_더존비즈온 - 이제는 DOU이상 ZONE버할 필요 없다.md
+  kuvic  051360     raw=None                      start_close=18850.0 file=data\markdown\kuvic\2024-10-10_토비스 - 전장으로 777 잭팟.md
+  kuvic  003490     raw=None                      start_close=23800.0 file=data\markdown\kuvic\2024-11-11_대한항공 - 국가권력급 인수합병.md
+  kuvic  084370     raw=None                      start_close=35950.0 file=data\markdown\kuvic\2024-11-11_유진테크 - 반도체가 여름이래'유~진'짜라니께.md
+  kuvic  326030     raw=None                      start_close=115200.0 file=data\markdown\kuvic\2025-02-24_SK바이오팜 - 바이오팜, 꿈과 미래를 팜.md
+  ewha   000720     raw=None                      start_close=62000.0 file=data\markdown\ewha\2025-05-27_[250527] (KEYSS 대회) 현대건설(000720).md
+  kuvic  419530     raw=None                      start_close=90200.0 file=data\markdown\kuvic\2025-06-27_SAMG엔터 - 나만 믿어핑!.md
+  kuvic  347850     raw=None                      start_close=35660.0 file=data\markdown\kuvic\2025-08-19_디앤디파마텍 - 간단히 말해, 비만도 MASH도 한 큐에.md
+  kuvic  062040     raw=None                      start_close=112900.0 file=data\markdown\kuvic\2025-08-19_산일전기 - BESS를 연결하고, 미국 전력망을 점령하다.md
+
+=== UPSIDE > 300% (64) ===
+  smic   087220     upside=   540.5 target=20841.0 start_close=3205.0 raw=20,841원
+  smic   003300     upside=  1020.5 target=170000.0 start_close=15172.0 raw=170,000 원
+  smic   092040     upside=   524.4 target=73850.0 start_close=11553.0 raw=73,850 원
+  smic   016590     upside=  1299.0 target=54000.0 start_close=3885.0 raw=54,000 원
+  smic   171120     upside=   373.7 target=39950.0 start_close=8258.0 raw=39,950 원
+  smic   002790     upside=  1308.9 target=1587000.0 start_close=103262.0 raw=1,587,000 원
+  smic   003200     upside=  1075.4 target=222734.0 start_close=18750.0 raw=222,734 원
+  smic   014280     upside=   662.0 target=116742.0 start_close=15820.0 raw=116,742 원
+  smic   204320     upside=   579.9 target=199223.0 start_close=29300.0 raw=199,223 원
+  smic   056090     upside=   393.8 target=43359.0 start_close=8780.0 raw=43,359 원
+  smic   138250     upside=  1141.6 target=211700.0 start_close=17000.0 raw=211,700 원
+  smic   035420     upside=   527.7 target=880000.0 start_close=142201.0 raw=880,000 원
+  smic   NVDA       upside=  5321.8 target=124.32 start_close=2.283617 raw=$124.32
+  smic   TSLA       upside=  1845.7 target=240.0 start_close=12.301333 raw=$240
+  smic   075580     upside=   359.6 target=8626.0 start_close=1769.0 raw=8,626 원
+  smic   144960     upside=   539.4 target=30178.0 start_close=4720.0 raw=30,178 원
+  smic   214330     upside=  1608.0 target=392498.0 start_close=23450.0 raw=392,498 원
+  smic   225190     upside=   699.2 target=25200.0 start_close=3045.0 raw=25,200 원
+  smic   016590     upside=  1428.0 target=46146.0 start_close=3090.0 raw=46,146 원
+  smic   214330     upside=   544.1 target=111300.0 start_close=17240.0 raw=111,300 원
+  smic   267250     upside=   572.8 target=546300.0 start_close=78200.0 raw=546,300 원
+  smic   263750     upside=   633.3 target=276300.0 start_close=37460.0 raw=276,300 원
+  smic   017670     upside=   750.9 target=425000.0 start_close=48655.0 raw=425,000 원
+  smic   247540     upside=   432.4 target=86830.0 start_close=15789.0 raw=86,830 원
+  smic   025900     upside=   420.4 target=33346.0 start_close=6408.0 raw=33,346 원
+  smic   228760     upside=  1407.9 target=332495.0 start_close=22050.0 raw=332,495 원
+  smic   086450     upside=   609.8 target=90800.0 start_close=12913.0 raw=90,800 원
+  smic   302550     upside=   653.6 target=42579.0 start_close=5640.0 raw=42,579 원
+  smic   TSLA       upside=   756.5 target=466.43 start_close=54.591331 raw=$466.43
+  smic   075580     upside=   955.9 target=31900.0 start_close=3011.0 raw=27,500 ~ 36,300원
+  smic   347770     upside=   414.6 target=28900.0 start_close=5500.0 raw=28,900 원
+  smic   353810     upside=  1909.7 target=103500.0 start_close=5398.0 raw=103,500 원
+  smic   285490     upside=   384.0 target=139200.0 start_close=30333.0 raw=139,200원
+  smic   003410     upside=   757.0 target=66500.0 start_close=7440.0 raw=66,500 원
+  smic   075580     upside=   841.6 target=61300.0 start_close=6510.0 raw=61,300원
+  voera  383220     upside=   524.3 target=889000.0 start_close=142400.0 raw=889,000원
+  smic   148150     upside=   320.4 target=35000.0 start_close=8175.0 raw=35,000 원
+  star   002310     upside=   627.1 target=63400.0 start_close=8720.0 raw=63,400
+  smic   366030     upside=   547.8 target=37400.0 start_close=5406.0 raw=37,400 원
+  star   010120     upside=   560.6 target=68700.0 start_close=10400.0 raw=68,700
+  star   310210     upside=   306.4 target=100700.0 start_close=24776.0 raw=100,700
+  smic   099430     upside=   489.0 target=42900.0 start_close=6707.0 raw=42,900
+  smic   403870     upside=   519.8 target=89100.0 start_close=14025.0 raw=89,100 원
+  star   007340     upside=   899.3 target=131700.0 start_close=13179.0 raw=131,700
+  smic   ANET       upside=   444.8 target=184.525 start_close=33.6525 raw=$167.75 - $201.30
+  smic   100840     upside=   328.1 target=35500.0 start_close=8293.0 raw=35,500 원
+  star   089030     upside=   760.2 target=60900.0 start_close=7080.0 raw=60,900
+  smic   328130     upside=   688.1 target=122700.0 start_close=15569.0 raw=122,700원
+  star   100840     upside=   301.6 target=31700.0 start_close=7894.0 raw=31,700
+  star   211050     upside=   515.3 target=18520.0 start_close=3010.0 raw=18,520원
+  star   408900     upside=   695.0 target=50800.0 start_close=6390.0 raw=50,800
+  smic   278470     upside=   597.0 target=414000.0 start_close=59400.0 raw=414,000 원
+  star   278470     upside=   754.8 target=571000.0 start_close=66800.0 raw=571,000원
+  smic   LEU        upside=  1686.8 target=832.82 start_close=46.610001 raw=$832.82
+  voera  058470     upside=   614.6 target=282000.0 start_close=39465.0 raw=282,000원
+  yig    058470     upside=   571.2 target=240700.0 start_close=35861.0 raw=240,700 ₩
+  yig    112610     upside=   738.9 target=500000.0 start_close=59600.0 raw=₩500,000 ₩
+  smic   356860     upside=   725.1 target=106000.0 start_close=12847.0 raw=106,000원
+  yig    084730     upside=   477.7 target=60200.0 start_close=10420.0 raw=60,200원
+  star   249420     upside=   445.6 target=59200.0 start_close=10850.0 raw=59,200원
+  smic   456160     upside=   474.2 target=319800.0 start_close=60532.0 raw=319,800원
+  yig    458870     upside=   429.9 target=153400.0 start_close=28949.0 raw=153,400원
+  smic   476830     upside=   367.0 target=None start_close=90000.0 raw=None
+  star   458870     upside=   673.3 target=291700.0 start_close=37720.0 raw=291,700
+
+=== MODERN BUY WITH NULL TARGET (78) ===
+  ewha   278280     parse_issue=missing_target_price qa=ocr_fallback;ocr_inconsistent_prices file=data\markdown\ewha\2020-08-22_[200822] 천보(278280).md
+  smic   075580     parse_issue=missing_target_price qa=None file=data\markdown\smic\2019-12-24_Equity Research, Visa.md
+  voera  051900     parse_issue=missing_target_price qa=None file=data\markdown\voera\undated_[BUY] LG생활건강.md
+  ewha   048260     parse_issue=missing_target_price qa=target_price_suspect file=data\markdown\ewha\2020-10-10_[201010] 오스템임플란트(048260).md
+  smic   115450     parse_issue=missing_target_price qa=None file=data\markdown\2020-10-31_equity-research-지트리비앤티.md
+  ewha   060150     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\ewha\2020-11-21_[201121] 인선이엔티(060150).md
+  ewha   307950     parse_issue=missing_target_price qa=ocr_fallback;ocr_inconsistent_prices file=data\markdown\ewha\2022-02-12_[220212] 현대오토에버(307950).md
+  ewha   308170     parse_issue=missing_target_price qa=ocr_fallback;ocr_inconsistent_prices file=data\markdown\ewha\2021-02-20_[210220] 센트랄모텍(308170).md
+  ewha   KOSPI      parse_issue=missing_target_price qa=None file=data\markdown\ewha\2021-02-20_[210220] 대한유화(006650).md
+  ewha   001530     parse_issue=missing_target_price qa=ocr_fallback;ocr_inconsistent_prices file=data\markdown\ewha\2021-10-09_[211009] DI동일(001530).md
+  ewha   005850     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\ewha\2021-04-10_[210410] 에스엘(005850).md
+  ewha   074600     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\ewha\2021-05-22_[210522] 원익QnC(074600).md
+  voera  207940     parse_issue=missing_target_price qa=target_price_suspect file=data\markdown\voera\undated_[Buy]이마트, 이맡에 산다.md
+  ewha   253450     parse_issue=missing_target_price qa=ocr_fallback;ocr_inconsistent_prices file=data\markdown\ewha\2021-08-21_[210821] 스튜디오드래곤(253450).md
+  ewha   KOSPI      parse_issue=missing_target_price qa=None file=data\markdown\ewha\2021-08-21_[210821] 롯데정밀화학(004000).md
+  star   272550     parse_issue=missing_target_price qa=report_date_far_from_upload;target_price_suspect file=data\markdown\star\2022-10-31_STAR_삼양패키징.md
+  voera  020000     parse_issue=missing_target_price qa=None file=data\markdown\voera\undated_[BUY] 한섬, HANDSOME!.md
+  ewha   029960     parse_issue=missing_target_price qa=ocr_fallback;ocr_inconsistent_prices file=data\markdown\ewha\2022-10-07_[221007] 코엔텍(029960).md
+  smic   OPEN       parse_issue=missing_target_price qa=None file=data\markdown\2021-11-30_equity-research-opendoor.md
+  star   194370     parse_issue=missing_target_price qa=None file=data\markdown\star\2022-04-07_STAR_배터리 재활용 산업.md
+  voera  241840     parse_issue=missing_target_price qa=None file=data\markdown\voera\undated_[BUY] 에이스토리, 올해는 닉값할 시기.md
+  ewha   009150     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\ewha\2022-04-09_[220409] 삼성전기(009150).md
+  star   353200     parse_issue=missing_target_price qa=None file=data\markdown\star\2022-05-28_STAR_암호화폐투자전략.md
+  smic   EAF        parse_issue=missing_target_price qa=target_price_suspect file=data\markdown\2022-05-25_equity-research-graftech-international-ltd.md
+  ewha   006890     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\ewha\2022-05-28_[220528] 태경케미컬(006890).md
+  star   048260     parse_issue=missing_target_price qa=target_price_suspect file=data\markdown\star\2023-03-01_STAR 오스템임플란트.md
+  voera  010950     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\voera\undated_[Buy] 하이비젼시스템,애플아 나 지금 되게 신나.md
+  ewha   298050     parse_issue=missing_target_price qa=ocr_fallback;ocr_inconsistent_prices file=data\markdown\ewha\2023-07-22_[230722] 효성첨단소재(298050).md
+  kuvic  083310     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\kuvic\2023-09-20_엘오티베큠 - 추석은 종합 진공 선물세트로 챙기세요!.md
+  kuvic  328130     parse_issue=missing_target_price qa=ocr_fallback file=data\markdown\kuvic\2023-09-20_루닛 - The Winner Takes It All.md
+  kuvic  251970     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\kuvic\2023-10-12_펌텍코리아 - '용기' 있는 자가 세상을 얻는다.md
+  kuvic  336570     parse_issue=missing_target_price qa=ocr_fallback file=data\markdown\kuvic\2023-10-13_원텍 - 우리 원텍 절대 월드클래스 맞습니다.md
+  smic   001120     parse_issue=missing_target_price qa=target_price_suspect file=data\markdown\2023-11-12_equity-research-lx인터내셔널.md
+  kuvic  340570     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=ata\markdown\kuvic\2023-11-20_티앤엘 - Mighty Patch is getting Mighter.md
+  ewha   195870     parse_issue=missing_target_price qa=ocr_fallback;ocr_inconsistent_prices file=data\markdown\ewha\2024-01-20_[240120] 해성디에스(195870).md
+  kuvic  000120     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\kuvic\2024-02-28_CJ대한통운 - [Web발신] [CJ대한통운_상한가 배송완료].md
+  kuvic  267270     parse_issue=missing_target_price qa=ocr_fallback file=data\markdown\kuvic\2024-02-28_HD현대건설기계 - HD현대건설기계 가치를 알아볼 시간.md
+  star   330860     parse_issue=missing_target_price qa=target_price_suspect file=data\markdown\star\2024-03-11_STAR_네패스아크.md
+  yig    357780     parse_issue=missing_target_price qa=ocr_fallback file=5-11-10_솔브레인 (357789, KQ), 솔브레인 안 사면 노브레인 (발간일 240315) YIG Research.md
+  kuvic  126700     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\kuvic\2024-04-05_하이비젼시스템 - 이 기업의 고점은 어디인가.md
+  ewha   126700     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\ewha\2024-04-06_[240406] 하이비젼시스템(126700).md
+  smic   042660     parse_issue=missing_target_price qa=None file=data\markdown\2024-04-17_equity-research-한화오션.md
+  yig    018670     parse_issue=missing_target_price qa=None file=SK가스 (018670, KS), 당신의 포트폴리오를 지켜줄 든든한 수비수 (발간일 240503) YIG Research.md
+  kuvic  039130     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\kuvic\2024-05-13_하나투어 - 나에게로 떠나는 여행.md
+  kuvic  338220     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\kuvic\2024-05-13_뷰노 - You know 뷰노 Why no.md
+  kuvic  172670     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\kuvic\2024-05-14_에이엘티 - ALT로 웨이퍼테스트 Alt+Tab.md
+  kuvic  178320     parse_issue=missing_target_price qa=ocr_fallback;ocr_inconsistent_prices file=data\markdown\kuvic\2024-05-18_서진시스템 - 서(희)진씨 ESS 밟으실 수 있쬬.md
+  yig    403550     parse_issue=missing_target_price qa=None file= (403550, KS), BTS, 봉준호, SONNY 말고 SOCAR LET'S GO (발간일 240531) YIG R.md
+  kuvic  196170     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\kuvic\2024-08-15_알테오젠 - 낫고 싶지만 링겔은 맞기 싫어.md
+  kuvic  012510     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\kuvic\2024-08-16_더존비즈온 - 이제는 DOU이상 ZONE버할 필요 없다.md
+  kuvic  051360     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\kuvic\2024-10-10_토비스 - 전장으로 777 잭팟.md
+  ewha   017960     parse_issue=missing_target_price qa=ocr_fallback;ocr_inconsistent_prices file=data\markdown\ewha\2025-10-03_[251003] 한국카본(017960).md
+  kuvic  003490     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\kuvic\2024-11-11_대한항공 - 국가권력급 인수합병.md
+  kuvic  084370     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\kuvic\2024-11-11_유진테크 - 반도체가 여름이래'유~진'짜라니께.md
+  kuvic  083650     parse_issue=missing_target_price qa=ocr_fallback file=data\markdown\kuvic\2024-11-14_비에이치아이 - Make BHI Great Again.md
+  ewha   003720     parse_issue=missing_target_price qa=ocr_fallback;ocr_inconsistent_prices file=data\markdown\ewha\2024-11-22_[241122] 삼영(003720).md
+  ewha   069620     parse_issue=missing_target_price qa=ocr_fallback;ocr_inconsistent_prices file=data\markdown\ewha\2025-01-24_[250124] 대웅제약(069620).md
+  yig    226400     parse_issue=missing_target_price qa=ocr_fallback;ocr_inconsistent_prices file=스테오닉 (226400, KQ), 내수, 수출, 실적, 삼박자가 맞는 기업 (발간일 250207) YIG Research.md
+  kuvic  326030     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\kuvic\2025-02-24_SK바이오팜 - 바이오팜, 꿈과 미래를 팜.md
+  smic   009830     parse_issue=missing_target_price qa=None file=data\markdown\2025-05-11_equity-research-한화솔루션-2.md
+  kuvic  278470     parse_issue=missing_target_price qa=ocr_fallback;ocr_inconsistent_prices file=data\markdown\kuvic\2025-05-15_에이피알 - (A)안 (P)팔 (R)릴 이유가 없다.md
+  kuvic  161890     parse_issue=missing_target_price qa=ocr_fallback;ocr_inconsistent_prices file=data\markdown\kuvic\2025-05-13_한국콜마 - 선크림하면 ~ 한국콜마INDI.md
+  yig    389650     parse_issue=missing_target_price qa=ocr_fallback file=025-1 SOKHA 우승] 넥스트바이오메디컬 (389650, KQ), 의료기기의 Next Level (발간일 25051.md
+  kuvic  214450     parse_issue=missing_target_price qa=ocr_fallback;ocr_inconsistent_prices file=data\markdown\kuvic\2025-05-15_파마리서치 - 폭싹 삭아버리기 전에 리쥬란.md
+  ewha   000720     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\ewha\2025-05-27_[250527] (KEYSS 대회) 현대건설(000720).md
+  kuvic  064760     parse_issue=missing_target_price qa=ocr_fallback;ocr_inconsistent_prices file=data\markdown\kuvic\2025-06-27_티씨케이 - 중국은 8대 핵심산업 중 반도체만 남았다.md
+  kuvic  419530     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\kuvic\2025-06-27_SAMG엔터 - 나만 믿어핑!.md
+  kuvic  475150     parse_issue=missing_target_price qa=ocr_fallback;ocr_inconsistent_prices file=data\markdown\kuvic\2025-06-27_SK이터닉스 - 나니가 SK.md
+  ewha   356860     parse_issue=missing_target_price qa=ocr_fallback;ocr_inconsistent_prices file=data\markdown\ewha\2025-07-25_[250725] 티엘비(356860).md
+  yig    307950     parse_issue=missing_target_price qa=ocr_fallback file=-11_현대오토에버 (307950, KS), 현대오토에버, 에버, 포에버! (발간일 250731) YIG Research.md
+  yig    119850     parse_issue=missing_target_price qa=ocr_fallback file=-11-11_지엔씨에너지 (119850, KQ), 비상발전기로 주가도 비상 (발간일 250801) YIG Research.md
+  kuvic  347850     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\kuvic\2025-08-19_디앤디파마텍 - 간단히 말해, 비만도 MASH도 한 큐에.md
+  kuvic  000150     parse_issue=missing_target_price qa=ocr_fallback file=data\markdown\kuvic\2025-08-19_두산 - GPU와 ASIC이라는 '두 산'.md
+  kuvic  062040     parse_issue=missing_target_price qa=ocr_fallback;target_price_suspect file=data\markdown\kuvic\2025-08-19_산일전기 - BESS를 연결하고, 미국 전력망을 점령하다.md
+  smic   CRWV       parse_issue=missing_target_price qa=None file=data\markdown\2025-10-23_equity-research-coreweave.md
+  smic   476830     parse_issue=missing_target_price qa=None file=data\markdown\2025-12-15_equity-research-알지노믹스.md
+  ewha   140860     parse_issue=missing_target_price qa=ocr_fallback file=data\markdown\ewha\2026-02-20_[260220] 파크시스템스(140860).md
+  smic   GLNG       parse_issue=missing_target_price qa=None file=data\markdown\2026-04-16_equity-research-golar-lng.md
+
+=== TICKER BUT NO PRICE (18) ===
+  smic   012345     market=KR data_issue=missing_market_prices company=코텍
+  smic   012345     market=KR data_issue=missing_market_prices company=강원랜드
+  smic   075189     market=KR data_issue=missing_market_prices company=새론오토모티브
+  smic   012345     market=KR data_issue=missing_market_prices company=유니드
+  smic   120000     market=KR data_issue=missing_market_prices company=전세계 IPTV 가입자 전망
+  smic   012345     market=KR data_issue=missing_market_prices company=와토스코리아
+  smic   012300     market=KR data_issue=missing_market_prices company=그러니까
+  smic   096235     market=KR data_issue=missing_market_prices company=청담러닝
+  smic   039944     market=KR data_issue=missing_market_prices company=CJ오쇼핑
+  smic   103150     market=KR data_issue=missing_market_prices company=하이트맥주
+  smic   CTRP       market=US data_issue=missing_market_prices company=CTRIP.COM INTERNATIONAL, LTD.
+  smic   ATVI       market=US data_issue=missing_market_prices company=Activision Blizzard
+  smic   009960     market=KR data_issue=missing_market_prices company=코엔텍
+  smic   210960     market=KR data_issue=missing_market_prices company=SK디앤디
+  ewha   KOSPI      market=US data_issue=missing_market_prices company=006650
+  ewha   KOSPI      market=US data_issue=missing_market_prices company=004000
+  yig    041840     market=KR data_issue=missing_market_prices company=케이에스피
+  kuvic  TAM        market=US data_issue=missing_market_prices company=이차전지
+
+=== OCR_INCONSISTENT_PRICES (19) ===
+  ewha   278280     file=data\markdown\ewha\2020-08-22_[200822] 천보(278280).md
+  ewha   307950     file=data\markdown\ewha\2022-02-12_[220212] 현대오토에버(307950).md
+  ewha   308170     file=data\markdown\ewha\2021-02-20_[210220] 센트랄모텍(308170).md
+  ewha   001530     file=data\markdown\ewha\2021-10-09_[211009] DI동일(001530).md
+  ewha   253450     file=data\markdown\ewha\2021-08-21_[210821] 스튜디오드래곤(253450).md
+  ewha   029960     file=data\markdown\ewha\2022-10-07_[221007] 코엔텍(029960).md
+  ewha   298050     file=data\markdown\ewha\2023-07-22_[230722] 효성첨단소재(298050).md
+  ewha   195870     file=data\markdown\ewha\2024-01-20_[240120] 해성디에스(195870).md
+  kuvic  178320     file=data\markdown\kuvic\2024-05-18_서진시스템 - 서(희)진씨 ESS 밟으실 수 있쬬.md
+  ewha   017960     file=data\markdown\ewha\2025-10-03_[251003] 한국카본(017960).md
+  ewha   003720     file=data\markdown\ewha\2024-11-22_[241122] 삼영(003720).md
+  ewha   069620     file=data\markdown\ewha\2025-01-24_[250124] 대웅제약(069620).md
+  yig    226400     file=스테오닉 (226400, KQ), 내수, 수출, 실적, 삼박자가 맞는 기업 (발간일 250207) YIG Research.md
+  kuvic  278470     file=data\markdown\kuvic\2025-05-15_에이피알 - (A)안 (P)팔 (R)릴 이유가 없다.md
+  kuvic  161890     file=data\markdown\kuvic\2025-05-13_한국콜마 - 선크림하면 ~ 한국콜마INDI.md
+  kuvic  214450     file=data\markdown\kuvic\2025-05-15_파마리서치 - 폭싹 삭아버리기 전에 리쥬란.md
+  kuvic  064760     file=data\markdown\kuvic\2025-06-27_티씨케이 - 중국은 8대 핵심산업 중 반도체만 남았다.md
+  kuvic  475150     file=data\markdown\kuvic\2025-06-27_SK이터닉스 - 나니가 SK.md
+  ewha   356860     file=data\markdown\ewha\2025-07-25_[250725] 티엘비(356860).md

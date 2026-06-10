@@ -1,0 +1,15 @@
+KRX 로그인 시도...
+  로그인 ID: chldlsel1
+KRX 로그인 완료.
+  로그인 시간: 2026-06-10 18:33:57
+  만료 시간: 2026-06-10 19:33:57
+OK   kuvic  tp=800.0        raw=800원                      cp=800.0      file=2024-08-16_더존비즈온 - 이제는 DOU이상 ZONE버할 필요 없다.md
+OK   kuvic  tp=52.0         raw=52                        cp=52.0       file=2025-02-24_SK바이오팜 - 바이오팜, 꿈과 미래를 팜.md
+OK   kuvic  tp=6.0          raw=06                        cp=None       file=2025-06-27_SAMG엔터 - 나만 믿어핑!.md
+OK   kuvic  tp=52.0         raw=52                        cp=None       file=2025-08-19_산일전기 - BESS를 연결하고, 미국 전력망을 점령하다.md
+OK   kuvic  tp=52.0         raw=52                        cp=None       file=2024-11-11_유진테크 - 반도체가 여름이래'유~진'짜라니께.md
+OK   kuvic  tp=52.0         raw=52                        cp=None       file=2024-02-28_CJ대한통운 - [Web발신] [CJ대한통운_상한가 배송완료].md
+FAIL smic   tp=None         raw=None                      cp=30300.0    file=2025-05-11_equity-research-한화솔루션-2.md
+FAIL smic   tp=None         raw=None                      cp=28500.0    file=2024-04-17_equity-research-한화오션.md
+FAIL smic   tp=None         raw=None                      cp=None       file=2026-04-16_equity-research-golar-lng.md
+FAIL smic   tp=None         raw=None                      cp=None       file=2025-10-23_equity-research-coreweave.md

@@ -39,14 +39,29 @@ def ensure_java() -> None:
 
 def transcribe_batch(pdfs: list[Path], target_dir: Path) -> int:
     """한글/특수문자 파일명이 Java CLI 인자 인코딩(cp949)에서 깨지는 문제를 피하려고
-    임시 ASCII 이름으로 복사한 뒤 변환하고, 결과를 원래 이름의 .md로 되돌린다."""
+    임시 ASCII 이름으로 복사한 뒤 변환하고, 결과를 원래 이름의 .md로 되돌린다.
+
+    - 0바이트 PDF는 경고만 출력하고 건너뛴다 (변환 시도 없음).
+    - 변환 후 markdown이 생성되지 않은 PDF는 빈 stub .md를 생성한다
+      → ocr_fallback.py가 near-empty 파일로 인식해 OCR을 시도한다.
+    """
     import opendataloader_pdf
+
+    # 0바이트 PDF 필터링
+    valid_pdfs: list[Path] = []
+    for pdf in pdfs:
+        if pdf.stat().st_size == 0:
+            print(f"  ! skipping 0-byte PDF: {pdf.name}", flush=True)
+        else:
+            valid_pdfs.append(pdf)
+    if not valid_pdfs:
+        return 0
 
     done = 0
     with tempfile.TemporaryDirectory(prefix="odl_in_") as tmp_in, tempfile.TemporaryDirectory(prefix="odl_out_") as tmp_out:
         in_dir, out_dir = Path(tmp_in), Path(tmp_out)
         alias_map: dict[str, Path] = {}
-        for i, pdf in enumerate(pdfs):
+        for i, pdf in enumerate(valid_pdfs):
             alias = f"r{i:04d}"
             shutil.copyfile(pdf, in_dir / f"{alias}.pdf")
             alias_map[alias] = pdf
@@ -59,12 +74,14 @@ def transcribe_batch(pdfs: list[Path], target_dir: Path) -> int:
                 quiet=True,
             )
         except Exception as exc:  # noqa: BLE001 - 배치 실패는 기록하고 다음 배치 진행
-            print(f"  ! batch failed ({len(pdfs)} pdfs): {exc}", flush=True)
+            print(f"  ! batch failed ({len(valid_pdfs)} pdfs): {exc}", flush=True)
             return 0
         for alias, pdf in alias_map.items():
             produced = list(out_dir.rglob(f"{alias}.md"))
             if not produced:
-                print(f"  ! no markdown produced: {pdf.name}", flush=True)
+                print(f"  ! no markdown produced: {pdf.name} — writing empty stub for OCR", flush=True)
+                stub = target_dir / f"{pdf.stem}.md"
+                stub.write_text("", encoding="utf-8")
                 continue
             target = target_dir / f"{pdf.stem}.md"
             shutil.move(str(produced[0]), target)
