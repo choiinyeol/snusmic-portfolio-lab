@@ -1,18 +1,15 @@
-"""학회 리포트 × 전략 연구 백테스트 v6.
+"""학회 리포트 × 전략 연구 백테스트 v7.
 
-변경사항 (v6):
-- Task 1: US 종목 유니버스 추가 (US_{TICKER}.csv 로드, yfinance 캐시 패턴)
-- Task 2: 종목 링크용 market 필드 trades에 포함
-- Task 3: 5가지 신규 전략 (A~E + optional F):
-    A. 12개월 보유 (헤드라인 기준선)
-    B. 36개월 보유 (장기 호라이즌)
-    C. 내러티브 홀드 (200MA 하방 + 진입가 하방 시 청산, Faber 2007)
-    D. 샹들리에 래칫 (ATR(42)×5 트레일링)
-    E. 목표가 절반 익절 + 러너 (C 규칙 트레일)
-    F. 모멘텀 필터 진입 (200MA 위에서만 진입, C 청산)
+변경사항 (v7):
+- 5가지 신규 전략 패밀리 추가 (G~K):
+    G. 딥바이 — 발간 후 ≥20% 하락 시 매수, 목표가/+50%/12mo/ATR×3 중 첫 도달 청산
+    H. 미너비니 트렌드 템플릿 — close>50MA>150MA>200MA, 200MA 상승, RS>0, 진입; close<50MA 주간 청산
+    I. 슈퍼트렌드(10,3) — 발간 시 또는 3개월 내 첫 상향 전환 시 진입, 하향 전환 시 청산
+    J. 코어-새틀라이트 80/20 + 폭락 레버리지 — D 샹들리에 NAV 오버레이, KOSPI -15% 폭락 시 120% 레버
+    K. R:R 2.5 추세추종 — 1R=ATR(20), 반절 +2.5R, 나머지 Chandelier ATR×3; 동시 10종목 한도
   파라미터: 문헌 표준값 고정, 그리드 서치 없음
-- Task 4: 전략별 CSV (strategy-trades-{key}.csv)
-- 오늘의 신호: 헤드라인 전략 기준 유지
+- 전략 탭 그룹화: 보유형/추세형/오버레이
+- 페이지 메타 타이틀: "전략 — 판결 아카이브"
 """
 
 from __future__ import annotations
@@ -203,10 +200,46 @@ def load_prices(ticker: str, market: str = "KR") -> pd.DataFrame | None:
         axis=1,
     ).max(axis=1)
     df["atr"] = tr.rolling(ATR_PERIOD, min_periods=ATR_PERIOD // 2).mean()
+    # ATR(20) for K R:R strategy
+    df["atr20"] = tr.rolling(20, min_periods=10).mean()
     ret = df["close"].pct_change()
     df["sharpe90"] = ret.rolling(90, min_periods=45).mean() / ret.rolling(90, min_periods=45).std() * math.sqrt(252)
-    # 200-day MA for narrative hold and momentum filter
+    # Moving averages for various strategies
+    df["ma50"]  = df["close"].rolling(50,  min_periods=25).mean()
+    df["ma150"] = df["close"].rolling(150, min_periods=75).mean()
     df["ma200"] = df["close"].rolling(200, min_periods=100).mean()
+    # 52-week high/low for Minervini RS
+    df["hi52w"] = df["high"].rolling(252, min_periods=126).max()
+    df["lo52w"] = df["low"].rolling(252, min_periods=126).min()
+    # Supertrend(10, 3): standard Supertrend indicator
+    #   basic upper/lower bands = hl2 ± multiplier * ATR(period)
+    _atr10 = tr.rolling(10, min_periods=5).mean()
+    _hl2 = (df["high"] + df["low"]) / 2
+    _upper = _hl2 + 3.0 * _atr10
+    _lower = _hl2 - 3.0 * _atr10
+    # Supertrend state: True=bullish, False=bearish
+    _final_upper = _upper.copy()
+    _final_lower = _lower.copy()
+    _trend = pd.Series(True, index=df.index)
+    for i in range(1, len(df)):
+        prev_fu = _final_upper.iloc[i - 1]
+        prev_fl = _final_lower.iloc[i - 1]
+        cu = _upper.iloc[i]
+        cl = _lower.iloc[i]
+        prev_close = df["close"].iloc[i - 1]
+        # Adjust bands
+        _final_upper.iloc[i] = min(cu, prev_fu) if prev_close <= prev_fu else cu
+        _final_lower.iloc[i] = max(cl, prev_fl) if prev_close >= prev_fl else cl
+        # Determine trend
+        prev_trend = _trend.iloc[i - 1]
+        close_now = df["close"].iloc[i]
+        if prev_trend:
+            _trend.iloc[i] = close_now >= _final_lower.iloc[i]
+        else:
+            _trend.iloc[i] = close_now > _final_upper.iloc[i]
+    df["supertrend_bull"] = _trend
+    df["supertrend_upper"] = _final_upper
+    df["supertrend_lower"] = _final_lower
     return df
 
 
@@ -820,6 +853,719 @@ def run_half_exit_runner(
                 ma200_val = asof_value(df["ma200"], day)
                 if ma200_val > 0 and close < ma200_val and close < entry_p:
                     runner_exits.add(ticker)
+
+        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav_series.append((day.isoformat(), nav))
+
+    last_day = calendar[-1]
+    for ticker, pos in list(positions.items()):
+        trades.append(_close_trade(ticker, pos, last_day, pos["last_close"], "데이터_종료_미청산",
+                                   ticker_reports, record_full_trades, None))
+
+    return _compute_result(nav_series, trades, START_CAPITAL, label, open_positions=positions)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Strategy G: 딥바이 — dip-buy on ≥20% pullback after report
+# Single-club OK (dip itself is the filter).
+# Entry: price falls ≥20% below publication-day close within 6 months.
+# Exit: club target price OR +50% OR 12mo OR ATR×3 trailing stop (whichever first).
+# Reference: mean-reversion after analyst catalyst (Jegadeesh & Kim 2006 framing).
+# ──────────────────────────────────────────────────────────────────────────────
+
+DIP_THRESHOLD = 0.20        # 20% below report-day close
+DIP_WINDOW_DAYS = 180       # watch window
+DIP_EXIT_PCT = 0.50         # +50% profit target
+DIP_HOLD_MONTHS = 12        # max hold
+DIP_ATR_MULT = 3.0          # trailing stop multiplier
+
+def run_dip_buy(
+    prices: dict[str, pd.DataFrame],
+    reports: list[tuple[dt.date, str, str, int]],
+    calendar: list[dt.date],
+    label: str,
+    ticker_reports: dict[str, list[dict]] | None = None,
+    record_full_trades: bool = False,
+) -> dict:
+    """
+    단독 커버 OK (딥이 필터).
+    진입: 발간일 종가 대비 ≥20% 하락 시점 (6개월 내), 다음 거래일 시가 매수.
+    청산: 목표가 / +50% / 12개월 / ATR×3 트레일 중 선착.
+    """
+    START_CAPITAL = 100_000_000
+    cash = float(START_CAPITAL)
+    positions: dict[str, dict] = {}
+    nav_series: list[tuple[str, float]] = []
+    trades: list[dict] = []
+    pending_exits: set[str] = set()
+
+    # Build per-ticker dip-watch queue: {ticker: [(report_date, pub_day_close, target_price, display_name, n_clubs, source)]}
+    dip_watch: dict[str, list[dict]] = {}
+    cal_set = set(calendar)
+    for rdate, ticker, source, n_clubs in reports:
+        if rdate < SIM_START - dt.timedelta(days=DIP_WINDOW_DAYS):
+            continue
+        df = prices.get(ticker)
+        if df is None:
+            continue
+        # publication-day close (asof)
+        pub_close = asof_value(df["close"], rdate)
+        if pub_close <= 0:
+            continue
+        tr_list = (ticker_reports or {}).get(ticker, [])
+        past_tr = [x for x in tr_list if x["report_date"] <= rdate]
+        tp = max((x["target_price"] for x in past_tr if x["target_price"]), default=None)
+        dn = past_tr[-1]["display_name"] if past_tr else ticker
+        market = past_tr[0].get("market", "KR") if past_tr else "KR"
+        dip_watch.setdefault(ticker, []).append({
+            "report_date": rdate,
+            "pub_close": pub_close,
+            "expire_date": rdate + dt.timedelta(days=DIP_WINDOW_DAYS),
+            "target_price": tp,
+            "display_name": dn,
+            "n_clubs": n_clubs,
+            "source": source,
+            "market": market,
+        })
+
+    # Flag set: ticker -> next-day entry queued
+    dip_entry_queue: list[tuple[str, dict]] = []
+
+    for day in calendar:
+        day_ts = pd.Timestamp(day)
+
+        # Execute pending exits (trailing stop or other)
+        to_exit = [t for t in list(pending_exits) if t in positions]
+        for ticker in to_exit:
+            pos = positions[ticker]
+            q = _get_quote(prices, ticker, day)
+            if q is None or float(q["open"]) <= 0:
+                continue
+            exit_price = float(q["open"])
+            cash += pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            trades.append(_close_trade(ticker, pos, day, exit_price, pos.get("_exit_reason", "dip_atr3_stop"),
+                                       ticker_reports, record_full_trades, None))
+            del positions[ticker]
+            pending_exits.discard(ticker)
+
+        # Execute dip entries queued from previous day's check
+        if dip_entry_queue:
+            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            slots = MAX_POSITIONS - len(positions)
+            for ticker, watch in dip_entry_queue[:slots]:
+                if ticker in positions:
+                    continue
+                df = prices.get(ticker)
+                if df is None:
+                    continue
+                if day_ts not in df.index:
+                    continue
+                q = df.loc[day_ts]
+                entry_price = float(q["open"])
+                if entry_price <= 0:
+                    continue
+                budget = min(nav_now * POSITION_WEIGHT, cash)
+                if budget < nav_now * POSITION_WEIGHT * 0.5:
+                    continue
+                shares = budget * (1 - COST_PER_SIDE) / entry_price
+                cash -= budget
+                atr_val = asof_value(df["atr"], day)
+                stop = entry_price - DIP_ATR_MULT * atr_val if atr_val else entry_price * 0.80
+                pos = {
+                    "shares": shares, "entry_price": entry_price, "entry_date": day,
+                    "cost": budget, "last_close": entry_price, "highest": entry_price,
+                    "source": watch["source"], "n_clubs": watch["n_clubs"],
+                    "display_name": watch["display_name"], "market": watch["market"],
+                    "target_price": watch["target_price"], "stop": stop,
+                    "max_hold_date": months_later(day, DIP_HOLD_MONTHS),
+                    "half_sold": False, "half_sell_price": None,
+                }
+                positions[ticker] = pos
+            dip_entry_queue = []
+
+        # Scan dip-watch for new triggers
+        for ticker, watches in dip_watch.items():
+            if ticker in positions:
+                continue
+            df = prices.get(ticker)
+            if df is None or day_ts not in df.index:
+                continue
+            close_today = float(df.loc[day_ts]["close"])
+            for watch in watches:
+                if day < watch["report_date"] or day > watch["expire_date"]:
+                    continue
+                dip_level = watch["pub_close"] * (1 - DIP_THRESHOLD)
+                if close_today <= dip_level:
+                    dip_entry_queue.append((ticker, watch))
+                    break  # one entry per ticker per day
+
+        # Update positions + check exits
+        for ticker, pos in list(positions.items()):
+            df = prices.get(ticker)
+            if df is None or day_ts not in df.index:
+                continue
+            close = float(df.loc[day_ts]["close"])
+            high_today = float(df.loc[day_ts].get("high", close))
+            pos["last_close"] = close
+            pos["highest"] = max(pos.get("highest", close), close)
+
+            # Trailing stop ratchet
+            atr_val = asof_value(df["atr"], day)
+            if atr_val:
+                new_stop = pos["highest"] - DIP_ATR_MULT * atr_val
+                pos["stop"] = max(pos.get("stop", 0.0), new_stop)
+
+            exit_reason = None
+            exit_price_override = None
+
+            # ATR trailing stop
+            if pos.get("stop") and close < pos["stop"]:
+                exit_reason = "dip_atr3_stop"
+
+            # +50% profit target
+            elif high_today >= pos["entry_price"] * (1 + DIP_EXIT_PCT):
+                exit_reason = "dip_+50pct"
+                exit_price_override = pos["entry_price"] * (1 + DIP_EXIT_PCT)
+
+            # Club target price
+            elif pos.get("target_price") and high_today >= pos["target_price"]:
+                exit_reason = "dip_목표가"
+                exit_price_override = pos["target_price"]
+
+            # Max hold
+            elif day >= pos["max_hold_date"]:
+                exit_reason = "dip_12mo_만기"
+
+            if exit_reason and ticker not in pending_exits:
+                if exit_price_override:
+                    # Immediate same-day close at override price
+                    ep = min(exit_price_override, close)
+                    cash += pos["shares"] * ep * (1 - COST_PER_SIDE)
+                    trades.append(_close_trade(ticker, pos, day, ep, exit_reason,
+                                               ticker_reports, record_full_trades, None))
+                    del positions[ticker]
+                else:
+                    pos["_exit_reason"] = exit_reason
+                    pending_exits.add(ticker)
+
+        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav_series.append((day.isoformat(), nav))
+
+    last_day = calendar[-1]
+    for ticker, pos in list(positions.items()):
+        trades.append(_close_trade(ticker, pos, last_day, pos["last_close"], "데이터_종료_미청산",
+                                   ticker_reports, record_full_trades, None))
+
+    return _compute_result(nav_series, trades, START_CAPITAL, label, open_positions=positions)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Strategy H: 미너비니 트렌드 템플릿
+# Consensus ≥2 required at entry.
+# Entry conditions (all must hold on entry day):
+#   close > 50MA > 150MA > 200MA
+#   200MA rising vs 1 month ago
+#   close ≥ 70% of 52w high
+#   RS(6mo) vs KOSPI > 0
+# Exit: close < 50MA on weekly check (Friday close).
+# Reference: Minervini (2013) "Trade Like a Stock Market Wizard"
+# ──────────────────────────────────────────────────────────────────────────────
+
+def run_minervini(
+    prices: dict[str, pd.DataFrame],
+    reports: list[tuple[dt.date, str, str, int]],
+    calendar: list[dt.date],
+    label: str,
+    ticker_reports: dict[str, list[dict]] | None = None,
+    record_full_trades: bool = False,
+    kospi: pd.Series | None = None,
+) -> dict:
+    """
+    미너비니 트렌드 템플릿. 진입: consensus ≥2 + 5-point template.
+    청산: 주간(금요일) 체크 시 close < 50MA.
+    """
+    START_CAPITAL = 100_000_000
+    cash = float(START_CAPITAL)
+    positions: dict[str, dict] = {}
+    nav_series: list[tuple[str, float]] = []
+    trades: list[dict] = []
+    pending_exits: set[str] = set()
+
+    pending_entries = build_pending_entries(reports, calendar, consensus_only=True)
+
+    # Weekly check days (Fridays, or last day of week in calendar)
+    cal_s = pd.Series(calendar)
+    week_ends: set[dt.date] = set(
+        cal_s.groupby(cal_s.apply(lambda d: (d.isocalendar()[0], d.isocalendar()[1]))).last().values
+    )
+
+    for day in calendar:
+        day_ts = pd.Timestamp(day)
+
+        # Execute pending exits
+        to_exit = [t for t in list(pending_exits) if t in positions]
+        for ticker in to_exit:
+            pos = positions[ticker]
+            q = _get_quote(prices, ticker, day)
+            if q is None or float(q["open"]) <= 0:
+                continue
+            exit_price = float(q["open"])
+            cash += pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            trades.append(_close_trade(ticker, pos, day, exit_price, "minervini_close<50MA",
+                                       ticker_reports, record_full_trades, None))
+            del positions[ticker]
+            pending_exits.discard(ticker)
+
+        # Execute pending entries — check Minervini template
+        if day in pending_entries:
+            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            slots = MAX_POSITIONS - len(positions)
+            candidates = list({t: (t, s, nc) for t, s, nc in pending_entries[day] if t not in positions}.values())
+            for ticker, source, n_clubs in candidates[:slots]:
+                df = prices.get(ticker)
+                if df is None or day_ts not in df.index:
+                    continue
+                q = df.loc[day_ts]
+                close = float(q["close"])
+                ma50  = asof_value(df["ma50"],  day)
+                ma150 = asof_value(df["ma150"], day)
+                ma200 = asof_value(df["ma200"], day)
+                hi52w = asof_value(df["hi52w"], day)
+                if any(v <= 0 for v in [ma50, ma150, ma200, hi52w]):
+                    continue
+                # Template: close > 50MA > 150MA > 200MA
+                if not (close > ma50 > ma150 > ma200):
+                    continue
+                # 200MA rising vs 1 month ago
+                ma200_1mo = asof_value(df["ma200"], day - dt.timedelta(days=30))
+                if ma200_1mo <= 0 or ma200 <= ma200_1mo:
+                    continue
+                # Price ≥ 70% of 52w high
+                if close < 0.70 * hi52w:
+                    continue
+                # RS vs KOSPI positive over 6mo
+                if kospi is not None:
+                    price_6mo_ago = asof_value(df["close"], day - dt.timedelta(days=182))
+                    kospi_6mo_ago = asof_value(kospi, day - dt.timedelta(days=182))
+                    kospi_now = asof_value(kospi, day)
+                    if price_6mo_ago > 0 and kospi_6mo_ago > 0 and kospi_now > 0:
+                        stock_rs = close / price_6mo_ago - 1
+                        kospi_rs = kospi_now / kospi_6mo_ago - 1
+                        if stock_rs <= kospi_rs:
+                            continue
+                pos, cash = _try_enter(ticker, source, n_clubs, day, prices, positions, cash, nav_now, ticker_reports)
+                if pos is not None:
+                    positions[ticker] = pos
+
+        # Update last_close
+        for ticker, pos in positions.items():
+            df = prices.get(ticker)
+            if df is not None and day_ts in df.index:
+                pos["last_close"] = float(df.loc[day_ts]["close"])
+
+        # Weekly check: exit if close < 50MA
+        if day in week_ends:
+            for ticker, pos in list(positions.items()):
+                df = prices.get(ticker)
+                if df is None:
+                    continue
+                close = pos["last_close"]
+                ma50_val = asof_value(df["ma50"], day)
+                if ma50_val > 0 and close < ma50_val:
+                    pending_exits.add(ticker)
+
+        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav_series.append((day.isoformat(), nav))
+
+    last_day = calendar[-1]
+    for ticker, pos in list(positions.items()):
+        trades.append(_close_trade(ticker, pos, last_day, pos["last_close"], "데이터_종료_미청산",
+                                   ticker_reports, record_full_trades, None))
+
+    return _compute_result(nav_series, trades, START_CAPITAL, label, open_positions=positions)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Strategy I: 슈퍼트렌드(10, 3)
+# Consensus ≥2 required.
+# Entry: Supertrend is bullish on report day OR first bullish flip within 3mo.
+# Exit: Supertrend flips bearish.
+# Reference: Supertrend indicator (Olivier Seban popularised; standard (10, 3) params).
+# ──────────────────────────────────────────────────────────────────────────────
+
+SUPERTREND_WINDOW_DAYS = 90   # 3mo window to wait for bullish flip after report
+
+def run_supertrend(
+    prices: dict[str, pd.DataFrame],
+    reports: list[tuple[dt.date, str, str, int]],
+    calendar: list[dt.date],
+    label: str,
+    ticker_reports: dict[str, list[dict]] | None = None,
+    record_full_trades: bool = False,
+) -> dict:
+    """
+    Supertrend(10, 3). 진입: 발간 시 불리시 OR 3개월 내 첫 상향 전환.
+    청산: 하향 전환 다음 거래일 시가.
+    """
+    START_CAPITAL = 100_000_000
+    cash = float(START_CAPITAL)
+    positions: dict[str, dict] = {}
+    nav_series: list[tuple[str, float]] = []
+    trades: list[dict] = []
+    pending_exits: set[str] = set()
+
+    # Build per-day ST-watch: tickers waiting for a bullish flip after report
+    # st_watch: ticker -> (report_date, expire_date, n_clubs, source)
+    st_watch: dict[str, dict] = {}
+    pending_entries_direct: dict[dt.date, list[tuple[str, str, int]]] = {}
+
+    for rdate, ticker, source, n_clubs in reports:
+        if n_clubs < 2:
+            continue
+        df = prices.get(ticker)
+        if df is None:
+            continue
+        # Check if supertrend is already bullish on report day
+        st_val = asof_value(df["supertrend_bull"].astype(float), rdate)
+        entry_day = first_trading_day_after(rdate, calendar)
+        if st_val >= 0.5:
+            # Already bullish → enter immediately
+            if entry_day:
+                pending_entries_direct.setdefault(entry_day, []).append((ticker, source, n_clubs))
+        else:
+            # Wait for first bullish flip within 3 months
+            expire = rdate + dt.timedelta(days=SUPERTREND_WINDOW_DAYS)
+            if ticker not in st_watch or st_watch[ticker]["report_date"] < rdate:
+                st_watch[ticker] = {
+                    "report_date": rdate, "expire_date": expire,
+                    "n_clubs": n_clubs, "source": source,
+                }
+
+    for day in calendar:
+        day_ts = pd.Timestamp(day)
+
+        # Execute pending exits
+        to_exit = [t for t in list(pending_exits) if t in positions]
+        for ticker in to_exit:
+            pos = positions[ticker]
+            q = _get_quote(prices, ticker, day)
+            if q is None or float(q["open"]) <= 0:
+                continue
+            exit_price = float(q["open"])
+            cash += pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            trades.append(_close_trade(ticker, pos, day, exit_price, "supertrend_bearish_flip",
+                                       ticker_reports, record_full_trades, None))
+            del positions[ticker]
+            pending_exits.discard(ticker)
+
+        # Execute direct entries (supertrend bullish at report)
+        if day in pending_entries_direct:
+            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            slots = MAX_POSITIONS - len(positions)
+            candidates = list({t: (t, s, nc) for t, s, nc in pending_entries_direct[day] if t not in positions}.values())
+            for ticker, source, n_clubs in candidates[:slots]:
+                pos, cash = _try_enter(ticker, source, n_clubs, day, prices, positions, cash, nav_now, ticker_reports)
+                if pos is not None:
+                    positions[ticker] = pos
+
+        # Scan st_watch for bullish flips
+        new_direct: list[tuple[str, str, int]] = []
+        for ticker, watch in list(st_watch.items()):
+            if ticker in positions:
+                continue
+            if day > watch["expire_date"]:
+                del st_watch[ticker]
+                continue
+            if day < watch["report_date"]:
+                continue
+            df = prices.get(ticker)
+            if df is None or day_ts not in df.index:
+                continue
+            st_now = bool(df.loc[day_ts]["supertrend_bull"])
+            if st_now:
+                new_direct.append((ticker, watch["source"], watch["n_clubs"]))
+                del st_watch[ticker]
+
+        if new_direct:
+            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            slots = MAX_POSITIONS - len(positions)
+            entry_day = first_trading_day_after(day, calendar)
+            if entry_day:
+                pending_entries_direct.setdefault(entry_day, []).extend(new_direct)
+
+        # Update last_close + check supertrend exit
+        for ticker, pos in list(positions.items()):
+            df = prices.get(ticker)
+            if df is None or day_ts not in df.index:
+                continue
+            pos["last_close"] = float(df.loc[day_ts]["close"])
+            st_now = bool(df.loc[day_ts]["supertrend_bull"])
+            if not st_now and ticker not in pending_exits:
+                pending_exits.add(ticker)
+
+        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav_series.append((day.isoformat(), nav))
+
+    last_day = calendar[-1]
+    for ticker, pos in list(positions.items()):
+        trades.append(_close_trade(ticker, pos, last_day, pos["last_close"], "데이터_종료_미청산",
+                                   ticker_reports, record_full_trades, None))
+
+    return _compute_result(nav_series, trades, START_CAPITAL, label, open_positions=positions)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Strategy J: 코어-새틀라이트 80/20 + 폭락 레버리지 overlay
+# Overlay on D (Chandelier) NAV series.
+# Allocation: 80% in strategy D, 20% cash buffer.
+# When KOSPI drawdown from 52w high ≥ 15%: deploy cash + borrow to 120% equity.
+# Borrow cost: 6%/yr accrued daily on borrowed amount.
+# Deleverage back to 80/20 when drawdown recovers to < 5%.
+# ──────────────────────────────────────────────────────────────────────────────
+
+LEVERAGE_BORROW_RATE = 0.06           # 6% pa
+LEVERAGE_DEPLOY_DD = 0.15             # KOSPI -15% from 52w high triggers deploy
+LEVERAGE_RECOVER_DD = 0.05            # KOSPI -5% (from 52w high) → deleverage
+LEVERAGE_TARGET = 1.20                # 120% of equity at leverage peak
+CORE_ALLOCATION = 0.80                # 80% core, 20% cash
+
+def run_core_satellite_leverage(
+    chandelier_nav: pd.Series,
+    kospi: pd.Series,
+    label: str = "J_core_satellite",
+) -> dict:
+    """
+    D 샹들리에 NAV 오버레이.
+    80% 코어(D), 20% 현금. KOSPI 52w 고점 대비 -15% 시 레버리지 120% 전개.
+    차입비용 6%/년 일 단위 적립. 복구 시(-5% 미만) 디레버.
+    """
+    START_CAPITAL = 100_000_000
+    # Normalise chandelier NAV to returns
+    chan_ret = chandelier_nav.pct_change().fillna(0)
+
+    idx = chandelier_nav.index
+    kospi_aligned = kospi.reindex(idx).ffill().bfill()
+    kospi_hi52 = kospi_aligned.rolling(252, min_periods=1).max()
+
+    equity = float(START_CAPITAL)
+    # core_units: how many "shares" of the chandelier strategy we hold
+    core_units = equity * CORE_ALLOCATION  # notional
+    cash_buffer = equity * (1 - CORE_ALLOCATION)
+    borrowed = 0.0
+    is_leveraged = False
+
+    nav_series: list[tuple[str, float]] = []
+
+    for i, ts in enumerate(idx):
+        day_ts = ts
+        day = ts.date()
+
+        # Compute KOSPI drawdown
+        kp = float(kospi_aligned.loc[day_ts])
+        kp_hi = float(kospi_hi52.loc[day_ts])
+        kospi_dd = (kp / kp_hi - 1) if kp_hi > 0 else 0.0
+
+        cr = float(chan_ret.iloc[i])
+
+        if not is_leveraged:
+            # Normal 80/20: core grows with chandelier return
+            core_units *= (1 + cr)
+            # Check if we should leverage
+            if kospi_dd <= -LEVERAGE_DEPLOY_DD and cash_buffer > 0:
+                # Deploy cash + borrow to get to 120% of current equity
+                total_equity = core_units + cash_buffer
+                target_core = total_equity * LEVERAGE_TARGET
+                additional = target_core - core_units
+                # First use cash, then borrow rest
+                from_cash = min(cash_buffer, additional)
+                from_borrow = additional - from_cash
+                core_units += additional
+                cash_buffer -= from_cash
+                borrowed = from_borrow
+                is_leveraged = True
+        else:
+            # Leveraged: core grows, borrow cost accrues
+            core_units *= (1 + cr)
+            borrow_cost_daily = borrowed * LEVERAGE_BORROW_RATE / 365
+            borrowed += borrow_cost_daily
+            cash_buffer -= borrow_cost_daily  # cost comes from cash; can go negative
+
+            # Check if we should deleverage
+            if kospi_dd > -LEVERAGE_RECOVER_DD:
+                # Sell down core to 80% of net equity and repay borrow
+                net_equity = core_units + cash_buffer - borrowed
+                target_core = net_equity * CORE_ALLOCATION
+                excess = core_units - target_core
+                cash_freed = max(0.0, excess)
+                core_units = target_core
+                cash_buffer += cash_freed
+                # Repay borrow with cash
+                repay = min(borrowed, cash_buffer)
+                borrowed -= repay
+                cash_buffer -= repay
+                if borrowed < 0:
+                    borrowed = 0.0
+                is_leveraged = False
+
+        nav = core_units + cash_buffer - borrowed
+        nav_series.append((day.isoformat(), nav))
+
+    # Build dummy trades list (overlay has no discrete trades)
+    trades: list[dict] = []
+
+    return _compute_result(nav_series, trades, START_CAPITAL, label, open_positions={})
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Strategy K: R:R 2.5 추세추종 (risk-defined fast trading)
+# Consensus ≥2.
+# Entry: open next day after report signal.
+# Stop: entry − 1×ATR(20) = 1R.
+# Take half at +2.5R.
+# Trail remainder with Chandelier ATR×3.
+# Max 10 concurrent positions (concentration).
+# Reference: Van Tharp "Trade Your Way to Financial Freedom" R-multiple framework.
+# ──────────────────────────────────────────────────────────────────────────────
+
+RR_STOP_MULT = 1.0          # 1R stop = 1×ATR(20)
+RR_TARGET_MULT = 2.5        # half off at +2.5R
+RR_TRAIL_ATR_MULT = 3.0     # trail rest with ATR(42)×3 chandelier
+RR_MAX_POSITIONS = 10       # max 10 concurrent positions
+
+def run_rr_trend(
+    prices: dict[str, pd.DataFrame],
+    reports: list[tuple[dt.date, str, str, int]],
+    calendar: list[dt.date],
+    label: str,
+    ticker_reports: dict[str, list[dict]] | None = None,
+    record_full_trades: bool = False,
+) -> dict:
+    """
+    R:R 2.5 추세추종. Stop = 1×ATR(20). 반절 +2.5R. 나머지 Chandelier ATR×3 트레일.
+    동시 최대 10종목.
+    """
+    START_CAPITAL = 100_000_000
+    cash = float(START_CAPITAL)
+    positions: dict[str, dict] = {}
+    nav_series: list[tuple[str, float]] = []
+    trades: list[dict] = []
+    pending_exits: dict[str, str] = {}  # ticker -> reason
+
+    pending_entries = build_pending_entries(reports, calendar, consensus_only=True)
+
+    for day in calendar:
+        day_ts = pd.Timestamp(day)
+
+        # Execute pending exits
+        to_exit = [t for t in list(pending_exits) if t in positions]
+        for ticker in to_exit:
+            pos = positions[ticker]
+            reason = pending_exits.pop(ticker)
+            q = _get_quote(prices, ticker, day)
+            if q is None or float(q["open"]) <= 0:
+                pending_exits[ticker] = reason  # defer
+                continue
+            exit_price = float(q["open"])
+            # How many shares remain?
+            shares = pos["shares"]
+            cost = pos["cost"] * (shares / pos.get("original_shares", shares))
+            cash += shares * exit_price * (1 - COST_PER_SIDE)
+            trades.append(_close_trade(ticker, pos, day, exit_price, reason,
+                                       ticker_reports, record_full_trades, None,
+                                       shares_override=shares, cost_override=cost))
+            del positions[ticker]
+
+        # Execute pending entries (max 10 positions)
+        if day in pending_entries:
+            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            slots = RR_MAX_POSITIONS - len(positions)
+            candidates = list({t: (t, s, nc) for t, s, nc in pending_entries[day] if t not in positions}.values())
+            for ticker, source, n_clubs in candidates[:slots]:
+                df = prices.get(ticker)
+                if df is None or day_ts not in df.index:
+                    continue
+                q = df.loc[day_ts]
+                entry_price = float(q["open"])
+                if entry_price <= 0:
+                    continue
+                atr20_val = asof_value(df["atr20"], day)
+                if atr20_val <= 0:
+                    continue
+                one_r = RR_STOP_MULT * atr20_val
+                stop = entry_price - one_r
+                take_profit = entry_price + RR_TARGET_MULT * one_r
+
+                budget = min(nav_now * POSITION_WEIGHT, cash)
+                if budget < nav_now * POSITION_WEIGHT * 0.5:
+                    continue
+                shares = budget * (1 - COST_PER_SIDE) / entry_price
+                cash -= budget
+
+                display_name = ticker
+                tp = None
+                market = "KR"
+                if ticker_reports is not None:
+                    tr_list = ticker_reports.get(ticker, [])
+                    past_tr = [x for x in tr_list if x["report_date"] < day]
+                    if past_tr:
+                        latest = max(past_tr, key=lambda x: x["report_date"])
+                        display_name = latest["display_name"]
+                        tps = [x["target_price"] for x in past_tr if x["target_price"]]
+                        tp = max(tps) if tps else None
+                        market = past_tr[0].get("market", "KR")
+
+                positions[ticker] = {
+                    "shares": shares, "original_shares": shares,
+                    "entry_price": entry_price, "entry_date": day,
+                    "cost": budget, "last_close": entry_price,
+                    "highest": entry_price, "stop": stop,
+                    "take_profit_price": take_profit,
+                    "one_r": one_r, "half_sold": False,
+                    "source": source, "n_clubs": n_clubs,
+                    "display_name": display_name, "market": market,
+                    "target_price": tp,
+                }
+
+        # Update positions and check exit conditions
+        for ticker, pos in list(positions.items()):
+            df = prices.get(ticker)
+            if df is None or day_ts not in df.index:
+                continue
+            close = float(df.loc[day_ts]["close"])
+            high_today = float(df.loc[day_ts].get("high", close))
+            low_today = float(df.loc[day_ts].get("low", close))
+            pos["last_close"] = close
+            pos["highest"] = max(pos.get("highest", close), close)
+
+            # Ratchet trail stop (Chandelier ATR×3) for remaining runner
+            atr_val = asof_value(df["atr"], day)
+            if atr_val:
+                trail_stop = pos["highest"] - RR_TRAIL_ATR_MULT * atr_val
+                pos["stop"] = max(pos.get("stop", 0.0), trail_stop)
+
+            if ticker in pending_exits:
+                continue  # already queued
+
+            # Half-exit at +2.5R
+            if not pos.get("half_sold") and high_today >= pos["take_profit_price"]:
+                half_price = pos["take_profit_price"]
+                half_shares = pos["original_shares"] * 0.5
+                half_cost = pos["cost"] * 0.5
+                cash += half_shares * half_price * (1 - COST_PER_SIDE)
+                trade = _close_trade(
+                    ticker, pos, day, half_price, "rr_half_+2.5R",
+                    ticker_reports, record_full_trades, None,
+                    shares_override=half_shares, cost_override=half_cost,
+                )
+                trades.append(trade)
+                # Keep only runner half
+                pos["shares"] = pos["original_shares"] * 0.5
+                pos["cost"] = pos["cost"] * 0.5
+                pos["half_sold"] = True
+
+            # Stop: low today touched stop
+            elif low_today <= pos["stop"]:
+                pending_exits[ticker] = "rr_stop"
 
         nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
         nav_series.append((day.isoformat(), nav))
@@ -1886,7 +2632,7 @@ def main() -> int:
     # Parameters are literature-grounded fixed values — no grid search
     # ══════════════════════════════════════════════════════════════════════════
 
-    print("\n── Running 6 strategies ──────────────────────────────────────────", flush=True)
+    print("\n── Running 11 strategies ─────────────────────────────────────────", flush=True)
 
     # A. 12개월 보유 (baseline headline)
     print("A. 12개월 보유...", flush=True)
@@ -1937,6 +2683,48 @@ def main() -> int:
     )
     print(f"   IS sharpe={result_F['in_sample'].get('sharpe')}  OOS sharpe={result_F['out_of_sample'].get('sharpe')}", flush=True)
 
+    # G. 딥바이 (발간 후 ≥20% 하락 매수, 단독 OK)
+    print("G. 딥바이 (≥20% dip, single-club OK)...", flush=True)
+    result_G = run_dip_buy(
+        prices, reports, calendar,
+        label="G_dip_buy", ticker_reports=ticker_reports, record_full_trades=True,
+    )
+    print(f"   IS sharpe={result_G['in_sample'].get('sharpe')}  OOS sharpe={result_G['out_of_sample'].get('sharpe')}", flush=True)
+
+    # H. 미너비니 트렌드 템플릿
+    print("H. 미너비니 트렌드 템플릿...", flush=True)
+    result_H = run_minervini(
+        prices, reports, calendar,
+        label="H_minervini", ticker_reports=ticker_reports, record_full_trades=True,
+        kospi=kospi,
+    )
+    print(f"   IS sharpe={result_H['in_sample'].get('sharpe')}  OOS sharpe={result_H['out_of_sample'].get('sharpe')}", flush=True)
+
+    # I. 슈퍼트렌드(10, 3)
+    print("I. 슈퍼트렌드(10, 3)...", flush=True)
+    result_I = run_supertrend(
+        prices, reports, calendar,
+        label="I_supertrend", ticker_reports=ticker_reports, record_full_trades=True,
+    )
+    print(f"   IS sharpe={result_I['in_sample'].get('sharpe')}  OOS sharpe={result_I['out_of_sample'].get('sharpe')}", flush=True)
+
+    # J. 코어-새틀라이트 80/20 + 폭락 레버리지 (overlay on D)
+    print("J. 코어-새틀라이트 레버리지 오버레이 (on D)...", flush=True)
+    result_J = run_core_satellite_leverage(
+        chandelier_nav=result_D["nav_df"],
+        kospi=kospi,
+        label="J_core_satellite",
+    )
+    print(f"   IS sharpe={result_J['in_sample'].get('sharpe')}  OOS sharpe={result_J['out_of_sample'].get('sharpe')}", flush=True)
+
+    # K. R:R 2.5 추세추종
+    print("K. R:R 2.5 추세추종 (max 10 positions)...", flush=True)
+    result_K = run_rr_trend(
+        prices, reports, calendar,
+        label="K_rr_trend", ticker_reports=ticker_reports, record_full_trades=True,
+    )
+    print(f"   IS sharpe={result_K['in_sample'].get('sharpe')}  OOS sharpe={result_K['out_of_sample'].get('sharpe')}", flush=True)
+
     v6_strategies = {
         "A_12mo": result_A,
         "B_36mo": result_B,
@@ -1944,10 +2732,15 @@ def main() -> int:
         "D_chandelier": result_D,
         "E_half_runner": result_E,
         "F_momentum_narrative": result_F,
+        "G_dip_buy": result_G,
+        "H_minervini": result_H,
+        "I_supertrend": result_I,
+        "J_core_satellite": result_J,
+        "K_rr_trend": result_K,
     }
 
     # ── Summary table
-    print("\n── Strategy summary (v6) ─────────────────────────────────────────", flush=True)
+    print("\n── Strategy summary (v7) ─────────────────────────────────────────", flush=True)
     print(f"{'Strategy':<28} {'IS CAGR':>9} {'IS Shp':>8} {'OOS CAGR':>10} {'OOS Shp':>9} {'MaxRet%':>8} {'Trades':>7}", flush=True)
     for key, r in v6_strategies.items():
         is_m = r.get("in_sample", {})

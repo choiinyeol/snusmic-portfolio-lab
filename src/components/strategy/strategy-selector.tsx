@@ -108,6 +108,11 @@ const STRATEGY_LABEL_KO: Record<string, string> = {
   D_chandelier:        "D. 샹들리에 래칫 ★",
   E_half_runner:       "E. 절반익절+러너",
   F_momentum_narrative:"F. 모멘텀 필터",
+  G_dip_buy:           "G. 딥바이",
+  H_minervini:         "H. 미너비니 템플릿",
+  I_supertrend:        "I. 슈퍼트렌드",
+  J_core_satellite:    "J. 코어-새틀라이트",
+  K_rr_trend:          "K. R:R 2.5",
 };
 
 const STRATEGY_DESC_KO: Record<string, string> = {
@@ -117,7 +122,19 @@ const STRATEGY_DESC_KO: Record<string, string> = {
   D_chandelier:        "ATR(42)×5 트레일링 스탑. 신고점에서 래칫 상승. 멀티배거를 살려두되 큰 낙폭은 차단.",
   E_half_runner:       "목표가 도달 시 절반 익절 + 나머지 C 규칙으로 트레일.",
   F_momentum_narrative:"200MA 위에서만 진입 + C 청산 규칙.",
+  G_dip_buy:           "발간일 종가 대비 ≥20% 하락 후 매수 (6개월 내, 단독 커버 OK). 목표가/+50%/12mo/ATR×3 스탑 중 선착 청산. 전성기 기준 피크 양(+) 비율을 딥에서 수확.",
+  H_minervini:         "트렌드 템플릿 진입: close>50MA>150MA>200MA, 200MA 상승, 52w고점 70% 이상, KOSPI 대비 RS양(+). 청산: 주간 체크 close<50MA. (Minervini 2013)",
+  I_supertrend:        "Supertrend(10, 3) 불리시 시 진입 (발간 시 또는 3개월 내 첫 전환). 베어리시 전환 시 청산. 빠른 사이클 트렌드 팔로잉.",
+  J_core_satellite:    "D 샹들리에 NAV 오버레이. 80% 코어·20% 현금. KOSPI 52w고점 대비 -15% 시 120% 레버리지 전개, 차입비용 6%/년. 복구(-5% 미만) 시 80/20 환원.",
+  K_rr_trend:          "Stop=1×ATR(20). 반절 +2.5R 익절, 나머지 Chandelier ATR×3 트레일. 동시 최대 10종목. (Van Tharp R-배수 프레임워크)",
 };
+
+// Strategy grouping for tab sections
+const STRATEGY_GROUPS: { label: string; keys: string[] }[] = [
+  { label: "보유형",  keys: ["A_12mo", "B_36mo", "C_narrative", "E_half_runner"] },
+  { label: "추세형",  keys: ["D_chandelier", "F_momentum_narrative", "G_dip_buy", "H_minervini", "I_supertrend", "K_rr_trend"] },
+  { label: "오버레이", keys: ["J_core_satellite"] },
+];
 
 const BENCHMARK_KO: Record<string, string> = {
   KOSPI: "KOSPI", SP500: "S&P500", NASDAQ: "NASDAQ", AllWeather: "올웨더",
@@ -301,40 +318,51 @@ export function StrategySelector({
 
   return (
     <div className="space-y-6">
-      {/* ── Strategy tabs ──────────────────────────────────────────── */}
+      {/* ── Strategy tabs (grouped) ─────────────────────────────────── */}
       <div>
         <p className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">
           전략 선택 — 탭 클릭으로 전환
         </p>
-        <div className="flex flex-wrap gap-2">
-          {multiStrategy.strategies.map((s) => {
-            const isHL = s.key === multiStrategy.headline_key;
-            const isActive = s.key === selectedKey;
-            return (
-              <button
-                key={s.key}
-                onClick={() => setSelectedKey(s.key)}
-                className={cn(
-                  "rounded-lg border px-3 py-2 text-left transition-all",
-                  isActive
-                    ? "border-stamp bg-stamp/10 shadow-sm"
-                    : "border-border bg-card hover:border-stamp/40 hover:bg-stamp/5",
-                )}
-                aria-pressed={isActive}
-              >
-                <p className="font-mono text-[11px] font-bold leading-tight">
-                  {STRATEGY_LABEL_KO[s.key] ?? s.key}
-                  {isHL && !isActive && (
-                    <span className="ml-1 font-mono text-[9px] text-stamp">[헤드라인]</span>
-                  )}
-                </p>
-                <p className={cn("tnum mt-0.5 font-mono text-xs font-bold", signColor(s.in_sample.cagr_pct))}>
-                  IS CAGR {s.in_sample.cagr_pct != null ? formatPct(s.in_sample.cagr_pct, 1) : "—"}
-                </p>
-              </button>
-            );
-          })}
-        </div>
+        {STRATEGY_GROUPS.map((group) => {
+          const groupStrats = multiStrategy.strategies.filter((s) => group.keys.includes(s.key));
+          if (!groupStrats.length) return null;
+          return (
+            <div key={group.label} className="mb-3">
+              <p className="mb-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/60">
+                {group.label}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {groupStrats.map((s) => {
+                  const isHL = s.key === multiStrategy.headline_key;
+                  const isActive = s.key === selectedKey;
+                  return (
+                    <button
+                      key={s.key}
+                      onClick={() => setSelectedKey(s.key)}
+                      className={cn(
+                        "rounded-lg border px-3 py-2 text-left transition-all",
+                        isActive
+                          ? "border-stamp bg-stamp/10 shadow-sm"
+                          : "border-border bg-card hover:border-stamp/40 hover:bg-stamp/5",
+                      )}
+                      aria-pressed={isActive}
+                    >
+                      <p className="font-mono text-[11px] font-bold leading-tight">
+                        {STRATEGY_LABEL_KO[s.key] ?? s.key}
+                        {isHL && !isActive && (
+                          <span className="ml-1 font-mono text-[9px] text-stamp">[헤드라인]</span>
+                        )}
+                      </p>
+                      <p className={cn("tnum mt-0.5 font-mono text-xs font-bold", signColor(s.in_sample.cagr_pct))}>
+                        IS CAGR {s.in_sample.cagr_pct != null ? formatPct(s.in_sample.cagr_pct, 1) : "—"}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* ── Selected strategy hero ──────────────────────────────────── */}

@@ -7,7 +7,7 @@ import backtest from "@/data/strategy-backtest.json";
 import { signColor } from "@/lib/verdict";
 import { cn, formatPct } from "@/lib/utils";
 
-export const metadata: Metadata = { title: "모멘텀 전략 — 판결 아카이브" };
+export const metadata: Metadata = { title: "전략 — 판결 아카이브" };
 
 function fmt만(v: number) {
   if (v >= 100_000_000) return `${(v / 100_000_000).toFixed(1)}억원`;
@@ -165,6 +165,11 @@ const STRATEGY_LABEL_KO: Record<string, string> = {
   D_chandelier:         "D. 샹들리에 래칫 ★",
   E_half_runner:        "E. 절반익절+러너",
   F_momentum_narrative: "F. 모멘텀 필터",
+  G_dip_buy:            "G. 딥바이",
+  H_minervini:          "H. 미너비니 템플릿",
+  I_supertrend:         "I. 슈퍼트렌드",
+  J_core_satellite:     "J. 코어-새틀라이트",
+  K_rr_trend:           "K. R:R 2.5 추세추종",
 };
 
 const BENCHMARK_KO: Record<string, string> = {
@@ -448,19 +453,24 @@ export default function StrategyPage() {
       ══════════════════════════════════════════════════════════════ */}
       <header>
         <h1 className="mt-2 font-display text-4xl font-black leading-[1.15] tracking-tight sm:text-5xl">
-          여러 학회가 동시에 <span className="text-stamp">Buy</span>를 외칠 때만 산다.
+          전성기 수익을 어떻게 <span className="text-stamp">수확</span>할 것인가.
         </h1>
         <p className="mt-3 max-w-3xl text-base leading-7 text-muted-foreground">
-          6가지 전략을 인샘플({simStartDisplay.slice(0, 7)}–2023-12)로 비교하고 아웃오브샘플(2024–현재)로 검증.
+          학회 리포트 발간 후 24개월 내 피크 수익률이 거의 전부 양(+)이라는 사실 —
+          하지만 라운드트립을 타면 그 이익은 사라집니다.
+          11가지 전략을 인샘플({simStartDisplay.slice(0, 7)}–2023-12)로 비교하고 아웃오브샘플(2024–현재)로 검증.
           헤드라인은 IS 샤프 최상위 전략인{" "}
           <strong className="text-foreground">
             {STRATEGY_LABEL_KO[params.headline_key] ?? params.headline_key}
           </strong>입니다.
         </p>
+        <p className="mt-1.5 text-sm text-muted-foreground italic">
+          주의: 과거 데이터 기반 시뮬레이션. 미래 수익 보장 없음. 과최적화 방지를 위해 파라미터는 문헌 표준값 고정.
+        </p>
         <p className="mt-1.5 text-sm text-muted-foreground">
           유니버스:{" "}
           <strong className="text-foreground">KR {universeStats.kr_tickers}개 + US {universeStats.us_tickers}개</strong>{" "}
-          종목 (≥2개 학회 Buy 컨센서스) · 시뮬 기점 {simStartDisplay}
+          종목 (≥2개 학회 Buy 컨센서스, G전략은 단독 OK) · 시뮬 기점 {simStartDisplay}
         </p>
       </header>
 
@@ -552,7 +562,7 @@ export default function StrategyPage() {
               IS/OOS 비교표 — 모든 전략
             </h3>
             <p className="mb-3 text-xs text-muted-foreground">
-              모든 전략: ≥2개 학회 컨센서스 즉시 진입, 동일비중 {Math.round((params.position_weight ?? 0.05) * 100)}%, 편도 수수료 {(params.cost_per_side ?? 0.003) * 100}%.{" "}
+              모든 전략: ≥2개 학회 컨센서스 즉시 진입 (G는 단독 OK, J는 D 오버레이), 동일비중 {Math.round((params.position_weight ?? 0.05) * 100)}%, 편도 수수료 {(params.cost_per_side ?? 0.003) * 100}%.{" "}
               <span className="text-foreground font-medium">{params.anti_overfit_note}</span>
             </p>
             <div className="overflow-x-auto">
@@ -846,23 +856,43 @@ export default function StrategyPage() {
             {[
               {
                 n: 1,
-                title: "유니버스 — KR + US 멀티클럽 컨센서스",
-                body: `KR ${universeStats.kr_tickers}개 + US ${universeStats.us_tickers}개 종목. 리포트 풀 ${params.universe_start} 이후, 시뮬 기점 ${simStartDisplay}. ≥2개 학회 동시 Buy. US 종목은 달러 기준 가격 사용 (환율 미반영).`,
+                title: "유니버스 — KR + US 컨센서스",
+                body: `KR ${universeStats.kr_tickers}개 + US ${universeStats.us_tickers}개 종목. 리포트 풀 ${params.universe_start} 이후, 시뮬 기점 ${simStartDisplay}. ≥2개 학회 동시 Buy (G딥바이는 단독 OK — 딥 자체가 필터). US 종목은 달러 기준 가격 사용 (환율 미반영).`,
               },
               {
                 n: 2,
-                title: "진입 — 발간 당일 (다음 거래일 시가)",
-                body: "신고가 돌파 대기 없음. 발간 다음 거래일 시가 즉시 매수.",
+                title: "진입 — 전략별 트리거 조건",
+                body: "A/B/C/D/E: 발간 다음 거래일 시가 즉시 진입. F: 200MA 위 확인 후 진입. G: 발간일 종가 -20% 도달 시 진입. H: 미너비니 5-point 템플릿 통과 시. I: Supertrend(10,3) 상향전환 시. J: D NAV 오버레이. K: 컨센서스 발생 즉시.",
               },
               {
                 n: 3,
-                title: `청산 — 샹들리에 래칫 ATR(42)×${params.chandelier_atr_mult ?? 5}`,
-                body: `신고점 대비 ATR(42)×5 아래로 종가가 내려오면 다음 거래일 시가 청산. 문헌 표준값 고정 (Le Beau Chandelier Exit).`,
+                title: `청산 — 전략별 규칙`,
+                body: `D 헤드라인: ATR(42)×5 트레일링 (Le Beau). G: 목표가/+50%/12mo/ATR×3 선착. H: 주간 close<50MA. I: Supertrend 하향전환. J: 80/20 자동 디레버. K: half at +2.5R + ATR×3 트레일.`,
               },
               {
                 n: 4,
-                title: `포지션 — 동일비중 ${Math.round((params.position_weight ?? 0.05) * 100)}%, 최대 ${params.max_positions ?? 20}종목`,
-                body: `슬롯당 NAV의 ${Math.round((params.position_weight ?? 0.05) * 100)}%. 최대 ${params.max_positions ?? 20}종목. 거래비용 편도 ${(params.cost_per_side ?? 0.003) * 100}%.`,
+                title: `포지션 — 동일비중 ${Math.round((params.position_weight ?? 0.05) * 100)}%`,
+                body: `슬롯당 NAV의 ${Math.round((params.position_weight ?? 0.05) * 100)}%. 최대 ${params.max_positions ?? 20}종목 (K는 최대 10). 거래비용 편도 ${(params.cost_per_side ?? 0.003) * 100}%. J(레버리지): 차입비용 6%/년 일 단위 적립.`,
+              },
+              {
+                n: 5,
+                title: "G 딥바이 — 파라미터 출처",
+                body: "딥 임계값 20%: Jegadeesh & Kim (2006) 애널리스트 반응 후 가격 조정 연구. 창 6개월, ATR×3 스탑, +50% 익절, 12개월 최대 보유. 단독 커버 허용 — 딥 진입 자체가 질적 필터 역할.",
+              },
+              {
+                n: 6,
+                title: "H 미너비니 — 파라미터 출처",
+                body: "Minervini (2013) 'Trade Like a Stock Market Wizard'. 5-point template: close>50MA>150MA>200MA, 200MA 상승(vs 1달 전), 52w 고점 70% 이상, 6개월 RS vs KOSPI 양(+). 청산: 주간 close<50MA.",
+              },
+              {
+                n: 7,
+                title: "I 슈퍼트렌드 — 파라미터 출처",
+                body: "Supertrend 표준 파라미터 (10, 3): ATR 기간 10일, 밴드 배수 3.0. Olivier Seban 대중화. 발간 시 불리시이거나 3개월 내 첫 상향 전환 시 진입. 하향 전환 다음 거래일 청산.",
+              },
+              {
+                n: 8,
+                title: "K R:R 2.5 — 파라미터 출처",
+                body: "Van Tharp 'Trade Your Way to Financial Freedom' R-배수 프레임워크. 1R = ATR(20)×1. 반절 +2.5R 익절 (고성과 트레이더 통계적 최적 구간). 나머지 Chandelier ATR×3 트레일. 최대 10종목 집중도 관리.",
               },
             ].map((rule) => (
               <article key={rule.n} className="rounded-lg border border-border bg-secondary/20 p-4">
@@ -883,6 +913,10 @@ export default function StrategyPage() {
               <li>· <strong className="text-foreground">과최적화 주의.</strong> 헤드라인(D) 파라미터는 ATR×5, 200MA — 문헌 표준값 고정. 그리드 서치 없음.</li>
               <li>· <strong className="text-foreground">시뮬 기점 주의.</strong> 2020-01 이전 리포트 풀이 얇아 기점을 2020-01-01로 설정. 실질 트레이딩은 신호 발생 시점부터이므로 첫 거래는 이후.</li>
               <li>· <strong className="text-foreground">내러티브 홀드(C) 주의.</strong> 무한 홀드 전략은 MDD 허용 범위가 넓습니다. 포지션 청산 규칙이 느슨합니다.</li>
+              <li>· <strong className="text-foreground">딥바이(G) 솔직한 평가.</strong> IS CAGR −2.2%, OOS CAGR −31.5%. 20% 하락이 저점이 아니라 시작인 경우가 많습니다. 단독 커버 허용이 과도한 노출을 만들었습니다. IS/OOS 모두 벤치마크 하회 — 채택 불가.</li>
+              <li>· <strong className="text-foreground">미너비니(H) / 슈퍼트렌드(I).</strong> IS Sharpe가 D보다 낮고 진입 필터가 신호를 크게 줄입니다. 추세 필터 전략은 급등 초입을 놓치는 비용이 존재합니다.</li>
+              <li>· <strong className="text-foreground">코어-새틀라이트 레버리지(J) 솔직한 평가.</strong> IS Sharpe 0.83, OOS Sharpe 1.04로 D(0.97/0.98)와 경쟁적이지만, 차입비용(6%/년)과 폭락 타이밍 미스 리스크가 있습니다. 레버리지 전개 구간에서 추가 낙폭이 발생하면 NAV가 D보다 더 많이 빠집니다. 단독 사용 권장 불가, D의 보조 시뮬로만 참고하세요.</li>
+              <li>· <strong className="text-foreground">R:R 2.5(K) 주의.</strong> IS/OOS Sharpe 0.52/0.50으로 안정적이나 D보다 낮습니다. 빠른 사이클이 거래비용을 높입니다.</li>
               <li>· <strong className="text-foreground">US 종목 주의.</strong> 수익은 달러 기준. KRW/USD 환율 변동 미반영.</li>
               <li>· <strong className="text-foreground">컨센서스 표본 제한.</strong> US 컨센서스 종목 4개. 통계적 유의성 낮음.</li>
               <li>· 롱온리 전략. 대세 하락장 손실 불가피. 헤드라인 MDD {formatPct(m.mdd_pct, 1)}.</li>

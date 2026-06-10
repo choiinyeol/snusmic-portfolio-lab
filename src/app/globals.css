@@ -476,6 +476,9 @@ table {
 }
 
 .wall-gold {
+  /* position: relative 필수 — 범례 견본처럼 비배치 요소에 쓰이면 ::after 글린트가
+     조상(서가 섹션) 기준으로 거대 오버레이가 되어 이웃 버튼 클릭을 가로챈다 */
+  position: relative;
   background: linear-gradient(135deg, hsl(44 80% 46%), hsl(40 86% 38%) 55%, hsl(44 80% 50%));
   box-shadow: 0 0 0 1px hsl(var(--gold) / 0.7), 0 0 5px hsl(var(--gold) / 0.55);
   overflow: hidden;
@@ -485,6 +488,7 @@ table {
   content: "";
   position: absolute;
   inset: -10% 30%;
+  pointer-events: none;
   background: linear-gradient(90deg, transparent, hsl(48 100% 88% / 0.9), transparent);
   animation: glint-sweep 5.2s ease-in-out infinite;
 }
@@ -500,6 +504,7 @@ table {
 }
 
 .wall-prism {
+  position: relative;
   background: conic-gradient(
     from 230deg at 32% 28%,
     hsl(192 95% 78%),
@@ -518,6 +523,7 @@ table {
   content: "";
   position: absolute;
   inset: -12% 26%;
+  pointer-events: none;
   background: linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.95), transparent);
   animation: glint-sweep 3.6s ease-in-out infinite;
 }

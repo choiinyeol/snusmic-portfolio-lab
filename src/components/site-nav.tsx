@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 const LINKS = [
   { href: "/", label: "아카이브" },
   { href: "/clubs", label: "학회별 성적표" },
-  { href: "/strategy", label: "모멘텀 전략" },
+  { href: "/strategy", label: "전략" },
 ];
 
 const noopSubscribe = () => () => {};
