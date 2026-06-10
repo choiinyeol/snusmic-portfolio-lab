@@ -198,16 +198,6 @@ export default function StrategyPage() {
     strategy_mdd_pct: number;
     series: WealthPoint[];
   };
-  const tail = backtest.tail_stats as {
-    total_trades: number;
-    top_decile_n: number;
-    top_decile_pnl_share_pct: number;
-    top_decile_avg_return_pct: number | null;
-    multibagger_count: number;
-    doubler_count: number;
-    top_decile_avg_hold_days: number | null;
-    top10_trades: { ticker: string; market?: string; display_name?: string; return_pct: number; days: number; n_clubs: number }[];
-  };
   const consensus = backtest.consensus_stats as {
     single_club: { count: number; avg_return_pct: number | null; win_rate_pct: number | null };
     multi_club: { count: number; avg_return_pct: number | null; win_rate_pct: number | null };
@@ -328,66 +318,12 @@ export default function StrategyPage() {
             </div>
           )}
 
-          {/* Open positions (compact table) */}
-          {signals.open_positions.length > 0 && (
-            <details className="mt-4" open>
-              <summary className="cursor-pointer font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground select-none">
-                보유 중 ({signals.open_positions.length}종목) — 클릭해서 접기/펼치기
-              </summary>
-              <div className="mt-2 overflow-x-auto">
-                <table className="w-full min-w-[680px] border-collapse text-sm">
-                  <thead>
-                    <tr className="border-b-2 border-border font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
-                      <th className="px-3 py-1.5 text-left">종목</th>
-                      <th className="px-3 py-1.5 text-right">진입일</th>
-                      <th className="px-3 py-1.5 text-right">진입가</th>
-                      <th className="px-3 py-1.5 text-right">현재가</th>
-                      <th className="px-3 py-1.5 text-right">미실현</th>
-                      <th className="px-3 py-1.5 text-right">경과일</th>
-                      <th className="px-3 py-1.5 text-right">매도 예정</th>
-                      <th className="px-3 py-1.5 text-right">잔여일</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {signals.open_positions.map((pos) => {
-                      const slug = pos.market && pos.ticker ? tickerSlug(pos.market, pos.ticker) : null;
-                      return (
-                        <tr
-                          key={pos.ticker}
-                          className={cn(
-                            "border-b border-dashed border-border last:border-b-0",
-                            pos.days_remaining <= 30 && pos.days_remaining >= 0 && "bg-down/5"
-                          )}
-                        >
-                          <td className="px-3 py-1.5">
-                            {slug ? (
-                              <Link href={`/stocks/${slug}`} className="hover:underline">
-                                <p className="font-mono text-xs font-bold">{pos.display_name ?? pos.ticker}</p>
-                              </Link>
-                            ) : (
-                              <p className="font-mono text-xs font-bold">{pos.display_name ?? pos.ticker}</p>
-                            )}
-                            <p className="font-mono text-[10px] text-muted-foreground">{pos.ticker}</p>
-                          </td>
-                          <td className="tnum px-3 py-1.5 text-right font-mono text-xs text-muted-foreground">{pos.entry_date}</td>
-                          <td className="tnum px-3 py-1.5 text-right font-mono text-xs">{pos.entry_price?.toLocaleString()}</td>
-                          <td className="tnum px-3 py-1.5 text-right font-mono text-xs">{pos.current_price ? pos.current_price.toLocaleString() : "—"}</td>
-                          <td className={cn("tnum px-3 py-1.5 text-right font-mono text-xs font-bold", signColor(pos.unrealized_pct))}>
-                            {pos.unrealized_pct != null ? formatPct(pos.unrealized_pct, 1) : "—"}
-                          </td>
-                          <td className="tnum px-3 py-1.5 text-right font-mono text-xs text-muted-foreground">{pos.days_elapsed}일</td>
-                          <td className="tnum px-3 py-1.5 text-right font-mono text-xs">{pos.exit_due}</td>
-                          <td className={cn("tnum px-3 py-1.5 text-right font-mono text-xs font-bold",
-                            pos.days_remaining <= 30 ? "text-down" : "text-muted-foreground")}>
-                            {pos.days_remaining}일
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </details>
+          {/* Open positions link — detail lives in strategy selector */}
+          {signals.counts.open > 0 && (
+            <p className="mt-3 font-mono text-xs text-muted-foreground">
+              보유 중 <strong className="text-foreground">{signals.counts.open}종목</strong>의 상세 보유 테이블은{" "}
+              <a href="#strategy-selector" className="underline hover:text-foreground">전략 비교 → 보유 중 탭</a>에서 확인하세요.
+            </p>
           )}
 
           {/* Watching list — capped with 더 보기 */}
@@ -470,7 +406,7 @@ export default function StrategyPage() {
         <p className="mt-1.5 text-sm text-muted-foreground">
           유니버스:{" "}
           <strong className="text-foreground">KR {universeStats.kr_tickers}개 + US {universeStats.us_tickers}개</strong>{" "}
-          종목 (≥2개 학회 Buy 컨센서스, G전략은 단독 OK) · 시뮬 기점 {simStartDisplay}
+          종목 (1회 이상 Buy 언급 — 단독·컨센서스 모두 진입) · 시뮬 기점 {simStartDisplay}
         </p>
       </header>
 
@@ -544,7 +480,7 @@ export default function StrategyPage() {
       {/* ══════════════════════════════════════════════════════════════
           ③ 전략 비교 + 자산곡선·시뮬 (selector tabs) — collapsible
       ══════════════════════════════════════════════════════════════ */}
-      <details open className="group rounded-lg border border-border bg-card">
+      <details open id="strategy-selector" className="group rounded-lg border border-border bg-card">
         <summary className="flex cursor-pointer select-none list-none items-baseline justify-between gap-2 p-5 hover:bg-secondary/20 transition-colors [&::-webkit-details-marker]:hidden">
           <div>
             <h2 className="font-display text-2xl font-black tracking-tight">전략 비교 &amp; 상세</h2>
@@ -562,7 +498,7 @@ export default function StrategyPage() {
               IS/OOS 비교표 — 모든 전략
             </h3>
             <p className="mb-3 text-xs text-muted-foreground">
-              모든 전략: ≥2개 학회 컨센서스 즉시 진입 (G는 단독 OK, J는 D 오버레이), 동일비중 {Math.round((params.position_weight ?? 0.05) * 100)}%, 편도 수수료 {(params.cost_per_side ?? 0.003) * 100}%.{" "}
+              모든 전략: 1회 이상 Buy 언급 시 즉시 진입 (J는 D 오버레이), 동일비중 {Math.round((params.position_weight ?? 0.05) * 100)}%, 편도 수수료 {(params.cost_per_side ?? 0.003) * 100}%. 동시 보유 20종목 한도로 신호 일부는 미체결.{" "}
               <span className="text-foreground font-medium">{params.anti_overfit_note}</span>
             </p>
             <div className="overflow-x-auto">
@@ -636,207 +572,6 @@ export default function StrategyPage() {
         </div>
       </details>
 
-      {/* ══════════════════════════════════════════════════════════════
-          ④ 분석 심화 — tail stats, consensus, open positions
-             (collapsible secondary depth)
-      ══════════════════════════════════════════════════════════════ */}
-      <details className="group rounded-lg border border-border bg-card">
-        <summary className="flex cursor-pointer select-none list-none items-baseline justify-between gap-2 p-5 hover:bg-secondary/20 transition-colors [&::-webkit-details-marker]:hidden">
-          <div>
-            <h2 className="font-display text-2xl font-black tracking-tight">분석 심화</h2>
-            <p className="mt-0.5 text-sm text-muted-foreground">
-              테일 캡처 · 멀티클럽 컨센서스 · 현재 보유 포지션 · 신고가 돌파 레거시 민감도
-            </p>
-          </div>
-          <span className="font-mono text-sm text-muted-foreground group-open:rotate-180 transition-transform">▼</span>
-        </summary>
-        <div className="border-t border-border px-5 pb-5 pt-4 space-y-6">
-
-          {/* Tail stats */}
-          <section aria-label="테일 캡처 통계">
-            <h3 className="mb-3 font-display text-xl font-black tracking-tight">수익은 꼬리에서 — 테일 캡처 (헤드라인)</h3>
-            <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3 lg:grid-cols-6">
-              {[
-                { label: "총 거래 수", value: String(tail.total_trades) },
-                { label: "상위 10% 거래", value: String(tail.top_decile_n) },
-                { label: "상위 10% P&L", value: `${tail.top_decile_pnl_share_pct}%`, tone: "text-up" },
-                { label: "상위 10% 평균 수익", value: formatPct(tail.top_decile_avg_return_pct, 0), tone: "text-up" },
-                { label: "2배 이상 거래", value: `${tail.doubler_count}건` },
-                { label: "상위 10% 평균 보유", value: tail.top_decile_avg_hold_days ? `${tail.top_decile_avg_hold_days}일` : "—" },
-              ].map((item) => (
-                <div key={item.label} className="bg-card px-4 py-3">
-                  <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">{item.label}</dt>
-                  <dd className={cn("tnum mt-1.5 font-display text-2xl font-black tracking-tight", item.tone ?? "")}>{item.value}</dd>
-                </div>
-              ))}
-            </dl>
-            {tail.top10_trades.length > 0 && (
-              <div className="mt-3 overflow-x-auto">
-                <p className="mb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">상위 10개 거래</p>
-                <table className="w-full min-w-[480px] border-collapse text-sm">
-                  <thead>
-                    <tr className="border-b-2 border-border font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                      <th className="px-3 py-1.5 text-left font-semibold">종목</th>
-                      <th className="px-3 py-1.5 text-right font-semibold">수익률</th>
-                      <th className="px-3 py-1.5 text-right font-semibold">보유일</th>
-                      <th className="px-3 py-1.5 text-right font-semibold">커버</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tail.top10_trades.map((t, i) => {
-                      const slug = t.market && t.ticker ? tickerSlug(t.market, t.ticker) : null;
-                      return (
-                        <tr key={`${t.ticker}-${i}`} className="border-b border-dashed border-border last:border-b-0">
-                          <td className="px-3 py-1.5">
-                            {slug ? (
-                              <Link href={`/stocks/${slug}`} className="hover:underline">
-                                <p className="font-mono text-xs font-bold">{t.display_name ?? t.ticker}</p>
-                              </Link>
-                            ) : (
-                              <p className="font-mono text-xs font-bold">{t.display_name ?? t.ticker}</p>
-                            )}
-                            <p className="font-mono text-[10px] text-muted-foreground">{t.ticker}</p>
-                          </td>
-                          <td className={cn("tnum px-3 py-1.5 text-right font-mono text-xs font-bold", signColor(t.return_pct))}>{formatPct(t.return_pct, 1)}</td>
-                          <td className="tnum px-3 py-1.5 text-right font-mono text-xs">{t.days}일</td>
-                          <td className="tnum px-3 py-1.5 text-right font-mono text-xs">{t.n_clubs}개</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
-
-          {/* Consensus stats */}
-          <section aria-label="컨센서스 분석">
-            <h3 className="mb-2 font-display text-xl font-black tracking-tight">
-              멀티클럽 컨센서스 — ≥2개 학회가 동시에 Buy를 내면?
-            </h3>
-            <p className="mb-3 text-sm text-muted-foreground">{consensus.note}</p>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {[
-                { label: "단독 커버 (1개 학회)", data: consensus.single_club },
-                { label: "멀티 커버 (≥2개 학회)", data: consensus.multi_club },
-              ].map(({ label, data }) => (
-                <div key={label} className="rounded-lg border border-border bg-secondary/30 p-4">
-                  <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">{label}</p>
-                  <dl className="mt-3 grid grid-cols-3 gap-3">
-                    {[
-                      { k: "거래 수", v: `${data.count}건` },
-                      { k: "평균 수익률", v: formatPct(data.avg_return_pct, 1), tone: signColor(data.avg_return_pct) },
-                      { k: "승률", v: data.win_rate_pct != null ? `${data.win_rate_pct}%` : "—" },
-                    ].map(({ k, v, tone }) => (
-                      <div key={k}>
-                        <dt className="font-mono text-[9px] text-muted-foreground">{k}</dt>
-                        <dd className={cn("tnum mt-0.5 font-mono text-base font-bold", tone ?? "")}>{v}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                </div>
-              ))}
-            </div>
-            {consensus.alpha_multi_vs_single != null && (
-              <p className="mt-3 text-sm text-muted-foreground">
-                멀티 커버 평균 수익률이 단독 커버 대비{" "}
-                <span className={cn("font-bold", signColor(consensus.alpha_multi_vs_single))}>
-                  {formatPct(consensus.alpha_multi_vs_single, 1)}p
-                </span>{" "}
-                {consensus.alpha_multi_vs_single > 0 ? "높습니다." : "낮습니다."}
-              </p>
-            )}
-          </section>
-
-          {/* Open positions from headline */}
-          {backtest.open_positions.length > 0 && (
-            <section aria-label="현재 보유 포지션">
-              <h3 className="mb-2 font-display text-xl font-black tracking-tight">
-                헤드라인 전략 현재 보유 ({backtest.open_positions.length}종목)
-              </h3>
-              <p className="mb-3 text-sm text-muted-foreground">백테스트 마지막 날 기준 미청산 포지션.</p>
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[520px] border-collapse text-sm">
-                  <thead>
-                    <tr className="border-b-4 border-double border-border font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                      <th className="px-3 py-2 text-left font-semibold">종목</th>
-                      <th className="px-3 py-2 text-left font-semibold">진입일</th>
-                      <th className="px-3 py-2 text-right font-semibold">진입가</th>
-                      <th className="px-3 py-2 text-right font-semibold">현재가</th>
-                      <th className="px-3 py-2 text-right font-semibold">수익률</th>
-                      <th className="px-3 py-2 text-right font-semibold">커버</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(backtest.open_positions as { ticker: string; market?: string; display_name?: string; entry_date: string; entry: number; last_close: number; return_pct: number; n_clubs?: number }[])
-                      .sort((a, b) => b.return_pct - a.return_pct)
-                      .map((pos) => {
-                        const slug = pos.market && pos.ticker ? tickerSlug(pos.market, pos.ticker) : null;
-                        return (
-                          <tr key={pos.ticker} className="border-b border-dashed border-border last:border-b-0">
-                            <td className="px-3 py-2">
-                              {slug ? (
-                                <Link href={`/stocks/${slug}`} className="hover:underline">
-                                  <p className="font-mono text-xs font-bold">{pos.display_name ?? pos.ticker}</p>
-                                </Link>
-                              ) : (
-                                <p className="font-mono text-xs font-bold">{pos.display_name ?? pos.ticker}</p>
-                              )}
-                              <p className="font-mono text-[10px] text-muted-foreground">{pos.ticker}</p>
-                            </td>
-                            <td className="tnum px-3 py-2 font-mono text-xs text-muted-foreground">{pos.entry_date}</td>
-                            <td className="tnum px-3 py-2 text-right font-mono text-xs">{pos.entry.toLocaleString()}</td>
-                            <td className="tnum px-3 py-2 text-right font-mono text-xs">{pos.last_close.toLocaleString()}</td>
-                            <td className={cn("tnum px-3 py-2 text-right font-mono text-xs font-bold", signColor(pos.return_pct))}>
-                              {formatPct(pos.return_pct, 1)}
-                            </td>
-                            <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">{pos.n_clubs ?? 1}개교</td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
-
-          {/* Legacy breakout sensitivity */}
-          <section aria-label="신고가 돌파 전략 민감도">
-            <h3 className="mb-2 font-display text-xl font-black tracking-tight">
-              참고: 신고가 돌파 전략 파라미터 민감도 (KR 전용, v3 레거시)
-            </h3>
-            <p className="mb-3 text-sm text-muted-foreground">
-              구 v3 헤드라인의 신고가 돌파 + ATR 래칫 그리드. 인샘플 샤프가 일관되게 낮습니다.
-            </p>
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[580px] border-collapse text-sm">
-                <thead>
-                  <tr className="border-b-4 border-double border-border font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                    <th className="px-3 py-2 text-left font-semibold">ATR 배수</th>
-                    <th className="px-3 py-2 text-left font-semibold">국면 필터</th>
-                    <th className="px-3 py-2 text-right font-semibold">IS 샤프</th>
-                    <th className="px-3 py-2 text-right font-semibold">OOS 샤프</th>
-                    <th className="px-3 py-2 text-right font-semibold">MDD</th>
-                    <th className="px-3 py-2 text-right font-semibold">거래수</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(backtest.sensitivity as { atr_mult: number; regime_filter: boolean; total_return_pct: number; sharpe: number | null; mdd_pct: number; trades: number; is_sharpe: number | null; oos_sharpe: number | null }[]).map((row) => (
-                    <tr key={`${row.atr_mult}-${row.regime_filter}`} className="border-b border-dashed border-border last:border-b-0">
-                      <td className="tnum px-3 py-2 font-mono text-xs">×{row.atr_mult}</td>
-                      <td className="px-3 py-2 font-mono text-xs">{row.regime_filter ? "ON" : "off"}</td>
-                      <td className="tnum px-3 py-2 text-right font-mono text-xs">{row.is_sharpe ?? "—"}</td>
-                      <td className="tnum px-3 py-2 text-right font-mono text-xs">{row.oos_sharpe ?? "—"}</td>
-                      <td className="tnum px-3 py-2 text-right font-mono text-xs text-down">{formatPct(row.mdd_pct, 1)}</td>
-                      <td className="tnum px-3 py-2 text-right font-mono text-xs">{row.trades}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        </div>
-      </details>
 
       {/* ══════════════════════════════════════════════════════════════
           ⑤ 방법론 / 전략 규칙 / 각주 — collapsible
@@ -856,8 +591,8 @@ export default function StrategyPage() {
             {[
               {
                 n: 1,
-                title: "유니버스 — KR + US 컨센서스",
-                body: `KR ${universeStats.kr_tickers}개 + US ${universeStats.us_tickers}개 종목. 리포트 풀 ${params.universe_start} 이후, 시뮬 기점 ${simStartDisplay}. ≥2개 학회 동시 Buy (G딥바이는 단독 OK — 딥 자체가 필터). US 종목은 달러 기준 가격 사용 (환율 미반영).`,
+                title: "유니버스 — KR + US 전체 Buy 언급",
+                body: `KR ${universeStats.kr_tickers}개 + US ${universeStats.us_tickers}개 종목. 리포트 풀 ${params.universe_start} 이후, 시뮬 기점 ${simStartDisplay}. 1회 이상 Buy 언급 즉시 진입 — 단독 커버·컨센서스 모두 포함. 동시 보유 20종목 한도로 신호 일부 미체결. US 종목은 달러 기준 가격 사용 (환율 미반영).`,
               },
               {
                 n: 2,
@@ -920,6 +655,11 @@ export default function StrategyPage() {
               <li>· <strong className="text-foreground">US 종목 주의.</strong> 수익은 달러 기준. KRW/USD 환율 변동 미반영.</li>
               <li>· <strong className="text-foreground">컨센서스 표본 제한.</strong> US 컨센서스 종목 4개. 통계적 유의성 낮음.</li>
               <li>· 롱온리 전략. 대세 하락장 손실 불가피. 헤드라인 MDD {formatPct(m.mdd_pct, 1)}.</li>
+              <li>· <strong className="text-foreground">컨센서스 분석.</strong>{" "}
+                헤드라인(D) 거래 기준: 단독 커버 {consensus.single_club.count}건 (평균 {formatPct(consensus.single_club.avg_return_pct, 1)}, 승률 {consensus.single_club.win_rate_pct ?? "—"}%) vs
+                멀티 커버 {consensus.multi_club.count}건 (평균 {formatPct(consensus.multi_club.avg_return_pct, 1)}, 승률 {consensus.multi_club.win_rate_pct ?? "—"}%).
+                {consensus.alpha_multi_vs_single != null && ` 멀티 커버 알파: ${formatPct(consensus.alpha_multi_vs_single, 1)}p.`}
+              </li>
               <li>· 생존 편향: 공개를 유지한 리포트만 수집. 상장폐지 종목 시세 일부 누락 가능.</li>
               <li>· 올웨더는 25% GLD/NASDAQ/S&P500/KOSPI 분기 리밸런싱으로 단순화. 채권 미포함.</li>
               <li>· 투자 권유가 아닙니다. 과거 데이터 기반 시뮬레이션으로 미래 수익을 보장하지 않습니다.</li>

@@ -1,15 +1,12 @@
-"""학회 리포트 × 전략 연구 백테스트 v7.
+"""학회 리포트 × 전략 연구 백테스트 v8.
 
-변경사항 (v7):
-- 5가지 신규 전략 패밀리 추가 (G~K):
-    G. 딥바이 — 발간 후 ≥20% 하락 시 매수, 목표가/+50%/12mo/ATR×3 중 첫 도달 청산
-    H. 미너비니 트렌드 템플릿 — close>50MA>150MA>200MA, 200MA 상승, RS>0, 진입; close<50MA 주간 청산
-    I. 슈퍼트렌드(10,3) — 발간 시 또는 3개월 내 첫 상향 전환 시 진입, 하향 전환 시 청산
-    J. 코어-새틀라이트 80/20 + 폭락 레버리지 — D 샹들리에 NAV 오버레이, KOSPI -15% 폭락 시 120% 레버
-    K. R:R 2.5 추세추종 — 1R=ATR(20), 반절 +2.5R, 나머지 Chandelier ATR×3; 동시 10종목 한도
-  파라미터: 문헌 표준값 고정, 그리드 서치 없음
-- 전략 탭 그룹화: 보유형/추세형/오버레이
-- 페이지 메타 타이틀: "전략 — 판결 아카이브"
+변경사항 (v8):
+- 유니버스 확대: ≥2개교 컨센서스 게이트 제거 → 1회 언급(단독 커버 포함) 즉시 진입.
+    컨센서스는 분석 통계(consensus_stats)로만 유지 — 진입 조건 아님.
+    동일 티커 중복 진입 방지: 이미 오픈된 포지션이 있으면 스킵.
+- 전략별 open_positions 추가: multi_strategy.open_positions_by_strategy 에 현재 보유 상태 포함.
+- 레거시 신고가 돌파 민감도 분석(sensitivity) 제거 — dead weight.
+- 11가지 전략(A~K) 동일 유니버스에서 재계산.
 """
 
 from __future__ import annotations
@@ -507,7 +504,7 @@ def run_fixed_hold(
     ticker_reports: dict[str, list[dict]] | None = None,
     record_full_trades: bool = False,
 ) -> dict:
-    """Immediate entry, sell after hold_months. Consensus ≥2 only."""
+    """Immediate entry, sell after hold_months. All single reports OK (v8: no consensus gate)."""
     START_CAPITAL = 100_000_000
     cash = float(START_CAPITAL)
     positions: dict[str, dict] = {}
@@ -515,7 +512,7 @@ def run_fixed_hold(
     trades: list[dict] = []
     scheduled_exits: dict[str, dt.date] = {}
 
-    pending_entries = build_pending_entries(reports, calendar, consensus_only=True)
+    pending_entries = build_pending_entries(reports, calendar, consensus_only=False)
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
@@ -581,7 +578,7 @@ def run_narrative_hold(
     momentum_filter_entry: bool = False,
 ) -> dict:
     """
-    진입: consensus ≥2, 발간 다음 거래일 시가
+    진입: 단독 커버 포함 즉시 진입 (v8: 컨센서스 게이트 제거)
     청산: 월말 체크 — close < 200MA AND close < entry_price → 다음 거래일 시가 청산
     (Faber 2007 10-month SMA rule 정신: 추세 아래로 돌아오면 EXIT)
     momentum_filter_entry=True: 진입 시 close > 200MA 조건 추가 (Strategy F)
@@ -593,7 +590,7 @@ def run_narrative_hold(
     trades: list[dict] = []
     pending_exits: set[str] = set()  # flagged at month-end, executed next open
 
-    pending_entries = build_pending_entries(reports, calendar, consensus_only=True)
+    pending_entries = build_pending_entries(reports, calendar, consensus_only=False)
 
     # Build set of month-end dates
     cal_s = pd.Series(calendar)
@@ -674,7 +671,7 @@ def run_chandelier(
     record_full_trades: bool = False,
 ) -> dict:
     """
-    진입: consensus ≥2, immediate entry
+    진입: 단독 커버 포함 즉시 진입 (v8: 컨센서스 게이트 제거)
     청산: close < (highest_high_since_entry - ATR(42) × 5)
     Chandelier Exit (Le Beau) — 문헌 표준값 ATR×5
     """
@@ -685,7 +682,7 @@ def run_chandelier(
     trades: list[dict] = []
     pending_exits: set[str] = set()
 
-    pending_entries = build_pending_entries(reports, calendar, consensus_only=True)
+    pending_entries = build_pending_entries(reports, calendar, consensus_only=False)
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
@@ -757,7 +754,7 @@ def run_half_exit_runner(
     record_full_trades: bool = False,
 ) -> dict:
     """
-    진입: consensus ≥2, immediate entry
+    진입: 단독 커버 포함 즉시 진입 (v8: 컨센서스 게이트 제거)
     절반 청산: 목표가(클럽 최고 목표가) 도달 시 → 보유 주수 50% 매도 (당일 종가)
     나머지 러너: C 규칙 (200MA + 진입가 하방, 월 1회 체크)
     목표가 없으면 전량 C 규칙만.
@@ -769,7 +766,7 @@ def run_half_exit_runner(
     trades: list[dict] = []
     runner_exits: set[str] = set()  # flagged for C-rule exit next open
 
-    pending_entries = build_pending_entries(reports, calendar, consensus_only=True)
+    pending_entries = build_pending_entries(reports, calendar, consensus_only=False)
 
     cal_s = pd.Series(calendar)
     month_ends: set[dt.date] = set(
@@ -1081,7 +1078,7 @@ def run_minervini(
     kospi: pd.Series | None = None,
 ) -> dict:
     """
-    미너비니 트렌드 템플릿. 진입: consensus ≥2 + 5-point template.
+    미너비니 트렌드 템플릿. 진입: 단독 커버 포함 + 5-point template (v8: 컨센서스 게이트 제거).
     청산: 주간(금요일) 체크 시 close < 50MA.
     """
     START_CAPITAL = 100_000_000
@@ -1091,7 +1088,7 @@ def run_minervini(
     trades: list[dict] = []
     pending_exits: set[str] = set()
 
-    pending_entries = build_pending_entries(reports, calendar, consensus_only=True)
+    pending_entries = build_pending_entries(reports, calendar, consensus_only=False)
 
     # Weekly check days (Fridays, or last day of week in calendar)
     cal_s = pd.Series(calendar)
@@ -1220,8 +1217,7 @@ def run_supertrend(
     pending_entries_direct: dict[dt.date, list[tuple[str, str, int]]] = {}
 
     for rdate, ticker, source, n_clubs in reports:
-        if n_clubs < 2:
-            continue
+        # v8: no consensus gate — single-club OK
         df = prices.get(ticker)
         if df is None:
             continue
@@ -1442,7 +1438,7 @@ def run_rr_trend(
 ) -> dict:
     """
     R:R 2.5 추세추종. Stop = 1×ATR(20). 반절 +2.5R. 나머지 Chandelier ATR×3 트레일.
-    동시 최대 10종목.
+    동시 최대 10종목. v8: 단독 커버 포함.
     """
     START_CAPITAL = 100_000_000
     cash = float(START_CAPITAL)
@@ -1451,7 +1447,7 @@ def run_rr_trend(
     trades: list[dict] = []
     pending_exits: dict[str, str] = {}  # ticker -> reason
 
-    pending_entries = build_pending_entries(reports, calendar, consensus_only=True)
+    pending_entries = build_pending_entries(reports, calendar, consensus_only=False)
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
@@ -2605,6 +2601,10 @@ def main() -> int:
         return 1
     print(f"  Calendar (clipped): {calendar[0]} to {calendar[-1]}", flush=True)
 
+    # ── v8: all reports (single-club included) used as entry signals
+    print(f"  Total signal reports (all clubs): {len(reports)}", flush=True)
+    print(f"  Consensus (≥2 clubs) subset: {len([(d,t,s,n) for d,t,s,n in reports if n>=2])} reports", flush=True)
+
     # ── Load benchmarks
     print("Loading benchmarks...", flush=True)
     kospi = load_kospi()
@@ -2632,7 +2632,7 @@ def main() -> int:
     # Parameters are literature-grounded fixed values — no grid search
     # ══════════════════════════════════════════════════════════════════════════
 
-    print("\n── Running 11 strategies ─────────────────────────────────────────", flush=True)
+    print("\n── Running 11 strategies (v8: single-club universe) ─────────────", flush=True)
 
     # A. 12개월 보유 (baseline headline)
     print("A. 12개월 보유...", flush=True)
@@ -2769,16 +2769,7 @@ def main() -> int:
     tail_stats = compute_tail_stats(headline.get("trades", []))
     consensus_stats = compute_consensus_stats(headline.get("trades", []))
 
-    # ── Also compute legacy variant research on A_12mo (for backwards compat section)
-    print("\nRunning legacy variant research...", flush=True)
-    # Use A (12mo, consensus) as D_consensus_12mo equivalent
-    legacy_d = result_A  # same logic
-    variants: list[dict] = []
-
-    for hold in [6, 9, 18]:
-        lbl = f"variant_{hold}mo"
-        rv = run_fixed_hold(prices, reports, calendar, hold_months=hold, label=lbl, ticker_reports=ticker_reports)
-        variants.append({"label": lbl, "metrics": rv["metrics"], "in_sample": rv.get("in_sample", {}), "out_of_sample": rv.get("out_of_sample", {})})
+    # ── Variant research skipped in v8 (dead weight removed)
 
     # ── Wealth simulation on headline
     print("\nComputing wealth simulations...", flush=True)
@@ -2825,10 +2816,10 @@ def main() -> int:
     multi_strategy_summary = build_multi_strategy_summary(v6_strategies)
 
     # ── Open positions from headline
-    open_positions_list = []
-    if "open_positions" in headline and isinstance(headline["open_positions"], dict):
-        for t, p in headline["open_positions"].items():
-            open_positions_list.append({
+    def _serialize_open_positions(raw: dict) -> list[dict]:
+        result = []
+        for t, p in raw.items():
+            result.append({
                 "ticker": t,
                 "market": p.get("market", "KR"),
                 "display_name": p.get("display_name", t),
@@ -2840,42 +2831,20 @@ def main() -> int:
                 "source": p.get("source", ""),
                 "n_clubs": p.get("n_clubs", 1),
             })
+        return result
 
-    # ── Legacy breakout sensitivity (kept for legacy page section)
-    print("\nBuilding breakout sensitivity (legacy E)...", flush=True)
-    # Use KR-only prices for breakout to keep signals consistent with v5
-    kr_prices = {k: v for k, v in prices.items() if k[0].isdigit()}
-    kr_reports = [(d, t, s, n) for d, t, s, n in reports if t[0].isdigit()]
+    open_positions_list = []
+    if "open_positions" in headline and isinstance(headline["open_positions"], dict):
+        open_positions_list = _serialize_open_positions(headline["open_positions"])
 
-    signals_list: list[tuple[dt.date, str, str, int]] = []
-    for rdate, ticker, source, n_clubs in kr_reports:
-        signal = find_signal(prices[ticker], rdate)
-        if signal:
-            signals_list.append((signal, ticker, source, n_clubs))
-    signals_list.sort()
-    by_signal_date: dict[dt.date, list[tuple[str, str, int]]] = {}
-    for date, ticker, source, n_clubs in signals_list:
-        by_signal_date.setdefault(date, []).append((ticker, source, n_clubs))
-
-    breakout_cal = [d for d in calendar if d >= min(s[0] for s in signals_list)] if signals_list else calendar
-    regime = load_regime()
-
-    sensitivity: list[dict] = []
-    for atr_mult in (2.0, 3.0, 4.0, 5.0):
-        for use_regime in (False, True):
-            r = run_breakout_backtest(
-                kr_prices, by_signal_date, breakout_cal, atr_mult,
-                regime if use_regime else None, use_ratchet=True,
-                label=f"E_atr{atr_mult}_regime{'on' if use_regime else 'off'}"
-            )
-            entry = {
-                "atr_mult": atr_mult, "regime_filter": use_regime,
-                **r["metrics"],
-                "is_sharpe": r["in_sample"].get("sharpe"), "is_cagr": r["in_sample"].get("cagr_pct"),
-                "oos_sharpe": r["out_of_sample"].get("sharpe"), "oos_cagr": r["out_of_sample"].get("cagr_pct"),
-            }
-            sensitivity.append(entry)
-            print(f"  E ATRx{atr_mult} regime={'on' if use_regime else 'off'}: IS-sharpe={entry['is_sharpe']} OOS-sharpe={entry['oos_sharpe']}", flush=True)
+    # ── Per-strategy open positions for UI switcher
+    open_positions_by_strategy: dict[str, list[dict]] = {}
+    for key, r in v6_strategies.items():
+        raw_op = r.get("open_positions", {})
+        if isinstance(raw_op, dict):
+            open_positions_by_strategy[key] = _serialize_open_positions(raw_op)
+        else:
+            open_positions_by_strategy[key] = []
 
     # ── Headline closed trades for JSON
     headline_trades_for_json = [
@@ -2913,8 +2882,7 @@ def main() -> int:
         "out_of_sample": headline.get("out_of_sample", {}),
         "yearly": headline["yearly"],
         "equity": headline["equity"],
-        "sensitivity": sensitivity,
-        # v6: per-strategy comparison
+        # v8: per-strategy comparison (single-club universe)
         "multi_strategy": {
             "strategies": multi_strategy_summary,
             "headline_key": headline_key,
@@ -2927,16 +2895,13 @@ def main() -> int:
             "yearly_by_strategy": {
                 key: r["yearly"] for key, r in v6_strategies.items()
             },
-        },
-        # legacy fields for backwards compat
-        "research_families": [
-            {"label": r["label"], "metrics": r["metrics"],
-             "in_sample": r.get("in_sample", {}), "out_of_sample": r.get("out_of_sample", {})}
-            for r in v6_strategies.values()
-        ],
-        "variant_research": {
-            "variants": variants,
-            "conclusion": "v6: 전략 패밀리 재구성 — 고정 홀드 vs 동적 청산 비교. 상세 내용은 multi_strategy 참조.",
+            # per-strategy open positions (for UI switcher)
+            "open_positions_by_strategy": open_positions_by_strategy,
+            # per-strategy trades (for UI switcher / CSV)
+            "trades_by_strategy": {
+                key: [t for t in r.get("trades", []) if not t.get("exit_reason", "").endswith("미청산")]
+                for key, r in v6_strategies.items()
+            },
         },
         "tail_stats": tail_stats,
         "consensus_stats": consensus_stats,
@@ -2946,6 +2911,8 @@ def main() -> int:
         "worst_trades": sorted(headline_trades_for_json, key=lambda t: t["return_pct"])[:5],
         "open_positions": open_positions_list,
         "signals": today_signals,
+        # v8: sensitivity removed (legacy dead weight) — kept as empty list for JSON compat
+        "sensitivity": [],  # noqa: always empty in v8
     }
 
     OUT_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")

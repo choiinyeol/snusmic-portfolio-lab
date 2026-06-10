@@ -79,12 +79,27 @@ type Trade = {
   trigger_target_prices?: number[];
 };
 
+type OpenPosition = {
+  ticker: string;
+  market?: string;
+  display_name?: string;
+  entry_date: string;
+  entry: number;
+  last_close: number;
+  stop?: number;
+  return_pct: number;
+  source?: string;
+  n_clubs?: number;
+};
+
 type MultiStrategyData = {
   strategies: StrategyRow[];
   headline_key: string;
   strategy_wealth_sims: Record<string, StrategyWealthSim>;
   equity_by_strategy: Record<string, EquityPoint[]>;
   yearly_by_strategy: Record<string, YearlyReturn[]>;
+  open_positions_by_strategy?: Record<string, OpenPosition[]>;
+  trades_by_strategy?: Record<string, Trade[]>;
 };
 
 type WealthSimGlobal = {
@@ -184,6 +199,69 @@ const TRADE_COLS: SortColumn<Trade>[] = [
 ];
 
 const PAGE_SIZE = 20;
+
+// ─── Open positions table ─────────────────────────────────────────────────────
+
+function OpenPositionsTable({ positions, stratKey }: { positions: OpenPosition[]; stratKey: string }) {
+  if (!positions.length) return null;
+  return (
+    <section className="rounded-lg border border-border bg-card p-5">
+      <h3 className="mb-3 font-display text-xl font-black tracking-tight">
+        보유 중 — {STRATEGY_LABEL_KO[stratKey] ?? stratKey} ({positions.length}종목)
+      </h3>
+      <p className="mb-2 text-xs text-muted-foreground">
+        백테스트 마지막 날 기준 미청산 포지션. 동시 보유 20종목 한도로 신호 일부는 미체결.
+      </p>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[560px] border-collapse text-sm">
+          <thead>
+            <tr className="border-b-4 border-double border-border font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+              <th className="px-3 py-2 text-left">종목</th>
+              <th className="px-3 py-2 text-right">진입일</th>
+              <th className="px-3 py-2 text-right">진입가</th>
+              <th className="px-3 py-2 text-right">현재가</th>
+              <th className="px-3 py-2 text-right">평가손익</th>
+              <th className="px-3 py-2 text-right">스탑</th>
+              <th className="px-3 py-2 text-right">커버</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[...positions].sort((a, b) => b.return_pct - a.return_pct).map((pos) => {
+              const market = pos.market ?? "KR";
+              const slug = pos.ticker ? `${market}-${pos.ticker}`.toLowerCase() : null;
+              return (
+                <tr key={pos.ticker} className="border-b border-dashed border-border last:border-b-0">
+                  <td className="px-3 py-2">
+                    {slug ? (
+                      <Link href={`/stocks/${slug}`} className="hover:underline">
+                        <p className="font-mono text-xs font-bold">{pos.display_name ?? pos.ticker}</p>
+                      </Link>
+                    ) : (
+                      <p className="font-mono text-xs font-bold">{pos.display_name ?? pos.ticker}</p>
+                    )}
+                    <p className="font-mono text-[10px] text-muted-foreground">{pos.ticker}{market !== "KR" ? ` · ${market}` : ""}</p>
+                  </td>
+                  <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">{pos.entry_date}</td>
+                  <td className="tnum px-3 py-2 text-right font-mono text-xs">{pos.entry.toLocaleString()}</td>
+                  <td className="tnum px-3 py-2 text-right font-mono text-xs">{pos.last_close.toLocaleString()}</td>
+                  <td className={cn("tnum px-3 py-2 text-right font-mono text-xs font-bold", signColor(pos.return_pct))}>
+                    {formatPct(pos.return_pct, 1)}
+                  </td>
+                  <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">
+                    {pos.stop && pos.stop > 0 ? pos.stop.toLocaleString() : "—"}
+                  </td>
+                  <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">
+                    {pos.n_clubs ?? 1}개교
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
 
 // ─── Trade log with sort + pagination ────────────────────────────────────────
 
@@ -297,9 +375,10 @@ export function StrategySelector({
   const wealthSim = multiStrategy.strategy_wealth_sims[selectedKey];
   const equity = multiStrategy.equity_by_strategy[selectedKey] ?? [];
   const yearly = multiStrategy.yearly_by_strategy[selectedKey] ?? [];
-  const trades = (allTrades[selectedKey] ?? []).filter(
-    (t) => !t.exit_reason?.endsWith("미청산")
-  );
+  // Prefer trades_by_strategy (v8) over legacy allTrades prop
+  const tradesRaw = multiStrategy.trades_by_strategy?.[selectedKey] ?? allTrades[selectedKey] ?? [];
+  const trades = tradesRaw.filter((t) => !t.exit_reason?.endsWith("미청산"));
+  const openPositions: OpenPosition[] = multiStrategy.open_positions_by_strategy?.[selectedKey] ?? [];
 
   const isHeadline = selectedKey === multiStrategy.headline_key;
   const oosBoundaryYear = 2024;
@@ -526,6 +605,9 @@ export function StrategySelector({
           </p>
         </section>
       )}
+
+      {/* ── Open positions (current holdings for this strategy) ────── */}
+      <OpenPositionsTable positions={openPositions} stratKey={selectedKey} />
 
       {/* ── Trade log (sortable + paginated) ─────────────────────────── */}
       <TradeLog trades={trades} stratKey={selectedKey} />
