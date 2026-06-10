@@ -1,13 +1,12 @@
 "use client";
 
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
 import { Check, ChevronLeft, ChevronRight, Link2, Printer, Search } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SiteNav } from "@/components/site-nav";
 import { VerdictWall } from "@/components/verdict-wall";
 import { ReportPathChart } from "@/components/report-path-chart";
-import { CountUp } from "@/components/react-bits-lite";
+import { CountUp } from "@/components/count-up";
 import { SourceLinks } from "@/components/source-links";
 import Link from "next/link";
 import { bucketFilters, type BucketFilter, type MarketFilter, type SchoolFilter, useReportDashboardState } from "@/components/report-dashboard/use-report-dashboard-state";
@@ -112,6 +111,19 @@ export function ReportDashboard() {
     return () => window.removeEventListener("hashchange", apply);
   }, [setMarket, setBucket, setSchool, setQuery, setIncludeReference, setSelectedName]);
 
+  // 안정 참조 — 서가(WallGrid memo)·신규 사건 카드가 대시보드 재렌더마다 다시 그려지지 않도록
+  const pickFromWall = useCallback(
+    (name: string) => {
+      setMarket("ALL");
+      setBucket("ALL");
+      setSchool("ALL");
+      setQuery("");
+      setSelectedName(name);
+      requestAnimationFrame(() => document.getElementById("verdict-paper")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    },
+    [setMarket, setBucket, setSchool, setQuery, setSelectedName],
+  );
+
   if (!selected) {
     return (
       <main className="flex min-h-screen items-center justify-center px-8 text-center">
@@ -125,15 +137,6 @@ export function ReportDashboard() {
   }
 
   const verdict = verdictOf(selected);
-
-  const pickFromWall = (name: string) => {
-    state.setMarket("ALL");
-    state.setBucket("ALL");
-    state.setSchool("ALL");
-    state.setQuery("");
-    state.setSelectedName(name);
-    requestAnimationFrame(() => document.getElementById("verdict-paper")?.scrollIntoView({ behavior: "smooth", block: "start" }));
-  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -371,6 +374,20 @@ function VerdictTimeStrip() {
 
 function FilterBar({ state }: { state: ReturnType<typeof useReportDashboardState> }) {
   const referenceTotal = state.referenceCounts.softBuy + state.referenceCounts.sell;
+  /* 검색 디바운스 — 입력은 즉시 보이고, 1,395건 필터·연대기 재렌더는 150ms 숨 고른 뒤 한 번만 */
+  const { query, setQuery } = state;
+  const [draft, setDraft] = useState(query);
+  const [lastQuery, setLastQuery] = useState(query);
+  if (query !== lastQuery) {
+    // 바깥(딥링크·서가 클릭)에서 query가 초기화되면 입력칸도 따라간다 — 렌더 중 상태 보정 패턴
+    setLastQuery(query);
+    setDraft(query);
+  }
+  useEffect(() => {
+    if (draft === query) return;
+    const timer = window.setTimeout(() => setQuery(draft), 150);
+    return () => window.clearTimeout(timer);
+  }, [draft, query, setQuery]);
   return (
     <section className="space-y-4 border-b border-border pb-5 print:hidden" aria-label="아카이브 필터">
       <div className="flex flex-wrap items-end gap-x-6 gap-y-2" role="group" aria-label="학교 필터">
@@ -457,8 +474,8 @@ function FilterBar({ state }: { state: ReturnType<typeof useReportDashboardState
           <span className="sr-only">회사명, 티커, 파일명 검색</span>
           <Search className="pointer-events-none absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
           <input
-            value={state.query}
-            onChange={(event) => state.setQuery(event.target.value)}
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
             className="w-full border-0 border-b border-border bg-transparent py-1.5 pl-7 pr-2 text-sm outline-none transition placeholder:text-muted-foreground focus:border-stamp"
             placeholder="회사명 · 티커 · 파일명 검색"
           />
@@ -526,23 +543,14 @@ function VerdictPaper({
         </span>
       </header>
 
-      <motion.div
-        key={report.source_name}
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.25, ease: "easeOut" }}
-        className="relative px-6 py-6 sm:px-8"
-      >
-        <motion.div
-          key={`stamp-${report.source_name}`}
-          initial={{ scale: 2.4, opacity: 0, rotate: 4 }}
-          animate={{ scale: 1, opacity: 1, rotate: -10 }}
-          transition={{ type: "spring", stiffness: 380, damping: 21 }}
-          className={cn("stamp right-6 top-2 z-10 select-none text-2xl sm:right-10 sm:text-3xl", fresh ? "text-warn" : stampTone[verdict.tone])}
+      {/* key=source_name — 기록을 넘길 때마다 CSS 등장 애니메이션이 처음부터 다시 돈다 (framer-motion 대체) */}
+      <div key={report.source_name} className="paper-enter relative px-6 py-6 sm:px-8">
+        <div
+          className={cn("stamp stamp-pop right-6 top-2 z-10 select-none text-2xl sm:right-10 sm:text-3xl", fresh ? "text-warn" : stampTone[verdict.tone])}
           aria-hidden="true"
         >
           {fresh ? "심리중" : verdict.stamp}
-        </motion.div>
+        </div>
 
         <h2 className="max-w-[70%] font-display text-3xl font-black tracking-tight sm:max-w-[78%] sm:text-5xl">
           {tickerSlug(report) ? (
@@ -685,7 +693,7 @@ function VerdictPaper({
             다음 기록 <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
           </button>
         </div>
-      </motion.div>
+      </div>
     </article>
   );
 }
@@ -926,7 +934,7 @@ function Chronicle({ reports, selected, onSelect }: { reports: ReportRecord[]; s
                 onClick={() => onSelect(report.source_name)}
                 aria-pressed={active}
                 className={cn(
-                  "grid w-full grid-cols-[2.6rem_minmax(0,1fr)_auto] items-center gap-2 border-b border-dashed border-border px-4 py-2.5 text-left transition",
+                  "cv-row grid w-full grid-cols-[2.6rem_minmax(0,1fr)_auto] items-center gap-2 border-b border-dashed border-border px-4 py-2.5 text-left transition",
                   active ? "bg-foreground text-background" : "hover:bg-secondary",
                   reference && !active && "opacity-55",
                 )}

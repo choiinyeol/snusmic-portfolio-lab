@@ -380,14 +380,18 @@ table {
   filter: saturate(1);
 }
 
-/* 바랜 금장·다이아몬드는 광택과 분광도 멈춘다 (animation의 filter가 dim을 덮지 않도록) */
-.wall-prism.wall-dim {
-  animation: none;
-}
-
+/* 바랜 금장·다이아몬드는 광택과 분광도 멈춘다 */
+.wall-dim .wall-prism-veil,
 .wall-dim::after {
   animation: none;
   opacity: 0;
+}
+
+/* 서가가 화면 밖이면 글린트·숨결이 잠든다 — IntersectionObserver가 wall-asleep을 붙인다 */
+.wall-asleep .wall-gold::after,
+.wall-asleep .wall-prism::after,
+.wall-asleep .wall-prism-veil {
+  animation-play-state: paused;
 }
 
 /* 셀 요약 카드 — 모바일에선 엄지가 닿는 바닥 시트, 데스크톱에선 셀 옆에 핀으로 꽂힌다 */
@@ -493,13 +497,15 @@ table {
   animation: glint-sweep 5.2s ease-in-out infinite;
 }
 
-/* 다이아몬드 — 텐배거에만 프리즘이 숨쉬듯 분광하고, 흰 광택이 더 잦게 스친다 */
-@keyframes prism-breathe {
+/* 다이아몬드 — 텐배거에만 프리즘이 숨쉬듯 분광하고, 흰 광택이 더 잦게 스친다.
+   숨결은 filter: hue-rotate(매 프레임 페인트) 대신, 색상환을 -50° 돌려 미리 구운
+   베일(.wall-prism-veil)의 불투명도만 오간다 — opacity는 컴포지터 전용이라 싸다 */
+@keyframes prism-veil-breathe {
   0%, 100% {
-    filter: hue-rotate(0deg) saturate(1);
+    opacity: 0;
   }
   50% {
-    filter: hue-rotate(-50deg) saturate(1.35);
+    opacity: 1;
   }
 }
 
@@ -516,7 +522,23 @@ table {
   );
   box-shadow: 0 0 0 1px hsl(var(--prism-edge) / 0.9), 0 0 7px hsl(258 85% 70% / 0.7);
   overflow: hidden;
-  animation: prism-breathe 6.4s ease-in-out infinite;
+}
+
+.wall-prism-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: conic-gradient(
+    from 230deg at 32% 28%,
+    hsl(142 100% 78%),
+    hsl(208 100% 80%) 28%,
+    hsl(272 100% 82%) 52%,
+    hsl(358 100% 80%) 72%,
+    hsl(128 100% 76%) 88%,
+    hsl(142 100% 78%)
+  );
+  opacity: 0;
+  animation: prism-veil-breathe 6.4s ease-in-out infinite;
 }
 
 .wall-prism::after {
@@ -529,16 +551,59 @@ table {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wall-prism {
-    animation: none;
-  }
-
+  .wall-prism-veil,
   .wall-gold::after,
   .wall-prism::after,
   .tier-prism::after {
     animation: none;
     opacity: 0;
   }
+}
+
+/* 판결문 등장 — framer-motion 없이 같은 동작 (opacity·transform만, 컴포지터 전용) */
+@keyframes paper-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.paper-enter {
+  animation: paper-enter 0.25s ease-out;
+}
+
+/* 도장 찍힘 — 스프링(과진동 한 번)을 키프레임으로 옮겼다. 최종 자세(-10°)는 클래스가 들고 있다 */
+@keyframes stamp-pop {
+  0% {
+    opacity: 0;
+    transform: scale(2.4) rotate(4deg);
+  }
+  62% {
+    opacity: 1;
+    transform: scale(0.965) rotate(-11.4deg);
+  }
+  82% {
+    transform: scale(1.015) rotate(-9.4deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-10deg);
+  }
+}
+
+.stamp-pop {
+  transform: rotate(-10deg);
+  animation: stamp-pop 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* 연대기 행 — 화면 밖 행은 레이아웃·페인트를 건너뛴다 (행 높이는 거의 일정해 안전) */
+.cv-row {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 58px;
 }
 
 @media (prefers-reduced-motion: reduce) {

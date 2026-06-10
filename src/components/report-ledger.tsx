@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { ReportPathChart } from "@/components/report-path-chart";
 import { SourceLinks } from "@/components/source-links";
-import { dateLabel, getDisplayName, SCHOOL_LABELS, type ReportRecord } from "@/lib/report-model";
+import { dateLabel, getDisplayName, SCHOOL_LABELS, type ReportRecord } from "@/lib/report-meta";
 import {
   bucketBadgeClass,
   bucketLabels,

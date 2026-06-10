@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Contrast, RotateCcw } from "lucide-react";
-import { dateLabel, getDisplayName, SCHOOL_LABELS, type ReportRecord, type School } from "@/lib/report-model";
+import { dateLabel, getDisplayName, SCHOOL_LABELS, type ReportRecord, type School } from "@/lib/report-meta";
 import { bucketBadgeClass, bucketLabels, bucketThresholds, schoolShort, signColor, tickerSlug } from "@/lib/verdict";
 import { cn, formatPct, formatPrice } from "@/lib/utils";
 
@@ -101,14 +101,29 @@ export function VerdictWall({
   const popRef = useRef<HTMLDivElement | null>(null);
   const [tip, setTip] = useState<Tip | null>(null);
   const [pop, setPop] = useState<Pop | null>(null);
+  /** 호버 콜백을 안정시키기 위한 거울 — pop 상태가 바뀌어도 셀 그리드는 재렌더되지 않는다 */
+  const popMirror = useRef<Pop | null>(null);
+  useEffect(() => {
+    popMirror.current = pop;
+  }, [pop]);
   const [buckets, setBuckets] = useState<Set<Bucket>>(() => new Set());
   const [schools, setSchools] = useState<Set<School>>(() => new Set());
   /** 판결 기준 — 기본은 현재. 전성기로 바꾸면 모든 칸이 bucket_peak 색으로 다시 칠해진다 */
   const [basis, setBasis] = useState<Basis>("current");
   const texture = useSyncExternalStore(subscribeTexture, readTexture, () => false);
+  /** 서가가 화면 밖이면 금장 글린트·프리즘 분광을 재운다 — 무한 애니메이션이 공회전하지 않도록 */
+  const [awake, setAwake] = useState(true);
 
   const bucketOf = (report: ReportRecord): Bucket => (basis === "peak" ? report.bucket_peak : report.performance_bucket);
   const returnOf = (report: ReportRecord) => (basis === "peak" ? report.peak_return_24m_pct : report.return_latest_pct);
+
+  useEffect(() => {
+    const node = sectionRef.current;
+    if (!node || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(([entry]) => setAwake(entry.isIntersecting), { rootMargin: "160px 0px" });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
 
   const years = useMemo(() => {
     const ordered = [...reports]
@@ -138,8 +153,6 @@ export function VerdictWall({
   }, [reports]);
 
   const filterActive = buckets.size > 0 || schools.size > 0;
-  const matches = (report: ReportRecord) =>
-    (buckets.size === 0 || buckets.has(bucketOf(report))) && (schools.size === 0 || schools.has(report.school));
   const matched = useMemo(() => {
     if (buckets.size === 0 && schools.size === 0) return reports.length;
     const bucket = (report: ReportRecord): Bucket => (basis === "peak" ? report.bucket_peak : report.performance_bucket);
@@ -171,15 +184,18 @@ export function VerdictWall({
 
   const toggleTexture = () => writeTexture(!texture);
 
-  const show = (report: ReportRecord, el: HTMLElement) => {
-    if (pop) return; // 카드가 열려 있으면 종이는 한 장만 — 호버 툴팁은 잠시 쉰다
+  /* 셀 콜백은 전부 안정 참조 — 마우스가 서가를 훑어도 670개 셀 그리드(WallGrid memo)는 재렌더되지 않는다 */
+  const show = useCallback((report: ReportRecord, el: HTMLElement) => {
+    if (popMirror.current) return; // 카드가 열려 있으면 종이는 한 장만 — 호버 툴팁은 잠시 쉰다
     const host = sectionRef.current?.getBoundingClientRect();
     const rect = el.getBoundingClientRect();
     if (!host) return;
     setTip({ report, x: rect.left - host.left + rect.width / 2, y: rect.top - host.top });
-  };
+  }, []);
 
-  const openPop = (report: ReportRecord, el: HTMLElement) => {
+  const hide = useCallback(() => setTip(null), []);
+
+  const openPop = useCallback((report: ReportRecord, el: HTMLElement) => {
     const host = sectionRef.current?.getBoundingClientRect();
     if (!host) return;
     const rect = el.getBoundingClientRect();
@@ -190,7 +206,20 @@ export function VerdictWall({
     const y = side === "above" ? rect.top - host.top - 8 : rect.bottom - host.top + 8;
     setTip(null);
     setPop({ report, x, y, side, anchor: el });
-  };
+  }, []);
+
+  const handleCellClick = useCallback(
+    (report: ReportRecord, el: HTMLElement) => {
+      // 두 번째 클릭은 너그럽게 — 같은 칸이면 곧장 판결문으로
+      if (popMirror.current?.report.source_name === report.source_name) {
+        setPop(null);
+        onSelect(report.source_name);
+      } else {
+        openPop(report, el);
+      }
+    },
+    [onSelect, openPop],
+  );
 
   // 카드 닫기 — ESC는 셀로 포커스를 되돌리고, 바깥 클릭은 조용히 접는다 (셀 클릭은 셀이 알아서)
   useEffect(() => {
@@ -222,9 +251,9 @@ export function VerdictWall({
   return (
     <section
       ref={sectionRef}
-      className={cn("relative", texture && "wall-pattern")}
+      className={cn("relative", texture && "wall-pattern", !awake && "wall-asleep")}
       aria-label="증거의 서가 — 발간 연대순 성과 모자이크"
-      onMouseLeave={() => setTip(null)}
+      onMouseLeave={hide}
     >
       <div className="flex flex-col justify-between gap-3 lg:flex-row lg:items-end">
         <div>
@@ -358,48 +387,17 @@ export function VerdictWall({
         </div>
       </div>
 
-      <div className="mt-4 space-y-2.5">
-        {years.map(([year, list]) => (
-          <div key={year} className="grid grid-cols-[2.4rem_minmax(0,1fr)] items-start gap-2 sm:grid-cols-[3rem_minmax(0,1fr)] sm:gap-3">
-            <p className="pt-px text-right font-mono text-[10px] font-bold leading-[13px] text-muted-foreground sm:text-[11px] sm:leading-[15px]">
-              {year}
-            </p>
-            <div className="flex flex-wrap gap-[3px]" role="list" aria-label={`${year}년 발간 ${list.length}건`}>
-              {list.map((report) => {
-                const active = report.source_name === selectedName;
-                const popped = pop?.report.source_name === report.source_name;
-                return (
-                  <button
-                    key={report.source_name}
-                    type="button"
-                    role="listitem"
-                    data-wall-cell
-                    onClick={(event) => {
-                      // 두 번째 클릭은 너그럽게 — 같은 칸이면 곧장 판결문으로
-                      if (popped) {
-                        setPop(null);
-                        onSelect(report.source_name);
-                      } else {
-                        openPop(report, event.currentTarget);
-                      }
-                    }}
-                    onMouseEnter={(event) => show(report, event.currentTarget)}
-                    onFocus={(event) => show(report, event.currentTarget)}
-                    onBlur={() => setTip(null)}
-                    aria-label={`${getDisplayName(report)} · ${schoolShort[report.school]} · ${dateLabel(report.report_date)} · ${basis === "peak" ? "전성기 " : ""}${formatPct(returnOf(report))} — 요약 카드 열기`}
-                    className={cn(
-                      "wall-cell h-[13px] w-[13px] sm:h-[15px] sm:w-[15px]",
-                      squareClass[bucketOf(report)],
-                      filterActive && !matches(report) && "wall-dim",
-                      (active || popped) && "z-[2] outline outline-2 outline-offset-1 outline-foreground",
-                    )}
-                  />
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
+      <WallGrid
+        years={years}
+        basis={basis}
+        buckets={buckets}
+        schools={schools}
+        selectedName={selectedName ?? null}
+        poppedName={pop?.report.source_name ?? null}
+        onEnter={show}
+        onLeave={hide}
+        onCellClick={handleCellClick}
+      />
 
       {tip && (
         <div
@@ -425,6 +423,79 @@ export function VerdictWall({
     </section>
   );
 }
+
+/**
+ * 셀 그리드 — 서가의 본체(~670 버튼). React.memo로 묶여 있어 호버 툴팁(tip) 상태가
+ * 부모에서 바뀌어도 재렌더되지 않는다. 콜백은 전부 부모의 안정 참조(useCallback)다.
+ * 카드 열림(poppedName)·선택(selectedName)·필터·기준 변경 때만 다시 그린다.
+ */
+const WallGrid = memo(function WallGrid({
+  years,
+  basis,
+  buckets,
+  schools,
+  selectedName,
+  poppedName,
+  onEnter,
+  onLeave,
+  onCellClick,
+}: {
+  years: [string, ReportRecord[]][];
+  basis: Basis;
+  buckets: Set<Bucket>;
+  schools: Set<School>;
+  selectedName: string | null;
+  poppedName: string | null;
+  onEnter: (report: ReportRecord, el: HTMLElement) => void;
+  onLeave: () => void;
+  onCellClick: (report: ReportRecord, el: HTMLElement) => void;
+}) {
+  const filterActive = buckets.size > 0 || schools.size > 0;
+  const bucketOf = (report: ReportRecord): Bucket => (basis === "peak" ? report.bucket_peak : report.performance_bucket);
+  const returnOf = (report: ReportRecord) => (basis === "peak" ? report.peak_return_24m_pct : report.return_latest_pct);
+  const matches = (report: ReportRecord) =>
+    (buckets.size === 0 || buckets.has(bucketOf(report))) && (schools.size === 0 || schools.has(report.school));
+  return (
+    <div className="mt-4 space-y-2.5">
+      {years.map(([year, list]) => (
+        <div key={year} className="grid grid-cols-[2.4rem_minmax(0,1fr)] items-start gap-2 sm:grid-cols-[3rem_minmax(0,1fr)] sm:gap-3">
+          <p className="pt-px text-right font-mono text-[10px] font-bold leading-[13px] text-muted-foreground sm:text-[11px] sm:leading-[15px]">
+            {year}
+          </p>
+          <div className="flex flex-wrap gap-[3px]" role="list" aria-label={`${year}년 발간 ${list.length}건`}>
+            {list.map((report) => {
+              const active = report.source_name === selectedName;
+              const popped = poppedName === report.source_name;
+              const bucket = bucketOf(report);
+              return (
+                <button
+                  key={report.source_name}
+                  type="button"
+                  role="listitem"
+                  data-wall-cell
+                  onClick={(event) => onCellClick(report, event.currentTarget)}
+                  onMouseEnter={(event) => onEnter(report, event.currentTarget)}
+                  onFocus={(event) => onEnter(report, event.currentTarget)}
+                  onBlur={onLeave}
+                  aria-label={`${getDisplayName(report)} · ${schoolShort[report.school]} · ${dateLabel(report.report_date)} · ${basis === "peak" ? "전성기 " : ""}${formatPct(returnOf(report))} — 요약 카드 열기`}
+                  className={cn(
+                    "wall-cell h-[13px] w-[13px] sm:h-[15px] sm:w-[15px]",
+                    squareClass[bucket],
+                    filterActive && !matches(report) && "wall-dim",
+                    (active || popped) && "z-[2] outline outline-2 outline-offset-1 outline-foreground",
+                  )}
+                >
+                  {/* 프리즘 숨결 — hue-rotate 필터 대신 색이 이동한 그라디언트 베일의 불투명도만 숨쉰다 (컴포지터 전용) */}
+                  {bucket === "Tenbagger" && <span className="wall-prism-veil" aria-hidden="true" />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+});
 
 /** 셀 요약 카드 — 판결문 미리보기. 판결문 전체 점프 또는 종목 페이지로 가는 두 갈래 */
 function WallPopCard({

@@ -8,14 +8,8 @@ const RatingClassSchema = z.enum(["buy", "soft_buy", "sell"]);
 const MaturitySchema = z.enum(["fresh", "developing", "seasoned", "veteran"]);
 const SchoolSchema = z.enum(["smic", "yig", "star", "kuvic", "ewha", "voera"]);
 
-export const SCHOOL_LABELS: Record<z.infer<typeof SchoolSchema>, string> = {
-  smic: "서울대 SMIC",
-  yig: "연세대 YIG",
-  star: "성균관대 STAR",
-  kuvic: "고려대 KUVIC",
-  ewha: "이화여대 EIA",
-  voera: "홍익대 Voera",
-};
+// 데이터 없는 메타 헬퍼는 report-meta.ts로 분리 — 서버 쪽 기존 import 경로는 그대로 살린다
+export { SCHOOL_LABELS, dateLabel, getDisplayName } from "@/lib/report-meta";
 
 const NullableNumber = z.number().finite().nullable();
 const NullableString = z.string().nullable();
@@ -163,11 +157,3 @@ export const reportDataQuality: DataQuality = {
   issueSummaries: parsedDataset.success ? [] : parsedDataset.error.issues.slice(0, 8).map(summarizeZodIssue),
 };
 
-export function getDisplayName(report: ReportRecord) {
-  return report.display_name || report.company || report.ticker || report.source_name.replace(/\.md$/, "");
-}
-
-export function dateLabel(value: string | null) {
-  if (!value) return "날짜 없음";
-  return value.replaceAll("-", ".");
-}

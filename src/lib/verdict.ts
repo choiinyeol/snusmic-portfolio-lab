@@ -1,4 +1,5 @@
-import { dateLabel, type ReportRecord } from "@/lib/report-model";
+// report-meta에서 가져온다 — report-model을 값으로 import하면 2.6MB JSON이 클라이언트 번들에 끌려온다
+import { dateLabel, type ReportRecord } from "@/lib/report-meta";
 import { formatPct } from "@/lib/utils";
 
 export type Tone = "hit" | "up" | "down" | "warn" | "muted";
