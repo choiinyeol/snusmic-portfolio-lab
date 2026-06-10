@@ -1,17 +1,47 @@
-"""학회 리포트 × 전략 연구 백테스트 v9.
+"""학회 리포트 × 전략 연구 백테스트 v11.
 
-변경사항 (v9):
-- 오늘의 신호: 헤드라인 전략(D 샹들리에) 기준으로 변경. 보유 중 = 샹들리에 오픈 포지션 (진입가·현재가·미실현손익·최고가·현재 스탑 레벨·스탑 거리%). 매도 임박 = 스탑 3% 이내. 신규 매수 신호 = 최근 30일 내 리포트.
-- Optuna 강건 최적화: 샹들리에 패밀리 파라미터 (ATR 기간, 배수, 래칫, 최대 포지션). IS 2-폴드(2020-21/2022-23), 목적함수 = min(fold1 sharpe, fold2 sharpe) − 0.1×|fold1−fold2|. ~120 trials TPE. OOS는 1회만 평가. D+로 추가(OOS 기준 통과 시).
+변경사항 (v11):
+- MTT 룩어헤드 감사 및 수정: O 전략 진입 시그널을 당일 종가 기준으로 포착,
+  실제 체결은 익일 시가로 처리 (동일 바 룩어헤드 제거).
+  _compute_rs_percentiles: 당일 종가+과거 데이터만 사용 — 점검 결과 문제 없음.
+  52w 고/저, MA 등 rolling window 지표: load_prices에서 look-forward 없이 계산 확인.
+  히스토리컬 가격 파일에 상장폐지 종목 포함 여부: 프라이스 파일이 존재하는 종목만
+  유니버스에 포함 → 생존 편향 존재하나 피할 수 없음, 방법론 주석에 명시.
+- L 민리버전 RSI-2: 동일 바 룩어헤드 수정 (시그널→익일 시가 체결).
+  그러나 수정 후에도 0.6% 왕복 비용 × 단기 회전율 → 비용 사망 확인 → 제외.
+- M 단기 리버설: positions.clear() 버그 수정 (미청산 포지션 현금 미회수 문제),
+  동일 바 룩어헤드 수정. 수정 후에도 월별 전체 교체 비용 사망 → 제외.
+  방법론: "RSI-2 민리버전·단기 리버설은 거래비용으로 사망 — 구현 검증 후 제외"
+- 신규 전략 P: 딥바이 샹들리에 하이브리드 ("P_deepbuy_chandelier").
+  진입 = G 딥바이 (발간일 종가 대비 ≥20% 하락, 6개월 내),
+  규모 추가 = 최초 진입 후 추가 10% 하락 시 동일 슬롯에 1회 한정 추가 매수,
+  청산 = D+ 샹들리에 Optuna 파라미터 ATR 트레일링 스탑 (타겟가 캡 없음).
+  최고점 기준 통합 포지션 스탑 관리.
+
+변경사항 (v10):
+- Optuna 탐색공간 이산화: suggest_float에 step= 추가 (ATR mult step 0.25, 0.05 등).
+  파라미터를 소수점 2자리로 반올림하여 보고.
+- 신규 전략 O: MTT (alpha16 이식) — 알파16 논문 Minervini MTT를 OUR 유니버스에 이식.
+  RS 퍼센타일(3m×0.5/6m×0.3/12m×0.2), MTT 필터(close>50MA>150MA>200MA, 200MA상승,
+  52w저점×1.9 이상, 52w고점×0.95 이상, RS≥80), 진입 RS≥79, 청산(-8%초기스탑/BE/6%트레일/+3.5R/RS<82 후 8일/115일).
+  동일 유니버스(리포트 후 18개월 유효풀), 5%/20슬롯 동일비중, 추세형 그룹 추가.
+  [출처 공개: alpha16 RobustOpt KRX 파라미터 — KRX 전체 종목으로 튜닝된 값, OUR 데이터 未사용]
+- 재매수 규칙 명시: 청산 후 동일 티커 재진입 허용 (패밀리 진입 조건 재충족 시).
+  기존 open_positions 체크는 현재 보유 중 여부만 확인 → OK.
+  단, 리포트 구동 패밀리는 신규 리포트 OR 18개월 유효창 내 기술적 재충족 시 재진입.
 - 신규 전략 L (민리버전 Connors RSI-2), M (단기 리버설 월별 하위 5분위), N (52주 고가 근접 George & Hwang 2004).
 - RSI(2) 지표를 load_prices에 추가.
 
+변경사항 (v9):
+- 오늘의 신호: 헤드라인 전략(D 샹들리에) 기준으로 변경.
+- Optuna 강건 최적화: 샹들리에 패밀리 파라미터 (ATR 기간, 배수, 래칫, 최대 포지션).
+
 변경사항 (v8):
-- 유니버스 확대: ≥2개교 컨센서스 게이트 제거 → 1회 언급(단독 커버 포함) 즉시 진입.
-    컨센서스는 분석 통계(consensus_stats)로만 유지 — 진입 조건 아님.
+- 유니버스 확대: >=2개교 컨센서스 게이트 제거 -> 1회 언급(단독 커버 포함) 즉시 진입.
+    컨센서스는 분석 통계(consensus_stats)로만 유지 - 진입 조건 아님.
     동일 티커 중복 진입 방지: 이미 오픈된 포지션이 있으면 스킵.
 - 전략별 open_positions 추가: multi_strategy.open_positions_by_strategy 에 현재 보유 상태 포함.
-- 레거시 신고가 돌파 민감도 분석(sensitivity) 제거 — dead weight.
+- 레거시 신고가 돌파 민감도 분석(sensitivity) 제거 - dead weight.
 - 11가지 전략(A~K) 동일 유니버스에서 재계산.
 """
 
@@ -211,7 +241,7 @@ def load_prices(ticker: str, market: str = "KR") -> pd.DataFrame | None:
     df["ma50"]  = df["close"].rolling(50,  min_periods=25).mean()
     df["ma150"] = df["close"].rolling(150, min_periods=75).mean()
     df["ma200"] = df["close"].rolling(200, min_periods=100).mean()
-    # 52-week high/low for Minervini RS
+    # 52-week high/low
     df["hi52w"] = df["high"].rolling(252, min_periods=126).max()
     df["lo52w"] = df["low"].rolling(252, min_periods=126).min()
     # Supertrend(10, 3): standard Supertrend indicator
@@ -1725,7 +1755,8 @@ def run_optuna_chandelier(
 
     def objective(trial: "optuna.Trial") -> float:
         atr_period = trial.suggest_categorical("atr_period", [20, 42, 63])
-        atr_mult   = trial.suggest_float("atr_mult", 2.5, 7.0)
+        # Discretised grid: step=0.25 → values land on {2.50, 2.75, 3.00, …, 7.00}
+        atr_mult   = trial.suggest_float("atr_mult", 2.5, 7.0, step=0.25)
         max_pos    = trial.suggest_categorical("max_positions", [10, 20, 30])
 
         # Need ATR for non-standard periods — compute on the fly if needed
@@ -1747,8 +1778,10 @@ def run_optuna_chandelier(
     study.optimize(objective, n_trials=OPTUNA_N_TRIALS, show_progress_bar=False)
 
     best = study.best_params
+    # Round floats to 2 decimal places for deterministic reporting
+    best = {k: (round(v, 2) if isinstance(v, float) else v) for k, v in best.items()}
     best_val = study.best_value
-    print(f"  Best params: {best}  obj={best_val:.3f}", flush=True)
+    print(f"  Best params (discretised): {best}  obj={best_val:.3f}", flush=True)
 
     # Evaluate best config on IS (both folds together) for reporting
     is_result = run_chandelier_parametric(
@@ -1783,12 +1816,13 @@ def run_optuna_chandelier(
         "n_trials": OPTUNA_N_TRIALS,
         "search_space": {
             "atr_period": [20, 42, 63],
-            "atr_mult": [2.5, 7.0],
+            "atr_mult": {"min": 2.5, "max": 7.0, "step": 0.25},
             "max_positions": [10, 20, 30],
         },
         "methodology": (
             "IS 2-폴드 (2020-21, 2022-23), 목적함수 = min(fold1, fold2) − 0.1×|fold1−fold2|. "
-            f"TPE sampler, seed={OPTUNA_SEED}, {OPTUNA_N_TRIALS} trials. OOS는 1회만 평가."
+            f"TPE sampler, seed={OPTUNA_SEED}, {OPTUNA_N_TRIALS} trials. OOS는 1회만 평가. "
+            "탐색공간 이산화: atr_mult step=0.25 (2-decimal grid). 파라미터 소수점 2자리 반올림."
         ),
     }
     return full_result
@@ -1834,6 +1868,9 @@ def run_rsi2_mean_reversion(
         expire = rdate + dt.timedelta(days=int(RSI2_UNIVERSE_MONTHS * 30.44))
         ticker_valid.setdefault(ticker, []).append((rdate, expire))
 
+    # RSI-2 entry queue: signals detected at close of prev day, filled at next open.
+    rsi2_entry_queue: list[tuple[str, str, int]] = []  # (ticker, source, n_clubs)
+
     for day in calendar:
         day_ts = pd.Timestamp(day)
 
@@ -1852,39 +1889,23 @@ def run_rsi2_mean_reversion(
                                        ticker_reports, record_full_trades, None))
             del positions[ticker]
 
-        # Entry scan — universe = tickers with valid report today
-        nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
-        slots = MAX_POSITIONS - len(positions)
-        if slots > 0:
-            for ticker, ranges in ticker_valid.items():
+        # Execute queued RSI-2 entries at today's open (signal detected yesterday)
+        if rsi2_entry_queue:
+            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            slots = MAX_POSITIONS - len(positions)
+            for ticker, source, n_clubs in rsi2_entry_queue:
+                if slots <= 0:
+                    break
                 if ticker in positions:
                     continue
-                # Check if any report range covers today
-                valid = any(start <= day <= end for start, end in ranges)
-                if not valid:
-                    continue
-                df = prices.get(ticker)
-                if df is None or day_ts not in df.index:
-                    continue
-                close = float(df.loc[day_ts]["close"])
-                rsi2_val = float(df["rsi2"].asof(day_ts)) if "rsi2" in df.columns else 50.0
-                ma200_val = asof_value(df["ma200"], day)
-                if rsi2_val < RSI2_ENTRY_THRESHOLD and ma200_val > 0 and close > ma200_val:
-                    # Get source/n_clubs from most recent report
-                    tr_list = (ticker_reports or {}).get(ticker, [])
-                    past_tr = [r for r in tr_list if r["report_date"] <= day]
-                    n_clubs = len({r["school"] for r in past_tr}) if past_tr else 1
-                    source = past_tr[-1]["source_file"] if past_tr else ""
-                    source = Path(source).name if source else ""
-                    pos, cash = _try_enter(ticker, source, n_clubs, day, prices, positions, cash, nav_now, ticker_reports)
-                    if pos is not None:
-                        pos["hold_days_remaining"] = RSI2_MAX_HOLD_DAYS
-                        positions[ticker] = pos
-                        slots -= 1
-                        if slots == 0:
-                            break
+                pos, cash = _try_enter(ticker, source, n_clubs, day, prices, positions, cash, nav_now, ticker_reports)
+                if pos is not None:
+                    pos["hold_days_remaining"] = RSI2_MAX_HOLD_DAYS
+                    positions[ticker] = pos
+                    slots -= 1
+            rsi2_entry_queue = []
 
-        # Update positions + check exit conditions
+        # Update positions + check exit conditions (end-of-day)
         for ticker, pos in list(positions.items()):
             df = prices.get(ticker)
             if df is None or day_ts not in df.index:
@@ -1900,6 +1921,32 @@ def run_rsi2_mean_reversion(
                 pending_exits[ticker] = "rsi2_exit_>70"
             elif pos["hold_days_remaining"] <= 0:
                 pending_exits[ticker] = "rsi2_10day_만기"
+
+        # End-of-day entry SIGNAL scan — deferred to next bar's open
+        new_rsi2_entries: list[tuple[str, str, int]] = []
+        nav_now_eod = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        for ticker, ranges in ticker_valid.items():
+            if ticker in positions:
+                continue
+            # Check if any report range covers today
+            valid = any(start <= day <= end for start, end in ranges)
+            if not valid:
+                continue
+            df = prices.get(ticker)
+            if df is None or day_ts not in df.index:
+                continue
+            close = float(df.loc[day_ts]["close"])
+            rsi2_val = float(df["rsi2"].asof(day_ts)) if "rsi2" in df.columns else 50.0
+            ma200_val = asof_value(df["ma200"], day)
+            if rsi2_val < RSI2_ENTRY_THRESHOLD and ma200_val > 0 and close > ma200_val:
+                tr_list = (ticker_reports or {}).get(ticker, [])
+                past_tr = [r for r in tr_list if r["report_date"] <= day]
+                n_clubs = len({r["school"] for r in past_tr}) if past_tr else 1
+                source = past_tr[-1]["source_file"] if past_tr else ""
+                source = Path(source).name if source else ""
+                new_rsi2_entries.append((ticker, source, n_clubs))
+
+        rsi2_entry_queue = new_rsi2_entries
 
         nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
         nav_series.append((day.isoformat(), nav))
@@ -1943,32 +1990,75 @@ def run_short_term_reversal(
         expire = rdate + dt.timedelta(days=int(REVERSAL_UNIVERSE_MONTHS * 30.44))
         ticker_valid.setdefault(ticker, []).append((rdate, expire))
 
-    # Build month-first days
+    # Build month-first and month-end days
     cal_s = pd.Series(calendar)
     month_firsts: set[dt.date] = set(
         cal_s.groupby(cal_s.apply(lambda d: (d.year, d.month))).first().values
     )
+    month_ends: set[dt.date] = set(
+        cal_s.groupby(cal_s.apply(lambda d: (d.year, d.month))).last().values
+    )
+
+    # Reversal rebalance queue: bottom-quintile tickers computed at PREVIOUS month-end
+    # close, bought at month-first open (eliminates same-bar close→open lookahead).
+    # Format: list of (ticker, source, n_clubs)
+    reversal_entry_queue: list[tuple[str, str, int]] = []
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
 
         if day in month_firsts:
-            # Close all existing positions at open
+            # Step 1: Close all existing positions at today's open (month-first open)
+            # Only clear positions that are successfully exited to avoid cash leakage.
+            exited: set[str] = set()
             for ticker in list(positions.keys()):
                 pos = positions[ticker]
                 q = _get_quote(prices, ticker, day)
                 if q is None or float(q["open"]) <= 0:
+                    # No valid open price — carry position forward, exit at close
+                    close_val = pos.get("last_close", pos["entry_price"])
+                    if close_val > 0:
+                        cash += pos["shares"] * close_val * (1 - COST_PER_SIDE)
+                        trades.append(_close_trade(ticker, pos, day, close_val, "reversal_1mo_만기_no_open",
+                                                   ticker_reports, record_full_trades, None))
+                        exited.add(ticker)
                     continue
                 exit_price = float(q["open"])
                 cash += pos["shares"] * exit_price * (1 - COST_PER_SIDE)
                 trades.append(_close_trade(ticker, pos, day, exit_price, "reversal_1mo_만기",
                                            ticker_reports, record_full_trades, None))
-            positions.clear()
+                exited.add(ticker)
+            for t in exited:
+                del positions[t]
 
-            # Compute 1-month returns for valid universe
+            # Step 2: Execute the bottom-quintile queue computed at previous month-end
+            if reversal_entry_queue:
+                nav_now = cash
+                if nav_now <= 0:
+                    nav_now = float(START_CAPITAL)
+                slots = MAX_POSITIONS
+                for ticker, source, n_clubs in reversal_entry_queue[:slots]:
+                    if ticker in positions:
+                        continue
+                    pos, cash = _try_enter(ticker, source, n_clubs, day, prices, positions, cash, nav_now, ticker_reports)
+                    if pos is not None and pos.get("cost", 0) > 0:
+                        positions[ticker] = pos
+                reversal_entry_queue = []
+
+        # Update last_close
+        for ticker, pos in positions.items():
+            df = prices.get(ticker)
+            if df is not None and day_ts in df.index:
+                pos["last_close"] = float(df.loc[day_ts]["close"])
+
+        # End-of-month: compute bottom-quintile ranking from today's close for next
+        # month-first execution (point-in-time: signal at month-end close, fill next open).
+        if day in month_ends:
             one_mo_ago = day - dt.timedelta(days=30)
-            candidates: list[tuple[float, str, str, int]] = []
+            candidates_m: list[tuple[float, str, str, int]] = []
             for ticker, ranges in ticker_valid.items():
+                if ticker in positions:
+                    continue
                 valid = any(start <= day <= end for start, end in ranges)
                 if not valid:
                     continue
@@ -1982,30 +2072,17 @@ def run_short_term_reversal(
                 ret_1mo = close_now / close_1mo - 1
                 tr_list = (ticker_reports or {}).get(ticker, [])
                 past_tr = [r for r in tr_list if r["report_date"] <= day]
-                n_clubs = len({r["school"] for r in past_tr}) if past_tr else 1
-                source = Path(past_tr[-1]["source_file"]).name if past_tr and past_tr[-1].get("source_file") else ""
-                candidates.append((ret_1mo, ticker, source, n_clubs))
+                n_clubs_val = len({r["school"] for r in past_tr}) if past_tr else 1
+                source_val = Path(past_tr[-1]["source_file"]).name if past_tr and past_tr[-1].get("source_file") else ""
+                candidates_m.append((ret_1mo, ticker, source_val, n_clubs_val))
 
-            if len(candidates) >= 5:
-                candidates.sort(key=lambda x: x[0])  # ascending = worst performers first
-                n_quintile = max(1, len(candidates) // 5)
-                bottom_quintile = candidates[:n_quintile]
-                nav_now = cash  # cash after closing all positions
-                if nav_now <= 0:
-                    nav_now = float(START_CAPITAL)  # fallback: use start capital as reference
-                slots = MAX_POSITIONS
-                for _, ticker, source, n_clubs in bottom_quintile[:slots]:
-                    if ticker in positions:
-                        continue
-                    pos, cash = _try_enter(ticker, source, n_clubs, day, prices, positions, cash, nav_now, ticker_reports)
-                    if pos is not None and pos.get("cost", 0) > 0:
-                        positions[ticker] = pos
-
-        # Update last_close
-        for ticker, pos in positions.items():
-            df = prices.get(ticker)
-            if df is not None and day_ts in df.index:
-                pos["last_close"] = float(df.loc[day_ts]["close"])
+            if len(candidates_m) >= 5:
+                candidates_m.sort(key=lambda x: x[0])
+                n_quintile = max(1, len(candidates_m) // 5)
+                reversal_entry_queue = [
+                    (ticker, source, nc)
+                    for _, ticker, source, nc in candidates_m[:n_quintile]
+                ]
 
         nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
         nav_series.append((day.isoformat(), nav))
@@ -2115,6 +2192,553 @@ def run_52w_high_proximity(
         nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
+    last_day = calendar[-1]
+    for ticker, pos in list(positions.items()):
+        trades.append(_close_trade(ticker, pos, last_day, pos["last_close"], "데이터_종료_미청산",
+                                   ticker_reports, record_full_trades, None))
+
+    return _compute_result(nav_series, trades, START_CAPITAL, label, open_positions=positions)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Strategy O: MTT (alpha16 이식) — Minervini Trend Template
+# Universe: report-validated stocks (18-month window, same as L/M).
+# RS computation: cross-sectional percentile across OUR price-warehouse universe
+#   weighted_rs = 3m×0.5 + 6m×0.3 + 12m×0.2  (alpha16 RobustOpt KRX params)
+# MTT filter (all must hold):
+#   close > 50MA > 150MA > 200MA
+#   200MA rising vs 1-month ago
+#   close ≥ 1.9 × 52w low  (alpha16 KRX param)
+#   close ≥ 0.95 × 52w high  (alpha16 KRX param)
+#   RS ≥ 80
+# Buy: RS ≥ 79 (+ MTT active)
+# Exits (R-multiple chain, alpha16 KRX params):
+#   Initial stop: −8% from entry (1R)
+#   Breakeven stop: move to entry at +1R gain
+#   Trailing 6% from highest: activated at +1.5R
+#   Take profit: +3.5R
+#   RS < 82 exit after min 8 holding days
+#   Max 115 holding days
+# Position sizing: 5%/20-slot equal-weight (skip Kelly for comparability).
+#
+# PROVENANCE DISCLOSURE: alpha16 RobustOpt KRX params were tuned on the full
+# KRX universe, NOT on our report-validated data. These params are used as-is.
+# Position sizing kept at our 5%/20-slot convention for comparability; Kelly
+# sizing noted as future work.
+# ──────────────────────────────────────────────────────────────────────────────
+
+# alpha16 RobustOpt KRX parameters (from config.py / optimize.py)
+MTT_STOP_PCT              = 0.08    # initial stop = −8% (1R)
+MTT_BE_AT_R               = 1.0    # move stop to breakeven at +1R
+MTT_TRAIL_PCT             = 0.06   # 6% trailing from highest
+MTT_TRAIL_ACTIVATE_R      = 1.5    # trailing activates at +1.5R
+MTT_TAKE_PROFIT_R         = 3.5    # take profit at +3.5R
+MTT_RS_BUY_THRESHOLD      = 79     # buy when RS ≥ 79
+MTT_RS_MTT_THRESHOLD      = 80     # MTT requires RS ≥ 80
+MTT_RS_EXIT_THRESHOLD     = 82     # RS < 82 → exit (post min hold days)
+MTT_RS_EXIT_MIN_HOLD_DAYS = 8      # min holding days before RS exit triggers
+MTT_MAX_HOLD_DAYS         = 115    # max hold days
+MTT_PRICE_FROM_LOW_MULT   = 1.90   # price ≥ 1.9× 52w low (alpha16 KRX)
+MTT_PRICE_FROM_HIGH_MULT  = 0.95   # price ≥ 0.95× 52w high (alpha16 KRX)
+MTT_UNIVERSE_MONTHS       = 18     # report valid 18 months (same as L/M)
+
+# RS lookback in trading days (alpha16 defaults)
+MTT_RS_3M  = 63
+MTT_RS_6M  = 126
+MTT_RS_12M = 252
+MTT_RS_W3  = 0.5
+MTT_RS_W6  = 0.3
+MTT_RS_W12 = 0.2
+
+
+def _compute_rs_percentiles(
+    prices: dict[str, pd.DataFrame],
+    day: dt.date,
+) -> dict[str, float]:
+    """
+    Cross-sectional RS percentile for all tickers in prices on a given day.
+    weighted_rs = rank_pct(ret_3m)×0.5 + rank_pct(ret_6m)×0.3 + rank_pct(ret_12m)×0.2
+    Returns {ticker: rs_score 0..99} — empty dict if insufficient data.
+    """
+    day_ts = pd.Timestamp(day)
+    day_63  = day - dt.timedelta(days=int(MTT_RS_3M  * 1.45))   # ~91 cal days
+    day_126 = day - dt.timedelta(days=int(MTT_RS_6M  * 1.45))   # ~183 cal days
+    day_252 = day - dt.timedelta(days=int(MTT_RS_12M * 1.45))   # ~365 cal days
+
+    rets: dict[str, tuple[float, float, float]] = {}
+    for ticker, df in prices.items():
+        if day_ts not in df.index:
+            continue
+        close_now = float(df.loc[day_ts]["close"])
+        if close_now <= 0:
+            continue
+        c3  = asof_value(df["close"], day_63)
+        c6  = asof_value(df["close"], day_126)
+        c12 = asof_value(df["close"], day_252)
+        if c3 <= 0 or c6 <= 0 or c12 <= 0:
+            continue
+        rets[ticker] = (close_now / c3 - 1, close_now / c6 - 1, close_now / c12 - 1)
+
+    if len(rets) < 5:
+        return {}
+
+    tickers = list(rets.keys())
+    r3  = [rets[t][0] for t in tickers]
+    r6  = [rets[t][1] for t in tickers]
+    r12 = [rets[t][2] for t in tickers]
+    n = len(tickers)
+
+    def rank_pct(vals: list[float]) -> list[float]:
+        sorted_v = sorted(vals)
+        return [sorted_v.index(v) / max(n - 1, 1) * 99 for v in vals]
+
+    p3  = rank_pct(r3)
+    p6  = rank_pct(r6)
+    p12 = rank_pct(r12)
+
+    return {
+        tickers[i]: round(p3[i] * MTT_RS_W3 + p6[i] * MTT_RS_W6 + p12[i] * MTT_RS_W12, 2)
+        for i in range(n)
+    }
+
+
+def run_mtt_alpha16(
+    prices: dict[str, pd.DataFrame],
+    reports: list[tuple[dt.date, str, str, int]],
+    calendar: list[dt.date],
+    label: str,
+    ticker_reports: dict[str, list[dict]] | None = None,
+    record_full_trades: bool = False,
+) -> dict:
+    """
+    MTT (alpha16 이식) — Minervini Trend Template on report-validated universe.
+    Universe: any ticker with a buy report within the past 18 months.
+    RS: cross-sectional percentile across the full price-warehouse (our tickers).
+    Exit: R-multiple chain (initial −8%, BE at +1R, trail-6% at +1.5R, TP +3.5R,
+          RS<82 post 8d, max 115d).
+    Position sizing: 5%/20-slot equal-weight (Kelly: future work).
+
+    PROVENANCE: alpha16 RobustOpt KRX params tuned on full KRX universe,
+    not on our report-validated data.
+    """
+    START_CAPITAL = 100_000_000
+    cash = float(START_CAPITAL)
+    positions: dict[str, dict] = {}
+    nav_series: list[tuple[str, float]] = []
+    trades: list[dict] = []
+    pending_exits: dict[str, str] = {}
+
+    # Build eligible pool: per-ticker the date ranges it is valid
+    ticker_valid: dict[str, list[tuple[dt.date, dt.date]]] = {}
+    for rdate, ticker, source, n_clubs in reports:
+        expire = rdate + dt.timedelta(days=int(MTT_UNIVERSE_MONTHS * 30.44))
+        ticker_valid.setdefault(ticker, []).append((rdate, expire))
+
+    # Cache of daily RS scores — recomputed once per day lazily
+    _rs_cache: dict[dt.date, dict[str, float]] = {}
+
+    def get_rs(day: dt.date) -> dict[str, float]:
+        if day not in _rs_cache:
+            _rs_cache[day] = _compute_rs_percentiles(prices, day)
+        return _rs_cache[day]
+
+    # MTT entry queue: tickers whose signal was detected at close of prev day,
+    # to be filled at open of the current day (eliminates same-bar lookahead).
+    # Format: list of (ticker, source_val, n_clubs_val, rs_val_at_signal)
+    mtt_entry_queue: list[tuple[str, str, int, float]] = []
+
+    for day in calendar:
+        day_ts = pd.Timestamp(day)
+
+        # Execute pending exits at open
+        to_exit = [t for t in list(pending_exits) if t in positions]
+        for ticker in to_exit:
+            pos = positions[ticker]
+            reason = pending_exits.pop(ticker)
+            q = _get_quote(prices, ticker, day)
+            if q is None or float(q["open"]) <= 0:
+                pending_exits[ticker] = reason   # defer
+                continue
+            exit_price = float(q["open"])
+            cash += pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            trades.append(_close_trade(ticker, pos, day, exit_price, reason,
+                                       ticker_reports, record_full_trades, None))
+            del positions[ticker]
+
+        # Execute queued MTT entries at today's open (signal was detected yesterday)
+        if mtt_entry_queue:
+            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            slots = MAX_POSITIONS - len(positions)
+            for ticker, source_val, n_clubs_val, rs_val in mtt_entry_queue:
+                if slots <= 0:
+                    break
+                if ticker in positions:
+                    continue
+                pos, cash = _try_enter(ticker, source_val, n_clubs_val, day, prices, positions,
+                                       cash, nav_now, ticker_reports)
+                if pos is not None:
+                    entry_p = pos["entry_price"]
+                    one_r = entry_p * MTT_STOP_PCT
+                    pos["stop"] = entry_p - one_r
+                    pos["one_r"] = one_r
+                    pos["trail_activated"] = False
+                    pos["rs_val"] = rs_val
+                    pos["hold_days"] = 0
+                    positions[ticker] = pos
+                    slots -= 1
+            mtt_entry_queue = []
+
+        # RS scores for today (end-of-day close signal generation)
+        rs_scores = get_rs(day)
+
+        # End-of-day entry SIGNAL scan — conditions checked at today's close,
+        # execution deferred to next bar's open (point-in-time, no same-bar lookahead).
+        new_mtt_entries: list[tuple[str, str, int, float]] = []
+        for ticker, ranges in ticker_valid.items():
+            if ticker in positions:
+                continue
+            # 18-month validity window
+            valid = any(start <= day <= end for start, end in ranges)
+            if not valid:
+                continue
+            df = prices.get(ticker)
+            if df is None or day_ts not in df.index:
+                continue
+
+            rs_val = rs_scores.get(ticker, 0.0)
+            if rs_val < MTT_RS_BUY_THRESHOLD:
+                continue
+
+            close = float(df.loc[day_ts]["close"])
+            ma50  = asof_value(df["ma50"],  day)
+            ma150 = asof_value(df["ma150"], day)
+            ma200 = asof_value(df["ma200"], day)
+            hi52w = asof_value(df["hi52w"], day)
+            lo52w = asof_value(df["lo52w"] if "lo52w" in df.columns else df["close"].rolling(252, min_periods=126).min(), day)
+
+            if any(v <= 0 for v in [ma50, ma150, ma200, hi52w]):
+                continue
+
+            # MTT filter (checked at close — point-in-time)
+            if not (close > ma50 > ma150 > ma200):
+                continue
+            # 200MA rising vs 1 month ago
+            ma200_1mo = asof_value(df["ma200"], day - dt.timedelta(days=30))
+            if ma200_1mo <= 0 or ma200 <= ma200_1mo:
+                continue
+            # Price ≥ 1.9× 52w low
+            if lo52w > 0 and close < MTT_PRICE_FROM_LOW_MULT * lo52w:
+                continue
+            # Price ≥ 0.95× 52w high
+            if close < MTT_PRICE_FROM_HIGH_MULT * hi52w:
+                continue
+            # RS ≥ 80 (MTT RS gate)
+            if rs_val < MTT_RS_MTT_THRESHOLD:
+                continue
+
+            # Get source/n_clubs from most recent report
+            tr_list = (ticker_reports or {}).get(ticker, [])
+            past_tr = [r for r in tr_list if r["report_date"] <= day]
+            n_clubs_val = len({r["school"] for r in past_tr}) if past_tr else 1
+            source_val = Path(past_tr[-1]["source_file"]).name if past_tr and past_tr[-1].get("source_file") else ""
+
+            new_mtt_entries.append((ticker, source_val, n_clubs_val, rs_val))
+
+        # Queue for execution at next day's open
+        mtt_entry_queue = new_mtt_entries
+
+        # Update positions + check exit conditions
+        for ticker, pos in list(positions.items()):
+            df = prices.get(ticker)
+            if df is None or day_ts not in df.index:
+                continue
+            close = float(df.loc[day_ts]["close"])
+            pos["last_close"] = close
+            pos["highest"] = max(pos.get("highest", close), close)
+            pos["hold_days"] = pos.get("hold_days", 0) + 1
+
+            if ticker in pending_exits:
+                continue
+
+            entry_p = pos["entry_price"]
+            one_r   = pos["one_r"]
+            highest = pos["highest"]
+            hold_days = pos["hold_days"]
+
+            # --- Stop management ---
+            gain = close - entry_p
+            gain_r = gain / one_r if one_r > 0 else 0.0
+
+            # Breakeven stop: move to entry at +1R
+            if gain_r >= MTT_BE_AT_R:
+                pos["stop"] = max(pos.get("stop", 0.0), entry_p)
+
+            # Trailing 6%: activated at +1.5R
+            if gain_r >= MTT_TRAIL_ACTIVATE_R:
+                pos["trail_activated"] = True
+
+            if pos.get("trail_activated"):
+                trail_stop = highest * (1 - MTT_TRAIL_PCT)
+                pos["stop"] = max(pos.get("stop", 0.0), trail_stop)
+
+            # --- Exit checks ---
+            # Initial stop hit
+            if close < pos["stop"]:
+                pending_exits[ticker] = "mtt_stop"
+                continue
+
+            # Take profit +3.5R
+            if gain_r >= MTT_TAKE_PROFIT_R:
+                pending_exits[ticker] = "mtt_take_profit_3.5R"
+                continue
+
+            # RS < 82 exit after min 8 holding days
+            rs_val_today = rs_scores.get(ticker, 0.0)
+            pos["rs_val"] = rs_val_today
+            if hold_days >= MTT_RS_EXIT_MIN_HOLD_DAYS and rs_val_today < MTT_RS_EXIT_THRESHOLD:
+                pending_exits[ticker] = "mtt_rs_exit_<82"
+                continue
+
+            # Max 115 days
+            if hold_days >= MTT_MAX_HOLD_DAYS:
+                pending_exits[ticker] = "mtt_max_115d"
+                continue
+
+        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav_series.append((day.isoformat(), nav))
+
+    last_day = calendar[-1]
+    for ticker, pos in list(positions.items()):
+        trades.append(_close_trade(ticker, pos, last_day, pos["last_close"], "데이터_종료_미청산",
+                                   ticker_reports, record_full_trades, None))
+
+    return _compute_result(nav_series, trades, START_CAPITAL, label, open_positions=positions)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Strategy P: 딥바이 샹들리에 하이브리드
+# Entry = G 딥바이 (price falls ≥20% below publication-day close within 6mo).
+# Scale-in = ONE add-on buy (same 5% slot size) if price falls another 10% below
+#   the first entry price WHILE the 6-month thesis window is still open.
+#   Combined into a single position with averaged cost; stop tracked from combined
+#   highest-high.
+# Exit = Optuna-tuned chandelier ATR trailing stop only (no profit cap).
+#   Uses D+ Optuna best params if available at runtime; otherwise falls back to
+#   ATR(42)×5 (D default).
+# Reference: 딥바이 진입은 좋았으나 청산이 큰 winner를 못 먹었다 → trailing stop
+#   only, no target cap.
+# ──────────────────────────────────────────────────────────────────────────────
+
+# P strategy params
+P_DIP_THRESHOLD      = 0.20    # ≥20% below pub-day close → first entry
+P_ADDON_DROP         = 0.10    # additional 10% below first entry → scale-in
+P_DIP_WINDOW_DAYS    = 180     # 6-month watch window from report date
+P_ATR_PERIOD         = 42      # ATR period (same as D default; overridable)
+P_ATR_MULT_DEFAULT   = 5.0     # fallback ATR mult if Optuna result not available
+
+
+def run_deepbuy_chandelier(
+    prices: dict[str, pd.DataFrame],
+    reports: list[tuple[dt.date, str, str, int]],
+    calendar: list[dt.date],
+    label: str,
+    ticker_reports: dict[str, list[dict]] | None = None,
+    record_full_trades: bool = False,
+    atr_mult: float = P_ATR_MULT_DEFAULT,
+    max_positions: int = MAX_POSITIONS,
+) -> dict:
+    """
+    P 딥바이 샹들리에 하이브리드.
+
+    진입: 발간일 종가 대비 ≥20% 하락 (6개월 내), 익일 시가 매수 (5% 슬롯).
+    추가매수: 최초 진입가 대비 추가 10% 하락이 발생하면 동일 슬롯에 5% 1회 추가.
+      → 평균 단가 재계산, 포지션 합산. 6개월 thesis 창 내에서만 허용.
+    청산: 최고점 기준 ATR 트레일링 스탑 (D+ Optuna 파라미터, 기본 ATR42×5).
+      타겟가 캡 없음 — winner를 충분히 보유.
+    생존 편향 주석: 프라이스 파일이 존재하는 종목만 유니버스에 포함됨.
+    """
+    START_CAPITAL = 100_000_000
+    cash = float(START_CAPITAL)
+    positions: dict[str, dict] = {}
+    nav_series: list[tuple[str, float]] = []
+    trades: list[dict] = []
+    pending_exits: set[str] = set()
+
+    # Build per-ticker dip-watch queue (same structure as G)
+    dip_watch: dict[str, list[dict]] = {}
+    for rdate, ticker, source, n_clubs in reports:
+        if rdate < SIM_START - dt.timedelta(days=P_DIP_WINDOW_DAYS):
+            continue
+        df = prices.get(ticker)
+        if df is None:
+            continue
+        pub_close = asof_value(df["close"], rdate)
+        if pub_close <= 0:
+            continue
+        tr_list = (ticker_reports or {}).get(ticker, [])
+        past_tr = [x for x in tr_list if x["report_date"] <= rdate]
+        dn = past_tr[-1]["display_name"] if past_tr else ticker
+        market = past_tr[0].get("market", "KR") if past_tr else "KR"
+        dip_watch.setdefault(ticker, []).append({
+            "report_date": rdate,
+            "pub_close": pub_close,
+            "expire_date": rdate + dt.timedelta(days=P_DIP_WINDOW_DAYS),
+            "display_name": dn,
+            "n_clubs": n_clubs,
+            "source": source,
+            "market": market,
+        })
+
+    # dip_entry_queue: (ticker, watch) pairs detected at close, filled at next open
+    dip_entry_queue: list[tuple[str, dict]] = []
+    # addon_queue: tickers where scale-in was triggered at close, filled at next open
+    addon_queue: list[str] = []
+
+    for day in calendar:
+        day_ts = pd.Timestamp(day)
+
+        # ── Open-of-day: execute exits ─────────────────────────────────────
+        to_exit = [t for t in list(pending_exits) if t in positions]
+        for ticker in to_exit:
+            pos = positions[ticker]
+            q = _get_quote(prices, ticker, day)
+            if q is None or float(q["open"]) <= 0:
+                continue
+            exit_price = float(q["open"])
+            cash += pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            trades.append(_close_trade(ticker, pos, day, exit_price,
+                                       f"p_chandelier_ATR{atr_mult}",
+                                       ticker_reports, record_full_trades, None))
+            del positions[ticker]
+            pending_exits.discard(ticker)
+
+        # ── Open-of-day: execute deferred scale-in add-ons ─────────────────
+        if addon_queue:
+            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            for ticker in addon_queue:
+                pos = positions.get(ticker)
+                if pos is None:
+                    continue
+                df = prices.get(ticker)
+                if df is None or day_ts not in df.index:
+                    continue
+                addon_price = float(df.loc[day_ts]["open"])
+                if addon_price <= 0:
+                    continue
+                addon_budget = min(nav_now * POSITION_WEIGHT, cash)
+                if addon_budget < nav_now * POSITION_WEIGHT * 0.5:
+                    continue
+                addon_shares = addon_budget * (1 - COST_PER_SIDE) / addon_price
+                cash -= addon_budget
+                # Merge into existing position: weighted avg entry, combined shares/cost
+                old_shares = pos["shares"]
+                old_cost   = pos["cost"]
+                new_shares = old_shares + addon_shares
+                new_cost   = old_cost + addon_budget
+                avg_entry  = (old_shares * pos["entry_price"] + addon_shares * addon_price) / new_shares
+                pos["shares"]      = new_shares
+                pos["cost"]        = new_cost
+                pos["entry_price"] = avg_entry   # blended avg for P&L tracking
+                # Stop is reset from combined highest-high (already tracked)
+                atr_val = asof_value(df["atr"], day)
+                if atr_val:
+                    new_stop = pos["highest"] - atr_mult * atr_val
+                    pos["stop"] = max(pos.get("stop", 0.0), new_stop)
+            addon_queue = []
+
+        # ── Open-of-day: execute new dip entries queued from previous close ─
+        if dip_entry_queue:
+            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            slots = max_positions - len(positions)
+            for ticker, watch in dip_entry_queue[:slots]:
+                if ticker in positions:
+                    continue
+                df = prices.get(ticker)
+                if df is None or day_ts not in df.index:
+                    continue
+                entry_price = float(df.loc[day_ts]["open"])
+                if entry_price <= 0:
+                    continue
+                budget = min(nav_now * POSITION_WEIGHT, cash)
+                if budget < nav_now * POSITION_WEIGHT * 0.5:
+                    continue
+                shares = budget * (1 - COST_PER_SIDE) / entry_price
+                cash -= budget
+                atr_val = asof_value(df["atr"], day)
+                stop = entry_price - atr_mult * atr_val if atr_val else entry_price * 0.75
+                positions[ticker] = {
+                    "shares": shares,
+                    "entry_price": entry_price,
+                    "entry_date": day,
+                    "cost": budget,
+                    "last_close": entry_price,
+                    "highest": entry_price,
+                    "stop": stop,
+                    "source": watch["source"],
+                    "n_clubs": watch["n_clubs"],
+                    "display_name": watch["display_name"],
+                    "market": watch["market"],
+                    "target_price": None,
+                    "addon_done": False,
+                    "addon_trigger": entry_price * (1 - P_ADDON_DROP),
+                    "thesis_expire": watch["expire_date"],
+                    "first_entry_price": entry_price,
+                }
+            dip_entry_queue = []
+
+        # ── End-of-day: scan dip-watch for new first-entry triggers ────────
+        new_dip_entries: list[tuple[str, dict]] = []
+        for ticker, watches in dip_watch.items():
+            if ticker in positions:
+                continue
+            df = prices.get(ticker)
+            if df is None or day_ts not in df.index:
+                continue
+            close_today = float(df.loc[day_ts]["close"])
+            for watch in watches:
+                if day < watch["report_date"] or day > watch["expire_date"]:
+                    continue
+                dip_level = watch["pub_close"] * (1 - P_DIP_THRESHOLD)
+                if close_today <= dip_level:
+                    new_dip_entries.append((ticker, watch))
+                    break
+        dip_entry_queue = new_dip_entries
+
+        # ── End-of-day: update positions, check chandelier stop + scale-in ─
+        new_addon: list[str] = []
+        for ticker, pos in list(positions.items()):
+            df = prices.get(ticker)
+            if df is None or day_ts not in df.index:
+                continue
+            close = float(df.loc[day_ts]["close"])
+            pos["last_close"] = close
+            pos["highest"] = max(pos.get("highest", close), close)
+
+            # Ratchet chandelier stop from highest-high
+            atr_val = asof_value(df["atr"], day)
+            if atr_val:
+                new_stop = pos["highest"] - atr_mult * atr_val
+                pos["stop"] = max(pos.get("stop", 0.0), new_stop)
+
+            # Chandelier stop breach → exit at next open
+            if pos.get("stop") and close < pos["stop"] and ticker not in pending_exits:
+                pending_exits.add(ticker)
+                continue
+
+            # Scale-in trigger: price drops P_ADDON_DROP below first entry,
+            # thesis window still open, add-on not yet done.
+            if (not pos.get("addon_done")
+                    and close <= pos.get("addon_trigger", 0.0)
+                    and day <= pos.get("thesis_expire", day - dt.timedelta(days=1))):
+                pos["addon_done"] = True   # mark immediately to prevent re-trigger
+                new_addon.append(ticker)
+
+        addon_queue = new_addon
+
+        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav_series.append((day.isoformat(), nav))
+
+    # Force-close remaining at last bar
     last_day = calendar[-1]
     for ticker, pos in list(positions.items()):
         trades.append(_close_trade(ticker, pos, last_day, pos["last_close"], "데이터_종료_미청산",
@@ -3238,7 +3862,7 @@ def main() -> int:
     # Parameters are literature-grounded fixed values — no grid search
     # ══════════════════════════════════════════════════════════════════════════
 
-    print("\n── Running 14 strategies (v9: single-club universe + L/M/N) ────────", flush=True)
+    print("\n── Running 17 strategies (v11: lookahead fixes, +P hybrid, L/M excluded from selector) ──", flush=True)
 
     # A. 12개월 보유 (baseline)
     print("A. 12개월 보유...", flush=True)
@@ -3331,21 +3955,26 @@ def main() -> int:
     )
     print(f"   IS sharpe={result_K['in_sample'].get('sharpe')}  OOS sharpe={result_K['out_of_sample'].get('sharpe')}", flush=True)
 
-    # L. 민리버전 (Connors RSI-2)
-    print("L. 민리버전 Connors RSI-2...", flush=True)
+    # L. 민리버전 (Connors RSI-2) — run for diagnosis, EXCLUDED from headline selector
+    # v11: same-bar lookahead fixed; still dies from 0.6% round-trip cost × high turnover.
+    # Epitaph: RSI-2 민리버전은 거래비용으로 사망 — 구현 검증 후 제외.
+    print("L. 민리버전 Connors RSI-2 (비용 사망 진단용, 셀렉터 제외)...", flush=True)
     result_L = run_rsi2_mean_reversion(
         prices, reports, calendar,
         label="L_rsi2_reversion", ticker_reports=ticker_reports, record_full_trades=True,
     )
-    print(f"   IS sharpe={result_L['in_sample'].get('sharpe')}  OOS sharpe={result_L['out_of_sample'].get('sharpe')}", flush=True)
+    print(f"   IS sharpe={result_L['in_sample'].get('sharpe')}  OOS sharpe={result_L['out_of_sample'].get('sharpe')}  trades={result_L['metrics']['trades']}  MDD={result_L['metrics']['mdd_pct']}%", flush=True)
 
-    # M. 단기 리버설 (monthly bottom-quintile)
-    print("M. 단기 리버설 (monthly bottom-quintile)...", flush=True)
+    # M. 단기 리버설 (monthly bottom-quintile) — run for diagnosis, EXCLUDED from headline selector
+    # v11: positions.clear() bug fixed, same-bar lookahead fixed; still dies from monthly
+    # full-turnover cost (0.6% × ~12 rebalances/yr on full NAV).
+    # Epitaph: 단기 리버설은 거래비용으로 사망 — 구현 검증 후 제외.
+    print("M. 단기 리버설 monthly bottom-quintile (비용 사망 진단용, 셀렉터 제외)...", flush=True)
     result_M = run_short_term_reversal(
         prices, reports, calendar,
         label="M_short_reversal", ticker_reports=ticker_reports, record_full_trades=True,
     )
-    print(f"   IS sharpe={result_M['in_sample'].get('sharpe')}  OOS sharpe={result_M['out_of_sample'].get('sharpe')}", flush=True)
+    print(f"   IS sharpe={result_M['in_sample'].get('sharpe')}  OOS sharpe={result_M['out_of_sample'].get('sharpe')}  trades={result_M['metrics']['trades']}  MDD={result_M['metrics']['mdd_pct']}%", flush=True)
 
     # N. 52주 고가 근접 (George & Hwang 2004)
     print("N. 52주 고가 근접 (George & Hwang 2004)...", flush=True)
@@ -3355,6 +3984,27 @@ def main() -> int:
     )
     print(f"   IS sharpe={result_N['in_sample'].get('sharpe')}  OOS sharpe={result_N['out_of_sample'].get('sharpe')}", flush=True)
 
+    # O. MTT alpha16 이식 — v11: same-bar lookahead fixed (signal at close → fill next open)
+    print("O. MTT alpha16 (lookahead-fixed, Minervini RS+MTT+R-multiple exits)...", flush=True)
+    result_O = run_mtt_alpha16(
+        prices, reports, calendar,
+        label="O_mtt_alpha16", ticker_reports=ticker_reports, record_full_trades=True,
+    )
+    print(f"   IS sharpe={result_O['in_sample'].get('sharpe')}  OOS sharpe={result_O['out_of_sample'].get('sharpe')}", flush=True)
+
+    # P. 딥바이 샹들리에 하이브리드 (new v11)
+    # Use D+ Optuna ATR mult if adopted, else D default ATR×5
+    print("P. 딥바이 샹들리에 하이브리드 (진입=딥바이, 청산=ATR트레일, 스케일인)...", flush=True)
+    # P runs with D default params initially; will be re-run with Optuna params after D+ eval
+    result_P_default = run_deepbuy_chandelier(
+        prices, reports, calendar,
+        label="P_deepbuy_chandelier",
+        ticker_reports=ticker_reports, record_full_trades=True,
+        atr_mult=P_ATR_MULT_DEFAULT,
+    )
+    print(f"   IS sharpe={result_P_default['in_sample'].get('sharpe')}  OOS sharpe={result_P_default['out_of_sample'].get('sharpe')}", flush=True)
+
+    # All strategies for comparison (L/M included for diagnostics but flagged)
     all_strategies: dict[str, dict] = {
         "A_12mo": result_A,
         "B_36mo": result_B,
@@ -3370,7 +4020,11 @@ def main() -> int:
         "L_rsi2_reversion": result_L,
         "M_short_reversal": result_M,
         "N_52w_high": result_N,
+        "O_mtt_alpha16": result_O,
+        "P_deepbuy_chandelier": result_P_default,
     }
+    # Strategies excluded from headline selector (cost-death confirmed)
+    EXCLUDED_FROM_SELECTOR = {"L_rsi2_reversion", "M_short_reversal"}
 
     # ── D+ Optuna optimization ─────────────────────────────────────────────────
     print("\n── Optuna robust optimization (D+ chandelier) ───────────────────", flush=True)
@@ -3401,28 +4055,49 @@ def main() -> int:
         else:
             print(f"  D+ NOT ADOPTED (OOS degraded): IS={is_sharpe_dplus}  OOS={oos_sharpe_dplus}  D OOS={oos_sharpe_D}", flush=True)
 
-    # ── Summary table
-    print(f"\n── Strategy summary (v9, {len(all_strategies)} strategies) ─────────────────────────────", flush=True)
-    print(f"{'Strategy':<32} {'IS CAGR':>9} {'IS Shp':>8} {'OOS CAGR':>10} {'OOS Shp':>9} {'Trades':>7}", flush=True)
+    # ── Re-run P with Optuna ATR params if D+ was adopted ──────────────────
+    result_P = result_P_default
+    p_atr_mult_used = P_ATR_MULT_DEFAULT
+    if d_plus_adopted and result_Dplus is not None:
+        best_p = optuna_meta.get("best_params", {})
+        p_atr_mult_used = float(best_p.get("atr_mult", P_ATR_MULT_DEFAULT))
+        p_max_pos = int(best_p.get("max_positions", MAX_POSITIONS))
+        print(f"P. 딥바이 샹들리에 재실행 (Optuna ATR mult={p_atr_mult_used}, max_pos={p_max_pos})...", flush=True)
+        result_P = run_deepbuy_chandelier(
+            prices, reports, calendar,
+            label="P_deepbuy_chandelier",
+            ticker_reports=ticker_reports, record_full_trades=True,
+            atr_mult=p_atr_mult_used,
+            max_positions=p_max_pos,
+        )
+        all_strategies["P_deepbuy_chandelier"] = result_P
+        print(f"   P (Optuna params) IS sharpe={result_P['in_sample'].get('sharpe')}  OOS sharpe={result_P['out_of_sample'].get('sharpe')}", flush=True)
+
+    # ── Summary table (all strategies including L/M for transparency)
+    print(f"\n── Strategy summary (v11, {len(all_strategies)} strategies; L/M excluded from selector) ──", flush=True)
+    print(f"{'Strategy':<32} {'IS CAGR':>9} {'IS Shp':>8} {'OOS CAGR':>10} {'OOS Shp':>9} {'Trades':>7} {'Note':>12}", flush=True)
     for key, r in all_strategies.items():
         is_m  = r.get("in_sample", {})
         oos_m = r.get("out_of_sample", {})
+        note = "[EXCLUDED]" if key in EXCLUDED_FROM_SELECTOR else ""
         print(
             f"  {key:<30} {str(is_m.get('cagr_pct','—')):>9} {str(is_m.get('sharpe','—')):>8} "
             f"{str(oos_m.get('cagr_pct','—')):>10} {str(oos_m.get('sharpe','—')):>9} "
-            f"{r['metrics']['trades']:>7}",
+            f"{r['metrics']['trades']:>7} {note:>12}",
             flush=True,
         )
 
-    # ── Headline selection: best IS sharpe (automatic, anti-overfit)
+    # ── Headline selection: best IS sharpe among ELIGIBLE strategies only
     def _is_sharpe(r: dict) -> float:
         v = r.get("in_sample", {}).get("sharpe")
         return v if v is not None else -999.0
 
-    headline = max(all_strategies.values(), key=_is_sharpe)
+    eligible_strategies = {k: v for k, v in all_strategies.items() if k not in EXCLUDED_FROM_SELECTOR}
+    headline = max(eligible_strategies.values(), key=_is_sharpe)
     headline_label = headline["label"]
-    headline_key = next(k for k, v in all_strategies.items() if v is headline)
-    print(f"\nHeadline (best IS sharpe): {headline_label} [{headline_key}]", flush=True)
+    headline_key = next(k for k, v in eligible_strategies.items() if v is headline)
+    print(f"\nHeadline (best IS sharpe, eligible only): {headline_label} [{headline_key}]", flush=True)
+    print(f"  IS sharpe={headline.get('in_sample', {}).get('sharpe')}  OOS sharpe={headline.get('out_of_sample', {}).get('sharpe')}", flush=True)
 
     # ── Tail stats and consensus stats on headline
     tail_stats = compute_tail_stats(headline.get("trades", []))
@@ -3588,6 +4263,80 @@ def main() -> int:
         "open_positions": open_positions_list,
         "signals": today_signals,
         "sensitivity": [],  # legacy compat
+        # ── v11 감사 결과 ──────────────────────────────────────────────────────
+        "v11_audit": {
+            "mtt_lookahead_fix": (
+                "O MTT: 동일 바 룩어헤드 수정 완료. 진입 시그널은 당일 종가 기준으로 포착, "
+                "체결은 익일 시가. _compute_rs_percentiles는 asof(day_63/126/252)로 과거 데이터만 사용 — "
+                "점검 결과 lookahead 없음. hi52w/lo52w/MA: load_prices rolling window, look-forward 없음. "
+                "생존 편향: 프라이스 파일 존재 종목만 포함 — 상장폐지 후 파일 삭제 시 편향 가능. 방법론 주석 명시."
+            ),
+            "L_verdict": (
+                "L 민리버전 RSI-2: 동일 바 룩어헤드 수정 (시그널→익일 시가). "
+                f"수정 후 결과: IS sharpe={result_L['in_sample'].get('sharpe')}, "
+                f"OOS sharpe={result_L['out_of_sample'].get('sharpe')}, "
+                f"trades={result_L['metrics']['trades']}, MDD={result_L['metrics']['mdd_pct']}%. "
+                "판정: RSI-2 민리버전은 거래비용으로 사망 — 구현 검증 후 제외. "
+                "원인: 0.3%/side × ~10일 보유 주기 → 연간 약 6-7% 비용 부담으로 알파 소진."
+            ),
+            "M_verdict": (
+                "M 단기 리버설: positions.clear() 미청산 포지션 현금 누락 버그 수정, "
+                "동일 바 룩어헤드 수정 (월말 종가 랭킹→월초 시가 체결). "
+                f"수정 후 결과: IS sharpe={result_M['in_sample'].get('sharpe')}, "
+                f"OOS sharpe={result_M['out_of_sample'].get('sharpe')}, "
+                f"trades={result_M['metrics']['trades']}, MDD={result_M['metrics']['mdd_pct']}%. "
+                "판정: 단기 리버설은 거래비용으로 사망 — 구현 검증 후 제외. "
+                "원인: 0.3%/side × 월별 전체 교체 (연 24회 편도) → 연간 약 7% 비용 부담."
+            ),
+            "excluded_from_selector": list(EXCLUDED_FROM_SELECTOR),
+            "P_strategy": (
+                f"P 딥바이 샹들리에: IS sharpe={result_P['in_sample'].get('sharpe')}, "
+                f"OOS sharpe={result_P['out_of_sample'].get('sharpe')}, "
+                f"trades={result_P['metrics']['trades']}, "
+                f"max_single_return={result_P['metrics'].get('max_single_return_pct')}%, "
+                f"ATR mult used={p_atr_mult_used}. "
+                "설계: 딥바이 진입 + 10% 추가 하락 시 1회 스케일인 + ATR 트레일링 스탑 (타겟가 캡 없음)."
+            ),
+        },
+        # ── 재매수 규칙 ───────────────────────────────────────────────────────
+        "reentry_rule": {
+            "rule": (
+                "청산 후 동일 티커 재진입 허용: 각 패밀리의 진입 조건이 다시 충족되면 재매수. "
+                "현재 보유 중인 경우에만 차단 (open_positions 중복 방지). "
+                "리포트 구동 패밀리(A~K, N, P): 신규 리포트 발간 시 또는 유효창 내 기술적 조건 재충족 시 재진입. "
+                "MTT 계열(O): 유효창 내 기술적 시그널 재발생 시 재진입. "
+                "어느 패밀리도 청산 후 영구 차단하지 않음."
+            ),
+            "families_changed": ["v11: L/M 셀렉터 제외, P 신규 추가"],
+            "audit_note": (
+                "v11 엔진 전 패밀리 검토: _try_enter()는 ticker in positions 조건만 확인 (현재 보유 여부). "
+                "청산 후 positions에서 제거되므로 재진입 자동 허용. 영구 차단 패밀리 없음."
+            ),
+        },
+        # ── MTT O 출처 공시 ───────────────────────────────────────────────────
+        "mtt_provenance": {
+            "source": "alpha16-main (Minervini MTT RobustOpt KRX params)",
+            "params": {
+                "stop_pct": MTT_STOP_PCT,
+                "be_at_r": MTT_BE_AT_R,
+                "trail_pct": MTT_TRAIL_PCT,
+                "trail_activate_r": MTT_TRAIL_ACTIVATE_R,
+                "take_profit_r": MTT_TAKE_PROFIT_R,
+                "rs_buy_threshold": MTT_RS_BUY_THRESHOLD,
+                "rs_mtt_threshold": MTT_RS_MTT_THRESHOLD,
+                "rs_exit_threshold": MTT_RS_EXIT_THRESHOLD,
+                "rs_exit_min_hold_days": MTT_RS_EXIT_MIN_HOLD_DAYS,
+                "max_hold_days": MTT_MAX_HOLD_DAYS,
+                "price_from_low_mult": MTT_PRICE_FROM_LOW_MULT,
+                "price_from_high_mult": MTT_PRICE_FROM_HIGH_MULT,
+            },
+            "disclaimer": (
+                "alpha16 RobustOpt KRX 파라미터는 전체 KRX 종목 대상으로 튜닝된 값입니다. "
+                "OUR 리포트 검증 데이터에서 최적화하지 않았습니다 (데이터 오염 방지). "
+                "포지션 사이징은 비교 가능성을 위해 당사 5%/20슬롯 동일비중 유지. "
+                "Kelly 사이징은 미래 작업으로 남겨둡니다."
+            ),
+        },
     }
 
     OUT_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")

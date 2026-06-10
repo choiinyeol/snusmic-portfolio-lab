@@ -98,6 +98,21 @@ TARGET_THEN_CURRENT_PAIR_RE = re.compile(
     rf"목표\s*주가{_LABEL_TAIL}현재\s*주가{_LABEL_TAIL}\|?\s*(?P<v1>{_PAIR_VALUE})\s+(?P<v2>{_PAIR_VALUE})",
     re.I,
 )
+# VOERA 라벨-블록→값-블록 레이아웃:
+#   "현재주가 목표주가 상승여력 19,400 원 30,000 원 54.6 %"
+#   표 셀에서 라벨(현재주가 / 목표주가 상승여력)이 먼저 나오고 값(cp / tp upside%)이 뒤따름
+VOERA_LABEL_BLOCK_RE = re.compile(
+    rf"현재\s*주가\s+목표\s*주가\s+상승\s*여력\s+"
+    rf"(?P<cp>{_PAIR_VALUE})\s+"
+    rf"(?P<tp>{_PAIR_VALUE})\s+"
+    rf"(?P<upside>[+\-]?\d+(?:\.\d+)?)\s*%",
+    re.I,
+)
+# 본문 고신뢰 목표주가 힌트: "목표주가 30,000원, 투자의견 BUY 제시" (모든 학교 공통)
+IN_TEXT_TARGET_PRICE_RE = re.compile(
+    r"목표\s*주가\s*(?:는|은|을|로|이)?\s*([\d,]+)\s*원.{0,20}?(투자의견|BUY|매수)\s*(제시)?",
+    re.I,
+)
 # 국내 코드 + 거래소 표기: (089970,KQ) (007810, KOSPI) (047050.KS) (187790) (KQ.237690)
 KR_CODE_EXCHANGE_RE = re.compile(r"^(\d{6})\s*[,.]?\s*(KS|KQ|KOSPI|KOSDAQ|코스피|코스닥|KRX)?$", re.I)
 KR_EXCHANGE_CODE_RE = re.compile(r"^(KS|KQ|KOSPI|KOSDAQ|코스피|코스닥|KRX)\s*[.,]?\s*(\d{6})$", re.I)
@@ -713,6 +728,30 @@ def parse_prices(lines: list[str], market: str | None) -> tuple[float | None, st
                 target, target_raw = tp_val, tp_raw
                 current, current_raw = cp_val, cp_raw
 
+    # 0c) VOERA 라벨-블록→값-블록 레이아웃:
+    #     "현재주가 목표주가 상승여력 19,400 원 30,000 원 54.6 %"
+    #     라벨이 먼저 나오고(현재주가 / 목표주가 상승여력) 값이 나중에 나오므로
+    #     라벨-창 방식(step 1)은 현재주가 레이블 근처에서 첫 값(cp)을 목표가로 오인식함.
+    #     상승여력도 이 블록에서 직접 추출하여 UPSIDE_RE 미매칭 케이스를 보완한다.
+    _voera_upside = None
+    if target is None:
+        vb = VOERA_LABEL_BLOCK_RE.search(first_page)
+        if vb:
+            cp_raw_v = vb.group("cp").strip()
+            tp_raw_v = vb.group("tp").strip()
+            cp_val_v = parse_price_value(cp_raw_v, market)
+            tp_val_v = parse_price_value(tp_raw_v, market)
+            min_plausible = 1000.0 if market == "KR" else 1.0
+            if (
+                tp_val_v is not None and cp_val_v is not None
+                and tp_val_v > cp_val_v
+                and 1.01 <= tp_val_v / cp_val_v <= 10.0
+                and tp_val_v >= min_plausible and cp_val_v >= min_plausible
+            ):
+                target, target_raw = tp_val_v, tp_raw_v
+                current, current_raw = cp_val_v, cp_raw_v
+                _voera_upside = float(vb.group("upside"))
+
     # 1) 라벨 뒤 토큰 — 창 안에서 통화 표기 우선, 없으면 그럴듯한 무통화 숫자 (KUVIC/STAR 레이아웃)
     if target is None:
         target, target_raw = choose_price_after_label(text, TARGET_LABEL_RE, market, lenient=True)
@@ -733,6 +772,20 @@ def parse_prices(lines: list[str], market: str | None) -> tuple[float | None, st
             if val is not None:
                 target, target_raw = val, raw_str
 
+    # 3b) 본문 고신뢰 힌트: "목표주가 30,000원, 투자의견 BUY 제시" 패턴 (모든 학교 공통)
+    #     VOERA 표지 소제목, 본문 맺음말 등에서 목표주가를 명시적으로 재확인하는 문장.
+    #     step 0c가 이미 처리했을 수 있으나, 레이아웃 불일치 시 보조 소스로 작동.
+    if target is None:
+        itm = IN_TEXT_TARGET_PRICE_RE.search(first_page)
+        if itm is None:
+            full_prose = " ".join(compact_line(x) for x in lines[:360])
+            itm = IN_TEXT_TARGET_PRICE_RE.search(full_prose)
+        if itm is not None:
+            raw_str = itm.group(1).strip() + "원"
+            val = parse_price_value(raw_str, market)
+            if val is not None:
+                target, target_raw = val, raw_str
+
     # 4) Extended prose search in the full document (beyond first 180 lines) for documents where
     #    the target price is stated clearly in a later section (e.g. "목표 주가 X원으로 매수").
     if target is None:
@@ -749,6 +802,9 @@ def parse_prices(lines: list[str], market: str | None) -> tuple[float | None, st
         upside = float(um.group(2))
         if um.group(1).replace(" ", "").startswith("하락") and upside > 0:
             upside = -upside
+    # 0c 에서 추출한 VOERA 블록 상승여력: UPSIDE_RE가 못 잡은 경우에만 사용
+    if upside is None and _voera_upside is not None:
+        upside = _voera_upside
 
     # 정합성 가드: 목표가==현재가인데 상승여력이 0이 아니면 현재가 쪽 오파싱 의심 → 현재가 폐기
     # (분리형 레이아웃은 위의 pair 처리가 이미 해결하므로, 남는 충돌은 현재가 라벨 오매칭이 대부분)

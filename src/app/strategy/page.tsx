@@ -158,12 +158,27 @@ type StrategyWealthSim = {
   series: WealthPoint[];
 };
 
+type OpenPositionItem = {
+  ticker: string;
+  market?: string;
+  display_name?: string;
+  entry_date: string;
+  entry: number;
+  last_close: number;
+  stop?: number;
+  return_pct: number;
+  source?: string;
+  n_clubs?: number;
+};
+
 type MultiStrategyData = {
   strategies: StrategyRow[];
   headline_key: string;
   strategy_wealth_sims: Record<string, StrategyWealthSim>;
   equity_by_strategy: Record<string, { date: string; nav: number }[]>;
   yearly_by_strategy: Record<string, { year: number; return_pct: number }[]>;
+  open_positions_by_strategy?: Record<string, OpenPositionItem[]>;
+  trades_by_strategy?: Record<string, Trade[]>;
 };
 
 const STRATEGY_LABEL_KO: Record<string, string> = {
@@ -179,9 +194,11 @@ const STRATEGY_LABEL_KO: Record<string, string> = {
   I_supertrend:         "I. 슈퍼트렌드",
   J_core_satellite:     "J. 코어-새틀라이트",
   K_rr_trend:           "K. R:R 2.5 추세추종",
-  L_rsi2_reversion:     "L. 민리버전 (RSI-2)",
-  M_short_reversal:     "M. 단기 리버설",
+  L_rsi2_reversion:     "L. 민리버전 (RSI-2) ⚠",
+  M_short_reversal:     "M. 단기 리버설 ⚠",
   N_52w_high:           "N. 52주 고가 근접",
+  O_mtt_alpha16:        "O. MTT (alpha16) ★",
+  P_deepbuy_chandelier: "P. 딥바이 샹들리에 ★",
 };
 
 const BENCHMARK_KO: Record<string, string> = {

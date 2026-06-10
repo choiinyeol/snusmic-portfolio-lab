@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { WealthChart } from "@/components/strategy/wealth-chart";
 import { useSortable, SortableTh, type SortColumn } from "@/components/sortable";
@@ -129,9 +129,11 @@ const STRATEGY_LABEL_KO: Record<string, string> = {
   I_supertrend:           "I. 슈퍼트렌드",
   J_core_satellite:       "J. 코어-새틀라이트",
   K_rr_trend:             "K. R:R 2.5",
-  L_rsi2_reversion:       "L. 민리버전 (RSI-2)",
-  M_short_reversal:       "M. 단기 리버설",
+  L_rsi2_reversion:       "L. 민리버전 (RSI-2) ⚠",
+  M_short_reversal:       "M. 단기 리버설 ⚠",
   N_52w_high:             "N. 52주 고가 근접",
+  O_mtt_alpha16:          "O. MTT (alpha16) ★",
+  P_deepbuy_chandelier:   "P. 딥바이 샹들리에 ★",
 };
 
 const STRATEGY_DESC_KO: Record<string, string> = {
@@ -147,17 +149,20 @@ const STRATEGY_DESC_KO: Record<string, string> = {
   I_supertrend:           "Supertrend(10, 3) 불리시 시 진입. 베어리시 전환 시 청산.",
   J_core_satellite:       "D 오버레이. 80% 코어·20% 현금. KOSPI -15% 시 120% 레버리지. 차입비용 6%/년.",
   K_rr_trend:             "Stop=1×ATR(20). 반절 +2.5R 익절, 나머지 Chandelier ATR×3. 최대 10종목.",
-  L_rsi2_reversion:       "RSI(2) < 10 AND close > 200MA 진입. RSI(2) > 70 OR 10거래일 청산. Connors & Alvarez (2009). 이 유니버스에서 음(−) 성과.",
-  M_short_reversal:       "월초: 직전 1개월 수익률 하위 20% 매수, 1개월 보유. 단기 리버설 팩터. 이 유니버스에서 음(−) 성과.",
+  L_rsi2_reversion:       "⚠ 셀렉터 제외. RSI(2) < 10 AND close > 200MA 진입. RSI(2) > 70 OR 10거래일 청산. Connors & Alvarez (2009). 판정: 0.3%/side 비용 × 단기 회전율로 비용 사망 — 구현 검증 후 제외.",
+  M_short_reversal:       "⚠ 셀렉터 제외. 월초: 직전 1개월 수익률 하위 20% 매수, 1개월 보유. 단기 리버설 팩터. 판정: 월별 전체 교체 비용(0.6% × 12회/년)으로 비용 사망 — 구현 검증 후 제외.",
   N_52w_high:             "리포트 당일 close ≥ 52w high × 85% 진입. 월말 close < 52w high × 70% 청산. George & Hwang (2004).",
+  O_mtt_alpha16:          "v11 룩어헤드 수정. alpha16 MTT 이식. RS 퍼센타일(3m×0.5/6m×0.3/12m×0.2) + Minervini 5-조건 필터. 진입 RS≥79, -8%/BE/6%트레일/+3.5R/RS<82/115일 청산. 시그널 종가→익일 시가 체결. [alpha16 KRX 파라미터, OUR 데이터 미튜닝]",
+  P_deepbuy_chandelier:   "딥바이 진입(≥20% 하락, 6개월 내) + 추가 10% 하락 시 스케일인(1회) + ATR 트레일링 스탑 청산(타겟 캡 없음). 딥바이 좋은 진입을 샹들리에로 멀티배거 포착.",
 };
 
 // Strategy grouping for tab sections
 const STRATEGY_GROUPS: { label: string; keys: string[] }[] = [
-  { label: "보유형",  keys: ["A_12mo", "B_36mo", "C_narrative", "E_half_runner"] },
-  { label: "추세형",  keys: ["D_chandelier", "D+_chandelier_optuna", "F_momentum_narrative", "H_minervini", "I_supertrend", "K_rr_trend", "N_52w_high"] },
-  { label: "회귀형",  keys: ["G_dip_buy", "L_rsi2_reversion", "M_short_reversal"] },
-  { label: "오버레이", keys: ["J_core_satellite"] },
+  { label: "보유형",    keys: ["A_12mo", "B_36mo", "C_narrative", "E_half_runner"] },
+  { label: "추세형",    keys: ["D_chandelier", "D+_chandelier_optuna", "F_momentum_narrative", "H_minervini", "I_supertrend", "K_rr_trend", "N_52w_high", "O_mtt_alpha16"] },
+  { label: "딥바이형",  keys: ["G_dip_buy", "P_deepbuy_chandelier"] },
+  { label: "회귀형 ⚠", keys: ["L_rsi2_reversion", "M_short_reversal"] },
+  { label: "오버레이",  keys: ["J_core_satellite"] },
 ];
 
 const BENCHMARK_KO: Record<string, string> = {
@@ -272,20 +277,224 @@ function OpenPositionsTable({ positions, stratKey }: { positions: OpenPosition[]
   );
 }
 
+// ─── Ticker history panel ─────────────────────────────────────────────────────
+
+type Candle = { time: string; open: number; high: number; low: number; close: number };
+
+/** Fetch /prices/{slug}.json and return sorted candles (module-level cache) */
+const _candleCache = new Map<string, Promise<Candle[] | null>>();
+function fetchCandles(slug: string): Promise<Candle[] | null> {
+  const hit = _candleCache.get(slug);
+  if (hit) return hit;
+  const p = fetch(`/prices/${slug}.json`)
+    .then(async (r) => {
+      if (!r.ok) return null;
+      const j = await r.json() as { candles?: Candle[] };
+      const valid = (j.candles ?? []).filter(
+        (c) => typeof c?.time === "string" && typeof c.close === "number" && isFinite(c.close),
+      );
+      valid.sort((a, b) => a.time.localeCompare(b.time));
+      return valid.length >= 2 ? valid : null;
+    })
+    .catch(() => null);
+  _candleCache.set(slug, p);
+  return p;
+}
+
+function TickerHistoryPanel({
+  ticker,
+  market,
+  displayName,
+  trades,
+  onClose,
+}: {
+  ticker: string;
+  market: string;
+  displayName: string;
+  trades: Trade[];
+  onClose: () => void;
+}) {
+  const slug = `${market}-${ticker}`.toLowerCase();
+  const [candles, setCandles] = useState<Candle[] | null>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+
+  useEffect(() => {
+    fetchCandles(slug).then(setCandles);
+  }, [slug]);
+
+  // Sort trades oldest first for timeline display
+  const sortedTrades = [...trades].sort((a, b) => a.entry_date.localeCompare(b.entry_date));
+
+  // Mini price chart with trade markers
+  const W = 600; const H = 120;
+  const chartEl = (() => {
+    if (!candles || !candles.length) return null;
+    // Clip candles to range covering all trades
+    const firstEntry = sortedTrades[0]?.entry_date;
+    const lastExit = sortedTrades[sortedTrades.length - 1]?.exit_date;
+    if (!firstEntry || !lastExit) return null;
+    // Show 60 days before first entry to 30 days after last exit
+    const startClip = new Date(firstEntry);
+    startClip.setDate(startClip.getDate() - 60);
+    const endClip = new Date(lastExit);
+    endClip.setDate(endClip.getDate() + 30);
+    const startStr = startClip.toISOString().slice(0, 10);
+    const endStr = endClip.toISOString().slice(0, 10);
+    const visible = candles.filter((c) => c.time >= startStr && c.time <= endStr);
+    if (visible.length < 2) return null;
+
+    const prices = visible.map((c) => c.close);
+    const minP = Math.min(...prices);
+    const maxP = Math.max(...prices);
+    const px = (i: number) => (i / (visible.length - 1)) * W;
+    const py = (p: number) => H - 4 - ((p - minP) / ((maxP - minP) || 1)) * (H - 12);
+    const linePath = visible.map((c, i) => `${i ? "L" : "M"}${px(i).toFixed(1)},${py(c.close).toFixed(1)}`).join(" ");
+
+    // Marker helpers: find index of candle closest to a date string
+    const nearestIdx = (dateStr: string) => {
+      let best = 0;
+      let bestDiff = Infinity;
+      visible.forEach((c, i) => {
+        const diff = Math.abs(new Date(c.time).getTime() - new Date(dateStr).getTime());
+        if (diff < bestDiff) { bestDiff = diff; best = i; }
+      });
+      return best;
+    };
+
+    return (
+      <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} className="w-full" aria-label={`${displayName} 가격 차트`}>
+        <path d={linePath} fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground" strokeLinejoin="round" />
+        {sortedTrades.map((t, ti) => {
+          const ei = nearestIdx(t.entry_date);
+          const xi = nearestIdx(t.exit_date);
+          const ex_ = px(ei); const ey_ = py(visible[ei]?.close ?? minP);
+          const xx = px(xi);  const xy  = py(visible[xi]?.close ?? minP);
+          return (
+            <g key={ti}>
+              {/* Entry: red triangle up (▲ KR convention: buy=red) */}
+              <polygon
+                points={`${ex_},${ey_ - 8} ${ex_ - 5},${ey_} ${ex_ + 5},${ey_}`}
+                className="fill-[hsl(var(--up))]"
+                opacity="0.9"
+              />
+              {/* Exit: blue triangle down (▼ KR convention: sell=blue) */}
+              <polygon
+                points={`${xx},${xy + 8} ${xx - 5},${xy} ${xx + 5},${xy}`}
+                className="fill-[hsl(var(--down))]"
+                opacity="0.9"
+              />
+            </g>
+          );
+        })}
+      </svg>
+    );
+  })();
+
+  const avgReturn = sortedTrades.reduce((s, t) => s + t.return_pct, 0) / (sortedTrades.length || 1);
+
+  return (
+    <div className="rounded-lg border-2 border-stamp bg-card p-5 shadow-lg">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-stamp">
+            종목별 매매 이력
+          </p>
+          <h4 className="mt-0.5 font-display text-xl font-black tracking-tight">
+            {displayName}
+            <span className="ml-2 font-mono text-sm font-normal text-muted-foreground">{ticker}</span>
+          </h4>
+          <p className="mt-0.5 font-mono text-xs text-muted-foreground">
+            총 {sortedTrades.length}회 거래 · 평균 수익률{" "}
+            <span className={cn("font-bold", signColor(avgReturn))}>
+              {formatPct(avgReturn, 1)}
+            </span>
+          </p>
+        </div>
+        <button
+          onClick={onClose}
+          className="rounded-md border border-border px-2.5 py-1 font-mono text-xs text-muted-foreground hover:border-stamp/40 hover:text-foreground transition-colors"
+          aria-label="닫기"
+        >
+          ✕ 닫기
+        </button>
+      </div>
+
+      {/* Price chart with trade markers */}
+      <div className="mt-4">
+        {candles === null ? (
+          <p className="font-mono text-xs text-muted-foreground">차트 로딩 중…</p>
+        ) : chartEl ? (
+          <>
+            <p className="mb-1 font-mono text-[9px] text-muted-foreground">
+              ▲ 매수(빨강)  ▼ 매도(파랑) — 진입 전후 60일 구간
+            </p>
+            {chartEl}
+          </>
+        ) : (
+          <p className="font-mono text-xs text-muted-foreground">가격 데이터 없음</p>
+        )}
+      </div>
+
+      {/* Trade timeline list */}
+      <div className="mt-4 space-y-2">
+        {sortedTrades.map((t, i) => (
+          <div
+            key={`${t.entry_date}-${i}`}
+            className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-md border border-dashed border-border px-3 py-2"
+          >
+            <span className="font-mono text-[10px] text-muted-foreground w-5 shrink-0">#{i + 1}</span>
+            <div className="flex items-center gap-1.5 font-mono text-xs">
+              <span className="font-mono text-[9px] px-1 rounded bg-[hsl(var(--up)/0.15)] text-[hsl(var(--up))] font-bold">매수</span>
+              <span className="text-muted-foreground">{t.entry_date}</span>
+              <span className="font-bold">{typeof t.entry === "number" ? t.entry.toLocaleString() : t.entry}원</span>
+            </div>
+            <div className="flex items-center gap-1.5 font-mono text-xs">
+              <span className="font-mono text-[9px] px-1 rounded bg-[hsl(var(--down)/0.15)] text-[hsl(var(--down))] font-bold">매도</span>
+              <span className="text-muted-foreground">{t.exit_date}</span>
+              <span className="font-bold">{typeof t.exit === "number" ? t.exit.toLocaleString() : t.exit}원</span>
+            </div>
+            <span className={cn("tnum font-mono text-xs font-bold ml-auto", signColor(t.return_pct))}>
+              {formatPct(t.return_pct, 1)}
+            </span>
+            <span className="font-mono text-[10px] text-muted-foreground">{t.days}일</span>
+            <span className="font-mono text-[10px] text-muted-foreground truncate max-w-[120px]">{t.exit_reason}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── Trade log with sort + pagination ────────────────────────────────────────
 
 function TradeLog({ trades, stratKey }: { trades: Trade[]; stratKey: string }) {
   const [page, setPage] = useState(0);
+  // openHistoryTicker: the ticker whose history panel is currently open (cap 1)
+  const [openHistoryTicker, setOpenHistoryTicker] = useState<string | null>(null);
   const { sorted, specs, toggle } = useSortable(trades, TRADE_COLS, [{ key: "exit_date", dir: "desc" }]);
   const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
   const pageRows = sorted.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
   const sort = { specs, toggle };
 
-  // Reset page when strategy changes
+  // Reset page and history panel when strategy changes
   const [lastKey, setLastKey] = useState(stratKey);
-  if (lastKey !== stratKey) { setLastKey(stratKey); setPage(0); }
+  if (lastKey !== stratKey) { setLastKey(stratKey); setPage(0); setOpenHistoryTicker(null); }
 
   if (!trades.length) return null;
+
+  // Group all trades by ticker for the history panel
+  const tradesByTicker: Record<string, Trade[]> = {};
+  for (const t of trades) {
+    if (!tradesByTicker[t.ticker]) tradesByTicker[t.ticker] = [];
+    tradesByTicker[t.ticker].push(t);
+  }
+
+  // Find the open-panel ticker's info
+  const openTicker = openHistoryTicker;
+  const openTrades = openTicker ? (tradesByTicker[openTicker] ?? []) : [];
+  const openDisplayName = openTrades[0]?.display_name ?? openTicker ?? "";
+  const openMarket = openTrades[0]?.market ?? "KR";
 
   return (
     <section className="rounded-lg border border-border bg-card p-5">
@@ -294,11 +503,25 @@ function TradeLog({ trades, stratKey }: { trades: Trade[]; stratKey: string }) {
           거래 로그 — {STRATEGY_LABEL_KO[stratKey] ?? stratKey} ({trades.length}건)
         </h3>
         <p className="font-mono text-[10px] text-muted-foreground">
-          Shift+클릭: 다중 정렬
+          Shift+클릭: 다중 정렬 · ▸ 이력: 종목별 매매 이력 패널
         </p>
       </div>
+
+      {/* Ticker history panel (capped to 1 open at a time) */}
+      {openTicker && openTrades.length > 0 && (
+        <div className="mt-4">
+          <TickerHistoryPanel
+            ticker={openTicker}
+            market={openMarket}
+            displayName={openDisplayName}
+            trades={openTrades}
+            onClose={() => setOpenHistoryTicker(null)}
+          />
+        </div>
+      )}
+
       <div className="mt-4 overflow-x-auto">
-        <table className="w-full min-w-[800px] border-collapse text-sm">
+        <table className="w-full min-w-[860px] border-collapse text-sm">
           <thead>
             <tr className="border-b-4 border-double border-border font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
               <SortableTh sortKey="display_name" sort={sort} className="px-3 py-2 text-left">종목</SortableTh>
@@ -309,13 +532,19 @@ function TradeLog({ trades, stratKey }: { trades: Trade[]; stratKey: string }) {
               <SortableTh sortKey="return_pct"   sort={sort} align="right" className="px-3 py-2">수익률</SortableTh>
               <SortableTh sortKey="days"         sort={sort} align="right" className="px-3 py-2">보유일</SortableTh>
               <SortableTh sortKey="exit_reason"  sort={sort} className="px-3 py-2">매도사유</SortableTh>
+              <th className="px-3 py-2 text-right font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">이력</th>
             </tr>
           </thead>
           <tbody>
             {pageRows.map((t, i) => {
               const slug = tickerSlugFromTrade(t);
+              const isOpen = openHistoryTicker === t.ticker;
+              const tickerTradeCount = tradesByTicker[t.ticker]?.length ?? 1;
               return (
-                <tr key={`${t.ticker}-${t.entry_date}-${i}`} className="border-b border-dashed border-border last:border-b-0">
+                <tr key={`${t.ticker}-${t.entry_date}-${i}`} className={cn(
+                  "border-b border-dashed border-border last:border-b-0",
+                  isOpen && "bg-stamp/5"
+                )}>
                   <td className="px-3 py-2">
                     {slug ? (
                       <Link href={`/stocks/${slug}`} className="hover:underline">
@@ -335,6 +564,20 @@ function TradeLog({ trades, stratKey }: { trades: Trade[]; stratKey: string }) {
                   </td>
                   <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">{t.days}일</td>
                   <td className="px-3 py-2 font-mono text-[10px] text-muted-foreground">{t.exit_reason}</td>
+                  <td className="px-3 py-2 text-right">
+                    <button
+                      onClick={() => setOpenHistoryTicker(isOpen ? null : t.ticker)}
+                      className={cn(
+                        "rounded px-2 py-0.5 font-mono text-[10px] font-bold transition-colors border",
+                        isOpen
+                          ? "border-stamp bg-stamp/10 text-stamp"
+                          : "border-border bg-card text-muted-foreground hover:border-stamp/40 hover:text-foreground"
+                      )}
+                      title={`${t.display_name ?? t.ticker} 매매이력 (${tickerTradeCount}회)`}
+                    >
+                      {isOpen ? "▾" : "▸"} {tickerTradeCount > 1 ? `${tickerTradeCount}회` : "이력"}
+                    </button>
+                  </td>
                 </tr>
               );
             })}
