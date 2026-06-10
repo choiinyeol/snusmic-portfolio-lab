@@ -5,6 +5,9 @@ import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SiteNav } from "@/components/site-nav";
+import { VerdictWall } from "@/components/verdict-wall";
+import { ReportPathChart } from "@/components/report-path-chart";
+import { CountUp } from "@/components/react-bits-lite";
 import Link from "next/link";
 import { bucketFilters, type BucketFilter, type MarketFilter, type SchoolFilter, useReportDashboardState } from "@/components/report-dashboard/use-report-dashboard-state";
 import { dateLabel, getDisplayName, reportDataQuality, reportDataset, SCHOOL_LABELS, type ReportRecord } from "@/lib/report-model";
@@ -30,16 +33,10 @@ const schoolFilters: SchoolFilter[] = ["ALL", "smic", "yig", "star", "kuvic"];
 const schoolLabels: Record<SchoolFilter, string> = { ALL: "전체 아카이브", ...SCHOOL_LABELS };
 const bucketFilterLabels: Record<BucketFilter, string> = { ALL: "전체", ...bucketLabels };
 
-const bucketTile: Record<ReportRecord["performance_bucket"], string> = {
-  Tenbagger: "bg-[#6b0018] dark:bg-[#ff3355]",
-  Multibagger: "bg-[#9c0f27] dark:bg-[#ff6177]",
-  Double: "bg-[#c42040] dark:bg-[#f04f68]",
-  Winner: "bg-[#d22f4a] dark:bg-[#e86070]",
-  Positive: "bg-[#ec97a6] dark:bg-[#d98897]",
-  Drawdown: "bg-[#9db9ec] dark:bg-[#7fa3e8]",
-  Wrecked: "bg-[#1c46a8] dark:bg-[#5e86e8]",
-  "No quote": "bg-[#c9c2b4] dark:bg-[#4a4a45]",
-};
+/** 증거의 서가 모집단 — modern 시대 매수 의견, 발간 연대순 */
+const wallReports = [...reportDataset.records]
+  .filter((report) => report.era === "modern" && report.rating_class === "buy" && report.report_date)
+  .sort((a, b) => String(a.report_date).localeCompare(String(b.report_date)));
 
 function yearOf(report: ReportRecord) {
   return report.report_date?.slice(0, 4) ?? "????";
@@ -55,15 +52,6 @@ export function ReportDashboard() {
   const state = useReportDashboardState();
   const selected = state.selected as ReportRecord | undefined;
   const selectedIndex = state.sorted.findIndex((report) => report.source_name === selected?.source_name);
-
-  const yearGroups = useMemo(() => {
-    const map = new Map<string, ReportRecord[]>();
-    for (const report of state.sorted) {
-      const year = yearOf(report);
-      map.set(year, [...(map.get(year) ?? []), report]);
-    }
-    return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
-  }, [state.sorted]);
 
   const { sorted } = state;
   const { setSelectedName } = state;
@@ -107,26 +95,30 @@ export function ReportDashboard() {
 
   const verdict = verdictOf(selected);
 
+  const pickFromWall = (name: string) => {
+    state.setMarket("ALL");
+    state.setBucket("ALL");
+    state.setSchool("ALL");
+    state.setQuery("");
+    state.setSelectedName(name);
+    requestAnimationFrame(() => document.getElementById("verdict-paper")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <main className="mx-auto max-w-[1500px] px-4 pt-6 sm:px-8">
         <Masthead />
+        <div className="mt-10">
+          <VerdictWall reports={wallReports} selectedName={selected.source_name} onSelect={pickFromWall} />
+        </div>
       </main>
 
-      <div className="mt-8">
+      <div className="mt-10">
         <VerdictTape />
       </div>
 
       <main className="mx-auto max-w-[1500px] space-y-10 px-4 pb-6 pt-8 sm:px-8">
-        <FreshVerdicts
-          onPick={(name) => {
-            state.setMarket("ALL");
-            state.setBucket("ALL");
-            state.setSchool("ALL");
-            state.setQuery("");
-            state.setSelectedName(name);
-          }}
-        />
+        <FreshVerdicts onPick={pickFromWall} />
 
         <FilterBar state={state} />
 
@@ -142,8 +134,6 @@ export function ReportDashboard() {
           <Chronicle reports={state.sorted} selected={selected} onSelect={state.setSelectedName} />
         </section>
 
-        <MosaicWall groups={yearGroups} selected={selected} onSelect={state.setSelectedName} />
-
         <footer className="flex flex-col gap-2 border-t-4 border-double border-foreground/50 pb-10 pt-4 font-mono text-[11px] leading-5 text-muted-foreground sm:flex-row sm:items-baseline sm:justify-between">
           <p>
             데이터 생성 {reportDataQuality.generatedAt?.slice(0, 10) ?? "—"} · 시세 이슈 {reportDataQuality.dataIssueCount}건 · 파싱 이슈{" "}
@@ -156,9 +146,10 @@ export function ReportDashboard() {
   );
 }
 
-/** 마스트헤드 — 아카이브 전체(매수 의견, 신생 제외)의 헤드라인 성적 */
+/** 마스트헤드 — modern 시대(2019-07 이후) 매수 의견, 신생 제외의 헤드라인 성적 */
 function Masthead() {
   const stats = useMemo(() => clubStats(reportDataset.records), []);
+  const archiveCount = useMemo(() => reportDataset.records.filter((report) => report.era === "archive").length, []);
   return (
     <header>
       <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b-4 border-double border-foreground/70 pb-2">
@@ -170,20 +161,25 @@ function Masthead() {
         </div>
       </div>
 
-      <h1 className="mt-9 font-display text-[2.6rem] font-black leading-[1.12] tracking-tight sm:text-6xl lg:text-7xl">
+      <h1 className="mt-9 font-display text-[2.4rem] font-black leading-[1.12] tracking-tight sm:text-6xl lg:text-7xl">
         모든 리포트는, 결국
         <br />
         <span className="text-stamp">시장의 판결</span>을 받는다.
       </h1>
       <p className="mt-5 max-w-2xl text-base leading-7 text-foreground/75">
         서울대·연세대·성균관대·고려대 투자동아리(SMIC·YIG·STAR·KUVIC)의 리포트 PDF {reportDataset.records.length}건을 전사·파싱해 목표가와
-        투자의견을 추출하고, point-in-time 시세로 발간 이후의 실제 주가 경로를 추적했습니다. 성적은 매수 의견 {stats.total}건으로 매기되,
-        발간 90일이 지나지 않은 신생 {stats.fresh}건은 판결을 보류합니다 — 가치투자 리포트는 시간이 필요합니다.
+        투자의견을 추출하고, point-in-time 시세로 발간 이후의 실제 주가 경로를 추적했습니다. 성적은 네 학회가 나란히 비교되는{" "}
+        <strong className="font-bold">2019년 7월 이후 매수 의견 {stats.total}건</strong>으로 매기고, 발간 90일이 지나지 않은 신생 {stats.fresh}건은
+        판결을 보류합니다. 그 이전 SMIC 단독 수집분 {archiveCount}건은 채점 없이 아카이브로 보관합니다.
       </p>
 
       <dl className="mt-9 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border md:grid-cols-3 xl:grid-cols-5">
-        <KpiCell label="검증된 매수 리포트" value={`${stats.priced}건`} sub={`매수 ${stats.total}건 중 · 신생 ${stats.fresh}건 보류`} />
-        <KpiCell label="목표가 적중" value={`${stats.hits}건`} sub="발간 후 목표가 도달" valueClass="text-stamp" />
+        <KpiCell
+          label="검증된 매수 리포트"
+          value={<CountUp value={stats.priced} suffix="건" />}
+          sub={`매수 ${stats.total}건 중 · 신생 ${stats.fresh}건 보류`}
+        />
+        <KpiCell label="목표가 적중" value={<CountUp value={stats.hits} suffix="건" />} sub="발간 후 목표가 도달" valueClass="text-stamp" />
         <KpiCell label="적중률" value={formatPct(stats.hitRate, 1).replace("+", "")} sub="가격 검증 가능 건 기준" />
         <KpiCell label="수익률 중앙값" value={formatPct(stats.medianReturn)} sub="발간일 → 최신 종가" valueClass={signColor(stats.medianReturn)} />
         <KpiCell
@@ -196,11 +192,11 @@ function Masthead() {
   );
 }
 
-function KpiCell({ label, value, sub, valueClass }: { label: string; value: string; sub: string; valueClass?: string }) {
+function KpiCell({ label, value, sub, valueClass }: { label: string; value: React.ReactNode; sub: string; valueClass?: string }) {
   return (
-    <div className="bg-card px-5 py-4">
+    <div className="bg-card px-4 py-4 sm:px-5">
       <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">{label}</dt>
-      <dd className={cn("tnum mt-2 font-display text-3xl font-black tracking-tight", valueClass)}>{value}</dd>
+      <dd className={cn("tnum mt-2 font-display text-2xl font-black tracking-tight sm:text-3xl", valueClass)}>{value}</dd>
       <dd className="mt-1 text-[11px] text-muted-foreground">{sub}</dd>
     </div>
   );
@@ -210,21 +206,21 @@ function VerdictTape() {
   const items = useMemo(
     () =>
       [...reportDataset.records]
-        .filter((report) => report.report_date && isBuy(report))
+        .filter((report) => report.era === "modern" && report.report_date && isBuy(report))
         .sort((a, b) => String(a.report_date).localeCompare(String(b.report_date))),
     [],
   );
   return (
-    <div className="tape overflow-hidden border-y-4 border-double border-foreground/60 bg-card py-2.5" aria-hidden="true">
+    <div className="tape overflow-hidden border-y border-border bg-card/70 py-2" aria-hidden="true">
       <div className="tape-track">
         {[0, 1].map((copy) => (
           <div key={copy} className="flex shrink-0 items-center">
             {items.map((report) => (
-              <span key={`${copy}-${report.source_name}`} className="mr-8 flex items-center gap-2 whitespace-nowrap font-mono text-xs">
-                <span className="text-muted-foreground">{schoolShort[report.school]} {dateLabel(report.report_date).slice(2, 7)}</span>
-                <span className="font-semibold text-foreground/85">{getDisplayName(report)}</span>
-                <span className={cn("tnum font-bold", signColor(report.return_latest_pct))}>{formatPct(report.return_latest_pct)}</span>
-                {report.target_hit_until_latest && <span className="text-[10px] font-black tracking-tight text-stamp">[적중]</span>}
+              <span key={`${copy}-${report.source_name}`} className="mr-10 flex items-center gap-2 whitespace-nowrap font-mono text-[11px]">
+                <span className="text-muted-foreground/80">{schoolShort[report.school]} {dateLabel(report.report_date).slice(2, 7)}</span>
+                <span className="font-semibold text-foreground/70">{getDisplayName(report)}</span>
+                <span className={cn("tnum font-bold opacity-85", signColor(report.return_latest_pct))}>{formatPct(report.return_latest_pct)}</span>
+                {report.target_hit_until_latest && <span className="text-[10px] font-black tracking-tight text-stamp/80">[적중]</span>}
               </span>
             ))}
           </div>
@@ -239,7 +235,7 @@ function FreshVerdicts({ onPick }: { onPick: (sourceName: string) => void }) {
   const latest = useMemo(
     () =>
       [...reportDataset.records]
-        .filter((report) => report.report_date && isBuy(report))
+        .filter((report) => report.era === "modern" && report.report_date && isBuy(report))
         .sort((a, b) => String(b.report_date).localeCompare(String(a.report_date)))
         .slice(0, 6),
     [],
@@ -293,7 +289,7 @@ function FreshVerdicts({ onPick }: { onPick: (sourceName: string) => void }) {
 function VerdictTimeStrip() {
   const data = useMemo(() => {
     const days = reportDataset.records
-      .filter((report) => isBuy(report) && report.target_hit_until_latest && report.days_to_target !== null)
+      .filter((report) => report.era === "modern" && isBuy(report) && report.target_hit_until_latest && report.days_to_target !== null)
       .map((report) => report.days_to_target as number);
     const bins = [
       { label: "30일 이내", max: 30 },
@@ -370,7 +366,7 @@ function FilterBar({ state }: { state: ReturnType<typeof useReportDashboardState
                   onClick={() => state.setMarket(item)}
                   aria-pressed={active}
                   className={cn(
-                    "rounded-full border px-3 py-1 text-xs font-bold transition",
+                    "chip rounded-full border px-3 py-1 text-xs font-bold transition",
                     active ? "border-stamp bg-stamp text-background" : "border-border bg-transparent text-muted-foreground hover:border-foreground/50 hover:text-foreground",
                   )}
                 >
@@ -390,7 +386,7 @@ function FilterBar({ state }: { state: ReturnType<typeof useReportDashboardState
                   aria-pressed={active}
                   title={item === "ALL" ? undefined : bucketThresholds[item]}
                   className={cn(
-                    "rounded-full border px-3 py-1 text-xs font-bold transition",
+                    "chip rounded-full border px-3 py-1 text-xs font-bold transition",
                     active ? "border-foreground bg-foreground text-background" : "border-border bg-transparent text-muted-foreground hover:border-foreground/50 hover:text-foreground",
                   )}
                 >
@@ -406,7 +402,7 @@ function FilterBar({ state }: { state: ReturnType<typeof useReportDashboardState
               aria-pressed={state.includeReference}
               title="약한 매수(명시 의견 없음·보유)와 매도 의견은 참고용 — 성과 집계에서 제외됩니다"
               className={cn(
-                "ml-2 rounded-full border border-dashed px-3 py-1 text-xs font-semibold transition",
+                "chip ml-2 rounded-full border border-dashed px-3 py-1 text-xs font-semibold transition",
                 state.includeReference
                   ? "border-foreground/60 bg-secondary text-foreground"
                   : "border-border bg-transparent text-muted-foreground hover:border-foreground/50 hover:text-foreground",
@@ -461,7 +457,8 @@ function VerdictPaper({
 
   return (
     <article
-      className="relative overflow-hidden rounded-lg border-2 border-foreground/80 bg-card shadow-[7px_7px_0_0_hsl(var(--foreground)/0.85)]"
+      id="verdict-paper"
+      className="relative scroll-mt-4 overflow-hidden rounded-lg border-2 border-foreground/80 bg-card shadow-[7px_7px_0_0_hsl(var(--foreground)/0.85)]"
       aria-label="선택된 리포트 판결문"
     >
       <header className="flex flex-wrap items-center justify-between gap-2 border-b border-dashed border-border px-6 py-3 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground sm:px-8">
@@ -489,7 +486,7 @@ function VerdictPaper({
           {fresh ? "심리중" : verdict.stamp}
         </motion.div>
 
-        <h2 className="max-w-[78%] font-display text-4xl font-black tracking-tight sm:text-5xl">
+        <h2 className="max-w-[70%] font-display text-3xl font-black tracking-tight sm:max-w-[78%] sm:text-5xl">
           {tickerSlug(report) ? (
             <Link href={`/stocks/${tickerSlug(report)}`} className="transition hover:text-stamp" title="이 종목을 다룬 모든 학회 리포트 보기">
               {getDisplayName(report)}
@@ -528,7 +525,7 @@ function VerdictPaper({
 
           <section aria-label="시간이 내린 판정">
             <h3 className="font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">시간의 판정 — {dateLabel(report.latest_trade_date)}</h3>
-            <p className={cn("tnum mt-3 font-display text-6xl font-black leading-none tracking-tight", signColor(report.return_latest_pct))}>
+            <p className={cn("tnum mt-3 font-display text-5xl font-black leading-none tracking-tight sm:text-6xl", signColor(report.return_latest_pct))}>
               {formatPct(report.return_latest_pct)}
             </p>
             <p className="mt-1.5 text-[11px] text-muted-foreground">
@@ -547,9 +544,9 @@ function VerdictPaper({
                 </>
               )}
             </p>
-            <div className="mt-4 grid grid-cols-6 divide-x divide-dashed divide-border border-y border-dashed border-border">
+            <div className="mt-4 grid grid-cols-3 border-y border-dashed border-border sm:grid-cols-6 sm:divide-x sm:divide-dashed sm:divide-border">
               {horizons.map((item) => (
-                <div key={item.label} className="px-2 py-2 text-center first:pl-0 last:pr-0">
+                <div key={item.label} className="px-2 py-2 text-center sm:first:pl-0 sm:last:pr-0">
                   <p className="font-mono text-[10px] text-muted-foreground">{item.label}</p>
                   <p className={cn("tnum mt-1 text-[13px] font-black", signColor(item.value))}>{formatPct(item.value, 0)}</p>
                 </div>
@@ -558,7 +555,28 @@ function VerdictPaper({
           </section>
         </div>
 
-        <Trajectory report={report} targetReturn={targetReturn} className="mt-7" />
+        {tickerSlug(report) && report.report_date ? (
+          <figure className="mt-7">
+            <figcaption className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+              <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">
+                가격 경로 — 발간가 기준선
+              </span>
+              <span className="font-mono text-[10px] text-muted-foreground">위는 상승(적) · 아래는 하락(청) · ┄ 목표가</span>
+            </figcaption>
+            <ReportPathChart
+              slug={tickerSlug(report) as string}
+              market={report.market}
+              reportDate={report.report_date}
+              targetPrice={report.target_price}
+              hitDate={report.first_target_hit_date}
+              eager
+              className="h-[220px] sm:h-[280px]"
+              fallback={<Trajectory report={report} targetReturn={targetReturn} />}
+            />
+          </figure>
+        ) : (
+          <Trajectory report={report} targetReturn={targetReturn} className="mt-7" />
+        )}
 
         <div className="mt-7 flex items-center justify-between gap-3 border-t border-dashed border-border pt-4">
           <button
@@ -757,77 +775,3 @@ function Chronicle({ reports, selected, onSelect }: { reports: ReportRecord[]; s
   );
 }
 
-function MosaicWall({
-  groups,
-  selected,
-  onSelect,
-}: {
-  groups: [string, ReportRecord[]][];
-  selected: ReportRecord;
-  onSelect: (sourceName: string) => void;
-}) {
-  return (
-    <section className="rounded-lg border border-border bg-card px-6 py-6 sm:px-8" aria-label="연도별 리포트 모자이크">
-      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-        <div>
-          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">The Archive Wall</p>
-          <h2 className="mt-1 font-display text-3xl font-black tracking-tight">증거의 서가</h2>
-          <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
-            책등 하나가 리포트 한 건입니다. 높이는 수익률의 크기, 색은 성과 등급 — 6년의 기록을 한 눈에 훑고, 눌러서 판결문을 펼치세요.
-          </p>
-        </div>
-        <ul className="flex flex-wrap gap-x-4 gap-y-1.5" aria-label="등급 범례">
-          {(Object.keys(bucketTile) as ReportRecord["performance_bucket"][]).map((bucket) => (
-            <li key={bucket} className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground" title={bucketThresholds[bucket]}>
-              <span className={cn("inline-block h-3 w-2 rounded-[1px]", bucketTile[bucket])} aria-hidden="true" />
-              {bucketLabels[bucket]}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="mt-7 space-y-5">
-        {groups.map(([year, list]) => {
-          const returns = list.filter((report) => report.return_latest_pct !== null).map((report) => report.return_latest_pct as number);
-          const hits = list.filter((report) => report.target_hit_until_latest).length;
-          const med = median(returns);
-          return (
-            <div key={year} className="grid grid-cols-[4.8rem_minmax(0,1fr)] items-end gap-4 border-b border-dashed border-border pb-5 last:border-b-0 last:pb-0">
-              <div>
-                <p className="font-display text-2xl font-black leading-none">{year}</p>
-                <p className="mt-1.5 font-mono text-[10px] leading-4 text-muted-foreground">
-                  {list.length}건 · 적중 {hits}
-                  <br />
-                  중앙값 <span className={signColor(med)}>{formatPct(med, 0)}</span>
-                </p>
-              </div>
-              <div className="flex flex-wrap items-end gap-[3px]">
-                {list.map((report) => {
-                  const active = report.source_name === selected.source_name;
-                  const ret = report.return_latest_pct ?? 0;
-                  const height = Math.round(Math.min(56, Math.max(14, 14 + Math.abs(ret) * 0.22)));
-                  return (
-                    <button
-                      key={report.source_name}
-                      type="button"
-                      onClick={() => onSelect(report.source_name)}
-                      title={`${getDisplayName(report)} · ${dateLabel(report.report_date)} · ${formatPct(report.return_latest_pct)} · ${bucketLabels[report.performance_bucket]}`}
-                      aria-label={`${getDisplayName(report)} ${dateLabel(report.report_date)} ${formatPct(report.return_latest_pct)}`}
-                      className={cn(
-                        "w-[9px] rounded-[1px] transition hover:opacity-75",
-                        bucketTile[report.performance_bucket],
-                        active && "outline outline-2 outline-offset-2 outline-foreground",
-                      )}
-                      style={{ height }}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
-        {groups.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">조건에 맞는 리포트가 없습니다.</p>}
-      </div>
-    </section>
-  );
-}

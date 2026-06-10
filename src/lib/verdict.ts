@@ -124,9 +124,10 @@ export type ClubStats = {
   moonshots: number;
 };
 
-/** 학회 성적표 — 매수 의견만 채점하고, 신생(<90일)은 적중률·중앙값 산정에서 제외 */
+/** 학회 성적표 — modern 시대 매수 의견만 채점하고, 신생(<90일)은 적중률·중앙값 산정에서 제외 */
 export function clubStats(records: ReportRecord[]): ClubStats {
-  const buys = records.filter(isBuy);
+  const modern = records.filter((r) => r.era === "modern");
+  const buys = modern.filter(isBuy);
   const judged = buys.filter((r) => !isFresh(r));
   const priced = judged.filter((r) => r.return_latest_pct !== null && !r.data_issue);
   const hits = priced.filter((r) => r.target_hit_until_latest).length;
@@ -134,7 +135,7 @@ export function clubStats(records: ReportRecord[]): ClubStats {
     total: buys.length,
     priced: priced.length,
     fresh: buys.filter(isFresh).length,
-    reference: records.length - buys.length,
+    reference: modern.length - buys.length,
     hits,
     hitRate: priced.length ? (hits / priced.length) * 100 : null,
     medianReturn: median(priced.map((r) => r.return_latest_pct as number)),

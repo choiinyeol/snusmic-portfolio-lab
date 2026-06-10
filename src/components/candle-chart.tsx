@@ -13,6 +13,7 @@ import {
   type Time,
 } from "lightweight-charts";
 import { useTheme } from "@/components/theme-provider";
+import { chartMonoFamily, cssHsl } from "@/lib/chart-colors";
 import { schoolShort } from "@/lib/verdict";
 import type { School } from "@/lib/report-model";
 
@@ -23,14 +24,6 @@ export type ReportMark = {
   date: string;
   targetPrice: number | null;
 };
-
-/** 테마 토큰을 실제 색으로 — 차트는 CSS 변수를 직접 못 읽는다 */
-function cssHsl(variable: string, alpha?: number) {
-  if (typeof window === "undefined") return "#888888";
-  const value = getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
-  if (!value) return "#888888";
-  return alpha !== undefined ? `hsl(${value} / ${alpha})` : `hsl(${value})`;
-}
 
 /** 학회별 마커 잉크 — 발간 시점을 차트에 찍는다 */
 const SCHOOL_VARS: Record<School, string> = {
@@ -70,16 +63,13 @@ export function CandleChart({ candles, marks, market }: { candles: Candle[]; mar
     const text = cssHsl("--muted-foreground");
     const grid = cssHsl("--border", 0.45);
     const border = cssHsl("--border");
-    // 캔버스는 CSS 변수를 못 읽으므로 모노 폰트 패밀리를 런타임에 풀어서 넘긴다
-    const monoFamily = getComputedStyle(document.body).getPropertyValue("--font-geist-mono").trim();
 
     const chart = createChart(container, {
       autoSize: true,
-      height: 420,
       layout: {
         background: { type: ColorType.Solid, color: "transparent" },
         textColor: text,
-        fontFamily: monoFamily ? `${monoFamily}, ui-monospace, monospace` : "ui-monospace, monospace",
+        fontFamily: chartMonoFamily(),
         fontSize: 11,
         attributionLogo: false,
       },
@@ -172,5 +162,12 @@ export function CandleChart({ candles, marks, market }: { candles: Candle[]; mar
     );
   }
 
-  return <div ref={containerRef} className="h-[420px] w-full" role="img" aria-label="종목 캔들 차트 — 발간 시점 마커와 학회별 목표가 수평선 포함" />;
+  return (
+    <div
+      ref={containerRef}
+      className="h-[300px] w-full sm:h-[420px]"
+      role="img"
+      aria-label="종목 캔들 차트 — 발간 시점 마커와 학회별 목표가 수평선 포함"
+    />
+  );
 }

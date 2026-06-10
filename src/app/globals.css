@@ -140,6 +140,30 @@ body {
   color: hsl(var(--foreground));
   font-family: var(--font-sans);
   word-break: keep-all;
+  /* 한글 본문 자간 — Pretendard는 살짝 좁혀야 인쇄물처럼 읽힌다 */
+  letter-spacing: -0.011em;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern";
+  /* 360px에서도 가로 스크롤이 생기지 않도록 — clip은 sticky를 깨지 않는다 */
+  overflow-x: clip;
+}
+
+/* 편집 디자인 위계 — 명조 디스플레이는 더 조이고, 표 숫자는 항상 탭형 */
+.font-display {
+  letter-spacing: -0.02em;
+}
+
+table {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 터치 기기에서는 칩·버튼 탭 타깃을 44px 이상으로 키운다 */
+@media (pointer: coarse) {
+  .chip {
+    min-height: 44px;
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+  }
 }
 
 ::selection {
@@ -152,22 +176,34 @@ body {
   outline-offset: 2px;
 }
 
-/* 판결 테이프 — 전체 아카이브가 천천히, 끝없이 흐른다. 호버 시 정지 */
+/* 판결 테이프 — 거의 멈춘 듯 흐르는 기록. 호버·포커스 시 정지, 양끝은 잉크처럼 바랜다 */
 @keyframes tape-scroll {
   to {
     transform: translateX(-50%);
   }
 }
 
+.tape {
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 6%, black 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, black 6%, black 94%, transparent);
+}
+
 .tape-track {
   display: flex;
   width: max-content;
-  animation: tape-scroll 340s linear infinite;
+  animation: tape-scroll 720s linear infinite;
+  will-change: transform;
 }
 
 .tape:hover .tape-track,
 .tape:focus-within .tape-track {
   animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tape-track {
+    animation: none;
+  }
 }
 
 /* 도장 — 판정이 찍히는 인장 */
@@ -203,7 +239,7 @@ body {
   position: relative;
   display: inline-flex;
   align-items: center;
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   padding: 0.25rem 0.125rem;
   font-weight: 700;
   color: hsl(var(--foreground) / 0.86);
@@ -269,6 +305,77 @@ body {
     linear-gradient(hsl(var(--border) / 0.55) 1px, transparent 1px),
     linear-gradient(90deg, hsl(var(--border) / 0.55) 1px, transparent 1px);
   background-size: 42px 42px;
+}
+
+/* 장부 표 — 모바일 가로 스크롤 시 첫 열(발간일)이 책등처럼 고정된다 */
+.ledger-table th:first-child,
+.ledger-table td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: hsl(var(--card));
+}
+
+.ledger-table thead th:first-child {
+  z-index: 2;
+}
+
+.ledger-table tr:hover td:first-child {
+  background: hsl(var(--secondary));
+}
+
+/* 증거의 서가 — 바둑판 모자이크. 사각형 하나가 리포트 한 건 */
+.wall-cell {
+  position: relative;
+  border-radius: 2px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.wall-cell:hover,
+.wall-cell:focus-visible {
+  transform: scale(1.45);
+  z-index: 3;
+  box-shadow: 0 1px 6px hsl(var(--foreground) / 0.45);
+}
+
+/* 터치 기기 — 보이는 크기는 그대로, 누르는 영역만 넓힌다 */
+@media (pointer: coarse) {
+  .wall-cell::before {
+    content: "";
+    position: absolute;
+    inset: -4px;
+  }
+}
+
+/* 금장 — 텐배거·멀티배거에만 박이 반짝인다 */
+@keyframes glint-sweep {
+  0%, 86% {
+    transform: translateX(-130%) skewX(-18deg);
+  }
+  100% {
+    transform: translateX(230%) skewX(-18deg);
+  }
+}
+
+.wall-gold {
+  background: linear-gradient(135deg, hsl(44 80% 46%), hsl(40 86% 38%) 55%, hsl(44 80% 50%));
+  box-shadow: 0 0 0 1px hsl(var(--gold) / 0.7), 0 0 5px hsl(var(--gold) / 0.55);
+  overflow: hidden;
+}
+
+.wall-gold::after {
+  content: "";
+  position: absolute;
+  inset: -10% 30%;
+  background: linear-gradient(90deg, transparent, hsl(48 100% 88% / 0.9), transparent);
+  animation: glint-sweep 5.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wall-gold::after {
+    animation: none;
+    opacity: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

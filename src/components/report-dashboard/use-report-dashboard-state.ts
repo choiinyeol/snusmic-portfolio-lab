@@ -28,6 +28,9 @@ export function useReportDashboardState() {
   const baseFiltered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return reportDataset.records.filter((report) => {
+      // 채점 가능한 modern 시대(2019-07 이후)만 — SMIC 아카이브 시대는 학회·종목 페이지에서 별도 열람
+      if (report.era !== "modern") return false;
+      if (!report.report_date) return false;
       if (market !== "ALL" && report.market !== market) return false;
       if (bucket !== "ALL" && report.performance_bucket !== bucket) return false;
       if (school !== "ALL" && report.school !== school) return false;

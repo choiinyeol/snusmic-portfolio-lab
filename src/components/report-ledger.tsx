@@ -1,7 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
+import { ReportPathChart } from "@/components/report-path-chart";
 import { dateLabel, getDisplayName, SCHOOL_LABELS, type ReportRecord } from "@/lib/report-model";
 import {
   bucketBadgeClass,
@@ -46,6 +48,8 @@ export function ReportLedger({
   linkStocks?: boolean;
 }) {
   const [showReference, setShowReference] = useState(false);
+  /** 펼쳐진 가격 경로 — 한 번에 한 행만 차트를 마운트한다 (성능 상한) */
+  const [expandedName, setExpandedName] = useState<string | null>(null);
   const buys = useMemo(() => reports.filter(isBuy), [reports]);
   const softBuys = useMemo(() => reports.filter((r) => r.rating_class === "soft_buy"), [reports]);
   const sells = useMemo(() => reports.filter((r) => r.rating_class === "sell"), [reports]);
@@ -63,7 +67,7 @@ export function ReportLedger({
             onClick={() => setShowReference((prev) => !prev)}
             aria-pressed={showReference}
             className={cn(
-              "rounded-full border border-dashed px-3 py-1.5 font-mono text-[11px] font-semibold transition",
+              "chip rounded-full border border-dashed px-3 py-1.5 font-mono text-[11px] font-semibold transition",
               showReference
                 ? "border-foreground/60 bg-secondary text-foreground"
                 : "border-border text-muted-foreground hover:border-foreground/50 hover:text-foreground",
@@ -76,10 +80,10 @@ export function ReportLedger({
       )}
 
       <div className="overflow-x-auto rounded-lg border border-border bg-card">
-        <table className="w-full min-w-[1180px] border-collapse text-sm">
+        <table className="ledger-table w-full min-w-[1180px] border-collapse text-sm">
           <thead>
             <tr className="border-b-4 border-double border-border font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-              <SortableTh sortKey="date" sort={sort}>발간일</SortableTh>
+              <SortableTh sortKey="date" sort={sort} title="발간일 — ▸ 를 누르면 가격 경로가 펼쳐집니다">발간일</SortableTh>
               {showSchool && <SortableTh sortKey="school" sort={sort}>학회</SortableTh>}
               <SortableTh sortKey="name" sort={sort}>종목</SortableTh>
               <SortableTh sortKey="rating" sort={sort}>의견</SortableTh>
@@ -99,15 +103,33 @@ export function ReportLedger({
               const verdict = verdictOf(report);
               const slug = tickerSlug(report);
               const reference = !isBuy(report);
+              const expandable = Boolean(slug && report.report_date);
+              const open = expandedName === report.source_name;
               return (
+                <Fragment key={report.source_name}>
                 <tr
-                  key={report.source_name}
                   className={cn(
                     "border-b border-dashed border-border transition last:border-b-0 hover:bg-secondary/60",
                     reference && "opacity-55",
+                    open && "bg-secondary/50",
                   )}
                 >
-                  <td className="tnum whitespace-nowrap px-3 py-2.5 font-mono text-xs text-muted-foreground">{dateLabel(report.report_date)}</td>
+                  <td className="tnum whitespace-nowrap px-1.5 py-1 font-mono text-xs text-muted-foreground">
+                    {expandable ? (
+                      <button
+                        type="button"
+                        onClick={() => setExpandedName(open ? null : report.source_name)}
+                        aria-expanded={open}
+                        title={open ? "가격 경로 접기" : "발간 이후 가격 경로 펼치기"}
+                        className="flex min-h-[2.25rem] w-full items-center gap-1 rounded px-1.5 text-left transition hover:text-foreground"
+                      >
+                        <ChevronRight className={cn("h-3 w-3 shrink-0 transition-transform", open && "rotate-90 text-stamp")} aria-hidden="true" />
+                        {dateLabel(report.report_date)}
+                      </button>
+                    ) : (
+                      <span className="block px-1.5 py-1.5 pl-[1.45rem]">{dateLabel(report.report_date)}</span>
+                    )}
+                  </td>
                   {showSchool && (
                     <td className="whitespace-nowrap px-3 py-2.5 font-mono text-xs font-bold" title={SCHOOL_LABELS[report.school]}>
                       {schoolShort[report.school]}
@@ -168,6 +190,25 @@ export function ReportLedger({
                     )}
                   </td>
                 </tr>
+                {open && slug && report.report_date && (
+                  <tr className="border-b border-dashed border-border">
+                    <td colSpan={showSchool ? 14 : 13} className="bg-secondary/30 px-3 py-3 sm:px-4">
+                      <p className="mb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                        {getDisplayName(report)} — 발간 이후 가격 경로 · 기준선은 발간가
+                      </p>
+                      <ReportPathChart
+                        slug={slug}
+                        market={report.market}
+                        reportDate={report.report_date}
+                        targetPrice={report.target_price}
+                        hitDate={report.first_target_hit_date}
+                        eager
+                        className="h-[180px] sm:h-[220px]"
+                      />
+                    </td>
+                  </tr>
+                )}
+                </Fragment>
               );
             })}
             {sort.sorted.length === 0 && (

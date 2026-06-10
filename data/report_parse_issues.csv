@@ -36,7 +36,6 @@ data\markdown\2026-05-29_equity-research-soitec-sa.md,smic,sector,False,2026-05-
 "data\markdown\smic\2013-09-18_Equity Research, 국민은행.md",smic,company,False,2007-05-26,2013-09-18,KR,국민은행,060000,KRX,Buy,,,,,,missing_target_price,
 "data\markdown\smic\2013-09-18_Equity Research, 다우기술.md",smic,sector,False,2013-09-18,2013-09-18,,,,,Buy,13900.0,"13,900",8640.0,"8,640",60.0,non_us_kr_or_unparsed_market;missing_ticker,
 "data\markdown\smic\2013-09-18_Equity Research, 대한통운.md",smic,sector,False,2013-09-18,2013-09-18,,,,,Buy,,,5.0,5,,non_us_kr_or_unparsed_market;missing_ticker;missing_target_price,
-"data\markdown\smic\2013-09-18_Equity Research, 동화약품공업.md",smic,company,False,2013-09-18,2013-09-18,KR,공업(,000020,KRX,Buy,,,,,,missing_target_price,
 "data\markdown\smic\2013-09-18_Equity Research, 롯데쇼핑.md",smic,sector,False,2008-11-07,2013-09-18,,,,,Hold,240851.0,"240,851",,,,non_us_kr_or_unparsed_market;missing_ticker,
 "data\markdown\smic\2013-09-18_Equity Research, 맥쿼리인프라(MKIF).md",smic,sector,False,2013-09-18,2013-09-18,,,,,Buy,7093.0,"7,093원",5110.0,"5,110원",38.81,non_us_kr_or_unparsed_market;missing_ticker,
 "data\markdown\smic\2013-09-18_Equity Research, 메가스터디.md",smic,sector,True,2007-04-07,2013-09-18,,,,,Buy,174500.0,"₩174,500",174500.0,"₩174,500",,non_us_kr_or_unparsed_market;missing_ticker,ocr_fallback
@@ -91,7 +90,6 @@ data\markdown\smic\2013-09-18_smic-5021.md,smic,sector,False,2009-05-02,2013-09-
 "data\markdown\smic\2015-05-22_Equity Research, 해천미업 (중국).md",smic,sector,False,2015-05-16,2015-05-22,,,,,Buy,47.0,47,34.0,34,38.0,non_us_kr_or_unparsed_market;missing_ticker,
 "data\markdown\smic\2015-12-16_Equity Research, 글로벌텍스프리.md",smic,sector,False,2015-12-05,2015-12-16,,,,,Buy,,,,,,non_us_kr_or_unparsed_market;missing_ticker;missing_target_price,
 "data\markdown\smic\2016-04-18_Equity Research, 휠라코리아.md",smic,company,False,2016-04-09,2016-04-18,KR,아,081660,KRX,Buy,,,,,,missing_target_price,
-"data\markdown\smic\2016-05-09_Equity Research, 티씨케이.md",smic,company,False,,2016-05-09,KR,티씨케이(,064760,KRX,Buy,,,,,,missing_target_price,
 "data\markdown\smic\2016-05-27_Equity Research, 서울옥션.md",smic,sector,False,2016-05-14,2016-05-27,,,,,Buy,31850.0,"31,850 원",19150.0,"19,150 원",66.3,non_us_kr_or_unparsed_market;missing_ticker,
 "data\markdown\smic\2016-06-03_Equity Research, 휴온스.md",smic,sector,False,2016-05-26,2016-06-03,,,,,Buy,99581.0,"99,581 원",80900.0,"80,900 원",23.09,non_us_kr_or_unparsed_market;missing_ticker,
 "data\markdown\smic\2016-12-05_Property Research, P2P 금융상품.md",smic,sector,False,2016-11-19,2016-12-05,,,,,,,,,,,non_us_kr_or_unparsed_market;missing_ticker,

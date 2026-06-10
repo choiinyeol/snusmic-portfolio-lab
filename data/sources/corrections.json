@@ -5,5 +5,15 @@
     "company": null,
     "market": null,
     "_comment": "YIG 우주산업 인-depth 멀티컴퍼니 보고서. 티커 없음 → sector 분류."
+  },
+  "2016-05-09_Equity Research, 티씨케이.md": {
+    "company": "티씨케이",
+    "ticker": "064760",
+    "report_date": "2016-04-30",
+    "_comment": "OCR 표지에 '2016년 44월 30일'로 깨진 날짜 → 실제 발간일 2016-04-30. 회사명 괄호 잔재 수동 교정."
+  },
+  "2013-09-18_Equity Research, 동화약품공업.md": {
+    "company": "동화약품공업",
+    "_comment": "OCR heading split: '# 공업(' → 정상 회사명으로 교정."
   }
 }

@@ -23,12 +23,15 @@ export default async function ClubPage({ params }: { params: Promise<{ school: s
   if (!SCHOOLS.includes(school as School)) notFound();
   const club = school as School;
 
-  const records = reportDataset.records
+  const all = reportDataset.records
     .filter((r) => r.school === club)
     .sort((a, b) => String(b.report_date ?? "").localeCompare(String(a.report_date ?? "")));
-  const stats = clubStats(records);
+  // 채점 모집단은 modern 시대(2019-07 이후) — 네 학회가 같은 출발선에서 비교된다
+  const records = all.filter((r) => r.era === "modern");
+  const archive = all.filter((r) => r.era === "archive");
+  const stats = clubStats(all);
 
-  // 연도별 요약도 성적표와 같은 잣대 — 매수 의견만 집계
+  // 연도별 요약도 성적표와 같은 잣대 — modern 시대 매수 의견만 집계
   const buys = records.filter(isBuy);
   const yearGroups = new Map<string, typeof records>();
   for (const record of buys) {
@@ -44,8 +47,9 @@ export default async function ClubPage({ params }: { params: Promise<{ school: s
       <header>
         <h1 className="mt-3 font-display text-4xl font-black tracking-tight sm:text-6xl">{SCHOOL_LABELS[club]}</h1>
         <p className="mt-3 max-w-2xl text-base leading-7 text-foreground/75">
-          {SCHOOL_LABELS[club]}의 매수 의견 리포트 {stats.total}건을 point-in-time 시세로 채점한 성적표입니다. 발간 90일 미만의 신생{" "}
-          {stats.fresh}건은 판결 보류, 약한 매수·매도 등 참고 기록 {stats.reference}건은 집계에서 제외했습니다.
+          {SCHOOL_LABELS[club]}의 2019년 7월 이후 매수 의견 리포트 {stats.total}건을 point-in-time 시세로 채점한 성적표입니다. 발간 90일
+          미만의 신생 {stats.fresh}건은 판결 보류, 약한 매수·매도 등 참고 기록 {stats.reference}건은 집계에서 제외했습니다.
+          {archive.length > 0 && ` 2019년 7월 이전 수집분 ${archive.length}건은 페이지 하단에 채점 없이 보관되어 있습니다.`}
         </p>
       </header>
 
@@ -84,11 +88,29 @@ export default async function ClubPage({ params }: { params: Promise<{ school: s
 
       <section aria-label="리포트 전체 목록">
         <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">전체 기록</h2>
-          <p className="font-mono text-[10px] text-muted-foreground">머리글 클릭으로 정렬 · Shift+클릭으로 다중 정렬</p>
+          <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">전체 기록 — 2019-07 이후</h2>
+          <p className="font-mono text-[10px] text-muted-foreground">머리글 클릭으로 정렬 · Shift+클릭으로 다중 정렬 · ▸ 발간일로 가격 경로 펼침</p>
         </div>
         <ReportLedger reports={records} />
       </section>
+
+      {archive.length > 0 && (
+        <section aria-label="아카이브 시대 기록 — 채점 제외">
+          <details className="group rounded-lg border border-dashed border-border bg-card/60">
+            <summary className="flex min-h-[2.75rem] cursor-pointer list-none flex-wrap items-center gap-x-3 gap-y-1 px-4 py-3 sm:px-5 [&::-webkit-details-marker]:hidden">
+              <span className="font-mono text-[11px] font-bold transition-transform group-open:rotate-90" aria-hidden="true">▸</span>
+              <h2 className="font-display text-lg font-black tracking-tight">아카이브 (2019-07 이전)</h2>
+              <span className="rounded-sm border border-dashed border-warn px-1.5 py-0.5 font-mono text-[10px] font-bold text-warn">채점 제외</span>
+              <span className="font-mono text-[11px] text-muted-foreground">
+                {archive.length}건 — 다른 학회 수집 범위 밖의 SMIC 단독 기록이라 성적 비교에서 빠집니다
+              </span>
+            </summary>
+            <div className="border-t border-dashed border-border px-4 py-4 sm:px-5">
+              <ReportLedger reports={archive} />
+            </div>
+          </details>
+        </section>
+      )}
     </main>
   );
 }

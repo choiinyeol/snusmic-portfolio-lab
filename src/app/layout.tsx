@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Noto_Serif_KR } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+// Pretendard Variable 자체 호스팅 — CDN 불안정성을 피하고 빌드에 woff2를 함께 싣는다
+import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
 import "./globals.css";
 
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -15,14 +17,6 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
-          crossOrigin="anonymous"
-        />
-      </head>
       <body className={`${geistMono.variable} ${notoSerif.variable} antialiased`}>
         <ThemeProvider>{children}</ThemeProvider>
       </body>

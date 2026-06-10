@@ -14,7 +14,10 @@ const LINKS = [
 export function SiteNav({ className }: { className?: string }) {
   const pathname = usePathname();
   return (
-    <nav className={cn("flex items-center gap-5 font-mono text-xs font-bold uppercase tracking-[0.16em]", className)} aria-label="사이트 내비게이션">
+    <nav
+      className={cn("flex items-center gap-3.5 font-mono text-[11px] font-bold uppercase tracking-[0.08em] sm:gap-5 sm:text-xs sm:tracking-[0.16em]", className)}
+      aria-label="사이트 내비게이션"
+    >
       {LINKS.map((link) => {
         const current = link.href === "/" ? pathname === "/" : pathname === link.href || pathname.startsWith(`${link.href}/`);
         return (

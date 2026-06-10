@@ -17,12 +17,14 @@ export const SCHOOL_LABELS: Record<z.infer<typeof SchoolSchema>, string> = {
 
 const NullableNumber = z.number().finite().nullable();
 const NullableString = z.string().nullable();
+const EraSchema = z.enum(["modern", "archive"]);
 
 export const ReportRecordSchema = z.object({
   source_file: z.string(),
   source_name: z.string(),
   school: SchoolSchema.catch("smic"),
   report_type: z.enum(["company", "sector"]).catch("company"),
+  era: EraSchema.catch("archive"),
   qa_flags: NullableString.optional().default(null),
   report_date: NullableString,
   filename_date: NullableString,
@@ -85,6 +87,7 @@ export const ReportDatasetSchema = z.object({
 
 export type Market = z.infer<typeof MarketSchema>;
 export type School = z.infer<typeof SchoolSchema>;
+export type Era = z.infer<typeof EraSchema>;
 export type ReportRecord = z.infer<typeof ReportRecordSchema>;
 export type SummaryRecord = z.infer<typeof SummaryRecordSchema>;
 export type ReportDataset = z.infer<typeof ReportDatasetSchema>;

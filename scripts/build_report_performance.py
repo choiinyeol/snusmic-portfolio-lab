@@ -171,11 +171,27 @@ class ParsedReport:
     qa_flags: str | None = None
 
 
+ERA_CUTOFF = dt.date(2019, 7, 1)  # YIG/STAR/KUVIC archives start here; earlier SMIC reports are archive-only
+
+
+def compute_era(report_date: str | None, filename_date: str | None) -> str:
+    """Determine era for cross-club fairness.
+
+    "modern"  — effective date ≥ 2019-07-01 (counted in stats)
+    "archive" — earlier, or no date at all (kept in dataset but excluded from stats)
+    """
+    effective = date_from_string(report_date) or date_from_string(filename_date)
+    if effective is None:
+        return "archive"
+    return "modern" if effective >= ERA_CUTOFF else "archive"
+
+
 @dataclass
 class PerformanceRow:
     source_file: str
     school: str
     report_type: str
+    era: str  # "modern" | "archive"
     report_date: str | None
     filename_date: str | None
     market: str | None
@@ -229,6 +245,8 @@ def clean_name(value: str | None) -> str | None:
     # Strip leading time-of-day artifacts from OCR/PDF headers: "08:56 슈피겐코리아" → "슈피겐코리아"
     value = re.sub(r"^\d{1,2}:\d{2}\s+", "", value)
     value = re.sub(r"\s+", " ", value)
+    # Strip trailing dangling open-bracket / punctuation: "티씨케이(" → "티씨케이"
+    value = re.sub(r"[\(\[\{\|,;:\s]+$", "", value)
     if not value or set(value) <= {"-", "|"}:
         return None
     return value
@@ -963,6 +981,7 @@ def evaluate_report(parsed: ParsedReport, prices: pd.DataFrame, as_of: dt.date, 
         source_file=parsed.source_file,
         school=parsed.school,
         report_type=parsed.report_type,
+        era=compute_era(parsed.report_date, parsed.filename_date),
         report_date=parsed.report_date,
         filename_date=parsed.filename_date,
         market=parsed.market,
@@ -1014,6 +1033,7 @@ def empty_performance(parsed: ParsedReport, data_issue: str, age_days: int | Non
         source_file=parsed.source_file,
         school=parsed.school,
         report_type=parsed.report_type,
+        era=compute_era(parsed.report_date, parsed.filename_date),
         report_date=parsed.report_date,
         filename_date=parsed.filename_date,
         market=parsed.market,
@@ -1133,20 +1153,20 @@ def dedup_reports(parsed: list[ParsedReport]) -> list[ParsedReport]:
 
 
 def summarize(rows: list[dict], group: str) -> dict:
-    # Only buy-class records count in headline stats
-    buy_rows = [r for r in rows if r.get("rating_class") == "buy"]
-    priced = [r for r in buy_rows if r["return_latest_pct"] is not None]
+    # Only modern-era buy-class records count in headline stats (archive era excluded for fairness)
+    modern_buy_rows = [r for r in rows if r.get("rating_class") == "buy" and r.get("era") == "modern"]
+    priced = [r for r in modern_buy_rows if r["return_latest_pct"] is not None]
     returns = sorted(r["return_latest_pct"] for r in priced)
     mid = len(returns) // 2
     median = None if not returns else returns[mid] if len(returns) % 2 else (returns[mid - 1] + returns[mid]) / 2
     return {
         "group": group,
-        "reports": len(buy_rows),
+        "reports": len(modern_buy_rows),
         "priced_reports": len(priced),
-        "with_target": sum(1 for r in buy_rows if r["target_price"] is not None),
+        "with_target": sum(1 for r in modern_buy_rows if r["target_price"] is not None),
         "up_latest": sum(1 for r in priced if r["return_latest_pct"] > 0),
         "down_latest": sum(1 for r in priced if r["return_latest_pct"] < 0),
-        "target_hit": sum(1 for r in buy_rows if r["target_hit_until_latest"]),
+        "target_hit": sum(1 for r in modern_buy_rows if r["target_hit_until_latest"]),
         "avg_return_latest_pct": round(sum(returns) / len(returns), 6) if returns else None,
         "median_return_latest_pct": round(median, 6) if median is not None else None,
     }
