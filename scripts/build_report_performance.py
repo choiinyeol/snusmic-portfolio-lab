@@ -61,7 +61,7 @@ EXCLUDED_DELISTED_TICKERS = {"VTNR", "NETI"}
 TARGET_LABEL_RE = re.compile(r"(?:\d{2,4}E?\s*)?(목표\s*주가|목표주가|적정\s*주가|적정주가|Target\s+Price)", re.I)
 CURRENT_LABEL_RE = re.compile(r"(현재\s*주가|현재주가|현재가(?!치)|Current\s+Price)", re.I)
 UPSIDE_RE = re.compile(r"(상승\s*여력|하락\s*여력|Upside)\s*[:：]?\s*([+\-]?\d+(?:\.\d+)?)\s*%", re.I)
-RATING_RE = re.compile(r"\b(Strong\s+Buy|Buy|Sell|Hold|Neutral|Outperform|Underperform)\b|(강력\s*매수|적극\s*매수|매수|매도|중립|보유)", re.I)
+RATING_RE = re.compile(r"\b(Strong\s+Buy|Buy|Sell|Hold|Neutral|Outperform|Underperform|Overweight|Underweight)\b|(강력\s*매수|적극\s*매수|매수|매도|중립|보유)", re.I)
 KOREAN_RATINGS = {"강력매수": "Buy", "적극매수": "Buy", "매수": "Buy", "매도": "Sell", "중립": "Neutral", "보유": "Hold"}
 PRICE_TOKEN_RE = re.compile(
     r"(?P<prefix>[$₩])?\s*(?P<a>\d[\d,]*(?:\.\d+)?)\s*(?:[~\-–]\s*(?P<prefix2>[$₩])?\s*(?P<b>\d[\d,]*(?:\.\d+)?))?\s*(?P<suffix>원|엔|달러|USD|KRW|[$₩])?",
@@ -86,6 +86,67 @@ KR_EXCHANGE_CODE_RE = re.compile(r"^(KS|KQ|KOSPI|KOSDAQ|코스피|코스닥|KRX)
 # 괄호 안 단독 미국 티커: (GLW) (TSLA)
 BARE_US_TICKER_RE = re.compile(r"^([A-Z]{1,5})$")
 YIG_PUBLISHED_RE = re.compile(r"발간일\s*(\d{6})")
+
+# ── 회사명 정제 패턴 ──────────────────────────────────────────────────────────
+# 목록 마커 / 숫자 TOC 접두사: "- 2.1.3 OCI홀딩스"  "1. 삼성전자"
+COMPANY_LIST_MARKER_RE = re.compile(r"^[-*•]\s*\d[\d.]*\s+|^\d[\d.]*\s+")
+# 등급 접두사: "BUY [매수] 루트로닉"  "STRONG BUY 삼성"
+COMPANY_RATING_PREFIX_RE = re.compile(
+    r"^(?:strong\s+buy|buy|sell|hold|neutral|overweight|underweight|매수|매도|중립|보유|강력\s*매수|적극\s*매수)"
+    r"(?:\s*[\[\(][^\]\)]*[\]\)])?\s+",
+    re.I,
+)
+# 대회/기수 접두사: "[2025-1 SOKHA 우승]" "[Top-pick]"
+COMPANY_BRACKET_PREFIX_RE = re.compile(r"^\[[^\]]{0,60}\]\s*")
+# 회사명이 TOC artifact인지 판단: "- 2.1.3" 로 시작하거나 전체가 숫자/점/공백
+COMPANY_TOC_ARTIFACT_RE = re.compile(r"^[-*•\s]*\d+[\d.\s]*$|[-*•]\s*\d+\.")
+# Line-level TOC pattern: a line that starts with a list marker followed by numbering
+# e.g. "- 2.1.3 [STRONG BUY] OCI홀딩스(010060, KS) 55p"
+LINE_TOC_RE = re.compile(r"^\s*[-*•]\s+\d+[\d.]*\s")
+# Figure/table captions: "그림1.지구저궤도(LEO) ..." or "Figure 3. ..."
+LINE_FIGURE_CAPTION_RE = re.compile(r"^(?:그림|표|Fig(?:ure)?|Table)\s*\d+[\d.]*", re.I)
+
+
+def _strip_company_prefixes(name: str) -> str:
+    """BUY/[award] 등 회사명에 붙은 접두사를 제거한다."""
+    original = name
+    # 대괄호 접두사 반복 제거
+    for _ in range(3):
+        cleaned = COMPANY_BRACKET_PREFIX_RE.sub("", name).strip()
+        if cleaned == name:
+            break
+        name = cleaned
+    # 등급 접두사
+    name = COMPANY_RATING_PREFIX_RE.sub("", name).strip()
+    # 대괄호 접두사 다시 (등급 제거 후 남은 경우)
+    for _ in range(3):
+        cleaned = COMPANY_BRACKET_PREFIX_RE.sub("", name).strip()
+        if cleaned == name:
+            break
+        name = cleaned
+    return name if name else original
+
+
+def _is_toc_artifact(name: str) -> bool:
+    """TOC 목록 마커/번호 패턴이면 True."""
+    return bool(COMPANY_TOC_ARTIFACT_RE.search(name))
+
+
+# ── 등급 분류 ─────────────────────────────────────────────────────────────────
+BUY_RATINGS = {"buy", "strong buy", "strongbuy", "매수", "강력매수", "적극매수", "overweight"}
+SELL_RATINGS = {"sell", "reduce", "underperform", "underweight", "매도"}
+
+
+def classify_rating(rating: str | None) -> str:
+    """등급 문자열 → "buy" | "soft_buy" | "sell"."""
+    if not rating:
+        return "soft_buy"
+    norm = rating.strip().lower().replace(" ", "")
+    if norm in BUY_RATINGS:
+        return "buy"
+    if norm in SELL_RATINGS:
+        return "sell"
+    return "soft_buy"
 
 
 @dataclass
@@ -122,6 +183,8 @@ class PerformanceRow:
     ticker: str | None
     exchange: str | None
     rating: str | None
+    rating_class: str  # "buy" | "soft_buy" | "sell"
+    display_name: str | None
     target_price: float | None
     target_price_raw: str | None
     report_current_price: float | None
@@ -145,6 +208,8 @@ class PerformanceRow:
     target_hit_until_latest: bool | None
     first_target_hit_date: str | None
     days_to_target: int | None
+    age_days: int | None
+    maturity: str | None
     data_issue: str | None
     parse_issue: str | None
     qa_flags: str | None
@@ -161,6 +226,8 @@ def clean_name(value: str | None) -> str | None:
         return None
     value = re.sub(r"^#+", "", value).strip()
     value = value.strip("| ")
+    # Strip leading time-of-day artifacts from OCR/PDF headers: "08:56 슈피겐코리아" → "슈피겐코리아"
+    value = re.sub(r"^\d{1,2}:\d{2}\s+", "", value)
     value = re.sub(r"\s+", " ", value)
     if not value or set(value) <= {"-", "|"}:
         return None
@@ -313,6 +380,12 @@ def parse_identity(path: Path, lines: list[str]) -> tuple[str | None, str | None
     # Prefer explicit header/table identity near the front page.
     for idx, line in enumerate(lines[:140]):
         cl = compact_line(line)
+        # Skip TOC list entries: "- 2.1.3 [STRONG BUY] OCI홀딩스(010060, KS) 55p"
+        if LINE_TOC_RE.match(cl):
+            continue
+        # Skip figure/table captions: "그림1.지구저궤도(LEO) 우주발사단가..."
+        if LINE_FIGURE_CAPTION_RE.match(cl):
+            continue
         m = TITLE_WITH_CODE_RE.search(cl)
         if not m:
             continue
@@ -326,6 +399,13 @@ def parse_identity(path: Path, lines: list[str]) -> tuple[str | None, str | None
         if not market:
             continue
         name = clean_name(m.group("name"))
+        # Strip rating/bracket prefixes from company name extracted from heading
+        if name:
+            name = _strip_company_prefixes(name)
+            name = clean_name(name)
+        # Reject TOC artifacts as company names
+        if name and _is_toc_artifact(name):
+            name = None
         if not name:
             name = infer_company_before(lines, idx, path)
         return market, ticker, exchange, name
@@ -352,7 +432,11 @@ def parse_identity(path: Path, lines: list[str]) -> tuple[str | None, str | None
         market, ticker, exchange = parse_market_from_inside(sm.group("inside").strip())
         if market:
             raw_name = re.sub(r"^(?:undated|\d{4}-\d{2}-\d{2})_", "", sm.group("name") or "")
-            return market, ticker, exchange, clean_name(raw_name)
+            name = clean_name(raw_name)
+            if name:
+                name = _strip_company_prefixes(name)
+                name = clean_name(name)
+            return market, ticker, exchange, name
 
     return None, None, None, None
 
@@ -583,7 +667,9 @@ def compute_issues(r: ParsedReport) -> None:
         issues.append("missing_ticker")
     if not r.report_date:
         issues.append("missing_report_date")
-    if r.target_price is None:
+    # soft_buy 레코드는 목표가 없어도 parse error가 아님 (Hold = no target)
+    rclass = classify_rating(r.rating)
+    if r.target_price is None and rclass == "buy":
         issues.append("missing_target_price")
     r.parse_issue = ";".join(issues) if issues else None
 
@@ -642,7 +728,43 @@ def safe_pct(new: float | None, old: float | None) -> float | None:
 def date_from_string(value: str | None) -> dt.date | None:
     if not value:
         return None
-    return dt.date.fromisoformat(value)
+    try:
+        return dt.date.fromisoformat(value)
+    except ValueError:
+        # 구형 리포트의 표지 날짜 오인식(월/일 뒤바뀜 등)은 일/월 스왑을 시도하고, 그래도 안 되면 버린다
+        m = re.fullmatch(r"(\d{4})-(\d{2})-(\d{2})", value)
+        if m:
+            year, mon, day = (int(x) for x in m.groups())
+            if mon > 12 >= day >= 1:
+                try:
+                    return dt.date(year, day, mon)
+                except ValueError:
+                    return None
+        return None
+
+
+def compute_age_maturity(report_date: str | None, filename_date: str | None, as_of: dt.date) -> tuple[int | None, str | None]:
+    """age_days와 maturity 버킷을 계산한다."""
+    effective = date_from_string(report_date) or date_from_string(filename_date)
+    if effective is None:
+        return None, None
+    age = (as_of - effective).days
+    if age < 90:
+        maturity = "fresh"
+    elif age < 365:
+        maturity = "developing"
+    elif age < 3 * 365:
+        maturity = "seasoned"
+    else:
+        maturity = "veteran"
+    return age, maturity
+
+
+def build_display_name(market: str | None, company: str | None, ticker: str | None) -> str | None:
+    """KR: 회사명 우선, US: 티커 우선."""
+    if market == "US":
+        return ticker or company
+    return company or ticker
 
 
 def fetch_kr_prices(ticker: str, start: dt.date, end: dt.date) -> pd.DataFrame:
@@ -756,20 +878,42 @@ def benchmark_for(parsed: ParsedReport, benchmarks: dict[str, pd.DataFrame]) -> 
     return benchmarks.get("KOSPI")
 
 
+def performance_bucket(ret: float | None) -> str:
+    if ret is None:
+        return "No quote"
+    if ret >= 900:
+        return "Tenbagger"
+    if ret >= 300:
+        return "Multibagger"
+    if ret >= 100:
+        return "Double"
+    if ret >= 30:
+        return "Winner"
+    if ret >= 0:
+        return "Positive"
+    if ret >= -30:
+        return "Drawdown"
+    return "Wrecked"
+
+
 def evaluate_report(parsed: ParsedReport, prices: pd.DataFrame, as_of: dt.date, benchmarks: dict[str, pd.DataFrame] | None = None) -> PerformanceRow:
+    age_days, maturity = compute_age_maturity(parsed.report_date, parsed.filename_date, as_of)
+    display_name = build_display_name(parsed.market, parsed.company, parsed.ticker)
+    rating_class = classify_rating(parsed.rating)
+
     data_issue = None
     report_dt = date_from_string(parsed.report_date)
     if report_dt is None:
         data_issue = "missing_report_date"
-        return empty_performance(parsed, data_issue)
+        return empty_performance(parsed, data_issue, age_days, maturity, display_name, rating_class)
     if prices.empty:
-        return empty_performance(parsed, "missing_market_prices")
+        return empty_performance(parsed, "missing_market_prices", age_days, maturity, display_name, rating_class)
 
     prices = prices.sort_index()
     start_ts = pd.Timestamp(report_dt)
     available = prices[prices.index >= start_ts]
     if available.empty:
-        return empty_performance(parsed, "no_price_on_or_after_report_date")
+        return empty_performance(parsed, "no_price_on_or_after_report_date", age_days, maturity, display_name, rating_class)
 
     start_row = available.iloc[0]
     start_date = available.index[0].date()
@@ -826,6 +970,8 @@ def evaluate_report(parsed: ParsedReport, prices: pd.DataFrame, as_of: dt.date, 
         ticker=parsed.ticker,
         exchange=parsed.exchange,
         rating=parsed.rating,
+        rating_class=rating_class,
+        display_name=display_name,
         target_price=parsed.target_price,
         target_price_raw=parsed.target_price_raw,
         report_current_price=parsed.report_current_price,
@@ -849,13 +995,21 @@ def evaluate_report(parsed: ParsedReport, prices: pd.DataFrame, as_of: dt.date, 
         target_hit_until_latest=hit,
         first_target_hit_date=first_hit_date,
         days_to_target=days_to_target,
+        age_days=age_days,
+        maturity=maturity,
         data_issue=data_issue,
         parse_issue=parsed.parse_issue,
         qa_flags=parsed.qa_flags,
     )
 
 
-def empty_performance(parsed: ParsedReport, data_issue: str) -> PerformanceRow:
+def empty_performance(parsed: ParsedReport, data_issue: str, age_days: int | None = None, maturity: str | None = None, display_name: str | None = None, rating_class: str | None = None) -> PerformanceRow:
+    if age_days is None:
+        age_days, maturity = compute_age_maturity(parsed.report_date, parsed.filename_date, dt.date.today())
+    if display_name is None:
+        display_name = build_display_name(parsed.market, parsed.company, parsed.ticker)
+    if rating_class is None:
+        rating_class = classify_rating(parsed.rating)
     return PerformanceRow(
         source_file=parsed.source_file,
         school=parsed.school,
@@ -867,6 +1021,8 @@ def empty_performance(parsed: ParsedReport, data_issue: str) -> PerformanceRow:
         ticker=parsed.ticker,
         exchange=parsed.exchange,
         rating=parsed.rating,
+        rating_class=rating_class,
+        display_name=display_name,
         target_price=parsed.target_price,
         target_price_raw=parsed.target_price_raw,
         report_current_price=parsed.report_current_price,
@@ -890,6 +1046,8 @@ def empty_performance(parsed: ParsedReport, data_issue: str) -> PerformanceRow:
         target_hit_until_latest=None,
         first_target_hit_date=None,
         days_to_target=None,
+        age_days=age_days,
+        maturity=maturity,
         data_issue=data_issue,
         parse_issue=parsed.parse_issue,
         qa_flags=parsed.qa_flags,
@@ -974,39 +1132,27 @@ def dedup_reports(parsed: list[ParsedReport]) -> list[ParsedReport]:
     return [best[k] for k in order] + unkeyed
 
 
-def performance_bucket(ret: float | None) -> str:
-    if ret is None:
-        return "No quote"
-    if ret >= 100:
-        return "Moonshot"
-    if ret >= 30:
-        return "Winner"
-    if ret >= 0:
-        return "Positive"
-    if ret > -50:
-        return "Negative"
-    return "Wrecked"
-
-
 def summarize(rows: list[dict], group: str) -> dict:
-    priced = [r for r in rows if r["return_latest_pct"] is not None]
+    # Only buy-class records count in headline stats
+    buy_rows = [r for r in rows if r.get("rating_class") == "buy"]
+    priced = [r for r in buy_rows if r["return_latest_pct"] is not None]
     returns = sorted(r["return_latest_pct"] for r in priced)
     mid = len(returns) // 2
     median = None if not returns else returns[mid] if len(returns) % 2 else (returns[mid - 1] + returns[mid]) / 2
     return {
         "group": group,
-        "reports": len(rows),
+        "reports": len(buy_rows),
         "priced_reports": len(priced),
-        "with_target": sum(1 for r in rows if r["target_price"] is not None),
+        "with_target": sum(1 for r in buy_rows if r["target_price"] is not None),
         "up_latest": sum(1 for r in priced if r["return_latest_pct"] > 0),
         "down_latest": sum(1 for r in priced if r["return_latest_pct"] < 0),
-        "target_hit": sum(1 for r in rows if r["target_hit_until_latest"]),
+        "target_hit": sum(1 for r in buy_rows if r["target_hit_until_latest"]),
         "avg_return_latest_pct": round(sum(returns) / len(returns), 6) if returns else None,
         "median_return_latest_pct": round(median, 6) if median is not None else None,
     }
 
 
-def write_web_json(path: Path, rows: list[PerformanceRow], as_of: dt.date) -> None:
+def write_web_json(path: Path, rows: list[PerformanceRow], as_of: dt.date, excluded_sector_count: int) -> None:
     records = []
     for row in rows:
         record = round_floats(asdict(row))
@@ -1022,6 +1168,7 @@ def write_web_json(path: Path, rows: list[PerformanceRow], as_of: dt.date) -> No
     payload = {
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
         "as_of": as_of.isoformat(),
+        "excluded_sector_count": excluded_sector_count,
         "records": records,
         "summary": [summarize(rows_, group) for group, rows_ in groups],
     }
@@ -1046,7 +1193,7 @@ def main() -> int:
     as_of = dt.date.fromisoformat(args.as_of)
     md_root = Path(args.markdown_dir)
     md_paths: list[tuple[Path, str]] = [(p, "smic") for p in sorted(md_root.glob("*.md"))]
-    for school in ("yig", "star", "kuvic"):
+    for school in ("smic", "yig", "star", "kuvic"):
         sub = md_root / school
         if sub.exists():
             md_paths += [(p, school) for p in sorted(sub.glob("*.md"))]
@@ -1056,6 +1203,11 @@ def main() -> int:
     parsed_all_raw = [parse_report(path, school, hints.get(path.stem)) for path, school in md_paths]
     apply_corrections(parsed_all_raw, load_corrections())
     resolve_missing_tickers(parsed_all_raw)
+
+    # 다운스트림(백테스트·프론트엔드)이 ISO 날짜를 신뢰할 수 있도록 표지 날짜를 정규화한다
+    for r in parsed_all_raw:
+        normalized = date_from_string(r.report_date)
+        r.report_date = normalized.isoformat() if normalized else None
 
     for r in parsed_all_raw:
         # 티커가 끝내 없으면 산업/전략 리포트로 분류 (목표가 채점 대상 아님)
@@ -1091,8 +1243,14 @@ def main() -> int:
     write_csv(Path(args.parsed_output), parsed_all)
     write_csv(Path(args.issues_output), [r for r in parsed_all if r.parse_issue])
 
+    # ── REQUIREMENT 1: only company reports go into the emitted dataset ────────
+    sector_reports = [r for r in parsed if r.report_type == "sector"]
+    company_reports = [r for r in parsed if r.report_type == "company"]
+    excluded_sector_count = len(sector_reports)
+    print(f"excluded sector/thematic reports: {excluded_sector_count}")
+
     groups: dict[tuple[str, str], list[ParsedReport]] = {}
-    for r in parsed:
+    for r in company_reports:
         if r.ticker and r.report_date:
             groups.setdefault((r.market or "", r.ticker), []).append(r)
 
@@ -1111,7 +1269,7 @@ def main() -> int:
         if (i + 1) % 50 == 0:
             print(f"  prices {i + 1}/{len(groups)}", flush=True)
 
-    min_report = min((d for r in parsed if (d := date_from_string(r.report_date))), default=year_start)
+    min_report = min((d for r in company_reports if (d := date_from_string(r.report_date))), default=year_start)
     idx_start = min(min_report, year_start) - dt.timedelta(days=10)
     benchmarks: dict[str, pd.DataFrame] = {}
     for name in ("KOSPI", "KOSDAQ", "US"):
@@ -1122,16 +1280,22 @@ def main() -> int:
             benchmarks[name] = pd.DataFrame()
 
     rows: list[PerformanceRow] = []
-    for r in parsed:
+    for r in company_reports:
         prices = price_cache.get((r.market or "", r.ticker or ""), pd.DataFrame())
         rows.append(evaluate_report(r, prices, as_of, benchmarks))
 
     rows.sort(key=lambda x: (x.report_date or "9999-99-99", x.market or "", x.ticker or "", x.source_file))
     write_csv(Path(args.output), rows)
-    write_web_json(Path(args.web_output), rows, as_of)
+    write_web_json(Path(args.web_output), rows, as_of, excluded_sector_count)
 
     ok = sum(1 for row in rows if not row.data_issue)
-    print(f"parsed_reports={len(parsed_all)} included_us_kr={len(parsed)} performance_rows={len(rows)} priced_rows={ok} as_of={as_of}")
+    # rating_class distribution
+    rc_dist: dict[str, int] = {}
+    for row in rows:
+        rc_dist[row.rating_class] = rc_dist.get(row.rating_class, 0) + 1
+    print(f"parsed_reports={len(parsed_all)} included_us_kr={len(parsed)} company_rows={len(rows)} priced_rows={ok} as_of={as_of}")
+    print(f"rating_class distribution: buy={rc_dist.get('buy', 0)} soft_buy={rc_dist.get('soft_buy', 0)} sell={rc_dist.get('sell', 0)}")
+    print(f"excluded_sector_count={excluded_sector_count}")
     print(f"wrote {args.output}")
     print(f"wrote {args.parsed_output}")
     print(f"wrote {args.issues_output}")

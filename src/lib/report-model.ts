@@ -3,7 +3,9 @@ import raw from "@/data/report-performance.json";
 
 const MarketSchema = z.enum(["KR", "US"]);
 const DirectionSchema = z.enum(["up", "down", "flat"]);
-const BucketSchema = z.enum(["Moonshot", "Winner", "Positive", "Negative", "Wrecked", "No quote"]);
+const BucketSchema = z.enum(["Tenbagger", "Multibagger", "Double", "Winner", "Positive", "Drawdown", "Wrecked", "No quote"]);
+const RatingClassSchema = z.enum(["buy", "soft_buy", "sell"]);
+const MaturitySchema = z.enum(["fresh", "developing", "seasoned", "veteran"]);
 const SchoolSchema = z.enum(["smic", "yig", "star", "kuvic"]);
 
 export const SCHOOL_LABELS: Record<z.infer<typeof SchoolSchema>, string> = {
@@ -52,6 +54,10 @@ export const ReportRecordSchema = z.object({
   target_hit_until_latest: z.boolean().nullable(),
   first_target_hit_date: NullableString,
   days_to_target: z.number().int().nullable(),
+  rating_class: RatingClassSchema.catch("soft_buy"),
+  display_name: NullableString.optional().default(null),
+  age_days: z.number().int().nullable().optional().default(null),
+  maturity: MaturitySchema.nullable().optional().default(null),
   data_issue: NullableString,
   parse_issue: NullableString,
   performance_bucket: BucketSchema,
@@ -72,6 +78,7 @@ export const SummaryRecordSchema = z.object({
 export const ReportDatasetSchema = z.object({
   generated_at: z.string(),
   as_of: z.string(),
+  excluded_sector_count: z.number().int().nonnegative().default(0),
   records: z.array(ReportRecordSchema),
   summary: z.array(SummaryRecordSchema),
 });
@@ -81,6 +88,8 @@ export type School = z.infer<typeof SchoolSchema>;
 export type ReportRecord = z.infer<typeof ReportRecordSchema>;
 export type SummaryRecord = z.infer<typeof SummaryRecordSchema>;
 export type ReportDataset = z.infer<typeof ReportDatasetSchema>;
+export type RatingClass = z.infer<typeof RatingClassSchema>;
+export type Maturity = z.infer<typeof MaturitySchema>;
 
 export type DataQuality = {
   valid: boolean;
@@ -113,6 +122,7 @@ function fallbackDataset(input: unknown): ReportDataset {
   return {
     generated_at: typeof candidate.generated_at === "string" ? candidate.generated_at : "",
     as_of: typeof candidate.as_of === "string" ? candidate.as_of : "",
+    excluded_sector_count: typeof candidate.excluded_sector_count === "number" ? candidate.excluded_sector_count : 0,
     records,
     summary,
   };
@@ -142,7 +152,7 @@ export const reportDataQuality: DataQuality = {
 };
 
 export function getDisplayName(report: ReportRecord) {
-  return report.company || report.ticker || report.source_name.replace(/\.md$/, "");
+  return report.display_name || report.company || report.ticker || report.source_name.replace(/\.md$/, "");
 }
 
 export function dateLabel(value: string | null) {

@@ -33,3 +33,5 @@ artifacts/
 
 # price warehouse (derived, incrementally refreshed)
 data/prices/
+
+.vercel

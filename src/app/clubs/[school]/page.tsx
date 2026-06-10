@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { SiteHeader } from "@/components/site-header";
 import { ReportLedger, StatStrip } from "@/components/report-ledger";
 import { reportDataset, SCHOOL_LABELS, type School } from "@/lib/report-model";
-import { clubStats, median, signColor } from "@/lib/verdict";
+import { clubStats, isBuy, median, signColor } from "@/lib/verdict";
 import { formatPct } from "@/lib/utils";
 
 const SCHOOLS: School[] = ["smic", "yig", "star", "kuvic"];
@@ -28,8 +28,10 @@ export default async function ClubPage({ params }: { params: Promise<{ school: s
     .sort((a, b) => String(b.report_date ?? "").localeCompare(String(a.report_date ?? "")));
   const stats = clubStats(records);
 
+  // 연도별 요약도 성적표와 같은 잣대 — 매수 의견만 집계
+  const buys = records.filter(isBuy);
   const yearGroups = new Map<string, typeof records>();
-  for (const record of records) {
+  for (const record of buys) {
     const year = record.report_date?.slice(0, 4) ?? "????";
     yearGroups.set(year, [...(yearGroups.get(year) ?? []), record]);
   }
@@ -41,19 +43,23 @@ export default async function ClubPage({ params }: { params: Promise<{ school: s
 
       <header>
         <h1 className="mt-3 font-display text-4xl font-black tracking-tight sm:text-6xl">{SCHOOL_LABELS[club]}</h1>
-        <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground">
-          {SCHOOL_LABELS[club]}의 리포트 {stats.total}건을 point-in-time 시세로 채점한 성적표입니다. 최신 발간 순으로 정렬되어 있습니다.
+        <p className="mt-3 max-w-2xl text-base leading-7 text-foreground/75">
+          {SCHOOL_LABELS[club]}의 매수 의견 리포트 {stats.total}건을 point-in-time 시세로 채점한 성적표입니다. 발간 90일 미만의 신생{" "}
+          {stats.fresh}건은 판결 보류, 약한 매수·매도 등 참고 기록 {stats.reference}건은 집계에서 제외했습니다.
         </p>
       </header>
 
       <StatStrip
         items={[
-          { label: "리포트", value: `${stats.total}건` },
+          { label: "매수 리포트", value: `${stats.total}건` },
           { label: "가격 검증", value: `${stats.priced}건` },
           { label: "목표가 적중", value: `${stats.hits}건`, tone: "text-stamp" },
           { label: "적중률", value: formatPct(stats.hitRate, 1).replace("+", "") },
           { label: "수익률 중앙값", value: formatPct(stats.medianReturn), tone: signColor(stats.medianReturn) },
-          { label: "문샷 (+100%↑)", value: `${stats.moonshots}건` },
+          {
+            label: "판결까지 걸린 시간",
+            value: stats.medianDaysToTarget !== null ? `${Math.round(stats.medianDaysToTarget)}일` : "—",
+          },
         ]}
       />
 
@@ -77,7 +83,10 @@ export default async function ClubPage({ params }: { params: Promise<{ school: s
       </section>
 
       <section aria-label="리포트 전체 목록">
-        <h2 className="mb-3 font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">전체 기록 — 최신순</h2>
+        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">전체 기록</h2>
+          <p className="font-mono text-[10px] text-muted-foreground">머리글 클릭으로 정렬 · Shift+클릭으로 다중 정렬</p>
+        </div>
         <ReportLedger reports={records} />
       </section>
     </main>

@@ -20,8 +20,9 @@ export default function ClubsPage() {
     <main className="mx-auto max-w-[1500px] px-4 py-6 sm:px-8">
       <SiteHeader eyebrow="Club Scorecards" />
       <h1 className="mt-9 font-display text-4xl font-black tracking-tight sm:text-5xl">학회별 성적표</h1>
-      <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground">
-        네 학회의 리포트를 같은 잣대(point-in-time 시세)로 채점했습니다. 학회를 누르면 전체 기록을 최신순으로 볼 수 있습니다.
+      <p className="mt-3 max-w-2xl text-base leading-7 text-foreground/75">
+        네 학회의 리포트를 같은 잣대(point-in-time 시세)로 채점했습니다. 성적은 <strong className="font-bold">매수 의견</strong>만으로 매기고, 발간
+        90일 미만의 신생 리포트는 판결을 보류합니다. 학회를 누르면 전체 기록을 볼 수 있습니다.
       </p>
 
       <div className="mt-9 grid gap-5 md:grid-cols-2">
@@ -37,11 +38,16 @@ export default function ClubsPage() {
               <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">{SCHOOL_DESC[school]}</p>
               <h2 className="mt-2 font-display text-3xl font-black tracking-tight transition group-hover:text-stamp">{SCHOOL_LABELS[school]}</h2>
               <dl className="mt-5 grid grid-cols-4 gap-3 border-t border-dashed border-border pt-4">
-                <Stat label="리포트" value={`${stats.total}건`} />
+                <Stat label="매수 리포트" value={`${stats.total}건`} />
                 <Stat label="적중" value={`${stats.hits}건`} tone="text-stamp" />
                 <Stat label="적중률" value={formatPct(stats.hitRate, 0).replace("+", "")} />
                 <Stat label="중앙값" value={formatPct(stats.medianReturn, 1)} tone={signColor(stats.medianReturn)} />
               </dl>
+              <p className="mt-3 font-mono text-[10px] text-muted-foreground">
+                판결까지 중앙값 {stats.medianDaysToTarget !== null ? `${Math.round(stats.medianDaysToTarget)}일` : "—"}
+                {stats.fresh > 0 ? ` · 신생 ${stats.fresh}건 보류` : ""}
+                {stats.reference > 0 ? ` · 참고 ${stats.reference}건 제외` : ""}
+              </p>
             </Link>
           );
         })}

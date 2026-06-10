@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 import { ReportLedger, StatStrip } from "@/components/report-ledger";
 import { StockChart } from "@/components/stock-chart";
 import { dateLabel, getDisplayName, reportDataset, SCHOOL_LABELS, type ReportRecord } from "@/lib/report-model";
-import { signColor, tickerSlug } from "@/lib/verdict";
+import { isBuy, signColor, tickerSlug } from "@/lib/verdict";
 import { formatPct, formatPrice } from "@/lib/utils";
 
 function groupBySlug() {
@@ -37,9 +37,11 @@ export default async function StockPage({ params }: { params: Promise<{ ticker: 
   const latest = sorted[0];
   const name = getDisplayName(latest);
   const schools = [...new Set(sorted.map((r) => r.school))];
-  const hits = sorted.filter((r) => r.target_hit_until_latest).length;
-  const targets = sorted.filter((r) => r.target_price !== null).map((r) => r.target_price as number);
-  const upsides = sorted.filter((r) => r.stated_upside_pct !== null).map((r) => r.stated_upside_pct as number);
+  // 컨센서스 통계는 매수 의견 기준 — 약한 매수·매도는 참고 기록
+  const buys = sorted.filter(isBuy);
+  const hits = buys.filter((r) => r.target_hit_until_latest).length;
+  const targets = buys.filter((r) => r.target_price !== null).map((r) => r.target_price as number);
+  const upsides = buys.filter((r) => r.stated_upside_pct !== null).map((r) => r.stated_upside_pct as number);
 
   return (
     <main className="mx-auto max-w-[1500px] space-y-8 px-4 py-6 sm:px-8">
@@ -83,7 +85,10 @@ export default async function StockPage({ params }: { params: Promise<{ ticker: 
       <StockChart slug={ticker.toLowerCase()} reports={sorted} />
 
       <section aria-label="학회별 주장 비교">
-        <h2 className="mb-3 font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">학회별 판결 기록 — 최신순</h2>
+        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">학회별 판결 기록</h2>
+          <p className="font-mono text-[10px] text-muted-foreground">머리글 클릭으로 정렬 · Shift+클릭으로 다중 정렬</p>
+        </div>
         <ReportLedger reports={sorted} showSchool linkStocks={false} />
       </section>
     </main>

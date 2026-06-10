@@ -1,9 +1,41 @@
+"use client";
+
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { dateLabel, getDisplayName, SCHOOL_LABELS, type ReportRecord } from "@/lib/report-model";
-import { horizonColumns, schoolShort, signColor, stampTone, tickerSlug, verdictOf } from "@/lib/verdict";
+import {
+  bucketBadgeClass,
+  bucketLabels,
+  bucketThresholds,
+  isBuy,
+  maturityLabels,
+  ratingClassLabels,
+  schoolShort,
+  signColor,
+  stampTone,
+  tickerSlug,
+  verdictOf,
+} from "@/lib/verdict";
+import { SortableTh, useSortable, type SortColumn } from "@/components/sortable";
 import { cn, formatPct, formatPrice } from "@/lib/utils";
 
-/** 학회/종목 페이지 공용 리포트 장부 테이블 (최신순 정렬은 호출자가 보장). */
+const sortColumns: SortColumn<ReportRecord>[] = [
+  { key: "date", value: (r) => r.report_date },
+  { key: "school", value: (r) => schoolShort[r.school] },
+  { key: "name", value: (r) => getDisplayName(r) },
+  { key: "rating", value: (r) => r.rating },
+  { key: "price", value: (r) => r.report_current_price, firstDir: "desc" },
+  { key: "target", value: (r) => r.target_price, firstDir: "desc" },
+  { key: "upside", value: (r) => r.stated_upside_pct, firstDir: "desc" },
+  { key: "r90", value: (r) => r.return_90d_pct, firstDir: "desc" },
+  { key: "r365", value: (r) => r.return_365d_pct, firstDir: "desc" },
+  { key: "latest", value: (r) => r.return_latest_pct, firstDir: "desc" },
+  { key: "alpha", value: (r) => r.alpha_latest_pct, firstDir: "desc" },
+  { key: "bucket", value: (r) => r.return_latest_pct, firstDir: "desc" },
+  { key: "days", value: (r) => r.days_to_target },
+];
+
+/** 학회/종목 페이지 공용 리포트 장부 — 정렬 가능, 기본은 매수 의견만. */
 export function ReportLedger({
   reports,
   showSchool = false,
@@ -13,74 +45,141 @@ export function ReportLedger({
   showSchool?: boolean;
   linkStocks?: boolean;
 }) {
+  const [showReference, setShowReference] = useState(false);
+  const buys = useMemo(() => reports.filter(isBuy), [reports]);
+  const softBuys = useMemo(() => reports.filter((r) => r.rating_class === "soft_buy"), [reports]);
+  const sells = useMemo(() => reports.filter((r) => r.rating_class === "sell"), [reports]);
+  const visible = useMemo(() => (showReference ? reports : buys), [showReference, reports, buys]);
+
+  const sort = useSortable(visible, sortColumns, [{ key: "date", dir: "desc" }]);
+  const referenceCount = softBuys.length + sells.length;
+
   return (
-    <div className="overflow-x-auto rounded-lg border border-border bg-card">
-      <table className="w-full min-w-[920px] border-collapse text-sm">
-        <thead>
-          <tr className="border-b-4 border-double border-border font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-            <th className="px-3 py-2.5 text-left font-semibold">발간일</th>
-            {showSchool && <th className="px-3 py-2.5 text-left font-semibold">학회</th>}
-            <th className="px-3 py-2.5 text-left font-semibold">종목</th>
-            <th className="px-3 py-2.5 text-left font-semibold">의견</th>
-            <th className="px-3 py-2.5 text-right font-semibold">목표가</th>
-            {horizonColumns.map((col) => (
-              <th key={col.key} className="px-2 py-2.5 text-right font-semibold">
-                {col.label}
-              </th>
-            ))}
-            <th className="px-2 py-2.5 text-right font-semibold" title="같은 기간 시장지수 대비 초과수익">
-              알파
-            </th>
-            <th className="px-3 py-2.5 text-right font-semibold">판정</th>
-          </tr>
-        </thead>
-        <tbody>
-          {reports.map((report) => {
-            const verdict = verdictOf(report);
-            const slug = tickerSlug(report);
-            return (
-              <tr key={report.source_name} className="border-b border-dashed border-border transition last:border-b-0 hover:bg-secondary/60">
-                <td className="tnum whitespace-nowrap px-3 py-2.5 font-mono text-xs text-muted-foreground">{dateLabel(report.report_date)}</td>
-                {showSchool && <td className="whitespace-nowrap px-3 py-2.5 font-mono text-xs font-bold">{schoolShort[report.school]}</td>}
-                <td className="max-w-[15rem] px-3 py-2.5">
-                  {linkStocks && slug ? (
-                    <Link href={`/stocks/${slug}`} className="font-bold transition hover:text-stamp">
-                      {getDisplayName(report)}
-                    </Link>
-                  ) : (
-                    <span className="font-bold">{getDisplayName(report)}</span>
-                  )}
-                  <span className="ml-1.5 font-mono text-[10px] text-muted-foreground">{report.ticker ?? ""}</span>
-                </td>
-                <td className="whitespace-nowrap px-3 py-2.5 text-xs font-semibold">{report.rating ?? "—"}</td>
-                <td className="tnum whitespace-nowrap px-3 py-2.5 text-right font-mono text-xs">{formatPrice(report.target_price, report.market)}</td>
-                {horizonColumns.map((col) => {
-                  const value = report[col.key] as number | null;
-                  return (
-                    <td key={col.key} className={cn("tnum whitespace-nowrap px-2 py-2.5 text-right font-mono text-xs font-bold", signColor(value))}>
-                      {formatPct(value, 0)}
-                    </td>
-                  );
-                })}
-                <td
-                  className={cn("tnum whitespace-nowrap px-2 py-2.5 text-right font-mono text-xs font-bold", signColor(report.alpha_latest_pct))}
-                  title={`지수 동기간 ${formatPct(report.benchmark_return_pct, 0)}`}
-                >
-                  {formatPct(report.alpha_latest_pct, 0)}
-                </td>
-                <td className={cn("whitespace-nowrap px-3 py-2.5 text-right text-xs font-black", stampTone[verdict.tone])}>{verdict.stamp}</td>
-              </tr>
-            );
-          })}
-          {reports.length === 0 && (
-            <tr>
-              <td colSpan={showSchool ? 13 : 12} className="px-4 py-10 text-center text-sm text-muted-foreground">
-                리포트가 없습니다.
-              </td>
+    <div className="space-y-2">
+      {referenceCount > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowReference((prev) => !prev)}
+            aria-pressed={showReference}
+            className={cn(
+              "rounded-full border border-dashed px-3 py-1.5 font-mono text-[11px] font-semibold transition",
+              showReference
+                ? "border-foreground/60 bg-secondary text-foreground"
+                : "border-border text-muted-foreground hover:border-foreground/50 hover:text-foreground",
+            )}
+          >
+            참고: 약한 매수 {softBuys.length}건{sells.length > 0 ? ` · 매도 ${sells.length}건` : ""} {showReference ? "숨기기" : "보기"}
+          </button>
+          <p className="font-mono text-[10px] text-muted-foreground">참고 기록은 성적 집계에서 제외됩니다</p>
+        </div>
+      )}
+
+      <div className="overflow-x-auto rounded-lg border border-border bg-card">
+        <table className="w-full min-w-[1180px] border-collapse text-sm">
+          <thead>
+            <tr className="border-b-4 border-double border-border font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+              <SortableTh sortKey="date" sort={sort}>발간일</SortableTh>
+              {showSchool && <SortableTh sortKey="school" sort={sort}>학회</SortableTh>}
+              <SortableTh sortKey="name" sort={sort}>종목</SortableTh>
+              <SortableTh sortKey="rating" sort={sort}>의견</SortableTh>
+              <SortableTh sortKey="price" sort={sort} align="right">발간가</SortableTh>
+              <SortableTh sortKey="target" sort={sort} align="right">목표가</SortableTh>
+              <SortableTh sortKey="upside" sort={sort} align="right" title="발간 당시 제시한 상승여력">괴리율</SortableTh>
+              <SortableTh sortKey="r90" sort={sort} align="right">3M</SortableTh>
+              <SortableTh sortKey="r365" sort={sort} align="right">1Y</SortableTh>
+              <SortableTh sortKey="latest" sort={sort} align="right">발간이후</SortableTh>
+              <SortableTh sortKey="alpha" sort={sort} align="right" title="같은 기간 시장지수 대비 초과수익">알파</SortableTh>
+              <SortableTh sortKey="bucket" sort={sort} align="right">등급</SortableTh>
+              <SortableTh sortKey="days" sort={sort} align="right" title="목표가 도달까지 걸린 시간">판결</SortableTh>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {sort.sorted.map((report) => {
+              const verdict = verdictOf(report);
+              const slug = tickerSlug(report);
+              const reference = !isBuy(report);
+              return (
+                <tr
+                  key={report.source_name}
+                  className={cn(
+                    "border-b border-dashed border-border transition last:border-b-0 hover:bg-secondary/60",
+                    reference && "opacity-55",
+                  )}
+                >
+                  <td className="tnum whitespace-nowrap px-3 py-2.5 font-mono text-xs text-muted-foreground">{dateLabel(report.report_date)}</td>
+                  {showSchool && (
+                    <td className="whitespace-nowrap px-3 py-2.5 font-mono text-xs font-bold" title={SCHOOL_LABELS[report.school]}>
+                      {schoolShort[report.school]}
+                    </td>
+                  )}
+                  <td className="max-w-[15rem] px-3 py-2.5">
+                    {linkStocks && slug ? (
+                      <Link href={`/stocks/${slug}`} className="font-bold transition hover:text-stamp">
+                        {getDisplayName(report)}
+                      </Link>
+                    ) : (
+                      <span className="font-bold">{getDisplayName(report)}</span>
+                    )}
+                    {report.maturity === "fresh" && (
+                      <span
+                        className="ml-1.5 inline-block rounded-sm border border-dashed border-warn px-1 py-px align-middle font-mono text-[9px] font-bold text-warn"
+                        title={`발간 ${report.age_days ?? "?"}일 — 90일 미만 신생 리포트, 성과 집계 제외`}
+                      >
+                        {maturityLabels.fresh}
+                      </span>
+                    )}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-2.5 text-xs font-semibold" title={ratingClassLabels[report.rating_class]}>
+                    {report.rating ?? (reference ? ratingClassLabels[report.rating_class] : "—")}
+                  </td>
+                  <td className="tnum whitespace-nowrap px-3 py-2.5 text-right font-mono text-xs text-muted-foreground">
+                    {formatPrice(report.report_current_price, report.market)}
+                  </td>
+                  <td className="tnum whitespace-nowrap px-3 py-2.5 text-right font-mono text-xs font-bold">
+                    {formatPrice(report.target_price, report.market)}
+                  </td>
+                  <td className="tnum whitespace-nowrap px-3 py-2.5 text-right font-mono text-xs text-muted-foreground">
+                    {formatPct(report.stated_upside_pct, 0)}
+                  </td>
+                  {(["return_90d_pct", "return_365d_pct", "return_latest_pct"] as const).map((key) => (
+                    <td key={key} className={cn("tnum whitespace-nowrap px-3 py-2.5 text-right font-mono text-xs font-bold", signColor(report[key]))}>
+                      {formatPct(report[key], 0)}
+                    </td>
+                  ))}
+                  <td
+                    className={cn("tnum whitespace-nowrap px-3 py-2.5 text-right font-mono text-xs font-bold", signColor(report.alpha_latest_pct))}
+                    title={`지수 동기간 ${formatPct(report.benchmark_return_pct, 0)}`}
+                  >
+                    {formatPct(report.alpha_latest_pct, 0)}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-2.5 text-right">
+                    <span
+                      className={cn("inline-block rounded-sm border px-1.5 py-0.5 font-mono text-[10px]", bucketBadgeClass[report.performance_bucket])}
+                      title={`${bucketLabels[report.performance_bucket]} — ${bucketThresholds[report.performance_bucket]}`}
+                    >
+                      {bucketLabels[report.performance_bucket]}
+                    </span>
+                  </td>
+                  <td className={cn("whitespace-nowrap px-3 py-2.5 text-right text-xs font-black", stampTone[verdict.tone])} title={verdict.detail}>
+                    {verdict.stamp}
+                    {report.target_hit_until_latest && report.days_to_target !== null && (
+                      <span className="tnum ml-1 font-mono text-[10px] font-bold text-muted-foreground">D+{report.days_to_target}</span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+            {sort.sorted.length === 0 && (
+              <tr>
+                <td colSpan={showSchool ? 14 : 13} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                  리포트가 없습니다.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

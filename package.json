@@ -13,6 +13,7 @@
     "class-variance-authority": "latest",
     "clsx": "latest",
     "framer-motion": "latest",
+    "lightweight-charts": "^5.2.0",
     "lucide-react": "latest",
     "next": "latest",
     "react": "latest",

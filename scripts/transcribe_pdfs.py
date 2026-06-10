@@ -19,8 +19,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PDF_ROOT = ROOT / "data" / "pdfs"
 MD_ROOT = ROOT / "data" / "markdown"
-SCHOOLS = ("yig", "star", "kuvic")
-BATCH_SIZE = 8
+SCHOOLS = ("smic", "yig", "star", "kuvic")
+BATCH_SIZE = 24
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -77,6 +77,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--school", choices=SCHOOLS, default=None)
     parser.add_argument("--limit", type=int, default=None, help="학교당 최대 전사 건수 (테스트용)")
+    parser.add_argument("--shard", default=None, help="i:n — 대기 목록을 n개로 나눠 i번째만 처리 (병렬 실행용)")
     args = parser.parse_args()
 
     ensure_java()
@@ -89,6 +90,9 @@ def main() -> int:
         target_dir = MD_ROOT / school
         target_dir.mkdir(parents=True, exist_ok=True)
         pending = [p for p in sorted(pdf_dir.glob("*.pdf")) if not (target_dir / f"{p.stem}.md").exists()]
+        if args.shard:
+            i, n = (int(x) for x in args.shard.split(":"))
+            pending = pending[i::n]
         if args.limit:
             pending = pending[: args.limit]
         print(f"== {school}: {len(pending)} pdfs to transcribe ==", flush=True)

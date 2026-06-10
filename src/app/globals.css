@@ -23,6 +23,8 @@
   --color-down: hsl(var(--down));
   --color-warn: hsl(var(--warn));
   --color-stamp: hsl(var(--stamp));
+  --color-gold: hsl(var(--gold));
+  --font-sans: "Pretendard Variable", Pretendard, ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   --font-display: var(--font-noto-serif), "Apple SD Gothic Neo", "Nanum Myeongjo", Georgia, serif;
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
@@ -70,6 +72,8 @@
   --finance-selected-bg: 354 64% 93%;
   --quality: 262 50% 45%;
   --quality-bg: 262 60% 94%;
+  --gold: 40 78% 34%;
+  --gold-bg: 44 72% 88%;
   --chart-positive: 354 70% 46%;
   --chart-negative: 219 62% 50%;
   --chart-target: 33 85% 40%;
@@ -113,6 +117,8 @@
   --finance-warning-bg: 40 50% 14%;
   --quality: 262 70% 74%;
   --quality-bg: 262 40% 16%;
+  --gold: 44 88% 60%;
+  --gold-bg: 42 45% 16%;
   --chart-positive: 354 85% 64%;
   --chart-negative: 217 90% 70%;
   --chart-target: 40 90% 60%;
@@ -132,7 +138,8 @@ body {
   min-height: 100vh;
   background: hsl(var(--background));
   color: hsl(var(--foreground));
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", sans-serif;
+  font-family: var(--font-sans);
+  word-break: keep-all;
 }
 
 ::selection {
@@ -145,7 +152,7 @@ body {
   outline-offset: 2px;
 }
 
-/* 판결 테이프 — 전체 아카이브가 끝없이 흐른다. 호버 시 정지 */
+/* 판결 테이프 — 전체 아카이브가 천천히, 끝없이 흐른다. 호버 시 정지 */
 @keyframes tape-scroll {
   to {
     transform: translateX(-50%);
@@ -155,7 +162,7 @@ body {
 .tape-track {
   display: flex;
   width: max-content;
-  animation: tape-scroll 90s linear infinite;
+  animation: tape-scroll 340s linear infinite;
 }
 
 .tape:hover .tape-track,
@@ -189,6 +196,62 @@ body {
 
 .tnum {
   font-variant-numeric: tabular-nums;
+}
+
+/* 내비게이션 — 잉크 밑줄. 현재 페이지는 도장색으로 박힌다 */
+.nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0.25rem 0.125rem;
+  font-weight: 700;
+  color: hsl(var(--foreground) / 0.86);
+  transition: color 0.15s ease;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0.3rem;
+  height: 2px;
+  background: hsl(var(--stamp));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s ease;
+}
+
+.nav-link:hover {
+  color: hsl(var(--foreground));
+}
+
+.nav-link:hover::after,
+.nav-link[aria-current="page"]::after {
+  transform: scaleX(1);
+}
+
+.nav-link[aria-current="page"] {
+  color: hsl(var(--stamp));
+}
+
+/* 금장 인장 — 텐배거·멀티배거 전용 박(箔) 처리 */
+.tier-gold {
+  color: hsl(var(--gold));
+  border-color: hsl(var(--gold) / 0.6);
+  background: linear-gradient(118deg, hsl(var(--gold) / 0.22), hsl(var(--gold) / 0.06) 42%, hsl(var(--gold) / 0.24));
+}
+
+/* 정렬 가능한 표 머리글 */
+.sortable-th {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+.sortable-th:hover {
+  color: hsl(var(--foreground));
 }
 
 .glass-panel {

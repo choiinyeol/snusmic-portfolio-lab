@@ -19,6 +19,8 @@ PDF를 markdown으로 전사하고, 목표가·투자의견을 파싱한 뒤 poi
 npm install && npm run dev          # http://localhost:3000
 
 # 1) 수집 (1회만 다운로드, manifest 관리, 요청 간 2.5초 지연)
+.venv/Scripts/python scripts/collect_smic.py              # SMIC (증분, WP REST API)
+.venv/Scripts/python scripts/collect_smic.py --full       # SMIC 전체 789건 순회
 .venv/Scripts/python scripts/collect_reports.py --source all
 .venv/Scripts/python scripts/collect_kuvic_browser.py     # KUVIC 전체 목록(브라우저)
 
@@ -50,7 +52,7 @@ npm install && npm run dev          # http://localhost:3000
 
 | 동아리 | 학교 | 수집 |
 |---|---|---|
-| SMIC | 서울대학교 | 217건 |
+| SMIC | 서울대학교 | 771건 — http://snusmic.com/research/ |
 | YIG | 연세대학교 | 104건 — https://yig.yonsei.ac.kr/research |
 | STAR | 성균관대학교 | 281건 — http://starskku.com/board/board_list?code=research |
 | KUVIC | 고려대학교 | 104건 — https://www.kuvic.com/research |
