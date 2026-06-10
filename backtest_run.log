@@ -11,9 +11,9 @@ Loading benchmarks...
   NASDAQ: 2007-01-03 to 2026-06-09
   GLD: 2007-01-03 to 2026-06-09
 
-── Running 15 strategies (v10: + O MTT alpha16) ────────────────────
+── Running 17 strategies (v11: lookahead fixes, +P hybrid, L/M excluded from selector) ──
 A. 12개월 보유...
-   IS sharpe=0.21  OOS sharpe=0.73
+   IS sharpe=0.21  OOS sharpe=0.72
 B. 36개월 보유...
    IS sharpe=0.43  OOS sharpe=0.96
 C. 내러티브 홀드 (200MA thesis-break)...
@@ -34,47 +34,100 @@ J. 코어-새틀라이트 레버리지 오버레이 (on D)...
    IS sharpe=0.6  OOS sharpe=0.73
 K. R:R 2.5 추세추종 (max 10 positions)...
    IS sharpe=0.38  OOS sharpe=0.62
-L. 민리버전 Connors RSI-2...
-   IS sharpe=-3.1  OOS sharpe=-2.53
-M. 단기 리버설 (monthly bottom-quintile)...
-   IS sharpe=-1.4  OOS sharpe=-2.18
+L. 민리버전 Connors RSI-2 (비용 사망 진단용, 셀렉터 제외)...
+   IS sharpe=0.01  OOS sharpe=0.74  trades=3031  MDD=-24.36%
+M. 단기 리버설 monthly bottom-quintile (비용 사망 진단용, 셀렉터 제외)...
+   IS sharpe=0.36  OOS sharpe=0.45  trades=914  MDD=-37.4%
 N. 52주 고가 근접 (George & Hwang 2004)...
    IS sharpe=0.2  OOS sharpe=1.2
-O. MTT alpha16 (Minervini RS+MTT+R-multiple exits)...
-   IS sharpe=2.3  OOS sharpe=3.71
+O. MTT alpha16 (lookahead-fixed, Minervini RS+MTT+R-multiple exits)...
+   IS sharpe=0.08  OOS sharpe=0.71
+P. 딥바이 샹들리에 하이브리드 (진입=딥바이, 청산=ATR트레일, 스케일인)...
+   IS sharpe=0.51  OOS sharpe=-0.14
+Q. 깡토 추세추종 (시장신호등+유닛사이징+RS+60d돌파+볼륨)...
+   IS sharpe=-0.26  OOS sharpe=0.32  win_rate=45.7%  trades=871
+R. Kelly 샹들리에 (D+ 규칙 + Kelly sizing)...
+   IS sharpe=0.53  OOS sharpe=0.6
+S(a). HRP 포트폴리오 최적화...
+   IS sharpe=0.75  OOS sharpe=0.9
+S(b). max-Sharpe 포트폴리오 최적화...
+   IS sharpe=0.25  OOS sharpe=1.41
+S(c). min-CVaR 포트폴리오 최적화...
+   IS sharpe=0.03  OOS sharpe=1.22
+   Best S variant (IS sharpe): S_hrp → IS 0.75  OOS 0.9
 
 ── Optuna robust optimization (D+ chandelier) ───────────────────
   Running Optuna (120 trials)...
   Best params (discretised): {'atr_period': 20, 'atr_mult': 5.5, 'max_positions': 10}  obj=0.596
   D+ Optuna: IS sharpe=1.1  fold1=1.53  fold2=0.68  OOS sharpe=1.34
   D+ ADOPTED: IS=1.10  OOS=1.34  (D OOS=0.65)
+P. 딥바이 샹들리에 재실행 (Optuna ATR mult=5.5, max_pos=10)...
+   P (Optuna params) IS sharpe=0.56  OOS sharpe=0.16
+R. Kelly 샹들리에 재실행 (Optuna ATR mult=5.5)...
+   R (Optuna params) IS sharpe=0.77  OOS sharpe=0.27
 
-── Strategy summary (v10, 16 strategies) ─────────────────────────────
-Strategy                           IS CAGR   IS Shp   OOS CAGR   OOS Shp  Trades
-  A_12mo                              2.22     0.21      18.52      0.73     118
-  B_36mo                              8.16     0.43      32.51      0.96      40
-  C_narrative                        14.89     0.63      28.98      0.84      53
-  D_chandelier                       14.31     0.74      16.99      0.65     379
-  E_half_runner                       8.74     0.47      26.52      0.87     130
-  F_momentum_narrative                5.64     0.39      50.64       1.5      54
-  G_dip_buy                          -2.15    -0.05     -31.54     -1.48     719
-  H_minervini                         0.91     0.23      35.66      1.62     105
-  I_supertrend                         5.4     0.44      11.11      0.52     498
-  J_core_satellite                   10.56      0.6      19.62      0.73       0
-  K_rr_trend                          1.53     0.38       5.58      0.62     608
-  L_rsi2_reversion                  -38.54     -3.1     -51.01     -2.53    2982
-  M_short_reversal                  -98.31     -1.4     -100.0     -2.18     555
-  N_52w_high                          1.76      0.2      29.35       1.2      70
-  O_mtt_alpha16                      16.49      2.3     133.86      3.71     771
-  D+_chandelier_optuna               16.33      1.1      32.45      1.34     186
+Computing per-strategy KOSPI DCA ratios (quick pass)...
 
-Headline (best IS sharpe): O_mtt_alpha16 [O_mtt_alpha16]
+── Strategy summary (v12, 22 strategies; L/M/S-non-best excluded from selector) ──
+Strategy                           IS Shp   OOS Shp  WinRate  vs KOSPI DCA  Trades         Note
+  A_12mo                             0.21      0.72    39.8%         0.51x     118             
+  B_36mo                             0.43      0.96    52.5%        0.693x      40             
+  C_narrative                        0.63      0.84     0.0%        0.748x      53             
+  D_chandelier                       0.74      0.65    36.4%        0.609x     379             
+  E_half_runner                      0.47      0.87    81.5%         0.66x     130             
+  F_momentum_narrative               0.39       1.5     0.0%         0.84x      54             
+  G_dip_buy                         -0.05     -1.48    32.3%        0.188x     719             
+  H_minervini                        0.23      1.62    37.1%        0.702x     105             
+  I_supertrend                       0.44      0.52    31.1%        0.495x     498             
+  J_core_satellite                    0.6      0.73        —        0.614x       0             
+  K_rr_trend                         0.38      0.62    50.5%        0.425x     608             
+  L_rsi2_reversion                   0.01      0.74    60.0%         0.48x    3031   [EXCLUDED]
+  M_short_reversal                   0.36      0.45    49.2%        0.467x     914   [EXCLUDED]
+  N_52w_high                          0.2       1.2    34.3%        0.607x      70             
+  O_mtt_alpha16                      0.08      0.71    40.1%        0.479x     705             
+  P_deepbuy_chandelier               0.56      0.16    34.6%        0.385x     191             
+  Q_kangto_trend                    -0.26      0.32    45.7%        0.385x     871             
+  R_kelly_chandelier                 0.77      0.27    39.2%        0.503x     171             
+  S_hrp                              0.75       0.9    51.6%        0.484x    3807     [S-BEST]
+  S_msharpe                          0.25      1.41    46.0%        0.593x    1881   [EXCLUDED]
+  S_mincvar                          0.03      1.22    45.7%        0.515x     803   [EXCLUDED]
+  D+_chandelier_optuna                1.1      1.34    40.3%        0.813x     186             
+
+  ✗ No eligible strategy beats KOSPI DCA in full-period wealth simulation.
+
+Headline (best IS sharpe, eligible only): D+_chandelier_optuna [D+_chandelier_optuna]
+  IS sharpe=1.1  OOS sharpe=1.34
 
 Computing wealth simulations...
-  Strategy final: 1,423,975,328원
+  Strategy final: 395,853,642원
 
-Computing today's signals (headline: O_mtt_alpha16)...
-  Open: 3, Approaching stop: 0, New buy signals (30d): 15, Watching (1-club): 301
+Computing today's signals (headline: D+_chandelier_optuna)...
+  Open: 7, Approaching stop: 0, New buy signals (30d): 14, Watching (1-club): 302
 
 Exporting trade CSVs...
-  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades.csv (771 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades.csv (186 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades-A_12mo.csv (118 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades-B_36mo.csv (40 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades-C_narrative.csv (53 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades-D_chandelier.csv (379 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades-E_half_runner.csv (130 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades-F_momentum_narrative.csv (54 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades-G_dip_buy.csv (719 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades-H_minervini.csv (105 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades-I_supertrend.csv (498 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades-J_core_satellite.csv (0 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades-K_rr_trend.csv (608 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades-L_rsi2_reversion.csv (3031 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades-M_short_reversal.csv (914 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades-N_52w_high.csv (70 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades-O_mtt_alpha16.csv (705 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades-P_deepbuy_chandelier.csv (191 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades-Q_kangto_trend.csv (871 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades-R_kelly_chandelier.csv (171 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades-S_hrp.csv (3807 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades-S_msharpe.csv (1881 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades-S_mincvar.csv (803 rows)
+  CSV written: C:\Users\FELAB\Desktop\projects\active\smic-easy\public\strategy-trades-D+_chandelier_optuna.csv (186 rows)
+
+Wrote src/data/strategy-backtest.json
+  Trades in JSON: 186

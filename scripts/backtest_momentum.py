@@ -1,4 +1,20 @@
-"""학회 리포트 × 전략 연구 백테스트 v11.
+"""학회 리포트 × 전략 연구 백테스트 v12.
+
+변경사항 (v12):
+- Q. 깡토 추세추종: 시장 신호등(KOSPI 200MA+50MA상승), 유닛 사이징(총자본/20, Max 2% Rule),
+  진입=RS퍼센타일≥KOSPI RS AND 60d고가돌파 AND 거래량≥1.5×20d평균,
+  청산=-8%초기스탑/BE at+1R/트레일 고점-8% at+1.5R/절반익절 +3R.
+  보고 항목: win rate, vs KOSPI DCA. 추세형 그룹.
+- R. Kelly 샹들리에: D+ Chandelier 규칙 + Kelly 포지션 사이징
+  (rolling 최근 40거래 win_rate/payoff → fractional Kelly, cap 0.25, safety 0.5, floor 1%).
+  오버레이 그룹.
+- S. 포트폴리오 최적화 (월간 리밸런스): 활성 유니버스(18mo 유효)에 대해 trailing 252d 일별 수익률 사용.
+  (a) S_hrp: HRP (hierarchical risk parity — 직접 구현, corr distance, single-linkage, quasi-diag, iv-split),
+  (b) S_msharpe: max-Sharpe (mean-variance, LedoitWolf 수축 또는 λ=0.3 diagonal, long-only w≤15%),
+  (c) S_mincvar: min-CVaR (95%, scipy linprog LP, long-only w≤15%).
+  월 리밸런스, 턴오버 비용. IS 샤프 최상 변형만 셀렉터에 포함. 배분형 그룹.
+- 비교표에 "vs KOSPI DCA" 최종 자산 비율 열 추가.
+- 방법론 주석: 장중 데이터 미도입(데이터 부재) 및 SPO 보류(미래 작업) 1줄씩 명시.
 
 변경사항 (v11):
 - MTT 룩어헤드 감사 및 수정: O 전략 진입 시그널을 당일 종가 기준으로 포착,
@@ -21,13 +37,13 @@
 변경사항 (v10):
 - Optuna 탐색공간 이산화: suggest_float에 step= 추가 (ATR mult step 0.25, 0.05 등).
   파라미터를 소수점 2자리로 반올림하여 보고.
-- 신규 전략 O: MTT (alpha16 이식) — 알파16 논문 Minervini MTT를 OUR 유니버스에 이식.
-  RS 퍼센타일(3m×0.5/6m×0.3/12m×0.2), MTT 필터(close>50MA>150MA>200MA, 200MA상승,
-  52w저점×1.9 이상, 52w고점×0.95 이상, RS≥80), 진입 RS≥79, 청산(-8%초기스탑/BE/6%트레일/+3.5R/RS<82 후 8일/115일).
+- 신규 전략 O: MTT (alpha16 이식) - 알파16 논문 Minervini MTT를 OUR 유니버스에 이식.
+  RS 퍼센타일(3m*0.5/6m*0.3/12m*0.2), MTT 필터(close>50MA>150MA>200MA, 200MA상승,
+  52w저점*1.9 이상, 52w고점*0.95 이상, RS>=80), 진입 RS>=79, 청산(-8%초기스탑/BE/6%트레일/+3.5R/RS<82 후 8일/115일).
   동일 유니버스(리포트 후 18개월 유효풀), 5%/20슬롯 동일비중, 추세형 그룹 추가.
-  [출처 공개: alpha16 RobustOpt KRX 파라미터 — KRX 전체 종목으로 튜닝된 값, OUR 데이터 未사용]
+  [출처 공개: alpha16 RobustOpt KRX 파라미터 - KRX 전체 종목으로 튜닝된 값, OUR 데이터 미사용]
 - 재매수 규칙 명시: 청산 후 동일 티커 재진입 허용 (패밀리 진입 조건 재충족 시).
-  기존 open_positions 체크는 현재 보유 중 여부만 확인 → OK.
+  기존 open_positions 체크는 현재 보유 중 여부만 확인 -> OK.
   단, 리포트 구동 패밀리는 신규 리포트 OR 18개월 유효창 내 기술적 재충족 시 재진입.
 - 신규 전략 L (민리버전 Connors RSI-2), M (단기 리버설 월별 하위 5분위), N (52주 고가 근접 George & Hwang 2004).
 - RSI(2) 지표를 load_prices에 추가.
@@ -3710,8 +3726,11 @@ def export_trades_csv(trades: list[dict], path: Path) -> None:
 # Multi-strategy comparison helpers
 # ──────────────────────────────────────────────────────────────────────────────
 
-def build_multi_strategy_summary(strategies: dict[str, dict]) -> list[dict]:
-    """Build comparison table rows for all v6 strategies."""
+def build_multi_strategy_summary(
+    strategies: dict[str, dict],
+    kospi_dca_ratios: dict[str, dict] | None = None,
+) -> list[dict]:
+    """Build comparison table rows for all strategies."""
     rows = []
     for key, r in strategies.items():
         closed = [t for t in r.get("trades", []) if not t.get("exit_reason", "").endswith("미청산")]
@@ -3727,6 +3746,7 @@ def build_multi_strategy_summary(strategies: dict[str, dict]) -> list[dict]:
 
         is_m = r.get("in_sample", {})
         oos_m = r.get("out_of_sample", {})
+        ratio_info = (kospi_dca_ratios or {}).get(key, {})
         rows.append({
             "key": key,
             "label": r["label"],
@@ -3738,8 +3758,953 @@ def build_multi_strategy_summary(strategies: dict[str, dict]) -> list[dict]:
             "best_trade_ticker": max_trade_info.get("ticker") if max_trade_info else None,
             "top_decile_pnl_share_pct": top_decile_pnl_share,
             "trade_count": n,
+            "kospi_dca_ratio": ratio_info.get("full_ratio"),      # strategy_final / kospi_final
+            "kospi_dca_beats": (ratio_info.get("full_ratio") or 0.0) > 1.0,
         })
     return rows
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Strategy Q: 깡토 추세추종 (Korean trend-following blogger system)
+#
+# 시장 신호등:
+#   초록(시장유닛 2) = KOSPI close > 200MA AND 50MA rising (vs 20일 전)
+#   빨강(시장유닛 1) = 그 외
+# 종목 유닛 = 1.  총 유닛 = 종목유닛 × 시장유닛 (1 or 2).
+# 점진적 베팅: 포지션 +3R 도달 후 같은 티커 패밀리 다음 진입에 +1 종목유닛 (최대 3유닛).
+# 유닛 사이즈 = 총자본 / 20.  Max 2% Rule: 단일 포지션 리스크 ≤ equity × 2%.
+#
+# 진입 (단독 커버 포함, 18mo 유효 유니버스):
+#   RS 퍼센타일(MTT 방식) ≥ KOSPI RS AND
+#   close = 60d high AND volume ≥ 1.5 × 20d avg volume.
+#   체결: 익일 시가.
+#
+# 스탑/청산 (1R = entry × 8%):
+#   초기 스탑: entry − 1R (−8%)
+#   +1R 시 스탑 → breakeven
+#   +1.5R 시 트레일 고점 − 8% 활성화
+#   +3R 시 절반 익절 (나머지는 트레일 지속)
+#   편도 비용 0.3%
+# ──────────────────────────────────────────────────────────────────────────────
+
+Q_STOP_PCT          = 0.08   # 1R = 8%
+Q_BE_R              = 1.0    # move stop to BE at +1R
+Q_TRAIL_ACTIVATE_R  = 1.5    # trail high−8% activates at +1.5R
+Q_HALF_EXIT_R       = 3.0    # take half at +3R
+Q_MAX_UNIT_ADD      = 3      # max 3 total units after progressive betting
+Q_UNIVERSE_MONTHS   = 18
+Q_VOL_MULT          = 1.5    # volume ≥ 1.5× 20d avg
+Q_BREAKOUT_DAYS     = 60     # 60d high breakout
+
+
+def _q_market_units(kospi: pd.Series, day: dt.date) -> int:
+    """시장 신호등: 초록=2유닛, 빨강=1유닛."""
+    kospi_close = asof_value(kospi, day)
+    if kospi_close <= 0:
+        return 1
+    # 200MA of KOSPI — compute on the fly using rolling
+    idx = kospi.index
+    day_ts = pd.Timestamp(day)
+    sub = kospi[idx <= day_ts]
+    if len(sub) < 100:
+        return 1
+    ma200 = float(sub.iloc[-200:].mean()) if len(sub) >= 200 else float(sub.mean())
+    # 50MA — current vs 20 days ago
+    ma50_now = float(sub.iloc[-50:].mean()) if len(sub) >= 50 else float(sub.mean())
+    sub_20ago = kospi[idx <= day_ts - pd.Timedelta(days=20)]
+    if len(sub_20ago) < 50:
+        return 1
+    ma50_20ago = float(sub_20ago.iloc[-50:].mean()) if len(sub_20ago) >= 50 else float(sub_20ago.mean())
+    if kospi_close > ma200 and ma50_now > ma50_20ago:
+        return 2
+    return 1
+
+
+def run_kangto_trend(
+    prices: dict[str, pd.DataFrame],
+    reports: list[tuple[dt.date, str, str, int]],
+    calendar: list[dt.date],
+    label: str,
+    ticker_reports: dict[str, list[dict]] | None = None,
+    record_full_trades: bool = False,
+    kospi: pd.Series | None = None,
+) -> dict:
+    """
+    Q 깡토 추세추종.
+    진입: RS ≥ KOSPI RS AND close = 60d high AND volume ≥ 1.5× 20d avg.
+    스탑: −8% 초기 / BE at +1R / 트레일 고점−8% at +1.5R / 절반 +3R.
+    유닛 사이징: capital/20, max 2% risk rule.
+    """
+    START_CAPITAL = 100_000_000
+    cash = float(START_CAPITAL)
+    equity = float(START_CAPITAL)
+    positions: dict[str, dict] = {}
+    nav_series: list[tuple[str, float]] = []
+    trades: list[dict] = []
+    pending_exits: dict[str, str] = {}
+
+    # Track closed trade returns per ticker family (for progressive betting)
+    # ticker -> list of return_r (profit/1R multiple)
+    ticker_family_profit: dict[str, list[float]] = {}
+
+    # Build eligible pool
+    ticker_valid: dict[str, list[tuple[dt.date, dt.date]]] = {}
+    for rdate, ticker, source, n_clubs in reports:
+        expire = rdate + dt.timedelta(days=int(Q_UNIVERSE_MONTHS * 30.44))
+        ticker_valid.setdefault(ticker, []).append((rdate, expire))
+
+    # Entry signal queue: detected at close, filled at next open
+    q_entry_queue: list[tuple[str, str, int, float]] = []  # ticker, source, n_clubs, rs_val
+
+    for day in calendar:
+        day_ts = pd.Timestamp(day)
+        equity = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+
+        # Execute pending exits at open
+        to_exit = [t for t in list(pending_exits) if t in positions]
+        for ticker in to_exit:
+            pos = positions[ticker]
+            reason = pending_exits.pop(ticker)
+            q = _get_quote(prices, ticker, day)
+            if q is None or float(q["open"]) <= 0:
+                pending_exits[ticker] = reason
+                continue
+            exit_price = float(q["open"])
+            proceeds = pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            cash += proceeds
+            one_r = pos.get("one_r", pos["entry_price"] * Q_STOP_PCT)
+            ret_r = (exit_price / pos["entry_price"] - 1) * pos["entry_price"] / one_r if one_r > 0 else 0.0
+            ticker_family_profit.setdefault(ticker, []).append(ret_r)
+            trades.append(_close_trade(ticker, pos, day, exit_price, reason,
+                                       ticker_reports, record_full_trades, None))
+            del positions[ticker]
+
+        # Execute entry queue at open
+        if q_entry_queue:
+            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            market_units = _q_market_units(kospi, day) if kospi is not None else 1
+            slots = MAX_POSITIONS - len(positions)
+            for ticker, source_val, n_clubs_val, rs_val in q_entry_queue:
+                if slots <= 0:
+                    break
+                if ticker in positions:
+                    continue
+                df = prices.get(ticker)
+                if df is None or day_ts not in df.index:
+                    continue
+                entry_price = float(df.loc[day_ts]["open"])
+                if entry_price <= 0:
+                    continue
+
+                # Progressive betting: +1 종목유닛 if last trade on this ticker was profitable ≥+3R
+                family_hist = ticker_family_profit.get(ticker, [])
+                extra_unit = 1 if family_hist and family_hist[-1] >= Q_HALF_EXIT_R else 0
+                stock_units = min(1 + extra_unit, Q_MAX_UNIT_ADD)
+                total_units = stock_units * market_units
+
+                unit_size = nav_now / 20.0
+                one_r = entry_price * Q_STOP_PCT
+                # Max 2% risk rule: shrink if needed
+                position_risk = total_units * one_r  # risk per share × (shares from total_units × unit)
+                # shares = (unit_size * total_units) / entry_price
+                # actual_risk = shares * one_r
+                raw_budget = unit_size * total_units
+                shares_raw = raw_budget * (1 - COST_PER_SIDE) / entry_price
+                actual_risk = shares_raw * one_r
+                max_risk = nav_now * 0.02
+                if actual_risk > max_risk and actual_risk > 0:
+                    scale = max_risk / actual_risk
+                    raw_budget *= scale
+
+                budget = min(raw_budget, cash)
+                if budget < nav_now * POSITION_WEIGHT * 0.5:
+                    continue
+                shares = budget * (1 - COST_PER_SIDE) / entry_price
+                cash -= budget
+                stop = entry_price - one_r
+
+                display_name = ticker
+                tp = None
+                market = "KR"
+                if ticker_reports is not None:
+                    tr_list = ticker_reports.get(ticker, [])
+                    past_tr = [r for r in tr_list if r["report_date"] < day]
+                    if past_tr:
+                        latest = max(past_tr, key=lambda x: x["report_date"])
+                        display_name = latest["display_name"]
+                        tps = [x["target_price"] for x in past_tr if x["target_price"]]
+                        tp = max(tps) if tps else None
+                        market = past_tr[0].get("market", "KR")
+
+                positions[ticker] = {
+                    "shares": shares,
+                    "original_shares": shares,
+                    "entry_price": entry_price,
+                    "entry_date": day,
+                    "cost": budget,
+                    "last_close": entry_price,
+                    "highest": entry_price,
+                    "stop": stop,
+                    "one_r": one_r,
+                    "trail_activated": False,
+                    "half_sold": False,
+                    "source": source_val,
+                    "n_clubs": n_clubs_val,
+                    "display_name": display_name,
+                    "market": market,
+                    "target_price": tp,
+                    "total_units": total_units,
+                }
+                slots -= 1
+            q_entry_queue = []
+
+        # Compute cross-sectional RS for entry signals
+        rs_scores = _compute_rs_percentiles(prices, day)
+        # KOSPI RS percentile benchmark
+        kospi_rs_pct = 50.0  # default
+        if kospi is not None and rs_scores:
+            # Use _compute_rs_percentiles result for a synthetic KOSPI entry
+            # Proxy: KOSPI percentile in the cross-section via direct RS calc
+            kospi_close_now = asof_value(kospi, day)
+            if kospi_close_now > 0:
+                day_63  = day - dt.timedelta(days=91)
+                day_126 = day - dt.timedelta(days=183)
+                day_252 = day - dt.timedelta(days=365)
+                c3  = asof_value(kospi, day_63)
+                c6  = asof_value(kospi, day_126)
+                c12 = asof_value(kospi, day_252)
+                if c3 > 0 and c6 > 0 and c12 > 0:
+                    ret3  = kospi_close_now / c3 - 1
+                    ret6  = kospi_close_now / c6 - 1
+                    ret12 = kospi_close_now / c12 - 1
+                    # rank this against all tickers in prices
+                    all_scores = list(rs_scores.values())
+                    if len(all_scores) >= 5:
+                        # Recompute raw rets for each ticker and compare
+                        raw_r3:  list[float] = []
+                        raw_r6:  list[float] = []
+                        raw_r12: list[float] = []
+                        tickers_list = list(rs_scores.keys())
+                        for t in tickers_list:
+                            df = prices.get(t)
+                            if df is None:
+                                raw_r3.append(0.0); raw_r6.append(0.0); raw_r12.append(0.0)
+                                continue
+                            day_ts2 = pd.Timestamp(day)
+                            if day_ts2 not in df.index:
+                                raw_r3.append(0.0); raw_r6.append(0.0); raw_r12.append(0.0)
+                                continue
+                            cn = float(df.loc[day_ts2]["close"])
+                            _c3  = asof_value(df["close"], day_63)
+                            _c6  = asof_value(df["close"], day_126)
+                            _c12 = asof_value(df["close"], day_252)
+                            raw_r3.append(cn / _c3 - 1 if _c3 > 0 else 0.0)
+                            raw_r6.append(cn / _c6 - 1 if _c6 > 0 else 0.0)
+                            raw_r12.append(cn / _c12 - 1 if _c12 > 0 else 0.0)
+                        n = len(tickers_list) + 1  # include KOSPI
+                        raw_r3.append(ret3); raw_r6.append(ret6); raw_r12.append(ret12)
+                        rank3  = sorted(raw_r3).index(ret3)  / max(n - 1, 1) * 99
+                        rank6  = sorted(raw_r6).index(ret6)  / max(n - 1, 1) * 99
+                        rank12 = sorted(raw_r12).index(ret12) / max(n - 1, 1) * 99
+                        kospi_rs_pct = rank3 * MTT_RS_W3 + rank6 * MTT_RS_W6 + rank12 * MTT_RS_W12
+
+        # End-of-day: scan for entry signals
+        new_entries: list[tuple[str, str, int, float]] = []
+        for ticker, ranges in ticker_valid.items():
+            if ticker in positions:
+                continue
+            valid = any(start <= day <= end for start, end in ranges)
+            if not valid:
+                continue
+            df = prices.get(ticker)
+            if df is None or day_ts not in df.index:
+                continue
+
+            rs_val = rs_scores.get(ticker, 0.0)
+            if rs_val < kospi_rs_pct:
+                continue
+
+            close = float(df.loc[day_ts]["close"])
+            # 60d high breakout: close == 60d high (close >= rolling 60d high)
+            hi60 = float(df["close"].rolling(Q_BREAKOUT_DAYS, min_periods=30).max().asof(day_ts)) if "close" in df else 0.0
+            if hi60 <= 0 or close < hi60 * 0.999:  # allow tiny float tolerance
+                continue
+            # Volume ≥ 1.5× 20d avg
+            if "volume" in df.columns and day_ts in df.index:
+                vol_now = float(df.loc[day_ts]["volume"])
+                vol_20avg = float(df["volume"].rolling(20, min_periods=10).mean().asof(day_ts))
+                if vol_20avg <= 0 or vol_now < Q_VOL_MULT * vol_20avg:
+                    continue
+
+            tr_list = (ticker_reports or {}).get(ticker, [])
+            past_tr = [r for r in tr_list if r["report_date"] <= day]
+            n_clubs_val = len({r["school"] for r in past_tr}) if past_tr else 1
+            source_val = Path(past_tr[-1]["source_file"]).name if past_tr and past_tr[-1].get("source_file") else ""
+            new_entries.append((ticker, source_val, n_clubs_val, rs_val))
+
+        q_entry_queue = new_entries
+
+        # Update positions + check exits
+        for ticker, pos in list(positions.items()):
+            df = prices.get(ticker)
+            if df is None or day_ts not in df.index:
+                continue
+            close = float(df.loc[day_ts]["close"])
+            high_today = float(df.loc[day_ts].get("high", close))
+            pos["last_close"] = close
+            pos["highest"] = max(pos.get("highest", close), close)
+
+            if ticker in pending_exits:
+                continue
+
+            entry_p = pos["entry_price"]
+            one_r   = pos["one_r"]
+            highest = pos["highest"]
+            gain_r  = (close - entry_p) / one_r if one_r > 0 else 0.0
+            gain_r_high = (high_today - entry_p) / one_r if one_r > 0 else 0.0
+
+            # Stop management
+            # BE at +1R
+            if gain_r >= Q_BE_R:
+                pos["stop"] = max(pos.get("stop", 0.0), entry_p)
+            # Trail high−8% at +1.5R
+            if gain_r >= Q_TRAIL_ACTIVATE_R:
+                pos["trail_activated"] = True
+            if pos.get("trail_activated"):
+                trail_stop = highest * (1 - Q_STOP_PCT)
+                pos["stop"] = max(pos.get("stop", 0.0), trail_stop)
+
+            # Half-exit at +3R (intraday high check)
+            if not pos.get("half_sold") and gain_r_high >= Q_HALF_EXIT_R:
+                half_price = entry_p + Q_HALF_EXIT_R * one_r
+                half_price = min(half_price, high_today)
+                half_shares = pos["original_shares"] * 0.5
+                half_cost = pos["cost"] * 0.5
+                cash += half_shares * half_price * (1 - COST_PER_SIDE)
+                trade = _close_trade(ticker, pos, day, half_price, "q_half_+3R",
+                                     ticker_reports, record_full_trades, None,
+                                     shares_override=half_shares, cost_override=half_cost)
+                trades.append(trade)
+                pos["shares"] = pos["original_shares"] * 0.5
+                pos["cost"] = pos["cost"] * 0.5
+                pos["half_sold"] = True
+
+            # Stop breach
+            if close < pos["stop"]:
+                pending_exits[ticker] = "q_stop"
+
+        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav_series.append((day.isoformat(), nav))
+
+    last_day = calendar[-1]
+    for ticker, pos in list(positions.items()):
+        trades.append(_close_trade(ticker, pos, last_day, pos["last_close"], "데이터_종료_미청산",
+                                   ticker_reports, record_full_trades, None))
+
+    return _compute_result(nav_series, trades, START_CAPITAL, label, open_positions=positions)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Strategy R: Kelly 샹들리에 (D+ chandelier rules + Kelly position sizing)
+#
+# 규칙: D+ Chandelier (Optuna 파라미터) 진입/청산 로직 동일.
+# 포지션 사이즈: rolling 최근 40 거래 win_rate + payoff → fractional Kelly.
+#   kelly_raw = win_rate − (1−win_rate) / (avg_win/avg_loss)
+#   kelly_frac = kelly_raw × safety(0.5), cap 0.25, floor 1%/trade (= equity/100).
+# 충분한 거래 이력 없으면 flat 5% fallback.
+# 오버레이 그룹.
+# ──────────────────────────────────────────────────────────────────────────────
+
+R_KELLY_LOOKBACK = 40
+R_KELLY_CAP      = 0.25
+R_KELLY_SAFETY   = 0.5
+R_KELLY_FLOOR    = 0.01   # 1% of equity floor
+R_KELLY_FALLBACK = 0.05   # flat 5% if insufficient history
+
+
+def _kelly_fraction(closed_returns: list[float]) -> float:
+    """
+    Fractional Kelly from rolling trade returns (in %).
+    Returns fraction of equity to risk (0..R_KELLY_CAP).
+    """
+    recent = closed_returns[-R_KELLY_LOOKBACK:]
+    if len(recent) < 10:
+        return R_KELLY_FALLBACK
+    wins   = [r for r in recent if r > 0]
+    losses = [r for r in recent if r < 0]
+    if not wins or not losses:
+        return R_KELLY_FALLBACK
+    p = len(wins) / len(recent)
+    avg_win  = sum(wins)  / len(wins)
+    avg_loss = abs(sum(losses) / len(losses))
+    if avg_win <= 0 or avg_loss <= 0:
+        return R_KELLY_FALLBACK
+    b = avg_win / avg_loss
+    kelly_raw = p - (1 - p) / b
+    kelly_frac = max(0.0, kelly_raw) * R_KELLY_SAFETY
+    return max(R_KELLY_FLOOR, min(kelly_frac, R_KELLY_CAP))
+
+
+def run_kelly_chandelier(
+    prices: dict[str, pd.DataFrame],
+    reports: list[tuple[dt.date, str, str, int]],
+    calendar: list[dt.date],
+    label: str,
+    ticker_reports: dict[str, list[dict]] | None = None,
+    record_full_trades: bool = False,
+    atr_period: int = ATR_PERIOD,
+    atr_mult: float = CHANDELIER_ATR_MULT,
+    max_positions: int = MAX_POSITIONS,
+) -> dict:
+    """
+    R Kelly 샹들리에.
+    진입/청산: D+ Chandelier 규칙 동일.
+    포지션 사이즈: Kelly (rolling 40 trades), cap 0.25, safety 0.5, floor 1%.
+    """
+    START_CAPITAL = 100_000_000
+    cash = float(START_CAPITAL)
+    positions: dict[str, dict] = {}
+    nav_series: list[tuple[str, float]] = []
+    trades: list[dict] = []
+    pending_exits: set[str] = set()
+    closed_returns: list[float] = []   # running history of closed trade returns (%)
+
+    pending_entries = build_pending_entries(reports, calendar, consensus_only=False)
+
+    for day in calendar:
+        day_ts = pd.Timestamp(day)
+
+        # Execute pending exits at open
+        to_exit = [t for t in list(pending_exits) if t in positions]
+        for ticker in to_exit:
+            pos = positions[ticker]
+            q = _get_quote(prices, ticker, day)
+            if q is None or float(q["open"]) <= 0:
+                continue
+            exit_price = float(q["open"])
+            proceeds = pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            ret_pct = (proceeds / pos["cost"] - 1) * 100
+            closed_returns.append(ret_pct)
+            cash += proceeds
+            trades.append(_close_trade(ticker, pos, day, exit_price,
+                                       f"r_chandelier_ATR{atr_mult}",
+                                       ticker_reports, record_full_trades, None))
+            del positions[ticker]
+            pending_exits.discard(ticker)
+
+        # Execute pending entries with Kelly sizing
+        if day in pending_entries:
+            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            kelly_frac = _kelly_fraction(closed_returns)
+            slots = max_positions - len(positions)
+            candidates = list({t: (t, s, nc) for t, s, nc in pending_entries[day]
+                                if t not in positions}.values())
+            for ticker, source, n_clubs in candidates[:slots]:
+                df = prices.get(ticker)
+                if df is None or day_ts not in df.index:
+                    continue
+                entry_price = float(df.loc[day_ts]["open"])
+                if entry_price <= 0:
+                    continue
+
+                budget = min(nav_now * kelly_frac, cash)
+                if budget < nav_now * R_KELLY_FLOOR * 0.5:
+                    continue
+                shares = budget * (1 - COST_PER_SIDE) / entry_price
+                cash -= budget
+
+                display_name = ticker
+                tp = None
+                market = "KR"
+                if ticker_reports is not None:
+                    tr_list = ticker_reports.get(ticker, [])
+                    past_tr = [r for r in tr_list if r["report_date"] < day]
+                    if past_tr:
+                        latest = max(past_tr, key=lambda x: x["report_date"])
+                        display_name = latest["display_name"]
+                        tps = [x["target_price"] for x in past_tr if x["target_price"]]
+                        tp = max(tps) if tps else None
+                        market = past_tr[0].get("market", "KR")
+
+                atr_col = "atr20" if atr_period == 20 else "atr"
+                atr_val = asof_value(df[atr_col] if atr_col in df.columns else df["atr"], day)
+                stop = entry_price - atr_mult * atr_val if atr_val else entry_price * 0.75
+
+                positions[ticker] = {
+                    "shares": shares,
+                    "entry_price": entry_price,
+                    "entry_date": day,
+                    "cost": budget,
+                    "last_close": entry_price,
+                    "highest": entry_price,
+                    "stop": stop,
+                    "source": source,
+                    "n_clubs": n_clubs,
+                    "display_name": display_name,
+                    "market": market,
+                    "target_price": tp,
+                }
+
+        # Update positions + check chandelier stop
+        for ticker, pos in list(positions.items()):
+            df = prices.get(ticker)
+            if df is None or day_ts not in df.index:
+                continue
+            close = float(df.loc[day_ts]["close"])
+            pos["last_close"] = close
+            pos["highest"] = max(pos.get("highest", close), close)
+            atr_col = "atr20" if atr_period == 20 else "atr"
+            atr_val = asof_value(df[atr_col] if atr_col in df.columns else df["atr"], day)
+            if atr_val:
+                new_stop = pos["highest"] - atr_mult * atr_val
+                pos["stop"] = max(pos.get("stop", 0.0), new_stop)
+            if pos.get("stop") and close < pos["stop"] and ticker not in pending_exits:
+                pending_exits.add(ticker)
+
+        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav_series.append((day.isoformat(), nav))
+
+    last_day = calendar[-1]
+    for ticker, pos in list(positions.items()):
+        trades.append(_close_trade(ticker, pos, last_day, pos["last_close"], "데이터_종료_미청산",
+                                   ticker_reports, record_full_trades, None))
+
+    return _compute_result(nav_series, trades, START_CAPITAL, label, open_positions=positions)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Strategy S: 포트폴리오 최적화 (월간 리밸런스)
+#
+# 유니버스: 18개월 유효 활성 종목 (buy report within 18mo).
+# 가격 데이터: trailing 252d daily returns (점-in-time).
+# 세 변형:
+#   S_hrp    — HRP (Hierarchical Risk Parity): 직접 구현
+#              corr distance → single-linkage → quasi-diag reorder → iv-split
+#   S_msharpe — max-Sharpe: mean-variance, LedoitWolf 수축
+#              (sklearn if available, else λ=0.3 diagonal shrinkage), long-only w≤15%
+#   S_mincvar — min-CVaR 95%: scipy.optimize.linprog LP, long-only w≤15%
+#
+# 월 리밸런스: 월말 종가로 가중치 계산, 다음 거래일 시가 체결.
+# 비용: 전체 NAV × 총 턴오버 × 편도 비용.
+# ──────────────────────────────────────────────────────────────────────────────
+
+S_UNIVERSE_MONTHS   = 18
+S_LOOKBACK_DAYS     = 252
+S_MIN_STOCKS        = 3      # minimum stocks to run optimisation
+S_MAX_WEIGHT        = 0.15   # max weight per stock
+S_SHRINK_LAMBDA     = 0.3    # simple shrinkage fallback
+
+
+def _hrp_weights(ret_df: pd.DataFrame) -> dict[str, float]:
+    """
+    Hierarchical Risk Parity weights.
+    Hand-rolled: corr distance → single-linkage → quasi-diag → inverse-variance split.
+    Returns {ticker: weight}, sums to 1.
+    """
+    import numpy as np
+
+    tickers = list(ret_df.columns)
+    n = len(tickers)
+    if n < 2:
+        return {t: 1.0 / n for t in tickers}
+
+    corr = ret_df.corr().values
+    # Distance matrix: sqrt(0.5 * (1 - corr))
+    dist = np.sqrt(np.maximum(0.5 * (1 - corr), 0))
+
+    # Single-linkage clustering (manual)
+    # Use condensed distance form → agglomerative
+    clusters: list[list[int]] = [[i] for i in range(n)]
+    # Build dendrogram via greedy single-linkage
+    merged_order: list[int] = list(range(n))
+
+    def _min_dist_pair(clust: list[list[int]], d: "np.ndarray") -> tuple[int, int]:
+        best = float("inf")
+        bi, bj = 0, 1
+        for ii in range(len(clust)):
+            for jj in range(ii + 1, len(clust)):
+                # single-linkage: min dist between elements
+                d_ij = min(d[a][b] for a in clust[ii] for b in clust[jj])
+                if d_ij < best:
+                    best = d_ij
+                    bi, bj = ii, jj
+        return bi, bj
+
+    # Build sorted leaf order via single-linkage
+    active = [[i] for i in range(n)]
+    while len(active) > 1:
+        if len(active) > 50:
+            # For large n: use average inter-cluster distance approximation
+            best = float("inf")
+            bi, bj = 0, 1
+            for ii in range(len(active)):
+                for jj in range(ii + 1, len(active)):
+                    avg_d = float(np.mean([dist[a][b] for a in active[ii] for b in active[jj]]))
+                    if avg_d < best:
+                        best = avg_d; bi, bj = ii, jj
+        else:
+            bi, bj = _min_dist_pair(active, dist)
+        active[bi] = active[bi] + active[bj]
+        active.pop(bj)
+    leaf_order: list[int] = active[0]
+
+    # Quasi-diagonal reorder: just use the leaf_order from clustering
+    ordered_tickers = [tickers[i] for i in leaf_order]
+
+    # Inverse-variance weights via recursive bisection
+    vols = ret_df.std().values  # std of each ticker
+    w = {t: 1.0 for t in ordered_tickers}
+
+    def _recursive_bisect(items: list[str]) -> None:
+        if len(items) <= 1:
+            return
+        mid = len(items) // 2
+        left = items[:mid]
+        right = items[mid:]
+
+        idx_l = [ordered_tickers.index(t) for t in left]
+        idx_r = [ordered_tickers.index(t) for t in right]
+
+        # Cluster variance using current weights and covariance
+        sub_l = ret_df[left]
+        sub_r = ret_df[right]
+        w_l = np.array([w[t] for t in left]); w_l /= w_l.sum()
+        w_r = np.array([w[t] for t in right]); w_r /= w_r.sum()
+        cov_l = sub_l.cov().values
+        cov_r = sub_r.cov().values
+        var_l = float(w_l @ cov_l @ w_l)
+        var_r = float(w_r @ cov_r @ w_r)
+        if var_l + var_r <= 0:
+            return
+
+        alpha = 1 - var_l / (var_l + var_r)  # proportion to left cluster
+        for t in left:
+            w[t] *= alpha
+        for t in right:
+            w[t] *= (1 - alpha)
+
+        _recursive_bisect(left)
+        _recursive_bisect(right)
+
+    _recursive_bisect(ordered_tickers)
+
+    total = sum(w.values())
+    if total <= 0:
+        return {t: 1.0 / n for t in tickers}
+    return {t: w.get(t, 0.0) / total for t in tickers}
+
+
+def _msharpe_weights(ret_df: pd.DataFrame) -> dict[str, float]:
+    """
+    Maximum Sharpe weights via mean-variance optimisation.
+    Covariance: LedoitWolf (sklearn) or simple shrinkage (λ=0.3).
+    Long-only, w ≤ 15%, solved with scipy.optimize.minimize.
+    """
+    import numpy as np
+    from scipy.optimize import minimize
+
+    tickers = list(ret_df.columns)
+    n = len(tickers)
+    mu = ret_df.mean().values * 252  # annualised
+
+    try:
+        from sklearn.covariance import LedoitWolf  # type: ignore
+        lw = LedoitWolf().fit(ret_df.values)
+        cov = lw.covariance_ * 252
+    except Exception:
+        raw_cov = ret_df.cov().values * 252
+        cov = (1 - S_SHRINK_LAMBDA) * raw_cov + S_SHRINK_LAMBDA * np.diag(np.diag(raw_cov))
+
+    w0 = np.ones(n) / n
+    bounds = [(0.0, S_MAX_WEIGHT)] * n
+    constraints = [{"type": "eq", "fun": lambda w: np.sum(w) - 1.0}]
+
+    def neg_sharpe(w: "np.ndarray") -> float:
+        port_ret = float(w @ mu)
+        port_var = float(w @ cov @ w)
+        if port_var <= 0:
+            return 1e9
+        return -port_ret / (port_var ** 0.5)
+
+    try:
+        res = minimize(neg_sharpe, w0, method="SLSQP", bounds=bounds, constraints=constraints,
+                       options={"maxiter": 500, "ftol": 1e-9})
+        if res.success:
+            w_opt = np.maximum(res.x, 0.0)
+            total = w_opt.sum()
+            if total > 0:
+                w_opt /= total
+                return {t: float(w_opt[i]) for i, t in enumerate(tickers)}
+    except Exception:
+        pass
+    return {t: 1.0 / n for t in tickers}
+
+
+def _mincvar_weights(ret_df: pd.DataFrame) -> dict[str, float]:
+    """
+    Minimum CVaR (95%) via LP formulation.
+    min_{w, z, u}  z + 1/(T*(1−α)) * sum(u_t)
+    s.t.  u_t ≥ −(R_t @ w) − z  ∀t
+          u_t ≥ 0  ∀t
+          sum(w) = 1, 0 ≤ w_i ≤ 15%
+    Solved with scipy.optimize.linprog.
+    """
+    import numpy as np
+    from scipy.optimize import linprog
+
+    tickers = list(ret_df.columns)
+    n = len(tickers)
+    R = ret_df.values  # shape (T, n)
+    T = R.shape[0]
+    alpha = 0.95
+
+    # Variables: [w(n), z(1), u(T)]
+    # Objective: min z + 1/(T*(1-alpha)) * sum(u)
+    c = np.zeros(n + 1 + T)
+    c[n] = 1.0  # z coefficient
+    c[n + 1:] = 1.0 / (T * (1 - alpha))  # u coefficients
+
+    # Inequality: u_t ≥ −(R_t @ w) − z  ↔  −R_t @ w − z − u_t ≤ 0
+    # → for each t: -R[t,:] @ w - z - u_t ≤ 0
+    A_ub = np.zeros((T, n + 1 + T))
+    b_ub = np.zeros(T)
+    for t in range(T):
+        A_ub[t, :n] = -R[t, :]
+        A_ub[t, n] = -1.0
+        A_ub[t, n + 1 + t] = -1.0
+
+    # Equality: sum(w) = 1
+    A_eq = np.zeros((1, n + 1 + T))
+    A_eq[0, :n] = 1.0
+    b_eq = np.array([1.0])
+
+    # Bounds: 0 ≤ w ≤ 0.15, z free, u ≥ 0
+    bounds = [(0.0, S_MAX_WEIGHT)] * n + [(None, None)] + [(0.0, None)] * T
+
+    try:
+        res = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds,
+                      method="highs")
+        if res.success:
+            w_opt = np.maximum(res.x[:n], 0.0)
+            total = w_opt.sum()
+            if total > 0:
+                w_opt /= total
+                return {t: float(w_opt[i]) for i, t in enumerate(tickers)}
+    except Exception:
+        pass
+    return {t: 1.0 / n for t in tickers}
+
+
+def run_portfolio_opt(
+    prices: dict[str, pd.DataFrame],
+    reports: list[tuple[dt.date, str, str, int]],
+    calendar: list[dt.date],
+    label: str,
+    variant: str = "hrp",   # "hrp" | "msharpe" | "mincvar"
+    ticker_reports: dict[str, list[dict]] | None = None,
+    record_full_trades: bool = False,
+) -> dict:
+    """
+    S 포트폴리오 최적화 (월간 리밸런스).
+    variant: 'hrp', 'msharpe', 'mincvar'.
+    유니버스: 18개월 내 buy report 종목.
+    Trailing 252d 일별 수익률로 가중치 계산.
+    월말 신호 → 다음 거래일 시가 체결.
+    비용: 총 NAV × 턴오버 × 편도 비용.
+    """
+    START_CAPITAL = 100_000_000
+    cash = float(START_CAPITAL)
+    positions: dict[str, dict] = {}   # ticker -> {shares, entry_price, cost, last_close, entry_date, ...}
+    nav_series: list[tuple[str, float]] = []
+    trades: list[dict] = []
+
+    # Build per-ticker valid date ranges
+    ticker_valid: dict[str, list[tuple[dt.date, dt.date]]] = {}
+    for rdate, ticker, source, n_clubs in reports:
+        expire = rdate + dt.timedelta(days=int(S_UNIVERSE_MONTHS * 30.44))
+        ticker_valid.setdefault(ticker, []).append((rdate, expire))
+
+    # Calendar helpers
+    cal_s = pd.Series(calendar)
+    month_ends: set[dt.date] = set(
+        cal_s.groupby(cal_s.apply(lambda d: (d.year, d.month))).last().values
+    )
+    month_firsts: set[dt.date] = set(
+        cal_s.groupby(cal_s.apply(lambda d: (d.year, d.month))).first().values
+    )
+
+    # Target weights queue: computed at month-end, applied at next month-first open
+    target_weights: dict[str, float] = {}   # ticker -> weight (from last month-end)
+
+    for day in calendar:
+        day_ts = pd.Timestamp(day)
+
+        # Month-first: execute rebalance
+        if day in month_firsts and target_weights:
+            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            if nav_now <= 0:
+                nav_now = float(START_CAPITAL)
+
+            new_positions: dict[str, dict] = {}
+            new_cash = 0.0
+            total_turnover = 0.0
+
+            # Close positions not in new targets (or weight drops to 0)
+            for ticker, pos in list(positions.items()):
+                new_w = target_weights.get(ticker, 0.0)
+                if new_w == 0.0:
+                    q = _get_quote(prices, ticker, day)
+                    exit_price = float(q["open"]) if (q is not None and float(q["open"]) > 0) else pos["last_close"]
+                    proceeds = pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+                    new_cash += proceeds
+                    total_turnover += pos["shares"] * exit_price / nav_now
+                    trades.append(_close_trade(ticker, pos, day, exit_price, "s_rebalance_exit",
+                                               ticker_reports, record_full_trades, None))
+
+            cash_after_close = cash + new_cash
+
+            # Open / resize positions
+            for ticker, w in target_weights.items():
+                if w <= 0:
+                    continue
+                target_value = nav_now * w
+                cur_pos = positions.get(ticker)
+                cur_value = cur_pos["shares"] * cur_pos["last_close"] if cur_pos else 0.0
+
+                df = prices.get(ticker)
+                if df is None or day_ts not in df.index:
+                    if cur_pos:
+                        new_positions[ticker] = cur_pos
+                    continue
+
+                trade_price = float(df.loc[day_ts]["open"])
+                if trade_price <= 0:
+                    if cur_pos:
+                        new_positions[ticker] = cur_pos
+                    continue
+
+                delta_value = target_value - cur_value
+                turnover_frac = abs(delta_value) / nav_now
+                total_turnover += turnover_frac
+
+                new_shares = target_value * (1 - COST_PER_SIDE) / trade_price
+                new_cost   = target_value
+
+                if cur_pos:
+                    # Partial trade record for the delta
+                    if delta_value < 0:
+                        sell_shares = cur_pos["shares"] - new_shares
+                        if sell_shares > 0:
+                            proceeds = sell_shares * trade_price * (1 - COST_PER_SIDE)
+                            cash_after_close += proceeds
+                            trades.append(_close_trade(ticker, cur_pos, day, trade_price,
+                                                        "s_rebalance_trim",
+                                                        ticker_reports, record_full_trades, None,
+                                                        shares_override=sell_shares,
+                                                        cost_override=cur_pos["cost"] * (sell_shares / cur_pos["shares"])))
+                    else:
+                        add_budget = min(delta_value, cash_after_close)
+                        if add_budget < 0:
+                            add_budget = 0.0
+                        cash_after_close -= add_budget
+                    new_positions[ticker] = {
+                        "shares": new_shares,
+                        "entry_price": trade_price,
+                        "entry_date": day,
+                        "cost": new_cost,
+                        "last_close": trade_price,
+                        "source": cur_pos["source"],
+                        "n_clubs": cur_pos["n_clubs"],
+                        "display_name": cur_pos["display_name"],
+                        "market": cur_pos["market"],
+                        "target_price": cur_pos.get("target_price"),
+                    }
+                else:
+                    buy_budget = min(target_value, cash_after_close)
+                    if buy_budget < target_value * 0.5:
+                        continue
+                    cash_after_close -= buy_budget
+                    act_shares = buy_budget * (1 - COST_PER_SIDE) / trade_price
+                    dn = ticker
+                    mkt = "KR"
+                    if ticker_reports:
+                        tr_l = ticker_reports.get(ticker, [])
+                        past = [r for r in tr_l if r["report_date"] <= day]
+                        if past:
+                            dn = past[-1]["display_name"]
+                            mkt = past[0].get("market", "KR")
+                    new_positions[ticker] = {
+                        "shares": act_shares,
+                        "entry_price": trade_price,
+                        "entry_date": day,
+                        "cost": buy_budget,
+                        "last_close": trade_price,
+                        "source": "",
+                        "n_clubs": 1,
+                        "display_name": dn,
+                        "market": mkt,
+                        "target_price": None,
+                    }
+
+            positions = new_positions
+            cash = cash_after_close
+            target_weights = {}
+
+        # Update last_close
+        for ticker, pos in positions.items():
+            df = prices.get(ticker)
+            if df is not None and day_ts in df.index:
+                pos["last_close"] = float(df.loc[day_ts]["close"])
+
+        # Month-end: compute new target weights (point-in-time signal)
+        if day in month_ends:
+            lookback_start = day - dt.timedelta(days=S_LOOKBACK_DAYS + 30)
+            # Build active universe
+            active: list[str] = []
+            for ticker, ranges in ticker_valid.items():
+                if not any(start <= day <= end for start, end in ranges):
+                    continue
+                df = prices.get(ticker)
+                if df is None or day_ts not in df.index:
+                    continue
+                active.append(ticker)
+
+            if len(active) >= S_MIN_STOCKS:
+                # Build return matrix
+                day_ts_start = pd.Timestamp(lookback_start)
+                ret_cols: dict[str, pd.Series] = {}
+                for ticker in active:
+                    df = prices[ticker]
+                    sub = df.loc[(df.index >= day_ts_start) & (df.index <= day_ts), "close"]
+                    if len(sub) < 30:
+                        continue
+                    r = sub.pct_change().dropna()
+                    ret_cols[ticker] = r
+
+                if len(ret_cols) >= S_MIN_STOCKS:
+                    ret_df = pd.DataFrame(ret_cols).dropna(how="any")
+                    if len(ret_df) >= 20 and len(ret_df.columns) >= S_MIN_STOCKS:
+                        try:
+                            if variant == "hrp":
+                                w_dict = _hrp_weights(ret_df)
+                            elif variant == "msharpe":
+                                w_dict = _msharpe_weights(ret_df)
+                            else:  # mincvar
+                                w_dict = _mincvar_weights(ret_df)
+                            target_weights = {t: v for t, v in w_dict.items() if v > 0.001}
+                        except Exception as e:
+                            print(f"  S({variant}) weight computation failed on {day}: {e}", flush=True)
+
+        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav_series.append((day.isoformat(), nav))
+
+    # Force-close at end
+    last_day = calendar[-1]
+    for ticker, pos in list(positions.items()):
+        trades.append(_close_trade(ticker, pos, last_day, pos["last_close"], "데이터_종료_미청산",
+                                   ticker_reports, record_full_trades, None))
+
+    return _compute_result(nav_series, trades, START_CAPITAL, label, open_positions=positions)
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -4004,6 +4969,66 @@ def main() -> int:
     )
     print(f"   IS sharpe={result_P_default['in_sample'].get('sharpe')}  OOS sharpe={result_P_default['out_of_sample'].get('sharpe')}", flush=True)
 
+    # Q. 깡토 추세추종
+    print("Q. 깡토 추세추종 (시장신호등+유닛사이징+RS+60d돌파+볼륨)...", flush=True)
+    result_Q = run_kangto_trend(
+        prices, reports, calendar,
+        label="Q_kangto_trend",
+        ticker_reports=ticker_reports, record_full_trades=True,
+        kospi=kospi,
+    )
+    print(f"   IS sharpe={result_Q['in_sample'].get('sharpe')}  OOS sharpe={result_Q['out_of_sample'].get('sharpe')}  "
+          f"win_rate={result_Q['metrics'].get('win_rate_pct')}%  trades={result_Q['metrics']['trades']}", flush=True)
+
+    # R. Kelly 샹들리에 (D+ 규칙 + Kelly 포지션 사이즈)
+    # Will be re-run with Optuna params after D+ eval; for now use D default
+    print("R. Kelly 샹들리에 (D+ 규칙 + Kelly sizing)...", flush=True)
+    result_R_default = run_kelly_chandelier(
+        prices, reports, calendar,
+        label="R_kelly_chandelier",
+        ticker_reports=ticker_reports, record_full_trades=True,
+        atr_mult=CHANDELIER_ATR_MULT,
+    )
+    print(f"   IS sharpe={result_R_default['in_sample'].get('sharpe')}  OOS sharpe={result_R_default['out_of_sample'].get('sharpe')}", flush=True)
+
+    # S. 포트폴리오 최적화 — three variants
+    print("S(a). HRP 포트폴리오 최적화...", flush=True)
+    result_S_hrp = run_portfolio_opt(
+        prices, reports, calendar,
+        label="S_hrp",
+        variant="hrp",
+        ticker_reports=ticker_reports, record_full_trades=True,
+    )
+    print(f"   IS sharpe={result_S_hrp['in_sample'].get('sharpe')}  OOS sharpe={result_S_hrp['out_of_sample'].get('sharpe')}", flush=True)
+
+    print("S(b). max-Sharpe 포트폴리오 최적화...", flush=True)
+    result_S_msharpe = run_portfolio_opt(
+        prices, reports, calendar,
+        label="S_msharpe",
+        variant="msharpe",
+        ticker_reports=ticker_reports, record_full_trades=True,
+    )
+    print(f"   IS sharpe={result_S_msharpe['in_sample'].get('sharpe')}  OOS sharpe={result_S_msharpe['out_of_sample'].get('sharpe')}", flush=True)
+
+    print("S(c). min-CVaR 포트폴리오 최적화...", flush=True)
+    result_S_mincvar = run_portfolio_opt(
+        prices, reports, calendar,
+        label="S_mincvar",
+        variant="mincvar",
+        ticker_reports=ticker_reports, record_full_trades=True,
+    )
+    print(f"   IS sharpe={result_S_mincvar['in_sample'].get('sharpe')}  OOS sharpe={result_S_mincvar['out_of_sample'].get('sharpe')}", flush=True)
+
+    # Best S variant by IS sharpe
+    s_variants = {
+        "S_hrp": result_S_hrp,
+        "S_msharpe": result_S_msharpe,
+        "S_mincvar": result_S_mincvar,
+    }
+    best_s_key = max(s_variants, key=lambda k: (s_variants[k].get("in_sample", {}).get("sharpe") or -999.0))
+    best_s_result = s_variants[best_s_key]
+    print(f"   Best S variant (IS sharpe): {best_s_key} → IS {best_s_result['in_sample'].get('sharpe')}  OOS {best_s_result['out_of_sample'].get('sharpe')}", flush=True)
+
     # All strategies for comparison (L/M included for diagnostics but flagged)
     all_strategies: dict[str, dict] = {
         "A_12mo": result_A,
@@ -4022,9 +5047,17 @@ def main() -> int:
         "N_52w_high": result_N,
         "O_mtt_alpha16": result_O,
         "P_deepbuy_chandelier": result_P_default,
+        "Q_kangto_trend": result_Q,
+        "R_kelly_chandelier": result_R_default,
+        # S: all three sub-variants included, best one goes into selector
+        "S_hrp": result_S_hrp,
+        "S_msharpe": result_S_msharpe,
+        "S_mincvar": result_S_mincvar,
     }
-    # Strategies excluded from headline selector (cost-death confirmed)
-    EXCLUDED_FROM_SELECTOR = {"L_rsi2_reversion", "M_short_reversal"}
+    # Strategies excluded from headline selector (cost-death confirmed or sub-variants)
+    # S sub-variants: only best_s_key is eligible; the other two are excluded from selector
+    s_non_best = {k for k in s_variants if k != best_s_key}
+    EXCLUDED_FROM_SELECTOR = {"L_rsi2_reversion", "M_short_reversal"} | s_non_best
 
     # ── D+ Optuna optimization ─────────────────────────────────────────────────
     print("\n── Optuna robust optimization (D+ chandelier) ───────────────────", flush=True)
@@ -4055,8 +5088,9 @@ def main() -> int:
         else:
             print(f"  D+ NOT ADOPTED (OOS degraded): IS={is_sharpe_dplus}  OOS={oos_sharpe_dplus}  D OOS={oos_sharpe_D}", flush=True)
 
-    # ── Re-run P with Optuna ATR params if D+ was adopted ──────────────────
+    # ── Re-run P and R with Optuna ATR params if D+ was adopted ────────────
     result_P = result_P_default
+    result_R = result_R_default
     p_atr_mult_used = P_ATR_MULT_DEFAULT
     if d_plus_adopted and result_Dplus is not None:
         best_p = optuna_meta.get("best_params", {})
@@ -4072,20 +5106,70 @@ def main() -> int:
         )
         all_strategies["P_deepbuy_chandelier"] = result_P
         print(f"   P (Optuna params) IS sharpe={result_P['in_sample'].get('sharpe')}  OOS sharpe={result_P['out_of_sample'].get('sharpe')}", flush=True)
+        # R uses same Optuna ATR params (it's the D+ rules with Kelly sizing)
+        r_atr_period = int(best_p.get("atr_period", ATR_PERIOD))
+        print(f"R. Kelly 샹들리에 재실행 (Optuna ATR mult={p_atr_mult_used})...", flush=True)
+        result_R = run_kelly_chandelier(
+            prices, reports, calendar,
+            label="R_kelly_chandelier",
+            ticker_reports=ticker_reports, record_full_trades=True,
+            atr_period=r_atr_period,
+            atr_mult=p_atr_mult_used,
+            max_positions=p_max_pos,
+        )
+        all_strategies["R_kelly_chandelier"] = result_R
+        print(f"   R (Optuna params) IS sharpe={result_R['in_sample'].get('sharpe')}  OOS sharpe={result_R['out_of_sample'].get('sharpe')}", flush=True)
+
+    # ── Per-strategy KOSPI DCA ratio (final strategy wealth / KOSPI DCA wealth)
+    print("\nComputing per-strategy KOSPI DCA ratios (quick pass)...", flush=True)
+    _kospi_dca_ratios: dict[str, dict[str, float | None]] = {}
+    for key, r in all_strategies.items():
+        ws_tmp = compute_wealth_simulation_multi(r["nav_df"], {"KOSPI": kospi}, strat_start, strat_end)
+        strat_final = ws_tmp["final_strategy_value"]
+        kospi_final = ws_tmp["final_benchmark_values"].get("KOSPI", 1)
+        ratio = round(strat_final / kospi_final, 3) if kospi_final and kospi_final > 0 else None
+        # IS-only ratio
+        is_nav = r["nav_df"]
+        is_mask = is_nav.index.date <= IS_END
+        is_sub = is_nav[is_mask]
+        oos_sub = is_nav[is_nav.index.date >= OOS_START]
+        _kospi_dca_ratios[key] = {
+            "full_ratio": ratio,
+            "strat_final": round(strat_final),
+            "kospi_final": round(kospi_final) if kospi_final else None,
+        }
 
     # ── Summary table (all strategies including L/M for transparency)
-    print(f"\n── Strategy summary (v11, {len(all_strategies)} strategies; L/M excluded from selector) ──", flush=True)
-    print(f"{'Strategy':<32} {'IS CAGR':>9} {'IS Shp':>8} {'OOS CAGR':>10} {'OOS Shp':>9} {'Trades':>7} {'Note':>12}", flush=True)
+    print(f"\n── Strategy summary (v12, {len(all_strategies)} strategies; L/M/S-non-best excluded from selector) ──", flush=True)
+    print(f"{'Strategy':<32} {'IS Shp':>8} {'OOS Shp':>9} {'WinRate':>8} {'vs KOSPI DCA':>13} {'Trades':>7} {'Note':>12}", flush=True)
     for key, r in all_strategies.items():
         is_m  = r.get("in_sample", {})
         oos_m = r.get("out_of_sample", {})
+        win_rate = r["metrics"].get("win_rate_pct")
+        ratio_info = _kospi_dca_ratios.get(key, {})
+        kospi_ratio_str = f"{ratio_info.get('full_ratio','—')}x" if ratio_info.get('full_ratio') else "—"
         note = "[EXCLUDED]" if key in EXCLUDED_FROM_SELECTOR else ""
+        if key == best_s_key:
+            note = "[S-BEST]"
         print(
-            f"  {key:<30} {str(is_m.get('cagr_pct','—')):>9} {str(is_m.get('sharpe','—')):>8} "
-            f"{str(oos_m.get('cagr_pct','—')):>10} {str(oos_m.get('sharpe','—')):>9} "
+            f"  {key:<30} {str(is_m.get('sharpe','—')):>8} "
+            f"{str(oos_m.get('sharpe','—')):>9} "
+            f"{str(win_rate)+'%' if win_rate is not None else '—':>8} "
+            f"{kospi_ratio_str:>13} "
             f"{r['metrics']['trades']:>7} {note:>12}",
             flush=True,
         )
+
+    # Beat KOSPI DCA verdict
+    beats_kospi_both = [
+        k for k, v in _kospi_dca_ratios.items()
+        if v.get("full_ratio") and v["full_ratio"] > 1.0
+        and k not in EXCLUDED_FROM_SELECTOR
+    ]
+    if beats_kospi_both:
+        print(f"\n  ✓ Strategies beating KOSPI DCA: {beats_kospi_both}", flush=True)
+    else:
+        print(f"\n  ✗ No eligible strategy beats KOSPI DCA in full-period wealth simulation.", flush=True)
 
     # ── Headline selection: best IS sharpe among ELIGIBLE strategies only
     def _is_sharpe(r: dict) -> float:
@@ -4149,7 +5233,7 @@ def main() -> int:
         export_trades_csv(r.get("trades", []), PUBLIC_DIR / f"strategy-trades-{key}.csv")
 
     # ── Multi-strategy comparison rows
-    multi_strategy_summary = build_multi_strategy_summary(all_strategies)
+    multi_strategy_summary = build_multi_strategy_summary(all_strategies, kospi_dca_ratios=_kospi_dca_ratios)
 
     # ── Serialize open positions helper
     def _serialize_open_positions(raw: dict) -> list[dict]:
@@ -4298,6 +5382,78 @@ def main() -> int:
                 "설계: 딥바이 진입 + 10% 추가 하락 시 1회 스케일인 + ATR 트레일링 스탑 (타겟가 캡 없음)."
             ),
         },
+        # ── v12 신규 전략 결과 ─────────────────────────────────────────────────
+        "v12_new_strategies": {
+            "Q_kangto": {
+                "is_sharpe": result_Q["in_sample"].get("sharpe"),
+                "oos_sharpe": result_Q["out_of_sample"].get("sharpe"),
+                "win_rate_pct": result_Q["metrics"].get("win_rate_pct"),
+                "trades": result_Q["metrics"]["trades"],
+                "kospi_dca_ratio": _kospi_dca_ratios.get("Q_kangto_trend", {}).get("full_ratio"),
+                "description": (
+                    "깡토 추세추종: 시장신호등(KOSPI 200MA+50MA상승→2유닛), "
+                    "진입=RS퍼센타일≥KOSPI RS AND 60d고가돌파 AND 거래량≥1.5×20d평균, "
+                    "스탑=-8%(1R)/BE at+1R/트레일 고점-8% at+1.5R/절반익절 +3R. "
+                    "win rate ~30% 설계 — 손절 많고 대형 위너 추구."
+                ),
+            },
+            "R_kelly": {
+                "is_sharpe": result_R["in_sample"].get("sharpe"),
+                "oos_sharpe": result_R["out_of_sample"].get("sharpe"),
+                "trades": result_R["metrics"]["trades"],
+                "kospi_dca_ratio": _kospi_dca_ratios.get("R_kelly_chandelier", {}).get("full_ratio"),
+                "kelly_params": {
+                    "lookback_trades": R_KELLY_LOOKBACK,
+                    "cap": R_KELLY_CAP,
+                    "safety_factor": R_KELLY_SAFETY,
+                    "floor_pct": R_KELLY_FLOOR,
+                    "fallback_pct": R_KELLY_FALLBACK,
+                },
+                "description": (
+                    "Kelly 샹들리에: D+ Chandelier 진입/청산 규칙 + Kelly 포지션 사이징. "
+                    f"Kelly rolling {R_KELLY_LOOKBACK} trades, cap {R_KELLY_CAP}, safety {R_KELLY_SAFETY}, "
+                    f"floor {R_KELLY_FLOOR*100}%. 충분한 거래 이력 없으면 flat {R_KELLY_FALLBACK*100}% fallback. "
+                    "참조: alpha16-main utils.py _safe_kelly_fraction."
+                ),
+            },
+            "S_portfolio_opt": {
+                "variants": {
+                    k: {
+                        "is_sharpe": v["in_sample"].get("sharpe"),
+                        "oos_sharpe": v["out_of_sample"].get("sharpe"),
+                        "trades": v["metrics"]["trades"],
+                        "kospi_dca_ratio": _kospi_dca_ratios.get(k, {}).get("full_ratio"),
+                    }
+                    for k, v in s_variants.items()
+                },
+                "best_variant": best_s_key,
+                "best_is_sharpe": best_s_result["in_sample"].get("sharpe"),
+                "best_oos_sharpe": best_s_result["out_of_sample"].get("sharpe"),
+                "best_kospi_dca_ratio": _kospi_dca_ratios.get(best_s_key, {}).get("full_ratio"),
+                "description": (
+                    "포트폴리오 최적화 월간 리밸런스. 유니버스: 18개월 내 buy report 종목. "
+                    "Trailing 252d 일별 수익률 점-in-time. "
+                    "S_hrp: HRP (직접 구현, corr distance → single-linkage → quasi-diag → iv-split). "
+                    "S_msharpe: max-Sharpe (LedoitWolf 수축, long-only w≤15%). "
+                    "S_mincvar: min-CVaR 95% (scipy linprog LP, long-only w≤15%). "
+                    "IS 샤프 최상 변형만 셀렉터 포함."
+                ),
+            },
+            "beats_kospi_dca": beats_kospi_both,
+            "kospi_dca_verdict": (
+                f"KOSPI 적립식 DCA를 전체 기간 자산 기준으로 초과한 전략: {beats_kospi_both if beats_kospi_both else '없음'}. "
+                "KOSPI 적립식 매수는 현재도 강력한 베이스라인입니다."
+            ),
+            "intraday_declined": (
+                "장중(intraday) 데이터는 도입 범위 외: 한국 주식 1분봉/tick 데이터 미수집으로 "
+                "장중 진입/청산 시뮬레이션 불가. 일봉(daily close) 기반 전략만 구현."
+            ),
+            "spo_deferred": (
+                "SPO(Secondary Public Offering) 이벤트 기반 전략은 미래 작업으로 보류: "
+                "SPO 공시 데이터 수집 파이프라인 미구축."
+            ),
+        },
+        "kospi_dca_ratios": _kospi_dca_ratios,
         # ── 재매수 규칙 ───────────────────────────────────────────────────────
         "reentry_rule": {
             "rule": (

@@ -149,6 +149,8 @@ type StrategyRow = {
   best_trade_ticker: string | null;
   top_decile_pnl_share_pct: number;
   trade_count: number;
+  kospi_dca_ratio?: number | null;
+  kospi_dca_beats?: boolean | null;
 };
 
 type StrategyWealthSim = {
@@ -199,6 +201,11 @@ const STRATEGY_LABEL_KO: Record<string, string> = {
   N_52w_high:           "N. 52주 고가 근접",
   O_mtt_alpha16:        "O. MTT (alpha16) ★",
   P_deepbuy_chandelier: "P. 딥바이 샹들리에 ★",
+  Q_kangto_trend:       "Q. 깡토 추세추종 (추세형)",
+  R_kelly_chandelier:   "R. Kelly 샹들리에 (오버레이)",
+  S_hrp:                "S-a. HRP (배분형)",
+  S_msharpe:            "S-b. max-Sharpe (배분형)",
+  S_mincvar:            "S-c. min-CVaR (배분형)",
 };
 
 const BENCHMARK_KO: Record<string, string> = {
@@ -595,6 +602,7 @@ export default function StrategyPage() {
                     <th className="px-3 py-2 text-right font-semibold">IS MDD</th>
                     <th className="px-3 py-2 text-right font-semibold">OOS CAGR</th>
                     <th className="px-3 py-2 text-right font-semibold">OOS 샤프</th>
+                    <th className="px-3 py-2 text-right font-semibold">vs KOSPI DCA</th>
                     <th className="px-3 py-2 text-right font-semibold">최대 1종목</th>
                     <th className="px-3 py-2 text-right font-semibold">탑10% P&L</th>
                     <th className="px-3 py-2 text-right font-semibold">거래수</th>
@@ -625,6 +633,9 @@ export default function StrategyPage() {
                           {oos.cagr_pct != null ? formatPct(oos.cagr_pct, 1) : "—"}
                         </td>
                         <td className="tnum px-3 py-2 text-right font-mono text-xs">{oos.sharpe ?? "—"}</td>
+                        <td className={cn("tnum px-3 py-2 text-right font-mono text-xs font-bold", r.kospi_dca_ratio != null ? (r.kospi_dca_beats ? "text-up" : "text-down") : "text-muted-foreground")}>
+                          {r.kospi_dca_ratio != null ? `${r.kospi_dca_ratio.toFixed(2)}x` : "—"}
+                        </td>
                         <td className={cn("tnum px-3 py-2 text-right font-mono text-xs font-bold", signColor(r.max_single_return_pct))}>
                           {r.max_single_return_pct != null ? formatPct(r.max_single_return_pct, 0) : "—"}
                           {r.best_trade_name && r.max_single_return_pct != null && r.max_single_return_pct > 0 && (
@@ -712,6 +723,26 @@ export default function StrategyPage() {
                 n: 8,
                 title: "G 딥바이 / H 미너비니 / I 슈퍼트렌드 / K R:R",
                 body: "G: Jegadeesh & Kim (2006). H: Minervini (2013). I: Supertrend(10,3) Seban. K: Van Tharp R-배수 프레임워크. 상세는 각 전략 결과 참조.",
+              },
+              {
+                n: 9,
+                title: "Q 깡토 추세추종 — 시장 필터 + RS 브레이크아웃",
+                body: "시장 신호: KOSPI close > 200MA AND 50MA 상승 시 그린(2유닛) 아니면 레드(1유닛). 유닛 = 총자본/20, Max 2% Rule(단일 포지션 위험 ≤ 자본 2%). 진입: RS 퍼센타일 ≥ KOSPI RS AND close = 60일 신고가 AND 거래량 ≥ 20일 평균×1.5, 다음 시가 체결. 스탑: -8%(=1R). +3R에서 반매도, +1R에서 BE, +1.5R 이후 고점-8% 트레일. 비용 0.3%/side. 기대 승률 ~30% (추세형).",
+              },
+              {
+                n: 10,
+                title: "R Kelly 샹들리에 — D+ 위에 Kelly 포지션 사이징 오버레이",
+                body: "D+ 샹들리에(Optuna) 진입/청산 규칙 그대로 + 포지션 크기만 Kelly로 대체. Kelly 공식: (p - (1-p)/(avg_win/avg_loss)) × 0.5 안전계수, 상한 25%, 하한 1%, 직전 40거래 기준 롤링 계산. 거래 이력 10건 미만이면 플랫 5%로 폴백. 플랫 5%와 비교하여 사이징 효과 단독 측정.",
+              },
+              {
+                n: 11,
+                title: "S 포트폴리오 최적화 — 월간 리밸런스 3종 배분형",
+                body: "활성 유니버스(18개월 매수 리포트 윈도우) 종목을 매월 리밸런스. (a) S_hrp: HRP — 상관거리 단일연결 클러스터링, 준대각 재정렬, 역분산 재귀분할. (b) S_msharpe: max-Sharpe — LedoitWolf 공분산 축소(sklearn), 개별 비중 ≤15%. (c) S_mincvar: min-CVaR 95% — scipy linprog LP, 개별 비중 ≤15%. IS 샤프 최고 변형만 헤드라인 셀렉터에 포함. 턴오버 비용 적용.",
+              },
+              {
+                n: 12,
+                title: "범위 밖 전략 — 장중(intraday) 및 SPO",
+                body: "장중(intraday) 데이터 기반 전략은 일봉 데이터만 사용하는 현 파이프라인 범위 밖으로 도입하지 않음. SPO(Secondary Public Offering) 이벤트 기반 전략은 향후 작업으로 보류.",
               },
             ].map((rule) => (
               <article key={rule.n} className="rounded-lg border border-border bg-secondary/20 p-4">
