@@ -20,6 +20,8 @@ import {
   isBuy,
   maturityLabels,
   median,
+  peakLag,
+  reportDidItsJob,
   schoolShort,
   signColor,
   stampTone,
@@ -202,7 +204,7 @@ function Masthead() {
         판결을 보류합니다. 그 이전 SMIC 단독 수집분 {archiveCount}건은 채점 없이 아카이브로 보관합니다.
       </p>
 
-      <dl className="mt-9 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border md:grid-cols-3 xl:grid-cols-5">
+      <dl className="mt-9 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border md:grid-cols-3 xl:grid-cols-6">
         <KpiCell
           label="검증된 매수 리포트"
           value={<CountUp value={stats.priced} suffix="건" />}
@@ -211,6 +213,12 @@ function Masthead() {
         <KpiCell label="목표가 적중" value={<CountUp value={stats.hits} suffix="건" />} sub="발간 후 목표가 도달" valueClass="text-stamp" />
         <KpiCell label="적중률" value={formatPct(stats.hitRate, 1).replace("+", "")} sub="가격 검증 가능 건 기준" />
         <KpiCell label="수익률 중앙값" value={formatPct(stats.medianReturn)} sub="발간일 → 최신 종가" valueClass={signColor(stats.medianReturn)} />
+        <KpiCell
+          label="전성기 — 더블 이상"
+          value={<CountUp value={stats.peakDoubles} suffix="건" />}
+          sub={`발간 24개월 내 +100% 도달${stats.peakDoubleRate !== null ? ` · ${stats.peakDoubleRate.toFixed(1)}%` : ""}`}
+          valueClass="text-up"
+        />
         <KpiCell
           label="판결까지 걸린 시간"
           value={stats.medianDaysToTarget !== null ? `${Math.round(stats.medianDaysToTarget)}일` : "—"}
@@ -568,7 +576,21 @@ function VerdictPaper({
             <dl className="mt-3 border-y border-dashed border-border">
               <ClaimRow label="투자의견" value={report.rating ?? "—"} />
               <ClaimRow label="발간 시점 주가" value={formatPrice(report.report_current_price, report.market)} />
-              <ClaimRow label="목표 주가" value={formatPrice(report.target_price, report.market)} emphasis />
+              <ClaimRow
+                label="목표 주가"
+                value={formatPrice(report.target_price, report.market)}
+                emphasis
+                badge={
+                  report.target_seq !== null && (report.target_seq_total ?? 0) > 1 ? (
+                    <span
+                      className="rounded-sm border border-stamp/40 px-1 py-px font-mono text-[10px] font-bold tracking-normal text-stamp"
+                      title={`${schoolShort[report.school]}가 이 종목에 제시한 ${report.target_seq}번째 목표 — 총 ${report.target_seq_total}회에 걸쳐 목표를 이어 썼습니다`}
+                    >
+                      목표 {report.target_seq}/{report.target_seq_total}
+                    </span>
+                  ) : null
+                }
+              />
               <ClaimRow label="제시 상승여력 (괴리율)" value={formatPct(report.stated_upside_pct)} />
             </dl>
           </section>
@@ -618,6 +640,8 @@ function VerdictPaper({
           </section>
         </div>
 
+        <DualVerdict report={report} />
+
         {tickerSlug(report) && report.report_date ? (
           <figure className="mt-7">
             <figcaption className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
@@ -666,6 +690,64 @@ function VerdictPaper({
   );
 }
 
+/**
+ * 이중 판결 — 보고서의 시간과 시장의 시간은 다르다.
+ * 왼쪽에는 발간 24개월 안에 닿은 전성기, 오른쪽에는 오늘 다시 읽은 성적.
+ * 전성기 더블 이상 · 현재 조정 이하면 판결문이 한 줄로 변호한다: "보고서는 제 일을 했다."
+ */
+function DualVerdict({ report }: { report: ReportRecord }) {
+  if (report.peak_return_24m_pct === null) return null;
+  const line = reportDidItsJob(report);
+  const lag = peakLag(report);
+  return (
+    <section aria-label="이중 판결 — 전성기와 현재" className="mt-7 overflow-hidden rounded-md border border-dashed border-border">
+      <div className="grid sm:grid-cols-2 sm:divide-x sm:divide-dashed sm:divide-border">
+        <div className="px-4 py-3.5 sm:px-5">
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+            전성기 판결 — {dateLabel(report.peak_date_24m)}
+          </p>
+          <p className="mt-2 flex flex-wrap items-center gap-2">
+            <span className={cn("tnum font-display text-3xl font-black leading-none tracking-tight", signColor(report.peak_return_24m_pct))}>
+              {formatPct(report.peak_return_24m_pct)}
+            </span>
+            <span
+              className={cn("inline-block -rotate-2 rounded-md border px-1.5 py-0.5 font-display text-xs tracking-tight", bucketBadgeClass[report.bucket_peak])}
+              title={`${bucketLabels[report.bucket_peak]} — ${bucketThresholds[report.bucket_peak]} · 발간 24개월 내 최고가 기준`}
+            >
+              {bucketLabels[report.bucket_peak]}
+            </span>
+          </p>
+          <p className="mt-1.5 text-[11px] text-muted-foreground">{lag ? `${lag} 닿은 ` : ""}발간 24개월 내 장중 최고가</p>
+        </div>
+        <div className="border-t border-dashed border-border px-4 py-3.5 sm:border-t-0 sm:px-5">
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+            현재 판결 — {dateLabel(report.latest_trade_date)}
+          </p>
+          <p className="mt-2 flex flex-wrap items-center gap-2">
+            <span className={cn("tnum font-display text-3xl font-black leading-none tracking-tight", signColor(report.return_latest_pct))}>
+              {formatPct(report.return_latest_pct)}
+            </span>
+            <span
+              className={cn("inline-block -rotate-2 rounded-md border px-1.5 py-0.5 font-display text-xs tracking-tight", bucketBadgeClass[report.performance_bucket])}
+              title={`${bucketLabels[report.performance_bucket]} — ${bucketThresholds[report.performance_bucket]}`}
+            >
+              {bucketLabels[report.performance_bucket]}
+            </span>
+          </p>
+          <p className="mt-1.5 text-[11px] text-muted-foreground">오늘 다시 읽은 같은 보고서의 성적</p>
+        </div>
+      </div>
+      {line && (
+        <p className="border-t border-dashed border-border bg-secondary/50 px-4 py-2.5 font-display text-sm font-bold tracking-tight sm:px-5">
+          <span className="text-stamp">{line.lead}</span>
+          <span className="text-muted-foreground"> — </span>
+          {line.rest}
+        </p>
+      )}
+    </section>
+  );
+}
+
 /** 판결문 공유 — /#r= 딥링크를 클립보드로. 누구에게 보내도 같은 판결문이 펼쳐진다 */
 function ShareButton({ report }: { report: ReportRecord }) {
   const [copied, setCopied] = useState(false);
@@ -701,10 +783,13 @@ function ShareButton({ report }: { report: ReportRecord }) {
   );
 }
 
-function ClaimRow({ label, value, emphasis = false }: { label: string; value: string; emphasis?: boolean }) {
+function ClaimRow({ label, value, emphasis = false, badge }: { label: string; value: string; emphasis?: boolean; badge?: React.ReactNode }) {
   return (
     <div className="flex items-baseline justify-between gap-4 border-b border-dashed border-border py-2.5 last:border-b-0">
-      <dt className="text-xs font-semibold text-muted-foreground">{label}</dt>
+      <dt className="flex items-baseline gap-2 text-xs font-semibold text-muted-foreground">
+        {label}
+        {badge}
+      </dt>
       <dd className={cn("tnum text-right font-bold", emphasis ? "font-display text-xl text-stamp underline decoration-stamp/40 decoration-2 underline-offset-4" : "text-sm")}>
         {value}
       </dd>

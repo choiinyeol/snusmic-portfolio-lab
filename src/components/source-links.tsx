@@ -3,7 +3,7 @@ import type { ReportRecord } from "@/lib/report-model";
 import { cn } from "@/lib/utils";
 
 /**
- * 원문 링크 — 각주처럼 작게. 전사 MD(GitHub blob)와 학회 원본 PDF로 이어진다.
+ * 원문 링크 — 각주처럼 작게. 전사 MD(GitHub blob)와 학회 사이트의 원문 게시글로 이어진다.
  * 파싱이 의심스러운 기록을 원문으로 추적하는 통로라, 모든 리포트 화면에 같은 모양으로 박힌다.
  */
 export function SourceLinks({ report, className }: { report: ReportRecord; className?: string }) {
@@ -12,7 +12,7 @@ export function SourceLinks({ report, className }: { report: ReportRecord; class
     <span className={cn("inline-flex items-center gap-2.5 whitespace-nowrap font-mono text-[10px] tracking-normal", className)}>
       <span className="text-muted-foreground/70">원문</span>
       {report.source_md_url && <SourceAnchor href={report.source_md_url} label="MD" title="전사 마크다운 원문 보기 (GitHub)" />}
-      {report.source_pdf_url && <SourceAnchor href={report.source_pdf_url} label="PDF" title="학회 사이트의 원본 PDF 열기" />}
+      {report.source_pdf_url && <SourceAnchor href={report.source_pdf_url} label="게시글" title="학회 사이트의 원문 게시글 열기" />}
     </span>
   );
 }

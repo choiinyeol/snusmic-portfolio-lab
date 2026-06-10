@@ -79,6 +79,46 @@ export const bucketBadgeClass: Record<ReportRecord["performance_bucket"], string
   "No quote": "border-border bg-muted text-muted-foreground font-semibold",
 };
 
+/* 이중 판결 — 전성기(발간 24개월 내 최고가)와 현재. 사다리 위의 높낮이를 비교하기 위한 순위 */
+export const bucketRank: Record<ReportRecord["performance_bucket"], number> = {
+  Tenbagger: 7,
+  Multibagger: 6,
+  Double: 5,
+  Winner: 4,
+  Positive: 3,
+  Drawdown: 2,
+  Wrecked: 1,
+  "No quote": 0,
+};
+
+export function hasPeakVerdict(report: ReportRecord) {
+  return report.peak_return_24m_pct !== null && report.bucket_peak !== "No quote";
+}
+
+/** "발간 N개월 만에" — 발간일에서 전성기까지 걸린 시간. 한 달이 안 되면 일 단위로 적는다 */
+export function peakLag(report: ReportRecord): string | null {
+  if (!report.report_date || !report.peak_date_24m) return null;
+  const ms = new Date(report.peak_date_24m).getTime() - new Date(report.report_date).getTime();
+  if (!Number.isFinite(ms) || ms < 0) return null;
+  const days = Math.round(ms / 86_400_000);
+  if (days < 31) return `발간 ${Math.max(days, 1)}일 만에`;
+  return `발간 ${Math.round(days / 30.437)}개월 만에`;
+}
+
+/**
+ * "보고서는 제 일을 했다" — 전성기에 더블 이상을 찍고 지금은 조정·급락까지 내려온 기록에만 찍히는 한 줄.
+ * +200%를 만들어 준 보고서가 오늘 −30%라는 이유로 실패로 읽히지 않도록, 판결문이 직접 변호한다.
+ */
+export function reportDidItsJob(report: ReportRecord): { lead: string; rest: string } | null {
+  if (!hasPeakVerdict(report)) return null;
+  if (bucketRank[report.bucket_peak] < bucketRank.Double) return null;
+  if (report.performance_bucket !== "Drawdown" && report.performance_bucket !== "Wrecked") return null;
+  const lag = peakLag(report);
+  const peak = formatPct(report.peak_return_24m_pct, 0);
+  const tail = report.performance_bucket === "Wrecked" ? "이후의 급락은 사이클의 몫이다" : "이후의 조정은 사이클의 몫이다";
+  return { lead: "보고서는 제 일을 했다", rest: `${lag ? `${lag} ` : ""}${peak}, ${tail}.` };
+}
+
 /* 리포트 연령 — 판결에는 시간이 필요하다 */
 export const maturityLabels: Record<NonNullable<ReportRecord["maturity"]>, string> = {
   fresh: "신생",
@@ -122,6 +162,10 @@ export type ClubStats = {
   medianReturn: number | null;
   medianDaysToTarget: number | null;
   moonshots: number;
+  /** 전성기 판결 — 발간 24개월 내 최고가 기준으로 더블(+100%) 이상을 찍은 건수 */
+  peakDoubles: number;
+  /** 전성기 더블 이상 비율 (%) — 24개월 시세가 있는 채점 대상 대비 */
+  peakDoubleRate: number | null;
 };
 
 /** 학회 성적표 — modern 시대 매수 의견만 채점하고, 신생(<90일)은 적중률·중앙값 산정에서 제외 */
@@ -131,6 +175,8 @@ export function clubStats(records: ReportRecord[]): ClubStats {
   const judged = buys.filter((r) => !isFresh(r));
   const priced = judged.filter((r) => r.return_latest_pct !== null && !r.data_issue);
   const hits = priced.filter((r) => r.target_hit_until_latest).length;
+  const peakEligible = judged.filter((r) => r.peak_return_24m_pct !== null);
+  const peakDoubles = peakEligible.filter((r) => bucketRank[r.bucket_peak] >= bucketRank.Double).length;
   return {
     total: buys.length,
     priced: priced.length,
@@ -141,6 +187,8 @@ export function clubStats(records: ReportRecord[]): ClubStats {
     medianReturn: median(priced.map((r) => r.return_latest_pct as number)),
     medianDaysToTarget: median(priced.filter((r) => r.days_to_target !== null).map((r) => r.days_to_target as number)),
     moonshots: judged.filter((r) => r.performance_bucket === "Tenbagger" || r.performance_bucket === "Multibagger" || r.performance_bucket === "Double").length,
+    peakDoubles,
+    peakDoubleRate: peakEligible.length ? (peakDoubles / peakEligible.length) * 100 : null,
   };
 }
 

@@ -23,6 +23,9 @@ export type ReportMark = {
   school: School;
   date: string;
   targetPrice: number | null;
+  /** 목표 시퀀스 — 같은 학회가 이 종목에 제시한 N번째 목표 (총 M회). 단발이면 null/1 */
+  targetSeq: number | null;
+  targetSeqTotal: number | null;
 };
 
 /** 학회별 마커 잉크 — 발간 시점을 차트에 찍는다 */
@@ -134,16 +137,21 @@ export function CandleChart({ candles, marks, market }: { candles: Candle[]; mar
       .sort((a, b) => String(a.time).localeCompare(String(b.time)));
     if (markers.length) createSeriesMarkers(candleSeries, markers);
 
-    // 목표가 수평선 — 그날의 주장이 가격축에 남는다
+    // 목표가 수평선 — 그날의 주장이 가격축에 남는다. 거듭 제시한 목표는 목표 1/3 → 2/3 순으로 번호가 붙는다
     for (const mark of marks) {
       if (mark.targetPrice === null) continue;
+      const seq = mark.targetSeq !== null && (mark.targetSeqTotal ?? 0) > 1 ? ` ${mark.targetSeq}/${mark.targetSeqTotal}` : "";
+      const priceText =
+        market === "US"
+          ? `$${mark.targetPrice.toLocaleString("ko-KR", { maximumFractionDigits: 2 })}`
+          : mark.targetPrice.toLocaleString("ko-KR", { maximumFractionDigits: 0 });
       candleSeries.createPriceLine({
         price: mark.targetPrice,
         color: cssHsl(SCHOOL_VARS[mark.school], 0.75),
         lineWidth: 1,
         lineStyle: LineStyle.Dashed,
         axisLabelVisible: true,
-        title: `${schoolShort[mark.school]} 목표`,
+        title: `${schoolShort[mark.school]} 목표${seq} ${priceText}`,
       });
     }
 

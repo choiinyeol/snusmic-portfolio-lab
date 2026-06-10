@@ -44,8 +44,11 @@ export async function StockChart({ slug, reports }: { slug: string; reports: Rep
       school: r.school,
       date: r.report_date as string,
       targetPrice: r.target_price,
+      targetSeq: r.target_seq,
+      targetSeqTotal: r.target_seq_total,
     }));
   const schools = [...new Set(marks.map((m) => m.school))];
+  const hasSequence = marks.some((m) => (m.targetSeqTotal ?? 0) > 1);
 
   return (
     <figure className="rounded-lg border border-border bg-card p-5">
@@ -59,9 +62,11 @@ export async function StockChart({ slug, reports }: { slug: string; reports: Rep
         </span>
       </figcaption>
       <CandleChart candles={candles} marks={marks} market={market} />
-      {schools.length > 1 && (
+      {(schools.length > 1 || hasSequence) && (
         <p className="mt-2 font-mono text-[10px] text-muted-foreground">
-          마커 색상: {schools.map((school) => schoolShort[school]).join(" · ")} — 학회별로 다른 잉크가 찍힙니다
+          {schools.length > 1 && <>마커 색상: {schools.map((school) => schoolShort[school]).join(" · ")} — 학회별로 다른 잉크가 찍힙니다</>}
+          {schools.length > 1 && hasSequence && " · "}
+          {hasSequence && "같은 학회가 목표를 거듭 제시한 경우, 목표 1/3 → 2/3 → 3/3 순으로 번호가 붙습니다"}
         </p>
       )}
     </figure>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { WealthChart } from "@/components/strategy/wealth-chart";
+import { useSortable, SortableTh, type SortColumn } from "@/components/sortable";
 import { signColor } from "@/lib/verdict";
 import { cn, formatPct } from "@/lib/utils";
 
@@ -122,7 +123,7 @@ const BENCHMARK_KO: Record<string, string> = {
   KOSPI: "KOSPI", SP500: "S&P500", NASDAQ: "NASDAQ", AllWeather: "올웨더",
 };
 
-// ─── Slug helper ──────────────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function tickerSlugFromTrade(trade: Trade): string | null {
   if (!trade.ticker) return null;
@@ -130,7 +131,12 @@ function tickerSlugFromTrade(trade: Trade): string | null {
   return `${market}-${trade.ticker}`.toLowerCase();
 }
 
-// ─── Mini equity curve ─────────────────────────────────────────────────────
+function fmt만(v: number) {
+  if (v >= 100_000_000) return `${(v / 100_000_000).toFixed(1)}억원`;
+  return `${Math.round(v / 10_000).toLocaleString("ko-KR")}만원`;
+}
+
+// ─── Mini equity curve ────────────────────────────────────────────────────────
 
 function MiniEquity({ equity, color }: { equity: EquityPoint[]; color: string }) {
   if (!equity.length) return null;
@@ -147,7 +153,117 @@ function MiniEquity({ equity, color }: { equity: EquityPoint[]; color: string })
   );
 }
 
-// ─── Main component ────────────────────────────────────────────────────────
+// ─── Trade columns definition ─────────────────────────────────────────────────
+
+const TRADE_COLS: SortColumn<Trade>[] = [
+  { key: "display_name", value: (t) => t.display_name ?? t.ticker },
+  { key: "entry_date",   value: (t) => t.entry_date },
+  { key: "entry",        value: (t) => t.entry,       firstDir: "desc" },
+  { key: "exit_date",    value: (t) => t.exit_date },
+  { key: "exit",         value: (t) => t.exit,         firstDir: "desc" },
+  { key: "return_pct",   value: (t) => t.return_pct,   firstDir: "desc" },
+  { key: "days",         value: (t) => t.days,         firstDir: "desc" },
+  { key: "exit_reason",  value: (t) => t.exit_reason ?? "" },
+];
+
+const PAGE_SIZE = 20;
+
+// ─── Trade log with sort + pagination ────────────────────────────────────────
+
+function TradeLog({ trades, stratKey }: { trades: Trade[]; stratKey: string }) {
+  const [page, setPage] = useState(0);
+  const { sorted, specs, toggle } = useSortable(trades, TRADE_COLS, [{ key: "exit_date", dir: "desc" }]);
+  const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
+  const pageRows = sorted.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  const sort = { specs, toggle };
+
+  // Reset page when strategy changes
+  const [lastKey, setLastKey] = useState(stratKey);
+  if (lastKey !== stratKey) { setLastKey(stratKey); setPage(0); }
+
+  if (!trades.length) return null;
+
+  return (
+    <section className="rounded-lg border border-border bg-card p-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-3">
+        <h3 className="font-display text-xl font-black tracking-tight">
+          거래 로그 — {STRATEGY_LABEL_KO[stratKey] ?? stratKey} ({trades.length}건)
+        </h3>
+        <p className="font-mono text-[10px] text-muted-foreground">
+          Shift+클릭: 다중 정렬
+        </p>
+      </div>
+      <div className="mt-4 overflow-x-auto">
+        <table className="w-full min-w-[800px] border-collapse text-sm">
+          <thead>
+            <tr className="border-b-4 border-double border-border font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+              <SortableTh sortKey="display_name" sort={sort} className="px-3 py-2 text-left">종목</SortableTh>
+              <SortableTh sortKey="entry_date"   sort={sort} align="right" className="px-3 py-2">매수일</SortableTh>
+              <SortableTh sortKey="entry"        sort={sort} align="right" className="px-3 py-2">매수가</SortableTh>
+              <SortableTh sortKey="exit_date"    sort={sort} align="right" className="px-3 py-2">매도일</SortableTh>
+              <SortableTh sortKey="exit"         sort={sort} align="right" className="px-3 py-2">매도가</SortableTh>
+              <SortableTh sortKey="return_pct"   sort={sort} align="right" className="px-3 py-2">수익률</SortableTh>
+              <SortableTh sortKey="days"         sort={sort} align="right" className="px-3 py-2">보유일</SortableTh>
+              <SortableTh sortKey="exit_reason"  sort={sort} className="px-3 py-2">매도사유</SortableTh>
+            </tr>
+          </thead>
+          <tbody>
+            {pageRows.map((t, i) => {
+              const slug = tickerSlugFromTrade(t);
+              return (
+                <tr key={`${t.ticker}-${t.entry_date}-${i}`} className="border-b border-dashed border-border last:border-b-0">
+                  <td className="px-3 py-2">
+                    {slug ? (
+                      <Link href={`/stocks/${slug}`} className="hover:underline">
+                        <p className="font-mono text-xs font-bold">{t.display_name ?? t.ticker}</p>
+                      </Link>
+                    ) : (
+                      <p className="font-mono text-xs font-bold">{t.display_name ?? t.ticker}</p>
+                    )}
+                    <p className="font-mono text-[10px] text-muted-foreground">{t.ticker}{t.market !== "KR" ? ` · ${t.market}` : ""}</p>
+                  </td>
+                  <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">{t.entry_date}</td>
+                  <td className="tnum px-3 py-2 text-right font-mono text-xs">{typeof t.entry === "number" ? t.entry.toLocaleString() : t.entry}</td>
+                  <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">{t.exit_date}</td>
+                  <td className="tnum px-3 py-2 text-right font-mono text-xs">{typeof t.exit === "number" ? t.exit.toLocaleString() : t.exit}</td>
+                  <td className={cn("tnum px-3 py-2 text-right font-mono text-xs font-bold", signColor(t.return_pct))}>
+                    {formatPct(t.return_pct, 1)}
+                  </td>
+                  <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">{t.days}일</td>
+                  <td className="px-3 py-2 font-mono text-[10px] text-muted-foreground">{t.exit_reason}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      {totalPages > 1 && (
+        <div className="mt-3 flex flex-wrap items-center gap-1.5 border-t border-dashed border-border pt-3">
+          <span className="font-mono text-[10px] text-muted-foreground mr-1">페이지:</span>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => setPage(i)}
+              className={cn(
+                "tnum h-6 min-w-[24px] rounded px-1.5 font-mono text-[11px] font-bold transition-colors",
+                i === page
+                  ? "bg-stamp text-background"
+                  : "border border-border bg-card text-muted-foreground hover:border-stamp/40 hover:text-foreground"
+              )}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <span className="ml-1 font-mono text-[10px] text-muted-foreground">
+            ({page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, sorted.length)} / {sorted.length})
+          </span>
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ─── Main component ────────────────────────────────────────────────────────────
 
 export function StrategySelector({
   multiStrategy,
@@ -167,7 +283,6 @@ export function StrategySelector({
   const trades = (allTrades[selectedKey] ?? []).filter(
     (t) => !t.exit_reason?.endsWith("미청산")
   );
-  const tradesSorted = [...trades].sort((a, b) => b.exit_date.localeCompare(a.exit_date));
 
   const isHeadline = selectedKey === multiStrategy.headline_key;
   const oosBoundaryYear = 2024;
@@ -185,7 +300,7 @@ export function StrategySelector({
   const oos = selected.out_of_sample;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* ── Strategy tabs ──────────────────────────────────────────── */}
       <div>
         <p className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">
@@ -244,7 +359,7 @@ export function StrategySelector({
             download={`strategy-trades-${selectedKey}.csv`}
             className="inline-flex items-center gap-1.5 rounded-md border border-border bg-secondary px-3 py-1.5 font-mono text-xs font-semibold hover:bg-secondary/70 transition-colors"
           >
-            ↓ CSV ({selected.trade_count}건)
+            CSV 다운로드 ({selected.trade_count}건)
           </a>
         </div>
 
@@ -266,7 +381,6 @@ export function StrategySelector({
           ))}
         </dl>
 
-        {/* Best trade badge */}
         {selected.best_trade_name && selected.max_single_return_pct != null && selected.max_single_return_pct > 0 && (
           <p className="mt-3 font-mono text-xs text-muted-foreground">
             최대 단일 수익:{" "}
@@ -316,7 +430,6 @@ export function StrategySelector({
               {equity[equity.length - 1]?.nav.toFixed(2)}
             </text>
           </svg>
-          {/* Yearly returns */}
           <div className="mt-3 flex flex-wrap gap-2 border-t border-dashed border-border pt-3">
             {yearly.map((row) => (
               <div
@@ -338,7 +451,7 @@ export function StrategySelector({
         </section>
       )}
 
-      {/* ── Wealth simulation (selected strategy) ─────────────────── */}
+      {/* ── Wealth simulation ─────────────────────────────────────────── */}
       {wealthSim && (
         <section className="rounded-lg border border-border bg-card p-5">
           <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
@@ -386,65 +499,8 @@ export function StrategySelector({
         </section>
       )}
 
-      {/* ── Trade log ────────────────────────────────────────────────── */}
-      {tradesSorted.length > 0 && (
-        <section className="rounded-lg border border-border bg-card p-5">
-          <div className="flex flex-wrap items-baseline justify-between gap-3">
-            <h3 className="font-display text-xl font-black tracking-tight">
-              거래 로그 — {STRATEGY_LABEL_KO[selectedKey] ?? selectedKey} ({tradesSorted.length}건)
-            </h3>
-          </div>
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[800px] border-collapse text-sm">
-              <thead>
-                <tr className="border-b-4 border-double border-border font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
-                  <th className="px-3 py-2 text-left font-semibold">종목</th>
-                  <th className="px-3 py-2 text-right font-semibold">매수일</th>
-                  <th className="px-3 py-2 text-right font-semibold">매수가</th>
-                  <th className="px-3 py-2 text-right font-semibold">매도일</th>
-                  <th className="px-3 py-2 text-right font-semibold">매도가</th>
-                  <th className="px-3 py-2 text-right font-semibold">수익률</th>
-                  <th className="px-3 py-2 text-right font-semibold">보유일</th>
-                  <th className="px-3 py-2 text-right font-semibold">매도사유</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tradesSorted.map((t, i) => {
-                  const slug = tickerSlugFromTrade(t);
-                  return (
-                    <tr key={`${t.ticker}-${t.entry_date}-${i}`} className="border-b border-dashed border-border last:border-b-0">
-                      <td className="px-3 py-2">
-                        {slug ? (
-                          <Link href={`/stocks/${slug}`} className="hover:underline">
-                            <p className="font-mono text-xs font-bold">{t.display_name ?? t.ticker}</p>
-                          </Link>
-                        ) : (
-                          <p className="font-mono text-xs font-bold">{t.display_name ?? t.ticker}</p>
-                        )}
-                        <p className="font-mono text-[10px] text-muted-foreground">{t.ticker} {t.market !== "KR" ? `· ${t.market}` : ""}</p>
-                      </td>
-                      <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">{t.entry_date}</td>
-                      <td className="tnum px-3 py-2 text-right font-mono text-xs">{typeof t.entry === "number" ? t.entry.toLocaleString() : t.entry}</td>
-                      <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">{t.exit_date}</td>
-                      <td className="tnum px-3 py-2 text-right font-mono text-xs">{typeof t.exit === "number" ? t.exit.toLocaleString() : t.exit}</td>
-                      <td className={cn("tnum px-3 py-2 text-right font-mono text-xs font-bold", signColor(t.return_pct))}>
-                        {formatPct(t.return_pct, 1)}
-                      </td>
-                      <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">{t.days}일</td>
-                      <td className="px-3 py-2 font-mono text-[10px] text-muted-foreground">{t.exit_reason}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
+      {/* ── Trade log (sortable + paginated) ─────────────────────────── */}
+      <TradeLog trades={trades} stratKey={selectedKey} />
     </div>
   );
-}
-
-function fmt만(v: number) {
-  if (v >= 100_000_000) return `${(v / 100_000_000).toFixed(1)}억원`;
-  return `${Math.round(v / 10_000).toLocaleString("ko-KR")}만원`;
 }

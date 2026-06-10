@@ -247,11 +247,15 @@ class PerformanceRow:
     target_hit_until_latest: bool | None
     first_target_hit_date: str | None
     days_to_target: int | None
+    peak_return_24m_pct: float | None
+    peak_date_24m: str | None
     age_days: int | None
     maturity: str | None
     data_issue: str | None
     parse_issue: str | None
     qa_flags: str | None
+    target_seq: int | None = None
+    target_seq_total: int | None = None
     source_md_url: str | None = None
     source_pdf_url: str | None = None
 
@@ -1183,6 +1187,17 @@ def evaluate_report(parsed: ParsedReport, prices: pd.DataFrame, as_of: dt.date, 
             first_hit_date = hit_frame.index[0].date().isoformat()
             days_to_target = (hit_frame.index[0].date() - report_dt).days
 
+    # 24m peak: max intraday high within 24 months after first_trade_date (or up to as_of if younger)
+    peak_24m_cutoff = min(start_date + dt.timedelta(days=365 * 2), as_of)
+    window_24m = prices[(prices.index >= pd.Timestamp(start_date)) & (prices.index <= pd.Timestamp(peak_24m_cutoff))]
+    peak_return_24m: float | None = None
+    peak_date_24m_val: str | None = None
+    if not window_24m.empty and "high" in window_24m.columns:
+        peak_high_24m = float(window_24m["high"].max())
+        peak_return_24m = safe_pct(peak_high_24m, start_close)
+        peak_idx = window_24m["high"].idxmax()
+        peak_date_24m_val = peak_idx.date().isoformat()
+
     latest_ret = safe_pct(latest_close, start_close)
     direction = None
     if latest_ret is not None:
@@ -1234,6 +1249,8 @@ def evaluate_report(parsed: ParsedReport, prices: pd.DataFrame, as_of: dt.date, 
         target_hit_until_latest=hit,
         first_target_hit_date=first_hit_date,
         days_to_target=days_to_target,
+        peak_return_24m_pct=peak_return_24m,
+        peak_date_24m=peak_date_24m_val,
         age_days=age_days,
         maturity=maturity,
         data_issue=data_issue,
@@ -1286,6 +1303,8 @@ def empty_performance(parsed: ParsedReport, data_issue: str, age_days: int | Non
         target_hit_until_latest=None,
         first_target_hit_date=None,
         days_to_target=None,
+        peak_return_24m_pct=None,
+        peak_date_24m=None,
         age_days=age_days,
         maturity=maturity,
         data_issue=data_issue,
@@ -1599,6 +1618,59 @@ def apply_target_sanity(parsed: list[ParsedReport]) -> None:
             compute_issues(r)
 
 
+# ── 전성기(peak) 판결 버킷 ────────────────────────────────────────────────────
+# performance_bucket()과 동일한 래더를 재사용하며, peak_return_24m_pct에 적용된다.
+# (write_web_json에서 record["bucket_peak"] = performance_bucket(record["peak_return_24m_pct"]) 로 호출)
+
+# ── 목표가 시퀀스 계산 ──────────────────────────────────────────────────────────
+
+def compute_target_sequences(rows: list["PerformanceRow"]) -> None:
+    """(school, ticker) 단위로 report_date 순서로 1-based target_seq를 부여한다.
+
+    ticker가 None인 레코드는 seq=None으로 남긴다.
+    """
+    # group by (school, ticker), sort by report_date
+    groups: dict[tuple[str, str], list["PerformanceRow"]] = {}
+    for row in rows:
+        if not row.ticker:
+            continue
+        key = (row.school, row.ticker)
+        groups.setdefault(key, []).append(row)
+    for key, group in groups.items():
+        group.sort(key=lambda r: (r.report_date or "9999-99-99"))
+        total = len(group)
+        for i, row in enumerate(group):
+            row.target_seq = i + 1
+            row.target_seq_total = total
+
+
+# ── 발간일 불가능 가드 ───────────────────────────────────────────────────────────
+# voera/ewha는 2015년 이전 창립 불가능. 그 이전 날짜는 OCR 오인식(설립일 등)
+SCHOOL_MIN_DATE: dict[str, dt.date] = {
+    "voera": dt.date(2015, 1, 1),
+    "ewha": dt.date(2015, 1, 1),
+}
+GLOBAL_MIN_DATE = dt.date(2000, 1, 1)
+
+
+def guard_implausible_dates(parsed: list[ParsedReport], as_of: dt.date) -> None:
+    """발간일이 불가능한 범위에 있으면 null 처리 + qa_flag를 추가한다.
+
+    - voera/ewha: 2015-01-01 이전 → impossible
+    - 모든 학교: 2000-01-01 이전 → impossible
+    - 모든 학교: as_of + 30d 이후 → impossible (미래 날짜)
+    """
+    future_limit = as_of + dt.timedelta(days=30)
+    for r in parsed:
+        d = date_from_string(r.report_date)
+        if d is None:
+            continue
+        school_min = SCHOOL_MIN_DATE.get(r.school, GLOBAL_MIN_DATE)
+        if d < school_min or d < GLOBAL_MIN_DATE or d > future_limit:
+            r.report_date = None
+            add_qa_flag(r, "report_date_implausible")
+
+
 GITHUB_RAW_BASE = "https://github.com/ChoiInYeol/SNUSMIC-Portfolio/blob/main"
 
 
@@ -1608,11 +1680,11 @@ def _url_encode_path(path_str: str) -> str:
 
 
 def _build_sha_url_index(hints: dict[str, dict]) -> dict[str, str]:
-    """manifest 항목의 sha256 → pdf_url 역인덱스를 한 번만 구성한다."""
+    """manifest 항목의 sha256 → page_url 역인덱스를 한 번만 구성한다."""
     index: dict[str, str] = {}
     for entry in hints.values():
         sha = entry.get("sha256")
-        url = entry.get("pdf_url")
+        url = entry.get("page_url")
         if sha and url:
             index[sha] = url
     return index
@@ -1653,9 +1725,11 @@ def build_source_urls(source_file: str, hints: dict[str, dict], sha_url_index: d
     """(source_md_url, source_pdf_url) for a given source_file path string.
 
     source_md_url  — GitHub blob URL to the markdown file.
-    source_pdf_url — original download URL from manifest (pdf_url field); None if not present.
+    source_pdf_url — post/detail PAGE URL from manifest (page_url field).
+                     Direct PDF download URLs are intentionally NOT stored here.
+                     None if no page_url is available for this record.
 
-    sha_url_index: 미리 구성한 sha256→pdf_url 역인덱스 (fix #5: stem 미일치 sha256_dedup 케이스).
+    sha_url_index: 미리 구성한 sha256→page_url 역인덱스 (stem 미일치 sha256_dedup 케이스).
     """
     # Normalise to forward-slash relative path from repo root
     rel = source_file.replace("\\", "/").lstrip("./")  # e.g. "data/markdown/yig/2025-11-10_피에스케이.md"
@@ -1663,15 +1737,16 @@ def build_source_urls(source_file: str, hints: dict[str, dict], sha_url_index: d
 
     stem = Path(source_file).stem
     hint = hints.get(stem)
-    pdf_url: str | None = hint.get("pdf_url") if hint else None
+    # Use the post/detail page URL, not the direct PDF download URL.
+    page_url: str | None = hint.get("page_url") if hint else None
 
     # Fallback: SHA-based lookup for sha256_dedup entries whose stem differs from MD stem
-    if pdf_url is None and sha_url_index:
+    if page_url is None and sha_url_index:
         sha = _sha256_of_pdf(source_file)
         if sha:
-            pdf_url = sha_url_index.get(sha)
+            page_url = sha_url_index.get(sha)
 
-    return md_url, pdf_url
+    return md_url, page_url
 
 
 def write_web_json(path: Path, rows: list[PerformanceRow], as_of: dt.date, excluded_sector_count: int, hints: dict[str, dict] | None = None) -> None:
@@ -1682,6 +1757,7 @@ def write_web_json(path: Path, rows: list[PerformanceRow], as_of: dt.date, exclu
         record = round_floats(asdict(row))
         record["source_name"] = Path(str(record["source_file"])).name
         record["performance_bucket"] = performance_bucket(record["return_latest_pct"])  # type: ignore[arg-type]
+        record["bucket_peak"] = performance_bucket(record["peak_return_24m_pct"])  # type: ignore[arg-type]
         md_url, pdf_url = build_source_urls(str(record["source_file"]), _hints, sha_url_index)
         record["source_md_url"] = md_url
         record["source_pdf_url"] = pdf_url
@@ -1736,6 +1812,9 @@ def main() -> int:
     for r in parsed_all_raw:
         normalized = date_from_string(r.report_date)
         r.report_date = normalized.isoformat() if normalized else None
+
+    # 발간일 불가능 가드: voera/ewha <2015, 전체 <2000, 또는 미래 날짜
+    guard_implausible_dates(parsed_all_raw, as_of)
 
     for r in parsed_all_raw:
         # 티커가 끝내 없으면 산업/전략 리포트로 분류 (목표가 채점 대상 아님)
@@ -1817,6 +1896,7 @@ def main() -> int:
         rows.append(evaluate_report(r, prices, as_of, benchmarks))
 
     rows.sort(key=lambda x: (x.report_date or "9999-99-99", x.market or "", x.ticker or "", x.source_file))
+    compute_target_sequences(rows)
     write_csv(Path(args.output), rows)
     write_web_json(Path(args.web_output), rows, as_of, excluded_sector_count, hints)
 
@@ -1834,6 +1914,22 @@ def main() -> int:
     split_adj_count = sum(1 for r in company_reports if r.qa_flags and "target_split_adjusted" in r.qa_flags)
     d0_count = sum(1 for row in rows if row.days_to_target == 0)
     print(f"target_sanity: suspect={suspect_count} swapped={swap_count} split_adjusted={split_adj_count} days_to_target_zero={d0_count}")
+    # bucket_peak distribution
+    bp_dist: dict[str, int] = {}
+    for row in rows:
+        bp = performance_bucket(row.peak_return_24m_pct)
+        bp_dist[bp] = bp_dist.get(bp, 0) + 1
+    print(f"bucket_peak distribution: " + " ".join(f"{k}={v}" for k, v in sorted(bp_dist.items())))
+    # target_seq sanity for 하이브 (352820)
+    hybe_rows = [r for r in rows if r.ticker == "352820"]
+    hybe_seq = [(r.school, r.report_date, r.target_seq, r.target_seq_total) for r in hybe_rows]
+    print(f"하이브(352820) target_seq: {hybe_seq}")
+    # source_pdf_url direct-PDF count (should be 0)
+    pdf_direct_count = sum(1 for r in rows if r.source_pdf_url and r.source_pdf_url.endswith(".pdf"))
+    print(f"source_pdf_url direct-PDF count (should be 0): {pdf_direct_count}")
+    # implausible date guard count
+    implausible_count = sum(1 for r in parsed_all_raw if r.qa_flags and "report_date_implausible" in r.qa_flags)
+    print(f"report_date_implausible nulled: {implausible_count}")
     print(f"wrote {args.output}")
     print(f"wrote {args.parsed_output}")
     print(f"wrote {args.issues_output}")

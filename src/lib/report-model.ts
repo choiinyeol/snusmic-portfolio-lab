@@ -3,7 +3,7 @@ import raw from "@/data/report-performance.json";
 
 const MarketSchema = z.enum(["KR", "US"]);
 const DirectionSchema = z.enum(["up", "down", "flat"]);
-const BucketSchema = z.enum(["Tenbagger", "Multibagger", "Double", "Winner", "Positive", "Drawdown", "Wrecked", "No quote"]);
+export const BucketSchema = z.enum(["Tenbagger", "Multibagger", "Double", "Winner", "Positive", "Drawdown", "Wrecked", "No quote"]);
 const RatingClassSchema = z.enum(["buy", "soft_buy", "sell"]);
 const MaturitySchema = z.enum(["fresh", "developing", "seasoned", "veteran"]);
 const SchoolSchema = z.enum(["smic", "yig", "star", "kuvic", "ewha", "voera"]);
@@ -58,6 +58,11 @@ export const ReportRecordSchema = z.object({
   target_hit_until_latest: z.boolean().nullable(),
   first_target_hit_date: NullableString,
   days_to_target: z.number().int().nullable(),
+  peak_return_24m_pct: NullableNumber.optional().default(null),
+  peak_date_24m: NullableString.optional().default(null),
+  bucket_peak: BucketSchema.catch("No quote").optional().default("No quote"),
+  target_seq: z.number().int().nullable().optional().default(null),
+  target_seq_total: z.number().int().nullable().optional().default(null),
   rating_class: RatingClassSchema.catch("soft_buy"),
   display_name: NullableString.optional().default(null),
   age_days: z.number().int().nullable().optional().default(null),

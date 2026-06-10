@@ -33,9 +33,10 @@ OUT_PATH = ROOT / "src" / "data" / "strategy-backtest.json"
 CSV_PATH = ROOT / "public" / "strategy-trades.csv"
 PUBLIC_DIR = ROOT / "public"
 
-# Universe filter — also the sim start date
+# Universe filter — reports from 2019-07 onwards feed the signal queue
 UNIVERSE_START = dt.date(2019, 7, 1)
-SIM_START = UNIVERSE_START  # all series start here
+# Simulation starts 2020-01-01: report pool too thin before this date
+SIM_START = dt.date(2020, 1, 1)
 
 # Common params
 ATR_PERIOD = 42
@@ -1411,6 +1412,24 @@ def compute_wealth_simulation_multi(
             for name, val in bench_vals.items():
                 entry[f"{name}_value"] = round(val)
             series.append(entry)
+
+    # Ensure the last calendar day is always represented so the strategy line
+    # extends exactly as far as the benchmark lines (fixes missing final point).
+    last_day_date = all_dates[-1].date()
+    if series and series[-1]["date"] != last_day_date.isoformat():
+        bench_vals_last: dict[str, float] = {
+            name: bench_units[name] * float(bench_aligned[name].iloc[-1])
+            for name in bench_units
+        }
+        final_entry: dict = {
+            "month": month_idx,
+            "date": last_day_date.isoformat(),
+            "contributed": round(total_contributed),
+            "strategy_value": round(strat_wealth),
+        }
+        for name, val in bench_vals_last.items():
+            final_entry[f"{name}_value"] = round(val)
+        series.append(final_entry)
 
     final_strat = series[-1]["strategy_value"] if series else round(strat_wealth)
     final_contrib = series[-1]["contributed"] if series else round(total_contributed)

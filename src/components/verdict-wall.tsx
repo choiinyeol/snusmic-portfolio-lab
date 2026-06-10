@@ -10,6 +10,17 @@ import { cn, formatPct, formatPrice } from "@/lib/utils";
 type Bucket = ReportRecord["performance_bucket"];
 
 /**
+ * 판결 기준 — 현재(발간일 → 최신 종가) 또는 전성기(발간 24개월 내 장중 최고가).
+ * 같은 서가가 두 번 읽힌다: 오늘의 성적표와, 보고서가 제 일을 했던 시절의 성적표.
+ */
+type Basis = "current" | "peak";
+const BASIS_LABELS: Record<Basis, string> = { current: "현재", peak: "전성기" };
+const BASIS_TITLES: Record<Basis, string> = {
+  current: "발간일 → 최신 종가 수익률로 칠합니다",
+  peak: "발간 후 24개월 내 장중 최고가 수익률로 다시 칠합니다 — 보고서의 전성기",
+};
+
+/**
  * 성과 사다리 색 — 급락의 짙은 청색에서 종이색을 지나 상승의 적색으로.
  * 멀티배거는 금장(.wall-gold), 텐배거는 다이아몬드 광채(.wall-prism)가 따로 찍힌다.
  * wall-b-* 클래스는 색약 대비 질감(.wall-pattern) 훅이다.
@@ -92,7 +103,12 @@ export function VerdictWall({
   const [pop, setPop] = useState<Pop | null>(null);
   const [buckets, setBuckets] = useState<Set<Bucket>>(() => new Set());
   const [schools, setSchools] = useState<Set<School>>(() => new Set());
+  /** 판결 기준 — 기본은 현재. 전성기로 바꾸면 모든 칸이 bucket_peak 색으로 다시 칠해진다 */
+  const [basis, setBasis] = useState<Basis>("current");
   const texture = useSyncExternalStore(subscribeTexture, readTexture, () => false);
+
+  const bucketOf = (report: ReportRecord): Bucket => (basis === "peak" ? report.bucket_peak : report.performance_bucket);
+  const returnOf = (report: ReportRecord) => (basis === "peak" ? report.peak_return_24m_pct : report.return_latest_pct);
 
   const years = useMemo(() => {
     const ordered = [...reports]
@@ -108,9 +124,12 @@ export function VerdictWall({
 
   const counts = useMemo(() => {
     const tally = new Map<Bucket, number>();
-    for (const report of reports) tally.set(report.performance_bucket, (tally.get(report.performance_bucket) ?? 0) + 1);
+    for (const report of reports) {
+      const bucket = basis === "peak" ? report.bucket_peak : report.performance_bucket;
+      tally.set(bucket, (tally.get(bucket) ?? 0) + 1);
+    }
     return tally;
-  }, [reports]);
+  }, [reports, basis]);
 
   const schoolCounts = useMemo(() => {
     const tally = new Map<School, number>();
@@ -120,13 +139,14 @@ export function VerdictWall({
 
   const filterActive = buckets.size > 0 || schools.size > 0;
   const matches = (report: ReportRecord) =>
-    (buckets.size === 0 || buckets.has(report.performance_bucket)) && (schools.size === 0 || schools.has(report.school));
+    (buckets.size === 0 || buckets.has(bucketOf(report))) && (schools.size === 0 || schools.has(report.school));
   const matched = useMemo(() => {
     if (buckets.size === 0 && schools.size === 0) return reports.length;
+    const bucket = (report: ReportRecord): Bucket => (basis === "peak" ? report.bucket_peak : report.performance_bucket);
     return reports.filter(
-      (report) => (buckets.size === 0 || buckets.has(report.performance_bucket)) && (schools.size === 0 || schools.has(report.school)),
+      (report) => (buckets.size === 0 || buckets.has(bucket(report))) && (schools.size === 0 || schools.has(report.school)),
     ).length;
-  }, [reports, buckets, schools]);
+  }, [reports, buckets, schools, basis]);
 
   const toggleBucket = (bucket: Bucket) =>
     setBuckets((prev) => {
@@ -277,13 +297,43 @@ export function VerdictWall({
             );
           })}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {basis === "peak" && (
+            <p className="font-mono text-[10px] font-semibold text-stamp" role="status">
+              전성기 기준 — 발간 24개월 내 최고가로 다시 칠했습니다
+            </p>
+          )}
           {filterActive && (
             <p className="font-mono text-[10px] text-muted-foreground" role="status">
               강조 <span className="tnum font-black text-foreground">{matched}</span>건 / {reports.length}건 (
               {((matched / Math.max(reports.length, 1)) * 100).toFixed(1)}%)
             </p>
           )}
+          <div
+            role="group"
+            aria-label="판결 기준 — 현재 또는 전성기"
+            className="flex items-center overflow-hidden rounded-full border border-border font-mono text-[10px] font-bold"
+          >
+            <span className="border-r border-border px-2 py-0.5 font-semibold uppercase tracking-[0.14em] text-muted-foreground">기준</span>
+            {(["current", "peak"] as const).map((item) => {
+              const active = basis === item;
+              return (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => setBasis(item)}
+                  aria-pressed={active}
+                  title={BASIS_TITLES[item]}
+                  className={cn(
+                    "px-2.5 py-0.5 transition active:scale-[0.94]",
+                    active ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {BASIS_LABELS[item]}
+                </button>
+              );
+            })}
+          </div>
           {filterActive && (
             <button
               type="button"
@@ -336,10 +386,10 @@ export function VerdictWall({
                     onMouseEnter={(event) => show(report, event.currentTarget)}
                     onFocus={(event) => show(report, event.currentTarget)}
                     onBlur={() => setTip(null)}
-                    aria-label={`${getDisplayName(report)} · ${schoolShort[report.school]} · ${dateLabel(report.report_date)} · ${formatPct(report.return_latest_pct)} — 요약 카드 열기`}
+                    aria-label={`${getDisplayName(report)} · ${schoolShort[report.school]} · ${dateLabel(report.report_date)} · ${basis === "peak" ? "전성기 " : ""}${formatPct(returnOf(report))} — 요약 카드 열기`}
                     className={cn(
                       "wall-cell h-[13px] w-[13px] sm:h-[15px] sm:w-[15px]",
-                      squareClass[report.performance_bucket],
+                      squareClass[bucketOf(report)],
                       filterActive && !matches(report) && "wall-dim",
                       (active || popped) && "z-[2] outline outline-2 outline-offset-1 outline-foreground",
                     )}
@@ -362,13 +412,16 @@ export function VerdictWall({
             {schoolShort[tip.report.school]} · {dateLabel(tip.report.report_date)}
           </p>
           <p className="mt-0.5 font-mono text-[11px] font-bold">
-            <span className={signColor(tip.report.return_latest_pct)}>{formatPct(tip.report.return_latest_pct)}</span>
-            <span className="ml-1.5 font-semibold text-muted-foreground">{bucketLabels[tip.report.performance_bucket]}</span>
+            <span className={signColor(returnOf(tip.report))}>{formatPct(returnOf(tip.report))}</span>
+            <span className="ml-1.5 font-semibold text-muted-foreground">
+              {bucketLabels[bucketOf(tip.report)]}
+              {basis === "peak" ? " · 전성기" : ""}
+            </span>
           </p>
         </div>
       )}
 
-      {pop && <WallPopCard pop={pop} popRef={popRef} onClose={() => setPop(null)} onSelect={onSelect} />}
+      {pop && <WallPopCard pop={pop} popRef={popRef} basis={basis} onClose={() => setPop(null)} onSelect={onSelect} />}
     </section>
   );
 }
@@ -377,17 +430,21 @@ export function VerdictWall({
 function WallPopCard({
   pop,
   popRef,
+  basis,
   onClose,
   onSelect,
 }: {
   pop: Pop;
   popRef: React.RefObject<HTMLDivElement | null>;
+  basis: Basis;
   onClose: () => void;
   onSelect: (sourceName: string) => void;
 }) {
   const report = pop.report;
   const slug = tickerSlug(report);
   const hit = Boolean(report.target_hit_until_latest) && report.days_to_target !== null;
+  /** 카드 상단 인장은 보고 있는 기준을 따른다 — 전성기 모드에선 전성기 등급 */
+  const badgeBucket = basis === "peak" ? report.bucket_peak : report.performance_bucket;
   return (
     <div
       ref={popRef}
@@ -415,10 +472,10 @@ function WallPopCard({
             <p className="mt-1 truncate font-display text-base font-black leading-tight tracking-tight">{getDisplayName(report)}</p>
           </div>
           <span
-            className={cn("inline-block shrink-0 -rotate-2 rounded-md border px-1.5 py-0.5 font-display text-[11px] tracking-tight", bucketBadgeClass[report.performance_bucket])}
-            title={`${bucketLabels[report.performance_bucket]} — ${bucketThresholds[report.performance_bucket]}`}
+            className={cn("inline-block shrink-0 -rotate-2 rounded-md border px-1.5 py-0.5 font-display text-[11px] tracking-tight", bucketBadgeClass[badgeBucket])}
+            title={`${bucketLabels[badgeBucket]} — ${bucketThresholds[badgeBucket]}${basis === "peak" ? " · 전성기 기준" : ""}`}
           >
-            {bucketLabels[report.performance_bucket]}
+            {bucketLabels[badgeBucket]}
           </span>
         </div>
 
@@ -434,6 +491,14 @@ function WallPopCard({
             <dt className="text-muted-foreground">발간 후 수익률</dt>
             <dd className={cn("tnum text-[13px] font-black", signColor(report.return_latest_pct))}>{formatPct(report.return_latest_pct)}</dd>
           </div>
+          {report.peak_return_24m_pct !== null && (
+            <div className="flex items-baseline justify-between gap-3">
+              <dt className="text-muted-foreground">전성기 (24개월 내)</dt>
+              <dd className={cn("tnum font-bold", signColor(report.peak_return_24m_pct))} title={`최고가 도달일 ${dateLabel(report.peak_date_24m)}`}>
+                {formatPct(report.peak_return_24m_pct)}
+              </dd>
+            </div>
+          )}
           {hit && (
             <div className="flex items-baseline justify-between gap-3">
               <dt className="text-muted-foreground">목표가 도달</dt>

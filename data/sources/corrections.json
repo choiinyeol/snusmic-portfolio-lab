@@ -1,4 +1,8 @@
 {
+  "undated_[BUY] 하이브, High View!.md": {
+    "report_date": "2022-05-28",
+    "_comment": "OCR 오인식: 본문 '2005년 2월 1일에 설립되었으며'(설립일)를 발간일로 잘못 파싱. 실제 발간일은 본문 '202205.28' 및 '주가(5/28)' 표기 기준 2022-05-28. guard_implausible_dates도 이 케이스를 처리하지만 corrections로 올바른 날짜를 명시."
+  },
   "2026-05-25_Becoming Multiplanetary YIG Research.md": {
     "report_type": "sector",
     "ticker": null,

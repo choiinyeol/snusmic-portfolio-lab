@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { getDisplayName, reportDataset, type Market, type ReportRecord, type School } from "@/lib/report-model";
-import { isBuy, isFresh, median } from "@/lib/verdict";
+import { bucketRank, isBuy, isFresh, median } from "@/lib/verdict";
 
 type MarketFilter = "ALL" | Market;
 type BucketFilter = "ALL" | ReportRecord["performance_bucket"];
@@ -86,6 +86,9 @@ export function useReportDashboardState() {
     const priced = judged.filter((report) => !report.data_issue && report.return_latest_pct !== null);
     const up = priced.filter((report) => (report.return_latest_pct ?? 0) >= 0).length;
     const targetHits = priced.filter((report) => report.target_hit_until_latest).length;
+    /** 전성기 판결 — 발간 24개월 내 최고가 기준 더블 이상 (보고서는 보고서의 일을 했다) */
+    const peakEligible = judged.filter((report) => report.peak_return_24m_pct !== null);
+    const peakDoubles = peakEligible.filter((report) => bucketRank[report.bucket_peak] >= bucketRank.Double).length;
     return {
       total: sorted.length,
       buys: buys.length,
@@ -93,6 +96,8 @@ export function useReportDashboardState() {
       priced: priced.length,
       up,
       targetHits,
+      peakDoubles,
+      peakDoubleRate: peakEligible.length ? (peakDoubles / peakEligible.length) * 100 : null,
       median: median(priced.map((report) => report.return_latest_pct as number)),
       medianDaysToTarget: median(priced.filter((report) => report.days_to_target !== null).map((report) => report.days_to_target as number)),
     };

@@ -34,6 +34,7 @@ const sortColumns: SortColumn<ReportRecord>[] = [
   { key: "r365", value: (r) => r.return_365d_pct, firstDir: "desc" },
   { key: "latest", value: (r) => r.return_latest_pct, firstDir: "desc" },
   { key: "alpha", value: (r) => r.alpha_latest_pct, firstDir: "desc" },
+  { key: "peak", value: (r) => r.peak_return_24m_pct, firstDir: "desc" },
   { key: "bucket", value: (r) => r.return_latest_pct, firstDir: "desc" },
   { key: "days", value: (r) => r.days_to_target },
 ];
@@ -81,7 +82,7 @@ export function ReportLedger({
       )}
 
       <div className="overflow-x-auto rounded-lg border border-border bg-card">
-        <table className="ledger-table w-full min-w-[1180px] border-collapse text-sm">
+        <table className="ledger-table w-full min-w-[1320px] border-collapse text-sm">
           <thead>
             <tr className="border-b-4 border-double border-border font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
               <SortableTh sortKey="date" sort={sort} title="발간일 — ▸ 를 누르면 가격 경로가 펼쳐집니다">발간일</SortableTh>
@@ -95,6 +96,7 @@ export function ReportLedger({
               <SortableTh sortKey="r365" sort={sort} align="right">1Y</SortableTh>
               <SortableTh sortKey="latest" sort={sort} align="right">발간이후</SortableTh>
               <SortableTh sortKey="alpha" sort={sort} align="right" title="같은 기간 시장지수 대비 초과수익">알파</SortableTh>
+              <SortableTh sortKey="peak" sort={sort} align="right" title="발간 후 24개월 내 장중 최고가 수익률 — 보고서의 전성기">전성기</SortableTh>
               <SortableTh sortKey="bucket" sort={sort} align="right">등급</SortableTh>
               <SortableTh sortKey="days" sort={sort} align="right" title="목표가 도달까지 걸린 시간">판결</SortableTh>
             </tr>
@@ -163,6 +165,14 @@ export function ReportLedger({
                   </td>
                   <td className="tnum whitespace-nowrap px-3 py-2.5 text-right font-mono text-xs font-bold">
                     {formatPrice(report.target_price, report.market)}
+                    {report.target_seq !== null && (report.target_seq_total ?? 0) > 1 && (
+                      <span
+                        className="ml-1.5 inline-block rounded-sm border border-border px-1 py-px align-middle font-mono text-[9px] font-bold text-muted-foreground"
+                        title={`같은 학회가 이 종목에 제시한 ${report.target_seq}번째 목표 (총 ${report.target_seq_total}회)`}
+                      >
+                        목표 {report.target_seq}/{report.target_seq_total}
+                      </span>
+                    )}
                   </td>
                   <td className="tnum whitespace-nowrap px-3 py-2.5 text-right font-mono text-xs text-muted-foreground">
                     {formatPct(report.stated_upside_pct, 0)}
@@ -177,6 +187,19 @@ export function ReportLedger({
                     title={`지수 동기간 ${formatPct(report.benchmark_return_pct, 0)}`}
                   >
                     {formatPct(report.alpha_latest_pct, 0)}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-2.5 text-right">
+                    <span className={cn("tnum font-mono text-xs font-bold", signColor(report.peak_return_24m_pct))}>
+                      {formatPct(report.peak_return_24m_pct, 0)}
+                    </span>
+                    {report.peak_return_24m_pct !== null && report.bucket_peak !== "No quote" && (
+                      <span
+                        className={cn("ml-1.5 inline-block rounded-sm border px-1 py-px align-middle font-mono text-[9px]", bucketBadgeClass[report.bucket_peak])}
+                        title={`전성기 ${bucketLabels[report.bucket_peak]} — ${bucketThresholds[report.bucket_peak]} · 최고가 도달 ${dateLabel(report.peak_date_24m)}`}
+                      >
+                        {bucketLabels[report.bucket_peak]}
+                      </span>
+                    )}
                   </td>
                   <td className="whitespace-nowrap px-3 py-2.5 text-right">
                     <span
@@ -195,7 +218,7 @@ export function ReportLedger({
                 </tr>
                 {open && (
                   <tr className="border-b border-dashed border-border">
-                    <td colSpan={showSchool ? 14 : 13} className="bg-secondary/30 px-3 py-3 sm:px-4">
+                    <td colSpan={showSchool ? 15 : 14} className="bg-secondary/30 px-3 py-3 sm:px-4">
                       <div className={cn("flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1", hasChart && "mb-2")}>
                         <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                           {getDisplayName(report)} — {hasChart ? "발간 이후 가격 경로 · 기준선은 발간가" : "가격 경로 없음 · 원문으로 확인"}
@@ -221,7 +244,7 @@ export function ReportLedger({
             })}
             {sort.sorted.length === 0 && (
               <tr>
-                <td colSpan={showSchool ? 14 : 13} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                <td colSpan={showSchool ? 15 : 14} className="px-4 py-10 text-center text-sm text-muted-foreground">
                   리포트가 없습니다.
                 </td>
               </tr>
