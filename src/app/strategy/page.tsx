@@ -258,7 +258,11 @@ export default function StrategyPage() {
     oos_sharpe: number | null;
     is_sharpe: number | null;
     n_trials: number;
-    search_space: { atr_period: number[]; atr_mult: number[]; max_positions: number[] };
+    search_space: {
+      atr_period: number[];
+      atr_mult: number[] | { min: number; max: number; step: number };
+      max_positions: number[];
+    };
     methodology: string;
     adoption_criteria: string;
   } | undefined;
@@ -733,7 +737,12 @@ export default function StrategyPage() {
                   <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-foreground">탐색 공간 (5차원 이하)</p>
                   <ul className="mt-1 space-y-0.5">
                     <li>· ATR 기간: {optunaNote.search_space.atr_period?.join(" / ")}</li>
-                    <li>· ATR 배수: [{optunaNote.search_space.atr_mult?.join(", ")}]</li>
+                    <li>
+                      · ATR 배수:{" "}
+                      {Array.isArray(optunaNote.search_space.atr_mult)
+                        ? `[${optunaNote.search_space.atr_mult.join(", ")}]`
+                        : `${optunaNote.search_space.atr_mult.min} ~ ${optunaNote.search_space.atr_mult.max} (step ${optunaNote.search_space.atr_mult.step})`}
+                    </li>
                     <li>· 최대 포지션: {optunaNote.search_space.max_positions?.join(" / ")}</li>
                   </ul>
                 </div>
