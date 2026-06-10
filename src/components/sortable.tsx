@@ -34,13 +34,18 @@ function compareValues(a: SortValue, b: SortValue, dir: SortDir) {
 
 export function useSortable<T>(rows: T[], columns: SortColumn<T>[], initial: SortSpec[] = []) {
   const [specs, setSpecs] = useState<SortSpec[]>(initial);
+  // 사용자가 직접 정렬을 만진 적이 있는지 — 기본 정렬(발간일 등)은 사용자 의도가 아니므로
+  // 첫 Shift+클릭이 기본 정렬 '밑에' 깔려 아무 변화도 안 보이는 문제를 막는다.
+  const [touched, setTouched] = useState(initial.length === 0);
   const byKey = useMemo(() => new Map(columns.map((col) => [col.key, col])), [columns]);
 
   const toggle = (key: string, multi: boolean) => {
     const firstDir = byKey.get(key)?.firstDir ?? "asc";
+    setTouched(true);
     setSpecs((prev) => {
       const existing = prev.find((spec) => spec.key === key);
-      if (!multi) {
+      if (!multi || (!touched && !existing)) {
+        if (multi && !touched && !existing) return [{ key, dir: firstDir }]; // 첫 Shift+클릭: 기본 정렬을 대체해 1순위로
         // 단일 정렬: 첫 클릭 기본 방향 → 반대 방향 → 해제
         if (!existing || prev.length > 1) return [{ key, dir: existing?.dir ?? firstDir }];
         if (existing.dir === firstDir) return [{ key, dir: firstDir === "asc" ? "desc" : "asc" }];
@@ -100,8 +105,12 @@ export function SortableTh({
       <button
         type="button"
         onClick={(event) => sort.toggle(sortKey, event.shiftKey)}
+        onMouseDown={(event) => {
+          // Shift+클릭이 브라우저 텍스트 선택을 끌고 다니는 것을 차단
+          if (event.shiftKey) event.preventDefault();
+        }}
         className={cn(
-          "flex w-full items-center gap-1 px-3 py-2.5",
+          "flex w-full select-none items-center gap-1 px-3 py-2.5",
           align === "right" ? "justify-end text-right" : "justify-start text-left",
           active && "text-foreground",
         )}
