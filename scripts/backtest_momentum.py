@@ -4708,6 +4708,227 @@ def run_portfolio_opt(
 
 
 # ──────────────────────────────────────────────────────────────────────────────
+# Strategy T: 코어-KOSPI 샹들리에 (KOSPI-parked idle cash)
+#
+# 설계 원칙:
+#   - D+ Chandelier Optuna 규칙(진입/청산/사이징)과 완전 동일.
+#   - 유휴 현금(비어있는 슬롯 현금 + DCA 기여금) → 모두 KOSPI 지수 익스포저로 주차.
+#   - NAV = 주식 포지션 + KOSPI 파킹 잔액.
+#   - 일별: 파킹 잔액은 KOSPI close-to-close 수익률을 반영.
+#   - 진입 시: 필요 금액만큼 KOSPI 익스포저 매도 (비용 0.05%/side 인덱스 ETF 가정)
+#             → 해당 금액으로 주식 매수 (비용 0.3%/side 기존과 동일).
+#   - 청산 시: 주식 매도 수익금(비용 0.3% 후) → KOSPI 익스포저 매수 (비용 0.05%).
+#   - 이 설계에서 전략의 베이스라인 = KOSPI DCA.
+#     주식 픽은 KOSPI 대비 순 알파를 더하거나 뺄 뿐.
+#   - DCA 기여금: KOSPI 익스포저로 즉시 편입 (이 시뮬레이션은 NAV-only, DCA 없음,
+#     같은 START_CAPITAL 100M 사용 — DCA 비교는 wealth_sim에서 처리).
+#   - KOSPI 인덱스 ETF 편도 비용 0.05% 가정: 실제 KODEX200 기준 0.02~0.05% 스프레드.
+#     이 가정을 method note에 명시.
+#
+# T  (always-KOSPI): 항상 KOSPI 파킹.
+# T- (regime-aware): KOSPI < 200MA이면 파킹 이자율 0% (현금). Faber 레짐.
+#
+# CSV: 주식 거래만 기록 + 헤더 주석에 "KOSPI 파킹 거래 미포함" 명시.
+# ──────────────────────────────────────────────────────────────────────────────
+
+KOSPI_PARK_COST = 0.0005   # 0.05%/side for index ETF switches (KODEX200 기준 가정)
+
+
+def run_kospi_core_chandelier(
+    prices: dict[str, pd.DataFrame],
+    reports: list[tuple[dt.date, str, str, int]],
+    calendar: list[dt.date],
+    label: str,
+    kospi: pd.Series,
+    atr_period: int,
+    atr_mult: float,
+    max_positions: int,
+    ticker_reports: dict[str, list[dict]] | None = None,
+    record_full_trades: bool = False,
+    regime_aware: bool = False,
+) -> dict:
+    """
+    T 코어-KOSPI 샹들리에.
+
+    D+ Chandelier 규칙 완전 동일; 유휴 현금을 KOSPI 익스포저로 주차.
+    진입: KOSPI 파킹 → 주식 (0.05% + 0.3% 편도 각각).
+    청산: 주식 → KOSPI 파킹 (0.3% + 0.05% 편도 각각).
+
+    regime_aware=True (T-): KOSPI < 200MA이면 파킹 수익률 0% (현금).
+
+    비용 공시: 인덱스 ETF 전환 비용 0.05%/side는 KODEX200 기준 추정값.
+    실제 체결 스프레드·세금·운용보수는 개별 계좌마다 상이할 수 있음.
+    """
+    START_CAPITAL = 100_000_000
+    cash = float(START_CAPITAL)          # this is now the "stock cash" reserve (should stay ~0)
+    kospi_parked = 0.0                   # notional KOSPI exposure (in KRW value)
+    positions: dict[str, dict] = {}
+    nav_series: list[tuple[str, float]] = []
+    trades: list[dict] = []
+    pending_exits: set[str] = set()
+
+    # Precompute KOSPI 200MA series for regime filter
+    kospi_ma200: pd.Series | None = None
+    if regime_aware:
+        kospi_ma200 = kospi.rolling(200, min_periods=100).mean()
+
+    # Align KOSPI to calendar
+    kospi_dates = kospi.index
+
+    # Initialise: all START_CAPITAL goes to KOSPI parking at cost (0.05% entry)
+    kospi_parked = START_CAPITAL * (1 - KOSPI_PARK_COST)
+    cash = 0.0
+
+    pending_entries = build_pending_entries(reports, calendar, consensus_only=False)
+
+    prev_kospi_close: float | None = None
+
+    for day in calendar:
+        day_ts = pd.Timestamp(day)
+
+        # ── Daily KOSPI return on parked balance ──────────────────────────────
+        kospi_close_today = asof_value(kospi, day)
+        if kospi_close_today > 0:
+            if prev_kospi_close is not None and prev_kospi_close > 0:
+                # Regime gate: if regime_aware and KOSPI < 200MA, no return (parked at 0%)
+                if regime_aware and kospi_ma200 is not None:
+                    ma200_val = asof_value(kospi_ma200, day)
+                    use_kospi_return = (ma200_val <= 0 or kospi_close_today >= ma200_val)
+                else:
+                    use_kospi_return = True
+
+                if use_kospi_return and kospi_parked > 0:
+                    daily_kospi_ret = kospi_close_today / prev_kospi_close - 1
+                    kospi_parked *= (1 + daily_kospi_ret)
+            prev_kospi_close = kospi_close_today
+        else:
+            if prev_kospi_close is None:
+                prev_kospi_close = asof_value(kospi, day) or None
+
+        # ── Execute pending exits (next open after stop signal) ───────────────
+        to_exit = [t for t in list(pending_exits) if t in positions]
+        for ticker in to_exit:
+            pos = positions[ticker]
+            q = _get_quote(prices, ticker, day)
+            if q is None or float(q["open"]) <= 0:
+                continue
+            exit_price = float(q["open"])
+            stock_proceeds = pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            # Park proceeds back into KOSPI (0.05% entry cost)
+            kospi_parked += stock_proceeds * (1 - KOSPI_PARK_COST)
+            trades.append(_close_trade(ticker, pos, day, exit_price,
+                                       f"t_chandelier_ATR{atr_mult}",
+                                       ticker_reports, record_full_trades, None))
+            del positions[ticker]
+            pending_exits.discard(ticker)
+
+        # ── Execute pending entries ───────────────────────────────────────────
+        if day in pending_entries:
+            nav_now = (
+                kospi_parked
+                + sum(p["shares"] * p["last_close"] for p in positions.values())
+            )
+            slots = max_positions - len(positions)
+            candidates = list(
+                {t: (t, s, nc) for t, s, nc in pending_entries[day]
+                 if t not in positions}.values()
+            )
+            for ticker, source, n_clubs in candidates[:slots]:
+                df = prices.get(ticker)
+                if df is None or day_ts not in df.index:
+                    continue
+                entry_price = float(df.loc[day_ts]["open"])
+                if entry_price <= 0:
+                    continue
+
+                budget = nav_now * POSITION_WEIGHT
+                if budget > kospi_parked:
+                    budget = kospi_parked
+                if budget < nav_now * POSITION_WEIGHT * 0.5:
+                    continue
+
+                # Sell KOSPI parking (0.05% cost) → receive cash for stock purchase
+                kospi_parked -= budget
+                stock_budget = budget * (1 - KOSPI_PARK_COST)  # proceeds after ETF sell cost
+                shares = stock_budget * (1 - COST_PER_SIDE) / entry_price
+                total_spent = budget   # taken from KOSPI parking
+
+                display_name = ticker
+                tp = None
+                market = "KR"
+                if ticker_reports is not None:
+                    tr_list = ticker_reports.get(ticker, [])
+                    past_tr = [x for x in tr_list if x["report_date"] < day]
+                    if past_tr:
+                        latest = max(past_tr, key=lambda x: x["report_date"])
+                        display_name = latest["display_name"]
+                        tps = [x["target_price"] for x in past_tr if x["target_price"]]
+                        tp = max(tps) if tps else None
+                        market = past_tr[0].get("market", "KR")
+
+                atr_col = "atr20" if atr_period == 20 else "atr"
+                atr_val = asof_value(df[atr_col] if atr_col in df.columns else df["atr"], day)
+                stop = entry_price - atr_mult * atr_val if atr_val else entry_price * 0.75
+
+                pos = {
+                    "shares": shares,
+                    "entry_price": entry_price,
+                    "entry_date": day,
+                    "cost": total_spent,
+                    "last_close": entry_price,
+                    "highest": entry_price,
+                    "stop": stop,
+                    "source": source,
+                    "n_clubs": n_clubs,
+                    "display_name": display_name,
+                    "market": market,
+                    "target_price": tp,
+                }
+                positions[ticker] = pos
+
+        # ── Update positions + check chandelier stop ──────────────────────────
+        for ticker, pos in list(positions.items()):
+            df = prices.get(ticker)
+            if df is None or day_ts not in df.index:
+                continue
+            close = float(df.loc[day_ts]["close"])
+            pos["last_close"] = close
+            pos["highest"] = max(pos.get("highest", close), close)
+            atr_col = "atr20" if atr_period == 20 else "atr"
+            atr_val = asof_value(df[atr_col] if atr_col in df.columns else df["atr"], day)
+            if atr_val:
+                new_stop = pos["highest"] - atr_mult * atr_val
+                pos["stop"] = max(pos.get("stop", 0.0), new_stop)
+            if pos.get("stop") and close < pos["stop"] and ticker not in pending_exits:
+                pending_exits.add(ticker)
+
+        nav = kospi_parked + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav_series.append((day.isoformat(), nav))
+
+    # Force-close remaining positions at end
+    last_day = calendar[-1]
+    for ticker, pos in list(positions.items()):
+        trades.append(_close_trade(ticker, pos, last_day, pos["last_close"],
+                                   "데이터_종료_미청산",
+                                   ticker_reports, record_full_trades, None))
+
+    result = _compute_result(nav_series, trades, START_CAPITAL, label,
+                             open_positions=positions)
+    result["kospi_parking_note"] = (
+        "T 코어-KOSPI 샹들리에: 유휴 현금을 KOSPI 지수 익스포저로 주차. "
+        "인덱스 ETF(KODEX200 기준) 전환 비용 0.05%/side 가정 (실제 스프레드·세금 상이 가능). "
+        "주식 편도 비용 0.3% (기존 동일). "
+        "CSV는 주식 거래만 기록; KOSPI 파킹 전환은 별도 미기록."
+    )
+    if regime_aware:
+        result["kospi_parking_note"] += (
+            " T- 레짐 변형: KOSPI < 200MA 구간에서는 파킹 수익률 0% (현금 보유). "
+            "참조: Faber (2007) 10개월 이동평균 레짐 필터."
+        )
+    return result
+
+
+# ──────────────────────────────────────────────────────────────────────────────
 # main
 # ──────────────────────────────────────────────────────────────────────────────
 
@@ -5053,11 +5274,13 @@ def main() -> int:
         "S_hrp": result_S_hrp,
         "S_msharpe": result_S_msharpe,
         "S_mincvar": result_S_mincvar,
+        # T / T-: added after D+ Optuna + T runs (see below)
     }
     # Strategies excluded from headline selector (cost-death confirmed or sub-variants)
     # S sub-variants: only best_s_key is eligible; the other two are excluded from selector
+    # T-: regime variant — not directly in selector (best of T/T- wins as "T. 코어-KOSPI 샹들리에")
     s_non_best = {k for k in s_variants if k != best_s_key}
-    EXCLUDED_FROM_SELECTOR = {"L_rsi2_reversion", "M_short_reversal"} | s_non_best
+    EXCLUDED_FROM_SELECTOR = {"L_rsi2_reversion", "M_short_reversal", "T-_kospi_core_regime"} | s_non_best
 
     # ── D+ Optuna optimization ─────────────────────────────────────────────────
     print("\n── Optuna robust optimization (D+ chandelier) ───────────────────", flush=True)
@@ -5087,6 +5310,49 @@ def main() -> int:
             print(f"  D+ ADOPTED: IS={is_sharpe_dplus:.2f}  OOS={oos_sharpe_dplus:.2f}  (D OOS={oos_sharpe_D})", flush=True)
         else:
             print(f"  D+ NOT ADOPTED (OOS degraded): IS={is_sharpe_dplus}  OOS={oos_sharpe_dplus}  D OOS={oos_sharpe_D}", flush=True)
+
+    # ── T / T-: 코어-KOSPI 샹들리에 (D+ params if adopted, else D defaults) ──
+    # Use D+ Optuna params if available; otherwise fall back to D ATR×5 / 20 pos
+    t_atr_period = ATR_PERIOD
+    t_atr_mult   = CHANDELIER_ATR_MULT
+    t_max_pos    = MAX_POSITIONS
+    if d_plus_adopted and result_Dplus is not None:
+        _bp = optuna_meta.get("best_params", {})
+        t_atr_period = int(_bp.get("atr_period", ATR_PERIOD))
+        t_atr_mult   = float(_bp.get("atr_mult", CHANDELIER_ATR_MULT))
+        t_max_pos    = int(_bp.get("max_positions", MAX_POSITIONS))
+
+    print(f"\nT. 코어-KOSPI 샹들리에 (always-KOSPI park, ATR{t_atr_mult}, {t_max_pos} slots)...", flush=True)
+    result_T = run_kospi_core_chandelier(
+        prices, reports, calendar,
+        label="T_kospi_core_chandelier",
+        kospi=kospi,
+        atr_period=t_atr_period,
+        atr_mult=t_atr_mult,
+        max_positions=t_max_pos,
+        ticker_reports=ticker_reports,
+        record_full_trades=True,
+        regime_aware=False,
+    )
+    print(f"   IS sharpe={result_T['in_sample'].get('sharpe')}  OOS sharpe={result_T['out_of_sample'].get('sharpe')}", flush=True)
+
+    print(f"T-. 코어-KOSPI 샹들리에 레짐 변형 (KOSPI<200MA → 현금 파킹)...", flush=True)
+    result_Tminus = run_kospi_core_chandelier(
+        prices, reports, calendar,
+        label="T-_kospi_core_regime",
+        kospi=kospi,
+        atr_period=t_atr_period,
+        atr_mult=t_atr_mult,
+        max_positions=t_max_pos,
+        ticker_reports=ticker_reports,
+        record_full_trades=True,
+        regime_aware=True,
+    )
+    print(f"   IS sharpe={result_Tminus['in_sample'].get('sharpe')}  OOS sharpe={result_Tminus['out_of_sample'].get('sharpe')}", flush=True)
+
+    # Add T / T- to all_strategies (after they are computed)
+    all_strategies["T_kospi_core_chandelier"] = result_T
+    all_strategies["T-_kospi_core_regime"] = result_Tminus
 
     # ── Re-run P and R with Optuna ATR params if D+ was adopted ────────────
     result_P = result_P_default
@@ -5119,6 +5385,7 @@ def main() -> int:
         )
         all_strategies["R_kelly_chandelier"] = result_R
         print(f"   R (Optuna params) IS sharpe={result_R['in_sample'].get('sharpe')}  OOS sharpe={result_R['out_of_sample'].get('sharpe')}", flush=True)
+        # T and T- were already run with Optuna params above; all_strategies already updated.
 
     # ── Per-strategy KOSPI DCA ratio (final strategy wealth / KOSPI DCA wealth)
     print("\nComputing per-strategy KOSPI DCA ratios (quick pass)...", flush=True)
@@ -5139,8 +5406,54 @@ def main() -> int:
             "kospi_final": round(kospi_final) if kospi_final else None,
         }
 
+    # ── T promotion: pick better of T / T- (by full-period wealth sim ratio vs KOSPI DCA)
+    # If the winner beats KOSPI DCA on full-period wealth sim AND IS+OOS sharpe >= D+'s,
+    # it competes as a single "T. 코어-KOSPI 샹들리에" entry in the selector.
+    # The loser variant is excluded from the selector.
+    # This must run BEFORE the summary table so exclusion flags are correct.
+    _dplus_ref = result_Dplus if result_Dplus is not None else result_D
+    _dplus_is  = (_dplus_ref.get("in_sample", {}).get("sharpe") or -999.0)
+    _dplus_oos = (_dplus_ref.get("out_of_sample", {}).get("sharpe") or -999.0)
+
+    _t_ratio     = (_kospi_dca_ratios.get("T_kospi_core_chandelier", {}).get("full_ratio") or 0.0)
+    _tm_ratio    = (_kospi_dca_ratios.get("T-_kospi_core_regime", {}).get("full_ratio") or 0.0)
+
+    # Best T variant = higher full-period wealth ratio; tie-break by IS sharpe
+    if _t_ratio >= _tm_ratio:
+        _t_best_key, _t_best, _t_best_ratio = "T_kospi_core_chandelier", result_T, _t_ratio
+        _t_other_key = "T-_kospi_core_regime"
+    else:
+        _t_best_key, _t_best, _t_best_ratio = "T-_kospi_core_regime", result_Tminus, _tm_ratio
+        _t_other_key = "T_kospi_core_chandelier"
+
+    # T promotion conditions: beats KOSPI DCA on full-period sim AND IS+OOS sharpe >= D+'s
+    _t_best_is  = (_t_best.get("in_sample", {}).get("sharpe") or -999.0)
+    _t_best_oos = (_t_best.get("out_of_sample", {}).get("sharpe") or -999.0)
+    _t_promoted = (
+        _t_best_ratio > 1.0
+        and _t_best_is  >= _dplus_is
+        and _t_best_oos >= _dplus_oos
+    )
+
+    # Exclude the losing T variant from selector; winning T stays in selector if promoted
+    EXCLUDED_FROM_SELECTOR.add(_t_other_key)
+    if _t_promoted:
+        # Remove the winning variant from exclusions so it competes in headline selection
+        EXCLUDED_FROM_SELECTOR.discard(_t_best_key)
+    else:
+        EXCLUDED_FROM_SELECTOR.add("T_kospi_core_chandelier")
+        EXCLUDED_FROM_SELECTOR.add("T-_kospi_core_regime")
+
+    t_promotion_verdict = (
+        f"T_best={_t_best_key}  ratio={_t_best_ratio}x  "
+        f"IS={_t_best_is}  OOS={_t_best_oos}  "
+        f"D+/D IS={_dplus_is}  OOS={_dplus_oos}  "
+        f"promoted={'YES — T becomes headline candidate' if _t_promoted else 'NO — switching costs eat alpha or sharpe below D+'}"
+    )
+    print(f"\nT promotion verdict: {t_promotion_verdict}", flush=True)
+
     # ── Summary table (all strategies including L/M for transparency)
-    print(f"\n── Strategy summary (v12, {len(all_strategies)} strategies; L/M/S-non-best excluded from selector) ──", flush=True)
+    print(f"\n── Strategy summary (v13, {len(all_strategies)} strategies; L/M/S-non-best/T-loser excluded from selector) ──", flush=True)
     print(f"{'Strategy':<32} {'IS Shp':>8} {'OOS Shp':>9} {'WinRate':>8} {'vs KOSPI DCA':>13} {'Trades':>7} {'Note':>12}", flush=True)
     for key, r in all_strategies.items():
         is_m  = r.get("in_sample", {})
@@ -5151,6 +5464,8 @@ def main() -> int:
         note = "[EXCLUDED]" if key in EXCLUDED_FROM_SELECTOR else ""
         if key == best_s_key:
             note = "[S-BEST]"
+        if key == _t_best_key and _t_promoted:
+            note = "[T-BEST]"
         print(
             f"  {key:<30} {str(is_m.get('sharpe','—')):>8} "
             f"{str(oos_m.get('sharpe','—')):>9} "
@@ -5179,7 +5494,11 @@ def main() -> int:
     eligible_strategies = {k: v for k, v in all_strategies.items() if k not in EXCLUDED_FROM_SELECTOR}
     headline = max(eligible_strategies.values(), key=_is_sharpe)
     headline_label = headline["label"]
+    # If headline is the promoted T best variant, relabel it for UI
     headline_key = next(k for k, v in eligible_strategies.items() if v is headline)
+    if headline_key in ("T_kospi_core_chandelier", "T-_kospi_core_regime"):
+        headline["label"] = "T_kospi_core_chandelier"   # canonical label for UI
+        headline_label = "T_kospi_core_chandelier"
     print(f"\nHeadline (best IS sharpe, eligible only): {headline_label} [{headline_key}]", flush=True)
     print(f"  IS sharpe={headline.get('in_sample', {}).get('sharpe')}  OOS sharpe={headline.get('out_of_sample', {}).get('sharpe')}", flush=True)
 
@@ -5437,6 +5756,43 @@ def main() -> int:
                     "S_msharpe: max-Sharpe (LedoitWolf 수축, long-only w≤15%). "
                     "S_mincvar: min-CVaR 95% (scipy linprog LP, long-only w≤15%). "
                     "IS 샤프 최상 변형만 셀렉터 포함."
+                ),
+            },
+            "T_kospi_core": {
+                "T": {
+                    "is_sharpe": result_T["in_sample"].get("sharpe"),
+                    "oos_sharpe": result_T["out_of_sample"].get("sharpe"),
+                    "trades": result_T["metrics"]["trades"],
+                    "kospi_dca_ratio": _kospi_dca_ratios.get("T_kospi_core_chandelier", {}).get("full_ratio"),
+                },
+                "T_minus": {
+                    "is_sharpe": result_Tminus["in_sample"].get("sharpe"),
+                    "oos_sharpe": result_Tminus["out_of_sample"].get("sharpe"),
+                    "trades": result_Tminus["metrics"]["trades"],
+                    "kospi_dca_ratio": _kospi_dca_ratios.get("T-_kospi_core_regime", {}).get("full_ratio"),
+                },
+                "best_variant": _t_best_key,
+                "promoted_to_headline": _t_promoted,
+                "promotion_verdict": t_promotion_verdict,
+                "atr_params": {
+                    "atr_period": t_atr_period,
+                    "atr_mult": t_atr_mult,
+                    "max_positions": t_max_pos,
+                    "source": "D+ Optuna best params" if d_plus_adopted else "D default (ATR42×5, 20 slots)",
+                },
+                "cost_disclosure": (
+                    "인덱스 ETF(KODEX200 기준) 전환 비용 0.05%/side 가정. "
+                    "주식 매수·매도 비용 0.3%/side (기존 동일). "
+                    "실제 KODEX200 스프레드·세금·운용보수는 계좌마다 상이할 수 있음."
+                ),
+                "interpretation": (
+                    "T의 베이스라인 = KOSPI DCA. 주식 픽이 KOSPI 대비 순 알파를 더하면 ratio>1, "
+                    "전환 비용이 알파를 삼키면 ratio≤1. "
+                    "T-는 KOSPI<200MA 구간에서 파킹 수익 0%(현금) — 약세장 방어 레이어. "
+                    "참조: Faber (2007) 10개월 이동평균 레짐 필터."
+                ),
+                "csv_note": (
+                    "CSV는 주식 거래만 기록. KOSPI 파킹 전환(ETF 매수/매도)은 별도 미기록."
                 ),
             },
             "beats_kospi_dca": beats_kospi_both,
