@@ -75,8 +75,12 @@ type SignalPosition = {
   current_price?: number | null;
   unrealized_pct?: number | null;
   days_elapsed: number;
-  exit_due: string;
-  days_remaining: number;
+  highest_since_entry?: number | null;
+  stop_level?: number | null;
+  dist_to_stop_pct?: number | null;
+  // legacy fixed-hold fields
+  exit_due?: string;
+  days_remaining?: number;
   trigger_schools?: string[];
   trigger_reports?: TriggerReport[];
 };
@@ -109,12 +113,16 @@ type SignalsData = {
   headline_strategy: string;
   disclaimer: string;
   open_positions: SignalPosition[];
-  expiring_soon: SignalPosition[];
+  approaching_stop: SignalPosition[];
+  // legacy
+  expiring_soon?: SignalPosition[];
   new_buy_signals: NewSignal[];
   watching_single_club: WatchingEntry[];
   counts: {
     open: number;
-    expiring_soon_30d: number;
+    approaching_stop: number;
+    // legacy
+    expiring_soon_30d?: number;
     new_buy_signals: number;
     watching_single_club: number;
   };
@@ -162,7 +170,8 @@ const STRATEGY_LABEL_KO: Record<string, string> = {
   A_12mo:               "A. 12개월 보유",
   B_36mo:               "B. 36개월 보유",
   C_narrative:          "C. 내러티브 홀드",
-  D_chandelier:         "D. 샹들리에 래칫 ★",
+  D_chandelier:         "D. 샹들리에 래칫",
+  "D+_chandelier_optuna": "D+. 샹들리에 (Optuna) ★",
   E_half_runner:        "E. 절반익절+러너",
   F_momentum_narrative: "F. 모멘텀 필터",
   G_dip_buy:            "G. 딥바이",
@@ -170,6 +179,9 @@ const STRATEGY_LABEL_KO: Record<string, string> = {
   I_supertrend:         "I. 슈퍼트렌드",
   J_core_satellite:     "J. 코어-새틀라이트",
   K_rr_trend:           "K. R:R 2.5 추세추종",
+  L_rsi2_reversion:     "L. 민리버전 (RSI-2)",
+  M_short_reversal:     "M. 단기 리버설",
+  N_52w_high:           "N. 52주 고가 근접",
 };
 
 const BENCHMARK_KO: Record<string, string> = {
@@ -221,6 +233,18 @@ export default function StrategyPage() {
     anti_overfit_note: string;
   };
   const signals = backtest.signals as SignalsData | undefined;
+  const optunaNote = (backtest as Record<string, unknown>).optuna_chandelier as {
+    adopted: boolean;
+    best_params: { atr_period: number; atr_mult: number; max_positions: number };
+    fold1_sharpe: number | null;
+    fold2_sharpe: number | null;
+    oos_sharpe: number | null;
+    is_sharpe: number | null;
+    n_trials: number;
+    search_space: { atr_period: number[]; atr_mult: number[]; max_positions: number[] };
+    methodology: string;
+    adoption_criteria: string;
+  } | undefined;
   const multiStrategy = backtest.multi_strategy as unknown as MultiStrategyData;
   const universeStats = backtest.universe_stats as {
     kr_reports: number; us_reports: number; total_reports: number;
@@ -263,9 +287,9 @@ export default function StrategyPage() {
           <div className="mt-3 flex flex-wrap gap-2">
             {[
               { label: "보유 중",           count: signals.counts.open,                  tone: "bg-card border-border" },
-              { label: "30일 내 만기",       count: signals.counts.expiring_soon_30d,     tone: signals.counts.expiring_soon_30d > 0 ? "bg-down/10 border-down/40" : "bg-card border-border" },
-              { label: "신규 매수 신호",     count: signals.counts.new_buy_signals,        tone: signals.counts.new_buy_signals > 0 ? "bg-up/10 border-up/40" : "bg-card border-border" },
-              { label: "매수 대기 (1개교)", count: signals.counts.watching_single_club,   tone: "bg-card border-border" },
+              { label: "매도 임박 (스탑 3% 이내)", count: signals.counts.approaching_stop ?? signals.counts.expiring_soon_30d ?? 0, tone: (signals.counts.approaching_stop ?? signals.counts.expiring_soon_30d ?? 0) > 0 ? "bg-down/10 border-down/40" : "bg-card border-border" },
+              { label: "신규 매수 신호 (30일)",  count: signals.counts.new_buy_signals,   tone: signals.counts.new_buy_signals > 0 ? "bg-up/10 border-up/40" : "bg-card border-border" },
+              { label: "대기 신호 (슬롯 한도)", count: signals.counts.watching_single_club,   tone: "bg-card border-border" },
             ].map((item) => (
               <div key={item.label} className={cn("rounded-lg border px-3 py-1.5", item.tone)}>
                 <p className="font-mono text-[10px] text-muted-foreground">{item.label}</p>
@@ -274,11 +298,50 @@ export default function StrategyPage() {
             ))}
           </div>
 
-          {/* New buy signals */}
+          {/* Approaching stop — 매도 임박 (chandelier) */}
+          {(signals.approaching_stop?.length ?? 0) > 0 && (
+            <div className="mt-4">
+              <p className="mb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-down">
+                매도 임박 — 트레일링 스탑 3% 이내
+              </p>
+              <div className="space-y-2">
+                {signals.approaching_stop!.map((pos, i) => {
+                  const slug = pos.market && pos.ticker ? tickerSlug(pos.market, pos.ticker) : null;
+                  return (
+                    <div key={`${pos.ticker}-${i}`} className="rounded-md border border-down/40 bg-down/5 px-4 py-3">
+                      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                        {slug ? (
+                          <Link href={`/stocks/${slug}`} className="font-mono text-sm font-bold hover:underline">
+                            {pos.display_name ?? pos.ticker}
+                          </Link>
+                        ) : (
+                          <span className="font-mono text-sm font-bold">{pos.display_name ?? pos.ticker}</span>
+                        )}
+                        <span className="font-mono text-xs text-muted-foreground">({pos.ticker})</span>
+                        {pos.dist_to_stop_pct != null && (
+                          <span className="rounded-sm bg-down/20 px-1.5 py-0.5 font-mono text-[10px] text-down font-bold">
+                            스탑까지 {pos.dist_to_stop_pct.toFixed(1)}%
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-muted-foreground">
+                        <span>진입가: <strong className="text-foreground">{pos.entry_price.toLocaleString()}</strong></span>
+                        {pos.current_price != null && <span>현재가: <strong className={cn(pos.unrealized_pct != null && pos.unrealized_pct >= 0 ? "text-up" : "text-down")}>{pos.current_price.toLocaleString()}</strong></span>}
+                        {pos.stop_level != null && <span>스탑: <strong className="text-down">{pos.stop_level.toLocaleString()}</strong></span>}
+                        {pos.unrealized_pct != null && <span>미실현: <strong className={cn(pos.unrealized_pct >= 0 ? "text-up" : "text-down")}>{pos.unrealized_pct > 0 ? "+" : ""}{pos.unrealized_pct.toFixed(1)}%</strong></span>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* New buy signals — reports within last 30 days */}
           {signals.new_buy_signals.length > 0 && (
             <div className="mt-4">
               <p className="mb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-up">
-                신규 매수 신호 — 컨센서스 형성
+                신규 매수 신호 — 최근 30일 리포트
               </p>
               <div className="space-y-2">
                 {signals.new_buy_signals.map((sig, i) => {
@@ -295,7 +358,7 @@ export default function StrategyPage() {
                         )}
                         <span className="font-mono text-xs text-muted-foreground">({sig.ticker})</span>
                         <span className="rounded-sm bg-up/20 px-1.5 py-0.5 font-mono text-[10px] text-up font-bold">
-                          {sig.n_schools}개교 컨센서스
+                          {sig.n_schools}개교
                         </span>
                       </div>
                       <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-muted-foreground">
@@ -318,10 +381,10 @@ export default function StrategyPage() {
             </div>
           )}
 
-          {/* Open positions link — detail lives in strategy selector */}
+          {/* Open positions link — chandelier detail in selector */}
           {signals.counts.open > 0 && (
             <p className="mt-3 font-mono text-xs text-muted-foreground">
-              보유 중 <strong className="text-foreground">{signals.counts.open}종목</strong>의 상세 보유 테이블은{" "}
+              보유 중 <strong className="text-foreground">{signals.counts.open}종목</strong>의 상세 보유 테이블 (진입가·현재가·스탑 레벨)은{" "}
               <a href="#strategy-selector" className="underline hover:text-foreground">전략 비교 → 보유 중 탭</a>에서 확인하세요.
             </p>
           )}
@@ -330,7 +393,7 @@ export default function StrategyPage() {
           {signals.watching_single_club.length > 0 && (
             <details className="mt-4">
               <summary className="cursor-pointer font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground select-none">
-                매수 대기 — 1개교 단독 커버 ({signals.watching_single_club.length}종목) — 클릭해서 펼치기
+                대기 신호 — 유효하지만 미체결 ({signals.watching_single_club.length}종목, 동시 보유 한도) — 클릭해서 펼치기
               </summary>
               <div className="mt-2 overflow-x-auto">
                 <table className="w-full min-w-[580px] border-collapse text-sm">
@@ -394,7 +457,7 @@ export default function StrategyPage() {
         <p className="mt-3 max-w-3xl text-base leading-7 text-muted-foreground">
           학회 리포트 발간 후 24개월 내 피크 수익률이 거의 전부 양(+)이라는 사실 —
           하지만 라운드트립을 타면 그 이익은 사라집니다.
-          11가지 전략을 인샘플({simStartDisplay.slice(0, 7)}–2023-12)로 비교하고 아웃오브샘플(2024–현재)로 검증.
+          14가지 전략 + D+ Optuna를 인샘플({simStartDisplay.slice(0, 7)}–2023-12)로 비교하고 아웃오브샘플(2024–현재)로 검증.
           헤드라인은 IS 샤프 최상위 전략인{" "}
           <strong className="text-foreground">
             {STRATEGY_LABEL_KO[params.headline_key] ?? params.headline_key}
@@ -597,37 +660,37 @@ export default function StrategyPage() {
               {
                 n: 2,
                 title: "진입 — 전략별 트리거 조건",
-                body: "A/B/C/D/E: 발간 다음 거래일 시가 즉시 진입. F: 200MA 위 확인 후 진입. G: 발간일 종가 -20% 도달 시 진입. H: 미너비니 5-point 템플릿 통과 시. I: Supertrend(10,3) 상향전환 시. J: D NAV 오버레이. K: 컨센서스 발생 즉시.",
+                body: "A/B/C/D/E: 발간 다음 거래일 시가 즉시 진입. F: 200MA 위 확인 후 진입. G: 발간일 종가 -20% 도달 시 진입. H: 미너비니 5-point 템플릿 통과 시. I: Supertrend(10,3) 상향전환 시. J: D NAV 오버레이. K: R:R 즉시. L: RSI(2)<10 AND close>200MA. M: 월초 직전 1mo 수익률 하위 20%. N: 리포트 당일 close≥52w고점×85%.",
               },
               {
                 n: 3,
-                title: `청산 — 전략별 규칙`,
-                body: `D 헤드라인: ATR(42)×5 트레일링 (Le Beau). G: 목표가/+50%/12mo/ATR×3 선착. H: 주간 close<50MA. I: Supertrend 하향전환. J: 80/20 자동 디레버. K: half at +2.5R + ATR×3 트레일.`,
+                title: "청산 — 전략별 규칙",
+                body: "D/D+: ATR 트레일링 스탑 (Le Beau Chandelier). G: 목표가/+50%/12mo/ATR×3 선착. H: 주간 close<50MA. I: Supertrend 하향전환. J: 80/20 자동 디레버. K: half at +2.5R + ATR×3 트레일. L: RSI(2)>70 OR 10거래일. M: 1개월 보유 후 전량 매도. N: 월말 close<52w고점×70%.",
               },
               {
                 n: 4,
                 title: `포지션 — 동일비중 ${Math.round((params.position_weight ?? 0.05) * 100)}%`,
-                body: `슬롯당 NAV의 ${Math.round((params.position_weight ?? 0.05) * 100)}%. 최대 ${params.max_positions ?? 20}종목 (K는 최대 10). 거래비용 편도 ${(params.cost_per_side ?? 0.003) * 100}%. J(레버리지): 차입비용 6%/년 일 단위 적립.`,
+                body: `슬롯당 NAV의 ${Math.round((params.position_weight ?? 0.05) * 100)}%. 최대 ${params.max_positions ?? 20}종목 (K는 최대 10, D+ Optuna는 최대 10). 거래비용 편도 ${(params.cost_per_side ?? 0.003) * 100}%. J(레버리지): 차입비용 6%/년 일 단위 적립.`,
               },
               {
                 n: 5,
-                title: "G 딥바이 — 파라미터 출처",
-                body: "딥 임계값 20%: Jegadeesh & Kim (2006) 애널리스트 반응 후 가격 조정 연구. 창 6개월, ATR×3 스탑, +50% 익절, 12개월 최대 보유. 단독 커버 허용 — 딥 진입 자체가 질적 필터 역할.",
+                title: "L 민리버전 — Connors RSI-2 출처",
+                body: "Connors & Alvarez (2009) 'Short-Term Trading Strategies That Work'. 유니버스: 최근 18개월 내 매수 리포트. RSI(2) < 10 AND close > 200MA 진입. RSI(2) > 70 OR 10거래일 청산. 단기 평균회귀 전략.",
               },
               {
                 n: 6,
-                title: "H 미너비니 — 파라미터 출처",
-                body: "Minervini (2013) 'Trade Like a Stock Market Wizard'. 5-point template: close>50MA>150MA>200MA, 200MA 상승(vs 1달 전), 52w 고점 70% 이상, 6개월 RS vs KOSPI 양(+). 청산: 주간 close<50MA.",
+                title: "M 단기 리버설 — Factor Zoo 출처",
+                body: "Jegadeesh (1990), Lehmann (1990) 단기 과매도 반전. 유니버스: 최근 18개월 리포트. 월초 리밸런싱: 직전 1개월 수익률 하위 20% 매수, 1개월 보유 후 전량 청산.",
               },
               {
                 n: 7,
-                title: "I 슈퍼트렌드 — 파라미터 출처",
-                body: "Supertrend 표준 파라미터 (10, 3): ATR 기간 10일, 밴드 배수 3.0. Olivier Seban 대중화. 발간 시 불리시이거나 3개월 내 첫 상향 전환 시 진입. 하향 전환 다음 거래일 청산.",
+                title: "N 52주 고가 근접 — George & Hwang 2004 출처",
+                body: "George & Hwang (2004) 'The 52-Week High and Momentum Investing'. 리포트 당일 close ≥ 52w high × 85% 진입. 월말 체크: close < 52w high × 70% 청산.",
               },
               {
                 n: 8,
-                title: "K R:R 2.5 — 파라미터 출처",
-                body: "Van Tharp 'Trade Your Way to Financial Freedom' R-배수 프레임워크. 1R = ATR(20)×1. 반절 +2.5R 익절 (고성과 트레이더 통계적 최적 구간). 나머지 Chandelier ATR×3 트레일. 최대 10종목 집중도 관리.",
+                title: "G 딥바이 / H 미너비니 / I 슈퍼트렌드 / K R:R",
+                body: "G: Jegadeesh & Kim (2006). H: Minervini (2013). I: Supertrend(10,3) Seban. K: Van Tharp R-배수 프레임워크. 상세는 각 전략 결과 참조.",
               },
             ].map((rule) => (
               <article key={rule.n} className="rounded-lg border border-border bg-secondary/20 p-4">
@@ -638,6 +701,54 @@ export default function StrategyPage() {
             ))}
           </div>
 
+          {/* Optuna methodology disclosure */}
+          {optunaNote && (
+            <section className="rounded-lg border border-stamp/40 bg-stamp/5 p-5">
+              <h3 className="font-display text-lg font-black tracking-tight">
+                D+ Optuna 강건 최적화 — 방법론 전문 공개
+                {optunaNote.adopted
+                  ? <span className="ml-2 font-mono text-[11px] font-normal text-up">채택됨 ✓</span>
+                  : <span className="ml-2 font-mono text-[11px] font-normal text-down">채택 불가 (OOS 미달)</span>
+                }
+              </h3>
+              <div className="mt-3 grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
+                <div>
+                  <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-foreground">탐색 공간 (5차원 이하)</p>
+                  <ul className="mt-1 space-y-0.5">
+                    <li>· ATR 기간: {optunaNote.search_space.atr_period?.join(" / ")}</li>
+                    <li>· ATR 배수: [{optunaNote.search_space.atr_mult?.join(", ")}]</li>
+                    <li>· 최대 포지션: {optunaNote.search_space.max_positions?.join(" / ")}</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-foreground">최적 파라미터</p>
+                  <ul className="mt-1 space-y-0.5">
+                    <li>· ATR 기간: {optunaNote.best_params?.atr_period}</li>
+                    <li>· ATR 배수: {optunaNote.best_params?.atr_mult?.toFixed(3)}</li>
+                    <li>· 최대 포지션: {optunaNote.best_params?.max_positions}</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-foreground">IS 폴드 검증 ({optunaNote.n_trials} trials)</p>
+                  <ul className="mt-1 space-y-0.5">
+                    <li>· 폴드1 (2020-21) 샤프: {optunaNote.fold1_sharpe?.toFixed(2) ?? "—"}</li>
+                    <li>· 폴드2 (2022-23) 샤프: {optunaNote.fold2_sharpe?.toFixed(2) ?? "—"}</li>
+                    <li>· 목적함수: min(f1,f2) − 0.1×|f1−f2|</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-foreground">OOS 1회 평가 결과</p>
+                  <ul className="mt-1 space-y-0.5">
+                    <li>· IS 샤프: {optunaNote.is_sharpe?.toFixed(2) ?? "—"}</li>
+                    <li>· OOS 샤프: {optunaNote.oos_sharpe?.toFixed(2) ?? "—"}</li>
+                    <li>· 채택 기준: {optunaNote.adoption_criteria}</li>
+                  </ul>
+                </div>
+              </div>
+              <p className="mt-3 text-xs text-muted-foreground italic">{optunaNote.methodology}</p>
+            </section>
+          )}
+
           {/* Honest footnotes */}
           <section
             className="rounded-lg border-2 border-foreground/70 bg-card p-5 shadow-[4px_4px_0_0_hsl(var(--foreground)/0.7)]"
@@ -645,18 +756,19 @@ export default function StrategyPage() {
           >
             <h3 className="font-display text-xl font-black tracking-tight">정직한 각주 — 이 전략이 무너지는 곳</h3>
             <ul className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
-              <li>· <strong className="text-foreground">과최적화 주의.</strong> 헤드라인(D) 파라미터는 ATR×5, 200MA — 문헌 표준값 고정. 그리드 서치 없음.</li>
+              <li>· <strong className="text-foreground">과최적화 주의.</strong> D 기본값 파라미터는 문헌 표준값(ATR×5, 200MA) 고정. D+ Optuna는 IS 2-폴드 교차검증으로 강건화했으나 표본 크기(460종목) 제한으로 과최적화 위험이 남습니다.</li>
               <li>· <strong className="text-foreground">시뮬 기점 주의.</strong> 2020-01 이전 리포트 풀이 얇아 기점을 2020-01-01로 설정. 실질 트레이딩은 신호 발생 시점부터이므로 첫 거래는 이후.</li>
               <li>· <strong className="text-foreground">내러티브 홀드(C) 주의.</strong> 무한 홀드 전략은 MDD 허용 범위가 넓습니다. 포지션 청산 규칙이 느슨합니다.</li>
-              <li>· <strong className="text-foreground">딥바이(G) 솔직한 평가.</strong> IS CAGR −2.2%, OOS CAGR −31.5%. 20% 하락이 저점이 아니라 시작인 경우가 많습니다. 단독 커버 허용이 과도한 노출을 만들었습니다. IS/OOS 모두 벤치마크 하회 — 채택 불가.</li>
-              <li>· <strong className="text-foreground">미너비니(H) / 슈퍼트렌드(I).</strong> IS Sharpe가 D보다 낮고 진입 필터가 신호를 크게 줄입니다. 추세 필터 전략은 급등 초입을 놓치는 비용이 존재합니다.</li>
-              <li>· <strong className="text-foreground">코어-새틀라이트 레버리지(J) 솔직한 평가.</strong> IS Sharpe 0.83, OOS Sharpe 1.04로 D(0.97/0.98)와 경쟁적이지만, 차입비용(6%/년)과 폭락 타이밍 미스 리스크가 있습니다. 레버리지 전개 구간에서 추가 낙폭이 발생하면 NAV가 D보다 더 많이 빠집니다. 단독 사용 권장 불가, D의 보조 시뮬로만 참고하세요.</li>
-              <li>· <strong className="text-foreground">R:R 2.5(K) 주의.</strong> IS/OOS Sharpe 0.52/0.50으로 안정적이나 D보다 낮습니다. 빠른 사이클이 거래비용을 높입니다.</li>
+              <li>· <strong className="text-foreground">딥바이(G) 솔직한 평가.</strong> 20% 하락이 저점이 아니라 시작인 경우가 많습니다. IS/OOS 모두 벤치마크 하회 — 채택 불가.</li>
+              <li>· <strong className="text-foreground">민리버전(L) / 단기 리버설(M) 솔직한 평가.</strong> L IS sharpe −3.1, OOS −2.53. M IS sharpe −1.4, OOS −2.18. 두 전략 모두 이 유니버스에서 작동하지 않습니다. Connors RSI-2는 미국 ETF·대형주 시장을 위해 설계된 전략으로 한국 소형·중형주 + 학회 리포트 필터 조합에서는 과도한 거래비용과 틱 노이즈로 음(−) 성과. 전략 참고용으로만 유지.</li>
+              <li>· <strong className="text-foreground">52주 고가 근접(N).</strong> IS sharpe 0.20, OOS sharpe 1.20. OOS 성과는 양호하나 IS 샤프가 낮아 헤드라인 선정 기준 미달. 참고용 전략으로 유지.</li>
+              <li>· <strong className="text-foreground">코어-새틀라이트 레버리지(J) 솔직한 평가.</strong> 차입비용(6%/년)과 폭락 타이밍 미스 리스크가 있습니다. D 보조 시뮬로만 참고하세요.</li>
+              <li>· <strong className="text-foreground">R:R 2.5(K) 주의.</strong> 빠른 사이클이 거래비용을 높입니다.</li>
               <li>· <strong className="text-foreground">US 종목 주의.</strong> 수익은 달러 기준. KRW/USD 환율 변동 미반영.</li>
-              <li>· <strong className="text-foreground">컨센서스 표본 제한.</strong> US 컨센서스 종목 4개. 통계적 유의성 낮음.</li>
+              <li>· <strong className="text-foreground">컨센서스 표본 제한.</strong> US 컨센서스 종목 소수. 통계적 유의성 낮음.</li>
               <li>· 롱온리 전략. 대세 하락장 손실 불가피. 헤드라인 MDD {formatPct(m.mdd_pct, 1)}.</li>
               <li>· <strong className="text-foreground">컨센서스 분석.</strong>{" "}
-                헤드라인(D) 거래 기준: 단독 커버 {consensus.single_club.count}건 (평균 {formatPct(consensus.single_club.avg_return_pct, 1)}, 승률 {consensus.single_club.win_rate_pct ?? "—"}%) vs
+                헤드라인 거래 기준: 단독 커버 {consensus.single_club.count}건 (평균 {formatPct(consensus.single_club.avg_return_pct, 1)}, 승률 {consensus.single_club.win_rate_pct ?? "—"}%) vs
                 멀티 커버 {consensus.multi_club.count}건 (평균 {formatPct(consensus.multi_club.avg_return_pct, 1)}, 승률 {consensus.multi_club.win_rate_pct ?? "—"}%).
                 {consensus.alpha_multi_vs_single != null && ` 멀티 커버 알파: ${formatPct(consensus.alpha_multi_vs_single, 1)}p.`}
               </li>
