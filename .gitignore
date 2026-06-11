@@ -38,3 +38,9 @@ data/prices/
 
 # agent/run logs
 logs/
+
+# secrets - NEVER commit
+.env
+
+# stray run logs at root
+*.log
