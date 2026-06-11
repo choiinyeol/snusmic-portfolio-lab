@@ -79,6 +79,7 @@ type Trade = {
   days: number;
   n_clubs?: number;
   exit_reason?: string;
+  entry_reason?: string;     // v18: 왜 진입했는가 (전략별 실제 규칙 텍스트)
   trigger_schools?: string[];
   trigger_reports?: TriggerReport[];
   trigger_target_prices?: number[];
@@ -96,6 +97,7 @@ type OpenPosition = {
   source?: string;
   n_clubs?: number;
   extension?: number | null;  // ATR% multiple from 50-MA (과열 게이지)
+  entry_reason?: string;      // v18: 왜 진입했는가
 };
 
 type MultiStrategyData = {
@@ -144,6 +146,7 @@ const TRADE_COLS: SortColumn<Trade>[] = [
   { key: "exit",         value: (t) => t.exit,         firstDir: "desc" },
   { key: "return_pct",   value: (t) => t.return_pct,   firstDir: "desc", groupValue: (t) => Math.floor(t.return_pct / 25) },
   { key: "days",         value: (t) => t.days,         firstDir: "desc", groupValue: (t) => Math.floor(t.days / 30) },
+  { key: "entry_reason", value: (t) => t.entry_reason ?? "" },
   { key: "exit_reason",  value: (t) => t.exit_reason ?? "" },
 ];
 
@@ -183,7 +186,7 @@ function OpenPositionsTable({ positions, stratKey }: { positions: OpenPosition[]
               const extColor = ext == null ? "" : ext >= 12 ? "text-down font-bold" : ext >= 8 ? "text-amber-500 font-bold" : ext >= 4 ? "text-foreground" : "text-muted-foreground";
               return (
                 <tr key={pos.ticker} className="border-b border-dashed border-border last:border-b-0">
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-2" title={pos.entry_reason || undefined}>
                     {slug ? (
                       <Link href={`/stocks/${slug}`} className="hover:underline">
                         <p className="font-mono text-xs font-bold">{pos.display_name ?? pos.ticker}</p>
@@ -192,6 +195,9 @@ function OpenPositionsTable({ positions, stratKey }: { positions: OpenPosition[]
                       <p className="font-mono text-xs font-bold">{pos.display_name ?? pos.ticker}</p>
                     )}
                     <p className="font-mono text-[10px] text-muted-foreground">{pos.ticker}{market !== "KR" ? ` · ${market}` : ""}</p>
+                    {pos.entry_reason && (
+                      <p className="mt-0.5 max-w-[260px] truncate font-mono text-[10px] text-muted-foreground">{pos.entry_reason}</p>
+                    )}
                   </td>
                   <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">{pos.entry_date}</td>
                   <td className="tnum px-3 py-2 text-right font-mono text-xs">{pos.entry.toLocaleString()}</td>
@@ -402,7 +408,12 @@ function TickerHistoryPanel({
               {formatPct(t.return_pct, 1)}
             </span>
             <span className="font-mono text-[10px] text-muted-foreground">{t.days}일</span>
-            <span className="font-mono text-[10px] text-muted-foreground truncate max-w-[120px]">{t.exit_reason}</span>
+            <span className="font-mono text-[10px] text-muted-foreground truncate max-w-[120px]" title={t.exit_reason}>{t.exit_reason}</span>
+            {t.entry_reason && (
+              <span className="basis-full font-mono text-[10px] text-muted-foreground">
+                매수 사유: <span className="text-foreground">{t.entry_reason}</span>
+              </span>
+            )}
           </div>
         ))}
       </div>
@@ -465,12 +476,13 @@ function TradeLog({ trades, stratKey }: { trades: Trade[]; stratKey: string }) {
       )}
 
       <div className="mt-4 overflow-x-auto">
-        <table className="w-full min-w-[860px] border-collapse text-sm">
+        <table className="w-full min-w-[1020px] border-collapse text-sm">
           <thead>
             <tr className="border-b-4 border-double border-border font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
               <SortableTh sortKey="display_name" sort={sort} className="px-3 py-2 text-left">종목</SortableTh>
               <SortableTh sortKey="entry_date"   sort={sort} align="right" className="px-3 py-2">매수일</SortableTh>
               <SortableTh sortKey="entry"        sort={sort} align="right" className="px-3 py-2">매수가</SortableTh>
+              <SortableTh sortKey="entry_reason" sort={sort} className="px-3 py-2">매수사유</SortableTh>
               <SortableTh sortKey="exit_date"    sort={sort} align="right" className="px-3 py-2">매도일</SortableTh>
               <SortableTh sortKey="exit"         sort={sort} align="right" className="px-3 py-2">매도가</SortableTh>
               <SortableTh sortKey="return_pct"   sort={sort} align="right" className="px-3 py-2">수익률</SortableTh>
@@ -501,6 +513,9 @@ function TradeLog({ trades, stratKey }: { trades: Trade[]; stratKey: string }) {
                   </td>
                   <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">{t.entry_date}</td>
                   <td className="tnum px-3 py-2 text-right font-mono text-xs">{typeof t.entry === "number" ? t.entry.toLocaleString() : t.entry}</td>
+                  <td className="px-3 py-2 font-mono text-[10px] text-muted-foreground">
+                    <span className="block max-w-[220px] truncate" title={t.entry_reason}>{t.entry_reason || "—"}</span>
+                  </td>
                   <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">{t.exit_date}</td>
                   <td className="tnum px-3 py-2 text-right font-mono text-xs">{typeof t.exit === "number" ? t.exit.toLocaleString() : t.exit}</td>
                   <td className={cn("tnum px-3 py-2 text-right font-mono text-xs font-bold", signColor(t.return_pct))}>

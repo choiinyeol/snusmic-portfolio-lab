@@ -1,4 +1,22 @@
-"""학회 리포트 × 전략 연구 백테스트 v16.
+"""학회 리포트 × 전략 연구 백테스트 v18.
+
+변경사항 (v18):
+- W. 올웨더-샹들리에: T-와 동일한 D+ 샹들리에 규칙이되 유휴 현금을 KOSPI 대신
+  올웨더 바스켓(25% GLD/NASDAQ/S&P500/KOSPI, 분기 리밸런스 — 벤치마크와 동일 시리즈)에
+  파킹. 레짐 게이트 없음 — 올웨더 자체가 방어 자산(GLD)을 포함하므로 KOSPI<200MA
+  스위치가 불필요하다는 설계 가설. 헤드라인 경쟁: W vs T- — 자기 파킹 벤치마크
+  (W→올웨더 DCA, T-→KOSPI DCA)를 이기고 IS+OOS 샤프가 높은 쪽 승격.
+  T(상시 KOSPI 파킹)는 연구 기록 비교용으로 유지.
+- 현금 이자 모델: 모든 전략의 유휴 현금에 연 3.0% (한국 MMF/단기채 ETF 프록시,
+  가정) 일복리 (1.03)^(1/252)−1 적용. T-/U 레짐 OFF 구간의 파킹 잔액도 동일.
+  전략 간 비교 공정성을 위해 일괄 적용.
+- 차입 비용 모델: J 코어-새틀라이트 레버리지 차입비용 연 6.0%를 일복리
+  (1.06)^(1/252)−1 로 통일 (기존 단리 6%/365).
+- entry_reason: 모든 거래에 "왜 진입했는가" 사유 문자열 기록 — 전략 패밀리별
+  실제 진입 규칙 텍스트 (리포트 트리거 학회·날짜 포함). CSV·JSON·오늘의 신호에 노출.
+- L 민리버전·M 단기 리버설 가지치기: v11에서 비용 사망 판정 확정 — 더 이상
+  실행/출력하지 않음 (구현은 기록용으로 코드에 유지, 방법론에 한 줄 명시).
+- 연구 기록 테이블에 vs 올웨더 DCA 비율 열 추가 (전 전략).
 
 변경사항 (v16):
 - V. SPO 포트폴리오 (Smart "Predict, then Optimize" — Elmachtoub & Grigas 2022):
@@ -118,6 +136,12 @@ REGIME_MA = 200
 # Literature-grounded, fixed parameters (no grid search)
 CHANDELIER_ATR_MULT = 5.0   # Chandelier Exit: ATR(42)×5 — wide, lets multibaggers breathe
 MA200_MONTHLY_CHECK = True  # Faber (2007): check 200-day MA monthly
+
+# v18: 현금 이자 / 차입 비용 — 모두 일복리, 252 거래일 기준
+CASH_YIELD_ANNUAL = 0.03    # 유휴 현금 수익률 (한국 MMF/단기채 ETF 2020-26 평균 프록시, 가정)
+CASH_YIELD_DAILY = (1 + CASH_YIELD_ANNUAL) ** (1 / 252) - 1
+BORROW_RATE_ANNUAL = 0.06   # J 레버리지 차입 비용 (연)
+BORROW_RATE_DAILY = (1 + BORROW_RATE_ANNUAL) ** (1 / 252) - 1
 
 # DCA params
 DCA_INITIAL = 10_000_000
@@ -393,6 +417,25 @@ def find_trigger_reports(
     return list(by_school.values())
 
 
+def _report_trigger_reason(
+    ticker: str,
+    entry_date: dt.date,
+    ticker_reports: dict[str, list[dict]] | None,
+    prefix: str = "학회 매수리포트 발간 → 익일 시가 진입",
+) -> str:
+    """v18: 진입 사유 텍스트 — 트리거 리포트(학회·발간일)를 붙인 표준 문구."""
+    if not ticker_reports:
+        return prefix
+    triggers = find_trigger_reports(ticker, entry_date, ticker_reports, None)
+    if not triggers:
+        return prefix
+    parts = ", ".join(
+        f"{t['school']} {t['report_date'].isoformat()}"
+        for t in sorted(triggers, key=lambda x: x["report_date"], reverse=True)
+    )
+    return f"{prefix} (트리거: {parts})"
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Shared helpers
 # ──────────────────────────────────────────────────────────────────────────────
@@ -466,10 +509,12 @@ def _try_enter(
     ticker_reports: dict[str, list[dict]] | None,
     weight: float = POSITION_WEIGHT,
     momentum_filter: bool = False,
+    entry_reason: str | None = None,
 ) -> tuple[dict | None, float]:
     """
     Try to enter a position. Returns (position_dict, new_cash) or (None, cash).
     momentum_filter=True: only enter if close > 200MA.
+    entry_reason: v18 — 진입 사유 텍스트. None이면 표준 리포트 트리거 문구 자동 생성.
     """
     if ticker in positions:
         return None, cash
@@ -533,6 +578,8 @@ def _try_enter(
         # For half-exit (E): whether half already sold
         "half_sold": False,
         "half_sell_price": None,
+        # v18: 진입 사유 (왜 샀는가)
+        "entry_reason": entry_reason or _report_trigger_reason(ticker, day, ticker_reports),
     }
     return pos, cash
 
@@ -565,6 +612,7 @@ def _close_trade(
         "return_pct": round((proceeds / cost - 1) * 100, 2),
         "days": (exit_date - pos["entry_date"]).days,
         "exit_reason": exit_reason,
+        "entry_reason": pos.get("entry_reason", ""),
     }
     if record_full_trades and ticker_reports is not None:
         triggers = find_trigger_reports(ticker, pos["entry_date"], ticker_reports, consensus_window)
@@ -608,6 +656,7 @@ def run_fixed_hold(
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
+        cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # Execute scheduled exits
         to_exit = [t for t, d in list(scheduled_exits.items()) if d <= day and t in positions]
@@ -631,6 +680,7 @@ def run_fixed_hold(
             for ticker, source, n_clubs in candidates[:slots]:
                 pos, cash = _try_enter(ticker, source, n_clubs, day, prices, positions, cash, nav_now, ticker_reports)
                 if pos is not None:
+                    pos["entry_reason"] += f" · {hold_months}개월 고정 보유"
                     positions[ticker] = pos
                     exit_target = months_later(day, hold_months)
                     exit_day = first_trading_day_on_or_after(exit_target, calendar)
@@ -692,6 +742,7 @@ def run_narrative_hold(
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
+        cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # Execute pending exits (flagged previous month-end)
         to_exit = [t for t in list(pending_exits) if t in positions]
@@ -716,6 +767,8 @@ def run_narrative_hold(
                 pos, cash = _try_enter(ticker, source, n_clubs, day, prices, positions, cash, nav_now,
                                        ticker_reports, momentum_filter=momentum_filter_entry)
                 if pos is not None:
+                    if momentum_filter_entry:
+                        pos["entry_reason"] += " · 진입 조건: 시가 > 200MA (모멘텀 필터 통과)"
                     positions[ticker] = pos
 
         # Update last_close and MA
@@ -778,6 +831,7 @@ def run_chandelier(
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
+        cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # Execute pending exits
         to_exit = [t for t in list(pending_exits) if t in positions]
@@ -867,6 +921,7 @@ def run_half_exit_runner(
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
+        cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # Execute runner exits (C-rule triggered previous month-end)
         to_exit = [t for t in list(runner_exits) if t in positions]
@@ -1022,6 +1077,7 @@ def run_dip_buy(
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
+        cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # Execute pending exits (trailing stop or other)
         to_exit = [t for t in list(pending_exits) if t in positions]
@@ -1068,6 +1124,10 @@ def run_dip_buy(
                     "target_price": watch["target_price"], "stop": stop,
                     "max_hold_date": months_later(day, DIP_HOLD_MONTHS),
                     "half_sold": False, "half_sell_price": None,
+                    "entry_reason": (
+                        f"발간일({watch['report_date'].isoformat()}) 종가 대비 "
+                        f"−{int(DIP_THRESHOLD * 100)}% 하락 도달 → 익일 시가 진입 (딥바이)"
+                    ),
                 }
                 positions[ticker] = pos
             dip_entry_queue = []
@@ -1190,6 +1250,7 @@ def run_minervini(
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
+        cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # Execute pending exits
         to_exit = [t for t in list(pending_exits) if t in positions]
@@ -1242,7 +1303,14 @@ def run_minervini(
                         kospi_rs = kospi_now / kospi_6mo_ago - 1
                         if stock_rs <= kospi_rs:
                             continue
-                pos, cash = _try_enter(ticker, source, n_clubs, day, prices, positions, cash, nav_now, ticker_reports)
+                pos, cash = _try_enter(
+                    ticker, source, n_clubs, day, prices, positions, cash, nav_now, ticker_reports,
+                    entry_reason=_report_trigger_reason(
+                        ticker, day, ticker_reports,
+                        prefix="미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, "
+                               "52주고점 70%↑, RS>KOSPI) → 진입",
+                    ),
+                )
                 if pos is not None:
                     positions[ticker] = pos
 
@@ -1306,7 +1374,8 @@ def run_supertrend(
     # Build per-day ST-watch: tickers waiting for a bullish flip after report
     # st_watch: ticker -> (report_date, expire_date, n_clubs, source)
     st_watch: dict[str, dict] = {}
-    pending_entries_direct: dict[dt.date, list[tuple[str, str, int]]] = {}
+    # v18: 4th element = entry_reason (직접 진입 vs 상방 전환 구분)
+    pending_entries_direct: dict[dt.date, list[tuple[str, str, int, str]]] = {}
 
     for rdate, ticker, source, n_clubs in reports:
         # v8: no consensus gate — single-club OK
@@ -1319,7 +1388,8 @@ def run_supertrend(
         if st_val >= 0.5:
             # Already bullish → enter immediately
             if entry_day:
-                pending_entries_direct.setdefault(entry_day, []).append((ticker, source, n_clubs))
+                pending_entries_direct.setdefault(entry_day, []).append(
+                    (ticker, source, n_clubs, "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입"))
         else:
             # Wait for first bullish flip within 3 months
             expire = rdate + dt.timedelta(days=SUPERTREND_WINDOW_DAYS)
@@ -1331,6 +1401,7 @@ def run_supertrend(
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
+        cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # Execute pending exits
         to_exit = [t for t in list(pending_exits) if t in positions]
@@ -1350,14 +1421,16 @@ def run_supertrend(
         if day in pending_entries_direct:
             nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
             slots = MAX_POSITIONS - len(positions)
-            candidates = list({t: (t, s, nc) for t, s, nc in pending_entries_direct[day] if t not in positions}.values())
-            for ticker, source, n_clubs in candidates[:slots]:
-                pos, cash = _try_enter(ticker, source, n_clubs, day, prices, positions, cash, nav_now, ticker_reports)
+            candidates = list({t: (t, s, nc, rsn) for t, s, nc, rsn in pending_entries_direct[day] if t not in positions}.values())
+            for ticker, source, n_clubs, st_reason in candidates[:slots]:
+                pos, cash = _try_enter(ticker, source, n_clubs, day, prices, positions, cash, nav_now,
+                                       ticker_reports,
+                                       entry_reason=_report_trigger_reason(ticker, day, ticker_reports, prefix=st_reason))
                 if pos is not None:
                     positions[ticker] = pos
 
         # Scan st_watch for bullish flips
-        new_direct: list[tuple[str, str, int]] = []
+        new_direct: list[tuple[str, str, int, str]] = []
         for ticker, watch in list(st_watch.items()):
             if ticker in positions:
                 continue
@@ -1371,7 +1444,8 @@ def run_supertrend(
                 continue
             st_now = bool(df.loc[day_ts]["supertrend_bull"])
             if st_now:
-                new_direct.append((ticker, watch["source"], watch["n_clubs"]))
+                new_direct.append((ticker, watch["source"], watch["n_clubs"],
+                                   "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입"))
                 del st_watch[ticker]
 
         if new_direct:
@@ -1448,6 +1522,10 @@ def run_core_satellite_leverage(
         day_ts = ts
         day = ts.date()
 
+        # v18: 현금 버퍼 일복리 이자 (연 3% MMF 프록시) — 양(+) 잔액에만
+        if cash_buffer > 0:
+            cash_buffer *= (1 + CASH_YIELD_DAILY)
+
         # Compute KOSPI drawdown
         kp = float(kospi_aligned.loc[day_ts])
         kp_hi = float(kospi_hi52.loc[day_ts])
@@ -1473,8 +1551,9 @@ def run_core_satellite_leverage(
                 is_leveraged = True
         else:
             # Leveraged: core grows, borrow cost accrues
+            # v18: 일복리 (1+6%)^(1/252)−1 — 단리 6%/365에서 통일
             core_units *= (1 + cr)
-            borrow_cost_daily = borrowed * LEVERAGE_BORROW_RATE / 365
+            borrow_cost_daily = borrowed * BORROW_RATE_DAILY
             borrowed += borrow_cost_daily
             cash_buffer -= borrow_cost_daily  # cost comes from cash; can go negative
 
@@ -1543,6 +1622,7 @@ def run_rr_trend(
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
+        cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # Execute pending exits
         to_exit = [t for t in list(pending_exits) if t in positions]
@@ -1612,6 +1692,10 @@ def run_rr_trend(
                     "source": source, "n_clubs": n_clubs,
                     "display_name": display_name, "market": market,
                     "target_price": tp,
+                    "entry_reason": _report_trigger_reason(
+                        ticker, day, ticker_reports,
+                        prefix="학회 매수리포트 발간 → 익일 시가 진입, R:R 세팅 (스탑 1×ATR20, 목표 +2.5R)",
+                    ),
                 }
 
         # Update positions and check exit conditions
@@ -1693,6 +1777,7 @@ def run_chandelier_parametric(
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
+        cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         to_exit = [t for t in list(pending_exits) if t in positions]
         for ticker in to_exit:
@@ -1920,6 +2005,7 @@ def run_rsi2_mean_reversion(
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
+        cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # Execute pending exits at open
         to_exit = [t for t in list(pending_exits) if t in positions]
@@ -2053,6 +2139,7 @@ def run_short_term_reversal(
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
+        cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         if day in month_firsts:
             # Step 1: Close all existing positions at today's open (month-first open)
@@ -2194,6 +2281,7 @@ def run_52w_high_proximity(
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
+        cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # Execute pending exits
         to_exit = [t for t in list(pending_exits) if t in positions]
@@ -2396,6 +2484,7 @@ def run_mtt_alpha16(
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
+        cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # Execute pending exits at open
         to_exit = [t for t in list(pending_exits) if t in positions]
@@ -2431,6 +2520,10 @@ def run_mtt_alpha16(
                     pos["trail_activated"] = False
                     pos["rs_val"] = rs_val
                     pos["hold_days"] = 0
+                    pos["entry_reason"] = (
+                        f"MTT 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, "
+                        f"52주저점×1.9↑, 52주고점×0.95↑, RS {rs_val:.0f}≥80) → 익일 시가 진입"
+                    )
                     positions[ticker] = pos
                     slots -= 1
             mtt_entry_queue = []
@@ -2643,6 +2736,7 @@ def run_deepbuy_chandelier(
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
+        cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # ── Open-of-day: execute exits ─────────────────────────────────────
         to_exit = [t for t in list(pending_exits) if t in positions]
@@ -2730,6 +2824,11 @@ def run_deepbuy_chandelier(
                     "addon_trigger": entry_price * (1 - P_ADDON_DROP),
                     "thesis_expire": watch["expire_date"],
                     "first_entry_price": entry_price,
+                    "entry_reason": (
+                        f"발간일({watch['report_date'].isoformat()}) 종가 대비 "
+                        f"−{int(P_DIP_THRESHOLD * 100)}% 하락 도달 → 익일 시가 진입 "
+                        f"(딥바이; 추가 −{int(P_ADDON_DROP * 100)}% 시 1회 스케일인)"
+                    ),
                 }
             dip_entry_queue = []
 
@@ -2852,6 +2951,7 @@ def run_immediate_hold(
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
+        cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         if target_exit:
             for ticker, pos in list(positions.items()):
@@ -3418,7 +3518,8 @@ def compute_wealth_simulation_multi(
         ),
         "schedule_desc": (
             "초기 자본 1,000만원 + 월 적립 (0~23개월: 100만원, 24~47개월: 200만원, "
-            "48~71개월: 300만원, …). 유휴 현금 이자 없음."
+            "48~71개월: 300만원, …). 적립금은 즉시 전략 NAV에 편입. "
+            "전략 내부 유휴 현금에는 연 3% 일복리 이자 반영 (v18, MMF 프록시 가정)."
         ),
         "final_contributed": final_contrib,
         "final_strategy_value": final_strat,
@@ -3550,7 +3651,7 @@ def compute_today_signals(
                 note = (
                     "레짐 ON — 유휴 현금이 KOSPI 익스포저로 작동 중."
                     if state == "ON" else
-                    "레짐 OFF — KOSPI < 200MA. 유휴 현금 파킹 수익 0% (현금 보유). "
+                    "레짐 OFF — KOSPI < 200MA. 유휴 현금은 파킹 대신 현금 이자 연 3% 일복리 (v18). "
                     "신규 진입 규칙 자체는 유지됩니다."
                 )
             else:
@@ -3613,6 +3714,7 @@ def compute_today_signals(
             "extension": ext_val,   # ATR% multiple from 50-MA (과열 게이지)
             "trigger_schools": trigger_schools,
             "trigger_reports": trigger_reports,
+            "entry_reason": pos.get("entry_reason", ""),   # v18: 왜 진입했는가
         }
         if is_chandelier_family:
             pos_info["stop_level"] = round(float(stop_level), 4) if stop_level else None
@@ -3656,6 +3758,11 @@ def compute_today_signals(
             if ts in df.index:
                 entry_basis_price = float(df.loc[ts]["open"])
 
+        # v18: 매수 사유 텍스트 — 헤드라인(샹들리에 패밀리) 진입 규칙 그대로
+        _trigger_txt = ", ".join(
+            f"{r['school']} {r['report_date'].isoformat()}"
+            for r in sorted(recent_reports, key=lambda x: x["report_date"], reverse=True)
+        )
         imminent_buys.append({
             "ticker": ticker,
             "market": market,
@@ -3664,6 +3771,7 @@ def compute_today_signals(
             "entry_basis_date": entry_basis_date.isoformat() if entry_basis_date else None,
             "entry_basis_price": round(entry_basis_price, 4) if entry_basis_price else None,
             "entry_pending": entry_pending,   # True = 익일 시가 진입이 아직 미래
+            "entry_reason": f"학회 매수리포트 발간 → 익일 시가 진입 (트리거: {_trigger_txt})",
             "trigger_schools": sorted({r["school"] for r in recent_reports}),
             "trigger_reports": [
                 {
@@ -3720,7 +3828,7 @@ def export_trades_csv(trades: list[dict], path: Path) -> None:
     closed_sorted = sorted(closed, key=lambda t: t["exit_date"], reverse=True)
 
     headers = [
-        "매수일", "매수가(시가)", "종목명", "티커", "시장", "비중(%)", "커버학회수",
+        "매수일", "매수가(시가)", "매수사유", "종목명", "티커", "시장", "비중(%)", "커버학회수",
         "트리거학회", "리포트날짜들", "목표가들", "매도일", "매도가", "보유일수",
         "수익률(%)", "매도사유",
     ]
@@ -3740,6 +3848,7 @@ def export_trades_csv(trades: list[dict], path: Path) -> None:
             writer.writerow([
                 t.get("entry_date", ""),
                 t.get("entry", ""),
+                t.get("entry_reason", ""),
                 t.get("display_name", t.get("ticker", "")),
                 t.get("ticker", ""),
                 t.get("market", "KR"),
@@ -3795,6 +3904,8 @@ def build_multi_strategy_summary(
             "trade_count": n,
             "kospi_dca_ratio": ratio_info.get("full_ratio"),      # strategy_final / kospi_final
             "kospi_dca_beats": (ratio_info.get("full_ratio") or 0.0) > 1.0,
+            "aw_dca_ratio": ratio_info.get("aw_ratio"),           # v18: strategy_final / allweather_final
+            "aw_dca_beats": (ratio_info.get("aw_ratio") or 0.0) > 1.0,
         })
     return rows
 
@@ -3893,6 +4004,7 @@ def run_kangto_trend(
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
+        cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
         equity = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
 
         # Execute pending exits at open
@@ -3989,6 +4101,10 @@ def run_kangto_trend(
                     "market": market,
                     "target_price": tp,
                     "total_units": total_units,
+                    "entry_reason": (
+                        f"깡토 추세추종: RS {rs_val:.0f} ≥ KOSPI RS + 60일 신고가 돌파 + "
+                        f"거래량 ≥ 1.5×20일평균 → 익일 시가 진입 ({total_units}유닛)"
+                    ),
                 }
                 slots -= 1
             q_entry_queue = []
@@ -4208,6 +4324,7 @@ def run_kelly_chandelier(
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
+        cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # Execute pending exits at open
         to_exit = [t for t in list(pending_exits) if t in positions]
@@ -4278,6 +4395,10 @@ def run_kelly_chandelier(
                     "display_name": display_name,
                     "market": market,
                     "target_price": tp,
+                    "entry_reason": _report_trigger_reason(
+                        ticker, day, ticker_reports,
+                        prefix=f"학회 매수리포트 발간 → 익일 시가 진입 (Kelly 사이징 {kelly_frac * 100:.1f}%)",
+                    ),
                 }
 
         # Update positions + check chandelier stop
@@ -4590,6 +4711,7 @@ def run_portfolio_opt(
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
+        cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # Month-first: execute rebalance
         if day in month_firsts and target_weights:
@@ -4670,6 +4792,7 @@ def run_portfolio_opt(
                         "display_name": cur_pos["display_name"],
                         "market": cur_pos["market"],
                         "target_price": cur_pos.get("target_price"),
+                        "entry_reason": f"{variant} 월간 리밸런스 — 목표비중 {w * 100:.1f}% 재조정 보유",
                     }
                 else:
                     buy_budget = min(target_value, cash_after_close)
@@ -4696,6 +4819,7 @@ def run_portfolio_opt(
                         "display_name": dn,
                         "market": mkt,
                         "target_price": None,
+                        "entry_reason": f"{variant} 월간 리밸런스 — 목표비중 {w * 100:.1f}% 신규 편입 (18개월 유효 리포트 유니버스)",
                     }
 
             positions = new_positions
@@ -4798,76 +4922,87 @@ def run_portfolio_opt(
 KOSPI_PARK_COST = 0.0005   # 0.05%/side for index ETF switches (KODEX200 기준 가정)
 
 
-def run_kospi_core_chandelier(
+def run_parking_core_chandelier(
     prices: dict[str, pd.DataFrame],
     reports: list[tuple[dt.date, str, str, int]],
     calendar: list[dt.date],
     label: str,
-    kospi: pd.Series,
+    parking: pd.Series,
     atr_period: int,
     atr_mult: float,
     max_positions: int,
     ticker_reports: dict[str, list[dict]] | None = None,
     record_full_trades: bool = False,
     regime_aware: bool = False,
+    regime_index: pd.Series | None = None,
+    parking_name: str = "KOSPI",
 ) -> dict:
     """
-    T 코어-KOSPI 샹들리에.
+    T/T-/W 코어-파킹 샹들리에 (v18: 파킹 시리즈 일반화).
 
-    D+ Chandelier 규칙 완전 동일; 유휴 현금을 KOSPI 익스포저로 주차.
-    진입: KOSPI 파킹 → 주식 (0.05% + 0.3% 편도 각각).
-    청산: 주식 → KOSPI 파킹 (0.3% + 0.05% 편도 각각).
+    D+ Chandelier 규칙 완전 동일; 유휴 현금을 parking 시리즈 익스포저로 주차.
+      T  : parking=KOSPI, regime_aware=False
+      T- : parking=KOSPI, regime_aware=True (KOSPI < 200MA → 파킹 수익 대신 현금 이자 3%)
+      W  : parking=올웨더(25% GLD/NASDAQ/S&P500/KOSPI 분기 리밸런스), 레짐 게이트 없음
 
-    regime_aware=True (T-): KOSPI < 200MA이면 파킹 수익률 0% (현금).
+    진입: 파킹 → 주식 (0.05% + 0.3% 편도 각각).
+    청산: 주식 → 파킹 (0.3% + 0.05% 편도 각각).
 
-    비용 공시: 인덱스 ETF 전환 비용 0.05%/side는 KODEX200 기준 추정값.
-    실제 체결 스프레드·세금·운용보수는 개별 계좌마다 상이할 수 있음.
+    regime_aware=True: regime_index(기본 KOSPI=parking) < 200MA이면 파킹 수익률 대신
+    현금 이자(연 3% 일복리, v18)를 적용.
+
+    비용 공시: 인덱스 ETF 전환 비용 0.05%/side는 KODEX200 기준 추정값
+    (올웨더는 4종 ETF 바스켓 평균 가정). 실제 스프레드·세금·운용보수는 상이할 수 있음.
     """
     START_CAPITAL = 100_000_000
     cash = float(START_CAPITAL)          # this is now the "stock cash" reserve (should stay ~0)
-    kospi_parked = 0.0                   # notional KOSPI exposure (in KRW value)
+    parked = 0.0                         # notional parking exposure (in KRW value)
     positions: dict[str, dict] = {}
     nav_series: list[tuple[str, float]] = []
     trades: list[dict] = []
     pending_exits: set[str] = set()
 
-    # Precompute KOSPI 200MA series for regime filter
-    kospi_ma200: pd.Series | None = None
+    # Precompute regime 200MA series (on regime_index, default = parking series)
+    _regime_src = regime_index if regime_index is not None else parking
+    regime_ma200: pd.Series | None = None
     if regime_aware:
-        kospi_ma200 = kospi.rolling(200, min_periods=100).mean()
+        regime_ma200 = _regime_src.rolling(200, min_periods=100).mean()
 
-    # Align KOSPI to calendar
-    kospi_dates = kospi.index
-
-    # Initialise: all START_CAPITAL goes to KOSPI parking at cost (0.05% entry)
-    kospi_parked = START_CAPITAL * (1 - KOSPI_PARK_COST)
+    # Initialise: all START_CAPITAL goes to parking at cost (0.05% entry)
+    parked = START_CAPITAL * (1 - KOSPI_PARK_COST)
     cash = 0.0
 
     pending_entries = build_pending_entries(reports, calendar, consensus_only=False)
 
-    prev_kospi_close: float | None = None
+    prev_park_close: float | None = None
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
+        cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
-        # ── Daily KOSPI return on parked balance ──────────────────────────────
-        kospi_close_today = asof_value(kospi, day)
-        if kospi_close_today > 0:
-            if prev_kospi_close is not None and prev_kospi_close > 0:
-                # Regime gate: if regime_aware and KOSPI < 200MA, no return (parked at 0%)
-                if regime_aware and kospi_ma200 is not None:
-                    ma200_val = asof_value(kospi_ma200, day)
-                    use_kospi_return = (ma200_val <= 0 or kospi_close_today >= ma200_val)
+        # ── Daily parking return on parked balance ────────────────────────────
+        park_close_today = asof_value(parking, day)
+        if park_close_today > 0:
+            if prev_park_close is not None and prev_park_close > 0:
+                # Regime gate: if regime_aware and regime_index < 200MA → cash yield instead
+                if regime_aware and regime_ma200 is not None:
+                    ma200_val = asof_value(regime_ma200, day)
+                    regime_close = asof_value(_regime_src, day)
+                    use_park_return = (ma200_val <= 0 or regime_close >= ma200_val)
                 else:
-                    use_kospi_return = True
+                    use_park_return = True
 
-                if use_kospi_return and kospi_parked > 0:
-                    daily_kospi_ret = kospi_close_today / prev_kospi_close - 1
-                    kospi_parked *= (1 + daily_kospi_ret)
-            prev_kospi_close = kospi_close_today
+                if parked > 0:
+                    if use_park_return:
+                        daily_park_ret = park_close_today / prev_park_close - 1
+                        parked *= (1 + daily_park_ret)
+                    else:
+                        # v18: 레짐 OFF — 파킹 잔액은 현금으로 간주, 연 3% 일복리 이자
+                        parked *= (1 + CASH_YIELD_DAILY)
+            prev_park_close = park_close_today
         else:
-            if prev_kospi_close is None:
-                prev_kospi_close = asof_value(kospi, day) or None
+            if prev_park_close is None:
+                prev_park_close = asof_value(parking, day) or None
 
         # ── Execute pending exits (next open after stop signal) ───────────────
         to_exit = [t for t in list(pending_exits) if t in positions]
@@ -4878,8 +5013,8 @@ def run_kospi_core_chandelier(
                 continue
             exit_price = float(q["open"])
             stock_proceeds = pos["shares"] * exit_price * (1 - COST_PER_SIDE)
-            # Park proceeds back into KOSPI (0.05% entry cost)
-            kospi_parked += stock_proceeds * (1 - KOSPI_PARK_COST)
+            # Park proceeds back into the parking vehicle (0.05% entry cost)
+            parked += stock_proceeds * (1 - KOSPI_PARK_COST)
             trades.append(_close_trade(ticker, pos, day, exit_price,
                                        f"t_chandelier_ATR{atr_mult}",
                                        ticker_reports, record_full_trades, None))
@@ -4889,7 +5024,7 @@ def run_kospi_core_chandelier(
         # ── Execute pending entries ───────────────────────────────────────────
         if day in pending_entries:
             nav_now = (
-                kospi_parked
+                parked
                 + sum(p["shares"] * p["last_close"] for p in positions.values())
             )
             slots = max_positions - len(positions)
@@ -4906,16 +5041,16 @@ def run_kospi_core_chandelier(
                     continue
 
                 budget = nav_now * POSITION_WEIGHT
-                if budget > kospi_parked:
-                    budget = kospi_parked
+                if budget > parked:
+                    budget = parked
                 if budget < nav_now * POSITION_WEIGHT * 0.5:
                     continue
 
-                # Sell KOSPI parking (0.05% cost) → receive cash for stock purchase
-                kospi_parked -= budget
+                # Sell parking exposure (0.05% cost) → receive cash for stock purchase
+                parked -= budget
                 stock_budget = budget * (1 - KOSPI_PARK_COST)  # proceeds after ETF sell cost
                 shares = stock_budget * (1 - COST_PER_SIDE) / entry_price
-                total_spent = budget   # taken from KOSPI parking
+                total_spent = budget   # taken from parking
 
                 display_name = ticker
                 tp = None
@@ -4947,6 +5082,10 @@ def run_kospi_core_chandelier(
                     "display_name": display_name,
                     "market": market,
                     "target_price": tp,
+                    "entry_reason": _report_trigger_reason(
+                        ticker, day, ticker_reports,
+                        prefix=f"학회 매수리포트 발간 → 익일 시가 진입 ({parking_name} 파킹 매도 후 전환)",
+                    ),
                 }
                 positions[ticker] = pos
 
@@ -4966,7 +5105,7 @@ def run_kospi_core_chandelier(
             if pos.get("stop") and close < pos["stop"] and ticker not in pending_exits:
                 pending_exits.add(ticker)
 
-        nav = kospi_parked + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav = parked + sum(p["shares"] * p["last_close"] for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
     # Force-close remaining positions at end
@@ -4979,14 +5118,14 @@ def run_kospi_core_chandelier(
     result = _compute_result(nav_series, trades, START_CAPITAL, label,
                              open_positions=positions)
     result["kospi_parking_note"] = (
-        "T 코어-KOSPI 샹들리에: 유휴 현금을 KOSPI 지수 익스포저로 주차. "
-        "인덱스 ETF(KODEX200 기준) 전환 비용 0.05%/side 가정 (실제 스프레드·세금 상이 가능). "
+        f"코어-{parking_name} 샹들리에: 유휴 현금을 {parking_name} 익스포저로 주차. "
+        "인덱스 ETF 전환 비용 0.05%/side 가정 (실제 스프레드·세금 상이 가능). "
         "주식 편도 비용 0.3% (기존 동일). "
-        "CSV는 주식 거래만 기록; KOSPI 파킹 전환은 별도 미기록."
+        f"CSV는 주식 거래만 기록; {parking_name} 파킹 전환은 별도 미기록."
     )
     if regime_aware:
         result["kospi_parking_note"] += (
-            " T- 레짐 변형: KOSPI < 200MA 구간에서는 파킹 수익률 0% (현금 보유). "
+            " 레짐 변형: 레짐 지수 < 200MA 구간에서는 파킹 수익률 대신 현금 이자 연 3% 일복리 (v18). "
             "참조: Faber (2007) 10개월 이동평균 레짐 필터."
         )
     return result
@@ -5077,6 +5216,7 @@ def run_kospi_core_chandelier_scaleout(
 
     for day in calendar:
         day_ts = pd.Timestamp(day)
+        cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # ── Daily KOSPI return on parked balance ──────────────────────────────
         kospi_close_today = asof_value(kospi, day)
@@ -5084,9 +5224,13 @@ def run_kospi_core_chandelier_scaleout(
             if prev_kospi_close is not None and prev_kospi_close > 0:
                 ma200_val = asof_value(kospi_ma200, day)
                 use_kospi_return = (ma200_val <= 0 or kospi_close_today >= ma200_val)
-                if use_kospi_return and kospi_parked > 0:
-                    daily_kospi_ret = kospi_close_today / prev_kospi_close - 1
-                    kospi_parked *= (1 + daily_kospi_ret)
+                if kospi_parked > 0:
+                    if use_kospi_return:
+                        daily_kospi_ret = kospi_close_today / prev_kospi_close - 1
+                        kospi_parked *= (1 + daily_kospi_ret)
+                    else:
+                        # v18: 레짐 OFF — 파킹 잔액은 현금 이자 연 3% 일복리
+                        kospi_parked *= (1 + CASH_YIELD_DAILY)
             prev_kospi_close = kospi_close_today
         else:
             if prev_kospi_close is None:
@@ -5171,6 +5315,10 @@ def run_kospi_core_chandelier_scaleout(
                     # U-specific: scale-out state (one-time triggers)
                     "scaleout1_done": False,   # extension > 8× triggered
                     "scaleout2_done": False,   # extension > 12× triggered
+                    "entry_reason": _report_trigger_reason(
+                        ticker, day, ticker_reports,
+                        prefix="학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙)",
+                    ),
                 }
                 positions[ticker] = pos
 
@@ -5375,7 +5523,7 @@ def main() -> int:
     # Parameters are literature-grounded fixed values — no grid search
     # ══════════════════════════════════════════════════════════════════════════
 
-    print("\n── Running strategy battery (v16: V SPO predict-then-optimize 추가) ──", flush=True)
+    print("\n── Running strategy battery (v18: W 올웨더-샹들리에 + 현금이자/차입 모델 + entry_reason + L/M 가지치기) ──", flush=True)
 
     # A. 12개월 보유 (baseline)
     print("A. 12개월 보유...", flush=True)
@@ -5468,26 +5616,10 @@ def main() -> int:
     )
     print(f"   IS sharpe={result_K['in_sample'].get('sharpe')}  OOS sharpe={result_K['out_of_sample'].get('sharpe')}", flush=True)
 
-    # L. 민리버전 (Connors RSI-2) — run for diagnosis, EXCLUDED from headline selector
-    # v11: same-bar lookahead fixed; still dies from 0.6% round-trip cost × high turnover.
-    # Epitaph: RSI-2 민리버전은 거래비용으로 사망 — 구현 검증 후 제외.
-    print("L. 민리버전 Connors RSI-2 (비용 사망 진단용, 셀렉터 제외)...", flush=True)
-    result_L = run_rsi2_mean_reversion(
-        prices, reports, calendar,
-        label="L_rsi2_reversion", ticker_reports=ticker_reports, record_full_trades=True,
-    )
-    print(f"   IS sharpe={result_L['in_sample'].get('sharpe')}  OOS sharpe={result_L['out_of_sample'].get('sharpe')}  trades={result_L['metrics']['trades']}  MDD={result_L['metrics']['mdd_pct']}%", flush=True)
-
-    # M. 단기 리버설 (monthly bottom-quintile) — run for diagnosis, EXCLUDED from headline selector
-    # v11: positions.clear() bug fixed, same-bar lookahead fixed; still dies from monthly
-    # full-turnover cost (0.6% × ~12 rebalances/yr on full NAV).
-    # Epitaph: 단기 리버설은 거래비용으로 사망 — 구현 검증 후 제외.
-    print("M. 단기 리버설 monthly bottom-quintile (비용 사망 진단용, 셀렉터 제외)...", flush=True)
-    result_M = run_short_term_reversal(
-        prices, reports, calendar,
-        label="M_short_reversal", ticker_reports=ticker_reports, record_full_trades=True,
-    )
-    print(f"   IS sharpe={result_M['in_sample'].get('sharpe')}  OOS sharpe={result_M['out_of_sample'].get('sharpe')}  trades={result_M['metrics']['trades']}  MDD={result_M['metrics']['mdd_pct']}%", flush=True)
+    # L 민리버전 / M 단기 리버설 — v18 가지치기: v11에서 룩어헤드·버그 수정 후에도
+    # 거래비용 사망 판정이 확정된 두 전략은 더 이상 실행/출력하지 않는다.
+    # (구현 run_rsi2_mean_reversion / run_short_term_reversal 은 기록용으로 코드에 유지.)
+    print("L/M. 민리버전·단기 리버설 — v18 가지치기 (비용 사망 확정, 미실행)", flush=True)
 
     # N. 52주 고가 근접 (George & Hwang 2004)
     print("N. 52주 고가 근접 (George & Hwang 2004)...", flush=True)
@@ -5612,8 +5744,7 @@ def main() -> int:
         "I_supertrend": result_I,
         "J_core_satellite": result_J,
         "K_rr_trend": result_K,
-        "L_rsi2_reversion": result_L,
-        "M_short_reversal": result_M,
+        # L/M: v18 가지치기 — 비용 사망 확정, 미실행 (방법론 한 줄로만 기록)
         "N_52w_high": result_N,
         "O_mtt_alpha16": result_O,
         "P_deepbuy_chandelier": result_P_default,
@@ -5633,7 +5764,8 @@ def main() -> int:
     # T-: regime variant — not directly in selector (best of T/T- wins as "T. 코어-KOSPI 샹들리에")
     s_non_best = {k for k in s_variants if k != best_s_key}
     # V_spo/V_ls: 기본 연구 기록 전용 — V_spo는 T- 게이트(부의 비율+OOS 샤프) 통과 시에만 셀렉터 승격
-    EXCLUDED_FROM_SELECTOR = {"L_rsi2_reversion", "M_short_reversal", "T-_kospi_core_regime", "U_chandelier_scaleout", "V_spo", "V_ls"} | s_non_best
+    # W: 올웨더 파킹 변형 — 헤드라인 콘테스트(W vs T-) 승자만 셀렉터 승격 (아래)
+    EXCLUDED_FROM_SELECTOR = {"T-_kospi_core_regime", "U_chandelier_scaleout", "V_spo", "V_ls", "W_allweather_chandelier"} | s_non_best
 
     # ── D+ Optuna optimization ─────────────────────────────────────────────────
     print("\n── Optuna robust optimization (D+ chandelier) ───────────────────", flush=True)
@@ -5676,36 +5808,56 @@ def main() -> int:
         t_max_pos    = int(_bp.get("max_positions", MAX_POSITIONS))
 
     print(f"\nT. 코어-KOSPI 샹들리에 (always-KOSPI park, ATR{t_atr_mult}, {t_max_pos} slots)...", flush=True)
-    result_T = run_kospi_core_chandelier(
+    result_T = run_parking_core_chandelier(
         prices, reports, calendar,
         label="T_kospi_core_chandelier",
-        kospi=kospi,
+        parking=kospi,
         atr_period=t_atr_period,
         atr_mult=t_atr_mult,
         max_positions=t_max_pos,
         ticker_reports=ticker_reports,
         record_full_trades=True,
         regime_aware=False,
+        parking_name="KOSPI",
     )
     print(f"   IS sharpe={result_T['in_sample'].get('sharpe')}  OOS sharpe={result_T['out_of_sample'].get('sharpe')}", flush=True)
 
-    print(f"T-. 코어-KOSPI 샹들리에 레짐 변형 (KOSPI<200MA → 현금 파킹)...", flush=True)
-    result_Tminus = run_kospi_core_chandelier(
+    print(f"T-. 코어-KOSPI 샹들리에 레짐 변형 (KOSPI<200MA → 현금 이자 3%)...", flush=True)
+    result_Tminus = run_parking_core_chandelier(
         prices, reports, calendar,
         label="T-_kospi_core_regime",
-        kospi=kospi,
+        parking=kospi,
         atr_period=t_atr_period,
         atr_mult=t_atr_mult,
         max_positions=t_max_pos,
         ticker_reports=ticker_reports,
         record_full_trades=True,
         regime_aware=True,
+        parking_name="KOSPI",
     )
     print(f"   IS sharpe={result_Tminus['in_sample'].get('sharpe')}  OOS sharpe={result_Tminus['out_of_sample'].get('sharpe')}", flush=True)
 
-    # Add T / T- to all_strategies (after they are computed)
+    # W. 올웨더-샹들리에 — v18: 유휴 현금을 올웨더 바스켓에 파킹 (레짐 게이트 없음)
+    # 올웨더 자체가 방어 자산(GLD 25%)을 포함 → KOSPI<200MA 스위치 불필요 가설.
+    print("W. 올웨더-샹들리에 (idle cash → 올웨더 파킹, 레짐 게이트 없음)...", flush=True)
+    result_W = run_parking_core_chandelier(
+        prices, reports, calendar,
+        label="W_allweather_chandelier",
+        parking=all_weather,
+        atr_period=t_atr_period,
+        atr_mult=t_atr_mult,
+        max_positions=t_max_pos,
+        ticker_reports=ticker_reports,
+        record_full_trades=True,
+        regime_aware=False,
+        parking_name="올웨더",
+    )
+    print(f"   IS sharpe={result_W['in_sample'].get('sharpe')}  OOS sharpe={result_W['out_of_sample'].get('sharpe')}", flush=True)
+
+    # Add T / T- / W to all_strategies (after they are computed)
     all_strategies["T_kospi_core_chandelier"] = result_T
     all_strategies["T-_kospi_core_regime"] = result_Tminus
+    all_strategies["W_allweather_chandelier"] = result_W
 
     # ── U: 코어-KOSPI 샹들리에 + 과열 스케일아웃 (T- identical + extension 8×/12×) ──
     print(f"\nU. 코어-KOSPI 샹들리에 + 과열 스케일아웃 (T- + ATR% extension 8×/12×)...", flush=True)
@@ -5760,70 +5912,113 @@ def main() -> int:
         print(f"   R (Optuna params) IS sharpe={result_R['in_sample'].get('sharpe')}  OOS sharpe={result_R['out_of_sample'].get('sharpe')}", flush=True)
         # T and T- were already run with Optuna params above; all_strategies already updated.
 
-    # ── Per-strategy KOSPI DCA ratio (final strategy wealth / KOSPI DCA wealth)
-    print("\nComputing per-strategy KOSPI DCA ratios (quick pass)...", flush=True)
+    # ── Per-strategy KOSPI/올웨더 DCA ratio (final strategy wealth / benchmark DCA wealth)
+    print("\nComputing per-strategy KOSPI/AllWeather DCA ratios (quick pass)...", flush=True)
     _kospi_dca_ratios: dict[str, dict[str, float | None]] = {}
     for key, r in all_strategies.items():
-        ws_tmp = compute_wealth_simulation_multi(r["nav_df"], {"KOSPI": kospi}, strat_start, strat_end)
+        ws_tmp = compute_wealth_simulation_multi(
+            r["nav_df"], {"KOSPI": kospi, "AllWeather": all_weather}, strat_start, strat_end)
         strat_final = ws_tmp["final_strategy_value"]
         kospi_final = ws_tmp["final_benchmark_values"].get("KOSPI", 1)
+        aw_final = ws_tmp["final_benchmark_values"].get("AllWeather", 1)
         ratio = round(strat_final / kospi_final, 3) if kospi_final and kospi_final > 0 else None
-        # IS-only ratio
-        is_nav = r["nav_df"]
-        is_mask = is_nav.index.date <= IS_END
-        is_sub = is_nav[is_mask]
-        oos_sub = is_nav[is_nav.index.date >= OOS_START]
+        aw_ratio = round(strat_final / aw_final, 3) if aw_final and aw_final > 0 else None
         _kospi_dca_ratios[key] = {
             "full_ratio": ratio,
+            "aw_ratio": aw_ratio,            # v18: vs 올웨더 DCA
             "strat_final": round(strat_final),
             "kospi_final": round(kospi_final) if kospi_final else None,
+            "aw_final": round(aw_final) if aw_final else None,
         }
 
-    # ── T promotion: pick better of T / T- (by full-period wealth sim ratio vs KOSPI DCA)
-    # If the winner beats KOSPI DCA on full-period wealth sim AND IS+OOS sharpe >= D+'s,
-    # it competes as a single "T. 코어-KOSPI 샹들리에" entry in the selector.
-    # The loser variant is excluded from the selector.
-    # This must run BEFORE the summary table so exclusion flags are correct.
+    # ── v18 파킹 헤드라인 콘테스트: W (올웨더 파킹) vs T- (KOSPI 파킹 + 레짐) ──
+    # 강건성 기준: (a) 자기 파킹 벤치마크를 이긴다 — W → 올웨더 DCA, T- → KOSPI DCA.
+    #             (b) IS+OOS 샤프 합이 높은 쪽이 승자.
+    # 승자는 기존 게이트(자기 벤치마크 우위 AND IS·OOS 샤프 >= D+) 통과 시 셀렉터 승격.
+    # T (상시 KOSPI 파킹, 레짐 없음)는 연구 기록 비교용 — 콘테스트에 미참여.
     _dplus_ref = result_Dplus if result_Dplus is not None else result_D
     _dplus_is  = (_dplus_ref.get("in_sample", {}).get("sharpe") or -999.0)
     _dplus_oos = (_dplus_ref.get("out_of_sample", {}).get("sharpe") or -999.0)
 
-    _t_ratio     = (_kospi_dca_ratios.get("T_kospi_core_chandelier", {}).get("full_ratio") or 0.0)
-    _tm_ratio    = (_kospi_dca_ratios.get("T-_kospi_core_regime", {}).get("full_ratio") or 0.0)
+    _tm_kospi_ratio = (_kospi_dca_ratios.get("T-_kospi_core_regime", {}).get("full_ratio") or 0.0)
+    _w_aw_ratio     = (_kospi_dca_ratios.get("W_allweather_chandelier", {}).get("aw_ratio") or 0.0)
+    _w_kospi_ratio  = (_kospi_dca_ratios.get("W_allweather_chandelier", {}).get("full_ratio") or 0.0)
+    _tm_aw_ratio    = (_kospi_dca_ratios.get("T-_kospi_core_regime", {}).get("aw_ratio") or 0.0)
 
-    # Best T variant = higher full-period wealth ratio; tie-break by IS sharpe
-    if _t_ratio >= _tm_ratio:
-        _t_best_key, _t_best, _t_best_ratio = "T_kospi_core_chandelier", result_T, _t_ratio
-        _t_other_key = "T-_kospi_core_regime"
+    _tm_is  = (result_Tminus.get("in_sample", {}).get("sharpe") or -999.0)
+    _tm_oos = (result_Tminus.get("out_of_sample", {}).get("sharpe") or -999.0)
+    _w_is   = (result_W.get("in_sample", {}).get("sharpe") or -999.0)
+    _w_oos  = (result_W.get("out_of_sample", {}).get("sharpe") or -999.0)
+
+    _tm_robust = _tm_kospi_ratio > 1.0   # T-는 자기 파킹 벤치마크 = KOSPI DCA
+    _w_robust  = _w_aw_ratio > 1.0       # W는 자기 파킹 벤치마크 = 올웨더 DCA
+    _tm_score = _tm_is + _tm_oos
+    _w_score  = _w_is + _w_oos
+
+    # Winner: robust 후보 중 IS+OOS 샤프 합 우위; 둘 다 robust 아니면 점수만으로 비교
+    if _w_robust and not _tm_robust:
+        _winner_key = "W_allweather_chandelier"
+    elif _tm_robust and not _w_robust:
+        _winner_key = "T-_kospi_core_regime"
     else:
-        _t_best_key, _t_best, _t_best_ratio = "T-_kospi_core_regime", result_Tminus, _tm_ratio
-        _t_other_key = "T_kospi_core_chandelier"
+        _winner_key = "W_allweather_chandelier" if _w_score > _tm_score else "T-_kospi_core_regime"
 
-    # T promotion conditions: beats KOSPI DCA on full-period sim AND IS+OOS sharpe >= D+'s
+    if _winner_key == "W_allweather_chandelier":
+        _t_best_key, _t_best = _winner_key, result_W
+        _t_best_own_ratio, _t_loser_key = _w_aw_ratio, "T-_kospi_core_regime"
+        _t_best_robust = _w_robust
+    else:
+        _t_best_key, _t_best = _winner_key, result_Tminus
+        _t_best_own_ratio, _t_loser_key = _tm_kospi_ratio, "W_allweather_chandelier"
+        _t_best_robust = _tm_robust
+
     _t_best_is  = (_t_best.get("in_sample", {}).get("sharpe") or -999.0)
     _t_best_oos = (_t_best.get("out_of_sample", {}).get("sharpe") or -999.0)
+    # 승격 게이트: 자기 파킹 벤치마크 우위 AND IS·OOS 샤프 >= D+
     _t_promoted = (
-        _t_best_ratio > 1.0
+        _t_best_robust
         and _t_best_is  >= _dplus_is
         and _t_best_oos >= _dplus_oos
     )
 
-    # Exclude the losing T variant from selector; winning T stays in selector if promoted
-    EXCLUDED_FROM_SELECTOR.add(_t_other_key)
+    # T(상시 파킹)와 콘테스트 패자는 연구 기록 전용; 승자만 승격 시 셀렉터 진입
+    EXCLUDED_FROM_SELECTOR.add("T_kospi_core_chandelier")
+    EXCLUDED_FROM_SELECTOR.add(_t_loser_key)
     if _t_promoted:
-        # Remove the winning variant from exclusions so it competes in headline selection
         EXCLUDED_FROM_SELECTOR.discard(_t_best_key)
     else:
-        EXCLUDED_FROM_SELECTOR.add("T_kospi_core_chandelier")
-        EXCLUDED_FROM_SELECTOR.add("T-_kospi_core_regime")
+        EXCLUDED_FROM_SELECTOR.add(_t_best_key)
 
     t_promotion_verdict = (
-        f"T_best={_t_best_key}  ratio={_t_best_ratio}x  "
-        f"IS={_t_best_is}  OOS={_t_best_oos}  "
-        f"D+/D IS={_dplus_is}  OOS={_dplus_oos}  "
-        f"promoted={'YES — T becomes headline candidate' if _t_promoted else 'NO — switching costs eat alpha or sharpe below D+'}"
+        f"파킹 콘테스트 승자={_t_best_key}  자기벤치마크 비율={_t_best_own_ratio}x  "
+        f"IS={_t_best_is}  OOS={_t_best_oos}  D+/D IS={_dplus_is}  OOS={_dplus_oos}  "
+        f"promoted={'YES — 헤드라인 후보' if _t_promoted else 'NO — 자기 벤치마크 미달 또는 샤프 D+ 미달'}"
     )
-    print(f"\nT promotion verdict: {t_promotion_verdict}", flush=True)
+    parking_showdown = {
+        "contest": "W(올웨더 파킹, 레짐 없음) vs T-(KOSPI 파킹, KOSPI<200MA 레짐)",
+        "W": {
+            "is_sharpe": _w_is, "oos_sharpe": _w_oos,
+            "vs_kospi_dca": _w_kospi_ratio, "vs_allweather_dca": _w_aw_ratio,
+            "own_benchmark": "올웨더 DCA", "beats_own_benchmark": _w_robust,
+        },
+        "T_minus": {
+            "is_sharpe": _tm_is, "oos_sharpe": _tm_oos,
+            "vs_kospi_dca": _tm_kospi_ratio, "vs_allweather_dca": _tm_aw_ratio,
+            "own_benchmark": "KOSPI DCA", "beats_own_benchmark": _tm_robust,
+        },
+        "winner": _t_best_key,
+        "promoted_to_headline_candidate": _t_promoted,
+        "criteria": "자기 파킹 벤치마크 DCA 우위 AND IS+OOS 샤프 합 우위 → 승자; 승자가 D+ 샤프 이상이면 셀렉터 승격",
+        "design_note": (
+            "사용자 가설: KOSPI 파킹+200MA 레짐은 과적합 냄새가 나고, 올웨더 파킹이 더 자연스럽다. "
+            "W는 레짐 게이트 없이 올웨더(GLD 25% 포함, 분기 리밸런스)에 상시 파킹 — "
+            "방어를 자산 배분으로 해결하고 타이밍 스위치를 제거한 설계."
+        ),
+        "verdict": t_promotion_verdict,
+    }
+    print(f"\n파킹 콘테스트 (W vs T-): {t_promotion_verdict}", flush=True)
+    print(f"  W: IS={_w_is} OOS={_w_oos} vsKOSPI={_w_kospi_ratio}x vs올웨더={_w_aw_ratio}x", flush=True)
+    print(f"  T-: IS={_tm_is} OOS={_tm_oos} vsKOSPI={_tm_kospi_ratio}x vs올웨더={_tm_aw_ratio}x", flush=True)
 
     # ── U vs T- comparison (KOSPI DCA ratio + OOS sharpe) ──────────────────
     # U is promoted to headline ONLY if it beats T- on full-period wealth ratio AND OOS sharpe.
@@ -5936,8 +6131,8 @@ def main() -> int:
     print(f"  {spo_vs_ls_verdict}", flush=True)
     print(f"  realized decision stats: {spo_meta.get('realized_decision_stats')}", flush=True)
 
-    # ── Summary table (all strategies including L/M for transparency)
-    print(f"\n── Strategy summary (v16, {len(all_strategies)} strategies; L/M/S-non-best/T-loser/U·V(if not promoted) excluded from selector) ──", flush=True)
+    # ── Summary table (all emitted strategies; L/M pruned in v18)
+    print(f"\n── Strategy summary (v18, {len(all_strategies)} strategies; S-non-best/파킹 콘테스트 패자/U·V(if not promoted) excluded from selector) ──", flush=True)
     print(f"{'Strategy':<32} {'IS Shp':>8} {'OOS Shp':>9} {'WinRate':>8} {'vs KOSPI DCA':>13} {'Trades':>7} {'Note':>12}", flush=True)
     for key, r in all_strategies.items():
         is_m  = r.get("in_sample", {})
@@ -6017,7 +6212,7 @@ def main() -> int:
     headline_open_pos_raw = headline.get("open_positions", {})
     if not isinstance(headline_open_pos_raw, dict):
         headline_open_pos_raw = {}
-    headline_is_t_family = headline_key in ("T_kospi_core_chandelier", "T-_kospi_core_regime")
+    headline_is_t_family = headline_key in ("T_kospi_core_chandelier", "T-_kospi_core_regime", "W_allweather_chandelier")
     today_signals = compute_today_signals(
         perf, prices, ticker_reports, calendar,
         headline_open_positions=headline_open_pos_raw,
@@ -6068,6 +6263,7 @@ def main() -> int:
                 "source": p.get("source", ""),
                 "n_clubs": p.get("n_clubs", 1),
                 "extension": ext_val,   # ATR% multiple from 50-MA (과열 게이지)
+                "entry_reason": p.get("entry_reason", ""),   # v18: 왜 진입했는가
             })
         return result_list
 
@@ -6167,22 +6363,11 @@ def main() -> int:
                 "점검 결과 lookahead 없음. hi52w/lo52w/MA: load_prices rolling window, look-forward 없음. "
                 "생존 편향: 프라이스 파일 존재 종목만 포함 — 상장폐지 후 파일 삭제 시 편향 가능. 방법론 주석 명시."
             ),
-            "L_verdict": (
-                "L 민리버전 RSI-2: 동일 바 룩어헤드 수정 (시그널→익일 시가). "
-                f"수정 후 결과: IS sharpe={result_L['in_sample'].get('sharpe')}, "
-                f"OOS sharpe={result_L['out_of_sample'].get('sharpe')}, "
-                f"trades={result_L['metrics']['trades']}, MDD={result_L['metrics']['mdd_pct']}%. "
-                "판정: RSI-2 민리버전은 거래비용으로 사망 — 구현 검증 후 제외. "
-                "원인: 0.3%/side × ~10일 보유 주기 → 연간 약 6-7% 비용 부담으로 알파 소진."
-            ),
-            "M_verdict": (
-                "M 단기 리버설: positions.clear() 미청산 포지션 현금 누락 버그 수정, "
-                "동일 바 룩어헤드 수정 (월말 종가 랭킹→월초 시가 체결). "
-                f"수정 후 결과: IS sharpe={result_M['in_sample'].get('sharpe')}, "
-                f"OOS sharpe={result_M['out_of_sample'].get('sharpe')}, "
-                f"trades={result_M['metrics']['trades']}, MDD={result_M['metrics']['mdd_pct']}%. "
-                "판정: 단기 리버설은 거래비용으로 사망 — 구현 검증 후 제외. "
-                "원인: 0.3%/side × 월별 전체 교체 (연 24회 편도) → 연간 약 7% 비용 부담."
+            "LM_pruned": (
+                "L 민리버전(Connors RSI-2)·M 단기 리버설: v11에서 룩어헤드·현금 누락 버그 수정 후 "
+                "재검증했으나 두 전략 모두 거래비용으로 사망 확정 (L: 0.3%/side × ~10일 회전 → 연 6-7% 비용; "
+                "M: 월별 전체 교체 연 24회 편도 → 연 7% 비용). v18부터 실행·출력하지 않음 — "
+                "테스트했고 실패했다는 기록만 방법론에 유지."
             ),
             "excluded_from_selector": list(EXCLUDED_FROM_SELECTOR),
             "P_strategy": (
@@ -6363,6 +6548,26 @@ def main() -> int:
             ),
         },
         "kospi_dca_ratios": _kospi_dca_ratios,
+        # ── v18: 파킹 헤드라인 콘테스트 (W 올웨더 vs T- KOSPI 레짐) ───────────
+        "parking_showdown": parking_showdown,
+        # ── v18: 현금 이자·차입 비용 모델 공시 ─────────────────────────────────
+        "cost_model": {
+            "cash_yield_annual_pct": round(CASH_YIELD_ANNUAL * 100, 1),
+            "cash_yield_daily": round(CASH_YIELD_DAILY, 8),
+            "cash_yield_note": (
+                "모든 전략의 유휴 현금(빈 슬롯 현금, T-/U 레짐 OFF 구간의 파킹 잔액 포함)에 "
+                "연 3.0% 일복리 — (1.03)^(1/252)−1/거래일 — 적용. "
+                "근거: 2020-26 한국 MMF/단기채 ETF 평균 수익률 프록시 (고정 가정, 공시). "
+                "전략 간 비교 공정성을 위해 일괄 적용."
+            ),
+            "borrow_rate_annual_pct": round(BORROW_RATE_ANNUAL * 100, 1),
+            "borrow_rate_daily": round(BORROW_RATE_DAILY, 8),
+            "borrow_note": (
+                "J 코어-새틀라이트 레버리지(120%)의 차입 잔액에 연 6.0% 일복리 — "
+                "(1.06)^(1/252)−1/거래일 — 적용 (v18: 기존 단리 6%/365에서 통일)."
+            ),
+            "parking_switch_cost_per_side": KOSPI_PARK_COST,
+        },
         # ── 재매수 규칙 ───────────────────────────────────────────────────────
         "reentry_rule": {
             "rule": (

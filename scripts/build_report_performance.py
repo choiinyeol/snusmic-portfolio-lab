@@ -192,7 +192,8 @@ class ParsedReport:
     school: str
     report_type: str  # company | sector
     ocr_recovered: bool
-    report_date: str | None
+    report_date: str | None  # public date = max(cover_date, upload_date)
+    authored_date: str | None  # cover/작성일 from document — may differ from report_date
     filename_date: str | None
     market: str | None
     company: str | None
@@ -230,7 +231,8 @@ class PerformanceRow:
     school: str
     report_type: str
     era: str  # "modern" | "archive"
-    report_date: str | None
+    report_date: str | None  # public date = max(cover_date, upload_date)
+    authored_date: str | None  # cover/작성일 from document
     filename_date: str | None
     market: str | None
     company: str | None
@@ -388,40 +390,83 @@ def _smic_pdf_prefix_date(hint: dict | None) -> str | None:
         return None
 
 
-def resolve_report_date(path: Path, lines: list[str], school: str, hint: dict | None) -> tuple[str | None, str | None]:
-    """발간일 우선순위: 본문 날짜 > YIG 발간일 표기 > 수집 힌트 > 파일명 날짜.
+def resolve_report_date(path: Path, lines: list[str], school: str, hint: dict | None) -> tuple[str | None, str | None, str | None]:
+    """공개일(public_date), 파일명 날짜, 작성일(authored_date)을 반환한다.
 
-    (YIG 파일명 앞의 날짜는 업로드일이라 발간일로 쓰면 안 된다.)
+    반환: (report_date, filename_date, authored_date)
+      report_date   = public_date = max(cover_date, upload_date)  ← PIT 기준
+      authored_date = 문서 표지의 작성일(cover date) — 투명성 목적으로 별도 보존
+      filename_date = 파일명에서 추출한 날짜
+
+    PIT 원칙: 정보는 업로드일에 공개된다. 표지 날짜(cover_date)가 업로드일보다
+    늦을 수 있으므로 max(cover_date, upload_date)를 공개일로 사용한다.
+    업로드일을 알 수 없을 때는 표지 날짜만 사용하고 qa_flag 'date_cover_only'를 붙인다.
+
     추가:
     - voera: 수집 힌트 없으면 파일명 브라켓 날짜 시도 (추정일)
     - smic: filename_date가 bulk-import 아티팩트(2013-09-18)면 pdf_url 접두사로 복구
     """
     content_date, filename_date = parse_date(path, lines)
-    if content_date:
-        return content_date, filename_date
-    published = yig_published_from_stem(path.stem)
-    if published:
-        return published, filename_date
-    # SMIC bulk-import 아티팩트 복구: published_hint가 "2013-09-18"이거나
-    # filename_date가 "2013-09-18"인 경우, pdf_url 접두사에서 실제 발간일을 복구한다.
-    # hint_date 체크보다 먼저 수행해야 "2013-09-18" hint를 무시하고 실제 날짜를 쓸 수 있다.
+
+    # authored_date = 문서 표지에서 직접 파싱한 날짜
+    authored_date: str | None = content_date
+
+    # YIG 파일명 내 '발간일 YYMMDD' 표기는 작성일 소스로도 사용
+    if not authored_date:
+        published = yig_published_from_stem(path.stem)
+        if published:
+            authored_date = published
+
+    # SMIC bulk-import 아티팩트: filename_date == "2013-09-18"이면 pdf_url 접두사로 복구
     if school == "smic" and filename_date == "2013-09-18":
         recovered = _smic_pdf_prefix_date(hint)
         if recovered:
-            return recovered, filename_date
+            # pdf_url 접두사가 실제 발간일에 가장 가까운 날짜. authored_date(표지)가 없으면 채운다.
+            authored_date = authored_date or recovered
+            # public_date = max(cover, pdf_prefix) — cover가 하루 늦을 수 있음
+            cover_d2 = date_from_string(authored_date)
+            recovered_d = date_from_string(recovered)
+            if cover_d2 and recovered_d:
+                public_date2 = max(cover_d2, recovered_d).isoformat()
+            else:
+                public_date2 = authored_date or recovered
+            return public_date2, filename_date, authored_date
+
+    # 업로드/공개 날짜 후보: hint의 published_hint 또는 파일명 날짜
     hint_date = (hint or {}).get("published_hint")
-    if hint_date:
-        return hint_date, filename_date
+    # YIG: hint_date / filename_date 는 일괄 재업로드일이라 PIT 기준으로 무의미.
+    #       발간일(authored_date)을 그대로 public_date로 사용한다.
+    # voera: 수집 힌트가 없으면 파일명 브라켓 날짜를 업로드일로 쓰지 않음.
+    # 나머지 학교: hint_date(수집 메타) 또는 filename_date가 업로드일.
     if school == "yig":
-        # 파일명 날짜 = 업로드일 → 발간일 대용으로 쓰지 않는다
-        return None, filename_date
-    if school == "voera":
-        # 수집 힌트가 없고 본문 날짜도 없는 voera: 파일명 브라켓 날짜 시도
-        bracket = _voera_bracket_date(path.stem)
-        if bracket:
-            return bracket, filename_date
-        return None, filename_date
-    return filename_date, filename_date
+        upload_date: str | None = None  # 일괄 재업로드일은 무시
+    elif school == "voera":
+        upload_date = hint_date  # voera는 hint_date만 업로드일로 인정
+    else:
+        upload_date = hint_date or filename_date
+
+    # 업로드일을 알 수 없고 본문 날짜도 없는 특수 케이스 처리
+    if upload_date is None and authored_date is None:
+        if school == "voera":
+            bracket = _voera_bracket_date(path.stem)
+            if bracket:
+                return bracket, filename_date, None
+        return None, filename_date, None
+
+    # public_date = max(authored_date, upload_date) — 둘 다 있을 때
+    cover_d = date_from_string(authored_date)
+    upload_d = date_from_string(upload_date)
+
+    if cover_d is not None and upload_d is not None:
+        public_date = max(cover_d, upload_d).isoformat()
+    elif cover_d is not None:
+        # 업로드일 미확인 → 표지 날짜를 public_date로 사용, 플래그는 parse_report에서 추가
+        public_date = cover_d.isoformat()
+    else:
+        # 표지 날짜 없음 → upload_date를 public_date로 사용
+        public_date = upload_date  # upload_d could be None only if upload_date is invalid iso
+
+    return public_date, filename_date, authored_date
 
 
 KR_EXCHANGE_NAMES = {"KQ": "KOSDAQ", "KOSDAQ": "KOSDAQ", "코스닥": "KOSDAQ", "KS": "KOSPI", "KOSPI": "KOSPI", "코스피": "KOSPI"}
@@ -824,7 +869,7 @@ def parse_report(path: Path, school: str = "smic", hint: dict | None = None) -> 
     text = path.read_text(encoding="utf-8", errors="ignore")
     lines = [line.rstrip("\n") for line in text.splitlines()]
     ocr_recovered = "<!-- ocr_fallback -->" in text[:200]
-    report_date, filename_date = resolve_report_date(path, lines, school, hint)
+    report_date, filename_date, authored_date = resolve_report_date(path, lines, school, hint)
     market, ticker, exchange, company = parse_identity(path, lines)
     rating = parse_rating(lines)
     # For foreign-exchange listings prices are in non-KRW/USD units — don't parse them
@@ -852,6 +897,11 @@ def parse_report(path: Path, school: str = "smic", hint: dict | None = None) -> 
     # smic bulk-date 복구 → qa_flag
     if school == "smic" and filename_date == "2013-09-18" and report_date and report_date != "2013-09-18":
         qa_flags.append("report_date_from_filename")
+    # date_cover_only: 업로드일 불명 → 표지 날짜만 사용 (PIT 주의)
+    hint_date = (hint or {}).get("published_hint")
+    has_upload_date = bool(hint_date or (filename_date and school not in ("voera",) and filename_date != "2013-09-18"))
+    if authored_date and not has_upload_date:
+        qa_flags.append("date_cover_only")
 
     if company and len(company) > 40:
         company = None  # OCR 덩어리 등 비정상 회사명 → 파일명/힌트 폴백으로
@@ -893,6 +943,7 @@ def parse_report(path: Path, school: str = "smic", hint: dict | None = None) -> 
         report_type="company",  # 티커 복구 이후 main()에서 확정
         ocr_recovered=ocr_recovered,
         report_date=report_date,
+        authored_date=authored_date,
         filename_date=filename_date,
         market=market,
         company=company,
@@ -1274,6 +1325,7 @@ def evaluate_report(parsed: ParsedReport, prices: pd.DataFrame, as_of: dt.date, 
         report_type=parsed.report_type,
         era=compute_era(parsed.report_date, parsed.filename_date),
         report_date=parsed.report_date,
+        authored_date=parsed.authored_date,
         filename_date=parsed.filename_date,
         market=parsed.market,
         company=parsed.company,
@@ -1328,6 +1380,7 @@ def empty_performance(parsed: ParsedReport, data_issue: str, age_days: int | Non
         report_type=parsed.report_type,
         era=compute_era(parsed.report_date, parsed.filename_date),
         report_date=parsed.report_date,
+        authored_date=parsed.authored_date,
         filename_date=parsed.filename_date,
         market=parsed.market,
         company=parsed.company,

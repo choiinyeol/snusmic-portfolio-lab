@@ -23,6 +23,7 @@ export const ReportRecordSchema = z.object({
   era: EraSchema.catch("archive"),
   qa_flags: NullableString.optional().default(null),
   report_date: NullableString,
+  authored_date: NullableString.optional().default(null),
   filename_date: NullableString,
   market: MarketSchema.nullable(),
   company: NullableString,
