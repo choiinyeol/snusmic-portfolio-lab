@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-11T08:14:30+00:00",
+  "generated_at": "2026-06-11T09:20:19+00:00",
   "strategy_key": "F_momentum_narrative",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -50,28 +50,6 @@
       ]
     },
     {
-      "ticker": "200130",
-      "market": "KR",
-      "name": "콜마비앤에이치",
-      "entry_date": "2020-01-02",
-      "exit_date": "2020-04-01",
-      "entry_price": 27700.0,
-      "exit_price": 23150.0,
-      "return_pct": -16.93,
-      "days": 90,
-      "exit_reason": "thesis_break_200MA",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: smic 2019-08-11) · 진입 조건: 시가 > 200MA (모멘텀 필터 통과)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2019-08-11",
-          "source_file": "2019-08-11_Equity Research, 콜마비앤에이치.md",
-          "target_price": 34500.0,
-          "stated_upside_pct": 35.0294
-        }
-      ]
-    },
-    {
       "ticker": "104460",
       "market": "KR",
       "name": "디와이피엔에프",
@@ -90,6 +68,28 @@
           "source_file": "2019-08-11_Equity Research, 동양피엔에프.md",
           "target_price": 12600.0,
           "stated_upside_pct": 37.8556
+        }
+      ]
+    },
+    {
+      "ticker": "200130",
+      "market": "KR",
+      "name": "콜마비앤에이치",
+      "entry_date": "2020-01-02",
+      "exit_date": "2020-04-01",
+      "entry_price": 27700.0,
+      "exit_price": 23150.0,
+      "return_pct": -16.93,
+      "days": 90,
+      "exit_reason": "thesis_break_200MA",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: smic 2019-08-11) · 진입 조건: 시가 > 200MA (모멘텀 필터 통과)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2019-08-11",
+          "source_file": "2019-08-11_Equity Research, 콜마비앤에이치.md",
+          "target_price": 34500.0,
+          "stated_upside_pct": 35.0294
         }
       ]
     },
@@ -255,28 +255,6 @@
       ]
     },
     {
-      "ticker": "028670",
-      "market": "KR",
-      "name": "팬오션",
-      "entry_date": "2021-03-11",
-      "exit_date": "2021-11-01",
-      "entry_price": 6210.0,
-      "exit_price": 5950.0,
-      "return_pct": -4.76,
-      "days": 235,
-      "exit_reason": "thesis_break_200MA",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: ewha 2021-03-10) · 진입 조건: 시가 > 200MA (모멘텀 필터 통과)",
-      "trigger_reports": [
-        {
-          "school": "ewha",
-          "report_date": "2021-03-10",
-          "source_file": "2021-02-20_[210220] 팬오션(028670).md",
-          "target_price": 6436.0,
-          "stated_upside_pct": 6.2046
-        }
-      ]
-    },
-    {
       "ticker": "018880",
       "market": "KR",
       "name": "한온시스템",
@@ -302,6 +280,28 @@
           "source_file": "2020-11-21_[201121] 한온시스템(018880).md",
           "target_price": 17200.0,
           "stated_upside_pct": 21.3404
+        }
+      ]
+    },
+    {
+      "ticker": "028670",
+      "market": "KR",
+      "name": "팬오션",
+      "entry_date": "2021-03-11",
+      "exit_date": "2021-11-01",
+      "entry_price": 6210.0,
+      "exit_price": 5950.0,
+      "return_pct": -4.76,
+      "days": 235,
+      "exit_reason": "thesis_break_200MA",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: ewha 2021-03-10) · 진입 조건: 시가 > 200MA (모멘텀 필터 통과)",
+      "trigger_reports": [
+        {
+          "school": "ewha",
+          "report_date": "2021-03-10",
+          "source_file": "2021-02-20_[210220] 팬오션(028670).md",
+          "target_price": 6436.0,
+          "stated_upside_pct": 6.2046
         }
       ]
     },
@@ -372,28 +372,6 @@
       ]
     },
     {
-      "ticker": "078600",
-      "market": "KR",
-      "name": "대주전자재료",
-      "entry_date": "2021-11-29",
-      "exit_date": "2022-05-02",
-      "entry_price": 121500.0,
-      "exit_price": 81900.0,
-      "return_pct": -33.0,
-      "days": 154,
-      "exit_reason": "thesis_break_200MA",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: ewha 2021-11-27) · 진입 조건: 시가 > 200MA (모멘텀 필터 통과)",
-      "trigger_reports": [
-        {
-          "school": "ewha",
-          "report_date": "2021-11-27",
-          "source_file": "2021-11-27_[211127] 대주전자재료(078600).md",
-          "target_price": 142000.0,
-          "stated_upside_pct": 13.0573
-        }
-      ]
-    },
-    {
       "ticker": "051600",
       "market": "KR",
       "name": "한전KPS",
@@ -416,31 +394,24 @@
       ]
     },
     {
-      "ticker": "189300",
+      "ticker": "078600",
       "market": "KR",
-      "name": "인텔리안테크",
-      "entry_date": "2021-12-14",
-      "exit_date": "2022-07-01",
-      "entry_price": 80544.0,
-      "exit_price": 58278.0,
-      "return_pct": -28.08,
-      "days": 199,
+      "name": "대주전자재료",
+      "entry_date": "2021-11-29",
+      "exit_date": "2022-05-02",
+      "entry_price": 121500.0,
+      "exit_price": 81900.0,
+      "return_pct": -33.0,
+      "days": 154,
       "exit_reason": "thesis_break_200MA",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: smic 2021-12-13, ewha 2020-09-12) · 진입 조건: 시가 > 200MA (모멘텀 필터 통과)",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: ewha 2021-11-27) · 진입 조건: 시가 > 200MA (모멘텀 필터 통과)",
       "trigger_reports": [
         {
           "school": "ewha",
-          "report_date": "2020-09-12",
-          "source_file": "2020-09-12_[200912] 인텔리안테크(189300).md",
-          "target_price": 38850.0,
-          "stated_upside_pct": 42.2973
-        },
-        {
-          "school": "smic",
-          "report_date": "2021-12-13",
-          "source_file": "2021-12-13_equity-research-인텔리안테크.md",
-          "target_price": 122000.0,
-          "stated_upside_pct": 50.9247
+          "report_date": "2021-11-27",
+          "source_file": "2021-11-27_[211127] 대주전자재료(078600).md",
+          "target_price": 142000.0,
+          "stated_upside_pct": 13.0573
         }
       ]
     },
@@ -463,50 +434,6 @@
           "source_file": "2020-06-09_Equity Research, NAVER.md",
           "target_price": 300766.0,
           "stated_upside_pct": 26.6383
-        }
-      ]
-    },
-    {
-      "ticker": "060250",
-      "market": "KR",
-      "name": "NHN KCP",
-      "entry_date": "2020-01-02",
-      "exit_date": "2022-07-01",
-      "entry_price": 12730.0,
-      "exit_price": 12750.0,
-      "return_pct": -0.44,
-      "days": 911,
-      "exit_reason": "thesis_break_200MA",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: smic 2019-08-11) · 진입 조건: 시가 > 200MA (모멘텀 필터 통과)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2019-08-11",
-          "source_file": "2019-08-11_Equity Research, NHN한국사이버결제.md",
-          "target_price": 19300.0,
-          "stated_upside_pct": 62.5811
-        }
-      ]
-    },
-    {
-      "ticker": "088980",
-      "market": "KR",
-      "name": "맥쿼리인프라",
-      "entry_date": "2022-05-30",
-      "exit_date": "2022-07-01",
-      "entry_price": 14143.0,
-      "exit_price": 12448.0,
-      "return_pct": -12.51,
-      "days": 32,
-      "exit_reason": "thesis_break_200MA",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: star 2022-05-28) · 진입 조건: 시가 > 200MA (모멘텀 필터 통과)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2022-05-28",
-          "source_file": "2022-05-28_STAR_맥쿼리인프라.md",
-          "target_price": 16500.0,
-          "stated_upside_pct": 16.6655
         }
       ]
     },
@@ -555,31 +482,75 @@
       ]
     },
     {
-      "ticker": "195870",
+      "ticker": "060250",
       "market": "KR",
-      "name": "해성디에스",
-      "entry_date": "2022-03-16",
-      "exit_date": "2022-10-04",
-      "entry_price": 46600.0,
-      "exit_price": 42400.0,
-      "return_pct": -9.56,
-      "days": 202,
+      "name": "NHN KCP",
+      "entry_date": "2020-01-02",
+      "exit_date": "2022-07-01",
+      "entry_price": 12730.0,
+      "exit_price": 12750.0,
+      "return_pct": -0.44,
+      "days": 911,
       "exit_reason": "thesis_break_200MA",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: star 2022-03-15, ewha 2021-03-10) · 진입 조건: 시가 > 200MA (모멘텀 필터 통과)",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: smic 2019-08-11) · 진입 조건: 시가 > 200MA (모멘텀 필터 통과)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2019-08-11",
+          "source_file": "2019-08-11_Equity Research, NHN한국사이버결제.md",
+          "target_price": 19300.0,
+          "stated_upside_pct": 62.5811
+        }
+      ]
+    },
+    {
+      "ticker": "088980",
+      "market": "KR",
+      "name": "맥쿼리인프라",
+      "entry_date": "2022-05-30",
+      "exit_date": "2022-07-01",
+      "entry_price": 14143.0,
+      "exit_price": 12448.0,
+      "return_pct": -12.51,
+      "days": 32,
+      "exit_reason": "thesis_break_200MA",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: star 2022-05-28) · 진입 조건: 시가 > 200MA (모멘텀 필터 통과)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2022-05-28",
+          "source_file": "2022-05-28_STAR_맥쿼리인프라.md",
+          "target_price": 16500.0,
+          "stated_upside_pct": 16.6655
+        }
+      ]
+    },
+    {
+      "ticker": "189300",
+      "market": "KR",
+      "name": "인텔리안테크",
+      "entry_date": "2021-12-14",
+      "exit_date": "2022-07-01",
+      "entry_price": 80544.0,
+      "exit_price": 58278.0,
+      "return_pct": -28.08,
+      "days": 199,
+      "exit_reason": "thesis_break_200MA",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: smic 2021-12-13, ewha 2020-09-12) · 진입 조건: 시가 > 200MA (모멘텀 필터 통과)",
       "trigger_reports": [
         {
           "school": "ewha",
-          "report_date": "2021-03-10",
-          "source_file": "2021-02-20_[210220] 해성디에스(195870).md",
-          "target_price": 53700.0,
-          "stated_upside_pct": 79.0
+          "report_date": "2020-09-12",
+          "source_file": "2020-09-12_[200912] 인텔리안테크(189300).md",
+          "target_price": 38850.0,
+          "stated_upside_pct": 42.2973
         },
         {
-          "school": "star",
-          "report_date": "2022-03-15",
-          "source_file": "2022-03-15_STAR_해성디에스.md",
-          "target_price": 67300.0,
-          "stated_upside_pct": 47.5877
+          "school": "smic",
+          "report_date": "2021-12-13",
+          "source_file": "2021-12-13_equity-research-인텔리안테크.md",
+          "target_price": 122000.0,
+          "stated_upside_pct": 50.9247
         }
       ]
     },
@@ -650,6 +621,57 @@
       ]
     },
     {
+      "ticker": "195870",
+      "market": "KR",
+      "name": "해성디에스",
+      "entry_date": "2022-03-16",
+      "exit_date": "2022-10-04",
+      "entry_price": 46600.0,
+      "exit_price": 42400.0,
+      "return_pct": -9.56,
+      "days": 202,
+      "exit_reason": "thesis_break_200MA",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: star 2022-03-15, ewha 2021-03-10) · 진입 조건: 시가 > 200MA (모멘텀 필터 통과)",
+      "trigger_reports": [
+        {
+          "school": "ewha",
+          "report_date": "2021-03-10",
+          "source_file": "2021-02-20_[210220] 해성디에스(195870).md",
+          "target_price": 53700.0,
+          "stated_upside_pct": 79.0
+        },
+        {
+          "school": "star",
+          "report_date": "2022-03-15",
+          "source_file": "2022-03-15_STAR_해성디에스.md",
+          "target_price": 67300.0,
+          "stated_upside_pct": 47.5877
+        }
+      ]
+    },
+    {
+      "ticker": "068270",
+      "market": "KR",
+      "name": "셀트리온",
+      "entry_date": "2022-12-09",
+      "exit_date": "2023-01-02",
+      "entry_price": 149506.0,
+      "exit_price": 141175.0,
+      "return_pct": -6.14,
+      "days": 24,
+      "exit_reason": "thesis_break_200MA",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: smic 2022-12-08) · 진입 조건: 시가 > 200MA (모멘텀 필터 통과)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2022-12-08",
+          "source_file": "2022-12-08_equity-research-셀트리온-3.md",
+          "target_price": 222000.0,
+          "stated_upside_pct": 48.9113
+        }
+      ]
+    },
+    {
       "ticker": "126340",
       "market": "KR",
       "name": "비나텍",
@@ -679,28 +701,6 @@
       ]
     },
     {
-      "ticker": "068270",
-      "market": "KR",
-      "name": "셀트리온",
-      "entry_date": "2022-12-09",
-      "exit_date": "2023-01-02",
-      "entry_price": 149506.0,
-      "exit_price": 141175.0,
-      "return_pct": -6.14,
-      "days": 24,
-      "exit_reason": "thesis_break_200MA",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: smic 2022-12-08) · 진입 조건: 시가 > 200MA (모멘텀 필터 통과)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2022-12-08",
-          "source_file": "2022-12-08_equity-research-셀트리온-3.md",
-          "target_price": 222000.0,
-          "stated_upside_pct": 48.9113
-        }
-      ]
-    },
-    {
       "ticker": "054950",
       "market": "KR",
       "name": "제이브이엠",
@@ -723,28 +723,6 @@
       ]
     },
     {
-      "ticker": "097950",
-      "market": "KR",
-      "name": "CJ제일제당",
-      "entry_date": "2020-05-18",
-      "exit_date": "2023-05-02",
-      "entry_price": 315500.0,
-      "exit_price": 307500.0,
-      "return_pct": -3.12,
-      "days": 1079,
-      "exit_reason": "thesis_break_200MA",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: voera 2020-05-17) · 진입 조건: 시가 > 200MA (모멘텀 필터 통과)",
-      "trigger_reports": [
-        {
-          "school": "voera",
-          "report_date": "2020-05-17",
-          "source_file": "undated_[BUY] CJ제일제당_사재기는 거들뿐.md",
-          "target_price": 395000.0,
-          "stated_upside_pct": 28.0389
-        }
-      ]
-    },
-    {
       "ticker": "034230",
       "market": "KR",
       "name": "파라다이스",
@@ -763,6 +741,28 @@
           "source_file": "2023-03-01_STAR_파라다이스.md",
           "target_price": 27700.0,
           "stated_upside_pct": 65.4719
+        }
+      ]
+    },
+    {
+      "ticker": "097950",
+      "market": "KR",
+      "name": "CJ제일제당",
+      "entry_date": "2020-05-18",
+      "exit_date": "2023-05-02",
+      "entry_price": 315500.0,
+      "exit_price": 307500.0,
+      "return_pct": -3.12,
+      "days": 1079,
+      "exit_reason": "thesis_break_200MA",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: voera 2020-05-17) · 진입 조건: 시가 > 200MA (모멘텀 필터 통과)",
+      "trigger_reports": [
+        {
+          "school": "voera",
+          "report_date": "2020-05-17",
+          "source_file": "undated_[BUY] CJ제일제당_사재기는 거들뿐.md",
+          "target_price": 395000.0,
+          "stated_upside_pct": 28.0389
         }
       ]
     },
@@ -861,6 +861,28 @@
       ]
     },
     {
+      "ticker": "278280",
+      "market": "KR",
+      "name": "천보",
+      "entry_date": "2020-08-24",
+      "exit_date": "2023-10-04",
+      "entry_price": 143100.0,
+      "exit_price": 130200.0,
+      "return_pct": -9.56,
+      "days": 1136,
+      "exit_reason": "thesis_break_200MA",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: ewha 2020-08-22) · 진입 조건: 시가 > 200MA (모멘텀 필터 통과)",
+      "trigger_reports": [
+        {
+          "school": "ewha",
+          "report_date": "2020-08-22",
+          "source_file": "2020-08-22_[200822] 천보(278280).md",
+          "target_price": null,
+          "stated_upside_pct": 30.16
+        }
+      ]
+    },
+    {
       "ticker": "340570",
       "market": "KR",
       "name": "티앤엘",
@@ -886,28 +908,6 @@
           "source_file": "undated_[BUY].md",
           "target_price": 105000.0,
           "stated_upside_pct": 118.75
-        }
-      ]
-    },
-    {
-      "ticker": "278280",
-      "market": "KR",
-      "name": "천보",
-      "entry_date": "2020-08-24",
-      "exit_date": "2023-10-04",
-      "entry_price": 143100.0,
-      "exit_price": 130200.0,
-      "return_pct": -9.56,
-      "days": 1136,
-      "exit_reason": "thesis_break_200MA",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: ewha 2020-08-22) · 진입 조건: 시가 > 200MA (모멘텀 필터 통과)",
-      "trigger_reports": [
-        {
-          "school": "ewha",
-          "report_date": "2020-08-22",
-          "source_file": "2020-08-22_[200822] 천보(278280).md",
-          "target_price": null,
-          "stated_upside_pct": 30.16
         }
       ]
     },

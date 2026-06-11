@@ -8,6 +8,8 @@ src/data/strategy-backtest.json.  It produces:
   public/api/v1/strategies.json            — all strategy IS/OOS metrics
   public/api/v1/trades/{strategy_key}.json — closed-trade log per strategy
   public/api/v1/openapi.json               — OpenAPI 3.1 spec
+  public/strategy-marks/{slug}.json        — headline-strategy trade marks per ticker
+                                             (slug = "{market}-{ticker}".lower(), e.g. kr-005930)
 
 Usage:
     python scripts/export_signals_api.py
@@ -25,6 +27,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SOURCE = ROOT / "src" / "data" / "strategy-backtest.json"
 API_DIR = ROOT / "public" / "api" / "v1"
+MARKS_DIR = ROOT / "public" / "strategy-marks"
 
 SCHEMA_VERSION = "1.0"
 
@@ -223,6 +226,100 @@ def build_trades(data: dict) -> dict[str, list[dict]]:
             })
         result[key] = mapped
     return result
+
+
+# ── strategy-marks/{slug}.json ───────────────────────────────────────────────
+
+def _exit_side(exit_reason: str) -> str:
+    """Stop-style exits (chandelier/trailing/stop) → 'stop', everything else → 'sell'."""
+    low = (exit_reason or "").lower()
+    if "chandelier" in low or "stop" in low or "trail" in low:
+        return "stop"
+    return "sell"
+
+
+def build_strategy_marks(data: dict) -> dict[str, dict]:
+    """Per-ticker trade marks for the HEADLINE strategy.
+
+    Returns {slug: payload} where slug matches public/prices/{slug}.json
+    (\"{market}-{ticker}\".lower()).  Each payload carries the full buy/sell/stop
+    mark list from the backtest trade log plus the current trailing-stop level
+    for tickers still held.
+    """
+    ms = data.get("multi_strategy", {})
+    sig = data.get("signals", {})
+    tbs = ms.get("trades_by_strategy", {})
+    # Prefer the key the public signals payload advertises (what users see on
+    # latest.json); fall back to multi_strategy.headline_key.
+    headline = sig.get("headline_strategy", "")
+    if headline not in tbs:
+        headline = ms.get("headline_key", data.get("params", {}).get("headline_key", ""))
+    trades = tbs.get(headline, [])
+    as_of = sig.get("as_of", "")
+
+    per: dict[str, dict] = {}
+
+    def _bucket(market: str, ticker: str, name: str) -> dict:
+        slug = f"{market or 'KR'}-{ticker}".lower()
+        return per.setdefault(slug, {
+            "schema_version": SCHEMA_VERSION,
+            "generated_at": _generated_at(),
+            "strategy_key": headline,
+            "ticker": ticker,
+            "market": market or "KR",
+            "name": name or ticker,
+            "disclaimer_ko": DISCLAIMER_KO,
+            "marks": [],
+            "open_stop": None,
+        })
+
+    # Closed trades → entry (buy) + exit (sell|stop) marks
+    for t in trades:
+        ticker = t.get("ticker", "")
+        if not ticker:
+            continue
+        entry = _bucket(t.get("market", "KR"), ticker, t.get("display_name", ticker))
+        if t.get("entry_date") and t.get("entry") is not None:
+            entry["marks"].append({
+                "date": t["entry_date"],
+                "side": "buy",
+                "price": t.get("entry"),
+                "reason": t.get("entry_reason", ""),
+            })
+        if t.get("exit_date") and t.get("exit") is not None:
+            ret = t.get("return_pct")
+            ret_txt = f" ({ret:+.1f}%)" if isinstance(ret, (int, float)) else ""
+            entry["marks"].append({
+                "date": t["exit_date"],
+                "side": _exit_side(t.get("exit_reason", "")),
+                "price": t.get("exit"),
+                "reason": f"{t.get('exit_reason', '')}{ret_txt}".strip(),
+            })
+
+    # Open positions → entry mark + current trailing-stop level
+    for p in sig.get("open_positions", []):
+        ticker = p.get("ticker", "")
+        if not ticker:
+            continue
+        entry = _bucket(p.get("market", "KR"), ticker, p.get("display_name", ticker))
+        if p.get("entry_date") and p.get("entry_price") is not None:
+            entry["marks"].append({
+                "date": p["entry_date"],
+                "side": "buy",
+                "price": p.get("entry_price"),
+                "reason": p.get("entry_reason", ""),
+            })
+        if p.get("stop_level") is not None:
+            entry["open_stop"] = {
+                "stop_level": p.get("stop_level"),
+                "entry_date": p.get("entry_date", ""),
+                "as_of": as_of,
+            }
+
+    for payload in per.values():
+        payload["marks"].sort(key=lambda m: (m["date"], 0 if m["side"] == "buy" else 1))
+
+    return per
 
 
 # ── openapi.json ─────────────────────────────────────────────────────────────
@@ -505,9 +602,20 @@ def main(argv: list[str] | None = None) -> int:
     openapi = build_openapi(as_of)
     _write_json(API_DIR / "openapi.json", openapi)
 
+    # 6. strategy-marks/{slug}.json — headline strategy trade marks per ticker.
+    #    Wipe stale files first: the headline strategy (and its traded universe)
+    #    can change between runs.
+    marks = build_strategy_marks(data)
+    if MARKS_DIR.exists():
+        for old in MARKS_DIR.glob("*.json"):
+            old.unlink()
+    for slug, payload in sorted(marks.items()):
+        _write_json(MARKS_DIR / f"{slug}.json", payload)
+    print(f"  strategy-marks: {len(marks)} tickers", flush=True)
+
     # Validate all written JSON can be re-parsed
     print("\nValidating written files ...", flush=True)
-    for path in sorted(API_DIR.rglob("*.json")):
+    for path in sorted(API_DIR.rglob("*.json")) + sorted(MARKS_DIR.glob("*.json")):
         try:
             with open(path, encoding="utf-8") as f:
                 json.load(f)

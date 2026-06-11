@@ -53,48 +53,39 @@ gh run watch --repo ChoiInYeol/SNUSMIC-Portfolio
 사이트는 SSG이므로 Vercel 측에는 런타임 시크릿이 필요 없습니다. KRX 자격증명은 GitHub Actions에서만 사용됩니다.
 자동 갱신 워크플로의 봇 커밋이 push될 때마다 재배포가 일어나므로, GitHub deployments 기록은 주기적으로 쌓입니다(2026-06 기준 최신 3건만 남기고 정리함).
 
-## SECURITY — KRX 자격증명 노출
+## SECURITY — KRX 자격증명 노출 [DONE 2026-06-11]
 
 **`.env`(KRX_ID/KRX_PW)가 public 히스토리 `51a789f`~`af2cb8b` 구간(23개 커밋)에 노출되었습니다.**
 `af2cb8b`에서 untrack 처리했지만, 그 이전 커밋들의 트리에는 파일이 그대로 남아 있어 public 레포에서 누구나 열람 가능했습니다.
 
-### 1. 필수 — KRX 비밀번호 교체 (사용자 액션)
+**완료된 조치 (2026-06-11):**
 
-> 히스토리를 세척하더라도 이미 노출된 자격증명은 폐기해야 합니다. 이것이 유일하게 확실한 조치입니다.
+1. **KRX 비밀번호 교체** — http://data.krx.co.kr 비밀번호 변경 + 레포 Secrets 갱신 완료.
+2. **git filter-repo 히스토리 세척** — 전체 히스토리에서 `.env` 제거 후 강제 푸시 완료. 모든 커밋 SHA 재작성됨.
+3. **잔여 (선택)** — GitHub Support에 GC(가비지 컬렉션) 요청 (dangling object 완전 제거용). 비밀번호를 이미 교체했으므로 필수는 아님.
 
-1. http://data.krx.co.kr 로그인 → 비밀번호 변경.
-2. 로컬 `.env` 갱신.
-3. 레포 Secrets 갱신:
-   ```bash
-   gh secret set KRX_ID --repo ChoiInYeol/SNUSMIC-Portfolio
-   gh secret set KRX_PW --repo ChoiInYeol/SNUSMIC-Portfolio
-   ```
+### 참고 — 세척 과정에서 발생한 영향
 
-### 2. 선택 — git filter-repo로 히스토리 세척
+- **모든 커밋 SHA가 바뀌었습니다.** 릴리스 노트(v1.0.0 등)에 박힌 구 SHA 링크가 끊어졌습니다.
+- **협업자(있을 경우)는 re-clone이 필요합니다.**
+- GitHub 측 캐시(PR, 포크, API의 dangling commit)에는 구 객체가 한동안 남을 수 있습니다.
 
-비밀번호를 교체했다면 필수는 아니지만, 히스토리에서 `.env` 흔적 자체를 지우려면:
+### 세척에 사용한 절차 (기록용)
 
 ```bash
-# 0) 설치 + 백업 (filter-repo는 fresh clone에서만 동작)
+# filter-repo는 fresh clone에서만 동작
 pip install git-filter-repo
 git clone https://github.com/ChoiInYeol/SNUSMIC-Portfolio.git smic-scrub
 cd smic-scrub
 
-# 1) 전체 히스토리(전 브랜치·태그)에서 .env 제거
+# 전체 히스토리(전 브랜치·태그)에서 .env 제거
 git filter-repo --invert-paths --path .env
 
-# 2) 리모트 재등록 후 강제 푸시 (filter-repo가 origin을 제거함)
+# 리모트 재등록 후 강제 푸시
 git remote add origin https://github.com/ChoiInYeol/SNUSMIC-Portfolio.git
 git push origin --force --all
 git push origin --force --tags
 ```
-
-주의 사항:
-
-- **모든 커밋 SHA가 바뀝니다.** 릴리스 태그(v1.0.0)는 새 SHA를 가리키도록 `--tags` 푸시로 함께 갱신되지만, 릴리스 노트에 박힌 구 SHA 링크는 끊어집니다.
-- **협업자는 전원 re-clone해야 합니다.** 기존 클론에서 pull하면 구·신 히스토리가 섞입니다. 로컬 작업 사본(이 작업 디렉터리 포함)도 백업 후 새로 클론하세요.
-- GitHub 측 캐시(PR, 포크, API의 dangling commit)에는 구 객체가 한동안 남을 수 있습니다. 완전 제거가 필요하면 GitHub Support에 가비지 컬렉션을 요청하세요 — 그래서 1번(비밀번호 교체)이 선행 필수입니다.
-- 강제 푸시 전 `main` 브랜치 보호 규칙이 있다면 일시 해제해야 합니다.
 
 ## 릴리스 / 태그 정책
 

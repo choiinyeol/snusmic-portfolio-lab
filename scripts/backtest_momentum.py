@@ -107,12 +107,15 @@ from __future__ import annotations
 
 import csv
 import datetime as dt
+import hashlib
 import json
 import math
+import pickle
 import sys
 from collections import defaultdict
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -306,22 +309,22 @@ def _fx(market: str, day: dt.date) -> float:
         return 1.0
     if _USDKRW is None:
         return _USDKRW_FALLBACK
-    ts = pd.Timestamp(day)
-    val = _USDKRW.asof(ts)
-    if pd.isna(val) or val <= 0:
+    val = _fast_asof_raw(_USDKRW, pd.Timestamp(day))
+    if math.isnan(val) or val <= 0:
         return _USDKRW_FALLBACK
-    return float(val)
+    return val
 
 
-def load_prices(ticker: str, market: str = "KR") -> pd.DataFrame | None:
-    """주가 데이터 로드. market='KR' → KR_{ticker}.csv, market='US' → US_{ticker}.csv"""
-    if market == "US":
-        path = PRICE_DIR / f"US_{ticker}.csv"
-    else:
-        path = PRICE_DIR / f"KR_{ticker}.csv"
+# ── Price warehouse cache (perf only — results identical) ─────────────────────
+# Parsed CSV + indicator columns are pickled to data/prices/.cache/, keyed by the
+# source file's (mtime_ns, size) plus a code version tag. Pickle round-trips
+# float64 bit-exactly, so cached frames are identical to freshly computed ones.
+_PRICE_CACHE_DIR = PRICE_DIR / ".cache"
+# Bump when load_prices indicator logic changes (invalidates all cached frames)
+_PRICE_CACHE_VERSION = "v1"
 
-    if not path.exists():
-        return None
+
+def _load_prices_uncached(path: Path) -> pd.DataFrame | None:
     try:
         df = pd.read_csv(path, index_col=0, parse_dates=True).sort_index()
     except Exception:
@@ -355,6 +358,12 @@ def load_prices(ticker: str, market: str = "KR") -> pd.DataFrame | None:
     # 52-week high/low
     df["hi52w"] = df["high"].rolling(252, min_periods=126).max()
     df["lo52w"] = df["low"].rolling(252, min_periods=126).min()
+    # Q 깡토: 60d-high breakout / 20d avg volume — precomputed once here instead of
+    # rebuilding the full rolling series per ticker per day inside run_kangto_trend.
+    # Same rolling ops on the same data → identical values.
+    df["hi60"] = df["close"].rolling(Q_BREAKOUT_DAYS, min_periods=30).max()
+    if "volume" in df.columns:
+        df["vol20avg"] = df["volume"].rolling(20, min_periods=10).mean()
     # Supertrend(10, 3): standard Supertrend indicator
     #   basic upper/lower bands = hl2 ± multiplier * ATR(period)
     _atr10 = tr.rolling(10, min_periods=5).mean()
@@ -362,28 +371,32 @@ def load_prices(ticker: str, market: str = "KR") -> pd.DataFrame | None:
     _upper = _hl2 + 3.0 * _atr10
     _lower = _hl2 - 3.0 * _atr10
     # Supertrend state: True=bullish, False=bearish
-    _final_upper = _upper.copy()
-    _final_lower = _lower.copy()
-    _trend = pd.Series(True, index=df.index)
+    # Recurrence identical to the original .iloc loop, run on numpy arrays
+    # (same float64 values, same min/max/comparison semantics — just faster).
+    up = _upper.to_numpy()
+    lo = _lower.to_numpy()
+    cl_arr = df["close"].to_numpy()
+    fu = up.copy()
+    fl = lo.copy()
+    trend = np.ones(len(df), dtype=bool)
     for i in range(1, len(df)):
-        prev_fu = _final_upper.iloc[i - 1]
-        prev_fl = _final_lower.iloc[i - 1]
-        cu = _upper.iloc[i]
-        cl = _lower.iloc[i]
-        prev_close = df["close"].iloc[i - 1]
+        prev_fu = fu[i - 1]
+        prev_fl = fl[i - 1]
+        cu = up[i]
+        cl = lo[i]
+        pc = cl_arr[i - 1]
         # Adjust bands
-        _final_upper.iloc[i] = min(cu, prev_fu) if prev_close <= prev_fu else cu
-        _final_lower.iloc[i] = max(cl, prev_fl) if prev_close >= prev_fl else cl
+        fu[i] = min(cu, prev_fu) if pc <= prev_fu else cu
+        fl[i] = max(cl, prev_fl) if pc >= prev_fl else cl
         # Determine trend
-        prev_trend = _trend.iloc[i - 1]
-        close_now = df["close"].iloc[i]
-        if prev_trend:
-            _trend.iloc[i] = close_now >= _final_lower.iloc[i]
+        close_now = cl_arr[i]
+        if trend[i - 1]:
+            trend[i] = close_now >= fl[i]
         else:
-            _trend.iloc[i] = close_now > _final_upper.iloc[i]
-    df["supertrend_bull"] = _trend
-    df["supertrend_upper"] = _final_upper
-    df["supertrend_lower"] = _final_lower
+            trend[i] = close_now > fu[i]
+    df["supertrend_bull"] = pd.Series(trend, index=df.index)
+    df["supertrend_upper"] = pd.Series(fu, index=df.index)
+    df["supertrend_lower"] = pd.Series(fl, index=df.index)
     # RSI(2) for Connors mean-reversion (L strategy)
     delta = df["close"].diff()
     gain = delta.clip(lower=0)
@@ -396,9 +409,102 @@ def load_prices(ticker: str, market: str = "KR") -> pd.DataFrame | None:
     return df
 
 
+def load_prices(ticker: str, market: str = "KR") -> pd.DataFrame | None:
+    """주가 데이터 로드. market='KR' → KR_{ticker}.csv, market='US' → US_{ticker}.csv"""
+    if market == "US":
+        path = PRICE_DIR / f"US_{ticker}.csv"
+    else:
+        path = PRICE_DIR / f"KR_{ticker}.csv"
+
+    if not path.exists():
+        return None
+
+    st = path.stat()
+    cache_key = (_PRICE_CACHE_VERSION, pd.__version__, st.st_mtime_ns, st.st_size)
+    cache_file = _PRICE_CACHE_DIR / f"{path.stem}.pkl"
+    if cache_file.exists():
+        try:
+            with open(cache_file, "rb") as fh:
+                stored_key, df = pickle.load(fh)
+            if stored_key == cache_key:
+                return df
+        except Exception:
+            pass  # corrupt/stale cache — recompute below
+
+    df = _load_prices_uncached(path)
+    if df is None:
+        return None
+    try:
+        _PRICE_CACHE_DIR.mkdir(exist_ok=True)
+        tmp = cache_file.with_suffix(".tmp")
+        with open(tmp, "wb") as fh:
+            pickle.dump((cache_key, df), fh, protocol=pickle.HIGHEST_PROTOCOL)
+        tmp.replace(cache_file)
+    except Exception:
+        pass  # cache write failure is non-fatal
+    return df
+
+
+# ── Fast point lookups (perf only — results identical) ────────────────────────
+# pd.Series.asof / df.loc[ts] dominate the per-day simulation loops. These
+# helpers do the same lookups via numpy searchsorted / a per-frame position map,
+# returning the exact same float64 values.
+
+def _fast_asof_raw(series: pd.Series, ts: pd.Timestamp) -> float:
+    """Exact mirror of float(series.asof(ts)) for a sorted DatetimeIndex.
+
+    Series.asof returns the last non-NaN value at or before ts (NaN if none).
+    """
+    idx = series.index.values.view("i8")
+    pos = int(idx.searchsorted(ts.value, side="right")) - 1
+    vals = series.to_numpy()
+    if vals.dtype.kind == "f":
+        while pos >= 0 and np.isnan(vals[pos]):
+            pos -= 1
+    return float(vals[pos]) if pos >= 0 else float("nan")
+
+
 def asof_value(series: pd.Series, day: dt.date) -> float:
-    value = series.asof(pd.Timestamp(day))
-    return float(value) if pd.notna(value) else 0.0
+    value = _fast_asof_raw(series, pd.Timestamp(day))
+    return value if not math.isnan(value) else 0.0
+
+
+class _FastFrame:
+    """Per-DataFrame numpy views: {timestamp→row position} + column arrays."""
+    __slots__ = ("df", "pos", "cols")
+
+    def __init__(self, df: pd.DataFrame) -> None:
+        self.df = df
+        self.pos = {int(v): i for i, v in enumerate(df.index.values.view("i8"))}
+        self.cols: dict[str, np.ndarray] = {}
+
+
+_FAST_FRAMES: dict[int, _FastFrame] = {}
+
+
+def _fast_frame(df: pd.DataFrame) -> _FastFrame:
+    ff = _FAST_FRAMES.get(id(df))
+    if ff is None or ff.df is not df:
+        ff = _FastFrame(df)
+        _FAST_FRAMES[id(df)] = ff
+    return ff
+
+
+def _px(df: pd.DataFrame, day_ts: pd.Timestamp, col: str) -> float | None:
+    """float(df.loc[day_ts][col]) if day_ts in df.index else None."""
+    ff = _fast_frame(df)
+    i = ff.pos.get(day_ts.value)
+    if i is None:
+        return None
+    arr = ff.cols.get(col)
+    if arr is None:
+        arr = ff.cols[col] = df[col].to_numpy()
+    return float(arr[i])
+
+
+def _has_day(df: pd.DataFrame, day_ts: pd.Timestamp) -> bool:
+    """Equivalent to `day_ts in df.index` (unique sorted index)."""
+    return day_ts.value in _fast_frame(df).pos
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -539,12 +645,16 @@ def months_later(base: dt.date, n: int) -> dt.date:
     return dt.date(base.year + m // 12, m % 12 + 1, min(base.day, 28))
 
 
-def _get_quote(prices: dict[str, pd.DataFrame], ticker: str, day: dt.date) -> pd.Series | None:
+def _get_quote(prices: dict[str, pd.DataFrame], ticker: str, day: dt.date) -> dict | None:
+    """Open/close quote at an exact day (None if no bar). Same values as df.loc[ts]."""
     df = prices.get(ticker)
     if df is None:
         return None
     ts = pd.Timestamp(day)
-    return df.loc[ts] if ts in df.index else None
+    o = _px(df, ts, "open")
+    if o is None:
+        return None
+    return {"open": o, "close": _px(df, ts, "close")}
 
 
 def _last_month_open(day: dt.date, calendar: list[dt.date]) -> dt.date | None:
@@ -602,10 +712,9 @@ def _try_enter(
     if df is None:
         return None, cash
     day_ts = pd.Timestamp(day)
-    if day_ts not in df.index:
+    entry_price = _px(df, day_ts, "open")
+    if entry_price is None:
         return None, cash
-    q = df.loc[day_ts]
-    entry_price = float(q["open"])
     if entry_price <= 0:
         return None, cash
 
@@ -775,8 +884,8 @@ def run_fixed_hold(
         # Update last_close
         for ticker, pos in positions.items():
             df = prices.get(ticker)
-            if df is not None and day_ts in df.index:
-                pos["last_close"] = float(df.loc[day_ts]["close"])
+            if df is not None and _has_day(df, day_ts):
+                pos["last_close"] = _px(df, day_ts, "close")
                 pos["fx"] = _fx(pos.get("market", "KR"), day)
 
         nav = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
@@ -831,7 +940,7 @@ def run_narrative_hold(
         cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # Execute pending exits (flagged previous month-end)
-        to_exit = [t for t in list(pending_exits) if t in positions]
+        to_exit = [t for t in sorted(pending_exits) if t in positions]
         for ticker in to_exit:
             pos = positions[ticker]
             q = _get_quote(prices, ticker, day)
@@ -860,8 +969,8 @@ def run_narrative_hold(
         # Update last_close and MA
         for ticker, pos in positions.items():
             df = prices.get(ticker)
-            if df is not None and day_ts in df.index:
-                pos["last_close"] = float(df.loc[day_ts]["close"])
+            if df is not None and _has_day(df, day_ts):
+                pos["last_close"] = _px(df, day_ts, "close")
                 pos["fx"] = _fx(pos.get("market", "KR"), day)
 
         # Month-end thesis-break check (Faber rule: monthly check)
@@ -921,7 +1030,7 @@ def run_chandelier(
         cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # Execute pending exits
-        to_exit = [t for t in list(pending_exits) if t in positions]
+        to_exit = [t for t in sorted(pending_exits) if t in positions]
         for ticker in to_exit:
             pos = positions[ticker]
             q = _get_quote(prices, ticker, day)
@@ -950,9 +1059,9 @@ def run_chandelier(
         # Update positions and check chandelier stop
         for ticker, pos in list(positions.items()):
             df = prices.get(ticker)
-            if df is None or day_ts not in df.index:
+            if df is None or not _has_day(df, day_ts):
                 continue
-            close = float(df.loc[day_ts]["close"])
+            close = _px(df, day_ts, "close")
             pos["last_close"] = close
             pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["highest"] = max(pos.get("highest", close), close)
@@ -1012,7 +1121,7 @@ def run_half_exit_runner(
         cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # Execute runner exits (C-rule triggered previous month-end)
-        to_exit = [t for t in list(runner_exits) if t in positions]
+        to_exit = [t for t in sorted(runner_exits) if t in positions]
         for ticker in to_exit:
             pos = positions[ticker]
             q = _get_quote(prices, ticker, day)
@@ -1048,10 +1157,10 @@ def run_half_exit_runner(
             if tp is None:
                 continue
             df = prices.get(ticker)
-            if df is None or day_ts not in df.index:
+            if df is None or not _has_day(df, day_ts):
                 continue
-            high_today = float(df.loc[day_ts].get("high", df.loc[day_ts]["close"]))
-            close_today = float(df.loc[day_ts]["close"])
+            high_today = _px(df, day_ts, "high")
+            close_today = _px(df, day_ts, "close")
             if high_today >= tp:
                 # Sell half at target price (capped by close if needed)
                 half_exit_price = min(tp, close_today) if close_today < tp else tp
@@ -1071,8 +1180,8 @@ def run_half_exit_runner(
         # Update last_close
         for ticker, pos in positions.items():
             df = prices.get(ticker)
-            if df is not None and day_ts in df.index:
-                pos["last_close"] = float(df.loc[day_ts]["close"])
+            if df is not None and _has_day(df, day_ts):
+                pos["last_close"] = _px(df, day_ts, "close")
                 pos["fx"] = _fx(pos.get("market", "KR"), day)
 
         # Month-end C-rule check for runners
@@ -1169,7 +1278,7 @@ def run_dip_buy(
         cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # Execute pending exits (trailing stop or other)
-        to_exit = [t for t in list(pending_exits) if t in positions]
+        to_exit = [t for t in sorted(pending_exits) if t in positions]
         for ticker in to_exit:
             pos = positions[ticker]
             q = _get_quote(prices, ticker, day)
@@ -1192,11 +1301,8 @@ def run_dip_buy(
                 df = prices.get(ticker)
                 if df is None:
                     continue
-                if day_ts not in df.index:
-                    continue
-                q = df.loc[day_ts]
-                entry_price = float(q["open"])
-                if entry_price <= 0:
+                entry_price = _px(df, day_ts, "open")
+                if entry_price is None or entry_price <= 0:
                     continue
                 budget = min(nav_now * POSITION_WEIGHT, cash)
                 if budget < nav_now * POSITION_WEIGHT * 0.5:
@@ -1226,9 +1332,9 @@ def run_dip_buy(
             if ticker in positions:
                 continue
             df = prices.get(ticker)
-            if df is None or day_ts not in df.index:
+            if df is None or not _has_day(df, day_ts):
                 continue
-            close_today = float(df.loc[day_ts]["close"])
+            close_today = _px(df, day_ts, "close")
             for watch in watches:
                 if day < watch["report_date"] or day > watch["expire_date"]:
                     continue
@@ -1240,10 +1346,10 @@ def run_dip_buy(
         # Update positions + check exits
         for ticker, pos in list(positions.items()):
             df = prices.get(ticker)
-            if df is None or day_ts not in df.index:
+            if df is None or not _has_day(df, day_ts):
                 continue
-            close = float(df.loc[day_ts]["close"])
-            high_today = float(df.loc[day_ts].get("high", close))
+            close = _px(df, day_ts, "close")
+            high_today = _px(df, day_ts, "high")
             pos["last_close"] = close
             pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["highest"] = max(pos.get("highest", close), close)
@@ -1343,7 +1449,7 @@ def run_minervini(
         cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # Execute pending exits
-        to_exit = [t for t in list(pending_exits) if t in positions]
+        to_exit = [t for t in sorted(pending_exits) if t in positions]
         for ticker in to_exit:
             pos = positions[ticker]
             q = _get_quote(prices, ticker, day)
@@ -1363,10 +1469,11 @@ def run_minervini(
             candidates = list({t: (t, s, nc) for t, s, nc in pending_entries[day] if t not in positions}.values())
             for ticker, source, n_clubs in candidates[:slots]:
                 df = prices.get(ticker)
-                if df is None or day_ts not in df.index:
+                if df is None:
                     continue
-                q = df.loc[day_ts]
-                close = float(q["close"])
+                close = _px(df, day_ts, "close")
+                if close is None:
+                    continue
                 ma50  = asof_value(df["ma50"],  day)
                 ma150 = asof_value(df["ma150"], day)
                 ma200 = asof_value(df["ma200"], day)
@@ -1407,8 +1514,8 @@ def run_minervini(
         # Update last_close
         for ticker, pos in positions.items():
             df = prices.get(ticker)
-            if df is not None and day_ts in df.index:
-                pos["last_close"] = float(df.loc[day_ts]["close"])
+            if df is not None and _has_day(df, day_ts):
+                pos["last_close"] = _px(df, day_ts, "close")
                 pos["fx"] = _fx(pos.get("market", "KR"), day)
 
         # Weekly check: exit if close < 50MA
@@ -1495,7 +1602,7 @@ def run_supertrend(
         cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # Execute pending exits
-        to_exit = [t for t in list(pending_exits) if t in positions]
+        to_exit = [t for t in sorted(pending_exits) if t in positions]
         for ticker in to_exit:
             pos = positions[ticker]
             q = _get_quote(prices, ticker, day)
@@ -1531,9 +1638,9 @@ def run_supertrend(
             if day < watch["report_date"]:
                 continue
             df = prices.get(ticker)
-            if df is None or day_ts not in df.index:
+            if df is None or not _has_day(df, day_ts):
                 continue
-            st_now = bool(df.loc[day_ts]["supertrend_bull"])
+            st_now = bool(_px(df, day_ts, "supertrend_bull"))
             if st_now:
                 new_direct.append((ticker, watch["source"], watch["n_clubs"],
                                    "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입"))
@@ -1549,10 +1656,10 @@ def run_supertrend(
         # Update last_close + check supertrend exit
         for ticker, pos in list(positions.items()):
             df = prices.get(ticker)
-            if df is None or day_ts not in df.index:
+            if df is None or not _has_day(df, day_ts):
                 continue
-            pos["last_close"] = float(df.loc[day_ts]["close"])
-            st_now = bool(df.loc[day_ts]["supertrend_bull"])
+            pos["last_close"] = _px(df, day_ts, "close")
+            st_now = bool(_px(df, day_ts, "supertrend_bull"))
             if not st_now and ticker not in pending_exits:
                 pending_exits.add(ticker)
 
@@ -1741,11 +1848,10 @@ def run_rr_trend(
             candidates = list({t: (t, s, nc) for t, s, nc in pending_entries[day] if t not in positions}.values())
             for ticker, source, n_clubs in candidates[:slots]:
                 df = prices.get(ticker)
-                if df is None or day_ts not in df.index:
+                if df is None:
                     continue
-                q = df.loc[day_ts]
-                entry_price = float(q["open"])
-                if entry_price <= 0:
+                entry_price = _px(df, day_ts, "open")
+                if entry_price is None or entry_price <= 0:
                     continue
                 atr20_val = asof_value(df["atr20"], day)
                 if atr20_val <= 0:
@@ -1792,11 +1898,11 @@ def run_rr_trend(
         # Update positions and check exit conditions
         for ticker, pos in list(positions.items()):
             df = prices.get(ticker)
-            if df is None or day_ts not in df.index:
+            if df is None or not _has_day(df, day_ts):
                 continue
-            close = float(df.loc[day_ts]["close"])
-            high_today = float(df.loc[day_ts].get("high", close))
-            low_today = float(df.loc[day_ts].get("low", close))
+            close = _px(df, day_ts, "close")
+            high_today = _px(df, day_ts, "high")
+            low_today = _px(df, day_ts, "low")
             pos["last_close"] = close
             pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["highest"] = max(pos.get("highest", close), close)
@@ -1871,7 +1977,7 @@ def run_chandelier_parametric(
         day_ts = pd.Timestamp(day)
         cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
-        to_exit = [t for t in list(pending_exits) if t in positions]
+        to_exit = [t for t in sorted(pending_exits) if t in positions]
         for ticker in to_exit:
             pos = positions[ticker]
             q = _get_quote(prices, ticker, day)
@@ -1904,9 +2010,9 @@ def run_chandelier_parametric(
 
         for ticker, pos in list(positions.items()):
             df = prices.get(ticker)
-            if df is None or day_ts not in df.index:
+            if df is None or not _has_day(df, day_ts):
                 continue
-            close = float(df.loc[day_ts]["close"])
+            close = _px(df, day_ts, "close")
             pos["last_close"] = close
             pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["highest"] = max(pos.get("highest", close), close)
@@ -1946,6 +2052,41 @@ IS_FOLD1_END   = dt.date(2021, 12, 31)
 IS_FOLD2_START = dt.date(2022, 1, 1)
 IS_FOLD2_END   = dt.date(2023, 12, 31)
 
+# ── Expensive-stage caches (Optuna / SPO) ─────────────────────────────────────
+# Both stages are fully deterministic given (prices, reports, calendar, FX,
+# seeds). We fingerprint those inputs; on an exact match the previously found
+# result is reused — identical to re-running. `--retune` forces a re-run.
+OPTUNA_CACHE_PATH = ROOT / "data" / "optuna_cache.json"
+SPO_CACHE_PATH = ROOT / "data" / "spo_cache.pkl"
+S_WEIGHTS_CACHE_PATH = ROOT / "data" / "s_weights_cache.pkl"
+# Bump when _hrp_weights/_msharpe_weights/_mincvar_weights logic changes
+S_WEIGHTS_CODE_TAG = "s_v1"
+FORCE_RETUNE = False  # set by --retune CLI flag
+
+
+def _dataset_fingerprint(
+    prices: dict[str, pd.DataFrame],
+    reports: list[tuple[dt.date, str, str, int]],
+    calendar: list[dt.date],
+) -> str:
+    """SHA-256 over every input that can influence backtest results:
+    report stream, calendar span, raw OHLCV of every ticker, and USDKRW."""
+    h = hashlib.sha256()
+    for rdate, ticker, source, n_clubs in reports:
+        h.update(f"{rdate.isoformat()}|{ticker}|{source}|{n_clubs}\n".encode())
+    h.update(f"cal|{calendar[0].isoformat()}|{calendar[-1].isoformat()}|{len(calendar)}\n".encode())
+    for tk in sorted(prices):
+        df = prices[tk]
+        h.update(tk.encode())
+        h.update(df.index.values.tobytes())
+        for col in ("open", "high", "low", "close", "volume"):
+            if col in df.columns:
+                h.update(np.ascontiguousarray(df[col].to_numpy()).tobytes())
+    if _USDKRW is not None:
+        h.update(_USDKRW.index.values.tobytes())
+        h.update(np.ascontiguousarray(_USDKRW.to_numpy()).tobytes())
+    return h.hexdigest()
+
 def _chandelier_fold_sharpe(
     nav_df: pd.Series,
     fold_start: dt.date,
@@ -1966,8 +2107,14 @@ def run_optuna_chandelier(
     reports: list[tuple[dt.date, str, str, int]],
     calendar: list[dt.date],
     ticker_reports: dict[str, list[dict]] | None = None,
+    dataset_fingerprint: str | None = None,
 ) -> dict:
-    """Run Optuna optimization on chandelier family. Returns best params + IS/OOS metrics."""
+    """Run Optuna optimization on chandelier family. Returns best params + IS/OOS metrics.
+
+    The 120-trial search is skipped when (dataset fingerprint, search space,
+    seed, trial count) match a cached run — TPE with a fixed seed on identical
+    inputs reproduces the same best params, so reusing them is result-identical.
+    """
     try:
         import optuna
         optuna.logging.set_verbosity(optuna.logging.WARNING)
@@ -1978,35 +2125,75 @@ def run_optuna_chandelier(
     # IS calendar only
     is_calendar = [d for d in calendar if IS_FOLD1_START <= d <= IS_FOLD2_END]
 
-    def objective(trial: "optuna.Trial") -> float:
-        atr_period = trial.suggest_categorical("atr_period", [20, 42, 63])
-        # Discretised grid: step=0.25 → values land on {2.50, 2.75, 3.00, …, 7.00}
-        atr_mult   = trial.suggest_float("atr_mult", 2.5, 7.0, step=0.25)
-        max_pos    = trial.suggest_categorical("max_positions", [10, 20, 30])
+    search_space_tag = "atr_period[20,42,63]|atr_mult[2.5,7.0,0.25]|max_positions[10,20,30]"
+    cache_key = None
+    if dataset_fingerprint is not None:
+        cache_key = hashlib.sha256(
+            f"{dataset_fingerprint}|{search_space_tag}|seed={OPTUNA_SEED}|trials={OPTUNA_N_TRIALS}".encode()
+        ).hexdigest()
 
-        # Need ATR for non-standard periods — compute on the fly if needed
-        # atr_period=20 uses atr20, atr_period=42 uses atr (default), 63 we reuse atr (closest)
-        result = run_chandelier_parametric(
-            prices, reports, is_calendar, "optuna_trial",
-            atr_period=atr_period, atr_mult=atr_mult, max_positions=max_pos,
-            ticker_reports=ticker_reports, record_full_trades=False,
-        )
-        nav_df = result["nav_df"]
-        s1 = _chandelier_fold_sharpe(nav_df, IS_FOLD1_START, IS_FOLD1_END)
-        s2 = _chandelier_fold_sharpe(nav_df, IS_FOLD2_START, IS_FOLD2_END)
-        # Objective: worst-fold sharpe with instability penalty
-        return min(s1, s2) - 0.1 * abs(s1 - s2)
+    best: dict | None = None
+    best_val: float | None = None
+    if cache_key is not None and not FORCE_RETUNE and OPTUNA_CACHE_PATH.exists():
+        try:
+            cache = json.loads(OPTUNA_CACHE_PATH.read_text(encoding="utf-8"))
+            entry = cache.get(cache_key)
+            if entry:
+                best = entry["best_params"]
+                best_val = float(entry["best_objective_raw"])
+                print(f"  Optuna cache HIT (dataset unchanged) — best params {best}  "
+                      f"obj={best_val:.3f}  [--retune to force re-search]", flush=True)
+        except Exception:
+            best = None
 
-    sampler = optuna.samplers.TPESampler(seed=OPTUNA_SEED)
-    study = optuna.create_study(direction="maximize", sampler=sampler)
-    print(f"  Running Optuna ({OPTUNA_N_TRIALS} trials)...", flush=True)
-    study.optimize(objective, n_trials=OPTUNA_N_TRIALS, show_progress_bar=False)
+    if best is None:
+        def objective(trial: "optuna.Trial") -> float:
+            atr_period = trial.suggest_categorical("atr_period", [20, 42, 63])
+            # Discretised grid: step=0.25 → values land on {2.50, 2.75, 3.00, …, 7.00}
+            atr_mult   = trial.suggest_float("atr_mult", 2.5, 7.0, step=0.25)
+            max_pos    = trial.suggest_categorical("max_positions", [10, 20, 30])
 
-    best = study.best_params
-    # Round floats to 2 decimal places for deterministic reporting
-    best = {k: (round(v, 2) if isinstance(v, float) else v) for k, v in best.items()}
-    best_val = study.best_value
-    print(f"  Best params (discretised): {best}  obj={best_val:.3f}", flush=True)
+            # Need ATR for non-standard periods — compute on the fly if needed
+            # atr_period=20 uses atr20, atr_period=42 uses atr (default), 63 we reuse atr (closest)
+            result = run_chandelier_parametric(
+                prices, reports, is_calendar, "optuna_trial",
+                atr_period=atr_period, atr_mult=atr_mult, max_positions=max_pos,
+                ticker_reports=ticker_reports, record_full_trades=False,
+            )
+            nav_df = result["nav_df"]
+            s1 = _chandelier_fold_sharpe(nav_df, IS_FOLD1_START, IS_FOLD1_END)
+            s2 = _chandelier_fold_sharpe(nav_df, IS_FOLD2_START, IS_FOLD2_END)
+            # Objective: worst-fold sharpe with instability penalty
+            return min(s1, s2) - 0.1 * abs(s1 - s2)
+
+        sampler = optuna.samplers.TPESampler(seed=OPTUNA_SEED)
+        study = optuna.create_study(direction="maximize", sampler=sampler)
+        print(f"  Running Optuna ({OPTUNA_N_TRIALS} trials)...", flush=True)
+        study.optimize(objective, n_trials=OPTUNA_N_TRIALS, show_progress_bar=False)
+
+        best = study.best_params
+        # Round floats to 2 decimal places for deterministic reporting
+        best = {k: (round(v, 2) if isinstance(v, float) else v) for k, v in best.items()}
+        best_val = study.best_value
+        print(f"  Best params (discretised): {best}  obj={best_val:.3f}", flush=True)
+
+        if cache_key is not None:
+            try:
+                cache = {}
+                if OPTUNA_CACHE_PATH.exists():
+                    cache = json.loads(OPTUNA_CACHE_PATH.read_text(encoding="utf-8"))
+                cache[cache_key] = {
+                    "best_params": best,
+                    "best_objective_raw": best_val,
+                    "search_space": search_space_tag,
+                    "seed": OPTUNA_SEED,
+                    "n_trials": OPTUNA_N_TRIALS,
+                    "cached_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
+                }
+                OPTUNA_CACHE_PATH.write_text(
+                    json.dumps(cache, ensure_ascii=False, indent=1), encoding="utf-8")
+            except Exception as e:
+                print(f"  WARNING: optuna cache write failed: {e}", flush=True)
 
     # Evaluate best config on IS (both folds together) for reporting
     is_result = run_chandelier_parametric(
@@ -2134,9 +2321,9 @@ def run_rsi2_mean_reversion(
         # Update positions + check exit conditions (end-of-day)
         for ticker, pos in list(positions.items()):
             df = prices.get(ticker)
-            if df is None or day_ts not in df.index:
+            if df is None or not _has_day(df, day_ts):
                 continue
-            close = float(df.loc[day_ts]["close"])
+            close = _px(df, day_ts, "close")
             pos["last_close"] = close
             pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["hold_days_remaining"] = pos.get("hold_days_remaining", RSI2_MAX_HOLD_DAYS) - 1
@@ -2160,9 +2347,9 @@ def run_rsi2_mean_reversion(
             if not valid:
                 continue
             df = prices.get(ticker)
-            if df is None or day_ts not in df.index:
+            if df is None or not _has_day(df, day_ts):
                 continue
-            close = float(df.loc[day_ts]["close"])
+            close = _px(df, day_ts, "close")
             rsi2_val = float(df["rsi2"].asof(day_ts)) if "rsi2" in df.columns else 50.0
             ma200_val = asof_value(df["ma200"], day)
             if rsi2_val < RSI2_ENTRY_THRESHOLD and ma200_val > 0 and close > ma200_val:
@@ -2276,8 +2463,8 @@ def run_short_term_reversal(
         # Update last_close
         for ticker, pos in positions.items():
             df = prices.get(ticker)
-            if df is not None and day_ts in df.index:
-                pos["last_close"] = float(df.loc[day_ts]["close"])
+            if df is not None and _has_day(df, day_ts):
+                pos["last_close"] = _px(df, day_ts, "close")
                 pos["fx"] = _fx(pos.get("market", "KR"), day)
 
         # End-of-month: compute bottom-quintile ranking from today's close for next
@@ -2292,9 +2479,9 @@ def run_short_term_reversal(
                 if not valid:
                     continue
                 df = prices.get(ticker)
-                if df is None or day_ts not in df.index:
+                if df is None or not _has_day(df, day_ts):
                     continue
-                close_now = float(df.loc[day_ts]["close"])
+                close_now = _px(df, day_ts, "close")
                 close_1mo = asof_value(df["close"], one_mo_ago)
                 if close_1mo <= 0:
                     continue
@@ -2379,7 +2566,7 @@ def run_52w_high_proximity(
         cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # Execute pending exits
-        to_exit = [t for t in list(pending_exits) if t in positions]
+        to_exit = [t for t in sorted(pending_exits) if t in positions]
         for ticker in to_exit:
             pos = positions[ticker]
             q = _get_quote(prices, ticker, day)
@@ -2405,8 +2592,8 @@ def run_52w_high_proximity(
         # Update last_close
         for ticker, pos in positions.items():
             df = prices.get(ticker)
-            if df is not None and day_ts in df.index:
-                pos["last_close"] = float(df.loc[day_ts]["close"])
+            if df is not None and _has_day(df, day_ts):
+                pos["last_close"] = _px(df, day_ts, "close")
                 pos["fx"] = _fx(pos.get("market", "KR"), day)
 
         # Monthly exit check: close < 70% of 52w high
@@ -2482,6 +2669,12 @@ MTT_RS_W6  = 0.3
 MTT_RS_W12 = 0.2
 
 
+# Shared per-day RS cache — _compute_rs_percentiles is a pure function of
+# (prices, day) and the same `prices` dict is used for the entire run, so the
+# O(MTT) and Q(깡토) strategies can share one computation per day.
+_RS_DAY_CACHE: dict[dt.date, dict[str, float]] = {}
+
+
 def _compute_rs_percentiles(
     prices: dict[str, pd.DataFrame],
     day: dt.date,
@@ -2491,6 +2684,10 @@ def _compute_rs_percentiles(
     weighted_rs = rank_pct(ret_3m)×0.5 + rank_pct(ret_6m)×0.3 + rank_pct(ret_12m)×0.2
     Returns {ticker: rs_score 0..99} — empty dict if insufficient data.
     """
+    cached = _RS_DAY_CACHE.get(day)
+    if cached is not None:
+        return cached
+
     day_ts = pd.Timestamp(day)
     day_63  = day - dt.timedelta(days=int(MTT_RS_3M  * 1.45))   # ~91 cal days
     day_126 = day - dt.timedelta(days=int(MTT_RS_6M  * 1.45))   # ~183 cal days
@@ -2498,10 +2695,8 @@ def _compute_rs_percentiles(
 
     rets: dict[str, tuple[float, float, float]] = {}
     for ticker, df in prices.items():
-        if day_ts not in df.index:
-            continue
-        close_now = float(df.loc[day_ts]["close"])
-        if close_now <= 0:
+        close_now = _px(df, day_ts, "close")
+        if close_now is None or close_now <= 0:
             continue
         c3  = asof_value(df["close"], day_63)
         c6  = asof_value(df["close"], day_126)
@@ -2511,6 +2706,7 @@ def _compute_rs_percentiles(
         rets[ticker] = (close_now / c3 - 1, close_now / c6 - 1, close_now / c12 - 1)
 
     if len(rets) < 5:
+        _RS_DAY_CACHE[day] = {}
         return {}
 
     tickers = list(rets.keys())
@@ -2527,10 +2723,12 @@ def _compute_rs_percentiles(
     p6  = rank_pct(r6)
     p12 = rank_pct(r12)
 
-    return {
+    result = {
         tickers[i]: round(p3[i] * MTT_RS_W3 + p6[i] * MTT_RS_W6 + p12[i] * MTT_RS_W12, 2)
         for i in range(n)
     }
+    _RS_DAY_CACHE[day] = result
+    return result
 
 
 def run_mtt_alpha16(
@@ -2638,14 +2836,14 @@ def run_mtt_alpha16(
             if not valid:
                 continue
             df = prices.get(ticker)
-            if df is None or day_ts not in df.index:
+            if df is None or not _has_day(df, day_ts):
                 continue
 
             rs_val = rs_scores.get(ticker, 0.0)
             if rs_val < MTT_RS_BUY_THRESHOLD:
                 continue
 
-            close = float(df.loc[day_ts]["close"])
+            close = _px(df, day_ts, "close")
             ma50  = asof_value(df["ma50"],  day)
             ma150 = asof_value(df["ma150"], day)
             ma200 = asof_value(df["ma200"], day)
@@ -2686,9 +2884,9 @@ def run_mtt_alpha16(
         # Update positions + check exit conditions
         for ticker, pos in list(positions.items()):
             df = prices.get(ticker)
-            if df is None or day_ts not in df.index:
+            if df is None or not _has_day(df, day_ts):
                 continue
-            close = float(df.loc[day_ts]["close"])
+            close = _px(df, day_ts, "close")
             pos["last_close"] = close
             pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["highest"] = max(pos.get("highest", close), close)
@@ -2836,7 +3034,7 @@ def run_deepbuy_chandelier(
         cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # ── Open-of-day: execute exits ─────────────────────────────────────
-        to_exit = [t for t in list(pending_exits) if t in positions]
+        to_exit = [t for t in sorted(pending_exits) if t in positions]
         for ticker in to_exit:
             pos = positions[ticker]
             q = _get_quote(prices, ticker, day)
@@ -2858,9 +3056,9 @@ def run_deepbuy_chandelier(
                 if pos is None:
                     continue
                 df = prices.get(ticker)
-                if df is None or day_ts not in df.index:
+                if df is None or not _has_day(df, day_ts):
                     continue
-                addon_price = float(df.loc[day_ts]["open"])
+                addon_price = _px(df, day_ts, "open")
                 if addon_price <= 0:
                     continue
                 addon_budget = min(nav_now * POSITION_WEIGHT, cash)
@@ -2894,9 +3092,9 @@ def run_deepbuy_chandelier(
                 if ticker in positions:
                     continue
                 df = prices.get(ticker)
-                if df is None or day_ts not in df.index:
+                if df is None or not _has_day(df, day_ts):
                     continue
-                entry_price = float(df.loc[day_ts]["open"])
+                entry_price = _px(df, day_ts, "open")
                 if entry_price <= 0:
                     continue
                 budget = min(nav_now * POSITION_WEIGHT, cash)
@@ -2937,9 +3135,9 @@ def run_deepbuy_chandelier(
             if ticker in positions:
                 continue
             df = prices.get(ticker)
-            if df is None or day_ts not in df.index:
+            if df is None or not _has_day(df, day_ts):
                 continue
-            close_today = float(df.loc[day_ts]["close"])
+            close_today = _px(df, day_ts, "close")
             for watch in watches:
                 if day < watch["report_date"] or day > watch["expire_date"]:
                     continue
@@ -2953,9 +3151,9 @@ def run_deepbuy_chandelier(
         new_addon: list[str] = []
         for ticker, pos in list(positions.items()):
             df = prices.get(ticker)
-            if df is None or day_ts not in df.index:
+            if df is None or not _has_day(df, day_ts):
                 continue
-            close = float(df.loc[day_ts]["close"])
+            close = _px(df, day_ts, "close")
             pos["last_close"] = close
             pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["highest"] = max(pos.get("highest", close), close)
@@ -3187,8 +3385,8 @@ def run_immediate_hold(
 
         for ticker, pos in positions.items():
             df = prices.get(ticker)
-            if df is not None and day_ts in df.index:
-                pos["last_close"] = float(df.loc[day_ts]["close"])
+            if df is not None and _has_day(df, day_ts):
+                pos["last_close"] = _px(df, day_ts, "close")
                 pos["fx"] = _fx(pos.get("market", "KR"), day)
 
         nav = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
@@ -3555,12 +3753,16 @@ def compute_wealth_simulation_multi(
 
     bench_units: dict[str, float] = {}
     bench_aligned: dict[str, pd.Series] = {}
+    # Positional numpy views — same aligned values as .loc[day], just O(1) access
+    bench_arr: dict[str, np.ndarray] = {}
     for name, idx_series in benchmarks.items():
         aligned = idx_series.reindex(all_dates).ffill().bfill()
         bench_aligned[name] = aligned
+        bench_arr[name] = aligned.to_numpy()
         bench_units[name] = DCA_INITIAL / float(aligned.iloc[0])
+    strat_ret_arr = strat_daily_ret.to_numpy()
 
-    for day in all_dates:
+    for day_i, day in enumerate(all_dates):
         day_date = day.date()
         is_month_first = day_date in monthly_dates
 
@@ -3569,17 +3771,17 @@ def compute_wealth_simulation_multi(
             total_contributed += contribution
             strat_wealth += contribution
             for name in bench_units:
-                price_today = float(bench_aligned[name].loc[day])
+                price_today = float(bench_arr[name][day_i])
                 bench_units[name] += contribution / price_today
 
         if is_month_first:
             month_idx += 1
 
-        sr = float(strat_daily_ret.loc[day])
+        sr = float(strat_ret_arr[day_i])
         strat_wealth *= (1 + sr)
 
         bench_vals: dict[str, float] = {
-            name: bench_units[name] * float(bench_aligned[name].loc[day])
+            name: bench_units[name] * float(bench_arr[name][day_i])
             for name in bench_units
         }
 
@@ -4157,9 +4359,9 @@ def run_kangto_trend(
                 if ticker in positions:
                     continue
                 df = prices.get(ticker)
-                if df is None or day_ts not in df.index:
+                if df is None or not _has_day(df, day_ts):
                     continue
-                entry_price = float(df.loc[day_ts]["open"])
+                entry_price = _px(df, day_ts, "open")
                 if entry_price <= 0:
                     continue
 
@@ -4261,10 +4463,10 @@ def run_kangto_trend(
                                 raw_r3.append(0.0); raw_r6.append(0.0); raw_r12.append(0.0)
                                 continue
                             day_ts2 = pd.Timestamp(day)
-                            if day_ts2 not in df.index:
+                            if not _has_day(df, day_ts2):
                                 raw_r3.append(0.0); raw_r6.append(0.0); raw_r12.append(0.0)
                                 continue
-                            cn = float(df.loc[day_ts2]["close"])
+                            cn = _px(df, day_ts2, "close")
                             _c3  = asof_value(df["close"], day_63)
                             _c6  = asof_value(df["close"], day_126)
                             _c12 = asof_value(df["close"], day_252)
@@ -4287,22 +4489,23 @@ def run_kangto_trend(
             if not valid:
                 continue
             df = prices.get(ticker)
-            if df is None or day_ts not in df.index:
+            if df is None or not _has_day(df, day_ts):
                 continue
 
             rs_val = rs_scores.get(ticker, 0.0)
             if rs_val < kospi_rs_pct:
                 continue
 
-            close = float(df.loc[day_ts]["close"])
+            close = _px(df, day_ts, "close")
             # 60d high breakout: close == 60d high (close >= rolling 60d high)
-            hi60 = float(df["close"].rolling(Q_BREAKOUT_DAYS, min_periods=30).max().asof(day_ts)) if "close" in df else 0.0
+            # hi60 precomputed in load_prices — identical rolling op on same data
+            hi60 = _fast_asof_raw(df["hi60"], day_ts) if "hi60" in df.columns else 0.0
             if hi60 <= 0 or close < hi60 * 0.999:  # allow tiny float tolerance
                 continue
-            # Volume ≥ 1.5× 20d avg
-            if "volume" in df.columns and day_ts in df.index:
-                vol_now = float(df.loc[day_ts]["volume"])
-                vol_20avg = float(df["volume"].rolling(20, min_periods=10).mean().asof(day_ts))
+            # Volume ≥ 1.5× 20d avg (vol20avg precomputed in load_prices)
+            if "vol20avg" in df.columns and _has_day(df, day_ts):
+                vol_now = _px(df, day_ts, "volume")
+                vol_20avg = _fast_asof_raw(df["vol20avg"], day_ts)
                 if vol_20avg <= 0 or vol_now < Q_VOL_MULT * vol_20avg:
                     continue
 
@@ -4317,10 +4520,10 @@ def run_kangto_trend(
         # Update positions + check exits
         for ticker, pos in list(positions.items()):
             df = prices.get(ticker)
-            if df is None or day_ts not in df.index:
+            if df is None or not _has_day(df, day_ts):
                 continue
-            close = float(df.loc[day_ts]["close"])
-            high_today = float(df.loc[day_ts].get("high", close))
+            close = _px(df, day_ts, "close")
+            high_today = _px(df, day_ts, "high")
             pos["last_close"] = close
             pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["highest"] = max(pos.get("highest", close), close)
@@ -4447,7 +4650,7 @@ def run_kelly_chandelier(
         cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
 
         # Execute pending exits at open
-        to_exit = [t for t in list(pending_exits) if t in positions]
+        to_exit = [t for t in sorted(pending_exits) if t in positions]
         for ticker in to_exit:
             pos = positions[ticker]
             q = _get_quote(prices, ticker, day)
@@ -4473,9 +4676,9 @@ def run_kelly_chandelier(
                                 if t not in positions}.values())
             for ticker, source, n_clubs in candidates[:slots]:
                 df = prices.get(ticker)
-                if df is None or day_ts not in df.index:
+                if df is None or not _has_day(df, day_ts):
                     continue
-                entry_price = float(df.loc[day_ts]["open"])
+                entry_price = _px(df, day_ts, "open")
                 if entry_price <= 0:
                     continue
 
@@ -4524,9 +4727,9 @@ def run_kelly_chandelier(
         # Update positions + check chandelier stop
         for ticker, pos in list(positions.items()):
             df = prices.get(ticker)
-            if df is None or day_ts not in df.index:
+            if df is None or not _has_day(df, day_ts):
                 continue
-            close = float(df.loc[day_ts]["close"])
+            close = _px(df, day_ts, "close")
             pos["last_close"] = close
             pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["highest"] = max(pos.get("highest", close), close)
@@ -4781,6 +4984,7 @@ def run_portfolio_opt(
     ticker_reports: dict[str, list[dict]] | None = None,
     record_full_trades: bool = False,
     weight_schedule: dict[dt.date, dict[str, float]] | None = None,
+    weights_memo: dict[str, dict[str, float] | None] | None = None,
 ) -> dict:
     """
     S 포트폴리오 최적화 (월간 리밸런스).
@@ -4793,6 +4997,11 @@ def run_portfolio_opt(
     weight_schedule (v16): 외부에서 계산한 {월말일 → {티커: 비중}} 스케줄이 주어지면
     내부 가중치 계산을 건너뛰고 동일한 실행 메커니즘(월말 신호 → 익월 첫 거래일
     시가 체결, 턴오버 비용)으로 체결만 수행. V(SPO) 패밀리가 사용.
+
+    weights_memo (perf cache): {month_end_iso → filtered target_weights | None}.
+    가중치 최적화(hrp/msharpe/mincvar)는 (prices, reports, calendar)의 순수 함수 —
+    동일 데이터셋에서는 캐시 재생이 재계산과 결과 동일. None = 해당 월말에 가중치
+    미산출(유니버스 부족/실패) 기록. 캐시에 없는 월은 정상 계산 후 기록.
     """
     # ── v15 프리플라이트: 의존성 누락은 즉시 크게 실패 ──────────────────────
     # (과거 버그: scipy 미설치 시 월별 except가 ImportError를 삼켜
@@ -4868,12 +5077,12 @@ def run_portfolio_opt(
                 cur_value = cur_pos["shares"] * cur_pos["last_close"] if cur_pos else 0.0
 
                 df = prices.get(ticker)
-                if df is None or day_ts not in df.index:
+                if df is None or not _has_day(df, day_ts):
                     if cur_pos:
                         new_positions[ticker] = cur_pos
                     continue
 
-                trade_price = float(df.loc[day_ts]["open"])
+                trade_price = _px(df, day_ts, "open")
                 if trade_price <= 0:
                     if cur_pos:
                         new_positions[ticker] = cur_pos
@@ -4953,8 +5162,8 @@ def run_portfolio_opt(
         # Update last_close
         for ticker, pos in positions.items():
             df = prices.get(ticker)
-            if df is not None and day_ts in df.index:
-                pos["last_close"] = float(df.loc[day_ts]["close"])
+            if df is not None and _has_day(df, day_ts):
+                pos["last_close"] = _px(df, day_ts, "close")
                 pos["fx"] = _fx(pos.get("market", "KR"), day)
 
         # Month-end: compute new target weights (point-in-time signal)
@@ -4964,42 +5173,55 @@ def run_portfolio_opt(
             if sched_w:
                 target_weights = {t: v for t, v in sched_w.items() if v > 0.001}
         elif day in month_ends:
-            lookback_start = day - dt.timedelta(days=S_LOOKBACK_DAYS + 30)
-            # Build active universe
-            active: list[str] = []
-            for ticker, ranges in ticker_valid.items():
-                if not any(start <= day <= end for start, end in ranges):
-                    continue
-                df = prices.get(ticker)
-                if df is None or day_ts not in df.index:
-                    continue
-                active.append(ticker)
-
-            if len(active) >= S_MIN_STOCKS:
-                # Build return matrix
-                day_ts_start = pd.Timestamp(lookback_start)
-                ret_cols: dict[str, pd.Series] = {}
-                for ticker in active:
-                    df = prices[ticker]
-                    sub = df.loc[(df.index >= day_ts_start) & (df.index <= day_ts), "close"]
-                    if len(sub) < 30:
+            mkey = day.isoformat()
+            if weights_memo is not None and mkey in weights_memo:
+                # Cache replay — same filtered weights the optimiser produced on
+                # this dataset → identical rebalance. None = no weights that month.
+                cached_w = weights_memo[mkey]
+                if cached_w is not None:
+                    target_weights = dict(cached_w)
+            else:
+                computed: dict[str, float] | None = None
+                lookback_start = day - dt.timedelta(days=S_LOOKBACK_DAYS + 30)
+                # Build active universe
+                active: list[str] = []
+                for ticker, ranges in ticker_valid.items():
+                    if not any(start <= day <= end for start, end in ranges):
                         continue
-                    r = sub.pct_change().dropna()
-                    ret_cols[ticker] = r
+                    df = prices.get(ticker)
+                    if df is None or not _has_day(df, day_ts):
+                        continue
+                    active.append(ticker)
 
-                if len(ret_cols) >= S_MIN_STOCKS:
-                    ret_df = pd.DataFrame(ret_cols).dropna(how="any")
-                    if len(ret_df) >= 20 and len(ret_df.columns) >= S_MIN_STOCKS:
-                        try:
-                            if variant == "hrp":
-                                w_dict = _hrp_weights(ret_df)
-                            elif variant == "msharpe":
-                                w_dict = _msharpe_weights(ret_df)
-                            else:  # mincvar
-                                w_dict = _mincvar_weights(ret_df)
-                            target_weights = {t: v for t, v in w_dict.items() if v > 0.001}
-                        except Exception as e:
-                            print(f"  S({variant}) weight computation failed on {day}: {e}", flush=True)
+                if len(active) >= S_MIN_STOCKS:
+                    # Build return matrix
+                    day_ts_start = pd.Timestamp(lookback_start)
+                    ret_cols: dict[str, pd.Series] = {}
+                    for ticker in active:
+                        df = prices[ticker]
+                        sub = df.loc[(df.index >= day_ts_start) & (df.index <= day_ts), "close"]
+                        if len(sub) < 30:
+                            continue
+                        r = sub.pct_change().dropna()
+                        ret_cols[ticker] = r
+
+                    if len(ret_cols) >= S_MIN_STOCKS:
+                        ret_df = pd.DataFrame(ret_cols).dropna(how="any")
+                        if len(ret_df) >= 20 and len(ret_df.columns) >= S_MIN_STOCKS:
+                            try:
+                                if variant == "hrp":
+                                    w_dict = _hrp_weights(ret_df)
+                                elif variant == "msharpe":
+                                    w_dict = _msharpe_weights(ret_df)
+                                else:  # mincvar
+                                    w_dict = _mincvar_weights(ret_df)
+                                computed = {t: v for t, v in w_dict.items() if v > 0.001}
+                            except Exception as e:
+                                print(f"  S({variant}) weight computation failed on {day}: {e}", flush=True)
+                if computed is not None:
+                    target_weights = dict(computed)
+                if weights_memo is not None:
+                    weights_memo[mkey] = computed
 
         nav = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         nav_series.append((day.isoformat(), nav))
@@ -5130,7 +5352,7 @@ def run_parking_core_chandelier(
                 prev_park_close = asof_value(parking, day) or None
 
         # ── Execute pending exits (next open after stop signal) ───────────────
-        to_exit = [t for t in list(pending_exits) if t in positions]
+        to_exit = [t for t in sorted(pending_exits) if t in positions]
         for ticker in to_exit:
             pos = positions[ticker]
             q = _get_quote(prices, ticker, day)
@@ -5159,9 +5381,9 @@ def run_parking_core_chandelier(
             )
             for ticker, source, n_clubs in candidates[:slots]:
                 df = prices.get(ticker)
-                if df is None or day_ts not in df.index:
+                if df is None or not _has_day(df, day_ts):
                     continue
-                entry_price = float(df.loc[day_ts]["open"])
+                entry_price = _px(df, day_ts, "open")
                 if entry_price <= 0:
                     continue
 
@@ -5217,9 +5439,9 @@ def run_parking_core_chandelier(
         # ── Update positions + check chandelier stop ──────────────────────────
         for ticker, pos in list(positions.items()):
             df = prices.get(ticker)
-            if df is None or day_ts not in df.index:
+            if df is None or not _has_day(df, day_ts):
                 continue
-            close = float(df.loc[day_ts]["close"])
+            close = _px(df, day_ts, "close")
             pos["last_close"] = close
             pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["highest"] = max(pos.get("highest", close), close)
@@ -5363,7 +5585,7 @@ def run_kospi_core_chandelier_scaleout(
                 prev_kospi_close = asof_value(kospi, day) or None
 
         # ── Execute pending exits (chandelier stop — next open) ───────────────
-        to_exit = [t for t in list(pending_exits) if t in positions]
+        to_exit = [t for t in sorted(pending_exits) if t in positions]
         for ticker in to_exit:
             pos = positions[ticker]
             q = _get_quote(prices, ticker, day)
@@ -5391,9 +5613,9 @@ def run_kospi_core_chandelier_scaleout(
             )
             for ticker, source, n_clubs in candidates[:slots]:
                 df = prices.get(ticker)
-                if df is None or day_ts not in df.index:
+                if df is None or not _has_day(df, day_ts):
                     continue
-                entry_price = float(df.loc[day_ts]["open"])
+                entry_price = _px(df, day_ts, "open")
                 if entry_price <= 0:
                     continue
 
@@ -5451,9 +5673,9 @@ def run_kospi_core_chandelier_scaleout(
         # ── Update positions + check chandelier stop + extension scale-out ────
         for ticker, pos in list(positions.items()):
             df = prices.get(ticker)
-            if df is None or day_ts not in df.index:
+            if df is None or not _has_day(df, day_ts):
                 continue
-            close = float(df.loc[day_ts]["close"])
+            close = _px(df, day_ts, "close")
             pos["last_close"] = close
             pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["highest"] = max(pos.get("highest", close), close)
@@ -5653,6 +5875,10 @@ def main() -> int:
     strat_end = calendar[-1]
     all_weather = compute_all_weather(kospi, sp500, nasdaq, gld, strat_start, strat_end)
 
+    # Fingerprint of all result-relevant inputs — gates the Optuna/SPO caches.
+    dataset_fp = _dataset_fingerprint(prices, reports, calendar)
+    print(f"  Dataset fingerprint: {dataset_fp[:16]}…", flush=True)
+
     # ══════════════════════════════════════════════════════════════════════════
     # v6 MULTI-STRATEGY COMPARISON
     # All strategies: consensus ≥2, immediate entry, same costs/position sizing
@@ -5808,12 +6034,27 @@ def main() -> int:
     print(f"   IS sharpe={result_R_default['in_sample'].get('sharpe')}  OOS sharpe={result_R_default['out_of_sample'].get('sharpe')}", flush=True)
 
     # S. 포트폴리오 최적화 — three variants
+    # Monthly optimiser weights are a pure function of the dataset → cached on
+    # disk keyed by dataset fingerprint (replay identical; --retune to force).
+    _s_cache_key = hashlib.sha256(f"{dataset_fp}|{S_WEIGHTS_CODE_TAG}".encode()).hexdigest()
+    s_weights_memos: dict[str, dict] = {"hrp": {}, "msharpe": {}, "mincvar": {}}
+    if not FORCE_RETUNE and S_WEIGHTS_CACHE_PATH.exists():
+        try:
+            with open(S_WEIGHTS_CACHE_PATH, "rb") as _fh:
+                _stored_key, _stored_memos = pickle.load(_fh)
+            if _stored_key == _s_cache_key:
+                s_weights_memos = _stored_memos
+                print("  S-family weights cache HIT (dataset unchanged) [--retune to force]", flush=True)
+        except Exception:
+            pass
+
     print("S(a). HRP 포트폴리오 최적화...", flush=True)
     result_S_hrp = run_portfolio_opt(
         prices, reports, calendar,
         label="S_hrp",
         variant="hrp",
         ticker_reports=ticker_reports, record_full_trades=True,
+        weights_memo=s_weights_memos["hrp"],
     )
     print(f"   IS sharpe={result_S_hrp['in_sample'].get('sharpe')}  OOS sharpe={result_S_hrp['out_of_sample'].get('sharpe')}", flush=True)
 
@@ -5823,6 +6064,7 @@ def main() -> int:
         label="S_msharpe",
         variant="msharpe",
         ticker_reports=ticker_reports, record_full_trades=True,
+        weights_memo=s_weights_memos["msharpe"],
     )
     print(f"   IS sharpe={result_S_msharpe['in_sample'].get('sharpe')}  OOS sharpe={result_S_msharpe['out_of_sample'].get('sharpe')}", flush=True)
 
@@ -5832,8 +6074,15 @@ def main() -> int:
         label="S_mincvar",
         variant="mincvar",
         ticker_reports=ticker_reports, record_full_trades=True,
+        weights_memo=s_weights_memos["mincvar"],
     )
     print(f"   IS sharpe={result_S_mincvar['in_sample'].get('sharpe')}  OOS sharpe={result_S_mincvar['out_of_sample'].get('sharpe')}", flush=True)
+
+    try:
+        with open(S_WEIGHTS_CACHE_PATH, "wb") as _fh:
+            pickle.dump((_s_cache_key, s_weights_memos), _fh, protocol=pickle.HIGHEST_PROTOCOL)
+    except Exception as e:
+        print(f"  WARNING: S-weights cache write failed: {e}", flush=True)
 
     # Best S variant by IS sharpe
     s_variants = {
@@ -5851,7 +6100,31 @@ def main() -> int:
     print("V. SPO 포트폴리오 (SPO+ vs LS 베이스라인, 워크포워드 월간 리밸런스)...", flush=True)
     sys.path.insert(0, str(ROOT / "scripts"))
     from spo_portfolio import compute_spo_weight_schedules
-    spo_schedules, spo_meta = compute_spo_weight_schedules(prices, reports, calendar, ticker_reports)
+
+    # SPO walk-forward training is seeded → deterministic given the dataset.
+    # Cache the (schedules, meta) artifact keyed by dataset fingerprint + the
+    # exact spo_portfolio.py source — a cache hit is identical to re-training.
+    _spo_src_hash = hashlib.sha256((ROOT / "scripts" / "spo_portfolio.py").read_bytes()).hexdigest()
+    _spo_key = hashlib.sha256(f"{dataset_fp}|{_spo_src_hash}".encode()).hexdigest()
+    spo_schedules = None
+    spo_meta = None
+    if not FORCE_RETUNE and SPO_CACHE_PATH.exists():
+        try:
+            with open(SPO_CACHE_PATH, "rb") as _fh:
+                _stored_key, _schedules, _meta = pickle.load(_fh)
+            if _stored_key == _spo_key:
+                spo_schedules, spo_meta = _schedules, _meta
+                print(f"  SPO cache HIT (dataset+code unchanged) — {_meta.get('n_rebalances')} rebalances "
+                      f"[--retune to force re-train]", flush=True)
+        except Exception:
+            spo_schedules = None
+    if spo_schedules is None:
+        spo_schedules, spo_meta = compute_spo_weight_schedules(prices, reports, calendar, ticker_reports)
+        try:
+            with open(SPO_CACHE_PATH, "wb") as _fh:
+                pickle.dump((_spo_key, spo_schedules, spo_meta), _fh, protocol=pickle.HIGHEST_PROTOCOL)
+        except Exception as e:
+            print(f"  WARNING: SPO cache write failed: {e}", flush=True)
     result_V_spo = run_portfolio_opt(
         prices, reports, calendar,
         label="V_spo", variant="spo_plus",
@@ -5905,7 +6178,10 @@ def main() -> int:
 
     # ── D+ Optuna optimization ─────────────────────────────────────────────────
     print("\n── Optuna robust optimization (D+ chandelier) ───────────────────", flush=True)
-    optuna_result = run_optuna_chandelier(prices, reports, calendar, ticker_reports=ticker_reports)
+    optuna_result = run_optuna_chandelier(
+        prices, reports, calendar, ticker_reports=ticker_reports,
+        dataset_fingerprint=dataset_fp,
+    )
     optuna_meta = optuna_result.get("optuna_meta", {})
     d_plus_adopted = False
     result_Dplus = None
@@ -6311,9 +6587,8 @@ def main() -> int:
     headline_label = headline["label"]
     # If headline is the promoted T best variant, relabel it for UI
     headline_key = next(k for k, v in eligible_strategies.items() if v is headline)
-    if headline_key in ("T_kospi_core_chandelier", "T-_kospi_core_regime"):
-        headline["label"] = "T_kospi_core_chandelier"   # canonical label for UI
-        headline_label = "T_kospi_core_chandelier"
+    # 키와 라벨은 항상 일치 — signals/multi_strategy/api가 같은 헤드라인을 가리켜야 한다
+    headline_label = headline_key
     print(f"\nHeadline (best IS sharpe, eligible only): {headline_label} [{headline_key}]", flush=True)
     print(f"  IS sharpe={headline.get('in_sample', {}).get('sharpe')}  OOS sharpe={headline.get('out_of_sample', {}).get('sharpe')}", flush=True)
 
@@ -6515,7 +6790,7 @@ def main() -> int:
                 "M: 월별 전체 교체 연 24회 편도 → 연 7% 비용). v18부터 실행·출력하지 않음 — "
                 "테스트했고 실패했다는 기록만 방법론에 유지."
             ),
-            "excluded_from_selector": list(EXCLUDED_FROM_SELECTOR),
+            "excluded_from_selector": sorted(EXCLUDED_FROM_SELECTOR),
             "P_strategy": (
                 f"P 딥바이 샹들리에: IS sharpe={result_P['in_sample'].get('sharpe')}, "
                 f"OOS sharpe={result_P['out_of_sample'].get('sharpe')}, "
@@ -6762,4 +7037,9 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    # --retune: ignore the Optuna/SPO artifact caches and re-run both searches.
+    # (Price-frame caches in data/prices/.cache/ auto-invalidate on CSV change.)
+    if "--retune" in sys.argv[1:]:
+        FORCE_RETUNE = True
+        print("[--retune] Optuna/SPO caches bypassed — full re-search/re-train", flush=True)
     sys.exit(main())

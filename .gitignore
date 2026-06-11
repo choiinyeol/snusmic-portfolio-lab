@@ -24,6 +24,11 @@ cache/
 artifacts/
 .omc/
 
+# backtest stage caches (deterministic; keyed by dataset fingerprint, --retune to rebuild)
+data/optuna_cache.json
+data/spo_cache.pkl
+data/s_weights_cache.pkl
+
 # session/orchestration state
 .gjc/
 .claude/settings.local.json

@@ -42,8 +42,11 @@
 
 - **증거의 서가** — 911건의 매수 의견을 숨김 없이 전부 전시. 급락도 텐배거도 같은 벽에 걸립니다.
 - **이중 판결** — 현재 판결 vs 전성기 판결. 전성기 +100% 도달 비율 37.2%(320건), 그러나 그 수익이 현재까지 남았는지는 별개의 질문.
-- **전략 랩** — "전성기 수익을 어떻게 수확할 것인가"에 대한 25개 전략 변형 실험. SOTA `T-. 코어-KOSPI 샹들리에 (레짐)`은 **KOSPI 적립식(DCA) 대비 1.23×** (OOS CAGR +54.8%, OOS Sharpe 1.65).
+- **전략 랩** — "전성기 수익을 어떻게 수확할 것인가"에 대한 25개 전략 변형 실험. SOTA `U. 샹들리에+과열 스케일아웃`은 **KOSPI 적립식(DCA) 대비 1.09×** (OOS CAGR +51.6%, OOS Sharpe 1.57).
 - **오늘의 신호** — SOTA 전략이 지금 규칙대로 굴러간다면 일어날 매매. 뉴스 피드가 아니라 임박 주문서.
+- **통계 페이지** — 배거의 관상(배거 도달 종목 패턴 분석), 전략별 KRW 환산 손익, 누적 수익 곡선.
+- **본문 읽기** — 판결문 안에서 전사된 리포트 원문을 즉시 열람. PDF 다운로드 없이 리포트 논거 확인 가능.
+- **시그널 API** — 헤드라인 전략의 매매 신호를 정적 JSON으로 서빙. 매일 갱신, CDN 캐시, CORS 허용. 자세한 내용은 [`docs/API.md`](docs/API.md).
 - **학회별 성적표** — 학회마다 최신순 장부와 연도별 요약, QA 플래그(파싱 신뢰도) 포함.
 - **원문 추적** — 판결문 → 전사 markdown → 원본 PDF → 출처 게시글. 모든 숫자에 출처가 달립니다.
 
@@ -101,6 +104,34 @@ npm install && npm run dev          # http://localhost:3000
 # 5) 전략 백테스트 (IS/OOS 분리, 민감도 그리드 포함) → src/data/strategy-backtest.json
 .venv/Scripts/python scripts/backtest_momentum.py
 ```
+
+## 시그널 API
+
+헤드라인 전략의 매매 신호를 매일 정적 JSON으로 서빙합니다. 서버리스 컴퓨팅 없이 Vercel CDN에서 직접 제공되며 CORS가 허용됩니다.
+
+```bash
+# 오늘의 신호 (보유 포지션·매수 임박·매도 임박)
+curl https://smic-easy.vercel.app/api/v1/signals/latest.json | python -m json.tool
+
+# 전략 목록 (IS/OOS 지표 포함)
+curl https://smic-easy.vercel.app/api/v1/strategies.json | python -m json.tool
+```
+
+엔드포인트 전체 명세: [`docs/API.md`](docs/API.md) · OpenAPI 스펙: [`/api/v1/openapi.json`](https://smic-easy.vercel.app/api/v1/openapi.json)
+
+## Docker
+
+로컬 재현성 및 셀프호스팅을 위한 멀티스테이지 이미지 — `pipeline`(Python 파이프라인)과 `web`(Next.js 프로덕션).
+
+```bash
+# 전체 파이프라인 실행 (백테스트 + API export)
+docker compose --profile pipeline run --rm pipeline
+
+# Next.js 프로덕션 서버 (localhost:3000)
+docker compose --profile web up web
+```
+
+자세한 빌드·플랫폼(Mac M-series, Linux, Windows) 가이드: [`docs/DOCKER.md`](docs/DOCKER.md)
 
 ## 자동 갱신
 

@@ -155,6 +155,25 @@ Full closed-trade log for one strategy.  Open (未청산) positions are excluded
 
 ---
 
+### `GET /strategy-marks/{slug}.json`
+
+Per-ticker **backtest trade marks of the headline strategy** — used by the
+stock pages to overlay buy/sell points on the candle chart.  
+`slug` matches the price-chart files: `"{market}-{ticker}".lower()`
+(e.g. `kr-278470`, `us-fix`). One file exists for every ticker the headline
+strategy ever traded (plus current open positions).
+
+| Field | Description |
+|---|---|
+| `strategy_key` | Headline strategy key |
+| `ticker` / `market` / `name` | Instrument identity |
+| `marks[]` | `{date, side: "buy"\|"sell"\|"stop", price, reason}` — entry/exit points |
+| `open_stop` | `{stop_level, entry_date, as_of}` for currently held tickers, else `null` |
+
+Example: `/strategy-marks/kr-278470.json`
+
+---
+
 ### `GET /api/v1/openapi.json`
 
 OpenAPI 3.1 spec — use with any OpenAPI client generator to get typed
@@ -266,3 +285,51 @@ uv run python scripts/export_signals_api.py --source src/data/strategy-backtest.
 
 The CI workflow (`.github/workflows/`) already chains these steps; see the
 weekly-refresh job for the canonical sequence.
+
+---
+
+## 텔레그램 일일 신호 봇
+
+`scripts/send_telegram_signals.py`가 매 거래일 CI(`refresh-daily.yml`)에서
+오늘의 신호를 한국어 다이제스트로 텔레그램에 보냅니다. 전일 스냅샷과
+비교해 **신규 진입 / 청산 / 매수 신호 / 매도 임박**의 변화가 있을 때만
+전송합니다 (변화 없으면 침묵 — 스팸 없음).
+
+### 1. 봇 만들기 (BotFather)
+
+1. 텔레그램에서 [@BotFather](https://t.me/BotFather) 검색 → 대화 시작
+2. `/newbot` 입력 → 봇 이름과 username(예: `verdict_signal_bot`) 지정
+3. BotFather가 주는 **HTTP API 토큰**(`123456:ABC-DEF...` 형태)을 복사
+   — 이것이 `TELEGRAM_BOT_TOKEN`
+
+### 2. chat_id 얻기
+
+1. 방금 만든 봇과 대화를 시작하고 아무 메시지나 보냅니다
+   (그룹에 봇을 초대해 그룹으로 받아도 됩니다)
+2. 브라우저에서 다음 URL 열기:
+   `https://api.telegram.org/bot<TOKEN>/getUpdates`
+3. 응답 JSON의 `result[].message.chat.id` 값이 `TELEGRAM_CHAT_ID`
+   (그룹이면 음수일 수 있습니다 — 그대로 사용)
+
+### 3. GitHub 저장소 시크릿 설정
+
+저장소 → Settings → Secrets and variables → Actions → New repository secret:
+
+| Secret 이름 | 값 |
+|---|---|
+| `TELEGRAM_BOT_TOKEN` | BotFather가 준 API 토큰 |
+| `TELEGRAM_CHAT_ID` | 위에서 얻은 chat id |
+
+시크릿을 설정하기 전에도 CI는 실패하지 않습니다 — 환경 변수가 없으면
+스크립트가 조용히 종료(exit 0)합니다.
+
+### 4. 로컬 테스트
+
+```bash
+# 다이제스트 내용만 출력 (전송 없음, 토큰 불필요)
+uv run python scripts/send_telegram_signals.py --dry-run
+
+# 실제 전송 (변화 없어도 강제 전송)
+TELEGRAM_BOT_TOKEN=... TELEGRAM_CHAT_ID=... \
+  uv run python scripts/send_telegram_signals.py --force
+```

@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 
 const LINKS = [
   { href: "/", label: "아카이브" },
+  { href: "/today", label: "오늘의 신문" },
   { href: "/clubs", label: "학회별 성적표" },
   { href: "/stats", label: "통계" },
   { href: "/strategy", label: "전략" },

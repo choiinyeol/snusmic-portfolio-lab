@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-11T08:14:30+00:00",
+  "generated_at": "2026-06-11T09:20:19+00:00",
   "headline_key": "T-_kospi_core_regime",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -491,19 +491,19 @@
       "is_headline": false,
       "trade_count": 198,
       "metrics": {
-        "total_return_pct": 122.52,
-        "cagr_pct": 13.23,
+        "total_return_pct": 122.94,
+        "cagr_pct": 13.26,
         "sharpe": 0.63,
-        "mdd_pct": -42.1,
+        "mdd_pct": -41.99,
         "win_rate_pct": 48.5,
         "avg_hold_days": 82.9
       },
       "in_sample": {
         "period": "2020-01-02 ~ 2023-12-29",
-        "total_return_pct": 34.78,
-        "cagr_pct": 7.77,
+        "total_return_pct": 35.04,
+        "cagr_pct": 7.82,
         "sharpe": 0.49,
-        "mdd_pct": -34.64
+        "mdd_pct": -34.55
       },
       "out_of_sample": {
         "period": "2024-01-02 ~ 2026-06-11",
@@ -512,7 +512,7 @@
         "sharpe": 0.78,
         "mdd_pct": -29.17
       },
-      "kospi_dca_ratio": 0.598,
+      "kospi_dca_ratio": 0.599,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 0.735,
       "aw_dca_beats": false
@@ -743,7 +743,7 @@
     },
     {
       "key": "T-_kospi_core_regime",
-      "label": "T_kospi_core_chandelier",
+      "label": "T-_kospi_core_regime",
       "is_headline": true,
       "trade_count": 237,
       "metrics": {

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-11T08:14:30+00:00",
+  "generated_at": "2026-06-11T09:20:19+00:00",
   "strategy_key": "H_minervini",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -752,35 +752,6 @@
       ]
     },
     {
-      "ticker": "001530",
-      "market": "KR",
-      "name": "DI동일",
-      "entry_date": "2023-06-12",
-      "exit_date": "2023-07-03",
-      "entry_price": 19271.0,
-      "exit_price": 19181.0,
-      "return_pct": -1.06,
-      "days": 21,
-      "exit_reason": "minervini_close<50MA",
-      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: smic 2023-06-09, ewha 2021-10-09)",
-      "trigger_reports": [
-        {
-          "school": "ewha",
-          "report_date": "2021-10-09",
-          "source_file": "2021-10-09_[211009] DI동일(001530).md",
-          "target_price": null,
-          "stated_upside_pct": 39.1
-        },
-        {
-          "school": "smic",
-          "report_date": "2023-06-09",
-          "source_file": "2023-06-09_equity-research-di동일.md",
-          "target_price": 30700.0,
-          "stated_upside_pct": 61.1718
-        }
-      ]
-    },
-    {
       "ticker": "001060",
       "market": "KR",
       "name": "JW중외제약",
@@ -806,6 +777,35 @@
           "source_file": "2023-05-25_equity-research-jw중외제약.md",
           "target_price": 35600.0,
           "stated_upside_pct": 49.6805
+        }
+      ]
+    },
+    {
+      "ticker": "001530",
+      "market": "KR",
+      "name": "DI동일",
+      "entry_date": "2023-06-12",
+      "exit_date": "2023-07-03",
+      "entry_price": 19271.0,
+      "exit_price": 19181.0,
+      "return_pct": -1.06,
+      "days": 21,
+      "exit_reason": "minervini_close<50MA",
+      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: smic 2023-06-09, ewha 2021-10-09)",
+      "trigger_reports": [
+        {
+          "school": "ewha",
+          "report_date": "2021-10-09",
+          "source_file": "2021-10-09_[211009] DI동일(001530).md",
+          "target_price": null,
+          "stated_upside_pct": 39.1
+        },
+        {
+          "school": "smic",
+          "report_date": "2023-06-09",
+          "source_file": "2023-06-09_equity-research-di동일.md",
+          "target_price": 30700.0,
+          "stated_upside_pct": 61.1718
         }
       ]
     },
@@ -883,6 +883,35 @@
       ]
     },
     {
+      "ticker": "095340",
+      "market": "KR",
+      "name": "ISC",
+      "entry_date": "2023-05-23",
+      "exit_date": "2023-09-18",
+      "entry_price": 46050.0,
+      "exit_price": 82200.0,
+      "return_pct": 77.43,
+      "days": 118,
+      "exit_reason": "minervini_close<50MA",
+      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: voera 2023-05-22, star 2023-02-16)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2023-02-16",
+          "source_file": "2023-02-16_STAR_ISC.md",
+          "target_price": 51000.0,
+          "stated_upside_pct": 32.2957
+        },
+        {
+          "school": "voera",
+          "report_date": "2023-05-22",
+          "source_file": "undated_[Buy] 로켓처럼 날아오르는 테스트소켓, ISC.md",
+          "target_price": 55000.0,
+          "stated_upside_pct": 17.8992
+        }
+      ]
+    },
+    {
       "ticker": "137400",
       "market": "KR",
       "name": "피엔티",
@@ -912,31 +941,31 @@
       ]
     },
     {
-      "ticker": "095340",
+      "ticker": "041510",
       "market": "KR",
-      "name": "ISC",
-      "entry_date": "2023-05-23",
-      "exit_date": "2023-09-18",
-      "entry_price": 46050.0,
-      "exit_price": 82200.0,
-      "return_pct": 77.43,
-      "days": 118,
+      "name": "에스엠",
+      "entry_date": "2023-08-02",
+      "exit_date": "2023-09-25",
+      "entry_price": 134000.0,
+      "exit_price": 129100.0,
+      "return_pct": -4.23,
+      "days": 54,
       "exit_reason": "minervini_close<50MA",
-      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: voera 2023-05-22, star 2023-02-16)",
+      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: star 2023-08-01, ewha 2023-02-08)",
       "trigger_reports": [
         {
-          "school": "star",
-          "report_date": "2023-02-16",
-          "source_file": "2023-02-16_STAR_ISC.md",
-          "target_price": 51000.0,
-          "stated_upside_pct": 32.2957
+          "school": "ewha",
+          "report_date": "2023-02-08",
+          "source_file": "2023-02-08_[230208] 에스엠(041510).md",
+          "target_price": 135600.0,
+          "stated_upside_pct": 37.386
         },
         {
-          "school": "voera",
-          "report_date": "2023-05-22",
-          "source_file": "undated_[Buy] 로켓처럼 날아오르는 테스트소켓, ISC.md",
-          "target_price": 55000.0,
-          "stated_upside_pct": 17.8992
+          "school": "star",
+          "report_date": "2023-08-01",
+          "source_file": "2023-08-01_STAR_에스엠.md",
+          "target_price": 189200.0,
+          "stated_upside_pct": 40.4603
         }
       ]
     },
@@ -995,35 +1024,6 @@
           "source_file": "2023-09-08_STAR_펌텍코리아.md",
           "target_price": 34300.0,
           "stated_upside_pct": 24.7273
-        }
-      ]
-    },
-    {
-      "ticker": "041510",
-      "market": "KR",
-      "name": "에스엠",
-      "entry_date": "2023-08-02",
-      "exit_date": "2023-09-25",
-      "entry_price": 134000.0,
-      "exit_price": 129100.0,
-      "return_pct": -4.23,
-      "days": 54,
-      "exit_reason": "minervini_close<50MA",
-      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: star 2023-08-01, ewha 2023-02-08)",
-      "trigger_reports": [
-        {
-          "school": "ewha",
-          "report_date": "2023-02-08",
-          "source_file": "2023-02-08_[230208] 에스엠(041510).md",
-          "target_price": 135600.0,
-          "stated_upside_pct": 37.386
-        },
-        {
-          "school": "star",
-          "report_date": "2023-08-01",
-          "source_file": "2023-08-01_STAR_에스엠.md",
-          "target_price": 189200.0,
-          "stated_upside_pct": 40.4603
         }
       ]
     },
@@ -1108,6 +1108,28 @@
       ]
     },
     {
+      "ticker": "000660",
+      "market": "KR",
+      "name": "SK하이닉스",
+      "entry_date": "2023-10-20",
+      "exit_date": "2023-10-30",
+      "entry_price": 124300.0,
+      "exit_price": 119100.0,
+      "return_pct": -4.76,
+      "days": 10,
+      "exit_reason": "minervini_close<50MA",
+      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: smic 2023-10-19)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2023-10-19",
+          "source_file": "2023-10-19_equity-research-sk하이닉스-2.md",
+          "target_price": 164600.0,
+          "stated_upside_pct": 30.9467
+        }
+      ]
+    },
+    {
       "ticker": "003030",
       "market": "KR",
       "name": "세아제강지주",
@@ -1133,28 +1155,6 @@
           "source_file": "2023-10-04_STAR_세아제강지주.md",
           "target_price": 283700.0,
           "stated_upside_pct": 38.3902
-        }
-      ]
-    },
-    {
-      "ticker": "000660",
-      "market": "KR",
-      "name": "SK하이닉스",
-      "entry_date": "2023-10-20",
-      "exit_date": "2023-10-30",
-      "entry_price": 124300.0,
-      "exit_price": 119100.0,
-      "return_pct": -4.76,
-      "days": 10,
-      "exit_reason": "minervini_close<50MA",
-      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: smic 2023-10-19)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2023-10-19",
-          "source_file": "2023-10-19_equity-research-sk하이닉스-2.md",
-          "target_price": 164600.0,
-          "stated_upside_pct": 30.9467
         }
       ]
     },
@@ -1334,31 +1334,24 @@
       ]
     },
     {
-      "ticker": "267260",
+      "ticker": "002840",
       "market": "KR",
-      "name": "HD현대일렉트릭",
-      "entry_date": "2023-10-20",
+      "name": "미원상사",
+      "entry_date": "2024-07-01",
       "exit_date": "2024-08-05",
-      "entry_price": 70300.0,
-      "exit_price": 262000.0,
-      "return_pct": 270.46,
-      "days": 290,
+      "entry_price": 203500.0,
+      "exit_price": 201000.0,
+      "return_pct": -1.82,
+      "days": 35,
       "exit_reason": "minervini_close<50MA",
-      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: smic 2023-10-19, ewha 2022-10-07)",
+      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: star 2024-06-30)",
       "trigger_reports": [
         {
-          "school": "ewha",
-          "report_date": "2022-10-07",
-          "source_file": "2022-10-07_[221007] 현대일렉트릭(267260).md",
-          "target_price": 44250.0,
-          "stated_upside_pct": 34.0909
-        },
-        {
-          "school": "smic",
-          "report_date": "2023-10-19",
-          "source_file": "2023-10-19_equity-research-hd현대일렉트릭.md",
-          "target_price": 140100.0,
-          "stated_upside_pct": 97.3239
+          "school": "star",
+          "report_date": "2024-06-30",
+          "source_file": "2024-06-30_STAR_미원상사.md",
+          "target_price": 348500.0,
+          "stated_upside_pct": 71.2531
         }
       ]
     },
@@ -1428,24 +1421,31 @@
       ]
     },
     {
-      "ticker": "002840",
+      "ticker": "267260",
       "market": "KR",
-      "name": "미원상사",
-      "entry_date": "2024-07-01",
+      "name": "HD현대일렉트릭",
+      "entry_date": "2023-10-20",
       "exit_date": "2024-08-05",
-      "entry_price": 203500.0,
-      "exit_price": 201000.0,
-      "return_pct": -1.82,
-      "days": 35,
+      "entry_price": 70300.0,
+      "exit_price": 262000.0,
+      "return_pct": 270.46,
+      "days": 290,
       "exit_reason": "minervini_close<50MA",
-      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: star 2024-06-30)",
+      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: smic 2023-10-19, ewha 2022-10-07)",
       "trigger_reports": [
         {
-          "school": "star",
-          "report_date": "2024-06-30",
-          "source_file": "2024-06-30_STAR_미원상사.md",
-          "target_price": 348500.0,
-          "stated_upside_pct": 71.2531
+          "school": "ewha",
+          "report_date": "2022-10-07",
+          "source_file": "2022-10-07_[221007] 현대일렉트릭(267260).md",
+          "target_price": 44250.0,
+          "stated_upside_pct": 34.0909
+        },
+        {
+          "school": "smic",
+          "report_date": "2023-10-19",
+          "source_file": "2023-10-19_equity-research-hd현대일렉트릭.md",
+          "target_price": 140100.0,
+          "stated_upside_pct": 97.3239
         }
       ]
     },
@@ -1631,28 +1631,6 @@
       ]
     },
     {
-      "ticker": "141080",
-      "market": "KR",
-      "name": "리가켐바이오",
-      "entry_date": "2024-09-12",
-      "exit_date": "2024-11-25",
-      "entry_price": 84500.0,
-      "exit_price": 99000.0,
-      "return_pct": 16.46,
-      "days": 74,
-      "exit_reason": "minervini_close<50MA",
-      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: star 2024-09-11)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2024-09-11",
-          "source_file": "2024-09-11_STAR_리가켐바이오.md",
-          "target_price": 126800.0,
-          "stated_upside_pct": 51.1323
-        }
-      ]
-    },
-    {
       "ticker": "009450",
       "market": "KR",
       "name": "경동나비엔",
@@ -1678,6 +1656,28 @@
           "source_file": "2024-10-07_경동나비엔 - Even하게 데웠어요.md",
           "target_price": 146700.0,
           "stated_upside_pct": 107.7904
+        }
+      ]
+    },
+    {
+      "ticker": "141080",
+      "market": "KR",
+      "name": "리가켐바이오",
+      "entry_date": "2024-09-12",
+      "exit_date": "2024-11-25",
+      "entry_price": 84500.0,
+      "exit_price": 99000.0,
+      "return_pct": 16.46,
+      "days": 74,
+      "exit_reason": "minervini_close<50MA",
+      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: star 2024-09-11)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2024-09-11",
+          "source_file": "2024-09-11_STAR_리가켐바이오.md",
+          "target_price": 126800.0,
+          "stated_upside_pct": 51.1323
         }
       ]
     },
@@ -1783,28 +1783,6 @@
       ]
     },
     {
-      "ticker": "326030",
-      "market": "KR",
-      "name": "SK바이오팜",
-      "entry_date": "2025-01-10",
-      "exit_date": "2025-03-10",
-      "entry_price": 118200.0,
-      "exit_price": 107000.0,
-      "return_pct": -10.02,
-      "days": 59,
-      "exit_reason": "minervini_close<50MA",
-      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: star 2025-01-09)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2025-01-09",
-          "source_file": "2025-01-09_STAR_KEYSS_SK바이오팜.md",
-          "target_price": 161500.0,
-          "stated_upside_pct": 37.9163
-        }
-      ]
-    },
-    {
       "ticker": "204320",
       "market": "KR",
       "name": "HL만도",
@@ -1830,6 +1808,28 @@
           "source_file": "2025-01-09_STAR_HL만도.md",
           "target_price": 57500.0,
           "stated_upside_pct": 39.0568
+        }
+      ]
+    },
+    {
+      "ticker": "326030",
+      "market": "KR",
+      "name": "SK바이오팜",
+      "entry_date": "2025-01-10",
+      "exit_date": "2025-03-10",
+      "entry_price": 118200.0,
+      "exit_price": 107000.0,
+      "return_pct": -10.02,
+      "days": 59,
+      "exit_reason": "minervini_close<50MA",
+      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: star 2025-01-09)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2025-01-09",
+          "source_file": "2025-01-09_STAR_KEYSS_SK바이오팜.md",
+          "target_price": 161500.0,
+          "stated_upside_pct": 37.9163
         }
       ]
     },
@@ -2210,42 +2210,6 @@
       ]
     },
     {
-      "ticker": "204620",
-      "market": "KR",
-      "name": "글로벌텍스프리",
-      "entry_date": "2025-06-20",
-      "exit_date": "2025-08-04",
-      "entry_price": 7100.0,
-      "exit_price": 4715.0,
-      "return_pct": -33.99,
-      "days": 45,
-      "exit_reason": "minervini_close<50MA",
-      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: star 2025-06-19, yig 2025-02-21, smic 2023-04-13)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2023-04-13",
-          "source_file": "2023-04-13_equity-research-글로벌텍스프리-2.md",
-          "target_price": 3800.0,
-          "stated_upside_pct": 13.5345
-        },
-        {
-          "school": "yig",
-          "report_date": "2025-02-21",
-          "source_file": "2025-11-11_글로벌텍스프리 (204620, KQ), Goodbye Tax, Feel me free~ (발간일 250221) YIG Res.md",
-          "target_price": 5830.0,
-          "stated_upside_pct": 40.3129
-        },
-        {
-          "school": "star",
-          "report_date": "2025-06-19",
-          "source_file": "2025-06-19_KEYSS_STAR_글로벌텍스프리.md",
-          "target_price": 9110.0,
-          "stated_upside_pct": 31.268
-        }
-      ]
-    },
-    {
       "ticker": "083650",
       "market": "KR",
       "name": "비에이치아이",
@@ -2285,6 +2249,42 @@
           "source_file": "undated_[BUY] Become HRSG Itself, BHI.md",
           "target_price": 49000.0,
           "stated_upside_pct": 21.5881
+        }
+      ]
+    },
+    {
+      "ticker": "204620",
+      "market": "KR",
+      "name": "글로벌텍스프리",
+      "entry_date": "2025-06-20",
+      "exit_date": "2025-08-04",
+      "entry_price": 7100.0,
+      "exit_price": 4715.0,
+      "return_pct": -33.99,
+      "days": 45,
+      "exit_reason": "minervini_close<50MA",
+      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: star 2025-06-19, yig 2025-02-21, smic 2023-04-13)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2023-04-13",
+          "source_file": "2023-04-13_equity-research-글로벌텍스프리-2.md",
+          "target_price": 3800.0,
+          "stated_upside_pct": 13.5345
+        },
+        {
+          "school": "yig",
+          "report_date": "2025-02-21",
+          "source_file": "2025-11-11_글로벌텍스프리 (204620, KQ), Goodbye Tax, Feel me free~ (발간일 250221) YIG Res.md",
+          "target_price": 5830.0,
+          "stated_upside_pct": 40.3129
+        },
+        {
+          "school": "star",
+          "report_date": "2025-06-19",
+          "source_file": "2025-06-19_KEYSS_STAR_글로벌텍스프리.md",
+          "target_price": 9110.0,
+          "stated_upside_pct": 31.268
         }
       ]
     },
@@ -2549,6 +2549,49 @@
       ]
     },
     {
+      "ticker": "083650",
+      "market": "KR",
+      "name": "비에이치아이",
+      "entry_date": "2025-09-01",
+      "exit_date": "2025-11-10",
+      "entry_price": 56600.0,
+      "exit_price": 41850.0,
+      "return_pct": -26.5,
+      "days": 70,
+      "exit_reason": "minervini_close<50MA",
+      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: star 2025-08-31, voera 2025-07-30, kuvic 2024-11-14, ewha 2024-06-01)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2025-08-31",
+          "source_file": "2025-08-31_STAR_비에이치아이 (1).md",
+          "target_price": 61600.0,
+          "stated_upside_pct": 6.0241
+        },
+        {
+          "school": "ewha",
+          "report_date": "2024-06-01",
+          "source_file": "2024-06-01_[240601] 비에이치아이(083650).md",
+          "target_price": 15150.0,
+          "stated_upside_pct": 34.1895
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2024-11-14",
+          "source_file": "2024-11-14_비에이치아이 - Make BHI Great Again.md",
+          "target_price": 16190.0,
+          "stated_upside_pct": 2.4684
+        },
+        {
+          "school": "voera",
+          "report_date": "2025-07-30",
+          "source_file": "undated_[BUY] Become HRSG Itself, BHI.md",
+          "target_price": 49000.0,
+          "stated_upside_pct": 21.5881
+        }
+      ]
+    },
+    {
       "ticker": "278470",
       "market": "KR",
       "name": "에이피알",
@@ -2595,49 +2638,6 @@
           "source_file": "2025-05-15_에이피알 - (A)안 (P)팔 (R)릴 이유가 없다.md",
           "target_price": null,
           "stated_upside_pct": 32.0
-        }
-      ]
-    },
-    {
-      "ticker": "083650",
-      "market": "KR",
-      "name": "비에이치아이",
-      "entry_date": "2025-09-01",
-      "exit_date": "2025-11-10",
-      "entry_price": 56600.0,
-      "exit_price": 41850.0,
-      "return_pct": -26.5,
-      "days": 70,
-      "exit_reason": "minervini_close<50MA",
-      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: star 2025-08-31, voera 2025-07-30, kuvic 2024-11-14, ewha 2024-06-01)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2025-08-31",
-          "source_file": "2025-08-31_STAR_비에이치아이 (1).md",
-          "target_price": 61600.0,
-          "stated_upside_pct": 6.0241
-        },
-        {
-          "school": "ewha",
-          "report_date": "2024-06-01",
-          "source_file": "2024-06-01_[240601] 비에이치아이(083650).md",
-          "target_price": 15150.0,
-          "stated_upside_pct": 34.1895
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2024-11-14",
-          "source_file": "2024-11-14_비에이치아이 - Make BHI Great Again.md",
-          "target_price": 16190.0,
-          "stated_upside_pct": 2.4684
-        },
-        {
-          "school": "voera",
-          "report_date": "2025-07-30",
-          "source_file": "undated_[BUY] Become HRSG Itself, BHI.md",
-          "target_price": 49000.0,
-          "stated_upside_pct": 21.5881
         }
       ]
     },
@@ -2729,35 +2729,6 @@
       ]
     },
     {
-      "ticker": "356860",
-      "market": "KR",
-      "name": "티엘비",
-      "entry_date": "2025-07-28",
-      "exit_date": "2025-12-15",
-      "entry_price": 25173.0,
-      "exit_price": 57552.0,
-      "return_pct": 127.26,
-      "days": 140,
-      "exit_reason": "minervini_close<50MA",
-      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: ewha 2025-07-25, smic 2024-11-07)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2024-11-07",
-          "source_file": "2024-11-07_equity-research-티엘비.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "ewha",
-          "report_date": "2025-07-25",
-          "source_file": "2025-07-25_[250725] 티엘비(356860).md",
-          "target_price": null,
-          "stated_upside_pct": 38.27
-        }
-      ]
-    },
-    {
       "ticker": "222800",
       "market": "KR",
       "name": "심텍",
@@ -2787,59 +2758,31 @@
       ]
     },
     {
-      "ticker": "278470",
+      "ticker": "356860",
       "market": "KR",
-      "name": "에이피알",
-      "entry_date": "2025-11-26",
-      "exit_date": "2025-12-22",
-      "entry_price": 253000.0,
-      "exit_price": 246500.0,
-      "return_pct": -3.15,
-      "days": 26,
+      "name": "티엘비",
+      "entry_date": "2025-07-28",
+      "exit_date": "2025-12-15",
+      "entry_price": 25173.0,
+      "exit_price": 57552.0,
+      "return_pct": 127.26,
+      "days": 140,
       "exit_reason": "minervini_close<50MA",
-      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: voera 2025-11-25, kuvic 2025-05-15, ewha 2025-04-05, yig 2025-02-07, star 2024-06-30, smic 2024-05-09)",
+      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: ewha 2025-07-25, smic 2024-11-07)",
       "trigger_reports": [
         {
           "school": "smic",
-          "report_date": "2024-05-09",
-          "source_file": "2024-05-09_equity-research-에이피알.md",
-          "target_price": 89212.1212,
-          "stated_upside_pct": 39.3939
-        },
-        {
-          "school": "star",
-          "report_date": "2024-06-30",
-          "source_file": "2024-06-30_STAR_에이피알.md",
-          "target_price": 134574.5127,
-          "stated_upside_pct": 71.2144
-        },
-        {
-          "school": "yig",
-          "report_date": "2025-02-07",
-          "source_file": "2025-11-11_에이피알 (278470, KS), “이제는 화장품도 장비발” (발간일 250207) YIG Research.md",
-          "target_price": 68800.0,
-          "stated_upside_pct": 38.9899
+          "report_date": "2024-11-07",
+          "source_file": "2024-11-07_equity-research-티엘비.md",
+          "target_price": null,
+          "stated_upside_pct": null
         },
         {
           "school": "ewha",
-          "report_date": "2025-04-05",
-          "source_file": "2025-04-04_[250404] 에이피알(278470).md",
-          "target_price": 100500.0,
-          "stated_upside_pct": 56.2986
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-05-15",
-          "source_file": "2025-05-15_에이피알 - (A)안 (P)팔 (R)릴 이유가 없다.md",
+          "report_date": "2025-07-25",
+          "source_file": "2025-07-25_[250725] 티엘비(356860).md",
           "target_price": null,
-          "stated_upside_pct": 32.0
-        },
-        {
-          "school": "voera",
-          "report_date": "2025-11-25",
-          "source_file": "undated_[BUY] 미국이 감탄하고 전세계가 부러워하는, APR.md",
-          "target_price": 362500.0,
-          "stated_upside_pct": 44.7106
+          "stated_upside_pct": 38.27
         }
       ]
     },
@@ -2938,6 +2881,63 @@
       ]
     },
     {
+      "ticker": "278470",
+      "market": "KR",
+      "name": "에이피알",
+      "entry_date": "2025-11-26",
+      "exit_date": "2025-12-22",
+      "entry_price": 253000.0,
+      "exit_price": 246500.0,
+      "return_pct": -3.15,
+      "days": 26,
+      "exit_reason": "minervini_close<50MA",
+      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: voera 2025-11-25, kuvic 2025-05-15, ewha 2025-04-05, yig 2025-02-07, star 2024-06-30, smic 2024-05-09)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2024-05-09",
+          "source_file": "2024-05-09_equity-research-에이피알.md",
+          "target_price": 89212.1212,
+          "stated_upside_pct": 39.3939
+        },
+        {
+          "school": "star",
+          "report_date": "2024-06-30",
+          "source_file": "2024-06-30_STAR_에이피알.md",
+          "target_price": 134574.5127,
+          "stated_upside_pct": 71.2144
+        },
+        {
+          "school": "yig",
+          "report_date": "2025-02-07",
+          "source_file": "2025-11-11_에이피알 (278470, KS), “이제는 화장품도 장비발” (발간일 250207) YIG Research.md",
+          "target_price": 68800.0,
+          "stated_upside_pct": 38.9899
+        },
+        {
+          "school": "ewha",
+          "report_date": "2025-04-05",
+          "source_file": "2025-04-04_[250404] 에이피알(278470).md",
+          "target_price": 100500.0,
+          "stated_upside_pct": 56.2986
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2025-05-15",
+          "source_file": "2025-05-15_에이피알 - (A)안 (P)팔 (R)릴 이유가 없다.md",
+          "target_price": null,
+          "stated_upside_pct": 32.0
+        },
+        {
+          "school": "voera",
+          "report_date": "2025-11-25",
+          "source_file": "undated_[BUY] 미국이 감탄하고 전세계가 부러워하는, APR.md",
+          "target_price": 362500.0,
+          "stated_upside_pct": 44.7106
+        }
+      ]
+    },
+    {
       "ticker": "010950",
       "market": "KR",
       "name": "S-Oil",
@@ -2981,28 +2981,6 @@
       ]
     },
     {
-      "ticker": "353200",
-      "market": "KR",
-      "name": "대덕전자",
-      "entry_date": "2025-12-15",
-      "exit_date": "2026-01-12",
-      "entry_price": 45800.0,
-      "exit_price": 42400.0,
-      "return_pct": -7.98,
-      "days": 28,
-      "exit_reason": "minervini_close<50MA",
-      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: star 2025-12-12)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2025-12-12",
-          "source_file": "2025-12-12_STAR_대덕전자.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        }
-      ]
-    },
-    {
       "ticker": "108490",
       "market": "KR",
       "name": "로보티즈",
@@ -3032,6 +3010,28 @@
       ]
     },
     {
+      "ticker": "353200",
+      "market": "KR",
+      "name": "대덕전자",
+      "entry_date": "2025-12-15",
+      "exit_date": "2026-01-12",
+      "entry_price": 45800.0,
+      "exit_price": 42400.0,
+      "return_pct": -7.98,
+      "days": 28,
+      "exit_reason": "minervini_close<50MA",
+      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: star 2025-12-12)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2025-12-12",
+          "source_file": "2025-12-12_STAR_대덕전자.md",
+          "target_price": null,
+          "stated_upside_pct": null
+        }
+      ]
+    },
+    {
       "ticker": "290650",
       "market": "KR",
       "name": "엘앤씨바이오",
@@ -3050,6 +3050,35 @@
           "source_file": "2025-11-25_[251125] (KEYSS 대회) 엘앤씨바이오(290650).md",
           "target_price": 82900.0,
           "stated_upside_pct": 54.9533
+        }
+      ]
+    },
+    {
+      "ticker": "004170",
+      "market": "KR",
+      "name": "신세계",
+      "entry_date": "2026-03-16",
+      "exit_date": "2026-04-06",
+      "entry_price": 328500.0,
+      "exit_price": 308000.0,
+      "return_pct": -6.8,
+      "days": 21,
+      "exit_reason": "minervini_close<50MA",
+      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: star 2026-03-14, voera 2020-05-14)",
+      "trigger_reports": [
+        {
+          "school": "voera",
+          "report_date": "2020-05-14",
+          "source_file": "undated_[BUY] 신세계_직감보다는 데이터에 주목하라.md",
+          "target_price": 278000.0,
+          "stated_upside_pct": 16.8067
+        },
+        {
+          "school": "star",
+          "report_date": "2026-03-14",
+          "source_file": "2026-03-14_STAR_신세계.md",
+          "target_price": 424500.0,
+          "stated_upside_pct": 30.2147
         }
       ]
     },
@@ -3119,31 +3148,38 @@
       ]
     },
     {
-      "ticker": "004170",
+      "ticker": "126340",
       "market": "KR",
-      "name": "신세계",
-      "entry_date": "2026-03-16",
-      "exit_date": "2026-04-06",
-      "entry_price": 328500.0,
-      "exit_price": 308000.0,
-      "return_pct": -6.8,
-      "days": 21,
+      "name": "비나텍",
+      "entry_date": "2026-02-10",
+      "exit_date": "2026-04-13",
+      "entry_price": 118900.0,
+      "exit_price": 106700.0,
+      "return_pct": -10.8,
+      "days": 62,
       "exit_reason": "minervini_close<50MA",
-      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: star 2026-03-14, voera 2020-05-14)",
+      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: kuvic 2026-02-09, ewha 2024-06-01, star 2022-10-31)",
       "trigger_reports": [
         {
-          "school": "voera",
-          "report_date": "2020-05-14",
-          "source_file": "undated_[BUY] 신세계_직감보다는 데이터에 주목하라.md",
-          "target_price": 278000.0,
-          "stated_upside_pct": 16.8067
+          "school": "ewha",
+          "report_date": "2024-06-01",
+          "source_file": "2024-06-01_[240601] 비나텍(126340).md",
+          "target_price": 80200.0,
+          "stated_upside_pct": 61.0118
         },
         {
           "school": "star",
-          "report_date": "2026-03-14",
-          "source_file": "2026-03-14_STAR_신세계.md",
-          "target_price": 424500.0,
-          "stated_upside_pct": 30.2147
+          "report_date": "2022-10-31",
+          "source_file": "2022-10-31_STAR_비나텍.md",
+          "target_price": 65400.0,
+          "stated_upside_pct": 74.7775
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2026-02-09",
+          "source_file": "2026-02-09_비나텍 - 팔려요.. 슈퍼캡 계속 팔려요!!.md",
+          "target_price": 165100.0,
+          "stated_upside_pct": 40.8703
         }
       ]
     },
@@ -3194,42 +3230,6 @@
           "source_file": "2025-08-31_STAR_인텔리안테크.md",
           "target_price": 71700.0,
           "stated_upside_pct": 55.7003
-        }
-      ]
-    },
-    {
-      "ticker": "126340",
-      "market": "KR",
-      "name": "비나텍",
-      "entry_date": "2026-02-10",
-      "exit_date": "2026-04-13",
-      "entry_price": 118900.0,
-      "exit_price": 106700.0,
-      "return_pct": -10.8,
-      "days": 62,
-      "exit_reason": "minervini_close<50MA",
-      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: kuvic 2026-02-09, ewha 2024-06-01, star 2022-10-31)",
-      "trigger_reports": [
-        {
-          "school": "ewha",
-          "report_date": "2024-06-01",
-          "source_file": "2024-06-01_[240601] 비나텍(126340).md",
-          "target_price": 80200.0,
-          "stated_upside_pct": 61.0118
-        },
-        {
-          "school": "star",
-          "report_date": "2022-10-31",
-          "source_file": "2022-10-31_STAR_비나텍.md",
-          "target_price": 65400.0,
-          "stated_upside_pct": 74.7775
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2026-02-09",
-          "source_file": "2026-02-09_비나텍 - 팔려요.. 슈퍼캡 계속 팔려요!!.md",
-          "target_price": 165100.0,
-          "stated_upside_pct": 40.8703
         }
       ]
     },

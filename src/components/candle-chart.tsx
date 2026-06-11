@@ -18,6 +18,13 @@ import { schoolShort } from "@/lib/verdict";
 import type { School } from "@/lib/report-model";
 
 export type Candle = { time: string; open: number; high: number; low: number; close: number; volume: number };
+/** SOTA 전략 백테스트 매매 지점 — ▲ 매수 / ▼ 매도·스탑 */
+export type TradeMark = {
+  date: string;
+  side: "buy" | "sell" | "stop";
+  price: number | null;
+  reason: string;
+};
 export type ReportMark = {
   sourceName: string;
   school: School;
@@ -52,7 +59,21 @@ function snapToCandle(date: string, times: string[]) {
   return times[lo];
 }
 
-export function CandleChart({ candles, marks, market }: { candles: Candle[]; marks: ReportMark[]; market: string | null }) {
+export function CandleChart({
+  candles,
+  marks,
+  market,
+  tradeMarks,
+  currentStop,
+}: {
+  candles: Candle[];
+  marks: ReportMark[];
+  market: string | null;
+  /** SOTA 전략 백테스트 매매 마커 — 없으면 발간 마커만 그린다 */
+  tradeMarks?: TradeMark[];
+  /** 보유 중 포지션의 현재 추적 스탑 — 점선 수평선 */
+  currentStop?: number | null;
+}) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const { resolvedTheme } = useTheme();
@@ -125,17 +146,43 @@ export function CandleChart({ candles, marks, market }: { candles: Candle[]; mar
     );
 
     // 발간 마커 — 학회별 잉크로 그날을 찍는다
-    const markers: SeriesMarker<Time>[] = marks
-      .map((mark) => ({
-        time: snapToCandle(mark.date, times) as Time,
-        position: "belowBar" as const,
-        shape: "arrowUp" as const,
-        color: cssHsl(SCHOOL_VARS[mark.school]),
-        text: schoolShort[mark.school],
-        size: 1.4,
-      }))
-      .sort((a, b) => String(a.time).localeCompare(String(b.time)));
+    const reportMarkers: SeriesMarker<Time>[] = marks.map((mark) => ({
+      time: snapToCandle(mark.date, times) as Time,
+      position: "belowBar" as const,
+      shape: "arrowUp" as const,
+      color: cssHsl(SCHOOL_VARS[mark.school]),
+      text: schoolShort[mark.school],
+      size: 1.4,
+    }));
+
+    // SOTA 매매 마커 — ▲ 매수(상승색) 아래, ▼ 매도·스탑(하락색) 위
+    const tradeMarkers: SeriesMarker<Time>[] = (tradeMarks ?? []).map((mark) => ({
+      time: snapToCandle(mark.date, times) as Time,
+      position: mark.side === "buy" ? ("belowBar" as const) : ("aboveBar" as const),
+      shape: mark.side === "buy" ? ("arrowUp" as const) : ("arrowDown" as const),
+      color: mark.side === "buy" ? up : down,
+      text: mark.side === "buy" ? "매수" : mark.side === "stop" ? "스탑" : "매도",
+      size: 1.1,
+    }));
+
+    const markers = [...reportMarkers, ...tradeMarkers].sort((a, b) => String(a.time).localeCompare(String(b.time)));
     if (markers.length) createSeriesMarkers(candleSeries, markers);
+
+    // 현재 추적 스탑 — 보유 중일 때만 점선으로 깔린다
+    if (typeof currentStop === "number" && Number.isFinite(currentStop)) {
+      const stopText =
+        market === "US"
+          ? `$${currentStop.toLocaleString("ko-KR", { maximumFractionDigits: 2 })}`
+          : currentStop.toLocaleString("ko-KR", { maximumFractionDigits: 0 });
+      candleSeries.createPriceLine({
+        price: currentStop,
+        color: down,
+        lineWidth: 1,
+        lineStyle: LineStyle.Dashed,
+        axisLabelVisible: true,
+        title: `SOTA 스탑 ${stopText}`,
+      });
+    }
 
     // 목표가 수평선 — 그날의 주장이 가격축에 남는다. 거듭 제시한 목표는 목표 1/3 → 2/3 순으로 번호가 붙는다
     for (const mark of marks) {
@@ -162,7 +209,7 @@ export function CandleChart({ candles, marks, market }: { candles: Candle[]; mar
       chart.remove();
     };
     // resolvedTheme 변경 시 차트를 테마 색으로 다시 그린다
-  }, [candles, marks, market, times, resolvedTheme]);
+  }, [candles, marks, market, times, tradeMarks, currentStop, resolvedTheme]);
 
   if (candles.length < 2) {
     return (
