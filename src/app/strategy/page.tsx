@@ -10,7 +10,7 @@ import {
 } from "@/components/strategy/strategy-meta";
 import backtest from "@/data/strategy-backtest.json";
 import { signColor } from "@/lib/verdict";
-import { cn, formatPct } from "@/lib/utils";
+import { cn, formatPct, formatPrice } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "전략 — 판결 아카이브",
@@ -400,9 +400,9 @@ export default function StrategyPage() {
                         )}
                       </div>
                       <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-muted-foreground">
-                        <span>진입가: <strong className="text-foreground">{pos.entry_price.toLocaleString()}</strong></span>
-                        {pos.current_price != null && <span>현재가: <strong className={cn(pos.unrealized_pct != null && pos.unrealized_pct >= 0 ? "text-up" : "text-down")}>{pos.current_price.toLocaleString()}</strong></span>}
-                        {pos.stop_level != null && <span>스탑: <strong className="text-down">{pos.stop_level.toLocaleString()}</strong></span>}
+                        <span>진입가: <strong className="text-foreground">{formatPrice(pos.entry_price, pos.market)}</strong></span>
+                        {pos.current_price != null && <span>현재가: <strong className={cn(pos.unrealized_pct != null && pos.unrealized_pct >= 0 ? "text-up" : "text-down")}>{formatPrice(pos.current_price, pos.market)}</strong></span>}
+                        {pos.stop_level != null && <span>스탑: <strong className="text-down">{formatPrice(pos.stop_level, pos.market)}</strong></span>}
                         {pos.unrealized_pct != null && <span>미실현: <strong className={cn(pos.unrealized_pct >= 0 ? "text-up" : "text-down")}>{pos.unrealized_pct > 0 ? "+" : ""}{pos.unrealized_pct.toFixed(1)}%</strong></span>}
                       </div>
                       {pos.entry_reason && (
@@ -515,10 +515,10 @@ export default function StrategyPage() {
                             {pos.unrealized_pct != null ? `${pos.unrealized_pct > 0 ? "+" : ""}${pos.unrealized_pct.toFixed(1)}%` : "—"}
                           </td>
                           <td className="tnum px-3 py-1.5 text-right font-mono text-xs">
-                            {pos.current_price != null ? pos.current_price.toLocaleString() : "—"}
+                            {pos.current_price != null ? formatPrice(pos.current_price, pos.market) : "—"}
                           </td>
                           <td className="tnum px-3 py-1.5 text-right font-mono text-xs text-muted-foreground">
-                            {pos.stop_level != null ? pos.stop_level.toLocaleString() : "—"}
+                            {pos.stop_level != null ? formatPrice(pos.stop_level, pos.market) : "—"}
                           </td>
                           <td className={cn("tnum px-3 py-1.5 text-right font-mono text-xs", extColor)}>
                             {ext != null ? `${ext.toFixed(1)}×` : "—"}
@@ -673,7 +673,7 @@ export default function StrategyPage() {
               {
                 n: 1,
                 title: "유니버스 — KR + US 전체 Buy 언급",
-                body: `KR ${universeStats.kr_tickers}개 + US ${universeStats.us_tickers}개 종목. 리포트 풀 ${params.universe_start} 이후, 시뮬 기점 ${simStartDisplay}. 1회 이상 Buy 언급 즉시 진입 — 단독 커버·컨센서스 모두 포함. 동시 보유 한도로 신호 일부 미체결. US 종목은 달러 기준 가격 사용 (환율 미반영).`,
+                body: `KR ${universeStats.kr_tickers}개 + US ${universeStats.us_tickers}개 종목. 리포트 풀 ${params.universe_start} 이후, 시뮬 기점 ${simStartDisplay}. 1회 이상 Buy 언급 즉시 진입 — 단독 커버·컨센서스 모두 포함. 동시 보유 한도로 신호 일부 미체결. US 종목 손익은 일별 USDKRW 환율(KRW=X)로 원화 환산 (v19 FX 레이어).`,
               },
               {
                 n: 2,
@@ -862,7 +862,7 @@ export default function StrategyPage() {
               <li>· <strong className="text-foreground">민리버전(L) / 단기 리버설(M).</strong> 구현·검증 후 거래비용 사망 확정 — v18부터 백테스트에서 제거. 방법론 규칙 7에 한 줄로만 기록합니다.</li>
               <li>· <strong className="text-foreground">코어-새틀라이트 레버리지(J) 솔직한 평가.</strong> 차입비용(연 6% 일복리)과 폭락 타이밍 미스 리스크가 있습니다. D 보조 시뮬로만 참고하세요.</li>
               <li>· <strong className="text-foreground">현금 이자 가정.</strong> 모든 전략의 유휴 현금에 연 3.0% 일복리(MMF/단기채 ETF 프록시)를 일괄 적용합니다 — 고정 가정이며 실제 단기 금리는 기간별로 변동했습니다.</li>
-              <li>· <strong className="text-foreground">US 종목 주의.</strong> 수익은 달러 기준. KRW/USD 환율 변동 미반영.</li>
+              <li>· <strong className="text-foreground">US 종목 FX.</strong> v19부터 일별 USDKRW 환율(yfinance KRW=X)로 원화 환산 적용. 원화 강세 구간에서 달러 자산 수익이 감소하며, 약세 구간에서 FX 수익이 추가됩니다.</li>
               <li>· <strong className="text-foreground">컨센서스 표본 제한.</strong> US 컨센서스 종목 소수. 통계적 유의성 낮음.</li>
               <li>· 롱온리 전략. 대세 하락장 손실 불가피. SOTA MDD {formatPct(m.mdd_pct, 1)}.</li>
               <li>· <strong className="text-foreground">컨센서스 분석.</strong>{" "}

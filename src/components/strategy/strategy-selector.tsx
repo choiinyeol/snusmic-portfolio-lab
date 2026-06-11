@@ -5,7 +5,7 @@ import Link from "next/link";
 import { WealthChart } from "@/components/strategy/wealth-chart";
 import { useSortable, SortableTh, type SortColumn } from "@/components/sortable";
 import { signColor } from "@/lib/verdict";
-import { cn, formatPct } from "@/lib/utils";
+import { cn, formatPct, formatPrice } from "@/lib/utils";
 import {
   STRATEGY_LABEL_KO,
   STRATEGY_DESC_KO,
@@ -200,13 +200,13 @@ function OpenPositionsTable({ positions, stratKey }: { positions: OpenPosition[]
                     )}
                   </td>
                   <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">{pos.entry_date}</td>
-                  <td className="tnum px-3 py-2 text-right font-mono text-xs">{pos.entry.toLocaleString()}</td>
-                  <td className="tnum px-3 py-2 text-right font-mono text-xs">{pos.last_close.toLocaleString()}</td>
+                  <td className="tnum px-3 py-2 text-right font-mono text-xs">{formatPrice(pos.entry, market)}</td>
+                  <td className="tnum px-3 py-2 text-right font-mono text-xs">{formatPrice(pos.last_close, market)}</td>
                   <td className={cn("tnum px-3 py-2 text-right font-mono text-xs font-bold", signColor(pos.return_pct))}>
                     {formatPct(pos.return_pct, 1)}
                   </td>
                   <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">
-                    {pos.stop && pos.stop > 0 ? pos.stop.toLocaleString() : "—"}
+                    {pos.stop && pos.stop > 0 ? formatPrice(pos.stop, market) : "—"}
                   </td>
                   <td className={cn("tnum px-3 py-2 text-right font-mono text-xs", extColor)}>
                     {ext != null ? `${ext.toFixed(1)}×` : "—"}
@@ -397,12 +397,12 @@ function TickerHistoryPanel({
             <div className="flex items-center gap-1.5 font-mono text-xs">
               <span className="font-mono text-[9px] px-1 rounded bg-[hsl(var(--up)/0.15)] text-[hsl(var(--up))] font-bold">매수</span>
               <span className="text-muted-foreground">{t.entry_date}</span>
-              <span className="font-bold">{typeof t.entry === "number" ? t.entry.toLocaleString() : t.entry}원</span>
+              <span className="font-bold">{typeof t.entry === "number" ? formatPrice(t.entry, t.market ?? "KR") : t.entry}</span>
             </div>
             <div className="flex items-center gap-1.5 font-mono text-xs">
               <span className="font-mono text-[9px] px-1 rounded bg-[hsl(var(--down)/0.15)] text-[hsl(var(--down))] font-bold">매도</span>
               <span className="text-muted-foreground">{t.exit_date}</span>
-              <span className="font-bold">{typeof t.exit === "number" ? t.exit.toLocaleString() : t.exit}원</span>
+              <span className="font-bold">{typeof t.exit === "number" ? formatPrice(t.exit, t.market ?? "KR") : t.exit}</span>
             </div>
             <span className={cn("tnum font-mono text-xs font-bold ml-auto", signColor(t.return_pct))}>
               {formatPct(t.return_pct, 1)}
@@ -512,12 +512,12 @@ function TradeLog({ trades, stratKey }: { trades: Trade[]; stratKey: string }) {
                     <p className="font-mono text-[10px] text-muted-foreground">{t.ticker}{t.market !== "KR" ? ` · ${t.market}` : ""}</p>
                   </td>
                   <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">{t.entry_date}</td>
-                  <td className="tnum px-3 py-2 text-right font-mono text-xs">{typeof t.entry === "number" ? t.entry.toLocaleString() : t.entry}</td>
+                  <td className="tnum px-3 py-2 text-right font-mono text-xs">{typeof t.entry === "number" ? formatPrice(t.entry, t.market ?? "KR") : t.entry}</td>
                   <td className="px-3 py-2 font-mono text-[10px] text-muted-foreground">
                     <span className="block max-w-[220px] truncate" title={t.entry_reason}>{t.entry_reason || "—"}</span>
                   </td>
                   <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">{t.exit_date}</td>
-                  <td className="tnum px-3 py-2 text-right font-mono text-xs">{typeof t.exit === "number" ? t.exit.toLocaleString() : t.exit}</td>
+                  <td className="tnum px-3 py-2 text-right font-mono text-xs">{typeof t.exit === "number" ? formatPrice(t.exit, t.market ?? "KR") : t.exit}</td>
                   <td className={cn("tnum px-3 py-2 text-right font-mono text-xs font-bold", signColor(t.return_pct))}>
                     {formatPct(t.return_pct, 1)}
                   </td>

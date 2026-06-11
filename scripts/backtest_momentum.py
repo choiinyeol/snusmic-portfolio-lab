@@ -273,6 +273,46 @@ def load_gld() -> pd.Series:
     return _fetch_index_yf("GLD", "GLD")
 
 
+def load_usdkrw() -> pd.Series:
+    """USDKRW 일별 환율 로드. KRW=X yfinance 심볼, data/prices/IDX_USDKRW.csv 캐시."""
+    path = PRICE_DIR / "IDX_USDKRW.csv"
+    if path.exists():
+        df = pd.read_csv(path, index_col=0, parse_dates=True).sort_index()
+        if not df.empty and "close" in df.columns:
+            last_date = df.index[-1].date()
+            today = dt.date.today()
+            if last_date >= today - dt.timedelta(days=5):
+                return df["close"]
+    return _fetch_index_yf("KRW=X", "USDKRW")
+
+
+# ── FX layer (v19) ────────────────────────────────────────────────────────────
+# _USDKRW: 1 USD → KRW 일별 환율 시리즈. main()에서 set_usdkrw()로 주입.
+# KR 자산: fx = 1.0 (원화 기준 그대로).
+# US 자산: fx = 해당 거래일 USDKRW 환율. 부재 시 전일 ffill, 최종 fallback 1300.
+_USDKRW: pd.Series | None = None
+_USDKRW_FALLBACK = 1300.0
+
+
+def set_usdkrw(series: pd.Series) -> None:
+    """main()에서 USDKRW 시리즈를 주입. 전역 ffill 적용."""
+    global _USDKRW
+    _USDKRW = series.ffill()
+
+
+def _fx(market: str, day: dt.date) -> float:
+    """Return USDKRW rate for US market, 1.0 for KR."""
+    if market != "US":
+        return 1.0
+    if _USDKRW is None:
+        return _USDKRW_FALLBACK
+    ts = pd.Timestamp(day)
+    val = _USDKRW.asof(ts)
+    if pd.isna(val) or val <= 0:
+        return _USDKRW_FALLBACK
+    return float(val)
+
+
 def load_prices(ticker: str, market: str = "KR") -> pd.DataFrame | None:
     """주가 데이터 로드. market='KR' → KR_{ticker}.csv, market='US' → US_{ticker}.csv"""
     if market == "US":
@@ -440,6 +480,46 @@ def _report_trigger_reason(
 # Shared helpers
 # ──────────────────────────────────────────────────────────────────────────────
 
+def round_to_tick(price: float, market: str) -> float:
+    """Round a DISPLAY-ONLY price level down to the nearest exchange tick size.
+
+    Conservative floor rounding (math.floor) is used for stop levels: a stop
+    slightly lower than the raw float never overstates protection to the user.
+    Entry/close prices that come from actual fills are left untouched — only
+    synthetic derived levels (chandelier stop, etc.) pass through here at the
+    serialization boundary.
+
+    KRX 2023 호가 단위 (tick table):
+      < 2,000       →  1원
+      < 5,000       →  5원
+      < 20,000      → 10원
+      < 50,000      → 50원
+      < 200,000     → 100원
+      < 500,000     → 500원
+      ≥ 500,000     → 1,000원
+
+    US: round to $0.01 (standard cent tick).
+    """
+    if market == "US":
+        return math.floor(price * 100) / 100
+    # KR / default: KRX tick table
+    if price < 2_000:
+        tick = 1
+    elif price < 5_000:
+        tick = 5
+    elif price < 20_000:
+        tick = 10
+    elif price < 50_000:
+        tick = 50
+    elif price < 200_000:
+        tick = 100
+    elif price < 500_000:
+        tick = 500
+    else:
+        tick = 1_000
+    return math.floor(price / tick) * tick
+
+
 def first_trading_day_after(target: dt.date, calendar: list[dt.date]) -> dt.date | None:
     for d in calendar:
         if d > target:
@@ -529,35 +609,35 @@ def _try_enter(
     if entry_price <= 0:
         return None, cash
 
-    # Momentum filter: price > 200MA at entry
+    # Momentum filter: price > 200MA at entry (in local currency — USD for US)
     if momentum_filter:
         ma200_val = asof_value(df["ma200"], day)
         if ma200_val <= 0 or entry_price < ma200_val:
             return None, cash
 
-    budget = min(nav_now * weight, cash)
-    if budget < nav_now * POSITION_WEIGHT * 0.5:
-        return None, cash
-
-    shares = budget * (1 - COST_PER_SIDE) / entry_price
-    cash -= budget
-
+    # Resolve market and display metadata before budget/shares (needed for FX)
     display_name = ticker
     tp = None
+    market = "KR"
     if ticker_reports is not None:
         tr_list = ticker_reports.get(ticker, [])
+        if tr_list:
+            market = tr_list[0].get("market", "KR")
         past_tr = [x for x in tr_list if x["report_date"] < day]
         if past_tr:
             latest = max(past_tr, key=lambda x: x["report_date"])
             display_name = latest["display_name"]
             tps = [x["target_price"] for x in past_tr if x["target_price"]]
             tp = max(tps) if tps else None
-    # market from ticker_reports
-    market = "KR"
-    if ticker_reports is not None:
-        tr_list = ticker_reports.get(ticker, [])
-        if tr_list:
-            market = tr_list[0].get("market", "KR")
+
+    budget = min(nav_now * weight, cash)
+    if budget < nav_now * POSITION_WEIGHT * 0.5:
+        return None, cash
+
+    # v19 FX: shares = KRW_budget / (local_price × USDKRW). KR: fx=1 → unchanged.
+    entry_fx = _fx(market, day)
+    shares = budget * (1 - COST_PER_SIDE) / (entry_price * entry_fx)
+    cash -= budget
 
     pos = {
         "shares": shares,
@@ -595,10 +675,15 @@ def _close_trade(
     consensus_window: int | None,
     shares_override: float | None = None,
     cost_override: float | None = None,
+    fx_rate: float | None = None,
 ) -> dict:
     shares = shares_override if shares_override is not None else pos["shares"]
     cost = cost_override if cost_override is not None else pos["cost"]
-    proceeds = shares * exit_price * (1 - COST_PER_SIDE)
+    # v19 FX: auto-derive USDKRW from pos market + exit_date if not supplied.
+    if fx_rate is None:
+        fx_rate = _fx(pos.get("market", "KR"), exit_date)
+    exit_price_krw = exit_price * fx_rate
+    proceeds = shares * exit_price_krw * (1 - COST_PER_SIDE)
     trade: dict = {
         "ticker": ticker,
         "market": pos.get("market", "KR"),
@@ -608,7 +693,7 @@ def _close_trade(
         "entry_date": pos["entry_date"].isoformat(),
         "exit_date": exit_date.isoformat(),
         "entry": round(pos["entry_price"], 4),
-        "exit": round(exit_price, 4),
+        "exit": round(exit_price, 4),   # local currency (USD for US)
         "return_pct": round((proceeds / cost - 1) * 100, 2),
         "days": (exit_date - pos["entry_date"]).days,
         "exit_reason": exit_reason,
@@ -666,7 +751,7 @@ def run_fixed_hold(
             if q is None or float(q["open"]) <= 0:
                 continue
             exit_price = float(q["open"])
-            cash += pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            cash += pos["shares"] * exit_price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
             trades.append(_close_trade(ticker, pos, day, exit_price, f"{hold_months}개월_만기",
                                        ticker_reports, record_full_trades, None))
             del positions[ticker]
@@ -674,7 +759,7 @@ def run_fixed_hold(
 
         # Execute pending entries
         if day in pending_entries:
-            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            nav_now = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
             slots = MAX_POSITIONS - len(positions)
             candidates = list({t: (t, s, nc) for t, s, nc in pending_entries[day] if t not in positions}.values())
             for ticker, source, n_clubs in candidates[:slots]:
@@ -692,8 +777,9 @@ def run_fixed_hold(
             df = prices.get(ticker)
             if df is not None and day_ts in df.index:
                 pos["last_close"] = float(df.loc[day_ts]["close"])
+                pos["fx"] = _fx(pos.get("market", "KR"), day)
 
-        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
     # Force-close remaining
@@ -752,7 +838,7 @@ def run_narrative_hold(
             if q is None or float(q["open"]) <= 0:
                 continue
             exit_price = float(q["open"])
-            cash += pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            cash += pos["shares"] * exit_price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
             trades.append(_close_trade(ticker, pos, day, exit_price, "thesis_break_200MA",
                                        ticker_reports, record_full_trades, None))
             del positions[ticker]
@@ -760,7 +846,7 @@ def run_narrative_hold(
 
         # Execute pending entries
         if day in pending_entries:
-            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            nav_now = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
             slots = MAX_POSITIONS - len(positions)
             candidates = list({t: (t, s, nc) for t, s, nc in pending_entries[day] if t not in positions}.values())
             for ticker, source, n_clubs in candidates[:slots]:
@@ -776,6 +862,7 @@ def run_narrative_hold(
             df = prices.get(ticker)
             if df is not None and day_ts in df.index:
                 pos["last_close"] = float(df.loc[day_ts]["close"])
+                pos["fx"] = _fx(pos.get("market", "KR"), day)
 
         # Month-end thesis-break check (Faber rule: monthly check)
         if day in month_ends:
@@ -790,7 +877,7 @@ def run_narrative_hold(
                 if ma200_val > 0 and close < ma200_val and close < entry_p:
                     pending_exits.add(ticker)
 
-        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
     # Force-close remaining
@@ -841,7 +928,7 @@ def run_chandelier(
             if q is None or float(q["open"]) <= 0:
                 continue
             exit_price = float(q["open"])
-            cash += pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            cash += pos["shares"] * exit_price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
             trades.append(_close_trade(ticker, pos, day, exit_price, "chandelier_ATR5",
                                        ticker_reports, record_full_trades, None))
             del positions[ticker]
@@ -849,7 +936,7 @@ def run_chandelier(
 
         # Execute pending entries
         if day in pending_entries:
-            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            nav_now = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
             slots = MAX_POSITIONS - len(positions)
             candidates = list({t: (t, s, nc) for t, s, nc in pending_entries[day] if t not in positions}.values())
             for ticker, source, n_clubs in candidates[:slots]:
@@ -867,6 +954,7 @@ def run_chandelier(
                 continue
             close = float(df.loc[day_ts]["close"])
             pos["last_close"] = close
+            pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["highest"] = max(pos.get("highest", close), close)
             atr_val = asof_value(df["atr"], day)
             if atr_val:
@@ -875,7 +963,7 @@ def run_chandelier(
             if pos.get("stop") and close < pos["stop"] and ticker not in pending_exits:
                 pending_exits.add(ticker)
 
-        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
     last_day = calendar[-1]
@@ -934,7 +1022,7 @@ def run_half_exit_runner(
             # Only the runner shares remain
             runner_shares = pos["shares"]
             runner_cost = pos.get("runner_cost", pos["cost"] * 0.5)
-            cash += runner_shares * exit_price * (1 - COST_PER_SIDE)
+            cash += runner_shares * exit_price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
             trade = _close_trade(ticker, pos, day, exit_price, "runner_thesis_break_200MA",
                                  ticker_reports, record_full_trades, None,
                                  shares_override=runner_shares, cost_override=runner_cost)
@@ -944,7 +1032,7 @@ def run_half_exit_runner(
 
         # Execute pending entries
         if day in pending_entries:
-            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            nav_now = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
             slots = MAX_POSITIONS - len(positions)
             candidates = list({t: (t, s, nc) for t, s, nc in pending_entries[day] if t not in positions}.values())
             for ticker, source, n_clubs in candidates[:slots]:
@@ -969,7 +1057,7 @@ def run_half_exit_runner(
                 half_exit_price = min(tp, close_today) if close_today < tp else tp
                 half_shares = pos["shares"] * 0.5
                 half_cost = pos["cost"] * 0.5
-                cash += half_shares * half_exit_price * (1 - COST_PER_SIDE)
+                cash += half_shares * half_exit_price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
                 trade = _close_trade(ticker, pos, day, half_exit_price, "목표가_절반익절",
                                      ticker_reports, record_full_trades, None,
                                      shares_override=half_shares, cost_override=half_cost)
@@ -985,6 +1073,7 @@ def run_half_exit_runner(
             df = prices.get(ticker)
             if df is not None and day_ts in df.index:
                 pos["last_close"] = float(df.loc[day_ts]["close"])
+                pos["fx"] = _fx(pos.get("market", "KR"), day)
 
         # Month-end C-rule check for runners
         if day in month_ends:
@@ -998,7 +1087,7 @@ def run_half_exit_runner(
                 if ma200_val > 0 and close < ma200_val and close < entry_p:
                     runner_exits.add(ticker)
 
-        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
     last_day = calendar[-1]
@@ -1087,7 +1176,7 @@ def run_dip_buy(
             if q is None or float(q["open"]) <= 0:
                 continue
             exit_price = float(q["open"])
-            cash += pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            cash += pos["shares"] * exit_price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
             trades.append(_close_trade(ticker, pos, day, exit_price, pos.get("_exit_reason", "dip_atr3_stop"),
                                        ticker_reports, record_full_trades, None))
             del positions[ticker]
@@ -1095,7 +1184,7 @@ def run_dip_buy(
 
         # Execute dip entries queued from previous day's check
         if dip_entry_queue:
-            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            nav_now = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
             slots = MAX_POSITIONS - len(positions)
             for ticker, watch in dip_entry_queue[:slots]:
                 if ticker in positions:
@@ -1112,7 +1201,7 @@ def run_dip_buy(
                 budget = min(nav_now * POSITION_WEIGHT, cash)
                 if budget < nav_now * POSITION_WEIGHT * 0.5:
                     continue
-                shares = budget * (1 - COST_PER_SIDE) / entry_price
+                shares = budget * (1 - COST_PER_SIDE) / (entry_price * _fx(watch["market"], day))
                 cash -= budget
                 atr_val = asof_value(df["atr"], day)
                 stop = entry_price - DIP_ATR_MULT * atr_val if atr_val else entry_price * 0.80
@@ -1156,6 +1245,7 @@ def run_dip_buy(
             close = float(df.loc[day_ts]["close"])
             high_today = float(df.loc[day_ts].get("high", close))
             pos["last_close"] = close
+            pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["highest"] = max(pos.get("highest", close), close)
 
             # Trailing stop ratchet
@@ -1197,7 +1287,7 @@ def run_dip_buy(
                     pos["_exit_reason"] = exit_reason
                     pending_exits.add(ticker)
 
-        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
     last_day = calendar[-1]
@@ -1260,7 +1350,7 @@ def run_minervini(
             if q is None or float(q["open"]) <= 0:
                 continue
             exit_price = float(q["open"])
-            cash += pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            cash += pos["shares"] * exit_price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
             trades.append(_close_trade(ticker, pos, day, exit_price, "minervini_close<50MA",
                                        ticker_reports, record_full_trades, None))
             del positions[ticker]
@@ -1268,7 +1358,7 @@ def run_minervini(
 
         # Execute pending entries — check Minervini template
         if day in pending_entries:
-            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            nav_now = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
             slots = MAX_POSITIONS - len(positions)
             candidates = list({t: (t, s, nc) for t, s, nc in pending_entries[day] if t not in positions}.values())
             for ticker, source, n_clubs in candidates[:slots]:
@@ -1319,6 +1409,7 @@ def run_minervini(
             df = prices.get(ticker)
             if df is not None and day_ts in df.index:
                 pos["last_close"] = float(df.loc[day_ts]["close"])
+                pos["fx"] = _fx(pos.get("market", "KR"), day)
 
         # Weekly check: exit if close < 50MA
         if day in week_ends:
@@ -1331,7 +1422,7 @@ def run_minervini(
                 if ma50_val > 0 and close < ma50_val:
                     pending_exits.add(ticker)
 
-        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
     last_day = calendar[-1]
@@ -1411,7 +1502,7 @@ def run_supertrend(
             if q is None or float(q["open"]) <= 0:
                 continue
             exit_price = float(q["open"])
-            cash += pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            cash += pos["shares"] * exit_price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
             trades.append(_close_trade(ticker, pos, day, exit_price, "supertrend_bearish_flip",
                                        ticker_reports, record_full_trades, None))
             del positions[ticker]
@@ -1419,7 +1510,7 @@ def run_supertrend(
 
         # Execute direct entries (supertrend bullish at report)
         if day in pending_entries_direct:
-            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            nav_now = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
             slots = MAX_POSITIONS - len(positions)
             candidates = list({t: (t, s, nc, rsn) for t, s, nc, rsn in pending_entries_direct[day] if t not in positions}.values())
             for ticker, source, n_clubs, st_reason in candidates[:slots]:
@@ -1449,7 +1540,7 @@ def run_supertrend(
                 del st_watch[ticker]
 
         if new_direct:
-            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            nav_now = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
             slots = MAX_POSITIONS - len(positions)
             entry_day = first_trading_day_after(day, calendar)
             if entry_day:
@@ -1465,7 +1556,7 @@ def run_supertrend(
             if not st_now and ticker not in pending_exits:
                 pending_exits.add(ticker)
 
-        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
     last_day = calendar[-1]
@@ -1637,7 +1728,7 @@ def run_rr_trend(
             # How many shares remain?
             shares = pos["shares"]
             cost = pos["cost"] * (shares / pos.get("original_shares", shares))
-            cash += shares * exit_price * (1 - COST_PER_SIDE)
+            cash += shares * exit_price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
             trades.append(_close_trade(ticker, pos, day, exit_price, reason,
                                        ticker_reports, record_full_trades, None,
                                        shares_override=shares, cost_override=cost))
@@ -1645,7 +1736,7 @@ def run_rr_trend(
 
         # Execute pending entries (max 10 positions)
         if day in pending_entries:
-            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            nav_now = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
             slots = RR_MAX_POSITIONS - len(positions)
             candidates = list({t: (t, s, nc) for t, s, nc in pending_entries[day] if t not in positions}.values())
             for ticker, source, n_clubs in candidates[:slots]:
@@ -1663,12 +1754,6 @@ def run_rr_trend(
                 stop = entry_price - one_r
                 take_profit = entry_price + RR_TARGET_MULT * one_r
 
-                budget = min(nav_now * POSITION_WEIGHT, cash)
-                if budget < nav_now * POSITION_WEIGHT * 0.5:
-                    continue
-                shares = budget * (1 - COST_PER_SIDE) / entry_price
-                cash -= budget
-
                 display_name = ticker
                 tp = None
                 market = "KR"
@@ -1681,6 +1766,12 @@ def run_rr_trend(
                         tps = [x["target_price"] for x in past_tr if x["target_price"]]
                         tp = max(tps) if tps else None
                         market = past_tr[0].get("market", "KR")
+
+                budget = min(nav_now * POSITION_WEIGHT, cash)
+                if budget < nav_now * POSITION_WEIGHT * 0.5:
+                    continue
+                shares = budget * (1 - COST_PER_SIDE) / (entry_price * _fx(market, day))
+                cash -= budget
 
                 positions[ticker] = {
                     "shares": shares, "original_shares": shares,
@@ -1707,6 +1798,7 @@ def run_rr_trend(
             high_today = float(df.loc[day_ts].get("high", close))
             low_today = float(df.loc[day_ts].get("low", close))
             pos["last_close"] = close
+            pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["highest"] = max(pos.get("highest", close), close)
 
             # Ratchet trail stop (Chandelier ATR×3) for remaining runner
@@ -1723,7 +1815,7 @@ def run_rr_trend(
                 half_price = pos["take_profit_price"]
                 half_shares = pos["original_shares"] * 0.5
                 half_cost = pos["cost"] * 0.5
-                cash += half_shares * half_price * (1 - COST_PER_SIDE)
+                cash += half_shares * half_price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
                 trade = _close_trade(
                     ticker, pos, day, half_price, "rr_half_+2.5R",
                     ticker_reports, record_full_trades, None,
@@ -1739,7 +1831,7 @@ def run_rr_trend(
             elif low_today <= pos["stop"]:
                 pending_exits[ticker] = "rr_stop"
 
-        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
     last_day = calendar[-1]
@@ -1786,14 +1878,14 @@ def run_chandelier_parametric(
             if q is None or float(q["open"]) <= 0:
                 continue
             exit_price = float(q["open"])
-            cash += pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            cash += pos["shares"] * exit_price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
             trades.append(_close_trade(ticker, pos, day, exit_price, f"chandelier_ATR{atr_mult}",
                                        ticker_reports, record_full_trades, None))
             del positions[ticker]
             pending_exits.discard(ticker)
 
         if day in pending_entries:
-            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            nav_now = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
             slots = max_positions - len(positions)
             candidates = list({t: (t, s, nc) for t, s, nc in pending_entries[day] if t not in positions}.values())
             for ticker, source, n_clubs in candidates[:slots]:
@@ -1816,6 +1908,7 @@ def run_chandelier_parametric(
                 continue
             close = float(df.loc[day_ts]["close"])
             pos["last_close"] = close
+            pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["highest"] = max(pos.get("highest", close), close)
             atr_col = "atr20" if atr_period == 20 else "atr"
             atr_val = asof_value(df[atr_col] if atr_col in df.columns else df["atr"], day)
@@ -1825,7 +1918,7 @@ def run_chandelier_parametric(
             if pos.get("stop") and close < pos["stop"] and ticker not in pending_exits:
                 pending_exits.add(ticker)
 
-        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
     last_day = calendar[-1]
@@ -2017,14 +2110,14 @@ def run_rsi2_mean_reversion(
                 pending_exits[ticker] = reason
                 continue
             exit_price = float(q["open"])
-            cash += pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            cash += pos["shares"] * exit_price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
             trades.append(_close_trade(ticker, pos, day, exit_price, reason,
                                        ticker_reports, record_full_trades, None))
             del positions[ticker]
 
         # Execute queued RSI-2 entries at today's open (signal detected yesterday)
         if rsi2_entry_queue:
-            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            nav_now = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
             slots = MAX_POSITIONS - len(positions)
             for ticker, source, n_clubs in rsi2_entry_queue:
                 if slots <= 0:
@@ -2045,6 +2138,7 @@ def run_rsi2_mean_reversion(
                 continue
             close = float(df.loc[day_ts]["close"])
             pos["last_close"] = close
+            pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["hold_days_remaining"] = pos.get("hold_days_remaining", RSI2_MAX_HOLD_DAYS) - 1
 
             if ticker in pending_exits:
@@ -2057,7 +2151,7 @@ def run_rsi2_mean_reversion(
 
         # End-of-day entry SIGNAL scan — deferred to next bar's open
         new_rsi2_entries: list[tuple[str, str, int]] = []
-        nav_now_eod = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav_now_eod = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         for ticker, ranges in ticker_valid.items():
             if ticker in positions:
                 continue
@@ -2081,7 +2175,7 @@ def run_rsi2_mean_reversion(
 
         rsi2_entry_queue = new_rsi2_entries
 
-        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
     last_day = calendar[-1]
@@ -2158,7 +2252,7 @@ def run_short_term_reversal(
                         exited.add(ticker)
                     continue
                 exit_price = float(q["open"])
-                cash += pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+                cash += pos["shares"] * exit_price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
                 trades.append(_close_trade(ticker, pos, day, exit_price, "reversal_1mo_만기",
                                            ticker_reports, record_full_trades, None))
                 exited.add(ticker)
@@ -2184,6 +2278,7 @@ def run_short_term_reversal(
             df = prices.get(ticker)
             if df is not None and day_ts in df.index:
                 pos["last_close"] = float(df.loc[day_ts]["close"])
+                pos["fx"] = _fx(pos.get("market", "KR"), day)
 
         # End-of-month: compute bottom-quintile ranking from today's close for next
         # month-first execution (point-in-time: signal at month-end close, fill next open).
@@ -2218,7 +2313,7 @@ def run_short_term_reversal(
                     for _, ticker, source, nc in candidates_m[:n_quintile]
                 ]
 
-        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
     last_day = calendar[-1]
@@ -2291,7 +2386,7 @@ def run_52w_high_proximity(
             if q is None or float(q["open"]) <= 0:
                 continue
             exit_price = float(q["open"])
-            cash += pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            cash += pos["shares"] * exit_price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
             trades.append(_close_trade(ticker, pos, day, exit_price, "52w_hi_exit",
                                        ticker_reports, record_full_trades, None))
             del positions[ticker]
@@ -2299,7 +2394,7 @@ def run_52w_high_proximity(
 
         # Execute entries
         if day in n52_pending:
-            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            nav_now = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
             slots = MAX_POSITIONS - len(positions)
             candidates = list({t: (t, s, nc) for t, s, nc in n52_pending[day] if t not in positions}.values())
             for ticker, source, n_clubs in candidates[:slots]:
@@ -2312,6 +2407,7 @@ def run_52w_high_proximity(
             df = prices.get(ticker)
             if df is not None and day_ts in df.index:
                 pos["last_close"] = float(df.loc[day_ts]["close"])
+                pos["fx"] = _fx(pos.get("market", "KR"), day)
 
         # Monthly exit check: close < 70% of 52w high
         if day in month_ends:
@@ -2324,7 +2420,7 @@ def run_52w_high_proximity(
                 if hi52w_val > 0 and close < N52W_EXIT_PCT * hi52w_val:
                     pending_exits.add(ticker)
 
-        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
     last_day = calendar[-1]
@@ -2496,14 +2592,14 @@ def run_mtt_alpha16(
                 pending_exits[ticker] = reason   # defer
                 continue
             exit_price = float(q["open"])
-            cash += pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            cash += pos["shares"] * exit_price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
             trades.append(_close_trade(ticker, pos, day, exit_price, reason,
                                        ticker_reports, record_full_trades, None))
             del positions[ticker]
 
         # Execute queued MTT entries at today's open (signal was detected yesterday)
         if mtt_entry_queue:
-            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            nav_now = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
             slots = MAX_POSITIONS - len(positions)
             for ticker, source_val, n_clubs_val, rs_val in mtt_entry_queue:
                 if slots <= 0:
@@ -2594,6 +2690,7 @@ def run_mtt_alpha16(
                 continue
             close = float(df.loc[day_ts]["close"])
             pos["last_close"] = close
+            pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["highest"] = max(pos.get("highest", close), close)
             pos["hold_days"] = pos.get("hold_days", 0) + 1
 
@@ -2644,7 +2741,7 @@ def run_mtt_alpha16(
                 pending_exits[ticker] = "mtt_max_115d"
                 continue
 
-        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
     last_day = calendar[-1]
@@ -2746,7 +2843,7 @@ def run_deepbuy_chandelier(
             if q is None or float(q["open"]) <= 0:
                 continue
             exit_price = float(q["open"])
-            cash += pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            cash += pos["shares"] * exit_price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
             trades.append(_close_trade(ticker, pos, day, exit_price,
                                        f"p_chandelier_ATR{atr_mult}",
                                        ticker_reports, record_full_trades, None))
@@ -2755,7 +2852,7 @@ def run_deepbuy_chandelier(
 
         # ── Open-of-day: execute deferred scale-in add-ons ─────────────────
         if addon_queue:
-            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            nav_now = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
             for ticker in addon_queue:
                 pos = positions.get(ticker)
                 if pos is None:
@@ -2769,7 +2866,9 @@ def run_deepbuy_chandelier(
                 addon_budget = min(nav_now * POSITION_WEIGHT, cash)
                 if addon_budget < nav_now * POSITION_WEIGHT * 0.5:
                     continue
-                addon_shares = addon_budget * (1 - COST_PER_SIDE) / addon_price
+                # v19 FX: KRW budget / (USD price × USDKRW) for US positions
+                addon_fx = _fx(pos.get("market", "KR"), day)
+                addon_shares = addon_budget * (1 - COST_PER_SIDE) / (addon_price * addon_fx)
                 cash -= addon_budget
                 # Merge into existing position: weighted avg entry, combined shares/cost
                 old_shares = pos["shares"]
@@ -2789,7 +2888,7 @@ def run_deepbuy_chandelier(
 
         # ── Open-of-day: execute new dip entries queued from previous close ─
         if dip_entry_queue:
-            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            nav_now = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
             slots = max_positions - len(positions)
             for ticker, watch in dip_entry_queue[:slots]:
                 if ticker in positions:
@@ -2803,7 +2902,7 @@ def run_deepbuy_chandelier(
                 budget = min(nav_now * POSITION_WEIGHT, cash)
                 if budget < nav_now * POSITION_WEIGHT * 0.5:
                     continue
-                shares = budget * (1 - COST_PER_SIDE) / entry_price
+                shares = budget * (1 - COST_PER_SIDE) / (entry_price * _fx(watch["market"], day))
                 cash -= budget
                 atr_val = asof_value(df["atr"], day)
                 stop = entry_price - atr_mult * atr_val if atr_val else entry_price * 0.75
@@ -2858,6 +2957,7 @@ def run_deepbuy_chandelier(
                 continue
             close = float(df.loc[day_ts]["close"])
             pos["last_close"] = close
+            pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["highest"] = max(pos.get("highest", close), close)
 
             # Ratchet chandelier stop from highest-high
@@ -2881,7 +2981,7 @@ def run_deepbuy_chandelier(
 
         addon_queue = new_addon
 
-        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
     # Force-close remaining at last bar
@@ -2976,7 +3076,7 @@ def run_immediate_hold(
             if q is None or float(q["open"]) <= 0:
                 continue
             price = float(q["open"])
-            proceeds = pos["shares"] * price * (1 - COST_PER_SIDE)
+            proceeds = pos["shares"] * price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
             cash += proceeds
             exit_reason = "목표가_도달" if target_exit and price >= (target_prices.get(ticker, 0)) else f"{hold_months}개월_만기"
             if day == calendar[-1]:
@@ -3017,7 +3117,7 @@ def run_immediate_hold(
                 del target_prices[ticker]
 
         if day in pending_entries:
-            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            nav_now = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
             slots = MAX_POSITIONS - len(positions)
             candidates = [(t, s, nc) for t, s, nc in pending_entries[day] if t not in positions]
             seen: set[str] = set()
@@ -3089,8 +3189,9 @@ def run_immediate_hold(
             df = prices.get(ticker)
             if df is not None and day_ts in df.index:
                 pos["last_close"] = float(df.loc[day_ts]["close"])
+                pos["fx"] = _fx(pos.get("market", "KR"), day)
 
-        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
     last_day = calendar[-1]
@@ -3204,7 +3305,7 @@ def run_breakout_backtest(
                 continue
             positions.pop(ticker)
             price = float(q["open"])
-            proceeds = pos["shares"] * price * (1 - COST_PER_SIDE)
+            proceeds = pos["shares"] * price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
             cash += proceeds
             trades.append({
                 "ticker": ticker,
@@ -3228,7 +3329,7 @@ def run_breakout_backtest(
             if regime is not None:
                 value = regime.asof(pd.Timestamp(signal_cutoff))
                 regime_ok = bool(value) if pd.notna(value) else False
-            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            nav_now = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
             slots = MAX_POSITIONS - len(positions)
             candidates = [(t, s, nc) for t, s, nc in pending_buys if t not in positions]
             if regime_ok and slots > 0 and candidates:
@@ -3271,6 +3372,7 @@ def run_breakout_backtest(
                 continue
             close = float(q["close"])
             pos["last_close"] = close
+            pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["highest"] = max(pos["highest"], close)
             atr = asof_value(prices[ticker]["atr"], day)
             if atr:
@@ -3281,7 +3383,7 @@ def run_breakout_backtest(
 
         pending_buys = by_signal_date.get(day, [])
 
-        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
     return _compute_result(nav_series, trades, START_CAPITAL, label, open_positions=positions)
@@ -3390,12 +3492,22 @@ def compute_all_weather(
     gld: pd.Series,
     start: dt.date,
     end: dt.date,
+    usdkrw: pd.Series | None = None,
 ) -> pd.Series:
     idx = pd.date_range(start=pd.Timestamp(start), end=pd.Timestamp(end), freq="B")
+    # v19 FX: align USDKRW to business-day index, ffill. Fallback to global _USDKRW.
+    fx_src = usdkrw if usdkrw is not None else _USDKRW
+    if fx_src is not None:
+        fx_aligned = fx_src.reindex(idx).ffill().bfill()
+        fx_aligned = fx_aligned.fillna(_USDKRW_FALLBACK)
+    else:
+        fx_aligned = pd.Series(_USDKRW_FALLBACK, index=idx)
+
     k = kospi.reindex(idx).ffill().bfill()
-    s = sp500.reindex(idx).ffill().bfill()
-    n = nasdaq.reindex(idx).ffill().bfill()
-    g = gld.reindex(idx).ffill().bfill()
+    # USD legs converted to KRW via daily USDKRW rate
+    s = sp500.reindex(idx).ffill().bfill() * fx_aligned
+    n = nasdaq.reindex(idx).ffill().bfill() * fx_aligned
+    g = gld.reindex(idx).ffill().bfill() * fx_aligned
 
     k = k / k.iloc[0]
     s = s / s.iloc[0]
@@ -3513,8 +3625,10 @@ def compute_wealth_simulation_multi(
 
     return {
         "fx_assumption": (
-            "미국 지수(NASDAQ, S&P500)와 GLD, 미국 종목은 달러 기준 포인트 수익률을 원화 환산 없이 그대로 사용. "
-            "실제 KRW/USD 환율 변동은 반영되지 않으므로 달러 강세 기간의 원화 환산 수익은 과소평가될 수 있습니다."
+            "v19 FX 레이어 적용: 미국 자산(S&P500, NASDAQ, GLD, US 개별주) 포지션 가치·손익을 "
+            "일별 USDKRW 환율(yfinance KRW=X)로 원화 환산. "
+            "원화 강세 구간에서 달러 자산 수익률이 낮아지고, 약세 구간에서 추가 수익이 발생하는 원화 투자자 관점의 실제 경험을 반영합니다. "
+            "KR 자산은 이미 원화 기준이므로 변경 없음."
         ),
         "schedule_desc": (
             "초기 자본 1,000만원 + 월 적립 (0~23개월: 100만원, 24~47개월: 200만원, "
@@ -3717,7 +3831,13 @@ def compute_today_signals(
             "entry_reason": pos.get("entry_reason", ""),   # v18: 왜 진입했는가
         }
         if is_chandelier_family:
-            pos_info["stop_level"] = round(float(stop_level), 4) if stop_level else None
+            # Round stop to exchange tick size (display boundary — conservative floor).
+            # dist_to_stop_pct is recomputed from the rounded stop so UI percentages are consistent.
+            market_code = pos.get("market", "KR")
+            rounded_stop = round_to_tick(float(stop_level), market_code) if stop_level else None
+            pos_info["stop_level"] = rounded_stop
+            if rounded_stop and current_price and current_price > 0:
+                dist_to_stop_pct = round((current_price - rounded_stop) / current_price * 100, 2)
             pos_info["dist_to_stop_pct"] = dist_to_stop_pct
             pos_info["stop_hit"] = bool(dist_to_stop_pct is not None and dist_to_stop_pct <= 0)
 
@@ -4005,7 +4125,7 @@ def run_kangto_trend(
     for day in calendar:
         day_ts = pd.Timestamp(day)
         cash *= (1 + CASH_YIELD_DAILY)  # v18: 유휴 현금 일복리 이자 (연 3% MMF 프록시)
-        equity = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        equity = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
 
         # Execute pending exits at open
         to_exit = [t for t in list(pending_exits) if t in positions]
@@ -4017,7 +4137,7 @@ def run_kangto_trend(
                 pending_exits[ticker] = reason
                 continue
             exit_price = float(q["open"])
-            proceeds = pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            proceeds = pos["shares"] * exit_price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
             cash += proceeds
             one_r = pos.get("one_r", pos["entry_price"] * Q_STOP_PCT)
             ret_r = (exit_price / pos["entry_price"] - 1) * pos["entry_price"] / one_r if one_r > 0 else 0.0
@@ -4028,7 +4148,7 @@ def run_kangto_trend(
 
         # Execute entry queue at open
         if q_entry_queue:
-            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            nav_now = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
             market_units = _q_market_units(kospi, day) if kospi is not None else 1
             slots = MAX_POSITIONS - len(positions)
             for ticker, source_val, n_clubs_val, rs_val in q_entry_queue:
@@ -4043,33 +4163,7 @@ def run_kangto_trend(
                 if entry_price <= 0:
                     continue
 
-                # Progressive betting: +1 종목유닛 if last trade on this ticker was profitable ≥+3R
-                family_hist = ticker_family_profit.get(ticker, [])
-                extra_unit = 1 if family_hist and family_hist[-1] >= Q_HALF_EXIT_R else 0
-                stock_units = min(1 + extra_unit, Q_MAX_UNIT_ADD)
-                total_units = stock_units * market_units
-
-                unit_size = nav_now / 20.0
-                one_r = entry_price * Q_STOP_PCT
-                # Max 2% risk rule: shrink if needed
-                position_risk = total_units * one_r  # risk per share × (shares from total_units × unit)
-                # shares = (unit_size * total_units) / entry_price
-                # actual_risk = shares * one_r
-                raw_budget = unit_size * total_units
-                shares_raw = raw_budget * (1 - COST_PER_SIDE) / entry_price
-                actual_risk = shares_raw * one_r
-                max_risk = nav_now * 0.02
-                if actual_risk > max_risk and actual_risk > 0:
-                    scale = max_risk / actual_risk
-                    raw_budget *= scale
-
-                budget = min(raw_budget, cash)
-                if budget < nav_now * POSITION_WEIGHT * 0.5:
-                    continue
-                shares = budget * (1 - COST_PER_SIDE) / entry_price
-                cash -= budget
-                stop = entry_price - one_r
-
+                # Resolve market first (needed for FX-correct risk sizing)
                 display_name = ticker
                 tp = None
                 market = "KR"
@@ -4082,6 +4176,31 @@ def run_kangto_trend(
                         tps = [x["target_price"] for x in past_tr if x["target_price"]]
                         tp = max(tps) if tps else None
                         market = past_tr[0].get("market", "KR")
+
+                # Progressive betting: +1 종목유닛 if last trade on this ticker was profitable ≥+3R
+                family_hist = ticker_family_profit.get(ticker, [])
+                extra_unit = 1 if family_hist and family_hist[-1] >= Q_HALF_EXIT_R else 0
+                stock_units = min(1 + extra_unit, Q_MAX_UNIT_ADD)
+                total_units = stock_units * market_units
+
+                unit_size = nav_now / 20.0
+                _entry_krw = entry_price * _fx(market, day)
+                one_r = entry_price * Q_STOP_PCT
+                # Max 2% risk rule: shrink if needed (risk in KRW terms)
+                raw_budget = unit_size * total_units
+                shares_raw = raw_budget * (1 - COST_PER_SIDE) / _entry_krw
+                actual_risk = shares_raw * one_r * _fx(market, day)
+                max_risk = nav_now * 0.02
+                if actual_risk > max_risk and actual_risk > 0:
+                    scale = max_risk / actual_risk
+                    raw_budget *= scale
+
+                budget = min(raw_budget, cash)
+                if budget < nav_now * POSITION_WEIGHT * 0.5:
+                    continue
+                shares = budget * (1 - COST_PER_SIDE) / _entry_krw
+                cash -= budget
+                stop = entry_price - one_r
 
                 positions[ticker] = {
                     "shares": shares,
@@ -4203,6 +4322,7 @@ def run_kangto_trend(
             close = float(df.loc[day_ts]["close"])
             high_today = float(df.loc[day_ts].get("high", close))
             pos["last_close"] = close
+            pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["highest"] = max(pos.get("highest", close), close)
 
             if ticker in pending_exits:
@@ -4231,7 +4351,7 @@ def run_kangto_trend(
                 half_price = min(half_price, high_today)
                 half_shares = pos["original_shares"] * 0.5
                 half_cost = pos["cost"] * 0.5
-                cash += half_shares * half_price * (1 - COST_PER_SIDE)
+                cash += half_shares * half_price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
                 trade = _close_trade(ticker, pos, day, half_price, "q_half_+3R",
                                      ticker_reports, record_full_trades, None,
                                      shares_override=half_shares, cost_override=half_cost)
@@ -4244,7 +4364,7 @@ def run_kangto_trend(
             if close < pos["stop"]:
                 pending_exits[ticker] = "q_stop"
 
-        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
     last_day = calendar[-1]
@@ -4334,7 +4454,7 @@ def run_kelly_chandelier(
             if q is None or float(q["open"]) <= 0:
                 continue
             exit_price = float(q["open"])
-            proceeds = pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            proceeds = pos["shares"] * exit_price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
             ret_pct = (proceeds / pos["cost"] - 1) * 100
             closed_returns.append(ret_pct)
             cash += proceeds
@@ -4346,7 +4466,7 @@ def run_kelly_chandelier(
 
         # Execute pending entries with Kelly sizing
         if day in pending_entries:
-            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            nav_now = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
             kelly_frac = _kelly_fraction(closed_returns)
             slots = max_positions - len(positions)
             candidates = list({t: (t, s, nc) for t, s, nc in pending_entries[day]
@@ -4358,12 +4478,6 @@ def run_kelly_chandelier(
                 entry_price = float(df.loc[day_ts]["open"])
                 if entry_price <= 0:
                     continue
-
-                budget = min(nav_now * kelly_frac, cash)
-                if budget < nav_now * R_KELLY_FLOOR * 0.5:
-                    continue
-                shares = budget * (1 - COST_PER_SIDE) / entry_price
-                cash -= budget
 
                 display_name = ticker
                 tp = None
@@ -4377,6 +4491,12 @@ def run_kelly_chandelier(
                         tps = [x["target_price"] for x in past_tr if x["target_price"]]
                         tp = max(tps) if tps else None
                         market = past_tr[0].get("market", "KR")
+
+                budget = min(nav_now * kelly_frac, cash)
+                if budget < nav_now * R_KELLY_FLOOR * 0.5:
+                    continue
+                shares = budget * (1 - COST_PER_SIDE) / (entry_price * _fx(market, day))
+                cash -= budget
 
                 atr_col = "atr20" if atr_period == 20 else "atr"
                 atr_val = asof_value(df[atr_col] if atr_col in df.columns else df["atr"], day)
@@ -4408,6 +4528,7 @@ def run_kelly_chandelier(
                 continue
             close = float(df.loc[day_ts]["close"])
             pos["last_close"] = close
+            pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["highest"] = max(pos.get("highest", close), close)
             atr_col = "atr20" if atr_period == 20 else "atr"
             atr_val = asof_value(df[atr_col] if atr_col in df.columns else df["atr"], day)
@@ -4417,7 +4538,7 @@ def run_kelly_chandelier(
             if pos.get("stop") and close < pos["stop"] and ticker not in pending_exits:
                 pending_exits.add(ticker)
 
-        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
     last_day = calendar[-1]
@@ -4715,7 +4836,7 @@ def run_portfolio_opt(
 
         # Month-first: execute rebalance
         if day in month_firsts and target_weights:
-            nav_now = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+            nav_now = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
             if nav_now <= 0:
                 nav_now = float(START_CAPITAL)
 
@@ -4729,9 +4850,10 @@ def run_portfolio_opt(
                 if new_w == 0.0:
                     q = _get_quote(prices, ticker, day)
                     exit_price = float(q["open"]) if (q is not None and float(q["open"]) > 0) else pos["last_close"]
-                    proceeds = pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+                    _fx_s = _fx(pos.get("market", "KR"), day)
+                    proceeds = pos["shares"] * exit_price * _fx_s * (1 - COST_PER_SIDE)
                     new_cash += proceeds
-                    total_turnover += pos["shares"] * exit_price / nav_now
+                    total_turnover += pos["shares"] * exit_price * _fx_s / nav_now
                     trades.append(_close_trade(ticker, pos, day, exit_price, "s_rebalance_exit",
                                                ticker_reports, record_full_trades, None))
 
@@ -4761,7 +4883,9 @@ def run_portfolio_opt(
                 turnover_frac = abs(delta_value) / nav_now
                 total_turnover += turnover_frac
 
-                new_shares = target_value * (1 - COST_PER_SIDE) / trade_price
+                # v19 FX: use cur_pos market if resizing, else defer to new-buy path below
+                _s_market = cur_pos.get("market", "KR") if cur_pos else "KR"
+                new_shares = target_value * (1 - COST_PER_SIDE) / (trade_price * _fx(_s_market, day))
                 new_cost   = target_value
 
                 if cur_pos:
@@ -4769,7 +4893,7 @@ def run_portfolio_opt(
                     if delta_value < 0:
                         sell_shares = cur_pos["shares"] - new_shares
                         if sell_shares > 0:
-                            proceeds = sell_shares * trade_price * (1 - COST_PER_SIDE)
+                            proceeds = sell_shares * trade_price * _fx(cur_pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
                             cash_after_close += proceeds
                             trades.append(_close_trade(ticker, cur_pos, day, trade_price,
                                                         "s_rebalance_trim",
@@ -4799,7 +4923,6 @@ def run_portfolio_opt(
                     if buy_budget < target_value * 0.5:
                         continue
                     cash_after_close -= buy_budget
-                    act_shares = buy_budget * (1 - COST_PER_SIDE) / trade_price
                     dn = ticker
                     mkt = "KR"
                     if ticker_reports:
@@ -4808,6 +4931,7 @@ def run_portfolio_opt(
                         if past:
                             dn = past[-1]["display_name"]
                             mkt = past[0].get("market", "KR")
+                    act_shares = buy_budget * (1 - COST_PER_SIDE) / (trade_price * _fx(mkt, day))
                     new_positions[ticker] = {
                         "shares": act_shares,
                         "entry_price": trade_price,
@@ -4831,6 +4955,7 @@ def run_portfolio_opt(
             df = prices.get(ticker)
             if df is not None and day_ts in df.index:
                 pos["last_close"] = float(df.loc[day_ts]["close"])
+                pos["fx"] = _fx(pos.get("market", "KR"), day)
 
         # Month-end: compute new target weights (point-in-time signal)
         if day in month_ends and weight_schedule is not None:
@@ -4876,7 +5001,7 @@ def run_portfolio_opt(
                         except Exception as e:
                             print(f"  S({variant}) weight computation failed on {day}: {e}", flush=True)
 
-        nav = cash + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav = cash + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
     # Force-close at end
@@ -5012,7 +5137,7 @@ def run_parking_core_chandelier(
             if q is None or float(q["open"]) <= 0:
                 continue
             exit_price = float(q["open"])
-            stock_proceeds = pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            stock_proceeds = pos["shares"] * exit_price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
             # Park proceeds back into the parking vehicle (0.05% entry cost)
             parked += stock_proceeds * (1 - KOSPI_PARK_COST)
             trades.append(_close_trade(ticker, pos, day, exit_price,
@@ -5025,7 +5150,7 @@ def run_parking_core_chandelier(
         if day in pending_entries:
             nav_now = (
                 parked
-                + sum(p["shares"] * p["last_close"] for p in positions.values())
+                + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
             )
             slots = max_positions - len(positions)
             candidates = list(
@@ -5046,12 +5171,6 @@ def run_parking_core_chandelier(
                 if budget < nav_now * POSITION_WEIGHT * 0.5:
                     continue
 
-                # Sell parking exposure (0.05% cost) → receive cash for stock purchase
-                parked -= budget
-                stock_budget = budget * (1 - KOSPI_PARK_COST)  # proceeds after ETF sell cost
-                shares = stock_budget * (1 - COST_PER_SIDE) / entry_price
-                total_spent = budget   # taken from parking
-
                 display_name = ticker
                 tp = None
                 market = "KR"
@@ -5064,6 +5183,12 @@ def run_parking_core_chandelier(
                         tps = [x["target_price"] for x in past_tr if x["target_price"]]
                         tp = max(tps) if tps else None
                         market = past_tr[0].get("market", "KR")
+
+                # Sell parking exposure (0.05% cost) → receive cash for stock purchase
+                parked -= budget
+                stock_budget = budget * (1 - KOSPI_PARK_COST)  # proceeds after ETF sell cost
+                shares = stock_budget * (1 - COST_PER_SIDE) / (entry_price * _fx(market, day))
+                total_spent = budget   # taken from parking
 
                 atr_col = "atr20" if atr_period == 20 else "atr"
                 atr_val = asof_value(df[atr_col] if atr_col in df.columns else df["atr"], day)
@@ -5096,6 +5221,7 @@ def run_parking_core_chandelier(
                 continue
             close = float(df.loc[day_ts]["close"])
             pos["last_close"] = close
+            pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["highest"] = max(pos.get("highest", close), close)
             atr_col = "atr20" if atr_period == 20 else "atr"
             atr_val = asof_value(df[atr_col] if atr_col in df.columns else df["atr"], day)
@@ -5105,7 +5231,7 @@ def run_parking_core_chandelier(
             if pos.get("stop") and close < pos["stop"] and ticker not in pending_exits:
                 pending_exits.add(ticker)
 
-        nav = parked + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav = parked + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
     # Force-close remaining positions at end
@@ -5244,7 +5370,7 @@ def run_kospi_core_chandelier_scaleout(
             if q is None or float(q["open"]) <= 0:
                 continue
             exit_price = float(q["open"])
-            stock_proceeds = pos["shares"] * exit_price * (1 - COST_PER_SIDE)
+            stock_proceeds = pos["shares"] * exit_price * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
             kospi_parked += stock_proceeds * (1 - KOSPI_PARK_COST)
             trades.append(_close_trade(ticker, pos, day, exit_price,
                                        f"u_chandelier_ATR{atr_mult}",
@@ -5256,7 +5382,7 @@ def run_kospi_core_chandelier_scaleout(
         if day in pending_entries:
             nav_now = (
                 kospi_parked
-                + sum(p["shares"] * p["last_close"] for p in positions.values())
+                + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
             )
             slots = max_positions - len(positions)
             candidates = list(
@@ -5277,11 +5403,6 @@ def run_kospi_core_chandelier_scaleout(
                 if budget < nav_now * POSITION_WEIGHT * 0.5:
                     continue
 
-                kospi_parked -= budget
-                stock_budget = budget * (1 - KOSPI_PARK_COST)
-                shares = stock_budget * (1 - COST_PER_SIDE) / entry_price
-                total_spent = budget
-
                 display_name = ticker
                 tp = None
                 market = "KR"
@@ -5294,6 +5415,11 @@ def run_kospi_core_chandelier_scaleout(
                         tps = [x["target_price"] for x in past_tr if x["target_price"]]
                         tp = max(tps) if tps else None
                         market = past_tr[0].get("market", "KR")
+
+                kospi_parked -= budget
+                stock_budget = budget * (1 - KOSPI_PARK_COST)
+                shares = stock_budget * (1 - COST_PER_SIDE) / (entry_price * _fx(market, day))
+                total_spent = budget
 
                 atr_col = "atr20" if atr_period == 20 else "atr"
                 atr_val = asof_value(df[atr_col] if atr_col in df.columns else df["atr"], day)
@@ -5329,6 +5455,7 @@ def run_kospi_core_chandelier_scaleout(
                 continue
             close = float(df.loc[day_ts]["close"])
             pos["last_close"] = close
+            pos["fx"] = _fx(pos.get("market", "KR"), day)
             pos["highest"] = max(pos.get("highest", close), close)
 
             atr_col = "atr20" if atr_period == 20 else "atr"
@@ -5349,7 +5476,7 @@ def run_kospi_core_chandelier_scaleout(
                 if not pos["scaleout1_done"] and ext > U_SCALEOUT_EXT_1:
                     half_shares = pos["shares"] * 0.5
                     half_cost = pos["cost"] * 0.5
-                    proceeds = half_shares * close * (1 - COST_PER_SIDE)
+                    proceeds = half_shares * close * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
                     kospi_parked += proceeds * (1 - KOSPI_PARK_COST)
                     trade = _close_trade(
                         ticker, pos, day, close,
@@ -5367,7 +5494,7 @@ def run_kospi_core_chandelier_scaleout(
                 elif pos["scaleout1_done"] and not pos["scaleout2_done"] and ext > U_SCALEOUT_EXT_2:
                     quarter_shares = pos["shares"] * 0.5
                     quarter_cost = pos["cost"] * 0.5
-                    proceeds = quarter_shares * close * (1 - COST_PER_SIDE)
+                    proceeds = quarter_shares * close * _fx(pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
                     kospi_parked += proceeds * (1 - KOSPI_PARK_COST)
                     trade = _close_trade(
                         ticker, pos, day, close,
@@ -5381,7 +5508,7 @@ def run_kospi_core_chandelier_scaleout(
                     pos["cost"] -= quarter_cost
                     pos["scaleout2_done"] = True
 
-        nav = kospi_parked + sum(p["shares"] * p["last_close"] for p in positions.values())
+        nav = kospi_parked + sum(p["shares"] * p["last_close"] * p.get("fx", 1.0) for p in positions.values())
         nav_series.append((day.isoformat(), nav))
 
     # Force-close remaining positions at end
@@ -5512,6 +5639,15 @@ def main() -> int:
     except Exception as e:
         print(f"  GLD fetch failed: {e}, using flat series as proxy", flush=True)
         gld = pd.Series(100.0, index=nasdaq.index)
+
+    # v19 FX: USDKRW 환율 로드 및 전역 주입
+    try:
+        usdkrw_series = load_usdkrw()
+        set_usdkrw(usdkrw_series)
+        print(f"  USDKRW: {usdkrw_series.index[0].date()} to {usdkrw_series.index[-1].date()}, "
+              f"latest={usdkrw_series.iloc[-1]:.1f}", flush=True)
+    except Exception as e:
+        print(f"  USDKRW fetch failed: {e}, FX fallback={_USDKRW_FALLBACK}", flush=True)
 
     strat_start = calendar[0]
     strat_end = calendar[-1]
@@ -6190,8 +6326,17 @@ def main() -> int:
     headline_nav: pd.Series = headline["nav_df"]
     assert headline_nav.index[0].date() >= SIM_START
 
+    # v19 FX: SP500 and NASDAQ are USD-denominated — convert to KRW for wealth sim.
+    # AllWeather already uses KRW-converted USD legs (compute_all_weather applies FX).
+    if _USDKRW is not None:
+        _fx_aligned_sim = _USDKRW.reindex(headline_nav.index).ffill().bfill().fillna(_USDKRW_FALLBACK)
+        sp500_krw = sp500.reindex(headline_nav.index).ffill().bfill() * _fx_aligned_sim
+        nasdaq_krw = nasdaq.reindex(headline_nav.index).ffill().bfill() * _fx_aligned_sim
+    else:
+        sp500_krw = sp500
+        nasdaq_krw = nasdaq
     benchmarks_for_sim: dict[str, pd.Series] = {
-        "KOSPI": kospi, "SP500": sp500, "NASDAQ": nasdaq, "AllWeather": all_weather,
+        "KOSPI": kospi, "SP500": sp500_krw, "NASDAQ": nasdaq_krw, "AllWeather": all_weather,
     }
     wealth_sim = compute_wealth_simulation_multi(headline_nav, benchmarks_for_sim, strat_start, strat_end)
     print(f"  Strategy final: {wealth_sim['final_strategy_value']:,}원", flush=True)
@@ -6247,18 +6392,19 @@ def main() -> int:
             stop_val = p.get("stop", 0) or 0
             last_close_val = p.get("last_close", p.get("entry_price", 0))
             cost_val = p.get("cost", 1)
+            market_code = p.get("market", "KR")
             # Compute extension gauge for this position (uses last available data)
             df_pos = prices.get(t)
             last_cal_day = calendar[-1]
             ext_val = compute_extension(df_pos, last_cal_day) if df_pos is not None else None
             result_list.append({
                 "ticker": t,
-                "market": p.get("market", "KR"),
+                "market": market_code,
                 "display_name": p.get("display_name", t),
                 "entry_date": entry_date_str,
                 "entry": round(float(p.get("entry_price", 0)), 4),
                 "last_close": round(float(last_close_val), 4),
-                "stop": round(float(stop_val), 4),
+                "stop": round_to_tick(float(stop_val), market_code) if stop_val else 0,
                 "return_pct": round((p["shares"] * float(last_close_val) / float(cost_val) - 1) * 100, 2),
                 "source": p.get("source", ""),
                 "n_clubs": p.get("n_clubs", 1),
