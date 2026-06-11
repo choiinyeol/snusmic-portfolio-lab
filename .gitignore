@@ -35,3 +35,6 @@ artifacts/
 data/prices/
 
 .vercel
+
+# agent/run logs
+logs/
