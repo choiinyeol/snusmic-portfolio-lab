@@ -107,7 +107,7 @@ npm install && npm run dev          # http://localhost:3000
 | 워크플로 | 주기 | 내용 |
 |---|---|---|
 | [`refresh-daily.yml`](.github/workflows/refresh-daily.yml) | 평일 18:30 KST (장 마감 후) | 증분 수집 → 새 PDF만 전사 → 데이터셋·차트·백테스트 재생성 → 커밋 |
-| [`refresh-reports.yml`](.github/workflows/refresh-reports.yml) | 매주 월요일 10:00 KST | 전체 페이지 스윕(`--full`) — 누락분 회수 |
+| [`refresh-reports.yml`](.github/workflows/refresh-reports.yml) | 수동 실행 전용 | 전체 페이지 스윕(`--full`) — 수집기 복구·과거 누락 의심 시에만 |
 
 레포 Settings → Secrets에 `KRX_ID`, `KRX_PW` 등록이 필요합니다. 갱신 커밋이 푸시되면 Vercel이 자동 재배포합니다.
 운영 상세는 [`docs/OPS.md`](docs/OPS.md) 참고.

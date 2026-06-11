@@ -9,7 +9,7 @@
 | 워크플로 | 파일 | 스케줄 (UTC / KST) | 모드 |
 |---|---|---|---|
 | `refresh-daily` | `.github/workflows/refresh-daily.yml` | `30 9 * * 1-5` (평일 18:30 KST, 장 마감 후) | 증분 — 새 게시글이 없으면 수집기가 조기 종료. 시세·백테스트는 항상 재생성 |
-| `refresh-weekly` | `.github/workflows/refresh-reports.yml` | `0 1 * * 1` (월요일 10:00 KST) | 전체 스윕 — 모든 수집기를 `--full`로 돌려 누락분 회수 |
+| `full-sweep-manual` | `.github/workflows/refresh-reports.yml` | 스케줄 없음 (workflow_dispatch 전용) | 전체 스윕 — 평소엔 일간 증분이 전부 커버, 복구용으로만 수동 실행 |
 
 공통 사항:
 
