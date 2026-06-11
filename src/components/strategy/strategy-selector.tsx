@@ -6,6 +6,11 @@ import { WealthChart } from "@/components/strategy/wealth-chart";
 import { useSortable, SortableTh, type SortColumn } from "@/components/sortable";
 import { signColor } from "@/lib/verdict";
 import { cn, formatPct } from "@/lib/utils";
+import {
+  STRATEGY_LABEL_KO,
+  STRATEGY_DESC_KO,
+  BENCHMARK_KO,
+} from "@/components/strategy/strategy-meta";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -115,78 +120,6 @@ type WealthSimGlobal = {
   series: WealthPoint[];
 };
 
-// ─── Labels ───────────────────────────────────────────────────────────────────
-
-const STRATEGY_LABEL_KO: Record<string, string> = {
-  A_12mo:                 "A. 12개월 보유",
-  B_36mo:                 "B. 36개월 보유",
-  C_narrative:            "C. 내러티브 홀드",
-  D_chandelier:           "D. 샹들리에 래칫",
-  "D+_chandelier_optuna": "D+. 샹들리에 (Optuna) ★",
-  E_half_runner:          "E. 절반익절+러너",
-  F_momentum_narrative:   "F. 모멘텀 필터",
-  G_dip_buy:              "G. 딥바이",
-  H_minervini:            "H. 미너비니 템플릿",
-  I_supertrend:           "I. 슈퍼트렌드",
-  J_core_satellite:       "J. 코어-새틀라이트",
-  K_rr_trend:             "K. R:R 2.5",
-  L_rsi2_reversion:       "L. 민리버전 (RSI-2) ⚠",
-  M_short_reversal:       "M. 단기 리버설 ⚠",
-  N_52w_high:             "N. 52주 고가 근접",
-  O_mtt_alpha16:          "O. MTT (alpha16) ★",
-  P_deepbuy_chandelier:   "P. 딥바이 샹들리에 ★",
-  Q_kangto_trend:         "Q. 깡토 추세추종",
-  R_kelly_chandelier:     "R. Kelly 샹들리에",
-  S_hrp:                  "S-a. HRP (배분형)",
-  S_msharpe:              "S-b. max-Sharpe (배분형)",
-  S_mincvar:              "S-c. min-CVaR (배분형)",
-  T_kospi_core_chandelier:"T. 코어-KOSPI 샹들리에",
-  "T-_kospi_core_regime": "T-. 코어-KOSPI 레짐 ★",
-  U_chandelier_scaleout:  "U. 과열 스케일아웃 ★",
-};
-
-const STRATEGY_DESC_KO: Record<string, string> = {
-  A_12mo:                 "진입 후 12개월 고정 보유. 단순·강건한 기준선.",
-  B_36mo:                 "진입 후 36개월 보유. 장기 복리 극대화.",
-  C_narrative:            "내러티브가 살아있으면 무한 보유. 월말 체크: close < 200MA AND < 진입가 → 청산 (Faber 2007).",
-  D_chandelier:           "ATR(42)×5 트레일링 스탑. 신고점에서 래칫 상승. 멀티배거를 살려두되 큰 낙폭은 차단. 문헌 표준값 고정.",
-  "D+_chandelier_optuna": "Optuna IS 2-폴드 강건 최적화. ATR 기간·배수·최대포지션 탐색. OOS 채택 기준 통과 시 헤드라인.",
-  E_half_runner:          "목표가 도달 시 절반 익절 + 나머지 C 규칙으로 트레일.",
-  F_momentum_narrative:   "200MA 위에서만 진입 + C 청산 규칙.",
-  G_dip_buy:              "발간일 종가 대비 ≥20% 하락 후 매수 (6개월 내). 목표가/+50%/12mo/ATR×3 스탑 중 선착 청산.",
-  H_minervini:            "트렌드 템플릿: close>50MA>150MA>200MA, 52w고점 70% 이상, RS양(+). 주간 close<50MA 청산. (Minervini 2013)",
-  I_supertrend:           "Supertrend(10, 3) 불리시 시 진입. 베어리시 전환 시 청산.",
-  J_core_satellite:       "D 오버레이. 80% 코어·20% 현금. KOSPI -15% 시 120% 레버리지. 차입비용 6%/년.",
-  K_rr_trend:             "Stop=1×ATR(20). 반절 +2.5R 익절, 나머지 Chandelier ATR×3. 최대 10종목.",
-  L_rsi2_reversion:       "⚠ 셀렉터 제외. RSI(2) < 10 AND close > 200MA 진입. RSI(2) > 70 OR 10거래일 청산. Connors & Alvarez (2009). 판정: 0.3%/side 비용 × 단기 회전율로 비용 사망 — 구현 검증 후 제외.",
-  M_short_reversal:       "⚠ 셀렉터 제외. 월초: 직전 1개월 수익률 하위 20% 매수, 1개월 보유. 단기 리버설 팩터. 판정: 월별 전체 교체 비용(0.6% × 12회/년)으로 비용 사망 — 구현 검증 후 제외.",
-  N_52w_high:             "리포트 당일 close ≥ 52w high × 85% 진입. 월말 close < 52w high × 70% 청산. George & Hwang (2004).",
-  O_mtt_alpha16:          "v11 룩어헤드 수정. alpha16 MTT 이식. RS 퍼센타일(3m×0.5/6m×0.3/12m×0.2) + Minervini 5-조건 필터. 진입 RS≥79, -8%/BE/6%트레일/+3.5R/RS<82/115일 청산. 시그널 종가→익일 시가 체결. [alpha16 KRX 파라미터, OUR 데이터 미튜닝]",
-  P_deepbuy_chandelier:   "딥바이 진입(≥20% 하락, 6개월 내) + 추가 10% 하락 시 스케일인(1회) + ATR 트레일링 스탑 청산(타겟 캡 없음). 딥바이 좋은 진입을 샹들리에로 멀티배거 포착.",
-  Q_kangto_trend:         "시장신호등(KOSPI 200MA+50MA상승→2유닛). 진입: RS퍼센타일≥KOSPI RS AND 60d고가돌파 AND 거래량≥20d평균×1.5. 스탑 -8%(1R), BE +1R, 트레일 고점-8% +1.5R, 절반익절 +3R.",
-  R_kelly_chandelier:     "D+ 샹들리에 규칙 + Kelly 포지션 사이징. Rolling 40거래 win/payoff 기준 fractional Kelly (cap 25%, safety 0.5, floor 1%).",
-  S_hrp:                  "HRP 배분형. 상관거리 단일연결 클러스터링 → 준대각 재정렬 → 역분산 재귀분할. 월간 리밸런스.",
-  S_msharpe:              "max-Sharpe 배분형. LedoitWolf 공분산 수축, 개별 비중 ≤15%. 월간 리밸런스.",
-  S_mincvar:              "min-CVaR 95% 배분형. scipy linprog LP, 개별 비중 ≤15%. 월간 리밸런스.",
-  T_kospi_core_chandelier:"D+ 샹들리에 규칙 + 유휴 현금을 KOSPI 익스포저(KODEX200)로 주차. 베이스라인 = KOSPI DCA.",
-  "T-_kospi_core_regime": "T와 동일 + KOSPI < 200MA 구간에서는 파킹 수익률 0%(현금 보유). Faber (2007) 레짐 필터.",
-  U_chandelier_scaleout:  "T-와 동일 + 과열 스케일아웃. extension(=ATR14% Multiple from 50SMA) > 8× → 절반 익절, > 12× → 나머지 절반 익절. Minervini circle / Fred6724.",
-};
-
-// Strategy grouping for tab sections
-const STRATEGY_GROUPS: { label: string; keys: string[] }[] = [
-  { label: "보유형",    keys: ["A_12mo", "B_36mo", "C_narrative", "E_half_runner"] },
-  { label: "추세형",    keys: ["D_chandelier", "D+_chandelier_optuna", "F_momentum_narrative", "H_minervini", "I_supertrend", "K_rr_trend", "N_52w_high", "O_mtt_alpha16", "Q_kangto_trend"] },
-  { label: "딥바이형",  keys: ["G_dip_buy", "P_deepbuy_chandelier"] },
-  { label: "회귀형 ⚠", keys: ["L_rsi2_reversion", "M_short_reversal"] },
-  { label: "오버레이",  keys: ["J_core_satellite", "R_kelly_chandelier"] },
-  { label: "KOSPI파킹", keys: ["T_kospi_core_chandelier", "T-_kospi_core_regime", "U_chandelier_scaleout"] },
-  { label: "배분형",    keys: ["S_hrp", "S_msharpe", "S_mincvar"] },
-];
-
-const BENCHMARK_KO: Record<string, string> = {
-  KOSPI: "KOSPI", SP500: "S&P500", NASDAQ: "NASDAQ", AllWeather: "올웨더",
-};
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -199,23 +132,6 @@ function tickerSlugFromTrade(trade: Trade): string | null {
 function fmt만(v: number) {
   if (v >= 100_000_000) return `${(v / 100_000_000).toFixed(1)}억원`;
   return `${Math.round(v / 10_000).toLocaleString("ko-KR")}만원`;
-}
-
-// ─── Mini equity curve ────────────────────────────────────────────────────────
-
-function MiniEquity({ equity, color }: { equity: EquityPoint[]; color: string }) {
-  if (!equity.length) return null;
-  const W = 200; const H = 48;
-  const maxNav = Math.max(...equity.map((p) => p.nav));
-  const minNav = Math.min(...equity.map((p) => p.nav));
-  const x = (i: number) => (i / (equity.length - 1)) * W;
-  const y = (nav: number) => H - 4 - ((nav - minNav) / ((maxNav - minNav) || 1)) * (H - 8);
-  const d = equity.map((p, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(p.nav).toFixed(1)}`).join(" ");
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full opacity-70" aria-hidden>
-      <path d={d} fill="none" stroke={color} strokeWidth="1.5" strokeLinejoin="round" />
-    </svg>
-  );
 }
 
 // ─── Trade columns definition ─────────────────────────────────────────────────
@@ -644,14 +560,24 @@ export function StrategySelector({
   multiStrategy,
   wealthSimGlobal,
   allTrades,
+  curatedKeys,
 }: {
   multiStrategy: MultiStrategyData;
   wealthSimGlobal: WealthSimGlobal;
   allTrades: Record<string, Trade[]>;
+  /** Focused key list (SOTA + adopted set). Others live in the research record table. */
+  curatedKeys?: string[];
 }) {
   const [selectedKey, setSelectedKey] = useState<string>(multiStrategy.headline_key);
 
-  const selected = multiStrategy.strategies.find((s) => s.key === selectedKey)!;
+  const tabKeys = (curatedKeys && curatedKeys.length
+    ? curatedKeys
+    : multiStrategy.strategies.map((s) => s.key)
+  ).filter((k) => multiStrategy.strategies.some((s) => s.key === k));
+
+  const selected =
+    multiStrategy.strategies.find((s) => s.key === selectedKey) ??
+    multiStrategy.strategies.find((s) => s.key === multiStrategy.headline_key)!;
   const wealthSim = multiStrategy.strategy_wealth_sims[selectedKey];
   const equity = multiStrategy.equity_by_strategy[selectedKey] ?? [];
   const yearly = multiStrategy.yearly_by_strategy[selectedKey] ?? [];
@@ -677,51 +603,49 @@ export function StrategySelector({
 
   return (
     <div className="space-y-6">
-      {/* ── Strategy tabs (grouped) ─────────────────────────────────── */}
+      {/* ── Strategy tabs — curated set only (full record in research table) ── */}
       <div>
-        <p className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">
-          전략 선택 — 탭 클릭으로 전환
+        <p className="mb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">
+          전략 선택 — 채택된 {tabKeys.length}개 (전체 연구 기록은 아래 표)
         </p>
-        {STRATEGY_GROUPS.map((group) => {
-          const groupStrats = multiStrategy.strategies.filter((s) => group.keys.includes(s.key));
-          if (!groupStrats.length) return null;
-          return (
-            <div key={group.label} className="mb-3">
-              <p className="mb-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/60">
-                {group.label}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {groupStrats.map((s) => {
-                  const isHL = s.key === multiStrategy.headline_key;
-                  const isActive = s.key === selectedKey;
-                  return (
-                    <button
-                      key={s.key}
-                      onClick={() => setSelectedKey(s.key)}
-                      className={cn(
-                        "rounded-lg border px-3 py-2 text-left transition-all",
-                        isActive
-                          ? "border-stamp bg-stamp/10 shadow-sm"
-                          : "border-border bg-card hover:border-stamp/40 hover:bg-stamp/5",
-                      )}
-                      aria-pressed={isActive}
+        <div className="flex flex-wrap gap-2">
+          {tabKeys.map((key) => {
+            const s = multiStrategy.strategies.find((x) => x.key === key)!;
+            const isHL = key === multiStrategy.headline_key;
+            const isActive = key === selectedKey;
+            return (
+              <button
+                key={key}
+                onClick={() => setSelectedKey(key)}
+                className={cn(
+                  "rounded-lg border px-3 py-2 text-left transition-all",
+                  isActive
+                    ? "border-stamp bg-stamp/10 shadow-sm"
+                    : "border-border bg-card hover:border-stamp/40 hover:bg-stamp/5",
+                )}
+                aria-pressed={isActive}
+              >
+                <p className="flex items-center gap-1.5 font-mono text-[11px] font-bold leading-tight">
+                  {STRATEGY_LABEL_KO[key] ?? key}
+                  {isHL && (
+                    <span
+                      className="rounded-sm bg-stamp px-1 py-px font-mono text-[9px] font-black tracking-wider text-background"
+                      title="State of the art — IS 샤프 최상위 자동 채택 전략"
                     >
-                      <p className="font-mono text-[11px] font-bold leading-tight">
-                        {STRATEGY_LABEL_KO[s.key] ?? s.key}
-                        {isHL && !isActive && (
-                          <span className="ml-1 font-mono text-[9px] text-stamp">[헤드라인]</span>
-                        )}
-                      </p>
-                      <p className={cn("tnum mt-0.5 font-mono text-xs font-bold", signColor(s.in_sample.cagr_pct))}>
-                        IS CAGR {s.in_sample.cagr_pct != null ? formatPct(s.in_sample.cagr_pct, 1) : "—"}
-                      </p>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
+                      SOTA
+                    </span>
+                  )}
+                </p>
+                <p className={cn("tnum mt-0.5 font-mono text-xs font-bold", signColor(s.in_sample.cagr_pct))}>
+                  IS CAGR {s.in_sample.cagr_pct != null ? formatPct(s.in_sample.cagr_pct, 1) : "—"}
+                </p>
+              </button>
+            );
+          })}
+        </div>
+        <p className="mt-2 font-mono text-[10px] text-muted-foreground">
+          SOTA = IS 샤프 최상위 자동 채택 · 나머지 연구 전략(기각·연구용)은 아래 “전체 연구 기록” 표에서 사유와 함께 확인
+        </p>
       </div>
 
       {/* ── Selected strategy hero ──────────────────────────────────── */}
@@ -732,7 +656,7 @@ export function StrategySelector({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.25em] text-stamp">
-              {isHeadline ? "헤드라인 전략 ★" : "전략 상세"}
+              {isHeadline ? "SOTA 전략 — IS 샤프 최상위 자동 채택" : "전략 상세"}
             </p>
             <h3 className="mt-0.5 font-display text-2xl font-black tracking-tight">
               {STRATEGY_LABEL_KO[selectedKey] ?? selectedKey}

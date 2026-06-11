@@ -1,4 +1,18 @@
-"""학회 리포트 × 전략 연구 백테스트 v12.
+"""학회 리포트 × 전략 연구 백테스트 v15.
+
+변경사항 (v15):
+- S 포트폴리오 최적화 침묵 실패 수정: scipy/sklearn 미설치 시 _msharpe/_mincvar의
+  함수 내부 import 실패가 월별 try/except에 삼켜져 NAV가 1.0 평탄(거래 0건)으로
+  출력되던 버그. run_portfolio_opt 시작 시 의존성 프리플라이트 체크 → 즉시
+  RuntimeError로 크게 실패. requirements.txt에 scipy/scikit-learn 추가.
+- 오늘의 신호 의미 재정의: 헤드라인(SOTA) 전략이 지금 규칙대로 굴러갈 때
+  임박한 매매만 표시.
+    매수 임박 = 최근 5거래일 내 발간된 buy 리포트 중 미보유 + 슬롯 여유.
+    매도 임박 = 트레일링 스탑 3% 이내 + 스탑 이미 터치(stop_hit).
+    보유 중 = 현 포지션 + 스탑 레벨 + 과열계수.
+    레짐 상태(T- 헤드라인): KOSPI vs 200MA — OFF면 파킹 수익 0%(현금) 명시.
+    대기(watching) 목록은 카운트만 유지(리포트 흐름이지 전략 신호가 아님).
+- 레거시 필드 제거: sensitivity(빈 배열, v8부터 dead) 페이로드에서 삭제.
 
 변경사항 (v12):
 - Q. 깡토 추세추종: 시장 신호등(KOSPI 200MA+50MA상승), 유닛 사이징(총자본/20, Max 2% Rule),
@@ -3482,27 +3496,57 @@ def compute_today_signals(
     headline_open_positions: dict,   # raw open_positions dict from the headline run
     headline_label: str,
     reports: list[tuple[dt.date, str, str, int]],
+    kospi: pd.Series | None = None,
+    regime_aware: bool = False,
+    max_positions: int = MAX_POSITIONS,
 ) -> dict:
     """
-    오늘의 신호 — 헤드라인 전략 기준 (single source of truth).
+    오늘의 신호 — "SOTA 전략이 지금 규칙대로 굴러간다면 일어날 매매" (v15 재정의).
 
-    For chandelier headline:
-      - 보유 중: chandelier open positions with entry, current price, unrealized %,
-                 highest-high since entry, current trailing stop, distance-to-stop %.
-      - 매도 임박: positions within 3% of their stop.
-      - 신규 매수 신호: buy reports in last 30 days (any single mention = universe).
+      - 매수 임박(imminent_buys): 최근 5거래일 내 발간된 buy 리포트 중
+        아직 미보유인 종목 — 익일 시가 진입이 지금 대기 중인 신호.
+        슬롯 여유(slots.available)와 함께 보고.
+      - 매도 임박(approaching_stop): 트레일링 스탑 3% 이내 포지션
+        + 현재가가 이미 스탑 아래인 포지션(stop_hit=True → 다음 시가 청산).
+      - 보유 중(open_positions): 현 포지션 + 스탑 레벨 + 과열계수.
+      - 레짐(regime): T- 헤드라인일 때 KOSPI vs 200MA 상태.
+        OFF = 유휴 현금 파킹 수익 0% (현금 보유). 진입 자체는 차단하지 않음 — 정직하게 명시.
+      - watching(대기)은 카운트만 — 리포트 흐름이지 전략의 임박 신호가 아님.
     """
     as_of = calendar[-1] if calendar else dt.date.today()
     as_of_ts = pd.Timestamp(as_of)
-    NEW_SIGNAL_WINDOW_DAYS = 30
-    APPROACHING_STOP_PCT = 0.03  # 3% distance-to-stop threshold
+    IMMINENT_BUY_TRADING_DAYS = 5    # 매수 임박: 최근 5거래일 내 리포트
+    APPROACHING_STOP_PCT = 0.03      # 3% distance-to-stop threshold
 
-    is_chandelier_family = "chandelier" in headline_label.lower()
+    is_chandelier_family = "chandelier" in headline_label.lower() or "regime" in headline_label.lower()
 
     open_positions: list[dict] = []
-    approaching_stop: list[dict] = []   # 매도 임박 (within 3% of stop)
-    new_signals: list[dict] = []
-    watching: list[dict] = []
+    approaching_stop: list[dict] = []   # 매도 임박 (within 3% of stop, incl. stop hit)
+    imminent_buys: list[dict] = []
+
+    # ── 레짐 상태 (T- 계열: KOSPI < 200MA → 파킹 수익 0%) ───────────────────
+    regime: dict | None = None
+    if kospi is not None:
+        kospi_close = asof_value(kospi, as_of)
+        kospi_ma200 = asof_value(kospi.rolling(200, min_periods=100).mean(), as_of)
+        if kospi_close > 0 and kospi_ma200 > 0:
+            state = "ON" if kospi_close >= kospi_ma200 else "OFF"
+            if regime_aware:
+                note = (
+                    "레짐 ON — 유휴 현금이 KOSPI 익스포저로 작동 중."
+                    if state == "ON" else
+                    "레짐 OFF — KOSPI < 200MA. 유휴 현금 파킹 수익 0% (현금 보유). "
+                    "신규 진입 규칙 자체는 유지됩니다."
+                )
+            else:
+                note = "레짐 필터 없는 전략 — 참고용 KOSPI 200MA 상태."
+            regime = {
+                "applies": regime_aware,
+                "state": state,
+                "kospi_close": round(kospi_close, 2),
+                "kospi_ma200": round(kospi_ma200, 2),
+                "note": note,
+            }
 
     # ── 보유 중: from headline open_positions dict ──────────────────────────
     already_in: set[str] = set()
@@ -3558,42 +3602,38 @@ def compute_today_signals(
         if is_chandelier_family:
             pos_info["stop_level"] = round(float(stop_level), 4) if stop_level else None
             pos_info["dist_to_stop_pct"] = dist_to_stop_pct
+            pos_info["stop_hit"] = bool(dist_to_stop_pct is not None and dist_to_stop_pct <= 0)
 
         open_positions.append(pos_info)
 
-        # 매도 임박: within 3% of stop
+        # 매도 임박: within 3% of stop (스탑 터치 포함 — dist ≤ 0)
         if is_chandelier_family and dist_to_stop_pct is not None and dist_to_stop_pct <= APPROACHING_STOP_PCT * 100:
             approaching_stop.append(pos_info)
 
     open_positions.sort(key=lambda x: (x.get("dist_to_stop_pct") or 999))
+    slots_available = max(0, max_positions - len(open_positions))
 
-    # ── 신규 매수 신호: reports within last 30 days ─────────────────────────
-    cutoff_date = as_of - dt.timedelta(days=NEW_SIGNAL_WINDOW_DAYS)
-    # Group by ticker → most recent report per ticker in window
+    # ── 매수 임박: 최근 5거래일 내 발간 buy 리포트, 미보유 ───────────────────
+    recent_days = calendar[-IMMINENT_BUY_TRADING_DAYS:] if len(calendar) >= IMMINENT_BUY_TRADING_DAYS else calendar
+    imminent_cutoff = recent_days[0] if recent_days else as_of
     recent_by_ticker: dict[str, list[dict]] = {}
     for rdate, ticker, source, n_clubs in reports:
-        if cutoff_date <= rdate <= as_of and ticker not in already_in:
+        if imminent_cutoff <= rdate <= as_of and ticker not in already_in:
             tr_list = ticker_reports.get(ticker, [])
-            past_tr = [r for r in tr_list if r["report_date"] <= as_of]
-            if past_tr:
-                recent_by_ticker.setdefault(ticker, [])
-                if not any(r["report_date"] == rdate for r in recent_by_ticker[ticker]):
-                    # find matching report info
-                    match = next((r for r in past_tr if r["report_date"] == rdate), None)
-                    if match:
-                        recent_by_ticker[ticker].append(match)
+            match = next((r for r in tr_list if r["report_date"] == rdate), None)
+            if match is not None:
+                bucket = recent_by_ticker.setdefault(ticker, [])
+                if not any(r["report_date"] == rdate for r in bucket):
+                    bucket.append(match)
 
     for ticker, recent_reports in recent_by_ticker.items():
         if not recent_reports:
             continue
-        tr_list = ticker_reports.get(ticker, [])
-        past_tr = [r for r in tr_list if r["report_date"] <= as_of]
-        latest = max(past_tr, key=lambda x: x["report_date"])
+        latest = max(recent_reports, key=lambda x: x["report_date"])
         market = latest.get("market", "KR")
-        n_schools = len({r["school"] for r in recent_reports})
-
-        latest_rdate = max(r["report_date"] for r in recent_reports)
+        latest_rdate = latest["report_date"]
         entry_basis_date = first_trading_day_after(latest_rdate, calendar)
+        entry_pending = entry_basis_date is None or entry_basis_date > as_of
         entry_basis_price = None
         if entry_basis_date and ticker in prices:
             df = prices[ticker]
@@ -3601,13 +3641,14 @@ def compute_today_signals(
             if ts in df.index:
                 entry_basis_price = float(df.loc[ts]["open"])
 
-        new_signals.append({
+        imminent_buys.append({
             "ticker": ticker,
             "market": market,
             "display_name": latest["display_name"],
-            "n_schools": n_schools,
+            "n_schools": len({r["school"] for r in recent_reports}),
             "entry_basis_date": entry_basis_date.isoformat() if entry_basis_date else None,
             "entry_basis_price": round(entry_basis_price, 4) if entry_basis_price else None,
+            "entry_pending": entry_pending,   # True = 익일 시가 진입이 아직 미래
             "trigger_schools": sorted({r["school"] for r in recent_reports}),
             "trigger_reports": [
                 {
@@ -3620,63 +3661,36 @@ def compute_today_signals(
             ],
         })
 
-    new_signals.sort(key=lambda x: x["entry_basis_date"] or "", reverse=True)
+    imminent_buys.sort(key=lambda x: x["entry_basis_date"] or "9999", reverse=True)
 
-    # ── 매수 대기 (watching): 1개교 단독 커버, not yet in positions ──────────
-    all_tickers = set(ticker_reports.keys()) & set(prices.keys())
-    for ticker in all_tickers:
+    # ── 대기(watching) 카운트만: 유효 리포트 보유 종목 중 미보유 ─────────────
+    # 목록은 전략의 "임박 신호"가 아니라 리포트 흐름 — 아카이브로 안내.
+    watching_count = 0
+    for ticker in set(ticker_reports.keys()) & set(prices.keys()):
         if ticker in already_in:
             continue
-        tr_list = ticker_reports.get(ticker, [])
-        past = [r for r in tr_list if r["report_date"] <= as_of]
-        if not past:
-            continue
-        by_school: dict[str, dict] = {}
-        for r in past:
-            school = r["school"]
-            if school not in by_school or r["report_date"] > by_school[school]["report_date"]:
-                by_school[school] = r
-        if len(by_school) != 1:
-            continue
-        school_name = list(by_school.keys())[0]
-        r = by_school[school_name]
-        market = past[0].get("market", "KR")
-        latest_rdate = r["report_date"]
-        entry_basis_date = first_trading_day_after(latest_rdate, calendar)
-        entry_basis_price = None
-        if entry_basis_date and ticker in prices:
-            df = prices[ticker]
-            ts = pd.Timestamp(entry_basis_date)
-            if ts in df.index:
-                entry_basis_price = float(df.loc[ts]["open"])
-        watching.append({
-            "ticker": ticker,
-            "market": market,
-            "display_name": r["display_name"],
-            "covering_school": school_name,
-            "latest_report_date": r["report_date"].isoformat(),
-            "target_price": r["target_price"],
-            "stated_upside_pct": r["stated_upside_pct"],
-            "entry_basis_date": entry_basis_date.isoformat() if entry_basis_date else None,
-            "entry_basis_price": round(entry_basis_price, 4) if entry_basis_price else None,
-            "note": "유효 신호 — 슬롯 여유 시 진입 대상 (동시 보유 한도)",
-        })
-
-    watching.sort(key=lambda x: x["latest_report_date"], reverse=True)
+        if any(r["report_date"] <= as_of for r in ticker_reports.get(ticker, [])):
+            watching_count += 1
 
     return {
         "as_of": as_of.isoformat(),
         "headline_strategy": headline_label,
         "disclaimer": "백테스트 규칙의 기계적 적용이며 투자 권유가 아닙니다. 과거 데이터 기반 시뮬레이션으로 미래 수익을 보장하지 않습니다.",
+        "regime": regime,
+        "slots": {
+            "max_positions": max_positions,
+            "open": len(open_positions),
+            "available": slots_available,
+        },
         "open_positions": open_positions,
         "approaching_stop": approaching_stop,
-        "new_buy_signals": new_signals,
-        "watching_single_club": watching[:30],
+        "imminent_buys": imminent_buys,
+        "watching_count": watching_count,
         "counts": {
             "open": len(open_positions),
             "approaching_stop": len(approaching_stop),
-            "new_buy_signals": len(new_signals),
-            "watching_single_club": len(watching),
+            "imminent_buys": len(imminent_buys),
+            "watching": watching_count,
         },
     }
 
@@ -4518,6 +4532,18 @@ def run_portfolio_opt(
     월말 신호 → 다음 거래일 시가 체결.
     비용: 총 NAV × 턴오버 × 편도 비용.
     """
+    # ── v15 프리플라이트: 의존성 누락은 즉시 크게 실패 ──────────────────────
+    # (과거 버그: scipy 미설치 시 월별 except가 ImportError를 삼켜
+    #  NAV 1.0 평탄·거래 0건의 "유령 전략"이 조용히 출력되었다)
+    if variant in ("msharpe", "mincvar"):
+        try:
+            import scipy.optimize  # noqa: F401
+        except ImportError as e:
+            raise RuntimeError(
+                f"S({variant}) 전략은 scipy가 필요합니다. "
+                f"`pip install -r requirements.txt` 후 재실행하세요: {e}"
+            ) from e
+
     START_CAPITAL = 100_000_000
     cash = float(START_CAPITAL)
     positions: dict[str, dict] = {}   # ticker -> {shares, entry_price, cost, last_close, entry_date, ...}
@@ -4709,6 +4735,13 @@ def run_portfolio_opt(
     for ticker, pos in list(positions.items()):
         trades.append(_close_trade(ticker, pos, last_day, pos["last_close"], "데이터_종료_미청산",
                                    ticker_reports, record_full_trades, None))
+
+    # v15 sanity guard: a portfolio-opt run that never traded is a wiring bug, not a result
+    if not trades:
+        raise RuntimeError(
+            f"S({variant}) 백테스트가 거래 0건으로 종료 — 가중치 계산이 매월 실패했을 가능성. "
+            "로그의 'weight computation failed' 메시지를 확인하세요."
+        )
 
     return _compute_result(nav_series, trades, START_CAPITAL, label, open_positions=positions)
 
@@ -5317,7 +5350,7 @@ def main() -> int:
     # Parameters are literature-grounded fixed values — no grid search
     # ══════════════════════════════════════════════════════════════════════════
 
-    print("\n── Running 17 strategies (v11: lookahead fixes, +P hybrid, L/M excluded from selector) ──", flush=True)
+    print("\n── Running strategy battery (v15: S silent-failure fix, signals rework) ──", flush=True)
 
     # A. 12개월 보유 (baseline)
     print("A. 12개월 보유...", flush=True)
@@ -5821,7 +5854,7 @@ def main() -> int:
     print(f"  U top-decile PnL share={_u_tb.get('top_decile_pnl_share_pct')}%  T- {_tm_tb.get('top_decile_pnl_share_pct')}%", flush=True)
 
     # ── Summary table (all strategies including L/M for transparency)
-    print(f"\n── Strategy summary (v14, {len(all_strategies)} strategies; L/M/S-non-best/T-loser/U(if not promoted) excluded from selector) ──", flush=True)
+    print(f"\n── Strategy summary (v15, {len(all_strategies)} strategies; L/M/S-non-best/T-loser/U(if not promoted) excluded from selector) ──", flush=True)
     print(f"{'Strategy':<32} {'IS Shp':>8} {'OOS Shp':>9} {'WinRate':>8} {'vs KOSPI DCA':>13} {'Trades':>7} {'Note':>12}", flush=True)
     for key, r in all_strategies.items():
         is_m  = r.get("in_sample", {})
@@ -5901,16 +5934,21 @@ def main() -> int:
     headline_open_pos_raw = headline.get("open_positions", {})
     if not isinstance(headline_open_pos_raw, dict):
         headline_open_pos_raw = {}
+    headline_is_t_family = headline_key in ("T_kospi_core_chandelier", "T-_kospi_core_regime")
     today_signals = compute_today_signals(
         perf, prices, ticker_reports, calendar,
         headline_open_positions=headline_open_pos_raw,
         headline_label=headline_label,
         reports=reports,
+        kospi=kospi,
+        regime_aware=(headline_key == "T-_kospi_core_regime"),
+        max_positions=(t_max_pos if headline_is_t_family else MAX_POSITIONS),
     )
     print(f"  Open: {today_signals['counts']['open']}, "
           f"Approaching stop: {today_signals['counts']['approaching_stop']}, "
-          f"New buy signals (30d): {today_signals['counts']['new_buy_signals']}, "
-          f"Watching (1-club): {today_signals['counts']['watching_single_club']}",
+          f"Imminent buys (5td): {today_signals['counts']['imminent_buys']}, "
+          f"Watching: {today_signals['counts']['watching']}, "
+          f"Regime: {(today_signals.get('regime') or {}).get('state', '—')}",
           flush=True)
 
     # ── Export CSVs per strategy
@@ -6038,7 +6076,6 @@ def main() -> int:
         "worst_trades": sorted(headline_trades_for_json, key=lambda t: t["return_pct"])[:5],
         "open_positions": open_positions_list,
         "signals": today_signals,
-        "sensitivity": [],  # legacy compat
         # ── v11 감사 결과 ──────────────────────────────────────────────────────
         "v11_audit": {
             "mtt_lookahead_fix": (

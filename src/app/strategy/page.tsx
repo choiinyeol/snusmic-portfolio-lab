@@ -3,16 +3,20 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { StatStrip } from "@/components/report-ledger";
 import { StrategySelector } from "@/components/strategy/strategy-selector";
+import {
+  STRATEGY_LABEL_KO,
+  STRATEGY_VERDICT,
+  buildCuratedKeys,
+} from "@/components/strategy/strategy-meta";
 import backtest from "@/data/strategy-backtest.json";
 import { signColor } from "@/lib/verdict";
 import { cn, formatPct } from "@/lib/utils";
 
-export const metadata: Metadata = { title: "전략 — 판결 아카이브" };
-
-function fmt만(v: number) {
-  if (v >= 100_000_000) return `${(v / 100_000_000).toFixed(1)}억원`;
-  return `${Math.round(v / 10_000).toLocaleString("ko-KR")}만원`;
-}
+export const metadata: Metadata = {
+  title: "전략 — 판결 아카이브",
+  description:
+    "학회 리포트 유니버스에서 25개 전략 변형을 IS/OOS로 검증. SOTA 전략의 임박 매매 신호와 전체 연구 기록.",
+};
 
 function tickerSlug(market: string, ticker: string): string {
   return `${market}-${ticker}`.toLowerCase();
@@ -78,54 +82,45 @@ type SignalPosition = {
   highest_since_entry?: number | null;
   stop_level?: number | null;
   dist_to_stop_pct?: number | null;
-  extension?: number | null;  // ATR% multiple from 50-MA (과열 게이지)
-  // legacy fixed-hold fields
-  exit_due?: string;
-  days_remaining?: number;
+  stop_hit?: boolean;
+  extension?: number | null; // ATR% multiple from 50-MA (과열 게이지)
   trigger_schools?: string[];
   trigger_reports?: TriggerReport[];
 };
 
-type NewSignal = {
+type ImminentBuy = {
   ticker: string;
   market?: string;
   display_name?: string;
   n_schools: number;
   entry_basis_date?: string | null;
   entry_basis_price?: number | null;
+  entry_pending?: boolean;
   trigger_schools?: string[];
   trigger_reports?: TriggerReport[];
-};
-
-type WatchingEntry = {
-  ticker: string;
-  market?: string;
-  display_name?: string;
-  covering_school: string;
-  latest_report_date: string;
-  target_price?: number | null;
-  stated_upside_pct?: number | null;
-  entry_basis_price?: number | null;
-  note: string;
 };
 
 type SignalsData = {
   as_of: string;
   headline_strategy: string;
   disclaimer: string;
+  regime?: {
+    applies: boolean;
+    state: "ON" | "OFF";
+    kospi_close: number;
+    kospi_ma200: number;
+    note: string;
+  } | null;
+  slots?: { max_positions: number; open: number; available: number };
   open_positions: SignalPosition[];
   approaching_stop: SignalPosition[];
-  // legacy
-  expiring_soon?: SignalPosition[];
-  new_buy_signals: NewSignal[];
-  watching_single_club: WatchingEntry[];
+  imminent_buys: ImminentBuy[];
+  watching_count?: number;
   counts: {
     open: number;
     approaching_stop: number;
-    // legacy
-    expiring_soon_30d?: number;
-    new_buy_signals: number;
-    watching_single_club: number;
+    imminent_buys: number;
+    watching: number;
   };
 };
 
@@ -184,40 +179,24 @@ type MultiStrategyData = {
   trades_by_strategy?: Record<string, Trade[]>;
 };
 
-const STRATEGY_LABEL_KO: Record<string, string> = {
-  A_12mo:               "A. 12개월 보유",
-  B_36mo:               "B. 36개월 보유",
-  C_narrative:          "C. 내러티브 홀드",
-  D_chandelier:         "D. 샹들리에 래칫",
-  "D+_chandelier_optuna": "D+. 샹들리에 (Optuna) ★",
-  E_half_runner:        "E. 절반익절+러너",
-  F_momentum_narrative: "F. 모멘텀 필터",
-  G_dip_buy:            "G. 딥바이",
-  H_minervini:          "H. 미너비니 템플릿",
-  I_supertrend:         "I. 슈퍼트렌드",
-  J_core_satellite:     "J. 코어-새틀라이트",
-  K_rr_trend:           "K. R:R 2.5 추세추종",
-  L_rsi2_reversion:     "L. 민리버전 (RSI-2) ⚠",
-  M_short_reversal:     "M. 단기 리버설 ⚠",
-  N_52w_high:           "N. 52주 고가 근접",
-  O_mtt_alpha16:        "O. MTT (alpha16) ★",
-  P_deepbuy_chandelier: "P. 딥바이 샹들리에 ★",
-  Q_kangto_trend:       "Q. 깡토 추세추종 (추세형)",
-  R_kelly_chandelier:   "R. Kelly 샹들리에 (오버레이)",
-  S_hrp:                "S-a. HRP (배분형)",
-  S_msharpe:            "S-b. max-Sharpe (배분형)",
-  S_mincvar:            "S-c. min-CVaR (배분형)",
-  T_kospi_core_chandelier: "T. 코어-KOSPI 샹들리에",
-  "T-_kospi_core_regime":  "T-. 코어-KOSPI 레짐 ★",
-  U_chandelier_scaleout:   "U. 과열 스케일아웃 ★",
-};
+// ─── Verdict chip ─────────────────────────────────────────────────────────────
 
-const BENCHMARK_KO: Record<string, string> = {
-  KOSPI: "KOSPI", SP500: "S&P500", NASDAQ: "NASDAQ", AllWeather: "올웨더",
-};
-
-// ─── Watching list: server-side first 8, rest hidden behind <details> ─────────
-const WATCHING_PREVIEW = 8;
+function VerdictChip({ kind, reason }: { kind: "SOTA" | "채택" | "기각" | "연구용"; reason?: string }) {
+  const styles: Record<string, string> = {
+    SOTA: "bg-stamp text-background",
+    채택: "border border-up/50 bg-up/10 text-up",
+    기각: "border border-down/50 bg-down/10 text-down",
+    연구용: "border border-border bg-secondary/40 text-muted-foreground",
+  };
+  return (
+    <span
+      className={cn("inline-block rounded-sm px-1.5 py-0.5 font-mono text-[10px] font-bold cursor-help", styles[kind])}
+      title={reason ?? (kind === "SOTA" ? "State of the art — IS 샤프 최상위 자동 채택" : kind === "채택" ? "셀렉터 채택 전략" : undefined)}
+    >
+      {kind}
+    </span>
+  );
+}
 
 export default function StrategyPage() {
   const m = backtest.metrics as {
@@ -260,7 +239,7 @@ export default function StrategyPage() {
     faber_ma_period: number;
     anti_overfit_note: string;
   };
-  const signals = backtest.signals as SignalsData | undefined;
+  const signals = backtest.signals as unknown as SignalsData | undefined;
   const optunaNote = (backtest as Record<string, unknown>).optuna_chandelier as {
     adopted: boolean;
     best_params: { atr_period: number; atr_mult: number; max_positions: number };
@@ -288,40 +267,71 @@ export default function StrategyPage() {
     [params.headline_key]: headlineTrades,
   };
 
-  const oosBoundaryYear = 2024;
-  const equity = backtest.equity as { date: string; nav: number }[];
-  const maxNav = Math.max(...equity.map((p) => p.nav));
-  const minNav = Math.min(...equity.map((p) => p.nav));
-  const W = 720; const H = 220;
-  const x = (i: number) => 8 + (i / (equity.length - 1)) * (W - 16);
-  const y = (nav: number) => 12 + ((maxNav - nav) / ((maxNav - minNav || 1))) * (H - 36);
-  const path = equity.map((p, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(p.nav).toFixed(1)}`).join(" ");
+  // Curated selector keys: SOTA + adopted set + best-of-S (data-driven)
+  const v12 = (backtest as Record<string, unknown>).v12_new_strategies as
+    | { S_portfolio_opt?: { best_variant?: string } }
+    | undefined;
+  const bestSKey = v12?.S_portfolio_opt?.best_variant ?? null;
+  const curatedKeys = buildCuratedKeys(multiStrategy.headline_key, bestSKey);
+  const curatedSet = new Set(curatedKeys);
 
+  const headlineLabel = STRATEGY_LABEL_KO[params.headline_key] ?? params.headline_key;
   const simStartDisplay = (params as { sim_start?: string }).sim_start ?? "2020-01-01";
+  const strategyCount = multiStrategy.strategies.length;
+
+  const regime = signals?.regime;
+  const slots = signals?.slots;
 
   return (
     <main className="mx-auto max-w-[1500px] space-y-8 px-4 py-6 sm:px-8">
       <SiteHeader eyebrow="Strategy Lab" />
 
       {/* ══════════════════════════════════════════════════════════════
-          ① 오늘의 신호 — compact
+          ① 오늘의 신호 — SOTA 전략의 임박 매매
       ══════════════════════════════════════════════════════════════ */}
       {signals && (
         <section className="rounded-lg border-2 border-stamp bg-stamp/5 p-5" aria-label="오늘의 신호">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="font-display text-xl font-black tracking-tight text-stamp">오늘의 신호</h2>
             <p className="font-mono text-[11px] text-muted-foreground">
-              기준일: {signals.as_of} · {STRATEGY_LABEL_KO[signals.headline_strategy] ?? signals.headline_strategy}
+              기준일: {signals.as_of} · {headlineLabel}
             </p>
           </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            SOTA 전략({headlineLabel})이 지금 규칙대로 굴러간다면 일어날 매매 —
+            리포트 뉴스 피드가 아니라 전략의 임박 주문서입니다.
+          </p>
+
+          {/* Regime banner */}
+          {regime && (
+            <div
+              className={cn(
+                "mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border px-3 py-2",
+                regime.applies && regime.state === "OFF"
+                  ? "border-down/50 bg-down/10"
+                  : "border-border bg-card",
+              )}
+            >
+              <span className={cn(
+                "rounded-sm px-1.5 py-0.5 font-mono text-[10px] font-black",
+                regime.state === "ON" ? "bg-up/15 text-up" : "bg-down/15 text-down",
+              )}>
+                레짐 {regime.state}
+              </span>
+              <span className="font-mono text-[11px] text-muted-foreground">
+                KOSPI {regime.kospi_close.toLocaleString()} vs 200MA {regime.kospi_ma200.toLocaleString()}
+              </span>
+              <span className="text-xs text-muted-foreground">{regime.note}</span>
+            </div>
+          )}
 
           {/* Count badges */}
           <div className="mt-3 flex flex-wrap gap-2">
             {[
-              { label: "보유 중",           count: signals.counts.open,                  tone: "bg-card border-border" },
-              { label: "매도 임박 (스탑 3% 이내)", count: signals.counts.approaching_stop ?? signals.counts.expiring_soon_30d ?? 0, tone: (signals.counts.approaching_stop ?? signals.counts.expiring_soon_30d ?? 0) > 0 ? "bg-down/10 border-down/40" : "bg-card border-border" },
-              { label: "신규 매수 신호 (30일)",  count: signals.counts.new_buy_signals,   tone: signals.counts.new_buy_signals > 0 ? "bg-up/10 border-up/40" : "bg-card border-border" },
-              { label: "대기 신호 (슬롯 한도)", count: signals.counts.watching_single_club,   tone: "bg-card border-border" },
+              { label: "보유 중", count: signals.counts.open, tone: "bg-card border-border" },
+              { label: "매도 임박 (스탑 3% 이내)", count: signals.counts.approaching_stop, tone: signals.counts.approaching_stop > 0 ? "bg-down/10 border-down/40" : "bg-card border-border" },
+              { label: "매수 임박 (최근 5거래일)", count: signals.counts.imminent_buys, tone: signals.counts.imminent_buys > 0 ? "bg-up/10 border-up/40" : "bg-card border-border" },
+              ...(slots ? [{ label: `슬롯 여유 (최대 ${slots.max_positions})`, count: slots.available, tone: slots.available === 0 ? "bg-down/10 border-down/40" : "bg-card border-border" }] : []),
             ].map((item) => (
               <div key={item.label} className={cn("rounded-lg border px-3 py-1.5", item.tone)}>
                 <p className="font-mono text-[10px] text-muted-foreground">{item.label}</p>
@@ -330,14 +340,14 @@ export default function StrategyPage() {
             ))}
           </div>
 
-          {/* Approaching stop — 매도 임박 (chandelier) */}
+          {/* 매도 임박 — within 3% of trailing stop (incl. stop hit) */}
           {(signals.approaching_stop?.length ?? 0) > 0 && (
             <div className="mt-4">
               <p className="mb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-down">
                 매도 임박 — 트레일링 스탑 3% 이내
               </p>
               <div className="space-y-2">
-                {signals.approaching_stop!.map((pos, i) => {
+                {signals.approaching_stop.map((pos, i) => {
                   const slug = pos.market && pos.ticker ? tickerSlug(pos.market, pos.ticker) : null;
                   return (
                     <div key={`${pos.ticker}-${i}`} className="rounded-md border border-down/40 bg-down/5 px-4 py-3">
@@ -350,8 +360,12 @@ export default function StrategyPage() {
                           <span className="font-mono text-sm font-bold">{pos.display_name ?? pos.ticker}</span>
                         )}
                         <span className="font-mono text-xs text-muted-foreground">({pos.ticker})</span>
-                        {pos.dist_to_stop_pct != null && (
-                          <span className="rounded-sm bg-down/20 px-1.5 py-0.5 font-mono text-[10px] text-down font-bold">
+                        {pos.stop_hit ? (
+                          <span className="rounded-sm bg-down px-1.5 py-0.5 font-mono text-[10px] font-bold text-background">
+                            스탑 터치 — 다음 시가 청산
+                          </span>
+                        ) : pos.dist_to_stop_pct != null && (
+                          <span className="rounded-sm bg-down/20 px-1.5 py-0.5 font-mono text-[10px] font-bold text-down">
                             스탑까지 {pos.dist_to_stop_pct.toFixed(1)}%
                           </span>
                         )}
@@ -369,14 +383,17 @@ export default function StrategyPage() {
             </div>
           )}
 
-          {/* New buy signals — reports within last 30 days */}
-          {signals.new_buy_signals.length > 0 && (
+          {/* 매수 임박 — reports in last 5 trading days, not yet entered */}
+          {signals.imminent_buys.length > 0 && (
             <div className="mt-4">
               <p className="mb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-up">
-                신규 매수 신호 — 최근 30일 리포트
+                매수 임박 — 최근 5거래일 리포트, 익일 시가 진입 대기
+                {slots && slots.available === 0 && (
+                  <span className="ml-2 normal-case tracking-normal text-down">슬롯 가득 — 빈 슬롯이 생겨야 진입</span>
+                )}
               </p>
               <div className="space-y-2">
-                {signals.new_buy_signals.map((sig, i) => {
+                {signals.imminent_buys.map((sig, i) => {
                   const slug = sig.market && sig.ticker ? tickerSlug(sig.market, sig.ticker) : null;
                   return (
                     <div key={`${sig.ticker}-${i}`} className="rounded-md border border-up/40 bg-up/5 px-4 py-3">
@@ -389,13 +406,18 @@ export default function StrategyPage() {
                           <span className="font-mono text-sm font-bold">{sig.display_name ?? sig.ticker}</span>
                         )}
                         <span className="font-mono text-xs text-muted-foreground">({sig.ticker})</span>
-                        <span className="rounded-sm bg-up/20 px-1.5 py-0.5 font-mono text-[10px] text-up font-bold">
+                        <span className="rounded-sm bg-up/20 px-1.5 py-0.5 font-mono text-[10px] font-bold text-up">
                           {sig.n_schools}개교
                         </span>
+                        {sig.entry_pending && (
+                          <span className="rounded-sm border border-up/50 px-1.5 py-0.5 font-mono text-[10px] font-bold text-up">
+                            진입 대기 중
+                          </span>
+                        )}
                       </div>
                       <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-muted-foreground">
-                        <span>진입 기준일: <strong className="text-foreground">{sig.entry_basis_date ?? "—"}</strong></span>
-                        <span>진입 기준가: <strong className="text-foreground">{sig.entry_basis_price != null ? sig.entry_basis_price.toLocaleString() : "—"}</strong></span>
+                        <span>진입 기준일: <strong className="text-foreground">{sig.entry_basis_date ?? "다음 거래일"}</strong></span>
+                        <span>진입 기준가: <strong className="text-foreground">{sig.entry_basis_price != null ? sig.entry_basis_price.toLocaleString() : "익일 시가"}</strong></span>
                       </div>
                       {sig.trigger_reports && sig.trigger_reports.length > 0 && (
                         <div className="mt-1.5 flex flex-wrap gap-1">
@@ -413,7 +435,7 @@ export default function StrategyPage() {
             </div>
           )}
 
-          {/* Open positions inline table with extension column */}
+          {/* 보유 중 — open positions table */}
           {signals.open_positions.length > 0 && (
             <div className="mt-4">
               <p className="mb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-foreground">
@@ -477,66 +499,20 @@ export default function StrategyPage() {
             </div>
           )}
 
-          {/* Watching list — capped with 더 보기 */}
-          {signals.watching_single_club.length > 0 && (
-            <details className="mt-4">
-              <summary className="cursor-pointer font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground select-none">
-                대기 신호 — 유효하지만 미체결 ({signals.watching_single_club.length}종목, 동시 보유 한도) — 클릭해서 펼치기
-              </summary>
-              <div className="mt-2 overflow-x-auto">
-                <table className="w-full min-w-[580px] border-collapse text-sm">
-                  <thead>
-                    <tr className="border-b-2 border-border font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
-                      <th className="px-3 py-1.5 text-left">종목</th>
-                      <th className="px-3 py-1.5 text-left">커버 학회</th>
-                      <th className="px-3 py-1.5 text-right">리포트일</th>
-                      <th className="px-3 py-1.5 text-right">목표가</th>
-                      <th className="px-3 py-1.5 text-right">시가 기준</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {signals.watching_single_club.slice(0, WATCHING_PREVIEW).map((w, i) => {
-                      const slug = w.market && w.ticker ? tickerSlug(w.market, w.ticker) : null;
-                      return (
-                        <tr key={`${w.ticker}-${i}`} className="border-b border-dashed border-border last:border-b-0">
-                          <td className="px-3 py-1.5">
-                            {slug ? (
-                              <Link href={`/stocks/${slug}`} className="hover:underline">
-                                <p className="font-mono text-xs font-bold">{w.display_name ?? w.ticker}</p>
-                              </Link>
-                            ) : (
-                              <p className="font-mono text-xs font-bold">{w.display_name ?? w.ticker}</p>
-                            )}
-                            <p className="font-mono text-[10px] text-muted-foreground">{w.ticker}</p>
-                          </td>
-                          <td className="px-3 py-1.5 font-mono text-xs">{w.covering_school}</td>
-                          <td className="tnum px-3 py-1.5 text-right font-mono text-xs text-muted-foreground">{w.latest_report_date}</td>
-                          <td className="tnum px-3 py-1.5 text-right font-mono text-xs">
-                            {w.target_price != null ? w.target_price.toLocaleString() : "—"}
-                          </td>
-                          <td className="tnum px-3 py-1.5 text-right font-mono text-xs text-muted-foreground">
-                            {w.entry_basis_price != null ? w.entry_basis_price.toLocaleString() : "—"}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-                {signals.watching_single_club.length > WATCHING_PREVIEW && (
-                  <p className="mt-2 font-mono text-[10px] text-muted-foreground">
-                    … 외 {signals.watching_single_club.length - WATCHING_PREVIEW}종목 더 (전체 목록은 CSV 다운로드)
-                  </p>
-                )}
-              </div>
-            </details>
+          {/* Watching — demoted to a one-line count (report flow, not a strategy signal) */}
+          {(signals.watching_count ?? 0) > 0 && (
+            <p className="mt-4 border-t border-dashed border-border pt-3 text-xs text-muted-foreground">
+              그 외 유효 리포트가 있는 미보유 종목 {signals.watching_count}개는 전략 신호가 아닌 리포트 흐름입니다 —{" "}
+              <Link href="/" className="underline hover:text-foreground">아카이브에서 확인</Link>.
+            </p>
           )}
 
-          <p className="mt-3 text-[11px] text-muted-foreground italic">{signals.disclaimer}</p>
+          <p className="mt-3 text-[11px] italic text-muted-foreground">{signals.disclaimer}</p>
         </section>
       )}
 
       {/* ══════════════════════════════════════════════════════════════
-          ② 헤드라인 요약 + 자산곡선
+          ② 헤드라인 요약
       ══════════════════════════════════════════════════════════════ */}
       <header>
         <h1 className="mt-2 font-display text-4xl font-black leading-[1.15] tracking-tight sm:text-5xl">
@@ -545,13 +521,12 @@ export default function StrategyPage() {
         <p className="mt-3 max-w-3xl text-base leading-7 text-muted-foreground">
           학회 리포트 발간 후 24개월 내 피크 수익률이 거의 전부 양(+)이라는 사실 —
           하지만 라운드트립을 타면 그 이익은 사라집니다.
-          14가지 전략 + D+ Optuna를 인샘플({simStartDisplay.slice(0, 7)}–2023-12)로 비교하고 아웃오브샘플(2024–현재)로 검증.
-          헤드라인은 IS 샤프 최상위 전략인{" "}
-          <strong className="text-foreground">
-            {STRATEGY_LABEL_KO[params.headline_key] ?? params.headline_key}
-          </strong>입니다.
+          {strategyCount}개 전략 변형을 인샘플({simStartDisplay.slice(0, 7)}–2023-12)로 비교하고
+          아웃오브샘플(2024–현재)로 검증, 그중 {curatedKeys.length}개를 채택했습니다.
+          SOTA는 IS 샤프 최상위 전략인{" "}
+          <strong className="text-foreground">{headlineLabel}</strong>입니다.
         </p>
-        <p className="mt-1.5 text-sm text-muted-foreground italic">
+        <p className="mt-1.5 text-sm italic text-muted-foreground">
           주의: 과거 데이터 기반 시뮬레이션. 미래 수익 보장 없음. 과최적화 방지를 위해 파라미터는 문헌 표준값 고정.
         </p>
         <p className="mt-1.5 text-sm text-muted-foreground">
@@ -563,7 +538,7 @@ export default function StrategyPage() {
 
       <StatStrip
         items={[
-          { label: `누적 수익률 (헤드라인)`, value: formatPct(m.total_return_pct, 1), tone: signColor(m.total_return_pct) },
+          { label: "누적 수익률 (SOTA)", value: formatPct(m.total_return_pct, 1), tone: signColor(m.total_return_pct) },
           { label: "CAGR (전체)", value: formatPct(m.cagr_pct, 1), tone: signColor(m.cagr_pct) },
           { label: "인샘플 샤프", value: String(inSample.sharpe ?? "—") },
           { label: "아웃오브샘플 샤프", value: String(outOfSample.sharpe ?? "—"), tone: "text-up" },
@@ -572,174 +547,134 @@ export default function StrategyPage() {
         ]}
       />
 
-      {/* Headline equity chart */}
-      <section className="rounded-lg border border-border bg-card p-5" aria-label="헤드라인 자산 곡선">
-        <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">
-            헤드라인 자산 곡선 — {STRATEGY_LABEL_KO[params.headline_key] ?? params.headline_key}
-          </h2>
-          <p className="font-mono text-[11px] text-muted-foreground">
-            {m.start} → {m.end} · 주간 샘플
-          </p>
-        </div>
-        <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="전략 자산 곡선">
-          <line x1="8" x2={W - 8} y1={y(1)} y2={y(1)} className="stroke-border" strokeDasharray="4 4" strokeWidth="1" />
-          <text x={W - 10} y={y(1) - 5} textAnchor="end" fontSize="10" className="fill-muted-foreground font-mono">1.0</text>
-          <path d={path} fill="none" className={m.total_return_pct >= 0 ? "stroke-up" : "stroke-down"} strokeWidth="2" strokeLinejoin="round" />
-          <text
-            x={x(equity.length - 1)}
-            y={y(equity[equity.length - 1].nav) - 8}
-            textAnchor="end"
-            fontSize="11"
-            fontWeight="700"
-            className={cn("font-mono", m.total_return_pct >= 0 ? "fill-up" : "fill-down")}
-          >
-            {equity[equity.length - 1].nav.toFixed(2)}
-          </text>
-          {(() => {
-            const oosIdx = equity.findIndex((p) => parseInt(p.date.slice(0, 4)) >= oosBoundaryYear);
-            if (oosIdx < 0) return null;
-            const bx = x(oosIdx);
-            return (
-              <>
-                <line x1={bx} x2={bx} y1={12} y2={H - 8} className="stroke-muted-foreground" strokeDasharray="3 3" strokeWidth="1" />
-                <text x={bx + 4} y={22} fontSize="9" className="fill-muted-foreground font-mono">OOS →</text>
-              </>
-            );
-          })()}
-        </svg>
-        <div className="mt-3 flex flex-wrap gap-2 border-t border-dashed border-border pt-3">
-          {(backtest.yearly as { year: number; return_pct: number }[]).map((row) => (
-            <div
-              key={row.year}
-              className={cn(
-                "rounded-md border border-border px-3 py-1.5 text-center",
-                row.year >= oosBoundaryYear && "border-stamp/50 bg-stamp/5"
-              )}
-            >
-              <p className="font-mono text-[10px] text-muted-foreground">
-                {row.year}{row.year >= oosBoundaryYear ? " OOS" : ""}
-              </p>
-              <p className={cn("tnum font-mono text-sm font-bold", signColor(row.return_pct))}>
-                {formatPct(row.return_pct, 1)}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ══════════════════════════════════════════════════════════════
-          ③ 전략 비교 + 자산곡선·시뮬 (selector tabs) — collapsible
+          ③ 전략 비교 + 자산곡선·시뮬 (curated selector)
       ══════════════════════════════════════════════════════════════ */}
       <details open id="strategy-selector" className="group rounded-lg border border-border bg-card">
-        <summary className="flex cursor-pointer select-none list-none items-baseline justify-between gap-2 p-5 hover:bg-secondary/20 transition-colors [&::-webkit-details-marker]:hidden">
+        <summary className="flex cursor-pointer select-none list-none items-baseline justify-between gap-2 p-5 transition-colors hover:bg-secondary/20 [&::-webkit-details-marker]:hidden">
           <div>
             <h2 className="font-display text-2xl font-black tracking-tight">전략 비교 &amp; 상세</h2>
             <p className="mt-0.5 text-sm text-muted-foreground">
-              IS/OOS 성과표 · 전략별 자산곡선 · 월 적립 시뮬레이션 · 거래 로그
+              채택 전략 {curatedKeys.length}개 · 자산곡선 · 월 적립 시뮬레이션 · 거래 로그
             </p>
           </div>
-          <span className="font-mono text-sm text-muted-foreground group-open:rotate-180 transition-transform">▼</span>
+          <span className="font-mono text-sm text-muted-foreground transition-transform group-open:rotate-180">▼</span>
         </summary>
-        <div className="border-t border-border px-5 pb-5 pt-4 space-y-6">
-
-          {/* IS/OOS comparison table */}
-          <div>
-            <h3 className="mb-2 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              IS/OOS 비교표 — 모든 전략
-            </h3>
-            <p className="mb-3 text-xs text-muted-foreground">
-              모든 전략: 1회 이상 Buy 언급 시 즉시 진입 (J는 D 오버레이), 동일비중 {Math.round((params.position_weight ?? 0.05) * 100)}%, 편도 수수료 {(params.cost_per_side ?? 0.003) * 100}%. 동시 보유 20종목 한도로 신호 일부는 미체결.{" "}
-              <span className="text-foreground font-medium">{params.anti_overfit_note}</span>
-            </p>
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[860px] border-collapse text-sm">
-                <thead>
-                  <tr className="border-b-4 border-double border-border font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                    <th className="px-3 py-2 text-left font-semibold">전략</th>
-                    <th className="px-3 py-2 text-right font-semibold">IS CAGR</th>
-                    <th className="px-3 py-2 text-right font-semibold">IS 샤프</th>
-                    <th className="px-3 py-2 text-right font-semibold">IS MDD</th>
-                    <th className="px-3 py-2 text-right font-semibold">OOS CAGR</th>
-                    <th className="px-3 py-2 text-right font-semibold">OOS 샤프</th>
-                    <th className="px-3 py-2 text-right font-semibold">vs KOSPI DCA</th>
-                    <th className="px-3 py-2 text-right font-semibold">최대 1종목</th>
-                    <th className="px-3 py-2 text-right font-semibold">탑10% P&L</th>
-                    <th className="px-3 py-2 text-right font-semibold">거래수</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {multiStrategy.strategies.map((r) => {
-                    const isHL = r.key === multiStrategy.headline_key;
-                    const is = r.in_sample;
-                    const oos = r.out_of_sample;
-                    return (
-                      <tr
-                        key={r.key}
-                        className={cn(
-                          "border-b border-dashed border-border last:border-b-0",
-                          isHL && "bg-secondary font-bold"
-                        )}
-                      >
-                        <td className="px-3 py-2 font-mono text-xs">{STRATEGY_LABEL_KO[r.key] ?? r.key}</td>
-                        <td className={cn("tnum px-3 py-2 text-right font-mono text-xs", signColor(is.cagr_pct))}>
-                          {is.cagr_pct != null ? formatPct(is.cagr_pct, 1) : "—"}
-                        </td>
-                        <td className="tnum px-3 py-2 text-right font-mono text-xs">{is.sharpe ?? "—"}</td>
-                        <td className="tnum px-3 py-2 text-right font-mono text-xs text-down">
-                          {is.mdd_pct != null ? formatPct(is.mdd_pct, 1) : "—"}
-                        </td>
-                        <td className={cn("tnum px-3 py-2 text-right font-mono text-xs", signColor(oos.cagr_pct))}>
-                          {oos.cagr_pct != null ? formatPct(oos.cagr_pct, 1) : "—"}
-                        </td>
-                        <td className="tnum px-3 py-2 text-right font-mono text-xs">{oos.sharpe ?? "—"}</td>
-                        <td className={cn("tnum px-3 py-2 text-right font-mono text-xs font-bold", r.kospi_dca_ratio != null ? (r.kospi_dca_beats ? "text-up" : "text-down") : "text-muted-foreground")}>
-                          {r.kospi_dca_ratio != null ? `${r.kospi_dca_ratio.toFixed(2)}x` : "—"}
-                        </td>
-                        <td className={cn("tnum px-3 py-2 text-right font-mono text-xs font-bold", signColor(r.max_single_return_pct))}>
-                          {r.max_single_return_pct != null ? formatPct(r.max_single_return_pct, 0) : "—"}
-                          {r.best_trade_name && r.max_single_return_pct != null && r.max_single_return_pct > 0 && (
-                            <span className="ml-1 font-normal text-muted-foreground text-[10px]">({r.best_trade_name})</span>
-                          )}
-                        </td>
-                        <td className="tnum px-3 py-2 text-right font-mono text-xs text-up">
-                          {r.top_decile_pnl_share_pct > 0 ? `${r.top_decile_pnl_share_pct}%` : "—"}
-                        </td>
-                        <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">{r.trade_count}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-            <p className="mt-2 text-xs text-muted-foreground">
-              IS = In-Sample {simStartDisplay.slice(0, 7)} ~ 2023-12 · OOS = Out-of-Sample 2024-01 ~ 현재.
-              헤드라인(★) = IS 샤프 최상위 자동 선정.
-            </p>
-          </div>
-
-          {/* Strategy selector: per-strategy equity, wealth sim, trade log */}
+        <div className="space-y-6 border-t border-border px-5 pb-5 pt-4">
+          <p className="text-xs text-muted-foreground">
+            모든 전략: 1회 이상 Buy 언급 시 즉시 진입, 동일비중 {Math.round((params.position_weight ?? 0.05) * 100)}%,
+            편도 수수료 {(params.cost_per_side ?? 0.003) * 100}%. 동시 보유 한도로 신호 일부는 미체결.{" "}
+            <span className="font-medium text-foreground">{params.anti_overfit_note}</span>
+          </p>
           <StrategySelector
             multiStrategy={multiStrategy}
             wealthSimGlobal={ws}
             allTrades={allTradesMap}
+            curatedKeys={curatedKeys}
           />
         </div>
       </details>
 
+      {/* ══════════════════════════════════════════════════════════════
+          ④ 전체 연구 기록 — every strategy ever tested, with verdicts
+      ══════════════════════════════════════════════════════════════ */}
+      <details className="group rounded-lg border border-border bg-card">
+        <summary className="flex cursor-pointer select-none list-none items-baseline justify-between gap-2 p-5 transition-colors hover:bg-secondary/20 [&::-webkit-details-marker]:hidden">
+          <div>
+            <h2 className="font-display text-2xl font-black tracking-tight">전체 연구 기록 — {strategyCount}개 전략 변형</h2>
+            <p className="mt-0.5 text-sm text-muted-foreground">
+              시험한 모든 전략의 IS/OOS 성적과 채택·기각 사유 · CSV 다운로드
+            </p>
+          </div>
+          <span className="font-mono text-sm text-muted-foreground transition-transform group-open:rotate-180">▼</span>
+        </summary>
+        <div className="border-t border-border px-5 pb-5 pt-4">
+          <p className="mb-3 text-xs text-muted-foreground">
+            <VerdictChip kind="SOTA" /> IS 샤프 최상위 자동 채택 ·{" "}
+            <VerdictChip kind="채택" /> 셀렉터 채택 ·{" "}
+            <VerdictChip kind="기각" /> 비용·성과 미달로 제외 ·{" "}
+            <VerdictChip kind="연구용" /> 참고 가치만 — 칩에 마우스를 올리면 사유가 표시됩니다.
+          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[920px] border-collapse text-sm">
+              <thead>
+                <tr className="border-b-4 border-double border-border font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                  <th className="px-3 py-2 text-left font-semibold">전략</th>
+                  <th className="px-3 py-2 text-left font-semibold">판정</th>
+                  <th className="px-3 py-2 text-right font-semibold">IS 샤프</th>
+                  <th className="px-3 py-2 text-right font-semibold">OOS 샤프</th>
+                  <th className="px-3 py-2 text-right font-semibold">vs KOSPI DCA</th>
+                  <th className="px-3 py-2 text-right font-semibold">MDD</th>
+                  <th className="px-3 py-2 text-right font-semibold">거래수</th>
+                  <th className="px-3 py-2 text-right font-semibold">CSV</th>
+                </tr>
+              </thead>
+              <tbody>
+                {multiStrategy.strategies.map((r) => {
+                  const isSota = r.key === multiStrategy.headline_key;
+                  const isCurated = curatedSet.has(r.key);
+                  const verdict = STRATEGY_VERDICT[r.key];
+                  const kind: "SOTA" | "채택" | "기각" | "연구용" = isSota ? "SOTA" : isCurated ? "채택" : (verdict?.chip ?? "연구용");
+                  return (
+                    <tr
+                      key={r.key}
+                      className={cn(
+                        "border-b border-dashed border-border last:border-b-0",
+                        isSota && "bg-secondary font-bold",
+                      )}
+                    >
+                      <td className="px-3 py-2">
+                        <p className="font-mono text-xs">{STRATEGY_LABEL_KO[r.key] ?? r.key}</p>
+                        {!isCurated && verdict && (
+                          <p className="mt-0.5 max-w-[320px] text-[10px] font-normal leading-4 text-muted-foreground">{verdict.reason}</p>
+                        )}
+                      </td>
+                      <td className="px-3 py-2">
+                        <VerdictChip kind={kind} reason={isSota ? undefined : verdict?.reason} />
+                      </td>
+                      <td className="tnum px-3 py-2 text-right font-mono text-xs">{r.in_sample.sharpe ?? "—"}</td>
+                      <td className="tnum px-3 py-2 text-right font-mono text-xs">{r.out_of_sample.sharpe ?? "—"}</td>
+                      <td className={cn("tnum px-3 py-2 text-right font-mono text-xs font-bold", r.kospi_dca_ratio != null ? (r.kospi_dca_beats ? "text-up" : "text-down") : "text-muted-foreground")}>
+                        {r.kospi_dca_ratio != null ? `${r.kospi_dca_ratio.toFixed(2)}x` : "—"}
+                      </td>
+                      <td className="tnum px-3 py-2 text-right font-mono text-xs text-down">
+                        {r.metrics.mdd_pct != null ? formatPct(r.metrics.mdd_pct, 1) : "—"}
+                      </td>
+                      <td className="tnum px-3 py-2 text-right font-mono text-xs text-muted-foreground">{r.trade_count}</td>
+                      <td className="px-3 py-2 text-right">
+                        <a
+                          href={`/strategy-trades-${r.key}.csv`}
+                          download={`strategy-trades-${r.key}.csv`}
+                          className="font-mono text-[10px] text-muted-foreground underline hover:text-foreground"
+                        >
+                          다운로드
+                        </a>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            IS = In-Sample {simStartDisplay.slice(0, 7)} ~ 2023-12 · OOS = Out-of-Sample 2024-01 ~ 현재 ·
+            vs KOSPI DCA = 동일 적립 스케줄 최종 자산 비율 (1.00x 초과 = KOSPI 적립식 우위).
+          </p>
+        </div>
+      </details>
 
       {/* ══════════════════════════════════════════════════════════════
           ⑤ 방법론 / 전략 규칙 / 각주 — collapsible
       ══════════════════════════════════════════════════════════════ */}
       <details className="group rounded-lg border border-border bg-card">
-        <summary className="flex cursor-pointer select-none list-none items-baseline justify-between gap-2 p-5 hover:bg-secondary/20 transition-colors [&::-webkit-details-marker]:hidden">
+        <summary className="flex cursor-pointer select-none list-none items-baseline justify-between gap-2 p-5 transition-colors hover:bg-secondary/20 [&::-webkit-details-marker]:hidden">
           <div>
             <h2 className="font-display text-2xl font-black tracking-tight">방법론 &amp; 각주</h2>
             <p className="mt-0.5 text-sm text-muted-foreground">전략 규칙 · 한계 · 면책사항</p>
           </div>
-          <span className="font-mono text-sm text-muted-foreground group-open:rotate-180 transition-transform">▼</span>
+          <span className="font-mono text-sm text-muted-foreground transition-transform group-open:rotate-180">▼</span>
         </summary>
-        <div className="border-t border-border px-5 pb-5 pt-4 space-y-5">
+        <div className="space-y-5 border-t border-border px-5 pb-5 pt-4">
 
           {/* Strategy rules */}
           <div className="grid gap-4 lg:grid-cols-2">
@@ -747,7 +682,7 @@ export default function StrategyPage() {
               {
                 n: 1,
                 title: "유니버스 — KR + US 전체 Buy 언급",
-                body: `KR ${universeStats.kr_tickers}개 + US ${universeStats.us_tickers}개 종목. 리포트 풀 ${params.universe_start} 이후, 시뮬 기점 ${simStartDisplay}. 1회 이상 Buy 언급 즉시 진입 — 단독 커버·컨센서스 모두 포함. 동시 보유 20종목 한도로 신호 일부 미체결. US 종목은 달러 기준 가격 사용 (환율 미반영).`,
+                body: `KR ${universeStats.kr_tickers}개 + US ${universeStats.us_tickers}개 종목. 리포트 풀 ${params.universe_start} 이후, 시뮬 기점 ${simStartDisplay}. 1회 이상 Buy 언급 즉시 진입 — 단독 커버·컨센서스 모두 포함. 동시 보유 한도로 신호 일부 미체결. US 종목은 달러 기준 가격 사용 (환율 미반영).`,
               },
               {
                 n: 2,
@@ -762,7 +697,7 @@ export default function StrategyPage() {
               {
                 n: 4,
                 title: `포지션 — 동일비중 ${Math.round((params.position_weight ?? 0.05) * 100)}%`,
-                body: `슬롯당 NAV의 ${Math.round((params.position_weight ?? 0.05) * 100)}%. 최대 ${params.max_positions ?? 20}종목 (K는 최대 10, D+ Optuna는 최대 10). 거래비용 편도 ${(params.cost_per_side ?? 0.003) * 100}%. J(레버리지): 차입비용 6%/년 일 단위 적립.`,
+                body: `슬롯당 NAV의 ${Math.round((params.position_weight ?? 0.05) * 100)}%. 최대 ${params.max_positions ?? 20}종목 (K는 최대 10, D+ Optuna는 탐색 결과에 따름). 거래비용 편도 ${(params.cost_per_side ?? 0.003) * 100}%. J(레버리지): 차입비용 6%/년 일 단위 적립.`,
               },
               {
                 n: 5,
@@ -797,7 +732,7 @@ export default function StrategyPage() {
               {
                 n: 11,
                 title: "S 포트폴리오 최적화 — 월간 리밸런스 3종 배분형",
-                body: "활성 유니버스(18개월 매수 리포트 윈도우) 종목을 매월 리밸런스. (a) S_hrp: HRP — 상관거리 단일연결 클러스터링, 준대각 재정렬, 역분산 재귀분할. (b) S_msharpe: max-Sharpe — LedoitWolf 공분산 축소(sklearn), 개별 비중 ≤15%. (c) S_mincvar: min-CVaR 95% — scipy linprog LP, 개별 비중 ≤15%. IS 샤프 최고 변형만 헤드라인 셀렉터에 포함. 턴오버 비용 적용.",
+                body: "활성 유니버스(18개월 매수 리포트 윈도우) 종목을 매월 리밸런스. (a) S_hrp: HRP — 상관거리 단일연결 클러스터링, 준대각 재정렬, 역분산 재귀분할. (b) S_msharpe: max-Sharpe — LedoitWolf 공분산 축소(sklearn), 개별 비중 ≤15%. (c) S_mincvar: min-CVaR 95% — scipy linprog LP, 개별 비중 ≤15%. IS 샤프 최고 변형만 셀렉터에 포함. 턴오버 비용 적용. v15: scipy 의존성 누락 시 침묵 실패(평탄 NAV) 버그 수정 — 의존성 프리플라이트로 즉시 실패.",
               },
               {
                 n: 12,
@@ -812,7 +747,7 @@ export default function StrategyPage() {
               {
                 n: 14,
                 title: "U. 과열 스케일아웃 — ATR% Multiple from 50-MA",
-                body: "T-와 완전 동일 + 과열 게이지: extension = B/A, A = ATR(14)/가격 (ATR%), B = (가격 − 50SMA)/50SMA. extension > 8× 시 보유 주수의 절반 매도 → KOSPI 파킹(1차). extension 이후 > 12× 시 남은 포지션의 절반 다시 매도(2차). 트리거는 포지션당 1회(오실레이션 재발동 없음; 재진입 시 초기화). PLTR·TSLA·NVDA 역사적 급등이 extension 10× 이상에서 스탈한 패턴에 근거. 출처: Minervini 커뮤니티 관행, TradingView Fred6724.",
+                body: "T-와 완전 동일 + 과열 게이지: extension = B/A, A = ATR(14)/가격 (ATR%), B = (가격 − 50SMA)/50SMA. extension > 8× 시 보유 주수의 절반 매도 → KOSPI 파킹(1차). extension 이후 > 12× 시 남은 포지션의 절반 다시 매도(2차). 트리거는 포지션당 1회(오실레이션 재발동 없음; 재진입 시 초기화). 출처: Minervini 커뮤니티 관행, TradingView Fred6724.",
               },
             ].map((rule) => (
               <article key={rule.n} className="rounded-lg border border-border bg-secondary/20 p-4">
@@ -829,7 +764,7 @@ export default function StrategyPage() {
               <h3 className="font-display text-lg font-black tracking-tight">
                 D+ Optuna 강건 최적화 — 방법론 전문 공개
                 {optunaNote.adopted
-                  ? <span className="ml-2 font-mono text-[11px] font-normal text-up">채택됨 ✓</span>
+                  ? <span className="ml-2 font-mono text-[11px] font-normal text-up">채택됨</span>
                   : <span className="ml-2 font-mono text-[11px] font-normal text-down">채택 불가 (OOS 미달)</span>
                 }
               </h3>
@@ -872,7 +807,7 @@ export default function StrategyPage() {
                   </ul>
                 </div>
               </div>
-              <p className="mt-3 text-xs text-muted-foreground italic">{optunaNote.methodology}</p>
+              <p className="mt-3 text-xs italic text-muted-foreground">{optunaNote.methodology}</p>
             </section>
           )}
 
@@ -883,19 +818,17 @@ export default function StrategyPage() {
           >
             <h3 className="font-display text-xl font-black tracking-tight">정직한 각주 — 이 전략이 무너지는 곳</h3>
             <ul className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
-              <li>· <strong className="text-foreground">과최적화 주의.</strong> D 기본값 파라미터는 문헌 표준값(ATR×5, 200MA) 고정. D+ Optuna는 IS 2-폴드 교차검증으로 강건화했으나 표본 크기(460종목) 제한으로 과최적화 위험이 남습니다.</li>
-              <li>· <strong className="text-foreground">시뮬 기점 주의.</strong> 2020-01 이전 리포트 풀이 얇아 기점을 2020-01-01로 설정. 실질 트레이딩은 신호 발생 시점부터이므로 첫 거래는 이후.</li>
+              <li>· <strong className="text-foreground">과최적화 주의.</strong> D 기본값 파라미터는 문헌 표준값(ATR×5, 200MA) 고정. D+ Optuna는 IS 2-폴드 교차검증으로 강건화했으나 표본 크기 제한으로 과최적화 위험이 남습니다.</li>
+              <li>· <strong className="text-foreground">시뮬 기점 주의.</strong> 2020-01 이전 리포트 풀이 얇아 기점을 {simStartDisplay}로 설정. 실질 트레이딩은 신호 발생 시점부터이므로 첫 거래는 이후.</li>
               <li>· <strong className="text-foreground">내러티브 홀드(C) 주의.</strong> 무한 홀드 전략은 MDD 허용 범위가 넓습니다. 포지션 청산 규칙이 느슨합니다.</li>
               <li>· <strong className="text-foreground">딥바이(G) 솔직한 평가.</strong> 20% 하락이 저점이 아니라 시작인 경우가 많습니다. IS/OOS 모두 벤치마크 하회 — 채택 불가.</li>
-              <li>· <strong className="text-foreground">민리버전(L) / 단기 리버설(M) 솔직한 평가.</strong> L IS sharpe −3.1, OOS −2.53. M IS sharpe −1.4, OOS −2.18. 두 전략 모두 이 유니버스에서 작동하지 않습니다. Connors RSI-2는 미국 ETF·대형주 시장을 위해 설계된 전략으로 한국 소형·중형주 + 학회 리포트 필터 조합에서는 과도한 거래비용과 틱 노이즈로 음(−) 성과. 전략 참고용으로만 유지.</li>
-              <li>· <strong className="text-foreground">52주 고가 근접(N).</strong> IS sharpe 0.20, OOS sharpe 1.20. OOS 성과는 양호하나 IS 샤프가 낮아 헤드라인 선정 기준 미달. 참고용 전략으로 유지.</li>
+              <li>· <strong className="text-foreground">민리버전(L) / 단기 리버설(M) 솔직한 평가.</strong> 두 전략 모두 이 유니버스에서 거래비용으로 작동하지 않습니다. Connors RSI-2는 미국 ETF·대형주 시장을 위해 설계된 전략으로 한국 소형·중형주 + 학회 리포트 필터 조합에서는 0.6% 왕복 비용 × 높은 회전율이 알파를 소진합니다. 구현 검증 후 기각 — 전체 연구 기록에만 유지.</li>
               <li>· <strong className="text-foreground">코어-새틀라이트 레버리지(J) 솔직한 평가.</strong> 차입비용(6%/년)과 폭락 타이밍 미스 리스크가 있습니다. D 보조 시뮬로만 참고하세요.</li>
-              <li>· <strong className="text-foreground">R:R 2.5(K) 주의.</strong> 빠른 사이클이 거래비용을 높입니다.</li>
               <li>· <strong className="text-foreground">US 종목 주의.</strong> 수익은 달러 기준. KRW/USD 환율 변동 미반영.</li>
               <li>· <strong className="text-foreground">컨센서스 표본 제한.</strong> US 컨센서스 종목 소수. 통계적 유의성 낮음.</li>
-              <li>· 롱온리 전략. 대세 하락장 손실 불가피. 헤드라인 MDD {formatPct(m.mdd_pct, 1)}.</li>
+              <li>· 롱온리 전략. 대세 하락장 손실 불가피. SOTA MDD {formatPct(m.mdd_pct, 1)}.</li>
               <li>· <strong className="text-foreground">컨센서스 분석.</strong>{" "}
-                헤드라인 거래 기준: 단독 커버 {consensus.single_club.count}건 (평균 {formatPct(consensus.single_club.avg_return_pct, 1)}, 승률 {consensus.single_club.win_rate_pct ?? "—"}%) vs
+                SOTA 거래 기준: 단독 커버 {consensus.single_club.count}건 (평균 {formatPct(consensus.single_club.avg_return_pct, 1)}, 승률 {consensus.single_club.win_rate_pct ?? "—"}%) vs
                 멀티 커버 {consensus.multi_club.count}건 (평균 {formatPct(consensus.multi_club.avg_return_pct, 1)}, 승률 {consensus.multi_club.win_rate_pct ?? "—"}%).
                 {consensus.alpha_multi_vs_single != null && ` 멀티 커버 알파: ${formatPct(consensus.alpha_multi_vs_single, 1)}p.`}
               </li>
@@ -909,7 +842,7 @@ export default function StrategyPage() {
           <section className="rounded-lg border border-stamp/40 bg-stamp/5 p-5">
             <h3 className="font-display text-lg font-black tracking-tight">가격-전용 데이터로 텐배거를 끝까지 들고 갈 수 있는가?</h3>
             <p className="mt-3 text-sm leading-7 text-muted-foreground">
-              샹들리에 ATR×5 트레일은 "고점이 어디인지 모른다"는 사실을 설계로 인정하고,
+              샹들리에 ATR×5 트레일은 “고점이 어디인지 모른다”는 사실을 설계로 인정하고,
               단지 <em>가격이 최고점에서 충분히 떨어질 때까지</em> 기다린다.
               이 접근은 10배·14배 구간을 가진 종목을 처음부터 끝까지 타는 것을 이론상 허용한다.
               실제로 백테스트에서 단일 최대 수익률 거래는 300~400%대로 나타났으며,
@@ -919,11 +852,10 @@ export default function StrategyPage() {
               그러나 <strong className="text-foreground">과열 구간에서 가격-전용 신호는 한계를 가진다.</strong>{" "}
               PLTR·TSLA·NVDA 유형처럼 extension(50SMA 대비 ATR% 배수)이 10×를 넘어 과열된 뒤 급락하는 패턴에서
               ATR 트레일은 이미 30~50% 되돌림을 감수한 뒤에야 청산한다.
-              이에 U 전략(과열 스케일아웃: extension 8×·12× 부분 익절)을 설계해 T-와 비교했다.
-              백테스트 결과, 이 유니버스(학회 리포트 발굴 한국·미국 종목)에서 과열 스케일아웃은
-              {" "}<strong className="text-foreground">상승 여력을 더 많이 지켰거나 깎았는지</strong>를 확인하려면
-              상단 U vs T- 검증 결과를 참고하라.
-              가격-전용 데이터만으로는 "지금이 고점인지 아닌지"를 알 수 없으므로,
+              이에 U 전략(과열 스케일아웃: extension 8×·12× 부분 익절)을 설계해 T-와 비교했으나,
+              이 유니버스에서는 과열 부분 익절이 남은 포지션의 상승을 놓치는 비용이 더 컸다 — U는 기각되었다
+              (전체 연구 기록 참조).
+              가격-전용 데이터만으로는 “지금이 고점인지 아닌지”를 알 수 없으므로,
               텐배거를 완전히 타려면 트레일링 스탑(ATR×5)이 과열 부분 익절보다 장기적으로 더 좋은 경우가 많다.
               결론: <em>샹들리에는 텐배거를 타는 데 가격-전용 데이터 중 가장 정직한 도구지만,
               과열 구간 이후의 되돌림 비용을 감수하는 것이 전략의 핵심 트레이드오프다.</em>

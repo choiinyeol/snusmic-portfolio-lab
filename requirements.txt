@@ -6,3 +6,6 @@ python-dotenv>=1.0
 requests>=2.31
 beautifulsoup4>=4.12
 optuna>=4.0
+# S 포트폴리오 최적화 (max-Sharpe SLSQP, min-CVaR linprog, LedoitWolf 수축)
+scipy>=1.11
+scikit-learn>=1.4
