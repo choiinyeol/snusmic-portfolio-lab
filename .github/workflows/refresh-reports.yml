@@ -1,8 +1,7 @@
-name: refresh-reports
+name: refresh-weekly
 
-# Weekly report check — Monday early (01:00 UTC = 10:00 KST).
-# Collectors run in incremental mode and no-op fast when nothing is new,
-# keeping load on origin servers minimal (manifest-dedup already prevents re-fetch).
+# Weekly full sweep — Monday early (01:00 UTC = 10:00 KST).
+# Collectors run with --full to walk all pages, catching any missed reports.
 # OCR fallback (ocr_fallback.py) is Windows-only and is skipped in CI.
 on:
   schedule:
@@ -12,24 +11,33 @@ on:
 permissions:
   contents: write
 
-# Shared concurrency group prevents overlap with the daily price workflow.
+# Shared concurrency group prevents overlap with the daily incremental workflow.
 concurrency:
   group: verdict-archive-refresh
   cancel-in-progress: false
 
 jobs:
-  refresh-reports:
+  refresh-weekly:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - uses: astral-sh/setup-uv@v5
         with:
-          python-version: "3.12"
-          cache: pip
+          enable-cache: true
 
-      - run: pip install -r requirements.txt
+      - run: uv python install 3.12
+
+      - run: uv sync --frozen
+
+      # Install Playwright browsers (needed for KUVIC and Voera collectors).
+      - name: Install Playwright + browsers
+        run: uv run python -m playwright install chromium --with-deps
+
+      # JDK is available on ubuntu-latest via PATH (openjdk pre-installed).
+      # transcribe_pdfs.py uses pdfminer/pdfplumber (pure Python); JDK is only
+      # needed by opendataloader-pdf tools which this project does not use directly.
 
       - name: Restore price cache
         uses: actions/cache@v4
@@ -39,43 +47,37 @@ jobs:
           restore-keys: |
             prices-${{ runner.os }}-
 
-      # Install Playwright browsers (needed for KUVIC and Voera collectors).
-      - name: Install Playwright + browsers
+      # Full sweep: collectors walk all pages to catch any missed reports.
+      - name: Collect all reports (full sweep)
         run: |
-          pip install playwright beautifulsoup4
-          python -m playwright install chromium --with-deps
+          uv run python scripts/collect_reports.py --source all
+          uv run python scripts/collect_kuvic_browser.py
+          uv run python scripts/collect_smic.py --full
+          uv run python scripts/collect_ewha.py --full
+          uv run python scripts/collect_voera.py --full
 
-      # Collectors are incremental: they check their manifests and skip
-      # already-downloaded reports, so this is a fast no-op when nothing is new.
-      - name: Collect new reports (incremental, no-op when nothing new)
-        run: |
-          python scripts/collect_reports.py --source all
-          python scripts/collect_kuvic_browser.py
-          python scripts/collect_smic.py --source all
-          python scripts/collect_ewha.py
-          python scripts/collect_voera.py
-
-      # Transcription is also incremental: already-transcribed .md files are skipped.
-      # JDK is available on ubuntu-latest via PATH (openjdk pre-installed).
+      # Transcription is incremental: already-transcribed .md files are skipped.
       # ocr_fallback.py (Windows winocr) is intentionally skipped in CI.
       - name: Transcribe only-new PDFs
         run: |
-          python scripts/transcribe_pdfs.py
+          uv run python scripts/transcribe_pdfs.py
 
       - name: Rebuild dataset, charts, backtest
         env:
           KRX_ID: ${{ secrets.KRX_ID }}
           KRX_PW: ${{ secrets.KRX_PW }}
         run: |
-          python scripts/build_report_performance.py --sleep 0.3
-          python scripts/export_stock_charts.py
-          python scripts/backtest_momentum.py
+          uv run python scripts/build_report_performance.py --sleep 0.3
+          uv run python scripts/export_stock_charts.py
+          uv run python scripts/backtest_momentum.py
 
       - name: Commit refreshed artifacts
         run: |
           git config user.name "verdict-archive-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add src/data/report-performance.json src/data/strategy-backtest.json public/prices data/report_performance.csv data/report_parsed.csv data/report_parse_issues.csv
+          git add src/data/report-performance.json src/data/strategy-backtest.json public/prices \
+            data/report_performance.csv data/report_parsed.csv data/report_parse_issues.csv \
+            data/sources/manifest.json data/pdfs data/markdown
           git diff --cached --quiet && echo "no changes" && exit 0
-          git commit -m "chore: weekly report refresh ($(date -u +%F))"
+          git commit -m "chore: weekly full sweep ($(date -u +%F))"
           git push

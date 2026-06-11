@@ -6033,9 +6033,11 @@
     "page_url": "https://www.kuvic.com/research",
     "pdf_url": "https://www.kuvic.com/_files/ugd/5ec6f7_1ad725b4b6af4fd8b8f236dc023140be.pdf",
     "published_hint": "2024-06-27",
-    "file": null,
-    "sha256": null,
-    "error": "('Connection broken: IncompleteRead(4692741 bytes read, 1071146 more expected)', IncompleteRead(4692741 bytes read, 1071146 more expected))"
+    "file": "data/pdfs/kuvic/2024-06-27_셀트리온 - K-바이오의 매운맛을 보여줄게.pdf",
+    "sha256": "b3c99ec032d6343de5d9bb1ddf89ca9af873921c2b299a794b1b7793afa86307",
+    "error": null,
+    "size": 5763887,
+    "downloaded_at": "2026-06-11T05:08:12+00:00"
   },
   {
     "school": "kuvic",
@@ -6136,9 +6138,11 @@
     "page_url": "https://www.kuvic.com/research",
     "pdf_url": "https://www.kuvic.com/_files/ugd/5ec6f7_761507f6d05b4f729180a0f7c0691862.pdf",
     "published_hint": "2024-05-09",
-    "file": null,
-    "sha256": null,
-    "error": "('Connection broken: IncompleteRead(4051642 bytes read, 1380796 more expected)', IncompleteRead(4051642 bytes read, 1380796 more expected))"
+    "file": "data/pdfs/kuvic/2024-05-09_코리아에프티 - 하이브리드 샘이솟아 리오레이비.pdf",
+    "sha256": "0129c9c7f8484e16d61df96417466131c0fb82c0b257bf844b3acf0ce8298caa",
+    "error": null,
+    "size": 5432438,
+    "downloaded_at": "2026-06-11T05:08:14+00:00"
   },
   {
     "school": "kuvic",
@@ -21181,6 +21185,71 @@
     "sha256": "fa902eeab8eae17badbe17672b652b399e3824bb30ac54b7c7e1f949196d5094",
     "size": 1719906,
     "downloaded_at": "2026-06-10T08:39:55+00:00",
+    "error": null
+  },
+  {
+    "school": "smic",
+    "source_id": "smic-12634",
+    "title": "Equity Research, 파트론",
+    "page_url": "http://snusmic.com/equity-research-%ed%8c%8c%ed%8a%b8%eb%a1%a0/",
+    "pdf_url": "http://snusmic.com/wp-content/uploads/2026/06/26_1_4주차_수정보고서_5팀_파트론.pdf",
+    "published_hint": "2026-06-10",
+    "file": "data/pdfs/smic/2026-06-10_Equity Research, 파트론.pdf",
+    "sha256": "cb8234d08449206a4b32612dd40a0c13c9afd1d02f853a27495f2fb0cffab022",
+    "size": 2250206,
+    "downloaded_at": "2026-06-11T04:38:10+00:00",
+    "error": null
+  },
+  {
+    "school": "smic",
+    "source_id": "smic-12632",
+    "title": "Equity Research, 코오롱인더스트리",
+    "page_url": "http://snusmic.com/equity-research-%ec%bd%94%ec%98%a4%eb%a1%b1%ec%9d%b8%eb%8d%94%ec%8a%a4%ed%8a%b8%eb%a6%ac/",
+    "pdf_url": "http://snusmic.com/wp-content/uploads/2026/06/26_1_4주차_수정보고서_4팀_코오롱인더.pdf",
+    "published_hint": "2026-06-10",
+    "file": "data/pdfs/smic/2026-06-10_Equity Research, 코오롱인더스트리.pdf",
+    "sha256": "ac13844aa5f195b94480a70ced6ecf94aa504fd540b62b66e095fdcbe44cab42",
+    "size": 2520784,
+    "downloaded_at": "2026-06-11T04:38:13+00:00",
+    "error": null
+  },
+  {
+    "school": "smic",
+    "source_id": "smic-12629",
+    "title": "Equity Research, 농심홀딩스",
+    "page_url": "http://snusmic.com/equity-research-%eb%86%8d%ec%8b%ac%ed%99%80%eb%94%a9%ec%8a%a4/",
+    "pdf_url": "http://snusmic.com/wp-content/uploads/2026/06/26_1_4주차_수정보고서_3팀_농심홀딩스.pdf",
+    "published_hint": "2026-06-10",
+    "file": "data/pdfs/smic/2026-06-10_Equity Research, 농심홀딩스.pdf",
+    "sha256": "82d274234aef2ba95fa8934dd742c960488124b9e0597e82a4b0fef41599df10",
+    "size": 1998996,
+    "downloaded_at": "2026-06-11T04:38:15+00:00",
+    "error": null
+  },
+  {
+    "school": "smic",
+    "source_id": "smic-12627",
+    "title": "Equity Research, F&F홀딩스",
+    "page_url": "http://snusmic.com/equity-research-%ec%97%90%ed%94%84%ec%97%94%ec%97%90%ed%94%84%ed%99%80%eb%94%a9%ec%8a%a4/",
+    "pdf_url": "http://snusmic.com/wp-content/uploads/2026/06/26_1_4주차_수정보고서_2팀_에프앤에프홀딩스.pdf",
+    "published_hint": "2026-06-10",
+    "file": "data/pdfs/smic/2026-06-10_Equity Research, F&F홀딩스.pdf",
+    "sha256": "822c49cd678ec33c063f1d5695e96503081ecd92a4c7df343c22ba9e14f93d2c",
+    "size": 1896240,
+    "downloaded_at": "2026-06-11T04:38:18+00:00",
+    "error": null
+  },
+  {
+    "school": "smic",
+    "source_id": "smic-12625",
+    "title": "Equity Research, 금화피에스시",
+    "page_url": "http://snusmic.com/equity-research-%ea%b8%88%ed%99%94%ed%94%bc%ec%97%90%ec%8a%a4%ec%8b%9c/",
+    "pdf_url": "http://snusmic.com/wp-content/uploads/2026/06/26_1_4주차_수정보고서_1팀_금화피에스시.pdf",
+    "published_hint": "2026-06-10",
+    "file": "data/pdfs/smic/2026-06-10_Equity Research, 금화피에스시.pdf",
+    "sha256": "ac436de0f1bd0d60bff84fcc05b88c62bf6df520b8c22d24a7642c78a04fde17",
+    "size": 2568417,
+    "downloaded_at": "2026-06-11T04:38:20+00:00",
     "error": null
   }
 ]

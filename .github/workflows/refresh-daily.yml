@@ -1,0 +1,86 @@
+name: refresh-daily
+
+# Daily incremental run — weekdays after KR market close (09:30 UTC = 18:30 KST).
+# Runs collectors in incremental mode (no --full) so they stop early when nothing
+# is new, keeping origin-server load minimal. Downstream rebuild is always run so
+# price data stays fresh even on quiet report days.
+# OCR fallback (ocr_fallback.py) is Windows-only and is intentionally skipped in CI.
+on:
+  schedule:
+    - cron: "30 9 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Shared concurrency group prevents overlap with the weekly full-sweep workflow.
+concurrency:
+  group: verdict-archive-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh-daily:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - run: uv python install 3.12
+
+      - run: uv sync --frozen
+
+      # Install Playwright browsers (needed for KUVIC and Voera collectors).
+      - name: Install Playwright + browsers
+        run: uv run python -m playwright install chromium --with-deps
+
+      # JDK is available on ubuntu-latest via PATH (openjdk pre-installed).
+      # transcribe_pdfs.py uses pdfminer/pdfplumber (pure Python); JDK is only
+      # needed by opendataloader-pdf tools which this project does not use directly.
+
+      - name: Restore price cache
+        uses: actions/cache@v4
+        with:
+          path: data/prices
+          key: prices-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            prices-${{ runner.os }}-
+
+      # Each collector runs in incremental mode (default, no --full).
+      # continue-on-error: true ensures a single site outage does not abort the run.
+      - name: Collect new reports (incremental)
+        run: |
+          uv run python scripts/collect_reports.py --source all || true
+          uv run python scripts/collect_kuvic_browser.py || true
+          uv run python scripts/collect_smic.py || true
+          uv run python scripts/collect_ewha.py || true
+          uv run python scripts/collect_voera.py || true
+
+      # Transcription is incremental: already-transcribed .md files are skipped.
+      # ocr_fallback.py (Windows winocr) is intentionally skipped in CI.
+      - name: Transcribe only-new PDFs
+        run: |
+          uv run python scripts/transcribe_pdfs.py
+
+      - name: Rebuild dataset, charts, backtest
+        env:
+          KRX_ID: ${{ secrets.KRX_ID }}
+          KRX_PW: ${{ secrets.KRX_PW }}
+        run: |
+          uv run python scripts/build_report_performance.py --sleep 0.3
+          uv run python scripts/export_stock_charts.py
+          uv run python scripts/backtest_momentum.py
+
+      - name: Commit refreshed artifacts
+        run: |
+          git config user.name "verdict-archive-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/data/report-performance.json src/data/strategy-backtest.json public/prices \
+            data/report_performance.csv data/report_parsed.csv data/report_parse_issues.csv \
+            data/sources/manifest.json data/pdfs data/markdown
+          git diff --cached --quiet && echo "no changes" && exit 0
+          git commit -m "chore: daily refresh ($(date -u +%F))"
+          git push
