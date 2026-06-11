@@ -28,6 +28,8 @@ export const STRATEGY_LABEL_KO: Record<string, string> = {
   T_kospi_core_chandelier: "T. 코어-KOSPI 샹들리에",
   "T-_kospi_core_regime":  "T-. 코어-KOSPI 샹들리에 (레짐)",
   U_chandelier_scaleout:   "U. 과열 스케일아웃",
+  V_spo:                   "V-a. SPO+ 포트폴리오 (배분형)",
+  V_ls:                    "V-b. SPO LS 베이스라인 (배분형)",
 };
 
 export const STRATEGY_DESC_KO: Record<string, string> = {
@@ -56,6 +58,8 @@ export const STRATEGY_DESC_KO: Record<string, string> = {
   T_kospi_core_chandelier: "D+ 샹들리에 규칙 + 유휴 현금을 KOSPI 익스포저(KODEX200)로 주차. 베이스라인 = KOSPI DCA.",
   "T-_kospi_core_regime":  "T와 동일 + KOSPI < 200MA 구간에서는 파킹 수익률 0%(현금 보유). Faber (2007) 레짐 필터.",
   U_chandelier_scaleout:   "T-와 동일 + 과열 스케일아웃. extension > 8× → 절반 익절, > 12× → 나머지 절반 익절. Minervini circle / Fred6724.",
+  V_spo:                   "Smart 'Predict, then Optimize' (Elmachtoub & Grigas 2022). 선형모델 ĉ=Bx를 SPO+ 손실(의사결정 리그렛 상계) SGD로 학습 → 캡 심플렉스(Σw=1, w≤15%) LP 월간 리밸런스. 워크포워드 확장 윈도우(최소 24개월).",
+  V_ls:                    "V-a와 완전 동일 파이프라인, 손실만 최소제곱(LS) — 전통적 predict-then-optimize 베이스라인. SPO+ 손실 효과 단독 분리용 대조군.",
 };
 
 // ─── Verdict chips — why each non-curated strategy is out of the selector ────
@@ -82,6 +86,8 @@ export const STRATEGY_VERDICT: Record<string, StrategyVerdict> = {
   S_mincvar:               { chip: "연구용", reason: "S 배분형 변형 — IS 샤프 베스트 변형만 셀렉터 채택" },
   T_kospi_core_chandelier: { chip: "연구용", reason: "레짐 필터 없는 T 변형 — T-(레짐)에 열위" },
   U_chandelier_scaleout:   { chip: "기각",   reason: "과열 스케일아웃이 텐배거 상승 여력을 깎음 — T- 대비 부의 비율 열위" },
+  V_spo:                   { chip: "연구용", reason: "SPO+ 의사결정 학습 검증 — T- 승격 게이트(부의 비율+OOS 샤프) 미달, 연구 기록 유지" },
+  V_ls:                    { chip: "연구용", reason: "SPO+ 효과 분리용 LS 대조군 — 비교 앵커로만 유지" },
 };
 
 /** Build the curated selector key list from data (SOTA + core set + best-of-S). */

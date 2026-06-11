@@ -1,4 +1,14 @@
-"""학회 리포트 × 전략 연구 백테스트 v15.
+"""학회 리포트 × 전략 연구 백테스트 v16.
+
+변경사항 (v16):
+- V. SPO 포트폴리오 (Smart "Predict, then Optimize" — Elmachtoub & Grigas 2022):
+  V_spo(SPO+ 손실 SGD)·V_ls(동일 파이프라인 LS 베이스라인). 워크포워드 확장 윈도우
+  (최소 24개월) 매월 재학습, 캡 심플렉스(Σw=1, w≤15%) LP 닫힌형 오라클, 월말 신호 →
+  익월 첫 거래일 시가 체결 (run_portfolio_opt weight_schedule 모드 재사용).
+  학습/검증 알고리즘은 scripts/spo_portfolio.py — Julia 레퍼런스
+  (github.com/paulgrigas/SmartPredictThenOptimize sgd.jl/validation_set.jl) 미러.
+  셀렉터 승격은 U와 동일 관례(T 베스트 대비 부의 비율+OOS 샤프 게이트).
+  기존 'SPO(유상증자) 보류' 방법론 항목을 spo_predict_optimize 결과로 대체.
 
 변경사항 (v15):
 - S 포트폴리오 최적화 침묵 실패 수정: scipy/sklearn 미설치 시 _msharpe/_mincvar의
@@ -205,13 +215,18 @@ def _fetch_us_stock_yf(ticker: str) -> bool:
 
 
 def load_kospi() -> pd.Series:
+    # CI 콜드스타트(빈 캐시)에서도 동작하도록 파일이 없으면 yfinance로 받아 캐시한다
     path = PRICE_DIR / "IDX_KOSPI.csv"
+    if not path.exists():
+        return _fetch_index_yf("^KS11", "KOSPI")
     df = pd.read_csv(path, index_col=0, parse_dates=True).sort_index()
     return df["close"]
 
 
 def load_sp500() -> pd.Series:
     path = PRICE_DIR / "IDX_US.csv"
+    if not path.exists():
+        return _fetch_index_yf("^GSPC", "US")
     df = pd.read_csv(path, index_col=0, parse_dates=True).sort_index()
     return df["close"]
 
@@ -4520,9 +4535,10 @@ def run_portfolio_opt(
     reports: list[tuple[dt.date, str, str, int]],
     calendar: list[dt.date],
     label: str,
-    variant: str = "hrp",   # "hrp" | "msharpe" | "mincvar"
+    variant: str = "hrp",   # "hrp" | "msharpe" | "mincvar" | (외부 스케줄: "spo_plus"/"ls")
     ticker_reports: dict[str, list[dict]] | None = None,
     record_full_trades: bool = False,
+    weight_schedule: dict[dt.date, dict[str, float]] | None = None,
 ) -> dict:
     """
     S 포트폴리오 최적화 (월간 리밸런스).
@@ -4531,11 +4547,15 @@ def run_portfolio_opt(
     Trailing 252d 일별 수익률로 가중치 계산.
     월말 신호 → 다음 거래일 시가 체결.
     비용: 총 NAV × 턴오버 × 편도 비용.
+
+    weight_schedule (v16): 외부에서 계산한 {월말일 → {티커: 비중}} 스케줄이 주어지면
+    내부 가중치 계산을 건너뛰고 동일한 실행 메커니즘(월말 신호 → 익월 첫 거래일
+    시가 체결, 턴오버 비용)으로 체결만 수행. V(SPO) 패밀리가 사용.
     """
     # ── v15 프리플라이트: 의존성 누락은 즉시 크게 실패 ──────────────────────
     # (과거 버그: scipy 미설치 시 월별 except가 ImportError를 삼켜
     #  NAV 1.0 평탄·거래 0건의 "유령 전략"이 조용히 출력되었다)
-    if variant in ("msharpe", "mincvar"):
+    if weight_schedule is None and variant in ("msharpe", "mincvar"):
         try:
             import scipy.optimize  # noqa: F401
         except ImportError as e:
@@ -4689,7 +4709,12 @@ def run_portfolio_opt(
                 pos["last_close"] = float(df.loc[day_ts]["close"])
 
         # Month-end: compute new target weights (point-in-time signal)
-        if day in month_ends:
+        if day in month_ends and weight_schedule is not None:
+            # 외부 스케줄 모드 (V SPO 패밀리): 사전 계산된 비중 사용
+            sched_w = weight_schedule.get(day)
+            if sched_w:
+                target_weights = {t: v for t, v in sched_w.items() if v > 0.001}
+        elif day in month_ends:
             lookback_start = day - dt.timedelta(days=S_LOOKBACK_DAYS + 30)
             # Build active universe
             active: list[str] = []
@@ -5350,7 +5375,7 @@ def main() -> int:
     # Parameters are literature-grounded fixed values — no grid search
     # ══════════════════════════════════════════════════════════════════════════
 
-    print("\n── Running strategy battery (v15: S silent-failure fix, signals rework) ──", flush=True)
+    print("\n── Running strategy battery (v16: V SPO predict-then-optimize 추가) ──", flush=True)
 
     # A. 12개월 보유 (baseline)
     print("A. 12개월 보유...", flush=True)
@@ -5552,6 +5577,28 @@ def main() -> int:
     best_s_result = s_variants[best_s_key]
     print(f"   Best S variant (IS sharpe): {best_s_key} → IS {best_s_result['in_sample'].get('sharpe')}  OOS {best_s_result['out_of_sample'].get('sharpe')}", flush=True)
 
+    # ── V. SPO 포트폴리오 — Smart "Predict, then Optimize" (Elmachtoub & Grigas 2022)
+    # 워크포워드 학습/예측은 spo_portfolio.py, 체결은 run_portfolio_opt 스케줄 모드.
+    # V_spo: SPO+ 손실 SGD (Julia 레포 미러), V_ls: 동일 파이프라인 LS 손실 베이스라인.
+    print("V. SPO 포트폴리오 (SPO+ vs LS 베이스라인, 워크포워드 월간 리밸런스)...", flush=True)
+    sys.path.insert(0, str(ROOT / "scripts"))
+    from spo_portfolio import compute_spo_weight_schedules
+    spo_schedules, spo_meta = compute_spo_weight_schedules(prices, reports, calendar, ticker_reports)
+    result_V_spo = run_portfolio_opt(
+        prices, reports, calendar,
+        label="V_spo", variant="spo_plus",
+        ticker_reports=ticker_reports, record_full_trades=True,
+        weight_schedule=spo_schedules["spo_plus"],
+    )
+    print(f"   V_spo (SPO+) IS sharpe={result_V_spo['in_sample'].get('sharpe')}  OOS sharpe={result_V_spo['out_of_sample'].get('sharpe')}", flush=True)
+    result_V_ls = run_portfolio_opt(
+        prices, reports, calendar,
+        label="V_ls", variant="ls",
+        ticker_reports=ticker_reports, record_full_trades=True,
+        weight_schedule=spo_schedules["ls"],
+    )
+    print(f"   V_ls  (LS)   IS sharpe={result_V_ls['in_sample'].get('sharpe')}  OOS sharpe={result_V_ls['out_of_sample'].get('sharpe')}", flush=True)
+
     # All strategies for comparison (L/M included for diagnostics but flagged)
     all_strategies: dict[str, dict] = {
         "A_12mo": result_A,
@@ -5576,13 +5623,17 @@ def main() -> int:
         "S_hrp": result_S_hrp,
         "S_msharpe": result_S_msharpe,
         "S_mincvar": result_S_mincvar,
+        # V: SPO+ vs LS — 연구 기록 테이블 기본, 셀렉터는 T- 게이트 통과 시에만 (아래)
+        "V_spo": result_V_spo,
+        "V_ls": result_V_ls,
         # T / T-: added after D+ Optuna + T runs (see below)
     }
     # Strategies excluded from headline selector (cost-death confirmed or sub-variants)
     # S sub-variants: only best_s_key is eligible; the other two are excluded from selector
     # T-: regime variant — not directly in selector (best of T/T- wins as "T. 코어-KOSPI 샹들리에")
     s_non_best = {k for k in s_variants if k != best_s_key}
-    EXCLUDED_FROM_SELECTOR = {"L_rsi2_reversion", "M_short_reversal", "T-_kospi_core_regime", "U_chandelier_scaleout"} | s_non_best
+    # V_spo/V_ls: 기본 연구 기록 전용 — V_spo는 T- 게이트(부의 비율+OOS 샤프) 통과 시에만 셀렉터 승격
+    EXCLUDED_FROM_SELECTOR = {"L_rsi2_reversion", "M_short_reversal", "T-_kospi_core_regime", "U_chandelier_scaleout", "V_spo", "V_ls"} | s_non_best
 
     # ── D+ Optuna optimization ─────────────────────────────────────────────────
     print("\n── Optuna robust optimization (D+ chandelier) ───────────────────", flush=True)
@@ -5853,8 +5904,40 @@ def main() -> int:
     print(f"  U max_trade={_u_max_trade}%  T- max_trade={_tm_max_trade}%", flush=True)
     print(f"  U top-decile PnL share={_u_tb.get('top_decile_pnl_share_pct')}%  T- {_tm_tb.get('top_decile_pnl_share_pct')}%", flush=True)
 
+    # ── V(SPO+) 승격 판정 — 기존 승격 관례 (U와 동일): T 베스트 변형 대비
+    # 부의 비율 우위 AND OOS 샤프 동등 이상일 때만 셀렉터 승격. 아니면 연구 기록 전용.
+    _vspo_ratio = (_kospi_dca_ratios.get("V_spo", {}).get("full_ratio") or 0.0)
+    _vls_ratio  = (_kospi_dca_ratios.get("V_ls",  {}).get("full_ratio") or 0.0)
+    _vspo_is  = (result_V_spo.get("in_sample", {}).get("sharpe") or -999.0)
+    _vspo_oos = (result_V_spo.get("out_of_sample", {}).get("sharpe") or -999.0)
+    _vls_is   = (result_V_ls.get("in_sample", {}).get("sharpe") or -999.0)
+    _vls_oos  = (result_V_ls.get("out_of_sample", {}).get("sharpe") or -999.0)
+
+    _v_promoted = (_vspo_ratio > _tm_ratio_cmp and _vspo_oos >= _tm_oos_cmp)
+    if _v_promoted:
+        EXCLUDED_FROM_SELECTOR.discard("V_spo")
+        v_verdict_str = "PROMOTED — SPO+가 T 베스트 대비 부의 비율·OOS 샤프 모두 우위"
+    else:
+        v_verdict_str = (
+            "NOT PROMOTED — "
+            + ("부의 비율이 T 베스트에 미달" if _vspo_ratio <= _tm_ratio_cmp else "부의 비율은 앞서나 OOS 샤프 미달")
+            + " → 연구 기록 전용"
+        )
+
+    # 논문의 핵심 주장 검증: 같은 파이프라인에서 SPO+ > LS (오지정 하 의사결정 품질)
+    _spo_beats_ls_is  = _vspo_is  > _vls_is
+    _spo_beats_ls_oos = _vspo_oos > _vls_oos
+    spo_vs_ls_verdict = (
+        f"SPO+ vs LS — IS {_vspo_is} vs {_vls_is} ({'SPO+ 우위' if _spo_beats_ls_is else 'LS 우위/동률'}), "
+        f"OOS {_vspo_oos} vs {_vls_oos} ({'SPO+ 우위' if _spo_beats_ls_oos else 'LS 우위/동률'}), "
+        f"vs KOSPI DCA {_vspo_ratio}x vs {_vls_ratio}x"
+    )
+    print(f"\nV(SPO) verdict: {v_verdict_str}", flush=True)
+    print(f"  {spo_vs_ls_verdict}", flush=True)
+    print(f"  realized decision stats: {spo_meta.get('realized_decision_stats')}", flush=True)
+
     # ── Summary table (all strategies including L/M for transparency)
-    print(f"\n── Strategy summary (v15, {len(all_strategies)} strategies; L/M/S-non-best/T-loser/U(if not promoted) excluded from selector) ──", flush=True)
+    print(f"\n── Strategy summary (v16, {len(all_strategies)} strategies; L/M/S-non-best/T-loser/U·V(if not promoted) excluded from selector) ──", flush=True)
     print(f"{'Strategy':<32} {'IS Shp':>8} {'OOS Shp':>9} {'WinRate':>8} {'vs KOSPI DCA':>13} {'Trades':>7} {'Note':>12}", flush=True)
     for key, r in all_strategies.items():
         is_m  = r.get("in_sample", {})
@@ -6231,9 +6314,52 @@ def main() -> int:
                 "장중(intraday) 데이터는 도입 범위 외: 한국 주식 1분봉/tick 데이터 미수집으로 "
                 "장중 진입/청산 시뮬레이션 불가. 일봉(daily close) 기반 전략만 구현."
             ),
-            "spo_deferred": (
-                "SPO(Secondary Public Offering) 이벤트 기반 전략은 미래 작업으로 보류: "
-                "SPO 공시 데이터 수집 파이프라인 미구축."
+        },
+        # ── v16: V. SPO 포트폴리오 — Smart "Predict, then Optimize" ───────────
+        # (기존 'SPO는 향후 과제' 항목 대체. 유상증자(Secondary Public Offering)
+        #  이벤트 전략은 여전히 범위 밖 — 여기의 SPO는 Elmachtoub & Grigas의
+        #  Smart Predict-then-Optimize 프레임워크.)
+        "spo_predict_optimize": {
+            "paper": spo_meta.get("paper"),
+            "reference_impl": spo_meta.get("reference_impl"),
+            "decision_problem": spo_meta.get("decision_problem"),
+            "features": spo_meta.get("features"),
+            "hyperparams": spo_meta.get("hyperparams"),
+            "mirrored_from_julia": spo_meta.get("mirrored_from_julia"),
+            "adaptations": spo_meta.get("adaptations"),
+            "panel_months": spo_meta.get("panel_months"),
+            "first_rebalance": spo_meta.get("first_rebalance"),
+            "n_rebalances": spo_meta.get("n_rebalances"),
+            "n_train_months_final": spo_meta.get("n_train_months_final"),
+            "lambda_selected_last": spo_meta.get("lambda_selected_last"),
+            "realized_decision_stats": spo_meta.get("realized_decision_stats"),
+            "V_spo": {
+                "is_sharpe": result_V_spo["in_sample"].get("sharpe"),
+                "oos_sharpe": result_V_spo["out_of_sample"].get("sharpe"),
+                "trades": result_V_spo["metrics"]["trades"],
+                "mdd_pct": result_V_spo["metrics"].get("mdd_pct"),
+                "kospi_dca_ratio": _vspo_ratio,
+            },
+            "V_ls": {
+                "is_sharpe": result_V_ls["in_sample"].get("sharpe"),
+                "oos_sharpe": result_V_ls["out_of_sample"].get("sharpe"),
+                "trades": result_V_ls["metrics"]["trades"],
+                "mdd_pct": result_V_ls["metrics"].get("mdd_pct"),
+                "kospi_dca_ratio": _vls_ratio,
+            },
+            "spo_beats_ls": {"is": _spo_beats_ls_is, "oos": _spo_beats_ls_oos},
+            "spo_vs_ls_verdict": spo_vs_ls_verdict,
+            "promoted_to_selector": _v_promoted,
+            "promotion_verdict": v_verdict_str,
+            "promotion_criteria": "U와 동일 관례: T 베스트 변형 대비 전체 기간 부의 비율 우위 AND OOS 샤프 동등 이상",
+            "warmup_note": (
+                "워크포워드 최소 24개월 학습 윈도우 — 첫 리밸런스 이전 구간은 현금 보유 "
+                "(NAV 평탄). IS 샤프는 이 현금 구간을 포함해 계산되므로 상시 투자 전략과의 "
+                "직접 비교 시 주의."
+            ),
+            "spo_secondary_offering_note": (
+                "주의: 과거 방법론의 'SPO(유상증자) 이벤트 전략 보류'와는 별개. "
+                "유상증자 이벤트 전략은 여전히 데이터 파이프라인 부재로 범위 밖."
             ),
         },
         "kospi_dca_ratios": _kospi_dca_ratios,

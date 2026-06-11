@@ -15,7 +15,7 @@ import { cn, formatPct } from "@/lib/utils";
 export const metadata: Metadata = {
   title: "전략 — 판결 아카이브",
   description:
-    "학회 리포트 유니버스에서 25개 전략 변형을 IS/OOS로 검증. SOTA 전략의 임박 매매 신호와 전체 연구 기록.",
+    "학회 리포트 유니버스에서 전체 전략 변형을 IS/OOS로 검증. SOTA 전략의 임박 매매 신호와 전체 연구 기록.",
 };
 
 function tickerSlug(market: string, ticker: string): string {
@@ -255,6 +255,26 @@ export default function StrategyPage() {
     };
     methodology: string;
     adoption_criteria: string;
+  } | undefined;
+  const spoNote = (backtest as Record<string, unknown>).spo_predict_optimize as {
+    paper: string;
+    reference_impl: string;
+    decision_problem: string;
+    features: string[];
+    mirrored_from_julia: string;
+    adaptations: string;
+    panel_months: number;
+    first_rebalance: string | null;
+    n_rebalances: number;
+    n_train_months_final: number;
+    V_spo: { is_sharpe: number | null; oos_sharpe: number | null; trades: number; mdd_pct: number | null; kospi_dca_ratio: number | null };
+    V_ls: { is_sharpe: number | null; oos_sharpe: number | null; trades: number; mdd_pct: number | null; kospi_dca_ratio: number | null };
+    spo_beats_ls: { is: boolean; oos: boolean };
+    spo_vs_ls_verdict: string;
+    promoted_to_selector: boolean;
+    promotion_verdict: string;
+    promotion_criteria: string;
+    warmup_note: string;
   } | undefined;
   const multiStrategy = backtest.multi_strategy as unknown as MultiStrategyData;
   const universeStats = backtest.universe_stats as {
@@ -736,8 +756,8 @@ export default function StrategyPage() {
               },
               {
                 n: 12,
-                title: "범위 밖 전략 — 장중(intraday) 및 SPO",
-                body: "장중(intraday) 데이터 기반 전략은 일봉 데이터만 사용하는 현 파이프라인 범위 밖으로 도입하지 않음. SPO(Secondary Public Offering) 이벤트 기반 전략은 향후 작업으로 보류.",
+                title: "V. SPO 포트폴리오 — Smart 'Predict, then Optimize'",
+                body: "Elmachtoub & Grigas (2022, Management Science) SPO+ 손실 구현 — 'SPO는 향후 과제' 항목을 결과로 대체. 선형모델 ĉ=Bx를 SPO+ 손실로 SGD 학습(V-a), 동일 파이프라인 LS 손실 대조군(V-b). 캡 심플렉스(Σw=1, w≤15%) LP는 닫힌형 그리디 오라클. 워크포워드 최소 24개월, 월말 신호 → 익월 첫 거래일 시가 체결, 비용 0.3%/side. 상세·정직한 판정은 아래 'SPO 방법론 공개' 참조. 장중(intraday) 전략과 유상증자(Secondary Public Offering) 이벤트 전략은 여전히 범위 밖(데이터 부재).",
               },
               {
                 n: 13,
@@ -808,6 +828,52 @@ export default function StrategyPage() {
                 </div>
               </div>
               <p className="mt-3 text-xs italic text-muted-foreground">{optunaNote.methodology}</p>
+            </section>
+          )}
+
+          {/* SPO (Smart Predict-then-Optimize) methodology disclosure */}
+          {spoNote && (
+            <section className="rounded-lg border border-stamp/40 bg-stamp/5 p-5">
+              <h3 className="font-display text-lg font-black tracking-tight">
+                V. SPO 방법론 공개 — Smart &lsquo;Predict, then Optimize&rsquo;
+                {spoNote.promoted_to_selector
+                  ? <span className="ml-2 font-mono text-[11px] font-normal text-up">셀렉터 승격</span>
+                  : <span className="ml-2 font-mono text-[11px] font-normal text-muted-foreground">연구 기록 전용</span>
+                }
+              </h3>
+              <p className="mt-2 text-xs text-muted-foreground">
+                논문: {spoNote.paper} · 참조 구현: {spoNote.reference_impl}
+              </p>
+              <div className="mt-3 grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
+                <div>
+                  <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-foreground">결과 — V-a SPO+ vs V-b LS</p>
+                  <ul className="mt-1 space-y-0.5">
+                    <li>· IS 샤프: {spoNote.V_spo.is_sharpe ?? "—"} vs {spoNote.V_ls.is_sharpe ?? "—"}</li>
+                    <li>· OOS 샤프: {spoNote.V_spo.oos_sharpe ?? "—"} vs {spoNote.V_ls.oos_sharpe ?? "—"}</li>
+                    <li>· vs KOSPI DCA: {spoNote.V_spo.kospi_dca_ratio ?? "—"}x vs {spoNote.V_ls.kospi_dca_ratio ?? "—"}x</li>
+                    <li>· SPO+ &gt; LS (논문 주장): IS {spoNote.spo_beats_ls.is ? "성립" : "불성립"} · OOS {spoNote.spo_beats_ls.oos ? "성립" : "불성립"}</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-foreground">워크포워드 설정</p>
+                  <ul className="mt-1 space-y-0.5">
+                    <li>· 의사결정: {spoNote.decision_problem}</li>
+                    <li>· 패널 {spoNote.panel_months}개월 · 리밸런스 {spoNote.n_rebalances}회 (첫 리밸런스 {spoNote.first_rebalance ?? "—"})</li>
+                    <li>· 최종 학습 윈도우 {spoNote.n_train_months_final}개월 (확장, 최소 24)</li>
+                    <li>· 피처 {spoNote.features.length}종: {spoNote.features.join(", ")}</li>
+                  </ul>
+                </div>
+              </div>
+              <p className="mt-3 text-xs text-muted-foreground">
+                <strong className="text-foreground">Julia 레퍼런스에서 미러:</strong> {spoNote.mirrored_from_julia}
+              </p>
+              <p className="mt-1.5 text-xs text-muted-foreground">
+                <strong className="text-foreground">우리의 적응:</strong> {spoNote.adaptations}
+              </p>
+              <p className="mt-1.5 text-xs text-muted-foreground">{spoNote.warmup_note}</p>
+              <p className="mt-3 text-xs italic text-muted-foreground">
+                판정: {spoNote.promotion_verdict} (승격 기준: {spoNote.promotion_criteria}) · {spoNote.spo_vs_ls_verdict}
+              </p>
             </section>
           )}
 
