@@ -1,6 +1,8 @@
-// ─── Shared strategy metadata — labels, descriptions, verdicts ────────────────
+// ─── Shared strategy metadata — labels, descriptions, groups ──────────────────
 // Used by both the server page (research record table) and the client selector.
-// No cryptic symbols (★/⚠) — explicit chips with reasons instead.
+// 판정(SOTA/채택/연구용/기각)과 그 사유는 여기에 없다 — 백테스트가 실행 시점의
+// 실제 수치로 생성해 strategy-backtest.json에 기록한다 (multi_strategy.strategies[].verdict).
+// 이 파일은 규칙 메커니즘 설명(라벨·전략 규칙·그룹)만 갖는다.
 
 export const STRATEGY_LABEL_KO: Record<string, string> = {
   A_12mo:                  "A. 12개월 보유",
@@ -61,48 +63,24 @@ export const STRATEGY_DESC_KO: Record<string, string> = {
   V_ls:                    "V-a와 완전 동일 파이프라인, 손실만 최소제곱(LS) — 전통적 predict-then-optimize 베이스라인. SPO+ 손실 효과 단독 분리용 대조군.",
 };
 
-// ─── Verdict chips — why each non-curated strategy is out of the selector ────
-// chip: "기각" (rejected — cost/performance) | "연구용" (research reference only)
-
-export type StrategyVerdict = { chip: "기각" | "연구용"; reason: string };
-
-export const STRATEGY_VERDICT: Record<string, StrategyVerdict> = {
-  A_12mo:                  { chip: "연구용", reason: "기준선 전략 — 비교 앵커로만 유지" },
-  E_half_runner:           { chip: "기각",   reason: "조기 절반 익절이 러너(멀티배거) 수익을 희석" },
-  G_dip_buy:               { chip: "기각",   reason: "-20% 하락이 저점이 아니라 시작인 경우 다수 — IS/OOS 모두 벤치마크 하회" },
-  H_minervini:             { chip: "연구용", reason: "OOS 양호하나 IS 샤프 미달 — 표본 부족" },
-  I_supertrend:            { chip: "기각",   reason: "잦은 추세 전환 → 거래비용 누적으로 알파 소진" },
-  J_core_satellite:        { chip: "연구용", reason: "D 오버레이 참고용 — 차입비용·폭락 타이밍 리스크" },
-  K_rr_trend:              { chip: "기각",   reason: "빠른 사이클이 거래비용을 키움" },
-  N_52w_high:              { chip: "연구용", reason: "OOS 양호, IS 샤프 미달 — 참고용" },
-  O_mtt_alpha16:           { chip: "연구용", reason: "alpha16 KRX 파라미터 이식 — 본 유니버스 미튜닝, 비교 참고용" },
-  Q_kangto_trend:          { chip: "기각",   reason: "IS 음(-) 샤프 — 손절 다발, 이 유니버스에서 미작동" },
-  R_kelly_chandelier:      { chip: "연구용", reason: "Kelly 사이징 효과 단독 검증용 오버레이" },
-  S_hrp:                   { chip: "연구용", reason: "S 배분형 변형 — IS 샤프 베스트 변형만 셀렉터 채택" },
-  S_msharpe:               { chip: "연구용", reason: "S 배분형 변형 — IS 샤프 베스트 변형만 셀렉터 채택" },
-  S_mincvar:               { chip: "연구용", reason: "S 배분형 변형 — IS 샤프 베스트 변형만 셀렉터 채택" },
-  T_kospi_core_chandelier: { chip: "연구용", reason: "상시 KOSPI 파킹 (레짐 없음) — 파킹 비교 앵커로 유지" },
-  "T-_kospi_core_regime":  { chip: "연구용", reason: "KOSPI 파킹 + 200MA 레짐 변형 — 파킹 콘테스트에서 W에 패배 (자기 벤치마크 KOSPI DCA 미달)" },
-  W_allweather_chandelier: { chip: "연구용", reason: "올웨더 파킹 변형 — 파킹 콘테스트(vs T-) 승자, 자기 벤치마크(올웨더 DCA) 우위" },
-  U_chandelier_scaleout:   { chip: "기각",   reason: "과열 스케일아웃이 텐배거 상승 여력을 깎음 — 파킹 챔피언 대비 부의 비율 열위" },
-  V_spo:                   { chip: "연구용", reason: "SPO+ 의사결정 학습 검증 — T- 승격 게이트(부의 비율+OOS 샤프) 미달, 연구 기록 유지" },
-  V_ls:                    { chip: "연구용", reason: "SPO+ 효과 분리용 LS 대조군 — 비교 앵커로만 유지" },
-};
-
-/** Build the curated selector key list from data (SOTA + core set + best-of-S). */
-export function buildCuratedKeys(headlineKey: string, bestSKey: string | null | undefined): string[] {
-  const base = [
-    headlineKey,                 // SOTA (T- 등 — 데이터가 정함)
-    "D+_chandelier_optuna",
-    "D_chandelier",
-    "B_36mo",
-    "C_narrative",
-    "P_deepbuy_chandelier",
-    "F_momentum_narrative",
-    ...(bestSKey ? [bestSKey] : []),
-  ];
-  return [...new Set(base)];
-}
+// ─── 전략 그룹 — 셀렉터 칩 보드의 헤더 분류 ──────────────────────────────────
+export const STRATEGY_GROUPS: { name: string; keys: string[] }[] = [
+  {
+    name: "보유형",
+    keys: ["A_12mo", "B_36mo", "C_narrative", "E_half_runner", "F_momentum_narrative", "G_dip_buy", "N_52w_high"],
+  },
+  {
+    name: "추세형",
+    keys: [
+      "D_chandelier", "D+_chandelier_optuna", "H_minervini", "I_supertrend", "K_rr_trend",
+      "O_mtt_alpha16", "P_deepbuy_chandelier", "Q_kangto_trend",
+      "T_kospi_core_chandelier", "T-_kospi_core_regime", "W_allweather_chandelier", "U_chandelier_scaleout",
+    ],
+  },
+  { name: "오버레이", keys: ["J_core_satellite", "R_kelly_chandelier"] },
+  { name: "배분형", keys: ["S_hrp", "S_msharpe", "S_mincvar"] },
+  { name: "회귀형", keys: ["V_spo", "V_ls"] },
+];
 
 export const BENCHMARK_KO: Record<string, string> = {
   KOSPI: "KOSPI", SP500: "S&P500", NASDAQ: "NASDAQ", AllWeather: "올웨더",

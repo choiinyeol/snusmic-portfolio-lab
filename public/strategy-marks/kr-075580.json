@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-11T09:20:19+00:00",
-  "strategy_key": "T-_kospi_core_regime",
+  "generated_at": "2026-06-11T09:52:00+00:00",
+  "strategy_key": "U_chandelier_scaleout",
   "ticker": "075580",
   "market": "KR",
   "name": "세진중공업",
@@ -11,25 +11,37 @@
       "date": "2020-01-02",
       "side": "buy",
       "price": 3057.0,
-      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2019-12-24)"
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: smic 2019-12-24)"
     },
     {
       "date": "2020-02-03",
       "side": "stop",
       "price": 2639.0,
-      "reason": "t_chandelier_ATR4.25 (-14.2%)"
+      "reason": "u_chandelier_ATR4.25 (-14.2%)"
     },
     {
       "date": "2020-06-23",
       "side": "buy",
       "price": 4050.0,
-      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2020-06-22)"
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: smic 2020-06-22)"
+    },
+    {
+      "date": "2020-06-23",
+      "side": "buy",
+      "price": 4050.0,
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: smic 2020-06-22)"
+    },
+    {
+      "date": "2020-06-23",
+      "side": "sell",
+      "price": 4151.0,
+      "reason": "u_scaleout1_ext8.6x (+1.8%)"
     },
     {
       "date": "2020-07-14",
       "side": "stop",
       "price": 3793.0,
-      "reason": "t_chandelier_ATR4.25 (-7.0%)"
+      "reason": "u_chandelier_ATR4.25 (-7.0%)"
     }
   ],
   "open_stop": null

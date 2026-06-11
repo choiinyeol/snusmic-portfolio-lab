@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { WealthChart } from "@/components/strategy/wealth-chart";
+import { OverlayChart, type OverlaySeries } from "@/components/strategy/overlay-chart";
 import { useSortable, SortableTh, type SortColumn } from "@/components/sortable";
 import { signColor } from "@/lib/verdict";
 import { cn, formatPct, formatPrice } from "@/lib/utils";
 import {
   STRATEGY_LABEL_KO,
   STRATEGY_DESC_KO,
+  STRATEGY_GROUPS,
   BENCHMARK_KO,
 } from "@/components/strategy/strategy-meta";
 
@@ -49,6 +50,9 @@ type StrategyRow = {
   best_trade_ticker: string | null;
   top_decile_pnl_share_pct: number;
   trade_count: number;
+  // v20: 백테스트가 생성한 데이터 주도 판정
+  verdict?: string | null;
+  verdict_reason?: string | null;
 };
 
 type StrategyWealthSim = {
@@ -96,13 +100,14 @@ type OpenPosition = {
   return_pct: number;
   source?: string;
   n_clubs?: number;
-  extension?: number | null;  // ATR% multiple from 50-MA (과열 게이지)
+  extension?: number | null;  // ATR% Multiple from 50-MA (과열 게이지)
   entry_reason?: string;      // v18: 왜 진입했는가
 };
 
 type MultiStrategyData = {
   strategies: StrategyRow[];
   headline_key: string;
+  curated_keys?: string[];
   strategy_wealth_sims: Record<string, StrategyWealthSim>;
   equity_by_strategy: Record<string, EquityPoint[]>;
   yearly_by_strategy: Record<string, YearlyReturn[]>;
@@ -134,6 +139,45 @@ function tickerSlugFromTrade(trade: Trade): string | null {
 function fmt만(v: number) {
   if (v >= 100_000_000) return `${(v / 100_000_000).toFixed(1)}억원`;
   return `${Math.round(v / 10_000).toLocaleString("ko-KR")}만원`;
+}
+
+function fmtNav(v: number) {
+  return v.toFixed(2);
+}
+
+// ─── 색 팔레트 — 전략별 고정·구분 가능한 색 (SOTA는 스탬프 적색) ──────────────
+// 인덱스는 그룹 순서 기준으로 안정적 — 토글을 껐다 켜도 색이 바뀌지 않는다.
+const PALETTE = [
+  "#1971c2", "#2f9e44", "#9c36b5", "#f08c00", "#0c8599", "#e64980", "#5f3dc4",
+  "#74b816", "#d6336c", "#1098ad", "#7048e8", "#c2255c", "#099268", "#3b5bdb",
+  "#fd7e14", "#0ca678", "#845ef7", "#a61e4d", "#228be6", "#66a80f", "#fab005",
+  "#15aabf", "#7950f2", "#fa5252", "#40c057", "#e8590c",
+];
+
+const BENCH_DEFS: { id: string; label: string; color: string; field: keyof WealthPoint }[] = [
+  { id: "KOSPI",      label: "KOSPI DCA",  color: "#868e96", field: "KOSPI_value" },
+  { id: "AllWeather", label: "올웨더 DCA",  color: "#f59e0b", field: "AllWeather_value" },
+  { id: "SP500",      label: "S&P500 DCA", color: "#60a5fa", field: "SP500_value" },
+  { id: "NASDAQ",     label: "NASDAQ DCA", color: "#34d399", field: "NASDAQ_value" },
+];
+
+// ─── Verdict chip (데이터 주도 — JSON verdict 필드 표시) ─────────────────────
+
+function VerdictChip({ kind, reason }: { kind: string; reason?: string | null }) {
+  const styles: Record<string, string> = {
+    SOTA: "bg-stamp text-background",
+    채택: "border border-up/50 bg-up/10 text-up",
+    기각: "border border-down/50 bg-down/10 text-down",
+    연구용: "border border-border bg-secondary/40 text-muted-foreground",
+  };
+  return (
+    <span
+      className={cn("inline-block rounded-sm px-1.5 py-0.5 font-mono text-[10px] font-bold cursor-help", styles[kind] ?? styles["연구용"])}
+      title={reason ?? undefined}
+    >
+      {kind}
+    </span>
+  );
 }
 
 // ─── Trade columns definition ─────────────────────────────────────────────────
@@ -570,6 +614,10 @@ function TradeLog({ trades, stratKey }: { trades: Trade[]; stratKey: string }) {
 }
 
 // ─── Main component ────────────────────────────────────────────────────────────
+// v20 UX: 단일 선택 탭 → 멀티 온/오프 오버레이 토글 + 포커스.
+//   · 색 스와치 클릭 = 곡선 표시 토글 (자산곡선 + 적립 시뮬 동시 오버레이)
+//   · 전략 이름 클릭 = 포커스 (상세 통계·보유 중·거래 로그·CSV 패널 바인딩, 곡선도 자동 ON)
+//   · 벤치마크(KOSPI/올웨더 DCA 등)는 적립 시뮬 차트의 항상 가능한 토글
 
 export function StrategySelector({
   multiStrategy,
@@ -580,90 +628,260 @@ export function StrategySelector({
   multiStrategy: MultiStrategyData;
   wealthSimGlobal: WealthSimGlobal;
   allTrades: Record<string, Trade[]>;
-  /** Focused key list (SOTA + adopted set). Others live in the research record table. */
+  /** 채택(셀렉터) 키 목록 — JSON multi_strategy.curated_keys (프리셋 버튼용) */
   curatedKeys?: string[];
 }) {
-  const [selectedKey, setSelectedKey] = useState<string>(multiStrategy.headline_key);
+  const headlineKey = multiStrategy.headline_key;
+  const presentKeys = useMemo(() => new Set(multiStrategy.strategies.map((s) => s.key)), [multiStrategy.strategies]);
 
-  const tabKeys = (curatedKeys && curatedKeys.length
-    ? curatedKeys
-    : multiStrategy.strategies.map((s) => s.key)
-  ).filter((k) => multiStrategy.strategies.some((s) => s.key === k));
+  // 그룹 순서대로 전 전략 나열 (그룹에 없는 신규 키는 "기타"로)
+  const groups = useMemo(() => {
+    const seen = new Set<string>();
+    const g = STRATEGY_GROUPS.map((grp) => ({
+      name: grp.name,
+      keys: grp.keys.filter((k) => {
+        if (!presentKeys.has(k)) return false;
+        seen.add(k);
+        return true;
+      }),
+    })).filter((grp) => grp.keys.length > 0);
+    const leftovers = multiStrategy.strategies.map((s) => s.key).filter((k) => !seen.has(k));
+    if (leftovers.length) g.push({ name: "기타", keys: leftovers });
+    return g;
+  }, [presentKeys, multiStrategy.strategies]);
+
+  const allKeysOrdered = useMemo(() => groups.flatMap((g) => g.keys), [groups]);
+
+  // 색 배정 — 그룹 순서 인덱스로 고정, SOTA는 스탬프 적색(차트에서 "stamp" 해석)
+  const colorOf = useMemo(() => {
+    const map = new Map<string, string>();
+    allKeysOrdered.forEach((k, i) => map.set(k, k === headlineKey ? "stamp" : PALETTE[i % PALETTE.length]));
+    return map;
+  }, [allKeysOrdered, headlineKey]);
+
+  // 기본 ON: SOTA + D + B (+ KOSPI DCA 벤치마크)
+  const [enabled, setEnabled] = useState<Set<string>>(() => {
+    const def = [headlineKey, "D_chandelier", "B_36mo"].filter((k) => presentKeys.has(k));
+    return new Set(def);
+  });
+  const [benchOn, setBenchOn] = useState<Set<string>>(() => new Set(["KOSPI"]));
+  const [focusKey, setFocusKey] = useState<string>(headlineKey);
+  const [wealthLog, setWealthLog] = useState(true); // 자산곡선은 로그가 정직함
+
+  const toggleStrategy = (key: string) => {
+    setEnabled((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+  const focusStrategy = (key: string) => {
+    setFocusKey(key);
+    setEnabled((prev) => (prev.has(key) ? prev : new Set(prev).add(key)));
+  };
+  const toggleBench = (id: string) => {
+    setBenchOn((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   const selected =
-    multiStrategy.strategies.find((s) => s.key === selectedKey) ??
-    multiStrategy.strategies.find((s) => s.key === multiStrategy.headline_key)!;
-  const wealthSim = multiStrategy.strategy_wealth_sims[selectedKey];
-  const equity = multiStrategy.equity_by_strategy[selectedKey] ?? [];
-  const yearly = multiStrategy.yearly_by_strategy[selectedKey] ?? [];
+    multiStrategy.strategies.find((s) => s.key === focusKey) ??
+    multiStrategy.strategies.find((s) => s.key === headlineKey)!;
+  const wealthSim = multiStrategy.strategy_wealth_sims[focusKey];
+  const yearly = multiStrategy.yearly_by_strategy[focusKey] ?? [];
   // Prefer trades_by_strategy (v8) over legacy allTrades prop
-  const tradesRaw = multiStrategy.trades_by_strategy?.[selectedKey] ?? allTrades[selectedKey] ?? [];
+  const tradesRaw = multiStrategy.trades_by_strategy?.[focusKey] ?? allTrades[focusKey] ?? [];
   const trades = tradesRaw.filter((t) => !t.exit_reason?.endsWith("미청산"));
-  const openPositions: OpenPosition[] = multiStrategy.open_positions_by_strategy?.[selectedKey] ?? [];
+  const openPositions: OpenPosition[] = multiStrategy.open_positions_by_strategy?.[focusKey] ?? [];
 
-  const isHeadline = selectedKey === multiStrategy.headline_key;
+  const isHeadline = focusKey === headlineKey;
   const oosBoundaryYear = 2024;
+  const oosBoundary = `${oosBoundaryYear}-01-01`;
 
-  // Equity chart dims
-  const W = 720; const H = 200;
-  const maxNav = Math.max(...equity.map((p) => p.nav));
-  const minNav = Math.min(...equity.map((p) => p.nav));
-  const ex = (i: number) => 8 + (i / (equity.length - 1)) * (W - 16);
-  const ey = (nav: number) => 12 + ((maxNav - nav) / ((maxNav - minNav) || 1)) * (H - 36);
-  const epath = equity.map((p, i) => `${i ? "L" : "M"}${ex(i).toFixed(1)},${ey(p.nav).toFixed(1)}`).join(" ");
+  // ── 오버레이 시리즈 (memo — OverlayChart effect 재실행 최소화) ──────────────
+  const equitySeries: OverlaySeries[] = useMemo(() => {
+    return allKeysOrdered
+      .filter((k) => enabled.has(k))
+      .map((k) => ({
+        id: k,
+        label: STRATEGY_LABEL_KO[k] ?? k,
+        color: colorOf.get(k) ?? "#888888",
+        width: (k === focusKey ? 3 : k === headlineKey ? 2 : 1) as 1 | 2 | 3,
+        data: (multiStrategy.equity_by_strategy[k] ?? []).map((p) => ({ time: p.date, value: p.nav })),
+      }))
+      .filter((s) => s.data.length >= 2);
+  }, [allKeysOrdered, enabled, colorOf, focusKey, headlineKey, multiStrategy.equity_by_strategy]);
+
+  const wealthSeries: OverlaySeries[] = useMemo(() => {
+    const out: OverlaySeries[] = [];
+    // 납입금 — 항상 표시 (점선)
+    out.push({
+      id: "_contributed",
+      label: "납입금",
+      color: "#adb5bd",
+      dashed: true,
+      width: 1,
+      data: wealthSimGlobal.series.map((p) => ({ time: p.date, value: p.contributed })),
+    });
+    // 벤치마크 DCA 토글
+    for (const b of BENCH_DEFS) {
+      if (!benchOn.has(b.id)) continue;
+      const data = wealthSimGlobal.series
+        .filter((p) => typeof p[b.field] === "number")
+        .map((p) => ({ time: p.date, value: p[b.field] as number }));
+      if (data.length >= 2) out.push({ id: `_bench_${b.id}`, label: b.label, color: b.color, dashed: true, width: 1, data });
+    }
+    // 전략들
+    for (const k of allKeysOrdered) {
+      if (!enabled.has(k)) continue;
+      const sim = multiStrategy.strategy_wealth_sims[k];
+      if (!sim) continue;
+      out.push({
+        id: k,
+        label: STRATEGY_LABEL_KO[k] ?? k,
+        color: colorOf.get(k) ?? "#888888",
+        width: (k === focusKey ? 3 : k === headlineKey ? 2 : 1) as 1 | 2 | 3,
+        data: sim.series.map((p) => ({ time: p.date, value: p.strategy_value })),
+      });
+    }
+    return out.filter((s) => s.data.length >= 2);
+  }, [allKeysOrdered, enabled, benchOn, colorOf, focusKey, headlineKey, multiStrategy.strategy_wealth_sims, wealthSimGlobal.series]);
 
   const m = selected.metrics;
   const is = selected.in_sample;
   const oos = selected.out_of_sample;
+  const curatedSet = useMemo(() => new Set(curatedKeys ?? []), [curatedKeys]);
 
   return (
     <div className="space-y-6">
-      {/* ── Strategy tabs — curated set only (full record in research table) ── */}
+      {/* ── 전략 토글 보드 — 전 전략 멀티 온/오프 + 포커스 ───────────── */}
       <div>
-        <p className="mb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">
-          전략 선택 — 채택된 {tabKeys.length}개 (전체 연구 기록은 아래 표)
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {tabKeys.map((key) => {
-            const s = multiStrategy.strategies.find((x) => x.key === key)!;
-            const isHL = key === multiStrategy.headline_key;
-            const isActive = key === selectedKey;
-            return (
-              <button
-                key={key}
-                onClick={() => setSelectedKey(key)}
-                className={cn(
-                  "rounded-lg border px-3 py-2 text-left transition-all",
-                  isActive
-                    ? "border-stamp bg-stamp/10 shadow-sm"
-                    : "border-border bg-card hover:border-stamp/40 hover:bg-stamp/5",
-                )}
-                aria-pressed={isActive}
-              >
-                <p className="flex items-center gap-1.5 font-mono text-[11px] font-bold leading-tight">
-                  {STRATEGY_LABEL_KO[key] ?? key}
-                  {isHL && (
-                    <span
-                      className="rounded-sm bg-stamp px-1 py-px font-mono text-[9px] font-black tracking-wider text-background"
-                      title="State of the art — IS 샤프 최상위 자동 채택 전략"
+        <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">
+            전략 오버레이 — 색칩 클릭 = 곡선 토글 · 이름 클릭 = 포커스(상세)
+          </p>
+          <div className="flex gap-1.5">
+            <button
+              onClick={() => {
+                setEnabled(new Set([headlineKey, "D_chandelier", "B_36mo"].filter((k) => presentKeys.has(k))));
+                setBenchOn(new Set(["KOSPI"]));
+              }}
+              className="rounded border border-border px-2 py-0.5 font-mono text-[10px] text-muted-foreground hover:border-stamp/40 hover:text-foreground transition-colors"
+            >
+              기본값
+            </button>
+            <button
+              onClick={() => setEnabled(new Set((curatedKeys ?? []).filter((k) => presentKeys.has(k))))}
+              className="rounded border border-border px-2 py-0.5 font-mono text-[10px] text-muted-foreground hover:border-stamp/40 hover:text-foreground transition-colors"
+            >
+              채택만
+            </button>
+            <button
+              onClick={() => setEnabled(new Set())}
+              className="rounded border border-border px-2 py-0.5 font-mono text-[10px] text-muted-foreground hover:border-stamp/40 hover:text-foreground transition-colors"
+            >
+              전체 해제
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-2.5">
+          {groups.map((grp) => (
+            <div key={grp.name} className="flex flex-wrap items-center gap-1.5">
+              <span className="w-14 shrink-0 font-mono text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+                {grp.name}
+              </span>
+              {grp.keys.map((key) => {
+                const row = multiStrategy.strategies.find((s) => s.key === key);
+                const on = enabled.has(key);
+                const isFocus = key === focusKey;
+                const isHL = key === headlineKey;
+                const color = colorOf.get(key);
+                return (
+                  <div
+                    key={key}
+                    className={cn(
+                      "flex items-center overflow-hidden rounded-md border transition-all",
+                      isFocus ? "border-stamp shadow-sm" : on ? "border-border bg-card" : "border-border/60 bg-card opacity-60 hover:opacity-100",
+                    )}
+                  >
+                    <button
+                      onClick={() => toggleStrategy(key)}
+                      aria-pressed={on}
+                      title={`${STRATEGY_LABEL_KO[key] ?? key} 곡선 ${on ? "끄기" : "켜기"}`}
+                      className="flex h-full items-center self-stretch border-r border-border/60 px-1.5 py-1.5 hover:bg-secondary/40 transition-colors"
                     >
-                      SOTA
-                    </span>
+                      <span
+                        className={cn(
+                          "inline-block h-3 w-3 rounded-sm",
+                          on && isHL && "bg-stamp",
+                          !on && "border border-dashed",
+                          !on && isHL && "border-stamp",
+                        )}
+                        style={on && !isHL ? { backgroundColor: color } : !on && !isHL ? { borderColor: color } : undefined}
+                      />
+                    </button>
+                    <button
+                      onClick={() => focusStrategy(key)}
+                      title={`${row?.verdict ?? ""} ${row?.verdict_reason ?? ""}`.trim() || undefined}
+                      className={cn("px-2 py-1.5 text-left hover:bg-stamp/5 transition-colors", isFocus && "bg-stamp/10")}
+                    >
+                      <span className="flex items-center gap-1 font-mono text-[11px] font-bold leading-none">
+                        {STRATEGY_LABEL_KO[key] ?? key}
+                        {isHL && (
+                          <span className="rounded-sm bg-stamp px-1 py-px font-mono text-[8px] font-black tracking-wider text-background">
+                            SOTA
+                          </span>
+                        )}
+                      </span>
+                      <span className="tnum mt-0.5 block font-mono text-[9px] text-muted-foreground">
+                        IS {row?.in_sample.sharpe ?? "—"} · OOS {row?.out_of_sample.sharpe ?? "—"}
+                      </span>
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+          {/* 벤치마크 토글 — 적립 시뮬 차트에 점선으로 */}
+          <div className="flex flex-wrap items-center gap-1.5 border-t border-dashed border-border pt-2">
+            <span className="w-14 shrink-0 font-mono text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+              벤치마크
+            </span>
+            {BENCH_DEFS.map((b) => {
+              const on = benchOn.has(b.id);
+              return (
+                <button
+                  key={b.id}
+                  onClick={() => toggleBench(b.id)}
+                  aria-pressed={on}
+                  className={cn(
+                    "flex items-center gap-1.5 rounded-md border px-2 py-1.5 font-mono text-[11px] font-bold transition-all",
+                    on ? "border-border bg-card" : "border-border/60 bg-card opacity-60 hover:opacity-100",
                   )}
-                </p>
-                <p className={cn("tnum mt-0.5 font-mono text-xs font-bold", signColor(s.in_sample.cagr_pct))}>
-                  IS CAGR {s.in_sample.cagr_pct != null ? formatPct(s.in_sample.cagr_pct, 1) : "—"}
-                </p>
-              </button>
-            );
-          })}
+                >
+                  <span
+                    className={cn("inline-block h-3 w-3 rounded-sm", !on && "border border-dashed")}
+                    style={on ? { backgroundColor: b.color } : { borderColor: b.color }}
+                  />
+                  {b.label}
+                </button>
+              );
+            })}
+            <span className="font-mono text-[9px] text-muted-foreground">— 월 적립 시뮬 차트에 표시</span>
+          </div>
         </div>
         <p className="mt-2 font-mono text-[10px] text-muted-foreground">
-          SOTA = IS 샤프 최상위 자동 채택 · 나머지 연구 전략(기각·연구용)은 아래 “전체 연구 기록” 표에서 사유와 함께 확인
+          켜진 곡선 {enabled.size}개 · 판정(SOTA/채택/연구용/기각)은 백테스트가 실행 시점 수치로 생성 — 칩에 마우스를 올리면 사유 표시
         </p>
       </div>
 
-      {/* ── Selected strategy hero ──────────────────────────────────── */}
+      {/* ── 포커스 전략 hero ──────────────────────────────────── */}
       <div className={cn(
         "rounded-lg border-2 p-5",
         isHeadline ? "border-stamp bg-stamp/5" : "border-border bg-card"
@@ -671,18 +889,24 @@ export function StrategySelector({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.25em] text-stamp">
-              {isHeadline ? "SOTA 전략 — IS 샤프 최상위 자동 채택" : "전략 상세"}
+              포커스 전략 {isHeadline ? "— SOTA (타이브레이크 1위)" : ""}
             </p>
-            <h3 className="mt-0.5 font-display text-2xl font-black tracking-tight">
-              {STRATEGY_LABEL_KO[selectedKey] ?? selectedKey}
+            <h3 className="mt-0.5 flex items-center gap-2 font-display text-2xl font-black tracking-tight">
+              {STRATEGY_LABEL_KO[focusKey] ?? focusKey}
+              {selected.verdict && <VerdictChip kind={selected.verdict} reason={selected.verdict_reason} />}
             </h3>
             <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
-              {STRATEGY_DESC_KO[selectedKey] ?? ""}
+              {STRATEGY_DESC_KO[focusKey] ?? ""}
             </p>
+            {selected.verdict_reason && (
+              <p className="mt-1 max-w-2xl font-mono text-[11px] text-muted-foreground">
+                판정 사유: <span className="text-foreground">{selected.verdict_reason}</span>
+              </p>
+            )}
           </div>
           <a
-            href={`/strategy-trades-${selectedKey}.csv`}
-            download={`strategy-trades-${selectedKey}.csv`}
+            href={`/strategy-trades-${focusKey}.csv`}
+            download={`strategy-trades-${focusKey}.csv`}
             className="inline-flex items-center gap-1.5 rounded-md border border-border bg-secondary px-3 py-1.5 font-mono text-xs font-semibold hover:bg-secondary/70 transition-colors"
           >
             CSV 다운로드 ({selected.trade_count}건)
@@ -713,50 +937,36 @@ export function StrategySelector({
             <strong className={cn("font-bold", signColor(selected.max_single_return_pct))}>
               {selected.best_trade_name} {formatPct(selected.max_single_return_pct, 0)}
             </strong>
+            {curatedSet.size > 0 && !curatedSet.has(focusKey) && (
+              <span className="ml-3 text-muted-foreground">· 이 전략은 셀렉터 비채택 — 사유는 판정 칩 참조</span>
+            )}
           </p>
         )}
       </div>
 
-      {/* ── Equity curve ─────────────────────────────────────────────── */}
-      {equity.length > 0 && (
-        <section className="rounded-lg border border-border bg-card p-5">
-          <div className="mb-2 flex items-baseline justify-between">
-            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">
-              자산 곡선 — {STRATEGY_LABEL_KO[selectedKey] ?? selectedKey}
-            </p>
-          </div>
-          <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img">
-            <line x1="8" x2={W - 8} y1={ey(1)} y2={ey(1)} className="stroke-border" strokeDasharray="4 4" strokeWidth="1" />
-            <path
-              d={epath}
-              fill="none"
-              className={m.total_return_pct >= 0 ? "stroke-up" : "stroke-down"}
-              strokeWidth="2"
-              strokeLinejoin="round"
-            />
-            {(() => {
-              const oosIdx = equity.findIndex((p) => parseInt(p.date.slice(0, 4)) >= oosBoundaryYear);
-              if (oosIdx < 0) return null;
-              const bx = ex(oosIdx);
-              return (
-                <>
-                  <line x1={bx} x2={bx} y1={12} y2={H - 8} className="stroke-muted-foreground" strokeDasharray="3 3" strokeWidth="1" />
-                  <text x={bx + 4} y={20} fontSize="9" className="fill-muted-foreground font-mono">OOS →</text>
-                </>
-              );
-            })()}
-            <text
-              x={ex(equity.length - 1)}
-              y={ey(equity[equity.length - 1]?.nav ?? 1) - 6}
-              textAnchor="end"
-              fontSize="11"
-              fontWeight="700"
-              className={cn("font-mono", m.total_return_pct >= 0 ? "fill-up" : "fill-down")}
-            >
-              {equity[equity.length - 1]?.nav.toFixed(2)}
-            </text>
-          </svg>
-          <div className="mt-3 flex flex-wrap gap-2 border-t border-dashed border-border pt-3">
+      {/* ── 자산 곡선 오버레이 (lightweight-charts) ───────────────────── */}
+      <section className="rounded-lg border border-border bg-card p-5">
+        <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">
+            자산 곡선 오버레이 — NAV (시작=1.00) · 켜진 전략 {equitySeries.length}개
+          </p>
+          <p className="font-mono text-[10px] text-muted-foreground">크로스헤어를 올리면 전체 시리즈 값 표시 · 2024-01부터 OOS</p>
+        </div>
+        {equitySeries.length > 0 ? (
+          <OverlayChart
+            series={equitySeries}
+            valueFormatter={fmtNav}
+            oosBoundary={oosBoundary}
+            heightClass="h-[320px]"
+            ariaLabel="전략별 자산 곡선 오버레이 차트"
+          />
+        ) : (
+          <p className="py-8 text-center font-mono text-xs text-muted-foreground">켜진 전략이 없습니다 — 위에서 색칩을 눌러 곡선을 켜세요.</p>
+        )}
+        {/* 연도별 수익률 — 포커스 전략 */}
+        {yearly.length > 0 && (
+          <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-dashed border-border pt-3">
+            <span className="font-mono text-[10px] text-muted-foreground">연도별 ({STRATEGY_LABEL_KO[focusKey] ?? focusKey}):</span>
             {yearly.map((row) => (
               <div
                 key={row.year}
@@ -774,62 +984,87 @@ export function StrategySelector({
               </div>
             ))}
           </div>
-        </section>
-      )}
+        )}
+      </section>
 
-      {/* ── Wealth simulation ─────────────────────────────────────────── */}
-      {wealthSim && (
-        <section className="rounded-lg border border-border bg-card p-5">
-          <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
-            <h3 className="font-display text-xl font-black tracking-tight">
-              월 적립 시뮬레이션 — {STRATEGY_LABEL_KO[selectedKey] ?? selectedKey}
-            </h3>
-          </div>
-          <p className="text-xs text-muted-foreground">{wealthSimGlobal.schedule_desc}</p>
-          <dl className="mt-3 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3 lg:grid-cols-6">
-            {[
-              { label: "총 납입금",     value: fmt만(wealthSimGlobal.final_contributed), tone: "" },
-              { label: "전략 최종 자산", value: fmt만(wealthSim.final_strategy_value), tone: signColor(wealthSim.final_strategy_value - wealthSimGlobal.final_contributed) },
-              ...Object.entries(wealthSimGlobal.final_benchmark_values).map(([k, v]) => ({
-                label: `${BENCHMARK_KO[k] ?? k} 벤치마크`,
-                value: fmt만(v),
-                tone: signColor(v - wealthSimGlobal.final_contributed),
-              })),
-            ].map((item) => (
-              <div key={item.label} className="bg-card px-3 py-2.5">
-                <dt className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{item.label}</dt>
-                <dd className={cn("tnum mt-1 font-display text-lg font-black tracking-tight", item.tone)}>{item.value}</dd>
+      {/* ── 월 적립 시뮬레이션 오버레이 ─────────────────────────── */}
+      <section className="rounded-lg border border-border bg-card p-5">
+        <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+          <h3 className="font-display text-xl font-black tracking-tight">
+            월 적립 시뮬레이션 오버레이
+          </h3>
+          <button
+            onClick={() => setWealthLog((v) => !v)}
+            aria-pressed={wealthLog}
+            className={cn(
+              "rounded border px-2 py-0.5 font-mono text-[10px] font-bold transition-colors",
+              wealthLog ? "border-stamp bg-stamp/10 text-stamp" : "border-border text-muted-foreground hover:text-foreground",
+            )}
+            title="자산곡선은 로그가 정직함 — 복리 구간의 기울기가 수익률"
+          >
+            로그 스케일 {wealthLog ? "ON" : "OFF"}
+          </button>
+        </div>
+        <p className="text-xs text-muted-foreground">{wealthSimGlobal.schedule_desc}</p>
+
+        {wealthSim && (
+          <>
+            <dl className="mt-3 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3 lg:grid-cols-6">
+              {[
+                { label: "총 납입금",     value: fmt만(wealthSimGlobal.final_contributed), tone: "" },
+                { label: `${STRATEGY_LABEL_KO[focusKey] ?? focusKey} 최종`, value: fmt만(wealthSim.final_strategy_value), tone: signColor(wealthSim.final_strategy_value - wealthSimGlobal.final_contributed) },
+                ...Object.entries(wealthSimGlobal.final_benchmark_values).map(([k, v]) => ({
+                  label: `${BENCHMARK_KO[k] ?? k} 벤치마크`,
+                  value: fmt만(v),
+                  tone: signColor(v - wealthSimGlobal.final_contributed),
+                })),
+              ].map((item) => (
+                <div key={item.label} className="bg-card px-3 py-2.5">
+                  <dt className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{item.label}</dt>
+                  <dd className={cn("tnum mt-1 font-display text-lg font-black tracking-tight", item.tone)}>{item.value}</dd>
+                </div>
+              ))}
+            </dl>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <div className="rounded-lg border border-stamp/60 bg-stamp/5 px-3 py-1.5">
+                <p className="font-mono text-[9px] text-muted-foreground">{STRATEGY_LABEL_KO[focusKey] ?? focusKey} (납입 대비)</p>
+                <p className={cn("tnum font-display text-xl font-black", signColor(wealthSim.strategy_gain_on_contributed_pct))}>
+                  {formatPct(wealthSim.strategy_gain_on_contributed_pct, 1)}
+                </p>
               </div>
-            ))}
-          </dl>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <div className="rounded-lg border border-stamp/60 bg-stamp/5 px-3 py-1.5">
-              <p className="font-mono text-[9px] text-muted-foreground">전략 (납입 대비)</p>
-              <p className={cn("tnum font-display text-xl font-black", signColor(wealthSim.strategy_gain_on_contributed_pct))}>
-                {formatPct(wealthSim.strategy_gain_on_contributed_pct, 1)}
-              </p>
+              {Object.entries(wealthSimGlobal.benchmark_gain_on_contributed_pct).map(([k, v]) => (
+                <div key={k} className="rounded-lg border border-border bg-secondary/20 px-3 py-1.5">
+                  <p className="font-mono text-[9px] text-muted-foreground">{BENCHMARK_KO[k] ?? k}</p>
+                  <p className={cn("tnum font-display text-xl font-black", signColor(v))}>{formatPct(v, 1)}</p>
+                </div>
+              ))}
             </div>
-            {Object.entries(wealthSimGlobal.benchmark_gain_on_contributed_pct).map(([k, v]) => (
-              <div key={k} className="rounded-lg border border-border bg-secondary/20 px-3 py-1.5">
-                <p className="font-mono text-[9px] text-muted-foreground">{BENCHMARK_KO[k] ?? k}</p>
-                <p className={cn("tnum font-display text-xl font-black", signColor(v))}>{formatPct(v, 1)}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4">
-            <WealthChart series={wealthSim.series} />
-          </div>
-          <p className="mt-2 font-mono text-[10px] text-muted-foreground">
-            {wealthSimGlobal.fx_assumption}
-          </p>
-        </section>
-      )}
+          </>
+        )}
 
-      {/* ── Open positions (current holdings for this strategy) ────── */}
-      <OpenPositionsTable positions={openPositions} stratKey={selectedKey} />
+        <div className="mt-4">
+          {wealthSeries.length > 1 ? (
+            <OverlayChart
+              series={wealthSeries}
+              valueFormatter={fmt만}
+              logScale={wealthLog}
+              heightClass="h-[340px]"
+              ariaLabel="월 적립 시뮬레이션 오버레이 차트 — 전략·벤치마크·납입금"
+            />
+          ) : (
+            <p className="py-8 text-center font-mono text-xs text-muted-foreground">켜진 전략/벤치마크가 없습니다.</p>
+          )}
+        </div>
+        <p className="mt-2 font-mono text-[10px] text-muted-foreground">
+          {wealthSimGlobal.fx_assumption}
+        </p>
+      </section>
 
-      {/* ── Trade log (sortable + paginated) ─────────────────────────── */}
-      <TradeLog trades={trades} stratKey={selectedKey} />
+      {/* ── 보유 중 (포커스 전략) ───────────────────────────────── */}
+      <OpenPositionsTable positions={openPositions} stratKey={focusKey} />
+
+      {/* ── 거래 로그 (포커스 전략) ─────────────────────────────── */}
+      <TradeLog trades={trades} stratKey={focusKey} />
     </div>
   );
 }

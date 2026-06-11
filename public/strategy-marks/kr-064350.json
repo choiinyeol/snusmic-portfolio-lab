@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-11T09:20:19+00:00",
-  "strategy_key": "T-_kospi_core_regime",
+  "generated_at": "2026-06-11T09:52:00+00:00",
+  "strategy_key": "U_chandelier_scaleout",
   "ticker": "064350",
   "market": "KR",
   "name": "현대로템",
@@ -11,13 +11,37 @@
       "date": "2025-04-14",
       "side": "buy",
       "price": 104700.0,
-      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: yig 2025-04-11)"
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: yig 2025-04-11)"
+    },
+    {
+      "date": "2025-04-14",
+      "side": "buy",
+      "price": 104700.0,
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: yig 2025-04-11)"
+    },
+    {
+      "date": "2025-04-14",
+      "side": "buy",
+      "price": 104700.0,
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: yig 2025-04-11)"
+    },
+    {
+      "date": "2025-06-10",
+      "side": "sell",
+      "price": 168300.0,
+      "reason": "u_scaleout1_ext8.6x (+59.7%)"
+    },
+    {
+      "date": "2025-06-16",
+      "side": "sell",
+      "price": 198600.0,
+      "reason": "u_scaleout2_ext12.6x (+88.5%)"
     },
     {
       "date": "2025-08-20",
       "side": "stop",
       "price": 167100.0,
-      "reason": "t_chandelier_ATR4.25 (+58.6%)"
+      "reason": "u_chandelier_ATR4.25 (+58.6%)"
     }
   ],
   "open_stop": null

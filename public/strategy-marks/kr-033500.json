@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-11T09:20:19+00:00",
-  "strategy_key": "T-_kospi_core_regime",
+  "generated_at": "2026-06-11T09:52:00+00:00",
+  "strategy_key": "U_chandelier_scaleout",
   "ticker": "033500",
   "market": "KR",
   "name": "동성화인텍",
@@ -11,25 +11,37 @@
       "date": "2024-07-29",
       "side": "buy",
       "price": 14070.0,
-      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: voera 2024-07-26)"
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: voera 2024-07-26)"
     },
     {
       "date": "2024-09-05",
       "side": "stop",
       "price": 11580.0,
-      "reason": "t_chandelier_ATR4.25 (-18.2%)"
+      "reason": "u_chandelier_ATR4.25 (-18.2%)"
     },
     {
       "date": "2024-12-06",
       "side": "buy",
       "price": 13840.0,
-      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2024-12-05, voera 2024-07-26)"
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: smic 2024-12-05, voera 2024-07-26)"
+    },
+    {
+      "date": "2024-12-06",
+      "side": "buy",
+      "price": 13840.0,
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: smic 2024-12-05, voera 2024-07-26)"
+    },
+    {
+      "date": "2025-01-22",
+      "side": "sell",
+      "price": 21450.0,
+      "reason": "u_scaleout1_ext8.4x (+54.0%)"
     },
     {
       "date": "2025-07-14",
       "side": "stop",
       "price": 21650.0,
-      "reason": "t_chandelier_ATR4.25 (+55.4%)"
+      "reason": "u_chandelier_ATR4.25 (+55.4%)"
     }
   ],
   "open_stop": null

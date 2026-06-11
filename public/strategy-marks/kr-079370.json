@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-11T09:20:19+00:00",
-  "strategy_key": "T-_kospi_core_regime",
+  "generated_at": "2026-06-11T09:52:00+00:00",
+  "strategy_key": "U_chandelier_scaleout",
   "ticker": "079370",
   "market": "KR",
   "name": "제우스",
@@ -11,13 +11,13 @@
       "date": "2024-01-22",
       "side": "buy",
       "price": 18650.0,
-      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: ewha 2024-01-20)"
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: ewha 2024-01-20)"
     },
     {
       "date": "2024-04-08",
       "side": "stop",
       "price": 17600.0,
-      "reason": "t_chandelier_ATR4.25 (-6.2%)"
+      "reason": "u_chandelier_ATR4.25 (-6.2%)"
     }
   ],
   "open_stop": null

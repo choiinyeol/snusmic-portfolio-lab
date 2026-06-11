@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-11T09:20:19+00:00",
-  "strategy_key": "T-_kospi_core_regime",
+  "generated_at": "2026-06-11T09:52:00+00:00",
+  "strategy_key": "U_chandelier_scaleout",
   "ticker": "010620",
   "market": "KR",
   "name": "HD현대미포",
@@ -11,25 +11,37 @@
       "date": "2021-02-22",
       "side": "buy",
       "price": 51500.0,
-      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: ewha 2021-02-20)"
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: ewha 2021-02-20)"
+    },
+    {
+      "date": "2021-02-22",
+      "side": "buy",
+      "price": 51500.0,
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: ewha 2021-02-20)"
+    },
+    {
+      "date": "2021-04-30",
+      "side": "sell",
+      "price": 85800.0,
+      "reason": "u_scaleout1_ext9.9x (+65.5%)"
     },
     {
       "date": "2021-07-14",
       "side": "stop",
       "price": 79600.0,
-      "reason": "t_chandelier_ATR4.25 (+53.6%)"
+      "reason": "u_chandelier_ATR4.25 (+53.6%)"
     },
     {
       "date": "2024-08-19",
       "side": "buy",
       "price": 110500.0,
-      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: kuvic 2024-08-16, star 2023-07-14, ewha 2021-02-20)"
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: kuvic 2024-08-16, star 2023-07-14, ewha 2021-02-20)"
     },
     {
       "date": "2025-02-10",
       "side": "stop",
       "price": 109900.0,
-      "reason": "t_chandelier_ATR4.25 (-1.2%)"
+      "reason": "u_chandelier_ATR4.25 (-1.2%)"
     }
   ],
   "open_stop": null

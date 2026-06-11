@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-11T09:20:19+00:00",
-  "strategy_key": "T-_kospi_core_regime",
+  "generated_at": "2026-06-11T09:52:00+00:00",
+  "strategy_key": "U_chandelier_scaleout",
   "ticker": "240550",
   "market": "KR",
   "name": "동방메디컬",
@@ -11,13 +11,13 @@
       "date": "2025-10-15",
       "side": "buy",
       "price": 10440.0,
-      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: yig 2025-10-14)"
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: yig 2025-10-14)"
     },
     {
       "date": "2025-11-10",
       "side": "stop",
       "price": 8410.0,
-      "reason": "t_chandelier_ATR4.25 (-20.0%)"
+      "reason": "u_chandelier_ATR4.25 (-20.0%)"
     }
   ],
   "open_stop": null

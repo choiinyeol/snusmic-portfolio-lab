@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-11T09:20:19+00:00",
-  "strategy_key": "T-_kospi_core_regime",
+  "generated_at": "2026-06-11T09:52:00+00:00",
+  "strategy_key": "U_chandelier_scaleout",
   "ticker": "119850",
   "market": "KR",
   "name": "지엔씨에너지",
@@ -11,13 +11,25 @@
       "date": "2025-04-21",
       "side": "buy",
       "price": 19540.0,
-      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2025-04-19, star 2025-03-10)"
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: smic 2025-04-19, star 2025-03-10)"
+    },
+    {
+      "date": "2025-04-21",
+      "side": "buy",
+      "price": 19540.0,
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: smic 2025-04-19, star 2025-03-10)"
+    },
+    {
+      "date": "2025-05-08",
+      "side": "sell",
+      "price": 26450.0,
+      "reason": "u_scaleout1_ext8.7x (+34.5%)"
     },
     {
       "date": "2025-09-02",
       "side": "stop",
       "price": 28250.0,
-      "reason": "t_chandelier_ATR4.25 (+43.6%)"
+      "reason": "u_chandelier_ATR4.25 (+43.6%)"
     }
   ],
   "open_stop": null

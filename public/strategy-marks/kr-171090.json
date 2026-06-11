@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-11T09:20:19+00:00",
-  "strategy_key": "T-_kospi_core_regime",
+  "generated_at": "2026-06-11T09:52:00+00:00",
+  "strategy_key": "U_chandelier_scaleout",
   "ticker": "171090",
   "market": "KR",
   "name": "선익시스템",
@@ -11,13 +11,37 @@
       "date": "2026-02-09",
       "side": "buy",
       "price": 98000.0,
-      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: yig 2026-02-06, star 2024-01-06)"
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: yig 2026-02-06, star 2024-01-06)"
+    },
+    {
+      "date": "2026-02-09",
+      "side": "buy",
+      "price": 98000.0,
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: yig 2026-02-06, star 2024-01-06)"
+    },
+    {
+      "date": "2026-02-09",
+      "side": "buy",
+      "price": 98000.0,
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: yig 2026-02-06, star 2024-01-06)"
+    },
+    {
+      "date": "2026-02-09",
+      "side": "sell",
+      "price": 100000.0,
+      "reason": "u_scaleout1_ext8.8x (+1.4%)"
+    },
+    {
+      "date": "2026-02-19",
+      "side": "sell",
+      "price": 128500.0,
+      "reason": "u_scaleout2_ext12.4x (+30.3%)"
     },
     {
       "date": "2026-03-20",
       "side": "stop",
       "price": 105800.0,
-      "reason": "t_chandelier_ATR4.25 (+7.3%)"
+      "reason": "u_chandelier_ATR4.25 (+7.3%)"
     }
   ],
   "open_stop": null

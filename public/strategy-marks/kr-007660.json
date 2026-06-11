@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-11T09:20:19+00:00",
-  "strategy_key": "T-_kospi_core_regime",
+  "generated_at": "2026-06-11T09:52:00+00:00",
+  "strategy_key": "U_chandelier_scaleout",
   "ticker": "007660",
   "market": "KR",
   "name": "이수페타시스",
@@ -11,25 +11,61 @@
       "date": "2023-03-13",
       "side": "buy",
       "price": 8284.0,
-      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: ewha 2023-03-11, smic 2022-11-13)"
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: ewha 2023-03-11, smic 2022-11-13)"
+    },
+    {
+      "date": "2023-03-13",
+      "side": "buy",
+      "price": 8284.0,
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: ewha 2023-03-11, smic 2022-11-13)"
+    },
+    {
+      "date": "2023-03-13",
+      "side": "buy",
+      "price": 8284.0,
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: ewha 2023-03-11, smic 2022-11-13)"
+    },
+    {
+      "date": "2023-05-30",
+      "side": "sell",
+      "price": 13936.0,
+      "reason": "u_scaleout1_ext8.8x (+67.1%)"
+    },
+    {
+      "date": "2023-07-03",
+      "side": "sell",
+      "price": 30537.0,
+      "reason": "u_scaleout2_ext12.2x (+266.2%)"
     },
     {
       "date": "2023-08-08",
       "side": "stop",
       "price": 30634.0,
-      "reason": "t_chandelier_ATR4.25 (+267.4%)"
+      "reason": "u_chandelier_ATR4.25 (+267.4%)"
     },
     {
       "date": "2025-01-10",
       "side": "buy",
       "price": 27959.0,
-      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: star 2025-01-09, ewha 2023-03-11, smic 2022-11-13)"
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: star 2025-01-09, ewha 2023-03-11, smic 2022-11-13)"
+    },
+    {
+      "date": "2025-01-10",
+      "side": "buy",
+      "price": 27959.0,
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: star 2025-01-09, ewha 2023-03-11, smic 2022-11-13)"
+    },
+    {
+      "date": "2025-01-24",
+      "side": "sell",
+      "price": 39776.0,
+      "reason": "u_scaleout1_ext8.7x (+41.3%)"
     },
     {
       "date": "2025-04-08",
       "side": "stop",
       "price": 30100.0,
-      "reason": "t_chandelier_ATR4.25 (+7.0%)"
+      "reason": "u_chandelier_ATR4.25 (+7.0%)"
     }
   ],
   "open_stop": null

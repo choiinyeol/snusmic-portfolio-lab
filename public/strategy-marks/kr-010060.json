@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-11T09:20:19+00:00",
-  "strategy_key": "T-_kospi_core_regime",
+  "generated_at": "2026-06-11T09:52:00+00:00",
+  "strategy_key": "U_chandelier_scaleout",
   "ticker": "010060",
   "market": "KR",
   "name": "OCI홀딩스",
@@ -11,25 +11,25 @@
       "date": "2021-08-23",
       "side": "buy",
       "price": 81055.0,
-      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: ewha 2021-08-21)"
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: ewha 2021-08-21)"
     },
     {
       "date": "2021-10-28",
       "side": "stop",
       "price": 111252.0,
-      "reason": "t_chandelier_ATR4.25 (+36.4%)"
+      "reason": "u_chandelier_ATR4.25 (+36.4%)"
     },
     {
       "date": "2026-01-02",
       "side": "buy",
       "price": 115200.0,
-      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: yig 2026-01-01, ewha 2021-08-21)"
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: yig 2026-01-01, ewha 2021-08-21)"
     },
     {
       "date": "2026-03-05",
       "side": "stop",
       "price": 131600.0,
-      "reason": "t_chandelier_ATR4.25 (+13.5%)"
+      "reason": "u_chandelier_ATR4.25 (+13.5%)"
     }
   ],
   "open_stop": null

@@ -4195,6 +4195,7 @@ def export_trades_csv(trades: list[dict], path: Path) -> None:
 def build_multi_strategy_summary(
     strategies: dict[str, dict],
     kospi_dca_ratios: dict[str, dict] | None = None,
+    verdicts: dict[str, dict[str, str]] | None = None,
 ) -> list[dict]:
     """Build comparison table rows for all strategies."""
     rows = []
@@ -4228,6 +4229,9 @@ def build_multi_strategy_summary(
             "kospi_dca_beats": (ratio_info.get("full_ratio") or 0.0) > 1.0,
             "aw_dca_ratio": ratio_info.get("aw_ratio"),           # v18: strategy_final / allweather_final
             "aw_dca_beats": (ratio_info.get("aw_ratio") or 0.0) > 1.0,
+            # v20: 데이터 주도 판정 — 백테스트 실행 시점의 실제 수치·게이트에서 생성
+            "verdict": (verdicts or {}).get(key, {}).get("verdict"),
+            "verdict_reason": (verdicts or {}).get(key, {}).get("verdict_reason"),
         })
     return rows
 
@@ -5074,7 +5078,12 @@ def run_portfolio_opt(
                     continue
                 target_value = nav_now * w
                 cur_pos = positions.get(ticker)
-                cur_value = cur_pos["shares"] * cur_pos["last_close"] if cur_pos else 0.0
+                # v20 FX fix: cur_value must be in KRW like target_value/nav_now.
+                # 누락 시(v19 회귀) US 보유 포지션 가치가 ~1/1400로 과소평가되어
+                # delta_value ≈ 전체 목표금액 → 매월 현금에서 목표금액을 재차 차감하면서
+                # 기존 보유분 가치는 증발 → NAV가 0으로 수렴 (S 3종·V 패밀리 MDD −100%의 근본 원인).
+                _cur_fx = _fx(cur_pos.get("market", "KR"), day) if cur_pos else 1.0
+                cur_value = cur_pos["shares"] * cur_pos["last_close"] * _cur_fx if cur_pos else 0.0
 
                 df = prices.get(ticker)
                 if df is None or not _has_day(df, day_ts):
@@ -5092,34 +5101,41 @@ def run_portfolio_opt(
                 turnover_frac = abs(delta_value) / nav_now
                 total_turnover += turnover_frac
 
-                # v19 FX: use cur_pos market if resizing, else defer to new-buy path below
-                _s_market = cur_pos.get("market", "KR") if cur_pos else "KR"
-                new_shares = target_value * (1 - COST_PER_SIDE) / (trade_price * _fx(_s_market, day))
-                new_cost   = target_value
-
                 if cur_pos:
-                    # Partial trade record for the delta
+                    # v20: delta-only resize — 비용은 실제 체결된 델타에만 부과하고,
+                    # 현금이 모자라면 그만큼만 산다 (현금 없이 주식이 생기는 유령 매수 금지).
+                    fx_t = _fx(cur_pos.get("market", "KR"), day)
                     if delta_value < 0:
-                        sell_shares = cur_pos["shares"] - new_shares
-                        if sell_shares > 0:
-                            proceeds = sell_shares * trade_price * _fx(cur_pos.get("market", "KR"), day) * (1 - COST_PER_SIDE)
+                        sell_value = min(-delta_value, cur_pos["shares"] * trade_price * fx_t)
+                        sell_shares = sell_value / (trade_price * fx_t) if trade_price * fx_t > 0 else 0.0
+                        if sell_shares > 0 and cur_pos["shares"] > 0:
+                            proceeds = sell_shares * trade_price * fx_t * (1 - COST_PER_SIDE)
                             cash_after_close += proceeds
                             trades.append(_close_trade(ticker, cur_pos, day, trade_price,
                                                         "s_rebalance_trim",
                                                         ticker_reports, record_full_trades, None,
                                                         shares_override=sell_shares,
                                                         cost_override=cur_pos["cost"] * (sell_shares / cur_pos["shares"])))
+                        new_shares = cur_pos["shares"] - sell_shares
+                        _rem_frac = (new_shares / cur_pos["shares"]) if cur_pos["shares"] > 0 else 0.0
+                        new_cost = cur_pos["cost"] * _rem_frac
                     else:
                         add_budget = min(delta_value, cash_after_close)
                         if add_budget < 0:
                             add_budget = 0.0
                         cash_after_close -= add_budget
+                        add_shares = add_budget * (1 - COST_PER_SIDE) / (trade_price * fx_t)
+                        new_shares = cur_pos["shares"] + add_shares
+                        new_cost = cur_pos["cost"] + add_budget
+                    if new_shares <= 0:
+                        continue
                     new_positions[ticker] = {
                         "shares": new_shares,
-                        "entry_price": trade_price,
-                        "entry_date": day,
+                        "entry_price": cur_pos["entry_price"],
+                        "entry_date": cur_pos["entry_date"],
                         "cost": new_cost,
                         "last_close": trade_price,
+                        "fx": fx_t,
                         "source": cur_pos["source"],
                         "n_clubs": cur_pos["n_clubs"],
                         "display_name": cur_pos["display_name"],
@@ -5147,6 +5163,7 @@ def run_portfolio_opt(
                         "entry_date": day,
                         "cost": buy_budget,
                         "last_close": trade_price,
+                        "fx": _fx(mkt, day),
                         "source": "",
                         "n_clubs": 1,
                         "display_name": dn,
@@ -5237,6 +5254,22 @@ def run_portfolio_opt(
         raise RuntimeError(
             f"S({variant}) 백테스트가 거래 0건으로 종료 — 가중치 계산이 매월 실패했을 가능성. "
             "로그의 'weight computation failed' 메시지를 확인하세요."
+        )
+
+    # v20 zero-NAV ghost guard: long-only(개별 비중 ≤15%, 무차입) 포트폴리오의 NAV는
+    # 0 근처로 떨어질 수 없다 — 도달했다면 수익률이 아니라 회계 버그다
+    # (예: v19 FX 누락 회귀 → S 3종 MDD −100% 유령). NaN NAV도 동일하게 즉시 실패.
+    _nav_vals = [v for _, v in nav_series]
+    if any((not math.isfinite(v)) or v <= 0 for v in _nav_vals):
+        raise RuntimeError(
+            f"S({variant}) NAV가 NaN/0 이하에 도달 — long-only 무차입 구조에서 불가능. "
+            "리밸런스 회계(FX 환산·현금 차감)를 점검하세요."
+        )
+    _min_nav = min(_nav_vals)
+    if _min_nav < START_CAPITAL * 0.02:
+        raise RuntimeError(
+            f"S({variant}) NAV 최저점이 시작자본의 {_min_nav / START_CAPITAL * 100:.2f}%까지 붕괴 — "
+            "개별 비중 캡 15% long-only에서 −98%는 시장 손실이 아니라 회계 버그 신호입니다."
         )
 
     return _compute_result(nav_series, trades, START_CAPITAL, label, open_positions=positions)
@@ -6577,20 +6610,151 @@ def main() -> int:
     else:
         print(f"\n  ✗ No eligible strategy beats KOSPI DCA in full-period wealth simulation.", flush=True)
 
-    # ── Headline selection: best IS sharpe among ELIGIBLE strategies only
-    def _is_sharpe(r: dict) -> float:
-        v = r.get("in_sample", {}).get("sharpe")
-        return v if v is not None else -999.0
+    # ── Headline selection among ELIGIBLE strategies only.
+    # v20 공정 타이브레이크: IS 샤프(표시 자릿수 동률 多) → OOS 샤프 → 전체 기간
+    # 부의 비율(vs KOSPI DCA). 과거에는 IS 샤프 단독 max()가 dict 삽입 순서로
+    # 동률을 깨면서 OOS·부의 비율 모두 앞선 후보가 밀리는 왜곡이 있었다.
+    def _headline_rank(item: tuple[str, dict]) -> tuple[float, float, float]:
+        k, r = item
+        is_s = r.get("in_sample", {}).get("sharpe")
+        oos_s = r.get("out_of_sample", {}).get("sharpe")
+        ratio = _kospi_dca_ratios.get(k, {}).get("full_ratio")
+        return (
+            is_s if is_s is not None else -999.0,
+            oos_s if oos_s is not None else -999.0,
+            ratio if ratio is not None else -999.0,
+        )
 
     eligible_strategies = {k: v for k, v in all_strategies.items() if k not in EXCLUDED_FROM_SELECTOR}
-    headline = max(eligible_strategies.values(), key=_is_sharpe)
-    headline_label = headline["label"]
-    # If headline is the promoted T best variant, relabel it for UI
-    headline_key = next(k for k, v in eligible_strategies.items() if v is headline)
+    headline_key, headline = max(eligible_strategies.items(), key=_headline_rank)
     # 키와 라벨은 항상 일치 — signals/multi_strategy/api가 같은 헤드라인을 가리켜야 한다
     headline_label = headline_key
-    print(f"\nHeadline (best IS sharpe, eligible only): {headline_label} [{headline_key}]", flush=True)
-    print(f"  IS sharpe={headline.get('in_sample', {}).get('sharpe')}  OOS sharpe={headline.get('out_of_sample', {}).get('sharpe')}", flush=True)
+    print(f"\nHeadline (tiebreak IS→OOS→wealth ratio, eligible only): {headline_label} [{headline_key}]", flush=True)
+    print(f"  IS sharpe={headline.get('in_sample', {}).get('sharpe')}  OOS sharpe={headline.get('out_of_sample', {}).get('sharpe')}  "
+          f"vs KOSPI DCA={_kospi_dca_ratios.get(headline_key, {}).get('full_ratio')}x", flush=True)
+
+    # ── v20 데이터 주도 판정 (verdict) — 매 실행 시 실제 수치·게이트 결과에서 생성 ──
+    # 칩: SOTA(헤드라인) | 채택(셀렉터 멤버) | 연구용(비교 앵커·오버레이·대조군) | 기각(미달).
+    # 프런트엔드 하드코딩 금지 — strategy-meta.ts는 라벨/규칙 설명만 갖는다.
+    _CURATED_CORE = [
+        "D+_chandelier_optuna", "D_chandelier", "B_36mo", "C_narrative",
+        "P_deepbuy_chandelier", "F_momentum_narrative",
+    ]
+    curated_keys: list[str] = [headline_key] + [k for k in _CURATED_CORE if k in all_strategies]
+    if best_s_key in all_strategies:
+        curated_keys.append(best_s_key)               # S 배분형 IS 샤프 베스트 변형
+    if _u_beats_tminus and "U_chandelier_scaleout" in all_strategies:
+        curated_keys.append("U_chandelier_scaleout")  # T 베스트 게이트 통과 시 셀렉터 승격
+    if _t_promoted and _t_best_key in all_strategies:
+        curated_keys.append(_t_best_key)              # 파킹 콘테스트 승자 (승격 시)
+    if _v_promoted and "V_spo" in all_strategies:
+        curated_keys.append("V_spo")
+    curated_keys = list(dict.fromkeys(curated_keys))
+
+    _h_is, _h_oos, _h_ratio = _headline_rank((headline_key, headline))
+
+    # 역할 앵커 — 구조적으로 비교용으로 설계된 전략 (성과 판정이 아니라 역할 기술)
+    _RESEARCH_ROLE = {
+        "A_12mo":                  "12개월 고정 보유 기준선 — 비교 앵커로만 유지",
+        "J_core_satellite":        "D 레버리지 오버레이 — 차입·디레버 효과 검증용 (차입 6%/년)",
+        "R_kelly_chandelier":      "Kelly 사이징 오버레이 — 사이징 효과 단독 검증용",
+        "T_kospi_core_chandelier": "상시 KOSPI 파킹 앵커 (레짐 없음) — 파킹 효과 분리용",
+        "O_mtt_alpha16":           "alpha16 KRX 파라미터 이식 — 본 유니버스 미튜닝, 비교 참고용",
+        "V_ls":                    "SPO+ 효과 분리용 LS 대조군 — 비교 앵커로만 유지",
+    }
+
+    def _vf(v) -> str:
+        return "—" if v is None else f"{v}"
+
+    def _strategy_verdict(key: str, r: dict) -> tuple[str, str]:
+        is_s = r.get("in_sample", {}).get("sharpe")
+        oos_s = r.get("out_of_sample", {}).get("sharpe")
+        ratio = _kospi_dca_ratios.get(key, {}).get("full_ratio")
+        aw_r = _kospi_dca_ratios.get(key, {}).get("aw_ratio")
+        mdd = r["metrics"].get("mdd_pct")
+        n_tr = r["metrics"].get("trades") or 0
+
+        if key == headline_key:
+            return "SOTA", (
+                f"타이브레이크(IS 샤프 → OOS 샤프 → 부의 비율) 1위 — "
+                f"IS {_vf(is_s)} · OOS {_vf(oos_s)} · vs KOSPI DCA {_vf(ratio)}x"
+            )
+        if key in curated_keys:
+            if key == best_s_key:
+                return "채택", f"S 배분형 IS 샤프 베스트 변형 — IS {_vf(is_s)} · OOS {_vf(oos_s)}"
+            if key == _t_best_key and _t_promoted:
+                return "채택", (
+                    f"파킹 콘테스트 승자·승격 게이트 통과 — 타이브레이크 차점 "
+                    f"(IS {_vf(is_s)} vs {_vf(_h_is)} · OOS {_vf(oos_s)} vs {_vf(_h_oos)})"
+                )
+            if key in ("U_chandelier_scaleout", "V_spo"):
+                return "채택", (
+                    f"승격 게이트 통과 (T 베스트 대비 부의 비율·OOS 샤프 우위) — "
+                    f"IS {_vf(is_s)} · OOS {_vf(oos_s)} · vs KOSPI DCA {_vf(ratio)}x"
+                )
+            return "채택", f"셀렉터 핵심 비교 세트 — IS {_vf(is_s)} · OOS {_vf(oos_s)} · vs KOSPI DCA {_vf(ratio)}x"
+
+        # 파킹 콘테스트 패자 (W 또는 T-)
+        if key == _t_loser_key:
+            _own = _w_aw_ratio if key == "W_allweather_chandelier" else _tm_kospi_ratio
+            _own_name = "올웨더 DCA" if key == "W_allweather_chandelier" else "KOSPI DCA"
+            _loser_score = _w_score if key == "W_allweather_chandelier" else _tm_score
+            _winner_score = _tm_score if key == "W_allweather_chandelier" else _w_score
+            return "연구용", (
+                f"파킹 콘테스트 패자 (vs {_t_best_key}) — IS+OOS 샤프 합 "
+                f"{round(_loser_score, 2)} vs {round(_winner_score, 2)} · 자기 벤치마크({_own_name}) {_vf(_own)}x"
+            )
+        # 파킹 콘테스트 승자였으나 승격 게이트 미달
+        if key == _t_best_key and not _t_promoted:
+            return "연구용", (
+                f"파킹 콘테스트 승자였으나 승격 게이트 미달 — 자기 벤치마크 {_vf(_t_best_own_ratio)}x · "
+                f"IS {_vf(is_s)} vs D+ {_vf(_dplus_is)}"
+            )
+        # U 미승격: 스케일아웃이 T 베스트에 패배
+        if key == "U_chandelier_scaleout":
+            why = ("과열 스케일아웃이 상승 여력을 깎음" if _u_ratio <= _tm_ratio_cmp
+                   else "부의 비율은 앞서나 OOS 샤프 미달")
+            return "기각", (
+                f"T 베스트 대비 부의 비율 {_vf(_u_ratio)}x vs {_vf(_tm_ratio_cmp)}x · "
+                f"OOS {_vf(_u_oos)} vs {_vf(_tm_oos_cmp)} — {why}"
+            )
+        # V_spo 미승격
+        if key == "V_spo":
+            return "연구용", (
+                f"SPO+ 의사결정 학습 검증 — 승격 게이트 미달 "
+                f"(부의 비율 {_vf(_vspo_ratio)}x vs {_vf(_tm_ratio_cmp)}x · OOS {_vf(_vspo_oos)} vs {_vf(_tm_oos_cmp)})"
+            )
+        # S 비베스트 변형
+        if key in s_variants and key != best_s_key:
+            return "연구용", f"S 배분형 비베스트 변형 — IS {_vf(is_s)} (베스트 {best_s_key} {_vf(best_s_result['in_sample'].get('sharpe'))})"
+        # 구조적 비교 앵커·오버레이·대조군
+        if key in _RESEARCH_ROLE:
+            return "연구용", f"{_RESEARCH_ROLE[key]} (IS {_vf(is_s)} · OOS {_vf(oos_s)})"
+        # OOS 양호하나 IS 미달 — 표본 부족 참고용
+        if oos_s is not None and oos_s >= 1.0 and (is_s or 0.0) > 0.0:
+            return "연구용", f"OOS 샤프 {_vf(oos_s)} 양호 · IS {_vf(is_s)} 미달 — 표본 부족, 참고용"
+
+        # 기각 — 지배적 실패 원인을 수치에서 골라 기술
+        if is_s is None or is_s < 0.1:
+            why = f"IS 샤프 {_vf(is_s)} — 이 유니버스에서 미작동"
+        elif mdd is not None and mdd <= -60:
+            why = f"MDD {mdd}% — 낙폭 과대 (IS {_vf(is_s)} · OOS {_vf(oos_s)})"
+        elif n_tr >= 400 and (ratio or 0.0) < 0.7:
+            why = f"거래 {n_tr}건 고회전 — 비용이 알파 소진 (vs KOSPI DCA {_vf(ratio)}x)"
+        else:
+            why = (
+                f"vs KOSPI DCA {_vf(ratio)}x · 올웨더 DCA {_vf(aw_r)}x — "
+                f"벤치마크 적립식 하회 (IS {_vf(is_s)} · OOS {_vf(oos_s)})"
+            )
+        return "기각", why
+
+    strategy_verdicts: dict[str, dict[str, str]] = {}
+    for key, r in all_strategies.items():
+        chip, reason = _strategy_verdict(key, r)
+        strategy_verdicts[key] = {"verdict": chip, "verdict_reason": reason}
+    print(f"\nVerdicts (data-driven): curated={curated_keys}", flush=True)
+    for key, v in strategy_verdicts.items():
+        print(f"  [{v['verdict']:>3}] {key}: {v['verdict_reason']}", flush=True)
 
     # ── Tail stats and consensus stats on headline
     tail_stats = compute_tail_stats(headline.get("trades", []))
@@ -6632,14 +6796,17 @@ def main() -> int:
     headline_open_pos_raw = headline.get("open_positions", {})
     if not isinstance(headline_open_pos_raw, dict):
         headline_open_pos_raw = {}
-    headline_is_t_family = headline_key in ("T_kospi_core_chandelier", "T-_kospi_core_regime", "W_allweather_chandelier")
+    # U(과열 스케일아웃)는 T-와 동일한 레짐·슬롯 구조 — 헤드라인 승격 시 동일 취급
+    headline_is_t_family = headline_key in (
+        "T_kospi_core_chandelier", "T-_kospi_core_regime", "W_allweather_chandelier", "U_chandelier_scaleout",
+    )
     today_signals = compute_today_signals(
         perf, prices, ticker_reports, calendar,
         headline_open_positions=headline_open_pos_raw,
         headline_label=headline_label,
         reports=reports,
         kospi=kospi,
-        regime_aware=(headline_key == "T-_kospi_core_regime"),
+        regime_aware=(headline_key in ("T-_kospi_core_regime", "U_chandelier_scaleout")),
         max_positions=(t_max_pos if headline_is_t_family else MAX_POSITIONS),
     )
     print(f"  Open: {today_signals['counts']['open']}, "
@@ -6656,7 +6823,8 @@ def main() -> int:
         export_trades_csv(r.get("trades", []), PUBLIC_DIR / f"strategy-trades-{key}.csv")
 
     # ── Multi-strategy comparison rows
-    multi_strategy_summary = build_multi_strategy_summary(all_strategies, kospi_dca_ratios=_kospi_dca_ratios)
+    multi_strategy_summary = build_multi_strategy_summary(
+        all_strategies, kospi_dca_ratios=_kospi_dca_ratios, verdicts=strategy_verdicts)
 
     # ── Serialize open positions helper
     def _serialize_open_positions(raw: dict) -> list[dict]:
@@ -6754,6 +6922,14 @@ def main() -> int:
         "multi_strategy": {
             "strategies": multi_strategy_summary,
             "headline_key": headline_key,
+            "curated_keys": curated_keys,
+            "verdict_rules": (
+                "SOTA = 적격 전략 중 타이브레이크(IS 샤프 → OOS 샤프 → 전체 기간 부의 비율 vs KOSPI DCA) 1위. "
+                "채택 = 셀렉터 멤버(핵심 비교 세트 + S 베스트 변형 + 승격 게이트 통과 전략). "
+                "연구용 = 비교 앵커·오버레이·대조군 또는 콘테스트 패자. "
+                "기각 = 미작동·낙폭 과대·비용 사망·벤치마크 하회. "
+                "판정과 사유는 매 백테스트 실행 시 실제 수치에서 생성 — 프런트엔드 하드코딩 없음."
+            ),
             "strategy_wealth_sims": strat_wealth_sims,
             "equity_by_strategy": {
                 key: r["equity"] for key, r in all_strategies.items()

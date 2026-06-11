@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-11T09:20:19+00:00",
-  "strategy_key": "T-_kospi_core_regime",
+  "generated_at": "2026-06-11T09:52:00+00:00",
+  "strategy_key": "U_chandelier_scaleout",
   "ticker": "036010",
   "market": "KR",
   "name": "아비코전자",
@@ -11,13 +11,13 @@
       "date": "2023-04-10",
       "side": "buy",
       "price": 11710.0,
-      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: ewha 2023-04-08)"
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: ewha 2023-04-08)"
     },
     {
       "date": "2023-08-11",
       "side": "stop",
       "price": 14120.0,
-      "reason": "t_chandelier_ATR4.25 (+19.8%)"
+      "reason": "u_chandelier_ATR4.25 (+19.8%)"
     }
   ],
   "open_stop": null

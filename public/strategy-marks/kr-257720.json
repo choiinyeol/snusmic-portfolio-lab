@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-11T09:20:19+00:00",
-  "strategy_key": "T-_kospi_core_regime",
+  "generated_at": "2026-06-11T09:52:00+00:00",
+  "strategy_key": "U_chandelier_scaleout",
   "ticker": "257720",
   "market": "KR",
   "name": "실리콘투",
@@ -11,13 +11,13 @@
       "date": "2024-11-21",
       "side": "buy",
       "price": 27150.0,
-      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: yig 2024-11-20, kuvic 2023-10-12)"
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: yig 2024-11-20, kuvic 2023-10-12)"
     },
     {
       "date": "2025-02-27",
       "side": "stop",
       "price": 26800.0,
-      "reason": "t_chandelier_ATR4.25 (-1.9%)"
+      "reason": "u_chandelier_ATR4.25 (-1.9%)"
     }
   ],
   "open_stop": null

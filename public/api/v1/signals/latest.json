@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
   "as_of": "2026-06-11",
-  "generated_at": "2026-06-11T09:20:19+00:00",
-  "headline_strategy": "T-_kospi_core_regime",
+  "generated_at": "2026-06-11T09:52:00+00:00",
+  "headline_strategy": "U_chandelier_scaleout",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
   "regime": {
@@ -29,7 +29,7 @@
       "stop_level": 1552.84,
       "unrealized_pct": -2.28,
       "days_held": 10,
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2026-05-29)",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: smic 2026-05-29)",
       "trigger_reports": [
         {
           "school": "smic",
@@ -49,7 +49,7 @@
       "stop_level": 81100,
       "unrealized_pct": 23.08,
       "days_held": 77,
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: star 2026-03-25)",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: star 2026-03-25)",
       "trigger_reports": [
         {
           "school": "star",
@@ -75,7 +75,7 @@
       "stop_level": 79600,
       "unrealized_pct": 1.93,
       "days_held": 0,
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2026-06-10)",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: smic 2026-06-10)",
       "trigger_reports": [
         {
           "school": "smic",
@@ -95,7 +95,7 @@
       "stop_level": 359500,
       "unrealized_pct": 61.46,
       "days_held": 197,
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: voera 2025-11-25, kuvic 2025-05-15, ewha 2025-04-05, yig 2025-02-07, star 2024-06-30, smic 2024-05-09)",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: voera 2025-11-25, kuvic 2025-05-15, ewha 2025-04-05, yig 2025-02-07, star 2024-06-30, smic 2024-05-09)",
       "trigger_reports": [
         {
           "school": "star",
@@ -139,7 +139,7 @@
       "stop_level": 13610,
       "unrealized_pct": -1.99,
       "days_held": 0,
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2026-06-10)",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: smic 2026-06-10)",
       "trigger_reports": [
         {
           "school": "smic",
@@ -159,7 +159,7 @@
       "stop_level": 5160,
       "unrealized_pct": -0.79,
       "days_held": 0,
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2026-06-10, ewha 2022-02-12)",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: smic 2026-06-10, ewha 2022-02-12)",
       "trigger_reports": [
         {
           "school": "smic",
@@ -185,7 +185,7 @@
       "stop_level": 27150,
       "unrealized_pct": 2.14,
       "days_held": 0,
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2026-06-10)",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: smic 2026-06-10)",
       "trigger_reports": [
         {
           "school": "smic",
@@ -205,7 +205,7 @@
       "stop_level": 46050,
       "unrealized_pct": 4.52,
       "days_held": 0,
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2026-06-10, star 2026-05-04, ewha 2021-08-21)",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: smic 2026-06-10, star 2026-05-04, ewha 2021-08-21)",
       "trigger_reports": [
         {
           "school": "smic",

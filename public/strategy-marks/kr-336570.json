@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-11T09:20:19+00:00",
-  "strategy_key": "T-_kospi_core_regime",
+  "generated_at": "2026-06-11T09:52:00+00:00",
+  "strategy_key": "U_chandelier_scaleout",
   "ticker": "336570",
   "market": "KR",
   "name": "원텍",
@@ -11,25 +11,37 @@
       "date": "2023-02-09",
       "side": "buy",
       "price": 4840.0,
-      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: ewha 2023-02-08)"
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: ewha 2023-02-08)"
+    },
+    {
+      "date": "2023-02-09",
+      "side": "buy",
+      "price": 4840.0,
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: ewha 2023-02-08)"
+    },
+    {
+      "date": "2023-06-13",
+      "side": "sell",
+      "price": 9890.0,
+      "reason": "u_scaleout1_ext8.1x (+103.0%)"
     },
     {
       "date": "2023-09-20",
       "side": "stop",
       "price": 11610.0,
-      "reason": "t_chandelier_ATR4.25 (+138.3%)"
+      "reason": "u_chandelier_ATR4.25 (+138.3%)"
     },
     {
       "date": "2023-10-16",
       "side": "buy",
       "price": 9420.0,
-      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: kuvic 2023-10-13, ewha 2023-02-08)"
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: kuvic 2023-10-13, ewha 2023-02-08)"
     },
     {
       "date": "2024-01-18",
       "side": "stop",
       "price": 8620.0,
-      "reason": "t_chandelier_ATR4.25 (-9.1%)"
+      "reason": "u_chandelier_ATR4.25 (-9.1%)"
     }
   ],
   "open_stop": null

@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-11T09:20:19+00:00",
-  "strategy_key": "T-_kospi_core_regime",
+  "generated_at": "2026-06-11T09:52:00+00:00",
+  "strategy_key": "U_chandelier_scaleout",
   "ticker": "036930",
   "market": "KR",
   "name": "주성엔지니어링",
@@ -11,13 +11,25 @@
       "date": "2021-11-04",
       "side": "buy",
       "price": 11600.0,
-      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2021-11-03)"
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: smic 2021-11-03)"
+    },
+    {
+      "date": "2021-11-04",
+      "side": "buy",
+      "price": 11600.0,
+      "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: smic 2021-11-03)"
+    },
+    {
+      "date": "2021-11-23",
+      "side": "sell",
+      "price": 16800.0,
+      "reason": "u_scaleout1_ext8.2x (+43.9%)"
     },
     {
       "date": "2022-04-26",
       "side": "stop",
       "price": 22300.0,
-      "reason": "t_chandelier_ATR4.25 (+91.0%)"
+      "reason": "u_chandelier_ATR4.25 (+91.0%)"
     }
   ],
   "open_stop": null
