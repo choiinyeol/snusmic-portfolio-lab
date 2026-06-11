@@ -1,0 +1,44 @@
+# Node
+node_modules
+.next
+npm-debug.log*
+
+# Python
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Large data blobs — mount as volumes at runtime instead
+data/pdfs
+data/markdown
+
+# Git / IDE
+.git
+.gitignore
+.DS_Store
+*.swp
+*.swo
+.vscode
+.idea
+
+# Logs
+logs/
+*.log
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Docs (not needed in image)
+docs/
+
+# Tests
+tests/
+*.test.*

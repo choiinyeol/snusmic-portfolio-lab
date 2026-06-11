@@ -1,0 +1,68 @@
+version: "3.9"
+
+# ── Shared volume for generated data and public API files ──────────────────
+# The pipeline writes to data/ and public/api/v1/; the web service reads
+# public/ at build time, but a mounted volume lets you re-run the pipeline
+# without rebuilding the web image during local development.
+
+volumes:
+  pipeline_data:
+  pipeline_public:
+
+services:
+
+  # ── Pipeline: run the daily refresh chain ────────────────────────────────
+  # Usage:
+  #   docker compose run --rm pipeline          # full backtest + export
+  #   docker compose run --rm pipeline scripts/export_signals_api.py  # export only
+  pipeline:
+    build:
+      context: .
+      target: pipeline
+    image: smic-pipeline:latest
+    volumes:
+      - ./data:/app/data          # persist price cache and markdown
+      - ./public:/app/public      # write public/api/v1/ JSON files
+      - ./src/data:/app/src/data  # write strategy-backtest.json
+    env_file:
+      - .env                      # KRX_ID, KRX_PW (create from .env.example)
+    environment:
+      - PYTHONUNBUFFERED=1
+    # Run both scripts in sequence by default
+    command: >
+      -c "
+      import subprocess, sys
+      steps = [
+        ['uv', 'run', 'python', 'scripts/backtest_momentum.py'],
+        ['uv', 'run', 'python', 'scripts/export_signals_api.py'],
+      ]
+      for step in steps:
+          r = subprocess.run(step)
+          if r.returncode != 0:
+              sys.exit(r.returncode)
+      "
+    restart: "no"
+    profiles:
+      - pipeline     # only starts with: docker compose --profile pipeline up
+
+  # ── Web: Next.js production server ───────────────────────────────────────
+  # Note: for Vercel deployments, this service is not needed — Vercel builds
+  # and serves the Next.js app automatically.  Use this for local testing or
+  # self-hosted deployments.
+  web:
+    build:
+      context: .
+      target: web
+    image: smic-web:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount the public directory so updated API files are visible
+      # without rebuilding the web image (local dev only).
+      - ./public:/app/public:ro
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    restart: unless-stopped
+    profiles:
+      - web          # only starts with: docker compose --profile web up

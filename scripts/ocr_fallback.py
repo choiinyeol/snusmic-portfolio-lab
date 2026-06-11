@@ -18,8 +18,17 @@ import sys
 from pathlib import Path
 
 import fitz
-import winocr
 from PIL import Image
+
+# winocr is Windows-only (pyproject.toml: sys_platform == 'win32').
+# Guard the import so the module can be imported on Linux without crashing.
+# Functions that call winocr will raise RuntimeError on non-Windows at call time.
+try:
+    import winocr as _winocr  # type: ignore[import-untyped]
+    _WINOCR_AVAILABLE = True
+except ImportError:  # pragma: no cover
+    _winocr = None  # type: ignore[assignment]
+    _WINOCR_AVAILABLE = False
 
 ROOT = Path(__file__).resolve().parents[1]
 MD_ROOT = ROOT / "data" / "markdown"
@@ -52,8 +61,13 @@ def ocr_pdf_head(pdf_path: Path, pages: int) -> str | None:
     for page in doc[: min(pages, len(doc))]:
         pix = page.get_pixmap(matrix=fitz.Matrix(2.5, 2.5))
         img = Image.open(io.BytesIO(pix.tobytes("png")))
+        if not _WINOCR_AVAILABLE:
+            raise RuntimeError(
+                "winocr is not available on this platform (Windows only). "
+                "Install winocr or run this script on Windows."
+            )
         try:
-            result = winocr.recognize_pil_sync(img, "ko")
+            result = _winocr.recognize_pil_sync(img, "ko")
         except Exception as exc:  # noqa: BLE001
             print(f"  ! ocr failed: {pdf_path.name} ({exc})", flush=True)
             return None

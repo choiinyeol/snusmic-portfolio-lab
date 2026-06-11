@@ -1,0 +1,268 @@
+# Signal API — Reference
+
+> **DISCLAIMER / 투자 경고**
+>
+> All data served by this API is derived from **backtested simulations** of
+> momentum strategies applied to student investment-club reports.
+> It is provided for **research and educational purposes only**.
+> It does **NOT** constitute investment advice or a solicitation to buy or sell
+> any security.  
+> Past backtest performance does not guarantee future results.  
+> **All trading decisions and their financial consequences are solely your
+> responsibility (실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다).**
+
+---
+
+## Overview
+
+The API is a set of **static JSON files** regenerated once daily by the CI
+pipeline (`scripts/backtest_momentum.py` → `scripts/export_signals_api.py`) and
+deployed as public assets on Vercel.  There is no server-side compute at request
+time — Vercel serves the files directly from CDN.
+
+Base URL: `https://smic-easy.vercel.app/api/v1`
+
+An OpenAPI 3.1 machine-readable spec is available at
+[`/api/v1/openapi.json`](https://smic-easy.vercel.app/api/v1/openapi.json).
+
+---
+
+## Endpoints
+
+### `GET /api/v1/signals/latest.json`
+
+The **headline strategy's current signals** — refreshed each trading day.
+
+| Field | Type | Description |
+|---|---|---|
+| `schema_version` | string | API schema version (`"1.0"`) |
+| `as_of` | date | Date the signals were computed |
+| `generated_at` | datetime | ISO-8601 UTC timestamp of generation |
+| `headline_strategy` | string | Strategy key (e.g. `W_allweather_chandelier`) |
+| `disclaimer` | string | English disclaimer text |
+| `disclaimer_ko` | string | Korean disclaimer text |
+| `regime` | object | Market regime state (see below) |
+| `slots` | object | `{max_positions, open, available}` |
+| `open_positions` | array | Currently held positions |
+| `buy_signals` | array | Imminent buy candidates (last 5 trading days) |
+| `sell_signals` | array | Positions approaching or hitting stop |
+| `counts` | object | Summary counts |
+
+**`regime` object**
+
+| Field | Type | Description |
+|---|---|---|
+| `kospi_above_200ma` | bool | KOSPI close > 200-day MA |
+| `state` | `"ON"` \| `"OFF"` | Regime gate state |
+| `kospi_close` | number | Last KOSPI close |
+| `kospi_ma200` | number | KOSPI 200-day MA value |
+| `parking` | `"allweather"` \| `"kospi"` \| `"cash"` | Idle-cash parking vehicle |
+| `applies` | bool | Whether the regime filter is active for this strategy |
+
+**`open_positions[]` item**
+
+| Field | Type | Description |
+|---|---|---|
+| `ticker` | string | KR 6-digit code or US ticker |
+| `market` | `"KR"` \| `"US"` | Market |
+| `name` | string | Company display name |
+| `entry_date` | date | Position open date |
+| `entry_price` | number | Entry price |
+| `current_price` | number | Last close price |
+| `stop_level` | number | Chandelier trailing stop level |
+| `unrealized_pct` | number | Unrealised return % |
+| `days_held` | integer | Calendar days since entry |
+| `entry_reason` | string | Human-readable entry rationale |
+| `trigger_reports` | array | Club reports that triggered entry |
+
+**`buy_signals[]` item**
+
+| Field | Type | Description |
+|---|---|---|
+| `ticker` | string | |
+| `market` | string | |
+| `name` | string | |
+| `signal_date` | date | Date signal was generated |
+| `entry_basis_price` | number\|null | Suggested entry reference price |
+| `entry_reason` | string | |
+| `trigger_reports` | array | |
+
+**`sell_signals[]` item**
+
+| Field | Type | Description |
+|---|---|---|
+| `ticker` | string | |
+| `market` | string | |
+| `name` | string | |
+| `reason` | `"approaching_stop"` \| `"stop_hit"` | Why it's flagged |
+| `stop_level` | number | Stop price |
+| `dist_to_stop_pct` | number | Distance to stop as % of current price |
+
+---
+
+### `GET /api/v1/signals/{YYYY-MM-DD}.json`
+
+Immutable daily snapshot — same shape as `latest.json`.  
+The CI pipeline appends a new file each day but never overwrites historical ones,
+so consumers can diff day-over-day.
+
+Example: `/api/v1/signals/2026-06-11.json`
+
+---
+
+### `GET /api/v1/strategies.json`
+
+All 25 strategies with full IS/OOS metrics.
+
+| Field | Description |
+|---|---|
+| `strategies[].key` | Internal strategy key |
+| `strategies[].is_headline` | `true` for the current headline strategy |
+| `strategies[].metrics` | Full-period stats: `total_return_pct`, `cagr_pct`, `sharpe`, `mdd_pct`, `win_rate_pct`, `avg_hold_days` |
+| `strategies[].in_sample` | IS period stats |
+| `strategies[].out_of_sample` | OOS period stats |
+| `strategies[].kospi_dca_ratio` | Final value vs KOSPI buy-and-hold (>1 = beats market) |
+| `strategies[].aw_dca_ratio` | Final value vs All-Weather DCA |
+
+---
+
+### `GET /api/v1/trades/{strategy_key}.json`
+
+Full closed-trade log for one strategy.  Open (未청산) positions are excluded.
+
+`strategy_key` values: `A_12mo`, `B_36mo`, `C_narrative`, `D_chandelier`,
+`E_half_runner`, `F_momentum_narrative`, `G_dip_buy`, `H_minervini`,
+`I_supertrend`, `J_core_satellite`, `K_rr_trend`, `N_52w_high`,
+`O_mtt_alpha16`, `P_deepbuy_chandelier`, `Q_kangto_trend`,
+`R_kelly_chandelier`, `S_hrp`, `S_msharpe`, `S_mincvar`, `V_spo`, `V_ls`,
+`T_kospi_core_chandelier`, `T-_kospi_core_regime`, `W_allweather_chandelier`,
+`U_chandelier_scaleout`
+
+**`trades[]` item**
+
+| Field | Description |
+|---|---|
+| `ticker` | KR 6-digit or US ticker |
+| `market` | `"KR"` or `"US"` |
+| `name` | Company name |
+| `entry_date` / `exit_date` | ISO dates |
+| `entry_price` / `exit_price` | Prices |
+| `return_pct` | Trade return % (net of transaction cost) |
+| `days` | Holding period in calendar days |
+| `exit_reason` | e.g. `"chandelier_stop"`, `"time_exit"` |
+| `entry_reason` | Human-readable entry rationale |
+| `trigger_reports` | Club reports that triggered entry |
+
+---
+
+### `GET /api/v1/openapi.json`
+
+OpenAPI 3.1 spec — use with any OpenAPI client generator to get typed
+access in your language.
+
+---
+
+## Worked Examples
+
+### curl
+
+```bash
+# Latest signals
+curl https://smic-easy.vercel.app/api/v1/signals/latest.json | python -m json.tool
+
+# Headline strategy trades
+curl https://smic-easy.vercel.app/api/v1/trades/W_allweather_chandelier.json | python -m json.tool
+```
+
+### Python — print today's buy and sell signals
+
+```python
+import urllib.request
+import json
+
+url = "https://smic-easy.vercel.app/api/v1/signals/latest.json"
+with urllib.request.urlopen(url) as resp:
+    data = json.load(resp)
+
+print(f"Signals as of {data['as_of']}  (strategy: {data['headline_strategy']})")
+print(f"Regime: {data['regime']['state']}  parking: {data['regime']['parking']}")
+print()
+
+buys = data["buy_signals"]
+if buys:
+    print(f"=== BUY signals ({len(buys)}) ===")
+    for b in buys:
+        print(f"  {b['ticker']} ({b['market']}) — {b['name']}")
+        print(f"    signal_date: {b['signal_date']}  basis: {b['entry_basis_price']}")
+        print(f"    reason: {b['entry_reason']}")
+else:
+    print("No buy signals today.")
+
+print()
+sells = data["sell_signals"]
+if sells:
+    print(f"=== SELL alerts ({len(sells)}) ===")
+    for s in sells:
+        print(f"  {s['ticker']} — {s['name']}  [{s['reason']}]")
+        print(f"    stop: {s['stop_level']}  dist: {s['dist_to_stop_pct']:.1f}%")
+else:
+    print("No sell alerts today.")
+```
+
+### Python — diff yesterday vs today
+
+```python
+import urllib.request, json, datetime
+
+base = "https://smic-easy.vercel.app/api/v1/signals"
+today = datetime.date.today().isoformat()
+yesterday = (datetime.date.today() - datetime.timedelta(days=1)).isoformat()
+
+def fetch(date):
+    try:
+        with urllib.request.urlopen(f"{base}/{date}.json") as r:
+            return json.load(r)
+    except Exception:
+        return None
+
+t = fetch(today)
+y = fetch(yesterday)
+if t and y:
+    t_tickers = {p["ticker"] for p in t["open_positions"]}
+    y_tickers = {p["ticker"] for p in y["open_positions"]}
+    print("Entered:", t_tickers - y_tickers)
+    print("Exited: ", y_tickers - t_tickers)
+```
+
+---
+
+## Cache-Control & CORS
+
+All `/api/*` responses are served with:
+
+```
+Cache-Control: public, max-age=43200, stale-while-revalidate=86400
+Access-Control-Allow-Origin: *
+```
+
+12-hour TTL matches the daily regeneration cadence. The serverless route
+`GET /api/v1/signals/latest` (no `.json`) also supports CORS preflight
+(`OPTIONS`) for browser `fetch()` calls.
+
+---
+
+## Pipeline integration — regenerating the API
+
+The export step runs automatically after `backtest_momentum.py`:
+
+```bash
+# Full pipeline
+uv run python scripts/backtest_momentum.py
+uv run python scripts/export_signals_api.py
+
+# Or just re-export from an existing strategy-backtest.json
+uv run python scripts/export_signals_api.py --source src/data/strategy-backtest.json
+```
+
+The CI workflow (`.github/workflows/`) already chains these steps; see the
+weekly-refresh job for the canonical sequence.
