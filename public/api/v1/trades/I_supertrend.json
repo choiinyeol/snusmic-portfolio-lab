@@ -1,54 +1,10 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-12T15:41:45+00:00",
+  "generated_at": "2026-06-12T17:15:31+00:00",
   "strategy_key": "I_supertrend",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
   "trades": [
-    {
-      "ticker": "090460",
-      "market": "KR",
-      "name": "비에이치",
-      "entry_date": "2020-01-02",
-      "exit_date": "2020-01-03",
-      "entry_price": 22050.0,
-      "exit_price": 22100.0,
-      "return_pct": -0.37,
-      "days": 1,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2019-11-05)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2019-11-05",
-          "source_file": "2019-11-05_Equity Research, 비에이치.md",
-          "target_price": 45300.0,
-          "stated_upside_pct": 100.4425
-        }
-      ]
-    },
-    {
-      "ticker": "230360",
-      "market": "KR",
-      "name": "에코마케팅",
-      "entry_date": "2020-01-02",
-      "exit_date": "2020-01-03",
-      "entry_price": 16100.0,
-      "exit_price": 15900.0,
-      "return_pct": -1.83,
-      "days": 1,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2019-11-05)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2019-11-05",
-          "source_file": "2019-11-05_Equity Research, 에코마케팅.md",
-          "target_price": 52500.0,
-          "stated_upside_pct": 190.8587
-        }
-      ]
-    },
     {
       "ticker": "161390",
       "market": "KR",
@@ -72,61 +28,17 @@
       ]
     },
     {
-      "ticker": "200130",
-      "market": "KR",
-      "name": "콜마비앤에이치",
-      "entry_date": "2020-01-02",
-      "exit_date": "2020-01-07",
-      "entry_price": 27700.0,
-      "exit_price": 25950.0,
-      "return_pct": -6.88,
-      "days": 5,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2019-08-11)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2019-08-11",
-          "source_file": "2019-08-11_Equity Research, 콜마비앤에이치.md",
-          "target_price": 34500.0,
-          "stated_upside_pct": 35.0294
-        }
-      ]
-    },
-    {
-      "ticker": "272550",
-      "market": "KR",
-      "name": "삼양패키징",
-      "entry_date": "2020-01-02",
-      "exit_date": "2020-01-08",
-      "entry_price": 15700.0,
-      "exit_price": 15350.0,
-      "return_pct": -2.82,
-      "days": 6,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2019-11-05)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2019-11-05",
-          "source_file": "2019-11-05_Equity Research, 삼양패키징.md",
-          "target_price": 23687.0,
-          "stated_upside_pct": 44.8746
-        }
-      ]
-    },
-    {
       "ticker": "ALGN",
       "market": "US",
       "name": "ALGN",
-      "entry_date": "2020-01-02",
+      "entry_date": "2020-01-10",
       "exit_date": "2020-01-16",
-      "entry_price": 281.2,
+      "entry_price": 297.21,
       "exit_price": 271.84,
-      "return_pct": -3.67,
-      "days": 14,
+      "return_pct": -9.16,
+      "days": 6,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2019-12-24)",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2019-12-24)",
       "trigger_reports": [
         {
           "school": "smic",
@@ -141,21 +53,21 @@
       "ticker": "BABA",
       "market": "US",
       "name": "BABA",
-      "entry_date": "2020-01-02",
+      "entry_date": "2020-01-10",
       "exit_date": "2020-01-27",
-      "entry_price": 205.7039,
-      "exit_price": 191.0976,
-      "return_pct": -6.44,
-      "days": 25,
+      "entry_price": 210.7016,
+      "exit_price": 189.3586,
+      "return_pct": -9.79,
+      "days": 17,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2019-12-24)",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2019-12-24)",
       "trigger_reports": [
         {
           "school": "smic",
           "report_date": "2019-12-24",
           "source_file": "2019-12-24_Equity Research, Alibaba Holdings.md",
           "target_price": 210.96,
-          "stated_upside_pct": 3.6752
+          "stated_upside_pct": 4.6273
         }
       ]
     },
@@ -231,8 +143,8 @@
       "name": "EQIX",
       "entry_date": "2020-02-05",
       "exit_date": "2020-02-28",
-      "entry_price": 538.7203,
-      "exit_price": 521.4287,
+      "entry_price": 538.7201,
+      "exit_price": 521.4288,
       "return_pct": -1.44,
       "days": 23,
       "exit_reason": "supertrend_bearish_flip",
@@ -273,14 +185,14 @@
       "ticker": "086450",
       "market": "KR",
       "name": "동국제약",
-      "entry_date": "2020-01-02",
+      "entry_date": "2020-01-03",
       "exit_date": "2020-03-02",
-      "entry_price": 17777.0,
+      "entry_price": 17877.0,
       "exit_price": 16876.0,
-      "return_pct": -5.64,
-      "days": 60,
+      "return_pct": -6.16,
+      "days": 59,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2019-11-05)",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2019-11-05)",
       "trigger_reports": [
         {
           "school": "smic",
@@ -314,28 +226,6 @@
       ]
     },
     {
-      "ticker": "060250",
-      "market": "KR",
-      "name": "NHN KCP",
-      "entry_date": "2020-01-02",
-      "exit_date": "2020-03-12",
-      "entry_price": 12730.0,
-      "exit_price": 14880.0,
-      "return_pct": 16.19,
-      "days": 70,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2019-08-11)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2019-08-11",
-          "source_file": "2019-08-11_Equity Research, NHN한국사이버결제.md",
-          "target_price": 19300.0,
-          "stated_upside_pct": 62.5811
-        }
-      ]
-    },
-    {
       "ticker": "082920",
       "market": "KR",
       "name": "비츠로셀",
@@ -361,14 +251,14 @@
       "ticker": "282880",
       "market": "KR",
       "name": "코윈테크",
-      "entry_date": "2020-01-02",
+      "entry_date": "2020-01-03",
       "exit_date": "2020-03-12",
-      "entry_price": 21780.0,
+      "entry_price": 21351.0,
       "exit_price": 21994.0,
-      "return_pct": 0.38,
-      "days": 70,
+      "return_pct": 2.39,
+      "days": 69,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2019-11-05)",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2019-11-05)",
       "trigger_reports": [
         {
           "school": "smic",
@@ -446,28 +336,6 @@
       ]
     },
     {
-      "ticker": "230240",
-      "market": "KR",
-      "name": "에치에프알",
-      "entry_date": "2020-05-22",
-      "exit_date": "2020-06-15",
-      "entry_price": 38358.0,
-      "exit_price": 32708.0,
-      "return_pct": -15.24,
-      "days": 24,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2020-05-06)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2020-05-06",
-          "source_file": "2020-05-06_Equity Research, 에치에프알.md",
-          "target_price": 45900.0,
-          "stated_upside_pct": 25.3277
-        }
-      ]
-    },
-    {
       "ticker": "007070",
       "market": "KR",
       "name": "GS리테일",
@@ -537,14 +405,14 @@
       "ticker": "064290",
       "market": "KR",
       "name": "인텍플러스",
-      "entry_date": "2020-05-07",
+      "entry_date": "2020-05-19",
       "exit_date": "2020-06-16",
-      "entry_price": 8920.0,
+      "entry_price": 11150.0,
       "exit_price": 9690.0,
-      "return_pct": 7.98,
-      "days": 40,
+      "return_pct": -13.61,
+      "days": 28,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2020-05-06)",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2020-05-06)",
       "trigger_reports": [
         {
           "school": "smic",
@@ -552,72 +420,6 @@
           "source_file": "2020-05-06_Equity Research, 인텍플러스.md",
           "target_price": 12534.0,
           "stated_upside_pct": 40.5157
-        }
-      ]
-    },
-    {
-      "ticker": "131390",
-      "market": "KR",
-      "name": "원익피앤이",
-      "entry_date": "2020-06-01",
-      "exit_date": "2020-06-16",
-      "entry_price": 16450.0,
-      "exit_price": 16200.0,
-      "return_pct": -2.11,
-      "days": 15,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: ewha 2020-05-30)",
-      "trigger_reports": [
-        {
-          "school": "ewha",
-          "report_date": "2020-05-30",
-          "source_file": "2020-05-30_[200530] 피엔이솔루션(131390).md",
-          "target_price": null,
-          "stated_upside_pct": null
-        }
-      ]
-    },
-    {
-      "ticker": "137400",
-      "market": "KR",
-      "name": "피엔티",
-      "entry_date": "2020-06-01",
-      "exit_date": "2020-06-16",
-      "entry_price": 12200.0,
-      "exit_price": 11250.0,
-      "return_pct": -8.34,
-      "days": 15,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2020-05-31)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2020-05-31",
-          "source_file": "2020-05-31_Equity Research, 피엔티.md",
-          "target_price": 14572.0,
-          "stated_upside_pct": 20.4298
-        }
-      ]
-    },
-    {
-      "ticker": "251970",
-      "market": "KR",
-      "name": "펌텍코리아",
-      "entry_date": "2020-05-07",
-      "exit_date": "2020-06-16",
-      "entry_price": 16400.0,
-      "exit_price": 15550.0,
-      "return_pct": -5.75,
-      "days": 40,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2020-05-06)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2020-05-06",
-          "source_file": "2020-05-06_Equity Research, 펌텍코리아.md",
-          "target_price": 20224.0,
-          "stated_upside_pct": 26.0062
         }
       ]
     },
@@ -640,28 +442,6 @@
           "source_file": "2020-05-30_[200530] 이노메트리(302430).md",
           "target_price": 22700.0,
           "stated_upside_pct": 40.1235
-        }
-      ]
-    },
-    {
-      "ticker": "302550",
-      "market": "KR",
-      "name": "리메드",
-      "entry_date": "2020-06-01",
-      "exit_date": "2020-06-24",
-      "entry_price": 7210.0,
-      "exit_price": 6390.0,
-      "return_pct": -11.9,
-      "days": 23,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2020-05-31)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2020-05-31",
-          "source_file": "2020-05-31_Equity Research, 리메드.md",
-          "target_price": 10821.8485,
-          "stated_upside_pct": 50.7221
         }
       ]
     },
@@ -732,15 +512,59 @@
       ]
     },
     {
+      "ticker": "230240",
+      "market": "KR",
+      "name": "에치에프알",
+      "entry_date": "2020-06-29",
+      "exit_date": "2020-08-19",
+      "entry_price": 34641.0,
+      "exit_price": 32460.0,
+      "return_pct": -6.86,
+      "days": 51,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2020-05-06)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2020-05-06",
+          "source_file": "2020-05-06_Equity Research, 에치에프알.md",
+          "target_price": 45900.0,
+          "stated_upside_pct": 25.3277
+        }
+      ]
+    },
+    {
+      "ticker": "131390",
+      "market": "KR",
+      "name": "원익피앤이",
+      "entry_date": "2020-06-26",
+      "exit_date": "2020-08-21",
+      "entry_price": 20000.0,
+      "exit_price": 20650.0,
+      "return_pct": 2.63,
+      "days": 56,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: ewha 2020-05-30)",
+      "trigger_reports": [
+        {
+          "school": "ewha",
+          "report_date": "2020-05-30",
+          "source_file": "2020-05-30_[200530] 피엔이솔루션(131390).md",
+          "target_price": null,
+          "stated_upside_pct": null
+        }
+      ]
+    },
+    {
       "ticker": "PYPL",
       "market": "US",
       "name": "PYPL",
-      "entry_date": "2020-06-11",
+      "entry_date": "2020-06-19",
       "exit_date": "2020-09-08",
-      "entry_price": 156.9805,
+      "entry_price": 169.1352,
       "exit_price": 183.1141,
-      "return_pct": 15.66,
-      "days": 89,
+      "return_pct": 5.44,
+      "days": 81,
       "exit_reason": "supertrend_bearish_flip",
       "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2020-06-09)",
       "trigger_reports": [
@@ -772,6 +596,28 @@
           "source_file": "undated_[BUY] CJ제일제당_사재기는 거들뿐.md",
           "target_price": 395000.0,
           "stated_upside_pct": 28.0389
+        }
+      ]
+    },
+    {
+      "ticker": "137400",
+      "market": "KR",
+      "name": "피엔티",
+      "entry_date": "2020-07-03",
+      "exit_date": "2020-09-25",
+      "entry_price": 14050.0,
+      "exit_price": 21900.0,
+      "return_pct": 54.94,
+      "days": 84,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2020-05-31)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2020-05-31",
+          "source_file": "2020-05-31_Equity Research, 피엔티.md",
+          "target_price": 14572.0,
+          "stated_upside_pct": 20.4298
         }
       ]
     },
@@ -816,28 +662,6 @@
           "source_file": "2020-06-22_equity-research-테스나.md",
           "target_price": 83099.0,
           "stated_upside_pct": 153.2966
-        }
-      ]
-    },
-    {
-      "ticker": "194700",
-      "market": "KR",
-      "name": "노바렉스",
-      "entry_date": "2020-05-07",
-      "exit_date": "2020-10-16",
-      "entry_price": 15007.0,
-      "exit_price": 19888.0,
-      "return_pct": 31.73,
-      "days": 162,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2020-05-06)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2020-05-06",
-          "source_file": "2020-05-06_Equity Research, 노바렉스.md",
-          "target_price": 35545.0,
-          "stated_upside_pct": 137.6797
         }
       ]
     },
@@ -1062,39 +886,17 @@
       ]
     },
     {
-      "ticker": "285490",
-      "market": "KR",
-      "name": "노바텍",
-      "entry_date": "2021-01-18",
-      "exit_date": "2021-02-01",
-      "entry_price": 37677.0,
-      "exit_price": 32622.0,
-      "return_pct": -13.94,
-      "days": 14,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2021-01-16)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2021-01-16",
-          "source_file": "2021-01-16_equity-research-노바텍.md",
-          "target_price": 139200.0,
-          "stated_upside_pct": 279.0437
-        }
-      ]
-    },
-    {
       "ticker": "317400",
       "market": "KR",
       "name": "자이에스앤디",
-      "entry_date": "2020-06-23",
+      "entry_date": "2020-07-29",
       "exit_date": "2021-02-01",
-      "entry_price": 6091.0,
+      "entry_price": 5942.0,
       "exit_price": 10897.0,
-      "return_pct": 77.83,
-      "days": 223,
+      "return_pct": 82.29,
+      "days": 187,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2020-06-22)",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2020-06-22)",
       "trigger_reports": [
         {
           "school": "smic",
@@ -1233,14 +1035,14 @@
       "ticker": "ROKU",
       "market": "US",
       "name": "ROKU",
-      "entry_date": "2020-12-07",
+      "entry_date": "2020-12-11",
       "exit_date": "2021-02-24",
-      "entry_price": 295.65,
+      "entry_price": 321.0,
       "exit_price": 410.0,
-      "return_pct": 41.09,
-      "days": 79,
+      "return_pct": 29.64,
+      "days": 75,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2020-12-05)",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2020-12-05)",
       "trigger_reports": [
         {
           "school": "smic",
@@ -1328,14 +1130,14 @@
       "ticker": "BILI",
       "market": "US",
       "name": "BILI",
-      "entry_date": "2020-12-07",
+      "entry_date": "2020-12-08",
       "exit_date": "2021-03-08",
-      "entry_price": 68.56,
+      "entry_price": 72.8,
       "exit_price": 111.0,
-      "return_pct": 67.42,
-      "days": 91,
+      "return_pct": 57.69,
+      "days": 90,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2020-12-05)",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2020-12-05)",
       "trigger_reports": [
         {
           "school": "smic",
@@ -1618,24 +1420,24 @@
       ]
     },
     {
-      "ticker": "166090",
+      "ticker": "285490",
       "market": "KR",
-      "name": "하나머티리얼즈",
-      "entry_date": "2021-01-18",
+      "name": "노바텍",
+      "entry_date": "2021-03-24",
       "exit_date": "2021-05-14",
-      "entry_price": 30650.0,
-      "exit_price": 42400.0,
-      "return_pct": 37.51,
-      "days": 116,
+      "entry_price": 37248.0,
+      "exit_price": 41206.0,
+      "return_pct": 9.96,
+      "days": 51,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2021-01-16)",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2021-01-16)",
       "trigger_reports": [
         {
           "school": "smic",
           "report_date": "2021-01-16",
-          "source_file": "2021-01-16_equity-research-하나머티리얼즈.md",
-          "target_price": 40400.0,
-          "stated_upside_pct": 29.4872
+          "source_file": "2021-01-16_equity-research-노바텍.md",
+          "target_price": 139200.0,
+          "stated_upside_pct": 279.0437
         }
       ]
     },
@@ -1884,7 +1686,7 @@
           "report_date": "2021-05-31",
           "source_file": "2021-05-31_equity-research-star-bulk-carriers.md",
           "target_price": 37.8,
-          "stated_upside_pct": 239.1601
+          "stated_upside_pct": 239.1602
         }
       ]
     },
@@ -2075,12 +1877,12 @@
       "ticker": "344820",
       "market": "KR",
       "name": "KCC글라스",
-      "entry_date": "2021-05-12",
+      "entry_date": "2021-07-07",
       "exit_date": "2021-08-18",
-      "entry_price": 66200.0,
+      "entry_price": 65800.0,
       "exit_price": 64200.0,
-      "return_pct": -3.6,
-      "days": 98,
+      "return_pct": -3.02,
+      "days": 42,
       "exit_reason": "supertrend_bearish_flip",
       "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2021-05-06)",
       "trigger_reports": [
@@ -2211,28 +2013,6 @@
       ]
     },
     {
-      "ticker": "010060",
-      "market": "KR",
-      "name": "OCI홀딩스",
-      "entry_date": "2021-08-26",
-      "exit_date": "2021-10-12",
-      "entry_price": 92974.0,
-      "exit_price": 111252.0,
-      "return_pct": 18.94,
-      "days": 47,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: ewha 2021-08-21)",
-      "trigger_reports": [
-        {
-          "school": "ewha",
-          "report_date": "2021-08-21",
-          "source_file": "2021-08-21_[210821] OCI(010060).md",
-          "target_price": 113156.0,
-          "stated_upside_pct": 40.2911
-        }
-      ]
-    },
-    {
       "ticker": "003670",
       "market": "KR",
       "name": "포스코퓨처엠",
@@ -2343,50 +2123,6 @@
       ]
     },
     {
-      "ticker": "376980",
-      "market": "KR",
-      "name": "원티드랩",
-      "entry_date": "2021-11-22",
-      "exit_date": "2021-11-29",
-      "entry_price": 39800.0,
-      "exit_price": 33000.0,
-      "return_pct": -17.58,
-      "days": 7,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2021-11-19)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2021-11-19",
-          "source_file": "2021-11-19_equity-research-원티드랩.md",
-          "target_price": 50900.0,
-          "stated_upside_pct": 26.3027
-        }
-      ]
-    },
-    {
-      "ticker": "352820",
-      "market": "KR",
-      "name": "하이브",
-      "entry_date": "2021-11-22",
-      "exit_date": "2021-12-02",
-      "entry_price": 395000.0,
-      "exit_price": 344000.0,
-      "return_pct": -13.43,
-      "days": 10,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2021-11-19)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2021-11-19",
-          "source_file": "2021-11-19_equity-research-하이브.md",
-          "target_price": 628000.0,
-          "stated_upside_pct": 56.804
-        }
-      ]
-    },
-    {
       "ticker": "078600",
       "market": "KR",
       "name": "대주전자재료",
@@ -2405,28 +2141,6 @@
           "source_file": "2021-11-27_[211127] 대주전자재료(078600).md",
           "target_price": 142000.0,
           "stated_upside_pct": 13.0573
-        }
-      ]
-    },
-    {
-      "ticker": "293490",
-      "market": "KR",
-      "name": "카카오게임즈",
-      "entry_date": "2021-11-22",
-      "exit_date": "2021-12-20",
-      "entry_price": 104900.0,
-      "exit_price": 86100.0,
-      "return_pct": -18.41,
-      "days": 28,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2021-11-19)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2021-11-19",
-          "source_file": "2021-11-19_equity-research-카카오게임즈.md",
-          "target_price": 151300.0,
-          "stated_upside_pct": 40.7442
         }
       ]
     },
@@ -2460,6 +2174,28 @@
       ]
     },
     {
+      "ticker": "376980",
+      "market": "KR",
+      "name": "원티드랩",
+      "entry_date": "2021-12-30",
+      "exit_date": "2022-01-18",
+      "entry_price": 36750.0,
+      "exit_price": 33050.0,
+      "return_pct": -10.61,
+      "days": 19,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2021-11-19)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2021-11-19",
+          "source_file": "2021-11-19_equity-research-원티드랩.md",
+          "target_price": 50900.0,
+          "stated_upside_pct": 26.3027
+        }
+      ]
+    },
+    {
       "ticker": "216050",
       "market": "KR",
       "name": "인크로스",
@@ -2485,12 +2221,12 @@
       "ticker": "CHGG",
       "market": "US",
       "name": "CHGG",
-      "entry_date": "2021-12-03",
+      "entry_date": "2021-12-22",
       "exit_date": "2022-01-21",
-      "entry_price": 28.89,
+      "entry_price": 30.3,
       "exit_price": 26.44,
-      "return_pct": -7.82,
-      "days": 49,
+      "return_pct": -13.18,
+      "days": 30,
       "exit_reason": "supertrend_bearish_flip",
       "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2021-11-30)",
       "trigger_reports": [
@@ -2565,14 +2301,14 @@
       "ticker": "004250",
       "market": "KR",
       "name": "NPC",
-      "entry_date": "2021-11-22",
+      "entry_date": "2021-12-22",
       "exit_date": "2022-01-28",
-      "entry_price": 7520.0,
+      "entry_price": 9740.0,
       "exit_price": 8040.0,
-      "return_pct": 6.27,
-      "days": 67,
+      "return_pct": -17.95,
+      "days": 37,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2021-11-19)",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2021-11-19)",
       "trigger_reports": [
         {
           "school": "smic",
@@ -2734,6 +2470,28 @@
           "source_file": "undated_[BUY] 반도체 산업의 백미, 한미반도체.md",
           "target_price": 40200.0,
           "stated_upside_pct": 131.7003
+        }
+      ]
+    },
+    {
+      "ticker": "293490",
+      "market": "KR",
+      "name": "카카오게임즈",
+      "entry_date": "2022-02-09",
+      "exit_date": "2022-04-13",
+      "entry_price": 77900.0,
+      "exit_price": 66000.0,
+      "return_pct": -15.78,
+      "days": 63,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2021-11-19)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2021-11-19",
+          "source_file": "2021-11-19_equity-research-카카오게임즈.md",
+          "target_price": 151300.0,
+          "stated_upside_pct": 40.7442
         }
       ]
     },
@@ -2913,50 +2671,6 @@
       ]
     },
     {
-      "ticker": "089860",
-      "market": "KR",
-      "name": "롯데렌탈",
-      "entry_date": "2022-04-18",
-      "exit_date": "2022-05-06",
-      "entry_price": 47000.0,
-      "exit_price": 42750.0,
-      "return_pct": -9.59,
-      "days": 18,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2022-04-16)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2022-04-16",
-          "source_file": "2022-04-16_equity-research-롯데렌탈.md",
-          "target_price": 63529.0,
-          "stated_upside_pct": 36.0364
-        }
-      ]
-    },
-    {
-      "ticker": "077360",
-      "market": "KR",
-      "name": "덕산하이메탈",
-      "entry_date": "2022-04-04",
-      "exit_date": "2022-05-09",
-      "entry_price": 9625.0,
-      "exit_price": 8600.0,
-      "return_pct": -11.18,
-      "days": 35,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2022-04-01)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2022-04-01",
-          "source_file": "2022-04-01_STAR_덕산하이메탈.md",
-          "target_price": 21800.0,
-          "stated_upside_pct": 128.2723
-        }
-      ]
-    },
-    {
       "ticker": "043650",
       "market": "KR",
       "name": "국순당",
@@ -3023,6 +2737,28 @@
       ]
     },
     {
+      "ticker": "077360",
+      "market": "KR",
+      "name": "덕산하이메탈",
+      "entry_date": "2022-06-03",
+      "exit_date": "2022-06-14",
+      "entry_price": 9570.0,
+      "exit_price": 8220.0,
+      "return_pct": -14.62,
+      "days": 11,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2022-04-01)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2022-04-01",
+          "source_file": "2022-04-01_STAR_덕산하이메탈.md",
+          "target_price": 21800.0,
+          "stated_upside_pct": 128.2723
+        }
+      ]
+    },
+    {
       "ticker": "005300",
       "market": "KR",
       "name": "롯데칠성",
@@ -3041,28 +2777,6 @@
           "source_file": "2022-03-12_[220312] 롯데칠성(005300).md",
           "target_price": 242000.0,
           "stated_upside_pct": 51.25
-        }
-      ]
-    },
-    {
-      "ticker": "006260",
-      "market": "KR",
-      "name": "LS",
-      "entry_date": "2022-06-09",
-      "exit_date": "2022-06-16",
-      "entry_price": 68200.0,
-      "exit_price": 62300.0,
-      "return_pct": -9.2,
-      "days": 7,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2022-06-08)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2022-06-08",
-          "source_file": "2022-06-08_equity-research-ls.md",
-          "target_price": 163000.0,
-          "stated_upside_pct": 137.2635
         }
       ]
     },
@@ -3092,28 +2806,6 @@
           "source_file": "2022-03-15_STAR_해성디에스.md",
           "target_price": 67300.0,
           "stated_upside_pct": 47.5877
-        }
-      ]
-    },
-    {
-      "ticker": "058610",
-      "market": "KR",
-      "name": "에스피지",
-      "entry_date": "2022-05-30",
-      "exit_date": "2022-06-22",
-      "entry_price": 17600.0,
-      "exit_price": 15500.0,
-      "return_pct": -12.46,
-      "days": 23,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2022-05-28)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2022-05-28",
-          "source_file": "2022-05-28_STAR_에스피지.md",
-          "target_price": 21100.0,
-          "stated_upside_pct": 20.2279
         }
       ]
     },
@@ -3224,6 +2916,28 @@
           "source_file": "2022-05-25_equity-research-graftech-international-ltd.md",
           "target_price": null,
           "stated_upside_pct": null
+        }
+      ]
+    },
+    {
+      "ticker": "089860",
+      "market": "KR",
+      "name": "롯데렌탈",
+      "entry_date": "2022-06-30",
+      "exit_date": "2022-08-09",
+      "entry_price": 38150.0,
+      "exit_price": 37750.0,
+      "return_pct": -1.64,
+      "days": 40,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2022-04-16)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2022-04-16",
+          "source_file": "2022-04-16_equity-research-롯데렌탈.md",
+          "target_price": 63529.0,
+          "stated_upside_pct": 36.0364
         }
       ]
     },
@@ -3492,28 +3206,6 @@
       ]
     },
     {
-      "ticker": "010120",
-      "market": "KR",
-      "name": "LS ELECTRIC",
-      "entry_date": "2022-08-17",
-      "exit_date": "2022-09-19",
-      "entry_price": 11520.0,
-      "exit_price": 10480.0,
-      "return_pct": -9.57,
-      "days": 33,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2022-08-16)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2022-08-16",
-          "source_file": "2022-08-16_STAR_LS ELECTRIC.md",
-          "target_price": 15325.3846,
-          "stated_upside_pct": 32.1154
-        }
-      ]
-    },
-    {
       "ticker": "112610",
       "market": "KR",
       "name": "씨에스윈드",
@@ -3601,6 +3293,28 @@
       ]
     },
     {
+      "ticker": "006260",
+      "market": "KR",
+      "name": "LS",
+      "entry_date": "2022-08-09",
+      "exit_date": "2022-09-27",
+      "entry_price": 60600.0,
+      "exit_price": 60100.0,
+      "return_pct": -1.42,
+      "days": 49,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2022-06-08)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2022-06-08",
+          "source_file": "2022-06-08_equity-research-ls.md",
+          "target_price": 163000.0,
+          "stated_upside_pct": 137.2635
+        }
+      ]
+    },
+    {
       "ticker": "009900",
       "market": "KR",
       "name": "명신산업",
@@ -3619,6 +3333,28 @@
           "source_file": "2022-08-16_STAR_명신산업.md",
           "target_price": 26760.0,
           "stated_upside_pct": 21.3605
+        }
+      ]
+    },
+    {
+      "ticker": "058610",
+      "market": "KR",
+      "name": "에스피지",
+      "entry_date": "2022-08-02",
+      "exit_date": "2022-10-04",
+      "entry_price": 16100.0,
+      "exit_price": 17750.0,
+      "return_pct": 9.59,
+      "days": 63,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2022-05-28)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2022-05-28",
+          "source_file": "2022-05-28_STAR_에스피지.md",
+          "target_price": 21100.0,
+          "stated_upside_pct": 20.2279
         }
       ]
     },
@@ -3830,12 +3566,12 @@
       "ticker": "322000",
       "market": "KR",
       "name": "HD현대에너지솔루션",
-      "entry_date": "2022-11-15",
+      "entry_date": "2022-11-25",
       "exit_date": "2022-12-12",
-      "entry_price": 61900.0,
+      "entry_price": 66500.0,
       "exit_price": 55000.0,
-      "return_pct": -11.68,
-      "days": 27,
+      "return_pct": -17.79,
+      "days": 17,
       "exit_reason": "supertrend_bearish_flip",
       "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2022-11-13)",
       "trigger_reports": [
@@ -4012,12 +3748,12 @@
       "ticker": "316140",
       "market": "KR",
       "name": "우리금융지주",
-      "entry_date": "2022-11-23",
+      "entry_date": "2022-11-25",
       "exit_date": "2022-12-29",
-      "entry_price": 12350.0,
+      "entry_price": 12600.0,
       "exit_price": 11700.0,
-      "return_pct": -5.83,
-      "days": 36,
+      "return_pct": -7.7,
+      "days": 34,
       "exit_reason": "supertrend_bearish_flip",
       "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2022-11-13)",
       "trigger_reports": [
@@ -4034,12 +3770,12 @@
       "ticker": "089600",
       "market": "KR",
       "name": "KT나스미디어",
-      "entry_date": "2022-10-21",
+      "entry_date": "2022-10-17",
       "exit_date": "2023-01-02",
-      "entry_price": 30175.0,
+      "entry_price": 29948.0,
       "exit_price": 24800.0,
-      "return_pct": -18.31,
-      "days": 73,
+      "return_pct": -17.69,
+      "days": 77,
       "exit_reason": "supertrend_bearish_flip",
       "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2022-10-13)",
       "trigger_reports": [
@@ -4236,28 +3972,6 @@
       ]
     },
     {
-      "ticker": "095340",
-      "market": "KR",
-      "name": "ISC",
-      "entry_date": "2023-02-17",
-      "exit_date": "2023-03-06",
-      "entry_price": 38050.0,
-      "exit_price": 33850.0,
-      "return_pct": -11.57,
-      "days": 17,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2023-02-16)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2023-02-16",
-          "source_file": "2023-02-16_STAR_ISC.md",
-          "target_price": 51000.0,
-          "stated_upside_pct": 32.2957
-        }
-      ]
-    },
-    {
       "ticker": "352820",
       "market": "KR",
       "name": "하이브",
@@ -4425,28 +4139,6 @@
       ]
     },
     {
-      "ticker": "082270",
-      "market": "KR",
-      "name": "젬백스",
-      "entry_date": "2023-02-17",
-      "exit_date": "2023-03-15",
-      "entry_price": 15940.0,
-      "exit_price": 14700.0,
-      "return_pct": -8.33,
-      "days": 26,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2023-02-16)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2023-02-16",
-          "source_file": "2023-02-16_STAR_젬백스.md",
-          "target_price": 20550.0,
-          "stated_upside_pct": 26.0736
-        }
-      ]
-    },
-    {
       "ticker": "100840",
       "market": "KR",
       "name": "SNT에너지",
@@ -4553,28 +4245,6 @@
           "source_file": "2023-03-01_STAR_파라다이스.md",
           "target_price": 27700.0,
           "stated_upside_pct": 65.4719
-        }
-      ]
-    },
-    {
-      "ticker": "204620",
-      "market": "KR",
-      "name": "글로벌텍스프리",
-      "entry_date": "2023-04-18",
-      "exit_date": "2023-04-24",
-      "entry_price": 3751.0,
-      "exit_price": 3042.0,
-      "return_pct": -19.39,
-      "days": 6,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2023-04-13)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2023-04-13",
-          "source_file": "2023-04-13_equity-research-글로벌텍스프리-2.md",
-          "target_price": 3800.0,
-          "stated_upside_pct": 13.5345
         }
       ]
     },
@@ -4691,14 +4361,14 @@
       "ticker": "277810",
       "market": "KR",
       "name": "레인보우로보틱스",
-      "entry_date": "2023-02-15",
+      "entry_date": "2023-02-28",
       "exit_date": "2023-04-27",
-      "entry_price": 76500.0,
+      "entry_price": 95200.0,
       "exit_price": 97900.0,
-      "return_pct": 27.21,
-      "days": 71,
+      "return_pct": 2.22,
+      "days": 58,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2023-02-14)",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2023-02-14)",
       "trigger_reports": [
         {
           "school": "star",
@@ -4735,6 +4405,35 @@
           "source_file": "2023-02-14_STAR_삼성엔지니어링.md",
           "target_price": 35250.0,
           "stated_upside_pct": 29.5956
+        }
+      ]
+    },
+    {
+      "ticker": "282880",
+      "market": "KR",
+      "name": "코윈테크",
+      "entry_date": "2023-04-24",
+      "exit_date": "2023-05-10",
+      "entry_price": 31485.0,
+      "exit_price": 27550.0,
+      "return_pct": -13.02,
+      "days": 16,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2023-04-22, smic 2019-11-05)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2019-11-05",
+          "source_file": "2019-11-05_Equity Research, 코윈테크.md",
+          "target_price": 41100.0,
+          "stated_upside_pct": 84.2058
+        },
+        {
+          "school": "star",
+          "report_date": "2023-04-22",
+          "source_file": "2023-04-22_STAR_코윈테크.md",
+          "target_price": 40200.0,
+          "stated_upside_pct": 26.3793
         }
       ]
     },
@@ -4823,35 +4522,6 @@
           "source_file": "2023-05-11_equity-research-레이.md",
           "target_price": 73700.0,
           "stated_upside_pct": 116.4464
-        }
-      ]
-    },
-    {
-      "ticker": "340570",
-      "market": "KR",
-      "name": "티앤엘",
-      "entry_date": "2023-05-04",
-      "exit_date": "2023-07-10",
-      "entry_price": 47700.0,
-      "exit_price": 49950.0,
-      "return_pct": 4.09,
-      "days": 67,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: voera 2023-05-03, star 2023-04-22)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2023-04-22",
-          "source_file": "2023-04-22_STAR_티앤엘.md",
-          "target_price": 63300.0,
-          "stated_upside_pct": 38.6637
-        },
-        {
-          "school": "voera",
-          "report_date": "2023-05-03",
-          "source_file": "undated_[BUY].md",
-          "target_price": 105000.0,
-          "stated_upside_pct": 118.75
         }
       ]
     },
@@ -4965,28 +4635,6 @@
       ]
     },
     {
-      "ticker": "159010",
-      "market": "KR",
-      "name": "아스플로",
-      "entry_date": "2023-04-17",
-      "exit_date": "2023-07-25",
-      "entry_price": 14170.0,
-      "exit_price": 14010.0,
-      "return_pct": -1.72,
-      "days": 99,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2023-04-13)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2023-04-13",
-          "source_file": "2023-04-13_equity-research-아스플로.md",
-          "target_price": 20300.0,
-          "stated_upside_pct": 45.1036
-        }
-      ]
-    },
-    {
       "ticker": "044490",
       "market": "KR",
       "name": "태웅",
@@ -5060,6 +4708,78 @@
       ]
     },
     {
+      "ticker": "112610",
+      "market": "KR",
+      "name": "씨에스윈드",
+      "entry_date": "2023-05-30",
+      "exit_date": "2023-07-27",
+      "entry_price": 77900.0,
+      "exit_price": 76500.0,
+      "return_pct": -2.39,
+      "days": 58,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: ewha 2023-05-27, kuvic 2022-11-24, star 2022-08-16, yig 2022-05-18, voera 2021-05-14)",
+      "trigger_reports": [
+        {
+          "school": "ewha",
+          "report_date": "2023-05-27",
+          "source_file": "2023-05-27_[230527] 씨에스윈드(112610).md",
+          "target_price": 103200.0,
+          "stated_upside_pct": 35.611
+        },
+        {
+          "school": "voera",
+          "report_date": "2021-05-14",
+          "source_file": "undated_[BUY] 씨에스윈드 불어라 바람! 불어라 수주!.md",
+          "target_price": 90900.0,
+          "stated_upside_pct": 31.3584
+        },
+        {
+          "school": "yig",
+          "report_date": "2022-05-18",
+          "source_file": "2025-11-10_씨에스윈드(112610, KS), 그래도 풍차는 돈다 (발간일 231007) YIG Research.md",
+          "target_price": 79200.0,
+          "stated_upside_pct": 63.6364
+        },
+        {
+          "school": "star",
+          "report_date": "2022-08-16",
+          "source_file": "2022-08-16_STAR_씨에스윈드.md",
+          "target_price": 66210.0,
+          "stated_upside_pct": 1.7051
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2022-11-24",
+          "source_file": "2022-11-24_씨에스윈드 - 나의 꿈은 맑은 바람이 되어서.md",
+          "target_price": 113000.0,
+          "stated_upside_pct": 42.8571
+        }
+      ]
+    },
+    {
+      "ticker": "272110",
+      "market": "KR",
+      "name": "케이엔제이",
+      "entry_date": "2023-02-17",
+      "exit_date": "2023-07-27",
+      "entry_price": 15230.0,
+      "exit_price": 21400.0,
+      "return_pct": 39.67,
+      "days": 160,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: ewha 2023-02-11)",
+      "trigger_reports": [
+        {
+          "school": "ewha",
+          "report_date": "2023-02-11",
+          "source_file": "2023-02-11_[230211] 케이엔제이(272110).md",
+          "target_price": 18100.0,
+          "stated_upside_pct": 22.962
+        }
+      ]
+    },
+    {
       "ticker": "010620",
       "market": "KR",
       "name": "HD현대미포",
@@ -5111,17 +4831,39 @@
       ]
     },
     {
+      "ticker": "007340",
+      "market": "KR",
+      "name": "DN오토모티브",
+      "entry_date": "2023-02-22",
+      "exit_date": "2023-07-31",
+      "entry_price": 13939.0,
+      "exit_price": 18106.0,
+      "return_pct": 29.12,
+      "days": 159,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2023-02-16)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2023-02-16",
+          "source_file": "2023-02-16_STAR_DN오토모티브.md",
+          "target_price": 27887.017,
+          "stated_upside_pct": 103.5549
+        }
+      ]
+    },
+    {
       "ticker": "010690",
       "market": "KR",
       "name": "화신",
-      "entry_date": "2023-04-24",
+      "entry_date": "2023-07-25",
       "exit_date": "2023-08-02",
-      "entry_price": 13770.0,
+      "entry_price": 20200.0,
       "exit_price": 17830.0,
-      "return_pct": 28.71,
-      "days": 100,
+      "return_pct": -12.26,
+      "days": 8,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2023-04-22)",
+      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: voera 2023-07-24, star 2023-04-22)",
       "trigger_reports": [
         {
           "school": "star",
@@ -5129,6 +4871,13 @@
           "source_file": "2023-04-22_STAR_화신.md",
           "target_price": 17620.0,
           "stated_upside_pct": 28.5193
+        },
+        {
+          "school": "voera",
+          "report_date": "2023-07-24",
+          "source_file": "undated_[Buy] 화신 화신 신랑 입장~신부 현대차 입장~.md",
+          "target_price": 42900.0,
+          "stated_upside_pct": 112.3762
         }
       ]
     },
@@ -5235,6 +4984,28 @@
       ]
     },
     {
+      "ticker": "101490",
+      "market": "KR",
+      "name": "에스앤에스텍",
+      "entry_date": "2023-07-17",
+      "exit_date": "2023-08-11",
+      "entry_price": 60600.0,
+      "exit_price": 48600.0,
+      "return_pct": -20.28,
+      "days": 25,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2023-06-12)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2023-06-12",
+          "source_file": "2023-06-12_STAR_에스앤에스텍.md",
+          "target_price": 88000.0,
+          "stated_upside_pct": 53.8462
+        }
+      ]
+    },
+    {
       "ticker": "207940",
       "market": "KR",
       "name": "삼성바이오로직스",
@@ -5260,28 +5031,6 @@
           "source_file": "2023-08-20_STAR_삼성바이오로직스.md",
           "target_price": 1307000.0,
           "stated_upside_pct": 15.1832
-        }
-      ]
-    },
-    {
-      "ticker": "395400",
-      "market": "KR",
-      "name": "SK리츠",
-      "entry_date": "2023-09-11",
-      "exit_date": "2023-09-12",
-      "entry_price": 4375.0,
-      "exit_price": 4355.0,
-      "return_pct": -1.05,
-      "days": 1,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2023-09-08)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2023-09-08",
-          "source_file": "2023-09-08_STAR_SK리츠.md",
-          "target_price": 10820.0,
-          "stated_upside_pct": 147.3143
         }
       ]
     },
@@ -5492,28 +5241,6 @@
           "source_file": "2023-09-20_루닛 - The Winner Takes It All.md",
           "target_price": null,
           "stated_upside_pct": 31.9
-        }
-      ]
-    },
-    {
-      "ticker": "425040",
-      "market": "KR",
-      "name": "티이엠씨",
-      "entry_date": "2023-09-11",
-      "exit_date": "2023-09-26",
-      "entry_price": 20375.0,
-      "exit_price": 18800.0,
-      "return_pct": -8.28,
-      "days": 15,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2023-09-08)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2023-09-08",
-          "source_file": "2023-09-08_STAR_티이엠씨.md",
-          "target_price": 69600.0,
-          "stated_upside_pct": 237.4545
         }
       ]
     },
@@ -5758,28 +5485,6 @@
       ]
     },
     {
-      "ticker": "149980",
-      "market": "KR",
-      "name": "하이로닉",
-      "entry_date": "2023-09-11",
-      "exit_date": "2023-10-06",
-      "entry_price": 17305.0,
-      "exit_price": 14191.0,
-      "return_pct": -18.49,
-      "days": 25,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2023-09-08)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2023-09-08",
-          "source_file": "2023-09-08_STAR_하이로닉.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        }
-      ]
-    },
-    {
       "ticker": "206640",
       "market": "KR",
       "name": "바디텍메드",
@@ -5896,6 +5601,28 @@
       ]
     },
     {
+      "ticker": "083450",
+      "market": "KR",
+      "name": "GST",
+      "entry_date": "2023-11-16",
+      "exit_date": "2023-12-06",
+      "entry_price": 11551.0,
+      "exit_price": 11000.0,
+      "return_pct": -5.34,
+      "days": 20,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: yig 2023-09-15)",
+      "trigger_reports": [
+        {
+          "school": "yig",
+          "report_date": "2023-09-15",
+          "source_file": "2025-11-06_GST(083450, KQ), Global Standard Technology (발간일 230916) YIG Research.md",
+          "target_price": 43773.0,
+          "stated_upside_pct": 256.5157
+        }
+      ]
+    },
+    {
       "ticker": "204270",
       "market": "KR",
       "name": "제이앤티씨",
@@ -5979,50 +5706,6 @@
           "source_file": "2023-10-04_STAR_감성코퍼레이션.md",
           "target_price": 5370.0,
           "stated_upside_pct": 58.1738
-        }
-      ]
-    },
-    {
-      "ticker": "375500",
-      "market": "KR",
-      "name": "DL이앤씨",
-      "entry_date": "2023-11-13",
-      "exit_date": "2023-12-20",
-      "entry_price": 37100.0,
-      "exit_price": 36950.0,
-      "return_pct": -1.0,
-      "days": 37,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2023-11-12)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2023-11-12",
-          "source_file": "2023-11-12_equity-research-dl이앤씨.md",
-          "target_price": 82600.0,
-          "stated_upside_pct": 122.6415
-        }
-      ]
-    },
-    {
-      "ticker": "001120",
-      "market": "KR",
-      "name": "LX인터내셔널",
-      "entry_date": "2023-11-13",
-      "exit_date": "2023-12-28",
-      "entry_price": 28750.0,
-      "exit_price": 29400.0,
-      "return_pct": 1.65,
-      "days": 45,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2023-11-12)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2023-11-12",
-          "source_file": "2023-11-12_equity-research-lx인터내셔널.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -6332,38 +6015,45 @@
       ]
     },
     {
-      "ticker": "082920",
+      "ticker": "189300",
       "market": "KR",
-      "name": "비츠로셀",
-      "entry_date": "2024-01-03",
-      "exit_date": "2024-01-23",
-      "entry_price": 8523.0,
-      "exit_price": 8044.0,
-      "return_pct": -6.19,
-      "days": 20,
+      "name": "인텔리안테크",
+      "entry_date": "2023-11-20",
+      "exit_date": "2024-01-18",
+      "entry_price": 77000.0,
+      "exit_price": 69700.0,
+      "return_pct": -10.02,
+      "days": 59,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2023-11-29, yig 2023-10-05, smic 2019-12-18)",
+      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: voera 2023-11-17, ewha 2023-10-07, kuvic 2023-09-20, smic 2021-12-13)",
       "trigger_reports": [
         {
+          "school": "ewha",
+          "report_date": "2023-10-07",
+          "source_file": "2023-10-07_[231007] 인텔리안테크(189300).md",
+          "target_price": 113710.0,
+          "stated_upside_pct": 34.8873
+        },
+        {
           "school": "smic",
-          "report_date": "2019-12-18",
-          "source_file": "2019-12-18_Equity Research, 비츠로셀.md",
-          "target_price": 16829.0,
-          "stated_upside_pct": 151.7051
+          "report_date": "2021-12-13",
+          "source_file": "2021-12-13_equity-research-인텔리안테크.md",
+          "target_price": 122000.0,
+          "stated_upside_pct": 50.9247
         },
         {
-          "school": "yig",
-          "report_date": "2023-10-05",
-          "source_file": "2025-11-10_비츠로셀(082920 KQ), 1짱 전지 (발간일 231007) YIG Research.md",
-          "target_price": 25700.0,
-          "stated_upside_pct": 183.0708
+          "school": "kuvic",
+          "report_date": "2023-09-20",
+          "source_file": "2023-09-20_인텔리안테크 - 정말 간절히 원하면, 온 우주가 나서서 도와준다.md",
+          "target_price": 293000.0,
+          "stated_upside_pct": 237.9469
         },
         {
-          "school": "star",
-          "report_date": "2023-11-29",
-          "source_file": "2023-11-29_STAR_비츠로셀.md",
-          "target_price": 28000.0,
-          "stated_upside_pct": 253.8481
+          "school": "voera",
+          "report_date": "2023-11-17",
+          "source_file": "undated_[Buy] 인텔리안테크 위성과 안테나만 있으면 어디든 갈 수 있어!.md",
+          "target_price": 96600.0,
+          "stated_upside_pct": 24.8062
         }
       ]
     },
@@ -6429,12 +6119,12 @@
       "ticker": "017370",
       "market": "KR",
       "name": "우신시스템",
-      "entry_date": "2023-10-13",
+      "entry_date": "2023-10-16",
       "exit_date": "2024-01-30",
-      "entry_price": 8270.0,
+      "entry_price": 8970.0,
       "exit_price": 8000.0,
-      "return_pct": -3.84,
-      "days": 109,
+      "return_pct": -11.35,
+      "days": 106,
       "exit_reason": "supertrend_bearish_flip",
       "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2023-10-04)",
       "trigger_reports": [
@@ -6477,28 +6167,6 @@
       ]
     },
     {
-      "ticker": "200710",
-      "market": "KR",
-      "name": "에이디테크놀로지",
-      "entry_date": "2023-11-08",
-      "exit_date": "2024-02-01",
-      "entry_price": 25750.0,
-      "exit_price": 25850.0,
-      "return_pct": -0.21,
-      "days": 85,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2023-10-19)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2023-10-19",
-          "source_file": "2023-10-19_equity-research-에이디테크놀로지.md",
-          "target_price": 75100.0,
-          "stated_upside_pct": 248.4919
-        }
-      ]
-    },
-    {
       "ticker": "140860",
       "market": "KR",
       "name": "파크시스템스",
@@ -6528,24 +6196,24 @@
       ]
     },
     {
-      "ticker": "222040",
+      "ticker": "281820",
       "market": "KR",
-      "name": "코스맥스엔비티",
-      "entry_date": "2024-01-08",
-      "exit_date": "2024-02-06",
-      "entry_price": 7130.0,
-      "exit_price": 5960.0,
-      "return_pct": -16.91,
-      "days": 29,
+      "name": "케이씨텍",
+      "entry_date": "2023-11-16",
+      "exit_date": "2024-02-02",
+      "entry_price": 23100.0,
+      "exit_price": 28000.0,
+      "return_pct": 20.49,
+      "days": 78,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2024-01-06)",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: yig 2023-09-14)",
       "trigger_reports": [
         {
-          "school": "star",
-          "report_date": "2024-01-06",
-          "source_file": "2024-01-06_STAR_코스맥스엔비티.md",
-          "target_price": 9660.0,
-          "stated_upside_pct": 36.2482
+          "school": "yig",
+          "report_date": "2023-09-14",
+          "source_file": "2025-11-06_케이씨텍(281820, KS), 슬러리 돈워리! (발간일 230916) YIG Research.md",
+          "target_price": 27580.0,
+          "stated_upside_pct": 21.766
         }
       ]
     },
@@ -6848,50 +6516,6 @@
       ]
     },
     {
-      "ticker": "408900",
-      "market": "KR",
-      "name": "스튜디오미르",
-      "entry_date": "2024-03-12",
-      "exit_date": "2024-04-19",
-      "entry_price": 6089.0,
-      "exit_price": 8230.0,
-      "return_pct": 34.35,
-      "days": 38,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2024-03-11)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2024-03-11",
-          "source_file": "2024-03-11_STAR_스튜디오미르.md",
-          "target_price": 8206.1538,
-          "stated_upside_pct": 34.748
-        }
-      ]
-    },
-    {
-      "ticker": "322310",
-      "market": "KR",
-      "name": "오로스테크놀로지",
-      "entry_date": "2024-03-12",
-      "exit_date": "2024-04-22",
-      "entry_price": 35400.0,
-      "exit_price": 29400.0,
-      "return_pct": -17.45,
-      "days": 41,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2024-03-11)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2024-03-11",
-          "source_file": "2024-03-11_STAR_오로스테크놀로지.md",
-          "target_price": 48200.0,
-          "stated_upside_pct": 36.3508
-        }
-      ]
-    },
-    {
       "ticker": "204620",
       "market": "KR",
       "name": "글로벌텍스프리",
@@ -7030,72 +6654,6 @@
       ]
     },
     {
-      "ticker": "214320",
-      "market": "KR",
-      "name": "이노션",
-      "entry_date": "2024-04-26",
-      "exit_date": "2024-05-22",
-      "entry_price": 22700.0,
-      "exit_price": 22050.0,
-      "return_pct": -3.45,
-      "days": 26,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: kuvic 2024-02-28)",
-      "trigger_reports": [
-        {
-          "school": "kuvic",
-          "report_date": "2024-02-28",
-          "source_file": "2024-02-28_이노션 - 초특가 이노션~ 초특가 이노션!.md",
-          "target_price": 23025.0,
-          "stated_upside_pct": 4.6591
-        }
-      ]
-    },
-    {
-      "ticker": "004490",
-      "market": "KR",
-      "name": "세방전지",
-      "entry_date": "2024-05-08",
-      "exit_date": "2024-05-24",
-      "entry_price": 107100.0,
-      "exit_price": 99000.0,
-      "return_pct": -8.12,
-      "days": 16,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2024-05-07)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2024-05-07",
-          "source_file": "2024-05-07_STAR_세방전지.md",
-          "target_price": 106000.0,
-          "stated_upside_pct": 0.0944
-        }
-      ]
-    },
-    {
-      "ticker": "397030",
-      "market": "KR",
-      "name": "에이프릴바이오",
-      "entry_date": "2024-05-08",
-      "exit_date": "2024-05-28",
-      "entry_price": 16290.0,
-      "exit_price": 14140.0,
-      "return_pct": -13.72,
-      "days": 20,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2024-05-07)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2024-05-07",
-          "source_file": "2024-05-07_STAR_에이프릴바이오.md",
-          "target_price": 26750.0,
-          "stated_upside_pct": 63.1098
-        }
-      ]
-    },
-    {
       "ticker": "034230",
       "market": "KR",
       "name": "파라다이스",
@@ -7121,6 +6679,35 @@
           "source_file": "undated_[Buy] Paradise, Lucky Dice.md",
           "target_price": 25300.0,
           "stated_upside_pct": 69.9127
+        }
+      ]
+    },
+    {
+      "ticker": "104460",
+      "market": "KR",
+      "name": "디와이피엔에프",
+      "entry_date": "2024-04-02",
+      "exit_date": "2024-05-31",
+      "entry_price": 20900.0,
+      "exit_price": 20300.0,
+      "return_pct": -3.45,
+      "days": 59,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2024-03-11, smic 2019-08-11)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2019-08-11",
+          "source_file": "2019-08-11_Equity Research, 동양피엔에프.md",
+          "target_price": 12600.0,
+          "stated_upside_pct": 37.8556
+        },
+        {
+          "school": "star",
+          "report_date": "2024-03-11",
+          "source_file": "2024-03-11_STAR_디와이피엔에프.md",
+          "target_price": 37100.0,
+          "stated_upside_pct": 83.6634
         }
       ]
     },
@@ -7208,28 +6795,6 @@
           "source_file": "2023-11-22_equity-research-vertiv-holdings-co.md",
           "target_price": 61.97,
           "stated_upside_pct": 42.8811
-        }
-      ]
-    },
-    {
-      "ticker": "172670",
-      "market": "KR",
-      "name": "에이엘티",
-      "entry_date": "2024-06-11",
-      "exit_date": "2024-06-25",
-      "entry_price": 20150.0,
-      "exit_price": 17750.0,
-      "return_pct": -12.44,
-      "days": 14,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: kuvic 2024-05-14)",
-      "trigger_reports": [
-        {
-          "school": "kuvic",
-          "report_date": "2024-05-14",
-          "source_file": "2024-05-14_에이엘티 - ALT로 웨이퍼테스트 Alt+Tab.md",
-          "target_price": 31300.0,
-          "stated_upside_pct": 46.2617
         }
       ]
     },
@@ -7404,14 +6969,14 @@
       "ticker": "194480",
       "market": "KR",
       "name": "데브시스터즈",
-      "entry_date": "2024-07-01",
+      "entry_date": "2024-05-10",
       "exit_date": "2024-07-03",
-      "entry_price": 60900.0,
+      "entry_price": 50800.0,
       "exit_price": 55400.0,
-      "return_pct": -9.58,
-      "days": 2,
+      "return_pct": 8.4,
+      "days": 54,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2024-06-30, smic 2024-05-09)",
+      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2024-05-09)",
       "trigger_reports": [
         {
           "school": "smic",
@@ -7419,13 +6984,6 @@
           "source_file": "2024-05-09_equity-research-데브시스터즈-2.md",
           "target_price": 87700.0,
           "stated_upside_pct": 72.6378
-        },
-        {
-          "school": "star",
-          "report_date": "2024-06-30",
-          "source_file": "2024-06-30_STAR_데브시스터즈.md",
-          "target_price": 80500.0,
-          "stated_upside_pct": 37.138
         }
       ]
     },
@@ -7535,6 +7093,35 @@
           "source_file": "2024-06-07_equity-research-오리온-2.md",
           "target_price": 116200.0,
           "stated_upside_pct": 25.7576
+        }
+      ]
+    },
+    {
+      "ticker": "278470",
+      "market": "KR",
+      "name": "에이피알",
+      "entry_date": "2024-07-01",
+      "exit_date": "2024-07-08",
+      "entry_price": 79800.0,
+      "exit_price": 62700.0,
+      "return_pct": -21.9,
+      "days": 7,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2024-06-30, smic 2024-05-09)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2024-05-09",
+          "source_file": "2024-05-09_equity-research-에이피알.md",
+          "target_price": 89212.1212,
+          "stated_upside_pct": 39.3939
+        },
+        {
+          "school": "star",
+          "report_date": "2024-06-30",
+          "source_file": "2024-06-30_STAR_에이피알.md",
+          "target_price": 134574.5127,
+          "stated_upside_pct": 71.2144
         }
       ]
     },
@@ -7793,17 +7380,39 @@
       ]
     },
     {
+      "ticker": "LEU",
+      "market": "US",
+      "name": "LEU",
+      "entry_date": "2024-07-15",
+      "exit_date": "2024-08-02",
+      "entry_price": 49.41,
+      "exit_price": 39.45,
+      "return_pct": -20.93,
+      "days": 18,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2024-05-24)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2024-05-24",
+          "source_file": "2024-05-24_equity-research-centrus-energy-corp.md",
+          "target_price": null,
+          "stated_upside_pct": null
+        }
+      ]
+    },
+    {
       "ticker": "114840",
       "market": "KR",
       "name": "아이패밀리에스씨",
-      "entry_date": "2024-03-12",
+      "entry_date": "2024-03-26",
       "exit_date": "2024-08-05",
-      "entry_price": 19050.0,
+      "entry_price": 19840.0,
       "exit_price": 28500.0,
-      "return_pct": 48.71,
-      "days": 146,
+      "return_pct": 42.79,
+      "days": 132,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2024-03-11)",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2024-03-11)",
       "trigger_reports": [
         {
           "school": "star",
@@ -7895,28 +7504,6 @@
       ]
     },
     {
-      "ticker": "002840",
-      "market": "KR",
-      "name": "미원상사",
-      "entry_date": "2024-07-01",
-      "exit_date": "2024-08-06",
-      "entry_price": 203500.0,
-      "exit_price": 186800.0,
-      "return_pct": -8.76,
-      "days": 36,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2024-06-30)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2024-06-30",
-          "source_file": "2024-06-30_STAR_미원상사.md",
-          "target_price": 348500.0,
-          "stated_upside_pct": 71.2531
-        }
-      ]
-    },
-    {
       "ticker": "376300",
       "market": "KR",
       "name": "디어유",
@@ -7935,6 +7522,28 @@
           "source_file": "undated_[BUY] 디어유, 팬 플랫폼 성장 열기에 디어유~.md",
           "target_price": 34500.0,
           "stated_upside_pct": 32.1839
+        }
+      ]
+    },
+    {
+      "ticker": "397030",
+      "market": "KR",
+      "name": "에이프릴바이오",
+      "entry_date": "2024-06-10",
+      "exit_date": "2024-08-06",
+      "entry_price": 15490.0,
+      "exit_price": 15690.0,
+      "return_pct": 0.68,
+      "days": 57,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2024-05-07)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2024-05-07",
+          "source_file": "2024-05-07_STAR_에이프릴바이오.md",
+          "target_price": 26750.0,
+          "stated_upside_pct": 63.1098
         }
       ]
     },
@@ -8080,28 +7689,6 @@
           "source_file": "2024-08-23_[240823] 디케이티(290550).md",
           "target_price": 17700.0,
           "stated_upside_pct": 49.4932
-        }
-      ]
-    },
-    {
-      "ticker": "294870",
-      "market": "KR",
-      "name": "IPARK현대산업개발",
-      "entry_date": "2024-09-12",
-      "exit_date": "2024-10-04",
-      "entry_price": 23900.0,
-      "exit_price": 21400.0,
-      "return_pct": -11.0,
-      "days": 22,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2024-09-11)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2024-09-11",
-          "source_file": "2024-09-11_STAR_HDC현대산업개발.md",
-          "target_price": 31200.0,
-          "stated_upside_pct": 30.5439
         }
       ]
     },
@@ -8410,6 +7997,28 @@
       ]
     },
     {
+      "ticker": "031980",
+      "market": "KR",
+      "name": "피에스케이홀딩스",
+      "entry_date": "2024-10-08",
+      "exit_date": "2024-11-06",
+      "entry_price": 47350.0,
+      "exit_price": 42900.0,
+      "return_pct": -9.94,
+      "days": 29,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2024-09-11)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2024-09-11",
+          "source_file": "2024-09-11_STAR_피에스케이홀딩스.md",
+          "target_price": 89300.0,
+          "stated_upside_pct": 128.6812
+        }
+      ]
+    },
+    {
       "ticker": "095340",
       "market": "KR",
       "name": "ISC",
@@ -8537,14 +8146,14 @@
       "ticker": "009420",
       "market": "KR",
       "name": "한올바이오파마",
-      "entry_date": "2024-09-12",
+      "entry_date": "2024-10-11",
       "exit_date": "2024-11-14",
-      "entry_price": 35050.0,
+      "entry_price": 42300.0,
       "exit_price": 40950.0,
-      "return_pct": 16.13,
-      "days": 63,
+      "return_pct": -3.77,
+      "days": 34,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2024-09-11)",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2024-09-11)",
       "trigger_reports": [
         {
           "school": "star",
@@ -8631,14 +8240,14 @@
       "ticker": "196170",
       "market": "KR",
       "name": "알테오젠",
-      "entry_date": "2024-05-23",
+      "entry_date": "2024-08-16",
       "exit_date": "2024-11-21",
-      "entry_price": 192300.0,
+      "entry_price": 294000.0,
       "exit_price": 344000.0,
-      "return_pct": 77.82,
-      "days": 182,
+      "return_pct": 16.31,
+      "days": 97,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2024-05-09)",
+      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: kuvic 2024-08-15, smic 2024-05-09)",
       "trigger_reports": [
         {
           "school": "smic",
@@ -8646,6 +8255,13 @@
           "source_file": "2024-05-09_equity-research-알테오젠.md",
           "target_price": 242200.0,
           "stated_upside_pct": 42.5544
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2024-08-15",
+          "source_file": "2024-08-15_알테오젠 - 낫고 싶지만 링겔은 맞기 싫어.md",
+          "target_price": null,
+          "stated_upside_pct": null
         }
       ]
     },
@@ -9048,7 +8664,7 @@
       "entry_date": "2024-12-05",
       "exit_date": "2024-12-19",
       "entry_price": 818.8728,
-      "exit_price": 756.8672,
+      "exit_price": 756.8671,
       "return_pct": -5.48,
       "days": 14,
       "exit_reason": "supertrend_bearish_flip",
@@ -9124,7 +8740,29 @@
           "report_date": "2024-11-21",
           "source_file": "2024-11-21_equity-research-levi-strauss-co.md",
           "target_price": 26.33,
-          "stated_upside_pct": 71.8821
+          "stated_upside_pct": 71.8822
+        }
+      ]
+    },
+    {
+      "ticker": "SE",
+      "market": "US",
+      "name": "SE",
+      "entry_date": "2024-11-13",
+      "exit_date": "2025-01-02",
+      "entry_price": 109.24,
+      "exit_price": 105.19,
+      "return_pct": 0.27,
+      "days": 50,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: yig 2024-11-09)",
+      "trigger_reports": [
+        {
+          "school": "yig",
+          "report_date": "2024-11-09",
+          "source_file": "2025-11-10_E-Commerce, '이'커머스 '커'지면 '머'지않아 '스'펙타클해짐 (발간일 241109) YIG Research.md",
+          "target_price": 148.05,
+          "stated_upside_pct": 58.2407
         }
       ]
     },
@@ -9328,12 +8966,12 @@
       "ticker": "FNKO",
       "market": "US",
       "name": "FNKO",
-      "entry_date": "2024-12-13",
+      "entry_date": "2024-12-02",
       "exit_date": "2025-02-27",
-      "entry_price": 12.14,
+      "entry_price": 11.69,
       "exit_price": 12.81,
-      "return_pct": 5.37,
-      "days": 76,
+      "return_pct": 11.61,
+      "days": 87,
       "exit_reason": "supertrend_bearish_flip",
       "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2024-11-21)",
       "trigger_reports": [
@@ -9459,12 +9097,12 @@
       "ticker": "GRND",
       "market": "US",
       "name": "GRND",
-      "entry_date": "2024-12-17",
+      "entry_date": "2024-12-09",
       "exit_date": "2025-03-07",
-      "entry_price": 16.91,
+      "entry_price": 16.1,
       "exit_price": 15.44,
-      "return_pct": -8.28,
-      "days": 80,
+      "return_pct": -3.18,
+      "days": 88,
       "exit_reason": "supertrend_bearish_flip",
       "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2024-11-21)",
       "trigger_reports": [
@@ -9703,28 +9341,6 @@
       ]
     },
     {
-      "ticker": "119850",
-      "market": "KR",
-      "name": "지엔씨에너지",
-      "entry_date": "2025-03-11",
-      "exit_date": "2025-03-28",
-      "entry_price": 15400.0,
-      "exit_price": 14230.0,
-      "return_pct": -8.15,
-      "days": 17,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2025-03-10)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2025-03-10",
-          "source_file": "2025-03-10_STAR_지엔씨에너지.md",
-          "target_price": 32000.0,
-          "stated_upside_pct": 99.6257
-        }
-      ]
-    },
-    {
       "ticker": "108490",
       "market": "KR",
       "name": "로보티즈",
@@ -9863,24 +9479,45 @@
       ]
     },
     {
-      "ticker": "010140",
+      "ticker": "340570",
       "market": "KR",
-      "name": "삼성중공업",
+      "name": "티앤엘",
       "entry_date": "2025-03-11",
-      "exit_date": "2025-04-08",
-      "entry_price": 14000.0,
-      "exit_price": 13040.0,
-      "return_pct": -7.42,
-      "days": 28,
+      "exit_date": "2025-04-04",
+      "entry_price": 78000.0,
+      "exit_price": 71100.0,
+      "return_pct": -9.39,
+      "days": 24,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2025-03-10)",
+      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2025-03-10, ewha 2024-08-23, kuvic 2023-11-20, voera 2023-05-03)",
       "trigger_reports": [
         {
           "school": "star",
           "report_date": "2025-03-10",
-          "source_file": "2025-03-10_STAR_삼성중공업.md",
-          "target_price": 19330.0,
-          "stated_upside_pct": 33.0351
+          "source_file": "2025-03-10_STAR_티앤엘.md",
+          "target_price": 114600.0,
+          "stated_upside_pct": 43.25
+        },
+        {
+          "school": "voera",
+          "report_date": "2023-05-03",
+          "source_file": "undated_[BUY].md",
+          "target_price": 105000.0,
+          "stated_upside_pct": 118.75
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2023-11-20",
+          "source_file": "2023-11-20_티앤엘 - Mighty Patch is getting Mighter.md",
+          "target_price": 59100.0,
+          "stated_upside_pct": 40.38
+        },
+        {
+          "school": "ewha",
+          "report_date": "2024-08-23",
+          "source_file": "2024-08-23_[240823] 티앤엘(340570).md",
+          "target_price": 113900.0,
+          "stated_upside_pct": 53.504
         }
       ]
     },
@@ -10102,42 +9739,6 @@
       ]
     },
     {
-      "ticker": "009830",
-      "market": "KR",
-      "name": "한화솔루션",
-      "entry_date": "2025-05-12",
-      "exit_date": "2025-05-26",
-      "entry_price": 33300.0,
-      "exit_price": 28650.0,
-      "return_pct": -14.48,
-      "days": 14,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2025-05-11, kuvic 2024-06-27, ewha 2021-03-13)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2025-05-11",
-          "source_file": "2025-05-11_equity-research-한화솔루션-2.md",
-          "target_price": 91200.0,
-          "stated_upside_pct": 179.3262
-        },
-        {
-          "school": "ewha",
-          "report_date": "2021-03-13",
-          "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
-          "target_price": 59700.0,
-          "stated_upside_pct": 8.508
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2024-06-27",
-          "source_file": "2024-06-27_한화솔루션 - 중국을 이겨낼 단 '한화'의 솔루션.md",
-          "target_price": 49500.0,
-          "stated_upside_pct": 75.5319
-        }
-      ]
-    },
-    {
       "ticker": "462870",
       "market": "KR",
       "name": "시프트업",
@@ -10178,28 +9779,6 @@
           "source_file": "2025-04-04_[250404] LS마린솔루션(060370).md",
           "target_price": 21130.0,
           "stated_upside_pct": 67.4326
-        }
-      ]
-    },
-    {
-      "ticker": "489790",
-      "market": "KR",
-      "name": "한화비전",
-      "entry_date": "2025-04-29",
-      "exit_date": "2025-05-29",
-      "entry_price": 57700.0,
-      "exit_price": 54500.0,
-      "return_pct": -6.11,
-      "days": 30,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2025-04-19)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2025-04-19",
-          "source_file": "2025-04-19_equity-research-한화비전.md",
-          "target_price": 111600.0,
-          "stated_upside_pct": 97.5221
         }
       ]
     },
@@ -10333,6 +9912,28 @@
       ]
     },
     {
+      "ticker": "298380",
+      "market": "KR",
+      "name": "에이비엘바이오",
+      "entry_date": "2025-04-08",
+      "exit_date": "2025-06-25",
+      "entry_price": 51000.0,
+      "exit_price": 66800.0,
+      "return_pct": 30.2,
+      "days": 78,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2025-03-10)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2025-03-10",
+          "source_file": "2025-03-10_STAR_에이비엘바이오.md",
+          "target_price": 44100.0,
+          "stated_upside_pct": 11.6456
+        }
+      ]
+    },
+    {
       "ticker": "100840",
       "market": "KR",
       "name": "SNT에너지",
@@ -10427,45 +10028,24 @@
       ]
     },
     {
-      "ticker": "010620",
+      "ticker": "010140",
       "market": "KR",
-      "name": "HD현대미포",
-      "entry_date": "2025-05-12",
+      "name": "삼성중공업",
+      "entry_date": "2025-04-18",
       "exit_date": "2025-07-07",
-      "entry_price": 170400.0,
-      "exit_price": 169900.0,
-      "return_pct": -0.89,
-      "days": 56,
+      "entry_price": 15010.0,
+      "exit_price": 15610.0,
+      "return_pct": 3.37,
+      "days": 80,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2025-05-11, kuvic 2024-08-16, star 2023-07-14, ewha 2021-02-20)",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2025-03-10)",
       "trigger_reports": [
         {
-          "school": "ewha",
-          "report_date": "2021-02-20",
-          "source_file": "2021-02-20_[210220] 현대미포조선(010620).md",
-          "target_price": 69100.0,
-          "stated_upside_pct": 36.0236
-        },
-        {
           "school": "star",
-          "report_date": "2023-07-14",
-          "source_file": "2023-07-14_STAR_현대미포조선.md",
-          "target_price": 111300.0,
-          "stated_upside_pct": 19.9353
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2024-08-16",
-          "source_file": "2024-08-16_HD현대미포 - 응답하라 2007 미포의 미친 (Positive) 포텐셜.md",
-          "target_price": 193000.0,
-          "stated_upside_pct": 76.9019
-        },
-        {
-          "school": "smic",
-          "report_date": "2025-05-11",
-          "source_file": "2025-05-11_equity-research-hd현대미포.md",
-          "target_price": 250000.0,
-          "stated_upside_pct": 45.4334
+          "report_date": "2025-03-10",
+          "source_file": "2025-03-10_STAR_삼성중공업.md",
+          "target_price": 19330.0,
+          "stated_upside_pct": 33.0351
         }
       ]
     },
@@ -10502,12 +10082,12 @@
       "ticker": "122870",
       "market": "KR",
       "name": "와이지엔터테인먼트",
-      "entry_date": "2025-02-04",
+      "entry_date": "2025-02-05",
       "exit_date": "2025-07-08",
-      "entry_price": 50500.0,
+      "entry_price": 51900.0,
       "exit_price": 84800.0,
-      "return_pct": 66.91,
-      "days": 154,
+      "return_pct": 62.41,
+      "days": 153,
       "exit_reason": "supertrend_bearish_flip",
       "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2025-01-09)",
       "trigger_reports": [
@@ -10517,6 +10097,50 @@
           "source_file": "2025-01-09_STAR_와이지엔터테인먼트.md",
           "target_price": 62900.0,
           "stated_upside_pct": 41.6667
+        }
+      ]
+    },
+    {
+      "ticker": "461300",
+      "market": "KR",
+      "name": "아이스크림미디어",
+      "entry_date": "2025-07-04",
+      "exit_date": "2025-07-22",
+      "entry_price": 23350.0,
+      "exit_price": 19470.0,
+      "return_pct": -17.12,
+      "days": 18,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2025-06-10)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2025-06-10",
+          "source_file": "2025-06-10_equity-research-아이스크림미디.md",
+          "target_price": 25700.0,
+          "stated_upside_pct": 37.8016
+        }
+      ]
+    },
+    {
+      "ticker": "472850",
+      "market": "KR",
+      "name": "폰드그룹",
+      "entry_date": "2025-06-17",
+      "exit_date": "2025-07-22",
+      "entry_price": 6312.0,
+      "exit_price": 5918.0,
+      "return_pct": -6.8,
+      "days": 35,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2025-06-10)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2025-06-10",
+          "source_file": "2025-06-10_equity-research-폰드그룹.md",
+          "target_price": 16057.0,
+          "stated_upside_pct": 248.5348
         }
       ]
     },
@@ -10612,6 +10236,28 @@
           "source_file": "undated_[BUY] 강(鋼)하게 버틴다, 세아제강.md",
           "target_price": 205630.0,
           "stated_upside_pct": 19.7612
+        }
+      ]
+    },
+    {
+      "ticker": "071050",
+      "market": "KR",
+      "name": "한국금융지주",
+      "entry_date": "2025-06-25",
+      "exit_date": "2025-08-04",
+      "entry_price": 148400.0,
+      "exit_price": 133600.0,
+      "return_pct": -10.51,
+      "days": 40,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2025-06-19)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2025-06-19",
+          "source_file": "2025-06-19_STAR_한국금융지주.md",
+          "target_price": 136000.0,
+          "stated_upside_pct": 6.8342
         }
       ]
     },
@@ -10725,49 +10371,6 @@
       ]
     },
     {
-      "ticker": "047810",
-      "market": "KR",
-      "name": "한국항공우주",
-      "entry_date": "2025-06-02",
-      "exit_date": "2025-08-13",
-      "entry_price": 83700.0,
-      "exit_price": 89100.0,
-      "return_pct": 5.81,
-      "days": 72,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: ewha 2025-05-30, star 2024-03-11, kuvic 2023-11-19, smic 2022-12-08)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2022-12-08",
-          "source_file": "2022-12-08_equity-research-한국항공우주.md",
-          "target_price": 67000.0,
-          "stated_upside_pct": 45.1788
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2023-11-19",
-          "source_file": "2023-11-19_한국항공우주 - 작전명 신세KAI.md",
-          "target_price": 69400.0,
-          "stated_upside_pct": 50.8696
-        },
-        {
-          "school": "star",
-          "report_date": "2024-03-11",
-          "source_file": "2024-03-11_STAR_한국항공우주.md",
-          "target_price": 71500.0,
-          "stated_upside_pct": 34.1463
-        },
-        {
-          "school": "ewha",
-          "report_date": "2025-05-30",
-          "source_file": "2025-05-30_[250530] 한국항공우주(047810).md",
-          "target_price": 125900.0,
-          "stated_upside_pct": 50.5981
-        }
-      ]
-    },
-    {
       "ticker": "000720",
       "market": "KR",
       "name": "현대건설",
@@ -10793,14 +10396,14 @@
       "ticker": "119850",
       "market": "KR",
       "name": "지엔씨에너지",
-      "entry_date": "2025-04-21",
+      "entry_date": "2025-04-15",
       "exit_date": "2025-08-14",
-      "entry_price": 19540.0,
+      "entry_price": 19080.0,
       "exit_price": 31900.0,
-      "return_pct": 62.28,
-      "days": 115,
+      "return_pct": 66.19,
+      "days": 121,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2025-04-19, star 2025-03-10)",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2025-03-10)",
       "trigger_reports": [
         {
           "school": "star",
@@ -10808,35 +10411,6 @@
           "source_file": "2025-03-10_STAR_지엔씨에너지.md",
           "target_price": 32000.0,
           "stated_upside_pct": 99.6257
-        },
-        {
-          "school": "smic",
-          "report_date": "2025-04-19",
-          "source_file": "2025-04-19_equity-research-지엔씨에너지.md",
-          "target_price": 39610.0,
-          "stated_upside_pct": 106.3021
-        }
-      ]
-    },
-    {
-      "ticker": "419530",
-      "market": "KR",
-      "name": "SAMG엔터",
-      "entry_date": "2025-06-19",
-      "exit_date": "2025-08-19",
-      "entry_price": 82700.0,
-      "exit_price": 61000.0,
-      "return_pct": -26.68,
-      "days": 61,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2025-06-18)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2025-06-18",
-          "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -10888,42 +10462,6 @@
           "source_file": "2025-11-11_현대로템 (064350, KS), 득템하세요, 현대로템 (발간일 250411) YIG Research.md",
           "target_price": 137300.0,
           "stated_upside_pct": 34.7399
-        }
-      ]
-    },
-    {
-      "ticker": "007660",
-      "market": "KR",
-      "name": "이수페타시스",
-      "entry_date": "2025-06-02",
-      "exit_date": "2025-08-21",
-      "entry_price": 38100.0,
-      "exit_price": 55300.0,
-      "return_pct": 44.27,
-      "days": 80,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: ewha 2025-05-31, star 2025-01-09, smic 2022-11-13)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2022-11-13",
-          "source_file": "2022-11-13_equity-research-이수페타시스-2.md",
-          "target_price": 7600.0,
-          "stated_upside_pct": 32.4734
-        },
-        {
-          "school": "ewha",
-          "report_date": "2025-05-31",
-          "source_file": "2025-05-30_[250530] 이수페타시스(007660).md",
-          "target_price": 57350.0,
-          "stated_upside_pct": 49.349
-        },
-        {
-          "school": "star",
-          "report_date": "2025-01-09",
-          "source_file": "2025-01-09_STAR_이수페타시스.md",
-          "target_price": 51600.0,
-          "stated_upside_pct": 81.7093
         }
       ]
     },
@@ -10997,6 +10535,42 @@
           "source_file": "2025-08-31_STAR_엔씨소프트.md",
           "target_price": 330500.0,
           "stated_upside_pct": 62.8079
+        }
+      ]
+    },
+    {
+      "ticker": "251970",
+      "market": "KR",
+      "name": "펌텍코리아",
+      "entry_date": "2025-03-17",
+      "exit_date": "2025-09-04",
+      "entry_price": 48400.0,
+      "exit_price": 61400.0,
+      "return_pct": 26.1,
+      "days": 171,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2025-03-10, kuvic 2023-10-12, smic 2020-05-06)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2020-05-06",
+          "source_file": "2020-05-06_Equity Research, 펌텍코리아.md",
+          "target_price": 20224.0,
+          "stated_upside_pct": 26.0062
+        },
+        {
+          "school": "star",
+          "report_date": "2025-03-10",
+          "source_file": "2025-03-10_STAR_펌텍코리아.md",
+          "target_price": 68500.0,
+          "stated_upside_pct": 65.8596
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2023-10-12",
+          "source_file": "2023-10-12_펌텍코리아 - '용기' 있는 자가 세상을 얻는다.md",
+          "target_price": 47000.0,
+          "stated_upside_pct": 88.0
         }
       ]
     },
@@ -11885,14 +11459,14 @@
       "ticker": "319400",
       "market": "KR",
       "name": "현대무벡스",
-      "entry_date": "2025-09-01",
+      "entry_date": "2025-09-03",
       "exit_date": "2025-11-19",
-      "entry_price": 4820.0,
+      "entry_price": 6360.0,
       "exit_price": 8700.0,
-      "return_pct": 79.42,
-      "days": 79,
+      "return_pct": 35.97,
+      "days": 77,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2025-08-31)",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2025-08-31)",
       "trigger_reports": [
         {
           "school": "star",
@@ -12136,6 +11710,28 @@
       ]
     },
     {
+      "ticker": "016360",
+      "market": "KR",
+      "name": "삼성증권",
+      "entry_date": "2025-12-15",
+      "exit_date": "2026-01-02",
+      "entry_price": 79300.0,
+      "exit_price": 75400.0,
+      "return_pct": -5.49,
+      "days": 18,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2025-12-12)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2025-12-12",
+          "source_file": "2025-12-12_STAR_삼성증권.md",
+          "target_price": 99700.0,
+          "stated_upside_pct": 24.4694
+        }
+      ]
+    },
+    {
       "ticker": "456160",
       "market": "KR",
       "name": "지투지바이오",
@@ -12154,6 +11750,28 @@
           "source_file": "2025-11-11_equity-research-지투지바이오.md",
           "target_price": 319800.0,
           "stated_upside_pct": 256.9196
+        }
+      ]
+    },
+    {
+      "ticker": "ESTA",
+      "market": "US",
+      "name": "ESTA",
+      "entry_date": "2025-12-23",
+      "exit_date": "2026-01-06",
+      "entry_price": 76.34,
+      "exit_price": 66.43,
+      "return_pct": -15.33,
+      "days": 14,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2025-12-01)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2025-12-01",
+          "source_file": "2025-12-01_equity-research-establishment-labs-holdings.md",
+          "target_price": 118.76,
+          "stated_upside_pct": 75.1881
         }
       ]
     },
@@ -12244,6 +11862,35 @@
       ]
     },
     {
+      "ticker": "010060",
+      "market": "KR",
+      "name": "OCI홀딩스",
+      "entry_date": "2026-01-02",
+      "exit_date": "2026-01-09",
+      "entry_price": 115200.0,
+      "exit_price": 103600.0,
+      "return_pct": -10.61,
+      "days": 7,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: yig 2026-01-01, ewha 2021-08-21)",
+      "trigger_reports": [
+        {
+          "school": "ewha",
+          "report_date": "2021-08-21",
+          "source_file": "2021-08-21_[210821] OCI(010060).md",
+          "target_price": 113156.0,
+          "stated_upside_pct": 40.2911
+        },
+        {
+          "school": "yig",
+          "report_date": "2026-01-01",
+          "source_file": "2026-04-04_OCI홀딩스(010060, KOSPI), 전력은 부족해도, 홀딩은 OCI YIG Research.md",
+          "target_price": 159300.0,
+          "stated_upside_pct": 38.2812
+        }
+      ]
+    },
+    {
       "ticker": "240550",
       "market": "KR",
       "name": "동방메디컬",
@@ -12291,28 +11938,6 @@
           "source_file": "2025-07-25_[250725] 티엘비(356860).md",
           "target_price": null,
           "stated_upside_pct": 38.27
-        }
-      ]
-    },
-    {
-      "ticker": "IMAX",
-      "market": "US",
-      "name": "IMAX",
-      "entry_date": "2025-12-09",
-      "exit_date": "2026-01-09",
-      "entry_price": 38.49,
-      "exit_price": 33.84,
-      "return_pct": -13.7,
-      "days": 31,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2025-12-01)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2025-12-01",
-          "source_file": "2025-12-01_equity-research-imax-corp.md",
-          "target_price": 54.6,
-          "stated_upside_pct": 48.2085
         }
       ]
     },
@@ -12386,28 +12011,6 @@
           "source_file": "2025-11-17_프로티나 - 빅파마에게 백‘프로’ 불‘티나’.md",
           "target_price": 90700.0,
           "stated_upside_pct": 39.5385
-        }
-      ]
-    },
-    {
-      "ticker": "089970",
-      "market": "KR",
-      "name": "브이엠",
-      "entry_date": "2025-12-23",
-      "exit_date": "2026-01-22",
-      "entry_price": 29900.0,
-      "exit_price": 27000.0,
-      "return_pct": -10.24,
-      "days": 30,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2025-12-12)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2025-12-12",
-          "source_file": "2025-12-12_STAR_브이엠.md",
-          "target_price": 59300.0,
-          "stated_upside_pct": 104.8359
         }
       ]
     },
@@ -12499,28 +12102,6 @@
       ]
     },
     {
-      "ticker": "IRMD",
-      "market": "US",
-      "name": "IRMD",
-      "entry_date": "2025-12-02",
-      "exit_date": "2026-02-05",
-      "entry_price": 92.0891,
-      "exit_price": 93.4432,
-      "return_pct": 0.17,
-      "days": 65,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2025-12-01)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2025-12-01",
-          "source_file": "2025-12-01_equity-research-iradimed-corporation.md",
-          "target_price": 146.0,
-          "stated_upside_pct": 59.6585
-        }
-      ]
-    },
-    {
       "ticker": "CRWV",
       "market": "US",
       "name": "CRWV",
@@ -12568,14 +12149,14 @@
       "ticker": "458870",
       "market": "KR",
       "name": "씨어스",
-      "entry_date": "2025-09-01",
+      "entry_date": "2025-09-05",
       "exit_date": "2026-03-04",
-      "entry_price": 16342.0,
+      "entry_price": 20244.0,
       "exit_price": 39988.0,
-      "return_pct": 143.23,
-      "days": 184,
+      "return_pct": 96.35,
+      "days": 180,
       "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2025-08-31)",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2025-08-31)",
       "trigger_reports": [
         {
           "school": "star",
@@ -12674,28 +12255,6 @@
       ]
     },
     {
-      "ticker": "039490",
-      "market": "KR",
-      "name": "키움증권",
-      "entry_date": "2025-12-24",
-      "exit_date": "2026-03-05",
-      "entry_price": 301500.0,
-      "exit_price": 411000.0,
-      "return_pct": 35.5,
-      "days": 71,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: yig 2025-11-27)",
-      "trigger_reports": [
-        {
-          "school": "yig",
-          "report_date": "2025-11-27",
-          "source_file": "2025-12-12_키움증권(039490, KOSPI), 증권의 영웅으로, 키움 YIG Research.md",
-          "target_price": 432300.0,
-          "stated_upside_pct": 59.8152
-        }
-      ]
-    },
-    {
       "ticker": "042660",
       "market": "KR",
       "name": "한화오션",
@@ -12757,6 +12316,49 @@
           "source_file": "2026-01-23_[260123] 태웅(044490).md",
           "target_price": 45800.0,
           "stated_upside_pct": 47.504
+        }
+      ]
+    },
+    {
+      "ticker": "047810",
+      "market": "KR",
+      "name": "한국항공우주",
+      "entry_date": "2025-12-15",
+      "exit_date": "2026-03-05",
+      "entry_price": 116300.0,
+      "exit_price": 170200.0,
+      "return_pct": 45.47,
+      "days": 80,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: star 2025-12-12, ewha 2025-05-30, kuvic 2023-11-19, smic 2022-12-08)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2022-12-08",
+          "source_file": "2022-12-08_equity-research-한국항공우주.md",
+          "target_price": 67000.0,
+          "stated_upside_pct": 45.1788
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2023-11-19",
+          "source_file": "2023-11-19_한국항공우주 - 작전명 신세KAI.md",
+          "target_price": 69400.0,
+          "stated_upside_pct": 50.8696
+        },
+        {
+          "school": "star",
+          "report_date": "2025-12-12",
+          "source_file": "2025-12-12_STAR_한국항공우주.md",
+          "target_price": 156800.0,
+          "stated_upside_pct": 36.2294
+        },
+        {
+          "school": "ewha",
+          "report_date": "2025-05-30",
+          "source_file": "2025-05-30_[250530] 한국항공우주(047810).md",
+          "target_price": 125900.0,
+          "stated_upside_pct": 50.5981
         }
       ]
     },
@@ -12891,6 +12493,28 @@
       ]
     },
     {
+      "ticker": "122640",
+      "market": "KR",
+      "name": "예스티",
+      "entry_date": "2026-01-08",
+      "exit_date": "2026-03-30",
+      "entry_price": 20000.0,
+      "exit_price": 19900.0,
+      "return_pct": -1.1,
+      "days": 81,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: smic 2025-12-15)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2025-12-15",
+          "source_file": "2025-12-15_equity-research-예스티-2.md",
+          "target_price": 40500.0,
+          "stated_upside_pct": 125.3756
+        }
+      ]
+    },
+    {
       "ticker": "004170",
       "market": "KR",
       "name": "신세계",
@@ -12978,6 +12602,28 @@
       ]
     },
     {
+      "ticker": "417200",
+      "market": "KR",
+      "name": "LS머트리얼즈",
+      "entry_date": "2026-03-30",
+      "exit_date": "2026-04-01",
+      "entry_price": 18240.0,
+      "exit_price": 18570.0,
+      "return_pct": 1.2,
+      "days": 2,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: kuvic 2026-03-27)",
+      "trigger_reports": [
+        {
+          "school": "kuvic",
+          "report_date": "2026-03-27",
+          "source_file": "2026-03-27_LS머트리얼즈 - 울트라캡숑시터.md",
+          "target_price": 37300.0,
+          "stated_upside_pct": 95.0837
+        }
+      ]
+    },
+    {
       "ticker": "440110",
       "market": "KR",
       "name": "파두",
@@ -12996,28 +12642,6 @@
           "source_file": "2026-02-09_파두 - 호재가 파두파두 끝이 없네.md",
           "target_price": 56400.0,
           "stated_upside_pct": 14.8676
-        }
-      ]
-    },
-    {
-      "ticker": "445680",
-      "market": "KR",
-      "name": "큐리옥스바이오시스템즈",
-      "entry_date": "2026-03-19",
-      "exit_date": "2026-04-02",
-      "entry_price": 135900.0,
-      "exit_price": 87600.0,
-      "return_pct": -35.93,
-      "days": 14,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2026-03-14)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2026-03-14",
-          "source_file": "2026-03-14_STAR_큐리옥스바이오시스템즈.md",
-          "target_price": 260500.0,
-          "stated_upside_pct": 181.014
         }
       ]
     },
@@ -13304,49 +12928,6 @@
       ]
     },
     {
-      "ticker": "083650",
-      "market": "KR",
-      "name": "비에이치아이",
-      "entry_date": "2026-04-06",
-      "exit_date": "2026-05-12",
-      "entry_price": 92500.0,
-      "exit_price": 91100.0,
-      "return_pct": -2.1,
-      "days": 36,
-      "exit_reason": "supertrend_bearish_flip",
-      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: ewha 2026-04-04, star 2025-08-31, voera 2025-07-30, kuvic 2024-11-14)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2025-08-31",
-          "source_file": "2025-08-31_STAR_비에이치아이 (1).md",
-          "target_price": 61600.0,
-          "stated_upside_pct": 6.0241
-        },
-        {
-          "school": "ewha",
-          "report_date": "2026-04-04",
-          "source_file": "2026-04-03_[260403] 비에이치아이(083650).md",
-          "target_price": 134000.0,
-          "stated_upside_pct": 44.8649
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2024-11-14",
-          "source_file": "2024-11-14_비에이치아이 - Make BHI Great Again.md",
-          "target_price": 16190.0,
-          "stated_upside_pct": 2.4684
-        },
-        {
-          "school": "voera",
-          "report_date": "2025-07-30",
-          "source_file": "undated_[BUY] Become HRSG Itself, BHI.md",
-          "target_price": 49000.0,
-          "stated_upside_pct": 21.5881
-        }
-      ]
-    },
-    {
       "ticker": "257720",
       "market": "KR",
       "name": "실리콘투",
@@ -13437,6 +13018,57 @@
           "source_file": "2026-04-14_아모텍 (052710, KOSDAQ) - 아모도 모르게 광(光)텍 나기 시작 YIG Research.md",
           "target_price": 54100.0,
           "stated_upside_pct": 132.6882
+        }
+      ]
+    },
+    {
+      "ticker": "092870",
+      "market": "KR",
+      "name": "엑시콘",
+      "entry_date": "2026-01-06",
+      "exit_date": "2026-05-18",
+      "entry_price": 16960.0,
+      "exit_price": 28800.0,
+      "return_pct": 68.79,
+      "days": 132,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: star 2025-12-12, smic 2020-10-10)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2020-10-10",
+          "source_file": "2020-10-10_equity-research-엑시콘.md",
+          "target_price": 28700.0,
+          "stated_upside_pct": 119.5029
+        },
+        {
+          "school": "star",
+          "report_date": "2025-12-12",
+          "source_file": "2025-12-12_STAR_엑시콘.md",
+          "target_price": 21700.0,
+          "stated_upside_pct": 45.4424
+        }
+      ]
+    },
+    {
+      "ticker": "127120",
+      "market": "KR",
+      "name": "제이에스링크",
+      "entry_date": "2025-12-30",
+      "exit_date": "2026-05-18",
+      "entry_price": 19300.0,
+      "exit_price": 36100.0,
+      "return_pct": 85.93,
+      "days": 139,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 후 3개월 내 슈퍼트렌드(10,3) 상방 전환 → 익일 시가 진입 (트리거: kuvic 2025-11-17)",
+      "trigger_reports": [
+        {
+          "school": "kuvic",
+          "report_date": "2025-11-17",
+          "source_file": "2025-11-17_제이에스링크 - 영구자석 업고 주가 튀어.md",
+          "target_price": 48200.0,
+          "stated_upside_pct": 181.3777
         }
       ]
     },
@@ -13773,6 +13405,35 @@
       ]
     },
     {
+      "ticker": "078600",
+      "market": "KR",
+      "name": "대주전자재료",
+      "entry_date": "2026-06-01",
+      "exit_date": "2026-06-04",
+      "entry_price": 148500.0,
+      "exit_price": 126000.0,
+      "return_pct": -15.66,
+      "days": 3,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: ewha 2026-05-30, star 2025-08-31)",
+      "trigger_reports": [
+        {
+          "school": "ewha",
+          "report_date": "2026-05-30",
+          "source_file": "2026-05-29_[260529] 대주전자재료(078600).md",
+          "target_price": 231400.0,
+          "stated_upside_pct": 51.143
+        },
+        {
+          "school": "star",
+          "report_date": "2025-08-31",
+          "source_file": "2025-08-31_STAR_대주전자재료.md",
+          "target_price": 116900.0,
+          "stated_upside_pct": 68.6869
+        }
+      ]
+    },
+    {
       "ticker": "403870",
       "market": "KR",
       "name": "HPSP",
@@ -13860,9 +13521,9 @@
         {
           "school": "kuvic",
           "report_date": "2026-05-18",
-          "source_file": "undated_kuvic-5ec6f7_7302d46cd033470899f067eb2d01c2e2.md",
-          "target_price": 159000.0,
-          "stated_upside_pct": 176.0417
+          "source_file": "2026-05-18_코스텍시스 - 코스텍시스, 800V짜리 카타르시스.md",
+          "target_price": null,
+          "stated_upside_pct": null
         }
       ]
     },
@@ -13885,6 +13546,28 @@
           "source_file": "2026-05-07_equity-research-나노.md",
           "target_price": 16310.0,
           "stated_upside_pct": 139.1496
+        }
+      ]
+    },
+    {
+      "ticker": "STRL",
+      "market": "US",
+      "name": "STRL",
+      "entry_date": "2026-06-01",
+      "exit_date": "2026-06-11",
+      "entry_price": 836.24,
+      "exit_price": 797.0,
+      "return_pct": -4.12,
+      "days": 10,
+      "exit_reason": "supertrend_bearish_flip",
+      "entry_reason": "리포트 발간 시점 슈퍼트렌드(10,3) 상방 → 익일 시가 진입 (트리거: smic 2026-05-29)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2026-05-29",
+          "source_file": "2026-05-29_equity-research-sterling-infrastructure-inc.md",
+          "target_price": 1500.0,
+          "stated_upside_pct": 74.2484
         }
       ]
     }

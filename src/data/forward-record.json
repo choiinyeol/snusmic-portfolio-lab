@@ -1,20 +1,184 @@
 {
  "schema_version": "1.0",
- "generated_at": "2026-06-12T15:43:43+00:00",
+ "generated_at": "2026-06-12T17:15:31+00:00",
  "method": "신호 스냅샷(append-only, 커밋 시점 박제)의 매수 신호를 이후 실현 시세로 채점. 진입 = 신호일 익일 시가, 수익률 = 로컬 통화 종가 기준, 동일 티커 7일 내 중복 신호 제외. 전략 규칙(스탑·슬롯) 재현이 아니라 공표된 신호 자체의 전진 성적.",
  "summary": {
-  "n_signals": 0,
+  "n_signals": 9,
   "n_tracking": 0,
   "avg_return_pct": null,
   "win_rate_pct": null,
   "best_pct": null,
   "worst_pct": null,
   "first_snapshot": "2026-06-11",
-  "last_snapshot": "2026-06-11",
-  "n_snapshots": 1
+  "last_snapshot": "2026-06-12",
+  "n_snapshots": 2
  },
- "entries": [],
+ "entries": [
+  {
+   "signal_date": "2026-06-12",
+   "ticker": "010060",
+   "market": "KR",
+   "name": "OCI홀딩스",
+   "basis_price": null,
+   "entry_date": null,
+   "entry_price": null,
+   "current_price": null,
+   "return_pct": null,
+   "peak_pct": null,
+   "days": 0,
+   "status": "pending",
+   "trigger_schools": [
+    "star"
+   ],
+   "headline_strategy": "U_chandelier_scaleout"
+  },
+  {
+   "signal_date": "2026-06-12",
+   "ticker": "011070",
+   "market": "KR",
+   "name": "LG이노텍",
+   "basis_price": null,
+   "entry_date": null,
+   "entry_price": null,
+   "current_price": null,
+   "return_pct": null,
+   "peak_pct": null,
+   "days": 0,
+   "status": "pending",
+   "trigger_schools": [
+    "star"
+   ],
+   "headline_strategy": "U_chandelier_scaleout"
+  },
+  {
+   "signal_date": "2026-06-12",
+   "ticker": "039490",
+   "market": "KR",
+   "name": "키움증권",
+   "basis_price": null,
+   "entry_date": null,
+   "entry_price": null,
+   "current_price": null,
+   "return_pct": null,
+   "peak_pct": null,
+   "days": 0,
+   "status": "pending",
+   "trigger_schools": [
+    "star"
+   ],
+   "headline_strategy": "U_chandelier_scaleout"
+  },
+  {
+   "signal_date": "2026-06-12",
+   "ticker": "052400",
+   "market": "KR",
+   "name": "코나아이",
+   "basis_price": null,
+   "entry_date": null,
+   "entry_price": null,
+   "current_price": null,
+   "return_pct": null,
+   "peak_pct": null,
+   "days": 0,
+   "status": "pending",
+   "trigger_schools": [
+    "star"
+   ],
+   "headline_strategy": "U_chandelier_scaleout"
+  },
+  {
+   "signal_date": "2026-06-12",
+   "ticker": "095610",
+   "market": "KR",
+   "name": "테스",
+   "basis_price": null,
+   "entry_date": null,
+   "entry_price": null,
+   "current_price": null,
+   "return_pct": null,
+   "peak_pct": null,
+   "days": 0,
+   "status": "pending",
+   "trigger_schools": [
+    "star"
+   ],
+   "headline_strategy": "U_chandelier_scaleout"
+  },
+  {
+   "signal_date": "2026-06-12",
+   "ticker": "105560",
+   "market": "KR",
+   "name": "KB금융",
+   "basis_price": null,
+   "entry_date": null,
+   "entry_price": null,
+   "current_price": null,
+   "return_pct": null,
+   "peak_pct": null,
+   "days": 0,
+   "status": "pending",
+   "trigger_schools": [
+    "star"
+   ],
+   "headline_strategy": "U_chandelier_scaleout"
+  },
+  {
+   "signal_date": "2026-06-12",
+   "ticker": "131970",
+   "market": "KR",
+   "name": "두산테스나",
+   "basis_price": null,
+   "entry_date": null,
+   "entry_price": null,
+   "current_price": null,
+   "return_pct": null,
+   "peak_pct": null,
+   "days": 0,
+   "status": "pending",
+   "trigger_schools": [
+    "star"
+   ],
+   "headline_strategy": "U_chandelier_scaleout"
+  },
+  {
+   "signal_date": "2026-06-12",
+   "ticker": "373220",
+   "market": "KR",
+   "name": "LG에너지솔루션",
+   "basis_price": null,
+   "entry_date": null,
+   "entry_price": null,
+   "current_price": null,
+   "return_pct": null,
+   "peak_pct": null,
+   "days": 0,
+   "status": "pending",
+   "trigger_schools": [
+    "star"
+   ],
+   "headline_strategy": "U_chandelier_scaleout"
+  },
+  {
+   "signal_date": "2026-06-12",
+   "ticker": "VST",
+   "market": "US",
+   "name": "VST",
+   "basis_price": null,
+   "entry_date": null,
+   "entry_price": null,
+   "current_price": null,
+   "return_pct": null,
+   "peak_pct": null,
+   "days": 0,
+   "status": "pending",
+   "trigger_schools": [
+    "star"
+   ],
+   "headline_strategy": "U_chandelier_scaleout"
+  }
+ ],
  "headline_by_date": {
-  "2026-06-11": "W_allweather_chandelier"
+  "2026-06-11": "W_allweather_chandelier",
+  "2026-06-12": "U_chandelier_scaleout"
  }
 }

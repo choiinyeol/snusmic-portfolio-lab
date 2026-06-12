@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-12T15:41:46+00:00",
+  "generated_at": "2026-06-12T17:15:31+00:00",
   "strategy_key": "U_chandelier_scaleout",
   "ticker": "CHGG",
   "market": "US",
@@ -14,10 +14,10 @@
       "reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환, 과열 스케일아웃 규칙) (트리거: smic 2021-11-30)"
     },
     {
-      "date": "2022-01-26",
+      "date": "2022-01-27",
       "side": "stop",
-      "price": 25.84,
-      "reason": "u_chandelier_ATR4.25 (-7.7%)"
+      "price": 24.37,
+      "reason": "u_chandelier_ATR4.25 (-12.6%)"
     }
   ],
   "open_stop": null

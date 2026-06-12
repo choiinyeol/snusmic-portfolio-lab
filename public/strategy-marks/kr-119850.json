@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-12T15:41:46+00:00",
+  "generated_at": "2026-06-12T17:15:31+00:00",
   "strategy_key": "U_chandelier_scaleout",
   "ticker": "119850",
   "market": "KR",
@@ -23,7 +23,7 @@
       "date": "2025-05-08",
       "side": "sell",
       "price": 26450.0,
-      "reason": "u_scaleout1_ext8.7x (+34.5%)"
+      "reason": "u_scaleout1_ext8.4x (+34.5%)"
     },
     {
       "date": "2025-09-02",

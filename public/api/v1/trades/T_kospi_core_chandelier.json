@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-12T15:41:46+00:00",
+  "generated_at": "2026-06-12T17:15:31+00:00",
   "strategy_key": "T_kospi_core_chandelier",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -1445,11 +1445,11 @@
       "market": "KR",
       "name": "하이브",
       "entry_date": "2021-11-22",
-      "exit_date": "2021-12-21",
+      "exit_date": "2022-01-06",
       "entry_price": 395000.0,
-      "exit_price": 325500.0,
-      "return_pct": -18.13,
-      "days": 29,
+      "exit_price": 308000.0,
+      "return_pct": -22.53,
+      "days": 45,
       "exit_reason": "t_chandelier_ATR4.25",
       "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2021-11-19)",
       "trigger_reports": [
@@ -1621,11 +1621,11 @@
       "market": "US",
       "name": "CHGG",
       "entry_date": "2021-12-01",
-      "exit_date": "2022-01-26",
+      "exit_date": "2022-01-27",
       "entry_price": 28.11,
-      "exit_price": 25.84,
-      "return_pct": -7.65,
-      "days": 56,
+      "exit_price": 24.37,
+      "return_pct": -12.57,
+      "days": 57,
       "exit_reason": "t_chandelier_ATR4.25",
       "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2021-11-30)",
       "trigger_reports": [
@@ -1851,6 +1851,28 @@
       ]
     },
     {
+      "ticker": "035900",
+      "market": "KR",
+      "name": "JYP Ent.",
+      "entry_date": "2022-04-18",
+      "exit_date": "2022-05-25",
+      "entry_price": 63400.0,
+      "exit_price": 53000.0,
+      "return_pct": -16.95,
+      "days": 37,
+      "exit_reason": "t_chandelier_ATR4.25",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2022-04-16)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2022-04-16",
+          "source_file": "2022-04-16_equity-research-jyp-ent.md",
+          "target_price": 92400.0,
+          "stated_upside_pct": 45.7413
+        }
+      ]
+    },
+    {
       "ticker": "009150",
       "market": "KR",
       "name": "삼성전기",
@@ -1961,6 +1983,28 @@
       ]
     },
     {
+      "ticker": "EAF",
+      "market": "US",
+      "name": "EAF",
+      "entry_date": "2022-05-26",
+      "exit_date": "2022-06-17",
+      "entry_price": 85.4492,
+      "exit_price": 76.417,
+      "return_pct": -9.64,
+      "days": 22,
+      "exit_reason": "t_chandelier_ATR4.25",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2022-05-25)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2022-05-25",
+          "source_file": "2022-05-25_equity-research-graftech-international-ltd.md",
+          "target_price": null,
+          "stated_upside_pct": null
+        }
+      ]
+    },
+    {
       "ticker": "001060",
       "market": "KR",
       "name": "JW중외제약",
@@ -1979,50 +2023,6 @@
           "source_file": "2022-05-28_[220528] JW중외제약(001060).md",
           "target_price": 38300.0,
           "stated_upside_pct": 54.9415
-        }
-      ]
-    },
-    {
-      "ticker": "EAF",
-      "market": "US",
-      "name": "EAF",
-      "entry_date": "2022-05-26",
-      "exit_date": "2022-06-21",
-      "entry_price": 85.4492,
-      "exit_price": 76.5163,
-      "return_pct": -9.22,
-      "days": 26,
-      "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2022-05-25)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2022-05-25",
-          "source_file": "2022-05-25_equity-research-graftech-international-ltd.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        }
-      ]
-    },
-    {
-      "ticker": "035900",
-      "market": "KR",
-      "name": "JYP Ent.",
-      "entry_date": "2022-04-18",
-      "exit_date": "2022-06-23",
-      "entry_price": 63400.0,
-      "exit_price": 48900.0,
-      "return_pct": -23.37,
-      "days": 66,
-      "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2022-04-16)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2022-04-16",
-          "source_file": "2022-04-16_equity-research-jyp-ent.md",
-          "target_price": 92400.0,
-          "stated_upside_pct": 45.7413
         }
       ]
     },
@@ -2151,28 +2151,6 @@
       ]
     },
     {
-      "ticker": "033290",
-      "market": "KR",
-      "name": "로젠",
-      "entry_date": "2022-08-17",
-      "exit_date": "2022-09-16",
-      "entry_price": 5671.0,
-      "exit_price": 5126.0,
-      "return_pct": -10.2,
-      "days": 30,
-      "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: star 2022-08-16)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2022-08-16",
-          "source_file": "2022-08-16_STAR_코웰패션.md",
-          "target_price": 8370.0,
-          "stated_upside_pct": 46.9194
-        }
-      ]
-    },
-    {
       "ticker": "010120",
       "market": "KR",
       "name": "LS ELECTRIC",
@@ -2234,6 +2212,28 @@
           "source_file": "2022-08-16_STAR_씨에스윈드.md",
           "target_price": 66210.0,
           "stated_upside_pct": 1.7051
+        }
+      ]
+    },
+    {
+      "ticker": "033290",
+      "market": "KR",
+      "name": "로젠",
+      "entry_date": "2022-08-17",
+      "exit_date": "2022-09-26",
+      "entry_price": 5671.0,
+      "exit_price": 4998.0,
+      "return_pct": -12.44,
+      "days": 40,
+      "exit_reason": "t_chandelier_ATR4.25",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: star 2022-08-16)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2022-08-16",
+          "source_file": "2022-08-16_STAR_코웰패션.md",
+          "target_price": 8370.0,
+          "stated_upside_pct": 46.9194
         }
       ]
     },
@@ -2374,11 +2374,11 @@
       "market": "KR",
       "name": "KT나스미디어",
       "entry_date": "2022-10-14",
-      "exit_date": "2022-11-22",
+      "exit_date": "2022-11-15",
       "entry_price": 28626.0,
-      "exit_price": 25025.0,
-      "return_pct": -13.15,
-      "days": 39,
+      "exit_price": 25480.0,
+      "return_pct": -11.57,
+      "days": 32,
       "exit_reason": "t_chandelier_ATR4.25",
       "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2022-10-13)",
       "trigger_reports": [
@@ -2529,6 +2529,28 @@
       ]
     },
     {
+      "ticker": "STNG",
+      "market": "US",
+      "name": "STNG",
+      "entry_date": "2022-05-26",
+      "exit_date": "2023-01-24",
+      "entry_price": 29.0493,
+      "exit_price": 42.9699,
+      "return_pct": 42.63,
+      "days": 243,
+      "exit_reason": "t_chandelier_ATR4.25",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2022-05-25)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2022-05-25",
+          "source_file": "2022-05-25_equity-research-scorpio-tankers-inc.md",
+          "target_price": 44.66,
+          "stated_upside_pct": 54.5657
+        }
+      ]
+    },
+    {
       "ticker": "145020",
       "market": "KR",
       "name": "휴젤",
@@ -2547,35 +2569,6 @@
           "source_file": "undated_[BUY] 휴~휴~ 불면은 수출길 뚫리는 휴젤.md",
           "target_price": 387000.0,
           "stated_upside_pct": 187.9464
-        }
-      ]
-    },
-    {
-      "ticker": "272550",
-      "market": "KR",
-      "name": "삼양패키징",
-      "entry_date": "2022-11-01",
-      "exit_date": "2023-03-02",
-      "entry_price": 15750.0,
-      "exit_price": 17560.0,
-      "return_pct": 10.77,
-      "days": 121,
-      "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: star 2022-10-31, smic 2019-11-05)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2019-11-05",
-          "source_file": "2019-11-05_Equity Research, 삼양패키징.md",
-          "target_price": 23687.0,
-          "stated_upside_pct": 44.8746
-        },
-        {
-          "school": "star",
-          "report_date": "2022-10-31",
-          "source_file": "2022-10-31_STAR_삼양패키징.md",
-          "target_price": 25800.0,
-          "stated_upside_pct": 62.2642
         }
       ]
     },
@@ -2697,28 +2690,6 @@
       ]
     },
     {
-      "ticker": "034230",
-      "market": "KR",
-      "name": "파라다이스",
-      "entry_date": "2023-03-02",
-      "exit_date": "2023-04-24",
-      "entry_price": 16990.0,
-      "exit_price": 14700.0,
-      "return_pct": -14.04,
-      "days": 53,
-      "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: star 2023-03-01)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2023-03-01",
-          "source_file": "2023-03-01_STAR_파라다이스.md",
-          "target_price": 27700.0,
-          "stated_upside_pct": 65.4719
-        }
-      ]
-    },
-    {
       "ticker": "126340",
       "market": "KR",
       "name": "비나텍",
@@ -2748,24 +2719,38 @@
       ]
     },
     {
-      "ticker": "004430",
+      "ticker": "352820",
       "market": "KR",
-      "name": "송원산업",
-      "entry_date": "2023-04-24",
-      "exit_date": "2023-07-05",
-      "entry_price": 17420.0,
-      "exit_price": 18490.0,
-      "return_pct": 5.45,
-      "days": 72,
+      "name": "하이브",
+      "entry_date": "2023-02-09",
+      "exit_date": "2023-07-14",
+      "entry_price": 198000.0,
+      "exit_price": 261500.0,
+      "return_pct": 31.21,
+      "days": 155,
       "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: star 2023-04-22)",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: ewha 2023-02-08, voera 2022-05-28, smic 2021-11-19)",
       "trigger_reports": [
         {
-          "school": "star",
-          "report_date": "2023-04-22",
-          "source_file": "2023-04-22_STAR_송원산업.md",
-          "target_price": 23530.0,
-          "stated_upside_pct": 34.4571
+          "school": "smic",
+          "report_date": "2021-11-19",
+          "source_file": "2021-11-19_equity-research-하이브.md",
+          "target_price": 628000.0,
+          "stated_upside_pct": 56.804
+        },
+        {
+          "school": "voera",
+          "report_date": "2022-05-28",
+          "source_file": "undated_[BUY] 하이브, High View!.md",
+          "target_price": 381500.0,
+          "stated_upside_pct": 74.5995
+        },
+        {
+          "school": "ewha",
+          "report_date": "2023-02-08",
+          "source_file": "2023-02-08_[230208] 하이브(352820).md",
+          "target_price": 229500.0,
+          "stated_upside_pct": 16.1437
         }
       ]
     },
@@ -2788,35 +2773,6 @@
           "source_file": "2023-02-08_[230208] 파마리서치(214450).md",
           "target_price": 107000.0,
           "stated_upside_pct": 40.0524
-        }
-      ]
-    },
-    {
-      "ticker": "090460",
-      "market": "KR",
-      "name": "비에이치",
-      "entry_date": "2023-07-05",
-      "exit_date": "2023-07-31",
-      "entry_price": 28300.0,
-      "exit_price": 24450.0,
-      "return_pct": -14.16,
-      "days": 26,
-      "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: star 2023-07-04, smic 2019-11-05)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2019-11-05",
-          "source_file": "2019-11-05_Equity Research, 비에이치.md",
-          "target_price": 45300.0,
-          "stated_upside_pct": 100.4425
-        },
-        {
-          "school": "star",
-          "report_date": "2023-07-04",
-          "source_file": "2023-07-04_STAR_비에이치.md",
-          "target_price": 39000.0,
-          "stated_upside_pct": 38.2979
         }
       ]
     },
@@ -3018,6 +2974,35 @@
       ]
     },
     {
+      "ticker": "010620",
+      "market": "KR",
+      "name": "HD현대미포",
+      "entry_date": "2023-07-17",
+      "exit_date": "2023-10-05",
+      "entry_price": 92100.0,
+      "exit_price": 78700.0,
+      "return_pct": -15.1,
+      "days": 80,
+      "exit_reason": "t_chandelier_ATR4.25",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: star 2023-07-14, ewha 2021-02-20)",
+      "trigger_reports": [
+        {
+          "school": "ewha",
+          "report_date": "2021-02-20",
+          "source_file": "2021-02-20_[210220] 현대미포조선(010620).md",
+          "target_price": 69100.0,
+          "stated_upside_pct": 36.0236
+        },
+        {
+          "school": "star",
+          "report_date": "2023-07-14",
+          "source_file": "2023-07-14_STAR_현대미포조선.md",
+          "target_price": 111300.0,
+          "stated_upside_pct": 19.9353
+        }
+      ]
+    },
+    {
       "ticker": "204620",
       "market": "KR",
       "name": "글로벌텍스프리",
@@ -3043,42 +3028,6 @@
           "source_file": "2025-11-10_글로벌텍스프리 (2024620, KQ), What's Your GTF (발간일 240405) YIG Research.md",
           "target_price": 8370.0,
           "stated_upside_pct": 106.1576
-        }
-      ]
-    },
-    {
-      "ticker": "005850",
-      "market": "KR",
-      "name": "에스엘",
-      "entry_date": "2023-08-28",
-      "exit_date": "2023-10-16",
-      "entry_price": 33500.0,
-      "exit_price": 30300.0,
-      "return_pct": -10.14,
-      "days": 49,
-      "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: ewha 2023-08-26, star 2023-04-22, smic 2021-06-06)",
-      "trigger_reports": [
-        {
-          "school": "ewha",
-          "report_date": "2023-08-26",
-          "source_file": "2023-08-26_[230826] 에스엘(005850).md",
-          "target_price": 49600.0,
-          "stated_upside_pct": 49.3976
-        },
-        {
-          "school": "smic",
-          "report_date": "2021-06-06",
-          "source_file": "2021-06-06_equity-research-에스엘.md",
-          "target_price": 50000.0,
-          "stated_upside_pct": 47.0588
-        },
-        {
-          "school": "star",
-          "report_date": "2023-04-22",
-          "source_file": "2023-04-22_STAR_에스엘.md",
-          "target_price": 39000.0,
-          "stated_upside_pct": 24.6006
         }
       ]
     },
@@ -3199,6 +3148,28 @@
       ]
     },
     {
+      "ticker": "310210",
+      "market": "KR",
+      "name": "보로노이",
+      "entry_date": "2023-10-05",
+      "exit_date": "2023-10-20",
+      "entry_price": 48800.0,
+      "exit_price": 34100.0,
+      "return_pct": -30.58,
+      "days": 15,
+      "exit_reason": "t_chandelier_ATR4.25",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: star 2023-10-04)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2023-10-04",
+          "source_file": "2023-10-04_STAR_보로노이.md",
+          "target_price": 100700.0,
+          "stated_upside_pct": 107.8431
+        }
+      ]
+    },
+    {
       "ticker": "003030",
       "market": "KR",
       "name": "세아제강지주",
@@ -3224,6 +3195,49 @@
           "source_file": "2023-10-04_STAR_세아제강지주.md",
           "target_price": 283700.0,
           "stated_upside_pct": 38.3902
+        }
+      ]
+    },
+    {
+      "ticker": "352820",
+      "market": "KR",
+      "name": "하이브",
+      "entry_date": "2023-10-20",
+      "exit_date": "2023-11-20",
+      "entry_price": 224000.0,
+      "exit_price": 190400.0,
+      "return_pct": -15.55,
+      "days": 31,
+      "exit_reason": "t_chandelier_ATR4.25",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2023-10-19, star 2023-03-01, ewha 2023-02-08, voera 2022-05-28)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2023-10-19",
+          "source_file": "2023-10-19_equity-research-하이브-2.md",
+          "target_price": 334500.0,
+          "stated_upside_pct": 47.033
+        },
+        {
+          "school": "voera",
+          "report_date": "2022-05-28",
+          "source_file": "undated_[BUY] 하이브, High View!.md",
+          "target_price": 381500.0,
+          "stated_upside_pct": 74.5995
+        },
+        {
+          "school": "ewha",
+          "report_date": "2023-02-08",
+          "source_file": "2023-02-08_[230208] 하이브(352820).md",
+          "target_price": 229500.0,
+          "stated_upside_pct": 16.1437
+        },
+        {
+          "school": "star",
+          "report_date": "2023-03-01",
+          "source_file": "2023-03-01_STAR_하이브.md",
+          "target_price": 223000.0,
+          "stated_upside_pct": 20.4754
         }
       ]
     },
@@ -3294,35 +3308,6 @@
       ]
     },
     {
-      "ticker": "336570",
-      "market": "KR",
-      "name": "원텍",
-      "entry_date": "2023-10-16",
-      "exit_date": "2024-01-18",
-      "entry_price": 9420.0,
-      "exit_price": 8620.0,
-      "return_pct": -9.09,
-      "days": 94,
-      "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: kuvic 2023-10-13, ewha 2023-02-08)",
-      "trigger_reports": [
-        {
-          "school": "ewha",
-          "report_date": "2023-02-08",
-          "source_file": "2023-02-08_[230208] 원텍(336570).md",
-          "target_price": 6200.0,
-          "stated_upside_pct": 26.9191
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2023-10-13",
-          "source_file": "2023-10-13_원텍 - 우리 원텍 절대 월드클래스 맞습니다.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        }
-      ]
-    },
-    {
       "ticker": "189300",
       "market": "KR",
       "name": "인텔리안테크",
@@ -3388,6 +3373,35 @@
       ]
     },
     {
+      "ticker": "047810",
+      "market": "KR",
+      "name": "한국항공우주",
+      "entry_date": "2023-11-20",
+      "exit_date": "2024-02-05",
+      "entry_price": 46150.0,
+      "exit_price": 48400.0,
+      "return_pct": 4.19,
+      "days": 77,
+      "exit_reason": "t_chandelier_ATR4.25",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: kuvic 2023-11-19, smic 2022-12-08)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2022-12-08",
+          "source_file": "2022-12-08_equity-research-한국항공우주.md",
+          "target_price": 67000.0,
+          "stated_upside_pct": 45.1788
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2023-11-19",
+          "source_file": "2023-11-19_한국항공우주 - 작전명 신세KAI.md",
+          "target_price": 69400.0,
+          "stated_upside_pct": 50.8696
+        }
+      ]
+    },
+    {
       "ticker": "089890",
       "market": "KR",
       "name": "코세스",
@@ -3414,11 +3428,11 @@
       "market": "KR",
       "name": "동진쎄미켐",
       "entry_date": "2023-12-07",
-      "exit_date": "2024-02-26",
+      "exit_date": "2024-02-27",
       "entry_price": 38550.0,
-      "exit_price": 36400.0,
-      "return_pct": -6.19,
-      "days": 81,
+      "exit_price": 35650.0,
+      "return_pct": -8.12,
+      "days": 82,
       "exit_reason": "t_chandelier_ATR4.25",
       "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2023-12-06)",
       "trigger_reports": [
@@ -3476,35 +3490,6 @@
       ]
     },
     {
-      "ticker": "140860",
-      "market": "KR",
-      "name": "파크시스템스",
-      "entry_date": "2024-01-22",
-      "exit_date": "2024-03-18",
-      "entry_price": 187000.0,
-      "exit_price": 159100.0,
-      "return_pct": -15.47,
-      "days": 56,
-      "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: ewha 2024-01-20, smic 2020-05-06)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2020-05-06",
-          "source_file": "2020-05-06_Equity Research, 파크시스템스.md",
-          "target_price": 55993.0,
-          "stated_upside_pct": 50.3168
-        },
-        {
-          "school": "ewha",
-          "report_date": "2024-01-20",
-          "source_file": "2024-01-20_[240120] 파크시스템스(140860).md",
-          "target_price": 254300.0,
-          "stated_upside_pct": 37.832
-        }
-      ]
-    },
-    {
       "ticker": "054040",
       "market": "KR",
       "name": "한국컴퓨터",
@@ -3545,35 +3530,6 @@
           "source_file": "2024-01-20_[240120] 제우스(079370).md",
           "target_price": 70800.0,
           "stated_upside_pct": 287.7327
-        }
-      ]
-    },
-    {
-      "ticker": "005490",
-      "market": "KR",
-      "name": "POSCO홀딩스",
-      "entry_date": "2024-03-18",
-      "exit_date": "2024-04-16",
-      "entry_price": 436500.0,
-      "exit_price": 386000.0,
-      "return_pct": -12.14,
-      "days": 29,
-      "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: voera 2024-03-15, smic 2022-12-08)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2022-12-08",
-          "source_file": "2022-12-08_equity-research-포스코홀딩스.md",
-          "target_price": 365000.0,
-          "stated_upside_pct": 27.3997
-        },
-        {
-          "school": "voera",
-          "report_date": "2024-03-15",
-          "source_file": "undated_[Buy] 어서 담으세요, POSCO hold+ings.md",
-          "target_price": 572000.0,
-          "stated_upside_pct": 31.4943
         }
       ]
     },
@@ -3654,6 +3610,28 @@
           "source_file": "2024-03-11_STAR_한국항공우주.md",
           "target_price": 71500.0,
           "stated_upside_pct": 34.1463
+        }
+      ]
+    },
+    {
+      "ticker": "214320",
+      "market": "KR",
+      "name": "이노션",
+      "entry_date": "2024-02-29",
+      "exit_date": "2024-06-07",
+      "entry_price": 22200.0,
+      "exit_price": 21550.0,
+      "return_pct": -3.56,
+      "days": 99,
+      "exit_reason": "t_chandelier_ATR4.25",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: kuvic 2024-02-28)",
+      "trigger_reports": [
+        {
+          "school": "kuvic",
+          "report_date": "2024-02-28",
+          "source_file": "2024-02-28_이노션 - 초특가 이노션~ 초특가 이노션!.md",
+          "target_price": 23025.0,
+          "stated_upside_pct": 4.6591
         }
       ]
     },
@@ -3818,24 +3796,24 @@
       ]
     },
     {
-      "ticker": "042660",
+      "ticker": "005720",
       "market": "KR",
-      "name": "한화오션",
-      "entry_date": "2024-04-18",
-      "exit_date": "2024-07-26",
-      "entry_price": 29400.0,
-      "exit_price": 29400.0,
-      "return_pct": -0.65,
-      "days": 99,
+      "name": "넥센",
+      "entry_date": "2024-06-10",
+      "exit_date": "2024-08-06",
+      "entry_price": 4630.0,
+      "exit_price": 4500.0,
+      "return_pct": -3.44,
+      "days": 57,
       "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2024-04-17)",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2024-06-07)",
       "trigger_reports": [
         {
           "school": "smic",
-          "report_date": "2024-04-17",
-          "source_file": "2024-04-17_equity-research-한화오션.md",
-          "target_price": 54500.0,
-          "stated_upside_pct": 87.931
+          "report_date": "2024-06-07",
+          "source_file": "2024-06-07_equity-research-넥센.md",
+          "target_price": 6080.0,
+          "stated_upside_pct": 32.3177
         }
       ]
     },
@@ -3993,28 +3971,6 @@
       ]
     },
     {
-      "ticker": "110990",
-      "market": "KR",
-      "name": "디아이티",
-      "entry_date": "2024-07-29",
-      "exit_date": "2024-09-06",
-      "entry_price": 18730.0,
-      "exit_price": 13980.0,
-      "return_pct": -25.84,
-      "days": 39,
-      "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: ewha 2024-07-27)",
-      "trigger_reports": [
-        {
-          "school": "ewha",
-          "report_date": "2024-07-27",
-          "source_file": "2024-07-26_[240726] 디아이티(110990).md",
-          "target_price": 28500.0,
-          "stated_upside_pct": 52.1623
-        }
-      ]
-    },
-    {
       "ticker": "322310",
       "market": "KR",
       "name": "오로스테크놀로지",
@@ -4153,6 +4109,28 @@
       ]
     },
     {
+      "ticker": "337930",
+      "market": "KR",
+      "name": "젝시믹스",
+      "entry_date": "2024-08-19",
+      "exit_date": "2024-10-23",
+      "entry_price": 10680.0,
+      "exit_price": 8870.0,
+      "return_pct": -17.49,
+      "days": 65,
+      "exit_reason": "t_chandelier_ATR4.25",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: kuvic 2024-08-16)",
+      "trigger_reports": [
+        {
+          "school": "kuvic",
+          "report_date": "2024-08-16",
+          "source_file": "2024-08-16_브랜드엑스코퍼레이션 - 1위 브랜드 엑스코퍼레이션.md",
+          "target_price": 16700.0,
+          "stated_upside_pct": 54.7729
+        }
+      ]
+    },
+    {
       "ticker": "LLY",
       "market": "US",
       "name": "LLY",
@@ -4207,28 +4185,6 @@
           "source_file": "2024-09-11_STAR_롯데에너지머티리얼즈.md",
           "target_price": 77500.0,
           "stated_upside_pct": 91.358
-        }
-      ]
-    },
-    {
-      "ticker": "031980",
-      "market": "KR",
-      "name": "피에스케이홀딩스",
-      "entry_date": "2024-09-12",
-      "exit_date": "2024-11-12",
-      "entry_price": 41850.0,
-      "exit_price": 39150.0,
-      "return_pct": -7.06,
-      "days": 61,
-      "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: star 2024-09-11)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2024-09-11",
-          "source_file": "2024-09-11_STAR_피에스케이홀딩스.md",
-          "target_price": 89300.0,
-          "stated_upside_pct": 128.6812
         }
       ]
     },
@@ -4338,11 +4294,11 @@
       "market": "KR",
       "name": "한올바이오파마",
       "entry_date": "2024-09-12",
-      "exit_date": "2024-11-14",
+      "exit_date": "2024-11-19",
       "entry_price": 35050.0,
-      "exit_price": 40950.0,
-      "return_pct": 16.08,
-      "days": 63,
+      "exit_price": 39700.0,
+      "return_pct": 12.53,
+      "days": 68,
       "exit_reason": "t_chandelier_ATR4.25",
       "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: star 2024-09-11)",
       "trigger_reports": [
@@ -4421,6 +4377,28 @@
       ]
     },
     {
+      "ticker": "015760",
+      "market": "KR",
+      "name": "한국전력",
+      "entry_date": "2024-11-08",
+      "exit_date": "2024-12-09",
+      "entry_price": 22900.0,
+      "exit_price": 21000.0,
+      "return_pct": -8.89,
+      "days": 31,
+      "exit_reason": "t_chandelier_ATR4.25",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2024-11-07)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2024-11-07",
+          "source_file": "2024-11-07_equity-research-한국전력-2.md",
+          "target_price": 37630.0,
+          "stated_upside_pct": 65.0439
+        }
+      ]
+    },
+    {
       "ticker": "003490",
       "market": "KR",
       "name": "대한항공",
@@ -4439,28 +4417,6 @@
           "source_file": "2024-11-11_대한항공 - 국가권력급 인수합병.md",
           "target_price": 24500.0,
           "stated_upside_pct": 2.9412
-        }
-      ]
-    },
-    {
-      "ticker": "450080",
-      "market": "KR",
-      "name": "에코프로머티",
-      "entry_date": "2024-11-18",
-      "exit_date": "2024-12-26",
-      "entry_price": 89700.0,
-      "exit_price": 70500.0,
-      "return_pct": -21.91,
-      "days": 38,
-      "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: kuvic 2024-11-15)",
-      "trigger_reports": [
-        {
-          "school": "kuvic",
-          "report_date": "2024-11-15",
-          "source_file": "2024-11-15_에코프로머티 - 전구체, 머티 중헌디!.md",
-          "target_price": 119364.0,
-          "stated_upside_pct": 33.0702
         }
       ]
     },
@@ -4552,6 +4508,57 @@
       ]
     },
     {
+      "ticker": "FNKO",
+      "market": "US",
+      "name": "FNKO",
+      "entry_date": "2024-11-22",
+      "exit_date": "2025-03-04",
+      "entry_price": 10.44,
+      "exit_price": 11.46,
+      "return_pct": 13.6,
+      "days": 102,
+      "exit_reason": "t_chandelier_ATR4.25",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2024-11-21)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2024-11-21",
+          "source_file": "2024-11-21_equity-research-funko-inc.md",
+          "target_price": 16.1,
+          "stated_upside_pct": 55.8567
+        }
+      ]
+    },
+    {
+      "ticker": "141080",
+      "market": "KR",
+      "name": "리가켐바이오",
+      "entry_date": "2024-12-09",
+      "exit_date": "2025-03-13",
+      "entry_price": 101600.0,
+      "exit_price": 104500.0,
+      "return_pct": 2.19,
+      "days": 94,
+      "exit_reason": "t_chandelier_ATR4.25",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: kuvic 2024-12-06, star 2024-09-11)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2024-09-11",
+          "source_file": "2024-09-11_STAR_리가켐바이오.md",
+          "target_price": 126800.0,
+          "stated_upside_pct": 51.1323
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2024-12-06",
+          "source_file": "2024-12-06_리가켐바이오 - 수류탄의 핵심은 안전핀!.md",
+          "target_price": 165000.0,
+          "stated_upside_pct": 57.5931
+        }
+      ]
+    },
+    {
       "ticker": "079550",
       "market": "KR",
       "name": "LIG디펜스앤에어로스페이스",
@@ -4599,28 +4606,6 @@
           "source_file": "2025-11-11_오스테오닉 (226400, KQ), 내수, 수출, 실적, 삼박자가 맞는 기업 (발간일 250207) YIG Research.md",
           "target_price": 12560.0,
           "stated_upside_pct": 49.702
-        }
-      ]
-    },
-    {
-      "ticker": "084370",
-      "market": "KR",
-      "name": "유진테크",
-      "entry_date": "2024-11-12",
-      "exit_date": "2025-04-07",
-      "entry_price": 35950.0,
-      "exit_price": 32750.0,
-      "return_pct": -9.49,
-      "days": 146,
-      "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: kuvic 2024-11-11)",
-      "trigger_reports": [
-        {
-          "school": "kuvic",
-          "report_date": "2024-11-11",
-          "source_file": "2024-11-11_유진테크 - 반도체가 여름이래'유~진'짜라니께.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -4690,31 +4675,24 @@
       ]
     },
     {
-      "ticker": "014620",
+      "ticker": "084730",
       "market": "KR",
-      "name": "성광벤드",
-      "entry_date": "2025-01-10",
+      "name": "팅크웨어",
+      "entry_date": "2025-03-17",
       "exit_date": "2025-04-08",
-      "entry_price": 24750.0,
-      "exit_price": 23300.0,
-      "return_pct": -6.47,
-      "days": 88,
+      "entry_price": 10390.0,
+      "exit_price": 9480.0,
+      "return_pct": -9.35,
+      "days": 22,
       "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: star 2025-01-09, ewha 2022-08-13)",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: yig 2025-03-14)",
       "trigger_reports": [
         {
-          "school": "ewha",
-          "report_date": "2022-08-13",
-          "source_file": "2022-08-13_[220813] 성광벤드(014620).md",
-          "target_price": 17800.0,
-          "stated_upside_pct": 22.3368
-        },
-        {
-          "school": "star",
-          "report_date": "2025-01-09",
-          "source_file": "2025-01-09_STAR_성광벤드.md",
-          "target_price": 35650.0,
-          "stated_upside_pct": 43.4608
+          "school": "yig",
+          "report_date": "2025-03-14",
+          "source_file": "2025-11-11_유진테크 (084730, KQ), 원영 말고 유진테크~ (발간일 250314) YIG Research.md",
+          "target_price": 14639.0665,
+          "stated_upside_pct": 40.4901
         }
       ]
     },
@@ -4737,6 +4715,49 @@
           "source_file": "2024-09-11_STAR_KT.md",
           "target_price": 49600.0,
           "stated_upside_pct": 20.2424
+        }
+      ]
+    },
+    {
+      "ticker": "192820",
+      "market": "KR",
+      "name": "코스맥스",
+      "entry_date": "2025-03-10",
+      "exit_date": "2025-04-10",
+      "entry_price": 184100.0,
+      "exit_price": 158100.0,
+      "return_pct": -14.68,
+      "days": 31,
+      "exit_reason": "t_chandelier_ATR4.25",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: voera 2025-03-08, star 2024-03-11, ewha 2024-02-16, smic 2023-12-06)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2023-12-06",
+          "source_file": "2023-12-06_equity-research-코스맥스-2.md",
+          "target_price": 142000.0,
+          "stated_upside_pct": 17.3554
+        },
+        {
+          "school": "ewha",
+          "report_date": "2024-02-16",
+          "source_file": "2024-02-16_[240216] 코스맥스(192820).md",
+          "target_price": 167700.0,
+          "stated_upside_pct": 46.9763
+        },
+        {
+          "school": "star",
+          "report_date": "2024-03-11",
+          "source_file": "2024-03-11_STAR_코스맥스.md",
+          "target_price": 147100.0,
+          "stated_upside_pct": 40.9004
+        },
+        {
+          "school": "voera",
+          "report_date": "2025-03-08",
+          "source_file": "undated_[BUY] 코스메틱 성공 코스 ODM 여기엠! 코스맥스.md",
+          "target_price": 222100.0,
+          "stated_upside_pct": 20.51
         }
       ]
     },
@@ -4766,28 +4787,6 @@
           "source_file": "2025-02-24_SK가스 - LNG도 ESS도 사로잡GAS!.md",
           "target_price": 320000.0,
           "stated_upside_pct": 33.0561
-        }
-      ]
-    },
-    {
-      "ticker": "060370",
-      "market": "KR",
-      "name": "LS마린솔루션",
-      "entry_date": "2025-04-07",
-      "exit_date": "2025-05-28",
-      "entry_price": 12287.0,
-      "exit_price": 15788.0,
-      "return_pct": 27.66,
-      "days": 51,
-      "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: ewha 2025-04-04)",
-      "trigger_reports": [
-        {
-          "school": "ewha",
-          "report_date": "2025-04-04",
-          "source_file": "2025-04-04_[250404] LS마린솔루션(060370).md",
-          "target_price": 21130.0,
-          "stated_upside_pct": 67.4326
         }
       ]
     },
@@ -4875,28 +4874,6 @@
           "source_file": "2024-12-05_equity-research-동성화인텍.md",
           "target_price": 20600.0,
           "stated_upside_pct": 48.2014
-        }
-      ]
-    },
-    {
-      "ticker": "000720",
-      "market": "KR",
-      "name": "현대건설",
-      "entry_date": "2025-05-28",
-      "exit_date": "2025-07-24",
-      "entry_price": 64700.0,
-      "exit_price": 66600.0,
-      "return_pct": 2.27,
-      "days": 57,
-      "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: ewha 2025-05-27)",
-      "trigger_reports": [
-        {
-          "school": "ewha",
-          "report_date": "2025-05-27",
-          "source_file": "2025-05-27_[250527] (KEYSS 대회) 현대건설(000720).md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -5054,15 +5031,37 @@
       ]
     },
     {
+      "ticker": "473980",
+      "market": "KR",
+      "name": "노머스",
+      "entry_date": "2025-04-21",
+      "exit_date": "2025-10-15",
+      "entry_price": 25800.0,
+      "exit_price": 28350.0,
+      "return_pct": 9.17,
+      "days": 177,
+      "exit_reason": "t_chandelier_ATR4.25",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2025-04-19)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2025-04-19",
+          "source_file": "2025-04-19_equity-research-노머스.md",
+          "target_price": 37950.0,
+          "stated_upside_pct": 48.8235
+        }
+      ]
+    },
+    {
       "ticker": "347850",
       "market": "KR",
       "name": "디앤디파마텍",
       "entry_date": "2025-08-20",
-      "exit_date": "2025-10-17",
+      "exit_date": "2025-10-20",
       "entry_price": 32908.0,
-      "exit_price": 41691.0,
-      "return_pct": 25.87,
-      "days": 58,
+      "exit_price": 40790.0,
+      "return_pct": 23.15,
+      "days": 61,
       "exit_reason": "t_chandelier_ATR4.25",
       "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: kuvic 2025-08-19)",
       "trigger_reports": [
@@ -5217,6 +5216,63 @@
           "source_file": "2025-11-11_동방메디컬 (240550, KQ), 삼천갑자 동방메디컬, 주가도 무병장수 (발간일 251014) YIG Research.md",
           "target_price": 14520.0,
           "stated_upside_pct": 40.6977
+        }
+      ]
+    },
+    {
+      "ticker": "352820",
+      "market": "KR",
+      "name": "하이브",
+      "entry_date": "2025-10-24",
+      "exit_date": "2025-11-12",
+      "entry_price": 288500.0,
+      "exit_price": 289000.0,
+      "return_pct": -0.48,
+      "days": 19,
+      "exit_reason": "t_chandelier_ATR4.25",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: smic 2025-10-23, kuvic 2025-02-24, star 2025-01-09, yig 2024-06-28, ewha 2023-02-08, voera 2022-05-28)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2025-10-23",
+          "source_file": "2025-10-23_equity-research-하이브-3.md",
+          "target_price": 393000.0,
+          "stated_upside_pct": 36.2218
+        },
+        {
+          "school": "voera",
+          "report_date": "2022-05-28",
+          "source_file": "undated_[BUY] 하이브, High View!.md",
+          "target_price": 381500.0,
+          "stated_upside_pct": 74.5995
+        },
+        {
+          "school": "ewha",
+          "report_date": "2023-02-08",
+          "source_file": "2023-02-08_[230208] 하이브(352820).md",
+          "target_price": 229500.0,
+          "stated_upside_pct": 16.1437
+        },
+        {
+          "school": "star",
+          "report_date": "2025-01-09",
+          "source_file": "2025-01-09_STAR_하이브.md",
+          "target_price": 310300.0,
+          "stated_upside_pct": 53.995
+        },
+        {
+          "school": "yig",
+          "report_date": "2024-06-28",
+          "source_file": "2025-11-11_하이브 (352820, KS), “봄날은 온다” (발간일 250207) YIG Research.md",
+          "target_price": 400500.0,
+          "stated_upside_pct": 97.7778
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2025-02-24",
+          "source_file": "2025-02-24_하이브 - 하이브'리드' 엔터.md",
+          "target_price": 369600.0,
+          "stated_upside_pct": 50.2439
         }
       ]
     },
@@ -5439,35 +5495,6 @@
       ]
     },
     {
-      "ticker": "356860",
-      "market": "KR",
-      "name": "티엘비",
-      "entry_date": "2025-07-28",
-      "exit_date": "2026-01-22",
-      "entry_price": 25173.0,
-      "exit_price": 53286.0,
-      "return_pct": 110.31,
-      "days": 178,
-      "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: ewha 2025-07-25, smic 2024-11-07)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2024-11-07",
-          "source_file": "2024-11-07_equity-research-티엘비.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "ewha",
-          "report_date": "2025-07-25",
-          "source_file": "2025-07-25_[250725] 티엘비(356860).md",
-          "target_price": null,
-          "stated_upside_pct": 38.27
-        }
-      ]
-    },
-    {
       "ticker": "017960",
       "market": "KR",
       "name": "한국카본",
@@ -5577,6 +5604,35 @@
       ]
     },
     {
+      "ticker": "222800",
+      "market": "KR",
+      "name": "심텍",
+      "entry_date": "2025-11-14",
+      "exit_date": "2026-03-05",
+      "entry_price": 50900.0,
+      "exit_price": 47050.0,
+      "return_pct": -8.16,
+      "days": 111,
+      "exit_reason": "t_chandelier_ATR4.25",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: yig 2025-11-13, ewha 2022-03-12)",
+      "trigger_reports": [
+        {
+          "school": "ewha",
+          "report_date": "2022-03-12",
+          "source_file": "2022-03-12_[220312] 심텍(222800).md",
+          "target_price": 66900.0,
+          "stated_upside_pct": 33.5329
+        },
+        {
+          "school": "yig",
+          "report_date": "2025-11-13",
+          "source_file": "2026-04-08_심텍 (222800, KOSDAQ), 흔들린 숫자, 명확해진 방향 YIG Research.md",
+          "target_price": 84100.0,
+          "stated_upside_pct": 56.903
+        }
+      ]
+    },
+    {
       "ticker": "171090",
       "market": "KR",
       "name": "선익시스템",
@@ -5602,42 +5658,6 @@
           "source_file": "2026-04-04_선익시스템(171090, KQ), SuperSUNic ~ YIG Research.md",
           "target_price": 131400.0,
           "stated_upside_pct": 43.9211
-        }
-      ]
-    },
-    {
-      "ticker": "005850",
-      "market": "KR",
-      "name": "에스엘",
-      "entry_date": "2026-01-26",
-      "exit_date": "2026-04-01",
-      "entry_price": 55200.0,
-      "exit_price": 58300.0,
-      "return_pct": 4.93,
-      "days": 65,
-      "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: ewha 2026-01-24, star 2023-04-22, smic 2021-06-06)",
-      "trigger_reports": [
-        {
-          "school": "ewha",
-          "report_date": "2026-01-24",
-          "source_file": "2026-01-23_[260123] 에스엘(005850).md",
-          "target_price": 82300.0,
-          "stated_upside_pct": 46.1812
-        },
-        {
-          "school": "smic",
-          "report_date": "2021-06-06",
-          "source_file": "2021-06-06_equity-research-에스엘.md",
-          "target_price": 50000.0,
-          "stated_upside_pct": 47.0588
-        },
-        {
-          "school": "star",
-          "report_date": "2023-04-22",
-          "source_file": "2023-04-22_STAR_에스엘.md",
-          "target_price": 39000.0,
-          "stated_upside_pct": 24.6006
         }
       ]
     },
@@ -5696,28 +5716,6 @@
           "source_file": "2025-11-17_제이에스링크 - 영구자석 업고 주가 튀어.md",
           "target_price": 48200.0,
           "stated_upside_pct": 181.3777
-        }
-      ]
-    },
-    {
-      "ticker": "047050",
-      "market": "KR",
-      "name": "포스코인터내셔널",
-      "entry_date": "2026-04-01",
-      "exit_date": "2026-05-21",
-      "entry_price": 73300.0,
-      "exit_price": 69000.0,
-      "return_pct": -6.48,
-      "days": 50,
-      "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: yig 2026-03-31)",
-      "trigger_reports": [
-        {
-          "school": "yig",
-          "report_date": "2026-03-31",
-          "source_file": "2026-04-04_포스코인터내셔널 (047050.KS), LNG·팜유·희토류, 3가지 재평가 포인트 YIG Research.md",
-          "target_price": 99800.0,
-          "stated_upside_pct": 39.5804
         }
       ]
     },
@@ -5913,49 +5911,6 @@
           "source_file": "2025-11-17_이오테크닉스 - 이오가 짱이오.md",
           "target_price": 416000.0,
           "stated_upside_pct": 51.2727
-        }
-      ]
-    },
-    {
-      "ticker": "082740",
-      "market": "KR",
-      "name": "한화엔진",
-      "entry_date": "2026-05-22",
-      "exit_date": "2026-06-09",
-      "entry_price": 74600.0,
-      "exit_price": 52000.0,
-      "return_pct": -30.75,
-      "days": 18,
-      "exit_reason": "t_chandelier_ATR4.25",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (KOSPI 파킹 매도 후 전환) (트리거: kuvic 2026-05-21, yig 2026-04-14, star 2026-03-14, smic 2024-12-05)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2026-03-14",
-          "source_file": "2026-03-14_STAR_한화엔진.md",
-          "target_price": 73700.0,
-          "stated_upside_pct": 48.4391
-        },
-        {
-          "school": "smic",
-          "report_date": "2024-12-05",
-          "source_file": "2024-12-05_equity-research-한화엔진.md",
-          "target_price": 24352.0,
-          "stated_upside_pct": 60.8454
-        },
-        {
-          "school": "yig",
-          "report_date": "2026-04-14",
-          "source_file": "2026-04-14_한화엔진 (082740, KOSPI)- 순풍만범(順風滿帆)– 한화엔진 달고 쾌속질주 YIG Research.md",
-          "target_price": 64200.0,
-          "stated_upside_pct": 32.0988
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2026-05-21",
-          "source_file": "2026-05-21_한화엔진 - 데센 상륙작전.md",
-          "target_price": 121000.0,
-          "stated_upside_pct": 66.6667
         }
       ]
     },

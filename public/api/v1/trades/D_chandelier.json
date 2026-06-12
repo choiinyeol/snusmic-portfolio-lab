@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-12T15:41:45+00:00",
+  "generated_at": "2026-06-12T17:15:31+00:00",
   "strategy_key": "D_chandelier",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -671,7 +671,7 @@
       "name": "PYPL",
       "entry_date": "2020-06-10",
       "exit_date": "2020-09-17",
-      "entry_price": 156.2468,
+      "entry_price": 156.2469,
       "exit_price": 175.1134,
       "return_pct": 9.06,
       "days": 99,
@@ -2197,6 +2197,28 @@
       ]
     },
     {
+      "ticker": "294570",
+      "market": "KR",
+      "name": "쿠콘",
+      "entry_date": "2021-12-14",
+      "exit_date": "2022-01-12",
+      "entry_price": 74500.0,
+      "exit_price": 62800.0,
+      "return_pct": -16.21,
+      "days": 29,
+      "exit_reason": "chandelier_ATR5",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: smic 2021-12-13)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2021-12-13",
+          "source_file": "2021-12-13_equity-research-쿠콘.md",
+          "target_price": 104100.0,
+          "stated_upside_pct": 38.6152
+        }
+      ]
+    },
+    {
       "ticker": "253450",
       "market": "KR",
       "name": "스튜디오드래곤",
@@ -2222,28 +2244,6 @@
           "source_file": "2021-08-21_[210821] 스튜디오드래곤(253450).md",
           "target_price": null,
           "stated_upside_pct": 40.83
-        }
-      ]
-    },
-    {
-      "ticker": "294570",
-      "market": "KR",
-      "name": "쿠콘",
-      "entry_date": "2021-12-14",
-      "exit_date": "2022-01-19",
-      "entry_price": 74500.0,
-      "exit_price": 58100.0,
-      "return_pct": -22.48,
-      "days": 36,
-      "exit_reason": "chandelier_ATR5",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: smic 2021-12-13)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2021-12-13",
-          "source_file": "2021-12-13_equity-research-쿠콘.md",
-          "target_price": 104100.0,
-          "stated_upside_pct": 38.6152
         }
       ]
     },
@@ -2332,28 +2332,6 @@
           "source_file": "2021-12-13_equity-research-에스티팜-2.md",
           "target_price": 185000.0,
           "stated_upside_pct": 46.2451
-        }
-      ]
-    },
-    {
-      "ticker": "CHGG",
-      "market": "US",
-      "name": "CHGG",
-      "entry_date": "2021-12-01",
-      "exit_date": "2022-01-28",
-      "entry_price": 28.11,
-      "exit_price": 24.17,
-      "return_pct": -13.04,
-      "days": 58,
-      "exit_reason": "chandelier_ATR5",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: smic 2021-11-30)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2021-11-30",
-          "source_file": "2021-11-30_equity-research-chegg.md",
-          "target_price": 43.5,
-          "stated_upside_pct": 56.1939
         }
       ]
     },
@@ -2453,6 +2431,28 @@
       ]
     },
     {
+      "ticker": "CHGG",
+      "market": "US",
+      "name": "CHGG",
+      "entry_date": "2021-12-01",
+      "exit_date": "2022-04-21",
+      "entry_price": 28.11,
+      "exit_price": 30.22,
+      "return_pct": 11.49,
+      "days": 141,
+      "exit_reason": "chandelier_ATR5",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: smic 2021-11-30)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2021-11-30",
+          "source_file": "2021-11-30_equity-research-chegg.md",
+          "target_price": 43.5,
+          "stated_upside_pct": 56.1939
+        }
+      ]
+    },
+    {
       "ticker": "000720",
       "market": "KR",
       "name": "현대건설",
@@ -2522,28 +2522,6 @@
           "source_file": "2021-11-03_equity-research-주성엔지니어링.md",
           "target_price": 26700.0,
           "stated_upside_pct": 135.2423
-        }
-      ]
-    },
-    {
-      "ticker": "241840",
-      "market": "KR",
-      "name": "에이스토리",
-      "entry_date": "2022-03-30",
-      "exit_date": "2022-05-03",
-      "entry_price": 29300.0,
-      "exit_price": 27250.0,
-      "return_pct": -7.55,
-      "days": 34,
-      "exit_reason": "chandelier_ATR5",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: voera 2022-03-29)",
-      "trigger_reports": [
-        {
-          "school": "voera",
-          "report_date": "2022-03-29",
-          "source_file": "undated_[BUY] 에이스토리, 올해는 닉값할 시기.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -2797,28 +2775,6 @@
       ]
     },
     {
-      "ticker": "114810",
-      "market": "KR",
-      "name": "한솔아이원스",
-      "entry_date": "2022-05-13",
-      "exit_date": "2022-06-20",
-      "entry_price": 8960.0,
-      "exit_price": 8220.0,
-      "return_pct": -8.81,
-      "days": 38,
-      "exit_reason": "chandelier_ATR5",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: smic 2022-05-12)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2022-05-12",
-          "source_file": "2022-05-12_equity-research-아이원스.md",
-          "target_price": 16450.0,
-          "stated_upside_pct": 85.2477
-        }
-      ]
-    },
-    {
       "ticker": "237690",
       "market": "KR",
       "name": "에스티팜",
@@ -2873,6 +2829,28 @@
           "source_file": "2021-11-24_[211124] 현대백화점(069960).md",
           "target_price": 110500.0,
           "stated_upside_pct": 45.9709
+        }
+      ]
+    },
+    {
+      "ticker": "114810",
+      "market": "KR",
+      "name": "한솔아이원스",
+      "entry_date": "2022-05-13",
+      "exit_date": "2022-06-21",
+      "entry_price": 8960.0,
+      "exit_price": 7680.0,
+      "return_pct": -14.8,
+      "days": 39,
+      "exit_reason": "chandelier_ATR5",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: smic 2022-05-12)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2022-05-12",
+          "source_file": "2022-05-12_equity-research-아이원스.md",
+          "target_price": 16450.0,
+          "stated_upside_pct": 85.2477
         }
       ]
     },
@@ -3020,11 +2998,11 @@
       "market": "US",
       "name": "EAF",
       "entry_date": "2022-05-26",
-      "exit_date": "2022-06-30",
+      "exit_date": "2022-06-24",
       "entry_price": 85.4492,
-      "exit_price": 70.3632,
-      "return_pct": -15.88,
-      "days": 35,
+      "exit_price": 74.5314,
+      "return_pct": -11.03,
+      "days": 29,
       "exit_reason": "chandelier_ATR5",
       "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: smic 2022-05-25)",
       "trigger_reports": [
@@ -3162,28 +3140,6 @@
       ]
     },
     {
-      "ticker": "010120",
-      "market": "KR",
-      "name": "LS ELECTRIC",
-      "entry_date": "2022-08-17",
-      "exit_date": "2022-09-26",
-      "entry_price": 11520.0,
-      "exit_price": 9800.0,
-      "return_pct": -15.44,
-      "days": 40,
-      "exit_reason": "chandelier_ATR5",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: star 2022-08-16)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2022-08-16",
-          "source_file": "2022-08-16_STAR_LS ELECTRIC.md",
-          "target_price": 15325.3846,
-          "stated_upside_pct": 32.1154
-        }
-      ]
-    },
-    {
       "ticker": "069260",
       "market": "KR",
       "name": "TKG휴켐스",
@@ -3202,6 +3158,28 @@
           "source_file": "2022-09-07_[220907] TKG휴켐스(069260).md",
           "target_price": 28188.0,
           "stated_upside_pct": 24.1762
+        }
+      ]
+    },
+    {
+      "ticker": "010120",
+      "market": "KR",
+      "name": "LS ELECTRIC",
+      "entry_date": "2022-08-17",
+      "exit_date": "2022-09-27",
+      "entry_price": 11520.0,
+      "exit_price": 9210.0,
+      "return_pct": -20.53,
+      "days": 41,
+      "exit_reason": "chandelier_ATR5",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: star 2022-08-16)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2022-08-16",
+          "source_file": "2022-08-16_STAR_LS ELECTRIC.md",
+          "target_price": 15325.3846,
+          "stated_upside_pct": 32.1154
         }
       ]
     },
@@ -3385,11 +3363,11 @@
       "market": "KR",
       "name": "KT나스미디어",
       "entry_date": "2022-10-14",
-      "exit_date": "2022-12-19",
+      "exit_date": "2022-11-29",
       "entry_price": 28626.0,
-      "exit_price": 26073.0,
-      "return_pct": -9.46,
-      "days": 66,
+      "exit_price": 25298.0,
+      "return_pct": -12.16,
+      "days": 46,
       "exit_reason": "chandelier_ATR5",
       "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: smic 2022-10-13)",
       "trigger_reports": [
@@ -3898,35 +3876,6 @@
       ]
     },
     {
-      "ticker": "028050",
-      "market": "KR",
-      "name": "삼성E&A",
-      "entry_date": "2023-02-15",
-      "exit_date": "2023-06-15",
-      "entry_price": 27250.0,
-      "exit_price": 27500.0,
-      "return_pct": 0.31,
-      "days": 120,
-      "exit_reason": "chandelier_ATR5",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: star 2023-02-14, smic 2022-12-08)",
-      "trigger_reports": [
-        {
-          "school": "smic",
-          "report_date": "2022-12-08",
-          "source_file": "2022-12-08_equity-research-삼성엔지니어링.md",
-          "target_price": 33800.0,
-          "stated_upside_pct": 46.0043
-        },
-        {
-          "school": "star",
-          "report_date": "2023-02-14",
-          "source_file": "2023-02-14_STAR_삼성엔지니어링.md",
-          "target_price": 35250.0,
-          "stated_upside_pct": 29.5956
-        }
-      ]
-    },
-    {
       "ticker": "340570",
       "market": "KR",
       "name": "티앤엘",
@@ -4010,6 +3959,28 @@
           "source_file": "2023-02-08_[230208] 하이브(352820).md",
           "target_price": 229500.0,
           "stated_upside_pct": 16.1437
+        }
+      ]
+    },
+    {
+      "ticker": "005490",
+      "market": "KR",
+      "name": "POSCO홀딩스",
+      "entry_date": "2022-12-09",
+      "exit_date": "2023-08-08",
+      "entry_price": 286000.0,
+      "exit_price": 565000.0,
+      "return_pct": 96.37,
+      "days": 242,
+      "exit_reason": "chandelier_ATR5",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: smic 2022-12-08)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2022-12-08",
+          "source_file": "2022-12-08_equity-research-포스코홀딩스.md",
+          "target_price": 365000.0,
+          "stated_upside_pct": 27.3997
         }
       ]
     },
@@ -4871,11 +4842,11 @@
       "market": "KR",
       "name": "코스맥스엔비티",
       "entry_date": "2024-01-08",
-      "exit_date": "2024-02-16",
+      "exit_date": "2024-02-22",
       "entry_price": 7130.0,
-      "exit_price": 5910.0,
-      "return_pct": -17.61,
-      "days": 39,
+      "exit_price": 5640.0,
+      "return_pct": -21.37,
+      "days": 45,
       "exit_reason": "chandelier_ATR5",
       "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: star 2024-01-06)",
       "trigger_reports": [
@@ -8515,45 +8486,45 @@
       ]
     },
     {
-      "ticker": "218410",
+      "ticker": "082740",
       "market": "KR",
-      "name": "RFHIC",
-      "entry_date": "2026-01-26",
-      "exit_date": "2026-06-11",
-      "entry_price": 35100.0,
-      "exit_price": 70000.0,
-      "return_pct": 98.24,
-      "days": 136,
+      "name": "한화엔진",
+      "entry_date": "2026-05-22",
+      "exit_date": "2026-06-12",
+      "entry_price": 74600.0,
+      "exit_price": 54700.0,
+      "return_pct": -27.11,
+      "days": 21,
       "exit_reason": "chandelier_ATR5",
-      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: yig 2026-01-23, star 2025-12-12, ewha 2025-07-25, smic 2024-12-05)",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: kuvic 2026-05-21, yig 2026-04-14, star 2026-03-14, smic 2024-12-05)",
       "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2026-03-14",
+          "source_file": "2026-03-14_STAR_한화엔진.md",
+          "target_price": 73700.0,
+          "stated_upside_pct": 48.4391
+        },
         {
           "school": "smic",
           "report_date": "2024-12-05",
-          "source_file": "2024-12-05_equity-research-rfhic.md",
-          "target_price": 17650.0,
-          "stated_upside_pct": 48.3193
-        },
-        {
-          "school": "ewha",
-          "report_date": "2025-07-25",
-          "source_file": "2025-07-25_[250725] RFHIC(218410).md",
-          "target_price": 39500.0,
-          "stated_upside_pct": 41.5771
-        },
-        {
-          "school": "star",
-          "report_date": "2025-12-12",
-          "source_file": "2025-12-12_STAR_RHFIC.md",
-          "target_price": 42050.0,
-          "stated_upside_pct": 29.784
+          "source_file": "2024-12-05_equity-research-한화엔진.md",
+          "target_price": 24352.0,
+          "stated_upside_pct": 60.8454
         },
         {
           "school": "yig",
-          "report_date": "2026-01-23",
-          "source_file": "2026-04-04_RFHIC(218410, 코스닥), GaN을 알간 YIG Research.md",
-          "target_price": 50500.0,
-          "stated_upside_pct": 44.4921
+          "report_date": "2026-04-14",
+          "source_file": "2026-04-14_한화엔진 (082740, KOSPI)- 순풍만범(順風滿帆)– 한화엔진 달고 쾌속질주 YIG Research.md",
+          "target_price": 64200.0,
+          "stated_upside_pct": 32.0988
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2026-05-21",
+          "source_file": "2026-05-21_한화엔진 - 데센 상륙작전.md",
+          "target_price": 121000.0,
+          "stated_upside_pct": 66.6667
         }
       ]
     }
