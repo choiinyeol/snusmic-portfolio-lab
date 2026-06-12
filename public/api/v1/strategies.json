@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-11T09:52:00+00:00",
+  "generated_at": "2026-06-12T15:41:45+00:00",
   "headline_key": "U_chandelier_scaleout",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -35,7 +35,30 @@
       "kospi_dca_ratio": 0.514,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 0.63,
-      "aw_dca_beats": false
+      "aw_dca_beats": false,
+      "dsr": {
+        "psr": 0.9139,
+        "dsr": 0.1322,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 61.5,
+        "beat_kospi_pct": 38.5,
+        "median_sharpe": 0.62,
+        "worst_sharpe": -2.62,
+        "worst_window_return_pct": -26.23
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 80.0,
+        "beat_kospi_pct": 40.0,
+        "median_sharpe": 0.62,
+        "worst_sharpe": -1.52,
+        "worst_window_return_pct": -22.68
+      }
     },
     {
       "key": "B_36mo",
@@ -67,7 +90,30 @@
       "kospi_dca_ratio": 0.742,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 0.911,
-      "aw_dca_beats": false
+      "aw_dca_beats": false,
+      "dsr": {
+        "psr": 0.9826,
+        "dsr": 0.3522,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 61.5,
+        "beat_kospi_pct": 46.2,
+        "median_sharpe": 0.8,
+        "worst_sharpe": -2.07,
+        "worst_window_return_pct": -26.12
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 60.0,
+        "beat_kospi_pct": 40.0,
+        "median_sharpe": 0.59,
+        "worst_sharpe": -0.38,
+        "worst_window_return_pct": -7.1
+      }
     },
     {
       "key": "C_narrative",
@@ -99,7 +145,30 @@
       "kospi_dca_ratio": 0.614,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 0.754,
-      "aw_dca_beats": false
+      "aw_dca_beats": false,
+      "dsr": {
+        "psr": 0.9088,
+        "dsr": 0.1217,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 61.5,
+        "beat_kospi_pct": 38.5,
+        "median_sharpe": 0.66,
+        "worst_sharpe": -2.54,
+        "worst_window_return_pct": -31.97
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 60.0,
+        "beat_kospi_pct": 40.0,
+        "median_sharpe": 0.45,
+        "worst_sharpe": -0.63,
+        "worst_window_return_pct": -9.55
+      }
     },
     {
       "key": "D_chandelier",
@@ -131,7 +200,30 @@
       "kospi_dca_ratio": 0.875,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 1.073,
-      "aw_dca_beats": true
+      "aw_dca_beats": true,
+      "dsr": {
+        "psr": 0.9954,
+        "dsr": 0.5564,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 69.2,
+        "beat_kospi_pct": 53.8,
+        "median_sharpe": 1.07,
+        "worst_sharpe": -2.12,
+        "worst_window_return_pct": -22.85
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 80.0,
+        "beat_kospi_pct": 40.0,
+        "median_sharpe": 1.8,
+        "worst_sharpe": -1.62,
+        "worst_window_return_pct": -22.85
+      }
     },
     {
       "key": "E_half_runner",
@@ -163,7 +255,30 @@
       "kospi_dca_ratio": 0.556,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 0.682,
-      "aw_dca_beats": false
+      "aw_dca_beats": false,
+      "dsr": {
+        "psr": 0.9482,
+        "dsr": 0.1964,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 61.5,
+        "beat_kospi_pct": 46.2,
+        "median_sharpe": 0.86,
+        "worst_sharpe": -2.7,
+        "worst_window_return_pct": -29.1
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 60.0,
+        "beat_kospi_pct": 40.0,
+        "median_sharpe": 0.86,
+        "worst_sharpe": -0.2,
+        "worst_window_return_pct": -2.91
+      }
     },
     {
       "key": "F_momentum_narrative",
@@ -195,7 +310,30 @@
       "kospi_dca_ratio": 0.553,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 0.679,
-      "aw_dca_beats": false
+      "aw_dca_beats": false,
+      "dsr": {
+        "psr": 0.9343,
+        "dsr": 0.165,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 76.9,
+        "beat_kospi_pct": 53.8,
+        "median_sharpe": 0.83,
+        "worst_sharpe": -2.34,
+        "worst_window_return_pct": -27.36
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 100.0,
+        "beat_kospi_pct": 60.0,
+        "median_sharpe": 0.83,
+        "worst_sharpe": 0.43,
+        "worst_window_return_pct": 3.52
+      }
     },
     {
       "key": "G_dip_buy",
@@ -227,7 +365,30 @@
       "kospi_dca_ratio": 0.146,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 0.179,
-      "aw_dca_beats": false
+      "aw_dca_beats": false,
+      "dsr": {
+        "psr": 0.006,
+        "dsr": 0.0,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 46.2,
+        "beat_kospi_pct": 30.8,
+        "median_sharpe": -0.56,
+        "worst_sharpe": -7.59,
+        "worst_window_return_pct": -52.48
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 20.0,
+        "beat_kospi_pct": 0.0,
+        "median_sharpe": -1.89,
+        "worst_sharpe": -7.59,
+        "worst_window_return_pct": -52.48
+      }
     },
     {
       "key": "H_minervini",
@@ -259,7 +420,30 @@
       "kospi_dca_ratio": 0.756,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 0.928,
-      "aw_dca_beats": false
+      "aw_dca_beats": false,
+      "dsr": {
+        "psr": 0.9996,
+        "dsr": 0.7705,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 84.6,
+        "beat_kospi_pct": 53.8,
+        "median_sharpe": 1.65,
+        "worst_sharpe": -1.76,
+        "worst_window_return_pct": -6.49
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 80.0,
+        "beat_kospi_pct": 40.0,
+        "median_sharpe": 2.46,
+        "worst_sharpe": -1.07,
+        "worst_window_return_pct": -6.49
+      }
     },
     {
       "key": "I_supertrend",
@@ -291,7 +475,30 @@
       "kospi_dca_ratio": 0.509,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 0.625,
-      "aw_dca_beats": false
+      "aw_dca_beats": false,
+      "dsr": {
+        "psr": 0.9018,
+        "dsr": 0.1171,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 53.8,
+        "beat_kospi_pct": 53.8,
+        "median_sharpe": 0.48,
+        "worst_sharpe": -2.24,
+        "worst_window_return_pct": -26.66
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 60.0,
+        "beat_kospi_pct": 40.0,
+        "median_sharpe": 1.02,
+        "worst_sharpe": -2.24,
+        "worst_window_return_pct": -26.66
+      }
     },
     {
       "key": "J_core_satellite",
@@ -323,7 +530,30 @@
       "kospi_dca_ratio": 0.838,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 1.029,
-      "aw_dca_beats": true
+      "aw_dca_beats": true,
+      "dsr": {
+        "psr": 0.9935,
+        "dsr": 0.4928,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 69.2,
+        "beat_kospi_pct": 53.8,
+        "median_sharpe": 1.11,
+        "worst_sharpe": -2.01,
+        "worst_window_return_pct": -22.01
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 80.0,
+        "beat_kospi_pct": 40.0,
+        "median_sharpe": 1.82,
+        "worst_sharpe": -1.44,
+        "worst_window_return_pct": -22.01
+      }
     },
     {
       "key": "K_rr_trend",
@@ -355,7 +585,30 @@
       "kospi_dca_ratio": 0.448,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 0.55,
-      "aw_dca_beats": false
+      "aw_dca_beats": false,
+      "dsr": {
+        "psr": 0.9829,
+        "dsr": 0.362,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 69.2,
+        "beat_kospi_pct": 38.5,
+        "median_sharpe": 1.28,
+        "worst_sharpe": -2.26,
+        "worst_window_return_pct": -7.73
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 60.0,
+        "beat_kospi_pct": 20.0,
+        "median_sharpe": 1.46,
+        "worst_sharpe": -2.26,
+        "worst_window_return_pct": -7.73
+      }
     },
     {
       "key": "N_52w_high",
@@ -387,7 +640,30 @@
       "kospi_dca_ratio": 0.65,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 0.798,
-      "aw_dca_beats": false
+      "aw_dca_beats": false,
+      "dsr": {
+        "psr": 0.9721,
+        "dsr": 0.2868,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 46.2,
+        "beat_kospi_pct": 53.8,
+        "median_sharpe": 0.05,
+        "worst_sharpe": -2.03,
+        "worst_window_return_pct": -11.19
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 40.0,
+        "beat_kospi_pct": 20.0,
+        "median_sharpe": 0.05,
+        "worst_sharpe": -1.24,
+        "worst_window_return_pct": -11.19
+      }
     },
     {
       "key": "O_mtt_alpha16",
@@ -419,7 +695,30 @@
       "kospi_dca_ratio": 0.479,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 0.588,
-      "aw_dca_beats": false
+      "aw_dca_beats": false,
+      "dsr": {
+        "psr": 0.9056,
+        "dsr": 0.1294,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 69.2,
+        "beat_kospi_pct": 46.2,
+        "median_sharpe": 0.77,
+        "worst_sharpe": -2.52,
+        "worst_window_return_pct": -6.51
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 60.0,
+        "beat_kospi_pct": 40.0,
+        "median_sharpe": 1.2,
+        "worst_sharpe": -1.38,
+        "worst_window_return_pct": -6.51
+      }
     },
     {
       "key": "P_deepbuy_chandelier",
@@ -451,7 +750,30 @@
       "kospi_dca_ratio": 0.383,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 0.47,
-      "aw_dca_beats": false
+      "aw_dca_beats": false,
+      "dsr": {
+        "psr": 0.7709,
+        "dsr": 0.0389,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 61.5,
+        "beat_kospi_pct": 30.8,
+        "median_sharpe": 0.21,
+        "worst_sharpe": -2.93,
+        "worst_window_return_pct": -21.31
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 60.0,
+        "beat_kospi_pct": 0.0,
+        "median_sharpe": 0.21,
+        "worst_sharpe": -1.64,
+        "worst_window_return_pct": -16.39
+      }
     },
     {
       "key": "Q_kangto_trend",
@@ -483,7 +805,30 @@
       "kospi_dca_ratio": 0.391,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 0.48,
-      "aw_dca_beats": false
+      "aw_dca_beats": false,
+      "dsr": {
+        "psr": 0.6582,
+        "dsr": 0.0185,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 46.2,
+        "beat_kospi_pct": 46.2,
+        "median_sharpe": 0.03,
+        "worst_sharpe": -2.91,
+        "worst_window_return_pct": -12.76
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 60.0,
+        "beat_kospi_pct": 40.0,
+        "median_sharpe": 1.17,
+        "worst_sharpe": -1.47,
+        "worst_window_return_pct": -12.67
+      }
     },
     {
       "key": "R_kelly_chandelier",
@@ -515,7 +860,30 @@
       "kospi_dca_ratio": 0.599,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 0.735,
-      "aw_dca_beats": false
+      "aw_dca_beats": false,
+      "dsr": {
+        "psr": 0.9469,
+        "dsr": 0.1927,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 69.2,
+        "beat_kospi_pct": 30.8,
+        "median_sharpe": 1.43,
+        "worst_sharpe": -1.86,
+        "worst_window_return_pct": -23.28
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 80.0,
+        "beat_kospi_pct": 20.0,
+        "median_sharpe": 1.43,
+        "worst_sharpe": -1.55,
+        "worst_window_return_pct": -23.28
+      }
     },
     {
       "key": "S_hrp",
@@ -547,7 +915,30 @@
       "kospi_dca_ratio": 0.467,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 0.574,
-      "aw_dca_beats": false
+      "aw_dca_beats": false,
+      "dsr": {
+        "psr": 0.9314,
+        "dsr": 0.1596,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 61.5,
+        "beat_kospi_pct": 53.8,
+        "median_sharpe": 0.38,
+        "worst_sharpe": -1.62,
+        "worst_window_return_pct": -16.66
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 60.0,
+        "beat_kospi_pct": 40.0,
+        "median_sharpe": 1.4,
+        "worst_sharpe": -0.76,
+        "worst_window_return_pct": -8.48
+      }
     },
     {
       "key": "S_msharpe",
@@ -579,7 +970,30 @@
       "kospi_dca_ratio": 0.59,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 0.724,
-      "aw_dca_beats": false
+      "aw_dca_beats": false,
+      "dsr": {
+        "psr": 0.9792,
+        "dsr": 0.3193,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 69.2,
+        "beat_kospi_pct": 53.8,
+        "median_sharpe": 0.76,
+        "worst_sharpe": -1.29,
+        "worst_window_return_pct": -17.43
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 100.0,
+        "beat_kospi_pct": 60.0,
+        "median_sharpe": 0.76,
+        "worst_sharpe": 0.34,
+        "worst_window_return_pct": 2.69
+      }
     },
     {
       "key": "S_mincvar",
@@ -611,7 +1025,30 @@
       "kospi_dca_ratio": 0.469,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 0.576,
-      "aw_dca_beats": false
+      "aw_dca_beats": false,
+      "dsr": {
+        "psr": 0.8006,
+        "dsr": 0.0479,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 53.8,
+        "beat_kospi_pct": 38.5,
+        "median_sharpe": 0.43,
+        "worst_sharpe": -2.22,
+        "worst_window_return_pct": -19.71
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 80.0,
+        "beat_kospi_pct": 40.0,
+        "median_sharpe": 1.09,
+        "worst_sharpe": 0.09,
+        "worst_window_return_pct": -0.4
+      }
     },
     {
       "key": "V_spo",
@@ -643,7 +1080,30 @@
       "kospi_dca_ratio": 0.548,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 0.673,
-      "aw_dca_beats": false
+      "aw_dca_beats": false,
+      "dsr": {
+        "psr": 0.8038,
+        "dsr": 0.0489,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 61.5,
+        "beat_kospi_pct": 38.5,
+        "median_sharpe": 0.09,
+        "worst_sharpe": -1.4,
+        "worst_window_return_pct": -14.13
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 80.0,
+        "beat_kospi_pct": 40.0,
+        "median_sharpe": 0.99,
+        "worst_sharpe": 0.09,
+        "worst_window_return_pct": -0.57
+      }
     },
     {
       "key": "V_ls",
@@ -675,7 +1135,30 @@
       "kospi_dca_ratio": 0.488,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 0.6,
-      "aw_dca_beats": false
+      "aw_dca_beats": false,
+      "dsr": {
+        "psr": 0.7562,
+        "dsr": 0.0345,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 61.5,
+        "beat_kospi_pct": 46.2,
+        "median_sharpe": 0.02,
+        "worst_sharpe": -1.38,
+        "worst_window_return_pct": -18.19
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 60.0,
+        "beat_kospi_pct": 40.0,
+        "median_sharpe": 1.13,
+        "worst_sharpe": -0.67,
+        "worst_window_return_pct": -15.22
+      }
     },
     {
       "key": "D+_chandelier_optuna",
@@ -707,7 +1190,30 @@
       "kospi_dca_ratio": 0.655,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 0.804,
-      "aw_dca_beats": false
+      "aw_dca_beats": false,
+      "dsr": {
+        "psr": 0.9963,
+        "dsr": 0.5845,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 69.2,
+        "beat_kospi_pct": 46.2,
+        "median_sharpe": 0.94,
+        "worst_sharpe": -2.09,
+        "worst_window_return_pct": -13.76
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 80.0,
+        "beat_kospi_pct": 40.0,
+        "median_sharpe": 1.88,
+        "worst_sharpe": -1.44,
+        "worst_window_return_pct": -13.76
+      }
     },
     {
       "key": "T_kospi_core_chandelier",
@@ -739,7 +1245,30 @@
       "kospi_dca_ratio": 0.964,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 1.183,
-      "aw_dca_beats": true
+      "aw_dca_beats": true,
+      "dsr": {
+        "psr": 0.9934,
+        "dsr": 0.5024,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 53.8,
+        "beat_kospi_pct": 53.8,
+        "median_sharpe": 1.57,
+        "worst_sharpe": -2.63,
+        "worst_window_return_pct": -25.02
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 80.0,
+        "beat_kospi_pct": 40.0,
+        "median_sharpe": 2.17,
+        "worst_sharpe": -1.39,
+        "worst_window_return_pct": -18.95
+      }
     },
     {
       "key": "T-_kospi_core_regime",
@@ -771,7 +1300,30 @@
       "kospi_dca_ratio": 1.089,
       "kospi_dca_beats": true,
       "aw_dca_ratio": 1.337,
-      "aw_dca_beats": true
+      "aw_dca_beats": true,
+      "dsr": {
+        "psr": 0.9997,
+        "dsr": 0.8425,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 69.2,
+        "beat_kospi_pct": 69.2,
+        "median_sharpe": 1.57,
+        "worst_sharpe": -2.11,
+        "worst_window_return_pct": -13.41
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 80.0,
+        "beat_kospi_pct": 60.0,
+        "median_sharpe": 2.3,
+        "worst_sharpe": -1.23,
+        "worst_window_return_pct": -13.41
+      }
     },
     {
       "key": "W_allweather_chandelier",
@@ -803,7 +1355,30 @@
       "kospi_dca_ratio": 0.921,
       "kospi_dca_beats": false,
       "aw_dca_ratio": 1.13,
-      "aw_dca_beats": true
+      "aw_dca_beats": true,
+      "dsr": {
+        "psr": 0.9994,
+        "dsr": 0.7743,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 76.9,
+        "beat_kospi_pct": 61.5,
+        "median_sharpe": 1.9,
+        "worst_sharpe": -2.23,
+        "worst_window_return_pct": -18.49
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 80.0,
+        "beat_kospi_pct": 40.0,
+        "median_sharpe": 2.25,
+        "worst_sharpe": -0.73,
+        "worst_window_return_pct": -9.34
+      }
     },
     {
       "key": "U_chandelier_scaleout",
@@ -835,7 +1410,30 @@
       "kospi_dca_ratio": 1.12,
       "kospi_dca_beats": true,
       "aw_dca_ratio": 1.375,
-      "aw_dca_beats": true
+      "aw_dca_beats": true,
+      "dsr": {
+        "psr": 0.9998,
+        "dsr": 0.8747,
+        "sr0_annualized": 0.974,
+        "n_trials": 26,
+        "significant_after_deflation": false
+      },
+      "walkforward": {
+        "n_windows": 13,
+        "positive_pct": 69.2,
+        "beat_kospi_pct": 69.2,
+        "median_sharpe": 1.71,
+        "worst_sharpe": -2.43,
+        "worst_window_return_pct": -12.97
+      },
+      "walkforward_oos": {
+        "n_windows": 5,
+        "positive_pct": 80.0,
+        "beat_kospi_pct": 60.0,
+        "median_sharpe": 2.25,
+        "worst_sharpe": -1.31,
+        "worst_window_return_pct": -12.97
+      }
     }
   ]
 }

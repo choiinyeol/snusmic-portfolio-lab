@@ -24,6 +24,21 @@ export type ResearchRow = {
   // v20: 백테스트가 실행 시점 수치로 생성한 판정
   verdict?: string | null;
   verdict_reason?: string | null;
+  // v24: 다중검정 보정 (Bailey & López de Prado) + 워크포워드 일관성
+  dsr?: {
+    psr: number;
+    dsr: number;
+    sr0_annualized: number;
+    n_trials: number;
+    significant_after_deflation: boolean;
+  } | null;
+  walkforward_oos?: {
+    n_windows: number;
+    positive_pct: number;
+    beat_kospi_pct: number | null;
+    median_sharpe: number | null;
+    worst_window_return_pct: number;
+  } | null;
 };
 
 const VERDICT_ORDER: Record<string, number> = { SOTA: 0, 채택: 1, 연구용: 2, 기각: 3 };
@@ -35,6 +50,8 @@ const COLS: SortColumn<ResearchRow>[] = [
   { key: "oos_sharpe", value: (r) => r.out_of_sample.sharpe ?? null,  firstDir: "desc" },
   { key: "kospi_dca",  value: (r) => r.kospi_dca_ratio ?? null,       firstDir: "desc" },
   { key: "aw_dca",     value: (r) => r.aw_dca_ratio ?? null,          firstDir: "desc" },
+  { key: "dsr",        value: (r) => r.dsr?.dsr ?? null,              firstDir: "desc" },
+  { key: "wf_oos",     value: (r) => r.walkforward_oos?.positive_pct ?? null, firstDir: "desc" },
   { key: "mdd",        value: (r) => r.metrics.mdd_pct ?? null,       firstDir: "desc" },
   { key: "trades",     value: (r) => r.trade_count,                   firstDir: "desc" },
 ];
@@ -68,7 +85,7 @@ export function ResearchTable({
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[1020px] border-collapse text-sm">
+      <table className="w-full min-w-[1180px] border-collapse text-sm">
         <thead>
           <tr className="border-b-4 border-double border-border font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
             <SortableTh sortKey="label" sort={sort} className="py-2 text-left">전략</SortableTh>
@@ -77,6 +94,8 @@ export function ResearchTable({
             <SortableTh sortKey="oos_sharpe" sort={sort} align="right" className="py-2">OOS 샤프</SortableTh>
             <SortableTh sortKey="kospi_dca"  sort={sort} align="right" className="py-2">vs KOSPI DCA</SortableTh>
             <SortableTh sortKey="aw_dca"     sort={sort} align="right" className="py-2">vs 올웨더 DCA</SortableTh>
+            <SortableTh sortKey="dsr"        sort={sort} align="right" className="py-2">DSR</SortableTh>
+            <SortableTh sortKey="wf_oos"     sort={sort} align="right" className="py-2">WF OOS</SortableTh>
             <SortableTh sortKey="mdd"        sort={sort} align="right" className="py-2">MDD</SortableTh>
             <SortableTh sortKey="trades"     sort={sort} align="right" className="py-2">거래수</SortableTh>
             <th className="px-3 py-2 text-right font-semibold">CSV</th>
@@ -111,6 +130,37 @@ export function ResearchTable({
                 <td className={cn("tnum px-3 py-2 text-right font-mono text-xs font-bold", r.aw_dca_ratio != null ? (r.aw_dca_beats ? "text-up" : "text-down") : "text-muted-foreground")}>
                   {r.aw_dca_ratio != null ? `${r.aw_dca_ratio.toFixed(2)}x` : "—"}
                 </td>
+                <td
+                  className={cn(
+                    "tnum px-3 py-2 text-right font-mono text-xs cursor-help",
+                    r.dsr == null
+                      ? "text-muted-foreground"
+                      : r.dsr.significant_after_deflation
+                        ? "font-bold text-up"
+                        : r.dsr.dsr < 0.5
+                          ? "text-down"
+                          : "",
+                  )}
+                  title={
+                    r.dsr
+                      ? `P(진짜 샤프 > N개 시도 기대 최대치). PSR ${r.dsr.psr.toFixed(3)} · SR0(연환산) ${r.dsr.sr0_annualized} · N=${r.dsr.n_trials} — 0.95 이상이면 선택 편향 보정 후에도 유의`
+                      : undefined
+                  }
+                >
+                  {r.dsr ? r.dsr.dsr.toFixed(2) : "—"}
+                </td>
+                <td
+                  className="tnum px-3 py-2 text-right font-mono text-xs cursor-help text-muted-foreground"
+                  title={
+                    r.walkforward_oos
+                      ? `OOS 6개월 윈도 ${r.walkforward_oos.n_windows}개 중 양(+) ${r.walkforward_oos.positive_pct}% · vs KOSPI 승률 ${r.walkforward_oos.beat_kospi_pct ?? "—"}% · 중앙 샤프 ${r.walkforward_oos.median_sharpe ?? "—"} · 최악 윈도 ${r.walkforward_oos.worst_window_return_pct}%`
+                      : undefined
+                  }
+                >
+                  {r.walkforward_oos
+                    ? `${Math.round((r.walkforward_oos.positive_pct / 100) * r.walkforward_oos.n_windows)}/${r.walkforward_oos.n_windows}`
+                    : "—"}
+                </td>
                 <td className="tnum px-3 py-2 text-right font-mono text-xs text-down">
                   {r.metrics.mdd_pct != null ? formatPct(r.metrics.mdd_pct, 1) : "—"}
                 </td>
@@ -129,6 +179,11 @@ export function ResearchTable({
           })}
         </tbody>
       </table>
+      <p className="mt-2 font-mono text-[10px] leading-4 text-muted-foreground">
+        DSR = Deflated Sharpe Ratio (Bailey &amp; López de Prado 2014) — 같은 데이터에서 N개 변형을 시도해 최고를
+        고른 선택 편향을 차감한 뒤 진짜 샤프가 양(+)일 확률. 0.95 이상이어야 보정 후에도 유의.
+        WF OOS = 2024-01 이후 6개월 워크포워드 윈도 중 수익이 양(+)인 윈도 수 (재적합 없음 — 셀 위에 마우스를 올리면 상세).
+      </p>
     </div>
   );
 }

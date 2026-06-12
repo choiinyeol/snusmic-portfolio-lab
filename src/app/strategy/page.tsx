@@ -303,6 +303,11 @@ export default function StrategyPage() {
   // 연구 기록 테이블: 전 전략 노출 (L/M은 백테스트에서 가지치기되어 행 자체가 없음).
   const researchRows = multiStrategy.strategies;
 
+  // v24: 헤드라인의 다중검정 보정 결과 — 정직성 공시 (백테스트 JSON이 단일 소스)
+  const headlineDsr = (researchRows as ResearchRow[]).find(
+    (r) => r.key === multiStrategy.headline_key,
+  )?.dsr;
+
   const headlineLabel = STRATEGY_LABEL_KO[params.headline_key] ?? params.headline_key;
   const simStartDisplay = (params as { sim_start?: string }).sim_start ?? "2020-01-01";
   const strategyCount = multiStrategy.strategies.length;
@@ -569,6 +574,15 @@ export default function StrategyPage() {
         <p className="mt-1.5 text-sm italic text-muted-foreground">
           주의: 과거 데이터 기반 시뮬레이션. 미래 수익 보장 없음. 과최적화 방지를 위해 파라미터는 문헌 표준값 고정.
         </p>
+        {headlineDsr && (
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            정직성 공시 — {headlineDsr.n_trials}개 변형 중 최고를 고른 선택 편향을 보정한{" "}
+            <strong className="text-foreground">DSR {headlineDsr.dsr.toFixed(2)}</strong>
+            {headlineDsr.significant_after_deflation
+              ? " · 보정 후에도 통계적으로 유의합니다 (≥ 0.95)."
+              : ` · 0.95 미달 — ${headlineDsr.n_trials}번 시도해 골랐다는 사실을 감안하면 유의성은 보류입니다. 전진 기록이 쌓여야 판가름납니다.`}
+          </p>
+        )}
         <p className="mt-1.5 text-sm text-muted-foreground">
           유니버스:{" "}
           <strong className="text-foreground">KR {universeStats.kr_tickers}개 + US {universeStats.us_tickers}개</strong>{" "}

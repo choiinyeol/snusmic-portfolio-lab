@@ -3916,6 +3916,139 @@ def compute_consensus_stats(trades: list[dict]) -> dict:
 
 
 # ──────────────────────────────────────────────────────────────────────────────
+# v24: Deflated Sharpe Ratio + 워크포워드 일관성
+# ──────────────────────────────────────────────────────────────────────────────
+
+def compute_dsr_stats(all_strategies: dict[str, dict]) -> dict[str, dict]:
+    """Deflated Sharpe Ratio (Bailey & López de Prado 2014) — 다중검정 보정.
+
+    N개 변형을 같은 데이터에서 시도해 최고를 고르는 선택 과정 자체가 헤드라인
+    샤프를 부풀린다. SR0 = N번의 무정보 시도에서 기대되는 최대 샤프(시도 간
+    샤프 분산 기반, E[max] of N gaussians). DSR = P(진짜 SR > SR0) — 비정규성
+    (왜도·첨도) 보정 포함. PSR = P(진짜 SR > 0), 단일 전략 기준.
+
+    DSR ≥ 0.95: 26개를 시도해 골랐다는 사실을 감안해도 스킬이 유의.
+    """
+    from scipy.stats import norm
+
+    sr_daily: dict[str, float] = {}
+    moments: dict[str, tuple[int, float, float]] = {}
+    for key, r in all_strategies.items():
+        nav = r.get("nav_df")
+        if nav is None or len(nav) < 30:
+            continue
+        ret = nav.pct_change().dropna()
+        sd = float(ret.std())
+        if not sd or math.isnan(sd):
+            continue
+        sr_daily[key] = float(ret.mean()) / sd
+        # pandas kurt()는 excess → γ4 = kurt + 3
+        moments[key] = (len(ret), float(ret.skew()), float(ret.kurt()) + 3.0)
+
+    n_trials = len(sr_daily)
+    if n_trials < 2:
+        return {}
+
+    var_sr = float(np.var(list(sr_daily.values()), ddof=1))
+    emc = 0.5772156649015329  # Euler–Mascheroni
+    sr0 = (
+        math.sqrt(var_sr)
+        * ((1 - emc) * norm.ppf(1 - 1 / n_trials) + emc * norm.ppf(1 - 1 / (n_trials * math.e)))
+        if var_sr > 0
+        else 0.0
+    )
+
+    out: dict[str, dict] = {}
+    for key, sr in sr_daily.items():
+        t, skew, kurt = moments[key]
+        denom = 1 - skew * sr + (kurt - 1) / 4 * sr * sr
+        if denom <= 0 or t < 2:
+            continue
+        scale = math.sqrt(t - 1) / math.sqrt(denom)
+        out[key] = {
+            "psr": round(float(norm.cdf(sr * scale)), 4),
+            "dsr": round(float(norm.cdf((sr - sr0) * scale)), 4),
+            "sr0_annualized": round(sr0 * math.sqrt(252), 3),
+            "n_trials": n_trials,
+            "significant_after_deflation": bool(norm.cdf((sr - sr0) * scale) >= 0.95),
+        }
+    return out
+
+
+WF_WINDOW_MONTHS = 6   # 워크포워드 윈도 길이
+WF_MIN_OBS = 40        # 이보다 짧은 꼬리 윈도는 통계에서 제외
+
+
+def compute_walkforward(
+    all_strategies: dict[str, dict],
+    kospi: pd.Series,
+    window_months: int = WF_WINDOW_MONTHS,
+) -> dict[str, dict]:
+    """롤링 윈도 일관성 — 단일 IS/OOS 분할의 보완.
+
+    NAV를 달력 기준 6개월 윈도로 잘라 윈도별 수익률·샤프·MDD와 같은 구간
+    KOSPI 수익률을 비교한다. 파라미터 재적합은 하지 않는다 — 전략 대부분이
+    문헌 고정 파라미터이고, D+/U의 Optuna 파라미터는 IS에서 적합되었으므로
+    IS 구간 윈도는 참고치, OOS(2024-01 이후) 윈도가 진짜 검증이다.
+    """
+    out: dict[str, dict] = {}
+    for key, r in all_strategies.items():
+        nav = r.get("nav_df")
+        if nav is None or len(nav) < WF_MIN_OBS:
+            continue
+        grp = (nav.index.year * 12 + (nav.index.month - 1)) // window_months
+        windows: list[dict] = []
+        for _, sub in nav.groupby(grp):
+            if len(sub) < WF_MIN_OBS:
+                continue
+            ret = sub.pct_change().dropna()
+            sd = float(ret.std())
+            sharpe = round(float(ret.mean()) / sd * math.sqrt(252), 2) if sd else None
+            w_ret = float(sub.iloc[-1] / sub.iloc[0] - 1)
+            mdd = float((sub / sub.cummax() - 1).min())
+            k0 = _fast_asof_raw(kospi, sub.index[0])
+            k1 = _fast_asof_raw(kospi, sub.index[-1])
+            k_ret = (k1 / k0 - 1) if (not math.isnan(k0) and not math.isnan(k1) and k0 > 0) else None
+            windows.append({
+                "start": sub.index[0].date().isoformat(),
+                "end": sub.index[-1].date().isoformat(),
+                "return_pct": round(w_ret * 100, 2),
+                "sharpe": sharpe,
+                "mdd_pct": round(mdd * 100, 2),
+                "kospi_return_pct": round(k_ret * 100, 2) if k_ret is not None else None,
+                "beat_kospi": (w_ret > k_ret) if k_ret is not None else None,
+                "oos": sub.index[0].date() >= OOS_START,
+            })
+
+        if not windows:
+            continue
+
+        def _consistency(ws: list[dict]) -> dict | None:
+            if not ws:
+                return None
+            sharpes = sorted(w["sharpe"] for w in ws if w["sharpe"] is not None)
+            beats = [w["beat_kospi"] for w in ws if w["beat_kospi"] is not None]
+            return {
+                "n_windows": len(ws),
+                "positive_pct": round(sum(1 for w in ws if w["return_pct"] > 0) / len(ws) * 100, 1),
+                "beat_kospi_pct": round(sum(beats) / len(beats) * 100, 1) if beats else None,
+                "median_sharpe": (
+                    round(sharpes[len(sharpes) // 2], 2) if len(sharpes) % 2 == 1
+                    else round((sharpes[len(sharpes) // 2 - 1] + sharpes[len(sharpes) // 2]) / 2, 2)
+                ) if sharpes else None,
+                "worst_sharpe": min(sharpes) if sharpes else None,
+                "worst_window_return_pct": min(w["return_pct"] for w in ws),
+            }
+
+        out[key] = {
+            "windows": windows,
+            "consistency": _consistency(windows),
+            "consistency_oos": _consistency([w for w in windows if w["oos"]]),
+        }
+    return out
+
+
+# ──────────────────────────────────────────────────────────────────────────────
 # Today's signals — keyed off the headline strategy (single source of truth)
 # For chandelier: open positions include stop level & distance-to-stop %
 # ──────────────────────────────────────────────────────────────────────────────
@@ -4196,6 +4329,8 @@ def build_multi_strategy_summary(
     strategies: dict[str, dict],
     kospi_dca_ratios: dict[str, dict] | None = None,
     verdicts: dict[str, dict[str, str]] | None = None,
+    dsr_stats: dict[str, dict] | None = None,
+    walkforward: dict[str, dict] | None = None,
 ) -> list[dict]:
     """Build comparison table rows for all strategies."""
     rows = []
@@ -4232,6 +4367,10 @@ def build_multi_strategy_summary(
             # v20: 데이터 주도 판정 — 백테스트 실행 시점의 실제 수치·게이트에서 생성
             "verdict": (verdicts or {}).get(key, {}).get("verdict"),
             "verdict_reason": (verdicts or {}).get(key, {}).get("verdict_reason"),
+            # v24: 다중검정 보정 (PSR/DSR) + 워크포워드 일관성 요약
+            "dsr": (dsr_stats or {}).get(key),
+            "walkforward": (walkforward or {}).get(key, {}).get("consistency"),
+            "walkforward_oos": (walkforward or {}).get(key, {}).get("consistency_oos"),
         })
     return rows
 
@@ -6822,9 +6961,22 @@ def main() -> int:
     for key, r in all_strategies.items():
         export_trades_csv(r.get("trades", []), PUBLIC_DIR / f"strategy-trades-{key}.csv")
 
+    # ── v24: 다중검정 보정 + 워크포워드 일관성 ─────────────────────────────────
+    print("\nComputing DSR (multiple-testing deflation) + walk-forward windows...", flush=True)
+    dsr_stats = compute_dsr_stats(all_strategies)
+    walkforward = compute_walkforward(all_strategies, kospi)
+    _h_dsr = dsr_stats.get(headline_key, {})
+    print(f"  trials N={_h_dsr.get('n_trials')}  SR0(ann)={_h_dsr.get('sr0_annualized')}", flush=True)
+    print(f"  headline {headline_key}: PSR={_h_dsr.get('psr')}  DSR={_h_dsr.get('dsr')}  "
+          f"significant_after_deflation={_h_dsr.get('significant_after_deflation')}", flush=True)
+    _h_wf = walkforward.get(headline_key, {}).get("consistency_oos") or {}
+    print(f"  headline OOS windows: n={_h_wf.get('n_windows')}  positive={_h_wf.get('positive_pct')}%  "
+          f"beat_kospi={_h_wf.get('beat_kospi_pct')}%  median_sharpe={_h_wf.get('median_sharpe')}", flush=True)
+
     # ── Multi-strategy comparison rows
     multi_strategy_summary = build_multi_strategy_summary(
-        all_strategies, kospi_dca_ratios=_kospi_dca_ratios, verdicts=strategy_verdicts)
+        all_strategies, kospi_dca_ratios=_kospi_dca_ratios, verdicts=strategy_verdicts,
+        dsr_stats=dsr_stats, walkforward=walkforward)
 
     # ── Serialize open positions helper
     def _serialize_open_positions(raw: dict) -> list[dict]:
@@ -6931,6 +7083,25 @@ def main() -> int:
                 "판정과 사유는 매 백테스트 실행 시 실제 수치에서 생성 — 프런트엔드 하드코딩 없음."
             ),
             "strategy_wealth_sims": strat_wealth_sims,
+            # v24: 다중검정 보정 — 26개 변형 중 최고를 고르는 선택 편향의 정량화
+            "dsr_note": (
+                f"Deflated Sharpe Ratio (Bailey & López de Prado 2014). N={_h_dsr.get('n_trials')}개 변형을 "
+                "같은 데이터에서 시도해 최고를 골랐으므로, 무정보 시도에서 기대되는 최대 샤프 "
+                f"SR0(연환산 {_h_dsr.get('sr0_annualized')})를 차감해 평가. DSR = P(진짜 샤프 > SR0), "
+                "왜도·첨도 보정 포함. DSR ≥ 0.95면 선택 편향을 감안해도 유의. "
+                "PSR = P(진짜 샤프 > 0), 단일 전략 기준."
+            ),
+            # v24: 워크포워드 일관성 — 단일 IS/OOS 분할 보완. 재적합 없음
+            # (대부분 문헌 고정 파라미터, D+/U Optuna 파라미터는 IS 적합 →
+            #  IS 윈도는 참고치, OOS 윈도가 진짜 검증).
+            "walkforward_params": {
+                "window_months": WF_WINDOW_MONTHS,
+                "refit": False,
+                "note": "달력 6개월 윈도별 수익률·샤프·MDD·vs KOSPI. oos=true 윈도가 2024-01 이후.",
+            },
+            "walkforward_by_strategy": {
+                key: v["windows"] for key, v in walkforward.items()
+            },
             "equity_by_strategy": {
                 key: r["equity"] for key, r in all_strategies.items()
             },

@@ -189,6 +189,10 @@ def build_strategies(data: dict) -> dict:
             "kospi_dca_beats": s.get("kospi_dca_beats"),
             "aw_dca_ratio": s.get("aw_dca_ratio"),
             "aw_dca_beats": s.get("aw_dca_beats"),
+            # v24: 다중검정 보정 + 워크포워드 일관성
+            "dsr": s.get("dsr"),
+            "walkforward": s.get("walkforward"),
+            "walkforward_oos": s.get("walkforward_oos"),
         })
     return {
         "schema_version": SCHEMA_VERSION,
