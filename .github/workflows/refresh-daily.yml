@@ -106,7 +106,9 @@ jobs:
             src/data/forward-record.json src/data/stats.json public/prices \
             public/api public/strategy-marks \
             data/report_performance.csv data/report_parsed.csv data/report_parse_issues.csv \
-            data/sources/manifest.json data/pdfs data/markdown data/health.json
+            data/sources/manifest.json data/markdown data/health.json
+          # data/pdfs는 gitignore (대용량 바이너리, 재다운로드 가능) — add하면
+          # "ignored paths" 에러로 커밋 스텝 전체가 죽는다 (역대 daily 커밋 0건의 공범)
           git diff --cached --quiet && echo "no changes" && exit 0
           git commit -m "chore: daily refresh ($(date -u +%F))"
           git push

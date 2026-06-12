@@ -197,11 +197,16 @@ YIG_PDF_RE = re.compile(r"https://storage\.googleapis\.com/yighub/research-repor
 YIG_MAX_ID = 130
 
 
-def collect_yig(limit: int | None) -> list[dict]:
+def collect_yig(limit: int | None, known_ids: set[str] | None = None) -> list[dict]:
+    """known_ids: manifest에 파일까지 확보된 source_id 집합 — 해당 게시글은 상세
+    페이지 요청 자체를 생략한다 (게시글당 2.5초 × 전 게시글 재열거가 daily CI
+    45분 타임아웃의 주범이었음). --full이면 None으로 들어와 전체를 순회한다."""
     entries: list[dict] = []
     for rid in range(1, YIG_MAX_ID + 1):
         if limit and len(entries) >= limit:
             break
+        if known_ids and f"yig-{rid}" in known_ids:
+            continue
         url = f"https://yig.yonsei.ac.kr/research/{rid}"
         try:
             resp = polite_get(url)
@@ -242,7 +247,10 @@ STAR_FILE_RE = re.compile(r"/fileRequest/download\?file=[^\"'\s]+")
 STAR_MAX_PAGES = 60
 
 
-def collect_star(limit: int | None) -> list[dict]:
+def collect_star(limit: int | None, known_ids: set[str] | None = None) -> list[dict]:
+    """known_ids 동작은 collect_yig와 동일 — 이미 확보된 게시글의 상세 페이지
+    요청을 생략하고, 목록 페이지도 전부 아는 글뿐이면 조기 종료한다
+    (게시판은 최신순이므로 그 뒤 페이지에 새 글이 있을 수 없다)."""
     post_ids: list[int] = []
     seen: set[int] = set()
     for page in range(1, STAR_MAX_PAGES + 1):
@@ -258,8 +266,10 @@ def collect_star(limit: int | None) -> list[dict]:
         if not fresh:
             break
         seen.update(fresh)
-        post_ids.extend(fresh)
+        post_ids.extend(n for n in fresh if not (known_ids and f"star-{n}" in known_ids))
         print(f"  star list page {page}: +{len(fresh)} posts", flush=True)
+        if known_ids and ids and all(f"star-{n}" in known_ids for n in ids):
+            break  # 이 페이지 전체가 기수집분 — 증분 조기 종료
 
     entries: list[dict] = []
     for no in post_ids:
@@ -392,6 +402,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", choices=[*COLLECTORS, "all"], required=True)
     parser.add_argument("--limit", type=int, default=None, help="소스당 최대 수집 건수 (테스트용)")
+    parser.add_argument("--full", action="store_true",
+                        help="기수집 게시글도 전부 재방문 (복구용 — daily는 증분 모드)")
     args = parser.parse_args()
 
     manifest = load_manifest()
@@ -399,9 +411,28 @@ def main() -> int:
     sha_index = build_sha_index(manifest)
     sources = list(COLLECTORS) if args.source == "all" else [args.source]
 
+    # 증분 모드: "완전히 처리된" source_id의 상세 페이지 요청을 생략 —
+    # yig/star가 매일 전 게시글을 2.5초 간격으로 재열거하며 CI 45분
+    # 타임아웃을 유발하던 것의 수정 (2026-06-11~12 daily run 연속 사망 원인).
+    #
+    # 완전 처리 = manifest에 파일 기록 AND 전사 markdown 존재.
+    # PDF는 gitignore라 CI 러너에 없다 — 전사가 안 끝난 게시글을 건너뛰면
+    # 재다운로드 경로가 사라져 영구 누락된다 (markdown까지 확인하는 이유).
+    known_ids: set[str] | None = None
+    if not args.full:
+        md_root = ROOT / "data" / "markdown"
+        known_ids = {
+            e["source_id"] for e in manifest
+            if e.get("file") and e.get("source_id")
+            and (md_root / e["school"] / f"{Path(e['file']).stem}.md").exists()
+        }
+
     for source in sources:
         print(f"== collecting {source} ==", flush=True)
-        entries = COLLECTORS[source](args.limit)
+        if source in ("yig", "star"):
+            entries = COLLECTORS[source](args.limit, known_ids=known_ids)
+        else:
+            entries = COLLECTORS[source](args.limit)
         print(f"== {source}: {len(entries)} reports discovered ==", flush=True)
         for entry in entries:
             download_pdf(entry, manifest, known, sha_index)

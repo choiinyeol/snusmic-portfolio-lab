@@ -48,7 +48,7 @@ jobs:
       # Full sweep: collectors walk all pages to catch any missed reports.
       - name: Collect all reports (full sweep)
         run: |
-          uv run python scripts/collect_reports.py --source all
+          uv run python scripts/collect_reports.py --source all --full
           uv run python scripts/collect_kuvic_browser.py
           uv run python scripts/collect_smic.py --full
           uv run python scripts/collect_ewha.py --full
@@ -77,7 +77,8 @@ jobs:
           git add src/data/report-performance.json src/data/strategy-backtest.json public/prices \
             public/api public/strategy-marks \
             data/report_performance.csv data/report_parsed.csv data/report_parse_issues.csv \
-            data/sources/manifest.json data/pdfs data/markdown
+            data/sources/manifest.json data/markdown
+          # data/pdfs는 gitignore — add하면 커밋 스텝이 죽는다 (refresh-daily와 동일)
           git diff --cached --quiet && echo "no changes" && exit 0
           git commit -m "chore: weekly full sweep ($(date -u +%F))"
           git push
