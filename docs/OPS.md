@@ -15,6 +15,7 @@
 
 - 커밋 주체는 `verdict-archive-bot`이며 `src/data/*.json`, `public/prices/`, `data/` 산출물만 스테이징합니다. 변경이 없으면 커밋 없이 종료합니다.
 - `data/prices/` 시세 캐시는 `actions/cache`로 복원되어 증분 조회만 발생합니다.
+- **2026-06-12 CI 소생 인시던트**: refresh-daily가 출범 후 한 번도 완주하지 못했던 사실이 발견됨 (yig/star 수집기 전수 재열거 36분 → 45분 타임아웃 + gitignore된 `data/pdfs`를 add하는 커밋 스텝). 증분 단락 도입 후 30분대 완주, 사상 첫 봇 커밋. 상세는 [`CHANGELOG.md`](CHANGELOG.md)의 "CI 소생" 절.
 - OCR 폴백(`scripts/ocr_fallback.py`)은 Windows `winocr` 전용이라 CI에서는 의도적으로 건너뜁니다. 이미지 전용 PDF가 새로 들어오면 로컬(Windows)에서 한 번 돌려 커밋하면 됩니다.
 
 ### 필요한 Secrets

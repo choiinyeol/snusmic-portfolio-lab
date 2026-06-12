@@ -141,7 +141,7 @@ docker compose --profile web up web
 | [`refresh-reports.yml`](.github/workflows/refresh-reports.yml) | 수동 실행 전용 | 전체 페이지 스윕(`--full`) — 수집기 복구·과거 누락 의심 시에만 |
 
 레포 Settings → Secrets에 `KRX_ID`, `KRX_PW` 등록이 필요합니다. 갱신 커밋이 푸시되면 Vercel이 자동 재배포합니다.
-운영 상세는 [`docs/OPS.md`](docs/OPS.md) 참고.
+운영 상세는 [`docs/OPS.md`](docs/OPS.md), 릴리스별 변경 기록은 [`docs/CHANGELOG.md`](docs/CHANGELOG.md) 참고.
 
 ## 방법론에 대한 정직한 주석
 
