@@ -417,6 +417,96 @@ def main() -> None:
         })
     candidates.sort(key=lambda c: (-c["score"], c["report_date"]))
 
+    # ── 6) 학회 합의(consensus) — 같은 종목을 여럿이 보면 성과가 다른가 (v25)
+    # 리포트 단위 분석: 각 매수 리포트에 대해 발간일 직전 90일 내 같은 종목을
+    # 커버한 학회 수(본인 포함)를 세고, 그룹(1 / 2 / 3+)별 결과를 비교한다.
+    # 주의: 리포트가 행 단위이므로 합의 에피소드의 리포트들은 각자 한 행 —
+    # 윈도가 겹치는 동시 커버는 그룹에 중복 기여한다 (에피소드 중복 제거 아님).
+    def n_schools_90d(ticker: str, asof: pd.Timestamp) -> int:
+        rows_cov = coverage.get(ticker, [])
+        lo = asof - pd.Timedelta(days=90)
+        return len({s for (d, s) in rows_cov if lo <= d <= asof})
+
+    cons_universe = [
+        r for r in records
+        if r.get("era") == "modern"
+        and r.get("rating_class") in ("buy", "soft_buy")
+        and r.get("target_seq", 1) == 1
+        and r.get("ticker") and r.get("report_date")
+        and not r.get("data_issue")
+        and r.get("bucket_peak") and r["bucket_peak"] != "No quote"
+    ]
+    cons_rows = []
+    for r in cons_universe:
+        n_sch = n_schools_90d(r["ticker"], pd.Timestamp(r["report_date"]))
+        cons_rows.append({
+            "ticker": r["ticker"], "market": r["market"], "school": r["school"],
+            "display_name": r.get("display_name") or r.get("company") or r["ticker"],
+            "report_date": r["report_date"],
+            "n_schools": max(n_sch, 1),
+            "success": r["bucket_peak"] in SUCCESS_TIERS,
+            "tier": r["bucket_peak"],
+            "peak_pct": r.get("peak_return_24m_pct"),
+            "latest_pct": r.get("return_latest_pct"),
+        })
+    cons_df = pd.DataFrame(cons_rows)
+    cons_base = float(cons_df["success"].mean()) if len(cons_df) else 0.0
+
+    def _cons_group(mask: pd.Series, label: str) -> dict | None:
+        sub = cons_df[mask]
+        if len(sub) < 10:
+            return None
+        return {
+            "label": label,
+            "n": int(len(sub)),
+            "success_pct": round_or_none(float(sub["success"].mean()) * 100, 1),
+            "lift": round_or_none(float(sub["success"].mean()) / cons_base, 2) if cons_base else None,
+            "median_peak_pct": round_or_none(quantile(sub["peak_pct"].dropna().tolist(), 0.5), 1),
+            "median_latest_pct": round_or_none(quantile(sub["latest_pct"].dropna().tolist(), 0.5), 1),
+        }
+
+    consensus_groups = [
+        g for g in (
+            _cons_group(cons_df["n_schools"] == 1, "단독 커버"),
+            _cons_group(cons_df["n_schools"] == 2, "2개 학회"),
+            _cons_group(cons_df["n_schools"] >= 3, "3개+ 학회"),
+        ) if g
+    ] if len(cons_df) else []
+
+    # 합의 에피소드 명부: 90일 내 2개+ 학회가 본 리포트, 최신순 상위 30건
+    episodes = sorted(
+        (r for r in cons_rows if r["n_schools"] >= 2),
+        key=lambda r: (r["report_date"], r["n_schools"]),
+        reverse=True,
+    )[:30]
+    consensus_out = {
+        "window_days": 90,
+        "base_rate_pct": round_or_none(cons_base * 100, 1),
+        "n_reports": int(len(cons_df)),
+        "groups": consensus_groups,
+        "episodes": [
+            {
+                "ticker": e["ticker"],
+                "slug": f"{e['market']}-{e['ticker']}".lower(),
+                "name": e["display_name"],
+                "report_date": e["report_date"],
+                "school": e["school"],
+                "n_schools": e["n_schools"],
+                "tier": e["tier"],
+                "peak_pct": round_or_none(e["peak_pct"], 1),
+                "latest_pct": round_or_none(e["latest_pct"], 1),
+            }
+            for e in episodes
+        ],
+        "note": (
+            "합의 = 발간일 직전 90일 내 같은 종목을 커버한 학회 수(본인 포함). "
+            "리포트 단위 집계라 동시 커버 에피소드는 그룹에 중복 기여. "
+            "성공 = 발간 후 24개월 피크 +100% 이상(Double+)."
+        ),
+    }
+    if consensus_groups:
+        print("consensus:", [(g["label"], g["n"], g["success_pct"], g["lift"]) for g in consensus_groups])
+
     out = {
         "generated_at": dt.datetime.now().isoformat(timespec="seconds"),
         "as_of": as_of,
@@ -436,6 +526,7 @@ def main() -> None:
         "top_factors": top_factors,
         "logit": logit_out,
         "candidates": candidates,
+        "consensus": consensus_out,
     }
     OUT_PATH.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"top factors: {[t['key'] for t in top_factors]}")

@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-06-11T16:49:14",
+ "generated_at": "2026-06-13T00:46:51",
  "as_of": "2026-06-11",
  "universe": {
   "n_reports": 817,
@@ -3974,5 +3974,361 @@
    "price_as_of": "2026-06-11",
    "stale_price": false
   }
- ]
+ ],
+ "consensus": {
+  "window_days": 90,
+  "base_rate_pct": 34.9,
+  "n_reports": 817,
+  "groups": [
+   {
+    "label": "단독 커버",
+    "n": 738,
+    "success_pct": 34.0,
+    "lift": 0.97,
+    "median_peak_pct": 57.9,
+    "median_latest_pct": 2.5
+   },
+   {
+    "label": "2개 학회",
+    "n": 78,
+    "success_pct": 43.6,
+    "lift": 1.25,
+    "median_peak_pct": 57.7,
+    "median_latest_pct": 25.5
+   }
+  ],
+  "episodes": [
+   {
+    "ticker": "120110",
+    "slug": "kr-120110",
+    "name": "코오롱인더",
+    "report_date": "2026-06-10",
+    "school": "smic",
+    "n_schools": 2,
+    "tier": "Positive",
+    "peak_pct": 5.1,
+    "latest_pct": 3.9
+   },
+   {
+    "ticker": "032350",
+    "slug": "kr-032350",
+    "name": "롯데관광개발",
+    "report_date": "2026-05-22",
+    "school": "voera",
+    "n_schools": 2,
+    "tier": "Positive",
+    "peak_pct": 3.3,
+    "latest_pct": -6.1
+   },
+   {
+    "ticker": "082740",
+    "slug": "kr-082740",
+    "name": "한화엔진",
+    "report_date": "2026-05-21",
+    "school": "kuvic",
+    "n_schools": 2,
+    "tier": "Positive",
+    "peak_pct": 11.2,
+    "latest_pct": -31.2
+   },
+   {
+    "ticker": "355150",
+    "slug": "kr-355150",
+    "name": "코스텍시스",
+    "report_date": "2026-05-18",
+    "school": "kuvic",
+    "n_schools": 3,
+    "tier": "Positive",
+    "peak_pct": 3.1,
+    "latest_pct": -42.0
+   },
+   {
+    "ticker": "036890",
+    "slug": "kr-036890",
+    "name": "진성티이씨",
+    "report_date": "2026-05-18",
+    "school": "kuvic",
+    "n_schools": 2,
+    "tier": "Positive",
+    "peak_pct": 2.1,
+    "latest_pct": -15.1
+   },
+   {
+    "ticker": "355150",
+    "slug": "kr-355150",
+    "name": "코스텍시스",
+    "report_date": "2026-05-08",
+    "school": "yig",
+    "n_schools": 2,
+    "tier": "Positive",
+    "peak_pct": 16.3,
+    "latest_pct": -39.4
+   },
+   {
+    "ticker": "484870",
+    "slug": "kr-484870",
+    "name": "엠앤씨솔루션",
+    "report_date": "2026-03-27",
+    "school": "kuvic",
+    "n_schools": 2,
+    "tier": "Positive",
+    "peak_pct": 20.3,
+    "latest_pct": -29.4
+   },
+   {
+    "ticker": "218410",
+    "slug": "kr-218410",
+    "name": "RFHIC",
+    "report_date": "2026-01-23",
+    "school": "yig",
+    "n_schools": 2,
+    "tier": "Double",
+    "peak_pct": 263.1,
+    "latest_pct": 110.3
+   },
+   {
+    "ticker": "062040",
+    "slug": "kr-062040",
+    "name": "산일전기",
+    "report_date": "2025-12-12",
+    "school": "star",
+    "n_schools": 2,
+    "tier": "Double",
+    "peak_pct": 122.9,
+    "latest_pct": 38.9
+   },
+   {
+    "ticker": "000150",
+    "slug": "kr-000150",
+    "name": "두산",
+    "report_date": "2025-11-11",
+    "school": "smic",
+    "n_schools": 2,
+    "tier": "Double",
+    "peak_pct": 145.5,
+    "latest_pct": 58.4
+   },
+   {
+    "ticker": "103140",
+    "slug": "kr-103140",
+    "name": "풍산",
+    "report_date": "2025-11-11",
+    "school": "smic",
+    "n_schools": 2,
+    "tier": "Winner",
+    "peak_pct": 55.8,
+    "latest_pct": -31.6
+   },
+   {
+    "ticker": "458870",
+    "slug": "kr-458870",
+    "name": "씨어스",
+    "report_date": "2025-11-06",
+    "school": "yig",
+    "n_schools": 2,
+    "tier": "Double",
+    "peak_pct": 121.9,
+    "latest_pct": 1.9
+   },
+   {
+    "ticker": "108490",
+    "slug": "kr-108490",
+    "name": "로보티즈",
+    "report_date": "2025-10-23",
+    "school": "smic",
+    "n_schools": 2,
+    "tier": "Double",
+    "peak_pct": 148.1,
+    "latest_pct": 51.1
+   },
+   {
+    "ticker": "062040",
+    "slug": "kr-062040",
+    "name": "산일전기",
+    "report_date": "2025-10-03",
+    "school": "ewha",
+    "n_schools": 2,
+    "tier": "Double",
+    "peak_pct": 205.8,
+    "latest_pct": 90.6
+   },
+   {
+    "ticker": "064760",
+    "slug": "kr-064760",
+    "name": "티씨케이",
+    "report_date": "2025-09-24",
+    "school": "yig",
+    "n_schools": 2,
+    "tier": "Double",
+    "peak_pct": 110.6,
+    "latest_pct": 64.4
+   },
+   {
+    "ticker": "128940",
+    "slug": "kr-128940",
+    "name": "한미약품",
+    "report_date": "2025-08-31",
+    "school": "star",
+    "n_schools": 2,
+    "tier": "Double",
+    "peak_pct": 112.8,
+    "latest_pct": 35.0
+   },
+   {
+    "ticker": "017800",
+    "slug": "kr-017800",
+    "name": "현대엘리베이터",
+    "report_date": "2025-06-19",
+    "school": "star",
+    "n_schools": 2,
+    "tier": "Winner",
+    "peak_pct": 31.4,
+    "latest_pct": -9.8
+   },
+   {
+    "ticker": "064350",
+    "slug": "kr-064350",
+    "name": "현대로템",
+    "report_date": "2025-06-19",
+    "school": "star",
+    "n_schools": 2,
+    "tier": "Winner",
+    "peak_pct": 33.0,
+    "latest_pct": -12.6
+   },
+   {
+    "ticker": "071970",
+    "slug": "kr-071970",
+    "name": "HD현대마린엔진",
+    "report_date": "2025-06-19",
+    "school": "star",
+    "n_schools": 2,
+    "tier": "Double",
+    "peak_pct": 118.1,
+    "latest_pct": 13.7
+   },
+   {
+    "ticker": "034020",
+    "slug": "kr-034020",
+    "name": "두산에너빌리티",
+    "report_date": "2025-05-27",
+    "school": "yig",
+    "n_schools": 2,
+    "tier": "Double",
+    "peak_pct": 228.7,
+    "latest_pct": 108.7
+   },
+   {
+    "ticker": "278470",
+    "slug": "kr-278470",
+    "name": "에이피알",
+    "report_date": "2025-05-15",
+    "school": "kuvic",
+    "n_schools": 2,
+    "tier": "Multibagger",
+    "peak_pct": 328.1,
+    "latest_pct": 269.7
+   },
+   {
+    "ticker": "389650",
+    "slug": "kr-389650",
+    "name": "넥스트바이오메디컬",
+    "report_date": "2025-05-15",
+    "school": "yig",
+    "n_schools": 2,
+    "tier": "Double",
+    "peak_pct": 147.2,
+    "latest_pct": -0.4
+   },
+   {
+    "ticker": "161890",
+    "slug": "kr-161890",
+    "name": "한국콜마",
+    "report_date": "2025-05-13",
+    "school": "kuvic",
+    "n_schools": 2,
+    "tier": "Winner",
+    "peak_pct": 32.6,
+    "latest_pct": 2.9
+   },
+   {
+    "ticker": "119850",
+    "slug": "kr-119850",
+    "name": "지엔씨에너지",
+    "report_date": "2025-04-19",
+    "school": "smic",
+    "n_schools": 2,
+    "tier": "Double",
+    "peak_pct": 142.9,
+    "latest_pct": 10.6
+   },
+   {
+    "ticker": "278470",
+    "slug": "kr-278470",
+    "name": "에이피알",
+    "report_date": "2025-04-05",
+    "school": "ewha",
+    "n_schools": 2,
+    "tier": "Multibagger",
+    "peak_pct": 660.5,
+    "latest_pct": 556.8
+   },
+   {
+    "ticker": "140860",
+    "slug": "kr-140860",
+    "name": "파크시스템스",
+    "report_date": "2025-03-14",
+    "school": "yig",
+    "n_schools": 2,
+    "tier": "Winner",
+    "peak_pct": 74.8,
+    "latest_pct": 28.7
+   },
+   {
+    "ticker": "326030",
+    "slug": "kr-326030",
+    "name": "SK바이오팜",
+    "report_date": "2025-02-24",
+    "school": "kuvic",
+    "n_schools": 2,
+    "tier": "Positive",
+    "peak_pct": 25.1,
+    "latest_pct": -24.5
+   },
+   {
+    "ticker": "099320",
+    "slug": "kr-099320",
+    "name": "쎄트렉아이",
+    "report_date": "2025-02-21",
+    "school": "ewha",
+    "n_schools": 2,
+    "tier": "Multibagger",
+    "peak_pct": 321.1,
+    "latest_pct": 115.6
+   },
+   {
+    "ticker": "033500",
+    "slug": "kr-033500",
+    "name": "동성화인텍",
+    "report_date": "2025-01-24",
+    "school": "ewha",
+    "n_schools": 2,
+    "tier": "Winner",
+    "peak_pct": 59.5,
+    "latest_pct": -17.1
+   },
+   {
+    "ticker": "003230",
+    "slug": "kr-003230",
+    "name": "삼양식품",
+    "report_date": "2025-01-09",
+    "school": "star",
+    "n_schools": 2,
+    "tier": "Double",
+    "peak_pct": 125.0,
+    "latest_pct": 58.6
+   }
+  ],
+  "note": "합의 = 발간일 직전 90일 내 같은 종목을 커버한 학회 수(본인 포함). 리포트 단위 집계라 동시 커버 에피소드는 그룹에 중복 기여. 성공 = 발간 후 24개월 피크 +100% 이상(Double+)."
+ }
 }

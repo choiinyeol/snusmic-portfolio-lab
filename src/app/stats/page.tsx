@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { TierStrip } from "@/components/stats/tier-strips";
 import { CandidatesTable } from "@/components/stats/candidates-table";
@@ -51,7 +52,7 @@ function LiftCell({ bin, unit }: { bin: LiftBin | null; unit: string }) {
 }
 
 export default function StatsPage() {
-  const { universe, features, tier_order, tier_stats, lift, top_factors, logit, candidates } = data;
+  const { universe, features, tier_order, tier_stats, lift, top_factors, logit, candidates, consensus } = data;
   const tierCounts = tier_order.map((t) => ({ tier: t, n: universe.n_by_tier[t] ?? 0 }));
   const orderedFeatures = [...features].sort((a, b) => Number(b.is_top) - Number(a.is_top) || (b.lift_spread ?? 0) - (a.lift_spread ?? 0));
   const maxCoef = logit ? Math.max(...logit.coefs.map((c) => Math.abs(c.coef ?? 0)), 0.001) : 1;
@@ -218,6 +219,78 @@ export default function StatsPage() {
           <CandidatesTable candidates={candidates} factors={top_factors} />
         </div>
       </section>
+
+      {/* ── ⑤ 학회 합의 — 둘이 보면 다른가 (v25) ── */}
+      {consensus && consensus.groups.length > 0 && (
+        <section aria-label="학회 합의">
+          <h2 className="border-b-2 border-foreground/60 pb-1.5 font-display text-2xl font-black tracking-tight">⑤ 학회 합의 — 둘이 보면 다른가</h2>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
+            발간일 직전 <strong className="font-semibold">{consensus.window_days}일</strong> 안에 같은 종목을 커버한
+            학회 수(본인 포함)별로 결과를 비교했습니다. 베이스레이트 {consensus.base_rate_pct}% 대비
+            합의 커버가 배거 확률을 끌어올렸는지 — 리포트 {consensus.n_reports.toLocaleString()}건 기준.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            {consensus.groups.map((g) => (
+              <div key={g.label} className={cn("rounded-lg border p-4", (g.lift ?? 0) > 1.1 ? "border-stamp/50 bg-stamp/5" : "border-border bg-card")}>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">{g.label} · n={g.n}</p>
+                <p className="tnum mt-1 font-display text-3xl font-black">
+                  {g.success_pct != null ? `${g.success_pct}%` : "—"}
+                  <span className={cn("ml-2 align-middle font-mono text-sm font-bold", (g.lift ?? 0) > 1 ? "text-up" : "text-muted-foreground")}>
+                    {g.lift != null ? `${g.lift.toFixed(2)}×` : ""}
+                  </span>
+                </p>
+                <p className="mt-1 font-mono text-[11px] text-muted-foreground">
+                  더블 이상 비율 · 피크 중앙값 {g.median_peak_pct != null ? `+${g.median_peak_pct}%` : "—"} ·
+                  현재 중앙값 {g.median_latest_pct != null ? `${g.median_latest_pct > 0 ? "+" : ""}${g.median_latest_pct}%` : "—"}
+                </p>
+              </div>
+            ))}
+          </div>
+          {consensus.episodes.length > 0 && (
+            <details className="group mt-4 rounded-lg border border-border bg-card">
+              <summary className="cursor-pointer select-none list-none p-4 font-display text-sm font-bold [&::-webkit-details-marker]:hidden">
+                최근 합의 에피소드 {consensus.episodes.length}건 보기
+                <span className="ml-2 font-mono text-xs font-normal text-muted-foreground">(2개+ 학회가 90일 내 같은 종목)</span>
+              </summary>
+              <div className="overflow-x-auto border-t border-border p-4">
+                <table className="w-full min-w-[640px] border-collapse text-sm">
+                  <thead>
+                    <tr className="border-b-2 border-foreground/60 font-mono text-[10px] uppercase tracking-wide text-muted-foreground">
+                      <th className="px-2 py-1.5 text-left">발간일</th>
+                      <th className="px-2 py-1.5 text-left">종목</th>
+                      <th className="px-2 py-1.5 text-left">학회</th>
+                      <th className="px-2 py-1.5 text-right">합의 수</th>
+                      <th className="px-2 py-1.5 text-right">피크</th>
+                      <th className="px-2 py-1.5 text-right">현재</th>
+                      <th className="px-2 py-1.5 text-left">등급</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {consensus.episodes.map((e) => (
+                      <tr key={`${e.report_date}-${e.ticker}-${e.school}`} className="border-b border-dashed border-border/80 last:border-b-0">
+                        <td className="px-2 py-1.5 font-mono text-xs text-muted-foreground">{e.report_date}</td>
+                        <td className="px-2 py-1.5">
+                          <Link href={`/stocks/${e.slug}`} className="font-medium hover:underline">{e.name}</Link>
+                        </td>
+                        <td className="px-2 py-1.5 font-mono text-[10px] uppercase text-muted-foreground">{e.school}</td>
+                        <td className="tnum px-2 py-1.5 text-right font-mono text-xs font-bold">{e.n_schools}</td>
+                        <td className={cn("tnum px-2 py-1.5 text-right font-mono text-xs", (e.peak_pct ?? 0) >= 100 ? "text-stamp font-bold" : (e.peak_pct ?? 0) > 0 ? "text-up" : "text-down")}>
+                          {e.peak_pct != null ? `${e.peak_pct > 0 ? "+" : ""}${e.peak_pct}%` : "—"}
+                        </td>
+                        <td className={cn("tnum px-2 py-1.5 text-right font-mono text-xs", (e.latest_pct ?? 0) > 0 ? "text-up" : "text-down")}>
+                          {e.latest_pct != null ? `${e.latest_pct > 0 ? "+" : ""}${e.latest_pct}%` : "—"}
+                        </td>
+                        <td className="px-2 py-1.5 font-mono text-[10px] text-muted-foreground">{TIER_KO[e.tier] ?? e.tier}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </details>
+          )}
+          <p className="mt-2 font-mono text-[10px] leading-4 text-muted-foreground">{consensus.note}</p>
+        </section>
+      )}
 
       {/* ── 정직 고지 ── */}
       <section aria-label="정직 고지" className="rounded-lg border border-border bg-secondary/30 p-5">

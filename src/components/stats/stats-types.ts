@@ -88,6 +88,32 @@ export type StatsData = {
     note: string;
   } | null;
   candidates: Candidate[];
+  // v25: 학회 합의 — 발간 직전 90일 내 같은 종목을 커버한 학회 수별 성과
+  consensus?: {
+    window_days: number;
+    base_rate_pct: number | null;
+    n_reports: number;
+    groups: {
+      label: string;
+      n: number;
+      success_pct: number | null;
+      lift: number | null;
+      median_peak_pct: number | null;
+      median_latest_pct: number | null;
+    }[];
+    episodes: {
+      ticker: string;
+      slug: string;
+      name: string;
+      report_date: string;
+      school: string;
+      n_schools: number;
+      tier: string;
+      peak_pct: number | null;
+      latest_pct: number | null;
+    }[];
+    note: string;
+  };
 };
 
 /** 피처 키 → 표 머리글용 짧은 라벨 */

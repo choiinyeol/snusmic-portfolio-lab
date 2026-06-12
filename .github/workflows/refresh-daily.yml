@@ -74,6 +74,8 @@ jobs:
           uv run python scripts/export_stock_charts.py
           uv run python scripts/backtest_momentum.py
           uv run python scripts/export_signals_api.py
+          uv run python scripts/build_forward_record.py
+          uv run python scripts/build_stats.py
 
       # Telegram daily digest — silent no-op until the two repo secrets are set
       # (script exits 0 when env vars are absent or nothing changed vs yesterday).
@@ -100,7 +102,8 @@ jobs:
         run: |
           git config user.name "verdict-archive-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add src/data/report-performance.json src/data/strategy-backtest.json public/prices \
+          git add src/data/report-performance.json src/data/strategy-backtest.json \
+            src/data/forward-record.json src/data/stats.json public/prices \
             public/api public/strategy-marks \
             data/report_performance.csv data/report_parsed.csv data/report_parse_issues.csv \
             data/sources/manifest.json data/pdfs data/markdown data/health.json

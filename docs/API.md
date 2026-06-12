@@ -110,6 +110,22 @@ Example: `/api/v1/signals/2026-06-11.json`
 
 ---
 
+### `GET /api/v1/forward.json`
+
+Forward track record (v25) — the buy signals frozen in the daily snapshots,
+scored against subsequently realized prices. Structurally out-of-sample:
+every entry was committed to the public repo *before* the future happened.
+
+| Field | Description |
+|---|---|
+| `method` | Scoring rules (entry = next-day open after signal, local-currency close returns, 7-day per-ticker dedup) |
+| `summary` | `n_signals`, `n_tracking`, `avg_return_pct`, `win_rate_pct`, `best_pct`, `worst_pct`, `first_snapshot`, `n_snapshots` |
+| `entries[]` | Per-signal: `signal_date`, `ticker`, `market`, `name`, `entry_date`, `entry_price`, `current_price`, `return_pct`, `peak_pct`, `days`, `status`, `trigger_schools` |
+
+Rendered at [/track](https://verdict-archive.vercel.app/track). Record starts 2026-06-11.
+
+---
+
 ### `GET /api/v1/strategies.json`
 
 All 25 strategies with full IS/OOS metrics.
@@ -123,6 +139,8 @@ All 25 strategies with full IS/OOS metrics.
 | `strategies[].out_of_sample` | OOS period stats |
 | `strategies[].kospi_dca_ratio` | Final value vs KOSPI buy-and-hold (>1 = beats market) |
 | `strategies[].aw_dca_ratio` | Final value vs All-Weather DCA |
+| `strategies[].dsr` | v24 — Deflated Sharpe Ratio block: `psr`, `dsr`, `sr0_annualized`, `n_trials`, `significant_after_deflation` (Bailey & López de Prado 2014; DSR ≥ 0.95 = significant after multiple-testing correction) |
+| `strategies[].walkforward` / `walkforward_oos` | v24 — 6-month rolling-window consistency: `n_windows`, `positive_pct`, `beat_kospi_pct`, `median_sharpe`, `worst_window_return_pct` (no refit; `_oos` = windows from 2024-01) |
 
 ---
 
