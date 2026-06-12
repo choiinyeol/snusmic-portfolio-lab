@@ -1,18 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { getDisplayName, reportDataset, type Market, type ReportRecord, type School } from "@/lib/report-model";
-import { bucketRank, isBuy, isFresh, median } from "@/lib/verdict";
+import { reportDataset, type Market, type ReportRecord, type School } from "@/lib/report-model";
+import { isBuy } from "@/lib/verdict";
 
 type MarketFilter = "ALL" | Market;
 type BucketFilter = "ALL" | ReportRecord["performance_bucket"];
 type SchoolFilter = "ALL" | School;
-
-export type ChartPoint = ReportRecord & {
-  x: number;
-  y: number;
-  label: string;
-};
 
 export const bucketFilters: BucketFilter[] = ["ALL", "Tenbagger", "Multibagger", "Double", "Winner", "Positive", "Drawdown", "Wrecked", "No quote"];
 
@@ -62,46 +56,17 @@ export function useReportDashboardState() {
     [filtered],
   );
 
-  const chartPoints = useMemo<ChartPoint[]>(
-    () =>
-      sorted
-        .filter((report) => report.report_date && report.return_latest_pct !== null)
-        .map((report) => ({
-          ...report,
-          x: new Date(report.report_date as string).getTime(),
-          y: report.return_latest_pct as number,
-          label: getDisplayName(report),
-        })),
-    [sorted],
-  );
-
-  const bestReturn = useMemo(() => [...chartPoints].sort((a, b) => b.y - a.y)[0] ?? sorted[0] ?? reportDataset.records[0], [chartPoints, sorted]);
-  const selected = sorted.find((report) => report.source_name === selectedName) ?? bestReturn;
-
-  /** 헤드라인 KPI — 매수 의견만, 신생(<90일)은 성과 산정에서 제외 */
-  const kpis = useMemo(() => {
-    const buys = sorted.filter(isBuy);
-    const fresh = buys.filter(isFresh).length;
-    const judged = buys.filter((report) => !isFresh(report));
-    const priced = judged.filter((report) => !report.data_issue && report.return_latest_pct !== null);
-    const up = priced.filter((report) => (report.return_latest_pct ?? 0) >= 0).length;
-    const targetHits = priced.filter((report) => report.target_hit_until_latest).length;
-    /** 전성기 판결 — 발간 24개월 내 최고가 기준 더블 이상 (보고서는 보고서의 일을 했다) */
-    const peakEligible = judged.filter((report) => report.peak_return_24m_pct !== null);
-    const peakDoubles = peakEligible.filter((report) => bucketRank[report.bucket_peak] >= bucketRank.Double).length;
-    return {
-      total: sorted.length,
-      buys: buys.length,
-      fresh,
-      priced: priced.length,
-      up,
-      targetHits,
-      peakDoubles,
-      peakDoubleRate: peakEligible.length ? (peakDoubles / peakEligible.length) * 100 : null,
-      median: median(priced.map((report) => report.return_latest_pct as number)),
-      medianDaysToTarget: median(priced.filter((report) => report.days_to_target !== null).map((report) => report.days_to_target as number)),
-    };
+  // 선택 fallback: 현재 필터에서 현재 수익률이 가장 높은 리포트
+  // (과거 chartPoints 정렬과 동일한 기준 — 차트 자체는 제거된 죽은 연산이었음)
+  const bestReturn = useMemo(() => {
+    const priced = sorted.filter((report) => report.report_date && report.return_latest_pct !== null);
+    return (
+      [...priced].sort((a, b) => (b.return_latest_pct as number) - (a.return_latest_pct as number))[0]
+      ?? sorted[0]
+      ?? reportDataset.records[0]
+    );
   }, [sorted]);
+  const selected = sorted.find((report) => report.source_name === selectedName) ?? bestReturn;
 
   return {
     market,
@@ -118,11 +83,7 @@ export function useReportDashboardState() {
     selected,
     setSelectedName,
     sorted,
-    chartPoints,
-    kpis,
-    bestReturn,
   };
 }
 
-export type ReportDashboardState = ReturnType<typeof useReportDashboardState>;
 export type { BucketFilter, MarketFilter, SchoolFilter };

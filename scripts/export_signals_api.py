@@ -129,7 +129,7 @@ def build_latest_signals(data: dict) -> dict:
         "disclaimer": DISCLAIMER_EN,
         "disclaimer_ko": DISCLAIMER_KO,
         "regime": {
-            "kospi_above_200ma": regime_raw.get("state", "ON") == "ON",
+            "kospi_above_200ma": regime_state == "ON",
             "state": regime_state,
             "kospi_close": regime_raw.get("kospi_close"),
             "kospi_ma200": regime_raw.get("kospi_ma200"),
@@ -329,7 +329,8 @@ def build_strategy_marks(data: dict) -> dict[str, dict]:
 # ── openapi.json ─────────────────────────────────────────────────────────────
 
 def build_openapi(as_of: str) -> dict:
-    base = "https://smic-easy.vercel.app"
+    # 라이브 도메인 — layout.tsx metadataBase와 반드시 일치 (과거 smic-easy 표기는 stale)
+    base = "https://verdict-archive.vercel.app"
     return {
         "openapi": "3.1.0",
         "info": {
@@ -607,14 +608,16 @@ def main(argv: list[str] | None = None) -> int:
     _write_json(API_DIR / "openapi.json", openapi)
 
     # 6. strategy-marks/{slug}.json — headline strategy trade marks per ticker.
-    #    Wipe stale files first: the headline strategy (and its traded universe)
-    #    can change between runs.
+    #    Write-then-prune (NOT wipe-then-write): 새 파일을 전부 쓴 뒤 스테일만
+    #    지운다. 중간에 죽어도 디렉터리가 비는 일이 없다.
     marks = build_strategy_marks(data)
-    if MARKS_DIR.exists():
-        for old in MARKS_DIR.glob("*.json"):
-            old.unlink()
+    fresh = {f"{slug}.json" for slug in marks}
     for slug, payload in sorted(marks.items()):
         _write_json(MARKS_DIR / f"{slug}.json", payload)
+    if MARKS_DIR.exists():
+        for old in MARKS_DIR.glob("*.json"):
+            if old.name not in fresh:
+                old.unlink()
     print(f"  strategy-marks: {len(marks)} tickers", flush=True)
 
     # Validate all written JSON can be re-parsed

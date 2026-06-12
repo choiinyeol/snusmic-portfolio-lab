@@ -202,9 +202,9 @@ export default async function TrackPage() {
           <p className="mt-2 font-mono text-[10px] leading-4 text-muted-foreground">
             신호 스냅샷 원본은{" "}
             <a href="/api/v1/signals/latest.json" className="underline">
-              /api/v1/signals/{"{YYYY-MM-DD}"}.json
+              /api/v1/signals/latest.json
             </a>{" "}
-            (append-only) · 채점 데이터는{" "}
+            (일별 박제본: /api/v1/signals/{"{YYYY-MM-DD}"}.json, append-only) · 채점 데이터는{" "}
             <a href="/api/v1/forward.json" className="underline">
               /api/v1/forward.json
             </a>

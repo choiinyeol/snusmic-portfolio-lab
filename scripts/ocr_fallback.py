@@ -6,7 +6,7 @@
 OCR 산출물에는 `<!-- ocr_fallback -->` 마커를 남긴다.
 
 사용:
-    python scripts/ocr_fallback.py [--school yig|kuvic|star] [--pages 3] [--limit N]
+    python scripts/ocr_fallback.py [--school smic|yig|star|kuvic|ewha|voera] [--pages 3] [--limit N]
 """
 
 from __future__ import annotations

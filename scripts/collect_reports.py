@@ -76,7 +76,22 @@ def slugify(name: str, max_len: int = 80) -> str:
     return name[:max_len] or "report"
 
 
-def download_pdf(entry: dict, manifest: list[dict], known: dict[str, dict]) -> None:
+def build_sha_index(manifest: list[dict]) -> dict[str, Path]:
+    """manifest의 SHA256 → 기존 파일 경로 인덱스 (디스크에 실재하는 항목만).
+
+    같은 PDF가 다른 URL로 재등장할 때 중복 저장을 막는다 —
+    collect_smic/ewha/voera와 동일한 dedup 규약 (이 파일만 빠져 있었음).
+    """
+    index: dict[str, Path] = {}
+    for e in manifest:
+        sha, file = e.get("sha256"), e.get("file")
+        if sha and file and (ROOT / file).exists():
+            index[sha] = ROOT / file
+    return index
+
+
+def download_pdf(entry: dict, manifest: list[dict], known: dict[str, dict],
+                 sha_index: dict[str, Path]) -> None:
     """manifest에 없을 때만 PDF를 내려받아 기록한다."""
     pdf_url = entry["pdf_url"]
     existing = known.get(pdf_url)
@@ -117,11 +132,31 @@ def download_pdf(entry: dict, manifest: list[dict], known: dict[str, dict]) -> N
         _record(entry, manifest, known)
         return
 
+    sha = hashlib.sha256(body).hexdigest()
+
+    # SHA256 기준 중복 검사: 동일 PDF가 다른 URL로 오면 기존 파일을 가리키고 저장 생략
+    if sha in sha_index:
+        existing_path = sha_index[sha]
+        print(f"  = already exists (SHA match): {existing_path.relative_to(ROOT).as_posix()}", flush=True)
+        entry.update(
+            {
+                "file": existing_path.relative_to(ROOT).as_posix(),
+                "sha256": sha,
+                "size": len(body),
+                "downloaded_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "error": None,
+                "note": "sha256_dedup",
+            }
+        )
+        _record(entry, manifest, known)
+        return
+
     target.write_bytes(body)
+    sha_index[sha] = target
     entry.update(
         {
             "file": target.relative_to(ROOT).as_posix(),
-            "sha256": hashlib.sha256(body).hexdigest(),
+            "sha256": sha,
             "size": len(body),
             "downloaded_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "error": None,
@@ -348,6 +383,8 @@ def collect_kuvic_items(limit: int | None) -> list[dict]:
 
 # ---------------------------------------------------------------- main
 
+# kuvic 주의: Wix 서버가 ?page=N을 무시하므로 collect_kuvic은 사실상 1페이지(최신글)
+# 전용 증분 수집기다. 전체 스윕은 collect_kuvic_browser.py → kuvic-items 경로가 담당.
 COLLECTORS = {"yig": collect_yig, "star": collect_star, "kuvic": collect_kuvic, "kuvic-items": collect_kuvic_items}
 
 
@@ -359,6 +396,7 @@ def main() -> int:
 
     manifest = load_manifest()
     known = {e["pdf_url"]: e for e in manifest}
+    sha_index = build_sha_index(manifest)
     sources = list(COLLECTORS) if args.source == "all" else [args.source]
 
     for source in sources:
@@ -366,7 +404,7 @@ def main() -> int:
         entries = COLLECTORS[source](args.limit)
         print(f"== {source}: {len(entries)} reports discovered ==", flush=True)
         for entry in entries:
-            download_pdf(entry, manifest, known)
+            download_pdf(entry, manifest, known, sha_index)
 
     ok = sum(1 for e in manifest if e.get("file"))
     failed = sum(1 for e in manifest if e.get("error"))

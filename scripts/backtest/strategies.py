@@ -884,7 +884,6 @@ def run_supertrend(
 # Deleverage back to 80/20 when drawdown recovers to < 5%.
 # ──────────────────────────────────────────────────────────────────────────────
 
-LEVERAGE_BORROW_RATE = 0.06           # 6% pa
 LEVERAGE_DEPLOY_DD = 0.15             # KOSPI -15% from 52w high triggers deploy
 LEVERAGE_RECOVER_DD = 0.05            # KOSPI -5% (from 52w high) → deleverage
 LEVERAGE_TARGET = 1.20                # 120% of equity at leverage peak
@@ -1262,6 +1261,10 @@ SPO_CACHE_PATH = ROOT / "data" / "spo_cache.pkl"
 S_WEIGHTS_CACHE_PATH = ROOT / "data" / "s_weights_cache.pkl"
 # Bump when _hrp_weights/_msharpe_weights/_mincvar_weights logic changes
 S_WEIGHTS_CODE_TAG = "s_v1"
+# Bump when load_prices indicator math or chandelier objective logic changes —
+# the dataset fingerprint hashes raw OHLCV only, so indicator-logic edits would
+# otherwise replay a stale Optuna cache silently (S-weights has the same guard).
+OPTUNA_CODE_TAG = "optuna_v1"
 FORCE_RETUNE = False  # set by --retune CLI flag
 
 
@@ -1298,9 +1301,11 @@ def _chandelier_fold_sharpe(
     if len(sub) < 20:
         return -9.0
     ret = sub.pct_change().dropna()
-    if ret.std() == 0:
+    sd = float(ret.std())
+    # 정확히 0뿐 아니라 1e-18 같은 수치적 0도 차단 — Inf 샤프가 목적함수를 오염시키지 않게
+    if not math.isfinite(sd) or sd < 1e-12:
         return -9.0
-    return float(ret.mean() / ret.std() * math.sqrt(252))
+    return float(ret.mean() / sd * math.sqrt(252))
 
 
 def run_optuna_chandelier(
@@ -1330,7 +1335,8 @@ def run_optuna_chandelier(
     cache_key = None
     if dataset_fingerprint is not None:
         cache_key = hashlib.sha256(
-            f"{dataset_fingerprint}|{search_space_tag}|seed={OPTUNA_SEED}|trials={OPTUNA_N_TRIALS}".encode()
+            f"{dataset_fingerprint}|{search_space_tag}|seed={OPTUNA_SEED}|trials={OPTUNA_N_TRIALS}"
+            f"|code={OPTUNA_CODE_TAG}".encode()
         ).hexdigest()
 
     best: dict | None = None
@@ -3349,10 +3355,6 @@ def _hrp_weights(ret_df: pd.DataFrame) -> dict[str, float]:
     dist = np.sqrt(np.maximum(0.5 * (1 - corr), 0))
 
     # Single-linkage clustering (manual)
-    # Use condensed distance form → agglomerative
-    clusters: list[list[int]] = [[i] for i in range(n)]
-    # Build dendrogram via greedy single-linkage
-    merged_order: list[int] = list(range(n))
 
     def _min_dist_pair(clust: list[list[int]], d: "np.ndarray") -> tuple[int, int]:
         best = float("inf")
@@ -3388,7 +3390,6 @@ def _hrp_weights(ret_df: pd.DataFrame) -> dict[str, float]:
     ordered_tickers = [tickers[i] for i in leaf_order]
 
     # Inverse-variance weights via recursive bisection
-    vols = ret_df.std().values  # std of each ticker
     w = {t: 1.0 for t in ordered_tickers}
 
     def _recursive_bisect(items: list[str]) -> None:
@@ -3397,9 +3398,6 @@ def _hrp_weights(ret_df: pd.DataFrame) -> dict[str, float]:
         mid = len(items) // 2
         left = items[:mid]
         right = items[mid:]
-
-        idx_l = [ordered_tickers.index(t) for t in left]
-        idx_r = [ordered_tickers.index(t) for t in right]
 
         # Cluster variance using current weights and covariance
         sub_l = ret_df[left]
@@ -3410,7 +3408,8 @@ def _hrp_weights(ret_df: pd.DataFrame) -> dict[str, float]:
         cov_r = sub_r.cov().values
         var_l = float(w_l @ cov_l @ w_l)
         var_r = float(w_r @ cov_r @ w_r)
-        if var_l + var_r <= 0:
+        # NaN 분산(퇴화 공분산)은 `<= 0` 비교를 통과해 가중치를 오염시킨다 — 명시 차단
+        if not math.isfinite(var_l + var_r) or var_l + var_r <= 0:
             return
 
         alpha = 1 - var_l / (var_l + var_r)  # proportion to left cluster

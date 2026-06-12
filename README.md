@@ -42,7 +42,7 @@
 
 - **증거의 서가** — 911건의 매수 의견을 숨김 없이 전부 전시. 급락도 텐배거도 같은 벽에 걸립니다.
 - **이중 판결** — 현재 판결 vs 전성기 판결. 전성기 +100% 도달 비율 37.2%(320건), 그러나 그 수익이 현재까지 남았는지는 별개의 질문.
-- **전략 랩** — "전성기 수익을 어떻게 수확할 것인가"에 대한 25개 전략 변형 실험. SOTA `U. 샹들리에+과열 스케일아웃`은 **KOSPI 적립식(DCA) 대비 1.12×** (IS Sharpe 1.26, OOS Sharpe 1.70). 판정 칩은 매 실행 수치로 자동 생성.
+- **전략 랩** — "전성기 수익을 어떻게 수확할 것인가"에 대한 26개 전략 변형 실험. SOTA `U. 샹들리에+과열 스케일아웃`은 **KOSPI 적립식(DCA) 대비 1.12×** (IS Sharpe 1.26, OOS Sharpe 1.70). 판정 칩은 매 실행 수치로 자동 생성.
 - **오늘의 신호** — SOTA 전략이 지금 규칙대로 굴러간다면 일어날 매매. 뉴스 피드가 아니라 임박 주문서.
 - **통계 페이지** — 배거의 관상(배거 도달 종목 패턴 분석), 전략별 KRW 환산 손익, 누적 수익 곡선.
 - **본문 읽기** — 판결문 안에서 전사된 리포트 원문을 즉시 열람. PDF 다운로드 없이 리포트 논거 확인 가능.
@@ -57,7 +57,7 @@ flowchart LR
     A["수집<br/>collect_*.py<br/>6개 학회 사이트"] --> B["전사<br/>transcribe_pdfs.py<br/>+ OCR 폴백"]
     B --> C["파싱<br/>목표가·투자의견<br/>티커 매칭"]
     C --> D["시세 결합<br/>build_report_performance.py<br/>KRX/yfinance PIT"]
-    D --> E["판결·백테스트<br/>backtest_momentum.py<br/>이중 판결 + 25개 전략"]
+    D --> E["판결·백테스트<br/>backtest_momentum.py<br/>이중 판결 + 26개 전략"]
     E --> F["SSG 배포<br/>Next.js → Vercel"]
 ```
 
@@ -111,13 +111,13 @@ npm install && npm run dev          # http://localhost:3000
 
 ```bash
 # 오늘의 신호 (보유 포지션·매수 임박·매도 임박)
-curl https://smic-easy.vercel.app/api/v1/signals/latest.json | python -m json.tool
+curl https://verdict-archive.vercel.app/api/v1/signals/latest.json | python -m json.tool
 
 # 전략 목록 (IS/OOS 지표 포함)
-curl https://smic-easy.vercel.app/api/v1/strategies.json | python -m json.tool
+curl https://verdict-archive.vercel.app/api/v1/strategies.json | python -m json.tool
 ```
 
-엔드포인트 전체 명세: [`docs/API.md`](docs/API.md) · OpenAPI 스펙: [`/api/v1/openapi.json`](https://smic-easy.vercel.app/api/v1/openapi.json)
+엔드포인트 전체 명세: [`docs/API.md`](docs/API.md) · OpenAPI 스펙: [`/api/v1/openapi.json`](https://verdict-archive.vercel.app/api/v1/openapi.json)
 
 ## Docker
 

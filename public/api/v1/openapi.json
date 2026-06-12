@@ -5,7 +5,7 @@
     "version": "1.0",
     "description": "Static JSON endpoints exposing backtested trading signals from the SMIC (Student Managed Investment Club) momentum strategy research pipeline. Last updated: 2026-06-11. These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
     "contact": {
-      "url": "https://smic-easy.vercel.app"
+      "url": "https://verdict-archive.vercel.app"
     },
     "license": {
       "name": "MIT"
@@ -13,7 +13,7 @@
   },
   "servers": [
     {
-      "url": "https://smic-easy.vercel.app/api/v1",
+      "url": "https://verdict-archive.vercel.app/api/v1",
       "description": "Production (Vercel static)"
     }
   ],

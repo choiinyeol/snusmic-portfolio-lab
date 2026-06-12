@@ -137,9 +137,11 @@ def main() -> int:
             last = recent_by_ticker.get(ticker)
             if last is not None and (as_of - last).days < DEDUP_DAYS:
                 continue
-            recent_by_ticker[ticker] = as_of
             scored = _score_entry(sig, as_of)
             if scored is not None:
+                # dedup 마킹은 실제로 기록된 신호에만 — 채점 실패(가격 파일 부재)가
+                # 이후 7일의 정상 신호까지 침묵 삭제하면 안 된다
+                recent_by_ticker[ticker] = as_of
                 scored["headline_strategy"] = snap.get("headline_strategy", "")
                 entries.append(scored)
 

@@ -4,7 +4,7 @@
 - opendataloader-pdf(자바 기반)를 사용하며, 로컬 JDK(.tools/jdk-21)를 PATH에 추가한다.
 
 사용:
-    python scripts/transcribe_pdfs.py [--school yig|star|kuvic] [--limit N]
+    python scripts/transcribe_pdfs.py [--school smic|yig|star|kuvic|ewha|voera] [--limit N] [--shard i:n]
 """
 
 from __future__ import annotations
@@ -108,7 +108,12 @@ def main() -> int:
         target_dir.mkdir(parents=True, exist_ok=True)
         pending = [p for p in sorted(pdf_dir.glob("*.pdf")) if not (target_dir / f"{p.stem}.md").exists()]
         if args.shard:
-            i, n = (int(x) for x in args.shard.split(":"))
+            try:
+                i, n = (int(x) for x in args.shard.split(":"))
+                if not (n > 0 and 0 <= i < n):
+                    raise ValueError(f"index out of range: {i}:{n}")
+            except ValueError as exc:
+                sys.exit(f"--shard must be 'i:n' with 0 <= i < n (got {args.shard!r}): {exc}")
             pending = pending[i::n]
         if args.limit:
             pending = pending[: args.limit]

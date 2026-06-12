@@ -58,24 +58,23 @@ def _assert_close(actual: Any, expected: Any, path: str) -> None:
 
 @pytest.fixture(scope="module")
 def golden_runs(universe) -> dict[str, dict]:
+    # FX 원복은 conftest의 autouse _restore_fx_state 픽스처가 담당한다
+    # (bt._USDKRW 재대입은 shim 네임스페이스만 바꾸는 무효 동작이라 제거).
     bt.set_usdkrw(universe["usdkrw"])
-    try:
-        prices, reports, calendar, tr = (
-            universe["prices"], universe["reports"], universe["calendar"],
-            universe["ticker_reports"],
-        )
-        cal_s_months = sorted({(d.year, d.month) for d in calendar})
-        runs = {
-            "fixed_hold_12mo": bt.run_fixed_hold(prices, reports, calendar, 12, "고정12", tr),
-            "chandelier": bt.run_chandelier(prices, reports, calendar, "샹들리에", tr),
-            "portfolio_hrp": bt.run_portfolio_opt(
-                prices, reports, calendar, "HRP", variant="hrp", ticker_reports=tr,
-            ),
-        }
-        assert len(cal_s_months) >= 24  # 유니버스 기간 sanity
-        return runs
-    finally:
-        bt._USDKRW = None
+    prices, reports, calendar, tr = (
+        universe["prices"], universe["reports"], universe["calendar"],
+        universe["ticker_reports"],
+    )
+    cal_s_months = sorted({(d.year, d.month) for d in calendar})
+    runs = {
+        "fixed_hold_12mo": bt.run_fixed_hold(prices, reports, calendar, 12, "고정12", tr),
+        "chandelier": bt.run_chandelier(prices, reports, calendar, "샹들리에", tr),
+        "portfolio_hrp": bt.run_portfolio_opt(
+            prices, reports, calendar, "HRP", variant="hrp", ticker_reports=tr,
+        ),
+    }
+    assert len(cal_s_months) >= 24  # 유니버스 기간 sanity
+    return runs
 
 
 def test_golden_snapshot(golden_runs):

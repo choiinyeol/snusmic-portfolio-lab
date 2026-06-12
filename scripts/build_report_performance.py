@@ -57,6 +57,8 @@ US_EXCHANGE_RE = re.compile(r"\b(NASDAQ|NYSE|AMEX|NSDQ)\b", re.I)
 US_TICKER_AFTER_EXCHANGE_RE = re.compile(r"\b(?:NASDAQ|NYSE|AMEX|NSDQ)\s*:?\s*([A-Z][A-Z0-9.\-]{0,7})\b", re.I)
 US_TICKER_BEFORE_EXCHANGE_RE = re.compile(r"\b([A-Z][A-Z0-9.\-]{0,7})\s*:?\s*(?:NASDAQ|NYSE|AMEX|NSDQ)\b", re.I)
 KR_CODE_RE = re.compile(r"\b\d{6}\b")
+# 상장폐지로 시세 복구가 불가능해 데이터셋에서 제외하는 US 티커 (2026-06 기준).
+# 재상장/시세 복구 시 여기서 제거할 것. 건별 교정은 corrections.json이 정위치.
 EXCLUDED_DELISTED_TICKERS = {"VTNR", "NETI"}
 
 # Non-KR/US exchange suffixes in ticker strings — e.g. 4751.T (Tokyo), 00700.HK, 600519.SS

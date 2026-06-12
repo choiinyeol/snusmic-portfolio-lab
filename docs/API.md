@@ -20,10 +20,10 @@ pipeline (`scripts/backtest_momentum.py` → `scripts/export_signals_api.py`) an
 deployed as public assets on Vercel.  There is no server-side compute at request
 time — Vercel serves the files directly from CDN.
 
-Base URL: `https://smic-easy.vercel.app/api/v1`
+Base URL: `https://verdict-archive.vercel.app/api/v1`
 
 An OpenAPI 3.1 machine-readable spec is available at
-[`/api/v1/openapi.json`](https://smic-easy.vercel.app/api/v1/openapi.json).
+[`/api/v1/openapi.json`](https://verdict-archive.vercel.app/api/v1/openapi.json).
 
 ---
 
@@ -128,7 +128,7 @@ Rendered at [/track](https://verdict-archive.vercel.app/track). Record starts 20
 
 ### `GET /api/v1/strategies.json`
 
-All 25 strategies with full IS/OOS metrics.
+All 26 strategies with full IS/OOS metrics.
 
 | Field | Description |
 |---|---|
@@ -205,10 +205,10 @@ access in your language.
 
 ```bash
 # Latest signals
-curl https://smic-easy.vercel.app/api/v1/signals/latest.json | python -m json.tool
+curl https://verdict-archive.vercel.app/api/v1/signals/latest.json | python -m json.tool
 
 # Headline strategy trades
-curl https://smic-easy.vercel.app/api/v1/trades/W_allweather_chandelier.json | python -m json.tool
+curl https://verdict-archive.vercel.app/api/v1/trades/W_allweather_chandelier.json | python -m json.tool
 ```
 
 ### Python — print today's buy and sell signals
@@ -217,7 +217,7 @@ curl https://smic-easy.vercel.app/api/v1/trades/W_allweather_chandelier.json | p
 import urllib.request
 import json
 
-url = "https://smic-easy.vercel.app/api/v1/signals/latest.json"
+url = "https://verdict-archive.vercel.app/api/v1/signals/latest.json"
 with urllib.request.urlopen(url) as resp:
     data = json.load(resp)
 
@@ -251,7 +251,7 @@ else:
 ```python
 import urllib.request, json, datetime
 
-base = "https://smic-easy.vercel.app/api/v1/signals"
+base = "https://verdict-archive.vercel.app/api/v1/signals"
 today = datetime.date.today().isoformat()
 yesterday = (datetime.date.today() - datetime.timedelta(days=1)).isoformat()
 

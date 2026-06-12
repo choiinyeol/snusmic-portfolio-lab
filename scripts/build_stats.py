@@ -267,7 +267,7 @@ def main() -> None:
                 "n": n,
                 "success": n_succ,
                 "p_pct": round_or_none(p * 100, 1),
-                "lift": round_or_none(p / base_rate, 2),
+                "lift": round_or_none(p / base_rate, 2) if base_rate else None,
             })
         ps = [b["p_pct"] for b in bin_rows]
         # 단조성: 인접 구간이 같은 방향으로 (2%p 허용오차) 움직이는가

@@ -24,7 +24,7 @@ import type { ReportRecord } from "@/lib/report-model";
  * blob:  https://github.com/{user}/{repo}/blob/{ref}/{path}
  * raw:   https://raw.githubusercontent.com/{user}/{repo}/{ref}/{path}
  */
-export function blobToRaw(url: string): string {
+function blobToRaw(url: string): string {
   try {
     const u = new URL(url);
     if (u.hostname !== "github.com") return url;
