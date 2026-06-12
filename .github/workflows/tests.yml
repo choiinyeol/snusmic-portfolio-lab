@@ -1,0 +1,41 @@
+name: tests
+
+# 백테스트 회귀 게이트 — 합성 유니버스 골든 스냅샷 + 회계 단위 테스트.
+# 실데이터에 의존하지 않으므로(KRX/yfinance 불필요) 모든 push/PR에서 빠르게 돈다.
+# 의도된 로직 변경은 UPDATE_GOLDEN=1 uv run pytest 로 골든을 갱신해 함께 커밋할 것.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/**"
+      - "tests/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/tests.yml"
+  pull_request:
+    paths:
+      - "scripts/**"
+      - "tests/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - run: uv python install 3.12
+
+      - run: uv sync --frozen
+
+      - run: uv run pytest

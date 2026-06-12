@@ -41,6 +41,28 @@ gh run watch --repo ChoiInYeol/SNUSMIC-Portfolio
 
 또는 GitHub UI: Actions 탭 → 워크플로 선택 → "Run workflow".
 
+## 회귀 테스트 (v23)
+
+`tests/` 의 pytest 스위트가 백테스트 회계 코어를 고정합니다. 실데이터가 아닌 **고정 시드 합성 유니버스**에서 돌므로 일일 데이터 갱신과 무관하게 코드 변경만 잡아냅니다. `.github/workflows/tests.yml`이 `scripts/**` 또는 `tests/**`를 건드리는 모든 push/PR에서 실행됩니다 (수 초 내 완료, KRX/yfinance 불필요).
+
+- **단위 테스트** — KRX 호가단위 라운딩, FX 환산(`_fx`/`set_usdkrw`), asof 패스트패스 ≡ pandas, `_close_trade`/`_try_enter` KRW 손익, Kelly 경계.
+- **회귀 테스트** — v22 FX 리밸런스 버그(보유 US 포지션 무환율 평가 → NAV 0 수렴) 재발 시 즉시 실패. zero-NAV 가드 계약 고정.
+- **행동 테스트** — 샹들리에 스탑: ATR 손계산 가능한 경로에서 "스탑 이탈 → 익일 시가 체결" 검증.
+- **골든 스냅샷** — 대표 전략 3종(고정보유/샹들리에/HRP)의 지표·거래 로그를 `tests/golden/strategies.json`과 비교. 의도된 로직 변경 시:
+
+```bash
+UPDATE_GOLDEN=1 uv run pytest tests/test_golden.py   # 골든 재생성
+git diff tests/golden/                                # 변경이 의도와 일치하는지 확인 후 커밋
+```
+
+## 파이프라인 헬스 체크 (v23)
+
+`scripts/pipeline_health.py`가 daily CI 마지막에 실행되어 산출물 카운트(수집 PDF·전사·파싱·성과 행), 파싱 이슈 증가량, 백테스트 신호 신선도(as_of ≤ 4일)를 직전 실행(`data/health.json`, 커밋됨)과 비교합니다. 이상 시에만 Telegram 운영 알림을 보냅니다 — 시크릿은 일일 다이제스트와 동일한 `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID`를 재사용하며, 미설정이면 콘솔 출력만 하고 조용히 통과합니다.
+
+```bash
+uv run python scripts/pipeline_health.py --dry-run   # 로컬 점검 (전송 없음)
+```
+
 ## Vercel 배포
 
 | 항목 | 값 |

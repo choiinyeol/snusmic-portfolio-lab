@@ -86,6 +86,16 @@ jobs:
         run: |
           uv run python scripts/send_telegram_signals.py
 
+      # Pipeline health — 카운트 감소/파싱 이슈 급증/신호 신선도 점검.
+      # 이상 시에만 Telegram 운영 알림 (시크릿 없으면 콘솔 출력만, 항상 exit 0 계열).
+      - name: Pipeline health check
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          uv run python scripts/pipeline_health.py
+
       - name: Commit refreshed artifacts
         run: |
           git config user.name "verdict-archive-bot"
@@ -93,7 +103,7 @@ jobs:
           git add src/data/report-performance.json src/data/strategy-backtest.json public/prices \
             public/api public/strategy-marks \
             data/report_performance.csv data/report_parsed.csv data/report_parse_issues.csv \
-            data/sources/manifest.json data/pdfs data/markdown
+            data/sources/manifest.json data/pdfs data/markdown data/health.json
           git diff --cached --quiet && echo "no changes" && exit 0
           git commit -m "chore: daily refresh ($(date -u +%F))"
           git push
