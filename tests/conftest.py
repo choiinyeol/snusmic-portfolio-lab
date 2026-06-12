@@ -20,16 +20,21 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import backtest_momentum as bt  # noqa: E402
+import backtest.fx as fx_state  # noqa: E402
 
 GOLDEN_DIR = Path(__file__).parent / "golden"
 
 
 @pytest.fixture(autouse=True)
 def _restore_fx_state():
-    """_USDKRW 전역을 테스트마다 원복 — 테스트 간 FX 누수 방지."""
-    saved = bt._USDKRW
+    """_USDKRW 전역을 테스트마다 원복 — 테스트 간 FX 누수 방지.
+
+    패키지 분할 후 가변 전역은 backtest.fx 모듈에 산다. bt._USDKRW(재노출 복사본)이
+    아니라 fx_state._USDKRW(엔진이 실제로 읽는 attribute)를 저장/복원해야 한다.
+    """
+    saved = fx_state._USDKRW
     yield
-    bt._USDKRW = saved
+    fx_state._USDKRW = saved
 
 
 # ── 합성 가격 생성 ────────────────────────────────────────────────────────────

@@ -12,6 +12,7 @@ import pandas as pd
 import pytest
 
 import backtest_momentum as bt
+import backtest.fx as fx_state
 
 
 # ── round_to_tick: KRX 호가단위 + US 센트 ─────────────────────────────────────
@@ -52,7 +53,7 @@ def test_fx_kr_is_always_one():
 
 
 def test_fx_us_fallback_without_series():
-    bt._USDKRW = None
+    fx_state._USDKRW = None
     assert bt._fx("US", dt.date(2024, 1, 2)) == bt._USDKRW_FALLBACK
 
 
