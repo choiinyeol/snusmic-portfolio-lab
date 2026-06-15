@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-12T17:15:31+00:00",
+  "generated_at": "2026-06-15T15:55:49+00:00",
   "strategy_key": "D_chandelier",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -1140,8 +1140,8 @@
       "name": "한화솔루션",
       "entry_date": "2021-01-18",
       "exit_date": "2021-02-25",
-      "entry_price": 66621.0,
-      "exit_price": 57327.0,
+      "entry_price": 62839.0,
+      "exit_price": 54073.0,
       "return_pct": -14.47,
       "days": 38,
       "exit_reason": "chandelier_ATR5",
@@ -1404,9 +1404,9 @@
       "name": "한화솔루션",
       "entry_date": "2021-03-15",
       "exit_date": "2021-06-10",
-      "entry_price": 55393.0,
-      "exit_price": 54270.0,
-      "return_pct": -2.61,
+      "entry_price": 52249.0,
+      "exit_price": 51189.0,
+      "return_pct": -2.62,
       "days": 87,
       "exit_reason": "chandelier_ATR5",
       "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: ewha 2021-03-13, smic 2021-01-16)",
@@ -1423,7 +1423,7 @@
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         }
       ]
     },
@@ -5828,8 +5828,8 @@
       "name": "한화솔루션",
       "entry_date": "2024-06-28",
       "exit_date": "2024-10-17",
-      "entry_price": 28100.0,
-      "exit_price": 21950.0,
+      "entry_price": 26505.0,
+      "exit_price": 20704.0,
       "return_pct": -22.35,
       "days": 111,
       "exit_reason": "chandelier_ATR5",
@@ -5847,14 +5847,14 @@
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         },
         {
           "school": "kuvic",
           "report_date": "2024-06-27",
           "source_file": "2024-06-27_한화솔루션 - 중국을 이겨낼 단 '한화'의 솔루션.md",
           "target_price": 49500.0,
-          "stated_upside_pct": 75.5319
+          "stated_upside_pct": 86.0972
         }
       ]
     },

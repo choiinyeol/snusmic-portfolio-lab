@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-12T17:15:31+00:00",
+  "generated_at": "2026-06-15T15:55:49+00:00",
   "strategy_key": "P_deepbuy_chandelier",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -810,8 +810,8 @@
       "name": "한화솔루션",
       "entry_date": "2021-03-09",
       "exit_date": "2021-05-14",
-      "entry_price": 53085.0,
-      "exit_price": 55081.0,
+      "entry_price": 50072.0,
+      "exit_price": 51954.0,
       "return_pct": 3.14,
       "days": 66,
       "exit_reason": "p_chandelier_ATR4.25",
@@ -883,7 +883,7 @@
       "name": "대한유화",
       "entry_date": "2021-05-12",
       "exit_date": "2021-06-24",
-      "entry_price": 271072.1579,
+      "entry_price": 271072.1488,
       "exit_price": 235500.0,
       "return_pct": -13.64,
       "days": 43,
@@ -934,8 +934,8 @@
       "name": "한화솔루션",
       "entry_date": "2021-07-12",
       "exit_date": "2021-08-02",
-      "entry_price": 53147.0,
-      "exit_price": 48593.0,
+      "entry_price": 50130.0,
+      "exit_price": 45835.0,
       "return_pct": -9.12,
       "days": 21,
       "exit_reason": "p_chandelier_ATR4.25",
@@ -953,7 +953,7 @@
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         }
       ]
     },
@@ -1109,7 +1109,7 @@
       "name": "바이넥스",
       "entry_date": "2021-07-27",
       "exit_date": "2021-09-28",
-      "entry_price": 18094.2187,
+      "entry_price": 18094.2184,
       "exit_price": 16950.0,
       "return_pct": -6.88,
       "days": 63,
@@ -5277,7 +5277,7 @@
       "name": "데브시스터즈",
       "entry_date": "2024-09-20",
       "exit_date": "2024-11-12",
-      "entry_price": 35952.714,
+      "entry_price": 35952.7143,
       "exit_price": 32400.0,
       "return_pct": -10.42,
       "days": 53,
@@ -5306,8 +5306,8 @@
       "name": "한화솔루션",
       "entry_date": "2024-10-17",
       "exit_date": "2024-11-13",
-      "entry_price": 20462.4864,
-      "exit_price": 17500.0,
+      "entry_price": 19300.958,
+      "exit_price": 16506.0,
       "return_pct": -14.99,
       "days": 27,
       "exit_reason": "p_chandelier_ATR4.25",
@@ -5325,14 +5325,14 @@
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         },
         {
           "school": "kuvic",
           "report_date": "2024-06-27",
           "source_file": "2024-06-27_한화솔루션 - 중국을 이겨낼 단 '한화'의 솔루션.md",
           "target_price": 49500.0,
-          "stated_upside_pct": 75.5319
+          "stated_upside_pct": 86.0972
         }
       ]
     },
@@ -5371,7 +5371,7 @@
       "name": "덕산네오룩스",
       "entry_date": "2024-10-16",
       "exit_date": "2024-11-13",
-      "entry_price": 27567.4366,
+      "entry_price": 27567.4369,
       "exit_price": 23800.0,
       "return_pct": -14.18,
       "days": 28,
@@ -5552,7 +5552,7 @@
       "name": "비나텍",
       "entry_date": "2024-11-13",
       "exit_date": "2024-11-20",
-      "entry_price": 27968.4416,
+      "entry_price": 27968.4441,
       "exit_price": 24672.0,
       "return_pct": -12.31,
       "days": 7,
@@ -5610,7 +5610,7 @@
       "name": "삼영",
       "entry_date": "2024-11-04",
       "exit_date": "2024-12-05",
-      "entry_price": 3986.6835,
+      "entry_price": 3986.6838,
       "exit_price": 3380.0,
       "return_pct": -15.73,
       "days": 31,
@@ -5639,7 +5639,7 @@
       "name": "롯데에너지머티리얼즈",
       "entry_date": "2024-12-05",
       "exit_date": "2025-02-04",
-      "entry_price": 22386.0434,
+      "entry_price": 22386.0436,
       "exit_price": 20600.0,
       "return_pct": -8.53,
       "days": 61,
@@ -5791,7 +5791,7 @@
       "name": "코스메카코리아",
       "entry_date": "2025-02-04",
       "exit_date": "2025-03-04",
-      "entry_price": 45446.4138,
+      "entry_price": 45446.4199,
       "exit_price": 39600.0,
       "return_pct": -13.39,
       "days": 28,
@@ -5820,7 +5820,7 @@
       "name": "씨에스윈드",
       "entry_date": "2024-11-12",
       "exit_date": "2025-03-06",
-      "entry_price": 43235.805,
+      "entry_price": 43235.8048,
       "exit_price": 37550.0,
       "return_pct": -13.67,
       "days": 114,
@@ -6080,7 +6080,7 @@
       "name": "에코프로머티",
       "entry_date": "2025-03-28",
       "exit_date": "2025-05-08",
-      "entry_price": 62676.0769,
+      "entry_price": 62676.0718,
       "exit_price": 54000.0,
       "return_pct": -14.36,
       "days": 41,
@@ -6102,8 +6102,8 @@
       "name": "한화솔루션",
       "entry_date": "2024-11-15",
       "exit_date": "2025-05-26",
-      "entry_price": 16505.682,
-      "exit_price": 28650.0,
+      "entry_price": 15568.3344,
+      "exit_price": 27023.0,
       "return_pct": 72.54,
       "days": 192,
       "exit_reason": "p_chandelier_ATR4.25",
@@ -6121,14 +6121,14 @@
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         },
         {
           "school": "kuvic",
           "report_date": "2024-06-27",
           "source_file": "2024-06-27_한화솔루션 - 중국을 이겨낼 단 '한화'의 솔루션.md",
           "target_price": 49500.0,
-          "stated_upside_pct": 75.5319
+          "stated_upside_pct": 86.0972
         }
       ]
     },
@@ -6340,7 +6340,7 @@
       "name": "티앤엘",
       "entry_date": "2025-06-17",
       "exit_date": "2025-08-20",
-      "entry_price": 57985.6736,
+      "entry_price": 57985.6737,
       "exit_price": 53600.0,
       "return_pct": -8.12,
       "days": 64,
@@ -6600,7 +6600,7 @@
       "name": "데브시스터즈",
       "entry_date": "2024-11-13",
       "exit_date": "2025-10-20",
-      "entry_price": 30255.706,
+      "entry_price": 30255.7064,
       "exit_price": 46800.0,
       "return_pct": 53.75,
       "days": 341,
@@ -6730,7 +6730,7 @@
       "name": "SAMG엔터",
       "entry_date": "2025-08-20",
       "exit_date": "2025-11-11",
-      "entry_price": 53833.4359,
+      "entry_price": 53833.436,
       "exit_price": 46350.0,
       "return_pct": -14.42,
       "days": 83,
@@ -6743,6 +6743,13 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2025-06-27",
+          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
+          "target_price": null,
+          "stated_upside_pct": null
         }
       ]
     },
@@ -6752,7 +6759,7 @@
       "name": "파마리서치",
       "entry_date": "2025-10-14",
       "exit_date": "2025-11-12",
-      "entry_price": 525269.3234,
+      "entry_price": 525269.3237,
       "exit_price": 444000.0,
       "return_pct": -15.98,
       "days": 29,
@@ -7015,6 +7022,13 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
+          "target_price": null,
+          "stated_upside_pct": null
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2025-06-27",
+          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-12T17:15:31+00:00",
+  "generated_at": "2026-06-15T15:55:49+00:00",
   "strategy_key": "S_hrp",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -6155,8 +6155,8 @@
       "name": "한화솔루션",
       "entry_date": "2021-02-01",
       "exit_date": "2021-04-01",
-      "entry_price": 61444.0,
-      "exit_price": 63253.0,
+      "entry_price": 57956.0,
+      "exit_price": 59662.0,
       "return_pct": 2.33,
       "days": 59,
       "exit_reason": "s_rebalance_trim",
@@ -9072,8 +9072,8 @@
       "name": "한화솔루션",
       "entry_date": "2021-02-01",
       "exit_date": "2021-07-01",
-      "entry_price": 61444.0,
-      "exit_price": 55580.0,
+      "entry_price": 57956.0,
+      "exit_price": 52425.0,
       "return_pct": -4.27,
       "days": 150,
       "exit_reason": "s_rebalance_trim",
@@ -9915,8 +9915,8 @@
       "name": "한화솔루션",
       "entry_date": "2021-02-01",
       "exit_date": "2021-08-02",
-      "entry_price": 61444.0,
-      "exit_price": 48593.0,
+      "entry_price": 57956.0,
+      "exit_price": 45835.0,
       "return_pct": -16.31,
       "days": 182,
       "exit_reason": "s_rebalance_trim",
@@ -14185,8 +14185,8 @@
       "name": "한화솔루션",
       "entry_date": "2021-02-01",
       "exit_date": "2021-12-01",
-      "entry_price": 61444.0,
-      "exit_price": 41108.0,
+      "entry_price": 57956.0,
+      "exit_price": 38774.0,
       "return_pct": -25.91,
       "days": 303,
       "exit_reason": "s_rebalance_trim",
@@ -15496,8 +15496,8 @@
       "name": "한화솔루션",
       "entry_date": "2021-02-01",
       "exit_date": "2022-01-03",
-      "entry_price": 61444.0,
-      "exit_price": 44289.0,
+      "entry_price": 57956.0,
+      "exit_price": 41775.0,
       "return_pct": -20.18,
       "days": 336,
       "exit_reason": "s_rebalance_exit",
@@ -19580,8 +19580,8 @@
       "name": "한화솔루션",
       "entry_date": "2022-04-01",
       "exit_date": "2022-08-01",
-      "entry_price": 44726.0,
-      "exit_price": 54270.0,
+      "entry_price": 42187.0,
+      "exit_price": 51189.0,
       "return_pct": 25.09,
       "days": 122,
       "exit_reason": "s_rebalance_trim",
@@ -19599,7 +19599,7 @@
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         }
       ]
     },
@@ -20373,7 +20373,7 @@
       "exit_date": "2022-08-01",
       "entry_price": 163500.0,
       "exit_price": 142500.0,
-      "return_pct": -6.02,
+      "return_pct": -6.03,
       "days": 91,
       "exit_reason": "s_rebalance_trim",
       "entry_reason": "hrp 월간 리밸런스 — 목표비중 0.8% 재조정 보유",
@@ -20744,9 +20744,9 @@
       "name": "한화솔루션",
       "entry_date": "2022-04-01",
       "exit_date": "2022-09-01",
-      "entry_price": 44726.0,
-      "exit_price": 65249.0,
-      "return_pct": 50.4,
+      "entry_price": 42187.0,
+      "exit_price": 61545.0,
+      "return_pct": 50.39,
       "days": 153,
       "exit_reason": "s_rebalance_exit",
       "entry_reason": "hrp 월간 리밸런스 — 목표비중 0.2% 재조정 보유",
@@ -20763,7 +20763,7 @@
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         }
       ]
     },
@@ -21249,7 +21249,7 @@
       "exit_date": "2022-09-01",
       "entry_price": 8160.0,
       "exit_price": 6800.0,
-      "return_pct": -14.54,
+      "return_pct": -14.55,
       "days": 153,
       "exit_reason": "s_rebalance_trim",
       "entry_reason": "hrp 월간 리밸런스 — 목표비중 1.2% 재조정 보유",
@@ -21535,7 +21535,7 @@
       "exit_date": "2022-09-01",
       "entry_price": 63000.0,
       "exit_price": 52200.0,
-      "return_pct": -12.82,
+      "return_pct": -12.83,
       "days": 153,
       "exit_reason": "s_rebalance_trim",
       "entry_reason": "hrp 월간 리밸런스 — 목표비중 1.2% 재조정 보유",
@@ -24602,7 +24602,7 @@
       "exit_date": "2022-12-01",
       "entry_price": 307500.0,
       "exit_price": 147000.0,
-      "return_pct": -30.32,
+      "return_pct": -30.31,
       "days": 244,
       "exit_reason": "s_rebalance_trim",
       "entry_reason": "hrp 월간 리밸런스 — 목표비중 0.3% 재조정 보유",
@@ -26414,7 +26414,7 @@
       "exit_date": "2023-01-02",
       "entry_price": 10800.0,
       "exit_price": 8130.0,
-      "return_pct": -13.84,
+      "return_pct": -13.85,
       "days": 276,
       "exit_reason": "s_rebalance_exit",
       "entry_reason": "hrp 월간 리밸런스 — 목표비중 0.8% 재조정 보유",
@@ -26883,7 +26883,7 @@
       "exit_date": "2023-01-02",
       "entry_price": 2745.0,
       "exit_price": 2050.0,
-      "return_pct": -22.23,
+      "return_pct": -22.24,
       "days": 185,
       "exit_reason": "s_rebalance_exit",
       "entry_reason": "hrp 월간 리밸런스 — 목표비중 0.2% 재조정 보유",
@@ -53136,8 +53136,8 @@
       "name": "한화솔루션",
       "entry_date": "2024-07-01",
       "exit_date": "2024-09-02",
-      "entry_price": 26300.0,
-      "exit_price": 25700.0,
+      "entry_price": 24807.0,
+      "exit_price": 24241.0,
       "return_pct": -0.86,
       "days": 63,
       "exit_reason": "s_rebalance_trim",
@@ -53155,14 +53155,14 @@
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         },
         {
           "school": "kuvic",
           "report_date": "2024-06-27",
           "source_file": "2024-06-27_한화솔루션 - 중국을 이겨낼 단 '한화'의 솔루션.md",
           "target_price": 49500.0,
-          "stated_upside_pct": 75.5319
+          "stated_upside_pct": 86.0972
         }
       ]
     },
@@ -55628,8 +55628,8 @@
       "name": "한화솔루션",
       "entry_date": "2024-07-01",
       "exit_date": "2024-11-01",
-      "entry_price": 26300.0,
-      "exit_price": 21200.0,
+      "entry_price": 24807.0,
+      "exit_price": 19996.0,
       "return_pct": -18.22,
       "days": 123,
       "exit_reason": "s_rebalance_exit",
@@ -55647,14 +55647,14 @@
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         },
         {
           "school": "kuvic",
           "report_date": "2024-06-27",
           "source_file": "2024-06-27_한화솔루션 - 중국을 이겨낼 단 '한화'의 솔루션.md",
           "target_price": 49500.0,
-          "stated_upside_pct": 75.5319
+          "stated_upside_pct": 86.0972
         }
       ]
     },
@@ -60730,8 +60730,8 @@
       "name": "한화솔루션",
       "entry_date": "2024-12-02",
       "exit_date": "2025-01-02",
-      "entry_price": 16500.0,
-      "exit_price": 16210.0,
+      "entry_price": 15563.0,
+      "exit_price": 15289.0,
       "return_pct": -2.35,
       "days": 31,
       "exit_reason": "s_rebalance_exit",
@@ -60749,14 +60749,14 @@
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         },
         {
           "school": "kuvic",
           "report_date": "2024-06-27",
           "source_file": "2024-06-27_한화솔루션 - 중국을 이겨낼 단 '한화'의 솔루션.md",
           "target_price": 49500.0,
-          "stated_upside_pct": 75.5319
+          "stated_upside_pct": 86.0972
         }
       ]
     },
@@ -60768,7 +60768,7 @@
       "exit_date": "2025-01-02",
       "entry_price": 9700.0,
       "exit_price": 8780.0,
-      "return_pct": -4.04,
+      "return_pct": -4.05,
       "days": 185,
       "exit_reason": "s_rebalance_exit",
       "entry_reason": "hrp 월간 리밸런스 — 목표비중 0.8% 재조정 보유",
@@ -63547,7 +63547,7 @@
       "exit_date": "2025-01-02",
       "entry_price": 10710.0,
       "exit_price": 8100.0,
-      "return_pct": -8.76,
+      "return_pct": -8.75,
       "days": 213,
       "exit_reason": "s_rebalance_exit",
       "entry_reason": "hrp 월간 리밸런스 — 목표비중 0.5% 재조정 보유",
@@ -67913,9 +67913,9 @@
       "name": "한화솔루션",
       "entry_date": "2025-04-01",
       "exit_date": "2025-06-02",
-      "entry_price": 18590.0,
-      "exit_price": 30300.0,
-      "return_pct": 62.01,
+      "entry_price": 17534.0,
+      "exit_price": 28580.0,
+      "return_pct": 62.02,
       "days": 62,
       "exit_reason": "s_rebalance_trim",
       "entry_reason": "hrp 월간 리밸런스 — 목표비중 0.1% 신규 편입 (18개월 유효 리포트 유니버스)",
@@ -67932,14 +67932,14 @@
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         },
         {
           "school": "kuvic",
           "report_date": "2024-06-27",
           "source_file": "2024-06-27_한화솔루션 - 중국을 이겨낼 단 '한화'의 솔루션.md",
           "target_price": 49500.0,
-          "stated_upside_pct": 75.5319
+          "stated_upside_pct": 86.0972
         }
       ]
     },
@@ -69352,9 +69352,9 @@
       "name": "한화솔루션",
       "entry_date": "2025-04-01",
       "exit_date": "2025-07-01",
-      "entry_price": 18590.0,
-      "exit_price": 33150.0,
-      "return_pct": 77.25,
+      "entry_price": 17534.0,
+      "exit_price": 31268.0,
+      "return_pct": 77.26,
       "days": 91,
       "exit_reason": "s_rebalance_exit",
       "entry_reason": "hrp 월간 리밸런스 — 목표비중 0.2% 재조정 보유",
@@ -69371,14 +69371,14 @@
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         },
         {
           "school": "kuvic",
           "report_date": "2024-06-27",
           "source_file": "2024-06-27_한화솔루션 - 중국을 이겨낼 단 '한화'의 솔루션.md",
           "target_price": 49500.0,
-          "stated_upside_pct": 75.5319
+          "stated_upside_pct": 86.0972
         }
       ]
     },
@@ -69937,7 +69937,7 @@
       "exit_date": "2025-07-01",
       "entry_price": 4905.0,
       "exit_price": 25750.0,
-      "return_pct": 333.09,
+      "return_pct": 333.1,
       "days": 148,
       "exit_reason": "s_rebalance_exit",
       "entry_reason": "hrp 월간 리밸런스 — 목표비중 0.3% 재조정 보유",
@@ -73452,6 +73452,13 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
+          "target_price": null,
+          "stated_upside_pct": null
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2025-06-27",
+          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -77928,7 +77935,7 @@
       "exit_date": "2025-10-01",
       "entry_price": 4480.0,
       "exit_price": 6060.0,
-      "return_pct": 33.61,
+      "return_pct": 33.62,
       "days": 240,
       "exit_reason": "s_rebalance_exit",
       "entry_reason": "hrp 월간 리밸런스 — 목표비중 0.3% 재조정 보유",
@@ -79701,7 +79708,7 @@
       "exit_date": "2025-10-01",
       "entry_price": 6570.0,
       "exit_price": 7520.0,
-      "return_pct": 11.02,
+      "return_pct": 11.03,
       "days": 183,
       "exit_reason": "s_rebalance_trim",
       "entry_reason": "hrp 월간 리밸런스 — 목표비중 0.3% 재조정 보유",
@@ -80755,8 +80762,8 @@
       "name": "한화솔루션",
       "entry_date": "2025-08-01",
       "exit_date": "2025-11-03",
-      "entry_price": 30800.0,
-      "exit_price": 31000.0,
+      "entry_price": 29051.0,
+      "exit_price": 29240.0,
       "return_pct": 7.69,
       "days": 94,
       "exit_reason": "s_rebalance_trim",
@@ -80767,21 +80774,21 @@
           "report_date": "2025-05-11",
           "source_file": "2025-05-11_equity-research-한화솔루션-2.md",
           "target_price": 91200.0,
-          "stated_upside_pct": 179.3262
+          "stated_upside_pct": 196.1424
         },
         {
           "school": "ewha",
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         },
         {
           "school": "kuvic",
           "report_date": "2024-06-27",
           "source_file": "2024-06-27_한화솔루션 - 중국을 이겨낼 단 '한화'의 솔루션.md",
           "target_price": 49500.0,
-          "stated_upside_pct": 75.5319
+          "stated_upside_pct": 86.0972
         }
       ]
     },
@@ -81573,6 +81580,13 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
+          "target_price": null,
+          "stated_upside_pct": null
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2025-06-27",
+          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -82763,8 +82777,8 @@
       "name": "한화솔루션",
       "entry_date": "2025-08-01",
       "exit_date": "2025-12-01",
-      "entry_price": 30800.0,
-      "exit_price": 28050.0,
+      "entry_price": 29051.0,
+      "exit_price": 26457.0,
       "return_pct": -2.56,
       "days": 122,
       "exit_reason": "s_rebalance_exit",
@@ -82775,21 +82789,21 @@
           "report_date": "2025-05-11",
           "source_file": "2025-05-11_equity-research-한화솔루션-2.md",
           "target_price": 91200.0,
-          "stated_upside_pct": 179.3262
+          "stated_upside_pct": 196.1424
         },
         {
           "school": "ewha",
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         },
         {
           "school": "kuvic",
           "report_date": "2024-06-27",
           "source_file": "2024-06-27_한화솔루션 - 중국을 이겨낼 단 '한화'의 솔루션.md",
           "target_price": 49500.0,
-          "stated_upside_pct": 75.5319
+          "stated_upside_pct": 86.0972
         }
       ]
     },
@@ -83157,7 +83171,7 @@
       "exit_date": "2025-12-01",
       "entry_price": 16240.0,
       "exit_price": 40150.0,
-      "return_pct": 73.69,
+      "return_pct": 73.68,
       "days": 301,
       "exit_reason": "s_rebalance_exit",
       "entry_reason": "hrp 월간 리밸런스 — 목표비중 0.2% 재조정 보유",
@@ -83694,7 +83708,7 @@
       "exit_date": "2025-12-01",
       "entry_price": 66900.0,
       "exit_price": 67500.0,
-      "return_pct": 4.88,
+      "return_pct": 4.87,
       "days": 122,
       "exit_reason": "s_rebalance_trim",
       "entry_reason": "hrp 월간 리밸런스 — 목표비중 0.1% 재조정 보유",
@@ -85002,7 +85016,7 @@
       "exit_date": "2025-12-01",
       "entry_price": 42950.0,
       "exit_price": 78500.0,
-      "return_pct": 11.08,
+      "return_pct": 11.09,
       "days": 182,
       "exit_reason": "s_rebalance_trim",
       "entry_reason": "hrp 월간 리밸런스 — 목표비중 0.3% 재조정 보유",
@@ -87051,6 +87065,13 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2025-06-27",
+          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
+          "target_price": null,
+          "stated_upside_pct": null
         }
       ]
     },
@@ -87888,7 +87909,7 @@
       "exit_date": "2026-01-02",
       "entry_price": 405500.0,
       "exit_price": 514000.0,
-      "return_pct": 4.05,
+      "return_pct": 4.06,
       "days": 214,
       "exit_reason": "s_rebalance_exit",
       "entry_reason": "hrp 월간 리밸런스 — 목표비중 0.2% 재조정 보유",
@@ -90041,8 +90062,8 @@
       "name": "한화솔루션",
       "entry_date": "2026-02-02",
       "exit_date": "2026-03-02",
-      "entry_price": 27600.0,
-      "exit_price": 53000.0,
+      "entry_price": 26033.0,
+      "exit_price": 49991.0,
       "return_pct": 90.88,
       "days": 28,
       "exit_reason": "s_rebalance_exit",
@@ -90053,21 +90074,21 @@
           "report_date": "2025-05-11",
           "source_file": "2025-05-11_equity-research-한화솔루션-2.md",
           "target_price": 91200.0,
-          "stated_upside_pct": 179.3262
+          "stated_upside_pct": 196.1424
         },
         {
           "school": "ewha",
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         },
         {
           "school": "kuvic",
           "report_date": "2024-06-27",
           "source_file": "2024-06-27_한화솔루션 - 중국을 이겨낼 단 '한화'의 솔루션.md",
           "target_price": 49500.0,
-          "stated_upside_pct": 75.5319
+          "stated_upside_pct": 86.0972
         }
       ]
     },
@@ -94287,6 +94308,13 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
+          "target_price": null,
+          "stated_upside_pct": null
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2025-06-27",
+          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }

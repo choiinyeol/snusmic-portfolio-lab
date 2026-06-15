@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-12T17:15:31+00:00",
+  "generated_at": "2026-06-15T15:55:49+00:00",
   "strategy_key": "A_12mo",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -473,8 +473,8 @@
       "name": "한화솔루션",
       "entry_date": "2021-01-18",
       "exit_date": "2022-01-18",
-      "entry_price": 66621.0,
-      "exit_price": 47595.0,
+      "entry_price": 62839.0,
+      "exit_price": 44893.0,
       "return_pct": -28.99,
       "days": 365,
       "exit_reason": "12개월_만기",
@@ -2672,9 +2672,9 @@
       "name": "한화솔루션",
       "entry_date": "2025-05-12",
       "exit_date": "2026-05-12",
-      "entry_price": 33300.0,
-      "exit_price": 44950.0,
-      "return_pct": 34.18,
+      "entry_price": 31410.0,
+      "exit_price": 42398.0,
+      "return_pct": 34.17,
       "days": 365,
       "exit_reason": "12개월_만기",
       "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입 (트리거: smic 2025-05-11, kuvic 2024-06-27, ewha 2021-03-13) · 12개월 고정 보유",
@@ -2684,21 +2684,21 @@
           "report_date": "2025-05-11",
           "source_file": "2025-05-11_equity-research-한화솔루션-2.md",
           "target_price": 91200.0,
-          "stated_upside_pct": 179.3262
+          "stated_upside_pct": 196.1424
         },
         {
           "school": "ewha",
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         },
         {
           "school": "kuvic",
           "report_date": "2024-06-27",
           "source_file": "2024-06-27_한화솔루션 - 중국을 이겨낼 단 '한화'의 솔루션.md",
           "target_price": 49500.0,
-          "stated_upside_pct": 75.5319
+          "stated_upside_pct": 86.0972
         }
       ]
     },

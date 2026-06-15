@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-12T17:15:31+00:00",
+  "generated_at": "2026-06-15T15:55:49+00:00",
   "strategy_key": "O_mtt_alpha16",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -9133,8 +9133,8 @@
       "name": "한화솔루션",
       "entry_date": "2025-07-28",
       "exit_date": "2025-07-31",
-      "entry_price": 38650.0,
-      "exit_price": 32650.0,
+      "entry_price": 36456.0,
+      "exit_price": 30796.0,
       "return_pct": -16.03,
       "days": 3,
       "exit_reason": "mtt_stop",
@@ -9145,21 +9145,21 @@
           "report_date": "2025-05-11",
           "source_file": "2025-05-11_equity-research-한화솔루션-2.md",
           "target_price": 91200.0,
-          "stated_upside_pct": 179.3262
+          "stated_upside_pct": 196.1424
         },
         {
           "school": "ewha",
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         },
         {
           "school": "kuvic",
           "report_date": "2024-06-27",
           "source_file": "2024-06-27_한화솔루션 - 중국을 이겨낼 단 '한화'의 솔루션.md",
           "target_price": 49500.0,
-          "stated_upside_pct": 75.5319
+          "stated_upside_pct": 86.0972
         }
       ]
     },
@@ -19736,6 +19736,78 @@
           "source_file": "2025-12-12_STAR_유진테크.md",
           "target_price": 119500.0,
           "stated_upside_pct": 59.3333
+        }
+      ]
+    },
+    {
+      "ticker": "319660",
+      "market": "KR",
+      "name": "피에스케이",
+      "entry_date": "2026-06-08",
+      "exit_date": "2026-06-15",
+      "entry_price": 120600.0,
+      "exit_price": 176300.0,
+      "return_pct": 45.31,
+      "days": 7,
+      "exit_reason": "mtt_take_profit_3.5R",
+      "entry_reason": "MTT 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주저점×1.9↑, 52주고점×0.95↑, RS 95≥80) → 익일 시가 진입",
+      "trigger_reports": [
+        {
+          "school": "yig",
+          "report_date": "2026-03-17",
+          "source_file": "2026-03-31_피에스케이(319660,KQ), Post Semiconductor King YIG Research.md",
+          "target_price": 87400.0,
+          "stated_upside_pct": 20.0549
+        },
+        {
+          "school": "star",
+          "report_date": "2026-05-03",
+          "source_file": "2026-05-03_STAR_피에스케이.md",
+          "target_price": 127800.0,
+          "stated_upside_pct": 44.0812
+        }
+      ]
+    },
+    {
+      "ticker": "036930",
+      "market": "KR",
+      "name": "주성엔지니어링",
+      "entry_date": "2026-06-12",
+      "exit_date": "2026-06-15",
+      "entry_price": 267500.0,
+      "exit_price": 237500.0,
+      "return_pct": -11.75,
+      "days": 3,
+      "exit_reason": "mtt_stop",
+      "entry_reason": "MTT 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주저점×1.9↑, 52주고점×0.95↑, RS 98≥80) → 익일 시가 진입",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2021-11-03",
+          "source_file": "2021-11-03_equity-research-주성엔지니어링.md",
+          "target_price": 26700.0,
+          "stated_upside_pct": 135.2423
+        },
+        {
+          "school": "star",
+          "report_date": "2022-04-01",
+          "source_file": "2022-04-01_STAR_주성엔지니어링.md",
+          "target_price": 34100.0,
+          "stated_upside_pct": 33.7255
+        },
+        {
+          "school": "yig",
+          "report_date": "2024-09-13",
+          "source_file": "2025-11-10_주성엔지니어링 (036930, KQ), 주성엔지니어링, 어서 빨리 주성~ (발간일 240913) YIG Research.md",
+          "target_price": 31350.0,
+          "stated_upside_pct": 26.1569
+        },
+        {
+          "school": "voera",
+          "report_date": "2026-05-22",
+          "source_file": "undated_[BUY] ALD의 왕 주성전하 납시오, 주성엔지니어링.md",
+          "target_price": 288820.0,
+          "stated_upside_pct": 28.9375
         }
       ]
     }

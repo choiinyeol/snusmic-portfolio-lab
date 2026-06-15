@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-12T17:15:31+00:00",
+  "generated_at": "2026-06-15T15:55:49+00:00",
   "strategy_key": "Q_kangto_trend",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -4574,8 +4574,8 @@
       "name": "한화솔루션",
       "entry_date": "2022-05-31",
       "exit_date": "2022-06-23",
-      "entry_price": 46348.0,
-      "exit_price": 45412.0,
+      "entry_price": 43717.0,
+      "exit_price": 42834.0,
       "return_pct": -2.61,
       "days": 23,
       "exit_reason": "q_stop",
@@ -4593,7 +4593,7 @@
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         }
       ]
     },
@@ -4771,8 +4771,8 @@
       "name": "한화솔루션",
       "entry_date": "2022-07-29",
       "exit_date": "2022-09-01",
-      "entry_price": 53709.0,
-      "exit_price": 66599.16,
+      "entry_price": 50660.0,
+      "exit_price": 62818.4,
       "return_pct": 23.26,
       "days": 34,
       "exit_reason": "q_half_+3R",
@@ -4790,7 +4790,7 @@
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         }
       ]
     },
@@ -5114,8 +5114,8 @@
       "name": "한화솔루션",
       "entry_date": "2022-07-29",
       "exit_date": "2022-09-22",
-      "entry_price": 53709.0,
-      "exit_price": 61007.0,
+      "entry_price": 50660.0,
+      "exit_price": 57544.0,
       "return_pct": 12.91,
       "days": 55,
       "exit_reason": "q_stop",
@@ -5133,7 +5133,7 @@
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         }
       ]
     },
@@ -15454,8 +15454,8 @@
       "name": "한화솔루션",
       "entry_date": "2025-04-22",
       "exit_date": "2025-04-25",
-      "entry_price": 24100.0,
-      "exit_price": 29884.0,
+      "entry_price": 22732.0,
+      "exit_price": 28187.68,
       "return_pct": 23.26,
       "days": 3,
       "exit_reason": "q_half_+3R",
@@ -15473,14 +15473,14 @@
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         },
         {
           "school": "kuvic",
           "report_date": "2024-06-27",
           "source_file": "2024-06-27_한화솔루션 - 중국을 이겨낼 단 '한화'의 솔루션.md",
           "target_price": 49500.0,
-          "stated_upside_pct": 75.5319
+          "stated_upside_pct": 86.0972
         }
       ]
     },
@@ -15722,8 +15722,8 @@
       "name": "한화솔루션",
       "entry_date": "2025-04-22",
       "exit_date": "2025-05-23",
-      "entry_price": 24100.0,
-      "exit_price": 31450.0,
+      "entry_price": 22732.0,
+      "exit_price": 29665.0,
       "return_pct": 29.72,
       "days": 31,
       "exit_reason": "q_stop",
@@ -15741,14 +15741,14 @@
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         },
         {
           "school": "kuvic",
           "report_date": "2024-06-27",
           "source_file": "2024-06-27_한화솔루션 - 중국을 이겨낼 단 '한화'의 솔루션.md",
           "target_price": 49500.0,
-          "stated_upside_pct": 75.5319
+          "stated_upside_pct": 86.0972
         }
       ]
     },
@@ -20015,8 +20015,8 @@
       "name": "한화솔루션",
       "entry_date": "2026-02-09",
       "exit_date": "2026-02-19",
-      "entry_price": 41900.0,
-      "exit_price": 51956.0,
+      "entry_price": 39521.0,
+      "exit_price": 49006.04,
       "return_pct": 23.26,
       "days": 10,
       "exit_reason": "q_half_+3R",
@@ -20027,21 +20027,21 @@
           "report_date": "2025-05-11",
           "source_file": "2025-05-11_equity-research-한화솔루션-2.md",
           "target_price": 91200.0,
-          "stated_upside_pct": 179.3262
+          "stated_upside_pct": 196.1424
         },
         {
           "school": "ewha",
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         },
         {
           "school": "kuvic",
           "report_date": "2024-06-27",
           "source_file": "2024-06-27_한화솔루션 - 중국을 이겨낼 단 '한화'의 솔루션.md",
           "target_price": 49500.0,
-          "stated_upside_pct": 75.5319
+          "stated_upside_pct": 86.0972
         }
       ]
     },
@@ -20051,9 +20051,9 @@
       "name": "한화솔루션",
       "entry_date": "2026-02-09",
       "exit_date": "2026-02-23",
-      "entry_price": 41900.0,
-      "exit_price": 54800.0,
-      "return_pct": 30.0,
+      "entry_price": 39521.0,
+      "exit_price": 51689.0,
+      "return_pct": 30.01,
       "days": 14,
       "exit_reason": "q_stop",
       "entry_reason": "깡토 추세추종: RS 82 ≥ KOSPI RS + 60일 신고가 돌파 + 거래량 ≥ 1.5×20일평균 → 익일 시가 진입 (4유닛)",
@@ -20063,21 +20063,21 @@
           "report_date": "2025-05-11",
           "source_file": "2025-05-11_equity-research-한화솔루션-2.md",
           "target_price": 91200.0,
-          "stated_upside_pct": 179.3262
+          "stated_upside_pct": 196.1424
         },
         {
           "school": "ewha",
           "report_date": "2021-03-13",
           "source_file": "2021-03-13_[210313] 한화솔루션(009830).md",
           "target_price": 59700.0,
-          "stated_upside_pct": 8.508
+          "stated_upside_pct": 15.04
         },
         {
           "school": "kuvic",
           "report_date": "2024-06-27",
           "source_file": "2024-06-27_한화솔루션 - 중국을 이겨낼 단 '한화'의 솔루션.md",
           "target_price": 49500.0,
-          "stated_upside_pct": 75.5319
+          "stated_upside_pct": 86.0972
         }
       ]
     },
@@ -23223,6 +23223,71 @@
           "source_file": "2026-05-11_후성 (093370, KOSPI), '후'퇴는 없다, '성'장만 남았다 YIG Research.md",
           "target_price": 20000.0,
           "stated_upside_pct": 49.1424
+        }
+      ]
+    },
+    {
+      "ticker": "222800",
+      "market": "KR",
+      "name": "심텍",
+      "entry_date": "2026-06-12",
+      "exit_date": "2026-06-15",
+      "entry_price": 142900.0,
+      "exit_price": 132000.0,
+      "return_pct": -8.18,
+      "days": 3,
+      "exit_reason": "q_stop",
+      "entry_reason": "깡토 추세추종: RS 96 ≥ KOSPI RS + 60일 신고가 돌파 + 거래량 ≥ 1.5×20일평균 → 익일 시가 진입 (2유닛)",
+      "trigger_reports": [
+        {
+          "school": "ewha",
+          "report_date": "2022-03-12",
+          "source_file": "2022-03-12_[220312] 심텍(222800).md",
+          "target_price": 66900.0,
+          "stated_upside_pct": 33.5329
+        },
+        {
+          "school": "yig",
+          "report_date": "2025-11-13",
+          "source_file": "2026-04-08_심텍 (222800, KOSDAQ), 흔들린 숫자, 명확해진 방향 YIG Research.md",
+          "target_price": 84100.0,
+          "stated_upside_pct": 56.903
+        }
+      ]
+    },
+    {
+      "ticker": "403870",
+      "market": "KR",
+      "name": "HPSP",
+      "entry_date": "2026-06-15",
+      "exit_date": "2026-06-15",
+      "entry_price": 71900.0,
+      "exit_price": 89156.0,
+      "return_pct": 23.26,
+      "days": 0,
+      "exit_reason": "q_half_+3R",
+      "entry_reason": "깡토 추세추종: RS 90 ≥ KOSPI RS + 60일 신고가 돌파 + 거래량 ≥ 1.5×20일평균 → 익일 시가 진입 (2유닛)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2022-10-13",
+          "source_file": "2022-10-13_equity-research-hpsp.md",
+          "target_price": 19911.913,
+          "stated_upside_pct": 54.9565
+        },
+        {
+          "school": "yig",
+          "report_date": "2025-03-14",
+          "source_file": "2025-11-11_HPSP (403870, KQ), HPSP의 역습이 시작된다 (발간일 250314) YIG Research.md",
+          "target_price": 37760.0,
+          "stated_upside_pct": 35.0984
+        },
+        {
+          "school": "star",
+          "report_date": "2026-03-14",
+          "source_file": "2026-03-14_STAR_HPSP.md",
+          "target_price": 44900.0,
+          "stated_upside_pct": 5.2755
         }
       ]
     }

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-12T17:15:31+00:00",
+  "generated_at": "2026-06-15T15:55:49+00:00",
   "strategy_key": "H_minervini",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -121,8 +121,8 @@
       "name": "한화솔루션",
       "entry_date": "2021-01-18",
       "exit_date": "2021-03-02",
-      "entry_price": 66621.0,
-      "exit_price": 57701.0,
+      "entry_price": 62839.0,
+      "exit_price": 54426.0,
       "return_pct": -13.91,
       "days": 43,
       "exit_reason": "minervini_close<50MA",
@@ -3067,6 +3067,35 @@
           "source_file": "2025-12-12_STAR_RHFIC.md",
           "target_price": 42050.0,
           "stated_upside_pct": 29.784
+        }
+      ]
+    },
+    {
+      "ticker": "010120",
+      "market": "KR",
+      "name": "LS ELECTRIC",
+      "entry_date": "2026-05-21",
+      "exit_date": "2026-06-15",
+      "entry_price": 254000.0,
+      "exit_price": 240000.0,
+      "return_pct": -6.08,
+      "days": 25,
+      "exit_reason": "minervini_close<50MA",
+      "entry_reason": "미너비니 트렌드 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주고점 70%↑, RS>KOSPI) → 진입 (트리거: voera 2026-05-20, star 2022-08-16)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2022-08-16",
+          "source_file": "2022-08-16_STAR_LS ELECTRIC.md",
+          "target_price": 15325.3846,
+          "stated_upside_pct": 32.1154
+        },
+        {
+          "school": "voera",
+          "report_date": "2026-05-20",
+          "source_file": "undated_[BUY] Linked to AI, Shipped to America, LS ELECREIC.md",
+          "target_price": 360000.0,
+          "stated_upside_pct": 50.9434
         }
       ]
     }
