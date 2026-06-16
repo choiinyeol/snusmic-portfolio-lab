@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-15T15:55:49+00:00",
+  "generated_at": "2026-06-16T15:11:58+00:00",
   "strategy_key": "Q_kangto_trend",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -23288,6 +23288,86 @@
           "source_file": "2026-03-14_STAR_HPSP.md",
           "target_price": 44900.0,
           "stated_upside_pct": 5.2755
+        }
+      ]
+    },
+    {
+      "ticker": "031980",
+      "market": "KR",
+      "name": "피에스케이홀딩스",
+      "entry_date": "2026-06-11",
+      "exit_date": "2026-06-16",
+      "entry_price": 132500.0,
+      "exit_price": 135600.0,
+      "return_pct": 1.73,
+      "days": 5,
+      "exit_reason": "q_stop",
+      "entry_reason": "깡토 추세추종: RS 92 ≥ KOSPI RS + 60일 신고가 돌파 + 거래량 ≥ 1.5×20일평균 → 익일 시가 진입 (2유닛)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2026-05-02",
+          "source_file": "2026-05-02_STAR_피에스케이홀딩스.md",
+          "target_price": 155200.0,
+          "stated_upside_pct": 24.8592
+        }
+      ]
+    },
+    {
+      "ticker": "183300",
+      "market": "KR",
+      "name": "코미코",
+      "entry_date": "2026-06-12",
+      "exit_date": "2026-06-16",
+      "entry_price": 133600.0,
+      "exit_price": 111400.0,
+      "return_pct": -17.12,
+      "days": 4,
+      "exit_reason": "q_stop",
+      "entry_reason": "깡토 추세추종: RS 96 ≥ KOSPI RS + 60일 신고가 돌파 + 거래량 ≥ 1.5×20일평균 → 익일 시가 진입 (2유닛)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2025-08-31",
+          "source_file": "2025-08-31_STAR_코미코.md",
+          "target_price": 87900.0,
+          "stated_upside_pct": 109.1961
+        },
+        {
+          "school": "yig",
+          "report_date": "2025-09-24",
+          "source_file": "2025-11-11_코미코 (183300, KQ), 코미코 짱! High~ (발간일 250924) YIG Research.md",
+          "target_price": 138000.0,
+          "stated_upside_pct": 174.2448
+        }
+      ]
+    },
+    {
+      "ticker": "039030",
+      "market": "KR",
+      "name": "이오테크닉스",
+      "entry_date": "2026-06-15",
+      "exit_date": "2026-06-16",
+      "entry_price": 598000.0,
+      "exit_price": 535000.0,
+      "return_pct": -11.07,
+      "days": 1,
+      "exit_reason": "q_stop",
+      "entry_reason": "깡토 추세추종: RS 90 ≥ KOSPI RS + 60일 신고가 돌파 + 거래량 ≥ 1.5×20일평균 → 익일 시가 진입 (2유닛)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2020-05-31",
+          "source_file": "2020-05-31_Equity Research, 이오테크닉스.md",
+          "target_price": 107593.0,
+          "stated_upside_pct": 22.4039
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2025-11-20",
+          "source_file": "2025-11-17_이오테크닉스 - 이오가 짱이오.md",
+          "target_price": 416000.0,
+          "stated_upside_pct": 51.2727
         }
       ]
     }

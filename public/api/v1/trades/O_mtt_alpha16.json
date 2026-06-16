@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-15T15:55:49+00:00",
+  "generated_at": "2026-06-16T15:11:58+00:00",
   "strategy_key": "O_mtt_alpha16",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -19808,6 +19808,108 @@
           "source_file": "undated_[BUY] ALD의 왕 주성전하 납시오, 주성엔지니어링.md",
           "target_price": 288820.0,
           "stated_upside_pct": 28.9375
+        }
+      ]
+    },
+    {
+      "ticker": "093370",
+      "market": "KR",
+      "name": "후성",
+      "entry_date": "2026-06-11",
+      "exit_date": "2026-06-16",
+      "entry_price": 15800.0,
+      "exit_price": 22400.0,
+      "return_pct": 40.92,
+      "days": 5,
+      "exit_reason": "mtt_take_profit_3.5R",
+      "entry_reason": "MTT 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주저점×1.9↑, 52주고점×0.95↑, RS 94≥80) → 익일 시가 진입",
+      "trigger_reports": [
+        {
+          "school": "yig",
+          "report_date": "2026-05-11",
+          "source_file": "2026-05-11_후성 (093370, KOSPI), '후'퇴는 없다, '성'장만 남았다 YIG Research.md",
+          "target_price": 20000.0,
+          "stated_upside_pct": 49.1424
+        }
+      ]
+    },
+    {
+      "ticker": "183300",
+      "market": "KR",
+      "name": "코미코",
+      "entry_date": "2026-06-12",
+      "exit_date": "2026-06-16",
+      "entry_price": 133600.0,
+      "exit_price": 111400.0,
+      "return_pct": -17.12,
+      "days": 4,
+      "exit_reason": "mtt_stop",
+      "entry_reason": "MTT 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주저점×1.9↑, 52주고점×0.95↑, RS 96≥80) → 익일 시가 진입",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2025-08-31",
+          "source_file": "2025-08-31_STAR_코미코.md",
+          "target_price": 87900.0,
+          "stated_upside_pct": 109.1961
+        },
+        {
+          "school": "yig",
+          "report_date": "2025-09-24",
+          "source_file": "2025-11-11_코미코 (183300, KQ), 코미코 짱! High~ (발간일 250924) YIG Research.md",
+          "target_price": 138000.0,
+          "stated_upside_pct": 174.2448
+        }
+      ]
+    },
+    {
+      "ticker": "039030",
+      "market": "KR",
+      "name": "이오테크닉스",
+      "entry_date": "2026-06-15",
+      "exit_date": "2026-06-16",
+      "entry_price": 598000.0,
+      "exit_price": 535000.0,
+      "return_pct": -11.07,
+      "days": 1,
+      "exit_reason": "mtt_stop",
+      "entry_reason": "MTT 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주저점×1.9↑, 52주고점×0.95↑, RS 90≥80) → 익일 시가 진입",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2020-05-31",
+          "source_file": "2020-05-31_Equity Research, 이오테크닉스.md",
+          "target_price": 107593.0,
+          "stated_upside_pct": 22.4039
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2025-11-20",
+          "source_file": "2025-11-17_이오테크닉스 - 이오가 짱이오.md",
+          "target_price": 416000.0,
+          "stated_upside_pct": 51.2727
+        }
+      ]
+    },
+    {
+      "ticker": "031980",
+      "market": "KR",
+      "name": "피에스케이홀딩스",
+      "entry_date": "2026-06-15",
+      "exit_date": "2026-06-16",
+      "entry_price": 150000.0,
+      "exit_price": 135600.0,
+      "return_pct": -10.14,
+      "days": 1,
+      "exit_reason": "mtt_stop",
+      "entry_reason": "MTT 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주저점×1.9↑, 52주고점×0.95↑, RS 92≥80) → 익일 시가 진입",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2026-05-02",
+          "source_file": "2026-05-02_STAR_피에스케이홀딩스.md",
+          "target_price": 155200.0,
+          "stated_upside_pct": 24.8592
         }
       ]
     }
