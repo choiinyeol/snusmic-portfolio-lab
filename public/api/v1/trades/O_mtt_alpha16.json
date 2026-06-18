@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-16T15:11:58+00:00",
+  "generated_at": "2026-06-18T13:04:14+00:00",
   "strategy_key": "O_mtt_alpha16",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -19910,6 +19910,71 @@
           "source_file": "2026-05-02_STAR_피에스케이홀딩스.md",
           "target_price": 155200.0,
           "stated_upside_pct": 24.8592
+        }
+      ]
+    },
+    {
+      "ticker": "403870",
+      "market": "KR",
+      "name": "HPSP",
+      "entry_date": "2026-06-15",
+      "exit_date": "2026-06-17",
+      "entry_price": 71900.0,
+      "exit_price": 66500.0,
+      "return_pct": -8.06,
+      "days": 2,
+      "exit_reason": "mtt_stop",
+      "entry_reason": "MTT 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주저점×1.9↑, 52주고점×0.95↑, RS 90≥80) → 익일 시가 진입",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2022-10-13",
+          "source_file": "2022-10-13_equity-research-hpsp.md",
+          "target_price": 19911.913,
+          "stated_upside_pct": 54.9565
+        },
+        {
+          "school": "yig",
+          "report_date": "2025-03-14",
+          "source_file": "2025-11-11_HPSP (403870, KQ), HPSP의 역습이 시작된다 (발간일 250314) YIG Research.md",
+          "target_price": 37760.0,
+          "stated_upside_pct": 35.0984
+        },
+        {
+          "school": "star",
+          "report_date": "2026-03-14",
+          "source_file": "2026-03-14_STAR_HPSP.md",
+          "target_price": 44900.0,
+          "stated_upside_pct": 5.2755
+        }
+      ]
+    },
+    {
+      "ticker": "084370",
+      "market": "KR",
+      "name": "유진테크",
+      "entry_date": "2026-06-15",
+      "exit_date": "2026-06-18",
+      "entry_price": 191000.0,
+      "exit_price": 175900.0,
+      "return_pct": -8.46,
+      "days": 3,
+      "exit_reason": "mtt_stop",
+      "entry_reason": "MTT 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주저점×1.9↑, 52주고점×0.95↑, RS 93≥80) → 익일 시가 진입",
+      "trigger_reports": [
+        {
+          "school": "kuvic",
+          "report_date": "2024-11-11",
+          "source_file": "2024-11-11_유진테크 - 반도체가 여름이래'유~진'짜라니께.md",
+          "target_price": null,
+          "stated_upside_pct": null
+        },
+        {
+          "school": "star",
+          "report_date": "2025-12-12",
+          "source_file": "2025-12-12_STAR_유진테크.md",
+          "target_price": 119500.0,
+          "stated_upside_pct": 59.3333
         }
       ]
     }

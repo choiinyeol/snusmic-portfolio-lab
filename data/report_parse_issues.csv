@@ -162,6 +162,8 @@ data/markdown/kuvic/2026-01-27_유틸리티 - I got the POWER POWER POWER.md,kuv
 data/markdown/kuvic/2026-03-16_우주 - 우주를 줄게.md,kuvic,sector,False,2026-03-16,2026-03-16,2026-03-16,,우주,,,,,,,,,non_us_kr_or_unparsed_market;missing_ticker,,
 data/markdown/kuvic/2026-04-07_게임 - 한 판만 더 할게요.md,kuvic,sector,False,2026-04-07,2026-04-07,2026-04-07,,게임,,,Hold,,,,,,non_us_kr_or_unparsed_market;missing_ticker,,
 data/markdown/kuvic/2026-04-07_호텔 레저 - 여기 20층에 사람 있어요~.md,kuvic,sector,False,2026-04-07,2026-04-07,2026-04-07,,호텔/레저,,,,,,,,,non_us_kr_or_unparsed_market;missing_ticker,,
+data/markdown/kuvic/2026-06-08_로봇 - Touch My Body.md,kuvic,sector,False,2026-06-08,2026-06-08,2026-06-08,,로봇,,,,,,,,,non_us_kr_or_unparsed_market;missing_ticker,,
+data/markdown/kuvic/2026-06-08_증권 - 만스피를 향해 가는 지금.md,kuvic,sector,False,2026-06-08,2026-06-08,2026-06-08,,증권,,,Buy,,,,,,non_us_kr_or_unparsed_market;missing_ticker;missing_target_price,,
 data/markdown/ewha/2020-08-22_[200822] 천보(278280).md,ewha,company,True,2020-08-22,2019-08-05,2020-08-22,KR,천보,278280,KRX,Buy,,,,,30.16,missing_target_price,ocr_fallback;ocr_inconsistent_prices,
 data/markdown/ewha/2020-09-12_[200912] 노바렉스(1947000).md,ewha,sector,False,2020-09-12,2020-09-12,2020-09-12,,,,,Hold,51200.0,"51,200원",9.0,9,22.17,non_us_kr_or_unparsed_market;missing_ticker,,
 data/markdown/ewha/2020-10-10_ewha-14218835.md,ewha,sector,False,2020-10-10,2020-10-10,2020-10-10,,187870,,,Buy,31700.0,"31,700원",10.0,10,26.51,non_us_kr_or_unparsed_market;missing_ticker,,
