@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-18T13:04:14+00:00",
+  "generated_at": "2026-06-19T13:40:08+00:00",
   "strategy_key": "G_dip_buy",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -19974,6 +19974,121 @@
           "source_file": "2026-03-14_STAR_링크솔루션.md",
           "target_price": 100400.0,
           "stated_upside_pct": 53.2824
+        }
+      ]
+    },
+    {
+      "ticker": "112610",
+      "market": "KR",
+      "name": "씨에스윈드",
+      "entry_date": "2026-06-01",
+      "exit_date": "2026-06-19",
+      "entry_price": 46700.0,
+      "exit_price": 44100.0,
+      "return_pct": -6.13,
+      "days": 18,
+      "exit_reason": "dip_atr3_stop",
+      "entry_reason": "발간일(2026-03-31) 종가 대비 −20% 하락 도달 → 익일 시가 진입 (딥바이)",
+      "trigger_reports": [
+        {
+          "school": "ewha",
+          "report_date": "2023-05-27",
+          "source_file": "2023-05-27_[230527] 씨에스윈드(112610).md",
+          "target_price": 103200.0,
+          "stated_upside_pct": 35.611
+        },
+        {
+          "school": "voera",
+          "report_date": "2021-05-14",
+          "source_file": "undated_[BUY] 씨에스윈드 불어라 바람! 불어라 수주!.md",
+          "target_price": 90900.0,
+          "stated_upside_pct": 31.3584
+        },
+        {
+          "school": "yig",
+          "report_date": "2026-03-31",
+          "source_file": "2026-04-04_씨에스윈드 (112610, KOSPI), 씨에스WINd~ YIG Research.md",
+          "target_price": 88500.0,
+          "stated_upside_pct": 48.4899
+        },
+        {
+          "school": "star",
+          "report_date": "2025-08-31",
+          "source_file": "2025-08-31_STAR_씨에스윈드.md",
+          "target_price": 51700.0,
+          "stated_upside_pct": 23.8323
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2024-10-08",
+          "source_file": "2024-10-08_씨에스윈드 - 해상 풍력, 늦바람 났어♬.md",
+          "target_price": 96684.0,
+          "stated_upside_pct": 45.8281
+        },
+        {
+          "school": "smic",
+          "report_date": "2024-10-17",
+          "source_file": "2024-10-17_equity-research-씨에스윈드.md",
+          "target_price": 134400.0,
+          "stated_upside_pct": 118.1818
+        }
+      ]
+    },
+    {
+      "ticker": "318060",
+      "market": "KR",
+      "name": "그래피",
+      "entry_date": "2026-05-13",
+      "exit_date": "2026-06-19",
+      "entry_price": 27650.0,
+      "exit_price": 21150.0,
+      "return_pct": -23.97,
+      "days": 37,
+      "exit_reason": "dip_atr3_stop",
+      "entry_reason": "발간일(2026-03-14) 종가 대비 −20% 하락 도달 → 익일 시가 진입 (딥바이)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2026-03-14",
+          "source_file": "2026-03-14_STAR_그래피.md",
+          "target_price": 87400.0,
+          "stated_upside_pct": 98.6364
+        }
+      ]
+    },
+    {
+      "ticker": "355150",
+      "market": "KR",
+      "name": "코스텍시스",
+      "entry_date": "2026-05-21",
+      "exit_date": "2026-06-19",
+      "entry_price": 47550.0,
+      "exit_price": 31600.0,
+      "return_pct": -33.94,
+      "days": 29,
+      "exit_reason": "dip_atr3_stop",
+      "entry_reason": "발간일(2026-05-18) 종가 대비 −20% 하락 도달 → 익일 시가 진입 (딥바이)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2026-05-07",
+          "source_file": "2026-05-07_equity-research-코스텍시스.md",
+          "target_price": 112400.0,
+          "stated_upside_pct": 121.2598
+        },
+        {
+          "school": "yig",
+          "report_date": "2026-05-08",
+          "source_file": "2026-05-10_코스텍시스 (355150,KQ), 전력반도체는 방열, 주가는 가열 YIG Research.md",
+          "target_price": 84400.0,
+          "stated_upside_pct": 53.176
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2026-05-18",
+          "source_file": "2026-05-18_코스텍시스 - 코스텍시스, 800V짜리 카타르시스.md",
+          "target_price": null,
+          "stated_upside_pct": null
         }
       ]
     }
