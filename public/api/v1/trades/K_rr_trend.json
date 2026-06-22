@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-19T13:40:08+00:00",
+  "generated_at": "2026-06-22T15:29:46+00:00",
   "strategy_key": "K_rr_trend",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -16599,6 +16599,100 @@
           "source_file": "2026-06-12_STAR_키움증권.md",
           "target_price": 674000.0,
           "stated_upside_pct": 85.4195
+        }
+      ]
+    },
+    {
+      "ticker": "007700",
+      "market": "KR",
+      "name": "F&F홀딩스",
+      "entry_date": "2026-06-11",
+      "exit_date": "2026-06-22",
+      "entry_price": 16590.0,
+      "exit_price": 16140.0,
+      "return_pct": -3.3,
+      "days": 11,
+      "exit_reason": "rr_stop",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입, R:R 세팅 (스탑 1×ATR20, 목표 +2.5R) (트리거: smic 2026-06-10)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2026-06-10",
+          "source_file": "2026-06-10_Equity Research, F&F홀딩스.md",
+          "target_price": 37960.0,
+          "stated_upside_pct": 127.1694
+        }
+      ]
+    },
+    {
+      "ticker": "120110",
+      "market": "KR",
+      "name": "코오롱인더",
+      "entry_date": "2026-06-11",
+      "exit_date": "2026-06-22",
+      "entry_price": 68600.0,
+      "exit_price": 63400.0,
+      "return_pct": -8.13,
+      "days": 11,
+      "exit_reason": "rr_stop",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입, R:R 세팅 (스탑 1×ATR20, 목표 +2.5R) (트리거: smic 2026-06-10, star 2026-05-04, ewha 2021-08-21)",
+      "trigger_reports": [
+        {
+          "school": "ewha",
+          "report_date": "2021-08-21",
+          "source_file": "2021-08-21_[210821] 코오롱인더(120110).md",
+          "target_price": 90876.0,
+          "stated_upside_pct": 27.2773
+        },
+        {
+          "school": "star",
+          "report_date": "2026-05-04",
+          "source_file": "2026-05-04_STAR_코오롱인더.md",
+          "target_price": 110400.0,
+          "stated_upside_pct": 17.6972
+        },
+        {
+          "school": "smic",
+          "report_date": "2026-06-10",
+          "source_file": "2026-06-10_Equity Research, 코오롱인더스트리.md",
+          "target_price": 157800.0,
+          "stated_upside_pct": 128.6957
+        }
+      ]
+    },
+    {
+      "ticker": "010060",
+      "market": "KR",
+      "name": "OCI홀딩스",
+      "entry_date": "2026-06-15",
+      "exit_date": "2026-06-22",
+      "entry_price": 304000.0,
+      "exit_price": 249000.0,
+      "return_pct": -18.58,
+      "days": 7,
+      "exit_reason": "rr_stop",
+      "entry_reason": "학회 매수리포트 발간 → 익일 시가 진입, R:R 세팅 (스탑 1×ATR20, 목표 +2.5R) (트리거: star 2026-06-13, yig 2026-01-01, ewha 2021-08-21)",
+      "trigger_reports": [
+        {
+          "school": "ewha",
+          "report_date": "2021-08-21",
+          "source_file": "2021-08-21_[210821] OCI(010060).md",
+          "target_price": 113156.0,
+          "stated_upside_pct": 40.2911
+        },
+        {
+          "school": "yig",
+          "report_date": "2026-01-01",
+          "source_file": "2026-04-04_OCI홀딩스(010060, KOSPI), 전력은 부족해도, 홀딩은 OCI YIG Research.md",
+          "target_price": 159300.0,
+          "stated_upside_pct": 38.2812
+        },
+        {
+          "school": "star",
+          "report_date": "2026-06-13",
+          "source_file": "2026-06-13_KEYSS_STAR_OCI홀딩스.md",
+          "target_price": 576500.0,
+          "stated_upside_pct": 92.1667
         }
       ]
     }

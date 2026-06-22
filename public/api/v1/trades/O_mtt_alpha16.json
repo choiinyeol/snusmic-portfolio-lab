@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-19T13:40:08+00:00",
+  "generated_at": "2026-06-22T15:29:46+00:00",
   "strategy_key": "O_mtt_alpha16",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -19975,6 +19975,42 @@
           "source_file": "2025-12-12_STAR_유진테크.md",
           "target_price": 119500.0,
           "stated_upside_pct": 59.3333
+        }
+      ]
+    },
+    {
+      "ticker": "204320",
+      "market": "KR",
+      "name": "HL만도",
+      "entry_date": "2026-06-17",
+      "exit_date": "2026-06-22",
+      "entry_price": 74400.0,
+      "exit_price": 64400.0,
+      "return_pct": -13.96,
+      "days": 5,
+      "exit_reason": "mtt_stop",
+      "entry_reason": "MTT 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주저점×1.9↑, 52주고점×0.95↑, RS 83≥80) → 익일 시가 진입",
+      "trigger_reports": [
+        {
+          "school": "ewha",
+          "report_date": "2025-02-21",
+          "source_file": "2025-02-21_[250221] HL만도(204320).md",
+          "target_price": 57950.0,
+          "stated_upside_pct": 30.6652
+        },
+        {
+          "school": "star",
+          "report_date": "2025-01-09",
+          "source_file": "2025-01-09_STAR_HL만도.md",
+          "target_price": 57500.0,
+          "stated_upside_pct": 39.0568
+        },
+        {
+          "school": "voera",
+          "report_date": "2025-05-09",
+          "source_file": "undated_[BUY] HL만 도전해, 수출길에.md",
+          "target_price": 47500.0,
+          "stated_upside_pct": 30.674
         }
       ]
     }
