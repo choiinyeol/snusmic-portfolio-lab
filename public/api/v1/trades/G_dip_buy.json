@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-22T15:29:46+00:00",
+  "generated_at": "2026-06-23T12:49:57+00:00",
   "strategy_key": "G_dip_buy",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -15917,35 +15917,6 @@
       ]
     },
     {
-      "ticker": "419530",
-      "market": "KR",
-      "name": "SAMG엔터",
-      "entry_date": "2025-07-23",
-      "exit_date": "2025-07-23",
-      "entry_price": 72100.0,
-      "exit_price": 37590.0,
-      "return_pct": -48.18,
-      "days": 0,
-      "exit_reason": "dip_목표가",
-      "entry_reason": "발간일(2025-06-27) 종가 대비 −20% 하락 도달 → 익일 시가 진입 (딥바이)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2025-06-18",
-          "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        }
-      ]
-    },
-    {
       "ticker": "348210",
       "market": "KR",
       "name": "넥스틴",
@@ -15993,35 +15964,6 @@
           "source_file": "2025-03-10_STAR_넥스트바이오메디컬.md",
           "target_price": 70400.0,
           "stated_upside_pct": 54.8955
-        }
-      ]
-    },
-    {
-      "ticker": "419530",
-      "market": "KR",
-      "name": "SAMG엔터",
-      "entry_date": "2025-07-25",
-      "exit_date": "2025-07-25",
-      "entry_price": 71900.0,
-      "exit_price": 37590.0,
-      "return_pct": -48.03,
-      "days": 0,
-      "exit_reason": "dip_목표가",
-      "entry_reason": "발간일(2025-06-27) 종가 대비 −20% 하락 도달 → 익일 시가 진입 (딥바이)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2025-06-18",
-          "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -16261,13 +16203,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -16288,13 +16223,6 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -16319,13 +16247,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -16346,13 +16267,6 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -16377,13 +16291,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -16404,13 +16311,6 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -16435,13 +16335,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -16462,13 +16355,6 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -16493,13 +16379,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -16520,13 +16399,6 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -16551,13 +16423,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -16578,13 +16443,6 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -16609,13 +16467,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -16638,13 +16489,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -16665,13 +16509,6 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -16783,13 +16620,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -16846,13 +16676,6 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -16918,13 +16741,6 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -17007,13 +16823,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -17036,13 +16845,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -17063,13 +16865,6 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -17116,13 +16911,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -17145,13 +16933,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -17172,13 +16953,6 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -17261,13 +17035,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -17288,13 +17055,6 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -17374,13 +17134,6 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -17463,13 +17216,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -17492,13 +17238,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -17519,13 +17258,6 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -17615,13 +17347,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -17666,13 +17391,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -17693,13 +17411,6 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -17760,13 +17471,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -17823,13 +17527,6 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -17909,13 +17606,6 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -18041,13 +17731,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -18106,13 +17789,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -18133,13 +17809,6 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -18207,13 +17876,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -18258,13 +17920,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -18307,93 +17962,6 @@
           "school": "smic",
           "report_date": "2025-10-23",
           "source_file": "2025-10-23_equity-research-coreweave.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        }
-      ]
-    },
-    {
-      "ticker": "419530",
-      "market": "KR",
-      "name": "SAMG엔터",
-      "entry_date": "2025-12-18",
-      "exit_date": "2025-12-18",
-      "entry_price": 40400.0,
-      "exit_price": 37590.0,
-      "return_pct": -7.51,
-      "days": 0,
-      "exit_reason": "dip_목표가",
-      "entry_reason": "발간일(2025-06-27) 종가 대비 −20% 하락 도달 → 익일 시가 진입 (딥바이)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2025-06-18",
-          "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        }
-      ]
-    },
-    {
-      "ticker": "419530",
-      "market": "KR",
-      "name": "SAMG엔터",
-      "entry_date": "2025-12-22",
-      "exit_date": "2025-12-22",
-      "entry_price": 41400.0,
-      "exit_price": 37590.0,
-      "return_pct": -9.75,
-      "days": 0,
-      "exit_reason": "dip_목표가",
-      "entry_reason": "발간일(2025-06-27) 종가 대비 −20% 하락 도달 → 익일 시가 진입 (딥바이)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2025-06-18",
-          "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        }
-      ]
-    },
-    {
-      "ticker": "419530",
-      "market": "KR",
-      "name": "SAMG엔터",
-      "entry_date": "2025-12-24",
-      "exit_date": "2025-12-24",
-      "entry_price": 42850.0,
-      "exit_price": 37590.0,
-      "return_pct": -12.8,
-      "days": 0,
-      "exit_reason": "dip_목표가",
-      "entry_reason": "발간일(2025-06-27) 종가 대비 −20% 하락 도달 → 익일 시가 진입 (딥바이)",
-      "trigger_reports": [
-        {
-          "school": "star",
-          "report_date": "2025-06-18",
-          "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -20089,6 +19657,35 @@
           "source_file": "2026-05-18_코스텍시스 - 코스텍시스, 800V짜리 카타르시스.md",
           "target_price": null,
           "stated_upside_pct": null
+        }
+      ]
+    },
+    {
+      "ticker": "475960",
+      "market": "KR",
+      "name": "토모큐브",
+      "entry_date": "2026-05-21",
+      "exit_date": "2026-06-23",
+      "entry_price": 44400.0,
+      "exit_price": 35950.0,
+      "return_pct": -19.52,
+      "days": 33,
+      "exit_reason": "dip_atr3_stop",
+      "entry_reason": "발간일(2026-03-14) 종가 대비 −20% 하락 도달 → 익일 시가 진입 (딥바이)",
+      "trigger_reports": [
+        {
+          "school": "smic",
+          "report_date": "2025-05-11",
+          "source_file": "2025-05-11_equity-research-토모큐브.md",
+          "target_price": 64550.0,
+          "stated_upside_pct": 219.5545
+        },
+        {
+          "school": "star",
+          "report_date": "2026-03-14",
+          "source_file": "2026-03-14_STAR_토모큐브.md",
+          "target_price": 78200.0,
+          "stated_upside_pct": 43.2234
         }
       ]
     }

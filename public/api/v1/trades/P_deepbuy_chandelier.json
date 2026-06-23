@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-22T15:29:46+00:00",
+  "generated_at": "2026-06-23T12:49:57+00:00",
   "strategy_key": "P_deepbuy_chandelier",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -6743,13 +6743,6 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
-          "target_price": null,
-          "stated_upside_pct": null
         }
       ]
     },
@@ -7022,13 +7015,6 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
-          "target_price": null,
-          "stated_upside_pct": null
-        },
-        {
-          "school": "kuvic",
-          "report_date": "2025-06-27",
-          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -7746,6 +7732,42 @@
           "source_file": "2026-03-14_STAR_일동제약.md",
           "target_price": 59200.0,
           "stated_upside_pct": 81.317
+        }
+      ]
+    },
+    {
+      "ticker": "100090",
+      "market": "KR",
+      "name": "SK오션플랜트",
+      "entry_date": "2026-05-19",
+      "exit_date": "2026-06-23",
+      "entry_price": 17903.403,
+      "exit_price": 15420.0,
+      "return_pct": -14.39,
+      "days": 35,
+      "exit_reason": "p_chandelier_ATR4.25",
+      "entry_reason": "발간일(2026-04-16) 종가 대비 −20% 하락 도달 → 익일 시가 진입 (딥바이; 추가 −10% 시 1회 스케일인)",
+      "trigger_reports": [
+        {
+          "school": "ewha",
+          "report_date": "2024-10-05",
+          "source_file": "2024-10-04_[241004] SK오션플랜트(100090).md",
+          "target_price": 20090.0,
+          "stated_upside_pct": 34.0227
+        },
+        {
+          "school": "star",
+          "report_date": "2025-08-31",
+          "source_file": "2025-08-31_STAR_SK오션플랜트.md",
+          "target_price": 32100.0,
+          "stated_upside_pct": 53.9568
+        },
+        {
+          "school": "smic",
+          "report_date": "2026-04-16",
+          "source_file": "2026-04-16_equity-research-sk오션플랜트.md",
+          "target_price": 41600.0,
+          "stated_upside_pct": 73.6952
         }
       ]
     }
