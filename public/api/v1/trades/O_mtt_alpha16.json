@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-23T12:49:57+00:00",
+  "generated_at": "2026-06-24T12:46:49+00:00",
   "strategy_key": "O_mtt_alpha16",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -20011,6 +20011,42 @@
           "source_file": "undated_[BUY] HL만 도전해, 수출길에.md",
           "target_price": 47500.0,
           "stated_upside_pct": 30.674
+        }
+      ]
+    },
+    {
+      "ticker": "009150",
+      "market": "KR",
+      "name": "삼성전기",
+      "entry_date": "2026-06-19",
+      "exit_date": "2026-06-24",
+      "entry_price": 2280000.0,
+      "exit_price": 1980000.0,
+      "return_pct": -13.68,
+      "days": 5,
+      "exit_reason": "mtt_stop",
+      "entry_reason": "MTT 템플릿 통과 (close>50MA>150MA>200MA, 200MA 상승, 52주저점×1.9↑, 52주고점×0.95↑, RS 99≥80) → 익일 시가 진입",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2025-12-12",
+          "source_file": "2025-12-12_STAR_삼성전기.md",
+          "target_price": 309000.0,
+          "stated_upside_pct": 13.6029
+        },
+        {
+          "school": "ewha",
+          "report_date": "2025-04-04",
+          "source_file": "2025-04-04_[250404] 삼성전기(009150).md",
+          "target_price": 187900.0,
+          "stated_upside_pct": 55.033
+        },
+        {
+          "school": "yig",
+          "report_date": "2025-10-14",
+          "source_file": "2025-11-11_삼성전기 (009150, KS), 내가 삼전이오 (발간일 251014) YIG Research.md",
+          "target_price": 297800.0,
+          "stated_upside_pct": 50.2523
         }
       ]
     }

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-23T12:49:57+00:00",
+  "generated_at": "2026-06-24T12:46:49+00:00",
   "strategy_key": "P_deepbuy_chandelier",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -6743,6 +6743,13 @@
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
           "target_price": null,
           "stated_upside_pct": null
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2025-06-27",
+          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
+          "target_price": null,
+          "stated_upside_pct": null
         }
       ]
     },
@@ -7015,6 +7022,13 @@
           "school": "star",
           "report_date": "2025-06-18",
           "source_file": "2025-06-18_STAR_SAMG엔터.md",
+          "target_price": null,
+          "stated_upside_pct": null
+        },
+        {
+          "school": "kuvic",
+          "report_date": "2025-06-27",
+          "source_file": "2025-06-27_SAMG엔터 - 나만 믿어핑!.md",
           "target_price": null,
           "stated_upside_pct": null
         }
@@ -7768,6 +7782,86 @@
           "source_file": "2026-04-16_equity-research-sk오션플랜트.md",
           "target_price": 41600.0,
           "stated_upside_pct": 73.6952
+        }
+      ]
+    },
+    {
+      "ticker": "171090",
+      "market": "KR",
+      "name": "선익시스템",
+      "entry_date": "2026-05-21",
+      "exit_date": "2026-06-24",
+      "entry_price": 73737.8687,
+      "exit_price": 58800.0,
+      "return_pct": -20.74,
+      "days": 34,
+      "exit_reason": "p_chandelier_ATR4.25",
+      "entry_reason": "발간일(2026-05-02) 종가 대비 −20% 하락 도달 → 익일 시가 진입 (딥바이; 추가 −10% 시 1회 스케일인)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2026-05-02",
+          "source_file": "2026-05-02_STAR_선익시스템.md",
+          "target_price": 173900.0,
+          "stated_upside_pct": 69.6585
+        },
+        {
+          "school": "yig",
+          "report_date": "2026-02-06",
+          "source_file": "2026-04-04_선익시스템(171090, KQ), SuperSUNic ~ YIG Research.md",
+          "target_price": 131400.0,
+          "stated_upside_pct": 43.9211
+        }
+      ]
+    },
+    {
+      "ticker": "329180",
+      "market": "KR",
+      "name": "HD현대중공업",
+      "entry_date": "2026-04-01",
+      "exit_date": "2026-06-24",
+      "entry_price": 456500.0,
+      "exit_price": 595000.0,
+      "return_pct": 29.56,
+      "days": 84,
+      "exit_reason": "p_chandelier_ATR4.25",
+      "entry_reason": "발간일(2025-11-20) 종가 대비 −20% 하락 도달 → 익일 시가 진입 (딥바이; 추가 −10% 시 1회 스케일인)",
+      "trigger_reports": [
+        {
+          "school": "star",
+          "report_date": "2024-06-30",
+          "source_file": "2024-06-30_STAR_HD현대중공업.md",
+          "target_price": 173400.0,
+          "stated_upside_pct": 11.368
+        },
+        {
+          "school": "yig",
+          "report_date": "2025-11-20",
+          "source_file": "2026-01-26_HD현대중공업, 동주공제(同舟共濟) 미해군과 한 배를 타다 YIG Research.md",
+          "target_price": 780000.0,
+          "stated_upside_pct": 33.7907
+        }
+      ]
+    },
+    {
+      "ticker": "468530",
+      "market": "KR",
+      "name": "프로티나",
+      "entry_date": "2026-05-18",
+      "exit_date": "2026-06-24",
+      "entry_price": 47500.0,
+      "exit_price": 27600.0,
+      "return_pct": -42.24,
+      "days": 37,
+      "exit_reason": "p_chandelier_ATR4.25",
+      "entry_reason": "발간일(2025-11-17) 종가 대비 −20% 하락 도달 → 익일 시가 진입 (딥바이; 추가 −10% 시 1회 스케일인)",
+      "trigger_reports": [
+        {
+          "school": "kuvic",
+          "report_date": "2025-11-17",
+          "source_file": "2025-11-17_프로티나 - 빅파마에게 백‘프로’ 불‘티나’.md",
+          "target_price": 90700.0,
+          "stated_upside_pct": 39.5385
         }
       ]
     }

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-23T12:49:57+00:00",
+  "generated_at": "2026-06-24T12:46:49+00:00",
   "strategy_key": "Q_kangto_trend",
   "disclaimer": "These are backtested signals for research purposes only. They do NOT constitute investment advice. Past performance does not guarantee future results. All trading decisions and their consequences are solely your responsibility.",
   "disclaimer_ko": "이 데이터는 백테스트 시뮬레이션 결과이며 연구 목적으로만 제공됩니다. 투자 권유가 아닙니다. 과거 성과가 미래 수익을 보장하지 않습니다. 실매매로 인한 모든 손익의 책임은 전적으로 사용자에게 있습니다.",
@@ -23455,6 +23455,57 @@
           "source_file": "2025-12-12_STAR_유진테크.md",
           "target_price": 119500.0,
           "stated_upside_pct": 59.3333
+        }
+      ]
+    },
+    {
+      "ticker": "319660",
+      "market": "KR",
+      "name": "피에스케이",
+      "entry_date": "2026-06-08",
+      "exit_date": "2026-06-24",
+      "entry_price": 120600.0,
+      "exit_price": 166300.0,
+      "return_pct": 37.07,
+      "days": 16,
+      "exit_reason": "q_stop",
+      "entry_reason": "깡토 추세추종: RS 95 ≥ KOSPI RS + 60일 신고가 돌파 + 거래량 ≥ 1.5×20일평균 → 익일 시가 진입 (2유닛)",
+      "trigger_reports": [
+        {
+          "school": "yig",
+          "report_date": "2026-03-17",
+          "source_file": "2026-03-31_피에스케이(319660,KQ), Post Semiconductor King YIG Research.md",
+          "target_price": 87400.0,
+          "stated_upside_pct": 20.0549
+        },
+        {
+          "school": "star",
+          "report_date": "2026-05-03",
+          "source_file": "2026-05-03_STAR_피에스케이.md",
+          "target_price": 127800.0,
+          "stated_upside_pct": 44.0812
+        }
+      ]
+    },
+    {
+      "ticker": "052710",
+      "market": "KR",
+      "name": "아모텍",
+      "entry_date": "2026-06-19",
+      "exit_date": "2026-06-24",
+      "entry_price": 31900.0,
+      "exit_price": 24550.0,
+      "return_pct": -23.5,
+      "days": 5,
+      "exit_reason": "q_stop",
+      "entry_reason": "깡토 추세추종: RS 95 ≥ KOSPI RS + 60일 신고가 돌파 + 거래량 ≥ 1.5×20일평균 → 익일 시가 진입 (2유닛)",
+      "trigger_reports": [
+        {
+          "school": "yig",
+          "report_date": "2026-04-14",
+          "source_file": "2026-04-14_아모텍 (052710, KOSDAQ) - 아모도 모르게 광(光)텍 나기 시작 YIG Research.md",
+          "target_price": 54100.0,
+          "stated_upside_pct": 132.6882
         }
       ]
     }
